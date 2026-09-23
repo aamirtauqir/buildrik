@@ -1,0 +1,82 @@
+[
+ {
+  "id": "2430:21365",
+  "name": "[not-implemented] Media · local-only assets — the localOnly flag is real (shared/constants/media.ts:182) but the drawer renders NO per-asset marker; the only persistent signal in the product is the workspace count pill in the fullpage manager (LibraryManager.tsx:449-455 \"N not on the server\"). The drawer says it as a transient toast only (useUploadState.ts:128, useMediaState.ts:235/268). V2 UX-H-11 / QA-A-39.",
+  "why": "UX-H-11 / QA-A-39 — the board draws per-card badges and a strip with no producer, unmarked, so it reads as shipped UI."
+ },
+ {
+  "id": "147:55",
+  "name": "Media · drill-in · stock-browser — [not-implemented] insert-to-canvas: this 280 overlay can only SAVE into the library (StockBrowserOverlay.tsx:148 has onSave and no onInsert). The provider switch, the colour filter and the Icons/Fonts tabs exist only on the 720 StockSourceModal (MediaTab.tsx:232-255). V2 UX-H-04: one stock browser, the narrow one a SIZE of it, not a second surface missing the primary verb.",
+  "why": "UX-H-04 — two stock browsers with unequal powers and nothing telling the user the other exists."
+ },
+ {
+  "id": "1161:129",
+  "name": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured or erroring AI flips the label back and says nothing. No inline error, no disabled state. V2 UX-H-09 / UX-G-05.",
+  "why": "UX-H-09 — fullpage twin of the drawer's silent ✨ Generate."
+ },
+ {
+  "id": "1163:4815",
+  "name": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured or erroring AI flips the label back and says nothing. No inline error, no disabled state. V2 UX-H-09 / UX-G-05.",
+  "why": "UX-H-09 — sibling on 1163:4641."
+ },
+ {
+  "id": "1163:14122",
+  "name": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured or erroring AI flips the label back and says nothing. No inline error, no disabled state. V2 UX-H-09 / UX-G-05.",
+  "why": "UX-H-09 — sibling on 1163:13948."
+ },
+ {
+  "id": "146:11",
+  "name": "Alt text — ✨ Generate fails in total silence (AssetDetailOverlay.tsx:270-289, the catch body is a comment). See the asset-detail · alt-generate-failed state board. V2 UX-H-09.",
+  "why": "UX-H-09 — the drawer's own alt field."
+ },
+ {
+  "id": "1160:52",
+  "name": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). There is no soft-delete, no trash view and no restore; ConfirmDeleteModal warns that deletion breaks the elements that use the file. Row kept drawn on purpose — this is what the user sees.",
+  "why": "COVER-1-22 (board-level row inside 1776:8372); also the destination UX-H-33 says the drawer should point at."
+ },
+ {
+  "id": "1162:4693",
+  "name": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delete, no trash view, no restore.",
+  "why": "COVER-1-22 sibling."
+ },
+ {
+  "id": "1163:4717",
+  "name": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delete, no trash view, no restore.",
+  "why": "COVER-1-22 sibling."
+ },
+ {
+  "id": "1163:13771",
+  "name": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delete, no trash view, no restore.",
+  "why": "COVER-1-22 sibling."
+ },
+ {
+  "id": "1163:14024",
+  "name": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delete, no trash view, no restore.",
+  "why": "COVER-1-22 sibling."
+ },
+ {
+  "id": "1165:4713",
+  "name": "hotspot/state · ⬚ expand does NOT widen the drawer — it CLOSES it and opens the fullpage library (MediaTab.tsx:87-96, useMediaState.ts:48-53). V2 UX-H-13: name the destination.",
+  "why": "UX-H-13 — the expand brackets swap application surface without saying so."
+ },
+ {
+  "id": "1671:7213",
+  "name": "hotspot/gesture · right-click a card → per-asset menu (Rename / Copy URL / Copy alt text / Move to folder / Edit image / Replace across pages / Delete). V2 UX-H-01: the gesture must NOT silently enter bulk mode — MediaContextMenu is imported at MediaTab.tsx:16 and never rendered; SlimLauncher.tsx:469-476 maps onContextMenu to onEnterSelection instead.",
+  "why": "UX-H-01 — restore the menu on the gesture; bulk select gets its own ☑ Select control."
+ },
+ {
+  "id": "1720:17505",
+  "name": "hotspot/state · opens the 720 StockSourceModal — a DIFFERENT component from this 280 overlay (StockBrowserOverlay vs StockSourceModal). V2 UX-H-04 / W-A-33: the 280 results, searching and search-failed states are boarded separately.",
+  "why": "UX-H-03 / UX-H-04 — the drawer's only stock edge jumps to another component."
+ },
+ {
+  "id": "1738:8394",
+  "name": "Media · stock · search-failed — COULD NOT REACH THE PROVIDER. Distinct from no-results (1716:8497) and from not-configured. Today all three render identically: StockService.ts:80-83/:94-97 catch every non-abort error and return [], and server/services/stock.service.ts:55-56/:102-103 returns [] when the provider key is unset. V2 UX-H-02.",
+  "why": "UX-H-02 — the board must name which of the three failures it draws."
+ },
+ {
+  "id": "1163:14182",
+  "name": "upload-queue — [not-implemented] archive extraction: no zip/extract path exists in the editor, the upload route or the type model (UploadZone.tsx:15-24, app/api/asset-upload/route.ts:31-50, mediaTypes.ts:48 img|vid|ico|fnt). W-A-19.",
+  "why": "UX-H-06 adjacent — the queue draws a capability the product does not have."
+ }
+]

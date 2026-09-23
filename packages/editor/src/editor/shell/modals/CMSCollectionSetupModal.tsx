@@ -59,11 +59,18 @@ function makeId(): string {
    Done reads as done now (a tick on a filled dot, muted label); the pretence of
    a third style is gone rather than invented. */
 const STEP_BAR = "tw:flex tw:items-center tw:gap-2 tw:pb-4 tw:mb-4 tw:border-b tw:border-[var(--bk-gray-200)]";
-const STEP = "tw:flex tw:items-center tw:gap-1.5 tw:text-xs";
-const STEP_LABEL_ON = "tw:text-[var(--bk-accent-text)] tw:font-semibold";
+/* 1173:4816 — gap 6, and the step words are 11, not `text-xs`'s 12. */
+const STEP = "tw:flex tw:items-center tw:gap-1.5 tw:text-[11px]";
+/* 1173:4824 — the CURRENT step's word is --color/ink, not accent. The blue
+   already lives one element to its left, on the dot; saying it twice made the
+   step bar the loudest thing in a modal whose subject is a form. */
+const STEP_LABEL_ON = "tw:text-[var(--bk-ink)] tw:font-semibold";
 const STEP_LABEL_OFF = "tw:text-[var(--bk-ink-muted)]";
+/* 1173:4817/4822 draw the marker as a PILL — 8/2 insets at radius 999 — not as
+   a fixed 20px circle. `rounded-[999px]` rather than `rounded-full` because
+   that is the number the board states; at this size the two render alike. */
 const STEP_DOT =
-  "tw:size-5 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-bold tw:flex-none";
+  "tw:px-2 tw:py-0.5 tw:rounded-[999px] tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-bold tw:flex-none";
 const STEP_DOT_ON = "tw:bg-[var(--bk-accent)] tw:text-white";
 /* The board marks a finished step with success green, not another blue. */
 const STEP_DOT_DONE = "tw:bg-[var(--bk-success)] tw:text-white";
@@ -78,8 +85,8 @@ const BOARD_GROUP_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-semibold t
 const BOARD_FIELD_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)]";
 const BOARD_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-1.5";
-/* The board calls this colour ink-placeholder (#9ca3af); the generated token
-   set has no such name — ink-muted is #6B7280 and ink-disabled is #D1D5DB —
+/* The board calls this colour ink-placeholder (`var(--bk-gray-400)`); the generated token
+   set has no such name — ink-muted is `var(--bk-gray-500)` and ink-disabled is `var(--bk-gray-300)` —
    so this uses the utility that IS that colour rather than inventing a token.
    Caught by gate:token-resolution, which fails an undefined ref with no
    fallback: it would have rendered no colour at all. */
@@ -96,7 +103,18 @@ const ERROR_BANNER =
   "tw:mt-2.5 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 " +
   "tw:rounded-lg tw:text-[var(--bk-error)] tw:text-xs";
 const FOOTER = "tw:flex tw:justify-end tw:gap-2 tw:pt-4 tw:mt-2 tw:border-t tw:border-[var(--bk-gray-200)]";
+/* 1170:4743/4745 — both foot buttons are 12/7 at radius 6 with an 11px label,
+   where flowbite's `size="xs"` gives 6, radius 8 and 12px. Only a SAME-property
+   utility displaces a flowbite default, which is why these are `py-*`/`rounded-*`
+   and not `min-h-*`. */
+const FOOT_BTN = "tw:px-3 tw:py-[7px] tw:rounded-md tw:text-[11px] tw:font-normal";
+/** The quiet in-row action (the field row's remove). */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/* …and Cancel is a bordered WHITE button on the board, not a borderless ghost:
+   a modal's two exits should read as two controls. */
+const FOOT_CANCEL =
+  "tw:border tw:border-solid tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] " +
+  "tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-100)] tw:enabled:hover:text-[var(--bk-ink)]";
 
 // =============================================================================
 // COMPONENT
@@ -227,24 +245,28 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   }, [canProceed, composer, name, description, fields, onClose, genPages, pageSlug, pageTemplate, pageSeoTitle, pageSeoDesc]);
 
   const footer = (
-    <div className={FOOTER}>
-      <Button color="light" size="xs" onClick={onClose} disabled={creating} className={GHOST}>
+    <div className={FOOTER} data-testid="cms-setup-foot">
+      <Button color="light" size="xs" onClick={onClose} disabled={creating} className={`${FOOT_BTN} ${FOOT_CANCEL}`} data-testid="cms-setup-cancel">
         Cancel
       </Button>
       {step === 1 ? (
         <Button
           size="xs"
+          className={FOOT_BTN}
           disabled={!canProceed}
           onClick={() => setStep(2)}
+          data-testid="cms-setup-next"
         >
           Next: Add Fields
         </Button>
       ) : (
         <Button
           size="xs"
+          className={FOOT_BTN}
           disabled={!canProceed || creating}
           onClick={handleCreate}
           aria-busy={creating || undefined}
+          data-testid="cms-setup-create"
         >
           Create Collection
         </Button>
@@ -265,9 +287,9 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         fields.some((f) => f.name !== "title")
       }
     >
-      <ModalContent size="fields">
+      <ModalContent size="fields" data-testid="cms-setup-modal">
         {/* Board 1170:4713's own title is the step, not the wizard. */}
-        <ModalTitle>{step === 2 && name.trim() ? `Fields for ${name.trim()}` : "Create Collection"}</ModalTitle>
+        <ModalTitle data-testid="cms-setup-title">{step === 2 && name.trim() ? `Fields for ${name.trim()}` : "Create Collection"}</ModalTitle>
         <ModalClose aria-label="Close modal">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -275,22 +297,22 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </ModalClose>
         <ModalBody>
     {/* Step indicator */}
-    <div className={STEP_BAR}>
-      <div className={STEP}>
-        <div className={`${STEP_DOT} ${step > 1 ? STEP_DOT_DONE : STEP_DOT_ON}`} aria-hidden="true">
+    <div className={STEP_BAR} data-testid="cms-setup-steps">
+      <div className={STEP} data-testid="cms-setup-step1">
+        <div className={`${STEP_DOT} ${step > 1 ? STEP_DOT_DONE : STEP_DOT_ON}`} aria-hidden="true" data-testid="cms-setup-step1-dot">
           {step > 1 ? <Check size={11} /> : "1"}
         </div>
-        <span className={step === 1 ? STEP_LABEL_ON : STEP_LABEL_OFF}>Name &amp; Type</span>
+        <span className={step === 1 ? STEP_LABEL_ON : STEP_LABEL_OFF} data-testid="cms-setup-step1-label">Name &amp; Type</span>
       </div>
       <div className={STEP_DIVIDER} />
-      <div className={STEP}>
-        <div className={`${STEP_DOT} ${step === 2 ? STEP_DOT_ON : STEP_DOT_OFF}`} aria-hidden="true">
+      <div className={STEP} data-testid="cms-setup-step2">
+        <div className={`${STEP_DOT} ${step === 2 ? STEP_DOT_ON : STEP_DOT_OFF}`} aria-hidden="true" data-testid="cms-setup-step2-dot">
           2
         </div>
-        <span className={step === 2 ? STEP_LABEL_ON : STEP_LABEL_OFF}>Fields</span>
+        <span className={step === 2 ? STEP_LABEL_ON : STEP_LABEL_OFF} data-testid="cms-setup-step2-label">Fields</span>
       </div>
     </div>
-    <p className={`${BOARD_CAPTION} tw:-mt-2 tw:mb-4`}>
+    <p className={`${BOARD_CAPTION} tw:-mt-2 tw:mb-4`} data-testid="cms-setup-caption">
       A collection turns rows of data into pages — one page per row.
     </p>
     {step === 1 && (
@@ -302,6 +324,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </label>
           <TextInput
             className="tw:w-full"
+            data-testid="cms-setup-name"
             type="text"
             placeholder="Blog Posts"
             value={name}
@@ -358,8 +381,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       <div>
         {/* The board keeps the name editable on step 2 — you learn what the
             fields are FOR while you are naming them. */}
-        <div className="tw:mb-3 tw:flex tw:flex-col tw:gap-1">
-          <label className={BOARD_FIELD_LABEL} htmlFor="cms-collection-name-2">NAME</label>
+        <div className="tw:mb-3 tw:flex tw:flex-col tw:gap-1" data-testid="cms-setup-name-group">
+          <label className={BOARD_FIELD_LABEL} htmlFor="cms-collection-name-2" data-testid="cms-setup-name-label">NAME</label>
           <TextInput
             id="cms-collection-name-2"
             className="tw:w-full"
@@ -372,9 +395,13 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         <span className={`${BOARD_GROUP_LABEL} tw:mb-1.5 tw:block`}>FIELDS</span>
 
         {/* Field rows */}
-        <div className="tw:flex tw:max-h-60 tw:flex-col tw:gap-1.5 tw:overflow-y-auto">
-          {fields.map((field) => (
-            <div key={field.id} className={BOARD_ROW}>
+        <div className="tw:flex tw:max-h-60 tw:flex-col tw:gap-1.5 tw:overflow-y-auto" data-testid="cms-setup-fields">
+          {/* Indexed rather than keyed by `field.id`: those ids come from
+              `makeId()` and change every mount, and an id that changes per run
+              is not an anchor. The list is hand-ordered, so the index IS the
+              row's place in it. */}
+          {fields.map((field, i) => (
+            <div key={field.id} className={BOARD_ROW} data-testid={`cms-setup-fieldrow-${i}`}>
               <span className={BOARD_HANDLE} aria-hidden="true">⠿</span>
               <TextInput
                 className="tw:flex-1"
@@ -428,7 +455,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 
         {/* E7 — dynamic-page binding. Board 1173:4825 draws it as a tinted
             block with a real switch, not a button that toggles its own label. */}
-        <div className={`${BOARD_BLOCK} tw:mt-4`}>
+        <div className={`${BOARD_BLOCK} tw:mt-4`} data-testid="cms-setup-pages-block">
           <ToggleSwitch
             checked={genPages}
             label="Generate a page per entry"

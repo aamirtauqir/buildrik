@@ -1,0 +1,8 @@
+[
+ {
+  "id": "2914:12831",
+  "key": "STEP_WORD (PublishTab.tsx:862)",
+  "why": "verified 2026-09-07 against HEAD; the board is full so this belongs on its caption",
+  "add": " Two more mismatches on the same vocabulary, verified 2026-09-07: STEP_WORD (PublishTab.tsx:862) maps pending|running|done|failed and has no key for either status the worker actually sends mid-run, so the in-flight step renders with no word and a step the worker deliberately marked skipped (images, Lighthouse) renders blank too. No editor file references “active” at all. Durable fix is one shared status union imported by worker and tab."
+ }
+]

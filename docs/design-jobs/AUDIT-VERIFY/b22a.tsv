@@ -1,0 +1,20 @@
+N	2855:12407	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	FRAME	2480,54852,900,480	true	NONE	18	true
+C	2855:12407	texts=17
+T	2875:12448	2496,55282,430,32	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector 
+T	2875:12447	2496,55264,430,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	One viewport control
+T	2875:12446	2950,55282,414,48	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Tab, sub-tab and five overlay toggles persist; device and zoom are plain state and reset t
+T	2875:12445	2950,55264,414,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	What the session remembers
+T	2875:12444	2950,55190,414,48	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	The selection readout is read-only (StudioFooter.tsx:210-224). Clicking it reveals the ele
+T	2875:12443	2950,55172,414,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	The status footer is a door
+T	2875:12442	2950,55050,414,80	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	useInspectorMode is read and persisted and the component that sets it renders nowhere — th
+T	2875:12441	2950,55032,414,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Two built surfaces with no door
+T	2875:12440	2950,54930,414,80	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Six overlay chords bind globally and plain ⌘R toggles Rulers (CanvasFooterToolbar.tsx:271)
+T	2875:12439	2950,54912,414,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	⌘R is not ours
+T	2875:12438	2496,55178,430,80	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	onDeviceChange sets the device and never touches zoom (AquibraStudio.tsx:545-548), so Wide
+T	2875:12437	2496,55160,430,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Choosing a breakpoint shows that breakpoint
+T	2875:12436	2496,55050,430,80	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	The footer flyout adds a fixed 10 (Canvas.tsx:408-414); the floating bar walks the presets
+T	2875:12435	2496,55032,430,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	One zoom owner · one step · one clamp
+T	2875:12434	2496,54930,430,80	11	Regular	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Tab is captured to cycle elements and preventDefault is called (Canvas.tsx:660, useCanvasK
+T	2875:12433	2496,54912,430,16	12	Medium	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Tab cannot leave the canvas
+T	2875:12431	2496,54868,868,20	14	Semi Bold	true	HEIGHT	Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-2	Canvas · keyboard, zoom and viewport — one owner each
+END	done=2855:12407	stopped=false	bytes=3643

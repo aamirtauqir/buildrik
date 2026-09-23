@@ -1,0 +1,266 @@
+{
+  "surface": "media-import-url",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1205:4804",
+  "boardName": "media-import-url",
+  "figmaHash": "962ca37ca994f46750fbde6ba2c272e86349866d3456d7a9ef9e6cd5e520b49d",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:29:37.433Z",
+  "copy": [
+    "Import from URL",
+    "Paste a link to an image or video and it lands in this library.",
+    "MEDIA URL",
+    "https://cdn.example.com/hero-dark.jpg",
+    "Cancel",
+    "Import"
+  ],
+  "targets": [
+    {
+      "nodeId": "1205:4804",
+      "name": "Media · modal · import-url",
+      "className": "bg-white border border-[#e5e7eb] border-solid content-stretch flex flex-col gap-[12px] items-start overflow-clip px-[16px] py-[14px] relative rounded-[12px] size-full",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "12px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "14px"
+        },
+        "padding-bottom": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4805",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#111827] text-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4806",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[#4b5563] text-[11px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4807",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#6b7280] text-[11px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4808",
+      "name": "input",
+      "className": "bg-[#f9fafb] border border-[#1a56db] border-solid content-stretch flex items-start overflow-clip px-[10px] py-[8px] relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4809",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[#111827] text-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4810",
+      "name": "foot",
+      "className": "bg-white content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4811",
+      "name": "spacer",
+      "className": "flex-[1_0_0] h-[6px] min-w-px relative",
+      "props": {
+        "height": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4812",
+      "name": "btn/cancel",
+      "className": "bg-white border border-[#e5e7eb] border-solid content-stretch cursor-pointer flex items-start overflow-clip px-[12px] py-[8px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4813",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[#4b5563] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4814",
+      "name": "btn/import",
+      "className": "bg-[#1a56db] content-stretch flex items-start overflow-clip px-[12px] py-[8px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1205:4815",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-white whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7221",
+      "name": "hotspot/state · Media · import-url · invalid",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[149px] opacity-0 top-[138px] w-[130px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "130px"
+        }
+      }
+    }
+  ]
+}

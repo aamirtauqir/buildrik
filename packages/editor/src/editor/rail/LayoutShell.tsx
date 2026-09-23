@@ -138,6 +138,10 @@ const Inspector: React.FC<InspectorSlotProps> = ({
 }) => (
   <aside
     data-tour-target="properties-panel"
+    /* Conformance anchor. Board 52:2 (the assembled shell) owns this column's
+       width and edge; `data-tour-target` is read by the onboarding tour, so it
+       is not free to double as one. */
+    data-testid="layout-shell-inspector"
     className={`layout-shell__inspector ${open ? "layout-shell__inspector--open" : ""} ${className}`}
     style={style}
     role="complementary"
@@ -298,7 +302,9 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
   } as React.CSSProperties;
 
   return (
-    <div className={shellClass} style={shellStyle}>
+    /* `layout-shell` is the conformance anchor for board 52:2's own frame —
+       this is the element that paints `--bk-bg-app` behind the whole editor. */
+    <div className={shellClass} style={shellStyle} data-testid="layout-shell">
       <a href="#layout-canvas" className="bd-skip-link">
         Skip to Canvas
       </a>

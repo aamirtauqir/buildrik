@@ -177,7 +177,7 @@ describe("VersionHistoryPanel — empty + availability states", () => {
     mocks.state.versions = [];
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
-    expect(screen.getByText("No saved versions yet")).toBeTruthy();
+    expect(screen.getByText("No saved versions yet.")).toBeTruthy();
   });
 
   it("renders an unavailable-state copy when isAvailable=false", async () => {

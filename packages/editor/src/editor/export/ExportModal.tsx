@@ -30,6 +30,25 @@ export interface ExportModalProps {
 
 type ExportTab = "preview" | "code" | "options";
 
+/* Board 1172:4838/1172:4834/1172:4836 — the foot is a gap-8 right-aligned row
+   of 11px buttons inset 12/7 on a 6 radius. flowbite's own xs is 40 tall with
+   its own padding and a gray-300 edge, and only same-property `tw:` utilities
+   beat that through twMerge (CLAUDE.md §Chrome). */
+const FOOT = "tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-2";
+const FOOT_BTN =
+  "tw:h-auto tw:min-h-0 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-normal";
+const FOOT_SECONDARY =
+  `${FOOT_BTN} tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink-soft)]`;
+/* The disabled primary keeps its own fill at 60% rather than taking flowbite's
+   gray-100/gray-500 swap — which is what shipped here before (an inline
+   `background: var(--bk-accent)` with `opacity: 0.6`) and what board 1172:4836
+   draws. flowbite expresses its disabled look through `disabled:` variants, so
+   only `disabled:` variants of the same properties beat it. */
+const FOOT_PRIMARY =
+  `${FOOT_BTN} tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white ` +
+  "tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-white tw:disabled:opacity-60 " +
+  "tw:disabled:cursor-not-allowed";
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -204,7 +223,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg">
+      {/* Board 1172:4825 draws this card at 560 — `form`, not `lg` (720). At
+          720 the five format pills, the three tabs and a 300-tall preview sat
+          in a dialog half again as wide as the board's, which is the
+          "oversized" half of boards.json's drift note. */}
+      <ModalContent size="form" data-testid="export-modal">
         <ModalTitle>Export site as {formatNoun[config.format] ?? config.format.toUpperCase()}</ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -283,84 +306,61 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           </div>
         )}
 
-        {/* Primary export button */}
-        <Button
-          onClick={
-            config.format === "zip"
-              ? handleDownloadZip
-              : config.format === "react"
-                ? handleDownloadReact
-                : handleDownloadHTML
-          }
-          disabled={
-            (config.format === "react" ? !result?.files?.length : !result?.html) ||
-            loading ||
-            zipLoading
-          }
-          style={{
-            width: "100%",
-            height: 44,
-            marginTop: 16,
-            background: "var(--bk-accent)",
-            color: "var(--bk-accent-on)",
-            border: "none",
-            borderRadius: "var(--bk-radius-lg)",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor:
-              (config.format === "react" ? !result?.files?.length : !result?.html) ||
-              loading ||
-              zipLoading
-                ? "not-allowed"
-                : "pointer",
-            opacity:
-              (config.format === "react" ? !result?.files?.length : !result?.html) ||
-              loading ||
-              zipLoading
-                ? 0.6
-                : 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            transition: "opacity 0.15s",
-          }}
-          aria-label={exportLabel}
-        >
-          {(loading || zipLoading) ? (
-            <>
-              <Spinner size="sm" />
-              Exporting…
-            </>
-          ) : (
-            exportLabel
-          )}
-        </Button>
-
-        {/* Secondary actions row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 12,
-          }}
-        >
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+        {/* Board 1172:4838 — ONE right-aligned foot, gap 8: Cancel, then the
+            primary. What this replaces was a full-width 44px accent bar and a
+            second row under it, and that second row carried a duplicate: with
+            the default `cssStyle: "embedded"`, "Download All" writes the same
+            single file the primary does, under a different name. It survives
+            only where it does something the primary cannot — an external
+            stylesheet alongside the page — which is also the only state the
+            board's foot has room for. */}
+        <div className={FOOT} data-testid="export-foot">
+          <Button
+            color="light"
+            size="xs"
+            className={FOOT_SECONDARY}
+            data-testid="export-cancel"
+            onClick={onClose}
+          >
             Cancel
           </Button>
-          <div style={{ display: "flex", gap: 8 }}>
-            {config.format !== "react" && config.cssStyle === "external" && (
-              <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
+          {config.format !== "react" && config.cssStyle === "external" && (
+            <>
+              <Button color="light" size="xs" className={FOOT_SECONDARY} onClick={handleDownloadCSS} disabled={!result?.css}>
                 Download CSS
               </Button>
-            )}
-            {config.format !== "react" && (
-              <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
+              <Button color="light" size="xs" className={FOOT_SECONDARY} onClick={handleDownloadAll} disabled={!result?.html}>
                 Download All
               </Button>
+            </>
+          )}
+          <Button
+            size="xs"
+            className={FOOT_PRIMARY}
+            data-testid="export-primary"
+            onClick={
+              config.format === "zip"
+                ? handleDownloadZip
+                : config.format === "react"
+                  ? handleDownloadReact
+                  : handleDownloadHTML
+            }
+            disabled={
+              (config.format === "react" ? !result?.files?.length : !result?.html) ||
+              loading ||
+              zipLoading
+            }
+            aria-label={exportLabel}
+          >
+            {(loading || zipLoading) ? (
+              <>
+                <Spinner size="sm" />
+                Exporting…
+              </>
+            ) : (
+              exportLabel
             )}
-          </div>
+          </Button>
         </div>
         </ModalBody>
       </ModalContent>

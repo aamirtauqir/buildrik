@@ -361,6 +361,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                   key={entry.kindId}
                   color="light"
                   data-kind-id={entry.kindId}
+                  data-testid={`brand-kind-${entry.kindId}`}
                   data-kind-count={count}
                   onClick={() => onOpenKind?.(entry.kindId)}
                   /* Board 152:52 draws these rows at 32, which is also
@@ -370,7 +371,10 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                      neither. */
                   className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
                 >
-                  <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-[var(--bk-ink)]">
+                  <span
+                    data-testid={`brand-kind-label-${entry.kindId}`}
+                    className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  >
                     {entry.title.toLowerCase()}
                     {dirty && (
                       <span
@@ -380,8 +384,20 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     )}
                   </span>
                   <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                    <span className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">{count}</span>
-                    <span aria-hidden="true" className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">›</span>
+                    {/* 11/16 for the count, 13/20 for the chevron, both in
+                        `--color/ink-muted` — 306:2055 / 306:2056 and their five
+                        siblings. Both leaned on flowbite's `text-sm`, whose 20px
+                        line is only right at 14px, and the chevron shipped a
+                        size small and a shade soft. */}
+                    <span
+                      data-testid={`brand-kind-count-${entry.kindId}`}
+                      className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]"
+                    >{count}</span>
+                    <span
+                      aria-hidden="true"
+                      data-testid={`brand-kind-chevron-${entry.kindId}`}
+                      className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+                    >›</span>
                   </span>
                 </Button>
               );
@@ -390,11 +406,19 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
             <Button
               color="light"
               data-kind-id="more-kinds"
+              data-testid="brand-more-kinds"
               aria-expanded={showAllKinds}
               onClick={() => setShowAllKinds((v) => !v)}
               className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
             >
-              <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
+              {/* 11px Inter Medium in accent — 1748:8392. It shipped as a
+                  13px `--bk-ink-muted` label, i.e. dressed as one more kind row
+                  but greyer, so the one row that is a DISCLOSURE looked like a
+                  disabled destination. The board draws it as a link. */}
+              <span
+                data-testid="brand-more-kinds-label"
+                className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)]"
+              >
                 {showAllKinds ? "Fewer token kinds" : "More token kinds"}
               </span>
               <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">

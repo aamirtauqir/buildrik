@@ -181,34 +181,34 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
       placement="bottom-end"
       label="Site menu"
       trigger={
-        <IconButton label="Site menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <IconButton label="Site menu" data-testid="site-menu-trigger" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           <SiteMenuIcon />
         </IconButton>
       }
     >
-      <Menu label="Site menu">
+      <Menu label="Site menu" data-testid="site-menu">
         {hasSite && (
           <MenuGroup>
             <MenuLabel>Site</MenuLabel>
             {onOpenSiteSettings ? (
-              <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)}>
+              <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
                 Site settings
               </MenuItem>
             ) : null}
             {onOpenHistory ? (
-              <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)}>
+              <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)} data-testid="site-menu-version-history">
                 Version history
               </MenuItem>
             ) : null}
             {onOpenReview ? <MenuItem onClick={run(onOpenReview)}>Review</MenuItem> : null}
             {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
             {onOpenPublishHistory ? (
-              <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
+              <MenuItem onClick={run(onOpenPublishHistory)} data-testid="site-menu-publish-history">Publish history</MenuItem>
             ) : null}
             {onUnpublish && publishedUrl ? (
               <MenuItem onClick={run(onUnpublish)}>Unpublish site…</MenuItem>
             ) : null}
-            {onExportCode ? <MenuItem onClick={run(onExportCode)}>Export code</MenuItem> : null}
+            {onExportCode ? <MenuItem onClick={run(onExportCode)} data-testid="site-menu-export-code">Export code</MenuItem> : null}
           </MenuGroup>
         )}
 
@@ -235,9 +235,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 chip (W · D · T · M) on the canvas toolbar. Showing a shortcut the
                 product cannot honour is worse than showing none, so it is omitted
                 until Figma resolves the collision. */}
-            {onOpenTemplates ? <MenuItem onClick={run(onOpenTemplates)}>Templates</MenuItem> : null}
+            {onOpenTemplates ? <MenuItem onClick={run(onOpenTemplates)} data-testid="site-menu-templates">Templates</MenuItem> : null}
             {onOpenComponents ? (
-              <MenuItem kbd="⇧A" onClick={run(onOpenComponents)}>
+              <MenuItem kbd="⇧A" onClick={run(onOpenComponents)} data-testid="site-menu-components">
                 Components
               </MenuItem>
             ) : null}
@@ -300,7 +300,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               <MenuItem onClick={run(onReplayOnboarding)}>Getting started</MenuItem>
             ) : null}
             {onOpenShortcuts ? (
-              <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)}>
+              <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)} data-testid="site-menu-shortcuts">
                 Keyboard shortcuts
               </MenuItem>
             ) : null}

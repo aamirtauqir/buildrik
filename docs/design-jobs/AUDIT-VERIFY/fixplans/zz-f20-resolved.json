@@ -1,0 +1,10 @@
+{
+ "slug": "zz-f20-resolved",
+ "page": "1:3",
+ "note": "F20's named read landed. The status half is closed; the label half is now a measured space problem rather than an unknown.",
+ "rows": [
+  {"op": "advisory", "hold": true, "id": "1751:8403",
+   "holdWhy": "F20 · READ LANDED. The dirty-dot is 1751:8403 — an 8x8 FRAME at abs (340,44376), fill #8E4B10, layoutPositioning ABSOLUTE, sitting inside 'List row · Tokens' 1334:7176 (100,44366,280,52).\n\nTHE STATUS HALF IS CLOSED. f-missed#58 landed 'Tokens not saved' over the footer's 'Brand is up to date' (read back OK). The audit's complaint was that an orange marker sat beside Tokens while the footer claimed everything was current; those two now agree, and the marker's meaning is stated in words on the same panel.\n\nTHE LABEL HALF IS A SPACE PROBLEM, NOT AN UNKNOWN. The audit also asked for the marker itself to carry a defined label. The row is 280 wide and already carries a title, a subtitle, a right-aligned count and a chevron, with the dot at x340-348 and the row's right edge at 380 — 32px, which is where the chevron lives. There is no free run of pixels for a word. Options, all design calls rather than repairs: (a) accept the footer sentence as the label, which is what the landed row does; (b) move the count and put a short state word in its place; (c) use a tooltip, which this board has no convention for. Recorded rather than guessed.",
+   "why": "F20 — status half closed by f-missed#58; label half is a measured space decision"}
+ ]
+}

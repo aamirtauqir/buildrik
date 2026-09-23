@@ -36,7 +36,8 @@ Everything below is LIVE as of 2026-08-03 and covered by 78 tests in
 |---|---|
 | `check-hooks.mjs` | Is the installed git hook the one this repo ships? Advisory, always exits 0 — see the header for why it cannot be enforcement. Runs first in `verify:ds`. |
 | `check-token-resolution.mjs` | Every `var(--token)` in `src/`+`demo/` must resolve to a definition (or carry a fallback → WARN). |
-| `check-anchors.mjs` | Every `testId` a recipe names must exist in `src/`. ~0.3s, no browser, catches a deleted anchor before a measurement cycle would. |
+| `check-anchors.mjs` | Every `testId` a recipe names must exist in `src/`. No browser; catches a deleted anchor before a measurement cycle would. **~14s** as of 2026-09-08 — this row said ~0.3s, which was true at ~40 anchors and is not at 667 across 134 recipes; the cost is anchors x files and grows with coverage, not with any one change. It resolves a derived id through ONE level of indirection (`data-testid={sub("label")}` where `sub` builds a template), because an attribute-only regex reported all 66 of `ListRow`'s derived anchors as missing while every one of them renders. |
+| `check-board-copy.mjs` | Board copy vs rendered copy — the structural blind spot, approached through text. ADVISORY, always exits 0: boards carry sample data, so a lead is a shape to look at, not a verdict. The "extras" direction is suppressed unless every target carries a spec, because a partly-joined recipe cannot tell drift from uncovered scope. |
 | `check-spec-age.mjs` | How long since each spec was extracted. `--mode=prepush` FAILS, `--mode=ci` WARNS. The mode is never inferred. |
 | `lib.mjs` | Shared vocabulary: recipe schema, `figmaTokenToBk`, colour/length normalisation, the tolerance table, `EXTRACTOR_VERSION`. Derived from `scripts/tokens/figma-tokens.json`, never hardcoded. |
 | `extract.mjs` | `raw-figma/*.json` → `specs/*.json`. Pure file-to-file, never touches Figma. |
@@ -118,16 +119,52 @@ any point.
 
 ## Why known defects are baselined rather than fixed-or-ignored
 
-Three real WCAG AA failures predate this harness (gray-500 on gray-100 at 4.39
+Three real WCAG AA failures predated this harness (gray-500 on gray-100 at 4.39
 against a 4.5 floor, on the add-page and zoom controls). Wiring conformance into
 CI with a hard zero would have landed the build red on day one, and a gate that
 is red on arrival gets disabled rather than fixed.
+
+**Those particular three are now fixed** — `shell-default` measured 0 text and 0
+icon failures on a whole-`body` sweep on 2026-09-08 and its baseline was
+tightened from 3 to 0, which is the ratchet working as intended. The policy
+below stands; the example is now history. Note that the pair itself is not
+history: gray-500 on gray-100 is `--bk-ink-muted` on `--bk-bg-subtle`, still
+4.39, and still 15 live instances on other surfaces — see
+`docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md`. That token passes on
+white and fails on every tint the system ships, which is a token-value defect
+the boards themselves specify, not something a call site can fix.
 
 So they are baselined, the same way `check-styling-ratchet.mjs` baselines
 `inline_literal` / `inline_hoisted` / `css_lines`. The defects print on every
 run, cannot grow, and lowering the count prompts you to lower the baseline. A
 MISSING target is never baselined — that is an instrument failure, not a product
 defect, and it exits 3.
+
+## Two ways a green verdict used to mean nothing
+
+Both were found on 2026-09-08, both by agents using the harness rather than by
+reading it, and both are now refusals rather than silences.
+
+**An empty contrast sweep.** `contrastScope` is a CSS selector, and a selector
+that resolves to a subtree containing none of the text under test reports
+`0 text-contrast failures` — indistinguishable from a clean screen. Five
+recipes were certifying modals nobody had measured, because `ModalRoot`
+PORTALS to the overlay root and a probe-, scrim- or panel-scoped selector
+contains no part of the dialog. The moment one was corrected it found a
+`--bk-warning` cell at 3.51:1; correcting the rest found a **1.34:1** — the
+canvas breadcrumb, effectively invisible text, on four more surfaces.
+`measure.mjs` now exits 3 and names the likely cause when a sweep sees nothing.
+
+**A measurement that never happened.** `diff.mjs` reads
+`measured/<surface>.json` and had no way to know the run that should have
+written it aborted. So while `modal-success-then-close` timed out on a step and
+read nothing at all, `diff` kept reporting `11 compared · 11 pass · 0 fail`
+from the previous run's file. `measure.mjs` now stamps the file on abort and
+`diff.mjs` exits 2 (STALE) rather than reporting an older build as today's
+verdict.
+
+The shape is the same one this directory keeps rediscovering: **absence reads
+as success unless something refuses it.**
 
 ## What this harness cannot see
 
@@ -137,9 +174,38 @@ Stated so nobody mistakes a green run for more than it is:
   targets. It knows nothing about their children, so a missing or extra child
   element is invisible to it. The shipped topbar renders three controls board
   681:26 does not contain; the screenshot caught that, the numbers could not.
+  `check-board-copy.mjs` now reaches the part of this that IS comparable — a
+  label is a label on both sides — and found real drift on surfaces already
+  passing their property diff: `export-html-modal` is 73/73 green while the
+  board says "Export site as HTML" and the product says "Export site as", and
+  while the board's body names which page becomes `index.html` and the
+  product's does not. Full structural comparison remains out of reach: Figma
+  nests frames the DOM has no obligation to mirror, so a child-count diff would
+  false-fail on every legitimate wrapper.
 - **Board freshness, continuously.** CI has no Figma access. `check-spec-age` is
   a calendar alarm, not drift detection.
 - **Hook installation.** `.git/hooks` is untracked and `--no-verify` exists.
 - **Token identity in the code.** ~6% of shipped chrome classes carry a
   `var(--bk-*)`; the rest are plain Tailwind. The token verdict is advisory and
   reports UNKNOWN outside that 6%.
+
+- **Opacity.** `lib.mjs` normalises a colour by dropping its alpha channel
+  (`:116`), treating only a literal alpha of `0` as distinct (`:109`). So
+  `rgba(17, 24, 39, 0.4)` and `#111827` compare EQUAL. This is deliberate
+  rather than accidental: Figma cannot export a layer opacity, so every scrim
+  on every board is baked to its opaque base colour, and requiring alpha to
+  match would fail all of them against a correct implementation. The cost is
+  that a scrim which lost its transparency entirely would still pass. If that
+  matters for a surface, assert it in a test, not here.
+
+- **Whether a fill is inherited or declared** — and this one has a rule.
+  `measure.mjs`'s `bgFor` reports an element's OWN background when it declares
+  one (translucent included), and composites up through its ancestors only when
+  the element is fully transparent. Chrome mostly does not restate an inherited
+  fill: a modal foot inside a white card is left transparent and simply looks
+  white, so comparing the declared `rgba(0, 0, 0, 0)` against the board's
+  `#ffffff` called a pixel-identical surface a failure. Compositing
+  unconditionally would have been the opposite error — it turned a scrim's
+  deliberate `rgba(17, 24, 39, 0.4)` into `#979da5` and silently redefined the
+  target. The declared value is kept alongside as `background-color-declared`
+  for evidence; no spec names it, so nothing compares it.

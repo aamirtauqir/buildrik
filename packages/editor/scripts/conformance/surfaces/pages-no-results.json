@@ -1,0 +1,170 @@
+{
+  "surface": "pages-no-results",
+  "board": "Pages \u00b7 no-results (Figma 782:4212)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "pages-search-box"
+    },
+    {
+      "action": "click",
+      "testId": "pages-search-box"
+    },
+    {
+      "action": "press",
+      "key": "c"
+    },
+    {
+      "action": "press",
+      "key": "h"
+    },
+    {
+      "action": "press",
+      "key": "e"
+    },
+    {
+      "action": "press",
+      "key": "c"
+    },
+    {
+      "action": "press",
+      "key": "k"
+    },
+    {
+      "action": "press",
+      "key": "o"
+    },
+    {
+      "action": "press",
+      "key": "u"
+    },
+    {
+      "action": "press",
+      "key": "t"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "waitFor",
+      "testId": "pages-no-results"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "pages-no-results",
+      "nodeId": "782:4213"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "pages-no-results",
+      "nodeId": "I782:4213;16:7"
+    },
+    {
+      "name": "no-results-block",
+      "testId": "pages-no-results",
+      "spec": "pages-no-results",
+      "nodeId": "782:4257"
+    },
+    {
+      "name": "no-results-text",
+      "testId": "pages-no-results-text",
+      "spec": "pages-no-results",
+      "nodeId": "782:4258"
+    },
+    {
+      "name": "clear-search",
+      "testId": "pages-clear-search",
+      "spec": "pages-no-results",
+      "nodeId": "782:4259"
+    },
+    {
+      "name": "add-page",
+      "testId": "pages-add-page",
+      "spec": "pages-no-results",
+      "nodeId": "782:4246"
+    },
+    {
+      "name": "footer",
+      "testId": "pages-footer"
+    },
+    {
+      "name": "search-band",
+      "testId": "pages-search-band"
+    },
+    {
+      "name": "search-box",
+      "testId": "pages-search-box"
+    }
+  ],
+  "_note": [
+    "PROBE, not the running editor: `search` is PageList's OWN state, so the",
+    "recipe types the board's own query \u2014 c-h-e-c-k-o-u-t \u2014 into the shipped",
+    "field. No page matches, `visible.length === 0 && search` is true",
+    "(PageList.tsx:264), and the block renders. Case `pages-panel` mounts the",
+    "composition PagesTab renders.",
+    "",
+    "CONFORMED to the board in this pass \u2014 the block was the older draw and had",
+    "the SAME nested-gutter defect `pages-load-error` fixed in its own block:",
+    "",
+    "  `.bd-pg-nores` was 24/16/0 with an 8px gap and a comment reading 'Board",
+    "  782:4212 \u2014 no-results, left at 16'. The 2026-09-08 export of 782:4257",
+    "  states all four insets and the gap: 36 top, 24 each side, 32 bottom, gap",
+    "  10, 13px type ON THE BLOCK, on a 280 column. Every one of those is now",
+    "  what ships.",
+    "",
+    "  `align-items` flex-start -> stretch. 782:4258 and 782:4259 are both",
+    "  `w-full`; as flex-start each shrank to its own text, so 'Clear search' \u2014",
+    "  the only control in the state \u2014 had a 78px hit area instead of 232.",
+    "",
+    "  `margin: 0 -6px`, so the block reaches the panel edge. Nested in",
+    "  `.bd-pg-list` it inherited that container's 6px gutter and measured 268",
+    "  against the board's 280, which put its text column at 220 against 232.",
+    "  It cannot be hoisted to a sibling the way the error block was \u2014 it",
+    "  replaces the list's CONTENT, not the list.",
+    "  Measured after: block 280x130, 36/24/32, gap 10, both lines 232 wide.",
+    "",
+    "The message paragraph and the Clear-search button gained",
+    "`pages-no-results-text` / `pages-clear-search` in this pass; neither had an",
+    "anchor, so the two nodes that carry the block's colour contract",
+    "(ink-muted for the fact, accent-text for the recovery) had nothing to join.",
+    "",
+    "This board and Layers 782:4260 draw the SAME block at the same numbers \u2014",
+    "36/24/32, gap 10, 13px, 280 wide, ink-muted fact then accent-text link.",
+    "Both are now measured against their own board and both pass, which is the",
+    "check that the two panels did not drift apart.",
+    "",
+    "NOT JOINED, with reasons:",
+    "",
+    "  the search BAND (782:4214) and BOX (782:4215) \u2014 settled by",
+    "  `pages-load-error`: the band's own border and radius would draw a second",
+    "  box around the box, and the field's width is `flex: 1` leftovers.",
+    "  Measured unjoined: band 280x40, box 168x28 on --flowbite/gray/50.",
+    "",
+    "  the query text (782:4216) \u2014 the text inside the input; the only anchor on",
+    "  that control is its wrapper, and joining a wrapper box to an input's type",
+    "  contract compares two different elements.",
+    "",
+    "  '\u229e Listings' (782:4217) \u2014 joined by `pages-load-error` against 141:172.",
+    "",
+    "  the Add-page FOOT (782:4245) \u2014 36 on the board, 54 shipped, for the two",
+    "  extra controls the founder added 2026-08-28. Its LABEL (782:4246) matches",
+    "  and IS joined.",
+    "",
+    "  the panel ROOT (782:4212) and the two hotspots (782:4247, 787:4313)."
+  ]
+}

@@ -60,13 +60,29 @@ const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> 
 };
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
-/* ONE line. Boards 164:2 / 164:22 head the list with a single string —
-   "All · 3" — but the label is a flowbite Button (block-level) and the count a
-   sibling span, so with no flex here they stacked: measured live, "All" at
-   y50 and "· 2" at y82, leaving the count orphaned on its own line where it
-   reads as stray punctuation. */
+/* ONE line, and one colour. Boards 164:2 / 164:22 head the list with a single
+   string — "All · 3", "Errors only · 1" — 12/18 accent, inset 16, in a 36-tall
+   row. `tw:flex` is load-bearing: the label is a flowbite Button (block-level)
+   and the count a sibling span, so without it they stacked — measured live,
+   "All" at y50 and "· 2" at y82, the count orphaned where it reads as stray
+   punctuation. The rest is 164:22's own row: it shipped 12px on the font's
+   own line box, in a shorter row, with the count in ink-muted. */
 const SUMMARY =
-  "tw:flex tw:items-center tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
+  "tw:flex tw:h-9 tw:items-center tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
+/* flowbite's Button is 40 tall and pads itself; only same-property utilities
+   beat that through twMerge (CLAUDE.md §Chrome), and left alone it pushed the
+   36 row to 40. */
+const FILTER_BTN =
+  "tw:h-[18px] tw:min-h-0 tw:p-0 tw:text-[12px] tw:leading-[18px] tw:font-normal " +
+  "tw:text-[var(--bk-accent-text)] tw:no-underline";
+/* Board 164:32 draws Fix as accent text on the row, not a bordered control. */
+const FIX_BTN =
+  "tw:h-[18px] tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 " +
+  "tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-accent-text)]";
+/* Board 164:33/164:34 — the filter's own consequence, a 36-tall 11/16 line. */
+const FILTER_NOTE =
+  "tw:m-0 tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 " +
+  "tw:text-[var(--bk-ink-muted)]";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
 /** The fixing / fix-failed bands differ only by tint. */
 const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-[var(--bk-gray-200)]";
@@ -159,17 +175,19 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               </Button>
             </Toolbar>
           )}
-          <div className={SUMMARY}>
+          <div className={SUMMARY} data-testid="issues-filter-row">
             <Button
               color="light"
               size="xs"
-              variant="link" className="tw:text-xs tw:font-normal"
+              variant="link"
+              className={FILTER_BTN}
+              data-testid="issues-filter"
               title={`Showing ${currentFilter.label.toLowerCase()} — click for ${nextFilter.label.toLowerCase()}`}
               onClick={() => setFilter(nextFilter.key)}
             >
               {currentFilter.label}
             </Button>
-            <span className="tw:ml-1 tw:text-[var(--bk-ink-muted)]">· {visible.length}</span>
+            <span className="tw:ml-1">· {visible.length}</span>
           </div>
 
           {fixing && (
@@ -181,7 +199,16 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                   fixed activity indicator rather than real progress. It is
                   flowbite's Progress now instead of a hand-built track+fill. */}
               <div className="tw:my-2">
-                <Progress progress={60} size="sm" aria-label="Applying the fix" />
+                {/* flowbite fills Progress with `bg-primary-600` = `var(--bk-blue-600)` (blue-600), one
+                step off the single accent `var(--bk-blue-700)`. DESIGN.md allows ONE blue, so
+                this override is a project rule rather than a board reading — no
+                board is being conformed to here. `theme.color` and not
+                `theme.bar`, because the colour class is twMerged AFTER bar and
+                would win. A themed wrapper would be the SSOT fix, but the closed
+                wrapper set is [TextInput, Select] and `gate:chrome-ui-surface`
+                requires every flowbite export in the barrel to stay a pure
+                re-export — so the override belongs at the call site. */}
+                <Progress progress={60} size="sm" aria-label="Applying the fix" theme={{ color: { default: "tw:bg-[var(--bk-accent)]" } }} />
               </div>
               <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
                 Auto-fix lands as ONE undo step.
@@ -215,14 +242,6 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             </div>
           )}
           <div className={SCROLL}>
-            {filter !== "all" && scoped.length > visible.length && (
-              /* Board 164:22 says what the filter is keeping from you, in the
-                 same breath as the filter itself. */
-              <p className="tw:m-0 tw:mb-2 tw:text-xs tw:text-[var(--bk-ink-muted)]">
-                Filtered to one severity. {scoped.length - visible.length}{" "}
-                {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
-              </p>
-            )}
             {visible.length === 0 ? (
               <EmptyState
                 className="tw:flex-1"
@@ -230,22 +249,35 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 title={`No ${filter === "error" ? "errors" : "warnings"}`}
               />
             ) : (
-              visible.map((i) => (
+              visible.map((i, idx) => (
                 // Fix sits BESIDE the navigate target, never inside it — a
                 // button nested in a role="button" is invalid, and it also
                 // swallows the outer element's accessible name.
-                <div key={i.id} className="tw:flex tw:items-start tw:gap-1.5 tw:mb-1.5">
+                <div
+                  key={i.id}
+                  className="tw:flex tw:items-start tw:gap-1.5 tw:mb-1.5"
+                  data-testid={`issue-row-${idx}`}
+                >
+                  {/* `tall` (56) not `comment` (min 64) — board 164:28 draws a
+                      56 row, and Row's own comment records 56 as board 8:29's
+                      height. The issue line is a message over a location, not
+                      a wrapping comment body. */}
                   <Row
-                    size="comment"
+                    size="tall"
                     interactive
                     className="tw:flex-1 tw:min-w-0"
                     onClick={() => onSelectElement?.(i.id)}
                   >
                     <span className={`tw:flex-none tw:mt-px ${TONE[i.type].className}`}>{TONE[i.type].icon}</span>
                     <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
-                      <span>{i.message}</span>
+                      <span className="tw:leading-5" data-testid={`issue-message-${idx}`}>{i.message}</span>
                       {i.location && (
-                        <span className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5">{i.location}</span>
+                        <span
+                          className="tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5"
+                          data-testid={`issue-location-${idx}`}
+                        >
+                          {i.location}
+                        </span>
                       )}
                     </span>
                   </Row>
@@ -253,7 +285,8 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                     <Button
                       color="light"
                       size="xs"
-                      className={GHOST}
+                      className={FIX_BTN}
+                      data-testid={`issue-fix-${idx}`}
                       disabled={fixing !== null}
                       onClick={() => void runFix(i)}
                     >
@@ -264,6 +297,19 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               ))
             )}
           </div>
+          {/* Board 164:22 orders this LAST — under the rows, not over them. It
+              shipped above the first issue, which is where the board's own
+              annotation put it in words but not in layout; the frame draws
+              Header · Filter row · Issue · note. Outside the scroller rather
+              than inside it, the same call SavesChrome made for the retention
+              rule: a sentence explaining why the list is short is useless at
+              the far end of a scroll. */}
+          {filter !== "all" && scoped.length > visible.length && (
+            <p className={FILTER_NOTE} data-testid="issues-filter-note">
+              Filtered to one severity. {scoped.length - visible.length}{" "}
+              {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
+            </p>
+          )}
         </>
       )}
     </div>

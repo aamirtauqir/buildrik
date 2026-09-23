@@ -1,56 +1,71 @@
 /**
- * PublishTab - Publish/deploy management panel
- * Shows publish status, URL, and publish/unpublish actions
+ * PublishTab — the Publish panel (board `4418:97118`, the panel behind B3-10
+ * `7574:193972`): PRE-PUBLISH CHECKS · RELEASE TO · CHANGES IN THIS SESSION ·
+ * LAST DEPLOY, then a pinned foot with the one CTA and the gate's reason.
  *
- * Follows the same pattern as HistoryTab and DesignSystemTab.
- * Publish API calls are injected from the host app (website) via callbacks.
+ * Reshaped 2026-09-22 (code-gap B4, G1-042/043/044/047/051/052):
+ *   · the readiness checks are INLINE (they were step 1 of a wizard) and the
+ *     panel's CTA opens the SAME confirm the topbar opens — `onRequestPublish`
+ *     is AquibraStudio's `requestPublish`, which routes on `nextMove.gate`.
+ *     The wizard, whose second step duplicated the facts confirm, is deleted;
+ *   · the panel reads `nextMove` (one derivation, `useLifecycle`) for whether
+ *     a publish can go ahead. `onRequestPublish` being absent is the ONLY
+ *     thing left that means "no publish path is wired" (flag off);
+ *   · a running publish can be cancelled (`publishJob.cancel` →
+ *     `sites.cancelPublish`), and a cancelled job has its own outcome block;
+ *   · Unpublish asks for the word (typed UNPUBLISH) from both doors.
+ *
+ * Read-only view of the ONE canonical publish state machine (`usePublishJob`,
+ * the same instance the topbar drives). No second state machine, no second
+ * toast — the outcome toast is `useExportHandlers`'s.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { PanelFrame, Button, ConfirmDialog, Progress, SkeletonBlock, Spinner, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Progress, SkeletonBlock, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
+import type { NextMove } from "../../../shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchPrePublishChecks, unpublishSite } from "../../../../services/PublishService";
 import { EVENTS } from "@/shared/constants";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
-import { PublishWizard } from "./PublishWizard";
+import { PrePublishChecks } from "./PrePublishChecks";
+import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
+import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
 import {
   VERCEL_CHECK_LABEL,
   type PrePublishChecksResult,
 } from "@buildrik/shared/schemas/publish";
+
 // ============================================
 // Types
 // ============================================
 
 export interface PublishTabProps {
-  /** Composer instance */
   composer: Composer | null;
   /** Project ID for publish operations */
   projectId?: string | null;
-  /** Panel pin state */
   isExpanded?: boolean;
-  /** Pin toggle callback */
   onExpandToggle?: () => void;
-  /** Help button callback */
   onHelpClick?: () => void;
-  /** Close panel callback */
   onClose?: () => void;
-  /**
-   * The canonical publish state machine (shared with the Topbar Publish
-   * dropdown). The sidebar is a read-only subscriber to its state.
-   */
+  /** The site menu asked for the unpublish confirm before this tab was
+   *  mounted, so the event it emits could not be heard here. The sidebar
+   *  latched the request; this reads it once on mount and reports it consumed
+   *  so a cancelled confirm does not come back on the next visit. */
+  initialUnpublish?: boolean;
+  onUnpublishIntentConsumed?: () => void;
+  /** The canonical publish state machine (shared with the topbar). */
   publishJob?: UsePublishJobResult;
-  /**
-   * Fire the canonical publish flow (same handler the Topbar uses:
-   * export pages → publishSite → poll). Fire-and-poll; state surfaces via
-   * publishJob. Toast is owned by the canonical path (useExportHandlers), so
-   * the sidebar does not toast.
-   */
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move (`useLifecycle`) — the same object the topbar
+   *  CTA reads. `null` = live with nothing waiting. */
+  nextMove: NextMove | null;
+  /** The ONE publish door — opens the dialog `nextMove.gate` names. Absent =
+   *  no publish path is wired (the flag is off): board 784:4480. */
+  onRequestPublish?: () => void;
   /** Initial published URL from loaded project */
   publishedUrl?: string | null;
   /** Initial published state from loaded project */
@@ -60,8 +75,6 @@ export interface PublishTabProps {
 // ============================================
 // Sub-components
 // ============================================
-
-
 
 /**
  * Where a non-passing check is fixed. Only `fail` rows block the publish, so a
@@ -81,13 +94,11 @@ const FIX_TARGETS: Record<string, { tab: string; label: string }> = {
   Favicon: { tab: "settings", label: "Fix" },
 };
 
-
-
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
 
-/** Board 641:2652's environment row — value on the right, chevron when the
-    value is somewhere you can actually go. */
+/** Board B3-10's RELEASE TO row — value on the right, chevron when the value
+    is somewhere you can actually go. */
 const EnvRow: React.FC<{ label: string; value: string | null; href?: string | null; empty: string }> = ({
   label,
   value,
@@ -128,6 +139,7 @@ const SkeletonRows: React.FC<{ widths: string[] }> = ({ widths }) => (
   </div>
 );
 
+const TEXT_LINK = "tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
 
 // ============================================
 // Main Component
@@ -141,12 +153,13 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   onHelpClick,
   onClose,
   publishJob,
-  onVercelPublish,
+  nextMove,
+  onRequestPublish,
   publishedUrl: initialUrl,
   isProjectPublished,
+  initialUnpublish,
+  onUnpublishIntentConsumed,
 }) => {
-  // Read-only view of the ONE canonical publish state machine (the same
-  // instance the Topbar drives). No second state machine, no second toast.
   const isPublishing = publishJob?.uiState === "publishing";
   const publishedUrl = publishJob?.publishedUrl ?? initialUrl ?? null;
   // Live-state is durable: a deployment serving (publishedUrl) OR the loaded
@@ -154,33 +167,22 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // from "published") must NOT make a still-live site read as Draft.
   const isPublished = publishJob?.uiState === "published" || !!publishedUrl || !!isProjectPublished;
   const error = publishJob?.error ?? null;
-  // The canonical handler resolves the site from the URL itself (and toasts if
-  // it can't), so "publishing is wired" == the handler being present. This
-  // matches how the Topbar gates its Publish dropdown on the feature flag.
-  const canPublish = !!onVercelPublish;
-
-  const handlePublish = async () => {
-    if (!onVercelPublish) return;
-    // Fire-and-poll: progress + completion surface via publishJob; the
-    // canonical useExportHandlers effect owns the success/failure toast.
-    await onVercelPublish();
-  };
 
   // The `projectId` prop is not threaded in unified-editor mode (AquibraStudio
   // never sets it), so resolve the site the same way the canonical publish path
   // does — from the URL. Without this the panel silently had no site: readiness
-  // never loaded and the publish-history section below never rendered.
+  // never loaded and the deploy sections below never rendered.
   const siteId = React.useMemo(() => projectId ?? getSiteIdFromUrl(), [projectId]);
 
-  // Board 641:2652's three sections, every field read from what the editor
-  // already owns (deploy history, undo stack, page list).
+  // Board B3-10's sections, every field read from what the editor already
+  // owns (deploy history, undo stack, page list).
   const snapshot = usePublishSnapshot(composer, siteId, publishedUrl, publishJob?.uiState);
 
   /* Unpublish. unpublishSite was fully built — Vercel teardown included — and
      exposed only in the dashboard's site header, so taking a site down meant
      leaving the editor. This panel hosts the ONE confirm; the site menu opens
      the panel and asks it (UI_UNPUBLISH_REQUEST) rather than hosting a second
-     dialog with drifting words. The copy is the dashboard's, verbatim. */
+     dialog with drifting words. */
   const { addToast } = useToast();
   const [confirmUnpublish, setConfirmUnpublish] = React.useState(false);
   const [unpublishing, setUnpublishing] = React.useState(false);
@@ -192,18 +194,29 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       composer.off(EVENTS.UI_UNPUBLISH_REQUEST, ask);
     };
   }, [composer]);
+  /* The cold-open half. The listener above only serves a panel that is
+     already mounted; on the first click from the site menu it did not exist
+     yet and the confirm never appeared. Verified live 2026-09-15: second click
+     worked, first click opened the panel and nothing else. */
+  React.useEffect(() => {
+    if (!initialUnpublish) return;
+    setConfirmUnpublish(true);
+    onUnpublishIntentConsumed?.();
+  }, [initialUnpublish, onUnpublishIntentConsumed]);
   const runUnpublish = async () => {
     if (!siteId) return;
-    setConfirmUnpublish(false);
     setUnpublishing(true);
     try {
       await unpublishSite(siteId);
+      setConfirmUnpublish(false);
       /* The server's truth changed; the shell derives `publishedUrl` from the
          last job and the hydrated state, so both are told. */
       publishJob?.unpublished();
       addToast({ title: "Site unpublished", description: "Its public URL stops working until you publish again.", tone: "info" });
       snapshot.reload();
     } catch (e) {
+      /* The dialog stays up with the word typed: the site is still live, and
+         the user decides whether to try again or stop. */
       addToast({
         title: "Couldn't unpublish",
         description: e instanceof Error ? e.message : "The site is still live. Try again.",
@@ -214,16 +227,21 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     }
   };
   const siteName = composer?.getProjectMetadata?.()?.name ?? "This site";
-  /* Board 833:4518 / 914:4507: publishing runs through a stepped modal, so the
-     panel's CTA opens the gate rather than firing the deploy. */
-  const [wizardOpen, setWizardOpen] = React.useState(false);
+
   /* Board 784:4326 is the just-published panel: the result leads and the
-     "what would go out" sections are empty by definition. */
-  const justPublished = publishJob?.uiState === "published" && snapshot.changeCount === 0;
-  /* Board 784:4403. "View log" is drawn beside Try again; this editor has no
-     log destination — the job reports a message, not a build log — so the row
-     carries the retry only rather than a link to nowhere. */
+     "what would go out" sections are empty by definition.
+
+     Gated on there BEING a job — the same gate TabRouter puts on the rollback
+     job it hands the History panel. `uiState` alone is "published" for any
+     site with a hydrated URL and nothing in flight, and `changeCount` is 0 on
+     every load because HistoryManager empties the undo stack when a project
+     opens. A job id is what says a publish actually ran in this session. */
+  const justPublished =
+    publishJob?.jobId != null && publishJob.uiState === "published" && snapshot.changeCount === 0;
   const hasFailed = publishJob?.uiState === "failed" && !!error;
+  /* Board 4418:98663 — the run was cancelled. Only a job THIS session started
+     can be cancelled, so a job id is implied; nothing was deployed. */
+  const wasCancelled = publishJob?.uiState === "cancelled";
   /* The build log behind board 784:4403's "View log". A pre-job failure never
      reaches the worker, so there are no steps and the link stays away rather
      than opening an empty list. */
@@ -260,6 +278,26 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     const secs = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
     return secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}m`;
   }, [startedAt, nowTick]);
+
+  /* Cancel (G1-047). `sites.cancelPublish` flips a QUEUED/BUILDING job to
+     CANCELLED and the poll reports it; past that point the server answers
+     NOT_CANCELLABLE and `publishJob.error` carries its sentence, shown under
+     the bar. What this cancels is the JOB on the server — the export that
+     produced the payload ran synchronously before the job existed and is not
+     a thing that can be cancelled, so the copy never claims it. */
+  const [cancelling, setCancelling] = React.useState(false);
+  const cancelRun = async () => {
+    if (!publishJob || cancelling) return;
+    setCancelling(true);
+    try {
+      await publishJob.cancel();
+    } finally {
+      setCancelling(false);
+    }
+  };
+  React.useEffect(() => {
+    if (!isPublishing) setCancelling(false);
+  }, [isPublishing]);
 
   // Readiness comes from the server (`runPrePublishChecks`), never from a local
   // approximation. See fetchPrePublishChecks for why: the old local set was a
@@ -301,105 +339,136 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     () => (checks?.checks ?? []).filter((c) => c.status === "fail"),
     [checks],
   );
-  const warnings = React.useMemo(
-    () => (checks?.checks ?? []).filter((c) => c.status === "warning"),
-    [checks],
-  );
   // Only a `fail` blocks. When the checks could not be loaded we do NOT invent a
   // block — the server gate is still authoritative and refuses on its own.
   const blockedByChecks = checkState === "ready" && !!checks && !checks.ready;
+  /** Board 893:4518 — the blocker is the connection itself, which is answered
+      with Connect rather than Fix. */
+  const blockedOnVercel = blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
 
   /*
     Board 784:4480 ("Connect Vercel to publish.") is the panel with no publish
-    path at all — `onVercelPublish` absent, i.e. publishing not wired.
+    path at all — `onRequestPublish` absent, i.e. publishing not wired.
 
-    It is NOT the panel for "connected account missing". That case has its own
-    board, 893:4518, which draws the WIZARD with the Vercel row failed, a
-    `Connect` link on the row and a `Connect Vercel` footer CTA — so the
-    checklist is what explains the block, reached by pressing the panel's
-    normal CTA. A previous pass here routed a failing Vercel check to 784:4480
-    instead, which read fine in isolation and made 893:4518 unreachable.
-    Two boards, two states; the board decides which.
+    It is NOT the panel for "connected account missing". That case is the
+    Vercel check failing in the list above, with `Connect` on the row and a
+    `Connect Vercel` footer CTA — so the checklist is what explains the block.
   */
-  const noPublishPath = !canPublish;
-  /** Board 893:4518 — the blocker is the connection itself, which the wizard
-      answers with Connect rather than Fix. */
-  const blockedOnVercel = blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
+  const noPublishPath = !onRequestPublish;
+  const openIntegrations = () =>
+    window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener");
+
+  const renderFix = (label: string): React.ReactNode => {
+    /* Board 893:4518 puts `Connect` on the Vercel row, not `Fix` — the fix is
+       not in this editor, so it opens the dashboard's integrations page
+       rather than switching tabs. */
+    if (label === VERCEL_CHECK_LABEL) {
+      return (
+        <a
+          href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+        >
+          Connect
+        </a>
+      );
+    }
+    const target = FIX_TARGETS[label];
+    if (!target) return null;
+    return (
+      <Button
+        color="light"
+        size="xs"
+        onClick={() => composer?.emit("ui:switch-tab", { tab: target.tab })}
+        className={`tw:flex-none ${TEXT_LINK}`}
+      >
+        Fix ›
+      </Button>
+    );
+  };
+
+  /* ── The CTA reads ONE gate (B4, decision #34) ────────────────────────────
+     Disabled, with the reason printed under it, when:
+       · the lifecycle blocks it (flag · role · offline · a review round that
+         has not cleared) — `nextMove.blockedReason` / gate `waiting`;
+       · the site has no next act (`nextMove === null`: live, nothing waiting);
+       · the server's readiness list has a blocking row;
+       · a publish is running, or just landed.
+     Otherwise it opens the door `nextMove.gate` names — the errors confirm,
+     the changes-requested gate, the stale acknowledgement, or the facts
+     confirm — through the same `requestPublish` the topbar uses. */
+  const gateShut = nextMove === null || nextMove.gate === "waiting" || nextMove.blockedReason !== null;
+  const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut;
+  const ctaReason: string | null = isPublishing
+    ? `${isPublished ? "Update" : "Publishing"} in progress — please wait.`
+    : nextMove === null
+      ? "Nothing has changed since the last deploy."
+      : nextMove.gate !== "waiting" && nextMove.blockedReason
+        ? nextMove.blockedReason
+        : null;
 
   /* Board 784:4403's failure block, hoisted to a const because it renders in
      TWO branches: the normal panel, and the no-publish-path panel when the
      publish failed by revoking the connection. One implementation, so the two
      cannot say different things about the same failure. */
   const failureSection = (
-          <section className={SECTION} aria-label="Publish failure">
-            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
-              Publish failed.
-            </h2>
-            <p className={META}>
-              {error}
-              {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
-            </p>
-            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
-              <Button
-                color="light"
-                size="xs"
-                onClick={() => {
-                  publishJob?.reset?.();
-                  setWizardOpen(true);
-                }}
-                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+    <section className={SECTION} aria-label="Publish failure">
+      <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
+        Publish failed.
+      </h2>
+      <p className={META}>
+        {error}
+        {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
+      </p>
+      <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
+        <Button
+          color="light"
+          size="xs"
+          disabled={!onRequestPublish}
+          onClick={() => {
+            publishJob?.reset?.();
+            onRequestPublish?.();
+          }}
+          className={TEXT_LINK}
+        >
+          Try again
+        </Button>
+        {/* Board 784:4403 draws "View log" beside "Try again". `getPublishStatus`
+            has always returned the `steps` column — the link names the step
+            that failed and the ones that never ran. */}
+        {failedSteps && (
+          <Button color="light" size="xs" onClick={() => setLogOpen((v) => !v)} aria-expanded={logOpen} className={TEXT_LINK}>
+            {logOpen ? "Hide log" : "View log"}
+          </Button>
+        )}
+      </div>
+      {failedSteps && logOpen && (
+        <ul className="tw:m-0 tw:mt-2 tw:list-none tw:p-0" aria-label="Build log">
+          {failedSteps.map((s) => (
+            <li key={s.name} className="tw:flex tw:items-center tw:gap-2 tw:py-0.5 tw:text-[12px] tw:leading-[18px]">
+              {/* The glyph carries the outcome visually and the sr-only word
+                  carries it to a screen reader — the same rule the check rows
+                  follow. */}
+              <span
+                aria-hidden="true"
+                className={
+                  s.status === "failed"
+                    ? "tw:text-[var(--bk-error)]"
+                    : s.status === "done"
+                      ? "tw:text-[var(--bk-success-text)]"
+                      : "tw:text-[var(--bk-ink-muted)]"
+                }
               >
-                Try again
-              </Button>
-              {/* Board 784:4403 draws "View log" beside "Try again". It was
-                  never built because nothing carried a log to the editor —
-                  but `getPublishStatus` has always selected the `steps`
-                  column and returned it; PublishService simply dropped it in
-                  the mapping. (Not the `log` column: that holds the raw page
-                  HTML and is deliberately never sent to a client.) So the
-                  link is disclosure, not decoration — it names the step that
-                  failed and the ones that never ran. */}
-              {failedSteps && (
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => setLogOpen((v) => !v)}
-                  aria-expanded={logOpen}
-                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
-                >
-                  {logOpen ? "Hide log" : "View log"}
-                </Button>
-              )}
-            </div>
-            {failedSteps && logOpen && (
-              <ul className="tw:m-0 tw:mt-2 tw:list-none tw:p-0" aria-label="Build log">
-                {failedSteps.map((s) => (
-                  <li
-                    key={s.name}
-                    className="tw:flex tw:items-center tw:gap-2 tw:py-0.5 tw:text-[12px] tw:leading-[18px]"
-                  >
-                    {/* The glyph carries the outcome visually and the sr-only
-                        word carries it to a screen reader — the same rule the
-                        wizard's check rows follow. */}
-                    <span
-                      aria-hidden="true"
-                      className={
-                        s.status === "failed"
-                          ? "tw:text-[var(--bk-error)]"
-                          : s.status === "done"
-                            ? "tw:text-[var(--bk-success-text)]"
-                            : "tw:text-[var(--bk-ink-muted)]"
-                      }
-                    >
-                      {s.status === "failed" ? "✕" : s.status === "done" ? "✓" : "·"}
-                    </span>
-                    <span className="tw:text-[var(--bk-ink)]">{s.name}</span>
-                    <span className={META}>{STEP_WORD[s.status] ?? s.status}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+                {s.status === "failed" ? "✕" : s.status === "done" ? "✓" : "·"}
+              </span>
+              <span className="tw:text-[var(--bk-ink)]">{s.name}</span>
+              <span className={META}>{STEP_WORD[s.status] ?? s.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 
   return (
@@ -414,11 +483,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <div className={CONTENT}>
-        {/* Board 784:4480 — with no publish path there is nothing to say about
-            environments, changes or deploys: the panel states the one fact
-            that matters and offers the one action that changes it. */}
-        {noPublishPath ? (
+      {noPublishPath ? (
+        <div className={CONTENT}>
+          {/* Board 784:4480 — with no publish path there is nothing to say
+              about environments, changes or deploys: the panel states the one
+              fact that matters and offers the one action that changes it. */}
           <section className={SECTION}>
             <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
               Connect Vercel to publish.
@@ -427,35 +496,120 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               Buildrick deploys into your own Vercel account — we host nothing.
             </p>
           </section>
-        ) : (
+        </div>
+      ) : snapshot.error ? (
+        /* Frame 781:4545 verbatim: pt-36 pb-32 px-24, 6px gaps, three lines at
+           13 / 12 / 13. */
+        <div
+          className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pt-9 tw:pb-8"
+          role="alert"
+          aria-label="Deploy service unreachable"
+          data-testid="publish-load-error"
+        >
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]" data-testid="publish-load-error-title">
+            Couldn&apos;t reach the deploy service.
+          </p>
+          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="publish-load-error-desc">
+            Nothing was published. Your work is saved.
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            variant="link"
+            onClick={() => snapshot.reload()}
+            data-testid="publish-load-error-retry"
+            className="tw:min-h-5 tw:self-start tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)]"
+          >
+            Try again
+          </Button>
+        </div>
+      ) : (
         <>
-        {/* Board 781:4489 — the deploy service is unreachable, so the panel
-            can claim nothing about environments or deploys. Both halves of the
-            reassurance: nothing went out, and the work is not lost. */}
-        {snapshot.error ? (
-          <section className={SECTION} aria-label="Deploy service unreachable">
-            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
-              Couldn&apos;t reach the deploy service.
-            </h2>
-            <p className={META}>Nothing was published. Your work is saved.</p>
-            <div className="tw:mt-1">
+        {/* Board 784:4250 — while a publish runs, the panel leads with the run
+            itself, at the panel's own width on the board's 24px gutters. */}
+        {isPublishing && (
+          <section
+            className="tw:flex tw:flex-col tw:gap-2 tw:px-6 tw:pt-8 tw:pb-7"
+            aria-label="Publish progress"
+            data-testid="publish-progress"
+          >
+            <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="publish-progress-title">
+              Publishing to production…
+            </h3>
+            {/* The board's meta line reads "Building · step 2 of 4 · started
+                14s ago". It names the running step rather than a phase word,
+                because the worker knows which one it is. Falls back to the
+                percentage when a job carries no steps. */}
+            <p className={META} data-testid="publish-progress-meta">
+              {runningStep
+                ? `${runningStep.name} · step ${runningStep.index} of ${runningStep.total}`
+                : publishJob && publishJob.progress > 0
+                  ? `${publishJob.progress}%`
+                  : "Starting"}
+              {startedAgo ? ` · started ${startedAgo} ago` : ""}
+            </p>
+            {/* GEOMETRY stays flowbite's (chrome-ui's shared `Progress`);
+                COLOUR is corrected to the single accent — flowbite fills the
+                bar blue-600, one step off blue-700. `theme.color`, not
+                `theme.bar`, because the colour class is twMerged after bar. */}
+            <Progress progress={publishJob?.progress ?? 0} size="sm" theme={{ color: { default: "tw:bg-[var(--bk-accent)]" } }} />
+            {/* Board 4418:97570 — Cancel beside the run. A job the worker has
+                already handed to Vercel answers NOT_CANCELLABLE; the server's
+                sentence prints under the bar and the run keeps going. */}
+            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
               <Button
                 color="light"
                 size="xs"
-                onClick={() => snapshot.reload()}
-                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+                onClick={() => void cancelRun()}
+                disabled={cancelling}
+                aria-busy={cancelling || undefined}
+                className={TEXT_LINK}
+                data-testid="publish-cancel"
               >
-                Try again
+                {cancelling ? "Cancelling…" : "Cancel"}
               </Button>
+              {error ? (
+                <span className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-cancel-error">
+                  {error}
+                </span>
+              ) : null}
             </div>
           </section>
-        ) : (
+        )}
+        <div className={CONTENT}>
         <>
 
         {/* Board 784:4403 — a failed publish leads with the failure AND with
             the fact that nothing changed, which is the half a user needs
-            first. Same shape as the rollback-failed modal. */}
+            first. */}
         {hasFailed && failureSection}
+
+        {/* Board 4418:98663 — the run was cancelled. Nothing went out; the
+            door to try again is the same door as always. ("Resume" is on the
+            board and has no backing: a cancelled job is terminal.) */}
+        {wasCancelled && (
+          <section className={SECTION} aria-label="Publish cancelled" data-testid="publish-cancelled">
+            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
+              Publish cancelled.
+            </h2>
+            <p className={META}>Nothing was deployed. Your work is saved.</p>
+            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
+              <Button
+                color="light"
+                size="xs"
+                disabled={ctaDisabled}
+                onClick={() => {
+                  publishJob?.reset?.();
+                  onRequestPublish?.();
+                }}
+                className={TEXT_LINK}
+                data-testid="publish-again"
+              >
+                Publish again
+              </Button>
+            </div>
+          </section>
+        )}
 
         {/* Board 784:4326 — the moment after a publish: what went out, where
             to see it, and what changed against the version it replaced. */}
@@ -470,12 +624,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             </p>
             <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
               {publishedUrl && (
-                <a
-                  href={publishedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
-                >
+                <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline">
                   View live site
                 </a>
               )}
@@ -484,7 +633,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   color="light"
                   size="xs"
                   onClick={() => composer?.emit("ui:switch-tab", { tab: "history" })}
-                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+                  className={TEXT_LINK}
                 >
                   Compare v{snapshot.lastDeploy.version - 1} → v{snapshot.lastDeploy.version}
                 </Button>
@@ -493,41 +642,27 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
-        {/* Board 784:4250 — while a publish runs, the panel leads with the run
-            itself and drops the "what would go out" sections: they describe a
-            publish the user has already started. ENVIRONMENT stays, because
-            where it is going is still the question being answered.
-
-            The board's meta line reads "Building · step 2 of 4 · started 14s
-            ago". This note used to say the job "exposes a percentage and a
-            start, not named steps" — true until `steps` was carried through
-            PublishService for board 784:4403's log. It names the running step
-            rather than the board's generic "Building", because the worker
-            knows which one it is and "Optimizing images" answers "what is it
-            doing" where a phase word does not. Falls back to the percentage
-            when a job carries no steps. */}
-        {isPublishing && (
-          <section className={SECTION} aria-label="Publish progress">
-            <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Publishing to production…
-            </h3>
-            <p className={META}>
-              {runningStep
-                ? `${runningStep.name} · step ${runningStep.index} of ${runningStep.total}`
-                : publishJob && publishJob.progress > 0
-                  ? `${publishJob.progress}%`
-                  : "Starting"}
-              {startedAgo ? ` · started ${startedAgo} ago` : ""}
-            </p>
-            <Progress progress={publishJob?.progress ?? 0} size="sm" />
-          </section>
+        {/* Board B3-10 opens on the checks. They gate the publish, so they
+            sit where the user decides to publish — in the panel, not behind
+            the CTA (they were a wizard step; owner decision 2026-09-21). The
+            list is the server's; the Client approval row is the lifecycle's,
+            and the two read as one list. Absent during a run, which the board
+            leads with. */}
+        {!isPublishing && (
+        <section className={SECTION} aria-label="Pre-publish checks">
+          <h3 className={SECTION_TITLE}>Pre-publish checks</h3>
+          <PrePublishChecks state={checkState} checks={checks} onRetry={() => void loadChecks()} renderFix={renderFix}>
+            <ApprovalCheckRow nextMove={nextMove} composer={composer} />
+          </PrePublishChecks>
+        </section>
         )}
 
-        {/* Board 641:2652 opens on WHERE it goes, not on a status chip.
-            Production carries the live domain; Preview stays listed because an
-            environment list that hides it says the site has none. */}
-        <section className={SECTION} aria-label="Environment">
-          <h3 className={SECTION_TITLE}>Environment</h3>
+        {/* Board B3-10's RELEASE TO: Production carries the live domain;
+            Preview deployment stays listed because an environment list that
+            hides it says the site has none (its row has no backing yet —
+            annotation card beside 4418:97118). */}
+        <section className={SECTION} aria-label="Release to">
+          <h3 className={SECTION_TITLE}>Release to</h3>
           {snapshot.loading ? (
             <SkeletonRows widths={["tw:w-32", "tw:w-24"]} />
           ) : (
@@ -538,18 +673,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 href={publishedUrl}
                 empty="Not published yet"
               />
-              <EnvRow label={snapshot.preview.label} value={snapshot.preview.value} empty="None" />
+              <EnvRow label="Preview deployment" value={snapshot.preview.value} empty="None" />
             </>
           )}
         </section>
 
-        {/* Board 641:2652 — what would go out if you published now. The count
-            pair is the header; the rows are the changes themselves. Absent
-            during a run (board 784:4250 drops it). */}
+        {/* Board B3-10's CHANGES IN THIS SESSION — what would go out if you
+            published now. The count pair is the header; the rows are the
+            changes themselves. Absent during a run and right after one. */}
         {!isPublishing && !justPublished && !hasFailed && (
-        <section className={SECTION} aria-label="Since last deploy">
+        <section className={SECTION} aria-label="Changes in this session">
           <div className={ROW}>
-            <h3 className={SECTION_TITLE}>Since last deploy</h3>
+            <h3 className={SECTION_TITLE}>Changes in this session</h3>
           </div>
           {snapshot.loading ? (
             <SkeletonRows widths={["tw:w-36", "tw:w-28", "tw:w-20", "tw:w-32"]} />
@@ -574,18 +709,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             </div>
           ))}
           {snapshot.changeCount === 0 && (
-            /*
-              Two different facts wore one sentence. With no deploy to measure
-              from, "Nothing has changed since the last deploy." is false — and
-              it reads as an all-clear two lines above LAST DEPLOY saying "This
-              site has never been published." The panel contradicted itself and
-              the reassuring half was the wrong one, on the path where a user
-              decides whether to publish at all.
-
-              `lastDeploy` is already null in that case, so the discriminator
-              needs no new state. The never-published line states what the
-              section claims to state — what would go out if you published now.
-            */
+            /* Two different facts wore one sentence. With no deploy to measure
+               from, "Nothing has changed since the last deploy." is false. The
+               never-published line states what the section claims to state —
+               what would go out if you published now. */
             <p className={META}>
               {snapshot.lastDeploy
                 ? "Nothing has changed since the last deploy."
@@ -597,8 +724,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         </section>
         )}
 
-        {/* Board 641:2652 — what is live right now, and therefore what a
-            rollback would return to. */}
+        {/* Board B3-10's LAST DEPLOY — what is live right now, and therefore
+            what a rollback would return to. */}
         {!isPublishing && !justPublished && !hasFailed && (
         <section className={SECTION} aria-label="Last deploy">
           <h3 className={SECTION_TITLE}>Last deploy</h3>
@@ -629,129 +756,72 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           )}
         </section>
         )}
-
-        {/* The "Published URL" copy-card is gone. Board 641:2652 and board
-            784:4326 both end their content after LAST DEPLOY and draw empty
-            space; neither carries it, and ENVIRONMENT › Production already
-            names the live domain and links to it. Founder call 2026-08-17. */}
-
-        {/* The pre-publish checklist moved to the wizard's first step
-            (board 833:4518). It gated a publish, so it belongs in the flow
-            that publishes, not in a panel the user may only be reading. */}
-
-        {/* The encryption reassurance banner and the "Ready to go live?" card
-            are not on board 641:2652 and were pure decoration around the CTA —
-            removed. The legal line below stays: a compliance disclosure is not
-            a visual call. */}
-
-        {/* The rocket card is not on board 641:2652. Its only load-bearing
-            sentence — why a blocked publish is blocked — already prints under
-            the CTA, so the card was restating the panel back to itself. */}
-        {/* The error chip with a dismiss X is gone: board 784:4403 makes the
-            failure a first-class state at the top of the panel, not a toast
-            hiding under the checklist. */}
-
-        {/* The published-version list and its rollback buttons are gone from
-            this panel. Boards 641:2652 and 784:4326 both end after LAST DEPLOY
-            and draw empty space below it, and the list has a board of its own —
-            History · Published (949:4474) — which SiteMenu's "Publish history"
-            already opens. Rendering it here made the panel a second, unboarded
-            copy of that destination. Founder call 2026-08-17.
-
-            LAST DEPLOY above still answers "what is live" (v3 · live · date),
-            which is what this panel is for; "show me every version and roll
-            one back" is the other surface's question. */}
         </>
-        )}
+        </div>
         </>
-        )}
-      </div>
+      )}
 
-      {/* Board 641:2652 pins the CTA to the bottom of the panel, full width,
-          and names the destination rather than the verb: "Publish to
-          production", not "Publish Site". Inside the scroll body it drifted
-          below the fold as the change list grew — exactly when it is most
-          needed. */}
-      <div className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3">
-        <div className="tw:flex tw:flex-col tw:gap-2">
-          {noPublishPath ? (
-            /* Board 784:4480 puts the CTA here too — the panel body above
-               carries the sentence, this is the action. */
-            <Button
-              onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener")}
-              className="tw:w-full"
-            >
-              Connect Vercel
-            </Button>
-          ) : (
-            <>
+      {/* Board B3-10 pins the foot to the bottom of the panel: a meta line
+          naming what the publish replaces, the CTA sized to its label, and
+          the gate's reason with its door beside it. A bordered white band on
+          16px gutters with 10 above and below. */}
+      <div
+        className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
+        data-testid="publish-footer"
+      >
+        {noPublishPath ? (
+          /* Board 784:4480 puts the CTA here too — the panel body above
+             carries the sentence, this is the action. */
+          <Button onClick={openIntegrations} className="tw:w-full">
+            Connect Vercel
+          </Button>
+        ) : (
+          <>
+            {!snapshot.loading && !snapshot.error ? (
+              <p className={META} data-testid="publish-footer-meta">
+                {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
+              </p>
+            ) : null}
+            <div className="tw:flex tw:items-center tw:gap-3">
+              {/* Boards 781:4526 / 784:4287 draw "Button · disabled" as a grey
+                  chip sized to its label, 28 tall. The remaining 50% dim is
+                  `themes/ux-fixes.css`'s global `button:disabled { opacity:
+                  .5 }`, left global deliberately. */}
               <Button
-                onClick={() => setWizardOpen(true)}
-                /* The gate moved into the wizard (board 833:4518), so this
-                   button opens it rather than publishing. Disabling it on a
-                   blocking check — which is what it used to do — locked the
-                   user out of the one screen that says WHY they are blocked.
-                   The wizard's "Continue to Confirm" is the dead control now,
-                   which is what the board draws. */
-                /* Board 784:4326 greys the CTA right after a deploy: with no
-                   pending change there is nothing to publish. */
-                disabled={isPublishing || justPublished || snapshot.error}
-                /* Boards 781:4526 / 784:4287 draw "Button · disabled" as a
-                   GREY chip — bg-subtle fill, ink-muted text, 28 tall, sized
-                   to its label. Flowbite's own disabled is
-                   `pointer-events-none opacity-50`, which left the brand blue
-                   showing at half strength: a dead control that still reads as
-                   the primary action. `disabled:opacity-100` is load-bearing —
-                   without it the greys render at 50% too.
-
-                   Height and width are the board's as well: this was h-10
-                   (flowbite's default, the same leak as the layers rows and
-                   the apply modal) and full-width, where the board sizes it to
-                   the label. */
-                /* Boards 781:4526 / 784:4287 draw "Button · disabled" as a grey
-                   chip: bg-subtle fill, ink-muted text, 28 tall, sized to its
-                   label. It rendered as the brand blue at half strength — a
-                   dead control that still read as the primary action.
-
-                   The fill, the text, the height and the padding are the
-                   board's now and measured. The remaining 50% is NOT from this
-                   button: `themes/ux-fixes.css` carries a global
-                   `button:disabled { opacity: .5 }` that dims all 207 disabled
-                   buttons in the editor. Three attempts to outrank it from here
-                   (a `disabled:opacity-100` utility, an arbitrary `opacity-[1]`,
-                   and a `theme.disabled` override) all still measured 0.5, and
-                   the utility never appeared in the dev stylesheet at all — the
-                   gap tw.css itself documents. Left global, deliberately: the
-                   board's grey already reads as disabled without the dimming,
-                   but dropping it changes 207 buttons and belongs in its own
-                   change. */
-                className="tw:h-7 tw:w-auto tw:self-start tw:px-3"
+                onClick={onRequestPublish}
+                disabled={ctaDisabled}
+                className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                data-testid="publish-cta"
               >
-                {/* One label, in every state. Board 641:2652 and 784:4326 both name the
-                    destination and neither draws an "Update" variant — the
-                    publish/update distinction is one the boards deliberately do not
-                    make, and the disabled state already says "nothing to send". */}
+                {/* One label, in every state. The board names the destination
+                    and never draws an "Update" variant. */}
                 {isPublishing ? "Publishing…" : "Publish to production"}
               </Button>
-              {blockedByChecks && !isPublishing && (
-                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]">
-                  {blocking.map((c) => c.detail).join(" ")}
-                </p>
-              )}
-              {isPublishing && (
-                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]">
-                  {isPublished ? "Update" : "Publishing"} in progress — please wait.
-                </p>
-              )}
-            </>
-          )}
-        </div>
+              {/* Board 893:4518 swaps the primary's neighbour for Connect
+                  Vercel when the connection is the blocker. */}
+              {blockedOnVercel && !isPublishing ? (
+                <Button color="light" size="xs" onClick={openIntegrations} className="tw:h-7">
+                  Connect Vercel
+                </Button>
+              ) : null}
+            </div>
+            {ctaReason ? (
+              <p className="tw:m-0 tw:text-[11px] tw:leading-[1.4] tw:text-[var(--bk-ink-muted)]" data-testid="publish-cta-reason">
+                {ctaReason}
+              </p>
+            ) : null}
+            {blockedByChecks && !isPublishing && (
+              <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]" data-testid="publish-blocked-by-checks">
+                {blocking.map((c) => c.detail).join(" ")}
+              </p>
+            )}
+            {!isPublishing ? <PublishGateBanner nextMove={nextMove} composer={composer} /> : null}
+          </>
+        )}
       </div>
       {/* Privacy & Terms footer. The two links are underlined and the sentence
           around them is gray-600: inside a text block, colour alone cannot
-          carry "this is a link" (WCAG 1.4.1), and axe measured these two at
-          1.27:1 against their surrounding text — nowhere near the 3:1 that
-          would let colour do the work on its own. */}
+          carry "this is a link" (WCAG 1.4.1). */}
       <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)] tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
         <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-[var(--bk-accent-text)] tw:underline">
@@ -763,81 +833,23 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         </a>
       </div>
 
-      <PublishWizard
-        open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-        onPublish={() => void handlePublish()}
-        checkState={checkState}
-        checks={checks}
-        onRetryChecks={() => void loadChecks()}
-        blockedOnVercel={blockedOnVercel}
-        onConnectVercel={() =>
-          window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener")
-        }
-        renderFix={(label) => {
-          /* Board 893:4518 puts `Connect` on the Vercel row, not `Fix` — the
-             fix is not in this editor, so it opens the dashboard's
-             integrations page rather than switching tabs. */
-          if (label === VERCEL_CHECK_LABEL) {
-            return (
-              <a
-                href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
-              >
-                Connect
-              </a>
-            );
-          }
-          const target = FIX_TARGETS[label];
-          if (!target) return null;
-          return (
-            <Button
-              color="light"
-              size="xs"
-              onClick={() => {
-                setWizardOpen(false);
-                composer?.emit("ui:switch-tab", { tab: target.tab });
-              }}
-              className="tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
-            >
-              Fix ›
-            </Button>
-          );
-        }}
-        composer={composer}
-        publishedUrl={publishedUrl}
-        isPublished={isPublished}
-        rollbackTo={snapshot.lastDeploy?.version ?? null}
-      />
-      <ConfirmDialog
+      <UnpublishConfirmModal
         open={confirmUnpublish}
-        onClose={() => setConfirmUnpublish(false)}
+        siteName={siteName}
+        busy={unpublishing}
         onConfirm={() => void runUnpublish()}
-        title="Unpublish site?"
-        message={<><strong>{siteName}</strong> will be taken offline and its public URL will stop working until you publish again.</>}
-        confirmLabel="Unpublish"
-        tone="destructive"
+        onClose={() => setConfirmUnpublish(false)}
       />
     </PanelFrame>
   );
 };
 
 // ============================================
-// Icons
-// ============================================
-
-
-// ============================================
 // Classes
 // ============================================
 
 const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-4";
-/* Board 641:2652 sets these sections on the panel surface itself — no cards.
-   A card per section turned three related facts into three separate objects
-   and cost 24px of chrome each, which is why the board's four sections fit
-   above the fold and the card version did not. */
+/* Board B3-10 sets these sections on the panel surface itself — no cards. */
 const SECTION = "tw:flex tw:flex-col tw:gap-0";
 /* The board's section label: 11px, uppercase, tracked, ink-muted. */
 const SECTION_TITLE =

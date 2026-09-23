@@ -1,0 +1,179 @@
+{
+  "surface": "s7-branding-pointer",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1344:7165",
+  "boardName": "s7-branding-pointer",
+  "figmaHash": "00a526f5acd6c73d2afdec5b7217ee991f163b845a72b0e42e8e783261c7e2f0",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T12:10:25.362Z",
+  "copy": [
+    "‹ Settings Branding",
+    "Brand lives in the Brand panel",
+    "Fonts, colors, logo and design tokens are edited in one place so nothing drifts.",
+    "Open Brand panel"
+  ],
+  "targets": [
+    {
+      "nodeId": "1344:7165",
+      "name": "S7.2 · Branding · pointer — NEW 2026-08-28",
+      "className": "bg-white border border-[#e5e7eb] border-solid relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7166",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[19px] not-italic text-[#111928] text-[14px] top-[19px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7167",
+      "name": "pointer card",
+      "className": "absolute bg-[#f9fafb] border border-[#e5e7eb] border-solid h-[120px] left-[19px] overflow-clip rounded-[8px] top-[63px] w-[680px]",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "120px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "680px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7168",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[15px] not-italic text-[#111928] text-[14px] top-[17px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7169",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[normal] left-[15px] not-italic text-[#6b7280] text-[12px] top-[43px] w-[640px]",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "640px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7170",
+      "name": "button/Open Brand panel",
+      "className": "absolute bg-[#1a56db] h-[32px] left-[15px] overflow-clip rounded-[6px] top-[75px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7171",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[20px] not-italic text-[12px] text-white top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7172",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[60px] leading-[normal] left-[19px] not-italic text-[#6b7280] text-[12px] top-[209px] w-[660px]",
+      "props": {
+        "height": {
+          "value": "60px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "660px"
+        }
+      }
+    },
+    {
+      "nodeId": "1688:16233",
+      "name": "hotspot/back · S7 · Settings · root",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[-1px] opacity-0 top-[277px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

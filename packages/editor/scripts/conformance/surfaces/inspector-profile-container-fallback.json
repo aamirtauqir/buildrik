@@ -1,0 +1,146 @@
+{
+  "surface": "inspector-profile-container-fallback",
+  "board": "Inspector · profile · CONTAINER (fallback) (Figma 32:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:2"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:3"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:4"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "920:4693"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:7"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:8"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:10"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-container-fallback",
+      "nodeId": "32:12"
+    },
+    {
+      "name": "sechead-layout",
+      "testId": "inspector-sechead-layout"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE, not through the probe: clicking Insert's Container row",
+    "creates a container and selects it, which is the real production path",
+    "into the fallback profile. The board frames the inspector alone at 300;",
+    "the app has no such view, so the measurement is taken at the shell's own",
+    "1440x900 where the panel renders 299 wide (--bk-size-inspector is 300;",
+    "the missing pixel is the frame's border, which the board does not draw).",
+    "",
+    "WHAT THE BOARD WON (changed in code):",
+    "  header 53h/x12 -> 48h/x16 (32:3, and 642:3251 draws the same row)",
+    "  header fill: a linear-gradient between --bk-bg-card and --bk-bg-panel,",
+    "    which are both #FFFFFF -- a gradient between one colour and itself.",
+    "    Now the flat token both boards draw.",
+    "  element name 600/13 -> 500 14/20 (32:4 `ui/14`)",
+    "  context row 33h/x10/gap6 -> 32h/x16/gap8 (32:7)",
+    "  pills radius 6 -> --radius/sm, and the two non-scope pills filled",
+    "    --bk-bg-subtle instead of transparent (32:10, 32:12). The strip is",
+    "    already that colour, so nothing moved; transparent simply cannot be",
+    "    read back as the value the board states.",
+    "  panel edge --bk-border -> --bk-gray-100 (32:2, 642:3249)",
+    "",
+    "WHAT THE CODE KEPT, and why:",
+    "  FIVE header controls, not two. The founder call recorded in boards.json",
+    "  stands, and the board has since been redrawn to agree: 32:2 now carries",
+    "  btn/pick @136, btn/select-parent @160, btn/ai @184, btn/bind @223 and",
+    "  the ... menu @257 -- the same five ProInspector ships.",
+    "",
+    "  The 26x26 accent-tinted icon square. The board renders the element glyph",
+    "  inline in the title ('OO Section', one text node), so there is no node to",
+    "  join a 26x26 box to. Founder-recorded delta, left alone.",
+    "",
+    "NOT JOINED, deliberately: the 11 section rows (32:14 onward). They are the",
+    "SECTION LIST, and which sections a container shows is decided by the",
+    "profile config in code, not by this frame -- boards.json already records",
+    "the six sibling profile boards as section-order matches. Joining a row",
+    "here would be asserting the board's sample section ORDER, which is the one",
+    "thing this board is not the authority on.",
+    "",
+    "2026-09-08 — RE-MEASURED after the shared section chassis was conformed to",
+    "the 807 profile family, and the element name (32:4, 14/20 in ink) joined.",
+    "31 properties -> 36. It still does NOT join the section body, and the reason",
+    "is now sharper than 'the board is not the authority on section order':",
+    "",
+    "THE FOUNDER CALL IS '807 GEOMETRY, 32:2 MASTER' — recorded in Figma itself,",
+    "in the retirement note the tool returns for 159:2: 'RETIRED 2026-09-02,",
+    "superseded by 32:2 (founder call in-session: 807 geometry, 32:2 master,",
+    "retire 159:2)'. Read as two statements, which is what it is: 32:2 is the",
+    "master frame for the inspector's IDENTITY — its header, its five controls,",
+    "its element name, its strip — and the 807 family owns the BODY's geometry.",
+    "The two frames disagree about the body on every measure that matters:",
+    "",
+    "    property row      32:2 draws 32 tall     807:* draw 34",
+    "    label column      32:2 draws 88 wide     807:* state no width at all",
+    "    control           32:2 draws 172 @x112   807:* draw 160 @x120",
+    "    control fill      32:2 draws bg-card     807:* draw gray/50",
+    "    control edge      32:2 draws #9ca3af     807:* draw gray/100",
+    "    control radius    32:2 draws 6           807:* draw 4",
+    "    section header    32:2 draws 32 flat     807:* draw 20 open / 28 shut",
+    "",
+    "Six boards to one, and the founder named the six. So the body rows here",
+    "(32:14 onward) are measured and left unjoined, and every one of those",
+    "properties IS joined — on inspector-profile-text, -button, -input, -flex,",
+    "-grid and -media, against the boards that won."
+  ]
+}

@@ -296,11 +296,23 @@ describe("ExportModal — download flows", () => {
     expect(((createObjectURL.mock.calls[0] as unknown[])[0] as Blob).type).toBe("text/css");
   });
 
-  it("Download All downloads export.html (embedded CSS keeps a single file)", async () => {
+  /* Rewritten with board 1172:4838's foot. "Download All" used to render for
+     every non-React format, and with the default `cssStyle: "embedded"` it
+     wrote the SAME single file the primary writes — `result.html`, under the
+     name export.html instead of index.html. Two buttons, one outcome, in a
+     foot the board draws with room for one. It survives only where it does
+     something the primary cannot: page plus stylesheet. */
+  it("offers Download All only for external CSS, where it is not the primary again", async () => {
     renderModal();
     await screen.findByText(/5 elements/);
+    expect(screen.queryByRole("button", { name: "Download All" })).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Download All" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Options" }));
+    fireEvent.click(screen.getByRole("button", { name: "external" }));
+
+    const allBtn = await screen.findByRole("button", { name: "Download All" });
+    await waitFor(() => expect(allBtn).toBeEnabled());
+    fireEvent.click(allBtn);
     expect(clicked).toEqual([{ download: "export.html", href: expect.stringContaining("blob:") }]);
   });
 });

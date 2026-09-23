@@ -1,0 +1,509 @@
+{
+ "rows": [],
+ "_note": "Deliberately an object with an empty rows array: apply-queue.mjs scans every .json in this directory and its five ops cannot CREATE a node. Everything below makes nodes, and is applied by the two scripts named in `runbook`. The pure moves/resizes/fills that go with it ARE apply-queue rows and live in layers-move.json; the copy is in layers-text.json and the board names in layers-rename.json.",
+ "_id_provenance": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12 (section 1776:8375 = 29 children, 2480x3696, identical to the dump). Every id in this file was read from that dump; none is inferred from a finding.",
+ "section": "1776:8375",
+ "page": "1:3",
+ "steps": [
+  {
+   "step": "B",
+   "why": "COVER-1-63, supporting UX-H-19 and UX-H-20",
+   "board": "143:295 (Layers · multi-select, 1300,1280)",
+   "finding": "At two or more selected the panel grows the selection toolbar that holds the only bulk actions Layers has. The board draws the footer switch ('3 selected of 12', 143:352) and not the toolbar, so the board says multi-select has no actions — which is also why UX-H-20's scope split is invisible on it: the one item that DOES act on the whole selection lives in a bar nobody drew.",
+   "create": [
+    {
+     "name": "bdc-layers-banner",
+     "t": "frame",
+     "x": 0,
+     "y": 98,
+     "w": 280,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "strokeBottom": {
+      "hex": "#E5E7EB",
+      "weight": 1
+     },
+     "_source": "LayerSelectionBanner.tsx:33-68 + layers-v2.css:271-310. 36 = 24px controls + 6px padding top and bottom.",
+     "nodes": [
+      {
+       "t": "text",
+       "x": 10,
+       "y": 10,
+       "w": 140,
+       "v": "3 selected",
+       "s": 12,
+       "wt": "Medium",
+       "c": "#4B5563",
+       "_source": "LayerSelectionBanner.tsx:36 — `{count} selected`; .bdc-layers-banner-count is 500 12px/16px ink-soft."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Group",
+       "x": 166,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "▦",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:37 title 'Group'. 24x24 is the size the shipped banner uses — and the size the 28h tree row's own eye/lock still do NOT (UX-H-23)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Dim in editor — these elements still publish",
+       "x": 192,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "👁",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:47-51 — title 'Dim in editor — these elements still publish'. Same editor-only dim as the row eye (UX-H-17)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Delete",
+       "x": 218,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "🗑",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:58 — this is the control that opens the inline confirm (index.tsx:412-418)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Done",
+       "x": 244,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "✕",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:63 — Escape does the same (:26-28)."
+      }
+     ]
+    }
+   ],
+   "then": "the eight row moves + spacer move/resize in layers-move.json (_depends_on: step B)",
+   "command": "node scripts/figma/fix-layers-ux.mjs --only=B --apply"
+  },
+  {
+   "step": "C",
+   "why": "UX-H-19 + COVER-1-63",
+   "board": "NEW — cloned from 143:295",
+   "finding": "Right-click Delete removes the element and every descendant instantly, with no dialog, no count and no toast (useLayerActions.ts:208-217) — while the multi-select banner confirms the same act inline. The safer path is the one on the control people use less, and it is drawn on no board, so the two cannot be compared.",
+   "clone": {
+    "source": "143:295",
+    "x": 2500,
+    "y": 220,
+    "w": 280,
+    "h": 812,
+    "name": "Layers · multi-delete-confirm — the banner's Delete opens an inline confirm inside the panel; the right-click Delete on one row opens nothing",
+    "_placement": "All three existing rows (y=220 / 1280 / 2304) are full at x=100,500,900,1300,1700,2100 (pitch 400), so this opens a sixth column. The section must widen 2480 -> 2880 (layers-move.json) and must NOT grow taller — section 04 · Pages starts 480px below."
+   },
+   "create": [
+    {
+     "name": "bdc-layers-banner",
+     "t": "frame",
+     "x": 0,
+     "y": 98,
+     "w": 280,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "strokeBottom": {
+      "hex": "#E5E7EB",
+      "weight": 1
+     },
+     "_source": "LayerSelectionBanner.tsx:33-68 + layers-v2.css:271-310. 36 = 24px controls + 6px padding top and bottom.",
+     "nodes": [
+      {
+       "t": "text",
+       "x": 10,
+       "y": 10,
+       "w": 140,
+       "v": "3 selected",
+       "s": 12,
+       "wt": "Medium",
+       "c": "#4B5563",
+       "_source": "LayerSelectionBanner.tsx:36 — `{count} selected`; .bdc-layers-banner-count is 500 12px/16px ink-soft."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Group",
+       "x": 166,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "▦",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:37 title 'Group'. 24x24 is the size the shipped banner uses — and the size the 28h tree row's own eye/lock still do NOT (UX-H-23)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Dim in editor — these elements still publish",
+       "x": 192,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "👁",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:47-51 — title 'Dim in editor — these elements still publish'. Same editor-only dim as the row eye (UX-H-17)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Delete",
+       "x": 218,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "🗑",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:58 — this is the control that opens the inline confirm (index.tsx:412-418)."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Done",
+       "x": 244,
+       "y": 6,
+       "w": 24,
+       "h": 24,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 5,
+         "y": 5,
+         "v": "✕",
+         "s": 13,
+         "wt": "Regular",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "LayerSelectionBanner.tsx:63 — Escape does the same (:26-28)."
+      }
+     ]
+    },
+    {
+     "name": "bdc-layers-confirm",
+     "t": "frame",
+     "x": 10,
+     "y": 140,
+     "w": 260,
+     "h": 28,
+     "fill": "#FDF6EC",
+     "r": 4,
+     "_source": "index.tsx:412-418 + layers-v2.css:498-512. The CSS fill is rgba(217,119,6,0.08); #FDF6EC is that resolved over the panel's white ground — the file has no alpha convention for these bars and a translucent fill reads differently on every board it is cloned onto.",
+     "nodes": [
+      {
+       "t": "rect",
+       "name": "border-left",
+       "x": 0,
+       "y": 0,
+       "w": 2,
+       "h": 28,
+       "fill": "#C27803",
+       "_source": "border-left: 2px solid var(--bk-warning) — tokens.generated.css:91."
+      },
+      {
+       "t": "text",
+       "x": 12,
+       "y": 6,
+       "w": 120,
+       "v": "Delete 3 layers?",
+       "s": 11,
+       "wt": "Medium",
+       "c": "#111827",
+       "_source": "index.tsx:414 — `Delete {n} layers?`; font 500 11px."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Delete",
+       "x": 140,
+       "y": 4,
+       "w": 52,
+       "h": 20,
+       "fill": "#E02424",
+       "r": 5,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 10,
+         "y": 2,
+         "v": "Delete",
+         "s": 11,
+         "wt": "Medium",
+         "c": "#FFFFFF"
+        }
+       ],
+       "_source": "index.tsx:415 .bdc-btn-danger — background --bk-error, colour --bk-bg-card."
+      },
+      {
+       "t": "frame",
+       "name": "btn/Cancel",
+       "x": 196,
+       "y": 4,
+       "w": 52,
+       "h": 20,
+       "fill": "#FFFFFF",
+       "stroke": "#D1D5DB",
+       "r": 5,
+       "nodes": [
+        {
+         "t": "text",
+         "x": 9,
+         "y": 2,
+         "v": "Cancel",
+         "s": 11,
+         "wt": "Medium",
+         "c": "#4B5563"
+        }
+       ],
+       "_source": "index.tsx:416 .bdc-btn-ghost."
+      }
+     ]
+    }
+   ],
+   "rowLadder": {
+    "rows": [
+     "clone of 245:1945",
+     "…",
+     "clone of 245:2008"
+    ],
+    "y": "176 + i*28",
+    "spacer": {
+     "y": 400,
+     "h": 384
+    },
+    "_geometry_source": "banner 98..134, confirm 140..168, rows 176..400, spacer 400..784."
+   },
+   "caption": {
+    "donor": "155:31",
+    "name": "caption/Layers · multi-delete-confirm",
+    "x": 2500,
+    "y": 1052,
+    "text": "Two or more selected and the banner's Delete opens an inline confirm inside the panel — “Delete 3 layers?” with Delete and Cancel — not a browser dialog (index.tsx:412-418). The right-click Delete on a single row has no equivalent: it removes the element and every descendant at once, with no count and no toast (useLayerActions.ts:208-217). The safer of the two paths is the one on the control people use less.",
+    "_placement": "board y 220 + 812 + the section's 20px caption gap = 1052; that slot is empty (row 1052 holds only 100 and 1700)."
+   },
+   "command": "node scripts/figma/add-state-board.mjs 143:295 \"<name above>\" --apply   # then: node scripts/figma/fix-layers-ux.mjs --only=C --confirm-board=<new id> --apply   # then: node scripts/figma/add-board-captions.mjs <a one-row plan built from `caption` above> --apply",
+   "_unresolved_id": "the clone's own id, and the ids of the nodes inside it, do not exist until add-state-board runs."
+  },
+  {
+   "step": "E",
+   "why": "UX-H-18",
+   "board": "1082:4589 (Layers · renaming, 1700,1280)",
+   "finding": "The board is NAMED renaming and draws no rename field at all — eight plain tree rows. And the name a user types never reaches the project: it is written to localStorage under the page id inside a try/catch that silently fails (layersPersistence.ts:73-79), so it is invisible to a teammate and gone on another machine. UX-H-18's own fix: 'until then the rename affordance should say the name is local to this browser.'",
+   "create": [
+    {
+     "parent": "1082:4610 (the Heading tree row, y=136)",
+     "name": "rename field",
+     "t": "frame",
+     "x": 60,
+     "y": 4,
+     "w": 180,
+     "h": 20,
+     "fill": "#FFFFFF",
+     "stroke": "#1A56DB",
+     "r": 4,
+     "_source": "LayerTreeItem.tsx:234-252 — the inline input; accent border is the panel's own focus treatment, not a new colour.",
+     "nodes": [
+      {
+       "t": "text",
+       "x": 6,
+       "y": 2,
+       "w": 150,
+       "v": "Hero heading",
+       "s": 12,
+       "wt": "Regular",
+       "c": "#111827"
+      },
+      {
+       "t": "rect",
+       "name": "caret",
+       "x": 84,
+       "y": 4,
+       "w": 1,
+       "h": 12,
+       "fill": "#111827"
+      }
+     ]
+    },
+    {
+     "parent": "1082:4589",
+     "t": "frame",
+     "x": 0,
+     "y": 164,
+     "w": 280,
+     "h": 20,
+     "name": "[not-implemented] rename hint — the name is written to localStorage under the page id and never reaches the project (layersPersistence.ts:73-79); the shipped field says nothing",
+     "_source": "This is UX-H-18's recommendation, not shipped copy, so it carries the file's own [not-implemented] marker — the same convention as 1082:4582 '[not-implemented] Move to page…' on the context-menu board.",
+     "nodes": [
+      {
+       "t": "text",
+       "x": 60,
+       "y": 2,
+       "w": 208,
+       "v": "This browser only, not the project",
+       "s": 11,
+       "wt": "Regular",
+       "c": "#6B7280"
+      }
+     ]
+    }
+   ],
+   "hide": [
+    {
+     "id": "1082:4612",
+     "why": "the row's static 'Heading' label is replaced by the field; apply-queue has no visibility op."
+    }
+   ],
+   "then": "the four row moves + spacer move/resize in layers-move.json (_depends_on: step E)",
+   "command": "node scripts/figma/fix-layers-ux.mjs --only=E --apply"
+  },
+  {
+   "step": "captions",
+   "why": "UX-H-18, UX-H-19, UX-H-20",
+   "finding": "Seven boards in this section have no caption at all: 1082:4527, 1082:4589, 1082:4640, 1082:4739, 1082:4835, 1082:5004, 1171:4829. Two of them carry findings I own.",
+   "create": [
+    {
+     "board": "1082:4527",
+     "donor": "155:30",
+     "name": "caption/Layers · context-menu",
+     "x": 900,
+     "y": 1052,
+     "text": "Eight items in two groups: Cut · Copy · Paste | Copy link · Duplicate · Delete | Rename · Group selection. Paste is disabled with “Copy or cut an element first”, Group selection below two selected with “Select 2 or more layers first”. With five rows selected every other item still acts on the ONE right-clicked row (useLayerContextActions.ts:16-19 vs :97-99) — the menu gives no sign which scope it is using. Delete removes the element and every descendant at once, with no confirm, no count and no toast (useLayerActions.ts:208-217), while the multi-select banner confirms the same act inline. selectChildren, moveToTop and moveToBottom have working handlers and no UI anywhere (:92-106).",
+     "_placement": "board 900,220 + 812 + 20 = 900,1052; slot empty."
+    },
+    {
+     "board": "1082:4589",
+     "donor": "155:30",
+     "name": "caption/Layers · renaming",
+     "x": 1700,
+     "y": 2112,
+     "text": "Reachable three ways — double-click an unlocked row, F2, or the context menu. Commits on Enter and on blur, cancels on Escape; an empty string DELETES the custom name and the row falls back to its type label (LayerTreeItem.tsx:234-252, useLayerActions.ts:180-201). The name never reaches the project: it is written to localStorage under the page id inside a try/catch that silently fails, so it is invisible to a teammate, gone on another machine and gone when site data is cleared (layersPersistence.ts:73-79). Nothing in the rename flow says so.",
+     "_placement": "board 1700,1280 + 812 + 20 = 1700,2112; slot empty."
+    }
+   ],
+   "command": "node scripts/figma/add-board-captions.mjs <this step as a plan array> --apply"
+  }
+ ],
+ "followups_unresolved": [
+  {
+   "op": "hotspot",
+   "over": "__banner btn/Delete on 143:295__",
+   "to": "__the multi-delete-confirm clone__",
+   "name": "hotspot/state · Layers · multi-delete-confirm",
+   "pad": 6,
+   "why": "UX-H-19 — a board with no inbound edge is a picture, not a screen.",
+   "_unresolved_id": "BOTH ids are created by steps B and C. Resolve after those run: `over` = the frame named 'btn/Delete' inside the frame named 'bdc-layers-banner' on board 143:295; `to` = the cloned board's id."
+  }
+ ],
+ "blocked": [
+  {
+   "finding": "UX-H-23",
+   "recommendation": "Take the row's full 24px of usable height for both toggles: the eye and lock are height 20px with NO width declared (layers-v2.css:157-178) and an 11px svg, so each box measures about 15x20 — under the 24x24 pointer minimum in a 28px row that has the height to give it. The selection banner in step B already uses 24x24 for the same glyph vocabulary, so the target size exists in the system.",
+   "blocker": "The eye and lock are not drawn on any Layers board. Every row is an INSTANCE of the tree-row master 243:6, which lives on page 🧩 Components (1:2) with 57 instances. The brief's hard rule 1 is 'write only inside page 1:3', so the master cannot be touched from this job. Overriding size on 57 instances is not a design fix, it is 57 desyncs.",
+   "carried_as": "a measured clause in caption 155:25 (layers-text.json), so the decision is recorded where a designer will read it.",
+   "unblocks_with": "founder permission to edit master 243:6 on page 1:2, plus a walk of all 57 instances afterwards (rule 6)."
+  }
+ ],
+ "runbook": [
+  "1. node scripts/figma/normalize-plans.mjs                                        (0 calls)",
+  "2. node scripts/figma/apply-queue.mjs --apply --only=layers-text,layers-rename    (9 rows, 2 calls) — the copy and the board names. Lands every finding that is a truth statement, and nothing here depends on anything else.",
+  "3. node scripts/figma/fix-layers-ux.mjs --only=A,D --apply                        (2 calls) — reshape the DragTooltip into the panel's alert bar, close the row ladder, and return caption 155:28 to its own board.",
+  "4. node scripts/figma/fix-layers-ux.mjs --only=B,E --apply                        (2 calls) — CREATE the selection toolbar on 143:295 and the rename field + [not-implemented] hint on 1082:4589. Both scripts move their own rows, so step 6's move rows will read SAME for those.",
+  "5. node scripts/figma/add-board-captions.mjs <the `captions` step as a plan array> --apply   (1 call, 2 rows)",
+  "6. node scripts/figma/apply-queue.mjs --apply --only=layers-move                  (32 rows, 3 calls) — idempotent after 3 and 4; run it anyway, it is the read-back that proves the geometry.",
+  "7. node scripts/figma/fix-layers-ux.mjs --only=F --apply                          (1 call) — widen the section 2480 -> 2880. MUST precede step 8.",
+  "8. node scripts/figma/add-state-board.mjs 143:295 \"<the step-C name>\" --apply     (1 call)",
+  "9. node scripts/figma/fix-layers-ux.mjs --only=C --confirm-board=<new id> --apply  (1 call)",
+  "10. node scripts/figma/add-board-captions.mjs <the step-C caption> --apply         (1 call)",
+  "11. node scripts/figma/add-hotspots.mjs <followups_unresolved, now resolvable> --apply  (1 call)",
+  "12. node scripts/figma/verify-invariants.mjs                                       (1 call)",
+  "TOTAL 14 calls. Steps 1-6 are self-contained and carry eleven of the twelve findings; 7-11 exist only for UX-H-19's new board."
+ ],
+ "_op_move_note": "Validated locally 2026-09-07 against normalize-plans.mjs + apply-queue.mjs --only=layers: 41 rows, 0 unusable, 5 calls (text 5, rename 4, move 26, resize 4, fill 2). Two width-changing resizes could not be expressed as queue rows and are listed under geometry_not_expressible_as_queue_rows.",
+ "geometry_not_expressible_as_queue_rows": {
+  "_why": "normalize-plans.mjs classifies a resize only as {target, from, to} — a height. These two change WIDTH, so they cannot be queue rows today and are executed by fix-layers-ux.mjs instead. Listed here with exact before/after so nothing is lost if that script is replaced.",
+  "rows": [
+   {
+    "op": "resize",
+    "id": "143:178",
+    "w": 248,
+    "h": 16,
+    "why": "UX-H-24 — 280 minus 2x16 pad.",
+    "_executed_by": "fix-layers-ux.mjs --only=A"
+   },
+   {
+    "op": "resize",
+    "id": "1776:8375",
+    "w": 2880,
+    "h": 3696,
+    "why": "UX-H-19 — the new multi-delete-confirm board opens a sixth column at x=2500; the section is 2480 wide. HEIGHT MUST NOT CHANGE: section 04 · Pages starts 480px below this one (11574+3696=15270 vs 15750), and section overlap is a verify-invariants FAIL.",
+    "_geometry_source": "MEASURED from the page-meta section table; all 29 children sit inside x 100..2380, y 220..3556.",
+    "_depends_on": "step C",
+    "_executed_by": "fix-layers-ux.mjs --only=F"
+   }
+  ]
+ }
+}

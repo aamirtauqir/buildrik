@@ -9,16 +9,20 @@
  * §4: "Modals, not drill-in"); Optimise keeps the OptimizationPanel view until
  * its S3.6 board pass.
  *
- * Versions view (146:32): 56h rows — dot · relative time · size delta,
- * current pinned with a 3px accent bar — and restore confirms INLINE in a
- * 32h band ("a drill-in that spawns a modal has lost the plot"). The data is
+ * Versions view (146:32): 44h chips — dot · relative time · size delta,
+ * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
+ * 56h full-bleed row) — and restore confirms INLINE in the 84h band 146:64
+ * draws ("a drill-in that spawns a modal has lost the plot"). The data is
  * the server restore points; the old sibling-filename heuristic list is gone
  * (those are separate library items the grid already shows). No author line —
  * AssetVersion carries none; the board's "Ali/Sara" is sample shape.
  *
- * Used-in view (146:68): 44h rows grouped by page with a 28h count header,
- * Jump switches the active page and selects the element. The empty state is
- * load-bearing: "Not used on any page" is what makes deleting safe.
+ * Used-in view: one 44h chip PER HIT — page name over the element's own name
+ * with a "Go ›" link — and no page-group header, per board 75:90, which beat
+ * 146:68's grouped list (that drew the page name twice and left the row with
+ * no shape). Go switches the active page and selects the element. Both ends
+ * of the state are load-bearing: "Not used on any page" is what makes
+ * deleting safe, and 75:111's warning band is what says when it is not.
  *
  * @license BSD-3-Clause
  */
@@ -311,7 +315,12 @@ export function AssetDetailOverlay({
   return (
     <div
       ref={overlayRef}
-      className="med-detail-overlay tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:overflow-y-auto tw:bg-[var(--bk-bg-panel,white)]"
+      /* Boards 146:2 / 146:32 / 146:68 give the drill-in frame the drawer's own
+         --flowbite/gray/100 edge; with no border set at all the computed
+         border-color came back #000000, the initial value — the same defect
+         SlimLauncher's own board found on 144:2. */
+      className="med-detail-overlay tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:overflow-y-auto tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel,white)]"
+      data-testid="media-detail-panel"
       role="dialog"
       aria-modal="true"
       aria-label={display}
@@ -319,11 +328,12 @@ export function AssetDetailOverlay({
       {/* The drill-in draws the shared panel header itself — the overlay
           covers the drawer, and the board keeps Media's 44h header on every
           drill-in screen. */}
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} />
 
       {/* Back row — ‹ pops one level, exactly like ESC. */}
       <Button
         variant="link" className={BACK_ROW}
+        data-testid="media-detail-back"
         onClick={() => (view === "hub" ? onClose() : setView("hub"))}
         aria-label={view === "hub" ? "Back to media grid" : `Back to ${display}`}
       >
@@ -351,7 +361,10 @@ export function AssetDetailOverlay({
           <>
             {/* Board 146:9 — 160h preview on bg-subtle, dims in mono at the
                 bottom-left of the well. */}
-            <div className="tw:relative tw:h-40 tw:w-full tw:shrink-0 tw:bg-[var(--bk-bg-subtle)]">
+            <div
+              className="tw:relative tw:h-40 tw:w-full tw:shrink-0 tw:bg-[var(--bk-bg-subtle)]"
+              data-testid="media-detail-preview"
+            >
               {item.type === "vid" ? (
                 <video
                   src={item.src}
@@ -370,15 +383,18 @@ export function AssetDetailOverlay({
                   onError={() => setMetaError(true)}
                 />
               )}
-              <span className="tw:absolute tw:bottom-2 tw:left-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+              <span
+                className="tw:absolute tw:bottom-2 tw:left-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+                data-testid="media-detail-dims"
+              >
                 {dims ? `${dims.w}\u00d7${dims.h} \u00b7 ` : ""}
                 {fmtSize(item.size)}
               </span>
             </div>
 
             {/* Board 146:11 — alt text above the fold, with ✨ Generate. */}
-            <div className="tw:w-full tw:px-4 tw:pt-1.5">
-              <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input">
+            <div className="tw:w-full tw:px-4 tw:pt-1.5" data-testid="media-detail-alt">
+              <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input" data-testid="media-detail-alt-label">
                 Alt text
               </label>
               <TextField
@@ -462,13 +478,20 @@ export function AssetDetailOverlay({
       ) : view === "versions" ? (
         <div className="tw:w-full" role="list" aria-label="Version history">
           {/* Current — pinned, accent-tint with the 3px bar (board 241:1436). */}
-          <div className="tw:relative tw:flex tw:h-14 tw:w-full tw:items-start tw:bg-[var(--bk-accent-tint)]" role="listitem">
+          {/* Board 75:65 — the current version is a 44-high accent-tint chip
+              on a 6 radius at a 10 inset, the same box the older rows use in
+              bg-subtle. It shipped 56 tall, full-bleed and square. */}
+          <div
+            className="tw:relative tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-2.5"
+            data-testid="media-version-current"
+            role="listitem"
+          >
             <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-            <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-            <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            <span className="tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]" aria-hidden="true" />
+            <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
               now
             </span>
-            <span className="tw:mt-2.5 tw:mr-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
+            <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]">
               current
             </span>
           </div>
@@ -484,19 +507,29 @@ export function AssetDetailOverlay({
                   : `${delta > 0 ? "+" : "−"}${fmtSize(Math.abs(delta))}`;
             return (
               <React.Fragment key={v.id}>
-                <div className="tw:flex tw:h-14 tw:w-full tw:items-start hover:tw:bg-[var(--bk-bg-subtle)]" role="listitem">
-                  <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-gray-300)]" aria-hidden="true" />
-                  <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                {/* Boards 75:71 / 75:77 / 75:83 — an older version wears the
+                    SAME box as the current one, in bg-subtle: 44 tall, 6
+                    radius, 10 inset, 10 gap, inset from the panel edge. They
+                    shipped 56 tall, full-bleed and square, directly under a
+                    44 chip on a 6 radius, which read as two different lists. */}
+                <div
+                  className="tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5"
+                  data-testid={`media-version-${v.id}`}
+                  role="listitem"
+                >
+                  <span className="tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-gray-300)]" aria-hidden="true" />
+                  <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                     {formatRelativeTime(ts, { fallback: "daysShort" })}
                   </span>
-                  <span className="tw:mt-2.5 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+                  <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]">
                     {meta}
                   </span>
                   <Button
                     type="button"
                     color="light"
                     size="xs"
-                    className="tw:mx-3 tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
+                    className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
+                    data-testid={`media-version-menu-${v.id}`}
                     aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
                     disabled={restoringId !== null}
                     onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
@@ -504,29 +537,42 @@ export function AssetDetailOverlay({
                     {restoringId === v.id ? "…" : "⋯"}
                   </Button>
                 </div>
-                {/* Board 146:64 — restore confirms INLINE in a 32h band. */}
+                {/* Board 146:64 — restore confirms INLINE, and the band is 84
+                    tall because the question names the cost: it shipped as a
+                    32h strip saying "Restore?", which asks for a decision
+                    while withholding the one fact needed to make it. */}
                 {pendingRestore === v.id ? (
-                  <div className="tw:flex tw:h-8 tw:w-full tw:items-center tw:gap-6 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[12px] tw:leading-[18px]" data-testid="media-restore-confirm">
-                    <span className="tw:flex-1 tw:text-[var(--bk-ink)]">Restore?</span>
-                    <Button
-                      type="button"
-                      color="light"
-                      size="xs"
-                      variant="link" className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]"
-                      onClick={() => setPendingRestore(null)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      color="light"
-                      size="xs"
-                      variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)]"
-                      data-testid="media-restore-go"
-                      onClick={() => confirmRestore(v.id)}
-                    >
-                      Restore
-                    </Button>
+                  <div
+                    className="tw:flex tw:h-21 tw:w-full tw:flex-col tw:justify-start tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:pt-2 tw:text-[12px] tw:leading-[18px]"
+                    data-testid="media-restore-confirm"
+                  >
+                    <span className="tw:text-[var(--bk-ink)]">
+                      Restore this version?{usageCount > 0
+                        ? ` It is used in ${usageCount} ${usageCount === 1 ? "place" : "places"} — those will update too.`
+                        : ""}
+                    </span>
+                    <span className="tw:flex tw:items-center tw:justify-end tw:gap-4">
+                      <Button
+                        type="button"
+                        color="light"
+                        size="xs"
+                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+                        data-testid="media-restore-cancel"
+                        onClick={() => setPendingRestore(null)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        color="light"
+                        size="xs"
+                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px]"
+                        data-testid="media-restore-go"
+                        onClick={() => confirmRestore(v.id)}
+                      >
+                        Restore
+                      </Button>
+                    </span>
                   </div>
                 ) : null}
               </React.Fragment>
@@ -550,40 +596,67 @@ export function AssetDetailOverlay({
               </p>
             </div>
           ) : (
-            usage.map((pg) => (
-              <React.Fragment key={pg.pageId}>
-                {/* 28h page-group header. */}
-                <div className="tw:flex tw:h-7 tw:w-full tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                  <span className="tw:flex-1">{pg.pageName}</span>
-                  <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums">
-                    {pg.hits.length}
-                  </span>
-                </div>
-                {pg.hits.map((hit) => (
-                  <div key={hit.elementId} className="tw:flex tw:h-11 tw:w-full tw:items-center tw:px-4" role="listitem">
-                    <span className="tw:min-w-0 tw:flex-1">
-                      <span className="tw:block tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-                        {hit.label}
-                      </span>
-                      <span className="tw:block tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                        {hit.crumb}
-                      </span>
+            /* Board 75:90 lists one CHIP PER HIT — page name over the
+               element's own name, with a "Go ›" link — and no page-group
+               header at all: 75:96 "Home / Hero background", 75:101 "Menu /
+               Header image", 75:106 "About / Gallery · item 2". It shipped as
+               a 28-high bg-subtle header per page with bare full-bleed rows
+               under it, which put the page name in two places and left the
+               row itself with no shape. Flattened here to the board's list;
+               the hit count the header carried is already in the drill-in row
+               that opens this view. */
+            usage.flatMap((pg) =>
+              pg.hits.map((hit) => (
+                <div
+                  key={hit.elementId}
+                  className="tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5"
+                  data-testid={`media-used-row-${hit.elementId}`}
+                  role="listitem"
+                >
+                  <span className="tw:min-w-0 tw:flex-1">
+                    {/* 75:98 — the page, 12 on an 18 line box in ink. */}
+                    <span className="tw:block tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+                      {pg.pageName}
                     </span>
-                    <Button
-                      type="button"
-                      color="light"
-                      size="xs"
-                      variant="link" className="tw:min-h-6 tw:shrink-0 tw:text-[12px]"
-                      data-testid={`media-jump-${hit.elementId}`}
-                      onClick={() => handleJump(pg.pageId, hit.elementId)}
+                    {/* 75:99 — what it is on that page, 11/16 in ink-muted. */}
+                    <span
+                      className="tw:block tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                      data-testid={`media-used-sub-${hit.elementId}`}
                     >
-                      Jump {"›"}
-                    </Button>
-                  </div>
-                ))}
-              </React.Fragment>
-            ))
+                      {hit.label}
+                    </span>
+                  </span>
+                  {/* 75:100 — "Go ›", 11/16 in accent-text. It said "Jump ›". */}
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:min-h-6 tw:shrink-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]"
+                    data-testid={`media-jump-${hit.elementId}`}
+                    onClick={() => handleJump(pg.pageId, hit.elementId)}
+                  >
+                    Go {"›"}
+                  </Button>
+                </div>
+              )),
+            )
           )}
+          {/* Board 75:111 — the delete guard. The empty state already tells
+              you deleting is safe; the state where it is NOT safe said
+              nothing at all, which is the half that matters. 40h warning-tint
+              band on a 6 radius, 11/16 in warning-text. */}
+          {usage.length > 0 ? (
+            <div
+              className="tw:mx-3 tw:mt-2 tw:mb-3 tw:flex tw:h-10 tw:items-center tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-2.5"
+              data-testid="media-used-delete-guard"
+              role="note"
+            >
+              <span className="tw:min-w-0 tw:flex-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]">
+                Deleting this breaks {usage.length} {usage.length === 1 ? "page" : "pages"}. Replace it instead.
+              </span>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">

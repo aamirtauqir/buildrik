@@ -1,0 +1,165 @@
+{
+  "surface": "s1-1-coach-dismissed",
+  "board": "S1.1 · coach-dismissed (Figma 297:1972)",
+  "_note": [
+    "boards.json recorded this row `drift-coach-never-mounts`. That was true and",
+    "it now has a cause and a fix, found by driving the demo rather than reading",
+    "the JSX: `RailCoach` renders only when `completedCount === 0`, and the",
+    "editor's OWN bootstrap page ticked 'Add your first page' on first paint —",
+    "`useComposerInit` calls `elements.createPage` when storage is empty, which",
+    "emits `project:changed { type: page:created }` outside any import, and",
+    "`OnboardingMount` credited it. Measured at localhost:5050: 1/7 done and an",
+    "achievement overlay on screen four seconds after boot, untouched. The credit",
+    "now requires MORE THAN ONE page — the same rule the catch-up seeding beside",
+    "it already used. Re-measured: 0/7 done and the coach on the rail. This",
+    "recipe then DISMISSES it with the button, which is the state the board draws.",
+    "",
+    "So the surface is reached the way a first-run user reaches it: boot, the",
+    "coach appears, press Got it, the drawer closes. No probe.",
+    "",
+    "WHAT MOVED:",
+    "  · Browse templates — 40 tall to the board's 32, with 16/10 insets and",
+    "    radius 8. Board 338:2326 is a real Button component instance, so this",
+    "    is the DS speaking through the board. flowbite's size-md h-10 only",
+    "    yields to a same-property utility (`tw:h-8`).",
+    "  · the CTA block's 12 is a GAP now, not a margin under the sentence. Same",
+    "    picture; only the gap can be measured against 297:2008.",
+    "  · Start blank keeps its sibling's height and DESIGN.md's radius, and takes",
+    "    the board's quieter 13px label and 14px inset — see the code note, and",
+    "    the refusal below.",
+    "",
+    "NOT JOINED, and why:",
+    "  297:2013 the Start blank BOX — 34 tall beside a 32-tall Button component",
+    "  instance on the same row (32 plus its own two 1px strokes, which Figma",
+    "  draws outside the box and CSS draws inside), and `--radius/sm` where",
+    "  DESIGN.md puts every button on radius-lg. It is a hand-drawn frame next",
+    "  to a real component instance, i.e. a stub. Its LABEL (297:2014) reads as",
+    "  a decision rather than an artifact and IS joined.",
+    "  297:2010 the actions row — the board says gap 10 and Canvas.css says 12,",
+    "  deliberately: there is no 10 on the 4px scale and no token for it, and",
+    "  the prior pass recorded that against board 65:203 which says 10 too. Two",
+    "  boards agreeing does not create a token; left as recorded rather than",
+    "  quietly re-litigated.",
+    "  682:5053 the TOPBAR and its children — board 681:26 owns the topbar and",
+    "  `shell-default` measures it. One screen board does not re-settle a",
+    "  surface six others are measured against.",
+    "  2034:8392 and the rail items — the Rail family (52:2 / 199:2) owns those,",
+    "  and boards.json already carries an `authority=code:topbar` ruling on the",
+    "  twelve Shell-state boards for exactly this kind of overlap. 3334:12647",
+    "  could not be joined in any case: its extracted props read",
+    "  `font-size: #6b7280`, a colour in a size slot, which is a bad export.",
+    "  297:2015-2017 the INSPECTOR empty state — two boards disagree. This one",
+    "  says 13/20 `--color/ink-soft`, centred, over a 32px `--color/bg-subtle`",
+    "  square; board 159:99, which InspectorEmptyState.tsx is built and",
+    "  commented against, says two lines flush-left in `--bk-ink-muted` with no",
+    "  square and an accent AI link. Neither re-settles the other, so it is",
+    "  measured on 159:99, where it already lives.",
+    "  697:444 the SAVE pill's fill — the board draws it as a `--color/success",
+    "  -tint` chip with `--color/success-text` type. Board 813:4836 draws the",
+    "  same component five times on a plain white specimen ground, and",
+    "  SaveStatus makes saved/saving/unsaved plain muted text with a coloured",
+    "  dot on purpose (T8/D7 rule 4). Two boards disagree; the geometry they",
+    "  AGREE on (692:421 — 24 tall, fully round) is joined instead.",
+    "  297:2006 the CANVAS column — two separate reasons, either one enough. The",
+    "  only element carrying `data-testid=\"canvas\"` is `.buildrick-canvas`, the",
+    "  CUSTOMER CONTENT mount, not the column the board draws; joining them would",
+    "  have measured the user's page against the editor's ground. And the ground",
+    "  itself is contested: this board says `--flowbite/gray/50` (#F9FAFB) while",
+    "  430:2348's own shell backdrop (430:2353), in this same assignment, says",
+    "  `--color/bg-app` (#F3F4F6), which is what `wrapperStyles` renders. Two",
+    "  boards disagree, so neither re-settles it. Measured but not joined; the",
+    "  board's `pb-32` (code: 24 all round) rides on the same node and waits with",
+    "  it.",
+    "  297:2018 the footer BAND — its element is the `<footer>` in",
+    "  AquibraStudio.tsx, which this arc may not stage (founder's tree). Both",
+    "  text nodes inside it are joined, which is where the 11/16 contract lives.",
+    "",
+    "Board sample data not conformed to: 'Bella Cucina' (a site name) and",
+    "'Saved 2m ago' (a live clock)."
+  ],
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-tab-add"
+    },
+    {
+      "action": "waitFor",
+      "testId": "canvas-empty-cta"
+    }
+  ],
+  "contrastScope": "body",
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ],
+  "targets": [
+    {
+      "name": "canvas",
+      "testId": "canvas"
+    },
+    {
+      "name": "empty-cta",
+      "testId": "canvas-empty-cta",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "297:2008"
+    },
+    {
+      "name": "empty-cta-title",
+      "testId": "canvas-empty-cta-title",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "297:2009"
+    },
+    {
+      "name": "empty-cta-actions",
+      "testId": "canvas-empty-cta-actions"
+    },
+    {
+      "name": "browse-templates",
+      "testId": "canvas-empty-browse",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "338:2326"
+    },
+    {
+      "name": "browse-templates-label",
+      "testId": "canvas-empty-browse",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "I338:2326;9:19"
+    },
+    {
+      "name": "start-blank",
+      "testId": "canvas-empty-start-blank",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "297:2014"
+    },
+    {
+      "name": "save-pill",
+      "testId": "save-status-saved",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "692:421"
+    },
+    {
+      "name": "footer-selection",
+      "testId": "footer-selection-label",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "297:2019"
+    },
+    {
+      "name": "footer-device-zoom",
+      "testId": "footer-device-zoom",
+      "spec": "s1-1-coach-dismissed",
+      "nodeId": "297:2022"
+    }
+  ]
+}

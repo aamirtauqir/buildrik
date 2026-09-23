@@ -1,0 +1,83 @@
+{
+  "surface": "s1-flows-setup-chip-footer-band",
+  "board": "S1.4 · setup-chip · footer-band (Figma 1342:7162)",
+  "_note": [
+    "This board is a SPEC SHEET, not a screen: a 1440x360 frame holding two",
+    "hand-drawn copies of the footer band stacked under annotation sentences",
+    "(\"Setup chip lives in the footer band (founder-approved move from the",
+    "floating pill)\" / \"Dismissed — chip gone, footer plain\"). Everything in it",
+    "is absolutely positioned at annotation coordinates. So the subject is the",
+    "CHIP, and the chip is what this recipe joins.",
+    "",
+    "The move itself was already done — OnboardingChecklist's CHIP_RIGHT block",
+    "records the 2026-08-27 measurement that put the collapsed pill in the",
+    "status band, and the orchestrator starts minimized. What had NOT followed",
+    "the board was the chip's own skin. WHAT MOVED:",
+    "  · fill `--bk-accent-tint` (#EBF5FF), was white + a gray-200 hairline +",
+    "    `--bk-shadow-overlay`. A small floating card inside the one band it is",
+    "    supposed to belong to.",
+    "  · label `--bk-accent-text` at 12/medium/leading-normal, was `--bk-ink`",
+    "    at 12/semibold/16. Measured 5.60:1 on the tint — over the 4.5 floor.",
+    "  · 96x24 with radius 12 and a 6px dot, was auto-width ~20 tall,",
+    "    `rounded-full` and an 8px dot.",
+    "  · the ChevronUp is gone: the board draws dot + label only, and the",
+    "    affordance is carried by role=button, the pointer cursor and the",
+    "    aria-label.",
+    "  · copy `2/7 done`, not `2 / 7 done` (1342:7169). The spoken form stays",
+    "    on the aria-label. OnboardingChecklist.test.tsx moved with it.",
+    "The 96 is board-literal rather than sample-derived: every string this",
+    "component can render (`0/7 done` … `7/7 done`, `All done!`) fits the 86px",
+    "the chip's padding leaves, so the fixed plate never clips.",
+    "",
+    "NOT JOINED, and why:",
+    "  1342:7164 / 1342:7171 the FOOTER BANDS and 1342:7165 / 7166 / 7172 /",
+    "  7173 their two text nodes — TWO BOARDS DISAGREE, and this is the one",
+    "  that is a diagram. 297:2018 (S1.1) draws the footer as a real component",
+    "  frame: flex, gap 16, px 16, h 32, `--color/bg-panel` on a",
+    "  `--flowbite/gray/100` top rule, with both texts at 11/16 in",
+    "  `--color/ink-muted`. This board draws it 40 tall with the texts absolutely",
+    "  placed at left 16 / left 1330 / top 11, at 12px, and in TWO different",
+    "  greys (#9ca3af left, #6b7280 right) for what is one type role. It is",
+    "  measured where it already lives — `s1-1-coach-dismissed` joins 297:2019",
+    "  and 297:2022. Independently: the band's element is the `<footer>` in",
+    "  AquibraStudio.tsx, which this arc may not stage (founder's tree).",
+    "  1342:7168 the DOT — extract.mjs kept no comparable property for it (it is",
+    "  an <img> of an SVG ellipse, so no fill reaches the spec). Its 6px size is",
+    "  conformed in the code anyway; there is simply nothing to measure it",
+    "  against.",
+    "  1342:7163 / 7170 / 7174 the annotation sentences and 1682:7211 the",
+    "  prototype hotspot — Figma authoring furniture, not product.",
+    "",
+    "Board sample data not conformed to: `2/7 done` (the live editor boots at",
+    "0/7) and `Desktop · 100%`."
+  ],
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "setup-chip"
+    }
+  ],
+  "contrastScope": "body",
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ],
+  "targets": [
+    {
+      "name": "setup-chip",
+      "testId": "setup-chip",
+      "spec": "s1-flows-setup-chip-footer-band",
+      "nodeId": "1342:7167"
+    },
+    {
+      "name": "setup-chip-text",
+      "testId": "setup-chip-text",
+      "spec": "s1-flows-setup-chip-footer-band",
+      "nodeId": "1342:7169"
+    }
+  ]
+}

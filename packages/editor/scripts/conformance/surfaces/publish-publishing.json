@@ -1,0 +1,41 @@
+{
+  "surface": "publish-publishing",
+  "board": "Publish · publishing (Figma 784:4250)",
+  "_note": [
+    "A deploy in flight is the shell's `publishJob` state machine, not something a",
+    "click reaches from a cold editor, so the probe hands PublishTab the shape that",
+    "machine is in mid-run. The panel under test is the shipped one.",
+    "",
+    "NOT joined, and why:",
+    "  784:4287 (Button · disabled) — this board fills it flowbite/gray/200 #e5e7eb;",
+    "  board 781:4526 fills the SAME control --color/bg-subtle #f3f4f6, and its label",
+    "  ink-muted #6b7280 against this board's ink-placeholder #9ca3af. Two boards",
+    "  disagreeing cannot re-settle a control, so the code keeps 781:4526's greys and",
+    "  the target stays SKIPPED rather than being scored against a coin toss. The",
+    "  publish-load-error recipe measures the same button against the board that is",
+    "  internally consistent with the rest of the set.",
+    "  784:4309 / 784:4310 (progress track + fill) — the board draws 4px on a 2px",
+    "  radius; the panel uses chrome-ui's `Progress`, i.e. flowbite `sm`, which is 6px",
+    "  and fully rounded. flowbite's Progress puts no anchor on either the track or",
+    "  the bar, so neither can be addressed by testId at all, and re-theming a shared",
+    "  re-export off one board is the move this arc's precedent forbids.",
+    "  784:4311 / 784:4315 / 784:4320 (ENVIRONMENT header and its rows) — the board",
+    "  gives each row its own 16px gutter; the panel delivers the same 16px from",
+    "  `CONTENT`'s px-4 one level up, so the rows measure 0. Moving the inset onto the",
+    "  rows is right, and it changes every section on boards 641:2652 / 784:4326 /",
+    "  784:4403 too — those have no recipe yet, so it belongs to their walk."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=publish-publishing",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [{ "action": "waitFor", "testId": "publish-progress" }],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel-header", "testId": "panel-header", "spec": "publish-publishing", "nodeId": "784:4251" },
+    { "name": "panel-header-title", "testId": "panel-header-title", "spec": "publish-publishing", "nodeId": "I784:4251;16:7" },
+    { "name": "status-block", "testId": "publish-progress", "spec": "publish-publishing", "nodeId": "784:4306" },
+    { "name": "status-title", "testId": "publish-progress-title", "spec": "publish-publishing", "nodeId": "784:4307" },
+    { "name": "status-meta", "testId": "publish-progress-meta", "spec": "publish-publishing", "nodeId": "784:4308" },
+    { "name": "footer", "testId": "publish-footer", "spec": "publish-publishing", "nodeId": "784:4286" },
+    { "name": "cta", "testId": "publish-cta" }
+  ]
+}

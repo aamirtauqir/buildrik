@@ -3,12 +3,14 @@
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "144:2",
   "boardName": "Media · grid",
-  "figmaHash": "8b9ed056476d3433472116f4ca2ff6cd7e2a0a811946a64183015a4a419914c9",
+  "figmaHash": "9930d1ce3f235415b4a6bbc04dc6c48810c9898587e8208cedc86e2400227eb5",
   "extractorVersion": 2,
-  "extractedAt": "2026-09-02T05:01:12.109Z",
+  "extractedAt": "2026-09-07T23:59:27.826Z",
   "copy": [
     "Media",
     "Search",
+    "📁 All ▾",
+    "☑ Select",
     "image",
     "128",
     "video",
@@ -23,7 +25,13 @@
     "AI",
     "team.jpg",
     "Showing 200 of 412",
-    "Load more"
+    "Load more",
+    "↑ Upload",
+    "☁ Stock",
+    "⬡ Icons",
+    "Aa Fonts",
+    "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+    "Sort and list view live in the full library ⇱"
   ],
   "targets": [
     {
@@ -84,24 +92,17 @@
     {
       "nodeId": "144:7",
       "name": "Search",
-      "className": "border border-[var(--color\\/border,#e5e7eb)] border-solid h-[36px] overflow-clip relative rounded-[6px] shrink-0 w-full",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
       "props": {
-        "border-color": {
-          "token": "--color/border",
-          "value": "#e5e7eb"
-        },
         "height": {
           "value": "36px"
-        },
-        "border-radius": {
-          "value": "6px"
         }
       }
     },
     {
       "nodeId": "144:8",
       "name": "search box",
-      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid cursor-pointer h-[28px] left-[15px] overflow-clip rounded-[6px] top-[3px] w-[248px]",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid cursor-pointer h-[28px] left-[16px] overflow-clip rounded-[6px] top-[4px] w-[248px]",
       "props": {
         "background-color": {
           "token": "--flowbite/gray/50",
@@ -142,7 +143,7 @@
     {
       "nodeId": "144:10",
       "name": "Folder row",
-      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[32px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-pre",
+      "className": "h-[32px] overflow-clip relative shrink-0 w-full",
       "props": {
         "height": {
           "value": "32px"
@@ -152,7 +153,7 @@
     {
       "nodeId": "144:11",
       "name": null,
-      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[7px]",
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[7px] whitespace-pre",
       "props": {
         "line-height": {
           "value": "20px"
@@ -169,7 +170,7 @@
     {
       "nodeId": "144:12",
       "name": null,
-      "className": "absolute leading-[18px] left-[196px] text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] top-[8px] tracking-[0.5px]",
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[200px] not-italic text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left top-[8px] tracking-[0.5px] w-[64px]",
       "props": {
         "line-height": {
           "value": "18px"
@@ -180,6 +181,22 @@
         "color": {
           "token": "--color/ink-soft",
           "value": "#4b5563"
+        },
+        "width": {
+          "value": "64px"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21924",
+      "name": "hotspot/folder-row · ☑ Select → bulk-select",
+      "className": "absolute h-[30px] left-[194px] opacity-0 top-[2px] w-[76px]",
+      "props": {
+        "height": {
+          "value": "30px"
+        },
+        "width": {
+          "value": "76px"
         }
       }
     },
@@ -516,7 +533,7 @@
     {
       "nodeId": "I218:686;218:6",
       "name": "badge",
-      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[40px]",
+      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[52px]",
       "props": {
         "background-color": {
           "token": "--color/ink",
@@ -529,7 +546,7 @@
           "value": "6px"
         },
         "width": {
-          "value": "40px"
+          "value": "52px"
         }
       }
     },
@@ -605,6 +622,19 @@
       }
     },
     {
+      "nodeId": "2865:21894",
+      "name": "hotspot/card · click inserts onto the canvas",
+      "className": "cursor-pointer h-[104px] opacity-0 relative shrink-0 w-[116px]",
+      "props": {
+        "height": {
+          "value": "104px"
+        },
+        "width": {
+          "value": "116px"
+        }
+      }
+    },
+    {
       "nodeId": "144:36",
       "name": "grid row",
       "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
@@ -671,7 +701,7 @@
     {
       "nodeId": "I218:697;218:6",
       "name": "badge",
-      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[40px]",
+      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[52px]",
       "props": {
         "background-color": {
           "token": "--color/ink",
@@ -684,7 +714,7 @@
           "value": "6px"
         },
         "width": {
-          "value": "40px"
+          "value": "52px"
         }
       }
     },
@@ -809,10 +839,20 @@
     {
       "nodeId": "144:46",
       "name": "Footer",
-      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left w-full",
+      "className": "h-[182px] overflow-clip relative shrink-0 w-full",
       "props": {
         "height": {
-          "value": "44px"
+          "value": "182px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:47",
+      "name": null,
+      "className": "[word-break:break-word] absolute cursor-pointer font-['Inter:Regular'] font-normal leading-[0] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
         },
         "font-size": {
           "value": "13px"
@@ -824,35 +864,125 @@
       }
     },
     {
-      "nodeId": "144:47",
-      "name": null,
-      "className": "absolute cursor-pointer leading-[0] left-[16px] top-[14px] whitespace-nowrap",
-      "props": {
-        "line-height": {
-          "value": "0"
-        }
-      }
-    },
-    {
       "nodeId": "144:48",
       "name": null,
-      "className": "absolute leading-[20px] left-[110px] top-[14px] w-[16px] whitespace-pre-wrap",
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[89px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] w-[54px]",
       "props": {
         "line-height": {
           "value": "20px"
         },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
         "width": {
-          "value": "16px"
+          "value": "54px"
         }
       }
     },
     {
       "nodeId": "1124:4588",
       "name": null,
-      "className": "absolute leading-[normal] left-[156px] top-[14px] whitespace-pre",
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[152px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] whitespace-pre",
       "props": {
         "line-height": {
           "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "2838:12021",
+      "name": null,
+      "className": "[word-break:break-word] absolute cursor-pointer font-['Inter:Regular'] font-normal leading-[0] left-[209px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] w-[58px]",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "58px"
+        }
+      }
+    },
+    {
+      "nodeId": "2838:12022",
+      "name": null,
+      "className": "[word-break:break-word] absolute cursor-pointer font-['Inter:Regular'] font-normal leading-[0] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[44px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "2838:12023",
+      "name": null,
+      "className": "[word-break:break-word] absolute cursor-pointer font-['Inter:Regular'] font-normal leading-[0] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[132px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21896",
+      "name": "hotspot/footer · ☁ Stock",
+      "className": "absolute cursor-pointer h-[32px] left-[83px] opacity-0 top-[8px] w-[66px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "66px"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21920",
+      "name": "hotspot/footer · ⬡ Icons",
+      "className": "absolute cursor-pointer h-[28px] left-[146px] opacity-0 top-[8px] w-[63px]",
+      "props": {
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "63px"
         }
       }
     },
@@ -950,16 +1080,16 @@
     {
       "nodeId": "873:4528",
       "name": "hotspot/back · to editor",
-      "className": "bg-[blue] opacity-0 relative shrink-0 size-[36px]",
+      "className": "bg-[rgba(0,0,0,0)] opacity-0 relative shrink-0 size-[36px]",
       "props": {
         "background-color": {
-          "value": "blue"
+          "value": "rgba(0,0,0,0)"
         }
       }
     },
     {
       "nodeId": "1165:4713",
-      "name": "hotspot/state · Media · fullpage · library",
+      "name": "hotspot/state · ⬚ expand does NOT widen the drawer — it CLOSES it and opens the fullpage library (MediaTab.tsx:87-96, useMediaState.ts:48-53). V2 UX-H-13: name the destination.",
       "className": "absolute h-[34px] left-[-1px] top-[773px] w-[280px]",
       "props": {
         "height": {
@@ -967,6 +1097,137 @@
         },
         "width": {
           "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7213",
+      "name": "hotspot/gesture · right-click a card → per-asset menu (Rename / Copy URL / Copy alt text / Move to folder / Edit image / Replace across pages / Delete). V2 UX-H-01: the gesture must NOT silently enter bulk mode — MediaContextMenu is imported at MediaTab.tsx:16 and never rendered; SlimLauncher.tsx:469-476 maps onContextMenu to onEnterSelection instead.",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[60px] left-[-1px] opacity-0 top-[171px] w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "60px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7215",
+      "name": "hotspot/state · Media · quota-warn",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[705px] w-[140px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "140px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7217",
+      "name": "hotspot/state · Media · quota-full",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[139px] opacity-0 top-[705px] w-[140px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "140px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17381",
+      "name": "hotspot/state · Media · filter-empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[-1px] top-[613px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17420",
+      "name": "hotspot/state · search-scope · truncated",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[645px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17423",
+      "name": "hotspot/state · search-scope · failed",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[677px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17525",
+      "name": "hotspot/state · move-to-folder · no-folders",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[709px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "2435:12153",
+      "name": "hotspot/state · Media · local-only assets",
+      "className": "absolute bg-[#f3f4f6] border border-[#d9d9d9] border-solid h-[28px] left-[-1px] top-[605px] w-[160px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "value": "#d9d9d9"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "160px"
         }
       }
     }

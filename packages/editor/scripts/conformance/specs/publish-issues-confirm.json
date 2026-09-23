@@ -1,0 +1,387 @@
+{
+  "surface": "publish-issues-confirm",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1168:4732",
+  "boardName": "publish-issues-confirm",
+  "figmaHash": "877c33349e60f14891eb67f7c58a7fb828b95b91187c883a51fa716fe6a2cde1",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:27:27.704Z",
+  "copy": [
+    "Publish with 2 open errors?",
+    "Brand › radius.md · Token \"radius.md\" has empty value.",
+    "Brand › color.brand · Token \"color.brand\" uses a purple/violet/indigo hue (\"#7C3AED\").",
+    "Brand › color.accent · Accent fails WCAG AA against the page background",
+    "+1 more warning",
+    "Fix issues first",
+    "Publish anyway"
+  ],
+  "targets": [
+    {
+      "nodeId": "1168:4732",
+      "name": "Publish · issues-confirm (publish anyway)",
+      "className": "bg-[var(--color\\/bg-elevated,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col gap-[12px] items-start overflow-clip px-[18px] py-[16px] relative rounded-[12px] shadow-[0px_10px_32px_0px_rgba(18,23,38,0.2)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-elevated",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "12px"
+        },
+        "padding-left": {
+          "value": "18px"
+        },
+        "padding-right": {
+          "value": "18px"
+        },
+        "padding-top": {
+          "value": "16px"
+        },
+        "padding-bottom": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4733",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4734",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] w-[min-content]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4735",
+      "name": "issue",
+      "className": "[word-break:break-word] bg-[var(--color\\/error-tint,#fde8e8)] content-stretch flex gap-[8px] items-start leading-[normal] not-italic overflow-clip px-[10px] py-[6px] relative rounded-[6px] shrink-0 text-[10px] w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/error-tint",
+          "value": "#fde8e8"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4736",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/error-text,#c81e1e)]",
+      "props": {
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4737",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4738",
+      "name": "issue",
+      "className": "[word-break:break-word] bg-[var(--color\\/error-tint,#fde8e8)] content-stretch flex gap-[8px] items-start leading-[normal] not-italic overflow-clip px-[10px] py-[6px] relative rounded-[6px] shrink-0 text-[10px] w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/error-tint",
+          "value": "#fde8e8"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4739",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/error-text,#c81e1e)]",
+      "props": {
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4740",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4741",
+      "name": "issue",
+      "className": "[word-break:break-word] bg-[var(--color\\/warning-tint,#fdfdea)] content-stretch flex gap-[8px] items-start leading-[normal] not-italic overflow-clip px-[10px] py-[6px] relative rounded-[6px] shrink-0 text-[10px] w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4742",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/warning-text,#723b13)]",
+      "props": {
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4743",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4744",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4745",
+      "name": "foot",
+      "className": "bg-white content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4746",
+      "name": "Frame",
+      "className": "flex-[1_0_0] h-[6px] min-w-px relative",
+      "props": {
+        "height": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4747",
+      "name": "btn/Fix issues first",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch cursor-pointer flex items-start overflow-clip px-[14px] py-[8px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4748",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4749",
+      "name": "btn/Publish anyway",
+      "className": "bg-[var(--color\\/warning,#c27803)] content-stretch cursor-pointer flex items-start overflow-clip px-[14px] py-[8px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/warning",
+          "value": "#c27803"
+        },
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1168:4750",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "surface": "s1-flows-recovery-banner",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "307:2223",
+  "boardName": "s1-flows-recovery-banner",
+  "figmaHash": "fb38efd5977c52f515814c4e63dd083de45bcb424edc6ae9ab3e35b0b0c0c29e",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T05:30:06.739Z",
+  "copy": [
+    "↩ Restore unsaved work from 3 minutes ago?",
+    "Restore",
+    "Discard"
+  ],
+  "targets": [
+    {
+      "nodeId": "307:2223",
+      "name": "C6 · Recovery banner",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2224",
+      "name": "banner",
+      "className": "absolute bg-[var(--color\\/warning-tint,#fdfdea)] content-stretch flex gap-[12px] h-[56px] items-center left-0 overflow-clip px-[20px] top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "gap": {
+          "value": "12px"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "padding-left": {
+          "value": "20px"
+        },
+        "padding-right": {
+          "value": "20px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2225",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/warning-text,#723b13)] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "342:2300",
+      "name": "Button",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I342:2300;9:43",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    },
+    {
+      "nodeId": "342:2302",
+      "name": "Button",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I342:2302;9:43",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--flowbite\\/gray\\/700,#374151)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    },
+    {
+      "nodeId": "444:2448",
+      "name": "hotspot/back · S1 · Editor — ASSEMBLED (1440, dra",
+      "className": "absolute block cursor-pointer h-[34px] left-[16px] top-[90px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

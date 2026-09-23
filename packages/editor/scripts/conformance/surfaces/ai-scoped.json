@@ -1,0 +1,122 @@
+{
+  "surface": "ai-scoped",
+  "board": "AI · scoped (Figma 170:17)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-ai-chip"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-ai-chip"
+    },
+    {
+      "action": "waitFor",
+      "testId": "ai-scope"
+    }
+  ],
+  "contrastScope": "[data-testid=\"ai-panel\"]",
+  "targets": [
+    {
+      "name": "back-row",
+      "testId": "ai-back-row",
+      "spec": "ai-scoped",
+      "nodeId": "170:18"
+    },
+    {
+      "name": "back-label",
+      "testId": "ai-back-label",
+      "spec": "ai-scoped",
+      "nodeId": "170:19"
+    },
+    {
+      "name": "header",
+      "testId": "ai-header",
+      "spec": "ai-scoped",
+      "nodeId": "170:20"
+    },
+    {
+      "name": "scope-band",
+      "testId": "ai-scope",
+      "spec": "ai-scoped",
+      "nodeId": "170:22"
+    },
+    {
+      "name": "scope-label",
+      "testId": "ai-scope-text",
+      "spec": "ai-scoped",
+      "nodeId": "170:23"
+    },
+    {
+      "name": "prompt-block",
+      "testId": "ai-prompt",
+      "spec": "ai-scoped",
+      "nodeId": "170:24"
+    },
+    {
+      "name": "panel",
+      "testId": "ai-panel"
+    },
+    {
+      "name": "prompt-input",
+      "testId": "ai-prompt-input"
+    }
+  ],
+  "_note": [
+    "Board 170:17 — the AI panel with a REAL element selection, which is the",
+    "only thing that separates it from 170:2 (ai-idle): the scope band reads",
+    "the selection's own label instead of 'Whole page'. Measured LIVE for that",
+    "reason — a probe would have to hand the band a scope object, i.e. measure",
+    "the fixture's opinion of the selection rather than the editor's. The steps",
+    "insert a Section on the canvas and open AI through 920:4546 `btn/ai`, the",
+    "inspector-header chip that is THE entry point when something is selected",
+    "(the rail deliberately has no AI icon).",
+    "",
+    "",
+    "VIEWPORT 1440, not the board's 360, for the same reason `ai-idle` uses it:",
+    "the panel is a column inside the shell and does not exist at 360 — the",
+    "Insert drawer the steps click through is not laid out there at all.",
+    "THE COACH MARK IS DISMISSED FIRST. It covers the Insert drawer's first six",
+    "rows at this viewport, so `insert-el-Section` is click-intercepted until",
+    "'Got it' is pressed — a step timing out there is the coach, not a bad",
+    "selector.",
+    "",
+    "SAME TWO EXEMPTIONS AS `ai-idle`, for the same recorded reason: the AI",
+    "boards are drawn on the 280 DRAWER frame while this panel ships in the 300",
+    "INSPECTOR column (measured 299 — 300 less the column's 1px rule), so every",
+    "absolute width on them is 19px short of the shipped panel. boards.json's",
+    "own 2026-08-17 walk of board 66:225 measured this panel at l=1140 w=300",
+    "and called it a match. So:",
+    "  panel        170:17 — `border-color` here is the inspector COLUMN's left",
+    "               rule (LayoutShell.css, --bk-border), shared with",
+    "               ProInspector. One AI board does not restyle the shell.",
+    "  prompt-input 170:25 — bg, border-color (--color/border-input #9CA3AF),",
+    "               height 52 and radius 8 all match; only `width` disagrees,",
+    "               248 against the column's own. Read it out of",
+    "               measured/ai-scoped.json rather than taking this note's word.",
+    "",
+    "NOT CONFORMED: 170:27 `note` (96) and 170:26's placeholder colour",
+    "--color/ink-disabled #D1D5DB. The note's height is set by the board's two",
+    "sample paragraphs and prose height is sample data. The placeholder is a",
+    "chrome-wide control's colour and #D1D5DB on white is 1.47:1 — adopting it",
+    "would put the only text in an empty composer four times below the floor.",
+    "The board is wrong there and the code keeps --bk-ink-muted."
+  ]
+}

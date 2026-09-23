@@ -1,0 +1,100 @@
+{
+  "surface": "content-data-sources",
+  "board": "Content · data-sources (Figma 151:46)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "content-open-sources"
+    },
+    {
+      "action": "waitFor",
+      "testId": "content-add-source"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-data-sources",
+      "nodeId": "208:471"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-data-sources",
+      "nodeId": "I208:471;16:7"
+    },
+    {
+      "name": "crumb",
+      "testId": "content-crumb",
+      "spec": "content-data-sources",
+      "nodeId": "151:52"
+    },
+    {
+      "name": "source-row",
+      "testId": "content-source-sheets",
+      "spec": "content-data-sources",
+      "nodeId": "151:53"
+    },
+    {
+      "name": "source-name",
+      "testId": "content-source-name-sheets"
+    },
+    {
+      "name": "source-status",
+      "testId": "content-source-status-sheets"
+    },
+    {
+      "name": "add-source",
+      "testId": "content-add-source",
+      "spec": "content-data-sources",
+      "nodeId": "151:59"
+    },
+    {
+      "name": "note",
+      "testId": "content-source-note"
+    }
+  ],
+  "_note": [
+    "Board 151:46, reached with the panel's own Sources row. The source is a real",
+    "DataManager registration, so the row's status line is `sourceStatus` reading",
+    "it rather than a string the fixture supplied.",
+    "",
+    "BOARD won on the note: 151:61 is 11/16 inside a frame with 8 above and 8",
+    "below. `INLINE_HINT` was `leading-normal` — 16.5 at 11px, so its two lines",
+    "drifted half a pixel per line off every other 11px line in the panel — with no",
+    "top inset and 12 below, which sat the note tight under the link it explains.",
+    "The 64 row (Row size=\"comment\"), the 13/20 name and the 11/16 status line were",
+    "already right; the last two came from the ROW_TITLE/SUB line-heights landed on",
+    "content-fields.",
+    "",
+    "NOT anchored, and why — all three are Figma frames, not design:",
+    "  151:54 the source NAME. Type and colour match exactly (13/20, --color/ink);",
+    "  the board's `w-[123px]` does not — the row is absolutely positioned art and",
+    "  the frame is narrower than the words inside it (\"Google Sheets · menu.xlsx\"",
+    "  at 13px needs ~150). Live is 208, the flex column's real width.",
+    "  151:56 the STATUS line, same shape: 11/16 ink-muted match, `w-[107px]`",
+    "  against 208.",
+    "  151:60 the note's frame at 52. That is 8 + a 36-tall drawn text box + 8, and",
+    "  the same two lines at the board's OWN 16 leading measure 32 — so the honest",
+    "  equivalent is 48, which is what live now renders. The insets and the leading",
+    "  the frame is built from ARE conformed above.",
+    "  151:55 the status dot — an exported SVG on the board against a 7px span",
+    "  live; no property pair. 151:57 the `⋯` (IconButton, board 697:440).",
+    "  151:51 / 151:58 the two 36 frames (margin + an h-8 control; the controls are",
+    "  anchored at 151:52 and 151:59). One hotspot/*.",
+    "",
+    "BOARD-COPY: the row's second line reads `object · 3 keys` where the board says",
+    "\"Connected · synced 4m ago\". Deliberate and documented at `sourceStatus` —",
+    "there is no sync clock and no connection state to report, so the panel writes",
+    "what it can prove. The board's `[not-implemented]` header says the same thing",
+    "from the other side: sources live in an in-memory Map and do not survive a",
+    "reload."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+ "slug": "zz-f14-back",
+ "page": "1:3",
+ "rows": [
+  {"op": "text", "id": "I1703:9209;698:448;9:55", "text": "‹ Back to canvas", "expect": "‹ Exit",
+   "why": "F14 · BACK TO CANVAS, the third of the three corrections, tried on ONE board first. Spec board 2844:12136 draws it as the topbar's LEFT control in full-page mode — rect 2844:12138 at board x+16, label 2844:12139 '‹ Back to canvas' — i.e. it REPLACES the exit control rather than sitting beside it, which is right: in full-page mode the action a person wants is returning to the canvas, not leaving for the dashboard. The text is WIDTH_AND_HEIGHT in a HORIZONTAL auto-layout topbar, so it should grow and push the title right; no `width` is passed, because forcing a width on a 32px box would wrap a topbar label onto several lines. Deliberately one board before five: if btn/exit turns out to be fixed-width the label escapes it, and a text row is fully reversible from the expect recorded here."}
+ ]
+}

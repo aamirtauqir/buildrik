@@ -1,7 +1,7 @@
 {
- "taken": "2026-09-06",
+ "taken": "2026-09-07",
  "page": "1:3",
- "total": 927,
+ "total": 1031,
  "sections": [
   {
    "id": "862:6859",
@@ -25,23 +25,23 @@
   },
   {
    "id": "1090:4527",
-   "name": "26 · REVIEW · Insert · 3",
-   "n": 3
+   "name": "26 · REVIEW · Insert · 4",
+   "n": 4
   },
   {
    "id": "1776:8372",
-   "name": "05 · Media · 61",
-   "n": 61
+   "name": "05 · Media · 72",
+   "n": 72
   },
   {
    "id": "1776:8373",
    "name": "07 · Brand · 51",
-   "n": 51
+   "n": 52
   },
   {
    "id": "1776:8374",
-   "name": "16 · History · 35",
-   "n": 35
+   "name": "16 · History · 43",
+   "n": 49
   },
   {
    "id": "1776:8375",
@@ -50,43 +50,43 @@
   },
   {
    "id": "1776:8376",
-   "name": "06 · Content · 37",
-   "n": 37
+   "name": "06 · Content · 46",
+   "n": 47
   },
   {
    "id": "1776:8377",
-   "name": "04 · Pages · 26",
-   "n": 26
+   "name": "04 · Pages · 33 — expanded drawer drawn at 700 (LeftSidebar.",
+   "n": 33
   },
   {
    "id": "1776:8378",
-   "name": "15 · Publish · 20",
-   "n": 20
-  },
-  {
-   "id": "1776:8379",
-   "name": "02 · Insert · 22",
-   "n": 22
-  },
-  {
-   "id": "1776:8380",
-   "name": "12 · AI · 25",
+   "name": "15 · Publish · 24",
    "n": 25
   },
   {
+   "id": "1776:8379",
+   "name": "02 · Insert · 28",
+   "n": 29
+  },
+  {
+   "id": "1776:8380",
+   "name": "12 · AI · 30",
+   "n": 30
+  },
+  {
    "id": "1776:8381",
-   "name": "08 · Inspector · 41",
-   "n": 41
+   "name": "08 · Inspector · 51",
+   "n": 52
   },
   {
    "id": "1776:8382",
    "name": "17 · Compare · 16",
-   "n": 16
+   "n": 17
   },
   {
    "id": "1776:8383",
    "name": "18 · Review · 38",
-   "n": 38
+   "n": 39
   },
   {
    "id": "1776:8384",
@@ -96,12 +96,12 @@
   {
    "id": "1776:8385",
    "name": "01 · Shell · 34",
-   "n": 34
+   "n": 56
   },
   {
    "id": "1776:8387",
-   "name": "21 · Settings/S7 · 46",
-   "n": 46
+   "name": "21 · Settings/S7 · 48",
+   "n": 49
   },
   {
    "id": "1776:8388",
@@ -121,7 +121,7 @@
   {
    "id": "1779:3",
    "name": "13 · Command palette · 13 — two palettes ship: shell ⌘K and ",
-   "n": 13
+   "n": 15
   },
   {
    "id": "1779:4",
@@ -131,12 +131,12 @@
   {
    "id": "1779:5",
    "name": "09 · Canvas · 14",
-   "n": 14
+   "n": 16
   },
   {
    "id": "1779:6",
    "name": "22 · Ecommerce · 5 — [not-implemented] ORDERS only. Narrower",
-   "n": 5
+   "n": 6
   },
   {
    "id": "1938:8372",

@@ -1,0 +1,160 @@
+{
+  "surface": "s3-flows-page-settings-social",
+  "board": "S3.7 · page-settings · Social (Figma 302:2004)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-settings-social",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "pg-drawer-tabbtn-social"
+    },
+    {
+      "action": "waitFor",
+      "testId": "social-field-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"pg-drawer\"]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "pg-drawer",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2005"
+    },
+    {
+      "name": "hdr",
+      "testId": "pg-drawer-hdr",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2006"
+    },
+    {
+      "name": "title",
+      "testId": "pg-drawer-title",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2007"
+    },
+    {
+      "name": "tab-seo",
+      "testId": "pg-drawer-tabbtn-seo",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2009"
+    },
+    {
+      "name": "tab-social",
+      "testId": "pg-drawer-tabbtn-social",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2010"
+    },
+    {
+      "name": "tab-advanced",
+      "testId": "pg-drawer-tabbtn-advanced",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2011"
+    },
+    {
+      "name": "close",
+      "testId": "pg-drawer-close",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "2838:12110"
+    },
+    {
+      "name": "body",
+      "testId": "pg-drawer-body",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2012"
+    },
+    {
+      "name": "field-title",
+      "testId": "social-field-title",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2013"
+    },
+    {
+      "name": "label-title",
+      "testId": "social-label-title",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2014"
+    },
+    {
+      "name": "input-title",
+      "testId": "social-input-title"
+    },
+    {
+      "name": "count-title",
+      "testId": "social-count-title",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "2838:12126"
+    },
+    {
+      "name": "field-desc",
+      "testId": "social-field-desc",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2017"
+    },
+    {
+      "name": "label-desc",
+      "testId": "social-label-desc",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2018"
+    },
+    {
+      "name": "count-desc",
+      "testId": "social-count-desc",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "2838:12127"
+    },
+    {
+      "name": "field-image",
+      "testId": "social-field-image",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2021"
+    },
+    {
+      "name": "label-image",
+      "testId": "social-label-image",
+      "spec": "s3-flows-page-settings-social",
+      "nodeId": "302:2022"
+    },
+    {
+      "name": "input-image",
+      "testId": "social-input-image"
+    }
+  ],
+  "_note": [
+    "Board 302:2004 — the same 580x520 chassis as 302:1978, Social tab active.",
+    "The chassis targets repeat on purpose: three boards drawing one card is the",
+    "strongest evidence in this family, and a chassis measured on one tab is not",
+    "measured on the others (the tab row re-colours, the body re-renders).",
+    "",
+    "WHAT MOVED here specifically:",
+    "  · Labels 'Open Graph Title' / 'Open Graph Description' / 'Image URL' ->",
+    "    'OG title' / 'OG description' / 'OG image' (302:2014 / 2018 / 2022).",
+    "  · The character counters (2838:12126 / 12127) are 11/16 ink-muted and had",
+    "    no line-height of their own, so they inherited the field stack's.",
+    "",
+    "NOT CONFORMED:",
+    "  · The OG preview card at the top of the shipped tab — the board draws no",
+    "    preview on this frame at all (it draws three fields). Deleting a live",
+    "    preview to match an absence is not what 'the board wins on visuals'",
+    "    means; an absence is the one thing a board cannot assert, since every",
+    "    board is a crop.",
+    "  · btn/choose-from-library (2838:12121) and btn/upload (2838:12123): the",
+    "    shipped OG image field is a URL input with no library picker and no",
+    "    upload. Those are new controls wired to the media library, not drift.",
+    "    Same 2838:* markup batch as the SEO board's btn/Done.",
+    "  · TextInput border-color — authority=open:input-fill, see the SEO recipe.",
+    "",
+    "THE TEXT INPUTS ARE SKIPPED, NOT PASSED. They are joined to no board node",
+    "because border-color is board-vs-board: 149:108 draws --color/border-input,",
+    "these three draw --color/ink #111827 on all four instances, and two boards",
+    "that disagree do not re-settle a chrome-wide primitive",
+    "(authority=open:input-fill, OPEN-DECISIONS §3). Measured anyway, from",
+    "measured/<surface>.json, because the numbers are the useful part: the",
+    "shipped control is 42 tall on a radius-8 white fill — which is what these",
+    "boards draw and what 149:108 disputes. Padding is the one real difference",
+    "(theme 10, board 12) and it belongs to the same open call."
+  ]
+}

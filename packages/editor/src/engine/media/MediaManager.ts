@@ -12,9 +12,11 @@ import {
   MEDIA_EVENTS,
   STORAGE_QUOTA_BYTES,
   getAssetTypeFromMime,
+  mimeTypeForFile,
 } from "../../shared/constants/media";
 import { MediaQuotaError } from "./MediaStorageTypes";
 import type {
+  EditsSnapshot,
   MediaAsset,
   MediaAssetType,
   MediaFolder,
@@ -66,6 +68,72 @@ function toServerAssetType(
       return null;
   }
 }
+
+/**
+ * BLOCKERS C3: the tag list a server row carries at `userMetadata.tags` —
+ * the JSON column `updateAsset` mirrors `{ tags }` into. Anything that is not
+ * a string array reads as no tags; a stray non-string inside one is dropped
+ * rather than failing the whole import.
+ */
+function tagsFromUserMetadata(meta: unknown): string[] {
+  if (typeof meta !== "object" || meta === null || !("tags" in meta)) return [];
+  const tags: unknown = meta.tags;
+  return Array.isArray(tags) ? tags.filter((t): t is string => typeof t === "string") : [];
+}
+
+/**
+ * Clone 3686:42317 (Site fonts): the ADDED flag a server row carries at
+ * `userMetadata.siteFont`, beside the tags. Only a literal `true` counts —
+ * anything else is "uploaded, not added", which is also what a row written
+ * before Phase 5 means.
+ */
+function siteFontFromUserMetadata(meta: unknown): boolean {
+  return typeof meta === "object" && meta !== null && "siteFont" in meta && meta.siteFont === true;
+}
+
+/**
+ * Clone 3695:45529 (Asset versions): the parent a server row names at
+ * `userMetadata.versionOf`. Only a string counts — anything else is a plain
+ * asset, which is also what every row written before Phase 6 is.
+ */
+function versionOfFromUserMetadata(meta: unknown): string | undefined {
+  if (typeof meta !== "object" || meta === null || !("versionOf" in meta)) return undefined;
+  return typeof meta.versionOf === "string" && meta.versionOf ? meta.versionOf : undefined;
+}
+
+const isNumber = (v: unknown): v is number => typeof v === "number";
+const isString = (v: unknown): v is string => typeof v === "string";
+
+/**
+ * The edits snapshot a server row carries at `userMetadata.edits`. The whole
+ * shape or nothing: a partial snapshot would print "Crop: Free" beside an
+ * invented "Brightness: undefined", so it reads as no snapshot at all.
+ */
+function editsFromUserMetadata(meta: unknown): EditsSnapshot | undefined {
+  if (typeof meta !== "object" || meta === null || !("edits" in meta)) return undefined;
+  if (typeof meta.edits !== "object" || meta.edits === null) return undefined;
+  const record: Record<string, unknown> = { ...meta.edits };
+  const { width, height, crop, preset, format, transform, brightness, contrast, saturation, blur } = record;
+  if (!isNumber(width) || !isNumber(height) || !isNumber(brightness) || !isNumber(contrast)) return undefined;
+  if (!isNumber(saturation) || !isNumber(blur)) return undefined;
+  if (!isString(crop) || !isString(preset) || !isString(format) || !isString(transform)) return undefined;
+  return { width, height, crop, preset, format, transform, brightness, contrast, saturation, blur };
+}
+
+/**
+ * The server row's JSON column, whole, from the asset as it now is. The
+ * server REPLACES the column with what is sent, so every writer sends every
+ * key the asset carries — the tags always, the flags only once set (an image
+ * that was never a font or a version has nothing to preserve).
+ */
+function userMetadataOf(asset: MediaAsset): Record<string, unknown> {
+  return {
+    tags: asset.tags,
+    ...(asset.siteFont !== undefined ? { siteFont: asset.siteFont } : {}),
+    ...(asset.versionOf !== undefined ? { versionOf: asset.versionOf } : {}),
+    ...(asset.edits !== undefined ? { edits: asset.edits } : {}),
+  };
+}
 // only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
@@ -112,6 +180,15 @@ interface UploadOptions {
   readonly tags?: string[];
   readonly generateThumbnail?: boolean;
   readonly autoOptimize?: boolean;
+  /**
+   * Clone 3695:45529: the file is a saved VERSION of this asset. The row is
+   * born flagged — flagging it after the upload would let the grid draw it
+   * as a library card for the whole round trip, since the row is in state
+   * and `MEDIA_UPDATED` fires before `uploadFile` resolves.
+   */
+  readonly versionOf?: string;
+  /** The edits the version was saved with; meaningful with `versionOf`. */
+  readonly edits?: EditsSnapshot;
 }
 
 /**
@@ -241,7 +318,21 @@ export class MediaManager extends MediaEventEmitter {
    */
   rebuildRetryQueueFromState(): void {
     for (const asset of this.state.assets) {
-      if (asset.localOnly) this.retryQueue.add(asset.id);
+      if (asset.localOnly) {
+        this.retryQueue.add(asset.id);
+        continue;
+      }
+      /* An upload whose server mirror never completed but which was persisted
+         before the failure branch could mark it: no serverId, and a src that
+         is still this session's Object URL. Measured 2026-09-13 — ten such
+         records sat in IndexedDB with localOnly=false, so the sync pill read
+         "0 not on the server" over ten files that were not, and no drain ever
+         picked them up. The marker is set here so the pill, the publish
+         warning and the retry all agree. */
+      if (!asset.serverId && asset.src.startsWith("blob:") && toServerAssetType(asset.type)) {
+        asset.localOnly = true;
+        this.retryQueue.add(asset.id);
+      }
     }
   }
 
@@ -484,6 +575,10 @@ export class MediaManager extends MediaEventEmitter {
       folderId: string | null;
       createdAt: string | Date;
       updatedAt: string | Date;
+      /** The row's JSON column; `tags` lives at `userMetadata.tags` (C3),
+       *  `siteFont` beside it (3686:42317), `versionOf` / `edits` too
+       *  (3695:45529). */
+      userMetadata?: unknown;
     }>,
     serverFolders: ReadonlyArray<{
       id: string;
@@ -517,6 +612,8 @@ export class MediaManager extends MediaEventEmitter {
       if (existingAssetIds.has(sa.id)) continue;
       const engineType: MediaAssetType =
         sa.type === "image" && sa.mimeType === "image/svg+xml" ? "svg" : sa.type;
+      const versionOf = versionOfFromUserMetadata(sa.userMetadata);
+      const edits = editsFromUserMetadata(sa.userMetadata);
       const asset: MediaAsset = {
         id: sa.id,
         serverId: sa.id,
@@ -530,7 +627,10 @@ export class MediaManager extends MediaEventEmitter {
         size: sa.bytes,
         altText: sa.altText ?? undefined,
         folderId: sa.folderId ?? undefined,
-        tags: [],
+        tags: tagsFromUserMetadata(sa.userMetadata),
+        ...(siteFontFromUserMetadata(sa.userMetadata) ? { siteFont: true } : {}),
+        ...(versionOf !== undefined ? { versionOf } : {}),
+        ...(edits !== undefined ? { edits } : {}),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
@@ -715,6 +815,17 @@ export class MediaManager extends MediaEventEmitter {
     this.rebuildFolderRetryQueueFromState();
     this.initialized = true;
     this.emit(MEDIA_EVENTS.INITIALIZED, { assetCount: this.state.assets.length });
+    /* The queue survived the reload; nothing drained it. The only triggers
+       were the `online` event and the chained retry after a NEW upload, so a
+       stranded file waited for the network to flap or for the person to
+       upload something else (measured 2026-09-13: ten device-only files sat
+       through four reloads with the server reachable the whole time). */
+    if (
+      (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) &&
+      (typeof navigator === "undefined" || navigator.onLine !== false)
+    ) {
+      void this.retryLocalOnlyAssets();
+    }
   }
 
   /** Has storage been read yet? False means "unknown", not "empty". */
@@ -840,7 +951,14 @@ export class MediaManager extends MediaEventEmitter {
 
     const validation = validateFile(file);
     if (!validation.valid) {
-      this.emit(MEDIA_EVENTS.UPLOAD_ERROR, { fileName: file.name, error: validation.error });
+      /* The numbers ride along with the prose: the drawer's rejected row
+         (Clone 3584:45522) offers a replacement against the real limit. */
+      this.emit(MEDIA_EVENTS.UPLOAD_ERROR, {
+        fileName: file.name,
+        error: validation.error,
+        size: file.size,
+        limit: validation.limit,
+      });
       return { success: false, error: validation.error, fileName: file.name };
     }
 
@@ -869,7 +987,10 @@ export class MediaManager extends MediaEventEmitter {
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
 
       let finalBlob: Blob = file;
-      let finalMime = file.type;
+      /* `mimeTypeForFile`, not `file.type`: a .woff2 arrives untyped from
+         macOS Chromium and validation already accepted it on its extension. */
+      const declaredMime = mimeTypeForFile(file);
+      let finalMime = declaredMime;
       // Will be reassigned to sniffed type below if SVG content was detected
       let finalSize = file.size;
       let finalDimensions = await getMediaDimensions(file, src);
@@ -879,7 +1000,7 @@ export class MediaManager extends MediaEventEmitter {
       // actually SVG, route to the sanitizer regardless of declared type.
       const sniffedMime = await sniffMimeType(file);
       const actualType =
-        sniffedMime === "image/svg+xml" ? "image/svg+xml" : file.type;
+        sniffedMime === "image/svg+xml" ? "image/svg+xml" : declaredMime;
 
       // SVG sanitization — strip <script>, event handlers, external refs, etc.
       // DOMPurify's USE_PROFILES:{svg,svgFilters} keeps drawing instructions
@@ -919,8 +1040,8 @@ export class MediaManager extends MediaEventEmitter {
       // Auto-optimization
       if (
         options.autoOptimize !== false &&
-        file.type.startsWith("image/") &&
-        file.type !== "image/svg+xml"
+        declaredMime.startsWith("image/") &&
+        declaredMime !== "image/svg+xml"
       ) {
         progress.status = "optimizing";
         this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
@@ -959,6 +1080,8 @@ export class MediaManager extends MediaEventEmitter {
         width: finalDimensions?.width,
         height: finalDimensions?.height,
         tags: options.tags || [],
+        ...(options.versionOf !== undefined ? { versionOf: options.versionOf } : {}),
+        ...(options.edits !== undefined ? { edits: options.edits } : {}),
         folderId: options.folderId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -1011,6 +1134,13 @@ export class MediaManager extends MediaEventEmitter {
           }
           await this.replaceAssetId(assetId, remote.serverId, remote.url);
           finalAsset = this.state.assets.find((a) => a.id === remote.serverId) ?? asset;
+          // Clone 3695:45529: the server row is created without its JSON
+          // column (`onUploadCompleted` may win the create race and the
+          // upsert's update branch never writes it), so a row born a version
+          // mirrors the column explicitly. Failure tolerated — local ahead.
+          if (finalAsset.versionOf !== undefined) {
+            await this.remoteSync.updateAsset(remote.serverId, { userMetadata: userMetadataOf(finalAsset) });
+          }
           // P2 fix: chain retry on success so other queued localOnly assets
           // get a fresh attempt without waiting for an 'online' event.
           if (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) {
@@ -1197,18 +1327,45 @@ export class MediaManager extends MediaEventEmitter {
     // persisted across devices. Guarded on serverId (asset is synced) and
     // an actual name/altText change in this update (folderId keeps its own
     // moveAsset path above).
-    if (
-      this.remoteSync &&
-      asset.serverId &&
-      ((Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
-        (Object.prototype.hasOwnProperty.call(updates, "altText") &&
-          asset.altText !== updated.altText))
-    ) {
-      await this.remoteSync.updateAsset(asset.serverId, {
-        filename: updated.name,
-        altText: updated.altText ?? null,
-      });
-      // Failure tolerated — local ahead until next edit / full sync.
+    //
+    // BLOCKERS C3 (2026-09-13): tags ride the same patch as
+    // `userMetadata: { tags }` — the server row's JSON column, which
+    // `media.updateAsset` already took and `importServerAssets` reads back.
+    // Sent only when the list actually changed, so a name edit's patch is
+    // still exactly `{ filename, altText }`.
+    //
+    // Clone 3686:42317 (Phase 5): `siteFont` shares that column, and since
+    // Phase 6 (3695:45529) so do `versionOf` and `edits`. The server
+    // REPLACES the column with what is sent, so the patch is the whole
+    // column — the tags AND every flag, from the asset as it now is —
+    // whichever of them changed (`userMetadataOf`). A flag that was never
+    // set stays out of it: an image has nothing to preserve.
+    if (this.remoteSync && asset.serverId) {
+      const patch: Parameters<RemoteAssetSync["updateAsset"]>[1] = {};
+      if (
+        (Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
+        (Object.prototype.hasOwnProperty.call(updates, "altText") && asset.altText !== updated.altText)
+      ) {
+        patch.filename = updated.name;
+        patch.altText = updated.altText ?? null;
+      }
+      const tagsChanged =
+        Object.prototype.hasOwnProperty.call(updates, "tags") &&
+        (asset.tags.length !== updated.tags.length || asset.tags.some((t, i) => t !== updated.tags[i]));
+      const siteFontChanged =
+        Object.prototype.hasOwnProperty.call(updates, "siteFont") && asset.siteFont !== updated.siteFont;
+      const versionOfChanged =
+        Object.prototype.hasOwnProperty.call(updates, "versionOf") && asset.versionOf !== updated.versionOf;
+      const editsChanged =
+        Object.prototype.hasOwnProperty.call(updates, "edits") &&
+        JSON.stringify(asset.edits) !== JSON.stringify(updated.edits);
+      if (tagsChanged || siteFontChanged || versionOfChanged || editsChanged) {
+        patch.userMetadata = userMetadataOf(updated);
+      }
+      if (Object.keys(patch).length > 0) {
+        await this.remoteSync.updateAsset(asset.serverId, patch);
+        // Failure tolerated — local ahead until next edit / full sync.
+      }
     }
 
     this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });
@@ -1512,16 +1669,42 @@ export class MediaManager extends MediaEventEmitter {
     let started = 0;
     for (const asset of assets) {
       if (!asset.src) continue;
-      const a = document.createElement("a");
-      a.href = asset.src;
-      a.download = asset.name;
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      void this.saveToDisk(asset);
       started += 1;
     }
     return started;
+  }
+
+  /**
+   * Browsers ignore `download` on a cross-origin href and NAVIGATE instead —
+   * with assets on the Blob store, the library's Download button replaced the
+   * whole editor with the raw file (measured 2026-09-13, the first day assets
+   * had a remote src). A same-origin Object URL made from the fetched bytes
+   * keeps the attribute honoured; a fetch the host refuses (CORS) falls back
+   * to a new tab rather than losing the editor.
+   */
+  private async saveToDisk(asset: { src: string; name: string }): Promise<void> {
+    const a = document.createElement("a");
+    a.download = asset.name;
+    a.rel = "noopener";
+    let objectUrl: string | null = null;
+    if (/^https?:/.test(asset.src)) {
+      try {
+        const res = await fetch(asset.src);
+        if (!res.ok) throw new Error(String(res.status));
+        objectUrl = URL.createObjectURL(await res.blob());
+        a.href = objectUrl;
+      } catch {
+        a.href = asset.src;
+        a.target = "_blank";
+      }
+    } else {
+      a.href = asset.src;
+    }
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl!), 60_000);
   }
 
   selectAssets(ids: string[]): void {

@@ -38,8 +38,8 @@ vi.mock("../tabs/media/MediaTab", () => ({
   MediaTab: () => <div data-testid="tab-assets" />,
 }));
 vi.mock("../tabs/publish/PublishTab", () => ({
-  default: (props: { onVercelPublish?: () => Promise<void> }) => (
-    <div data-testid="tab-publish" data-vercel={props.onVercelPublish ? "wired" : "none"} />
+  default: (props: { onRequestPublish?: () => void }) => (
+    <div data-testid="tab-publish" data-vercel={props.onRequestPublish ? "wired" : "none"} />
   ),
 }));
 vi.mock("../tabs/history/HistoryTab", () => ({
@@ -135,18 +135,18 @@ describe("TabRouter — components tab", () => {
   });
 });
 
-describe("TabRouter — publish action flag gating", () => {
-  const onVercelPublish = async () => {};
+describe("TabRouter — publish door flag gating", () => {
+  const onRequestPublish = () => {};
 
-  it("withholds onVercelPublish from PublishTab when the publish flag is OFF", async () => {
-    renderRouter("publish", { onVercelPublish });
+  it("withholds the publish door from PublishTab when the publish flag is OFF", async () => {
+    renderRouter("publish", { onRequestPublish });
     const tab = await screen.findByTestId("tab-publish");
     expect(tab.getAttribute("data-vercel")).toBe("none");
   });
 
-  it("passes onVercelPublish through when the publish flag is ON", async () => {
+  it("passes the publish door through when the publish flag is ON", async () => {
     flags.enabled.add("publish");
-    renderRouter("publish", { onVercelPublish });
+    renderRouter("publish", { onRequestPublish });
     const tab = await screen.findByTestId("tab-publish");
     expect(tab.getAttribute("data-vercel")).toBe("wired");
   });

@@ -1,0 +1,106 @@
+{
+ "page": "1:3",
+ "why": "Sibling sweep A — corrections already applied on one board in 03 · Layers and 08 · Inspector, applied to the siblings that show the same defect. A caption below the board, parented to the section, is this file's convention for commentary.",
+ "rows": [
+  {
+   "board": "1082:4527",
+   "name": "caption/Layers · context-menu",
+   "from": "155:26",
+   "w": 280,
+   "x": 900,
+   "y": 1052,
+   "text": "Eye and lock are drawn 10x10, 16px apart, inside a 28h row — under the 24x24 minimum. These rows are hand-drawn here, not instances of 243:6, so unlike the master this board can be corrected from page 1:3. UX-H-23.",
+   "why": "UX-H-23 sibling sweep — the open half of the finding, on a board whose rows are not instances"
+  },
+  {
+   "board": "1082:4589",
+   "name": "caption/Layers · renaming",
+   "from": "155:26",
+   "w": 280,
+   "x": 1700,
+   "y": 2286,
+   "text": "No rename field is drawn on the board named for renaming. Custom names are localStorage-only (buildrick-layers-{pageId}-names, layersPersistence.ts:73-79) and never reach the project, so a teammate opening the file sees the original names. UX-H-18.",
+   "why": "UX-H-18 sibling sweep — the finding's own board carried no record of it"
+  },
+  {
+   "board": "1082:4640",
+   "name": "caption/Layers · expanded",
+   "from": "155:26",
+   "w": 280,
+   "x": 2100,
+   "y": 1052,
+   "text": "Seventeen rows, each with an eye and a lock — the same two controls corrected on 143:179 and 143:237. The eye only writes data-hidden on the canvas node (useLayerActions.ts:140-146); the element still publishes. The lock also writes ElementData.locked, so it travels with the document while the panel re-reads only localStorage. UX-H-14, UX-H-17.",
+   "why": "UX-H-14 / UX-H-17 sibling sweep — largest uncaptioned board drawing both toggles"
+  },
+  {
+   "board": "1082:4739",
+   "name": "caption/Layers · component-instance",
+   "from": "155:26",
+   "w": 280,
+   "x": 500,
+   "y": 1052,
+   "text": "NOT A STATE — and the row toggles carry the same two defects as every other board in this section: the eye dims in the editor only, the lock lives in two stores that never reconcile. UX-H-14, UX-H-17.",
+   "why": "UX-H-14 / UX-H-17 sibling sweep"
+  },
+  {
+   "board": "1082:4835",
+   "name": "caption/Layers · scroll-overflow",
+   "from": "155:26",
+   "w": 280,
+   "x": 2100,
+   "y": 2286,
+   "text": "NOT A STATE. Twenty-four hand-drawn rows, each with a 10x10 eye and lock 16px apart — under the 24x24 minimum, and the reason a click can land on the wrong row. UX-H-23.",
+   "why": "UX-H-23 sibling sweep"
+  },
+  {
+   "board": "1171:4829",
+   "name": "caption/Layers · display-settings",
+   "from": "155:26",
+   "w": 280,
+   "x": 1300,
+   "y": 1052,
+   "text": "The popover draws four options; LayerDisplaySettings.tsx ships three — Show HTML tags (div, section, h1…), Show element IDs (#abc123 format), Compact rows. Show hidden layers, Show lock badges and Highlight CMS-bound do not exist in LayerDisplayPrefs (types.ts:60-67), and the real title is Display Settings.",
+   "why": "Same false-copy class the layers pass marked on 1082:5004 and 143:355, never swept to this board"
+  },
+  {
+   "board": "807:8342",
+   "name": "caption/Inspector · profile · TEXT",
+   "from": "161:13",
+   "w": 300,
+   "x": 1780,
+   "y": 5865,
+   "text": "Locked changes nothing here — zero reads of isLocked under editor/inspector/, so every control stays live (2865:12419). No search, no count pills (2865:22079). UX-D-02, UX-D-10.",
+   "why": "UX-D-02 / UX-D-10 sibling sweep — profile board with no caption and no paired proposal"
+  },
+  {
+   "board": "807:8475",
+   "name": "caption/Inspector · profile · GRID",
+   "from": "161:13",
+   "w": 300,
+   "x": 520,
+   "y": 5865,
+   "text": "Locked changes nothing here — zero reads of isLocked under editor/inspector/, so every control stays live (2865:12419). No search, no count pills (2865:22079). UX-D-02, UX-D-10.",
+   "why": "UX-D-02 / UX-D-10 sibling sweep"
+  },
+  {
+   "board": "807:8521",
+   "name": "caption/Inspector · profile · MEDIA",
+   "from": "161:13",
+   "w": 300,
+   "x": 1360,
+   "y": 5865,
+   "text": "Locked changes nothing here — zero reads of isLocked under editor/inspector/, so every control stays live (2865:12419). No search, no count pills (2865:22079). UX-D-02, UX-D-10.",
+   "why": "UX-D-02 / UX-D-10 sibling sweep"
+  },
+  {
+   "board": "807:8614",
+   "name": "caption/Inspector · profile · INPUT",
+   "from": "161:13",
+   "w": 300,
+   "x": 940,
+   "y": 5865,
+   "text": "Locked changes nothing here — zero reads of isLocked under editor/inspector/, so every control stays live (2865:12419). No search, no count pills (2865:22079). UX-D-02, UX-D-10.",
+   "why": "UX-D-02 / UX-D-10 sibling sweep"
+  }
+ ]
+}

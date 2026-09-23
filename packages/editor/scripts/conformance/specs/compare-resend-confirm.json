@@ -1,0 +1,617 @@
+{
+  "surface": "compare-resend-confirm",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "169:92",
+  "boardName": "compare-resend-confirm",
+  "figmaHash": "918842f5e2bc037556b932f695e109c78e3e512dfe7bcc91cde01d72b5242d78",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:16:09.686Z",
+  "copy": [
+    "Compare",
+    "Side by side",
+    "Overlay",
+    "List",
+    "Home ▾",
+    "12 changes · 3 of 12",
+    "v3 · approved",
+    "Wood-fired pizza, five minutes away",
+    "Current",
+    "changed",
+    "Wood-fired pizza, five minutes from home",
+    "Send v4 to Sara?",
+    "Her current link stops working immediately. Her comments carry over — only the link changes.",
+    "Cancel",
+    "Send new round"
+  ],
+  "targets": [
+    {
+      "nodeId": "169:92",
+      "name": "Compare · resend-confirm — SUPERSEDED 2026-09-02 by 158:2 (no re-send in ApprovedCompareView; ReviewTab.tsx:839 owns the confirm)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex flex-col items-start overflow-clip relative rounded-[12px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:93",
+      "name": "Compare bar",
+      "className": "bg-[var(--color\\/bg-card,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-b border-solid h-[48px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "48px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:94",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[20px] left-[16px] not-italic text-[14px] text-[color:var(--color\\/ink,#111827)] text-left top-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:95",
+      "name": "mode strip",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex items-start left-[100px] overflow-clip rounded-[6px] top-[10px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:96",
+      "name": "seg/Side by side",
+      "className": "bg-[var(--color\\/bg-card,white)] content-stretch flex items-start overflow-clip px-[14px] py-[5px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:97",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:98",
+      "name": "seg/Overlay",
+      "className": "content-stretch flex items-start overflow-clip px-[14px] py-[5px] relative rounded-[6px] shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:99",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "169:100",
+      "name": "seg/List",
+      "className": "content-stretch flex items-start overflow-clip px-[14px] py-[5px] relative rounded-[6px] shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:101",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "169:102",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[380px] not-italic text-[12px] text-[color:var(--color\\/ink,#111827)] text-left top-[15px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:103",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[470px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "169:104",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[1052px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "169:105",
+      "name": "Body",
+      "className": "h-[700px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "700px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:106",
+      "name": "pane",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[660px] left-[16px] overflow-clip rounded-[8px] top-[8px] w-[516px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "660px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "516px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:107",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/success-text,#057a55)] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "169:108",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[120px] left-[16px] rounded-[6px] top-[40px] w-[484px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "120px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "484px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:109",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[16px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[180px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:110",
+      "name": "pane",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[660px] left-[548px] overflow-clip rounded-[8px] top-[8px] w-[516px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "660px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "516px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:111",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink,#111827)] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:112",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/accent-tint,#ebf5ff)] h-[120px] left-[16px] overflow-clip rounded-[6px] top-[40px] w-[484px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "120px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "484px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:113",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[10px] not-italic text-[11px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "169:114",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/accent-tint,#ebf5ff)] h-[28px] left-[16px] rounded-[4px] top-[176px] w-[484px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "484px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:115",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[16px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[180px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:116",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[776px] left-[-1px] top-[-1px] w-[1080px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "776px"
+        },
+        "width": {
+          "value": "1080px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:117",
+      "name": "modal/Resend",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[216px] left-[319px] overflow-clip rounded-[12px] top-[279px] w-[440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "216px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:118",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[24px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:119",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[40px] leading-[18px] left-[24px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[56px] w-[392px]",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:120",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[36px] left-[196px] overflow-clip rounded-[6px] top-[148px] w-[84px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "84px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:121",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[21px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "169:122",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] h-[36px] left-[288px] overflow-clip rounded-[6px] top-[148px] w-[128px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "128px"
+        }
+      }
+    },
+    {
+      "nodeId": "169:123",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[15px] not-italic text-[13px] text-[color:var(--color\\/bg-card,white)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

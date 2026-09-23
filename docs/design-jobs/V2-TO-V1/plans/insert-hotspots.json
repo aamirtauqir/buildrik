@@ -1,0 +1,71 @@
+[
+  {
+    "over": "137:26",
+    "to": "BLOCKS-ROWS-BOARD-ID",
+    "name": "hotspot/state · Insert · blocks-expanded · rows",
+    "pad": 8,
+    "why": "UX-A-05 — the BLOCKS group header must open the shipping rows board, not the design-ahead picture grid.",
+    "over_id_source": "read from file — 137:2 full tree: TEXT 137:26 'BLOCKS' @(32,8 49x16) inside FRAME 137:24 'Group header · BLOCKS' @(0,208 280x32). Hotspot bounds after pad=8: x=24, y=200, w=65, h=32 in board-local coordinates.",
+    "to_unresolved": true,
+    "to_note": "Resolve after add-state-board creates 'Insert · blocks-expanded · rows' (insert-new-boards.json row 1)."
+  },
+  {
+    "over": "137:26",
+    "to": "1069:4707",
+    "name": "hotspot/state · Insert · blocks-expanded (picture grid, design-ahead)",
+    "pad": 8,
+    "why": "Keep the existing edge to the picture grid if one exists — 1069:4707 stays in the file as the design-ahead target. Run this row ONLY if 137:2 has no edge to 1069:4707 already; add-hotspots reports ALREADY and skips when it does.",
+    "over_id_source": "read from file — 137:2 full tree",
+    "conflict-note": "Two hotspots over the same label collide. If both edges are wanted, place this one over the BLOCKS count TEXT 137:27 '50' @(244,8 14x16) instead — pad 8 gives x=236, y=200, w=30, h=32, clear of the label hotspot which ends at x=89.",
+    "optional": true
+  },
+  {
+    "over": "137:38",
+    "to": "MINE-EMPTY-BOARD-ID",
+    "name": "hotspot/state · Insert · mine-expanded · empty",
+    "pad": 8,
+    "why": "UX-A-24 — the MINE header must reach its own empty state; today MINE 0 leads nowhere.",
+    "over_id_source": "read from file — 137:2 full tree: TEXT 137:38 'MINE' @(32,8 31x16) inside FRAME 137:36 'Group header · MINE' @(0,272 280x32). Hotspot bounds after pad=8: x=24, y=264, w=47, h=32.",
+    "to_unresolved": true,
+    "to_note": "Resolve after add-state-board creates 'Insert · mine-expanded · empty'."
+  },
+  {
+    "over": "137:30",
+    "to": "1069:4790",
+    "name": "hotspot/state · Insert · components-expanded",
+    "pad": 8,
+    "why": "UX-A-25 — the COMPONENTS header must open the components-expanded board. That board is currently parked in the REVIEW section 1090:4527 and may have no inbound edge at all; add-hotspots reports ALREADY if one exists.",
+    "over_id_source": "read from file — 137:2 full tree: TEXT 137:30 'COMPONENTS' @(32,8 88x16) inside FRAME 137:28 'Group header · COMPONENTS' @(0,240 280x32). Hotspot bounds after pad=8: x=24, y=232, w=104, h=32.",
+    "to_id_source": "read from file — section 1090:4527 child list"
+  },
+  {
+    "over": "137:13",
+    "to": "1069:4529",
+    "name": "hotspot/state · Insert · elements-expanded",
+    "pad": 8,
+    "why": "Completeness of the group-header edge set — all four group headers should open their expanded board. Skip if it already exists.",
+    "over_id_source": "read from file — 137:2 full tree: TEXT 137:13 'ELEMENTS' @(32,8 65x16) inside FRAME 137:11 @(0,80 280x32). Hotspot bounds after pad=8: x=24, y=72, w=81, h=32.",
+    "to_id_source": "read from file — section 1776:8379 child list",
+    "optional": true
+  },
+  {
+    "over": "137:9",
+    "to": "138:53",
+    "name": "hotspot/state · Insert · searching",
+    "pad": 8,
+    "why": "The search field must reach the searching state. Skip if it already exists.",
+    "over_id_source": "read from file — 137:2 full tree: TEXT 137:9 'Search elements' @(10,5 103x20) inside FRAME 137:8 'search box' @(16,4 248x28) inside FRAME 137:7 'Search' @(0,44 280x36). NOTE the nesting: 137:9's x/y are relative to 137:8, so the hotspot lands inside 137:8, not on the board. add-hotspots appends the rect to lbl.parent, which is 137:8 — correct.",
+    "to_id_source": "read from file — section 1776:8379 child list",
+    "optional": true
+  },
+  {
+    "over": "TIP-NAV-NODE",
+    "to": "138:244",
+    "name": "hotspot/state · Insert · tip-dismissed",
+    "pad": 6,
+    "why": "An edge already exists — FRAME 1668:7245 'hotspot/state · Insert · tip-dismissed' @(130,742 150x34) on 137:2. Recorded so nobody adds a second one.",
+    "status": "ALREADY-PRESENT",
+    "id_source": "read from file — 137:2 full tree",
+    "skip": true
+  }
+]

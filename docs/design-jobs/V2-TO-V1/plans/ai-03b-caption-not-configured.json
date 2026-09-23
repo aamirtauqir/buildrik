@@ -1,0 +1,11 @@
+[
+  {
+    "id": "172:43",
+    "expect": "PUT THE CURRENT FIRST WORDS HERE BEFORE APPLYING",
+    "width": 280,
+    "text": "The panel's answer, and only the panel's. The message is honest and reachable — the server distinguishes this case with its own error code before it spends quota — but two other shipped AI entry points hit the same server error and show nothing at all: Pages → SEO “Write with AI” and Media → “✨ Generate” both swallow the exception, flip the label back and leave the field blank. This board is not the product-wide answer until those two carry the same two sentences.",
+    "why": "UX-G-05 + UX-G-15's board-side twin FIG-K-15(b). The board id and size (172:43, 280x72 @100,2498) ARE read; its CURRENT TEXT is not.",
+    "idSource": "read — 172:43 is confirmed present as 'caption/AI · not-configured' in the 2026-09-07 section listing.",
+    "APPLIER-MUST": "Run WITHOUT --apply first. The dry run prints 'WOULD<TAB>172:43<TAB><the first 70 chars of the current text>'. Paste those first words into `expect`, then apply. Do NOT apply this row with the placeholder expect in place — it will refuse, which is the intended failure, but the point is to learn the current copy rather than to overwrite a caption another module's agent may have rewritten since 2026-09-06."
+  }
+]

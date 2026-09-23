@@ -1,0 +1,188 @@
+{
+  "surface": "s1-editor-assembled-1440-drawer-pinned",
+  "board": "S1 · Editor — ASSEMBLED (1440, drawer pinned) (Figma 52:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-tab-layers"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-active-bar"
+    }
+  ],
+  "contrastScope": "body",
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ],
+  "targets": [
+    {
+      "name": "shell",
+      "testId": "layout-shell",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "52:5"
+    },
+    {
+      "name": "drawer",
+      "testId": "sidebar-panel",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "52:7"
+    },
+    {
+      "name": "inspector",
+      "testId": "layout-shell-inspector"
+    },
+    {
+      "name": "rail-insert",
+      "testId": "rail-tab-add",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8415"
+    },
+    {
+      "name": "rail-layers-active",
+      "testId": "rail-tab-layers",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8418"
+    },
+    {
+      "name": "rail-active-bar",
+      "testId": "rail-active-bar",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8421"
+    },
+    {
+      "name": "rail-pages",
+      "testId": "rail-tab-pages",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8422"
+    },
+    {
+      "name": "rail-media",
+      "testId": "rail-tab-assets",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8425"
+    },
+    {
+      "name": "rail-content",
+      "testId": "rail-tab-content",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8428"
+    },
+    {
+      "name": "rail-brand",
+      "testId": "rail-tab-design",
+      "spec": "s1-editor-assembled-1440-drawer-pinned",
+      "nodeId": "2034:8431"
+    },
+    {
+      "name": "rail",
+      "testId": "rail"
+    },
+    {
+      "name": "topbar",
+      "testId": "topbar"
+    },
+    {
+      "name": "canvas",
+      "testId": "canvas"
+    }
+  ],
+  "_note": [
+    "Board 52:2 is the MASTER assembled shell — the whole editor at 1440 with the",
+    "drawer pinned — and almost every part of it is already conformed by another",
+    "recipe. What is genuinely THIS board's is the ARRANGEMENT (the pinned drawer's",
+    "own column) and THE RAIL: `s1-1-coach-dismissed` defers the rail items to here",
+    "in as many words (\"the Rail family (52:2 / 199:2) owns those\"), and until now",
+    "the owning board had no recipe, so the rail had never been measured against",
+    "anything.",
+    "",
+    "The state is reached the way a person reaches it — boot, dismiss the first-run",
+    "coach if it is up, press the Layers rail tab, which is the tab the board draws",
+    "active with its panel in the pinned drawer.",
+    "",
+    "WHAT MOVED:",
+    "  2034:8415 + 5 siblings — every rail item is `--radius/md` (6). `.ls-btn` had",
+    "  a hardcoded `border-radius: 7px`, one pixel off the token, on all six.",
+    "  2034:8421 — the active bar is `rounded-[2px]`. It shipped `rounded-r-[2px]`,",
+    "  so its two left corners were square. The code comment beside it cites board",
+    "  199:2, and correctly — but 199:2 settles the bar's POSITION (3px, flush to",
+    "  the rail edge, the item's full 44) and says nothing about corners, which is",
+    "  what 52:2 draws. Position, size and fill were already right and still are.",
+    "  52:7 — the drawer's edge now declares its colour on all four sides",
+    "  (`border: 0 solid var(--bk-gray-100)` + `border-right-width: 1px`) instead of",
+    "  the one-sided `border-right` shorthand. Identical pixels: a one-sided",
+    "  shorthand leaves the other three sides at `currentColor`, so what any reader",
+    "  — this harness included — got back for `border-top-color` was `--bk-ink`",
+    "  #111827, not the token the rule names. `.bdi-panel` already documents this",
+    "  exact pattern for the inspector's edge and calls it out as \"what the recipes",
+    "  read back\"; the drawer had simply never been converted.",
+    "",
+    "ANCHORS ADDED: `layout-shell` and `layout-shell-inspector` on LayoutShell's own",
+    "slots, and `rail-active-bar` on the active item's rule. None on",
+    "AquibraStudio.tsx, which this arc may not stage.",
+    "",
+    "NOT JOINED, and why:",
+    "  52:2 itself — the board's frame fill is `--color/bg-app` #F3F4F6, and the",
+    "  element that is 1440x900 is `.bd-studio` in AquibraStudio.tsx, which this arc",
+    "  may not stage (founder's tree). `.layout-shell` is the 1440x812 MIDDLE BAND,",
+    "  which is 52:5, and that is what `shell` joins. See \"Found, not fixed\" in the",
+    "  report for what `.layout-shell`'s own ground turned out to be.",
+    "  52:9 the INSPECTOR column — the board gives it a `--flowbite/gray/100` edge;",
+    "  the column deliberately has none, and inspector.css says why at length:",
+    "  boards 32:2 and 807:8521 draw `border-l` on the PANEL, `.bdi-panel` draws it,",
+    "  and a second hairline on the column outside it cost a pixel of the 300 that",
+    "  boards 301:2080 / 301:2287 fix. Nine boards against this one. The column is",
+    "  anchored and SKIPPED so its 300 is measured and the ratchet can see it;",
+    "  `.bdi-panel` itself cannot be the join because it only mounts with a",
+    "  selection, and the demo project is empty.",
+    "  682:2570 the TOPBAR and its six children — board 681:26 owns the topbar and",
+    "  `shell-default` measures it; the S5 flow recipes hold `btn/exit` open. Three",
+    "  recipes on one control is two too many.",
+    "  52:8 the CANVAS column — its ground is contested three ways: this board says",
+    "  `--flowbite/gray/50` #F9FAFB, 297:2006 agrees, and 430:2353 says",
+    "  `--color/bg-app` #F3F4F6, which is what ships. `s1-1-coach-dismissed` already",
+    "  recorded the standoff and declined it; nothing here re-settles it. Separately,",
+    "  the only element carrying `data-testid=\"canvas\"` is `.buildrick-canvas`, the",
+    "  CUSTOMER CONTENT mount, not the column — joining them would measure the",
+    "  user's page against the editor's ground.",
+    "  52:10 the FOOTER — the `<footer>` lives in AquibraStudio.tsx. Its two text",
+    "  nodes are measured on 297:2019 / 297:2022 by `s1-1-coach-dismissed`.",
+    "  52:29 / 2102:11013 / 52:33 / 52:34 / 2143:205xx — the LAYERS panel, its",
+    "  header, search and eight rows. The Layers family has seven recipes of its own",
+    "  (`layers-tree` and siblings) and `panel-header` is the shared 44h drawer",
+    "  header. This board draws them because it draws the whole editor.",
+    "  52:56-52:145 — the entire inspector body, ~90 nodes. Six",
+    "  `inspector-profile-*` recipes measure it against 159:99 and its profile",
+    "  boards, and it needs a selection this surface has no honest way to make.",
+    "  462:3961-462:4000 — the canvas toolbar's 20 chips. `canvas-zoom-levels` and",
+    "  the S3 canvas recipes own those.",
+    "  52:153-52:167 and 54:3-54:10 — the SITE PAGE the board draws inside the",
+    "  canvas (nav, hero, cards). That is sample customer content, not chrome.",
+    "  444:xxxx / 633:xxxx / 635:4023 / 644:xxxx / 1168:4753 — the 28 state hotspots",
+    "  ringing the frame. Figma prototype furniture.",
+    "  92:8 / 92:11 / 2142:11048 — component definitions Figma inlines at the top of",
+    "  the generated file (a Slider and a ListRow), not nodes on this frame.",
+    "",
+    "STRUCTURAL GAP the numbers cannot see: the board draws SEVEN rail entries —",
+    "Insert, Layers, Pages, Media, Content, Brand, then a divider (3334:12656) and",
+    "`More` (3334:12657). `RAIL_FIGMA` in tabsConfig.ts is ONE group of six, so",
+    "neither the divider nor More exists in the product, and neither could be",
+    "anchored. Reported rather than invented.",
+    "",
+    "Board sample data not conformed to: 'Bella Cucina', 'In review · 3 open',",
+    "'Saved 2m ago', 'Section · Hero', '680 × 250'."
+  ]
+}

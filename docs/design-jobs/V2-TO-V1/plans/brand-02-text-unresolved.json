@@ -1,0 +1,69 @@
+{
+  "note": "Rows whose BOARD is measured but whose TEXT NODE ID was never read from the file — the read that would have resolved them was killed by the account-wide Figma seat-quota stop. Each row carries a selector precise enough to resolve mechanically: page 1:3 → board id → the TEXT node whose characters match `match`. Resolve, then move the row into brand-01-text.json with the real id and an `expect` taken from the read.",
+  "resolver": "for each row: n = (await figma.getNodeByIdAsync(board)).findAll(x => x.type==='TEXT' && x.characters.indexOf(match)===0); refuse unless n.length === 1",
+  "rows": [
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "153:120",
+      "board_name": "Brand · import-export",
+      "match": "Drop .json",
+      "text": "Drop tokens.json — JSON only",
+      "width": 216,
+      "why": "UX-H-28 · FIG-F-35 named 153:120 in its target list but the applied plan-text-B.json only rewrote the three sibling copies (306:2261/2294/2327). 153:120's own drop-zone string is still the .ts one."
+    },
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "153:120",
+      "board_name": "Brand · import-export",
+      "match": "Errors",
+      "sibling_value_match": "0",
+      "text": "3 — heading-xl, radius-pill, shadow-soft",
+      "why": "UX-H-29 · the VALUE beside the 'Errors' key, not the key itself. ImportCard.tsx:172-186 clears parsed state on any parse error and builds ParsedState with a literal `errors: []` at :183, so the row rendered at :346-354 can only ever read 0. The board must draw the truthful shape — a per-token rejection list beside a non-zero count. NOTE: the drawn value is board sample data; the SHAPE (count + named rejected ids) is the contract."
+    },
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "153:120",
+      "board_name": "Brand · import-export",
+      "match": "Choose how to handle them",
+      "text": "12 tokens already exist with the same ID. Choose what happens to them — nothing is applied until you choose.",
+      "width": 216,
+      "why": "UX-H-26 · ImportCard.tsx:126 initialises strategy to 'replace', :188 resets it to 'replace' at the end of every ingestRaw and :208 again on Cancel. The screen asks a question it has already answered with the destructive option. If this string is not on 153:120 it belongs only on the new board N1 — file the row there instead."
+    },
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "153:120",
+      "board_name": "Brand · import-export",
+      "match": "Apply 12 valid only",
+      "alt_match": "Apply",
+      "text": "Apply",
+      "state": "disabled",
+      "why": "UX-H-26 · ImportCard.tsx:400-403 labels the primary 'Apply {applyCount} valid only'. 'only' reads as the cautious option while the active strategy is the destructive one. Until a strategy is chosen the button is disabled and unnumbered; once chosen it names the outcome (see N1's content spec)."
+    },
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "155:65",
+      "board_name": "caption/Brand · import-export",
+      "match": null,
+      "read_first": true,
+      "text": "Export rows first (CSS / JSON / Tailwind, Figma disabled with its reason inline), then the drop zone. JSON only — the file input's .ts/.js are refused at drop, not after a failed parse. Conflicts open a per-token list — token id, your value, their value, keep or take — with the two whole-file chips as bulk shortcuts over it, and nothing applies until a strategy is chosen.",
+      "width": 248,
+      "why": "UX-H-26 + UX-H-27 + UX-H-28. FIG-F-44 lists 155:65 among the eight accurate captions but does not quote it, so its current string is unknown to me. READ IT before writing — no `expect`, no blind overwrite."
+    },
+    {
+      "unresolved-id": true,
+      "section": "1776:8373",
+      "board": "152:137",
+      "board_name": "Brand · starters",
+      "match": null,
+      "read_first": true,
+      "new_nodes": true,
+      "text": "Apply Linear Dark",
+      "why": "UX-H-30 · a footer commit control does not exist on either Starters board (StartersSection.tsx:8-12 says so in as many words: 'There is no Apply button on either board: the CARD is the control'). This is a NEW node, not a rewrite — see brand-04-boards.json E3 for the full footer spec."
+    }
+  ]
+}

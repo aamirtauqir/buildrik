@@ -1,0 +1,3266 @@
+{
+  "surface": "b9-1-animation-editor-entrance-attention-exi",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "429:2350",
+  "boardName": "b9-1-animation-editor-entrance-attention-exi",
+  "figmaHash": "bed43170bac11b2d17be3465d8799c93733b1e509f8fb8168595eab47ca09b64",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:06:40.889Z",
+  "copy": [
+    "Entrance",
+    "Attention",
+    "Exit",
+    "Fade In",
+    "Fade In Up",
+    "Fade In Down",
+    "Fade In Left",
+    "Fade In Right",
+    "Zoom In",
+    "Bounce In",
+    "Slide In Up",
+    "Slide In Down",
+    "Flip In X",
+    "Flip In Y",
+    "Rotate In",
+    "TIMING",
+    "Duration",
+    "600ms",
+    "Delay",
+    "0ms",
+    "Easing",
+    "Ease Out",
+    "Iterations",
+    "▶ Preview animation",
+    "animation: bd-anim-fadeInUp 600ms ease-out 0ms 1 normal forwards;",
+    "Entrance",
+    "Attention",
+    "Exit",
+    "Pulse",
+    "Bounce",
+    "Shake",
+    "Swing",
+    "Wobble",
+    "Flash",
+    "Heart Beat",
+    "Rubber Band",
+    "TIMING",
+    "Duration",
+    "600ms",
+    "Delay",
+    "0ms",
+    "Easing",
+    "Ease Out",
+    "Iterations",
+    "▶ Preview animation",
+    "animation: bd-anim-pulse 600ms ease-out 0ms 1 normal forwards;",
+    "Entrance",
+    "Attention",
+    "Exit",
+    "Fade Out",
+    "Fade Out Up",
+    "Fade Out Down",
+    "Zoom Out",
+    "Slide Out Up",
+    "TIMING",
+    "Duration",
+    "600ms",
+    "Delay",
+    "0ms",
+    "Easing",
+    "Ease Out",
+    "Iterations",
+    "▶ Preview animation",
+    "animation: bd-anim-zoomOut 600ms ease-out 0ms 1 normal forwards;"
+  ],
+  "targets": [
+    {
+      "nodeId": "429:2350",
+      "name": "B9.1 · Animation editor — Entrance · Attention · Exit",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex gap-[40px] items-start overflow-clip p-[40px] relative rounded-[12px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "40px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2351",
+      "name": "Animation editor · Entrance",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[320px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2352",
+      "name": "body",
+      "className": "content-stretch flex flex-col gap-[24px] items-start overflow-clip p-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2354",
+      "name": "tab/active",
+      "className": "border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-b-2 border-solid content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2355",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2356",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2357",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2358",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2359",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2360",
+      "name": "chip-grid",
+      "className": "content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2361",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2362",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2363",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2364",
+      "name": "chip/selected",
+      "className": "bg-[var(--flowbite\\/blue\\/500,#3f83f8)] content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2365",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/bg-card,white)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2366",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2367",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2368",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2369",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2370",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2371",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2372",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2373",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2374",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2375",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2376",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2377",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2378",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2379",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2380",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2381",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2382",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2383",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2384",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2385",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2386",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2387",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2388",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2389",
+      "name": "timing",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2390",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left tracking-[0.66px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2391",
+      "name": "field/Duration",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2392",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2393",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2394",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2395",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2396",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-[54px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "54px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2397",
+      "name": "field/Delay",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2398",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2399",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2400",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2401",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2402",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-0",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2403",
+      "name": "field/Easing",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2404",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2405",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2406",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2407",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2408",
+      "name": "field/Iterations",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2409",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2410",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2411",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2412",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2413",
+      "name": "btn/preview",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-center justify-center overflow-clip py-[9px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-top": {
+          "value": "9px"
+        },
+        "padding-bottom": {
+          "value": "9px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2414",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2415",
+      "name": "generated-css",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-start overflow-clip p-[12px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2416",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Geist_Mono:Regular'] font-normal leading-[normal] min-w-px relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2417",
+      "name": "Animation editor · Attention",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[320px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2418",
+      "name": "body",
+      "className": "content-stretch flex flex-col gap-[24px] items-start overflow-clip p-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2420",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2421",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2422",
+      "name": "tab/active",
+      "className": "border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-b-2 border-solid content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2423",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2424",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2425",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2426",
+      "name": "chip-grid",
+      "className": "content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2427",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2428",
+      "name": "chip/selected",
+      "className": "bg-[var(--flowbite\\/blue\\/500,#3f83f8)] content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2429",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/bg-card,white)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2430",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2431",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2432",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2433",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2434",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2435",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2436",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2437",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2438",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2439",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2440",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2441",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2442",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2443",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2444",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2445",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2446",
+      "name": "timing",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2447",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left tracking-[0.66px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2448",
+      "name": "field/Duration",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2449",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2450",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2451",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2452",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2453",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-[54px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "54px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2454",
+      "name": "field/Delay",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2455",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2456",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2457",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2458",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2459",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-0",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2460",
+      "name": "field/Easing",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2461",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2462",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2463",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2464",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2465",
+      "name": "field/Iterations",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2466",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2467",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2468",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2469",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2470",
+      "name": "btn/preview",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-center justify-center overflow-clip py-[9px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-top": {
+          "value": "9px"
+        },
+        "padding-bottom": {
+          "value": "9px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2471",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2472",
+      "name": "generated-css",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-start overflow-clip p-[12px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2473",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Geist_Mono:Regular'] font-normal leading-[normal] min-w-px relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2474",
+      "name": "Animation editor · Exit",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[320px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2475",
+      "name": "body",
+      "className": "content-stretch flex flex-col gap-[24px] items-start overflow-clip p-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2477",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2478",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2479",
+      "name": "tab",
+      "className": "content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2480",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2481",
+      "name": "tab/active",
+      "className": "border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-b-2 border-solid content-stretch flex items-start justify-center overflow-clip px-[10px] py-[6px] relative shrink-0",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2482",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2483",
+      "name": "chip-grid",
+      "className": "content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2484",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2485",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2486",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2487",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2488",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2489",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2490",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2491",
+      "name": "row",
+      "className": "content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2492",
+      "name": "chip/selected",
+      "className": "bg-[var(--flowbite\\/blue\\/500,#3f83f8)] content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2493",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/bg-card,white)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2494",
+      "name": "chip",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[40px] items-center justify-center overflow-clip px-[6px] py-[12px] relative rounded-[4px] shrink-0 w-[93px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "93px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2495",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2496",
+      "name": "timing",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2497",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left tracking-[0.66px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2498",
+      "name": "field/Duration",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2499",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2500",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2501",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2502",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2503",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-[54px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "54px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2504",
+      "name": "field/Delay",
+      "className": "content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2505",
+      "name": "head",
+      "className": "[word-break:break-word] content-stretch flex items-start justify-between leading-[normal] overflow-clip relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2506",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium not-italic relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2507",
+      "name": null,
+      "className": "font-['Geist_Mono:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2508",
+      "name": "track",
+      "className": "bg-[var(--color\\/border,#e5e7eb)] h-[4px] overflow-clip relative rounded-[2px] shrink-0 w-[272px]",
+      "props": {
+        "background-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2509",
+      "name": "fill",
+      "className": "absolute bg-[var(--flowbite\\/blue\\/500,#3f83f8)] h-[4px] left-0 rounded-[2px] top-0 w-0",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2510",
+      "name": "field/Easing",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2511",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2512",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2513",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2514",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2515",
+      "name": "field/Iterations",
+      "className": "[word-break:break-word] content-stretch flex flex-col gap-[6px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2516",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2517",
+      "name": "control",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex font-['Inter:Regular'] font-normal items-center justify-between overflow-clip px-[10px] py-[7px] relative rounded-[4px] shrink-0 text-[12px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2518",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2519",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2520",
+      "name": "btn/preview",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-center justify-center overflow-clip py-[9px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-top": {
+          "value": "9px"
+        },
+        "padding-bottom": {
+          "value": "9px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2521",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2522",
+      "name": "generated-css",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-start overflow-clip p-[12px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "429:2523",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Geist_Mono:Regular'] font-normal leading-[normal] min-w-px relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "633:4015",
+      "name": "hotspot/back · Inspector · single-selection",
+      "className": "absolute h-[34px] left-[-1px] top-[666px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

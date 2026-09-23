@@ -1,0 +1,466 @@
+{
+  "surface": "history-saves-load-error",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "453:4031",
+  "boardName": "history-saves-load-error",
+  "figmaHash": "f1d5f7f2c32073facd54f172dbcd8586a842c97946e469c51b4ac2c6e60f617d",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:45:55.826Z",
+  "copy": [
+    "Version History",
+    "Saves",
+    "Named milestones",
+    "Published",
+    "What's live",
+    "Saved versions",
+    "This session",
+    "Search saves...",
+    "Couldn’t load version history.",
+    "Your versions are still stored. Only this list failed to load.",
+    "Retry, or reopen Versions in a moment.",
+    "Try again"
+  ],
+  "targets": [
+    {
+      "nodeId": "453:4031",
+      "name": "History · Saves · load-error",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-l border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7165",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I1657:7165;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7175",
+      "name": "View switcher",
+      "className": "bg-white border-[#e5e7eb] border-b border-solid h-[40px] relative shrink-0 w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7176",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[28px] not-italic text-[#111827] text-[13px] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7177",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[28px] not-italic text-[#9ca3af] text-[11px] text-left top-[31px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7178",
+      "name": "active underline",
+      "className": "absolute bg-[#1a56db] h-[2px] left-[12px] top-[38px] w-[129px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "129px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7179",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[157px] not-italic text-[#6b7280] text-[13px] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7180",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[157px] not-italic text-[#9ca3af] text-[11px] text-left top-[31px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7181",
+      "name": "Saves filter",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7183",
+      "name": "chip",
+      "className": "absolute bg-[#1a56db] h-[24px] left-[12px] rounded-[12px] top-[8px] w-[79px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "79px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7182",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[8px] not-italic text-[12px] text-left text-white top-[4px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7185",
+      "name": "chip",
+      "className": "absolute border border-[#e5e7eb] border-solid h-[24px] left-[95px] rounded-[12px] top-[8px] w-[82px]",
+      "props": {
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "82px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7184",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[7px] not-italic text-[#6b7280] text-[12px] text-left top-[3px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7186",
+      "name": "Search bar",
+      "className": "bg-white border-[#e5e7eb] border-b border-solid h-[53px] relative shrink-0 w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "53px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7187",
+      "name": "search box",
+      "className": "absolute bg-[#f3f4f6] h-[36px] left-[12px] rounded-[6px] top-[8px] w-[256px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "256px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7188",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[10px] not-italic text-[#9ca3af] text-[12px] text-left top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4038",
+      "name": "Empty state",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[120px] not-italic overflow-clip relative shrink-0 text-center w-full",
+      "props": {
+        "height": {
+          "value": "120px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4039",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[20px] left-[144px] text-[13px] text-[color:var(--color\\/error-text,#c81e1e)] top-[40px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4040",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[16px] left-[144px] text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[64px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4041",
+      "name": "spacer",
+      "className": "h-[403px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "403px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4042",
+      "name": "Prune note",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[40px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4043",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left top-[8px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4044",
+      "name": "Footer",
+      "className": "h-[44px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4045",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4049",
+      "name": "hotspot/back · Versions · empty",
+      "className": "absolute h-[34px] left-[-1px] top-[742px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "881:4569",
+      "name": "hotspot/alt · Versions · saves",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[32px] left-[-1px] opacity-0 top-[744px] w-[220px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "220px"
+        }
+      }
+    }
+  ]
+}

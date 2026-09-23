@@ -1,0 +1,206 @@
+{
+  "surface": "publish-not-connected",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "784:4480",
+  "boardName": "publish-not-connected",
+  "figmaHash": "4a6bfdc9133e8d8817bfe168463071c4094714e9a7af1e471e99c2f81e2f0c29",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:22:31.070Z",
+  "copy": [
+    "Publish",
+    "Publishing is off for this workspace.",
+    "Ask a workspace owner to turn it on. A missing Vercel connection is a different state.",
+    "Nothing on this screen can turn it on."
+  ],
+  "targets": [
+    {
+      "nodeId": "784:4480",
+      "name": "Publish · unavailable (feature off) — the shipping panel prints the VERCEL copy in this state instead (PublishTab.tsx:336 noPublishPath, :436 'Connect Vercel to publish.'), while the topbar says 'Publishing isn't switched on for this workspace yet' (lifecycle.ts:104-109). Two mutually exclusive reasons for one state; the missing-connection state has its own board now (UX-E-04)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "784:4481",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I784:4481;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "784:4536",
+      "name": "Status",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[8px] items-start leading-[normal] not-italic pb-[28px] pt-[32px] px-[24px] relative shrink-0 w-[280px]",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-bottom": {
+          "value": "28px"
+        },
+        "padding-top": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "784:4537",
+      "name": null,
+      "className": "relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)] w-full",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "784:4538",
+      "name": null,
+      "className": "relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] w-full",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "784:4516",
+      "name": "Panel footer",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--color\\/border,#e5e7eb)] border-solid border-t content-stretch cursor-pointer flex h-[48px] items-start overflow-clip px-[16px] py-[10px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "48px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4389",
+      "name": "hotspot/back · Publish · panel",
+      "className": "absolute block cursor-pointer h-[34px] left-[-1px] top-[777px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "2846:21439",
+      "name": "hotspot/state · Publish · no Vercel connection",
+      "className": "bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] relative shrink-0 w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "2863:12414",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[#6b7280] text-[11px] top-[775px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    }
+  ]
+}

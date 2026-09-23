@@ -1,0 +1,240 @@
+<article class="v ok" id="M01">
+<header><span class="id">M01</span><span class="area">modal</span><span class="tag">confirmed exact</span></header>
+<h3>Single-file delete is still the bulk-delete design</h3>
+<p>fresh read b07: board <code>2850:22371</code> is named &#x27;Media · delete-confirm · single file&#x27; and its seven texts are &#x27;Delete 34 files?&#x27;, &#x27;⚠ 5 files are currently used on the canvas. Deleting will break those elements.&#x27;, &#x27;Type DELETE to confirm:&#x27;, &#x27;DELE&#x27;, &#x27;Cancel&#x27;, &#x27;Delete 34 files&#x27;, &#x27;Delete stays disabled until the word matches exactly.&#x27; — the bulk board <code>1175:4827</code>&#x27;s content, string for string.</p>
+</article>
+<article class="v ok" id="M02">
+<header><span class="id">M02</span><span class="area">modal</span><span class="tag">confirmed exact</span></header>
+<h3>All-failed rollback state contains success and partial success</h3>
+<p>fresh read b07: board <code>2881:12608</code> is named &#x27;Media · modal · replace-across · all-failed (rollback)&#x27; and contains <code>2881:12614</code> &#x27;Replaced 3 uses ✓&#x27; under a child named result-clean and <code>2881:12617</code> &#x27;2 replaced, 1 failed.&#x27; under result-partial — the reference board <code>1174:4849</code>&#x27;s content. No all-failed outcome is drawn anywhere on it.</p>
+</article>
+<article class="v ok" id="M03">
+<header><span class="id">M03</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Add Child refused state has no refusal message</h3>
+<p>fresh read b06: <code>2850:21560</code> &#x27;Modal · Add Child Element · refused&#x27; contains exactly 7 texts — &#x27;Add Child Element&#x27;, search placeholder, BASIC/MEDIA/LAYOUT/FORMS, close. No refusal sentence, no target element named.</p>
+</article>
+<article class="v ok" id="M04">
+<header><span class="id">M04</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Page-deletion impact dialog is an unsaved-SEO copy</h3>
+<p>fresh read b03+b06: <code>2898:22178</code> is literally named &#x27;Pages · delete-page · confirm · inbound links (of <code>1171:4820</code>)&#x27; and carries the unsaved-warning copy verbatim — &#x27;Discard unsaved SEO changes?&#x27; + &#x27;You edited the page title and description...&#x27; + Keep editing / Discard changes — identical to <code>1171:4820</code>.</p>
+</article>
+<article class="v ok" id="M05">
+<header><span class="id">M05</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Create Component Cancel overlaps the primary button</h3>
+<p>fresh read b01: board <code>1170:4777</code> origin (2060,55919); Cancel text <code>1712:8430</code> abs [2580,56617,43,16] = rel x520-563 y698-714; btn/Create component <code>1712:8431</code> abs [2608,56609,152,34] = rel x548-700 y690-724; intersection <b class="m">15x16px</b>. Audit&#x27;s numbers exact.</p>
+</article>
+<article class="v ok" id="M06">
+<header><span class="id">M06</span><span class="area">modal</span><span class="tag">confirmed with mechanism</span></header>
+<h3>Destructive warning is clipped inside its alert</h3>
+<p>fresh read b07: the alert frame <code>2850:22373</code> &#x27;in-use-warn&#x27; is 408x25 with clipsContent=true, and its text <code>2850:22374</code> is <b class="m">406px</b> starting <b class="m">10px</b> inside it, so the string overruns the clip by <b class="m">8px</b> on the right and the final word &#x27;elements.&#x27; is cut. The audit&#x27;s own screenshot shows the sentence ending at &#x27;those element&#x27;.</p>
+</article>
+<article class="v ok" id="M07">
+<header><span class="id">M07</span><span class="area">modal</span><span class="tag">confirmed and sharper</span></header>
+<h3>Brand change review displays four changes but says three</h3>
+<p>fresh read b03: <code>1172:4840</code> title &#x27;Review 3 staged changes&#x27;, four change rows (color/accent, type/heading, spacing/lg, shadow/raised removed), and the CTA reads &#x27;Apply 3 changes&#x27; while its own frame is named &#x27;btn/Apply 4 changes&#x27;. The fourth row&#x27;s parent is named &#x27;[not-implemented] shadow&#x27;, so the unsupported row is the extra one.</p>
+</article>
+<article class="v ok" id="M08">
+<header><span class="id">M08</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Single-image picker shows multiple selection</h3>
+<p>fresh read b02: <code>1164:4713</code> &#x27;Media · modal · picker (choose for element)&#x27; carries title &#x27;Choose an image&#x27; + &#x27;for Hero · Image&#x27; with footer &#x27;2 selected&#x27; and CTA &#x27;Use Selected&#x27;.</p>
+</article>
+<article class="v ok" id="M09">
+<header><span class="id">M09</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>CMS publish error contradicts the record&#x27;s own state</h3>
+<p>fresh read b04: <code>1706:8451</code> &#x27;Modal · CMS records · publish-error&#x27; shows row <code>1706:8402</code> &#x27;Margherita  EUR9.00  published  2d ago&#x27; directly above message <code>1706:8403</code> &quot;Can&#x27;t publish: Price is required&quot; — the record is marked published, and the price it says is required is present.</p>
+</article>
+<article class="v ok" id="M10">
+<header><span class="id">M10</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>No-published-records state sends users to create more records</h3>
+<p>fresh read b04: <code>1706:8437</code> titled &#x27;Menu items — 12 records&#x27; with body &#x27;No records published yet. Dynamic pages generate only from published records...&#x27; and exactly one action, <code>1706:8442</code> &#x27;+ Add record&#x27;. Nothing offers to publish any of the 12.</p>
+</article>
+<article class="v ok" id="M11">
+<header><span class="id">M11</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>No-collections dialog explains a detour without providing it</h3>
+<p>fresh read b04: <code>1706:8433</code> is 720x80 with three texts — title &#x27;Records&#x27;, body &quot;No collections yet. Create one from an element&#x27;s CMS binding first.&quot;, and a close glyph. No action of any kind.</p>
+</article>
+<article class="v ok" id="M12">
+<header><span class="id">M12</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>AI success has no way to use the result</h3>
+<p>fresh read b05: <code>1706:8483</code> &#x27;Modal · Brand · AI prompt · success&#x27; texts = title, raw JSON schema preview, &#x27;Discard&#x27;, &#x27;Retry&#x27;, close. No apply/insert action exists on the board. Fix direction: the audit&#x27;s own second option is the right one. The Accept button was removed in code deliberately (<code>AIPromptModal.tsx:211-225,</code> pinned by a test) because the artifact is a preset BINDING schema with no destination — so label the result unsupported; do not draw an Apply.</p>
+</article>
+<article class="v ok" id="M13">
+<header><span class="id">M13</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>AI not-configured state suggests Retry</h3>
+<p>fresh read b05: <code>1706:8492</code> &#x27;Modal · Brand · AI prompt · error&#x27; = &#x27;AI service not configured&#x27; with buttons &#x27;Cancel&#x27; and &#x27;Retry&#x27;. Fix direction: correct, and already shipped elsewhere — <code>AITab.tsx:266-281</code> gives the named state, the explanation and &#x27;Open workspace settings&#x27; with no Retry. Copy that, do not invent one.</p>
+</article>
+<article class="v ok" id="M14">
+<header><span class="id">M14</span><span class="area">modal</span><span class="tag">confirmed exact</span></header>
+<h3>CMS dialog width changes between default and error/empty variants</h3>
+<p>fresh read b04 + b02: the four state variants <code>1706:8433</code>, <code>1706:8437</code>, <code>1706:8444</code> and <code>1706:8451</code> all measure 720 wide, while the default records modal <code>1170:4749</code> measures 640 and carries its own note &#x27;Width stays 640: F15 adds the matching kind to <code>Modal.tsx</code> KIND_WIDTH.&#x27; The default is the one with a code citation, so the four variants are the ones that are wrong.</p>
+</article>
+<article class="v ok" id="M15">
+<header><span class="id">M15</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Collection wizard uses a mismatched example configuration</h3>
+<p>fresh read b02: <code>1170:4713</code> fields are Title/Price/Photo/Description for &#x27;Menu items&#x27; while <code>1173:4830</code> reads &#x27;Slug pattern - /blog/{slug} · Template - blog/_template · SEO title - {title} - Blog&#x27;. Blog example under a menu collection.</p>
+</article>
+<article class="v ok" id="M16">
+<header><span class="id">M16</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>No-records binding popover offers the wrong prerequisite</h3>
+<p>fresh read b05: <code>1707:8427</code> body &#x27;No records yet. Open Content &gt; this collection to add the first one.&#x27; with the only CTA &#x27;+ Create Collection&#x27;.</p>
+</article>
+<article class="v ok" id="M17">
+<header><span class="id">M17</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Save-as-template field has no visible label</h3>
+<p>fresh read b02: <code>1169:4753</code> has 5 texts (title, value &#x27;Autumn menu layout&#x27; inside field/name, token note, Cancel, Save template). No label text node for the field exists.</p>
+</article>
+<article class="v ok" id="M18">
+<header><span class="id">M18</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Canvas AI error popover ends at a failure sentence</h3>
+<p>fresh read b06: <code>1707:8455</code> &#x27;Popover · Canvas · AI · error&#x27; is 248x40 with exactly one text — &quot;The AI service didn&#x27;t respond.&quot; No control of any kind.</p>
+</article>
+<article class="v ok" id="M19">
+<header><span class="id">M19</span><span class="area">modal</span><span class="tag">confirmed and generalised</span></header>
+<h3>New modal specimens drift from the existing modal typography and control scale</h3>
+<p>The reference kit measures as the audit says: fresh read b23b of 46:2 &#x27;Modal instances — 3 widths · 5 states&#x27; uses <b class="m">16px</b> Semi Bold for titles (7 nodes) and <b class="m">13px</b> for action/body text (12 Regular + 9 Medium) across its 48 texts. The two named specimens measure as the audit says too: <code>2850:22371</code> has a <b class="m">14px</b> Semi Bold title (<code>2850:22372</code>), <b class="m">11px</b> actions (<code>2850:22381</code>/22383) and a <b class="m">27px</b> footer (<code>2850:22378</code>, 408x27); <code>1172:4840</code> has <b class="m">11px</b> actions (<code>1172:4860</code>/4862/4864) and a <b class="m">27px</b> footer (<code>1172:4865</code>, 488x27). But a census of all 26 modal and popover boards read fresh in this pass shows the drift is family-wide, not confined to new specimens: titles run 12, 13, 14 and <b class="m">16px</b> and action text runs 11, 12 and <b class="m">13px</b>, and the kit&#x27;s 16/13 scale is used by exactly ONE of the 26 — <code>1170:4777</code> Components · create. Adopting the kit is a re-scale of the whole modal family, not a correction of two specimens.</p>
+</article>
+<article class="v ok" id="M20">
+<header><span class="id">M20</span><span class="area">modal</span><span class="tag">confirmed</span></header>
+<h3>Long Create Component modal needs a constrained-height state</h3>
+<p>fresh read b01: <code>1170:4777</code> measures 720x740; its primary action frame <code>1712:8431</code> sits at rel y 690-724, i.e. below a <b class="m">720px</b> viewport.</p>
+</article>
+<article class="v ok" id="F01">
+<header><span class="id">F01</span><span class="area">Shell / Layers / Inspector</span><span class="tag">confirmed</span></header>
+<h3>Selection disagrees across the editor</h3>
+<p>fresh read b08a of the assembled editor 52:2: the highlighted Layers row I2143:20605;<code>2142:11080</code> reads &#x27;heading-that-is-long&#x27; while the canvas selection label <code>52:163</code> reads &#x27;Section · Hero&#x27; and the footer reads <code>53:20</code> &#x27;Section · Hero&#x27; + <code>53:21</code> &#x27;680 x 250&#x27;. Four surfaces, two answers, on one board. Corroborated independently by the post-arc dump <code>DISCOVERY.md:72,85,133,154</code> (<code>16:20</code>) and by the same pattern on the 55:* and 58:* variant boards, so it is not confined to one specimen. The lane that first measured it, D-C-40, appears exactly once in the whole repo and was never actioned. The second cited board settles it too: fresh read b08b of <code>199:205</code> &#x27;Shell state 3 · Element selected&#x27; carries inspector header <code>199:304</code> &#x27;⬚ Section&#x27;, canvas label <code>199:296</code> &#x27;Section · Hero&#x27; and <code>199:406</code> &#x27;Section&#x27;, footer <code>199:400</code> &#x27;Section · Hero&#x27;, and a Layers row I2143:20497;<code>2142:11080</code> &#x27;heading-that-is-long&#x27; — while the outlined canvas frame is itself named &#x27;Hero — SELECTED&#x27;. So the outline agrees with the three text surfaces and the Layers highlight is the single outlier, which is a slightly different shape from the audit&#x27;s wording but the same contradiction.</p>
+</article>
+<article class="v ok" id="F02">
+<header><span class="id">F02</span><span class="area">Shell / Inspector</span><span class="tag">confirmed value render caveat</span></header>
+<h3>The displayed fill does not match the selected section</h3>
+<p>fresh read b08a: the Inspector Background Fill input on 52:2 carries <code>52:131</code> &#x27;#1A56DB&#x27;, confirmed also at <code>DISCOVERY.md:109</code> and repeated on the 55:* and 58:* variants (:217, :315). What a text dump cannot carry is the hero section&#x27;s own paint, so the MISMATCH half rests on renders: the audit&#x27;s screenshot shows a light-gray hero, and the repo&#x27;s own lane D-C-40 recorded &#x27;Fill #1A56DB while the hero renders white&#x27; on the sibling board <code>199:205</code>. Value confirmed by measurement; the colour mismatch is corroborated twice by render but not measured here. The fill value repeats on the second board: <code>199:377</code> &#x27;#1A56DB&#x27; on <code>199:205</code>.</p>
+</article>
+<article class="v ok" id="F03">
+<header><span class="id">F03</span><span class="area">Pages</span><span class="tag">confirmed and understated</span></header>
+<h3>Audit notes and overlapping blocks obscure the panel</h3>
+<p>fresh read b09: inside product frame 140:2 &#x27;Pages · tree&#x27;, visible texts <code>2838:12105</code> &#x27;UX-B-32 - Pages owns the per-page fact...&#x27; and <code>2838:12104</code> &#x27;UX-B-13 - + Add page routes through the uniqueness helpers...&#x27; each <b class="m">248x117px</b>; 13 hotspot frames with visible=true across y16407-16782; &#x27;⚂ Structure&#x27; <code>2838:12106</code> overlaps count &#x27;3&#x27; <code>140:16</code> by <b class="m">7x6px</b>. Independently: <code>docs/design-jobs/V2-TO-V1/.render-defects-after.json</code> (our own detector, <code>18:19</code> — 21 min AFTER the audit published) lists CONTAINER 140:2 140:7 &#x27;Search&#x27; bottom +36 and TEXTOVER <code>2838:12106</code> by 36. The defect is clone-propagated: fresh read b22b finds the identical <b class="m">7x6px</b> &#x27;⚂ Structure&#x27; x &#x27;3&#x27; collision on <code>2898:12617</code> and <code>2898:21981</code>, both named &#x27;(of 140:2)&#x27;.</p>
+</article>
+<article class="v ok" id="F04">
+<header><span class="id">F04</span><span class="area">Media</span><span class="tag">confirmed twice</span></header>
+<h3>Footer actions and accepted-format text overlap</h3>
+<p>fresh read b09: in 144:2 &#x27;Media · grid&#x27;, text <code>2838:12023</code> &#x27;Sort and list view live in the full ...&#x27; overlaps <code>2838:12022</code> &#x27;Accepts PNG, JPG, GIF, WebP, AVIF, S...&#x27; by <b class="m">185x40px</b>. Independently: <code>docs/design-jobs/V2-TO-V1/.render-defects-after.json</code> (our own detector, <code>18:19</code> — 21 min AFTER the audit published) lists OVERPRINT 144:2 <code>2838:12022</code> x <code>2838:12023</code> by 185 — the same <b class="m">185px</b>.</p>
+</article>
+<article class="v refuted" id="F05">
+<header><span class="id">F05</span><span class="area">Notifications</span><span class="tag">refuted already fixed</span></header>
+<h3>Message text overlaps timestamps</h3>
+<p>Refuted three independent ways. (1) Fresh read b11a: 165:2 is now 360 wide — its own name reads &#x27;Notifications · unread — UX-F-26 / UX-F-25: drawn 360 as of 2026-09-07, matching the shipp[ing]&#x27; — and the columns no longer touch: message texts <code>165:11</code>/<code>165:16</code> run x932-1200 while stamps <code>165:12</code>/<code>165:17</code>/<code>165:23</code> sit at x1212-1226, a <b class="m">12px</b> gap, with zero text overlaps on the board. (2) The targeted re-measure <code>RENDER-DEFECTS-notifications.txt</code> logs six <b class="m">14px</b> overprints (165:11x165:12, 165:16x165:17, 165:22x165:23 and three on <code>165:24</code>) before the repair and &#x27;0&#x27; after, timestamped <code>16:29</code> — 89 minutes BEFORE the audit published at <code>17:58</code>. (3) The whole-page post-arc sweep .<code>render-defects-after.json</code> (<code>18:19</code>) returns an empty list for section 1779:2. The audit&#x27;s screenshot shows a 280-wide panel that no longer exists.</p>
+</article>
+<article class="v ok" id="F06">
+<header><span class="id">F06</span><span class="area">AI</span><span class="tag">confirmed on four boards</span></header>
+<h3>Explanatory and recovery content is clipped</h3>
+<p>fresh read b12: on <code>171:105</code> the clipping parent &#x27;Error&#x27; <code>171:132</code> ends at y67339, but &#x27;Continue by hand in the inspector&#x27; <code>2846:21651</code> spans 67335-67371 and its explanation <code>2846:21652</code> spans 67379-67459 — both essentially outside the clip, so the promised manual-continuation control does not render. On <code>171:136</code> the clipping parent &#x27;Not configured&#x27; <code>171:163</code> ends at y65815 while <code>2846:21649</code> (65813-65849) and <code>2846:21650</code> (65857-65921) fall outside it, and body text <code>171:165</code> overprints &#x27;Contact your workspace owner&#x27; <code>171:166</code> by <b class="m">178x18px</b>. Independently: <code>docs/design-jobs/V2-TO-V1/.render-defects-after.json</code> (our own detector, <code>18:19</code> — 21 min AFTER the audit published) lists CONTAINER <code>171:105</code> &#x27;Error&#x27; bottom +120, TEXTOVER <code>2846:21652</code> by 120, <code>2846:21651</code> by 32; CONTAINER <code>171:136</code> &#x27;Not configured&#x27; bottom +106, OVERPRINT <code>171:165</code> x <code>171:166</code> by 178, TEXTOVER <code>2846:21650</code> by 106, <code>2846:21649</code> by 34. Third board, measured on the fresh read b11b: on 170:2 &#x27;AI · idle&#x27; the clipping frame &#x27;note&#x27; <code>170:15</code> is 280x96 at y64421 (ends 64517) while its text <code>170:16</code> is 248x96 at y64429 (ends 64525) — <b class="m">8px</b>, one line, cut; the rendered sentence stops at &#x27;one step at a tim&#x27;. Four hotspot frames (<code>2483:11978</code>/11981/11984, <code>1671:7241</code>) sit visible=true inside the same product frame with their labels visible.</p>
+</article>
+<article class="v ok" id="F07">
+<header><span class="id">F07</span><span class="area">History</span><span class="tag">confirmed with mechanism</span></header>
+<h3>History retention warning is cut off</h3>
+<p>fresh read b21: on <code>2854:21814</code>/21739/21854/12294 the retention text (e.g. <code>2854:21848</code>, <b class="m">248x48px</b>) sits in clipping frame &#x27;Prune note&#x27; <code>2854:21847</code> of only <b class="m">280x40px</b> and overlaps the Footer text by <b class="m">106x2px</b>. The sentence is cut because the note frame is <b class="m">8px</b> shorter than its own text. Independently: <code>docs/design-jobs/V2-TO-V1/.render-defects-after.json</code> (our own detector, <code>18:19</code> — 21 min AFTER the audit published) lists CONTAINER 163:2 <code>163:44</code> &#x27;Prune note&#x27; bottom +16 and TEXTOVER <code>163:45</code> by 16 on the very board the audit cites, plus further rows on <code>163:220</code> and <code>163:269</code>.</p>
+</article>
+<article class="v ok" id="F08">
+<header><span class="id">F08</span><span class="area">Review</span><span class="tag">confirmed</span></header>
+<h3>Page grouping contradicts comment metadata</h3>
+<p>fresh read b10: on 156:2 the section header I220:847;<code>16:17</code> reads &#x27;OPEN · HOME&#x27; and the two comment bodies beneath it are I228:1002;<code>17:39</code> &#x27;Sara · client · Home · 2d&#x27; and I228:1007;<code>17:39</code> &#x27;Sara · client · Contact · 2d&#x27;.</p>
+</article>
+<article class="v ok" id="F09">
+<header><span class="id">F09</span><span class="area">Review</span><span class="tag">confirmed</span></header>
+<h3>The reply composer does not identify a recipient or thread</h3>
+<p>fresh read b10: 156:2 carries placeholder <code>1753:8433</code> &#x27;Reply to the client...&#x27; with <code>1753:8434</code> directly beneath it reading &#x27;Internal note - posts to this page&#x27;s comments, not under a reply.&#x27;</p>
+</article>
+<article class="v ok" id="F10">
+<header><span class="id">F10</span><span class="area">Review</span><span class="tag">confirmed twice</span></header>
+<h3>Re-send button has insufficient room for its label</h3>
+<p>fresh read b10: the label I229:1088;9:19 &#x27;Re-send for review&#x27; is <b class="m">127px</b> wide inside button <code>229:1088</code>; our own detector logs ESCAPES 156:2 I229:1088;9:19 by 4 past <code>229:1088</code> in the <code>18:19</code> post-arc sweep.</p>
+</article>
+<article class="v caveat" id="F11">
+<header><span class="id">F11</span><span class="area">Settings</span><span class="tag">true but fix is a product change</span></header>
+<h3>Error states explain failure but offer no immediate recovery</h3>
+<p>Fresh read b13 confirms the board: <code>1703:9208</code> &#x27;S7 · Settings · Forms · action-error&#x27; carries <code>1703:9369</code> &#x27;Failed to load submissions.&#x27; inside a parent named SCREEN_ERROR, and none of the board&#x27;s 38 texts is a recovery control; the sibling board <code>1703:9046</code> does the same with &#x27;Failed to load forms.&#x27; (<code>1703:9207</code>). The observation is right and the code says why: <code>FormsScreen.tsx:127</code> sets &#x27;Failed to load submissions.&#x27; and :306-308 renders it as a bare role=alert box with no action, so the board is faithful to what ships - there is no retry to draw. The board cannot have grown one either: no lane ever asked for it, and the arc&#x27;s record forbids inventing product affordances on a board. So the audit&#x27;s fix is a PRODUCT change (add retry to FormsScreen - loadSubs is already a stable useCallback at :107, so it is one onClick, and the repo has the pattern in four other places), not a design correction. The genuine board defect on that screen is one the audit did not name: COVER-1-11 records that the error should reduce the screen to one block while <code>FormsScreen.tsx:306-307</code> keeps the Select and filter chips above it, and <code>CONTRADICTIONS.md:118</code> has it unresolved against UX-I-32.</p>
+</article>
+<article class="v caveat" id="F12">
+<header><span class="id">F12</span><span class="area">CMS / Pages</span><span class="tag">part stale part fix wrong</span></header>
+<h3>Dynamic-page configuration lacks a visible template-change path</h3>
+<p>Two halves, both settled against the audit. (1) STALE: the audit&#x27;s screenshot shows two long red engineering paragraphs inside the panel; the fresh read b23a of <code>2429:12111</code> returns 10 texts and neither paragraph — they were moved out to captions at <code>16:23</code>, before the audit published at <code>17:58</code>. (2) FIX-WRONG: a template picker cannot be drawn, because pageTemplatePath is settable only once as free text at collection creation (<code>CMSCollectionSetupModal.tsx:440</code>) and nothing in the panel binds one (<code>ContentViews.tsx:643-685</code>); the arc deleted an invented &#x27;Choose a page...&#x27; picker twice on that ground (commit 667fd830d). The published-record count the audit asks for is already on the board — <code>2429:12119</code> &#x27;Generates 4 pages from published records.&#x27;</p>
+</article>
+<article class="v ok" id="F13">
+<header><span class="id">F13</span><span class="area">Insert</span><span class="tag">confirmed with measurement</span></header>
+<h3>Search-result category wraps into a clipped row</h3>
+<p>fresh read b12: in <code>138:53</code> the category text <code>138:105</code> &#x27;COMPONENTS&#x27; is <b class="m">66x32px</b> (two lines) while its siblings &#x27;BLOCKS&#x27; <code>138:102</code> and &#x27;ELEMENTS&#x27; <code>138:99</code> are <b class="m">16px</b>; the row pitch is <b class="m">32px</b>, so the wrapped label overruns its row. Independently: <code>docs/design-jobs/V2-TO-V1/.render-defects-after.json</code> (our own detector, <code>18:19</code> — 21 min AFTER the audit published) lists CONTAINER <code>138:53</code> <code>138:103</code> &#x27;Result · CTA button&#x27; bottom +8 and TEXTOVER <code>138:105</code> by 8.</p>
+</article>
+<article class="v ok" id="F14">
+<header><span class="id">F14</span><span class="area">Shell / Navigation</span><span class="tag">confirmed</span></header>
+<h3>New navigation corrections are not consistently assembled into existing screens</h3>
+<p>fresh read b20: the corrections exist only as small spec boards — <code>2844:12025</code> &#x27;Rail · More index (popover · 240)&#x27; 240x320, <code>2844:12121</code> &#x27;Topbar · location line&#x27; 1440x320, <code>2844:12136</code> &#x27;Shell · full-page mode — Back to canvas&#x27; 1440x320 — while the assembled editor 52:2 still renders the six-item rail.</p>
+</article>
+<article class="v ok" id="F15">
+<header><span class="id">F15</span><span class="area">Settings / Shell</span><span class="tag">confirmed</span></header>
+<h3>Canvas-specific footer persists in full-page Settings</h3>
+<p>fresh read b14: <code>638:2378</code>&#x27;s Footer still holds three visible texts — <code>638:2614</code> &#x27;Section · Hero&#x27;, <code>638:2615</code> &#x27;680 x 250&#x27;, <code>638:2617</code> &#x27;Desktop · 100%&#x27; — on a full-page Settings screen with no canvas. Code says why: <code>AquibraStudio.tsx:710-729</code> renders the footer as an unconditional flex sibling outside the grid, so every --fullpage rule misses it, and LayoutShell&#x27;s own Footer slot (<code>LayoutShell.tsx:332</code>) has zero consumers. Wider than the audit states: fresh read b13 finds the same three footer texts on two more full-page Settings boards — <code>1703:9311</code>/9312/9314 on <code>1703:9208</code> and <code>1703:9149</code>/9150/9152 on <code>1703:9046</code>.</p>
+</article>
+<article class="v ok" id="F16">
+<header><span class="id">F16</span><span class="area">Canvas</span><span class="tag">confirmed</span></header>
+<h3>Zoom and device controls have competing representations</h3>
+<p>fresh read b08a: 52:2 carries a canvas toolbar device control <code>52:65</code> &#x27;Desktop ▾&#x27; and a zoom chip <code>462:3995</code> &#x27;100%&#x27; (parent chip/100%), while the global footer separately carries <code>53:23</code> &#x27;Desktop · 100%&#x27;. Corroborated by <code>DISCOVERY.md:76,140,154</code>. The code says it is worse than drawn — the device has THREE representations (<code>CanvasFooterToolbar.tsx:318-332,</code> <code>ProInspector.tsx:428-432</code> BreakpointPill, <code>StudioFooter.tsx:236</code>) over one state owner (<code>useStudioState.ts:221-222</code> to <code>Composer.ts:1027-1036</code>). And the correction already exists, unapplied: board <code>2855:12407</code> states &#x27;One viewport control — chrome-ui BreakpointSwitcher is the one (<code>CanvasFooterToolbar.tsx:318-331</code>)&#x27;.</p>
+</article>
+<article class="v ok" id="F17">
+<header><span class="id">F17</span><span class="area">Templates</span><span class="tag">confirmed</span></header>
+<h3>Gallery thumbnails are placeholders</h3>
+<p>fresh read b15 + audit screenshot: <code>641:2487</code> &#x27;Templates · gallery&#x27; carries card meta text only (&#x27;Restaurant — one page / 6 sections&#x27; etc.); the three preview areas render as flat gray rectangles with no loading or unavailable variant.</p>
+</article>
+<article class="v ok" id="F18">
+<header><span class="id">F18</span><span class="area">Components / Brand</span><span class="tag">confirmed and code backed</span></header>
+<h3>Unavailable brand components look linked and actionable</h3>
+<p>fresh read b15: <code>641:2546</code> still contains section header &#x27;FROM BRAND · NOT IMPLEMENTED&#x27; (I641:2581;<code>16:17</code>) above rows &#x27;Button / primary&#x27; + &#x27;linked&#x27; + chevron and &#x27;Price row&#x27; + &#x27;linked&#x27; + chevron. Code ships one group only (<code>ComponentsTab.tsx:247-249</code>) and states in-source at :231-235 that a FROM BRAND section &#x27;would always be empty chrome&#x27;. The board draws a capability the engine does not have.</p>
+</article>
+<article class="v ok" id="F19">
+<header><span class="id">F19</span><span class="area">Inspector</span><span class="tag">confirmed premise decision needed</span></header>
+<h3>Two adjacent motion systems compete for the same task</h3>
+<p>fresh read b22b: the &#x27;newer MOTION specimen&#x27; the audit names does exist — <code>2865:22206</code> &#x27;Inspector · MOTION · one section&#x27;, 300x812, built by this arc — so two motion models are drawn side by side, which is the audit&#x27;s premise. But the code has no Motion section at all (<code>elementProfiles.ts:70-85</code> renders &#x27;Interactions&#x27; and &#x27;Animation&#x27; as separate adjacent sections; SectionId has 17 ids and Motion is not one). So this is an open design decision, not a redraw: adopting MOTION means shipping a section that does not exist. Note also that the MOTION board carries its own defect the audit missed — <code>2865:22216</code> &#x27;Slide In Up · Entrances&#x27; overprints <code>2865:22215</code> &#x27;When it scrolls into view&#x27; by <b class="m">150x14px</b>.</p>
+</article>
+<article class="v ok" id="F20">
+<header><span class="id">F20</span><span class="area">Brand</span><span class="tag">confirmed in part</span></header>
+<h3>Status and mode explanations are visually ambiguous</h3>
+<p>Two halves. The status half is corroborated without the audit: <code>DISCOVERY.md:4086</code> &#x27;Brand is up to date&#x27; and the conformance scan&#x27;s dirty-dot paint <code>1751:8403</code> #8E4B10 sit on the same panel (<code>SHOTS.md:70-79</code>), so an unnamed orange marker and a global &#x27;up to date&#x27; line do coexist. The cramped-help half is NOT settled here: <code>DISCOVERY.md:4089</code> has the string &#x27;Friendly · hides token IDs and empty foundations&#x27; but no geometry, and the only clipping row in <code>RENDER-DEFECTS-brand.txt</code> for beginner-mode help is on a different board (CLIPPED <code>154:132</code> &#x27;Brand · root · Beginner mode&#x27; <code>154:186</code> needs <b class="m">32px</b> has 28), which <code>SHOTS.md:79</code> reports as no longer clipped. That half needs a fresh read of <code>1333:7162</code> and did not get one.</p>
+</article>
+<article class="v ok" id="F21">
+<header><span class="id">F21</span><span class="area">Prototype</span><span class="tag">confirmed exact</span></header>
+<h3>The site-menu prototype still routes to retired destinations</h3>
+<p>fresh read b16, all three controls and all three destinations read back in the same call: <code>642:3538</code> &#x27;Inspector&#x27; NAVIGATEs to 159:2, whose name is &#x27;Inspector · single-selection — RETIRED 2026-09-02&#x27;; <code>926:4484</code> &#x27;menu · Share preview link&#x27; NAVIGATEs to <code>817:4774</code>, named &#x27;[not-implemented · superseded by 988:2 · Site · Ac...&#x27;; hotspot <code>1172:4895</code> NAVIGATEs to <code>1172:4867</code>, named &#x27;RETIRED — Project settings modal (⌃,) · superseded&#x27;. Every destination exists, so the arc&#x27;s only wiring invariant (dangling edges = 0, <code>OUTCOME.md:18</code>) passes while three live controls lead into retired designs. That invariant cannot see this class.</p>
+</article>
+<article class="v ok" id="F22">
+<header><span class="id">F22</span><span class="area">File organization</span><span class="tag">confirmed exact</span></header>
+<h3>Section totals and content types are not reliable screen counts</h3>
+<p>fresh read b17: section <code>1776:8385</code> titled &#x27;01 · Shell · 34&#x27; has 56 children; <code>1776:8381</code> &#x27;08 · Inspector · 51&#x27; has 56; <code>1776:8374</code> &#x27;16 · History · 43&#x27; has 49. All three audit numbers exact.</p>
+</article>
+<article class="v dup" id="F23">
+<header><span class="id">F23</span><span class="area">File organization</span><span class="tag">duplicate of f03/f06/f12</span></header>
+<h3>Prototype and engineering material contaminates user-facing specimens</h3>
+<p>The contamination half is real and already counted: fresh read b09 shows <code>2838:12104</code>/12105 (two <b class="m">248x117px</b> UX-B-* engineering paragraphs) rendering visible inside product frame 140:2, and the audit&#x27;s own screenshots show the same in 170:2 and <code>2429:12111</code>. The distinct half — &#x27;912 descendants named hotspot/&#x27; — is not a defect on its own: those frames are the arc&#x27;s stated navigation method and were already dispositioned NOT-APPLICABLE (<code>reports/brand.md:94</code>), and on 140:2 their labels are visible=false. F23&#x27;s correction is written verbatim into F03, F06 and F12, so it adds no separate work.</p>
+</article>
+<article class="v ok" id="F24">
+<header><span class="id">F24</span><span class="area">Client sign-off</span><span class="tag">confirmed</span></header>
+<h3>The editor-page client review echo is a schematic, not a complete viewing screen</h3>
+<p>audit screenshot of <code>1339:7171</code>: main content reads &#x27;(the site, page tabs, and Your notes)&#x27; with unresolved {Agency}, {Name}, {date} placeholders. [PROVISIONAL: audit screenshot only; the arc wrote to this page until <code>18:31</code>, and F05 proves a screenshot can be 90 minutes stale. Awaiting fresh read.] Corroborated independently of the audit by the post-arc dump: <code>DISCOVERY.md:5249</code> &#x27;(the site, page tabs, and Your notes)&#x27;, :5250-5251 &#x27;Signed as {Name}. You are looking at the version sent to you {date}...&#x27;, :5247 &#x27;{Agency}&#x27;. The audit under-counts — {Agency} is unresolved on nine sibling boards (:5237, 5253, 5258, 5263, 5268, 5273, 5278, 5287, 5290).</p>
+</article>
+<article class="v ok" id="F25">
+<header><span class="id">F25</span><span class="area">Preview</span><span class="tag">confirmed via unchanged render</span></header>
+<h3>The interaction-testing reference covers content with its console</h3>
+<p>Settled without a fresh read, because the board provably did not change. The ONLY queue row in the entire arc that touches <code>817:4856</code> is publish-marks#12, op:&#x27;rename&#x27; (<code>queue.json</code> and <code>queue-sweep-b.json</code>, one hit each) — a name change, no interior edit — and <code>queue-state.json</code> does not mention the node at all. <code>reports/publish.md:180-184</code> says the same in the first person: &#x27;I never read inside ... <code>817:4856</code>&#x27;. So no writer altered the interior between the audit&#x27;s capture and its publication, and its screenshot is current: the dark &#x27;Preview console&#x27; panel covers the lower half of the &#x27;Scroll &amp; anchor&#x27; and &#x27;Broken element&#x27; cards, truncating both mid-sentence. Why nothing local caught it: <code>render-defects.mjs</code>&#x27;s six classes are all parent-to-child or title-vs-right-sibling, so an opaque SIBLING frame sitting on top of a card is invisible to our own detector — the same blind spot that let this pass unmeasured all day. Verified from an unchanged render, not from geometry; a fresh read of <code>817:4856</code> was queued and did not land before the daily Figma cap ran out.</p>
+</article>
+<article class="v caveat" id="F26">
+<header><span class="id">F26</span><span class="area">V2 proposal</span><span class="tag">true but off page</span></header>
+<h3>The final V2 shell still uses cryptic rail labels</h3>
+<p>Proven at source, not by screenshot: <code>scripts/figma/build-polished-editor.mjs:77</code> draws each of the six upper rail seats as T(label.slice(0,4), 7, &#x27;Medium&#x27;) — &#x27;Inse&#x27;,&#x27;Laye&#x27;,&#x27;Page&#x27;,&#x27;Medi&#x27;,&#x27;Cont&#x27;,&#x27;Bran&#x27; — and :82-85 draws the lower six from the literal list [&#x27;Tmpl&#x27;,&#x27;Comp&#x27;,&#x27;AI&#x27;,&#x27;Pub&#x27;,&#x27;Hist&#x27;,&#x27;Rev&#x27;] at <b class="m">8px</b> with NO icon() call, while the upper seats each call icon(cell,k,...). Both halves of the audit&#x27;s complaint are in the builder. But <code>2797:22382</code> sits on page 2668:2 &#x27;Editor v2 — Proposal&#x27;, not on Editor v1 (1:3), so it is not an Editor-v1 defect. The shipping code&#x27;s labels are full words and test-pinned (<code>tabsConfig.ts:78-253,</code> <code>tabsConfig.figma.test.ts:30</code>).</p>
+</article>
+<article class="v caveat" id="F27">
+<header><span class="id">F27</span><span class="area">V2 proposal</span><span class="tag">true but off page</span></header>
+<h3>Corrected-module documentation does not match the current board inventory</h3>
+<p><code>V2-CORPUS-6-12.md:166</code> records TEXT <code>2797:562</code> &#x27;Five panels, drawn at their real widths...&#x27; and :172 &#x27;The five corrected panels are drawn below...&#x27;, while the same corpus lists 19 boards in that section and seven further module panels written by <code>build-polished-modules-a/b.mjs</code> (mtime 2026-09-07 <code>04:28</code>). The intro was not updated when the panels were added. Same page-2668:2 scope caveat as F26.</p>
+</article>
+<article class="v refuted" id="F28">
+<header><span class="id">F28</span><span class="area">Settings</span><span class="tag">refuted</span></header>
+<h3>Repeated subtitle bounds require a targeted cleanup pass</h3>
+<p>fresh read b15: on <code>640:3135</code> the header subtitle <code>640:3442</code> &#x27;Submissions inbox + config&#x27; is visible=false — deliberately hidden by this arc (<code>OUTCOME.md</code>: &#x27;30 Settings headers corrected … the invented subtitle and the invented primary hidden, because <code>DrillInHeader.tsx:12-47</code> has no action slot&#x27;). It is not clipped or concealed by geometry. The audit&#x27;s structural probe flagged hidden nodes; its required result (&#x27;all header subtitles are readable&#x27;) would undo a code-grounded decision. Confirmed a second time on a different board by fresh read b13: on <code>1703:9208</code> — the very screen the audit cites as &#x27;omits the header subtitle visible in the node text&#x27; — the subtitle <code>1703:9273</code> &#x27;Submissions inbox + config&#x27; is visible=false, and so is <code>1703:9111</code> on the sibling <code>1703:9046</code>. Hidden, not clipped, exactly as the arc recorded.</p>
+</article>

@@ -1,0 +1,105 @@
+{
+  "surface": "notifications-jump-target-deleted",
+  "board": "Notifications · jump-target-deleted (Figma 165:71)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=notifications-jump-target-deleted",
+  "viewport": {
+    "width": 360,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "notifications-jump-gone"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "notifications-panel",
+      "spec": "notifications-jump-target-deleted",
+      "nodeId": "165:71"
+    },
+    {
+      "name": "day-band",
+      "testId": "notifications-day-band-0",
+      "spec": "notifications-jump-target-deleted",
+      "nodeId": "220:923"
+    },
+    {
+      "name": "note-row",
+      "testId": "notifications-row-0",
+      "spec": "notifications-jump-target-deleted",
+      "nodeId": "165:77"
+    },
+    {
+      "name": "jump-gone",
+      "testId": "notifications-jump-gone",
+      "spec": "notifications-jump-target-deleted",
+      "nodeId": "165:81"
+    },
+    {
+      "name": "jump-gone-title",
+      "testId": "notifications-jump-gone-title",
+      "spec": "notifications-jump-target-deleted",
+      "nodeId": "165:82"
+    },
+    {
+      "name": "jump-gone-body",
+      "testId": "notifications-jump-gone-body"
+    },
+    {
+      "name": "header",
+      "testId": "panel-header"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: the list is a dashboard tRPC read (NotificationService",
+    "-> api-client, superjson), so the probe answers that one request and lets",
+    "the real panel, the real service and the real ordering run. Nothing about",
+    "the markup is re-implemented.",
+    "",
+    "BOARD WON, three times:",
+    "  165:81 marker height  64, not the 44 that shipped, and the two lines are",
+    "                        TOP-anchored at y=6/y=24 rather than centred.",
+    "                        The 16 right inset is what makes 165:83 measure",
+    "                        312 wide inside the 360 panel.",
+    "  165:77 row height     44 (Row size `stack`), not `comment`'s min-h-16.",
+    "                        The loading skeleton at 165:51 already draws 44,",
+    "                        so the two states of one list disagreed by 20px",
+    "                        per row. `.bk-notif-row`'s flex-start is now two",
+    "                        classes deep so `stack`'s items-center cannot win",
+    "                        on source order.",
+    "  165:71 panel border   --flowbite/gray/100, not the general --bk-border",
+    "                        (gray-200). Panel-local rule, nothing else moves.",
+    "",
+    "NOT JOINED: `header` is PanelHeader size=panel, a shared primitive that",
+    "six boards draw. 165:72 gives it line-height 20; the component ships 21",
+    "off board 16:6 / 165:52 and is measured there. One state board does not",
+    "re-settle it, so the header is measured and reported, not joined.",
+    "",
+    "NOT JOINED: `jump-gone-body` (165:83). The board gives that line w-[312px]",
+    "at left 32 inside a 360 frame; the shipped panel measures 310, and the 2px",
+    "is the popover's own left+right 1px borders, which the board's right-docked",
+    "frame does not draw. The board is 1px inconsistent with ITSELF here — its",
+    "own root carries `border-l`, so 32+312 leaves a 15px right gap in a 359",
+    "content box, not the 16 the layout intends. Export/re-seat noise at 1-2px,",
+    "so the line's insets stay on the panel's 32/16 gutter grid rather than",
+    "being contorted to `pr-[14px]` to buy a number. Still measured, and the",
+    "type properties it shares with 165:82 (12/18 and 11/16 in ink-muted) are",
+    "joined on the title above.",
+    "",
+    "CONTRAST, REPORTED NOT HIDDEN: the day band fails AA at 4.39 —",
+    "--color/ink-muted #6B7280 on --color/bg-subtle #F3F4F6 at 11px/500. It is",
+    "the pre-existing gray-500-on-gray-100 pair the harness README already",
+    "names, it shipped before this pass, and the board specifies BOTH colours",
+    "(I220:923;16:17 and I220:923;220:6). Conforming cannot fix it; only the",
+    "band's ink moving to --bk-ink-soft #4B5563 (7.0) would, and that is a",
+    "design-system call across every Section header, not this recipe's.",
+    "",
+    "2026-09-08: `notifications-row` / `notifications-day-band` became",
+    "`notifications-row-${i}` / `notifications-day-band-${i}` so the three-row",
+    "165:2 and 165:24 boards can address a row each. This fixture has one row, so",
+    "the ids here are -0. Re-measured after the rename."
+  ]
+}

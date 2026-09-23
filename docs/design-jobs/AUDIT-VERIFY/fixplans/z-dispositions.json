@@ -1,0 +1,19 @@
+{
+ "slug": "z-dispositions",
+ "page": "1:3",
+ "note": "Four verified findings that correctly get NO executable row. They are recorded here as held rows so that a closure count driven off the queue sees them as decided rather than absent. The previous QA pass caught 16 findings that were 'dispositioned by nobody'; the fix for that is not prose, it is a row.",
+ "rows": [
+  {"op": "advisory", "hold": true, "id": "52:2",
+   "holdWhy": "F14 — NEEDS A BUILD SCRIPT, NOT A QUEUE ROW. A queue row edits one node that already exists. All three navigation corrections need NEW nodes inside an existing shell: a 7th rail seat plus the More popover (2844:12025), a topbar location line (2844:12121), and a Back-to-canvas affordance (2844:12136). A build script would clone from those three spec boards into 52:2, 199:205 and the 55:* / 58:* variants and re-pitch the six 48px rail seats. It must run AFTER the rest of this arc, because F02 and F16 edit inside those same two boards and a clone taken mid-edit copies whichever half had landed.",
+   "why": "F14 — build-script work, deliberately not authored as rows"},
+  {"op": "advisory", "hold": true, "id": "807:8342",
+   "holdWhy": "F19 — FOUNDER DECISION, NOT A DEFECT REPAIR. The premise is confirmed: the Text profile draws INTERACTIONS and ANIMATION as separate adjacent sections, and a newer MOTION specimen exists at 2865:22206, built by this arc. But the code has no Motion section at all — elementProfiles.ts:70-85 renders 'Interactions' and 'Animation', and SectionId has 17 ids of which Motion is not one. Adopting MOTION means shipping a section the product does not have; keeping both means the file draws two motion models. Neither is a repair the queue may choose. (Noted separately: the MOTION board carries its own 150x14px overprint, 2865:22216 over 2865:22215.)",
+   "why": "F19 — open design decision, deliberately not authored"},
+  {"op": "advisory", "hold": true, "id": "2797:22382",
+   "holdWhy": "F26 — NOT ON EDITOR v1. 2797:22382 lives on page 2668:2 'Editor v2 — Proposal', so it is out of scope for a v1 repair arc. The finding is nonetheless TRUE and proven at source rather than by screenshot: scripts/figma/build-polished-editor.mjs:77 draws each upper rail seat as T(label.slice(0,4), 7, 'Medium') — 'Inse','Laye','Page','Medi','Cont','Bran' — and :82-85 draws the lower six from a literal list at 8px with no icon() call. The shipping code's labels are full words and test-pinned (tabsConfig.figma.test.ts:30). Fixing it means editing the V2 builder and re-running it, which is a different arc.",
+   "why": "F26 — off Editor v1 (page 2668:2), deliberately not authored"},
+  {"op": "advisory", "hold": true, "id": "2797:559",
+   "holdWhy": "F27 — NOT ON EDITOR v1, same page-2668:2 scope as F26. Also true: V2-CORPUS-6-12.md:166 records TEXT 2797:562 'Five panels, drawn at their real widths...' while the same corpus lists 19 boards in that section, seven of them module panels written by build-polished-modules-a/b.mjs at 04:28 on 2026-09-07. The intro was never updated when the panels were added. Repair belongs with the V2 builder.",
+   "why": "F27 — off Editor v1 (page 2668:2), deliberately not authored"}
+ ]
+}

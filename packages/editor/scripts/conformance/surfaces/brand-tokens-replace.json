@@ -1,0 +1,261 @@
+{
+  "surface": "brand-tokens-replace",
+  "board": "Brand \u00b7 tokens \u00b7 replace (Figma 306:2080)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-tokens"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-kind-motion"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2081"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-tokens-replace",
+      "nodeId": "I306:2081;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2082"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2083"
+    },
+    {
+      "name": "kind-color",
+      "testId": "brand-kind-color",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2084"
+    },
+    {
+      "name": "kind-color-label",
+      "testId": "brand-kind-label-color",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2085"
+    },
+    {
+      "name": "kind-color-count",
+      "testId": "brand-kind-count-color",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2086"
+    },
+    {
+      "name": "kind-color-chevron",
+      "testId": "brand-kind-chevron-color",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2087"
+    },
+    {
+      "name": "kind-spacing",
+      "testId": "brand-kind-spacing",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2088"
+    },
+    {
+      "name": "kind-spacing-label",
+      "testId": "brand-kind-label-spacing",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2089"
+    },
+    {
+      "name": "kind-spacing-count",
+      "testId": "brand-kind-count-spacing",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2090"
+    },
+    {
+      "name": "kind-spacing-chevron",
+      "testId": "brand-kind-chevron-spacing",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2091"
+    },
+    {
+      "name": "kind-radius",
+      "testId": "brand-kind-radius",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2092"
+    },
+    {
+      "name": "kind-radius-label",
+      "testId": "brand-kind-label-radius",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2093"
+    },
+    {
+      "name": "kind-radius-count",
+      "testId": "brand-kind-count-radius",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2094"
+    },
+    {
+      "name": "kind-radius-chevron",
+      "testId": "brand-kind-chevron-radius",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2095"
+    },
+    {
+      "name": "kind-type",
+      "testId": "brand-kind-type",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2096"
+    },
+    {
+      "name": "kind-type-label",
+      "testId": "brand-kind-label-type",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2097"
+    },
+    {
+      "name": "kind-type-count",
+      "testId": "brand-kind-count-type",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2098"
+    },
+    {
+      "name": "kind-type-chevron",
+      "testId": "brand-kind-chevron-type",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2099"
+    },
+    {
+      "name": "kind-shadow",
+      "testId": "brand-kind-shadow",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2100"
+    },
+    {
+      "name": "kind-shadow-label",
+      "testId": "brand-kind-label-shadow",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2101"
+    },
+    {
+      "name": "kind-shadow-count",
+      "testId": "brand-kind-count-shadow",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2102"
+    },
+    {
+      "name": "kind-shadow-chevron",
+      "testId": "brand-kind-chevron-shadow",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2103"
+    },
+    {
+      "name": "kind-motion",
+      "testId": "brand-kind-motion",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2104"
+    },
+    {
+      "name": "kind-motion-label",
+      "testId": "brand-kind-label-motion",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2105"
+    },
+    {
+      "name": "kind-motion-count",
+      "testId": "brand-kind-count-motion",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2106"
+    },
+    {
+      "name": "kind-motion-chevron",
+      "testId": "brand-kind-chevron-motion",
+      "spec": "brand-tokens-replace",
+      "nodeId": "306:2107"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: Brand -> Tokens. Same screen as brand-tokens-add \u2014 the two",
+    "boards draw the identical kind list and differ only in the Badge on top of it,",
+    "so both recipes measure the same 24 anchors against their own node ids. That",
+    "is not duplication for its own sake: the two boards were extracted separately",
+    "and either could drift, and a shared chassis is exactly the thing that should",
+    "be measured against every board that draws it.",
+    "",
+    "WHAT THE BOARD WON on the kind list (both boards state it identically):",
+    "  kind label      13/20 (306:2054). It inherited flowbite's `text-sm` 20px",
+    "                  line only by accident of the 13px size; stated now.",
+    "  kind count      11/16 (306:2055). Was 11 with a 20px line.",
+    "  kind chevron    12/20 `--bk-ink-soft` -> 13/20 `--color/ink-muted`",
+    "                  (306:2056). A size small and a shade soft against the row",
+    "                  it belongs to.",
+    "  back row        36 tall, 16 in, no fill of its own (306:2051). It shipped",
+    "                  as a 12/8-padded strip on `--bk-bg-subtle`, which on the",
+    "                  now-white panel read as a second header.",
+    "  crumb           13/20 in `--color/accent-text` (306:2052).",
+    "",
+    "Six rows, not fourteen: the board draws color / spacing / radius / typography",
+    "/ shadow / motion, which is exactly `ordered.populated` in Beginner mode \u2014",
+    "the eight foundation kinds with no tokens fold behind the `More token kinds`",
+    "disclosure. The counts on the board (18, 11) are sample data; the live panel",
+    "answers from the registries.",
+    "",
+    "NOT CONFORMED \u2014 the `Replace across usages` Badge (333:2350), for the reason",
+    "in brand-tokens-add.json plus one of its own: the replace flow is not reached",
+    "from this screen at all. `TokenReplaceModal` is opened by TokenDetailView when",
+    "a Pro user deletes a token that still has consumers \u2014 two levels down, from a",
+    "token's own detail \u2014 and it is a `ModalRoot`, not an inline block. The board",
+    "draws the state on the kind LIST, which the flow never has open. Conforming",
+    "would mean rendering a pill on a screen the state cannot occur on.",
+    "The badge's own frame corroborates the reading: it is placed at y=59, inside",
+    "the 44-80 back-row band it would collide with, and given `width: 112px` while",
+    "its label needs about 155 at 12/500.",
+    "",
+    "CHECK-BOARD-COPY: identical leads to brand-tokens-add.json \u2014 same screen \u2014",
+    "and triaged there. `replace across usages` is the Badge, above.",
+    "",
+    "HEADER TITLE REVERSED TO THE BOARD: the panel header now reads `Brand` at",
+    "every depth, not `Brand \u203a <Section>`. Six destination frames state the title",
+    "text and all six say `Brand`; check-board-copy.mjs reported it on all six at",
+    "once. This undoes a deliberate 2026-09-04 change whose argument is kept in",
+    "DesignSystemTab.tsx \u2014 the boards answer `where am I` one row lower, in the",
+    "36px Back row they all draw."
+  ]
+}

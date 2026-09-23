@@ -20,7 +20,7 @@ import {
 } from "@/server/services/media.service";
 import { applyAltTextToAsset } from "@/server/services/alt-text.service";
 import { z } from "zod";
-import { searchStockPhotos, searchStockVideos } from "@/server/services/stock.service";
+import { searchStockPhotos, searchStockVideos, StockError } from "@/server/services/stock.service";
 import {
   checkStorageQuotaSchema,
   createAssetSchema,
@@ -38,6 +38,31 @@ import {
   restoreAssetVersionSchema,
   updateAssetSchema,
 } from "@buildrik/shared/schemas/media";
+
+/**
+ * Carry the stock failure's REASON to the client, which only ever sees the tRPC
+ * code. Code choice is load-bearing: tRPC maps codes onto JSON-RPC numbers and
+ * several collapse onto -32603 (BAD_GATEWAY, SERVICE_UNAVAILABLE,
+ * GATEWAY_TIMEOUT, NOT_IMPLEMENTED), which decodes back as
+ * INTERNAL_SERVER_ERROR. Only a code with a unique number survives the round
+ * trip, so the two reasons the UI words differently take PRECONDITION_FAILED
+ * (-32012) and FORBIDDEN (-32003). REQUEST_FAILED is allowed to collapse — it
+ * is the client's fallback bucket, shared with a bare network error that
+ * carries no tRPC code at all.
+ *
+ * FORBIDDEN here means the PROVIDER refused OUR key, never that the caller
+ * lacks permission — the procedure is already past protectedProcedure.
+ */
+function translateStockError(e: unknown): never {
+  if (e instanceof StockError) {
+    const code =
+      e.code === "NOT_CONFIGURED" ? "PRECONDITION_FAILED"
+      : e.code === "UNAUTHORIZED" ? "FORBIDDEN"
+      : "BAD_GATEWAY";
+    throw new TRPCError({ code, message: e.message });
+  }
+  throw e;
+}
 
 /**
  * Phase A / B / C — media library tRPC.
@@ -296,7 +321,8 @@ export const mediaRouter = router({
 
   // ─── Stock media search (#24) ───────────────────────────────────────────
   // Server-proxied so provider keys (UNSPLASH_ACCESS_KEY / PEXELS_API_KEY)
-  // never reach the client. Returns [] when unconfigured (prior stub behavior).
+  // never reach the client. `[]` means nothing matched, and ONLY that — a
+  // missing key, a refused key and a dead request each throw their own code.
   searchStockPhotos: protectedProcedure
     .input(
       z.object({
@@ -307,12 +333,20 @@ export const mediaRouter = router({
       })
     )
     .query(async ({ input }) => {
-      return searchStockPhotos(input.query, input.page, input.orientation ?? null, input.color ?? null);
+      try {
+        return await searchStockPhotos(input.query, input.page, input.orientation ?? null, input.color ?? null);
+      } catch (e) {
+        translateStockError(e);
+      }
     }),
 
   searchStockVideos: protectedProcedure
     .input(z.object({ query: z.string(), page: z.number().int().min(1).default(1) }))
     .query(async ({ input }) => {
-      return searchStockVideos(input.query, input.page);
+      try {
+        return await searchStockVideos(input.query, input.page);
+      } catch (e) {
+        translateStockError(e);
+      }
     }),
 });

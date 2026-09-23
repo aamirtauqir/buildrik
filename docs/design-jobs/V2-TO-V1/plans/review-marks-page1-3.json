@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1717:17235",
+    "why": "UX-I-21 — the Review section draws Compare's load-error at 280 (drawer) while section 17 draws the whole Compare family at 1080 (canvas surface). Two mountings for one screen, with nothing saying which is the proposal. Record that 1080 is the fix and 280 is today's code, and file the 700-vs-560 expanded-drawer conflict rather than resolving it.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "id_source": "read-from-file 2026-09-07 (section listing)",
+    "current_name": "Review · compare · load-error — panel-mounted; ApprovedCompareView renders inside the Review drawer, 280 collapsed / 700 expanded (ReviewTab.tsx:497-532)",
+    "name": "Review · compare · load-error — panel-mounted; ApprovedCompareView renders inside the Review drawer, 280 collapsed / 700 expanded (ReviewTab.tsx:497-532). UX-I-21: this 280 board records what the CODE does today; the proposed fix is the §17 Compare family, drawn 1080 wide on the canvas surface. Redraw here when the fix lands. OPEN: SPEC-NAVIGATION proposes 560 for the expanded drawer; SPEC-PAGES-PANEL, SPEC-PUBLISH-PANEL and LeftSidebar.tsx:586-587 are 700 — drawn 700, 560 unresolved."
+  },
+  {
+    "id": "1717:17246",
+    "why": "UX-I-21 — same inconsistency, sibling state. Left un-noted it reads as a settled 280 mounting.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "id_source": "read-from-file 2026-09-07 (section listing)",
+    "current_name": "Review · compare · loading",
+    "name": "Review · compare · loading — panel-mounted at 280 collapsed / 700 expanded (ReviewTab.tsx:497-532). UX-I-21: this board records the CURRENT drawer mounting; the proposed fix is the §17 Compare family at 1080 on the canvas surface, where Compare is already drawn."
+  },
+  {
+    "id": "1705:8704",
+    "why": "UX-I-26 — the board already carries the defect. What is missing is the recommendation and its cost: a per-row reply needs a parentId the schema does not have, so it is design-ahead rather than a redraw of this band.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "id_source": "read-from-file 2026-09-07 (section listing)",
+    "current_name": "[not-implemented] Review · reply-composer band — comments are flat (no parentId in the schema) and a reply is filed against the round's FIRST comment's page, not the one being answered (ReviewTab.tsx:242)",
+    "name": "[not-implemented] Review · reply-composer band — comments are flat (no parentId in the schema) and a reply is filed against the round's FIRST comment's page, not the one being answered (ReviewTab.tsx:242). UX-I-26: the fix is a reply per comment, inline on the row where Resolve already sits — not one global box over a grouped list. That needs a parentId (or at minimum the row's own pageId) on the comment, so it is design-ahead: see '[design-ahead] Review panel · per-comment reply'."
+  },
+  {
+    "id": "1339:7214",
+    "why": "UX-I-18 — this is the screen the bar's argument-less Re-send actually produces. The defect is filed on the editor side and its consequence is drawn on the client side, with nothing linking them. Cross-link so the dead-link family names its own cause.",
+    "page": "1:3",
+    "section": "1776:8384",
+    "id_source": "read-from-file 2026-09-07 (section listing)",
+    "current_name": "Client sign-off · F · dead-link · not-found · 1280 — echo of 1:6 canonical 1736:8397, which is also 1280×720. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state.",
+    "name": "Client sign-off · F · dead-link · not-found · 1280 — echo of 1:6 canonical 1736:8397, which is also 1280×720. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state. UX-I-18: this is also the screen a ReviewBar Re-send produces — it calls the shell with no client email, so the new round ships token: null, the old link is already revoked, and the editor reports success while the client's link resolves to nothing."
+  }
+]

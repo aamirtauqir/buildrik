@@ -1,0 +1,207 @@
+{
+  "surface": "inspector-empty-template-applied",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1175:4841",
+  "boardName": "inspector-empty-template-applied",
+  "figmaHash": "1f9c40f631e36424d17a4249ba4a86b5c2f78e883da05bb9cd180b1486afa701",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:28:25.639Z",
+  "copy": [
+    "Template applied!",
+    "Bistro Landing",
+    "Set Brand Colors",
+    "Tip: Click an element to edit its properties",
+    "(shows for 30 minutes after a template apply, then reverts to 'Nothing Selected')"
+  ],
+  "targets": [
+    {
+      "nodeId": "1175:4841",
+      "name": "[unreachable] Inspector · empty · template-applied — the appliedName branch exists but nothing writes buildrick-last-applied-template (InspectorEmptyState.tsx:44,27)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col gap-[10px] items-start overflow-clip px-[16px] py-[14px] relative rounded-[12px] shadow-[0px_8px_24px_0px_rgba(18,23,38,0.18)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "10px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "14px"
+        },
+        "padding-bottom": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4842",
+      "name": "banner",
+      "className": "bg-[var(--color\\/success-tint,#def7ec)] content-stretch flex flex-col gap-[6px] items-start overflow-clip px-[12px] py-[10px] relative rounded-[8px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/success-tint",
+          "value": "#def7ec"
+        },
+        "gap": {
+          "value": "6px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4843",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/success-text,#057a55)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4844",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4845",
+      "name": "btn/Set Brand Colors",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch flex items-start overflow-clip px-[12px] py-[7px] relative rounded-[6px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4846",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-inverse,white)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4847",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4848",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[9px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] w-[min-content]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "9px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4876",
+      "name": "hotspot/back",
+      "className": "absolute block cursor-pointer h-[34px] left-[-1px] top-[123px] w-[300px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "300px"
+        }
+      }
+    }
+  ]
+}

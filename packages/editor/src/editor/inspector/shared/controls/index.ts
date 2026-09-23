@@ -5,7 +5,7 @@
  */
 
 // Unified ControlRow system
-export { ControlRow, CompactRow, StackedRow, SubTitle } from "./ControlRow";
+export { ControlRow, CompactRow, StackedRow, SubTitle, rowTestId, fieldTestId, labelTestId } from "./ControlRow";
 export type { ControlRowProps, SubTitleProps } from "./ControlRow";
 
 // Section wrapper

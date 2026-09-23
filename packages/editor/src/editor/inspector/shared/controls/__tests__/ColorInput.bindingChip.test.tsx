@@ -41,8 +41,15 @@ describe("ColorInput · DSBindingChip integration", () => {
     expect(chip).toBeTruthy();
   });
 
-  it("renders yellow off-DS chip when value is a raw hex", () => {
-    render(
+  /* REWRITTEN 2026-09-08 with the change it covers. There is no off-DS chip
+     any more: it carried a warning mark beside a hex the field already shows,
+     and it cost the control a fifth of its width — measured 127 against the
+     160 every profile board fixes (807:8366 draws the swatch and the hex
+     INSIDE one 160 frame and no chip). Board 32:2 draws a chip in this slot
+     only in the BOUND state (32:78, green), which is the state a chip can say
+     something the field cannot: the token's name. */
+  it("renders NO chip when the value is a raw hex — the field already shows it", () => {
+    const { container } = render(
       <ColorInput
         label="Color"
         value="#FFAA22"
@@ -50,8 +57,12 @@ describe("ColorInput · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Off-design-system value #FFAA22/i });
-    expect(chip).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: /Off-design-system value/i })
+    ).toBeNull();
+    expect(container.querySelector('[aria-label^="Off-design-system value"]')).toBeNull();
+    // The hex is still on screen, inside the field, which is the whole point.
+    expect(screen.getByDisplayValue("FFAA22")).toBeTruthy();
   });
 
   it("renders no chip when value is empty", () => {
@@ -78,18 +89,23 @@ describe("ColorInput · DSBindingChip integration", () => {
     expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, {});
   });
 
-  it("renders the chip without click when composer prop is absent", () => {
+  it("renders no chip for a raw hex even without a composer", () => {
     const { container } = render(
       <ColorInput label="Color" value="#FFAA22" onChange={() => {}} />
     );
-    // DSBindingChip degrades to a non-interactive span when onClick is missing.
-    // Confirm no button-role chip is rendered for this value.
-    const chipButtons = screen.queryAllByRole("button", { name: /Off-design-system value/i });
-    expect(chipButtons.length).toBe(0);
-    // But the chip should still render as a span with the appropriate aria-label.
-    const chipSpan = container.querySelector(
-      'span[aria-label="Off-design-system value #FFAA22. Click to bind to a token."]'
+    expect(
+      screen.queryAllByRole("button", { name: /Off-design-system value/i }).length
+    ).toBe(0);
+    expect(container.querySelector('[aria-label^="Off-design-system value"]')).toBeNull();
+  });
+
+  /* The bound chip still degrades to a non-interactive span with no composer —
+     the state DSBindingChip was written for, now its only one. */
+  it("renders the bound chip without a click target when composer is absent", () => {
+    const { container } = render(
+      <ColorInput label="Color" value="var(--buildrick-design-color-primary)" onChange={() => {}} />
     );
-    expect(chipSpan).toBeTruthy();
+    expect(screen.queryAllByRole("button", { name: /Jump to token/i }).length).toBe(0);
+    expect(container.querySelector('[aria-label^="Jump to token color-primary"]')).toBeTruthy();
   });
 });

@@ -6,6 +6,9 @@
  * @license BSD-3-Clause
  */
 
+import { formatBytes } from "../utils/helpers/number";
+import type { MediaAssetType } from "../types/media";
+
 // ============================================
 // File Size Limits
 // ============================================
@@ -22,11 +25,30 @@ export const MEDIA_SIZE_LIMITS = {
   MAX_AUDIO_SIZE: 50 * 1024 * 1024,
   /** Maximum SVG file size (1MB) */
   MAX_SVG_SIZE: 1 * 1024 * 1024,
+  /** Maximum font file size (5MB) — a full variable family is ~1MB. */
+  MAX_FONT_SIZE: 5 * 1024 * 1024,
   /** Thumbnail max dimension in pixels */
   THUMBNAIL_SIZE: 200,
   /** Maximum image dimension (width or height) */
   MAX_IMAGE_DIMENSION: 4096,
 } as const;
+
+/**
+ * The longest side, in px, the image editor will ask a canvas to encode — the
+ * Resize tab's cap (Clone 3695:43624 "Maximum is N × N px", QA contract
+ * 3697:20354: "Limit value must come from backend capability, not be invented
+ * in design" — the board's 8000 is a sample).
+ *
+ * Why 8192: the editor's output goes through `canvas.toDataURL`, and its
+ * default format is WebP, whose container refuses anything over 16383 px per
+ * side; Chrome, Firefox and Safari also cap a 2D canvas at 268,435,456 px of
+ * area (16384²) and past it `toDataURL` fails silently, returning `data:,`.
+ * The encoder holds two full-size RGBA bitmaps (the rotated source and the
+ * output), so halving the ceiling keeps each at ≤ 256 MB instead of 1 GB
+ * apiece, which is where desktop tabs start dying. 8192 is still above any
+ * current camera's long edge (a 48-MP sensor is ~8000).
+ */
+export const MAX_IMAGE_EDIT_DIMENSION = 8192;
 
 // ============================================
 // Allowed MIME Types
@@ -49,6 +71,11 @@ export const ALLOWED_MIME_TYPES = {
   VIDEO: ["video/mp4", "video/webm", "video/ogg", "video/quicktime"] as const,
   /** Allowed audio MIME types */
   AUDIO: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/webm", "audio/aac"] as const,
+  /** Allowed font MIME types. The engine, the server enum and the library's
+   *  `fnt` bucket all had a font type; the upload gate never let one in, so
+   *  Clone screen 3696:21550 ("Selected · Inter-Var.woff2") was unreachable
+   *  and the file input's `.woff2` accept was a promise nothing kept. */
+  FONT: ["font/woff2", "font/woff", "font/ttf", "font/otf"] as const,
 } as const;
 
 /**
@@ -58,6 +85,7 @@ export const ALL_ALLOWED_MIME_TYPES = [
   ...ALLOWED_MIME_TYPES.IMAGE,
   ...ALLOWED_MIME_TYPES.VIDEO,
   ...ALLOWED_MIME_TYPES.AUDIO,
+  ...ALLOWED_MIME_TYPES.FONT,
 ] as const;
 
 // ============================================
@@ -71,7 +99,154 @@ export const MEDIA_EXTENSIONS = {
   IMAGE: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif"] as const,
   VIDEO: [".mp4", ".webm", ".ogv", ".mov"] as const,
   AUDIO: [".mp3", ".wav", ".ogg", ".webm", ".aac"] as const,
+  FONT: [".woff2", ".woff", ".ttf", ".otf"] as const,
 } as const;
+
+/**
+ * The upload gate's accept contract, spelled for a person.
+ *
+ * Clone 3397:18325 footnotes the picker with "PNG, JPG, GIF, WebP, AVIF or
+ * SVG · up to 10 MB for this image field.", 3695:43876 refuses a URL with
+ * "Use a direct JPG, PNG, WebP or SVG image URL.", 3397:18137's drop zone and
+ * 3437:36027's drawer footer list the whole library — sample lists, the SHAPE
+ * being "the formats and the limit the code really enforces". Every one of
+ * them reads the tables `validateFile` reads (`ALLOWED_MIME_TYPES`,
+ * `getMaxFileSize`), so the sentence on screen cannot drift from the refusal
+ * behind it. The picker's `allowedTypes` are `MediaAssetType`s, where an SVG
+ * is its own kind (`getAssetTypeFromMime`), so an image-only field lists no
+ * SVG: that is what the picker's own filter admits. Audio is left off the
+ * library-wide lines on purpose: the library has no audio bucket and the
+ * server no schema for it (`toServerAssetType` → null).
+ */
+const FORMAT_LABEL: Record<string, string> = {
+  "image/jpeg": "JPG",
+  "image/png": "PNG",
+  "image/gif": "GIF",
+  "image/webp": "WebP",
+  "image/svg+xml": "SVG",
+  "image/avif": "AVIF",
+  "video/mp4": "MP4",
+  "video/webm": "WebM",
+  "video/ogg": "OGV",
+  "video/quicktime": "MOV",
+  "audio/mpeg": "MP3",
+  "audio/wav": "WAV",
+  "audio/ogg": "OGG",
+  "audio/webm": "WebM",
+  "audio/aac": "AAC",
+  "font/woff2": "WOFF2",
+  "font/woff": "WOFF",
+  "font/ttf": "TTF",
+  "font/otf": "OTF",
+};
+
+const SVG = "image/svg+xml";
+
+/** The MIME types the gate admits for these kinds, in the gate's own order. */
+export function acceptedMimes(kinds: readonly MediaAssetType[]): string[] {
+  const out: string[] = [];
+  const push = (list: readonly string[]) => {
+    for (const m of list) if (!out.includes(m)) out.push(m);
+  };
+  for (const kind of kinds) {
+    if (kind === "image") push(ALLOWED_MIME_TYPES.IMAGE.filter((m) => m !== SVG));
+    else if (kind === "svg" || kind === "icon") push([SVG]);
+    else if (kind === "video") push(ALLOWED_MIME_TYPES.VIDEO);
+    else if (kind === "audio") push(ALLOWED_MIME_TYPES.AUDIO);
+    else if (kind === "font") push(ALLOWED_MIME_TYPES.FONT);
+  }
+  return out;
+}
+
+export function acceptsMime(kinds: readonly MediaAssetType[], mime: string): boolean {
+  return acceptedMimes(kinds).includes(mime);
+}
+
+/** "JPG, PNG, GIF, WebP or AVIF" */
+export function acceptedFormats(kinds: readonly MediaAssetType[]): string {
+  const labels = acceptedMimes(kinds).map((m) => FORMAT_LABEL[m] ?? m.split("/")[1].toUpperCase());
+  const unique = labels.filter((l, i) => labels.indexOf(l) === i);
+  if (unique.length <= 1) return unique.join("");
+  return `${unique.slice(0, -1).join(", ")} or ${unique[unique.length - 1]}`;
+}
+
+/**
+ * "up to 10 MB" — or, when the kinds carry different ceilings, every one of
+ * them: "up to 10 MB per image, 1 MB per SVG, 100 MB per video".
+ */
+export function acceptedLimit(kinds: readonly MediaAssetType[]): string {
+  const perKind = new Map<string, number>();
+  for (const kind of kinds) {
+    const [mime] = acceptedMimes([kind]);
+    if (mime && !perKind.has(kindNoun(kind))) perKind.set(kindNoun(kind), getMaxFileSize(mime));
+  }
+  const limits = [...perKind.values()];
+  if (limits.length === 0) return "";
+  if (new Set(limits).size === 1) return `up to ${formatBytes(limits[0], 0)}`;
+  return `up to ${[...perKind].map(([noun, bytes]) => `${formatBytes(bytes, 0)} per ${noun}`).join(", ")}`;
+}
+
+/** "image" / "video" / "SVG" … — the word a sentence uses for the kind. */
+export function kindNoun(kind: MediaAssetType): string {
+  switch (kind) {
+    case "svg":
+      return "SVG";
+    case "icon":
+      return "icon";
+    default:
+      return kind;
+  }
+}
+
+/** "Image" / "Video" / "Media" — the kind as the Clone's `· Image` reads it. */
+export function kindLabel(kinds: readonly MediaAssetType[]): string {
+  if (kinds.length === 1) {
+    const noun = kindNoun(kinds[0]);
+    return noun === "SVG" ? noun : noun.charAt(0).toUpperCase() + noun.slice(1);
+  }
+  return "Media";
+}
+
+/** The kinds the LIBRARY takes — what the drop zone, the drawer footer and
+ *  an Import-URL refusal name, and what a URL import admits. Audio is off the
+ *  list on purpose: the library has no audio bucket and the server no schema
+ *  for it (`toServerAssetType` → null), so an audio file could only ever be
+ *  a local-only row nobody can browse to. */
+export const LIBRARY_KINDS: readonly MediaAssetType[] = ["image", "svg", "video", "font"];
+
+/** "JPG · PNG · GIF · WebP · AVIF · SVG · MP4 · …" — Clone 3397:18137 / 3437:36027. */
+export const MEDIA_ACCEPTED_FORMATS_LABEL = acceptedMimes(LIBRARY_KINDS)
+  .map((m) => FORMAT_LABEL[m] ?? m.split("/")[1].toUpperCase())
+  .filter((l, i, all) => all.indexOf(l) === i)
+  .join(" · ");
+
+/** "up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font" — the code's own limits. */
+export const MEDIA_SIZE_LIMITS_LABEL = acceptedLimit(LIBRARY_KINDS).replace(/, /g, " · ");
+
+/** "pasta-2-small.jpg" → "JPG": the file's own extension, the way the Clone's lines spell it. */
+export function fileExtensionLabel(fileName: string): string {
+  return (fileName.match(/\.([a-z0-9]+)$/i)?.[1] ?? "").toUpperCase();
+}
+
+/**
+ * The MIME a file should be handled as. Browsers fill `File.type` from the
+ * OS registry, and macOS Chromium has no entry for `.woff2` — the type comes
+ * back "" and the upload was refused as "Unsupported file type: " (measured
+ * 2026-09-13 with the Clone fixture). Only the font extensions are inferred:
+ * images and video always arrive typed, and inferring those would let a
+ * renamed file past the sniffer.
+ */
+export function mimeTypeForFile(file: Pick<File, "name" | "type">): string {
+  if (file.type) return file.type;
+  const ext = file.name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
+  switch (ext) {
+    case "woff2": return "font/woff2";
+    case "woff": return "font/woff";
+    case "ttf": return "font/ttf";
+    case "otf": return "font/otf";
+    default: return "";
+  }
+}
 
 // ============================================
 // Media Events
@@ -204,6 +379,13 @@ export function isAllowedAudioType(mimeType: string): boolean {
 }
 
 /**
+ * Check if a MIME type is allowed for fonts
+ */
+function isAllowedFontType(mimeType: string): boolean {
+  return (ALLOWED_MIME_TYPES.FONT as readonly string[]).includes(mimeType);
+}
+
+/**
  * Check if a MIME type is allowed
  */
 export function isAllowedMimeType(mimeType: string): boolean {
@@ -225,6 +407,9 @@ export function getMaxFileSize(mimeType: string): number {
   if (isAllowedAudioType(mimeType)) {
     return MEDIA_SIZE_LIMITS.MAX_AUDIO_SIZE;
   }
+  if (isAllowedFontType(mimeType)) {
+    return MEDIA_SIZE_LIMITS.MAX_FONT_SIZE;
+  }
   return MEDIA_SIZE_LIMITS.MAX_IMAGE_SIZE; // Default fallback
 }
 
@@ -233,11 +418,12 @@ export function getMaxFileSize(mimeType: string): number {
  */
 export function getAssetTypeFromMime(
   mimeType: string
-): "image" | "video" | "audio" | "svg" | "icon" | null {
+): "image" | "video" | "audio" | "svg" | "icon" | "font" | null {
   if (mimeType === "image/svg+xml") return "svg";
   if (isAllowedImageType(mimeType)) return "image";
   if (isAllowedVideoType(mimeType)) return "video";
   if (isAllowedAudioType(mimeType)) return "audio";
+  if (isAllowedFontType(mimeType)) return "font";
   return null;
 }
 

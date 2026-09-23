@@ -121,4 +121,28 @@ describe("TimeTravelScrubber — keyboard", () => {
     fireEvent.keyDown(document, { key: "Enter" });
     expect(onRestore).toHaveBeenCalledWith("e3");
   });
+
+  /* The chord is registered on the document, and the History panel's search
+     field stays mounted and focusable underneath the drawer. Without a guard,
+     typing a search term and pressing Enter restored whatever the slider
+     happened to sit on — by default the MIDDLE of the stack — truncating
+     everything after it. */
+  it("ignores Enter typed into a text field", () => {
+    const { onRestore } = renderScrubber(makeHistory(5));
+    const field = document.createElement("input");
+    field.type = "search";
+    document.body.appendChild(field);
+    field.focus();
+
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onRestore).not.toHaveBeenCalled();
+
+    field.remove();
+  });
+
+  it("still restores on Enter from its own range slider", () => {
+    const { onRestore } = renderScrubber(makeHistory(5));
+    fireEvent.keyDown(slider(), { key: "Enter" });
+    expect(onRestore).toHaveBeenCalledWith("e2");
+  });
 });

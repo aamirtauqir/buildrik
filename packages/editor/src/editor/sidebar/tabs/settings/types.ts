@@ -3,6 +3,7 @@
  * @license BSD-3-Clause
  */
 
+import type * as React from "react";
 import type { Composer } from "../../../../engine";
 
 // ============================================
@@ -11,20 +12,49 @@ import type { Composer } from "../../../../engine";
 
 export type PlanTier = "starter" | "pro" | "enterprise";
 
+/**
+ * Every row the Clone sidebar draws (3397:32011), in one union so the nav,
+ * the icon map, the Overview's rows and the search registry name the same
+ * sixteen things. `overview` is the landing screen; `branding` and `export`
+ * are doors (the Brand panel, the Export modal); `members` / `billing` open
+ * the dashboard.
+ */
+export type SettingsNavId =
+  | "overview"
+  | "general" | "branding" | "localization"
+  | "seo" | "domains" | "redirects" | "export"
+  | "analytics" | "forms"
+  | "custom-code" | "headers" | "integrations"
+  | "webhooks" | "members" | "billing";
+
+/** The Pages panel's URL-repair draft (Clone 3519:19920): the page whose
+ *  slug just changed, and the move the redirect should cover. */
+export interface RedirectRepair {
+  pageId: string;
+  pageName: string;
+  from: string;
+  to: string;
+}
+
+/** `ui:settings-open` — open Settings on a screen; a repair draft may ride along. */
+export interface SettingsOpenRequest {
+  screen: SettingsNavId;
+  repair?: RedirectRepair | null;
+}
+
 export interface SettingsTabProps {
   composer: Composer | null;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
-  onHelpClick?: () => void;
+  /** `‹ Back to canvas` / `Done` / a discarded edit — every door out of Settings. */
   onClose?: () => void;
   userPlan?: PlanTier;
-  /** Called when user clicks "Get Started Tour" card — triggers orchestrator replayTour */
-  onReplayTour?: () => void;
   /** Project ID — scopes localStorage key so nav position is per-project */
   projectId?: string | null;
   /** Called when the sub-screen's unsaved-changes state changes — used by shell to guard tab switch */
   onDirtyChange?: (isDirty: boolean) => void;
 }
+
+/** The screen's server read, as the shell's footer reports it. */
+export type ScreenLoadState = "loading" | "ready" | "error";
 
 export interface ScreenProps {
   composer?: Composer | null;
@@ -52,6 +82,32 @@ export interface ScreenProps {
    * was never wired. This contract fixes both cases with one path.
    */
   registerFlushHandler?: (handler: (() => void) | null) => void;
+  /** The screen's server read: the shell's footer and the screen's own card follow it. */
+  onLoadStateChange?: (state: ScreenLoadState) => void;
+  /**
+   * Registered by a screen that loads from the server; the load-error card's
+   * Try again calls it. The screen renders that card itself (`LoadCard`
+   * `onRetry`), so the shell has no button of its own for this — the slot is
+   * the contract's, kept for a host that does.
+   */
+  registerRetryLoad?: (fn: (() => void) | null) => void;
+  /** The last Save's failure, set by the shell; the screen renders the banner above its cards. */
+  saveError?: string | null;
+  /**
+   * A screen's own primary in the pane header — `Add domain` (Clone
+   * 3397:32206), `Add locale` (3397:32376). Registered in an effect on mount
+   * and cleared with `null` on unmount; the shell renders it at the header's
+   * right, where the locked screen's `Upgrade` sits.
+   */
+  registerHeaderAction?: (node: React.ReactNode | null) => void;
+  /**
+   * A screen with sub-views (Integrations › Browse all / Manage, Clone
+   * 3873:25643 / 3866:25629) renames the shell's header while one is up:
+   * `title` is appended after the nav's `Group / Screen`, `subtitle`
+   * replaces the nav's line. Pass `null` to return to the nav's own header;
+   * the shell clears it on a screen change.
+   */
+  registerHeader?: (header: { title?: string; subtitle?: string } | null) => void;
 }
 
 // ============================================

@@ -48,7 +48,7 @@ const RULE_LABEL: Record<LintRuleId, string> = {
 export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
   if (issues.length === 0) {
     return (
-      <div className="tw:px-2 tw:py-6 tw:text-center">
+      <div className="tw:px-4 tw:py-6 tw:text-center">
         <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">Nothing to fix</div>
         <div className="tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
           Every token passes the brand rules.
@@ -70,7 +70,7 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
         {ordered.map((issue) => (
           <li
             key={`${issue.rule}:${issue.tokenId}`}
-            className="tw:flex tw:items-start tw:gap-2 tw:px-2 tw:py-2"
+            className="tw:flex tw:items-start tw:gap-2 tw:px-4 tw:py-2"
           >
             <span
               aria-hidden="true"
@@ -89,7 +89,7 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
           </li>
         ))}
       </ul>
-      <p className="tw:mt-3 tw:px-2 tw:text-xs tw:text-[var(--bk-ink-muted)]">
+      <p className="tw:mt-3 tw:px-4 tw:text-xs tw:text-[var(--bk-ink-muted)]">
         Auto-fix isn&apos;t available yet — the linter reports what is wrong, not
         what to replace it with. Edit the token in Tokens.
       </p>

@@ -23,6 +23,7 @@
 
 import * as React from "react";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/types/media";
+import type { EditsSnapshot, ImageEditorTab } from "../../media/ImageEditorModal";
 import { useGlobalModals } from "./useGlobalModals";
 import { useContentModals } from "./useContentModals";
 import { useDomainModals } from "./useDomainModals";
@@ -46,10 +47,20 @@ export interface ImageEditorContext {
    * Audit-remediation PR1 [ModalSubmit]: accept sync OR async handler.
    * MediaTab's actual onSave is async (fetch → blob → upload). Pre-fix
    * the contract was sync `void`, so a thrown promise from the parent
-   * escaped as an unhandled rejection.
+   * escaped as an unhandled rejection. Clone P6-X: the second argument is
+   * the edits the version was made with; a one-argument handler still fits.
    */
-  onSave: (editedSrc: string) => void | Promise<void>;
+  onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>;
+  /** The file's library name — the dialog's head prints it. */
+  fileName?: string;
+  /** Which tab opens first (the library's Optimize door asks for "optimise"). */
+  initialTab?: ImageEditorTab;
+  /** The Saved state's Done — the host opens Asset versions from here. */
+  onDone?: () => void;
 }
+
+/** The optional third argument of `openImageEditor`. */
+export type ImageEditorOptions = Pick<ImageEditorContext, "fileName" | "initialTab" | "onDone">;
 
 /** Icon picker context for icon selection */
 export interface IconPickerContext {
@@ -115,7 +126,8 @@ export interface UseStudioModalsReturn {
   imageEditorContext: ImageEditorContext | null;
   openImageEditor: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: ImageEditorContext["onSave"],
+    options?: ImageEditorOptions,
   ) => void;
   closeImageEditor: () => void;
 

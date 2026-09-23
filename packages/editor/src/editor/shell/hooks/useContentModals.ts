@@ -20,6 +20,7 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/typ
 import type {
   IconPickerContext,
   ImageEditorContext,
+  ImageEditorOptions,
   MediaLibraryContext,
 } from "./useStudioModals";
 
@@ -51,7 +52,8 @@ export interface UseContentModalsReturn {
   imageEditorContext: ImageEditorContext | null;
   openImageEditor: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: ImageEditorContext["onSave"],
+    options?: ImageEditorOptions,
   ) => void;
   closeImageEditor: () => void;
 
@@ -99,8 +101,8 @@ export function useContentModals(): UseContentModalsReturn {
   }, []);
 
   const openImageEditor = React.useCallback(
-    (imageSrc: string, onSave: (editedSrc: string) => void | Promise<void>) => {
-      setImageEditorContext({ imageSrc, onSave });
+    (imageSrc: string, onSave: ImageEditorContext["onSave"], options?: ImageEditorOptions) => {
+      setImageEditorContext({ imageSrc, onSave, ...options });
       setShowImageEditor(true);
     },
     [],

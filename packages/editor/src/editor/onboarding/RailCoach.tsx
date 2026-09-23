@@ -62,6 +62,7 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
       <div
         role="note"
         aria-label="Rail introduction"
+        data-testid="rail-coach"
         /* Board 65:208 is a dark bubble at 240, radius 6, 12px padding — not a
            light card. It sits over the canvas, and an elevated-surface card on an
            elevated surface had nothing to separate it from what it points at. */
@@ -87,6 +88,7 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
           variant="link"
           className="tw:h-auto tw:min-h-6 tw:self-start tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-bg-card)]"
           onClick={dismiss}
+          data-testid="rail-coach-got-it"
         >
           Got it
         </Button>

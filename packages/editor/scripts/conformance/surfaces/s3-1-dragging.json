@@ -1,0 +1,102 @@
+{
+  "surface": "s3-1-dragging",
+  "board": "S3.1 \u00b7 dragging (Figma 301:1979)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "body",
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ],
+  "targets": [
+    {
+      "name": "topbar",
+      "testId": "topbar",
+      "spec": "s3-1-dragging",
+      "nodeId": "682:5126"
+    },
+    {
+      "name": "inspector",
+      "testId": "inspector-panel",
+      "spec": "s3-1-dragging",
+      "nodeId": "301:2080"
+    },
+    {
+      "name": "drawer",
+      "testId": "sidebar-panel"
+    },
+    {
+      "name": "canvas",
+      "testId": "canvas"
+    },
+    {
+      "name": "rail",
+      "testId": "rail"
+    }
+  ],
+  "_note": [
+    "THE BOARD DOES NOT DRAW THE DRAG. 301:1979 is byte-for-byte the same shell",
+    "as 301:2186 (S3.1 \u00b7 pick-mode) \u2014 diffed with node ids and asset URLs",
+    "stripped, the only differences are the frame name, one `cursor-pointer`, a",
+    "back-hotspot, and the status badge at the bottom ('Dragging element' vs",
+    "'Pick an element'). That badge is a gray-200 documentation chip of the same",
+    "kind 807:7301 uses for 'Drop target shown'. There is no drag ghost, no",
+    "dragged-element affordance and no drop line anywhere on this frame. So the",
+    "recipe conforms the SHELL the board draws, in the selected state it draws,",
+    "and the drag itself is verified outside the property diff.",
+    "",
+    "THE DRAG WAS DRIVEN FOR REAL, just not through diff.mjs. measure.mjs has no",
+    "drag step, and the artefact could not survive one anyway: the ghost is an",
+    "imperative node parked at top/left -9999 for `setDragImage` and REMOVED 50ms",
+    "later (useCanvasElementDrag.ts:325, the BUG-018 fix). It was measured with a",
+    "real `dragstart` on a real canvas element instead",
+    "(`scripts/conformance/_dragstate.mjs`, 2026-09-08):",
+    "  source element   opacity 0.4, class `bd-dragging`   \u2014 as designed",
+    "  ghost            #FFFFFF, 2px solid #1A56DB, radius 8, 300 x 64,",
+    "                   opacity 1, shadow 0 10 15 rgba(0,0,0,.1)",
+    "  ghost label      12px, white on #1A56DB, uppercase",
+    "",
+    "FOUND, NOT FIXED \u2014 the ghost disagrees with the only board that draws one.",
+    "807:7519 (on 807:7301, S3.2) draws it --color/bg-subtle #F3F4F6 with a 1px",
+    "#CCCCD9 border, radius 4, 100 x 24, opacity 0.85, and its label 11px Medium",
+    "in #4D4D66 with NO accent chip (807:7520). Every number above differs. It is",
+    "not conformed for one concrete reason: #CCCCD9 and #4D4D66 have no token",
+    "behind them \u2014 they are raw hexes on the board, the token set has no near",
+    "match, and Gate 16's hex ratchet over src/editor may only go DOWN. Same call",
+    "the publish-confirm recipe records for that board's #FFF7EB band. If the",
+    "ghost is meant to move, those two colours enter figma-tokens.json first.",
+    "",
+    "BOARD WON \u2014 301:2080, the inspector is 300 wide. It measured 299 because",
+    "`.layout-shell__inspector` drew a border-left of its own inside the 300",
+    "border-box column, a second hairline outside the one `.bdi-panel` already",
+    "draws off boards 32:2/642:3249. Removed; full account in the s3-1-pick-mode",
+    "recipe, which shares this shell.",
+    "",
+    "NOT JOINED: drawer (301:2019) \u2014 its edge is `border-r` on the board and",
+    "measure.mjs reads `borderTopColor` only. The colour was still conformed",
+    "(--bk-border -> --bk-gray-100, matching the topbar and the inspector); the",
+    "join would compare an edge neither side draws. canvas / rail \u2014 the board's",
+    "680 x 520 page is sample document geometry, and 301:2047's canvas column",
+    "has no live counterpart with a testid of its own.",
+    "",
+    "CONTRAST: the same four 1.34:1 CanvasBreadcrumb failures s3-1-pick-mode",
+    "reports in full \u2014 --bk-gray-400 on a 50%-ink bar over a light canvas. Not",
+    "drawn on this board, not restyled on my own authority, reported loudly."
+  ]
+}

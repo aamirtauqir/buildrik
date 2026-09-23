@@ -1,0 +1,293 @@
+[
+  {
+    "new": "Insert · blocks-expanded · rows",
+    "why": "UX-A-05 (Critical)",
+    "decision": "BLOCKS stops promising pictures. b.preview is undefined for all 64 registry entries, so the picture grid renders 50 identical blank 136x80 grey rectangles under 11px labels. The fix the finding prescribes is the second option — 'drop the grid until they exist and show BLOCKS as labelled rows like the other three groups'. The card grid is NOT deleted: 1069:4707 is truth-marked DESIGN-AHEAD and keeps it. This board is the shipping drawing.",
+    "clone": "1069:4529",
+    "cloneName": "Insert · elements-expanded",
+    "clone_id_source": "read from file — section 1776:8379 child list, 2026-09-07 (FRAME 1069:4529 @1300,220 280x812)",
+    "targetSection": "1776:8379",
+    "wireFrom": "137:26",
+    "wireFrom_id_source": "read from file — full node tree of 137:2 (TEXT 137:26 'BLOCKS' @32,8 49x16 inside frame 137:24 'Group header · BLOCKS' @0,208 280x32)",
+    "wireFrom_note": "Use add-hotspots.mjs over 137:26, NOT add-state-board's --wire-from: --wire-from puts the reaction on the node itself, and 137:26 is a bare TEXT appended into a group-header frame. See insert-hotspots.json row hotspot/state · Insert · blocks-expanded · rows.",
+    "command": "node scripts/figma/add-state-board.mjs 1069:4529 \"Insert · blocks-expanded · rows\" --apply",
+    "postClone": {
+      "kind": "text-edits-by-ordinal",
+      "note": "1069:4529's inner node ids were NEVER READ (quota stop). Resolve after the clone by reading the new board. The clone is a 280x812 Insert panel whose structure is known from 137:2: Panel header 44h, Search 36h at y44, then group headers (280x32) and List row instances (280x32) stacked from y80.",
+      "edits": [
+        {
+          "target": "group-header label currently reading ELEMENTS",
+          "text": "BLOCKS"
+        },
+        {
+          "target": "group-header count beside it currently reading 53",
+          "text": "50",
+          "why": "blockRows = getBlockDefinitions() minus componentBlockDefinitions = 64 − 14 = 50 (catalog/groups.ts:46)"
+        },
+        {
+          "target": "group-header chevron on the ELEMENTS header",
+          "text": "▸",
+          "why": "In this state BLOCKS is the open group, so ELEMENTS collapses. If the clone draws ELEMENTS' chevron as ▾ it must flip; the BLOCKS header's own chevron becomes ▾."
+        },
+        {
+          "target": "list rows, in order from the top",
+          "ordinalLabels": [
+            "Container",
+            "Text",
+            "Heading",
+            "Paragraph",
+            "Button",
+            "Link",
+            "Section",
+            "Hero Section",
+            "Features",
+            "Footer",
+            "Navbar",
+            "Call to Action",
+            "Product Card",
+            "Product Grid"
+          ],
+          "why": "Registry order, blockRegistry.ts:100-179 minus the 14 component ids. Deliberately a SLICE, not the first 14 in strict order: it shows one primitive run, the five section-shaped blocks the onboarding step names (UX-A-07 — hero and features have NO element row and appear only here), and two ecommerce blocks so the 'Needs a collection' badge is visible. Board sample data is shape, not contract."
+        },
+        {
+          "target": "rows 13 and 14 (Product Card, Product Grid)",
+          "addBadge": "Needs a collection",
+          "spec": "11px / leading 16 / --bk-ink-muted, right-aligned at x=264 minus the text width, vertically centred in the 32px row.",
+          "why": "UX-A-28 — inserting Product Card / Product Grid / Product Detail opens a full CMS collection-setup modal unannounced, and the prompt is one-shot: hasPromptedForCollectionRef is claimed BEFORE the async collection lookup (useComposerInit.ts:735-763), so a single dismissal spends it. The card must say what the block needs before it is inserted."
+        }
+      ]
+    }
+  },
+  {
+    "new": "Modal · Add Child Element · refused",
+    "why": "UX-A-02 (Critical)",
+    "decision": "The picker must stop reporting a success it has not had. Success moves after the inserter returns an id; a refusal keeps the modal OPEN and says why, in the contextual sentence the sidebar path already writes.",
+    "clone": "1706:8501",
+    "cloneName": "Modal · Add Child Element",
+    "clone_id_source": "read from file — section 1776:8379 child list, 2026-09-07 (FRAME 1706:8501 @100,2340 380x225)",
+    "targetSection": "1776:8379",
+    "wireFrom": "1706:8501",
+    "wireFrom_note": "Wire from the picker's own element tile — resolve the tile node after reading 1706:8501. If no single tile can be identified, place a hotspot over the modal's primary element row.",
+    "command": "node scripts/figma/add-state-board.mjs 1706:8501 \"Modal · Add Child Element · refused\" --apply",
+    "postClone": {
+      "kind": "add-inline-error",
+      "note": "1706:8501's inner node ids were NEVER READ (quota stop).",
+      "edits": [
+        {
+          "target": "new inline error band, full modal width minus 2×16 inset, directly under the picker list",
+          "text": "Can’t add Button — a heading doesn’t take children. Select a container first.",
+          "spec": "13px / leading 20 / --bk-error #E02424 on a --bk-bg-panel band with a 1px --bk-border #E5E7EB top rule; 12px vertical padding.",
+          "why": "UX-A-02 — BlockPickerModal.tsx:41-63 and :91-100 return silently on three distinct failures (nesting refused, target element not found, block config not found). The sidebar path already writes a contextual refusal; the modal must use the same sentence."
+        },
+        {
+          "target": "the picker list",
+          "state": "stays visible and interactive",
+          "why": "UX-A-02's fix: 'Keep the modal open on refusal so the user can pick something else.' Today onClose() fires and the modal vanishes under a green success toast."
+        },
+        {
+          "target": "any success toast drawn on the clone",
+          "action": "remove",
+          "why": "useElementsState.ts:151-161 fires addToast BEFORE onBlockClick. On the refused branch there is no toast at all."
+        }
+      ]
+    }
+  },
+  {
+    "new": "Insert · drop-refused",
+    "why": "UX-A-01 (Critical), UX-A-22, UX-A-19",
+    "decision": "SPEC-INSERT-PANEL §4: 'A visible failure. If a drop is refused — wrong parent, locked target — say so at the cursor. Silence is what makes UX-A-01 invisible.' This is the state that does not exist anywhere in the file.",
+    "clone": "138:153",
+    "cloneName": "Insert · dragging",
+    "clone_id_source": "read from file — section 1776:8379 child list, 2026-09-07 (FRAME 138:153 @900,220 280x812)",
+    "targetSection": "1776:8379",
+    "wireFrom": "138:153",
+    "command": "node scripts/figma/add-state-board.mjs 138:153 \"Insert · drop-refused\" --apply",
+    "postClone": {
+      "kind": "swap-indicator-for-refusal",
+      "note": "138:153's inner node ids were NEVER READ (quota stop). VIS-2-21 records one node on 138:153 by description: the annotation text 'Dragging to canvas — the panel keeps its scroll', clipped at ~22px under the ELEMENTS group and colliding with the BLOCKS row. Fix it on the clone AND on 138:153 (see insert-geometry.json).",
+      "edits": [
+        {
+          "target": "the valid/green drop indicator drawn on the clone",
+          "action": "restyle to refused",
+          "spec": "2px rule in --bk-error #E02424 replacing the accent line; no insertion caret."
+        },
+        {
+          "target": "new refusal chip at the cursor",
+          "text": "Can’t place Submit Button inside Heading",
+          "spec": "Chip at the drag cursor: 12px / leading 18 white on --bk-error #E02424, radius 4 (--bk-radius-sm), 6px vertical / 8px horizontal padding, no shadow.",
+          "why": "UX-A-19 — the real per-type check and its NESTING_FORBIDDEN message exist but only fire at drop time (dropOperations.tsx:481-489). Drawing it at the cursor is what makes the drag indicator answer the same question the drop will."
+        },
+        {
+          "target": "second refusal variant, drawn as a second chip or a note beside the first",
+          "text": "Detach this instance first",
+          "why": "UX-A-22 — nothing on any insert path consults isLocked or isComponentInstance, while the canvas context menu hides 'Insert inside' for an instance precisely because structural inserts there are discarded by the next syncInstance (insertActions.ts:65-69). Same rule, everywhere."
+        },
+        {
+          "target": "board annotation",
+          "text": "The chip is the missing half of UX-A-01: useDropExecution.ts:302-303 sets dropSucceeded = true whatever handleBlockDrop returns, so today a refused drop and a silent no-op look identical — both say nothing.",
+          "spec": "11px / leading 16 / --bk-ink-muted, full panel width minus 2×16 inset."
+        }
+      ]
+    }
+  },
+  {
+    "new": "Insert · mine-expanded · empty",
+    "why": "UX-A-24",
+    "decision": "MINE on a new site is a header reading 'MINE 0' over nothing. GroupSection.tsx:217-224 has no empty branch. The empty state must name the action that creates one, because the only route to it — right-click an element → Save as component — is never mentioned in Insert.",
+    "clone": "1069:4970",
+    "cloneName": "Insert · mine-expanded",
+    "clone_id_source": "read from file — section 1090:4527 child list, 2026-09-07 (FRAME 1069:4970 @500,220 280x812)",
+    "targetSection": "1776:8379",
+    "wireFrom": "137:38",
+    "wireFrom_id_source": "read from file — full node tree of 137:2 (TEXT 137:38 'MINE' @32,8 31x16 inside frame 137:36 'Group header · MINE' @0,272 280x32)",
+    "command": "node scripts/figma/add-state-board.mjs 1069:4970 \"Insert · mine-expanded · empty\" --apply",
+    "postClone": {
+      "kind": "replace-rows-with-empty-state",
+      "note": "1069:4970's inner node ids were NEVER READ (quota stop).",
+      "edits": [
+        {
+          "target": "the MINE group-header count",
+          "text": "0"
+        },
+        {
+          "target": "every MINE list row",
+          "action": "remove"
+        },
+        {
+          "target": "new empty-state block directly under the MINE header",
+          "lines": [
+            {
+              "text": "Nothing saved yet.",
+              "spec": "13px / leading 20 / --bk-ink #111827"
+            },
+            {
+              "text": "Right-click any element on the canvas and choose Save as component. It appears here.",
+              "spec": "12px / leading 18 / --bk-ink-muted #6B7280"
+            }
+          ],
+          "spec": "Left-aligned at the row inset (x=28, matching GroupSection's tw:pl-[var(--bk-space-28)]), 8px gap between lines, 12px top padding. No icon, no button chrome — the file's own zero-state pattern, matching Insert · no-results (SearchResults.tsx:34-58).",
+          "why": "UX-A-24. 'Save as component' is the exact shipped label (standaloneActions.ts:14)."
+        }
+      ]
+    }
+  },
+  {
+    "new": "Insert · favourites",
+    "why": "UX-A-31",
+    "decision": "Favourites are FULLY BUILT and rendered nowhere — favs, toggleFav, favOpen, clearFavs, restoreFavs, favsInformed, markFavsInformed all exist in useBuildTab.ts:104-106,131-133,140-147,159-168 behind STORAGE_KEYS.BUILD_FAVORITES, and BuildTab.tsx destructures none of them. PHASE4-QA-REPORT §1.1 calls this the cheaper win the spec should be claiming. RECENTS ARE NOT DRAWN: only the orphan constant BUILD_RECENT (storageKeys.ts:59) exists, with zero consumers — SPEC-INSERT-PANEL §3's RECENT band is new work presented as existing code, and this board does not repeat that error.",
+    "clone": "137:2",
+    "cloneName": "Insert · default",
+    "clone_id_source": "read from file — FULL node tree of 137:2, 2026-09-07 (FRAME @100,220 280x812)",
+    "targetSection": "1776:8379",
+    "wireFrom": "137:2",
+    "command": "node scripts/figma/add-state-board.mjs 137:2 \"Insert · favourites\" --apply",
+    "postClone": {
+      "kind": "insert-band-above-elements",
+      "note": "The clone's child ids are new, but the SOURCE ids and geometry are known exactly (read from 137:2). Map by position.",
+      "geometry": "Insert a 64px FAVOURITES band at y=80 (immediately below frame 'Search' which is 137:7 @0,44 280x36 on the source) and push everything from the ELEMENTS group header down by 64: ELEMENTS header 80→144, the three list rows 112/144/176→176/208/240, BLOCKS 208→272, COMPONENTS 240→304, MINE 272→336, spacer 304→368 and shrink its height 400→336 so the pinned bottom (Paste HTML row @704, TipsFooter @736) does not move.",
+      "band": [
+        {
+          "role": "group header",
+          "x": 0,
+          "y": 80,
+          "w": 280,
+          "h": 32,
+          "children": [
+            {
+              "text": "▾",
+              "x": 16,
+              "y": 8,
+              "spec": "11px / leading 16 / --bk-ink-muted"
+            },
+            {
+              "text": "FAVOURITES",
+              "x": 32,
+              "y": 8,
+              "spec": "11px / 600 / tracking 0.5 / caps / --bk-ink-muted — identical to 137:13 'ELEMENTS'"
+            },
+            {
+              "text": "3",
+              "x": 244,
+              "y": 8,
+              "spec": "11px / leading 16 / --bk-ink-muted / tabular-nums — identical to 137:14 '53'"
+            }
+          ]
+        },
+        {
+          "role": "chip row",
+          "x": 0,
+          "y": 112,
+          "w": 280,
+          "h": 32,
+          "chips": [
+            "Heading",
+            "Image",
+            "Button"
+          ],
+          "spec": "Three chips on one row, no scroll: 24px tall, radius 9999 (--bk-radius-full), 1px --bk-border #E5E7EB, --bk-bg-panel #FFFFFF fill, 12px / leading 18 / --bk-ink label, 8px horizontal padding, 8px gap, first chip at x=28 (the row inset). Purely a pinned shortcut — clicking inserts exactly as the ELEMENTS row does.",
+          "why": "SPEC-INSERT-PANEL §3 draws exactly this: 'FAVOURITES … 3 chips, one row, no scroll'."
+        }
+      ],
+      "alsoNeeded": {
+        "target": "every ELEMENTS list row on Insert · elements-expanded (1069:4529)",
+        "add": "a ☆ toggle at x=248, 14px, --bk-ink-muted, visible on hover / focus only",
+        "why": "UX-A-31 — toggleFav exists with no control anywhere. A favourites band with no way to fill it is furniture. Draw this on 1069:4529 in the same pass; it was NOT drawn here because this board shows the collapsed default.",
+        "status": "NOT SPECIFIED AS A RESOLVED EDIT — 1069:4529's row ids were never read."
+      }
+    }
+  },
+  {
+    "new": "Insert · element-hover (description)",
+    "why": "UX-A-09",
+    "decision": "All 53 catalog entries carry a written one-liner ('Swipeable image or content carousel') that the user can never read: GroupSection.tsx:186-187 passes it as disabledReason only when the entry is disabled, and catalog.ts:4 records that nothing is. The rival picker shows a description per element (ElementCard.tsx:33,64). Show it on hover. Nothing new needs writing.",
+    "clone": "1069:4529",
+    "cloneName": "Insert · elements-expanded",
+    "clone_id_source": "read from file — section 1776:8379 child list, 2026-09-07",
+    "targetSection": "1776:8379",
+    "wireFrom": "1069:4529",
+    "command": "node scripts/figma/add-state-board.mjs 1069:4529 \"Insert · element-hover (description)\" --apply",
+    "postClone": {
+      "kind": "add-hover-row-and-tooltip",
+      "edits": [
+        {
+          "target": "one ELEMENTS list row, mid-list",
+          "state": "hover",
+          "spec": "row background --bk-bg-subtle (the shipped hover, GroupSection.tsx:105 hover:tw:bg-[var(--bk-bg-subtle)]); ☆ favourite toggle revealed at x=248 (see Insert · favourites → alsoNeeded)."
+        },
+        {
+          "target": "description tooltip anchored to that row",
+          "text": "Swipeable image or content carousel",
+          "spec": "Tooltip primitive's dark style — 12px white on --bk-ink #111827, radius 4, 6/8 padding, placement bottom, no arrow (matching board 138:198's disabled-reason tooltip, GroupSection.tsx:167-170).",
+          "why": "UX-A-09 — the description already exists for all 53; this is the surface that shows it. Sample string is Slider/Carousel's, from catalog/catalog.ts."
+        }
+      ]
+    }
+  },
+  {
+    "new": "Insert · transition-callout",
+    "why": "UX-A-16",
+    "decision": "The callout has no board at all today, and its shipped sentence describes a panel that never existed: 'Quick Picks removed. Browse and drag elements directly from categories below.' There are no categories — there are four source groups — and only one of them drags. It also has no dismiss control: useCallout.ts:13,65-71 auto-dismisses after 8000ms and BuildTab.tsx:208 never passes callout.dismiss to it.",
+    "clone": "137:2",
+    "cloneName": "Insert · default",
+    "clone_id_source": "read from file — FULL node tree of 137:2, 2026-09-07",
+    "targetSection": "1776:8379",
+    "wireFrom": "137:2",
+    "command": "node scripts/figma/add-state-board.mjs 137:2 \"Insert · transition-callout\" --apply",
+    "postClone": {
+      "kind": "insert-callout-above-groups",
+      "geometry": "Insert a 64px callout at y=80 (below 'Search', source frame 137:7 @0,44 280x36) and push the ELEMENTS header at 80 and everything under it down by 64, shrinking the spacer (source 137:40 @0,304 280x400) from 400 to 336 so the pinned bottom does not move — identical displacement arithmetic to Insert · favourites.",
+      "callout": {
+        "spec": "Full width minus 2×12 inset, --bk-accent-tint #EBF5FF fill, radius 6 (--bk-radius-md), 12px padding, 16px info glyph in --bk-accent #1A56DB at x=12, text from x=36 to x=236, ✕ at x=248.",
+        "text": "Quick Picks removed. Open a source group below — ELEMENTS, BLOCKS, COMPONENTS or MINE — and click a row to insert it. ELEMENTS rows can also be dragged onto the canvas.",
+        "textSpec": "12px / leading 18 / --bk-ink #111827, with 'Quick Picks removed.' at weight 600 (weights cap at 600).",
+        "dismiss": {
+          "glyph": "✕",
+          "x": 248,
+          "spec": "12px, --bk-ink-muted, 24x24 hit area",
+          "why": "UX-A-16 — replaces the 8-second timer. useCallout.ts:37-45 already exposes dismiss(); BuildTab.tsx:208 never passes it."
+        },
+        "why": "UX-A-16 — every clause rewritten to describe the panel that shipped: four SOURCE groups not categories, and drag narrowed to ELEMENTS (GroupSection.tsx:189 vs :206-262)."
+      }
+    }
+  }
+]

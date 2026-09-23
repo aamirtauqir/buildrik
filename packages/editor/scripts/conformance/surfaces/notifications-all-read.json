@@ -1,0 +1,151 @@
+{
+  "surface": "notifications-all-read",
+  "board": "Notifications · all-read (Figma 165:24)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=notifications-all-read",
+  "viewport": {
+    "width": 360,
+    "height": 776
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "notifications-row-0"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "notifications-panel",
+      "spec": "notifications-all-read",
+      "nodeId": "165:24"
+    },
+    {
+      "name": "band-today",
+      "testId": "notifications-day-band-0",
+      "spec": "notifications-all-read",
+      "nodeId": "220:911"
+    },
+    {
+      "name": "band-today-label",
+      "testId": "notifications-day-band-0",
+      "spec": "notifications-all-read",
+      "nodeId": "I220:911;16:17"
+    },
+    {
+      "name": "row-0",
+      "testId": "notifications-row-0",
+      "spec": "notifications-all-read",
+      "nodeId": "165:30"
+    },
+    {
+      "name": "row-0-text",
+      "testId": "notifications-row-text-0",
+      "spec": "notifications-all-read",
+      "nodeId": "165:32"
+    },
+    {
+      "name": "row-0-meta",
+      "testId": "notifications-row-meta-0",
+      "spec": "notifications-all-read",
+      "nodeId": "165:33"
+    },
+    {
+      "name": "row-1",
+      "testId": "notifications-row-1",
+      "spec": "notifications-all-read",
+      "nodeId": "165:34"
+    },
+    {
+      "name": "row-1-text",
+      "testId": "notifications-row-text-1",
+      "spec": "notifications-all-read",
+      "nodeId": "165:36"
+    },
+    {
+      "name": "row-1-meta",
+      "testId": "notifications-row-meta-1",
+      "spec": "notifications-all-read",
+      "nodeId": "165:37"
+    },
+    {
+      "name": "band-yesterday",
+      "testId": "notifications-day-band-2",
+      "spec": "notifications-all-read",
+      "nodeId": "220:915"
+    },
+    {
+      "name": "band-yesterday-label",
+      "testId": "notifications-day-band-2",
+      "spec": "notifications-all-read",
+      "nodeId": "I220:915;16:17"
+    },
+    {
+      "name": "row-2",
+      "testId": "notifications-row-2",
+      "spec": "notifications-all-read",
+      "nodeId": "165:40"
+    },
+    {
+      "name": "row-2-text",
+      "testId": "notifications-row-text-2",
+      "spec": "notifications-all-read",
+      "nodeId": "165:42"
+    },
+    {
+      "name": "row-2-meta",
+      "testId": "notifications-row-meta-2",
+      "spec": "notifications-all-read",
+      "nodeId": "165:43"
+    }
+  ],
+  "_note": [
+    "Board 165:24 — the same three rows with nothing unread: no accent tint and",
+    "no left bar on any row. Its own frame name records 'NO CODE SUBJECT —",
+    "LoadState is lo…' and the 2026-09-02 flow audit lists 165:24 among eight",
+    "boards NAMED rather than wired because no producer reaches them. That is a",
+    "PROTOTYPE fact, not a code one: `read: true` on every row is an ordinary",
+    "state of the shipped panel and is exactly what this measures. The board is",
+    "the read half of 165:2 and it is worth its own recipe for one reason — it",
+    "is the only frame that says what a read row must NOT have.",
+    "",
+    "WHAT MOVED (both boards, same code):",
+    "  · The unread ground was --bk-accent-subtle #E1EFFE; 165:8 / 165:13 name",
+    "    --color/accent-tint #EBF5FF.",
+    "  · 165:9 — a 2px full-height accent bar at the row's left edge — did not",
+    "    exist. What did exist was a coloured StatusDot whose colour was the ONLY",
+    "    thing carrying the notification's type (`dotState` -> live / review /",
+    "    changes / failed): colour as sole encoding, design codex #6, and no",
+    "    board draws a dot on any row. The dot is gone, the bar is in, and the",
+    "    word 'Unread' stays in a `bd-sr-only` span so the fact survives for a",
+    "    screen reader — which is what the dot's `label` prop was doing.",
+    "  · Row text was 13px at leading-normal (1.5 = 19.5). 165:11 / 165:32 are",
+    "    12/18, which is the same ramp as the 11/16 age beside it.",
+    "",
+    "IDS RENAMED, and another recipe re-measured: `notifications-row` and",
+    "`notifications-day-band` were single ids on a repeated element, which is fine",
+    "for a one-row fixture and ambiguous for these three-row boards. They are now",
+    "`notifications-row-${i}` / `notifications-day-band-${i}`.",
+    "`notifications-jump-target-deleted` was updated to -0 and re-measured PASS.",
+    "",
+    "NOT JOINED, and why:",
+    "  · `panel-header` — PanelHeader size='panel', a shared primitive settled",
+    "    by component board 2100:11651, not by this one.",
+    "  · 165:11's `w-[268px]`. That is a Figma text-frame width forcing the long",
+    "    publish string to wrap inside a 44-tall row; the live column is `flex:1`",
+    "    in a 360 panel and cannot be 268 without inventing a spacer the board",
+    "    does not draw. Type and colour on that node ARE measured.",
+    "",
+    "CONTRAST, said out loud rather than baselined quietly: the age column is",
+    "--bk-ink-muted on the row's accent tint and measures 4.38:1 against a 4.5",
+    "floor. That is the systemic pair in CONTRAST-INK-MUTED.md (ink-muted on",
+    "blue-50, 9 instances across the arc), and the board specifies both halves",
+    "— 165:12 is --color/ink-muted, 165:8 is --color/accent-tint. It was",
+    "WORSE before this pass, not better: the row shipped on accent-subtle",
+    "#E1EFFE, one step darker, so the same pair sat near 4.1. Conforming",
+    "improved it and did not clear it, and it cannot be cleared at this call",
+    "site — the token is generated and checksum-locked.",
+    "The two day bands are the same token on --bk-bg-subtle at 4.39, from the",
+    "shared Section header component 220:919."
+  ]
+}

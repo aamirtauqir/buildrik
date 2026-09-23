@@ -10,10 +10,12 @@ import type {
   DiscIcon,
   DiscFont,
 } from "../../../../../engine/media/MediaManager";
-import type { MediaSortBy, SortDirection, UploadProgress } from "../../../../../shared/types/media";
+import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
+import type { StockFailureReason } from "../../../../../services/stock/StockService";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };
+export type { StockFailureReason };
 export type { StockPhoto, StockVideo, DiscIcon, DiscFont };
 
 // --- Nav ---
@@ -51,6 +53,11 @@ export interface LibraryItem {
   type: "img" | "vid" | "ico" | "fnt";
   src: string;
   thumb?: string;
+  /** The folder the asset is filed in; null at the root ("unfiled"). The
+   *  Move modal (Clone 3683:19950) says where each checked file IS, and the
+   *  move result (3699:20381) tells a file that moved from one that was
+   *  already there — both read this. */
+  folderId?: string | null;
   size: number; // bytes
   duration?: number; // seconds, video only
   width?: number;
@@ -80,13 +87,46 @@ export interface LibraryItem {
    * AssetVersion) from the detail drawer's Versions tab.
    */
   assetId?: string;
+  /** The file's tags — the rail's TAGS chips (Clone 3695:45155) and the tag
+   *  filter (3721:43697) read them; the rail's TAGS block writes them. */
+  tags?: string[];
+  /** A font file ADDED as a site font (Clone 3686:42317) — the rail's meta
+   *  line reads it (`Site font · added` / `Uploaded · not added`). Written
+   *  by the Site fonts dialog only, through the engine. */
+  siteFont?: boolean;
+  /** Clone 3695:45529 — a saved version of the asset with this key. Such a
+   *  row is never a card, a count or a search hit; `versionsOf(parent)` is
+   *  the only way to it. */
+  versionOf?: string;
+  /** The edits a version was saved with — the Asset versions cards print
+   *  them. Absent on originals and on versions saved without a snapshot. */
+  edits?: EditsSnapshot;
+}
+
+/** One member of an asset's family, as the rail's VERSIONS block and the
+ *  Asset versions dialog draw it (Clone 3695:45529). `index` is 1-based —
+ *  v1 is the original; the highest is the latest saved. "Applied" is a fact
+ *  about the site, not the row: `placements` counts the elements carrying
+ *  this version's src, on `pages`. */
+export interface VersionEntry {
+  item: LibraryItem;
+  index: number;
+  placements: number;
+  pages: string[];
 }
 
 // --- Delete confirmation ---
 
 /** One asset the delete would break, and where it is used. */
 export interface AssetUsage {
+  /** Library key — the confirm joins each checked file to its count by it. */
+  key: string;
   name: string;
+  /** Elements on the site referencing it — the Clone's "Used in 3 site
+   *  placements" (3708:20650) and "hero-dark.jpg (3 uses)" (3701:20385). The
+   *  same `findByMediaSrc` answer the rail's USED IN and the grid's `used ×3`
+   *  print, so the three never disagree. */
+  count: number;
   /** Page names holding an element that references it. Empty when the element
    *  cannot be traced to a page — named as unknown rather than dropped. */
   pages: string[];
@@ -120,6 +160,11 @@ export interface ConfirmFolderDeletePayload {
 export interface FailedUpload {
   fileName: string;
   reason: string;
+  /** The refused file's bytes — present when the engine's size gate said no. */
+  size?: number;
+  /** The bytes its type may have (Clone 3584:45522 → 3585:23326: the
+   *  rejected row offers a replacement against exactly this). */
+  limit?: number;
 }
 
 // --- Overlays ---
@@ -156,12 +201,24 @@ export interface LibraryStateResult {
   libraryError: string | null;
   retryLibraryLoad(): void;
   rawAssets: MediaAsset[];
+  /** The scoped, filtered, sorted list the grid draws. */
   libraryItems: LibraryItem[];
+  /** Every asset, unscoped — the SMART rows count the library, not a folder.
+   *  Saved versions (`versionOf`) are not in it: they are not library cards. */
+  allLibraryItems: LibraryItem[];
+  /** Clone 3695:45529 — an asset's family: the original first, then its
+   *  saved versions oldest to newest. A version's key resolves to its
+   *  parent's family; an unknown key is empty; a file with no versions is
+   *  a family of one. */
+  versionsOf(key: string): LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
+  /** Direct-child asset count per folder id; a folder with none is absent. */
+  folderCounts: ReadonlyMap<string, number>;
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
-  createFolder(name: string): Promise<void>;
+  /** Files `name` under the current folder; resolves with the folder made. */
+  createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): { assetCount: number; subFolderCount: number };
   deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
@@ -175,6 +232,10 @@ export interface LibraryStateResult {
   activeTypes: ReadonlySet<MediaBucket>;
   librarySearch: string;
   setLibrarySearch(q: string): void;
+  /** Clone 3721:43697 — the TAGS chip's filter: a tag, or null for none.
+   *  Applied after the scope and before the search; the scope stays. */
+  tagFilter: string | null;
+  setTagFilter(tag: string | null): void;
   setSort(by: MediaSortBy, dir: SortDirection): void;
   setGridN(n: 2 | 3 | 4): void;
   setFmtFilter(f: string): void;
@@ -192,9 +253,12 @@ export interface UploadStateResult {
   /** Phase C: total quota bytes. From server when available, else local IndexedDB cap. */
   storageTotal: number;
   panelDragOver: boolean;
-  upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  /** Resolves the engine's result per file, in order — the asset that landed
+   *  or the reason it did not. Clone 3724:20832 (Upload complete) and
+   *  3585:23337 (Replacement uploaded) both read what landed. */
+  upload(files: File[], opts?: { folderId?: string | null }): Promise<UploadResult[]>;
   retryUpload(fileName: string): void;
-  /** Board 1163:13948 — drop a failed upload row. */
+  /** Board 1163:13948 — drop a failed upload row (queue and failure record). */
   dismissUpload(fileName: string): void;
   dismissFailedUploads(): void;
   handlePanelDragEnter(e: React.DragEvent): void;
@@ -218,6 +282,12 @@ export interface SelectionStateResult {
   shiftSelect(key: string): void;
   /** §14 — right-click "Select" entry: enter mode + pre-select one item. */
   enterSelectModeWith(key: string): void;
+  /** Which of these assets are on a page, and which pages. The delete confirm
+   *  and the details rail's USED IN (Clone 3695:20340 — "1 place — Menu
+   *  preview") read the same answer. */
+  checkInUse(keys: string[]): AssetUsage[];
+  /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
+  clearSelection(): void;
 }
 
 export type DiscSource = "unsplash" | "pexels" | "pixabay";
@@ -229,9 +299,11 @@ export interface DiscoveryStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** The last search THREW. Separate from "no results" — the modal used to
-      render both as "No photos found for …" (blocker A-STOCK). */
-  searchFailed: boolean;
+  /** WHY the last search failed, or null when it did not. A reason and an
+      empty result are different facts — the modal used to render both as
+      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
+      callers that only care whether it broke can still just test it. */
+  searchFailed: StockFailureReason | null;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -241,7 +313,10 @@ export interface DiscoveryStateResult {
   setDiscColor(c: DiscColor): void;
   setDiscSource(s: DiscSource): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
-  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
+  /** Resolves with the asset the library now holds (Clone 3695:45573 names it and
+      View asset selects it), null when the engine refused. Icons save too —
+      their SVG data URL goes through the same upload gate. */
+  saveToLibrary(type: "img" | "vid" | "ico", item: StockPhoto | StockVideo | DiscIcon): Promise<{ key: string; name: string } | null>;
 }
 
 // --- Full state result (returned by useMediaState) ---
@@ -269,9 +344,16 @@ export interface MediaStateResult {
 
   // Library
   libraryItems: LibraryItem[];
+  /** See `LibraryStateResult.allLibraryItems`. */
+  allLibraryItems: LibraryItem[];
+  /** See `LibraryStateResult.versionsOf`. */
+  versionsOf(key: string): LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
-  createFolder(name: string): Promise<void>;
+  /** See `LibraryStateResult.folderCounts`. */
+  folderCounts: ReadonlyMap<string, number>;
+  /** Files `name` under the current folder; resolves with the folder made. */
+  createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): { assetCount: number; subFolderCount: number };
   deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
@@ -292,9 +374,13 @@ export interface MediaStateResult {
   selectAll(): void;
   shiftSelect(key: string): void;
   enterSelectModeWith(key: string): void;
-  upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  checkInUse(keys: string[]): AssetUsage[];
+  /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
+  clearSelection(): void;
+  /** See `UploadStateResult.upload` — the engine's result per file. */
+  upload(files: File[], opts?: { folderId?: string | null }): Promise<UploadResult[]>;
   retryUpload(fileName: string): void;
-  /** Board 1163:13948 — drop a failed upload row. */
+  /** Board 1163:13948 — drop a failed upload row (queue and failure record). */
   dismissUpload(fileName: string): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
@@ -315,9 +401,11 @@ export interface MediaStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** The last search THREW. Separate from "no results" — the modal used to
-      render both as "No photos found for …" (blocker A-STOCK). */
-  searchFailed: boolean;
+  /** WHY the last search failed, or null when it did not. A reason and an
+      empty result are different facts — the modal used to render both as
+      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
+      callers that only care whether it broke can still just test it. */
+  searchFailed: StockFailureReason | null;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -325,7 +413,7 @@ export interface MediaStateResult {
   setDiscOrientation(o: DiscOrientation): void;
   setDiscColor(c: DiscColor): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
-  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
+  saveToLibrary: DiscoveryStateResult["saveToLibrary"];
 
   // Panel drag
   panelDragOver: boolean;
@@ -337,6 +425,15 @@ export interface MediaStateResult {
   // Shared
   librarySearch: string;
   setLibrarySearch(q: string): void;
+  /** Library-only search — the fullpage Asset library's field (Clone
+   *  3695:44339, "Search across all folders…"). `setLibrarySearch` is the
+   *  drawer's unified search and also fires stock discovery, which toasts
+   *  "Stock search isn't set up" on every third keystroke when no provider
+   *  key is configured. */
+  setLibraryQuery(q: string): void;
+  /** See `LibraryStateResult.tagFilter`. */
+  tagFilter: string | null;
+  setTagFilter(tag: string | null): void;
   storage: { used: number; total: number };
 
   // Clipboard
@@ -344,7 +441,9 @@ export interface MediaStateResult {
 
   // Overlays
   ctxMenu: CtxMenuState | null;
-  openCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
+  /** Opens the asset menu at the pointer, or at `anchor` when a control (the
+   *  card's `···`, Clone 3721:43552) rather than a right-click opened it. */
+  openCtxMenu(e: React.MouseEvent, item: LibraryItem, anchor?: { x: number; y: number }): void;
   closeCtxMenu(): void;
   detailItem: LibraryItem | null;
   openDetail(item: LibraryItem): void;
@@ -424,33 +523,6 @@ export type DiscColor =
   | "teal"
   | "blue";
 
-export interface DiscoveryViewProps {
-  activeType: MediaTypeFilter;
-  photos: StockPhoto[];
-  videos: StockVideo[];
-  icons: DiscIcon[];
-  fonts: DiscFont[];
-  loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
-  searchQuery: string;
-  /** The last search THREW. Without it this surface renders a failed request
-      as "No photos found for …" — see blocker A-STOCK. */
-  searchFailed?: boolean;
-  orientation: DiscOrientation;
-  color: DiscColor;
-  /** S19: current source provider (Unsplash / Pexels / Pixabay). */
-  source?: DiscSource;
-  /** S19: monthly stock-search quota strip; hidden when omitted. */
-  quota?: { used: number; limit: number; upgradeHref?: string };
-  onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
-  onSetOrientation(o: DiscOrientation): void;
-  onSetColor(c: DiscColor): void;
-  /** S19: switch the active stock provider; triggers a re-search. */
-  onSetSource?(s: DiscSource): void;
-  onLoadMore(type: "img" | "vid"): void;
-  onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
-  onInsert(filename: string): void;
-}
-
 export interface UploadZoneProps {
   /** Lets a caller (the drawer footer's Upload link) open this zone's file dialog. */
   inputRef?: React.RefObject<HTMLInputElement | null>;
@@ -462,8 +534,14 @@ export interface UploadZoneProps {
   /** Currently-uploading files. When any item has status "uploading"/"optimizing"/"processing",
    *  the zone applies med-upload-zone--uploading. Failed items render below the zone. */
   uploadQueue?: UploadProgress[];
+  /** The engine's verdicts by file name — a failed row whose record carries
+   *  a `limit` was the size gate, and its door is a replacement, not Retry
+   *  (Clone 3584:45522). */
+  failedUploads?: FailedUpload[];
   /** §22 — fired when user clicks Retry on a failed queue item. */
   onRetryUpload?(fileName: string): void;
+  /** `Choose a smaller file…` picked one: the refused record and the pick. */
+  onReplacementPicked?(original: FailedUpload, file: File): void;
   /** Quota-warn band's "Optimise images to free space ›" (board 145:199). */
   onOptimize?(): void;
 }

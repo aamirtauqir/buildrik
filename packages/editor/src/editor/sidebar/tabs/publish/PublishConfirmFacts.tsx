@@ -20,8 +20,16 @@ import { fetchPrePublishChecks } from "@/services/PublishService";
 import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
-const ROW = "tw:flex tw:justify-between tw:items-baseline tw:gap-[16px] tw:py-[7px] tw:text-[12px]";
-const KEY = "tw:flex-none tw:text-[var(--bk-ink-muted)]";
+/* Board B3-10 (7574:193972) draws the four facts as a two-column table on a
+   25 pitch: the KEY in a fixed left column at 12 ink-muted, the VALUE beside
+   it at 13 ink, LEFT-aligned — a ledger, read top to bottom. The older board
+   (914:4507) right-aligned the values at gap 10; both doors now open this
+   dialog, so it follows the newer board.
+
+   `min-h`, not `h`: two of the four values are sentences (the approval line,
+   the Vercel block) and wrap at this width; a fixed pitch would clip them. */
+const ROW = "tw:flex tw:items-start tw:gap-3 tw:min-h-[25px] tw:py-[3px]";
+const KEY = "tw:w-[88px] tw:flex-none tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* `min-w-0` is the whole fix for ledger row R12 ("the value column runs into
    the right border and clips — 'your connected Vercel projec[t]'"). A flex
    item's min-width defaults to `auto`, which is its CONTENT width, so a long
@@ -30,7 +38,7 @@ const KEY = "tw:flex-none tw:text-[var(--bk-ink-muted)]";
    truncate — these are facts someone is reading before they publish, so
    nothing here may be hidden behind an ellipsis. */
 const VAL =
-  "tw:min-w-0 tw:[overflow-wrap:anywhere] tw:text-right tw:font-medium tw:text-[var(--bk-ink)]";
+  "tw:min-w-0 tw:flex-1 tw:[overflow-wrap:anywhere] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 /** Board 914:4507 prints "Approved 2 Jul"; the real line names who, too. */
 function approvalLine(round: CurrentRound | null, loading: boolean): string {
@@ -156,22 +164,24 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   return (
     <div>
       <div className={ROW}>
-        <span className={KEY}>Target</span>
-        <span className={VAL}>{target}</span>
+        <span className={KEY} data-testid="publish-fact-key-target">Target</span>
+        <span className={VAL} data-testid="publish-fact-val-target">{target}</span>
       </div>
       <div className={ROW}>
-        <span className={KEY}>Pages</span>
-        <span className={VAL}>
+        <span className={KEY} data-testid="publish-fact-key-pages">Pages</span>
+        <span className={VAL} data-testid="publish-fact-val-pages">
           {pageCount == null ? "Preparing…" : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
         </span>
       </div>
       <div className={ROW}>
-        <span className={KEY}>Client approval</span>
-        <span className={VAL}>{approvalLine(round, loadingRound)}</span>
+        {/* "Approval", the newer board's word (B3-10); 914:4507 said "Client
+            approval". The value still names who. */}
+        <span className={KEY} data-testid="publish-fact-key-approval">Approval</span>
+        <span className={VAL} data-testid="publish-fact-val-approval">{approvalLine(round, loadingRound)}</span>
       </div>
       <div className={ROW}>
-        <span className={KEY}>Rollback</span>
-        <span className={VAL}>
+        <span className={KEY} data-testid="publish-fact-key-rollback">Rollback</span>
+        <span className={VAL} data-testid="publish-fact-val-rollback">
           {/* "Every version stays restorable" was the first-publish line, and
               publish history keeps twenty: `runPublishJob` nulls the stored
               payload on COMPLETED jobs beyond the 20 most recent

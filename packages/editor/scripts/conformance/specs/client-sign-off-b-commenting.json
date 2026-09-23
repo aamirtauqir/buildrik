@@ -1,0 +1,250 @@
+{
+  "surface": "client-sign-off-b-commenting",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1340:7162",
+  "boardName": "client-sign-off-b-commenting",
+  "figmaHash": "4d721df8ccf0b71a5d6d9d533d7f01c44d34ca7ad73e451639189ed5e30b3c56",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:50:39.427Z",
+  "copy": [
+    "Ali's Studio",
+    "Your notes",
+    "Logo thora bara karein please",
+    "Anything you'd like changed?",
+    "Add note"
+  ],
+  "targets": [
+    {
+      "nodeId": "1340:7162",
+      "name": "Client sign-off · B · commenting · 1280 — echo of 1:6 at the 1280×720 minimum fold; canonical 114:2 is 1280×900. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state.",
+      "className": "bg-[#f9fafb] relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7163",
+      "name": "Agency header",
+      "className": "absolute bg-white border-[#e5e7eb] border-b border-solid h-[56px] left-0 overflow-clip top-0 w-[1280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7164",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[24px] not-italic text-[#111827] text-[13px] top-[20px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7165",
+      "name": "Site preview (iframe)",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[500px] left-[114px] rounded-[8px] top-[80px] w-[700px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "500px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "700px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7166",
+      "name": "Your notes",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[500px] left-[846px] overflow-clip rounded-[8px] top-[80px] w-[320px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "500px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7167",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[15px] not-italic text-[#111827] text-[13px] top-[15px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7168",
+      "name": "Note · sent",
+      "className": "absolute bg-[#f9fafb] h-[56px] left-[15px] overflow-clip rounded-[6px] top-[47px] w-[288px]",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "288px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7169",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[12px] not-italic text-[#111827] text-[12px] top-[10px] w-[256px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "256px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7170",
+      "name": "Composer",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[72px] left-[15px] overflow-clip rounded-[6px] top-[119px] w-[288px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "72px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "288px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7171",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[12px] top-[9px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7172",
+      "name": "Add note",
+      "className": "absolute bg-[#1a56db] h-[36px] left-[15px] overflow-clip rounded-[6px] top-[203px] w-[288px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "288px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7173",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[110px] not-italic text-[13px] text-white top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7315",
+      "name": "hotspot/state · Client · A viewing",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[682px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+{
+  "surface": "content-unsaved-record",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "149:108",
+  "boardName": "content-unsaved-record",
+  "figmaHash": "c49298c78488d1ae83cb1aaac1ac447e04b71d8cf77c21e9faa57ee7e276fe2b",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:08:42.513Z",
+  "copy": [
+    "Content",
+    "‹ Margherita",
+    "Name",
+    "Margherita",
+    "Price",
+    "$12",
+    "Description",
+    "Tomato, mozzarella, basil",
+    "Published",
+    "Unsaved changes",
+    "Discard",
+    "Save"
+  ],
+  "targets": [
+    {
+      "nodeId": "14:8",
+      "name": null,
+      "className": "h-[24px] relative w-[44px]",
+      "props": {
+        "height": {
+          "value": "24px"
+        },
+        "width": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:108",
+      "name": "Content · unsaved-record",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:451",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:451;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "149:113",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:114",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "149:115",
+      "name": "Field · Name",
+      "className": "h-[64px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "64px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:116",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "149:117",
+      "name": "input",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border-input,#9ca3af)] border-solid h-[32px] left-[16px] overflow-clip rounded-[6px] top-[24px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-input",
+          "value": "#9ca3af"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:118",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "149:119",
+      "name": "Field · Price",
+      "className": "h-[64px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "64px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:120",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "149:121",
+      "name": "input",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border-input,#9ca3af)] border-solid h-[32px] left-[16px] overflow-clip rounded-[6px] top-[24px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-input",
+          "value": "#9ca3af"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:122",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "149:123",
+      "name": "Field · Description",
+      "className": "h-[64px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "64px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:124",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "149:125",
+      "name": "input",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border-input,#9ca3af)] border-solid h-[56px] left-[16px] overflow-clip rounded-[6px] top-[24px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-input",
+          "value": "#9ca3af"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:126",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[7px] w-[116px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "116px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:127",
+      "name": "Row · Published",
+      "className": "h-[32px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:128",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "149:132",
+      "name": "Save bar",
+      "className": "[word-break:break-word] bg-[var(--color\\/warning-tint,#fdfdea)] font-['Inter:Regular'] font-normal h-[44px] leading-[18px] not-italic overflow-clip relative shrink-0 text-[12px] text-left w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "149:133",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/warning-text,#723b13)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "149:134",
+      "name": null,
+      "className": "absolute left-[146px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "149:135",
+      "name": null,
+      "className": "absolute left-[216px] text-[color:var(--color\\/accent-text,#1a56db)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7259",
+      "name": "hotspot/back · Content · records",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

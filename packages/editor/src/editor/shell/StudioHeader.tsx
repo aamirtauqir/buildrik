@@ -16,25 +16,23 @@
  *   · a blocked publish stays visible with its reason attached, never hidden;
  *   · an invited editor sends for review instead of publishing.
  *
+ * The site's next move is NOT derived here any more. `useLifecycle` runs once
+ * in AquibraStudio and the result arrives as `nextMove` — the same object the
+ * Publish panel reads — so the CTA and the panel cannot disagree (B4, #34).
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
-import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
-import { deriveLifecycleState } from "./lifecycle";
-import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
+import type { NextMove } from "./lifecycle";
+import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
-import {
-  fetchReviewStatus,
-  fetchReviewStatusOrNull,
-  UNKNOWN_REVIEW_STATUS,
-  type ReviewStatus,
-} from "../../services/ReviewService";
+import type { ReviewStatus } from "../../services/ReviewService";
 import { useRefetchOnFocus } from "../../shared/hooks";
 import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import { EVENTS } from "../../shared/constants";
@@ -104,6 +102,10 @@ export interface StudioHeaderProps {
   onOpenComponents?: () => void;
   /** F3 — the review pill is a door, not a label: opens the Review panel. */
   onOpenReview?: () => void;
+  /** B2 — the save pill in its `conflict` state re-opens the recovery
+   *  dialog (B1-01 7563:197963) the shell owns; the shell keeps the
+   *  server's token after the dialog is dismissed so it can. */
+  onOpenConflict?: () => void;
 
   // Core actions
   /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
@@ -112,7 +114,9 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
-  /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
+  /** The publish door. AquibraStudio's `requestPublish` — it routes on
+   *  `nextMove.gate` and opens the right dialog (errors confirm · stale
+   *  acknowledgement · facts confirm); this bar never publishes on its own. */
   onVercelPublish?: () => void;
   /** True while a publish job is in flight */
   publishLoading?: boolean;
@@ -121,26 +125,56 @@ export interface StudioHeaderProps {
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
    *  region. Toasts stay with useExportHandlers (eng D10), never here. */
   publishOutcome?: "published" | "failed" | null;
-  /** When the site last went live, ISO — from `usePublishJob`. Compared against
-   *  this session's own save clock to answer "is anything waiting to ship?". */
-  lastPublishedAt?: string | null;
-  /** The server's answer at mount. Used only when this session has no save of
-   *  its own to compare — see `hasUnpublishedChanges` below. */
-  serverHasUnpublishedChanges?: boolean | null;
+  /** The review round, from `useLifecycle` — drives the chip. */
+  reviewStatus: ReviewStatus;
+  /** The round's open comments, from `useLifecycle` — the chip's count. */
+  openCommentCount?: number | null;
+  /** The site's ONE next move, from `useLifecycle`. `null` = live with nothing
+   *  waiting: the CTA is withheld. The Publish panel reads the same object. */
+  nextMove: NextMove | null;
 
   // Toast notifications
   addToast: (input: ToastInput) => string;
 }
 
-/** Persistent review status → the topbar's one review pill. */
-const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | null> = {
-  none: null,
-  pending: { label: "In review", tone: "info" },
-  "opened-not-acted": { label: "Opened · no reply", tone: "info" },
-  "changes-requested": { label: "Changes requested", tone: "warning" },
-  approved: { label: "Approved", tone: "success" },
-  "approved-edited-since": { label: "Approved · edited since", tone: "warning" },
-};
+/**
+ * The topbar's one review chip — board B3-01 `7569:190283` (C2, owner
+ * decision D3): the status VERB plus the one number that matters, in five
+ * states: Not sent · Waiting · Sara · Changes requested · 2 · Approved ·
+ * Approved · edited since. The sentence (who, when, opened-but-no-reply)
+ * rides in `title`. Tones by status token (#26): warning-tint for Changes
+ * requested, success-tint for Approved, neutral otherwise.
+ *
+ * "Not sent" is drawn only where a send is the site's next act — an
+ * approval workspace. Elsewhere a round that was never opened is not a
+ * status, and the chip stays away as it always did.
+ */
+function reviewChip(
+  status: ReviewStatus,
+  openCount: number | null,
+): Omit<ReviewPill, "onClick"> | null {
+  const who = status.reviewerName;
+  switch (status.state) {
+    case "none":
+      return status.reviewsEnabled && status.editsRequireApproval
+        ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
+        : null;
+    case "pending":
+      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
+    case "opened-not-acted":
+      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
+    case "changes-requested":
+      return {
+        label: openCount ? `Changes requested · ${openCount}` : "Changes requested",
+        tone: "warning",
+        title: `${who ?? "Your client"} asked for changes${openCount ? ` — ${openCount} open` : ""}`,
+      };
+    case "approved":
+      return { label: "Approved", tone: "success", title: `Approved by ${who ?? "your client"}${pillAgo(status.at)}` };
+    case "approved-edited-since":
+      return { label: "Approved · edited since", tone: "warning", title: `${who ?? "Your client"} approved an earlier version — edited since` };
+  }
+}
 
 /**
  * Save transitions worth announcing (T5/eng D5). `conflict` is listed even
@@ -197,14 +231,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenTemplates,
   onOpenComponents,
   onOpenReview,
+  onOpenConflict,
   onSave,
   onExportHTML,
   onVercelPublish,
   publishLoading,
   publishedUrl,
   publishOutcome = null,
-  lastPublishedAt = null,
-  serverHasUnpublishedChanges = null,
+  reviewStatus,
+  openCommentCount = null,
+  nextMove,
   addToast,
 }) => {
   const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
@@ -217,7 +253,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      which already gates rollback this way two files over. */
   const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
   const viewMode = getEditorViewMode();
-  const publishEnabled = isFeatureEnabled("publish");
   // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known P1s)
   // and was the #1 reason the product read as "broken" in user testing. The flag
   // gates the ENTIRE surface — when it is off, nothing collab shows, even if a
@@ -273,54 +308,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     return () => document.removeEventListener("keydown", onKey);
   }, [viewMode.readOnlyView]);
 
-  /* S5.2: the persistent review pill. Starts at UNKNOWN — `state: "none"`, so
-     it still renders nothing, but with the two flags null rather than asserting
-     "reviews are on and publishing is ungated" before anyone has asked. A
-     control that picks a verb from a guessed lifecycle position and changes it
-     after paint is worse than one that arrives a beat late. */
-  const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>(UNKNOWN_REVIEW_STATUS);
-  const refreshReview = React.useCallback(() => {
-    fetchReviewStatus().then(setReviewStatus);
-  }, []);
-  React.useEffect(() => {
-    refreshReview();
-  }, [refreshReview]);
-  // F3/6A: approval usually lands while the editor is backgrounded — refresh
-  // on return. The OrNull variant keeps the last-known pill on transport
-  // failure instead of erasing it (fail-closed is for the mount only).
-  useRefetchOnFocus(
-    React.useCallback(() => {
-      void fetchReviewStatusOrNull().then((s) => {
-        if (s) setReviewStatus(s);
-      });
-    }, []),
-  );
   useRefetchOnFocus(refreshUnread);
-
-  /* Board 158:213 announces the close: "Review closed — Sara approved v3". The
-     product had no such moment. The pill changed and the review bar vanished,
-     both silently, and the one thing a designer is waiting on — did my client
-     answer — arrived as furniture quietly rearranging itself.
-
-     Fires on the TRANSITION only, and only away from a live round, so opening
-     an already-approved site does not congratulate you on news from last week.
-     `answeredRef` starts unset and is seeded by the first status that lands, so
-     the mount itself is never a transition. */
-  const answeredRef = React.useRef<ReviewPillState | null>(null);
-  React.useEffect(() => {
-    const now = reviewStatus.state;
-    const was = answeredRef.current;
-    answeredRef.current = now;
-    if (was === null || was === now) return;
-    const LIVE: ReadonlySet<ReviewPillState> = new Set(["pending", "opened-not-acted"]);
-    if (!LIVE.has(was)) return;
-    const who = reviewStatus.reviewerName ?? "Your client";
-    if (now === "approved" || now === "approved-edited-since") {
-      addToast({ title: "Review closed", description: `${who} approved this design.`, tone: "success" });
-    } else if (now === "changes-requested") {
-      addToast({ title: "Review closed", description: `${who} asked for changes.`, tone: "info" });
-    }
-  }, [reviewStatus.state, reviewStatus.reviewerName, addToast]);
 
   // Keeps "Saved · 2m ago" honest without a render on every tick.
   const [, setTick] = React.useState(0);
@@ -369,6 +357,21 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     onShowExporter();
     setTimeout(() => onSetExportLoading(false), 500);
   }, [onSetExportLoading, onShowExporter]);
+
+  /* Settings' `Export` row (Clone 3397:32011) is a door to this modal, not a
+     screen of its own. It emits OPEN rather than the ⌘K palette's TOGGLE so a
+     modal that is already up stays up. Read through a ref: the subscription
+     is per composer, not per render (F7 — the bar subscribes once). */
+  const handleExportRef = React.useRef(handleExport);
+  handleExportRef.current = handleExport;
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => handleExportRef.current();
+    composer.on(EVENTS.UI_OPEN_EXPORTER, open);
+    return () => {
+      composer.off(EVENTS.UI_OPEN_EXPORTER, open);
+    };
+  }, [composer]);
 
   // 60-save-states: "offline" is the browser being offline OR the dashboard sync
   // being disconnected. Either way edits are queued locally, so it outranks
@@ -569,49 +572,44 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? "unsaved"
             : "saved";
 
+  /* ── B2 (decision #23) · the save pill's click, by state ─────────────────
+     The pill used to save for `unsaved`/`error` and do nothing otherwise.
+     Board G1-005's dot opens History; the owner kept ⌘S as the save. So:
+       saved · saving · unsaved → History (the timeline the pill summarises)
+       error                    → retry the save (the one state where a
+                                  click IS the fix)
+       conflict                 → the recovery dialog (B1-01), re-opened
+       offline                  → nothing to click; the reason is a tooltip
+     `onSave` stays the save — ⌘S and the exit guard call it directly. */
+  const savePillClick: (() => void) | undefined =
+    save === "error"
+      ? () => void onSave()
+      : save === "conflict"
+        ? onOpenConflict
+        : save === "offline"
+          ? undefined
+          : onOpenHistory;
+  const savePillHint =
+    save === "offline" ? "Offline — changes aren't reaching the server. Reconnect to keep saving." : undefined;
+
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
   // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
   // is gone — the IssueChip owns count copy via formatIssueSummary.
 
-  /* A blocked publish is shown disabled with its reason, never hidden — the
-     user must be able to find out why (P6 permissions boards). The three
-     permission/network reasons used to be spelled out again here; they live in
-     `deriveLifecycleState`'s `publishBlocker` now, beside the review reasons
-     they have to be ordered against. */
   /* ── The site's ONE next move (wireframes §2) ─────────────────────────────
-     The shell knew whether publishing was *permitted* and never where the site
-     stood. `deriveLifecycleState` is the table; everything here is the reads it
-     needs.
+     Arrives as a prop. `useLifecycle` (AquibraStudio) is the one caller of
+     `deriveLifecycleState`; the Publish panel — its footer CTA, its gate
+     banner — and the dialog `requestPublish` opens all read the same
+     `nextMove`, so a review-blocked site cannot be disabled here and offered
+     there (B4, decision #34). The blocked reasons (flag · role · network ·
+     review) are ordered inside the derivation, never re-spelled here.
 
-     "Anything waiting to ship?" prefers THIS session's save clock over the
-     server's snapshot, which was taken at mount and cannot see an edit made
-     since. Unsaved work counts on its own — it is by definition not live. */
-  const savedAtMs = lastSavedAt ?? lastSaved?.getTime() ?? null;
-  const publishedAtMs = lastPublishedAt ? Date.parse(lastPublishedAt) : null;
-  const hasUnpublishedChanges =
-    isDirty ||
-    (savedAtMs != null && publishedAtMs != null
-      ? savedAtMs > publishedAtMs
-      : serverHasUnpublishedChanges);
-  const nextMove = deriveLifecycleState({
-    reviewState: reviewStatus.state,
-    reviewerName: reviewStatus.reviewerName,
-    reviewsEnabled: reviewStatus.reviewsEnabled,
-    editsRequireApproval: reviewStatus.editsRequireApproval,
-    isPublished: Boolean(publishedUrl),
-    hasUnpublishedChanges,
-    isViewer,
-    publishEnabled,
-    offline,
-    errorCount,
-  });
-  /* The visual state follows the derived move, not the old permission-only
-     reason. Reading `publishBlockedReason` here left a review-blocked site
-     rendering the ENABLED branch — no tooltip, no aria-disabled — because a
-     pending round is not a permission problem and never set that string.
-     `"anyway"` is gone: the derivation owns the error re-label, and it refuses
-     to put an invitation on a button nobody can press. */
+     The visual state follows the derived move: a pending round is not a
+     permission problem, and reading only the permission reason used to leave
+     a review-blocked site rendering the ENABLED branch. `"anyway"` is gone:
+     the derivation owns the error re-label, and it refuses to put an
+     invitation on a button nobody can press. */
   const publish: PublishState =
     publishOutcome === "published"
       ? "published"
@@ -650,41 +648,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     else if (publishOutcome === "failed") setAlertMsg("Publish failed");
   }, [publishOutcome]);
 
-  // ── T4 · publish-anyway confirm (plan §5, D12/D13, eng D9) ────────────────
-  // Errors > 0 opens a confirm instead of publishing in one click; warnings
-  // alone never confirm — the chip already carried that signal. Gate
-  // precedence (D9): this fires only when publish isn't `disabled` (the
-  // blocked reasons above win); the SERVER approval gate can still reject the
-  // attempt afterwards — its acknowledge flow owns that path, not this modal.
-  const [pubConfirm, setPubConfirm] = React.useState(false);
-  // `onVercelPublish` is a plain useCallback in AquibraStudio, so it is never
-  // undefined and the two fallbacks below are unreachable in the shipping
-  // editor. That is fine for `handleExport`, but it silently made the Publish
-  // PANEL (board 641:2652) undiscoverable — this was its only wire. The panel
-  // now has its own door in SiteMenu; the chain stays as a degraded path for a
-  // build with publishing switched off.
-  const publishNow = onVercelPublish ?? onOpenPublish ?? handleExport;
   /* One control, so one handler. Both review verbs land on the Review panel —
      the door that already owns SendForReview and the feedback thread — so a
-     state-dependent CTA adds no surface, only a destination. */
+     state-dependent CTA adds no surface, only a destination. The publish verb
+     hands off to the shell's `requestPublish`, which routes on
+     `nextMove.gate`: the "Publish with N open errors?" confirm used to be this
+     bar's private dialog, so the Publish panel's identical verb skipped it
+     (B4 — one confirm door, both entrances). */
   const handleCtaClick = React.useCallback(() => {
     if (nextMove && nextMove.kind !== "publish") {
       onOpenReview?.();
       return;
     }
-    if (errorCount > 0) {
-      setPubConfirm(true);
-      return;
-    }
-    publishNow();
-  }, [nextMove, onOpenReview, errorCount, publishNow]);
-  // D12: top-3 concrete rows, errors first — real messages from the shipped
-  // Issue shape, never invented categories.
-  const confirmRows = issues
-    .filter((i) => i.type !== "info")
-    .sort((a, b) => (a.type === b.type ? 0 : a.type === "error" ? -1 : 1))
-    .slice(0, 3);
-  const confirmMore = errorCount + warnCount - confirmRows.length;
+    onVercelPublish?.();
+  }, [nextMove, onOpenReview, onVercelPublish]);
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
@@ -706,23 +683,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         },
       };
 
-  const pill = REVIEW_PILL[reviewStatus.state];
+  const pill = reviewChip(reviewStatus, openCommentCount);
   // T8/D7 rule 6 — at most two amber signals at once. Offline-or-unsaved save
   // and an amber Issues chip are both about *this* publish; a warning review
-  // pill is about the last one, so it is the signal that steps back. Demoted to
-  // `info`, which D7 rule 3 already renders neutral — the copy still says
-  // "Changes requested", it just stops shouting alongside two louder ambers.
+  // chip is about the last one, so it is the signal that steps back. Demoted
+  // to `info` (neutral) — the copy still says "Changes requested", it just
+  // stops shouting alongside two louder ambers.
   const amberElsewhere = (save === "offline" || save === "unsaved") && warnCount > 0;
   const tone: ReviewTone = pill?.tone === "warning" && amberElsewhere ? "info" : (pill?.tone ?? "info");
   const review: ReviewPill | null = pill
     ? {
         ...pill,
         tone,
-        label:
-          reviewStatus.state === "approved" && reviewStatus.reviewerName
-            ? `Approved by ${reviewStatus.reviewerName}${pillAgo(reviewStatus.at)}`
-            : pill.label,
-        title: reviewStatus.reviewerName ? `${pill.label} — ${reviewStatus.reviewerName}` : undefined,
         // F3: every review state opens the same door — the Review panel.
         onClick: onOpenReview,
       }
@@ -748,9 +720,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         exitLabel={viewMode.readOnlyView ? "‹ Back to editing" : "‹ Exit"}
         save={viewMode.readOnlyView ? undefined : save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
-        /* SaveStatus renders as a BUTTON that fires onSave when the state is
-           unsaved or error. A view does not offer a save control. */
-        onSave={viewMode.readOnlyView ? undefined : onSave}
+        /* The pill is a button wherever a click has a destination (B2). A
+           view does not offer one — nothing in it can become unsaved. */
+        onSaveClick={viewMode.readOnlyView ? undefined : savePillClick}
+        saveHint={viewMode.readOnlyView ? undefined : savePillHint}
         review={review}
         tools={tools}
         presence={
@@ -812,10 +785,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   }
             }
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
-               view, options — and it had no door. `handleExport` opens it, but
-               `handleExport` is third in `onVercelPublish ?? onOpenPublish ??
-               handleExport`, and the first is never undefined, so it was as
-               unreachable as the Publish panel was. Meanwhile this row fired
+               view, options. `handleExport` opens it. This row used to fire
                `onExportHTML`, which downloads a zip on the spot: the one
                screen for CHOOSING a format was skipped by the only control
                that mentions exporting. The row opens the modal; the immediate
@@ -854,99 +824,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       ) : null}
 
       {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
-
-      {/* T4 publish-anyway confirm — the missing frame (TODOS.md founder
-          decision, resolved D12/D13). Focus opens on the safe door (F26);
-          ModalRoot's trap returns focus to Publish on close. */}
-      {pubConfirm ? (
-        <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
-          <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
-            <ModalTitle id="bk-pubconfirm-title">
-              {/* Board 1168:4732 says "open errors", not "errors" — the word
-                  is doing work: these are errors the user has already been
-                  shown and left, not ones this dialog is reporting. */}
-              Publish with {errorCount} open {errorCount === 1 ? "error" : "errors"}?
-            </ModalTitle>
-            {/* Board 1168:4732 states the consequence, not the options — the
-                options are the two buttons. */}
-            <ModalDescription>
-              These will ship to every visitor exactly as they are now.
-              {reviewStatus.state !== "none"
-                ? ` A review round is open — ${reviewStatus.reviewerName ?? "your reviewer"} will see the published site.`
-                : ""}
-            </ModalDescription>
-            <div className="bk-pubconfirm__list">
-              {confirmRows.map((i) => (
-                /* Each row carries its OWN severity tint. They used to share
-                   one amber box with only the text colour differing, which
-                   dressed an error as a warning — the single distinction the
-                   modal exists to make. */
-                <p
-                  key={i.id}
-                  className={`tw:m-0 tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-8)] tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-normal)] ${
-                    i.type === "error"
-                      ? "tw:text-[var(--bk-error-text)] tw:bg-[var(--bk-error-tint)]"
-                      : "tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]"
-                  }`}
-                >
-                  <span aria-hidden="true">{i.type === "error" ? "●" : "▲"}</span>{" "}
-                  {/* `location` is the human "where" the Issue shape already
-                      carries ("Brand › color.accent"); `pageId` is an id and
-                      would print as one. */}
-                  {i.location ? `${i.location} · ` : ""}
-                  {i.message || `A ${i.type} will go live exactly as it looks now.`}
-                </p>
-              ))}
-              {confirmMore > 0 ? (
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => {
-                    setPubConfirm(false);
-                    onOpenIssues?.();
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-                >
-                  +{plural(confirmMore, "more warning")}
-                </Button>
-              ) : null}
-            </div>
-            {/* Board 1168:4732 makes "Fix issues first" the strong primary and
-                "Publish anyway" the amber secondary. This footer had it exactly
-                backwards: the safe action carried `color="light"` PLUS a
-                transparent/ghost class string, while the risky one was a bare
-                `<Button>` — which buttonTheme.ts documents as already being the
-                brand accent. So the destructive choice was the solid blue CTA
-                and the safe one read as a faint text link, on a dialog opened
-                *because* the site has unresolved errors. Same amber treatment
-                as StaleApprovalModal's "Publish anyway", which was already
-                right. autoFocus stays on the safe action. */}
-            <ModalFooter>
-              <Button
-                autoFocus
-                onClick={() => {
-                  setPubConfirm(false);
-                  onOpenIssues?.();
-                }}
-              >
-                Fix issues first
-              </Button>
-              <Button
-                /* Same properties flowbite sets, so twMerge drops its accent
-                   fill for the warning tone. Utilities rather than a `style`
-                   object — the ratchet counts inline styles, and this value is
-                   authored, not measured. */
-                className="tw:bg-[var(--bk-warning)] tw:border-[var(--bk-warning)] tw:hover:bg-[var(--bk-warning)]"
-                onClick={() => {
-                  setPubConfirm(false);
-                  publishNow();
-                }}
-              >
-                Publish anyway
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </ModalRoot>
-      ) : null}
 
       {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
           dialog B ("risky": offline/conflict, a save here would be a lie). */}

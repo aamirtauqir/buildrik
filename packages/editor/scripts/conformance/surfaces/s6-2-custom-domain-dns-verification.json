@@ -1,0 +1,111 @@
+{
+  "surface": "s6-2-custom-domain-dns-verification",
+  "board": "S6.2 \u00b7 custom-domain \u00b7 DNS-verification (Figma 807:8756)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-domains-dns",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-dom-dns-row-d1-0"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "rec-a",
+      "testId": "set-dom-dns-row-d1-0"
+    },
+    {
+      "name": "rec-a-cell",
+      "testId": "set-dom-dns-row-d1-0",
+      "spec": "s6-2-custom-domain-dns-verification",
+      "nodeId": "807:8767"
+    },
+    {
+      "name": "rec-a-state",
+      "testId": "set-dom-dns-state-d1-0",
+      "spec": "s6-2-custom-domain-dns-verification",
+      "nodeId": "807:8770"
+    },
+    {
+      "name": "rec-cname",
+      "testId": "set-dom-dns-row-d1-1"
+    },
+    {
+      "name": "rec-cname-cell",
+      "testId": "set-dom-dns-row-d1-1",
+      "spec": "s6-2-custom-domain-dns-verification",
+      "nodeId": "807:8773"
+    },
+    {
+      "name": "rec-head",
+      "testId": "set-dom-dns-d1",
+      "spec": "s6-2-custom-domain-dns-verification",
+      "nodeId": "807:8762"
+    },
+    {
+      "name": "rec-cname-state",
+      "testId": "set-dom-dns-state-d1-1"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: the domain list is a dashboard tRPC read",
+    "(siteDetail.domains.list), so the probe answers that one request \u2014 one",
+    "result entry per BATCHED call, the trap the notifications recipe documents",
+    "\u2014 and lets the real screen, the real client and the real 30s recheck loop",
+    "run. The fixture is the board's own pair: an A record verified and a CNAME",
+    "still pending.",
+    "",
+    "CODE WON on the SHAPE, and boards.json already says so (authority",
+    "`code:state-exists`). 807:8756 draws a 560 x 520 MODAL \u2014 'Connect domain \u00b7",
+    "Step 2 of 3 \u00b7 Verify DNS' over a scrim, with a Back / 'Check DNS now'",
+    "foot. The product connects a domain from an inline settings screen with no",
+    "wizard: `publishInputSchema`-style step state does not exist, and the three",
+    "steps the board numbers are one form plus a poll. Not rebuilt.",
+    "",
+    "BOARD WON, four times \u2014 all inside the DNS block, which is what the board",
+    "is actually about:",
+    "  807:8766  a record is a 36-high --flowbite/gray/50 bar on a 4 radius with",
+    "            12px cells in --flowbite/gray/700 and NO border. It shipped as",
+    "            an 11px mono chip on 4/6 padding inside a border-medium",
+    "            hairline \u2014 at that size a tag, not a row of a table.",
+    "  807:8762  the four columns are HEADED (Type / Name / Value / Status).",
+    "            They were not. A row read 'A @ 76.76.21.21 verified' and",
+    "            nothing on screen said which cell was the host and which the",
+    "            value \u2014 the one thing a person has to get right at their",
+    "            registrar.",
+    "  807:8770  the state is a WORD, coloured: 'verified' in --color/",
+    "            success-text. It shipped as a bare \u2713 / \u2026, which says it only",
+    "            to someone who already knows and reads out as nothing.",
+    "  807:8757  the block sits on WHITE. `.bd-set-domain-card` was",
+    "            --bk-bg-subtle, and two things hung off that: the board's",
+    "            gray-50 rows were one step from invisible on it, and the new",
+    "            ink-muted column headers measured 4.39:1 there against a 4.5",
+    "            floor (4.83:1 on white). One ground, two defects. Measured",
+    "            before and after: 4 contrast failures -> 0.",
+    "",
+    "CONTRAST, and it went DOWN: the pre-existing `.bd-set-domain-status` line",
+    "('Waiting for DNS\u2026') was ink-muted on the same grey card \u2014 4.39:1, on the",
+    "one line that tells you whether the domain is live. It is ink-soft now",
+    "(7.0:1) and the card is white. The run reports 0 text-contrast failures.",
+    "",
+    "NOT JOINED, and why:",
+    "  807:8766/8772 the record BOXES \u2014 both carry `w-[512px]`, which is the",
+    "  board's modal arithmetic (560 less 2x24). The shipped row is the settings",
+    "  pane's width. Their fill, height and radius ARE conformed and are in",
+    "  `measured/`; the join could not be taken without the width coming along.",
+    "  807:8776 the 'pending' state \u2014 the board colours it #CC991A, a RAW HEX",
+    "  with no token (its sibling 'verified' resolves to --color/success-text,",
+    "  which is why this one stands out). The nearest token is",
+    "  --bk-warning-text #723B13, which is what ships; introducing #CC991A would",
+    "  add to Gate 16's hex ratchet. Same call publish-confirm records for",
+    "  #FFF7EB and s3-9 for #80B2FF \u2014 three raw ambers/blues on three different",
+    "  boards, which together look like a palette gap worth a founder decision.",
+    "  807:8779 the Domain field and 807:8784 'Check DNS now' \u2014 both belong to",
+    "  the modal wizard the code does not have; the live equivalents are the",
+    "  add-domain form and '\u27f3 Check now'."
+  ]
+}

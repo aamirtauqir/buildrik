@@ -1,9 +1,19 @@
 /**
  * Stock media search proxy (#24, 2026-06-24). Server-side so provider API keys
  * stay off the client. Photos via Unsplash (UNSPLASH_ACCESS_KEY), videos via
- * Pexels (PEXELS_API_KEY). When a key is unset OR the upstream errors, returns
- * `[]` — exactly the prior stub behavior, so the editor's "no results" empty
- * state still holds. Shapes mirror the editor's StockPhoto / StockVideo.
+ * Pexels (PEXELS_API_KEY). Shapes mirror the editor's StockPhoto / StockVideo.
+ *
+ * A search has FOUR outcomes and they are not the same fact:
+ *
+ *   nothing matched   → `[]`
+ *   no key configured → StockError("NOT_CONFIGURED")
+ *   key was refused   → StockError("UNAUTHORIZED")
+ *   request faulted   → StockError("REQUEST_FAILED")
+ *
+ * Until 2026-09-07 all four returned `[]`, so an unconfigured deployment and an
+ * expired key both reached the user as "No photos found for '<their query>'" —
+ * a sentence about their search term describing our configuration. Nobody could
+ * report the bug because the product never admitted there was one.
  *
  * @license BSD-3-Clause
  */
@@ -32,15 +42,42 @@ export interface StockVideoResult {
 const PER_PAGE = 24;
 const TIMEOUT_MS = 8000;
 
-async function fetchJson(url: string, headers: Record<string, string>): Promise<unknown | null> {
+export type StockErrorCode = "NOT_CONFIGURED" | "UNAUTHORIZED" | "REQUEST_FAILED";
+
+/** Domain error, per the services-throw / routers-translate convention. */
+export class StockError extends Error {
+  constructor(
+    public code: StockErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "StockError";
+  }
+}
+
+async function fetchJson(
+  url: string,
+  headers: Record<string, string>,
+  provider: string,
+): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const res = await fetch(url, { headers, signal: controller.signal });
-    if (!res.ok) return null;
+    // 401/403 is the expired-or-revoked-key case: a key WAS sent and the
+    // provider refused it. That is an operator problem with a different fix
+    // from "no key at all", so it gets its own code rather than the generic one.
+    if (res.status === 401 || res.status === 403) {
+      throw new StockError("UNAUTHORIZED", `${provider} rejected the configured API key.`);
+    }
+    if (!res.ok) {
+      throw new StockError("REQUEST_FAILED", `${provider} returned HTTP ${res.status}.`);
+    }
     return await res.json();
-  } catch {
-    return null; // network / abort / parse — caller falls back to []
+  } catch (e) {
+    if (e instanceof StockError) throw e;
+    // DNS failure, connection refused, the TIMEOUT_MS abort, unparseable body.
+    throw new StockError("REQUEST_FAILED", `${provider} could not be reached.`);
   } finally {
     clearTimeout(timer);
   }
@@ -52,8 +89,16 @@ export async function searchStockPhotos(
   orientation: "landscape" | "portrait" | "squarish" | null,
   color: string | null,
 ): Promise<StockPhotoResult[]> {
+  // Configured-ness is checked before the query: an operator whose key is
+  // missing needs to hear that whatever they typed.
   const key = process.env.UNSPLASH_ACCESS_KEY;
-  if (!key || !query.trim()) return [];
+  if (!key) {
+    throw new StockError(
+      "NOT_CONFIGURED",
+      "Stock photo search is not configured — UNSPLASH_ACCESS_KEY is unset.",
+    );
+  }
+  if (!query.trim()) return [];
 
   const params = new URLSearchParams({
     query,
@@ -63,12 +108,18 @@ export async function searchStockPhotos(
   if (orientation) params.set("orientation", orientation);
   if (color) params.set("color", color);
 
-  const data = await fetchJson(`https://api.unsplash.com/search/photos?${params}`, {
-    Authorization: `Client-ID ${key}`,
-    "Accept-Version": "v1",
-  });
+  const data = await fetchJson(
+    `https://api.unsplash.com/search/photos?${params}`,
+    { Authorization: `Client-ID ${key}`, "Accept-Version": "v1" },
+    "Unsplash",
+  );
   const results = (data as { results?: unknown[] })?.results;
-  if (!Array.isArray(results)) return [];
+  // A successful Unsplash search always carries a `results` array — an empty
+  // one for no matches. Anything else means we did not get a search result,
+  // which is a failure, not an absence.
+  if (!Array.isArray(results)) {
+    throw new StockError("REQUEST_FAILED", "Unsplash returned an unexpected response.");
+  }
 
   return results.flatMap((raw) => {
     const r = raw as {
@@ -100,7 +151,13 @@ export async function searchStockVideos(
   page: number,
 ): Promise<StockVideoResult[]> {
   const key = process.env.PEXELS_API_KEY;
-  if (!key || !query.trim()) return [];
+  if (!key) {
+    throw new StockError(
+      "NOT_CONFIGURED",
+      "Stock video search is not configured — PEXELS_API_KEY is unset.",
+    );
+  }
+  if (!query.trim()) return [];
 
   const params = new URLSearchParams({
     query,
@@ -108,11 +165,15 @@ export async function searchStockVideos(
     per_page: String(PER_PAGE),
   });
 
-  const data = await fetchJson(`https://api.pexels.com/videos/search?${params}`, {
-    Authorization: key,
-  });
+  const data = await fetchJson(
+    `https://api.pexels.com/videos/search?${params}`,
+    { Authorization: key },
+    "Pexels",
+  );
   const videos = (data as { videos?: unknown[] })?.videos;
-  if (!Array.isArray(videos)) return [];
+  if (!Array.isArray(videos)) {
+    throw new StockError("REQUEST_FAILED", "Pexels returned an unexpected response.");
+  }
 
   return videos.flatMap((raw) => {
     const v = raw as {

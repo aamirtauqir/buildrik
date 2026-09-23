@@ -1,0 +1,192 @@
+{
+  "surface": "media-fullpage-empty",
+  "board": "Media · fullpage · empty (Figma 1162:4617)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-fullpage-empty",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "mgr-empty-actions"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "SAME PROBE AS media-fullpage-library, WITH AN EMPTY LIBRARY — the fixture",
+    "answers `getAssets` with nothing and everything else identically, so this",
+    "is the same manager in a different state rather than a second fixture that",
+    "could drift from the first. The wait names the CTA row, not the manager:",
+    "the empty state is what distinguishes this board from 1159:4593 and a wait",
+    "on `mgr-root` would resolve for either. The folders and tags the rail",
+    "shows are real — an empty library can still have folders — which is what",
+    "the board draws too.",
+    "",
+    "BOARD WON — the empty state, and it was the loudest thing on the screen:",
+    "  1162:4851  the hero is TOP-anchored at a 180 inset with a 10 gap. It was",
+    "             vertically centred in a 760 column, so at any window height",
+    "             the CTA moved and never sat where the board puts it.",
+    "  1162:4852  the icon is a 28px glyph in --color/ink-placeholder. It",
+    "             shipped as an 80px tinted disc — the largest element on the",
+    "             screen, weighting the absence rather than the way out of it.",
+    "  1162:4853  the headline is 14/600, not 16/700.",
+    "  1162:4854  the sentence is 11, not 13.",
+    "  1162:4856 / 1162:4858  the two CTAs are 14/8 at 11px.",
+    "",
+    "BOARD WON — the toolbar buttons, which this board and 1159:4593 draw",
+    "identically (1162:4648/4650/4652): 12/6 padding at 12px on a 6 radius.",
+    "They shipped on a FIXED 27 height at 13px, and the fixed height is why the",
+    "board's 6 vertical pad had never been applied — a set height and a padding",
+    "are different properties, so nothing conflicted and nothing won. Same",
+    "class of defect as the replace-across footer and the picker's view toggle,",
+    "three surfaces apart.",
+    "",
+    "NOT JOINED: 1162:4784, the details rail — see the media-fullpage-library",
+    "note; the board draws a flat 14-inset column and AssetDetailsPanel is a",
+    "head-over-preview-over-tabs structure, which is a rebuild rather than a",
+    "restyle. 1162:4860 is that rail's own empty line, whose --bk-ink-disabled",
+    "measured 1.47:1 on white and is --bk-ink-soft now — the board names",
+    "ink-placeholder (2.5:1), which also fails, so neither the board nor the",
+    "code got this right and the code is now the safer of the two. 1162:4683 is",
+    "the rail gap at w-216 (the 1px-border arithmetic). 1162:4645 is the search",
+    "field, authority=open:input-fill. The topbar (1162:4618) and rail belong",
+    "to other surfaces and are not mounted here.",
+    "",
+    "1162:4685/4686 (the TAGS group) is drawn on this board and does not render: `allTags` is derived from the assets' own tags, so an empty library has no tags to filter by. That is the code contract answering a board that carried the populated state's rail across unchanged — behaviour wins, and a TAGS heading over nothing would be a filter that can only ever return zero. The pills ARE conformed and are measured on media-fullpage-library."
+  ],
+  "targets": [
+    {
+      "name": "mgr",
+      "testId": "mgr-root",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4639"
+    },
+    {
+      "name": "mgr-top",
+      "testId": "mgr-top",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4640"
+    },
+    {
+      "name": "mgr-body",
+      "testId": "mgr-body",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4655"
+    },
+    {
+      "name": "btn-import",
+      "testId": "mgr-btn-import",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4648"
+    },
+    {
+      "name": "btn-upload",
+      "testId": "mgr-btn-upload",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4650"
+    },
+    {
+      "name": "btn-stock",
+      "testId": "mgr-btn-stock",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4652"
+    },
+    {
+      "name": "col-folders",
+      "testId": "mgr-folders",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4656"
+    },
+    {
+      "name": "row-recent",
+      "testId": "mgr-row-recent",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4658"
+    },
+    {
+      "name": "row-new-folder",
+      "testId": "mgr-new-folder-open",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4681"
+    },
+    {
+      "name": "row-trash",
+      "testId": "mgr-row-trash",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4693"
+    },
+    {
+      "name": "col-grid",
+      "testId": "mgr-grid-col",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4695"
+    },
+    {
+      "name": "toolbar",
+      "testId": "mgr-subbar",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4696"
+    },
+    {
+      "name": "sort",
+      "testId": "mgr-sort",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4710"
+    },
+    {
+      "name": "empty",
+      "testId": "mgr-empty",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4851"
+    },
+    {
+      "name": "empty-icon",
+      "testId": "mgr-empty-icon",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4852"
+    },
+    {
+      "name": "empty-title",
+      "testId": "mgr-empty-title",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4853"
+    },
+    {
+      "name": "empty-sub",
+      "testId": "mgr-empty-sub",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4854"
+    },
+    {
+      "name": "empty-actions",
+      "testId": "mgr-empty-actions",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4855"
+    },
+    {
+      "name": "empty-upload",
+      "testId": "mgr-empty-upload",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4856"
+    },
+    {
+      "name": "empty-stock",
+      "testId": "mgr-empty-stock",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4858"
+    },
+    {
+      "name": "status",
+      "testId": "mgr-status",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4818"
+    },
+    {
+      "name": "quota-bar",
+      "testId": "mgr-quota-bar",
+      "spec": "media-fullpage-empty",
+      "nodeId": "1162:4823"
+    }
+  ]
+}

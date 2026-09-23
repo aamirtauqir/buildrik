@@ -1,0 +1,270 @@
+{
+  "surface": "content-conditions",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "151:87",
+  "boardName": "content-conditions",
+  "figmaHash": "35888e825a97801df23b30f94c7c0a6cb3da20c1b10f85715f5c5031092d181a",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:17:03.075Z",
+  "copy": [
+    "Content",
+    "‹ Conditions",
+    "Happy hour banner",
+    "when time is 17:00–19:00",
+    "Sold-out badge",
+    "when available is false",
+    "+ New condition"
+  ],
+  "targets": [
+    {
+      "nodeId": "151:87",
+      "name": "[not-implemented] Content · conditions — the screen ships; its OUTCOME does not. Evaluating a condition writes data-condition-hidden='true' (DataManager.ts:482-491); no stylesheet and no export step reads that attribute, and it is evaluated once at creation, so the element stays fully visible on the canvas and on the published site.",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:491",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:491;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "151:92",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:93",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:94",
+      "name": "Cond · Happy hour banner",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[56px] not-italic overflow-clip relative rounded-[8px] shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:95",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[8px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "151:96",
+      "name": null,
+      "className": "absolute leading-[16px] left-[16px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[28px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:97",
+      "name": null,
+      "className": "absolute leading-[20px] left-[256px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[16px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:98",
+      "name": "Cond · Sold-out badge",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[56px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "56px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:99",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[8px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "151:100",
+      "name": null,
+      "className": "absolute leading-[16px] left-[16px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[28px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:101",
+      "name": null,
+      "className": "absolute leading-[20px] left-[256px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[16px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:102",
+      "name": "Add cond",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:103",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17396",
+      "name": "hotspot/state · conditions · empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[-1px] top-[235px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

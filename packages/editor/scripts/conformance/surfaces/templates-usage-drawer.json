@@ -1,0 +1,105 @@
+{
+ "surface": "templates-usage-drawer",
+ "board": "Templates · usage-drawer (Figma 1169:4764)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=templates-usage-drawer",
+ "viewport": {
+  "width": 1440,
+  "height": 900
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "tpl-usage-tab-used"
+  },
+  {
+   "action": "click",
+   "testId": "tpl-usage-tab-used"
+  },
+  {
+   "action": "waitFor",
+   "testId": "tpl-use-row-menu"
+  }
+ ],
+ "contrastScope": "body",
+ "targets": [
+  {
+   "name": "use-row-1",
+   "testId": "tpl-use-row-menu",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4766"
+  },
+  {
+   "name": "use-row-1-name",
+   "testId": "tpl-use-name-menu",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4767"
+  },
+  {
+   "name": "use-row-1-meta",
+   "testId": "tpl-use-meta-menu",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4768"
+  },
+  {
+   "name": "use-row-2",
+   "testId": "tpl-use-row-menu-2",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4769"
+  },
+  {
+   "name": "use-row-2-name",
+   "testId": "tpl-use-name-menu-2",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4770"
+  },
+  {
+   "name": "use-row-2-meta",
+   "testId": "tpl-use-meta-menu-2",
+   "spec": "templates-usage-drawer",
+   "nodeId": "1169:4771"
+  },
+  {
+   "name": "footnote",
+   "testId": "tpl-usage-footnote"
+  },
+  {
+   "name": "title",
+   "testId": "tpl-usage-title"
+  }
+ ],
+ "_note": [
+  "boards.json carries authority `code:usage-drawer-reachable-but-not-",
+  "visually-confirmed`, and LEDGER J-1169:4764 skipped this row code-ahead:",
+  "the board is a 380x139 POPOVER showing only the used-in list, the shipped",
+  "surface is a three-tab modal (Preview / Used in / Versions) over the same",
+  "data. That superset is behaviour and stays. What this pass does is settle",
+  "the SHAPES the two share.",
+  "",
+  "BOARD WON — the used-in entry. 1169:4766/4769 draw a TINTED CHIP:",
+  "bg-subtle, 6 radius, 10/7 insets, 8 gap, 11px, top-aligned, name in Inter",
+  "Medium and the when in ink-muted on a 16 line box, sitting NEXT to the",
+  "name rather than pushed to the far edge. It shipped as a transparent 13px",
+  "row at gap-3 on a 4 radius with the name flex-1 — a menu, not a pair of",
+  "facts. Versions keeps the old ROW; the board draws no versions list.",
+  "The footnote went 12px -> the board's 11px (1169:4772).",
+  "",
+  "NOT JOINED, and why:",
+  "  1169:4764 root — this is ModalContent, shared by every dialog in the",
+  "  editor and settled by the Modal boards. The board's 380 popover carries",
+  "  its own 16/14 padding, 10 gap, 12 radius and an 8/24 shadow; one screen",
+  "  board does not re-settle the dialog frame. Measured, not joined.",
+  "  1169:4765 title — 12px semibold is the 380-popover's scale. The live",
+  "  surface is a `lg` modal whose title type ModalTitle owns (the same call",
+  "  export-html-modal recorded for 1172:4826). Measured, not joined.",
+  "  1169:4772 footnote — carries w-[348px], which is 380 minus the popover's",
+  "  own 2x16 padding. Frame-scale, not an inset a modal can hold; its type",
+  "  (11/16 ink-muted) was conformed anyway and is measured here.",
+  "",
+  "FOUND, NOT FIXED: the board's rows say 'applied Aug 2' and 'created",
+  "today' — two different verbs for two different provenances. The code has",
+  "one field (`appliedAt`) and prints an absolute date for both, so a page",
+  "CREATED from a template and a page the template was APPLIED to read",
+  "identically. That needs a second fact from templateUsage, not a restyle.",
+  "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"tpl-usage-footnote\\\"]\", which resolved to a subtree holding none of the text under test — ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero."
+ ]
+}

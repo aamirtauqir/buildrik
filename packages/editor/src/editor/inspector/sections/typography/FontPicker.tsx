@@ -7,15 +7,12 @@
  */
 
 import * as React from "react";
-import {
-  GoogleFontsService,
-  loadGoogleFont,
-  searchGoogleFonts,
-  type GoogleFont,
-  type FontCategory,
-} from "../../../../services/GoogleFontsService";
-import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
+import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFontsService";
+import { FontPickerPanel, namesFont } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
+import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "../../../../engine";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -40,6 +37,11 @@ export const SYSTEM_FONTS: SystemFont[] = [
   { value: "'Courier New', monospace", label: "Courier New", category: "monospace" },
 ];
 
+/** The door every picker carries — Site fonts (3686:42317) listens in StudioPanels. */
+export const openSiteFonts = (composer: Composer | null | undefined): void => {
+  composer?.emit("ui:site-fonts", {});
+};
+
 // ============================================================================
 // COMPONENT
 // ============================================================================
@@ -47,24 +49,43 @@ export const SYSTEM_FONTS: SystemFont[] = [
 interface FontPickerProps {
   value: string;
   onChange: (value: string) => void;
+  /** Source of the UPLOADED group — the FontManager's custom fonts, which the
+   *  Composer registers from the media library's ADDED site fonts. */
+  composer?: Composer | null;
 }
 
-export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
-  const [fontSearch, setFontSearch] = React.useState("");
+/* Clone 3721:43423 — an uploaded font is "a separate uploaded source; it does
+   not replace the built-in family". Read on mount and on every font event, so
+   a font added in Site fonts shows up here without a reopen. Both pickers
+   (Typography's Family row, the Brand font token) read through this one hook. */
+export function useUploadedFonts(composer: Composer | null | undefined): SystemFont[] {
+  const fontManager = composer?.fonts;
+  const read = React.useCallback(
+    (): SystemFont[] =>
+      (fontManager?.getAllFonts({ source: "custom" }) ?? []).map((f) => ({
+        value: `'${f.family}', sans-serif`,
+        label: f.family,
+        category: "sans-serif",
+      })),
+    [fontManager],
+  );
+  const [fonts, setFonts] = React.useState<SystemFont[]>(read);
+  React.useEffect(() => {
+    setFonts(read());
+    if (!fontManager) return;
+    const refresh = () => setFonts(read());
+    const events = [EVENTS.FONT_UPLOADED, EVENTS.FONT_LOADED, EVENTS.FONT_DELETED];
+    for (const ev of events) fontManager.on(ev, refresh);
+    return () => {
+      for (const ev of events) fontManager.off(ev, refresh);
+    };
+  }, [fontManager, read]);
+  return fonts;
+}
+
+export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, composer }) => {
   const [showFontPicker, setShowFontPicker] = React.useState(false);
-  const [selectedCategory, setSelectedCategory] = React.useState<FontCategory | "all">("all");
-  const fontsService = React.useMemo(() => GoogleFontsService.getInstance(), []);
-
-  // Get filtered fonts
-  const googleFonts = React.useMemo(() => {
-    let fonts = searchGoogleFonts(fontSearch);
-    if (selectedCategory !== "all") {
-      fonts = fonts.filter((f) => f.category === selectedCategory);
-    }
-    return fonts.slice(0, 50); // Limit for performance
-  }, [fontSearch, selectedCategory]);
-
-  const totalFonts = React.useMemo(() => fontsService.getFonts().length, [fontsService]);
+  const uploadedFonts = useUploadedFonts(composer);
 
   // Handle font selection
   const handleFontSelect = (font: GoogleFont | SystemFont) => {
@@ -77,28 +98,43 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
 
     onChange(fontValue);
     setShowFontPicker(false);
-    setFontSearch("");
   };
+
+  const handleManage = () => {
+    setShowFontPicker(false);
+    openSiteFonts(composer);
+  };
+
+  /* An uploaded family reads back as one: the trigger says so for the walk
+     (`data-font-source`), the reopened dropdown by its selected `Uploaded` row. */
+  const uploaded = uploadedFonts.some((f) => namesFont(value, f));
 
   // Get current font name for display
   const currentFontName = React.useMemo(() => {
     if (!value) return "Select font...";
 
-    // Check system fonts
-    const systemFont = SYSTEM_FONTS.find((f) => f.value === value);
+    // Check system + uploaded fonts
+    const systemFont = [...uploadedFonts, ...SYSTEM_FONTS].find((f) => f.value === value);
     if (systemFont) return systemFont.label;
 
     // Extract font name from value
     const match = value.match(/'([^']+)'/);
     return match ? match[1] : value;
-  }, [value]);
+  }, [value, uploadedFonts]);
 
   return (
     /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
        same 88px column every other row uses. It used to stack a "Font Family"
        caption above a full-bleed button, the only row in the section that did. */
-    <div className="bdi-row-ctrl" style={{ marginBottom: 12, position: "relative" }}>
-      <label className="bdi-lb">Family</label>
+    /* `.bdi-ddn` — the SHARED control frame, not a fourth hand-rolled one.
+       807:8352 draws Family's box exactly like every other control on the
+       board: gray-50 on a gray-100 hairline, radius 4, 28 tall, 160 wide. This
+       one was white on `--bk-border-medium` at radius 6, and carried a 12px
+       bottom margin that broke the board's contiguous 34-row rhythm — the only
+       row in the panel that did either. The one style left inline is the
+       preview typeface, which is the field's value and cannot be a class. */
+    <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Family")}>
+      <label className="bdi-lb" data-testid={labelTestId("Family")}>Family</label>
       {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
@@ -106,68 +142,26 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
         aria-label="Font family"
-        style={{
-          width: "100%",
-          padding: "4px 8px",
-          background: "var(--bk-bg-card)",
-          border: `1px solid ${"var(--bk-border-medium)"}`,
-          borderRadius: 6,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          textAlign: "left",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          fontFamily: value || "inherit",
-        }}
+        data-testid={fieldTestId("Family")}
+        data-font-source={uploaded ? "uploaded" : undefined}
+        className="bdi-ddn tw:justify-between tw:text-left"
+        style={{ fontFamily: value || "inherit" }}
       >
         <span>{currentFontName}</span>
-        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+        <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
           {showFontPicker ? "\u25B2" : "\u25BC"}
         </span>
       </Button>
       {/* Font Picker Dropdown */}
       {showFontPicker && (
-        <div
-          className="tw:flex tw:flex-col tw:gap-0"
+        <FontPickerPanel
           id="font-picker-listbox"
-          role="listbox"
-          aria-label="Font family selection"
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            marginTop: 4,
-            background: "var(--bk-bg-panel)",
-            border: `1px solid ${"var(--bk-border-medium)"}`,
-            borderRadius: 8,
-            zIndex: 100,
-            maxHeight: 300,
-            overflow: "hidden",
-          }}
-        >
-          <FontSearchInput value={fontSearch} onChange={setFontSearch} />
-          <CategoryTabs selected={selectedCategory} onSelect={setSelectedCategory} />
-          <div
-            style={{
-              padding: "6px 8px",
-              fontSize: 12,
-              color: "var(--bk-ink-muted)",
-              borderBottom: `1px solid ${"var(--bk-border)"}`,
-            }}
-          >
-            Showing {googleFonts.length} of {totalFonts} Google fonts
-          </div>
-          <FontList
-            googleFonts={googleFonts}
-            systemFonts={SYSTEM_FONTS}
-            selectedCategory={selectedCategory}
-            fontSearch={fontSearch}
-            currentValue={value}
-            onSelect={handleFontSelect}
-          />
-        </div>
+          systemFonts={SYSTEM_FONTS}
+          uploadedFonts={uploadedFonts}
+          currentValue={value}
+          onSelect={handleFontSelect}
+          onManage={handleManage}
+        />
       )}
     </div>
   );

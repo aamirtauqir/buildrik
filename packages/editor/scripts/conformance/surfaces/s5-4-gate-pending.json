@@ -1,0 +1,106 @@
+{
+  "surface": "s5-4-gate-pending",
+  "board": "S5.4 · gate · pending (Figma 307:2193)",
+  "_note": [
+    "S5.4 draws THREE gates because the next move differs — send one, wait for",
+    "one, or go read the comments that came back. The code already split the",
+    "server's four PRECONDITION_FAILED messages into four `blockedReason`s, and",
+    "then rendered three of them as one shape: a warning TOAST that described the",
+    "way out in prose (\"Open the Review panel (press R)\") and dismissed the",
+    "reason in the same effect. All three boards draw a modal with the door in it.",
+    "",
+    "WHAT MOVED: `PublishGateModal` (src/editor/shell/modals/PublishGateModal.tsx)",
+    "is new, and `APPROVAL_GATE_TOASTS` in useExportHandlers is gone with the",
+    "effect that raised it. That effect called `dismissBlock()` immediately, so no",
+    "dialog could ever have been driven off `blockedReason` while it stood. The",
+    "modal is mounted by StudioPanels, which already receives `publishJob` for the",
+    "Publish panel and already owns the `ui:switch-tab` event every gate's primary",
+    "fires. `stale-approval` is untouched — it is the one gate with something to",
+    "over-ride, and it keeps StaleApprovalModal.",
+    "",
+    "Probe, not the live app: the gate only opens when the DASHBOARD refuses a",
+    "publish, which needs a site, a round in the wrong state, and a real",
+    "`sites.publish` rejection. The probe mounts the real modal with the reason",
+    "the server would have sent.",
+    "",
+    "NOT anchored, and why:",
+    "  307:2194 the card frame — its `rounded-[16px]` belongs to the DIALOG, and",
+    "    the dialog frame is MODAL_FRAME_BASE_CLASS, shared by every modal in the",
+    "    product at radius 12 (the same call publish-confirm's recipe records for",
+    "    914:4507). The code therefore splits it: the shared frame carries the",
+    "    radius and the 520 width, an inner block carries the board's 32 gutter,",
+    "    30 top and 14 stack. The gutter is still measured — 307:2196 is 456 wide,",
+    "    which IS 520 less two 32s.",
+    "  390:3837 the scrim — exported as an opaque `--flowbite/gray/900` because",
+    "    Figma bakes layer opacity out. A 100% black scrim is export noise.",
+    "  307:2193 the board root — the 1440 page behind the dialog.",
+    "",
+    "COPY: the board's sentence, with the round's real client in place of",
+    "\"Sara (sara@client.com)\" and a fallback for a round that cannot be read.",
+    "\"once she approves\" is written \"once they approve\" — the product does not",
+    "know a reviewer's gender.",
+    "",
+    "COPY DEVIATION, deliberate — `check-board-copy` flags it, and it is the",
+    "sample-data rule rather than drift: the boards write \"once SHE approves\"",
+    "and \"resolve HER comments\" because the board's reviewer is called Sara.",
+    "Nothing in the product knows a reviewer's gender — `reviewerName` is a",
+    "string — so the shipped sentence is \"once they approve\" / \"resolve their",
+    "comments\". The SHAPE is conformed; the pronoun is bound to the persona."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=s5-4-gate-pending&siteId=probe-site",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "publish-gate-primary"
+    }
+  ],
+  "contrastScope": "[data-testid=\"publish-gate\"]",
+  "targets": [
+    {
+      "name": "gate-title",
+      "testId": "publish-gate-title",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "307:2195"
+    },
+    {
+      "name": "gate-body",
+      "testId": "publish-gate-body",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "307:2196"
+    },
+    {
+      "name": "gate-actions",
+      "testId": "publish-gate-actions",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "307:2197"
+    },
+    {
+      "name": "gate-primary",
+      "testId": "publish-gate-primary",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "337:2240"
+    },
+    {
+      "name": "gate-primary-label",
+      "testId": "publish-gate-primary",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "I337:2240;9:19"
+    },
+    {
+      "name": "gate-cancel",
+      "testId": "publish-gate-cancel",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "337:2242"
+    },
+    {
+      "name": "gate-cancel-label",
+      "testId": "publish-gate-cancel",
+      "spec": "s5-4-gate-pending",
+      "nodeId": "I337:2242;9:43"
+    }
+  ]
+}

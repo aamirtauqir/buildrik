@@ -7,6 +7,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
@@ -15,6 +17,8 @@ import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailG
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { NextMove } from "../shell/lifecycle";
+import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -72,9 +76,13 @@ export interface LeftSidebarProps {
   /** Settings' unsaved-edit flag, owned by the shell — see the guard below. */
   settingsDirty?: boolean;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
+  pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
+  nextMove?: NextMove | null;
+  onRequestPublish?: () => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
@@ -84,7 +92,8 @@ export interface LeftSidebarProps {
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
   onOpenIconPicker?: (
@@ -154,9 +163,15 @@ function RailZone({
               aria-selected={isVisibleActive}
               aria-label={tab.ariaLabel}
               data-tab={tab.id}
+              /* Conformance anchor, same reason as `data-testid="rail"` below:
+                 recipes address by testid so a class or aria-label rewrite
+                 cannot silently unhook a measurement. `data-tab` is read by
+                 CSS and by the drag code, so it is not free to double as one. */
+              data-testid={`rail-tab-${tab.id}`}
             >
               {isVisibleActive && (
                 <div
+                  data-testid="rail-active-bar"
                   /* Board 199:2: 3px, flush to the RAIL edge, the full
                      height of the item — measured at 1440x900 as x 0..2 over
                      y 114..157, the same 44px as the tinted pill. It was 2px,
@@ -165,7 +180,7 @@ function RailZone({
                      floating beside the pill rather than a rule down its edge.
                      The offset is the button's own centring inset, written
                      from the two tokens that create it. */
-                  className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-r-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
+                  className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
                 />
               )}
               {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
@@ -360,9 +375,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   canvasHoveredId,
   settingsDirty = false,
   onSettingsDirtyChange,
+  pagesOpen,
   projectId,
   publishJob,
-  onVercelPublish,
+  nextMove,
+  onRequestPublish,
   onOpenLibrary,
   onCreateCollection,
   onResendReview,
@@ -403,6 +420,29 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   React.useEffect(() => {
     if (activeTab !== "templates") setTemplatesNewPage(false);
   }, [activeTab]);
+
+  /* Site menu › Unpublish, same trap as the one above and caught the same way
+     — live, on the first cold click. StudioHeader opens the Publish panel and
+     then emits UI_UNPUBLISH_REQUEST synchronously; PublishTab subscribes in an
+     effect that has not run yet, so on a cold open the event was dropped and
+     the confirm appeared only on the SECOND click. This component is mounted
+     whenever the editor is not in view mode, so its listener is alive at emit
+     time. It latches the intent and hands it down as a prop; PublishTab
+     consumes it once and reports back, so a cancelled confirm cannot re-open
+     on the next visit. Cleared on leaving the tab for the same reason. */
+  const [unpublishIntent, setUnpublishIntent] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const latch = () => setUnpublishIntent(true);
+    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    return () => {
+      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    };
+  }, [composer]);
+  React.useEffect(() => {
+    if (activeTab !== "publish") setUnpublishIntent(false);
+  }, [activeTab]);
+  const consumeUnpublishIntent = React.useCallback(() => setUnpublishIntent(false), []);
 
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
@@ -678,6 +718,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 <TabRouter
                   activeTab={activeTab}
                   activeSubTab={activeSubTab}
+                  pagesOpen={pagesOpen}
                   composer={composer}
                   commonTabProps={commonTabProps}
                   onBlockClick={onBlockClick}
@@ -690,10 +731,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                     safeTabChange("templates");
                   }}
                   templatesNewPageMode={templatesNewPage}
+                  unpublishIntent={unpublishIntent}
+                  onUnpublishIntentConsumed={consumeUnpublishIntent}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   publishJob={publishJob}
-                  onVercelPublish={onVercelPublish}
+                  nextMove={nextMove}
+                  onRequestPublish={onRequestPublish}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}

@@ -18,6 +18,8 @@ import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { EVENTS } from "../../shared/constants/events";
+import type { SectionId } from "./sections/registry";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
@@ -35,6 +37,7 @@ import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hoo
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
+import { MediaSourceRow } from "./sections/MediaSourceRow";
 import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
@@ -287,6 +290,28 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
 
+  /* v3 IA Q8 — the canvas context menu's "Add interaction" lands here. A
+     collapsed section stays collapsed on selection, so the door has to open
+     it AND bring it on screen; `toggleSection` is keyed by element type, the
+     same key InspectorTabContent reads. The scroll waits one frame so the
+     expanded body has a height to scroll to. */
+  const selectedType = selectedElement?.type ?? null;
+  React.useEffect(() => {
+    if (!composer || !selectedType) return;
+    const focus = ({ section }: { section: SectionId }) => {
+      if (!expandedSections.has(`${selectedType}:${section}`)) toggleSection(selectedType, section);
+      requestAnimationFrame(() => {
+        contentRef.current
+          ?.querySelector<HTMLElement>(`#inspector-section-${section}`)
+          ?.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+    };
+    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
+    return () => {
+      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
+    };
+  }, [composer, selectedType, expandedSections, toggleSection]);
+
   const ElementIcon = selectedElement
     ? getElementIcon(selectedElement.type)
     : getElementIcon("default");
@@ -324,7 +349,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const selectedInstance = composer?.elements?.getElement(selectedElement.id) ?? null;
 
   return (
-    <div className="bdi-panel">
+    <div className="bdi-panel" data-testid="inspector-panel">
       {/* Live region for selection announcement */}
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
@@ -333,12 +358,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           EDITING / this container" banner and the tag.class DOM breadcrumb were
           dropped from the primary view; pick-element + select-parent stay as
           compact icons, binding + the ⋯ menu on the right. */}
-      <div className="bdi-ehdr">
+      <div className="bdi-ehdr" data-testid="inspector-header">
         <div className="bdi-eic" aria-hidden="true">
           <ElementIcon size="sm" />
         </div>
         <div className="bdi-ename">
-          <div className="bdi-n">{elementLabel}</div>
+          <div className="bdi-n" data-testid="inspector-element-name">{elementLabel}</div>
         </div>
         <div className="bdi-eact">
           <Button
@@ -346,6 +371,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             className={`bdi-icon-btn${pickActive ? " on" : ""}`}
             title="Pick element on canvas"
             aria-label="Pick element on canvas"
+            data-testid="inspector-pick"
             aria-pressed={pickActive}
             onClick={() => {
               const next = !pickActive;
@@ -417,7 +443,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       {/* Figma 32-2 pill row: `This ▾ · Desktop ▾ · Base ▾` (scope · breakpoint ·
           state), three compact dropdowns on one line. S3.9: no tab strip — the
           body below is one flat scrolling column ordered per element profile. */}
-      <div className="bdi-bpr">
+      <div className="bdi-bpr" data-testid="inspector-context-row">
         <ScopeDropdown
           composer={composer}
           selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
@@ -464,7 +490,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           // the extra 2px `border-l-2` was never in the frame, and the
           // banner's own inset is x16 in a 300-wide frame (px-4, not px-3).
           <p
-            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:pt-2.5 tw:pb-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-warning-text)]"
+            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:pt-2.5 tw:pb-2 tw:text-[12px]/[18px] tw:font-normal tw:text-[var(--bk-warning-text)]"
             role="status"
             data-testid="reach-all-banner"
           >
@@ -491,7 +517,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           // sized to a 32-tall band (px-4 pt-2 pb-2) — this carried 12px at
           // a 12px inset instead.
           <p
-            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
+            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px]/[16px] tw:font-normal tw:text-[var(--bk-accent)]"
             data-testid="pseudo-state-banner"
           >
             Editing {pseudoStateLabel(currentPseudoState)} — not Base
@@ -516,21 +542,53 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </div>
         </div>
       ) : wholeSite ? (
-        /* Whole-site scope (board 189:2) — per-element controls step aside;
-           site-wide styles live in the Brand panel. */
-        <div style={{ padding: "16px" }} data-testid="inspector-whole-site">
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)", marginBottom: 6 }}>
+        /* Whole-site scope, board 189:2 — per-element controls step aside;
+           site-wide styles live in the Brand panel.
+
+           The board draws this takeover as THREE BANDS, not one padded block:
+           a warning-tint reach note (189:14, 36 tall, 12/18 in warning ink)
+           saying where the edits land, an accent-tint hint under it (189:102,
+           52 tall, 11/16) saying where those styles actually live, then a 44
+           tall action row (1698:6943) with two 28-tall buttons. What shipped
+           was a 16px-padded stack of a 13/600 ink heading, a 12px ink-muted
+           paragraph and two flowbite `xs` buttons at their own 32 — the same
+           three sentences with none of the banding that tells you the panel
+           has changed what it is pointed at. */
+        <div data-testid="inspector-whole-site">
+          <p
+            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-[9px] tw:text-[12px]/[18px] tw:font-normal tw:text-[var(--bk-warning-text)]"
+            data-testid="whole-site-note"
+          >
             Editing the whole site — every page
-          </div>
-          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.5, marginBottom: 12 }}>
+          </p>
+          <p
+            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px]/[16px] tw:font-normal tw:text-[var(--bk-accent-text)]"
+            data-testid="whole-site-hint"
+          >
             Site-wide colours, fonts and spacing live in the Brand panel — change them once,
             everywhere updates.
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button size="xs" onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}>
+          </p>
+          <div className="tw:flex tw:gap-2 tw:px-4 tw:py-2" data-testid="whole-site-actions">
+            {/* `size="xs"` carries flowbite's own `h-8`; `tw:h-7` is the same
+                twMerge group and is what reaches the board's 28. `px-2`, not
+                `px-3`: 1698:6944 is 88 wide around a 13px "Open Brand", and
+                13px Inter measures that label ~73 — so the board's inset is 8
+                a side, not 12. Both buttons were 8px wider than the frame. */}
+            <Button
+              size="xs"
+              data-testid="whole-site-open-brand"
+              className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[13px] tw:font-medium"
+              onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}
+            >
               Open Brand
             </Button>
-            <Button color="light" size="xs" onClick={() => setWholeSite(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+            <Button
+              color="light"
+              size="xs"
+              data-testid="whole-site-back"
+              onClick={() => setWholeSite(false)}
+              className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[13px] tw:font-medium tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+            >
               Back to this element
             </Button>
           </div>
@@ -543,6 +601,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         aria-label="Element properties"
       >
         <div className="bdi-body">
+          {/* Clone 3721:45178 / 3724:43815 / 3724:44339 — a media element's
+              source is the first thing in its inspector, above SIZE. */}
+          <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
           <InspectorErrorBoundary>
             <InspectorTabContent
               tabId="style"

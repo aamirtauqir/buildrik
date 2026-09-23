@@ -1,0 +1,85 @@
+{
+  "surface": "media-drill-in-asset-detail",
+  "board": "Media · drill-in · asset-detail (Figma 146:2)",
+  "_note": "Probe, not the live app: the hub is reached by opening an asset from the drawer grid, and the drawer's own library is a fact about the user's account. The waitFor is on `media-detail-preview` — the hub's own 160h well — rather than on the overlay, because AssetDetailOverlay has four views behind one root and a wait on the root would have measured whichever one happened to render.\n\nBOARD WON, twice: 146:2 gives the drill-in frame the drawer's --flowbite/gray/100 edge and the overlay drew no border at all, so its computed border-color was #000000, the initial value — the identical defect board 144:2 found on SlimLauncher and fixed the same way. 146:10's dimension line is leading-[16px] and the span carried no line-height, computing `normal`; it is tw:leading-4 now.\n\nNOT JOINED: 146:11, the alt-text block. Its board height of 80 is a Figma frame around children that OVERLAP — the label sits at top 6, the input spans 24→76, and the '✨ Generate' link is drawn at top 62, i.e. inside the input it is supposed to sit under. The dominant term in the 80 is that 52-tall input, which boards.json holds at authority=open:input-fill, so the container height is downstream of a control this board does not get to settle. Its label (146:12) IS joined and passes. 146:13 the input itself, same authority. 146:14 (w-129) and 146:15 are text-frame widths inside it.\n\n2838:12071 / 12076 / 12081 / 12086 — '✎ Rename', '🔗 Copy URL', '⤓ Download', '🗑 Delete' — are the MediaContextMenu's rows, drawn on this frame as the menu the grid opens over a card. They belong to board 1163:13695 (fullpage · unused-scope · context-menu), which measures MediaContextMenu directly, and joining them here would measure the same component twice against two frames. Likewise 633:3979, 1682:7215/7217 and 2865:21948/21950/21952 are hotspots, not drawn elements.\n\nCONTRAST, REPORTED NOT HIDDEN: one failure at 4.39:1 — 146:10's dimension line is --color/ink-muted #6B7280 on the preview well's --color/bg-subtle #F3F4F6. The board pins both halves of that pair, so conforming cannot fix it; it is the systemic ink-muted-on-tint defect (OPEN-DECISIONS #1), pre-existing here and not introduced by this pass.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-detail-hub",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-detail-preview"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-detail-panel",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "146:2"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "208:361"
+    },
+    {
+      "name": "back-row",
+      "testId": "media-detail-back",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "146:7"
+    },
+    {
+      "name": "preview",
+      "testId": "media-detail-preview",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "146:9"
+    },
+    {
+      "name": "dims",
+      "testId": "media-detail-dims",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "146:10"
+    },
+    {
+      "name": "alt-label",
+      "testId": "media-detail-alt-label",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "146:12"
+    },
+    {
+      "name": "row-used",
+      "testId": "media-detail-used",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "233:1254"
+    },
+    {
+      "name": "row-versions",
+      "testId": "media-detail-versions",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "233:1259"
+    },
+    {
+      "name": "row-edit",
+      "testId": "media-detail-edit",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "233:1264"
+    },
+    {
+      "name": "row-optimize",
+      "testId": "media-detail-optimize",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "233:1269"
+    },
+    {
+      "name": "row-replace",
+      "testId": "media-detail-replace",
+      "spec": "media-drill-in-asset-detail",
+      "nodeId": "233:1274"
+    }
+  ]
+}

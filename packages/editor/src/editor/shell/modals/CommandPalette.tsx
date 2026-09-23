@@ -156,6 +156,25 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     }
   );
 
+  // 4b. v3 IA doors (docs/plans/2026-09-14-editor-v3-ia.md Q8) — the two
+  // features that had no non-keystroke entry once the rail's ⋯ More went:
+  // the page-replace flow lives inside Templates, the cheat sheet behind `?`.
+  commands.push(
+    {
+      id: "templates-replace-layout",
+      label: "Replace page layout with template…",
+      group: "Pages",
+      handler: () => { composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {}); onClose(); },
+    },
+    {
+      id: "help-keyboard-shortcuts",
+      label: "Keyboard shortcuts",
+      group: "Help",
+      shortcut: "?",
+      handler: () => { composer.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); onClose(); },
+    },
+  );
+
   // 5. Registry-backed commands (S3.14 B8 fix). The CommandCenter holds ~39
   // commands the hardcoded list never surfaced — Export HTML/JSON, Open
   // Exporter, device switches — so ⌘K couldn't reach them. Append the ones not
@@ -216,7 +235,7 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
 // SHORTCUT BADGE
 // =============================================================================
 
-const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
+const ShortcutBadge: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
   const isMac =
     typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   const display = shortcut
@@ -225,8 +244,15 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
     .replace(/Alt/g, isMac ? "⌥" : "Alt");
 
   return (
-    /* gray-700 on the gray-200 chip: gray-500 measured 3.9:1 there (axe). */
-    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-[var(--bk-gray-200)] tw:text-[11px] tw:text-[var(--bk-gray-700)] tw:[font-family:var(--bk-font-mono)]">
+    /* Boards 166:9 / 166:14 / 166:17 / 303:1984 draw the chord as bare mono
+       text in --color/ink-muted at 11/16, not as a chip. The gray-200 chip it
+       shipped as needed gray-700 to clear AA against its own fill (3.9:1 with
+       gray-500, per axe); dropped onto the panel's white it is ink-muted at
+       4.83 and the note that justified the darker grey no longer applies. */
+    <span
+      data-testid={testId}
+      className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-mono)] tw:font-medium"
+    >
       {display}
     </span>
   );
@@ -238,6 +264,12 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
 
 /** One id for the listbox, so the input can point at it and at its rows. */
 const LIST_ID = "bk-cmdk-list";
+
+/** Fixed strip order — see `bands` below for why it cannot be emission order. */
+const BAND_ORDER = ["Recent", "Suggested", "Actions", "Go to"];
+
+/** Band name -> test-id suffix ("Go to" -> "go-to"). */
+const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer }) => {
   const [query, setQuery] = React.useState("");
@@ -283,6 +315,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
   // What actually renders: on an empty query, a "Recent" group of the last-run
   // commands is prepended (S3.14). Recents are clones (distinct object identity)
   // so list indexing stays correct even though they repeat a real command.
+  //
+  // A promoted command is MOVED, not copied. Board 166:2 draws "Open Insert
+  // panel" under RECENT and opens SUGGESTED at the NEXT command, and the two
+  // rows it would otherwise draw are indistinguishable: same label, same
+  // shortcut, same handler, one above the other. They were also literally the
+  // same anchor — `data-testid={`cmdk-row-${cmd.id}`}` resolved to two elements
+  // for every recent, which no measurement can address.
   const displayCommands = React.useMemo(() => {
     if (query.trim()) return filteredCommands;
     if (recentIds.length === 0) return commands;
@@ -290,7 +329,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
       .map((id) => commands.find((c) => c.id === id))
       .filter((c): c is PaletteCommand => Boolean(c))
       .map((c) => ({ ...c, group: "Recent" }));
-    return [...recents, ...commands];
+    const promoted = new Set(recents.map((c) => c.id));
+    return [...recents, ...commands.filter((c) => !promoted.has(c.id))];
   }, [query, filteredCommands, commands, recentIds]);
 
   // ai-offer: a query that matches nothing → offer the AI panel instead of a
@@ -327,23 +367,38 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     return cmd.group === "Navigation" ? "Go to" : "Actions";
   }, [query]);
 
-  const grouped = React.useMemo(() => {
-    const groups: Record<string, PaletteCommand[]> = {};
+  /* The strips render in a FIXED sequence, not in whatever order buildCommands
+     happens to emit. Board 303:1978 draws ACTIONS above GO TO for exactly the
+     query 166:27 draws (166:27's own two strips are both labelled GO TO, so
+     that frame cannot settle its own order); live drew GO TO first only
+     because the navigation commands are pushed first. */
+  const bands = React.useMemo(() => {
+    const groups = new Map<string, PaletteCommand[]>();
     let nonRecent = 0;
     for (const cmd of displayCommands) {
       const band = bandFor(cmd, cmd.group === "Recent" ? -1 : nonRecent++);
-      if (!groups[band]) groups[band] = [];
-      groups[band].push(cmd);
+      const list = groups.get(band);
+      if (list) list.push(cmd);
+      else groups.set(band, [cmd]);
     }
-    return groups;
+    const rank = (b: string) => {
+      const i = BAND_ORDER.indexOf(b);
+      return i === -1 ? BAND_ORDER.length : i;
+    };
+    return [...groups].sort(([a], [b]) => rank(a) - rank(b));
   }, [displayCommands, bandFor]);
+
+  /* What the arrow keys walk. It has to be the BANDED order, not
+     displayCommands' — reordering only the render would leave ArrowDown
+     stepping between strips instead of down the list you can see. */
+  const orderedCommands = React.useMemo(() => bands.flatMap(([, cmds]) => cmds), [bands]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex((i) => Math.min(i + 1, displayCommands.length - 1));
+          setSelectedIndex((i) => Math.min(i + 1, orderedCommands.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -351,9 +406,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           break;
         case "Enter":
           e.preventDefault();
-          if (displayCommands.length === 0 && query.trim()) askAI();
+          if (orderedCommands.length === 0 && query.trim()) askAI();
           else {
-            const cmd = displayCommands[selectedIndex];
+            const cmd = orderedCommands[selectedIndex];
             if (cmd) runCommand(cmd);
           }
           break;
@@ -363,7 +418,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           break;
       }
     },
-    [displayCommands, selectedIndex, onClose, query, askAI, runCommand]
+    [orderedCommands, selectedIndex, onClose, query, askAI, runCommand]
   );
 
   return (
@@ -380,16 +435,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           the dialog still open. Arrow keys and Enter had the same reach. On
           the panel it covers everything inside, and the input still receives
           it by bubbling. */}
+      {/* Boards 166:2 / 166:18 / 166:27 / 166:45 / 303:1978: the palette is a
+          bg-panel card on a --color/border edge at radius 12, not the
+          bg-subtle sheet it shipped as — the subtle fill made the band strips
+          invisible, since those are bg-subtle too. */}
       <div
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
+        data-testid="cmdk-palette"
         onKeyDown={handleKeyDown}
-        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
+        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
-        {/* Search row */}
+        {/* Search row — 56 tall on a gray-100 rule, 20px gutter (166:3/166:4) */}
         <div
-          className="tw:flex tw:items-center tw:h-13 tw:px-4 tw:gap-2.5 tw:border-b tw:border-[var(--bk-gray-200)]"
+          data-testid="cmdk-query"
+          className="tw:flex tw:items-center tw:h-14 tw:px-5 tw:gap-2.5 tw:border-b tw:border-[var(--bk-gray-100)]"
         >
           {/* Search icon */}
           <svg
@@ -425,10 +486,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             aria-controls={LIST_ID}
             aria-autocomplete="list"
             aria-activedescendant={
-              displayCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined
+              orderedCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined
             }
             aria-label="Type a command or search"
-            className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base"
+            data-testid="cmdk-input"
+            /* 16/24 in --color/ink (166:4). `text-base` already carries both;
+               the colour was flowbite's gray-900, one step off --bk-ink.
+               SEMIBOLD on -0.01em: all five palette boards draw the query row
+               in `Inter:Semi_Bold` at `tracking-[-0.16px]` (166:4, 166:20,
+               166:29, 166:47, 303:1980) — the `ui/16 · heading` style, which
+               is what --bk-tracking-tight resolves to at 16px. It shipped
+               regular, so the one line a reader types read lighter than the
+               13px rows under it. */
+            className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base tw:[&_input]:font-semibold tw:[&_input]:[letter-spacing:var(--bk-tracking-tight)] tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:placeholder:text-[var(--bk-ink-disabled)]"
           />
         </div>
 
@@ -440,42 +510,62 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           aria-label="Commands"
           className="tw:max-h-90 tw:overflow-y-auto tw:[scrollbar-width:thin] tw:[scrollbar-color:var(--bk-gray-200)_transparent]"
         >
-          {displayCommands.length === 0 ? (
+          {orderedCommands.length === 0 ? (
             query.trim() ? (
               // Boards 166:45 / 166:51 — a garbage query gets "nothing
               // matches"; a natural-language one gets the AI hand-off with the
               // diff-not-direct-writes explainer. Both route to the AI panel.
-              <div className="tw:px-4 tw:py-3.5" data-testid="cmdk-no-results">
-                {query.trim().split(/\s+/).length > 1 ? (
-                  <>
-                    <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                      That isn&rsquo;t a command — send it to AI?
-                    </div>
-                    <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-[var(--bk-ink-muted)]">
-                      AI proposes a diff and never writes directly. Apply lands as one undo step.
-                    </div>
-                  </>
-                ) : (
-                  <div className="tw:mb-2.5 tw:text-[13px] tw:text-[var(--bk-ink)]">
+              query.trim().split(/\s+/).length > 1 ? (
+                /* 166:51 (ai-offer) — not this agent's board; left as it ships. */
+                <div className="tw:px-4 tw:py-3.5" data-testid="cmdk-no-results">
+                  <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">
+                    That isn&rsquo;t a command — send it to AI?
+                  </div>
+                  <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-[var(--bk-ink-muted)]">
+                    AI proposes a diff and never writes directly. Apply lands as one undo step.
+                  </div>
+                  <Button
+                    onClick={askAI}
+                    data-idx={0}
+                    className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent-text)]"
+                  >
+                    <span aria-hidden="true">✨</span>
+                    Ask AI ›
+                  </Button>
+                </div>
+              ) : (
+                /* 166:48 — a 120-tall centred block: the miss in ink-muted,
+                   the offer under it as an accent text link. It shipped as a
+                   left-aligned ink line above a tinted ✨ chip; the board
+                   draws neither the fill nor the emoji, and DESIGN.md's
+                   anti-slop list bans the decorative glyph independently. */
+                <div
+                  className="tw:flex tw:h-30 tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-5 tw:text-center tw:text-[13px] tw:leading-5"
+                  data-testid="cmdk-no-results"
+                >
+                  <div
+                    data-testid="cmdk-no-results-line"
+                    className="tw:text-[var(--bk-ink-muted)]"
+                  >
                     Nothing matches &lsquo;{query.trim()}&rsquo;.
                   </div>
-                )}
-                <Button
-                  onClick={askAI}
-                  data-idx={0}
-                  className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent-text)]"
-                >
-                  <span aria-hidden="true">✨</span>
-                  {query.trim().split(/\s+/).length > 1 ? "Ask AI ›" : "Ask AI instead ›"}
-                </Button>
-              </div>
+                  <Button
+                    onClick={askAI}
+                    data-idx={0}
+                    variant="link"
+                    data-testid="cmdk-no-results-ai"
+                  >
+                    Ask AI instead ›
+                  </Button>
+                </div>
+              )
             ) : (
               <div className="tw:px-4 tw:py-6 tw:text-center tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
                 No commands found
               </div>
             )
           ) : (
-            Object.entries(grouped).map(([group, cmds]) => {
+            bands.map(([group, cmds]) => {
               return (
                 <div key={group}>
                   {/* Section header */}
@@ -483,16 +573,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                     /* A listbox may only own options and groups, so the band
                        label is the group's own name rather than a loose div. */
                     role="presentation"
-                    /* gray-600: these band labels are 11px on
-                       --bk-bg-subtle, where gray-500 measures 4.39:1 — under
-                       AA (axe, 6 nodes in this palette). */
-                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]"
+                    data-testid={`cmdk-band-${bandSlug(group)}`}
+                    /* 220:927 — 28 tall, 16px gutters, 8px gap, on a
+                       --color/bg-subtle strip. The COLOUR stays ink-soft
+                       against the board's ink-muted: 11px ink-muted on
+                       bg-subtle is 4.39:1 (axe flagged 6 nodes here), which is
+                       open decision #1 in FIGMA-TO-CODE/OPEN-DECISIONS.md and
+                       a Figma-side fix, not a call-site one. */
+                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:gap-2 tw:text-[11px] tw:leading-4 tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]"
                   >
                     {group}
                   </div>
                   {/* Items */}
                   {cmds.map((cmd) => {
-                    const globalIdx = displayCommands.indexOf(cmd);
+                    const globalIdx = orderedCommands.indexOf(cmd);
                     const isSelected = globalIdx === selectedIndex;
 
                     return (
@@ -505,8 +599,28 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
                         aria-disabled={cmd.disabled || undefined}
-                        className={`tw:flex tw:items-center tw:justify-between tw:w-full tw:h-11 tw:px-4 tw:gap-2.5 tw:rounded-none tw:border-0 tw:text-left ${
-                          isSelected ? "tw:bg-[var(--bk-accent-tint)]" : "tw:bg-transparent"
+                        data-testid={`cmdk-row-${cmd.id}`}
+                        /* A row is a quiet action on a transparent fill, which
+                           is what `ghost` means — and the reason it has to say
+                           so is measured, not stylistic. Without a variant this
+                           is flowbite's PRIMARY button: the `tw:bg-*` above
+                           overrides its resting fill through twMerge, but
+                           nothing overrode `enabled:hover:bg-primary-800`, so
+                           hovering any command row painted it `var(--bk-blue-800)` under a
+                           13px --bk-ink label — 1.97:1, well under AA, on the
+                           row the pointer is actually on. Boards 166:2/166:18/
+                           166:27/303:1978 draw no hover state at all, so the
+                           fix is free of them. The selected row keeps the
+                           accent tint ON hover as well, because mouseEnter is
+                           what selects it. */
+                        variant="ghost"
+                        /* 40 tall on a 20px gutter (166:7 / 166:8). `h-11` put
+                           44px rows under 28px band strips and pushed the
+                           third row off the board's own list height. */
+                        className={`tw:flex tw:items-center tw:justify-between tw:w-full tw:h-10 tw:px-5 tw:gap-2.5 tw:rounded-none tw:border-0 tw:text-left ${
+                          isSelected
+                            ? "tw:bg-[var(--bk-accent-tint)] tw:enabled:hover:bg-[var(--bk-accent-tint)]"
+                            : "tw:bg-transparent"
                         } ${cmd.disabled ? "tw:opacity-55 tw:cursor-default" : ""}`}
                       >
                         <div className="tw:flex tw:items-center tw:gap-2.5 tw:min-w-0">
@@ -518,7 +632,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                               {cmd.icon}
                             </span>
                           )}
-                          <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-sm tw:text-[var(--bk-ink)]">
+                          {/* 13/20 in --color/ink (166:8). `text-sm` is 14 —
+                              a step above every other list row in the shell. */}
+                          <span
+                            data-testid={`cmdk-label-${cmd.id}`}
+                            className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                          >
                             {cmd.label}
                           </span>
                           {cmd.disabled && cmd.disabledReason && (
@@ -527,7 +646,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                             </span>
                           )}
                         </div>
-                        {cmd.shortcut && <ShortcutBadge shortcut={cmd.shortcut} />}
+                        {cmd.shortcut && (
+                          <ShortcutBadge shortcut={cmd.shortcut} testId={`cmdk-kbd-${cmd.id}`} />
+                        )}
                       </Button>
                     );
                   })}

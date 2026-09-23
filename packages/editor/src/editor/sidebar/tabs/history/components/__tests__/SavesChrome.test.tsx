@@ -35,9 +35,9 @@ const HISTORY = [
 
 /* No default on `maxVersions` — passing `undefined` to a defaulted parameter
    would take the default and the no-cap case would silently test the cap. */
-const composerWith = (maxVersions?: number): Composer =>
+const composerWith = (maxVersions?: number, maxHistory?: number): Composer =>
   ({
-    history: { getHistoryStack: () => HISTORY },
+    history: { getHistoryStack: () => HISTORY, maxHistory },
     versions: { maxVersions },
   }) as unknown as Composer;
 
@@ -95,7 +95,7 @@ describe("SavesApproval — the band", () => {
 
 describe("SavesPruneNote — the retention rule", () => {
   it("reads the cap off the manager instead of hardcoding it", () => {
-    render(<SavesPruneNote composer={composerWith(20)} />);
+    render(<SavesPruneNote composer={composerWith(20)} filter="milestones" />);
     expect(
       screen.getByText("20 versions kept. Auto-saves prune oldest first; named ones never prune."),
     ).toBeInTheDocument();
@@ -103,13 +103,31 @@ describe("SavesPruneNote — the retention rule", () => {
 
   it("says nothing when the manager cannot report a cap", () => {
     // A number invented here is a claim about retention that nothing backs.
-    render(<SavesPruneNote composer={composerWith(undefined)} />);
+    render(<SavesPruneNote composer={composerWith(undefined)} filter="milestones" />);
     expect(screen.queryByText(/versions kept/)).toBeNull();
   });
 
   it("survives a composer that has no versions manager", () => {
-    render(<SavesPruneNote composer={{} as Composer} />);
+    render(<SavesPruneNote composer={{} as Composer} filter="milestones" />);
     expect(screen.queryByText(/versions kept/)).toBeNull();
+  });
+
+  /* Board 163:2 is the CHANGES filter, and its note is about the undo stack,
+     not about saved versions. The panel printed the versions sentence under
+     both filters, which promises a durability the undo stack does not have. */
+  it("states the session-only rule under the changes filter", () => {
+    render(<SavesPruneNote composer={composerWith(20, 100)} filter="changes" />);
+    expect(
+      screen.getByText(
+        "This session only — the last 100 steps, cleared when you reload. Save a version to keep a point.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/versions kept/)).toBeNull();
+  });
+
+  it("says nothing under the changes filter when no undo cap can be read", () => {
+    render(<SavesPruneNote composer={composerWith(20)} filter="changes" />);
+    expect(screen.queryByText(/This session only/)).toBeNull();
   });
 });
 

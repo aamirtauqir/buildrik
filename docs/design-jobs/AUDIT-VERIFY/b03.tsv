@@ -1,0 +1,75 @@
+N	1171:4820	Pages · settings · unsaved-warning (modal)	FRAME	100,19925,440,117	true	VERTICAL	3	true
+K	1171:4821	TEXT	116,19939,199,16	true		Discard unsaved SEO changes?
+K	1171:4822	TEXT	116,19965,408,26	true		You edited the page title and description but didn't save. Leaving this tab throws those e
+K	1171:4823	FRAME	116,20001,408,27	true	true	foot
+C	1171:4820	texts=4
+T	1171:4828	424,20008,88,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Discard changes	Discard changes
+T	1171:4826	326,20008,66,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Keep editing	Keep editing
+T	1171:4822	116,19965,408,26	11	Regular	true	HEIGHT	Pages · settings · unsaved-warning (modal)	You edited the page title and description but didn't save. Leaving this tab throws those e
+T	1171:4821	116,19939,199,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Pages · settings · unsaved-warning (modal)	Discard unsaved SEO changes?
+R	1171:4827	140:2	NAVIGATE	btn/Discard changes
+R	1171:4825	302:1978	NAVIGATE	btn/Keep editing
+N	1172:4840	Brand · review-changes (modal) — [not-implemented] for 11 of 14 token kinds; only colour, 	FRAME	100,43784,520,259	true	VERTICAL	9	true
+K	1172:4841	TEXT	116,43798,161,16	true		Review 3 staged changes
+K	1172:4842	FRAME	116,43824,488,28	true	true	chg
+K	1172:4846	FRAME	116,43862,488,28	true	true	chg
+K	1172:4850	FRAME	116,43900,488,28	true	true	chg
+K	1172:4854	FRAME	116,43938,488,28	true	true	[not-implemented] shadow/raised · removed — ReviewModal's two filters iterate the CURRENT 
+K	1172:4858	TEXT	116,43976,359,16	true		Applying updates every element bound to these tokens — 63 places.
+K	1172:4865	FRAME	116,44002,488,27	true	true	foot
+K	1670:7243	FRAME	100,43985,150,34	true	true	hotspot/back · Brand · dirty (Keep editing)
+K	1670:7245	FRAME	250,43985,130,34	true	true	hotspot/back · Brand · root (Apply / Discard all)
+C	1172:4840	texts=13
+T	1172:4864	504,44009,88,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Apply 4 changes	Apply 3 changes
+T	1172:4862	406,44009,66,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Keep editing	Keep editing
+T	1172:4860	319,44009,55,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Discard all	Discard all
+T	1172:4858	116,43976,359,16	11	Regular	true	WIDTH_AND_HEIGHT	Brand · review-changes (modal) — [not-implemented] for 11 of 14 token kinds; only colour, 	Applying updates every element bound to these tokens — 63 places.
+T	1172:4857	548,43944,46,16	11	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] shadow/raised · removed — ReviewModal's two filters iterate the CURRENT 	removed
+T	1172:4855	126,43944,78,16	11	Medium	true	WIDTH_AND_HEIGHT	[not-implemented] shadow/raised · removed — ReviewModal's two filters iterate the CURRENT 	shadow/raised
+T	1172:4853	550,43906,44,16	11	Regular	true	WIDTH_AND_HEIGHT	chg	24 → 32
+T	1172:4851	126,43906,55,16	11	Medium	true	WIDTH_AND_HEIGHT	chg	spacing/lg
+T	1172:4849	483,43868,111,16	11	Regular	true	WIDTH_AND_HEIGHT	chg	Inter 600 → Inter 700
+T	1172:4847	126,43868,70,16	11	Medium	true	WIDTH_AND_HEIGHT	chg	type/heading
+T	1172:4845	483,43830,111,16	11	Regular	true	WIDTH_AND_HEIGHT	chg	#1A56DB → #1E429F
+T	1172:4843	126,43830,66,16	11	Medium	true	WIDTH_AND_HEIGHT	chg	color/accent
+T	1172:4841	116,43798,161,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Brand · review-changes (modal) — [not-implemented] for 11 of 14 token kinds; only colour, 	Review 3 staged changes
+R	1670:7245	1333:7162	NAVIGATE	hotspot/back · Brand · root (Apply / Discard all)
+R	1670:7243	154:78	NAVIGATE	hotspot/back · Brand · dirty (Keep editing)
+R	1172:4863	1333:7162	NAVIGATE	btn/Apply 4 changes
+R	1172:4861	154:78	NAVIGATE	btn/Keep editing
+R	1172:4859	1333:7162	NAVIGATE	btn/Discard all
+N	1174:4849	Media · modal · replace-across · result-states	FRAME	100,29822,948,80	true	HORIZONTAL	4	true
+K	1174:4850	FRAME	100,29822,300,52	true	true	[no-producer] committing — replace-across is SYNCHRONOUS (5 samples at 400ms all read 'Rep
+K	1174:4854	FRAME	424,29822,300,60	true	true	result-clean
+K	1174:4857	FRAME	748,29822,300,80	true	true	result-partial
+K	1174:4864	FRAME	100,29782,320,34	true	false	hotspot/back · fullpage library
+C	1174:4849	texts=7
+T	1174:4862	800,29877,61,13	11	Medium	true	WIDTH_AND_HEIGHT	btns	Retry failed
+T	1174:4861	762,29877,30,13	11	Medium	true	WIDTH_AND_HEIGHT	btns	Close
+T	1174:4859	762,29857,96,12	10	Regular	true	WIDTH_AND_HEIGHT	result-partial	▸ Failed elements (1)
+T	1174:4858	762,29834,112,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	result-partial	2 replaced, 1 failed.
+T	1174:4856	438,29857,28,13	11	Medium	true	WIDTH_AND_HEIGHT	result-clean	Done
+T	1174:4855	438,29834,109,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	result-clean	Replaced 3 uses ✓
+T	1174:4851	114,29834,67,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	[no-producer] committing — replace-across is SYNCHRONOUS (5 samples at 400ms all read 'Rep	Replacing…
+R	1174:4864	1159:4593	NAVIGATE	hotspot/back · fullpage library
+N	1175:4827	Media · delete-confirm · bulk type-DELETE (>20)	FRAME	100,24734,440,214	true	VERTICAL	8	true
+K	1175:4828	TEXT	116,24748,106,17	true		Delete 34 files?
+K	1175:4829	FRAME	116,24775,408,25	true	true	in-use-warn
+K	1175:4831	TEXT	116,24810,130,13	true		Type DELETE to confirm:
+K	1175:4832	FRAME	116,24833,408,29	true	true	confirm-input
+K	1175:4834	FRAME	116,24872,408,39	true	true	foot
+K	1175:4840	TEXT	116,24921,277,13	true		Delete stays disabled until the word matches exactly.
+K	1175:4874	FRAME	100,24899,320,34	true	false	hotspot/back
+K	1671:7209	FRAME	100,24895,280,34	true	true	hotspot/back · Media · bulk-select
+C	1175:4827	texts=7
+T	1175:4840	116,24921,277,13	11	Regular	true	WIDTH_AND_HEIGHT	Media · delete-confirm · bulk type-DELETE (>20)	Delete stays disabled until the word matches exactly.
+T	1175:4839	435,24879,77,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Delete 34 files	Delete 34 files
+T	1175:4837	317,24879,37,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Cancel	Cancel
+T	1175:4833	126,24841,28,13	11	Regular	true	WIDTH_AND_HEIGHT	confirm-input	DELE
+T	1175:4831	116,24810,130,13	11	Medium	true	WIDTH_AND_HEIGHT	Media · delete-confirm · bulk type-DELETE (>20)	Type DELETE to confirm:
+T	1175:4830	126,24781,406,13	11	Regular	true	WIDTH_AND_HEIGHT	in-use-warn	⚠ 5 files are currently used on the canvas. Deleting will break those elements.
+T	1175:4828	116,24748,106,17	14	Semi Bold	true	WIDTH_AND_HEIGHT	Media · delete-confirm · bulk type-DELETE (>20)	Delete 34 files?
+R	1671:7209	145:300	NAVIGATE	hotspot/back · Media · bulk-select
+R	1175:4874	145:300	NAVIGATE	hotspot/back
+R	2865:21978	145:300	NAVIGATE	hotspot/btn · Cancel
+END	done=1171:4820|1172:4840|1174:4849|1175:4827	stopped=false	bytes=6437

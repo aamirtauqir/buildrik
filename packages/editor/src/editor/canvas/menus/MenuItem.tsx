@@ -34,6 +34,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
          reference as invalid (critical): the menu announced a focused item
          that, to an AT, was not there. */
       id={action.id}
+      data-testid={`canvas-ctx-item-${action.id}`}
       onClick={onClick}
       disabled={!enabled && !hasSubmenu}
       style={{
@@ -42,13 +43,22 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         justifyContent: "space-between",
         gap: 8,
         width: "100%",
-        padding: "8px 10px",
-        background: (isHovered || isHighlighted) && enabled ? CANVAS_COLORS.bgHover : "transparent",
+        /* 6/12 and 11px in `--color/ink-soft` — 1176:4868 / 4869 and their
+           twenty siblings on board 1176:4866. It shipped `8px 10px` at 13px in
+           full ink, which made every row of a twelve-row menu four pixels
+           taller and a size louder than the board draws it. */
+        padding: "6px 12px",
+        /* `--color/bg-selected` (1176:4872), not the accent at 15% alpha. The
+           two are close and not the same, and the board names a token. */
+        background: (isHovered || isHighlighted) && enabled ? "var(--bk-accent-tint)" : "transparent",
         border: "none",
-        color: enabled ? CANVAS_COLORS.textPrimary : CANVAS_COLORS.textMuted,
-        fontSize: 13,
+        color: enabled ? CANVAS_COLORS.textSecondary : CANVAS_COLORS.textMuted,
+        fontSize: 11,
         cursor: enabled ? "pointer" : "not-allowed",
-        borderRadius: 6,
+        /* 0: the board's rows are full-bleed 200-wide highlights inside a menu
+           whose own padding is vertical only, so a rounded row inside a
+           square-edged surface has nothing to round against. */
+        borderRadius: 0,
         textAlign: "left",
         transition: "background 0.12s ease",
       }}

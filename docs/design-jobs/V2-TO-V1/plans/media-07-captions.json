@@ -1,0 +1,81 @@
+[
+ {
+  "id": "155:33",
+  "board": "144:2 Media · grid",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-33 — THE STRUCTURAL PROBLEM: Media has two surfaces with unequal powers. This 280 drawer is the default (MediaTab → SlimLauncher, mounted at 320); the fullpage LibraryManager holds rename, folders, sort, single-asset delete, the richer stock browser and the per-asset context menu. Nothing in the drawer named the second one or explained why an action was missing. This pass closes the gap in the drawer where the code already can (Select, the folder menu with ＋ New folder, the four footer doors, rename/copy-URL/download/delete on the drill-in) and names the destination for the rest in the footer's second line. Decision recorded, NOT taken: make one surface canonical and the other a size of it.\n\nOPEN DECISION — the drawer has three widths and no token. This board draws 280. The panel mounts at 320 (SlimLauncher). LeftSidebar.css:231 overrides Media to 560, which V2 §11 measured and called 'a runtime override with no token'. The expanded drawer elsewhere is 700 (LeftSidebar.tsx:586-587), and SPEC-NAVIGATION proposes 560 while SPEC-PAGES-PANEL and SPEC-PUBLISH-PANEL draw 700. Not resolved here; the brief says draw 700 for the expanded drawer and file the 560 proposal as an open decision.",
+  "unresolved-text": true,
+  "why": "UX-H-33 + the shell-dimension conflict the brief forbids resolving silently.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:46",
+  "board": "147:55 Media · drill-in · stock-browser",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-04 — there are TWO stock browsers with different powers and which one you get depends on which Media surface you opened. This 280 overlay can only SAVE into the library; you must then find the asset in the grid and click it again to place it (StockBrowserOverlay.tsx:148, props :26-38 carry no onInsert). The 720 StockSourceModal can insert straight onto the canvas, switch provider, filter by colour and browse icons and fonts (MediaTab.tsx:232-255). Nothing tells the user the other exists. Recommendation: one component, two sizes, same actions.\n\nV2 UX-H-03 — the overlay is not wired to the failure flag at all: MediaTab.tsx:378-392 passes no searchFailed and StockBrowserOverlayProps declares none, while :243 passes one to the modal. Its three result states are now boarded separately (no-results / search-failed / not-configured).",
+  "unresolved-text": true,
+  "why": "UX-H-03 + UX-H-04.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:36",
+  "board": "145:96 Media · uploading",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-12 — an upload in flight could not be cancelled or dismissed: UploadZone.tsx:163-192 renders a name, a percent and a bar and no control at all, and state.dismissUpload is wired only in the fullpage manager (LibraryManager.tsx:379). A 48 MB video picked by accident occupied the footer until it finished or failed. Cancel added here, dismiss on the failed sibling.",
+  "unresolved-text": true,
+  "why": "UX-H-12.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:37",
+  "board": "145:148 Media · upload-failed",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-06 — the file picker offered more formats than the product can store: UploadZone.tsx:15 accepts image/*,video/* so an iPhone HEIC, an .avi and an .mkv all start uploading, and the server's allow-list is a closed set of eight media formats plus fonts (app/api/asset-upload/route.ts:31-49). The limit on this row is now the one the code enforces — 50 MB per file (UploadZone.tsx:16, route.ts:52), not the picker's 10 MB (MediaLibraryPanel.tsx:272), which remains unreconciled.\n\nStill missing: the PRE-upload rejection state — the red strip UploadZone.tsx:55-73 flashes for 4000ms with its two reasons — has no board (W-A-42).",
+  "unresolved-text": true,
+  "why": "UX-H-06 + the owed pre-upload rejection state.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:42",
+  "board": "146:2 Media · drill-in · asset-detail",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-10 — the one screen entirely about a single file offered no rename, no delete, no download and no copy-URL; its five rows were Used in / Versions / Edit image / Optimise / Replace across site (AssetDetailOverlay.tsx:415-465), while useMediaState.ts:379-381 exports renameItem and copyUrl to no consumer at all. Four rows added. Combined with UX-H-01 this is why a user who opened a file in the drawer and wanted it gone had to leave for the fullpage manager.\n\nV2 UX-H-09 — ✨ Generate fails in total silence: AssetDetailOverlay.tsx:270-289's catch body is a comment, so unconfigured, out-of-credit, rate-limited and provider-down are indistinguishable from 'the AI had nothing to say'. See the alt-generate-failed state board.",
+  "unresolved-text": true,
+  "why": "UX-H-09 + UX-H-10.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:40",
+  "board": "145:300 Media · bulk-select",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-01 — this state used to be entered by right-clicking an asset, a gesture the drawer stole from the per-asset menu (SlimLauncher.tsx:469-476 → MediaTab.tsx:352-355). Bulk selection now has its own ☑ Select control in the folder row, and right-click opens the menu MediaContextMenu.tsx already implements and MediaTab.tsx:16 imports without ever rendering.",
+  "unresolved-text": true,
+  "why": "UX-H-01.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": "155:35",
+  "board": "145:49 Media · folder-scoped",
+  "mode": "append-paragraph",
+  "text": "V2 UX-H-07 — the drawer's folder scope button was disabled whenever the library had no folders (SlimLauncher.tsx:255) and the drawer had no way to create one; folder creation lived only in the fullpage folder rail (LibraryManager.tsx:354, FolderTree.tsx:378). ＋ New folder… now sits in the drawer's own 📁 All ▾ menu.",
+  "unresolved-text": true,
+  "why": "UX-H-07.",
+  "howToApply": "This node's Figma NAME is 'caption/…', not its characters, so the current string was never read and no `expect` guard can be written. Read n.characters first, then set n.characters = had + '\\n\\n' + text. Refuse if `text` is already a substring."
+ },
+ {
+  "id": null,
+  "board": "2430:21365 Media · local-only assets",
+  "mode": "create-caption",
+  "unresolved-id": true,
+  "text": "AUTHOR a caption/<board name> TEXT node in section 1776:8372 directly below the board, matching the 280-wide caption run (x = board.x, y = board.y + 832).",
+  "why": "UX-H-11 — the board has no caption at all; ARR-A-07 flags the same hole for filter-empty."
+ },
+ {
+  "id": null,
+  "board": "1704:8514 Media · detail · filter-empty (of 145:49)",
+  "mode": "create-caption",
+  "unresolved-id": true,
+  "text": "AUTHOR a caption/<board name> TEXT node in section 1776:8372 directly below the board, matching the 280-wide caption run (x = board.x, y = board.y + 832).",
+  "why": "ARR-A-07 — the only 280-wide board in its row with no caption."
+ }
+]

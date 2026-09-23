@@ -1,0 +1,116 @@
+{
+  "surface": "b9-1-animation-editor-entrance-attention-exi",
+  "board": "B9.1 \u00b7 Animation editor \u2014 Entrance \u00b7 Attention \u00b7 Exit (Figma 429:2350)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=animation-editor",
+  "viewport": {
+    "width": 1120,
+    "height": 701
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "anim-chip-fadeIn"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "chip",
+      "testId": "anim-chip-fadeIn",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2362"
+    },
+    {
+      "name": "chip-label",
+      "testId": "anim-chip-fadeIn",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2363"
+    },
+    {
+      "name": "chip-3",
+      "testId": "anim-chip-fadeInDown",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2366"
+    },
+    {
+      "name": "chip-3-label",
+      "testId": "anim-chip-fadeInDown",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2367"
+    },
+    {
+      "name": "chip-selected-label",
+      "testId": "anim-chip-fadeInUp",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2365"
+    },
+    {
+      "name": "timing-label",
+      "testId": "anim-timing-label",
+      "spec": "b9-1-animation-editor-entrance-attention-exi",
+      "nodeId": "429:2390"
+    },
+    {
+      "name": "chip-selected",
+      "testId": "anim-chip-fadeInUp"
+    }
+  ],
+  "_note": [
+    "LEDGER J-429:2350 closed this row 2026-09-04 as 'already conformant \u2014",
+    "AnimationEditor already renders every element the board shows'. That was a",
+    "claim about the element LIST, and it holds (12 / 8 / 5 presets, three tabs,",
+    "the timing block). It was not a measurement, and two things were off.",
+    "",
+    "REACHED VIA PROBE: the editor takes `{animation, onChange}` and mounts with",
+    "no composer, so this is the shipping component with a real AnimationConfig.",
+    "The 320 host is the board's own card (429:2351) \u2014 the chip grid is",
+    "`repeat(3, 1fr)` inside the editor's 12 padding, so 320 is what makes a",
+    "chip 93 wide the way the board draws it. `fadeInUp` is selected because",
+    "429:2364 is the chip the board draws selected.",
+    "",
+    "BOARD WON, twice:",
+    "  429:2362  the preset chip is 40 tall. `padding: 12px 6px` on an 11px line",
+    "            box measured 37, and nothing pinned the height \u2014 so the moment",
+    "            a label wrapped, one chip in a row grew and the row lost its",
+    "            baseline. Now an explicit 40.",
+    "  429:2390  the TIMING label is 11 Semi Bold at 0.66 tracking. It shipped",
+    "            12px with no tracking.",
+    "",
+    "NOT CONFORMED \u2014 the SELECTED chip's fill, and this one needs a founder",
+    "ruling. 429:2364 fills it --flowbite/blue/500 #3F83F8 (and 429:2354 paints",
+    "the active tab's underline the same blue-500). The chip ships",
+    "--bk-accent #1A56DB. DESIGN.md is explicit and founder-locked: 'One accent",
+    "color: #1A56DB \u2026 One blue everywhere', and CLAUDE.md says not to deviate",
+    "from DESIGN.md without explicit approval. A board asking for a second blue",
+    "as a SELECTION fill is exactly the deviation that rule exists to catch, so",
+    "the accent stays and this is reported. The selected chip's LABEL (429:2365,",
+    "11px on --color/bg-card white) IS joined and passes \u2014 only the box is left",
+    "out, because a join compares every property of a node and the fill would",
+    "come with it.",
+    "",
+    "NOT JOINED \u2014 429:2353-2359, the tabs. chrome-ui `Tabs` is a shared",
+    "primitive; export-html-modal's recipe already records that its pill",
+    "treatment is cited to THREE boards (1172:4867, 1172:4825, 1164:4713). This",
+    "board draws a fourth reading \u2014 11px on a blue-500 2px underline instead of",
+    "13px on an accent-tint pill. One screen board does not re-settle it.",
+    "  429:2395/2401 the slider tracks \u2014 SliderField/Slider are shared, and the",
+    "  board's 272 track width is its 320 card's arithmetic, not a spec.",
+    "",
+    "THREE UNKNOWNS, not failures: the chip labels report line-height 15.7143px",
+    "against the board's `leading-[normal]`. flowbite's Button resolves `normal`",
+    "to a number; the board keeps the keyword. Same value, two spellings, and",
+    "the comparator cannot say so.",
+    "",
+    "FOUND, NOT FIXED: the board draws three cards side by side \u2014 Entrance,",
+    "Attention and Exit each with their own visible chip grid. The product shows",
+    "ONE card and a tab strip. That is the right call for a 300-wide inspector",
+    "(three 320 cards need 1040), and the board is a documentation layout of the",
+    "three tab states rather than three panels the product should ship. Recorded",
+    "so nobody reads the frame as a missing feature.",
+    "",
+    "ALSO FOUND: AnimationSection.tsx:156-170 renders a SECOND 'Generated CSS:'",
+    "block underneath the editor's own (AnimationEditor.tsx:198-213), so an",
+    "element with animation enabled shows the same declaration twice. Not visual",
+    "drift against this board \u2014 the board draws one \u2014 but it is what a user sees."
+  ]
+}

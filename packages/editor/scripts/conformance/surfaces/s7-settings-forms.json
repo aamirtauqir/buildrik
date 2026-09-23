@@ -1,0 +1,100 @@
+{
+  "surface": "s7-settings-forms",
+  "board": "S7 · Settings · Forms (Figma 640:3135)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-forms",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-form"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-provider",
+      "testId": "set-card-form",
+      "spec": "s7-settings-forms",
+      "nodeId": "640:3447"
+    },
+    {
+      "name": "card-provider-title",
+      "testId": "set-card-title-form",
+      "spec": "s7-settings-forms",
+      "nodeId": "640:3448"
+    },
+    {
+      "name": "field-provider",
+      "testId": "set-field-form",
+      "spec": "s7-settings-forms",
+      "nodeId": "640:3449"
+    },
+    {
+      "name": "field-provider-label",
+      "testId": "set-field-label-form",
+      "spec": "s7-settings-forms",
+      "nodeId": "640:3450"
+    },
+    {
+      "name": "card-submissions-title",
+      "testId": "set-card-title-submissions",
+      "spec": "s7-settings-forms",
+      "nodeId": "640:3464"
+    },
+    {
+      "name": "card-submissions",
+      "testId": "set-card-submissions"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE, in the board's own pane — `.bd-set-pane-body` at 824,",
+    "which is 760 (the card) plus its two 32 insets. Host and arithmetic settled",
+    "by s7-settings-general (638:2378); the ten S7 screens share one probe host",
+    "rather than ten.",
+    "The screen reads two tRPC procedures (forms.listBlocks, forms.listSubmissions),",
+    "so the fixture is one form block with a page of two submissions behind it —",
+    "enough that the picker and the inbox both render rather than the empty state.",
+    "",
+    "CONFORMANT ON THE CHASSIS: 17 properties. The card, its title, the field and",
+    "its 180 label column all match, and 0 contrast failures.",
+    "",
+    "THE JOIN IS HONEST BUT THE TWO SCREENS ARE NOT THE SAME SCREEN, and that is",
+    "the headline. The board's first card is PROVIDER — 'Form provider',",
+    "'Endpoint URL', 'Spam protection' — i.e. where form submissions are SENT.",
+    "Live's first card is 'Form': a picker that chooses which form block's inbox",
+    "to read. Both are one card with one leading field on the settled chassis, so",
+    "the CHASSIS properties are joined at 640:3447/3448/3449/3450 and they pass;",
+    "the IDENTITY is not the same and no rename would make it so. Recorded here",
+    "rather than dressed up: this board asks for a provider-configuration card the",
+    "product does not have, and the product ships a submissions inbox the board",
+    "only half draws.",
+    "",
+    "ANCHOR PINNED, copy left alone: the second card is 'Submissions (2)' live and",
+    "'SUBMISSIONS' on the board. The count is product data, so the title stands",
+    "and `Section` took an optional `anchor`; `set-card-submissions` no longer",
+    "changes with the row count. Its TITLE is joined to 640:3464 and passes.",
+    "",
+    "NOT JOINED, and why:",
+    "  640:3455 Field · Endpoint URL and 640:3459 Field · Spam protection — parts",
+    "  of the PROVIDER card above, which does not exist. A feature. REPORTED.",
+    "  640:3463 the SUBMISSIONS card BOX — 940 wide against the 760 above it.",
+    "  Live cards stretch inside `.bd-set-pane-body`, so one screen cannot hold",
+    "  both; the family's settled probe host is 824, fixed by s7-settings-general.",
+    "  640:3451 the Select — same shared SETTINGS_SELECT_THEME flagged on the",
+    "  Localization and Headers recipes (220x36, radius 8, gray-300, 10px",
+    "  gutters, agreed by three boards). Family-wide, flagged not taken.",
+    "",
+    "FOUND, NOT FIXED, and it is the biggest thing on this screen: the product's",
+    "own empty state says form capture is UNBUILT — 'A Form block renders on the",
+    "published page, but its submissions are not captured yet — this inbox stays",
+    "empty until that is wired'. The exported <form> carries no action and no",
+    "submit script, nothing creates a FormBlock row, and so this inbox can never",
+    "have a row in production. The board draws a working provider card, a working",
+    "inbox and a submissions table. Fifth board in this family drawing a feature",
+    "whose product version ships with a disclaimer — and this is the one where the",
+    "gap is the whole feature, not a caveat on it."
+  ]
+}

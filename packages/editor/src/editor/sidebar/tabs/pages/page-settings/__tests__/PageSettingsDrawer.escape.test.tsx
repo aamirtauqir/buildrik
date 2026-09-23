@@ -39,7 +39,7 @@ describe("PageSettingsDrawer — ESC", () => {
 
   it("stops a dirty drawer at the discard modal instead of closing", () => {
     const onClose = mount();
-    fireEvent.change(screen.getByLabelText("Title"), {
+    fireEvent.change(screen.getByLabelText("Meta title"), {
       target: { value: "Edited title" },
     });
     escape();

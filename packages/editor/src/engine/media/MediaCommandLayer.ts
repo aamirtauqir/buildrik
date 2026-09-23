@@ -98,13 +98,29 @@ export class MediaCommandLayer {
 
     /* Raw values, not the src helper's parsed form, so restore is exact. */
     const cleared: Array<{ element: Element; src?: string; bg?: string }> = [];
-    for (const element of this.composer.elements.findByMediaSrc(asset.src)) {
-      const src = element.getAttribute("src");
-      const bg = element.getStyle("background-image");
-      cleared.push({ element, src, bg });
-      if (src === asset.src) element.removeAttribute("src");
-      if (bg && bg.includes(asset.src)) element.setStyle("background-image", "none");
-    }
+    /* These writes must dirty the project and reach autosave, but must NOT
+       become an undo entry: the asset lives outside the snapshot, so a history
+       record of this clear would be an entry that restores the dead src and
+       not the file — measured live 2026-09-15, pressing Undo put the blob URL
+       back on an <img> whose asset was gone from the library for good. The
+       announce below was already after these writes and it still lost,
+       because the recorder is DEBOUNCED: it fired ~1s later and re-armed Undo.
+       So the writes go through runWithoutTracking; the dirty flag and autosave
+       read the same event through their own listeners and are unaffected. */
+    const untracked = (fn: () => void) => {
+      const h = this.composer.history;
+      if (h?.runWithoutTracking) h.runWithoutTracking(fn);
+      else fn();
+    };
+    untracked(() => {
+      for (const element of this.composer.elements.findByMediaSrc(asset.src)) {
+        const src = element.getAttribute("src");
+        const bg = element.getStyle("background-image");
+        cleared.push({ element, src, bg });
+        if (src === asset.src) element.removeAttribute("src");
+        if (bg && bg.includes(asset.src)) element.setStyle("background-image", "none");
+      }
+    });
     this.composer.history?.noteUnrecordedAction?.("deleting a file");
 
     let settled = false;
@@ -123,10 +139,14 @@ export class MediaCommandLayer {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        for (const { element, src, bg } of cleared) {
-          if (src !== undefined) element.setAttribute("src", src);
-          if (bg !== undefined) element.setStyle("background-image", bg);
-        }
+        /* The library's own undo, same rule: restoring the references is not
+           a user edit and must not seed the global stack either. */
+        untracked(() => {
+          for (const { element, src, bg } of cleared) {
+            if (src !== undefined) element.setAttribute("src", src);
+            if (bg !== undefined) element.setStyle("background-image", bg);
+          }
+        });
         trashed.restore();
       },
       commitNow: async () => {
@@ -156,16 +176,24 @@ export class MediaCommandLayer {
    * @param opts.x / opts.y        Page-space coordinates (image/video only).
    * @param opts.targetElementId   Replace this element's src instead of creating a new one.
    * @param opts.path              Telemetry tag: "click" or "drag".
+   * @param opts.alt               The asset's alt text, carried onto the element.
    */
   insertMediaAt(
     src: string,
     type: MediaInsertType,
-    opts?: { x?: number; y?: number; targetElementId?: string; path?: "click" | "drag" },
+    opts?: {
+      x?: number;
+      y?: number;
+      targetElementId?: string;
+      path?: "click" | "drag";
+      alt?: string;
+    },
   ): InsertResult | null {
     const result = this.composer.elements.insertMediaAt(src, type, {
       x: opts?.x,
       y: opts?.y,
       targetElementId: opts?.targetElementId,
+      alt: opts?.alt,
     });
 
     if (!result) {

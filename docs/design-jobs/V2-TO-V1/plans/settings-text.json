@@ -1,0 +1,559 @@
+[
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Analytics",
+  "expect": "Analytics",
+  "board": "1703:10515",
+  "boardName": "S7 · Settings · Analytics · validation",
+  "selector": {
+   "board": "1703:10515",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Analytics"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "board": "1702:7095",
+  "boardName": "S7 · Settings · Domains · empty",
+  "selector": {
+   "board": "1702:7095",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Domains"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "board": "1702:7261",
+  "boardName": "S7 · Settings · Domains · load-error",
+  "selector": {
+   "board": "1702:7261",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Domains"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "board": "1702:6931",
+  "boardName": "S7 · Settings · Domains · loading",
+  "selector": {
+   "board": "1702:6931",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Domains"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "board": "1702:7425",
+  "boardName": "S7 · Settings · Domains · save-error",
+  "selector": {
+   "board": "1702:7425",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Domains"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "640:3135",
+  "boardName": "S7 · Settings · Forms",
+  "selector": {
+   "board": "640:3135",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:9208",
+  "boardName": "S7 · Settings · Forms · action-error",
+  "selector": {
+   "board": "1703:9208",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:8882",
+  "boardName": "S7 · Settings · Forms · empty",
+  "selector": {
+   "board": "1703:8882",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:9046",
+  "boardName": "S7 · Settings · Forms · error",
+  "selector": {
+   "board": "1703:9046",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:9532",
+  "boardName": "S7 · Settings · Forms · inbox-empty",
+  "selector": {
+   "board": "1703:9532",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:9370",
+  "boardName": "S7 · Settings · Forms · inbox-loading",
+  "selector": {
+   "board": "1703:9370",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "board": "1703:8720",
+  "boardName": "S7 · Settings · Forms · loading",
+  "selector": {
+   "board": "1703:8720",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Forms"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "board": "640:2789",
+  "boardName": "S7 · Settings · Headers",
+  "selector": {
+   "board": "640:2789",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Headers"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "board": "1703:7760",
+  "boardName": "S7 · Settings · Headers · load-error",
+  "selector": {
+   "board": "1703:7760",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Headers"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "board": "1703:7606",
+  "boardName": "S7 · Settings · Headers · loading",
+  "selector": {
+   "board": "1703:7606",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Headers"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "board": "1703:7914",
+  "boardName": "S7 · Settings · Headers · save-error",
+  "selector": {
+   "board": "1703:7914",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Headers"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "board": "1703:7286",
+  "boardName": "S7 · Settings · Localization · load-error",
+  "selector": {
+   "board": "1703:7286",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Localization"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "board": "1703:7127",
+  "boardName": "S7 · Settings · Localization · loading",
+  "selector": {
+   "board": "1703:7127",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Localization"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "board": "1703:7445",
+  "boardName": "S7 · Settings · Localization · save-error",
+  "selector": {
+   "board": "1703:7445",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Localization"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "board": "640:2440",
+  "boardName": "S7 · Settings · Redirects",
+  "selector": {
+   "board": "640:2440",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Redirects"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "board": "1703:8232",
+  "boardName": "S7 · Settings · Redirects · empty",
+  "selector": {
+   "board": "1703:8232",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Redirects"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "board": "1703:8394",
+  "boardName": "S7 · Settings · Redirects · load-error",
+  "selector": {
+   "board": "1703:8394",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Redirects"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "board": "1703:8070",
+  "boardName": "S7 · Settings · Redirects · loading",
+  "selector": {
+   "board": "1703:8070",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Redirects"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "board": "1703:8556",
+  "boardName": "S7 · Settings · Redirects · save-error",
+  "selector": {
+   "board": "1703:8556",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Redirects"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "640:3849",
+  "boardName": "S7 · Settings · Webhooks",
+  "selector": {
+   "board": "640:3849",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "1703:9857",
+  "boardName": "S7 · Settings · Webhooks · empty",
+  "selector": {
+   "board": "1703:9857",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "1703:10352",
+  "boardName": "S7 · Settings · Webhooks · forbidden",
+  "selector": {
+   "board": "1703:10352",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "1703:10022",
+  "boardName": "S7 · Settings · Webhooks · load-error",
+  "selector": {
+   "board": "1703:10022",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "1703:9694",
+  "boardName": "S7 · Settings · Webhooks · loading",
+  "selector": {
+   "board": "1703:9694",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "board": "1703:10185",
+  "boardName": "S7 · Settings · Webhooks · save-error",
+  "selector": {
+   "board": "1703:10185",
+   "within": "^(pane header|panel header|header)$",
+   "type": "TEXT",
+   "rule": "the header's FIRST text node — the pane title, currently the bare section name",
+   "currentTextIsExpected": "Webhooks"
+  },
+  "idProvenance": "unresolved-id — COVER-1-01 names the header BUTTON ids literally but not the title text node. One read of the 30 header frames resolves all 30.",
+  "why": "COVER-1-01 + UX-I-31 — the pane title becomes the two-item breadcrumb DrillInHeader actually renders (breadcrumb={[GROUP_LABELS[current.group], current.title]}, SettingsTab.tsx:870-879), so the header stops being a third heading that repeats the section name."
+ },
+ {
+  "op": "text",
+  "id": null,
+  "unresolved_id": true,
+  "text": "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics snippets, web fonts, chat widgets, anything the editor has no field for. It ships with the site on every publish.",
+  "expect": "Upgrade your plan to unlock this feature.",
+  "board": "1138:13436",
+  "boardName": "S7 · Settings · Custom code · locked (Pro)",
+  "selector": {
+   "board": "1138:13436",
+   "type": "TEXT",
+   "rule": "the LockedScreen description line, currently the generic default",
+   "currentTextIsExpected": "Upgrade your plan to unlock this feature."
+  },
+  "idProvenance": "unresolved-id — no lane row names a node on 1138:13436. One read of that board resolves it.",
+  "why": "UX-I-38 (Major, dead-end) — two nav rows drill in with a full push animation to a card that never says what the feature is or does, so the upgrade decision is asked for with no information. LockedScreen already takes a per-screen `message` prop (LockedScreen.tsx:36,58) and nothing passes one; the board should draw the message that prop is for."
+ }
+]

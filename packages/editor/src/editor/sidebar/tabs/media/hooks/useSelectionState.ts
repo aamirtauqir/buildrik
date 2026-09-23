@@ -17,7 +17,11 @@ type ShowToast = (
 export function useSelectionState(
   composer: Composer,
   libraryItems: LibraryItem[],
-  showToast: ShowToast
+  showToast: ShowToast,
+  /** A file's family — the original and its saved versions (Clone 3695:45529),
+   *  as `useLibraryState.versionsOf`. Delete takes the whole family and warns
+   *  for every member's placements; absent, a key is its own family. */
+  versionsOf: (key: string) => LibraryItem[] = () => [],
 ): SelectionStateResult {
   const [selMode, setSelMode] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
@@ -31,7 +35,7 @@ export function useSelectionState(
      on. */
   const checkInUse = useCallback(
     (keys: string[]): AssetUsage[] => {
-      type ElNode = { getParent?: () => ElNode | null; id?: string };
+      type ElNode = { getParent?: () => ElNode | null; getId?: () => string; id?: string };
       const elements = composer.elements as unknown as {
         findByMediaSrc?: (src: string) => ElNode[];
       };
@@ -50,7 +54,12 @@ export function useSelectionState(
         /* Bounded: a cycle in the parent chain would hang the confirm dialog,
            and no tree in this product is anywhere near this deep. */
         for (let hops = 0; node && hops < 200; hops++) {
-          if (node.id && pageOfRoot.has(node.id)) return pageOfRoot.get(node.id)!;
+          /* The engine's Element answers getId(); its `id` is not a public
+             field — reading it found no page for any live placement, so the
+             confirms and the versions cards said "on the site" without a name
+             (seen 2026-09-14). The test doubles carry a bare `id`. */
+          const id = node.getId?.() ?? node.id;
+          if (id && pageOfRoot.has(id)) return pageOfRoot.get(id)!;
           node = node.getParent?.() ?? null;
         }
         return null;
@@ -72,12 +81,18 @@ export function useSelectionState(
         const found = elements.findByMediaSrc!(asset.src);
         if (found.length === 0) continue;
         const pages = [...new Set(found.map(pageFor).filter((n): n is string => Boolean(n)))];
-        usages.push({ name: asset.name ?? key, pages });
+        usages.push({ key, name: asset.name ?? key, count: found.length, pages });
       }
       return usages;
     },
     [composer]
   );
+
+  /* Clone 3695:19968 — the bulk bar's ✕ Clear empties the checked set and
+     STAYS in select mode ("Assets · List · no selection"); leaving the mode
+     is the toolbar's ☑. It used to leave, which threw the person back to the
+     grid one click after they had asked for checkboxes. */
+  const clearSelection = useCallback(() => setSelectedKeys(new Set()), []);
 
   const toggleSelMode = useCallback(() => {
     setSelMode((v) => {
@@ -146,43 +161,88 @@ export function useSelectionState(
     [anchorKey, libraryItems],
   );
 
+  /* The rows a file's delete takes: its saved versions, then itself. A
+     version is a hidden row (`versionOf`) that only `versionsOf` reaches, so
+     deleting the original alone would strand every version in storage; and
+     the site may be sitting on an APPLIED version (Clone 3697:20341), so the
+     confirm counts the family's placements under the file's name — not the
+     original's src alone, which would have called an in-use file unused. */
+  const familyKeys = useCallback(
+    (key: string): string[] => {
+      const family = versionsOf(key).map((v) => v.key);
+      return family.length > 0 ? [...family.slice(1), family[0]] : [key];
+    },
+    [versionsOf],
+  );
+
+  const familyUsage = useCallback(
+    (items: LibraryItem[]): AssetUsage[] =>
+      items.flatMap((item) => {
+        const members = checkInUse(familyKeys(item.key));
+        if (members.length === 0) return [];
+        return [
+          {
+            key: item.key,
+            name: item.name,
+            count: members.reduce((n, m) => n + m.count, 0),
+            pages: [...new Set(members.flatMap((m) => m.pages))],
+          },
+        ];
+      }),
+    [checkInUse, familyKeys],
+  );
+
   const requestDelete = useCallback(
     (key: string) => {
       const item = libraryItems.find((i) => i.key === key);
       if (!item) return;
-      const inUse = checkInUse([key]);
-      setConfirmDelete({ keys: [key], names: [item.name], inUseCount: inUse.length, inUse, isBulk: false });
+      const inUse = familyUsage([item]);
+      setConfirmDelete({ keys: [key], names: [item.displayName ?? item.name], inUseCount: inUse.length, inUse, isBulk: false });
     },
-    [libraryItems, checkInUse]
+    [libraryItems, familyUsage]
   );
 
   const requestBulkDelete = useCallback(
     (items: LibraryItem[]) => {
       const keys = items.map((i) => i.key);
-      const names = items.map((i) => i.name);
-      const inUse = checkInUse(keys);
+      const names = items.map((i) => i.displayName ?? i.name);
+      const inUse = familyUsage(items);
       setConfirmDelete({ keys, names, inUseCount: inUse.length, inUse, isBulk: true });
     },
-    [checkInUse]
+    [familyUsage]
   );
 
   const executeDelete = useCallback(async () => {
     if (!confirmDelete) return;
-    const { keys } = confirmDelete;
+    const { keys, names } = confirmDelete;
     /* Every delete goes through the grace path, and the ones that could not
-       be granted one (still uploading) have already happened the old way. */
+       be granted one (still uploading) have already happened the old way.
+       A file's versions go with it; the toast and its Undo count FILES. */
     const graced: NonNullable<Awaited<ReturnType<typeof composer.mediaOps.deleteWithGrace>>>[] = [];
-    for (const key of keys) {
-      try {
-        const g = await composer.mediaOps.deleteWithGrace(key);
-        if (g) graced.push(g);
-      } catch {
-        const item = libraryItems.find((i) => i.key === key);
-        showToast(`Could not delete "${item?.name ?? key}"`, "error");
+    let files = 0;
+    let gracedName = "";
+    for (const [i, key] of keys.entries()) {
+      let deleted = false;
+      for (const member of familyKeys(key)) {
+        try {
+          const g = await composer.mediaOps.deleteWithGrace(member);
+          if (g) {
+            graced.push(g);
+            deleted = true;
+          }
+        } catch {
+          showToast(`Could not delete "${names[i] ?? key}"`, "error");
+        }
+      }
+      if (deleted) {
+        files += 1;
+        gracedName = names[i];
       }
     }
     if (graced.length > 0) {
-      const what = graced.length === 1 ? `"${graced[0].name}"` : `${graced.length} files`;
+      /* The toast names the file the way the confirm did — the full display
+         name (Clone 3708:20446), not the engine's stem. */
+      const what = files === 1 ? `"${gracedName}"` : `${files} files`;
       const broke = graced.reduce((n, g) => n + g.usageCount, 0);
       showToast(
         broke > 0
@@ -195,7 +255,7 @@ export function useSelectionState(
     setConfirmDelete(null);
     setSelectedKeys(new Set());
     if (keys.length > 1) setSelMode(false);
-  }, [composer, confirmDelete, libraryItems, showToast]);
+  }, [composer, confirmDelete, showToast, familyKeys]);
 
   const cancelDelete = useCallback(() => setConfirmDelete(null), []);
 
@@ -212,5 +272,7 @@ export function useSelectionState(
     cancelDelete,
     shiftSelect,
     enterSelectModeWith,
+    checkInUse,
+    clearSelection,
   };
 }

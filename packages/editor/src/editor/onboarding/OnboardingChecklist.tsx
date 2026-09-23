@@ -13,7 +13,7 @@
  *   - Collapsed: thin header pill showing progress
  *   - Expanded: full accordion checklist, one active step at a time
  *   - Each step: click to expand → description + optional CTA button
- *   - Completed steps: green check, muted, collapses automatically
+ *   - Completed steps: accent-filled DS checkbox, muted, collapses automatically
  *   - Dismiss: inline "Are you sure?" confirmation (not permanent on first click)
  *   - Minimize: collapses to pill without confirming
  *
@@ -80,19 +80,31 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
       <div className={PILL} onClick={onRestore} role="button" tabIndex={0}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onRestore(); }}
         aria-label={`Get started — ${completedCount} of ${totalCount} complete. Click to expand.`}
+        data-testid="setup-chip"
       >
-        <span className={`${PILL_DOT} ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-accent)]"}`} />
-        <span className={PILL_TEXT}>
-          {allDone ? "All done!" : `${completedCount} / ${totalCount} done`}
+        <span
+          data-testid="setup-chip-dot"
+          className={`${PILL_DOT} ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-accent)]"}`}
+        />
+        {/* `2/7 done`, not `2 / 7 done` — board 1342:7169. The spoken form
+            ("2 of 7 complete") stays on the aria-label above, where it reads
+            correctly; the visible chip follows the board. */}
+        <span className={PILL_TEXT} data-testid="setup-chip-text">
+          {allDone ? "All done!" : `${completedCount}/${totalCount} done`}
         </span>
-        <ChevronUp size={12} className="tw:text-[var(--bk-ink-muted)] tw:flex-none" />
       </div>
     );
   }
 
   // ── Full panel ──────────────────────────────────────────────────────────
   return (
-    <div ref={containerRef} className={PANEL} role="region" aria-label="Getting started checklist">
+    <div
+      ref={containerRef}
+      className={PANEL}
+      role="region"
+      aria-label="Getting started checklist"
+      data-testid="checklist-panel"
+    >
       {/* Header */}
       <div className={HEADER}>
         {/* Boards 296:1999 / 296:2030 put the title and the counter on ONE
@@ -101,11 +113,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             stacked them as two lines and spelled the count out as
             "4 of 7 complete". The spoken form stays on the aria-label above,
             where it belongs; the visible one follows the board. */}
-        <div className="tw:flex tw:items-center tw:gap-2 tw:flex-1 tw:min-w-0">
-          <span className={`${HEADER_TITLE} tw:flex-1 tw:min-w-0 tw:truncate`}>
+        <div
+          className="tw:flex tw:items-center tw:gap-2 tw:flex-1 tw:min-w-0"
+          data-testid="checklist-header-row"
+        >
+          <span className={`${HEADER_TITLE} tw:flex-1 tw:min-w-0 tw:truncate`} data-testid="checklist-title">
             {allDone ? "You’re all set" : "Get started"}
           </span>
-          <span className={`${HEADER_COUNT} tw:flex-none`}>
+          <span className={`${HEADER_COUNT} tw:flex-none`} data-testid="checklist-count">
             {completedCount}/{totalCount}
           </span>
         </div>
@@ -118,6 +133,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             onClick={onMinimize}
             aria-label="Minimize checklist"
             title="Minimize"
+            data-testid="checklist-minimize"
           >
             <Minus size={13} />
           </Button>
@@ -126,7 +142,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           {confirmingDismiss ? (
             <div className="tw:flex tw:items-center tw:gap-1.5 tw:pl-1">
               <span className={CONFIRM_TEXT}>Hide this?</span>
-              <Button type="button" size="xs" className="tw:border-0 tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)] tw:text-[11px] tw:font-semibold" onClick={onDismiss}>
+              <Button type="button" size="xs" className="tw:border-0 tw:bg-[var(--bk-error-tint)] tw:hover:bg-[var(--bk-error)] tw:hover:text-[var(--bk-bg-panel)] tw:text-[var(--bk-error-text)] tw:text-[11px] tw:font-semibold" onClick={onDismiss}>
                 Yes
               </Button>
               <Button type="button" size="xs" color="light" className="tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:text-[11px]" onClick={() => setConfirmingDismiss(false)}>
@@ -156,7 +172,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
       </div>
       {/* Steps */}
       <ul className={LIST} aria-label="Onboarding steps">
-        {steps.map((step) => {
+        {steps.map((step, index) => {
           const isActive = activeStepId === step.id;
           const isCompleted = step.completed;
 
@@ -165,7 +181,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               key={step.id}
               className={[
                 "tw:[transition:var(--bk-transition-fast)] tw:border-l-2",
-                isCompleted ? "tw:opacity-55" : "tw:opacity-100",
+                /* Was `opacity-55` on a completed row. The boards draw those
+                   rows at FULL strength — the muted label and the filled box
+                   carry "done" — and the fade was a contrast failure NO
+                   instrument here can see: the sweep reads computed `color`,
+                   which is still `--bk-ink-muted`, while the pixels were that
+                   colour at 55% over white, i.e. 2.1:1. DESIGN.md: tints are never
+                   frame/alpha opacity. */
+                "tw:opacity-100",
                 isActive && !isCompleted
                   ? "tw:bg-[var(--bk-accent-subtle)] tw:border-l-blue-700"
                   : "tw:bg-transparent tw:border-l-transparent",
@@ -174,20 +197,28 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               {/* Step header row */}
               <Button
                 type="button"
-                className={STEP_ROW}
+                className={`${STEP_ROW} ${isCompleted ? STEP_ROW_NO_HOVER : STEP_ROW_HOVER}`}
                 onClick={() => onSetActiveStepId(isActive ? null : step.id)}
                 aria-expanded={isActive}
+                data-testid={`checklist-step-${index}`}
               >
-                {/* Circle indicator */}
+                {/* Box indicator — boards 296:1999 / 296:2030 draw the DS
+                    Checkbox: a 4px-radius square, accent-filled with a white
+                    tick once done, white with a `--bk-border-medium` hairline
+                    while pending. It was a green ROUND disc.
+                    ACTIVE is the one state the board has no opinion on (it
+                    draws a flat list, no accordion), and it must not read as
+                    done — so it is the accent OUTLINE, not the accent fill. */}
                 <span
-                  className={`${CIRCLE} ${
+                  className={`${BOX} ${
                     isCompleted
-                      ? "tw:bg-[var(--bk-success)] tw:border-[var(--bk-success)]"
+                      ? "tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]"
                       : isActive
-                        ? "tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]"
-                        : "tw:bg-transparent tw:border-[var(--bk-gray-300)]"
+                        ? "tw:bg-[var(--bk-bg-panel)] tw:border-[var(--bk-accent)]"
+                        : "tw:bg-[var(--bk-bg-panel)] tw:border-[var(--bk-border-medium)]"
                   }`}
                   aria-hidden="true"
+                  data-testid={`checklist-box-${index}`}
                 >
                   {isCompleted && <Check size={10} strokeWidth={3} color="var(--bk-accent-on)" />}
                 </span>
@@ -195,6 +226,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                 {/* Label */}
                 <span
                   className={`${STEP_LABEL} ${isCompleted ? "tw:text-[var(--bk-ink-muted)] tw:line-through" : "tw:text-[var(--bk-ink)] tw:no-underline"}`}
+                  data-testid={`checklist-label-${index}`}
                 >
                   {step.label}
                 </span>
@@ -235,8 +267,11 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
       {/* All-done footer */}
       {allDone && (
         <div className={FOOTER}>
+          {/* The same sentence board 430:2375 gives the achievement prompt, so
+              the two surfaces that congratulate the same user one screen apart
+              stop doing it in two different sets of words. */}
           <p className={FOOTER_TEXT}>
-            You have completed all the getting started steps. Go build something great.
+            You’ve finished every getting-started step. Go build something great.
           </p>
           <Button type="button" size="xs" color="light" className="tw:self-start tw:font-semibold" onClick={onDismiss}>
             Close checklist
@@ -297,29 +332,71 @@ const PANEL =
    `elementFromPoint` at its centre returned the FOOTER. Still below popovers
    (40), overlays (50) and modals (60), so the original rule holds: a dismissible
    progress helper does not outrank an open menu. */
+/* Board 1342:7167 draws the collapsed chip as a plate in the status bar, not a
+   card floating over it: 96x24, radius 12, `--color/accent-tint` fill,
+   `--color/accent-text` type at 12/medium, a 6px dot, and NO border and NO
+   shadow. What shipped was white with a gray-200 hairline and
+   `--bk-shadow-overlay`, i.e. a small floating card sitting in a band it is
+   supposed to belong to, with `--bk-ink` type a weight heavier than the board's.
+   The chevron went with it — the board draws dot + label only, and the
+   affordance is already carried by role=button, the pointer cursor and the
+   aria-label.
+   The 96 is board-literal and safe: every string this component can render
+   ("0/7 done" … "7/7 done", "All done!") measures under the 86px the padding
+   leaves. */
 const PILL =
-  `tw:fixed ${CHIP_RIGHT} tw:bottom-0.5 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-0.5 tw:bg-white ` +
-  "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  `tw:fixed ${CHIP_RIGHT} tw:bottom-1 tw:flex tw:h-6 tw:w-24 tw:items-center tw:gap-[6px] tw:pl-[10px] tw:pr-2 ` +
+  "tw:bg-[var(--bk-accent-tint)] tw:rounded-[12px] " +
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
-const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
-const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
+const PILL_DOT = "tw:size-1.5 tw:rounded-full tw:flex-none";
+const PILL_TEXT =
+  "tw:text-[12px] tw:leading-[normal] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap";
 const HEADER = "tw:flex tw:items-start tw:gap-2.5 tw:px-3.5 tw:pt-3.5 tw:pb-3";
-const HEADER_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)] tw:tracking-[-0.1px]";
-const HEADER_COUNT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
+/* 14 / 13, not 13 / 11 — boards 296:1999 and 296:2030 size the title and the
+   counter one step up from what shipped. */
+const HEADER_TITLE = "tw:text-[14px] tw:font-semibold tw:text-[var(--bk-ink)] tw:tracking-[-0.1px]";
+const HEADER_COUNT = "tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
+/* THE HOVER OVERRIDES ARE NOT DECORATION — see the block comment above
+   STEP_ROW. Without them these icon buttons turned flowbite primary-800 on
+   hover with `--bk-ink-muted` glyphs on top. */
 const ICON_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-6.5 tw:bg-transparent tw:border-0 tw:rounded-md " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] tw:hover:text-[var(--bk-ink)] " +
   "tw:text-[var(--bk-ink-muted)] tw:p-0 tw:[transition:var(--bk-transition-fast)]";
 const CONFIRM_TEXT = "tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap";
 const PROGRESS_TRACK = "tw:h-0.5 tw:bg-[var(--bk-gray-100)] tw:flex-none";
 const LIST = "tw:list-none tw:m-0 tw:py-1.5 tw:overflow-y-auto tw:flex-1";
+/* A HOVER OVERRIDE IS REQUIRED HERE, and the modifier has to be the bare
+   `hover:` one. Measured 2026-09-08: flowbite's default colour is
+   `bg-primary-700 text-white hover:bg-primary-800`, and `tw:bg-transparent`
+   only conflicts with the FIRST of those — so every one of these rows painted
+   itself flowbite primary-800 on hover while its label stayed
+   `--bk-ink-muted`: 1.86:1,
+   on the panel a first-run user is meant to read. `tw:enabled:hover:` would
+   NOT have fixed it; twMerge only drops the flowbite class when the modifier
+   chain matches too. */
 const STEP_ROW =
   "tw:flex tw:items-center tw:gap-2.5 tw:w-full tw:px-3.5 tw:py-2 tw:bg-transparent tw:border-0 " +
   "tw:text-left tw:text-inherit";
-const CIRCLE =
-  "tw:size-4.5 tw:rounded-full tw:border-[1.5px] tw:flex-none tw:flex tw:items-center tw:justify-center " +
+/* The wash is 6% ink and it is NOT applied to completed rows, which is a
+   contrast result rather than a preference: their label is the board's
+   `--color/ink-muted`, 4.83:1 on white, and 6% of ink under it drops that to
+   4.28 — under AA. Pending rows carry `--bk-ink` (15:1) and can afford it.
+   Nothing between 0 and 6% exists in the alpha scale. */
+const STEP_ROW_HOVER = "tw:hover:bg-[var(--bk-alpha-ink-06)]";
+const STEP_ROW_NO_HOVER = "tw:hover:bg-transparent";
+/* Was CIRCLE (`rounded-full`). The boards draw the DS Checkbox — square,
+   `--radius/sm` (4px). */
+const BOX =
+  "tw:size-4.5 tw:rounded-[var(--bk-radius-sm)] tw:border-[1.5px] tw:flex-none tw:flex tw:items-center tw:justify-center " +
   "tw:[transition:var(--bk-transition-fast)]";
-const STEP_LABEL = "tw:text-[13px] tw:font-medium tw:flex-1 tw:min-w-0 tw:leading-[1.35]";
+/* 14, and no explicit leading: the boards' label nodes are 14px on
+   `leading-[normal]`, and 13/1.35 was 17.55px against normal's ~16.9. */
+/* `leading-[normal]` is the board's value AND the only way to say it: the
+   row is a flowbite Button, whose size-md `text-sm` puts 20px on it and the
+   label inherits that. */
+const STEP_LABEL = "tw:text-[14px] tw:font-medium tw:leading-[normal] tw:flex-1 tw:min-w-0";
 const STEP_BODY = "tw:pt-0.5 tw:pr-3.5 tw:pb-3 tw:pl-[42px] tw:flex tw:flex-col tw:gap-2.5";
 const STEP_DESC = "tw:m-0 tw:text-xs tw:leading-relaxed tw:text-[var(--bk-ink-muted)]";
 const FOOTER = "tw:px-4 tw:pt-3 tw:pb-4 tw:border-t tw:border-[var(--bk-gray-200)] tw:flex tw:flex-col tw:gap-2.5";

@@ -140,11 +140,13 @@ export const StylesRouter: React.FC = () => {
     <div
       data-styles-router
       data-list-view
+      data-testid="brand-preset-list"
+      /* Flush and flush to the top: 306:2161 puts the first Preset row at the
+         back row's own baseline with no gap between rows. The 2px gap and the
+         8px top pad pushed six 44px rows 20px down the panel between them. */
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 2,
-        padding: "8px 0",
         minHeight: 0,
         overflowY: "auto",
       }}

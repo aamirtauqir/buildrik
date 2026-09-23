@@ -23,7 +23,7 @@ import type { Composer } from "../../../../engine/Composer";
 import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 export interface ComponentsSectionProps {
   composer: Composer | null;
@@ -44,16 +44,28 @@ const LIST = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
 /* Board 153:29 draws Components as a DRILL-IN LIST with a chevron per row, not
    the card grid with sketch previews this replaced. Same move Tokens and the
    Brand root already made — the whole panel is one nav model now. */
+/* `text-[13px]` on the ROW, not only on its label: 153:36 states 13/20 for the
+   whole row, and flowbite's Button base is `text-sm`. The label overrode it and
+   the trailing count did not, so the two halves of one row ran at two sizes. */
 const ROW =
-  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-11 tw:px-4 tw:py-0 " +
+  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-11 tw:px-4 tw:py-0 tw:text-[13px] tw:leading-5 " +
   "tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]";
 const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
   "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-[var(--bk-gray-50)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
 const CARD_NAME = "tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]";
 const CARD_META = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
-const AI_ROW = "tw:flex tw:flex-none tw:h-11 tw:items-center tw:px-4 tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:bg-white";
+/* `--color/accent-tint`, not white — 153:55. The board tints the whole 44px
+   strip, which is what separates the one action on this screen from the list
+   of things it acts on; on white it was a row that happened to have a sparkle. */
+const AI_ROW = "tw:flex tw:flex-none tw:h-11 tw:items-center tw:px-4 tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-accent-tint)]";
 const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
+/* What a user is told when AI is not switched on, phrased the way the blocked
+   Publish button phrases its own flag ("Publishing isn't switched on for this
+   workspace yet" — lifecycle.ts:105). It replaces what the service used to say
+   through this button: "no AIClient configured (stub the service in tests;
+   wire a real provider in production)". */
+const AI_UNAVAILABLE = "AI generation isn't switched on for this workspace yet";
 const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const SAVED_HEADER =
   "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
@@ -124,6 +136,26 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
 }) => {
   const savedComponents = React.useMemo(() => getSavedComponents(composer), [composer]);
 
+  /* One element for both states: the blocked CTA must be the same control the
+     board draws, differing only in whether it can be pressed. */
+  const aiCta = (
+    <Button
+      type="button"
+      color="light"
+      size="xs"
+      onClick={onOpenAIAssist ?? (() => {})}
+      aria-disabled={onOpenAIAssist ? undefined : "true"}
+      data-open-ai-assist
+      data-testid="brand-ai-cta"
+      /* 13/20 in `--color/accent-text` — 153:56. It took flowbite's `size="xs"`
+         12/16, so the one call to action on the screen was a size below the
+         rows it sat under. */
+      variant="link" className="tw:w-full tw:justify-start tw:gap-1.5 tw:font-normal tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)]"
+    >
+      ✨ Generate with AI
+    </Button>
+  );
+
   return (
     <div className={CONTAINER} data-components-catalog data-mode="summary">
       {/* Board 153:29 is a list and one CTA at its foot. The catalogue's own
@@ -142,13 +174,14 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
               key={component.id}
               color="light"
               data-catalog-card={component.id}
+              data-testid={`brand-comp-row-${component.id}`}
               className={ROW}
             >
               {/* One line per row, count at the right — the Brand panel's own
                   list grammar (152:2, 152:112, 153:2). */}
-              <span className={CARD_NAME}>{component.name}</span>
+              <span data-testid={`brand-comp-label-${component.id}`} className={CARD_NAME}>{component.name}</span>
               <span className="tw:ml-auto tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                <span className={CARD_META}>
+                <span data-testid={`brand-comp-meta-${component.id}`} className={CARD_META}>
                   {variantCount} variant{variantCount === 1 ? "" : "s"}
                   {instanceCount > 0 ? ` · ${instanceCount} in use` : ""}
                 </span>
@@ -161,27 +194,31 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
 
       {/* Board 153:29 pins ONE call to action at the foot of the list —
           "✨ Generate with AI" — where the code had a label, a bordered button
-          and a paragraph stacked in three rows. */}
-      <div className={AI_ROW} data-ai-assist-cta>
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={onOpenAIAssist}
-          disabled={!onOpenAIAssist}
-          data-open-ai-assist
-          variant="link" className="tw:w-full tw:justify-start tw:gap-1.5 tw:font-normal"
-        >
-          ✨ Generate with AI
-        </Button>
+          and a paragraph stacked in three rows.
+
+          No `onOpenAIAssist` means the `dsAi` flag is off, so no AIClient was
+          ever built (useComposerInit.ts:132) and pressing this reached
+          AIAssistService's "no AIClient configured" throw — a sentence written
+          for a developer, shown to a customer. Blocked, never hidden, and
+          `aria-disabled` rather than `disabled` so the control stays focusable
+          and the reason is reachable by keyboard (Topbar.tsx:295 does this for
+          the blocked Publish button). */}
+      <div className={AI_ROW} data-ai-assist-cta data-testid="brand-ai-row">
+        {onOpenAIAssist ? (
+          aiCta
+        ) : (
+          <Tooltip content={AI_UNAVAILABLE} placement="top" arrow={false}>
+            {aiCta}
+          </Tooltip>
+        )}
       </div>
 
-      <div className={SAVED_HEADER} data-saved-header>
+      <div className={SAVED_HEADER} data-saved-header data-testid="brand-saved-header">
         Your saved components · {savedComponents.length}
       </div>
 
       {savedComponents.length === 0 ? (
-        <div className={EMPTY_SAVED} data-saved-empty>
+        <div className={EMPTY_SAVED} data-saved-empty data-testid="brand-saved-empty">
           No saved components yet — save a selection from the canvas to start.
         </div>
       ) : (

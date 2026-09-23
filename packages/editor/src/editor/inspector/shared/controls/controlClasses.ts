@@ -71,10 +71,16 @@ export const SECTION_SUBTITLE =
  * keyboard path the CSS version never had.
  */
 export const CHAIN_ROW = "tw:group tw:relative tw:flex tw:items-center";
+/* `enabled:hover:bg-transparent` is not decoration. This is a flowbite Button,
+   whose own `enabled:hover:bg-primary-800` is a HOVER variant — a bare
+   `tw:bg-transparent` never contests it. MEASURED on the breakpoint-override
+   run: hovering the chain button painted it flowbite primary-800 and left the glyph on
+   --bk-ink, 1.97:1 against a 3.0 floor for a 12px icon. The button is only
+   VISIBLE on hover, so the unreadable state was the only state anyone sees. */
 export const CHAIN_TRIGGER =
   "tw:flex tw:items-center tw:flex-none tw:p-0.5 tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-muted)] " +
   "tw:opacity-0 tw:transition-opacity tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 " +
-  "tw:focus-visible:opacity-100 tw:hover:text-[var(--bk-ink)]";
+  "tw:focus-visible:opacity-100 tw:enabled:hover:bg-transparent tw:hover:text-[var(--bk-ink)]";
 /** The chain button once a token IS bound — always visible, accent-tinted. */
 export const CHAIN_BOUND =
   "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +

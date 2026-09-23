@@ -361,8 +361,12 @@ describe("CommandPalette", () => {
       // Second mount reads recents → a Recent group with Undo, before the rest.
       renderPalette();
       expect(screen.getByText("Recent")).toBeInTheDocument();
-      // Undo now appears twice: once under Recent, once under its real group.
-      expect(screen.getAllByText("Undo").length).toBeGreaterThanOrEqual(2);
+      /* MOVED, not copied. This asserted "at least twice" until 2026-09-08;
+         board 166:2 draws the promoted command once, under RECENT, and opens
+         SUGGESTED at the next one. Two rows with the same label, shortcut and
+         handler also shared one `data-testid`, so nothing could address
+         either. */
+      expect(screen.getAllByText("Undo")).toHaveLength(1);
     });
 
     it("no Recent group when nothing has run yet", () => {

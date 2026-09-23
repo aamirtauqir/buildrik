@@ -1,0 +1,72 @@
+{
+  "slug": "brand",
+  "covers": ["VIS-1-22", "VIS-2-13", "VIS-3-30"],
+  "note": "measured render defects on boards inside my four sections. Board ids are confirmed against my 05:07 census; child ids are resolved from local files where a quoted string identifies them, and marked unresolved otherwise.",
+
+  "rows": [
+    {
+      "ref": "V1",
+      "finding": "VIS-1-22",
+      "severity": "Major",
+      "board": "154:2",
+      "board_name": "Brand · lint",
+      "board_confirmed": "yes — 280x812, 12 TEXT, 11 bound, at 1660,4578 in 1776:8373",
+      "defect_a": {
+        "node": "154:25",
+        "id_source": "RESOLVED FROM A LOCAL FILE, not read from Figma. The applied plan-text-B.json set 154:25 to 'Auto-fix isn't available yet — the linter reports what is wrong, not what to replace it with. Edit the token in Tokens.' VIS-1-22 quotes the clipped render as '…not what to replace it with. Edit' and then nothing. Same string, same node.",
+        "what": "the closing note is cut off mid-sentence at the frame's bottom-right — the sentence runs past the text frame",
+        "fix": "grow the note's frame by one line (about 18px) so the full sentence renders. Do NOT shorten the string to end at '…not what to replace it with.' — the sentence's second half is the actionable half, and FIG-F-14 put it there on purpose.",
+        "guard": "if growing the frame pushes it past the board's 812 bottom, take the height out of the spacer above it, not out of the sentence."
+      },
+      "defect_b": {
+        "node": "154:17",
+        "id_source": "RESOLVED FROM A LOCAL FILE. plan-text-B.json set 154:17 to 'Banned hue — purple, violet or indigo · color-accent', which VIS-1-22 quotes verbatim as the row that breaks to four ragged lines against the 'Open' action.",
+        "what": "the issue-row detail text wraps against the 'Open' action instead of clearing it",
+        "fix": "give the issue-row detail text a 48px right inset",
+        "conflict_to_resolve_first": "FIG-F-12's truth is that the shipped lint rows have NO control of any kind — no 'Fix', no 'Open'. If the 'Open' action has already been removed from 154:2 by that fix, the 48px inset is wrong and the text should simply run to the row's full width. READ THE ROW before insetting."
+      }
+    },
+    {
+      "ref": "V2",
+      "finding": "VIS-2-13",
+      "severity": "Major",
+      "board": "306:2161",
+      "board_name": "[not-implemented] Brand · presets · draft",
+      "board_confirmed": "yes — 280x812, 15 TEXT, 13 bound, at 1300,5961 in 1776:8373",
+      "what": "a 'Draft preset' pill is drawn on top of an existing dark heading; only the ascenders of the word behind it show above the pill. The pill was added absolutely into a stack that already had a label at that y.",
+      "pill_node": { "unresolved-id": true, "selector": "the INSTANCE or FRAME inside 306:2161 whose child TEXT reads 'Draft preset'" },
+      "heading_node": { "unresolved-id": true, "selector": "the TEXT inside 306:2161 that the pill's bounding box partially covers — VIS-2-13 reports it starts with 'D'" },
+      "fix": "put the pill on the same baseline as the label with a horizontal gap (pill.x = label.right + 8). If that overflows the 280 panel, push the pill into its own row 24px down and shrink the list below by 24.",
+      "do_not": "if the parent is auto-layout, make the pill a sibling ROW rather than an absolute child — an absolute child in an auto-layout stack is how this happened.",
+      "tooling_note": "VIS-2-32 records that render-defects.mjs cannot see this class at all: its OVERPRINT check filters BOTH sides to TEXT (render-defects.mjs:118), so a pill-over-text pair is structurally invisible to it. Do not treat a clean render-defects sweep as proof this is fixed — read the two nodes' boxes."
+    },
+    {
+      "ref": "V3",
+      "finding": "VIS-3-30",
+      "severity": "Major",
+      "board": "642:2832",
+      "board_name": "Templates · applying",
+      "board_confirmed": "yes — 1440x900, 109 TEXT, 87 bound, at 4780,220 in 1084:4527",
+      "node": "642:2928",
+      "node_name": "Canvas toolbar (floating)",
+      "id_source": "from the VIS-3 lane row, not read by me",
+      "what": "the toolbar is 760x40 but its contents span y=-8 to y=48 — 56px of content in a 40px pill, 8px proud top AND bottom, so the chips print outside the white rounded background on both edges. The frame's own name says 'wraps when tight', so the two-row wrap is intended and the height was never grown for it.",
+      "fix": [
+        "642:2928: height 40 → 80, y 740 → 700 (keeps the same bottom edge)",
+        "then shift children down 16: row-1 groups y -8 → 8, row-1 dividers y -4 → 12, row-2 groups y 20 → 44, row-2 divider y 24 → 48",
+        "content then spans 8..72 inside 80"
+      ],
+      "sibling_check": "the SWEEP-FULL cache reports the identical CONTAINER defect ('Canvas toolbar (floa…' bottom +8, top +8) on 642:2556 Templates · preview (node 642:2652), on 807:4299 (node 807:4330) and on 807:6694 (node 807:6778). Same toolbar, same class, three more boards. Fix all four or the family disagrees with itself."
+    }
+  ],
+
+  "also_cached_in_SWEEP-FULL_for_my_sections_not_yet_planned": {
+    "1084:4527": [
+      "807:7252 S1.3b · new-page · template-picker — six template-card frames each overflow their container by 9px (807:7280/7282/7284/7286/7288/7290) and each card's TEXT overprints by 9 (807:7281/7283/7285/7287/7289/7291). One card recipe, six instances: fix the card, not the six.",
+      "778:4102 Templates · loading (RETIRED) — 4 CONTAINER + 4 OUT defects. RETIRED board; fix only if it stays on the page.",
+      "813:4489 S1.1e · template-preview — 1711:8404 'modal/1100 · templat…' overflows bottom by 72",
+      "807:6694 S1.1d — 'Canvas' bottom +195, 'canvas viewport' ±14, 'selection box' top +18"
+    ],
+    "status": "IDENTIFIED, NOT PLANNED — these came from the cached SWEEP-FULL-2026-09-06.txt, not from a read I took, and I could not re-measure them. Each needs a measurement before a fix."
+  }
+}

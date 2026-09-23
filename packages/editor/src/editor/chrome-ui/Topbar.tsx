@@ -35,7 +35,12 @@ import { Presence, type PresenceProps } from "./Presence";
    the primary CTA at 32px with 13px medium text. The omission was the only
    reason it stood 8px taller than the design and than the bar's own rhythm.
    Stated once here so the two branches cannot drift apart again. */
-const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-5 tw:text-[13px] tw:font-medium";
+/* 680:22 on all three topbar frames (681:26, 682:4576, 682:4651): 32 tall,
+   16 horizontal, a 14/20 label. It shipped 20 horizontal and 13. The 10px
+   VERTICAL the boards also declare is nominal — 10 + a 20 line + 10 is 40 and
+   the same node fixes its height at 32 — so it is carried as a box-model value
+   the explicit height overrides, which is what Figma is doing too. */
+const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -110,8 +115,12 @@ export interface TopbarProps {
       not operating. */
   save?: SaveState;
   savedAt?: number;
-  /** Save now — turns the save pill into a button for the states worth retrying. */
-  onSave?: () => void;
+  /** The save pill's click — the container routes it by state (B2): History
+   *  for saved/saving/unsaved, a retry for error, the recovery dialog for a
+   *  conflict. Omit for offline, where `saveHint` carries the reason. */
+  onSaveClick?: () => void;
+  /** The tooltip on a pill with nothing to click (offline). */
+  saveHint?: string;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments · IssueChip. */
@@ -174,7 +183,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
+  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
   publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
 }: TopbarProps) {
@@ -198,13 +207,19 @@ export function Topbar({
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
     >
-      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS}>
+      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS} data-testid="topbar-exit">
         {exitLabel}
       </Button>
 
+      {/* 680:11 on all three topbar frames — 681:26 (which shell-default
+          measures) and 682:4576 / 682:4651 on the S5 flow frames — is a FIXED
+          200 column at 14/20. It shipped 13px in a 120..200 elastic box, so
+          the site's own name read at the size of the controls around it and
+          the whole bar re-laid itself when the name changed length. */}
       <span
-        className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:max-w-[200px] tw:min-w-[120px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
+        className="tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)] tw:w-[200px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
         title={siteName}
+        data-testid="topbar-site-name"
       >
         {siteName}
       </span>
@@ -212,7 +227,7 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
 
       {liveUrl ? (
         <a
@@ -238,6 +253,7 @@ export function Topbar({
       {review ? (
         <ReviewBadge {...review} />
       ) : null}
+
 
       <span className="tw:flex-1" />
 
@@ -327,6 +343,7 @@ export function Topbar({
             size="xs"
             title={ctaHint}
             className={PUBLISH_BTN_CLASS}
+            data-testid="topbar-publish"
           >
             {ctaLabel ?? PUBLISH_LABEL[publish]}
           </Button>
@@ -342,16 +359,15 @@ const REVIEW_BASE_CLASS =
   "tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
   "tw:text-xs tw:font-medium tw:whitespace-nowrap";
 
-/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
-   information, not instructions: they sit on gray so the bar's colour budget
-   stays with the two signals that gate a publish (Issues chip, save trouble).
-   Only "Changes requested" — the one review state that blocks — keeps amber.
-   `info` and `success` are visually identical by design (same neutral
-   surface); only `warning` gets its own look. */
+/* Board B3-01 7569:190283, decision #26 (C2): tones via the status tokens —
+   warning-tint for Changes requested, success-tint for Approved, neutral
+   otherwise. (T8/D7 rule 3 had `success` on the neutral surface; the chip
+   set's tone variants were drawn since, and the container still demotes a
+   warning chip to neutral when two louder ambers are on the bar.) */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
   info: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  success: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  warning: "tw:bg-yellow-50 tw:text-yellow-800",
+  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
+  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
 };
 
 /* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
@@ -365,8 +381,8 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
   const className = `${REVIEW_BASE_CLASS} ${REVIEW_TONE_CLASS[tone]}`;
   if (!onClick) {
     return (
-      <span className={className} title={title ?? label}>
-        <span className={REVIEW_LABEL_CLASS}>{label}</span>
+      <span className={className} title={title ?? label} data-testid="topbar-review-pill">
+        <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
       </span>
     );
   }
@@ -376,8 +392,9 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       className={`${className} tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
       title={title ?? label}
       onClick={onClick}
+      data-testid="topbar-review-pill"
     >
-      <span className={REVIEW_LABEL_CLASS}>{label}</span>
+      <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
     </button>
   );
 }

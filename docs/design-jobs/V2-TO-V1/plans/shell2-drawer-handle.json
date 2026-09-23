@@ -1,0 +1,222 @@
+{
+ "note": "UX-F-15's drag handle — the half the first shell pass left undrawn (its report says so: “the open decision is drawn, the drag handle is not”). Placement read back 2026-09-07: section 1776:8385 is 7880x7020 with 54 children; the y=6640 row holds 2844:12149 (100..1100), 2844:12158 (1220..2220) and 2844:12186 (2340..3060), and its captions sit on y=6956. (3180,6640) 1000x300 is the next free slot in that row, 120px clear of the board on its left and 3700 clear of the section's right edge.",
+ "page": "1:3",
+ "section": "1776:8385",
+ "boards": [
+  {
+   "name": "Drawer · width steps and the drag handle (280 ↔ 700)",
+   "x": 3180,
+   "y": 6640,
+   "w": 1000,
+   "h": 300,
+   "bg": "#FFFFFF",
+   "caption": {
+    "y": 6956,
+    "w": 1000,
+    "text": "caption/Drawer · width steps and the drag handle — the drawer ships exactly two widths and no way to choose between them (LeftSidebar.tsx:580-587). 700 is drawn per the arc decision; 560 is an open decision on 2844:12186, not a third width drawn here. (UX-F-15)"
+   },
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 968,
+     "v": "Drawer · width steps and the drag handle",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 40,
+     "w": 968,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 56,
+     "w": 360,
+     "v": "280 · default",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 76,
+     "w": 15,
+     "h": 36,
+     "fill": "#E5E7EB",
+     "n": "rail"
+    },
+    {
+     "t": "rect",
+     "x": 31,
+     "y": 76,
+     "w": 70,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "n": "drawer 280"
+    },
+    {
+     "t": "rect",
+     "x": 101,
+     "y": 76,
+     "w": 200,
+     "h": 36,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "n": "canvas"
+    },
+    {
+     "t": "rect",
+     "x": 301,
+     "y": 76,
+     "w": 75,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "n": "inspector 300"
+    },
+    {
+     "t": "rect",
+     "x": 99,
+     "y": 76,
+     "w": 2,
+     "h": 36,
+     "fill": "#1A56DB",
+     "n": "handle"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 120,
+     "w": 360,
+     "v": "700 · expanded",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 138,
+     "w": 15,
+     "h": 36,
+     "fill": "#E5E7EB",
+     "n": "rail"
+    },
+    {
+     "t": "rect",
+     "x": 31,
+     "y": 138,
+     "w": 175,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "n": "drawer 700"
+    },
+    {
+     "t": "rect",
+     "x": 206,
+     "y": 138,
+     "w": 95,
+     "h": 36,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "n": "canvas"
+    },
+    {
+     "t": "rect",
+     "x": 301,
+     "y": 138,
+     "w": 75,
+     "h": 36,
+     "fill": "#F3F4F6",
+     "n": "inspector 300"
+    },
+    {
+     "t": "rect",
+     "x": 204,
+     "y": 138,
+     "w": 2,
+     "h": 36,
+     "fill": "#1A56DB",
+     "n": "handle"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 186,
+     "w": 360,
+     "v": "The 2px edge is the handle — drag to any width, double-click to reset. There is no resize affordance in the sidebar today: LeftSidebar.tsx and .css carry no resize, onMouseDown or drag.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 56,
+     "w": 464,
+     "v": "What 700 costs at 1440",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 76,
+     "w": 464,
+     "v": "60 rail + 700 drawer + 300 inspector = 1060, so the canvas lane is 380 while the page frame’s floor is 1024 (canvasStyles.ts:57). Expanding a panel to read it pushes the page being edited into heavy horizontal scroll, and the only way back is the same toggle. Say what it costs, or re-fit.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 152,
+     "w": 464,
+     "v": "Two panels ignore the toggle",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 170,
+     "w": 464,
+     "v": "Media sets 560 and Templates 700 from runtime events (LeftSidebar.tsx:580-587), so three widths ship from two controls. One control, one remembered width.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 214,
+     "w": 464,
+     "v": "The step in between is filed, not drawn",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 520,
+     "y": 232,
+     "w": 464,
+     "v": "SPEC-NAVIGATION §5.2 proposes 560; SPEC-PAGES-PANEL and SPEC-PUBLISH-PANEL draw 700, and LeftSidebar.tsx:586-587 does 700. 700 is drawn; 560 stays filed on Shell · open decisions (2844:12186). (UX-F-15)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ]
+  }
+ ]
+}

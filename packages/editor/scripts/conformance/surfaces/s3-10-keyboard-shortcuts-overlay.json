@@ -1,0 +1,129 @@
+{
+  "surface": "s3-10-keyboard-shortcuts-overlay",
+  "board": "S3.10 \u00b7 keyboard-shortcuts-overlay (Figma 815:4518)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=keyboard-shortcuts",
+  "viewport": {
+    "width": 640,
+    "height": 934
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "kb-search"
+    }
+  ],
+  "contrastScope": "[data-testid=\"panel-modal\"]",
+  "targets": [
+    {
+      "name": "group-edit",
+      "testId": "kb-group-edit",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4524"
+    },
+    {
+      "name": "label-undo",
+      "testId": "kb-label-undo",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4526"
+    },
+    {
+      "name": "badge-undo",
+      "testId": "kb-badge-undo",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4531"
+    },
+    {
+      "name": "badge-redo",
+      "testId": "kb-badge-redo",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4534"
+    },
+    {
+      "name": "label-copy",
+      "testId": "kb-label-copy",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4535"
+    },
+    {
+      "name": "badge-copy",
+      "testId": "kb-badge-copy",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4537"
+    },
+    {
+      "name": "label-paste",
+      "testId": "kb-label-paste",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4538"
+    },
+    {
+      "name": "badge-paste",
+      "testId": "kb-badge-paste",
+      "spec": "s3-10-keyboard-shortcuts-overlay",
+      "nodeId": "815:4540"
+    },
+    {
+      "name": "search",
+      "testId": "kb-search"
+    }
+  ],
+  "_note": [
+    "WHOSE BOARD THIS IS: LEDGER 2026-09-02 settles it. helpChords.test.ts",
+    "called 815:4518 'the canvas cheat sheet'; KeyboardShortcutsPanel.tsx:126",
+    "claimed it too. The board's own copy decides \u2014 it draws 'Keyboard shortcuts",
+    "/ Search shortcuts\u2026 / General / Save \u2318S / Undo \u2318Z / Redo \u2318\u21e7Z', which are",
+    "app-wide chords. This is the SHELL panel's board, and the canvas cheat",
+    "sheet has none.",
+    "",
+    "REACHED VIA PROBE: the panel is a controlled modal (`isOpen`), so the probe",
+    "opens it the way \u2318/ does. Measured at the board's own 640 x 934.",
+    "",
+    "BOARD WON, five times:",
+    "  815:4518  the dialog is 640 wide. It shipped `lg` (720); `table` is the",
+    "            640 already in the shared scale (boards 1170:4749 / 1164:4713).",
+    "  815:4518  ONE column. The board stacks its groups full-width with a rule",
+    "            under each heading; the panel shipped a 3-column grid the board",
+    "            never draws, which left every row about 200 wide.",
+    "  815:4524  the group heading is TITLE case \u2014 'General', not 'GENERAL'. The",
+    "            uppercase and the 0.5 tracking came from nowhere on this board.",
+    "  815:4525  the rule under a heading is --color/bg-subtle, not --bk-border.",
+    "  815:4526  a row's action reads 13 in --flowbite/gray/700; it shipped",
+    "            ink-soft, one step lighter.",
+    "  815:4527  the chord chip is 24 high on a 4 radius, bg-subtle inside a",
+    "            --color/border-medium hairline, glyphs 12 in ink-soft. It",
+    "            shipped 11px ink on 2/6 padding inside --bk-border with no",
+    "            height at all, so a column of chips had no common box.",
+    "",
+    "CODE WON, and this is the important half: the LIST. The board draws",
+    "General / Canvas / Elements / Navigation with rows like 'Pan \u2014 Space +",
+    "drag', 'Toggle grid', 'Insert text \u2014 T', 'Lock \u2014 \u2318\u21e7L', 'Quick search \u2014 \u2318F'",
+    "and 'Layers panel \u2014 \u2318\\'. None of those chords is bound anywhere in",
+    "useEditorShortcuts. A shortcuts sheet that advertises chords the product",
+    "does not answer is worse than a short one \u2014 behaviour is the CODE contract,",
+    "and the panel keeps the three groups it can honour (Panels / Edit / View).",
+    "The panel's own comments already record two chords it corrected by",
+    "measurement (\u23180 vs \u23181, and '?' vs \u2318/).",
+    "",
+    "NOT JOINED, and why:",
+    "  815:4527/4530/4533/4536/4539 \u2014 the chip BOXES. Their widths (39, 39, 40,",
+    "  40, 55) are the glyph run plus 14: the board sizes each chip to its own",
+    "  chord, which is sample data by construction \u2014 \u2318S and \u2318C differ by one",
+    "  pixel on the board for no reason but letter shapes. The chips' fill,",
+    "  border, height and radius ARE conformed; what is JOINED is the chip's",
+    "  label node (815:4528/4531/4534/4537/4540), which carries the type with no",
+    "  width attached, and it is read off the chip element itself.",
+    "  815:4519 the header band / 815:4522 the search box \u2014 ModalTitle,",
+    "  ModalClose and TextInput, all shared primitives; and the search box's",
+    "  #F2F2F5 fill is a raw hex with no token behind it (every other fill on",
+    "  this board resolves), so it could not be taken even locally without",
+    "  adding to Gate 16's hex ratchet.",
+    "",
+    "NOT CONFORMED \u2014 the chip's TYPEFACE. 815:4528 draws Inter Medium; board",
+    "2838:12148 draws the same object (MenuItem's `kbd`) in Geist Mono Medium,",
+    "and DESIGN.md calls mono the data face \u2014 which is what both chips ship as.",
+    "Two boards, one question, and NEITHER is `verified` in boards.json, so",
+    "under the conformance rule neither re-settles the control. The measurable",
+    "properties moved; the face did not. Founder call. (font-family is not a",
+    "property the extractor reads, so no join is affected either way.)"
+  ]
+}

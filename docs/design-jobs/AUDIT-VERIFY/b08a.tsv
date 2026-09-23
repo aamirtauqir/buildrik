@@ -1,0 +1,158 @@
+N	52:2	S1 · Editor — ASSEMBLED (1440, drawer pinned)	FRAME	100,111047,1440,900	true	VERTICAL	34	true
+K	682:2570	INSTANCE	100,111047,1440,56	true	true	Topbar
+K	52:5	FRAME	100,111103,1440,812	true	true	Middle band
+K	52:10	FRAME	100,111915,1440,32	true	true	Footer
+K	444:2416	FRAME	1240,111607,100,34	true	true	hotspot/state · Shell state 7 · Preview
+K	444:2418	FRAME	1340,111607,100,34	true	true	hotspot/state · Shell state 12 · Loading
+K	444:2420	FRAME	1440,111607,100,34	true	true	hotspot/state · Shell state 9 · AI agent run
+K	444:2422	FRAME	1240,111641,100,34	true	true	hotspot/state · Shell state 10 · Offline
+K	444:2424	FRAME	1340,111641,100,34	true	true	hotspot/state · Shell state 11 · Saving → conflict
+K	444:2426	FRAME	1440,111641,100,34	true	true	hotspot/state · Shell state 5 · Drawer closed
+K	444:2428	FRAME	1240,111675,100,34	true	true	hotspot/state · Shell state 6 · Comment mode
+K	444:2432	FRAME	1340,111675,100,34	true	true	hotspot/state · Shell · 1280 · pin auto-released (
+K	444:2434	FRAME	1440,111675,100,34	true	true	hotspot/state · S1.1 · coach-dismissed
+K	444:2436	FRAME	1240,111709,100,34	true	true	hotspot/state · S1.2 · crash-recovery
+K	444:2438	FRAME	1340,111709,100,34	true	true	hotspot/state · S3.14 · cmdk · recent
+K	444:2442	FRAME	1440,111709,100,34	true	true	hotspot/state · Brand · starters · applied
+K	444:2446	FRAME	1240,111743,100,34	true	true	hotspot/state · Brand · lint · suppressed
+K	444:2450	FRAME	1340,111743,100,34	true	true	hotspot/state · C6 · Recovery banner
+K	633:2378	FRAME	1440,111743,100,34	true	true	hotspot/state · Review panel · open
+K	633:2380	FRAME	1240,111777,100,34	true	true	hotspot/state · Publish · pre-checks
+K	633:2382	FRAME	1340,111777,100,34	true	true	hotspot/state · S1.5 · session-expired
+K	633:2384	FRAME	1440,111777,100,34	true	true	hotspot/state · B9.6 · Project settings modal
+K	633:2386	FRAME	1240,111811,100,34	true	true	hotspot/state · B9.7 · Page tab bar
+K	633:2388	FRAME	1340,111811,100,34	true	true	hotspot/state · B9.4 · Milestone suggestion banner
+K	633:2390	FRAME	1440,111811,100,34	true	true	hotspot/state · Modal · open
+K	635:4023	FRAME	1240,111845,100,34	true	true	hotspot/state · AI · idle
+K	644:2592	FRAME	1340,111845,100,34	true	true	hotspot/state · Templates · gallery
+K	644:2594	FRAME	1440,111845,100,34	true	true	hotspot/state · Components · library
+K	644:2596	FRAME	1240,111879,100,34	true	true	hotspot/state · Publish · panel
+K	644:2598	FRAME	1340,111879,100,34	true	true	hotspot/state · S7 · Settings · General
+K	644:2600	FRAME	1440,111879,100,34	true	true	hotspot/state · Shell state 13 · Presence (multiplayer)
+C	52:2	texts=100
+T	53:23	1443,111923,81,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	Desktop · 100%
+T	53:21	206,111923,55,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	680 × 250
+T	53:20	116,111923,74,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	Section · Hero
+T	I2144:11535;92:12	1484,111639,34,16	12	Regular	true	HEIGHT	field	100
+T	52:146	1256,111638,88,18	12	Regular	true	HEIGHT	row	Opacity
+T	52:144	1519,111607,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:143	1256,111607,255,16	11	Medium	true	HEIGHT	row	EFFECTS
+T	52:141	1360,111575,8,16	12	Regular	true	WIDTH_AND_HEIGHT	input	8
+T	52:138	1256,111574,88,18	12	Regular	true	HEIGHT	row	Radius
+T	52:136	1519,111543,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:135	1256,111543,255,16	11	Medium	true	HEIGHT	row	BORDER
+T	52:133	1510,111511,13,16	11	Regular	true	WIDTH_AND_HEIGHT	binding chip	◈
+T	52:131	1396,111511,51,16	12	Regular	true	WIDTH_AND_HEIGHT	input	#1A56DB
+T	52:127	1256,111510,88,18	12	Regular	true	HEIGHT	row	Fill
+T	52:125	1519,111479,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:124	1256,111479,255,16	11	Medium	true	HEIGHT	row	BACKGROUND
+T	52:122	1450,111447,22,16	12	Regular	true	WIDTH_AND_HEIGHT	input	1.5
+T	52:120	1360,111447,15,16	12	Regular	true	WIDTH_AND_HEIGHT	input	14
+T	52:117	1256,111446,88,18	12	Regular	true	HEIGHT	row	Size
+T	52:115	1360,111414,67,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Inter Tight ▾
+T	52:112	1256,111414,88,18	12	Regular	true	HEIGHT	row	Family
+T	52:110	1519,111383,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:109	1256,111383,255,16	11	Medium	true	HEIGHT	row	TYPOGRAPHY
+T	52:107	1360,111351,15,16	12	Regular	true	WIDTH_AND_HEIGHT	input	16
+T	52:104	1256,111350,88,18	12	Regular	true	HEIGHT	row	Gap
+T	52:102	1450,111319,15,16	12	Regular	true	WIDTH_AND_HEIGHT	input	16
+T	52:100	1360,111319,15,16	12	Regular	true	WIDTH_AND_HEIGHT	input	24
+T	52:97	1256,111318,88,18	12	Regular	true	HEIGHT	row	Padding
+T	52:95	1519,111287,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:94	1256,111287,255,16	11	Medium	true	HEIGHT	row	SPACING
+T	52:92	1458,111254,24,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Hug
+T	52:90	1433,111255,11,16	11	Regular	true	WIDTH_AND_HEIGHT	⛓	⛓
+T	52:88	1360,111254,16,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Fill
+T	52:85	1256,111254,88,18	12	Regular	true	HEIGHT	row	Size
+T	52:83	1501,111222,9,18	12	Regular	true	WIDTH_AND_HEIGHT	∅	∅
+T	52:81	1465,111222,12,18	12	Regular	true	WIDTH_AND_HEIGHT	▫	▫
+T	52:79	1432,111222,11,18	12	Regular	true	WIDTH_AND_HEIGHT	▦	▦
+T	52:77	1398,111222,11,18	12	Regular	true	WIDTH_AND_HEIGHT	▤	▤
+T	52:75	1363,111222,12,18	12	Regular	true	WIDTH_AND_HEIGHT	▭	▭
+T	52:72	1256,111222,88,18	12	Regular	true	HEIGHT	row	Display
+T	52:70	1519,111191,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	52:69	1256,111191,255,16	11	Medium	true	HEIGHT	row	LAYOUT
+T	52:67	1393,111159,33,16	11	Regular	true	WIDTH_AND_HEIGHT	Base ▾	Base ▾
+T	52:65	1318,111159,51,16	11	Regular	true	WIDTH_AND_HEIGHT	Desktop ▾	Desktop ▾
+T	52:63	1264,111159,30,16	11	Regular	true	WIDTH_AND_HEIGHT	This ▾	This ▾
+T	52:60	1513,111117,11,20	13	Regular	true	WIDTH_AND_HEIGHT	row	⋯
+T	920:4547	1474,111121,24,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/ai	✦ AI
+T	52:58	1256,111117,67,20	14	Medium	true	WIDTH_AND_HEIGHT	row	⬚ Section
+T	462:4001	618,111871,12,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/⌘	⌘
+T	462:3997	563,111871,8,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/+	+
+T	462:3995	506,111871,28,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/100%	100%
+T	462:3993	468,111871,8,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/−	−
+T	462:3989	1114,111843,31,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/X-Ray	X-Ray
+T	462:3987	1037,111843,40,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/Badges	Badges
+T	462:3985	967,111843,33,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/Rulers	Rulers
+T	462:3983	907,111843,22,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/Grid	Grid
+T	462:3981	828,111843,42,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/Spacing	Spacing
+T	462:3979	718,111843,67,13	11	Medium	true	WIDTH_AND_HEIGHT	chip/Snap Guides (active)	Snap Guides
+T	462:3975	648,111843,10,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/M	M
+T	462:3973	613,111843,8,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/T	T
+T	462:3971	577,111843,8,13	11	Medium	true	WIDTH_AND_HEIGHT	chip/D (active)	D
+T	462:3969	540,111843,11,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/W	W
+T	462:3966	495,111843,14,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/↷	↷
+T	462:3964	463,111843,14,13	11	Regular	true	WIDTH_AND_HEIGHT	chip/↶	↶
+T	52:163	504,111283,74,16	11	Regular	true	WIDTH_AND_HEIGHT	selection label	Section · Hero
+T	52:161	730,111439,220,20	13	Regular	true	WIDTH_AND_HEIGHT	Hero — SELECTED	Open Tuesday to Sunday, from 5pm
+T	52:160	642,111397,396,30	20	Semi Bold	true	WIDTH_AND_HEIGHT	Hero — SELECTED	Wood-fired pizza, five minutes from home
+T	52:158	1111,111268,41,18	12	Regular	true	WIDTH_AND_HEIGHT	site nav	Find us
+T	52:157	1062,111268,29,18	12	Regular	true	WIDTH_AND_HEIGHT	site nav	Book
+T	52:156	1010,111268,32,18	12	Regular	true	WIDTH_AND_HEIGHT	site nav	Menu
+T	52:155	528,111267,462,20	13	Medium	true	HEIGHT	site nav	Bella Cucina
+T	54:12	663,111113,10,16	11	Regular	true	WIDTH_AND_HEIGHT	Contact	✕
+T	54:11	611,111112,46,18	12	Regular	true	WIDTH_AND_HEIGHT	Contact	Contact
+T	54:9	581,111113,10,16	11	Regular	true	WIDTH_AND_HEIGHT	Menu	✕
+T	54:7	532,111112,32,18	12	Regular	true	WIDTH_AND_HEIGHT	Menu	Menu
+T	54:5	502,111113,10,16	11	Regular	true	WIDTH_AND_HEIGHT	Home	✕
+T	54:4	462,111112,34,18	12	Regular	true	WIDTH_AND_HEIGHT	Home	Home
+T	I2143:20611;2142:11053	192,111411,240,20	13	Regular	true	NONE	row	footer
+T	I2143:20609;2142:11071	240,111383,192,20	13	Regular	true	NONE	row	button
+T	I2143:20607;2142:11077	256,111355,176,20	13	Regular	true	NONE	row	paragraph
+T	I2143:20605;2142:11080	256,111327,176,20	13	Regular	true	NONE	row	heading-that-is-long
+T	I2143:20603;2142:11071	240,111299,192,20	13	Regular	true	NONE	row	column
+T	I2143:20601;2142:11065	224,111271,208,20	13	Regular	true	NONE	row	grid
+T	I2143:20599;2142:11059	208,111243,224,20	13	Regular	true	NONE	row	container
+T	I2143:20597;2142:11053	192,111215,240,20	13	Regular	true	NONE	row	section
+T	I2143:20595;2142:11047	176,111187,256,20	13	Regular	true	NONE	row	body
+T	52:35	186,111156,40,18	12	Regular	true	WIDTH_AND_HEIGHT	field	Search
+T	I2102:11013;2100:10962	415,111117,13,17	14	Regular	true	WIDTH_AND_HEIGHT	Panel header	✕
+T	I2102:11013;2100:10961	176,111117,239,17	14	Semi Bold	true	HEIGHT	Panel header	LAYERS
+T	I2040:20649;2034:8433	115,111377,31,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Brand	Brand
+T	I2040:20649;2034:8430	109,111329,42,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Content	Content
+T	I2040:20649;2034:8427	114,111281,32,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Media	Media
+T	I2040:20649;2034:8424	114,111233,33,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Pages	Pages
+T	I2040:20649;2034:8420	113,111185,35,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Layers	Layers
+T	I2040:20649;2034:8417	115,111137,30,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Insert	Insert
+T	I682:2570;681:42;9:25	1419,111065,49,20	14	Medium	true	WIDTH_AND_HEIGHT	btn/publish	Publish
+T	I682:2570;681:37	533,111066,101,18	12	Regular	true	WIDTH_AND_HEIGHT	pill/in	In review · 3 open
+T	I682:2570;698:465;697:443	412,111066,81,18	12	Regular	true	WIDTH_AND_HEIGHT	pill/saved	Saved 2m ago
+T	I682:2570;681:31	180,111065,200,20	14	Medium	true	HEIGHT	Topbar	Bella Cucina
+T	I682:2570;698:448;9:55	124,111066,32,18	13	Medium	true	WIDTH_AND_HEIGHT	btn/exit	‹ Exit
+R	52:2	815:4518	NAVIGATE	S1 · Editor — ASSEMBLED (1440, drawer pinned)
+R	1168:4753	1168:4732	NAVIGATE	hotspot/state · Publish · issues-confirm
+R	785:4301	165:2	NAVIGATE	hotspot/state · Notifications · unread
+R	785:4299	642:3401	NAVIGATE	hotspot/state · Site menu (⋯)
+R	644:2602	166:2	NAVIGATE	hotspot/state · CmdK · empty
+R	644:2600	642:3696	NAVIGATE	hotspot/state · Shell state 13 · Presence (multiplayer)
+R	644:2598	638:2378	NAVIGATE	hotspot/state · S7 · Settings · General
+R	644:2596	641:2652	NAVIGATE	hotspot/state · Publish · panel
+R	644:2594	641:2546	NAVIGATE	hotspot/state · Components · library
+R	644:2592	641:2487	NAVIGATE	hotspot/state · Templates · gallery
+R	635:4023	170:2	NAVIGATE	hotspot/state · AI · idle
+R	633:2390	183:2	NAVIGATE	hotspot/state · Modal · open
+R	633:2388	433:2348	NAVIGATE	hotspot/state · B9.4 · Milestone suggestion banner
+R	633:2386	435:2348	NAVIGATE	hotspot/state · B9.7 · Page tab bar
+R	633:2384	638:2378	NAVIGATE	hotspot/state · B9.6 · Project settings modal
+R	633:2382	294:1976	NAVIGATE	hotspot/state · S1.5 · session-expired
+R	633:2380	833:4518	NAVIGATE	hotspot/state · Publish · pre-checks
+R	633:2378	156:2	NAVIGATE	hotspot/state · Review panel · open
+R	444:2450	307:2223	NAVIGATE	hotspot/state · C6 · Recovery banner
+R	444:2446	306:2217	NAVIGATE	hotspot/state · Brand · lint · suppressed
+R	444:2442	306:2186	NAVIGATE	hotspot/state · Brand · starters · applied
+R	444:2438	303:1978	NAVIGATE	hotspot/state · S3.14 · cmdk · recent
+R	444:2436	297:2027	NAVIGATE	hotspot/state · S1.2 · crash-recovery
+R	444:2434	297:1972	NAVIGATE	hotspot/state · S1.1 · coach-dismissed
+R	444:2432	202:2	NAVIGATE	hotspot/state · Shell · 1280 · pin auto-released (
+END	done=52:2	stopped=false	bytes=11681

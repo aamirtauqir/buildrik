@@ -1,0 +1,114 @@
+{
+  "surface": "media-drill-in-used-in",
+  "board": "Media · drill-in · used-in (Figma 146:68)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-detail-used-in",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-used-row-e1"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE WAIT NAMES THE STATE'S OWN ANCHOR, not the panel's. AssetDetailOverlay",
+    "has four views behind one `media-detail-panel` root, and this recipe's",
+    "subject is the non-empty used-in list — the state that had never actually",
+    "rendered in a probe until USAGE_COMPOSER was taught to answer",
+    "`mediaOps.getUsagesByPage`. Waiting on the row proves the list is there;",
+    "waiting on the panel would have measured the empty state and passed.",
+    "",
+    "TWO BOARDS DISAGREE ABOUT THIS SCREEN, and this one does not get to",
+    "re-settle it. 146:68 draws a 28h bg-subtle page-group HEADER (146:75 /",
+    "146:86) over bare 44h rows whose primary line is the element name at 13/20",
+    "and whose link says 'Jump ›' at 12/18. Board 75:90 draws one 44h CHIP per",
+    "hit — page name at 12/18 over the element name at 11/16, with 'Go ›' at",
+    "11/16 — and no group header at all. boards.json has 75:2 recorded",
+    "drift-fixed against the shipped code (2026-09-08); 146:68 is `driven`. So",
+    "75:90 stands and 146:78 / 146:82 / 146:89 are joined only on the fact the",
+    "two boards agree about: the row is 44 tall. 146:75 / 146:86 (the group",
+    "headers), 146:79 / 146:83 / 146:90 (13/20 primaries) and 146:81 / 146:85 /",
+    "146:92 ('Jump ›' at 12/18) are NOT joined — superseded, not drift.",
+    "146:80 / 146:84 / 146:91 ARE joined: both boards put the sub-line at 11/16",
+    "ink-muted, so there is nothing to disagree about.",
+    "",
+    "BACK ROW NOT JOINED. 146:73 gives it 56, and so does 146:38 on the versions",
+    "board — but 146:7 (asset-detail), 147:7 (icon-picker) and 147:60 (stock)",
+    "all give the SAME component 36, which is what ships and what",
+    "media-drill-in-asset-detail already measured green. Three frames to two on",
+    "one shared control is not a redesign, and the two tall ones are the two",
+    "whose own back label wraps to a second line in the export.",
+    "",
+    "BOARD WON — 75:111, THE DELETE GUARD, WHICH WAS MISSING ENTIRELY. The",
+    "empty state has said 'Deleting this file won't change anything on your",
+    "site' for as long as it has existed; the state where deleting DOES break",
+    "something said nothing. Built here as the board draws it: a 40h",
+    "warning-tint band on a 6 radius, 11/16 in warning-text, under the list.",
+    "The page count is real (`usage.length`), not the board's 3.",
+    "",
+    "CONTRAST, STANDING AND BOARD-MANDATED: media-used-sub-* measures 4.39:1 —",
+    "--bk-ink-muted #6B7280 on the chip's --bk-bg-subtle #F3F4F6 ground. BOTH",
+    "boards pin that pair (146:80 and 75:99 name the same token on the same",
+    "fill), so conforming cannot fix it. It is the systemic ink-muted-on-tint",
+    "defect, CONTRAST-INK-MUTED.md, and is pre-existing here."
+  ],
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-detail-panel",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:68"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "208:381"
+    },
+    {
+      "name": "used-row-1",
+      "testId": "media-used-row-e1",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:78"
+    },
+    {
+      "name": "used-sub-1",
+      "testId": "media-used-sub-e1",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:80"
+    },
+    {
+      "name": "used-row-2",
+      "testId": "media-used-row-e2",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:82"
+    },
+    {
+      "name": "used-sub-2",
+      "testId": "media-used-sub-e2",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:84"
+    },
+    {
+      "name": "used-row-3",
+      "testId": "media-used-row-e3",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:89"
+    },
+    {
+      "name": "used-sub-3",
+      "testId": "media-used-sub-e3",
+      "spec": "media-drill-in-used-in",
+      "nodeId": "146:91"
+    },
+    {
+      "name": "delete-guard",
+      "testId": "media-used-delete-guard",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:111"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "_": "Bodies for the six Content · dynamic-pages boards. Applier: scripts/figma/build-dynamic-pages-boards.mjs [--apply] (it reads THIS file). Copy is ContentViews.tsx verbatim; `tone` follows the code's own colour choice.",
+  "_ids": "The four existing board ids were READ from the file this session (section 1776:8376 child dump, 2026-09-07). The two new boards are addressed by NAME because their ids do not exist yet — create them first with content-new-boards.json.",
+  "_layerNames": "unresolved-id — the dp/* layer names (dp/lbl-pattern, dp/in-pattern, dp/val-pattern, dp/hint-pattern, dp/warn) and the Crumb / meta / block / spacer frame names are INFERRED from scripts/figma/build-dynamic-pages-boards.mjs at 667fd830d, not read back this session. The applier reports SHAPE-CHANGED and skips a board whose frames do not match.",
+  "boards": [
+    {
+      "id": "2429:12111",
+      "name": "Content · dynamic-pages",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "/menu/{slug}",
+      "tone": "muted",
+      "state": "Generates 4 pages from published records.",
+      "warn": "",
+      "why": "QA-A-10 (label casing), QA-A-11 (audit notes leave the panel), QA-A-01/02/03 (no TEMPLATE PAGE control)"
+    },
+    {
+      "id": "2429:21243",
+      "name": "Content · dynamic-pages · no-pattern",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "",
+      "tone": "muted",
+      "state": "No pattern set — this collection generates no pages.",
+      "warn": "",
+      "why": "QA-A-07 (state copy = ContentViews.tsx:672), QA-A-08 (placeholder = :645 /menu/{slug}), QA-A-10"
+    },
+    {
+      "id": "2429:21262",
+      "name": "Content · dynamic-pages · none-published",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "/menu/{slug}",
+      "tone": "warn",
+      "state": "4 records, none published. Dynamic pages only generate from published records.",
+      "warn": "",
+      "why": "QA-A-09 — the board carried a third string that exists in neither branch of ContentViews.tsx:662-664"
+    },
+    {
+      "id": "2429:21281",
+      "name": "Content · dynamic-pages · no-template",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "/menu/{slug}",
+      "tone": "muted",
+      "state": "Generates 4 pages from published records.",
+      "warn": "No template page is bound, so publishing emits none of these yet.",
+      "why": "QA-A-01/02 — the no-template WARNING is an extra line under the count line (ContentViews.tsx:683-685), not the state line, and there is no TEMPLATE PAGE field to carry it"
+    },
+    {
+      "id": "2850:12042",
+      "name": "Content · dynamic-pages · unknown-key",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "/menu/{name}",
+      "tone": "muted",
+      "state": "Generates 4 pages from published records.",
+      "warn": "This collection has no field called “name”, so every record resolves to the same URL.",
+      "why": "QA-A-13 — ContentViews.tsx:675-681, the variant COMPILE-A N1 specified and no pass drew"
+    },
+    {
+      "id": "2850:21351",
+      "name": "Content · dynamic-pages · no-records",
+      "crumb": "‹  Menu items · dynamic pages",
+      "meta": "Dynamic pages",
+      "pattern": "/menu/{slug}",
+      "tone": "warn",
+      "state": "No records yet — nothing to generate.",
+      "warn": "",
+      "why": "QA-A-13 — ContentViews.tsx:663, the second missing branch"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+ "surface": "s1-2f-save-indicator",
+ "board": "S1.2f · save-indicator · 5-states (Figma 813:4836) — states 1, 2, 4, 5",
+ "_note": "['ONE BOARD, FIVE STATES, AND EACH ONE IS JOINED SEPARATELY. Measuring one', \"pill and calling the board covered is exactly what boards.json's\", '`drift-7-states-board-draws-5` note could not rule out. This recipe joins', '813:4843 (Saving), 813:4849 (Saved · fresh), 813:4861 (Unsaved changes)', 'and 813:4867 (Save failed — retry); the fifth, 813:4855 (Saved · stale),', 'is in `s1-2f-save-indicator-saved-stale`. It has to be a second page', 'because states 2 and 3 are the SAME `saved` branch at two clock positions —', \"the board's own caption says so, 'The same saved state as 2, only savedAt\", \"is older' — so both render the one `save-status-saved` anchor and cannot\", 'stand on one page without the target resolving to two elements.', '', 'WHAT MOVED:', '  · `Saved · just now` -> `Saved just now`. The board draws no middot in', \"    either saved state, and neither does board 297:1972's topbar\", \"    ('Saved 2m ago'). Two boards, same answer. The separator was there so\", '    the stamp could be dropped at narrow widths, and it still can be —', \"    'Saved' alone reads identically with or without it. Two tests asserted\", '    the old string and were rewritten in the same change.', '  · `leading-[normal]` on the pill. All five board label nodes are on', '    `leading-[normal]`; `text-xs` was putting 16px on them.', '', 'THE BOARD DRAWS 5, THE COMPONENT HAS 6 (+1 rendering). `conflict` and', \"`offline` have no card here — and the board KNOWS: card 4's own caption\", \"says 'Offline is a SEPARATE state: Offline — not saved'. So this is a\", 'board that documents a subset on purpose, not a code surplus. Nothing to', 'conform; the two uncovered states keep their own copy (SaveStatus.tsx', 'carries the reasoning for `offline` — it deliberately does NOT promise a', 'local copy, because a dashboard-backed save writes none).', '', 'NOT JOINED, and why:', \"  813:4841 / 4847 / 4859 / 4865 — the 228x40 white bordered 'Frame' each\", '  state sits in. That is the SPECIMEN box, not the pill: all five states', \"  have an identical one, including 'Save failed', which the shipped\", '  component gives a red-tinted pill. A board whose five cards share one', '  container is drawing a catalogue page, not five containers. The shipped', '  pill is h-6/rounded-full, and the topbar boards are where its box is', '  settled.', \"  813:4840 / 4844 (and siblings) — the '1. Saving' card titles and the\", '  prose under each pill are designer annotation (the LEDGER J-164:22', '  ruling), not product copy.', '  LABEL COLOUR is not in the spec at all and so cannot be joined: the', '  board writes those as bare `text-[#998026]` / `text-[#268c40]` /', '  `text-[#b2661a]` / `text-[#bf2626]`, which extract.mjs does not read as', '  colours. It is a live disagreement worth recording rather than', '  silently winning: the board wants amber/green/orange TEXT for saving,', '  saved-fresh and unsaved; the component makes those three plain', '  `--bk-ink-muted` and lets the dot carry the state (T8/D7 rule 4), and', \"  reserves tinted text for the states that mean 'your work is not where\", \"  you think it is'. Only state 3's colour is in the spec, and there the\", '  two agree on `--color/ink-muted`.', '', 'check-board-copy leads, walked: the only REAL one is the ellipsis. The board types \"Saving...\" (three periods) and the component says \"Saving\\\\u2026\" (U+2026), which is the house form everywhere else in the editor (\"Reconnecting\\\\u2026\", \"Saving\\\\u2026\" in seven settings screens). A typographic normalisation, kept, and recorded here so the lead is not re-opened. The rest are artifacts: \"Saved just now\" reads as unmatched because the stamp is its own element (the compact tier drops it independently), so the checker sees \"Saved\" and \" just now\" as two nodes while the pill renders one string; and every \"N. <state>\" heading plus its prose is the card\\'s designer annotation, not product copy.'] PER-PROPERTY SKIPS 2026-09-08: all four state colours are refused; see each target's skipProps. The geometry and type on every state still compare.",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=s1-2f-save-indicator",
+ "viewport": {
+  "width": 1440,
+  "height": 360
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "save-status-error"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "saving",
+   "testId": "save-status-saving",
+   "spec": "s1-2f-save-indicator-5-states",
+   "nodeId": "813:4843",
+   "skipProps": {
+    "color": "BOARD PENDING REDRAW (founder call 2026-09-08). The code now paints each state its own ACCESSIBLE token — saved --bk-success-text 5.36, saving --bk-ink-soft 7.56, unsaved --bk-warning-text 8.93, error --bk-error-text on --bk-error-tint 4.89 — which supersedes the component's old 'text-first' rule where all three non-error states painted the same grey. Board 813:4836 asked for four hues that exist as NO token and, three of four, fail AA on white (3.84 / 4.28 / 4.37 against 4.5), so the board is right about the problem and wrong about the fix. This join re-opens the moment the board is redrawn to the tokens; until then the colour is refused rather than conformed to an inaccessible hex."
+   }
+  },
+  {
+   "name": "saved-fresh",
+   "testId": "save-status-saved",
+   "spec": "s1-2f-save-indicator-5-states",
+   "nodeId": "813:4849",
+   "skipProps": {
+    "color": "BOARD PENDING REDRAW (founder call 2026-09-08). The code now paints each state its own ACCESSIBLE token — saved --bk-success-text 5.36, saving --bk-ink-soft 7.56, unsaved --bk-warning-text 8.93, error --bk-error-text on --bk-error-tint 4.89 — which supersedes the component's old 'text-first' rule where all three non-error states painted the same grey. Board 813:4836 asked for four hues that exist as NO token and, three of four, fail AA on white (3.84 / 4.28 / 4.37 against 4.5), so the board is right about the problem and wrong about the fix. This join re-opens the moment the board is redrawn to the tokens; until then the colour is refused rather than conformed to an inaccessible hex."
+   }
+  },
+  {
+   "name": "unsaved",
+   "testId": "save-status-unsaved",
+   "spec": "s1-2f-save-indicator-5-states",
+   "nodeId": "813:4861",
+   "skipProps": {
+    "color": "BOARD PENDING REDRAW (founder call 2026-09-08). The code now paints each state its own ACCESSIBLE token — saved --bk-success-text 5.36, saving --bk-ink-soft 7.56, unsaved --bk-warning-text 8.93, error --bk-error-text on --bk-error-tint 4.89 — which supersedes the component's old 'text-first' rule where all three non-error states painted the same grey. Board 813:4836 asked for four hues that exist as NO token and, three of four, fail AA on white (3.84 / 4.28 / 4.37 against 4.5), so the board is right about the problem and wrong about the fix. This join re-opens the moment the board is redrawn to the tokens; until then the colour is refused rather than conformed to an inaccessible hex."
+   }
+  },
+  {
+   "name": "save-failed",
+   "testId": "save-status-error",
+   "spec": "s1-2f-save-indicator-5-states",
+   "nodeId": "813:4867",
+   "skipProps": {
+    "color": "BOARD PENDING REDRAW (founder call 2026-09-08). The code now paints each state its own ACCESSIBLE token — saved --bk-success-text 5.36, saving --bk-ink-soft 7.56, unsaved --bk-warning-text 8.93, error --bk-error-text on --bk-error-tint 4.89 — which supersedes the component's old 'text-first' rule where all three non-error states painted the same grey. Board 813:4836 asked for four hues that exist as NO token and, three of four, fail AA on white (3.84 / 4.28 / 4.37 against 4.5), so the board is right about the problem and wrong about the fix. This join re-opens the moment the board is redrawn to the tokens; until then the colour is refused rather than conformed to an inaccessible hex."
+   }
+  }
+ ]
+}

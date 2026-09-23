@@ -1,0 +1,262 @@
+{
+ "slug": "fix-c2-clipping",
+ "page": "1:3",
+ "note": "Cause C2 - text grew, its clipping parent did not. Every box in every `why` is copied from docs/design-jobs/AUDIT-VERIFY/b*.tsv via analyze.py (reads taken 18:29-19:07 on 2026-09-07); zero Figma calls were made to author this. `expect` on every row is that node's CURRENT absoluteBoundingBox as 'x,y,w,h'. READ THIS BEFORE APPLYING: apply-queue.mjs only enforces `expect` for op text and op rename - for resize and move it is documentation, not a guard, so re-read these 28 nodes before spending write calls if the file has moved on. Rows are ordered so the resize batch runs before the move batch (apply-queue groups by page|op in first-appearance order) and so each History spacer shrinks before the Prune note it pays for grows. The `held` array is deliberately OUTSIDE `rows` because normalize-plans.mjs ignores the `hold` flag and would execute those rows.",
+ "rows": [
+  {
+   "op": "resize",
+   "id": "171:132",
+   "h": 240,
+   "expect": "2100,67231,280,108",
+   "why": "F06 (VERDICTS row F06; PLAN C2 bullet 1) — clipping parent 'Error' of 171:105. b12 kids: 171:132 = 2100,67231,280,108 so it ends y67231+108=67339. b12 texts inside it: 171:133 67241+18=67259, 171:134 67263+32=67295, 171:135 67305+18=67323, 2846:21651 67335+36=67371, 2846:21652 67379+80=67459. Lowest content bottom = 67459, i.e. 67459-67231 = 228 from the frame top. Top pad is 67241-67231 = 10, so a symmetric bottom pad gives 238; rounded up to the 4px grid = 240. 108 -> 240, delta +132. NO sibling shrink needed: 171:105 is 2100,67047,280,812 (bottom 67859) and its five children tile 36+44+32+72+108 = 292 ending at 67339, so the board carries 520px of unused tail; after +132 the stack ends 67471, still 388px clear. Cited: analyze.py kids 171:105."
+  },
+  {
+   "op": "resize",
+   "id": "171:163",
+   "h": 304,
+   "expect": "100,65675,280,140",
+   "why": "F06 — clipping parent 'Not configured' of 171:136. b12 kids: 171:163 = 100,65675,280,140, ends y65815. After the three move rows below the content bottom is 2846:21650 at 65897+64 = 65961, i.e. 65961-65675 = 286 from the frame top. Top pad is 65691-65675 = 16, symmetric bottom pad gives 302, rounded up to the 4px grid = 304. 140 -> 304, delta +164. NO sibling shrink needed: 171:136 is 100,65563,280,812 (bottom 66375) and its four children tile 36+44+32+140 = 252 ending 65815, leaving 560px of tail; after +164 the stack ends 65979, still 396px clear. Cited: analyze.py kids 171:136. ORDER: this resize is in the resize batch, which runs before the move batch (apply-queue groups by page|op in first-appearance order), so the frame is tall before the children are reseated."
+  },
+  {
+   "op": "move",
+   "id": "171:166",
+   "x": 16,
+   "y": 148,
+   "expect": "116,65783,178,18",
+   "why": "F06 overprint half — 171:165 (body, ar=HEIGHT, 116,65719,248,96) grew to 6 lines and now spans 65719-65815, swallowing 171:166 'Contact your workspace owner' at 65783-65801: analyze.py report 171:136 measures the collision at 178x18px, a full line. Fix = move the tail down clear of the body. New top = 65815 (body bottom) + 8 (the gap this board already uses between 171:164 and 171:165) = 65823. Parent 171:163 origin is 100,65675, so parent-relative x = 116-100 = 16, y = 65823-65675 = 148 (apply-queue's move op writes n.x/n.y, which are parent-relative; the dumps are absoluteBoundingBox). Shift = +40y, x unchanged."
+  },
+  {
+   "op": "move",
+   "id": "2846:21649",
+   "x": 16,
+   "y": 178,
+   "expect": "116,65813,178,36",
+   "why": "F06 clipped half — 'Continue by hand in the inspector' spans 65813-65849 against a frame that ends 65815, so 34 of its 36px are clipped (and analyze.py report 171:136 also shows it overprinting 171:165 by 178x2). Same +40 shift as 171:166: 65813 -> 65853, which preserves the existing 12px gap after 171:166's new bottom (65841 + 12 = 65853) — the same 12px this family uses on 171:105 (67323 -> 67335). Parent-relative: x = 16, y = 65853-65675 = 178."
+  },
+  {
+   "op": "move",
+   "id": "2846:21650",
+   "x": 16,
+   "y": 222,
+   "expect": "116,65857,178,64",
+   "why": "F06 clipped half — the explanation spans 65857-65921, entirely below the frame's 65815 bottom. Same +40 shift: 65857 -> 65897, preserving the existing 8px gap after 2846:21649's new bottom (65889 + 8 = 65897). Ends 65961, which is what sizes 171:163 to 304 above. Parent-relative: x = 16, y = 65897-65675 = 222. NOTE the held row H1 — this node's copy is written in the third person about 'the user', which may make it C4 annotation rather than product copy."
+  },
+  {
+   "op": "resize",
+   "id": "2846:21678",
+   "w": 248,
+   "expect": "1236,64311,100,36",
+   "why": "F06, overprint 1 of 2 on 2846:21667 (analyze.py report: 2846:21679 over 2846:21678 by 100x14). Root cause is a clone that kept its source's width: on the twin board 171:105 the same title node 171:133 holds 'AI is out of credit.' in 100x18 with ar=WIDTH_AND_HEIGHT (one line); here 2846:21678 holds the longer 'The AI service didn't respond.' in a FIXED 100px box with ar=HEIGHT, so it wrapped to two lines and became 36 tall, ending 64347 while the body 2846:21679 starts 64333. Fix the width, not the position: 248 is the frame's own content width (280 - 16 - 16, the width 2846:21679 already uses). At 12px Regular the string measures ~178px, so it unwraps to one line and its auto-height returns to 18, ending 64329 — 4px above the body's 64333, which is exactly the twin board's gap (171:133 ends 67259, 171:134 starts 67263). Overprint 1 closes with no move at all."
+  },
+  {
+   "op": "resize",
+   "id": "2846:21677",
+   "h": 272,
+   "expect": "1220,64301,280,108",
+   "why": "F06 — clipping parent 'Error' of 2846:21667. b20 kids: 2846:21677 = 1220,64301,280,108, ends 64409, while 2846:21681 spans 64405-64441 and 2846:21682 spans 64449-64529 (the same clip as 171:132; the audit named only the two overprints, but the board is the same defect twice). After the three move rows below, content bottom = 2846:21682 at 64481+80 = 64561, i.e. 64561-64301 = 260 from the frame top. Top pad is 64311-64301 = 10, symmetric bottom pad gives 270, rounded up to the 4px grid = 272. 108 -> 272, delta +164. NO sibling shrink needed: 2846:21667 is 1220,64117,280,812 (bottom 64929) and its five children tile 36+44+32+72+108 = 292 ending 64409, leaving 520px of tail; after +164 the stack ends 64573, still 356px clear. Cited: analyze.py kids 2846:21667."
+  },
+  {
+   "op": "move",
+   "id": "2846:21680",
+   "x": 16,
+   "y": 106,
+   "expect": "1236,64375,56,18",
+   "why": "F06, overprint 2 of 2 (analyze.py report: 2846:21680 'Try again' over 2846:21679 by 56x18). The body 2846:21679 is 248x64 = 4 lines where the twin's 171:134 is 2 lines, so it ends at 64397 while 'Try again' sits at 64375-64393, wholly inside it. The whole tail shifts down by exactly the body's extra height (64-32 = 32): 64375 -> 64407, which puts it 10px below the body — the twin board's gap (171:134 ends 67295, 171:135 starts 67305). Parent 2846:21677 origin 1220,64301, so parent-relative x = 1236-1220 = 16, y = 64407-64301 = 106."
+  },
+  {
+   "op": "move",
+   "id": "2846:21681",
+   "x": 16,
+   "y": 136,
+   "expect": "1236,64405,160,36",
+   "why": "F06 clipped half — 'Continue by hand in the inspector' spans 64405-64441 against a frame ending 64409, so 32 of its 36px are clipped and the promised manual-continuation route does not render. Same uniform +32 shift: 64405 -> 64437, preserving the existing 12px gap after 2846:21680's new bottom (64425 + 12 = 64437). Parent-relative: x = 16, y = 64437-64301 = 136."
+  },
+  {
+   "op": "move",
+   "id": "2846:21682",
+   "x": 16,
+   "y": 180,
+   "expect": "1236,64449,160,80",
+   "why": "F06 clipped half — the explanation spans 64449-64529, entirely below the 64409 clip. Same uniform +32 shift: 64449 -> 64481, preserving the existing 8px gap after 2846:21681's new bottom (64473 + 8 = 64481). Ends 64561, which is what sizes 2846:21677 to 272 above. Parent-relative: x = 16, y = 64481-64301 = 180. NOTE held row H1 — same third-person copy as 2846:21650/21652."
+  },
+  {
+   "op": "resize",
+   "id": "170:15",
+   "h": 112,
+   "expect": "100,64421,280,96",
+   "why": "F06 third board (VERDICTS: 'the rendered sentence stops at one step at a tim'). b11b: clipping frame 'note' 170:15 = 100,64421,280,96 ends 64517; its only text 170:16 = 116,64429,248,96 ends 64525 — 8px, one line, cut. Content bottom 64525 - frame top 64421 = 104; top pad is 64429-64421 = 8, symmetric bottom pad = 112 (already on the 4px grid). 96 -> 112, delta +16. NO spacer shrink needed and none exists: 170:2 is 100,64117,280,812 (bottom 64929) and its IN-FLOW children tile contiguously 170:3(36)+170:5(44)+1625:7162(32)+170:7(72)+170:10(120)+170:15(96)+921:4478(92)+444:2388(34)+444:2390(34)+873:4544(36) = 596, ending 64713. The remaining five children are absolutely positioned (2846:21653 sits at y64265, above its array position; 1671:7241 at 64823 breaks the tiling; 2483:11978/11981/11984 sit at x106, inside the 100 padding line) so they do not move. +16 puts the in-flow tail at 64729, still 78px above the first absolute hotspot at 64807 and 200px above the board bottom. Cited: analyze.py kids 170:2."
+  },
+  {
+   "op": "resize",
+   "id": "163:43",
+   "h": 316,
+   "expect": "1300,79840,280,340",
+   "why": "F07 — AUTO-LAYOUT COMPENSATION, paid before the growth it pays for. Board 163:2 is 1300,79452,280,812, layout=VERTICAL, and its in-flow children tile 48+36+88+40+44+44+44+44+340+40+44 = 812 EXACTLY, so the Footer's bottom is the board's bottom and the board has ZERO slack (cited: analyze.py kids 163:2). Growing 'Prune note' by 24 without this row would push the Footer 24px out of a clipsContent board. Spacer '163:43' 340 -> 316, delta -24; net board height change 0."
+  },
+  {
+   "op": "resize",
+   "id": "163:44",
+   "h": 64,
+   "expect": "1300,80180,280,40",
+   "why": "F07 — clipping frame 'Prune note' 163:44 = 1300,80180,280,40 ends y80220, while its retention text 163:45 = 1316,80188,248,48 ends y80236: 3 lines of 16px in a box that shows 2, so the sentence is cut at 'Save a version to keep a', and its bottom edge collides with the Footer text 163:47 (1316,80234,106,20) by 106x2px (analyze.py report 163:2). Content bottom 80236 - frame top 80180 = 56; top pad is 80188-80180 = 8, symmetric bottom pad = 64 (on the 4px grid). 40 -> 64, delta +24, paid for by the spacer row immediately above. Because the compensation pulls this frame's TOP up 24 as well, the text rides up with its parent to 80164-80212 and clears the Footer text at 80234 by 22px — the 106x2 overprint closes with it."
+  },
+  {
+   "op": "resize",
+   "id": "2854:12326",
+   "h": 170,
+   "expect": "3400,77888,280,194",
+   "why": "F07 — AUTO-LAYOUT COMPENSATION, paid before the growth it pays for. Board 2854:12294 is 3400,77354,280,812, layout=VERTICAL, and its in-flow children tile 48+36+146+88+40+44+44+44+44+194+40+44 = 812 EXACTLY, so the Footer's bottom is the board's bottom and the board has ZERO slack (cited: analyze.py kids 2854:12294). Growing 'Prune note' by 24 without this row would push the Footer 24px out of a clipsContent board. Spacer '2854:12326' 194 -> 170, delta -24; net board height change 0."
+  },
+  {
+   "op": "resize",
+   "id": "2854:12327",
+   "h": 64,
+   "expect": "3400,78082,280,40",
+   "why": "F07 — clipping frame 'Prune note' 2854:12327 = 3400,78082,280,40 ends y78122, while its retention text 2854:12328 = 3416,78090,248,48 ends y78138: 3 lines of 16px in a box that shows 2, so the sentence is cut at 'Save a version to keep a', and its bottom edge collides with the Footer text 2854:12330 (3416,78136,106,20) by 106x2px (analyze.py report 2854:12294). Content bottom 78138 - frame top 78082 = 56; top pad is 78090-78082 = 8, symmetric bottom pad = 64 (on the 4px grid). 40 -> 64, delta +24, paid for by the spacer row immediately above. Because the compensation pulls this frame's TOP up 24 as well, the text rides up with its parent to 78066-78114 and clears the Footer text at 78136 by 22px — the 106x2 overprint closes with it."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21771",
+   "h": 158,
+   "expect": "4300,77900,280,182",
+   "why": "F07 — AUTO-LAYOUT COMPENSATION, paid before the growth it pays for. Board 2854:21739 is 4300,77354,280,812, layout=VERTICAL, and its in-flow children tile 48+36+56+88+40+44+44+44+44+102+182+40+44 = 812 EXACTLY, so the Footer's bottom is the board's bottom and the board has ZERO slack (cited: analyze.py kids 2854:21739). Growing 'Prune note' by 24 without this row would push the Footer 24px out of a clipsContent board. Spacer '2854:21771' 182 -> 158, delta -24; net board height change 0."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21772",
+   "h": 64,
+   "expect": "4300,78082,280,40",
+   "why": "F07 — clipping frame 'Prune note' 2854:21772 = 4300,78082,280,40 ends y78122, while its retention text 2854:21773 = 4316,78090,248,48 ends y78138: 3 lines of 16px in a box that shows 2, so the sentence is cut at 'Save a version to keep a', and its bottom edge collides with the Footer text 2854:21775 (4316,78136,106,20) by 106x2px (analyze.py report 2854:21739). Content bottom 78138 - frame top 78082 = 56; top pad is 78090-78082 = 8, symmetric bottom pad = 64 (on the 4px grid). 40 -> 64, delta +24, paid for by the spacer row immediately above. Because the compensation pulls this frame's TOP up 24 as well, the text rides up with its parent to 78066-78114 and clears the Footer text at 78136 by 22px — the 106x2 overprint closes with it."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21846",
+   "h": 66,
+   "expect": "4860,77872,280,90",
+   "why": "F07 — AUTO-LAYOUT COMPENSATION, paid before the growth it pays for. Board 2854:21814 is 4860,77354,280,812, layout=VERTICAL, and its in-flow children tile 48+36+130+88+40+44+44+44+44+90+120+40+44 = 812 EXACTLY, so the Footer's bottom is the board's bottom and the board has ZERO slack (cited: analyze.py kids 2854:21814). Growing 'Prune note' by 24 without this row would push the Footer 24px out of a clipsContent board. Spacer '2854:21846' 90 -> 66, delta -24; net board height change 0."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21847",
+   "h": 64,
+   "expect": "4860,78082,280,40",
+   "why": "F07 — clipping frame 'Prune note' 2854:21847 = 4860,78082,280,40 ends y78122, while its retention text 2854:21848 = 4876,78090,248,48 ends y78138: 3 lines of 16px in a box that shows 2, so the sentence is cut at 'Save a version to keep a', and its bottom edge collides with the Footer text 2854:21850 (4876,78136,106,20) by 106x2px (analyze.py report 2854:21814). Content bottom 78138 - frame top 78082 = 56; top pad is 78090-78082 = 8, symmetric bottom pad = 64 (on the 4px grid). 40 -> 64, delta +24, paid for by the spacer row immediately above. Because the compensation pulls this frame's TOP up 24 as well, the text rides up with its parent to 78066-78114 and clears the Footer text at 78136 by 22px — the 106x2 overprint closes with it."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21886",
+   "h": 214,
+   "expect": "5140,77844,280,238",
+   "why": "F07 — AUTO-LAYOUT COMPENSATION, paid before the growth it pays for. Board 2854:21854 is 5140,77354,280,812, layout=VERTICAL, and its in-flow children tile 48+36+102+88+40+44+44+44+44+238+40+44 = 812 EXACTLY, so the Footer's bottom is the board's bottom and the board has ZERO slack (cited: analyze.py kids 2854:21854). Growing 'Prune note' by 24 without this row would push the Footer 24px out of a clipsContent board. Spacer '2854:21886' 238 -> 214, delta -24; net board height change 0."
+  },
+  {
+   "op": "resize",
+   "id": "2854:21887",
+   "h": 64,
+   "expect": "5140,78082,280,40",
+   "why": "F07 — clipping frame 'Prune note' 2854:21887 = 5140,78082,280,40 ends y78122, while its retention text 2854:21888 = 5156,78090,248,48 ends y78138: 3 lines of 16px in a box that shows 2, so the sentence is cut at 'Save a version to keep a', and its bottom edge collides with the Footer text 2854:21890 (5156,78136,106,20) by 106x2px (analyze.py report 2854:21854). Content bottom 78138 - frame top 78082 = 56; top pad is 78090-78082 = 8, symmetric bottom pad = 64 (on the 4px grid). 40 -> 64, delta +24, paid for by the spacer row immediately above. Because the compensation pulls this frame's TOP up 24 as well, the text rides up with its parent to 78066-78114 and clears the Footer text at 78136 by 22px — the 106x2 overprint closes with it."
+  },
+  {
+   "op": "resize",
+   "id": "138:105",
+   "w": 92,
+   "expect": "2298,7431,66,32",
+   "why": "F13 — b13: row 138:103 'Result . CTA button' = 2108,7423,264,32 with clipsContent=true, ends y7455; its category text 138:105 'COMPONENTS' = 2298,7431,66,32 ends 7463, overrunning the clip by 8px. The siblings are single-line 16px (138:99 'ELEMENTS' 2298,7367,65,16 in a row ending 7391; 138:102 'BLOCKS' 2298,7399,49,16 in a row ending 7423), so the row pitch is right and the LABEL is wrong: 138:105 is ar=HEIGHT at a fixed 66px and 'COMPONENTS' does not fit, so it wrapped to 2 lines. Do not grow the row (that breaks a 32px pitch and pushes 4 siblings); widen the text so it unwraps. Width needed, measured off the two siblings rather than guessed: Inter caps advances at 11px give BLOCKS = 43.1px and ELEMENTS = 56.9px against measured 49 and 65, i.e. ~1.0px of tracking per character; COMPONENTS = 76.4 + 10 = 86.4px. 92 gives 5.6px of headroom. 66 -> 92, delta +26w. Height is not set: with ar=HEIGHT it returns to 16 by itself, and the existing y7431 then leaves 8px above and 8px below inside the 7423-7455 row, which is exactly the siblings' inset. VERIFY: if it still measures 32 tall after the write, the string needs more than 92 - re-measure before widening further, because 2372 (the row's clip edge) is the hard ceiling."
+  },
+  {
+   "op": "move",
+   "id": "138:105",
+   "x": 164,
+   "y": 8,
+   "expect": "2298,7431,66,32",
+   "why": "F13 — the widened box has to move left or it hits the same clip from the other side: at x2298 a 92px box ends 2390, and the row clips at 2108+264 = 2372. New left edge 2272 puts the box's right edge at 2364, the SAME right edge it has today (2298+66), so nothing shifts visually on the right while the glyphs get their room on the left; clearance to the row's clip edge is 8px, matching 138:99's 9px. Parent 138:103 origin 2108,7423, so parent-relative x = 2272-2108 = 164, y = 7431-7423 = 8 (y unchanged). Gap to the left label 138:104 'CTA button' (ends 2194) is 78px."
+  },
+  {
+   "op": "move",
+   "id": "138:99",
+   "x": 164,
+   "y": 8,
+   "expect": "2298,7367,65,16",
+   "why": "F13 alignment compensation, same plan as required by the rule that a fix must not leave a worse defect. The three category labels are LEFT-aligned on a common line at x2298 (138:99 w65, 138:102 w49, 138:105 w66 all start there); 'COMPONENTS' cannot stay on that line at any width that fits it, so the line itself moves to x2272 and all three move with it. Without this row the column reads as two labels at 2298 and one at 2272. Parent 138:97 origin 2108,7359: parent-relative x = 2272-2108 = 164, y = 7367-7359 = 8 (unchanged). Delta -26x. This node is not clipped and its size is untouched."
+  },
+  {
+   "op": "move",
+   "id": "138:102",
+   "x": 164,
+   "y": 8,
+   "expect": "2298,7399,49,16",
+   "why": "F13 alignment compensation, as 138:99. Parent 138:100 origin 2108,7391: parent-relative x = 2272-2108 = 164, y = 7399-7391 = 8 (unchanged). Delta -26x. Note all three rows resolve to the same parent-relative (164,8), which is the check that the column really is one line and that the three rows really are the same 264x32 geometry."
+  },
+  {
+   "op": "resize",
+   "id": "2850:22374",
+   "w": 388,
+   "expect": "6846,21181,406,13",
+   "why": "M06 — b07: alert frame 2850:22373 'in-use-warn' = 6836,21175,408,25 with clipsContent=true; its only text 2850:22374 = 6846,21181,406,13 starts 10px inside it, so it ends 6846+406 = 7252 against a clip edge at 6836+408 = 7244 and the final word 'elements.' is cut (analyze.py report 2850:22373: TEXT-OUTSIDE-BOARD right+8). CHOSE WRAPPING over widening, and here is why the other option is not available: the modal 2850:22371 is 440 wide with 16px padding on both sides (its children all start at x6836 and the 408-wide ones end at 7244 = 7260-16), so the alert's content column IS 408. Making the sentence fit on one line needs 406 + 10 + 10 = 426 of frame, i.e. a 458px modal — 18px wider than the 440 modal, which would push it off its own specimen width and out of step with the modal family. So the text gets a real width instead of hugging: 388 = 408 - 10 (its own left inset) - 10 (the same inset mirrored on the right). 406 -> 388, delta -18w. It is ar=WIDTH_AND_HEIGHT today; apply-queue's resize flips a WIDTH_AND_HEIGHT text to HEIGHT before resizing, so the height then reflows to 2 lines on its own.",
+   "hold": true,
+   "holdWhy": "M06 HELD ON THE CLONE by the parent, and re-aimed at the bulk board. c1-clones rewrites this same board: 2850:22372 becomes 'Delete “hero-dark.jpg”?' and 2850:22374 becomes the much shorter '⚠ Used by 3 elements on Home and Menu. Deleting breaks them.', and it hides the typed-confirm block, resizing the modal 202→117. So this row's wrap-and-grow is aimed at a string that will no longer be on this board, and its h=217 would fight c1's h=117 on the same node. The long bulk warning it was written for legitimately lives on 1175:4827, where the identical defect is present and the audit never looked: in-use-warn 1175:4829 is 408x25 clipsContent=true while its text 1175:4830 is 406px inset 10px (126+406=532 vs frame right 116+408=524) — the same 8px overflow. Equivalent rows now target that board."
+  },
+  {
+   "op": "resize",
+   "id": "2850:22373",
+   "h": 40,
+   "expect": "6836,21175,408,25",
+   "why": "M06 — the wrap has to be paid for in height or the same defect reappears on the bottom edge. 11px Regular measures 13px per line on this board (2850:22375 and 2850:22384 are both h13), so 2 lines = 26-27px. Current 25 = 6 + 13 + 6, i.e. 6px insets top and bottom. New = 6 + 27 + 6 = 39, taken to 40 to absorb the +-1px of line-box rounding rather than risk a 1px clip on the descenders. 25 -> 40, delta +15. If this frame turns out to HUG vertically (25 is exactly its hug value) the write reports SAME/DRIFT and costs nothing - the row is here because if it is FIXED, the wrap would be clipped vertically instead of horizontally and the finding would read as unfixed.",
+   "hold": true,
+   "holdWhy": "M06 HELD ON THE CLONE by the parent, and re-aimed at the bulk board. c1-clones rewrites this same board: 2850:22372 becomes 'Delete “hero-dark.jpg”?' and 2850:22374 becomes the much shorter '⚠ Used by 3 elements on Home and Menu. Deleting breaks them.', and it hides the typed-confirm block, resizing the modal 202→117. So this row's wrap-and-grow is aimed at a string that will no longer be on this board, and its h=217 would fight c1's h=117 on the same node. The long bulk warning it was written for legitimately lives on 1175:4827, where the identical defect is present and the audit never looked: in-use-warn 1175:4829 is 408x25 clipsContent=true while its text 1175:4830 is 406px inset 10px (126+406=532 vs frame right 116+408=524) — the same 8px overflow. Equivalent rows now target that board."
+  },
+  {
+   "op": "resize",
+   "id": "2850:22371",
+   "h": 217,
+   "expect": "6820,21134,440,202",
+   "why": "M06 — AUTO-LAYOUT COMPENSATION, and the one place in this plan where the container grows instead of a spacer shrinking, because this board has no spacer to take it out of. 2850:22371 is layout=VERTICAL with 14px padding and 10px item spacing, and its height is exactly its content: 14 + 17 + 10 + 25 + 10 + 13 + 10 + 29 + 10 + 27 + 10 + 13 + 14 = 202 (children 2850:22372/22373/22375/22376/22378/22384, cited analyze.py kids 2850:22371). Zero slack, so the +15 on 2850:22373 has to land somewhere: 202 + 15 = 217. It is a free-standing 440px modal specimen, not a child of an 812px band, so it can grow. If the modal HUGs vertically this row reports SAME and the growth happened by itself. NOT AUTHORED and flagged in the report: the two absolutely-positioned back-hotspots 2850:22385 (6820,21299,320,34) and 2850:22386 (6820,21295,280,34) do not move with the flow and already overlap each other and the foot row - their placement is a prototype-wiring question, not a clipping one.",
+   "hold": true,
+   "holdWhy": "M06 HELD ON THE CLONE by the parent, and re-aimed at the bulk board. c1-clones rewrites this same board: 2850:22372 becomes 'Delete “hero-dark.jpg”?' and 2850:22374 becomes the much shorter '⚠ Used by 3 elements on Home and Menu. Deleting breaks them.', and it hides the typed-confirm block, resizing the modal 202→117. So this row's wrap-and-grow is aimed at a string that will no longer be on this board, and its h=217 would fight c1's h=117 on the same node. The long bulk warning it was written for legitimately lives on 1175:4827, where the identical defect is present and the audit never looked: in-use-warn 1175:4829 is 408x25 clipsContent=true while its text 1175:4830 is 406px inset 10px (126+406=532 vs frame right 116+408=524) — the same 8px overflow. Equivalent rows now target that board."
+  },
+  {
+   "op": "resize",
+   "id": "1175:4830",
+   "w": 388,
+   "expect": "126,24781,406,13",
+   "why": "M06 on the BULK board (found while resolving the c1/c2 collision; the audit cited only the clone). Text 1175:4830 is 406px at x126 inside in-use-warn 1175:4829 [116,24775,408,25] clipsContent=true, so it ends at 532 against a frame right edge of 524 and the final word 'elements.' is cut. 408 - 10 left inset - 10 right inset = 388, mirroring its own left inset, so the string wraps to two lines instead of being clipped. Wrap, not widen: widening needs 426 of frame, i.e. a 458px modal, 18px past this family's 440 specimen."
+  },
+  {
+   "op": "resize",
+   "id": "1175:4829",
+   "h": 40,
+   "expect": "116,24775,408,25",
+   "why": "M06 on the BULK board — the alert must be tall enough for the two lines the 388px width creates. 11px Inter at ~16px line-height: 2 lines = 32, plus the frame's own 4px top and bottom = 40. Paired with the 1175:4830 width row above; neither works alone."
+  },
+  {
+   "op": "resize",
+   "id": "1175:4827",
+   "h": 229,
+   "expect": "100,24734,440,214",
+   "why": "M06 on the BULK board — auto-layout compensation. 1175:4827 is layout=VERTICAL and its 214 height is exactly its content (14 + 17 title + 10 + 25 in-use-warn + 10 + 13 + 10 + 29 confirm-input + 10 + 39 foot + 10 + 13 + 14). Growing in-use-warn 25→40 adds 15, so 214+15=229. This board is a floating modal, not a 280x812 panel, so there is no clipping board bottom to pay it out of and no spacer to shrink — the same call c2 made for the clone at 202→217."
+  }
+ ],
+ "held": [
+  {
+   "hold": true,
+   "op": "delete",
+   "id": "2846:21652",
+   "expect": "2116,67379,160,80",
+   "why": "HELD - H1, and NOT to be normalized: neither normalize-plans.mjs nor apply-queue.mjs reads the `hold` key, so this row lives outside `rows` on purpose. QUESTION: is 'The thread and the prompt you typed stay on screen behind this state. Losing the user's wo[rk]...' product copy or C4 engineering annotation? It is written in the THIRD PERSON about 'the user', it is 160px wide inside a 248px content column (171:134 and 171:165 are both 248), and it is one of exactly two nodes on the board that sit below the clip - the same shape PLAN C4 describes for 2838:12104/12105 inside 140:2. If it is annotation it should be hidden and 171:132 sized to 152 (last product text 2846:21651 ends 67371; 67371-67231 = 140, +10 top-pad-symmetric = 150, 4px grid = 152) instead of the 240 authored above. I authored the 240 because the caller's instruction and PLAN C2 both say 'grow the parent so both render', and revealing content is reversible while hiding it pre-empts C4's owner."
+  },
+  {
+   "hold": true,
+   "op": "delete",
+   "id": "2846:21650",
+   "expect": "116,65857,178,64",
+   "why": "HELD - H1 on 171:136, same string and same question as 2846:21652. If it is annotation: hide it, and 171:163 becomes 232 instead of 304 (last product text 2846:21649 moves to 65853 and ends 65889; 65889-65675 = 214, +16 = 230, 4px grid = 232). The three move rows above stay correct either way - they close the 178x18 overprint, which is a product-copy defect regardless of this answer."
+  },
+  {
+   "hold": true,
+   "op": "delete",
+   "id": "2846:21682",
+   "expect": "1236,64449,160,80",
+   "why": "HELD - H1 on 2846:21667, same string and same question. If it is annotation: hide it, and 2846:21677 becomes 184 instead of 272 (last product text 2846:21681 moves to 64437 and ends 64473; 64473-64301 = 172, +10 = 182, 4px grid = 184). The 2846:21678 width fix and the three move rows close both audited overprints regardless of this answer."
+  }
+ ]
+}

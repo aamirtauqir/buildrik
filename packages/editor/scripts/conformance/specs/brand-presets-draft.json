@@ -1,0 +1,424 @@
+{
+  "surface": "brand-presets-draft",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "306:2161",
+  "boardName": "brand-presets-draft",
+  "figmaHash": "b8c369db6b6b662a13e72e43544534a72b50822eacd5bb9f39cf4eb838ca18c0",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:07:31.606Z",
+  "copy": [
+    "Brand",
+    "‹ Presets",
+    "Buttons",
+    "3 variants",
+    "Cards",
+    "3 variants",
+    "Sections",
+    "3 variants",
+    "Forms",
+    "3 variants",
+    "Nav",
+    "3 variants",
+    "Footers",
+    "3 variants",
+    "Draft preset"
+  ],
+  "targets": [
+    {
+      "nodeId": "306:2161",
+      "name": "[not-implemented] Brand · presets · draft — updatePreset/addPreset/deletePreset have zero UI callers AND the editable binding row (ui/presets/BindingRow.tsx) has no importer, so isDirty is permanently false (usePresetsForCategory.ts:67-88; PresetBindingRow.tsx:5 “no-op v1”)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2162",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I306:2162;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2163",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2164",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2165",
+      "name": "Preset · Buttons",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2166",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2167",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2168",
+      "name": "Preset · Cards",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative rounded-[8px] shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2169",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2170",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2171",
+      "name": "Preset · Sections",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2172",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2173",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2174",
+      "name": "Preset · Forms",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2175",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2176",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2177",
+      "name": "Preset · Nav",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2178",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2179",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2180",
+      "name": "Preset · Footers",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2181",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2182",
+      "name": null,
+      "className": "absolute leading-[16px] left-[192px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "333:2356",
+      "name": "Badge",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/200,#e5e7eb)] border border-[var(--flowbite\\/gray\\/400,#9ca3af)] border-solid content-stretch flex items-center left-[15px] px-[10px] py-[2px] rounded-[9999px] top-[87px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/200",
+          "value": "#e5e7eb"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/400",
+          "value": "#9ca3af"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "I333:2356;12:7",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[16px] not-italic relative shrink-0 text-[12px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "surface": "s5-4-gate-no-review-sent",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "307:2213",
+  "boardName": "s5-4-gate-no-review-sent",
+  "figmaHash": "f9b938947bab4e6c492114dbd6560e6df2d575ae9debeadcb811a81a77365a11",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:47:41.589Z",
+  "copy": [
+    "No review sent yet",
+    "This site needs client approval before it can go live. Send it for review first.",
+    "Send for review",
+    "Cancel"
+  ],
+  "targets": [
+    {
+      "nodeId": "307:2213",
+      "name": "S5.4 · gate · no-review-sent",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "390:3839",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2214",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] content-stretch flex flex-col gap-[14px] items-start left-[460px] overflow-clip pt-[30px] px-[32px] rounded-[16px] top-[373px] w-[520px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "gap": {
+          "value": "14px"
+        },
+        "padding-top": {
+          "value": "30px"
+        },
+        "padding-left": {
+          "value": "32px"
+        },
+        "padding-right": {
+          "value": "32px"
+        },
+        "border-radius": {
+          "value": "16px"
+        },
+        "width": {
+          "value": "520px"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2215",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[16px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2216",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left w-[456px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "456px"
+        }
+      }
+    },
+    {
+      "nodeId": "307:2217",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-start overflow-clip pt-[8px] relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "337:2248",
+      "name": "Button",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch cursor-pointer drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I337:2248;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "337:2250",
+      "name": "Button",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I337:2250;9:43",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    },
+    {
+      "nodeId": "633:4001",
+      "name": "hotspot/state · Publish · pre-checks",
+      "className": "absolute h-[34px] left-0 top-[866px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

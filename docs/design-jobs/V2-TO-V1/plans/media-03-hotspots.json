@@ -1,0 +1,370 @@
+[
+ {
+  "over": "1161:146",
+  "to": "52:2",
+  "name": "hotspot/act · Insert to canvas → editor",
+  "pad": 6,
+  "why": "W-A-01 CRITICAL — 'Insert to canvas' is rx=0 on all three fullpage boards, so an asset landing on a page, the module's whole purpose, has no wired edge anywhere in the section. Code inserts on a single card click: SlimLauncher.tsx:461 onInsert → useMediaState.ts:245-259 composer.mediaOps.insertMediaAt. Destination 52:2 'S1 · Editor — ASSEMBLED'.",
+  "board": "1159:4593 Media · fullpage · library"
+ },
+ {
+  "over": "1163:4832",
+  "to": "52:2",
+  "name": "hotspot/act · Insert to canvas → editor",
+  "pad": 6,
+  "why": "W-A-01 CRITICAL — 'Insert to canvas' is rx=0 on all three fullpage boards, so an asset landing on a page, the module's whole purpose, has no wired edge anywhere in the section. Code inserts on a single card click: SlimLauncher.tsx:461 onInsert → useMediaState.ts:245-259 composer.mediaOps.insertMediaAt. Destination 52:2 'S1 · Editor — ASSEMBLED'.",
+  "board": "1163:4641 Media · fullpage · list-view · bulk-select"
+ },
+ {
+  "over": "1163:14139",
+  "to": "52:2",
+  "name": "hotspot/act · Insert to canvas → editor",
+  "pad": 6,
+  "why": "W-A-01 CRITICAL — 'Insert to canvas' is rx=0 on all three fullpage boards, so an asset landing on a page, the module's whole purpose, has no wired edge anywhere in the section. Code inserts on a single card click: SlimLauncher.tsx:461 onInsert → useMediaState.ts:245-259 composer.mediaOps.insertMediaAt. Destination 52:2 'S1 · Editor — ASSEMBLED'.",
+  "board": "1163:13948 Media · fullpage · drag-over · uploading"
+ },
+ {
+  "over": "218:686",
+  "to": "52:2",
+  "name": "hotspot/card · click inserts onto the canvas",
+  "pad": 0,
+  "why": "W-A-01 CRITICAL — on the drawer a card click goes to asset-detail (the board's frame catch-all 144:2 → 146:2), but the code INSERTS on a single click and switches the tab back to Insert (useMediaState.ts:240-259). A hotspot over card 1 wins over the frame catch-all and makes the real primary action reachable. Detail stays reachable from the other three cards.",
+  "board": "144:2 Media · grid"
+ },
+ {
+  "over": "144:48",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "144:2 Media · grid"
+ },
+ {
+  "over": "145:48",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:2 Media · filtered"
+ },
+ {
+  "over": "145:95",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:49 Media · folder-scoped"
+ },
+ {
+  "over": "145:142",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:96 Media · uploading"
+ },
+ {
+  "over": "145:194",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:148 Media · upload-failed"
+ },
+ {
+  "over": "145:245",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:199 Media · quota-warn"
+ },
+ {
+  "over": "145:296",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:250 Media · quota-full"
+ },
+ {
+  "over": "145:405",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "145:359 Media · empty"
+ },
+ {
+  "over": "453:3959",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "453:3931 Media · load-error"
+ },
+ {
+  "over": "777:4124",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "777:4093 Media · loading"
+ },
+ {
+  "over": "782:4384",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "782:4353 Media · no-results"
+ },
+ {
+  "over": "2430:21399",
+  "to": "147:55",
+  "name": "hotspot/footer · ☁ Stock",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-03 — the footer's stock link is the ONLY stock door on the 280 panel and carries no reaction, so the board's frame-level catch-all swallows the click and opens an asset's detail page instead. Code: SlimLauncher.tsx:634-648 'Browse stock' → onOpenStock → MediaTab.tsx:372 setStockBrowserOpen(true). Run AFTER media-02 (the label is renamed to '☁ Stock' first).",
+  "board": "2430:21365 Media · local-only assets"
+ },
+ {
+  "over": "1124:4588",
+  "to": "147:2",
+  "name": "hotspot/footer · ⬡ Icons",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-13 — the Icons link is dead and the drill-in it should open (147:2) is reachable only from a designer hotspot. Code: SlimLauncher.tsx:650-663 media-icons-action → onOpenIconPicker → MediaTab.tsx:376 setIconBrowserOpen(true).",
+  "board": "144:2 Media · grid"
+ },
+ {
+  "over": "2430:21400",
+  "to": "147:2",
+  "name": "hotspot/footer · ⬡ Icons",
+  "pad": 6,
+  "why": "UX-H-05 / W-A-13 — the Icons link is dead and the drill-in it should open (147:2) is reachable only from a designer hotspot. Code: SlimLauncher.tsx:650-663 media-icons-action → onOpenIconPicker → MediaTab.tsx:376 setIconBrowserOpen(true).",
+  "board": "2430:21365 Media · local-only assets"
+ },
+ {
+  "over": "144:12",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "144:2"
+ },
+ {
+  "over": "145:12",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:2"
+ },
+ {
+  "over": "145:59",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:49"
+ },
+ {
+  "over": "145:106",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:96"
+ },
+ {
+  "over": "145:158",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:148"
+ },
+ {
+  "over": "145:209",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:199"
+ },
+ {
+  "over": "145:260",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:250"
+ },
+ {
+  "over": "145:369",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "145:359"
+ },
+ {
+  "over": "453:3938",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "453:3931"
+ },
+ {
+  "over": "777:4100",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "777:4093"
+ },
+ {
+  "over": "782:4360",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "782:4353"
+ },
+ {
+  "over": "2430:21372",
+  "to": "145:300",
+  "name": "hotspot/folder-row · ☑ Select → bulk-select",
+  "pad": 6,
+  "why": "UX-H-01 + UX-H-08 — with the inert Grid/List/Sort trio replaced by ☑ Select (media-02), bulk selection finally has a door that is not the stolen right-click gesture. 145:310 on 145:300 itself is excluded — it is already in that state.",
+  "board": "2430:21365"
+ },
+ {
+  "over": "233:1254",
+  "to": "146:68",
+  "name": "hotspot/row · Used in N places",
+  "pad": 0,
+  "why": "W-A-06 (serves UX-H-10) — the destination board exists and the row has no edge. Code: AssetDetailOverlay.tsx:407 setView('used').",
+  "board": "146:2 Media · drill-in · asset-detail"
+ },
+ {
+  "over": "233:1259",
+  "to": "146:32",
+  "name": "hotspot/row · Versions",
+  "pad": 0,
+  "why": "W-A-06 — destination exists, row dead. Code: AssetDetailOverlay.tsx:414 setView('versions').",
+  "board": "146:2"
+ },
+ {
+  "over": "233:1274",
+  "to": "1164:4738",
+  "name": "hotspot/row · Replace across site",
+  "pad": 0,
+  "why": "W-A-06 — destination exists, row dead. Code: AssetDetailOverlay.tsx:443 onReplaceAcross.",
+  "board": "146:2"
+ },
+ {
+  "over": "1160:13",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1159:4593"
+ },
+ {
+  "over": "1163:4676",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1163:4641"
+ },
+ {
+  "over": "1163:13730",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1163:13695"
+ },
+ {
+  "over": "1163:13983",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1163:13948"
+ },
+ {
+  "over": "1162:4652",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1162:4617"
+ },
+ {
+  "over": "1162:4858",
+  "to": "1716:8391",
+  "name": "hotspot/toolbar · + Add from stock",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-10 — '+ Add from stock' is dead on four of the five manager boards and on the empty state, where it is the one alternative to uploading. Destination exists. Code: LibraryManager.tsx:326 setStockModalOpen.",
+  "board": "1162:4617 (empty-state CTA)"
+ },
+ {
+  "over": "1160:9",
+  "to": "1205:4804",
+  "name": "hotspot/toolbar · ⭳ Import URL",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-39 — '⭳ Import URL' is dead everywhere except 1163:13695. Destination exists. Code: LibraryManager.tsx:318 setImportUrlOpen.",
+  "board": "1159:4593"
+ },
+ {
+  "over": "1163:4672",
+  "to": "1205:4804",
+  "name": "hotspot/toolbar · ⭳ Import URL",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-39 — '⭳ Import URL' is dead everywhere except 1163:13695. Destination exists. Code: LibraryManager.tsx:318 setImportUrlOpen.",
+  "board": "1163:4641"
+ },
+ {
+  "over": "1163:13979",
+  "to": "1205:4804",
+  "name": "hotspot/toolbar · ⭳ Import URL",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-39 — '⭳ Import URL' is dead everywhere except 1163:13695. Destination exists. Code: LibraryManager.tsx:318 setImportUrlOpen.",
+  "board": "1163:13948"
+ },
+ {
+  "over": "1162:4648",
+  "to": "1205:4804",
+  "name": "hotspot/toolbar · ⭳ Import URL",
+  "pad": 0,
+  "why": "UX-H-05 / W-A-09 / W-A-39 — '⭳ Import URL' is dead everywhere except 1163:13695. Destination exists. Code: LibraryManager.tsx:318 setImportUrlOpen.",
+  "board": "1162:4617"
+ },
+ {
+  "over": "1716:8435",
+  "to": "144:2",
+  "name": "hotspot/tile · Save to library → back to the grid",
+  "pad": 0,
+  "why": "UX-H-04 / W-A-05 — no stock board has a save or insert edge from a result tile, so the flow ends where the user has found the picture and cannot take it. StockBrowserOverlay.tsx:290 onSave; StockSourceModal receives onInsert (MediaTab.tsx:253).",
+  "board": "1716:8391 Media · stock · photos · results"
+ },
+ {
+  "over": "147:74",
+  "to": "52:2",
+  "name": "hotspot/tile · Insert to canvas — NOT in the 280 overlay today (StockBrowserOverlay.tsx:148 saves only)",
+  "pad": 0,
+  "why": "UX-H-04 — the drawer's overlay is missing the primary verb: it can only SAVE, so the user must then find the asset in the grid and click it again. The edge draws the unified design; the board rename in media-01 carries the [not-implemented] marker so the board does not print a behaviour the code lacks.",
+  "board": "147:55 Media · drill-in · stock-browser"
+ },
+ {
+  "over": "1175:4837",
+  "to": "145:300",
+  "name": "hotspot/btn · Cancel",
+  "pad": 6,
+  "why": "W-A-02 CRITICAL (serves UX-H-10's delete story) — the confirm's frame carries no reaction and both hotspot/back rects sit BELOW the button row (y≥161 against buttons at y138), so Cancel and Delete are outside every clickable rect.",
+  "board": "1175:4827 Media · delete-confirm · bulk type-DELETE (>20)"
+ }
+]

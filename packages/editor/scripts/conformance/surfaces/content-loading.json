@@ -1,0 +1,174 @@
+{
+  "surface": "content-loading",
+  "board": "Content · loading (Figma 775:4241)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-loading",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "content-loading"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-loading",
+      "nodeId": "775:4242"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-loading",
+      "nodeId": "I775:4242;16:7"
+    },
+    {
+      "name": "band-collections",
+      "testId": "content-section-collections",
+      "spec": "content-loading",
+      "nodeId": "776:4095"
+    },
+    {
+      "name": "band-data",
+      "testId": "content-section-data",
+      "spec": "content-loading",
+      "nodeId": "776:4098"
+    },
+    {
+      "name": "skel-c0",
+      "testId": "content-skel-c0",
+      "spec": "content-loading",
+      "nodeId": "775:4287"
+    },
+    {
+      "name": "skel-c0-icon",
+      "testId": "content-skel-c0-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4288"
+    },
+    {
+      "name": "skel-c0-bar",
+      "testId": "content-skel-c0-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4289"
+    },
+    {
+      "name": "skel-c1",
+      "testId": "content-skel-c1",
+      "spec": "content-loading",
+      "nodeId": "775:4290"
+    },
+    {
+      "name": "skel-c1-icon",
+      "testId": "content-skel-c1-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4291"
+    },
+    {
+      "name": "skel-c1-bar",
+      "testId": "content-skel-c1-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4292"
+    },
+    {
+      "name": "skel-c2",
+      "testId": "content-skel-c2",
+      "spec": "content-loading",
+      "nodeId": "775:4293"
+    },
+    {
+      "name": "skel-c2-icon",
+      "testId": "content-skel-c2-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4294"
+    },
+    {
+      "name": "skel-c2-bar",
+      "testId": "content-skel-c2-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4295"
+    },
+    {
+      "name": "skel-d0",
+      "testId": "content-skel-d0",
+      "spec": "content-loading",
+      "nodeId": "775:4296"
+    },
+    {
+      "name": "skel-d0-icon",
+      "testId": "content-skel-d0-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4297"
+    },
+    {
+      "name": "skel-d0-bar",
+      "testId": "content-skel-d0-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4298"
+    },
+    {
+      "name": "skel-d1",
+      "testId": "content-skel-d1",
+      "spec": "content-loading",
+      "nodeId": "775:4299"
+    },
+    {
+      "name": "skel-d1-icon",
+      "testId": "content-skel-d1-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4300"
+    },
+    {
+      "name": "skel-d1-bar",
+      "testId": "content-skel-d1-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4301"
+    },
+    {
+      "name": "skel-d2",
+      "testId": "content-skel-d2",
+      "spec": "content-loading",
+      "nodeId": "775:4302"
+    },
+    {
+      "name": "skel-d2-icon",
+      "testId": "content-skel-d2-icon",
+      "spec": "content-loading",
+      "nodeId": "775:4303"
+    },
+    {
+      "name": "skel-d2-bar",
+      "testId": "content-skel-d2-bar",
+      "spec": "content-loading",
+      "nodeId": "775:4304"
+    }
+  ],
+  "_note": [
+    "Board 775:4241. The loading screen is module state in `cmsSync` (one hydrate",
+    "per session), so ContentTab takes an injected `hydrationStatus` and the probe",
+    "mounts the whole tab — the skeleton is the panel's OWN structure, not a",
+    "stand-in list, so it has to be measured inside the panel that draws it.",
+    "",
+    "BOARD won once: the two section bands drew line-height 16 and the shared",
+    "SectionHeader leaves it to the face (`normal`). `SECTION_H` — the Content-only",
+    "override that already raises the band from the shared 28 to 32 — now carries",
+    "`tw:leading-4` too. Nothing outside Content reads SECTION_H, so the shared",
+    "primitive is untouched.",
+    "",
+    "A data-testid was added to the skeleton row's GLYPH block; the row and the",
+    "label bar already had one.",
+    "",
+    "NOT anchored: 776:4099 (the DATA band's text node) — SectionHeader puts the",
+    "label in an inner <span> and the type is declared on the band itself, which",
+    "776:4098 already anchors. The two hotspot/* nodes are prototype wiring.",
+    "",
+    "CONTRAST: 2 recorded failures, both `Collections`/`Data` at ink-muted on",
+    "bg-subtle = 4.39. Pre-existing and specified BY this board; it is the",
+    "39-instance token defect in docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md,",
+    "fixable only by moving the token value in Figma."
+  ]
+}

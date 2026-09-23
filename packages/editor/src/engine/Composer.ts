@@ -34,7 +34,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS, siteFontCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
@@ -417,8 +417,66 @@ export class Composer extends EventEmitter {
     });
     this.on(EVENTS.PROJECT_LOADED, () => this.repairLocalMediaUrls());
 
+    /* Site fonts. A font file in the library is UPLOADED; it becomes a
+       family the pickers offer once it is ADDED — `Add font` in the Site
+       fonts dialog sets `MediaAsset.siteFont` (Clone 3686:42317: "Existing
+       text is unchanged until you choose this font"). Only flagged fonts are
+       registered with the FontManager: at init for what is already stored,
+       then on add / update (the flag turning on, or a device-only upload
+       reaching the server with a new url); the flag turning off or the
+       asset's deletion unregisters. `fonts.getAllFonts({ source: "custom" })`
+       is therefore the added set, and the pickers and the export read
+       nothing else. Registration failures (a file the browser cannot decode)
+       are the FontManager's own event; nothing here should stop the library
+       from loading over one bad file. */
+    /* The delete event carries only the id and fires after the asset has
+       left the media state, so the file each id provided is remembered here. */
+    const fontFileById = new Map<string, string>();
+    /* A family is keyed by FILE name, and two library files can share one
+       (seen live: two Inter-Var.woff2, one added). It stays registered while
+       ANY asset carrying that name is added — a not-added duplicate must not
+       pull the added one's family out from under the pickers. */
+    const stillAddedElsewhere = (filename: string, exceptId: string | undefined) => {
+      for (const [id, file] of fontFileById) if (id !== exceptId && file === filename) return true;
+      return false;
+    };
+    const syncLibraryFont = (asset: unknown) => {
+      const a = asset as
+        | { id?: string; type?: string; originalName?: string; src?: string; siteFont?: boolean }
+        | undefined;
+      if (a?.type !== "font" || !a.originalName || !a.src) return;
+      if (a.siteFont === true) {
+        /* A device-only upload reaching the server comes back under a new id
+           for the same file; the old id's entry would otherwise hold the
+           family registered forever. Entries the library no longer knows go. */
+        for (const [id, file] of fontFileById) {
+          if (id !== a.id && file === a.originalName && !this.media.getAsset(id)) fontFileById.delete(id);
+        }
+        if (a.id) fontFileById.set(a.id, a.originalName);
+        void this.fonts.registerLibraryFont({ filename: a.originalName, url: a.src }).catch(() => {});
+        return;
+      }
+      if (a.id) fontFileById.delete(a.id);
+      if (stillAddedElsewhere(a.originalName, a.id)) return;
+      this.fonts.unregisterLibraryFont(a.originalName);
+    };
+    this.media.on(MEDIA_EVENTS.MEDIA_ADDED, syncLibraryFont);
+    this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
+      const p = payload as { asset?: unknown } | undefined;
+      syncLibraryFont(p && "asset" in p ? p.asset : payload);
+    });
+    this.media.on(MEDIA_EVENTS.MEDIA_DELETED, (payload: unknown) => {
+      const id = (payload as { id?: string } | undefined)?.id;
+      const filename = id ? fontFileById.get(id) : undefined;
+      if (!filename) return;
+      fontFileById.delete(id!);
+      if (stillAddedElsewhere(filename, id)) return;
+      this.fonts.unregisterLibraryFont(filename);
+    });
+
     // Initialize async managers
     await this.media.init();
+    for (const asset of this.media.getAssets()) syncLibraryFont(asset);
 
     // Load project if configured
     if (this.config.project?.autoLoad) {
@@ -564,6 +622,14 @@ export class Composer extends EventEmitter {
       this.styles.importStyles(data.styles);
     }
 
+    // Restore CMS bindings before settings, so anything that reacts to a
+    // settings change already sees the element->field wiring.
+    if (data.cmsBindings) {
+      if (data.cmsBindings.field) this.cms.bindings.import(data.cmsBindings.field as never);
+      if (data.cmsBindings.collection)
+        this.cms.bindings.importCollectionBindings(data.cmsBindings.collection as never);
+    }
+
     // Import project settings
     this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
       emitProjectChanged: false,
@@ -611,6 +677,19 @@ export class Composer extends EventEmitter {
         updatedAt: new Date().toISOString(),
       },
       settings: this.projectSettings,
+      /* Without this the binding survives only the session that made it: the
+         maps are in memory, and a reload republished the placeholder text.
+         Guarded because HistoryManager snapshots from its own constructor
+         (:244), before `cms` exists (:272) — that snapshot is of an empty
+         project, so an absent field there is correct, not lossy. */
+      ...(this.cms
+        ? {
+            cmsBindings: {
+              field: this.cms.bindings.export(),
+              collection: this.cms.bindings.exportCollectionBindings(),
+            },
+          }
+        : {}),
     };
   }
 
@@ -648,9 +727,17 @@ export class Composer extends EventEmitter {
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.
+    const slotFamilies = [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f));
+    /* The site's ADDED fonts (Clone 3721:43423): this document renders in its
+       own frame, where the editor's document.fonts never reach, so the faces
+       the export declares are declared here too — and a family the site
+       provides is never asked of Google. */
+    const siteFonts = this.fonts?.getAllFonts({ source: "custom" }) ?? [];
+    const faces = siteFontFaceCSS(`${css}${siteCss}${html}`, slotFamilies, siteFonts).css;
     const fontLinks = googleFontsHeadLinks(
       `${css}${siteCss}${html}`,
-      [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f))
+      slotFamilies,
+      siteFonts.map((f) => f.family)
     );
 
     // The THIRD head this codebase assembles, after the single-file export and
@@ -689,7 +776,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHTML(title)}</title>
-${fontLinks ? `${fontLinks}\n` : ""}  <style>${RESET_CSS}${css}${siteCss}</style>
+${fontLinks ? `${fontLinks}\n` : ""}  <style>${faces}${RESET_CSS}${css}${siteCss}</style>
 </head>
 <body>
 ${html}${interactionScript}

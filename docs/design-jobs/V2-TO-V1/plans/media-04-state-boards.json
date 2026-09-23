@@ -1,0 +1,90 @@
+[
+ {
+  "source": "1716:8497",
+  "name": "Media · stock · not-configured",
+  "wireFrom": "1716:8511",
+  "cmd": "node scripts/figma/add-state-board.mjs 1716:8497 \"Media · stock · not-configured\" --wire-from 1716:8511 --apply",
+  "why": "UX-H-02 CRITICAL — 'Stock search isn't set up on this site' is a DIFFERENT screen from 'No photos match beach', and only one of the two is worth a retry button. Neither the editor nor the server can tell them apart today: StockService.ts:80-83 and :94-97 both `catch { return []; }`, and server/services/stock.service.ts:55-56 / :102-103 return [] when UNSPLASH_ACCESS_KEY / PEXELS_API_KEY are unset. StockService.ts:54-57 admits the gap in a comment. Cloned from the no-results board because the modal chrome is identical and only the result copy differs. --wire-from 1716:8511 (the provider pill group) is a placeholder edge so the board is not born orphaned; replace it with the hotspot in media-06.",
+  "thenRun": "media-06 rows tagged not-configured-720"
+ },
+ {
+  "source": "1716:8541",
+  "name": "Media · stock · fonts · empty",
+  "wireFrom": "1716:8569",
+  "cmd": "node scripts/figma/add-state-board.mjs 1716:8541 \"Media · stock · fonts · empty\" --wire-from 1716:8569 --apply",
+  "why": "UX-H-05 — the Icons and Fonts entry points must sit in the footer beside Upload and Stock. Icons has a destination (147:2); Fonts has none anywhere in the section, so the new footer door would be a fourth dead control. Cloned from the icons-empty board, which is the same 720x340 tab shell. Copy 'No icons found.' → 'No fonts found.'; Fonts tab active instead of Icons. Note the code truth: MediaManager.ts:1588-1600 getFonts() is a hardcoded four-item array, not a stock provider — the clone inherits 1716:8541's [not-implemented] framing, which must be re-stated for fonts (media-06).",
+  "thenRun": "media-06 rows tagged fonts-empty"
+ },
+ {
+  "source": "147:55",
+  "name": "Media · drill-in · stock-browser · no-results",
+  "wireFrom": "1720:17505",
+  "cmd": "node scripts/figma/add-state-board.mjs 147:55 \"Media · drill-in · stock-browser · no-results\" --wire-from 1720:17505 --apply",
+  "why": "UX-H-03 — the drawer's stock overlay has no result states of its own at all. Its only outbound edge jumps to the 720 StockSourceModal, a different component (W-A-33). Genuinely-empty arm: StockBrowserOverlay.tsx:303-307 renders 'Search to browse free photos.' unconditionally.",
+  "thenRun": "media-06 rows tagged sb-no-results"
+ },
+ {
+  "source": "147:55",
+  "name": "Media · drill-in · stock-browser · search-failed",
+  "wireFrom": null,
+  "cmd": "node scripts/figma/add-state-board.mjs 147:55 \"Media · drill-in · stock-browser · search-failed\" --apply",
+  "why": "UX-H-03 — 'even after UX-H-02 is fixed the drawer would still show a blank grid': MediaTab.tsx:378-392 mounts StockBrowserOverlay with no failure prop and StockBrowserOverlayProps (:26-38) declares none, while MediaTab.tsx:243 passes searchFailed to StockSourceModal instead. The drawer needs the same three-way result state as the modal.",
+  "thenRun": "media-06 rows tagged sb-search-failed"
+ },
+ {
+  "source": "147:55",
+  "name": "Media · drill-in · stock-browser · not-configured",
+  "wireFrom": null,
+  "cmd": "node scripts/figma/add-state-board.mjs 147:55 \"Media · drill-in · stock-browser · not-configured\" --apply",
+  "why": "UX-H-02 + UX-H-03 — the configured-ness signal is owed at BOTH stock surfaces, not only the 720 modal.",
+  "thenRun": "media-06 rows tagged sb-not-configured"
+ },
+ {
+  "source": "146:2",
+  "name": "Media · drill-in · asset-detail · alt-generate-failed",
+  "wireFrom": "146:15",
+  "cmd": "node scripts/figma/add-state-board.mjs 146:2 \"Media · drill-in · asset-detail · alt-generate-failed\" --wire-from 146:15 --apply",
+  "why": "UX-H-09 — '✨ Generate' flips to 'Generating…', flips back, and says nothing: AssetDetailOverlay.tsx:270-289's catch body is a comment only. Without OPENAI_API_KEY every AI job fails on 'Missing credentials' (root CLAUDE.md). The fix asks for an inline error under the field, or hiding the affordance entirely when AI is not configured — this board draws the first and names the second as the alternative.",
+  "thenRun": "media-06 rows tagged alt-failed"
+ },
+ {
+  "source": "146:2",
+  "name": "Media · drill-in · asset-detail · device-only (re-upload)",
+  "wireFrom": null,
+  "cmd": "node scripts/figma/add-state-board.mjs 146:2 \"Media · drill-in · asset-detail · device-only (re-upload)\" --apply",
+  "why": "UX-H-11 CRITICAL — 'a device-only asset needs a persistent badge in the grid AND a line in the detail screen with the action that fixes it (re-upload), not two toasts that are gone in five seconds'. The grid half exists (2430:21365); the detail half does not exist anywhere.",
+  "thenRun": "media-06 rows tagged detail-device-only"
+ },
+ {
+  "source": "1175:4827",
+  "name": "Media · delete-confirm · single file",
+  "wireFrom": null,
+  "cmd": "node scripts/figma/add-state-board.mjs 1175:4827 \"Media · delete-confirm · single file\" --apply",
+  "why": "UX-H-10 + UX-H-01 + W-A-27 + W-A-29 — the only delete-confirm board is the >20-file typing-gate bulk one, which is the wrong dialog for the single asset the drawer's new Delete row, the fullpage rail's Delete (1161:154) and the context menu's Delete (1163:13945) all act on. Code: ConfirmDeleteModal.tsx:25 LARGE_BULK_THRESHOLD=20, :45-47 title 'Delete file?' when not bulk, :91-105 the typing gate renders only for large bulk; the payload is isBulk:false (useSelectionState.ts:149-156).",
+  "thenRun": "media-06 rows tagged delete-single"
+ },
+ {
+  "source": "1717:17203",
+  "name": "Media · detail · context-menu · asset (drawer right-click, of 144:2)",
+  "wireFrom": "1671:7213",
+  "cmd": "node scripts/figma/add-state-board.mjs 1717:17203 \"Media · detail · context-menu · asset (drawer right-click, of 144:2)\" --wire-from 1671:7213 --apply",
+  "why": "UX-H-01 MAJOR — right-clicking an asset in the drawer opens no menu; it silently switches the whole panel into bulk-selection mode (SlimLauncher.tsx:469-476 → MediaTab.tsx:352-355). The per-asset menu is finished and mounted only in the fullpage manager (LibraryManager.tsx:495). Cloned from 1717:17203 because that is the existing menu card; its item list must be corrected to the code's nine (W-A-49) in media-06.",
+  "thenRun": "media-06 rows tagged ctx-drawer"
+ },
+ {
+  "source": "1717:17203",
+  "name": "Media · detail · folder-menu · ＋ New folder (of 144:2)",
+  "wireFrom": "144:11",
+  "cmd": "node scripts/figma/add-state-board.mjs 1717:17203 \"Media · detail · folder-menu · ＋ New folder (of 144:2)\" --wire-from 144:11 --apply",
+  "why": "UX-H-07 MAJOR — the drawer's folder scope button is disabled whenever the library has no folders (SlimLauncher.tsx:255) and the drawer has no way to create one; folder creation lives only in the fullpage folder rail (FolderTree.tsx:378, reached at LibraryManager.tsx:354). 'A disabled scope control with no reachable way to enable it is worse than no control.' This board is the 📁 All ▾ menu with ＋ New folder… in it.",
+  "thenRun": "media-06 rows tagged folder-menu"
+ },
+ {
+  "source": "1174:4849",
+  "name": "Media · modal · replace-across · all-failed (rollback)",
+  "wireFrom": null,
+  "cmd": "node scripts/figma/add-state-board.mjs 1174:4849 \"Media · modal · replace-across · all-failed (rollback)\" --apply",
+  "why": "COVER-1-25 (board-level row inside 1776:8372) — there is a fourth arm and it is the surprising one: when every update fails the operation ROLLS BACK and commits nothing (MediaCommandLayer.ts:280-287, :414-418, reason 'all-failed'), copy 'Nothing replaced — all {n} update(s) failed. No changes committed.' + 'Show errors ({n})' + Close only, no Retry (ReplaceAcrossDialog.tsx:296-311). Materially different from the partial arm, which does commit what succeeded.",
+  "thenRun": "media-06 rows tagged replace-all-failed"
+ }
+]

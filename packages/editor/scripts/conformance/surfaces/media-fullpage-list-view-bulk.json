@@ -1,0 +1,138 @@
+{
+  "surface": "media-fullpage-list-view-bulk",
+  "board": "Media · fullpage · list-view · bulk-select (Figma 1163:4641)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-fullpage-library",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "mgr-asset-mg0"
+    },
+    {
+      "action": "click",
+      "testId": "mgr-view-list"
+    },
+    {
+      "action": "waitFor",
+      "testId": "mgr-list-head"
+    },
+    {
+      "action": "click",
+      "testId": "mgr-list-check-mg0"
+    },
+    {
+      "action": "click",
+      "testId": "mgr-list-check-mg2"
+    },
+    {
+      "action": "waitFor",
+      "testId": "mgr-bulk-bar"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE SAME PROBE AS media-fullpage-library, DRIVEN INTO THIS STATE BY REAL",
+    "CLICKS. `viewMode` is AssetGrid's own state and `selectedKeys` is",
+    "useSelectionState's; neither is a prop, so a fixture that forced them",
+    "would be measuring the fixture. The recipe clicks the List toggle and then",
+    "two row checkboxes, which is what a user does, and waits on the BULK BAR —",
+    "a state that only exists once something is selected, so a run where the",
+    "clicks silently missed cannot pass.",
+    "",
+    "BOARD WON — the bulk bar and the list, and both were the same mistake:",
+    "  1163:4875  the bulk bar is a 6-radius accent-tint BLOCK on a 12/8 pad",
+    "             with a 10 gap, inside the grid column's own 12 rhythm. It",
+    "             shipped as a full-bleed 29-high strip with an accent rule",
+    "             beneath it — a second toolbar under the first.",
+    "  1163:4882  the list header is 12/6 padded at 10px, not a 24-high rule",
+    "             at 11.",
+    "  1163:4888 / 1163:4900  the rows are 12/8 padded on a 6 radius, and the",
+    "             selected ones are filled rather than ruled. Every row was a",
+    "             FIXED 29 with a hairline under it — and the fixed height is",
+    "             again why the board's 8 was never applied: a height and a",
+    "             padding are different properties, so nothing conflicted and",
+    "             nothing won. Third surface in this batch with that exact",
+    "             cause (the picker's view toggle, the replace-across footer).",
+    "  1163:4891 / 1163:4893  Type / Size / Usage are 10px, not 11.",
+    "",
+    "NOT JOINED: 1163:4889 and the other per-row cells that carry a fixed",
+    "`width` (24 / 300 / 60 / 80) — those are the board's own column track",
+    "widths inside an 820 column, and the product's grid template distributes",
+    "1fr to the name; the COLUMNS are conformed (24px / 1fr / 64 / 88 / 88 on a",
+    "12 gap) but a text node's measured width is the track's, not the cell's.",
+    "1163:4890's `height: 13` is a text frame's line box, not a row height.",
+    "The rail, topbar, toolbar and status bar are the shared chassis and are",
+    "measured on media-fullpage-library; only what is NEW on this board is",
+    "joined here, so one fix cannot report itself five times.",
+    "",
+    "CONTRAST, BOARD-MANDATED AND DECLARED — 7 failures at 4.38:1, every one of",
+    "them --bk-ink-muted on --bk-accent-tint, and both halves are the board's:",
+    "1163:4888 fills a SELECTED row with --color/bg-selected #EBF5FF and",
+    "1163:4891 / 1163:4892 / 1163:4893 put its Type / Size / Usage cells in",
+    "--color/ink-muted; 1163:4875 and 1163:4881 pair the same two on the bulk",
+    "bar's '✕ Clear'. Conforming cannot fix it — it is the ink-muted-on-tint",
+    "token defect (CONTRAST-INK-MUTED.md) on a second ground. Unselected rows",
+    "are white and pass at 4.83. The fix is one step darker on the secondary",
+    "cells (--bk-ink-soft is 6.9 on accent-tint), which deviates from a board",
+    "that names the token, so it is a founder call rather than a silent edit."
+  ],
+  "targets": [
+    {
+      "name": "bulk-bar",
+      "testId": "mgr-bulk-bar",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4875"
+    },
+    {
+      "name": "bulk-count",
+      "testId": "mgr-bulk-count",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4876"
+    },
+    {
+      "name": "list-head",
+      "testId": "mgr-list-head",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4882"
+    },
+    {
+      "name": "row-selected",
+      "testId": "mgr-list-row-mg0",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4888"
+    },
+    {
+      "name": "row-plain",
+      "testId": "mgr-list-row-mg1",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4900"
+    },
+    {
+      "name": "row-type",
+      "testId": "mgr-list-type-mg1",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4903"
+    },
+    {
+      "name": "col-grid",
+      "testId": "mgr-grid-col",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4719"
+    },
+    {
+      "name": "toolbar",
+      "testId": "mgr-subbar",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4720"
+    },
+    {
+      "name": "sort",
+      "testId": "mgr-sort",
+      "spec": "media-fullpage-list-view-bulk",
+      "nodeId": "1163:4734"
+    }
+  ]
+}

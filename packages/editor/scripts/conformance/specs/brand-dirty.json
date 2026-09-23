@@ -1,0 +1,971 @@
+{
+  "surface": "brand-dirty",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "154:78",
+  "boardName": "brand-dirty",
+  "figmaHash": "12dd6fd8504e78f2f8ffe98ec2ef873ecb06a73b9e3889dc51245a13e55cfcfe",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:06:57.861Z",
+  "copy": [
+    "Brand",
+    "Aa",
+    "Heading",
+    "Aa",
+    "Body",
+    "Tokens",
+    "Colours, type, spacing",
+    "Presets",
+    "Component style presets",
+    "18",
+    "Starters",
+    "Whole-brand starting points",
+    "Classes",
+    "Names shared across elements",
+    "Components",
+    "What the brand ships",
+    "Typography",
+    "The fonts this site uses",
+    "Colour mode",
+    "Light and dark values",
+    "Lint",
+    "What breaks the brand",
+    "Import / export",
+    "Move the brand in and out",
+    "Unsaved brand changes",
+    "Discard",
+    "Save"
+  ],
+  "targets": [
+    {
+      "nodeId": "154:78",
+      "name": "Brand · dirty",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:621",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:621;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7280",
+      "name": "Brand preview (NEW)",
+      "className": "content-stretch flex flex-col gap-[8px] h-[82px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "82px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7281",
+      "name": "Swatches",
+      "className": "content-stretch flex gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7282",
+      "name": "swatch",
+      "className": "bg-[#1a56db] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7283",
+      "name": "swatch",
+      "className": "bg-white border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7284",
+      "name": "swatch",
+      "className": "bg-[#1f2937] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1f2937"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7285",
+      "name": "swatch",
+      "className": "bg-[#ef4444] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ef4444"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7286",
+      "name": "Specimen · Heading",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7287",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7288",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7289",
+      "name": "Specimen · Body",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7290",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7291",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7292",
+      "name": "List row · Tokens",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7294",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7295",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7296",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7297",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7298",
+      "name": "List row · Presets",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7300",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7301",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7302",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7303",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7304",
+      "name": "List row · Starters",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7306",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7307",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7308",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7309",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7310",
+      "name": "List row · Classes",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7312",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7313",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7314",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7315",
+      "name": "List row · Components",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7317",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7318",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7319",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7320",
+      "name": "List row · Typography",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7322",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7323",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7324",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7325",
+      "name": "List row · Colour mode",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7327",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7328",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7329",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7330",
+      "name": "List row · Lint",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7332",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7333",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7334",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7335",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7336",
+      "name": "List row · Import / export",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7338",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7339",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7340",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "154:128",
+      "name": "Save bar",
+      "className": "[word-break:break-word] bg-[var(--color\\/warning-tint,#fdfdea)] font-['Inter:Regular'] font-normal h-[44px] leading-[18px] not-italic overflow-clip relative shrink-0 text-[12px] text-left w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "154:129",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/warning-text,#723b13)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "154:130",
+      "name": null,
+      "className": "absolute left-[156px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "154:131",
+      "name": null,
+      "className": "absolute left-[226px] text-[color:var(--color\\/accent-text,#1a56db)] top-[14px]",
+      "props": {
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1172:4897",
+      "name": "hotspot/state · Brand · review-changes",
+      "className": "absolute h-[34px] left-[-1px] top-[773px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7239",
+      "name": "hotspot/state · Brand · review-changes (Save)",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[149px] opacity-0 top-[773px] w-[130px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "130px"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7241",
+      "name": "hotspot/back · Brand · root (Discard)",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

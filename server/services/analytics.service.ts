@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import type { AnalyticsStatus } from "@buildrik/shared/schemas/site-detail";
 
 type AnalyticsRange = "today" | "yesterday" | "7d" | "30d" | "90d";
 type AnalyticsGranularity = "hourly" | "daily" | "weekly" | "monthly";
@@ -89,6 +90,25 @@ export async function recordPageView(
     },
   });
   return true;
+}
+
+/**
+ * Settings → Analytics "Last received data" (Clone 3397:32295) and the
+ * Connection-verified dialog's "<n> events arrived in the last 24 hours"
+ * (4256:26844). Counts OUR beacon's rows (`recordPageView` above) — the only
+ * receiving signal this app has; a provider's own numbers would need its API.
+ */
+export async function getAnalyticsStatus(siteId: string): Promise<AnalyticsStatus> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const [last, events24h] = await Promise.all([
+    prisma.analyticsEvent.findFirst({
+      where: { siteId },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    }),
+    prisma.analyticsEvent.count({ where: { siteId, createdAt: { gte: since } } }),
+  ]);
+  return { lastEventAt: last ? last.createdAt.toISOString() : null, events24h };
 }
 
 export async function getSiteAnalytics(

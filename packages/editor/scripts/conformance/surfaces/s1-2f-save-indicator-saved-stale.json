@@ -1,0 +1,45 @@
+{
+ "surface": "s1-2f-save-indicator-saved-stale",
+ "board": "S1.2f · save-indicator · 5-states (Figma 813:4836) — state 3, Saved (stale)",
+ "_note": [
+  "The fifth card of board 813:4836, on its own page. See",
+  "`s1-2f-save-indicator` for why: states 2 and 3 are the same `saved`",
+  "branch and therefore the same `save-status-saved` anchor, so putting both",
+  "on one page makes the target resolve to two elements and measure.mjs",
+  "refuses (correctly). Two pages, five states, five joins — the alternative",
+  "was to measure one pill and call the board done.",
+  "",
+  "`savedAt` is `Date.now() - 2min`, so the label really is the board's",
+  "'Saved 2m ago' rather than a pinned string: `formatRelativeTime` computes",
+  "it, and pinning an epoch would read '2y ago' next year.",
+  "",
+  "This is the ONE state where the board and the component already agreed on",
+  "colour before this pass — `--color/ink-muted` on both sides. The board's",
+  "caption for this card ('Green dot, grey text') is also the rule the",
+  "component applies to saving and unsaved, which is the substance of the",
+  "colour disagreement recorded in the sibling recipe."
+ ],
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=s1-2f-save-indicator-saved-stale",
+ "viewport": {
+  "width": 1440,
+  "height": 360
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "save-status-saved"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "saved-stale",
+   "testId": "save-status-saved",
+   "spec": "s1-2f-save-indicator-5-states",
+   "nodeId": "813:4855",
+   "skipProps": {
+    "color": "BOARD PENDING REDRAW (founder call 2026-09-08). This board names --color/ink-muted for the SAVED state, which is the old 'text-first' rule where saved, saving and unsaved all painted the same grey — so the one control whose job is telling you your save state said nothing by colour. Each state now carries its own accessible token; saved is --bk-success-text (5.36:1). The sibling board 813:4836 asked for per-state hues too, but chose four that exist as no token and three of which fail AA (3.84 / 4.28 / 4.37), so the boards are right about the problem and wrong about the fix. This join re-opens when they are redrawn to the tokens. Size and line box are joined and pass."
+   }
+  }
+ ]
+}

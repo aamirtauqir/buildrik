@@ -1,0 +1,247 @@
+{
+  "surface": "s1-flows-view-mode-stripped-chrome",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1343:7162",
+  "boardName": "s1-flows-view-mode-stripped-chrome",
+  "figmaHash": "5fb50e27dcf55c02ce3ba6d8979bd277cb6013cf327ea4e64123ec596f695253",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T12:10:17.566Z",
+  "copy": [
+    "‹ Back to editing",
+    "Bella Cucina",
+    "Opened · no reply",
+    "💬 🔔 ⋯",
+    "Desktop · 100%"
+  ],
+  "targets": [
+    {
+      "nodeId": "1343:7162",
+      "name": "S1.6 · view-mode · stripped-chrome — NEW 2026-08-28",
+      "className": "bg-[#f9fafb] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7163",
+      "name": "Topbar (view mode)",
+      "className": "absolute bg-white border-[#e5e7eb] border-b border-solid h-[56px] left-0 overflow-clip top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7164",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[24px] not-italic text-[#111928] text-[13px] text-left top-[20px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7165",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[170px] not-italic text-[#111928] text-[14px] text-left top-[19px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7166",
+      "name": "lifecycle pill",
+      "className": "absolute bg-[#f3f4f6] h-[24px] left-[280px] overflow-clip rounded-[12px] top-[16px] w-[120px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "120px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7167",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[12px] not-italic text-[#4b5563] text-[11px] text-left top-[5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7168",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[1310px] not-italic text-[#6b7280] text-[14px] text-left top-[19px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7169",
+      "name": "Canvas (full width — no rail, no drawer, no inspector)",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[740px] left-[24px] overflow-clip rounded-[8px] top-[80px] w-[1392px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "740px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "1392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7170",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[40px] leading-[normal] left-[39px] not-italic text-[#9ca3af] text-[13px] text-left top-[39px] w-[600px]",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7171",
+      "name": "footer (bare)",
+      "className": "absolute bg-white border-[#e5e7eb] border-solid border-t h-[40px] left-0 overflow-clip top-[860px] w-[1440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7172",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[1330px] not-italic text-[#6b7280] text-[12px] text-left top-[11px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1343:7173",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[30px] leading-[normal] left-[24px] not-italic text-[#6b7280] text-[12px] text-left top-[830px] w-[1300px]",
+      "props": {
+        "height": {
+          "value": "30px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "1300px"
+        }
+      }
+    },
+    {
+      "nodeId": "1682:7207",
+      "name": "hotspot/back · S1 · Editor",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-0 opacity-0 top-[862px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

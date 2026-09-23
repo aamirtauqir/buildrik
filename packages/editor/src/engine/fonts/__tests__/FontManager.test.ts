@@ -345,3 +345,81 @@ describe("destroy", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 });
+
+/* Site fonts: a font file in the media library is a family the pickers offer.
+   Clone 3696:21550 (Manage font) and the Fonts round-trip note (3721:43423):
+   "Enabling Inter-Var.woff2 adds a separate uploaded source; it does not
+   replace the built-in family." Before this, an uploaded font was stored and
+   usable nowhere — nothing called FontManager. */
+describe("library fonts (registerLibraryFont)", () => {
+  class MockFontFace {
+    constructor(public family: string, public source: string, public descriptors: { weight: string; style: string }) {}
+    load = vi.fn(async () => this);
+  }
+  /* A FontFaceSet stand-in that keeps what was added, so the re-registration
+     test can see stale faces being dropped. */
+  let faces: Set<MockFontFace>;
+  beforeEach(() => {
+    vi.stubGlobal("FontFace", MockFontFace);
+    faces = new Set();
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: {
+        add: vi.fn((f: MockFontFace) => faces.add(f)),
+        delete: vi.fn((f: MockFontFace) => faces.delete(f)),
+        forEach: (fn: (f: MockFontFace) => void) => faces.forEach(fn),
+        load: () => Promise.resolve([]),
+        ready: Promise.resolve(),
+      },
+    });
+  });
+
+  it("registers a library font under a family named from its file, loads it, and lists it as custom", async () => {
+    const manager = makeManager();
+    const font = await manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "blob:http://x/1" });
+    expect(font.family).toBe("Inter Var");
+    expect(font.id).toBe("library-inter-var");
+    expect(font.variants).toEqual([{ weight: 400, style: "normal", url: "blob:http://x/1", loaded: true }]);
+    expect(manager.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]);
+    expect(document.fonts.add).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-registering the same file with a new url swaps the face instead of adding a second family", async () => {
+    const manager = makeManager();
+    await manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "blob:http://x/1" });
+    const again = await manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "https://cdn/inter.woff2" });
+    expect(again.variants[0].url).toBe("https://cdn/inter.woff2");
+    expect(manager.getAllFonts({ source: "custom" })).toHaveLength(1);
+    // One face in the document, not one per registration.
+    expect(faces.size).toBe(1);
+    expect([...faces][0].source).toBe("url(https://cdn/inter.woff2)");
+  });
+
+  /* Seen live 2026-09-14: after a reload the editor's own init registered the
+     added font and the server import's MEDIA_UPDATED registered it again
+     before the first FontFace had finished loading — the sweep of stale faces
+     ran on an empty set and both faces landed. One family, one face. */
+  it("two registrations in flight for the same file still leave one face", async () => {
+    const manager = makeManager();
+    await Promise.all([
+      manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "blob:http://x/1" }),
+      manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "https://cdn/inter.woff2" }),
+    ]);
+    expect(faces.size).toBe(1);
+    expect(manager.getAllFonts({ source: "custom" })).toHaveLength(1);
+  });
+
+  it("a font whose file cannot be decoded stays out of the list rather than listed as loaded", async () => {
+    vi.stubGlobal("FontFace", class { load = vi.fn(async () => { throw new Error("bad font"); }); });
+    const manager = makeManager();
+    await expect(manager.registerLibraryFont({ filename: "broken.ttf", url: "blob:http://x/2" })).rejects.toThrow();
+    expect(manager.getAllFonts({ source: "custom" })).toHaveLength(0);
+  });
+
+  it("unregisterLibraryFont removes the family by its file", async () => {
+    const manager = makeManager();
+    await manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "blob:http://x/1" });
+    manager.unregisterLibraryFont("Inter-Var.woff2");
+    expect(manager.getAllFonts({ source: "custom" })).toHaveLength(0);
+  });
+});

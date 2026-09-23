@@ -1,0 +1,801 @@
+{
+  "surface": "history-milestone-suggestion-banner-code-mil",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "433:2348",
+  "boardName": "history-milestone-suggestion-banner-code-mil",
+  "figmaHash": "2a0cfcefc7d10c838b58a410db62a66b0a6ded794fec48e31d56b41ffa1b6a93",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:10:01.443Z",
+  "copy": [
+    "SUGGESTED",
+    "New page added",
+    "Added pricing page",
+    "3 sections added, hero copy changed",
+    "Save",
+    "Edit",
+    "Dismiss",
+    "EDITING",
+    "New page added",
+    "Added pricing page",
+    "Save",
+    "SAVING",
+    "New page added",
+    "Added pricing page",
+    "3 sections added, hero copy changed",
+    "Edit",
+    "Dismiss"
+  ],
+  "targets": [
+    {
+      "nodeId": "433:2348",
+      "name": "History · milestone suggestion banner (code: MilestoneSuggestionBanner.tsx)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col gap-[10px] items-start overflow-clip p-[40px] relative rounded-[12px] shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.04),0px_20px_25px_-5px_rgba(0,0,0,0.1)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2349",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2350",
+      "name": "MilestoneSuggestionBanner · suggested",
+      "className": "bg-[#ebf5ff] border border-[rgba(26,86,219,0.3)] border-solid content-stretch flex gap-[8px] items-center overflow-clip px-[12px] py-[8px] relative rounded-[8px] shrink-0 w-[600px]",
+      "props": {
+        "background-color": {
+          "value": "#ebf5ff"
+        },
+        "border-color": {
+          "value": "rgba(26,86,219,0.3)"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2351",
+      "name": "icon/clock",
+      "className": "border-[1.5px] border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-solid relative rounded-[9999px] shrink-0 size-[16px]",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2352",
+      "name": "content",
+      "className": "[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[normal] min-w-px not-italic overflow-clip relative whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2353",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2354",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2355",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2356",
+      "name": "actions",
+      "className": "content-stretch flex gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2357",
+      "name": "btn/primary",
+      "className": "bg-[#1a56db] content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2358",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/bg-card,white)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2359",
+      "name": "btn/secondary",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2360",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2361",
+      "name": "btn/ghost",
+      "className": "content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2362",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2363",
+      "name": "gap",
+      "className": "h-[18px] relative shrink-0 w-[600px]",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2364",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2365",
+      "name": "MilestoneSuggestionBanner · editing",
+      "className": "bg-[#ebf5ff] border border-[rgba(26,86,219,0.3)] border-solid content-stretch flex gap-[8px] items-center overflow-clip px-[12px] py-[8px] relative rounded-[8px] shrink-0 w-[600px]",
+      "props": {
+        "background-color": {
+          "value": "#ebf5ff"
+        },
+        "border-color": {
+          "value": "rgba(26,86,219,0.3)"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2366",
+      "name": "icon/clock",
+      "className": "border-[1.5px] border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-solid relative rounded-[9999px] shrink-0 size-[16px]",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2367",
+      "name": "content",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start min-w-px overflow-clip relative",
+      "props": {
+        "gap": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2368",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2369",
+      "name": "input (focused · 50 char cap)",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-solid content-stretch flex gap-px items-center overflow-clip px-[6px] py-[3px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "padding-left": {
+          "value": "6px"
+        },
+        "padding-right": {
+          "value": "6px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2370",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2371",
+      "name": "caret",
+      "className": "bg-[var(--color\\/ink,#111827)] h-[15px] relative shrink-0 w-px",
+      "props": {
+        "background-color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2373",
+      "name": "btn/primary",
+      "className": "bg-[#1a56db] content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2374",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/bg-card,white)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2375",
+      "name": "gap",
+      "className": "h-[18px] relative shrink-0 w-[600px]",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2376",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2377",
+      "name": "MilestoneSuggestionBanner · saving",
+      "className": "bg-[#ebf5ff] border border-[rgba(26,86,219,0.3)] border-solid content-stretch flex gap-[8px] items-center overflow-clip px-[12px] py-[8px] relative rounded-[8px] shrink-0 w-[600px]",
+      "props": {
+        "background-color": {
+          "value": "#ebf5ff"
+        },
+        "border-color": {
+          "value": "rgba(26,86,219,0.3)"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2378",
+      "name": "icon/clock",
+      "className": "border-[1.5px] border-[var(--flowbite\\/blue\\/500,#3f83f8)] border-solid relative rounded-[9999px] shrink-0 size-[16px]",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/blue/500",
+          "value": "#3f83f8"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2379",
+      "name": "content",
+      "className": "[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[normal] min-w-px not-italic overflow-clip relative whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2380",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2381",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2382",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2383",
+      "name": "actions",
+      "className": "content-stretch flex gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2384",
+      "name": "btn/primary (disabled while saving)",
+      "className": "bg-[#1a56db] content-stretch flex items-center justify-center opacity-50 overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2385",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/bg-card,white)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2386",
+      "name": "btn/secondary",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2387",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2388",
+      "name": "btn/ghost",
+      "className": "content-stretch flex items-center justify-center overflow-clip px-[10px] py-[5px] relative rounded-[4px] shrink-0",
+      "props": {
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "433:2389",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "633:4021",
+      "name": "hotspot/back · S1 · Editor — ASSEMBLED",
+      "className": "absolute block cursor-pointer h-[34px] left-[-1px] top-[367px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

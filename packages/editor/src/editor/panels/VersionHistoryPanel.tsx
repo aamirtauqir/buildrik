@@ -73,9 +73,14 @@ const SKELETON_BAR_W = ["tw:w-[132px]", "tw:w-[96px]", "tw:w-[150px]", "tw:w-[11
 
 /* Board 163:269 pruned / 163:220 restoring. Amber says nothing failed — the
    oldest auto-saves aged out; accent says something is happening, not wrong. */
+/* 163:315 (pruned) and 163:266 (restoring) are the same 56-tall block: inset
+   16 either side, 10 of lead, a 12/18 line, 2, an 11/16 line, 10. It shipped
+   12/8 around an 11px stack, i.e. 44 — and the two lines were the same size,
+   so the notice read as one grey paragraph instead of a statement and its
+   qualifier. The radius is NOT shared: 163:315 rounds 8, 163:266 does not
+   round at all, so it hangs off the two variants rather than the base. */
 const NOTICE_BASE =
-  "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-12)] " +
-  "tw:py-[var(--bk-space-8)] tw:rounded-lg tw:text-[11px]";
+  "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-16)] tw:py-2.5";
 /* Board 163:167's confirm band — accent tint, its own actions row. */
 const RESTORE_CONFIRM =
   "tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
@@ -84,11 +89,11 @@ const RESTORE_CONFIRM_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const RESTORE_CONFIRM_ACTIONS = "tw:mt-1 tw:flex tw:items-center tw:justify-between tw:gap-2";
 
 const NOTICE_PRUNED =
-  `${NOTICE_BASE} tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
+  `${NOTICE_BASE} tw:rounded-lg tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
 const NOTICE_RESTORING =
-  `${NOTICE_BASE} tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
-const NOTICE_STRONG = "tw:font-normal tw:text-[12px]";
-const NOTICE_SUB = "tw:text-[var(--bk-ink-muted)]";
+  `${NOTICE_BASE} tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
+const NOTICE_STRONG = "tw:font-normal tw:text-[12px] tw:leading-[18px]";
+const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 export function VersionHistoryPanel({
   composer,
@@ -312,11 +317,11 @@ export function VersionHistoryPanel({
   if (isLoading) {
     return (
       <div className="saves-view">
-        <div className={SKELETON} aria-busy="true" aria-label="Loading versions">
+        <div className={SKELETON} aria-busy="true" aria-label="Loading versions" data-testid="saves-skeleton">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className={`${SKELETON_ROW} ${SKELETON_INDENT[i]}`}>
-              <span className={SKELETON_DOT} />
-              <span className={`${SKELETON_BAR} ${SKELETON_BAR_W[i]}`} />
+            <div key={i} className={`${SKELETON_ROW} ${SKELETON_INDENT[i]}`} data-testid={`saves-sk-row-${i}`}>
+              <span className={SKELETON_DOT} data-testid={`saves-sk-icon-${i}`} />
+              <span className={`${SKELETON_BAR} ${SKELETON_BAR_W[i]}`} data-testid={`saves-sk-bar-${i}`} />
             </div>
           ))}
         </div>
@@ -378,17 +383,20 @@ export function VersionHistoryPanel({
 
       {/* Board 163:220 — the restore banner, above the list. */}
       {restoring && (
-        <div className={NOTICE_RESTORING} role="status">
-          <strong className={NOTICE_STRONG}>Restoring {restoring.targetName}…</strong>
-          {restoring.savedAs && <span className={NOTICE_SUB}>Saving your current work as “{restoring.savedAs}” first.</span>}
+        <div className={NOTICE_RESTORING} role="status" data-testid="history-restoring-notice">
+          <strong className={NOTICE_STRONG} data-testid="history-restoring-title">Restoring {restoring.targetName}…</strong>
+          {/* 163:268 writes the name bare — 'Saving your current work as v4
+              first.' The curly quotes around it were the code's, and at 11px
+              they read as scare quotes on a version name. */}
+          {restoring.savedAs && <span className={NOTICE_SUB} data-testid="history-restoring-sub">Saving your current work as {restoring.savedAs} first.</span>}
         </div>
       )}
 
       {pruned && (
-        <div className={NOTICE_PRUNED} role="status">
-          <strong className={NOTICE_STRONG}>Older auto-saves were removed</strong>
-          <span className={NOTICE_SUB}>
-            Past {pruned.kept}. Named versions and the approved one were kept.
+        <div className={NOTICE_PRUNED} role="status" data-testid="history-pruned-notice">
+          <strong className={NOTICE_STRONG} data-testid="history-pruned-title">Older auto-saves were removed</strong>
+          <span className={NOTICE_SUB} data-testid="history-pruned-sub">
+            Past {pruned.kept}. Named versions were kept.
           </span>
         </div>
       )}
@@ -427,7 +435,7 @@ export function VersionHistoryPanel({
         </div>
       )}
       {/* Save Version FAB / inline form — fixed at bottom-right of saves-view */}
-      <div className="fab-container">
+      <div className="fab-container" data-testid="saves-footer">
         {showSaveForm ? (
           <div className="save-form open">
             <div className="form-row">
@@ -481,7 +489,8 @@ export function VersionHistoryPanel({
             color="light"
             size="xs"
             onClick={() => setShowSaveForm(true)}
-            className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)]"
+            data-testid="saves-save-version"
+            className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
           >
             + Save a version
           </Button>

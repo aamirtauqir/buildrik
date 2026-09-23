@@ -38,6 +38,7 @@ import {
   RecordView,
   RootView,
   CONTENT_BODY,
+  SECTION_H,
   SourcesView,
   VariablesView,
 } from "./ContentViews";
@@ -63,11 +64,16 @@ export interface ContentTabProps {
 /** One placeholder row of the Content root: the row glyph, then the label bar.
  *  Board 775:4241 keeps both, so the skeleton occupies the same box the real
  *  row will. */
-function SkeletonRow({ width }: { width: string }) {
+function SkeletonRow({ width, testId }: { width: string; testId: string }) {
   return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5">
-      <SkeletonBlock className="tw:size-3.5 tw:flex-none tw:rounded-sm" />
-      <SkeletonBlock className={`tw:h-3 ${width}`} />
+    /* 32 tall on 16px gutters, exactly the List row it stands in for — it was
+       12px gutters and 34 tall, so the rows it replaced moved sideways and up
+       the moment data landed. */
+    <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid={testId}>
+      {/* 12 square at radius 3, and 10 tall at radius 4 — the board draws the
+          glyph placeholder smaller than the glyph, not the same size. */}
+      <SkeletonBlock className="tw:size-3 tw:flex-none tw:rounded-[3px]" data-testid={`${testId}-icon`} />
+      <SkeletonBlock className={`tw:h-2.5 tw:rounded-[4px] ${width}`} data-testid={`${testId}-bar`} />
     </div>
   );
 }
@@ -190,8 +196,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
     body =
       hydration === "error" ? (
         <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="content-load-error" role="alert">
-          <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">Couldn&apos;t load your collections.</p>
-          <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+          <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]" data-testid="content-load-error-title">Couldn&apos;t load your collections.</p>
+          <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]" data-testid="content-load-error-hint">
             This is a connection problem, not a change to your data.
           </p>
           <Button
@@ -213,13 +219,16 @@ export const ContentTab: React.FC<ContentTabProps> = ({
            moment data landed, which is the one thing a skeleton exists to
            prevent. */
         <div data-testid="content-loading" aria-busy="true" aria-label="Loading collections">
-          <SectionHeader tint>Collections</SectionHeader>
-          {["tw:w-40", "tw:w-24", "tw:w-44"].map((w, i) => (
-            <SkeletonRow key={`c${i}`} width={w} />
+          {/* 32, like the bands the loaded panel draws (148:7 / 148:23) — the
+              shared SectionHeader is 28, so both bands grew 4px when the data
+              landed, which is the reflow the skeleton exists to prevent. */}
+          <SectionHeader tint className={SECTION_H} data-testid="content-section-collections">Collections</SectionHeader>
+          {["tw:w-[92px]", "tw:w-[96px]", "tw:w-[110px]"].map((w, i) => (
+            <SkeletonRow key={`c${i}`} width={w} testId={`content-skel-c${i}`} />
           ))}
-          <SectionHeader tint>Data</SectionHeader>
-          {["tw:w-28", "tw:w-20", "tw:w-36"].map((w, i) => (
-            <SkeletonRow key={`d${i}`} width={w} />
+          <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
+          {["tw:w-[110px]", "tw:w-[86px]", "tw:w-[124px]"].map((w, i) => (
+            <SkeletonRow key={`d${i}`} width={w} testId={`content-skel-d${i}`} />
           ))}
         </div>
       );
@@ -363,7 +372,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   return (
     <div className={CONTENT_BODY}>
       <PanelHeader
-        title="Content"
+        // v3 IA Q4 — the panel is the CMS; the rail says so, the header agrees.
+        title="CMS"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}

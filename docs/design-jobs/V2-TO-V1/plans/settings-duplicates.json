@@ -1,0 +1,132 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — deletion, which apply-queue.mjs has no op for and should not have. Run: node scripts/figma/drop-settings-duplicates.mjs docs/design-jobs/V2-TO-V1/plans/settings-duplicates.json [--apply]. Every row is matched by EXACT string inside a named scope; more than one match is REFUSED, not applied.",
+ "structural": [
+  {
+   "board": "640:2789",
+   "boardName": "S7 · Settings · Headers",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass."
+  },
+  {
+   "board": "2209:11816",
+   "boardName": "S7 · Settings · Headers · dirty (unsaved changes)",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass."
+  },
+  {
+   "board": "1703:7606",
+   "boardName": "… · loading",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass."
+  },
+  {
+   "board": "1703:7760",
+   "boardName": "… · load-error",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass."
+  },
+  {
+   "board": "1703:7914",
+   "boardName": "… · save-error",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass."
+  },
+  {
+   "board": "639:3795",
+   "boardName": "S7 · Settings · Localization",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers."
+  },
+  {
+   "board": "1703:7127",
+   "boardName": "… · loading",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers."
+  },
+  {
+   "board": "1703:7286",
+   "boardName": "… · load-error",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers."
+  },
+  {
+   "board": "1703:7445",
+   "boardName": "… · save-error",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers."
+  },
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  },
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half."
+  }
+ ]
+}

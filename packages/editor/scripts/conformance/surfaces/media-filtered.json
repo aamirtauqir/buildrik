@@ -1,0 +1,24 @@
+{
+  "surface": "media-filtered",
+  "board": "Media · filtered (Figma 145:2)",
+  "_note": "Probe: the board's state is one type pill pressed over a populated library. The waitFor is on the selected chip's own aria-pressed rather than on the panel, so a fixture that failed to apply the filter would not be measured as this board.\n\nNOT joined: 1313:11 / 1313:12, the search-scope band — 280 and a 123 text-frame width (see media-no-results for the panel-border reason). The band is also NOT on screen here, and deliberately: this board draws `Searching all 412 items` over an EMPTY query, while the code gates the band on a query of 2+ characters against a partially-loaded library, which is the only situation where the scope is a real question. Board 782:4353 draws the same band over a real query and agrees with the code; this frame is the odd one. Also skipped: 145:8 the inner search field (authority=open:input-fill) and 145:12 the folder row's Select, a text-frame auto-width around a ☑ that stands in for an icon.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-filtered",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-grid" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel",        "testId": "media-panel",         "spec": "media-filtered", "nodeId": "145:2" },
+    { "name": "panel-header", "testId": "panel-header",        "spec": "media-filtered", "nodeId": "208:281" },
+    { "name": "search",       "testId": "media-search",        "spec": "media-filtered", "nodeId": "145:7" },
+    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-filtered", "nodeId": "145:10" },
+    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-filtered", "nodeId": "145:13" },
+    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-filtered", "nodeId": "145:14" },
+    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-filtered", "nodeId": "145:17" },
+    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-filtered", "nodeId": "145:20" },
+    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-filtered", "nodeId": "145:23" },
+    { "name": "asset-grid",   "testId": "media-grid",          "spec": "media-filtered", "nodeId": "145:26" },
+    { "name": "footer",       "testId": "media-footer",        "spec": "media-filtered", "nodeId": "145:46" }
+  ]
+}

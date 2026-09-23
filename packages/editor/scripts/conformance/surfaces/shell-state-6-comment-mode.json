@@ -1,0 +1,184 @@
+{
+  "surface": "shell-state-6-comment-mode",
+  "board": "Shell state 6 · Comment mode (Figma 200:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "achievement-cta"
+    },
+    {
+      "action": "click",
+      "testId": "achievement-cta"
+    },
+    {
+      "action": "press",
+      "key": "c"
+    },
+    {
+      "action": "waitFor",
+      "testId": "comment-capture-layer"
+    },
+    {
+      "action": "hover",
+      "testId": "footer-selection-label"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "inspector-header",
+      "testId": "inspector-header",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:100"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:101"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "920:4624"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:104"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:105"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:107"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:109"
+    },
+    {
+      "name": "footer-selection",
+      "testId": "footer-selection-label",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:197"
+    },
+    {
+      "name": "footer-dims",
+      "testId": "footer-selection-dims",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:198"
+    },
+    {
+      "name": "footer-zoom",
+      "testId": "footer-device-zoom",
+      "spec": "shell-state-6-comment-mode",
+      "nodeId": "200:200"
+    },
+    {
+      "name": "comment-layer",
+      "testId": "comment-capture-layer"
+    }
+  ],
+  "_note": [
+    "FULL-SHELL BOARD, measured live at 1440x900 — the board's own frame size.",
+    "",
+    "Per the brief: what is joined here is what this board is ABOUT (its state).",
+    "The chassis the four Shell-state boards redraw identically is skipped, with",
+    "the reason, rather than re-asserted four times:",
+    "",
+    "  the TOPBAR (682:2657 and its children) — boards.json carries",
+    "  authority=code:topbar against all twelve 'Shell state N' boards, decided",
+    "  2026-08-17 on evidence: they draw Exit | name | Saved pill | review pill |",
+    "  bell | Publish(disabled) and no Quick preview, Comments or Issues chip,",
+    "  while the shipped topbar has all three. The boards lose because they",
+    "  contradict the board SET — 200:2 is named 'Comment mode' and its own",
+    "  topbar has no comments control, and the Issues chip is what opens board",
+    "  1168:4732. The same snapshot also draws Publish grey/disabled on a",
+    "  returning user with content, which would mean nobody could ever publish.",
+    "  The topbar has its own spec (`topbar`) and its own recipe (shell-default).",
+    "",
+    "  the RAIL (2034:8392) — the board fills it --color/bg-app #F3F4F6; the",
+    "  shipped rail is white. That is one reading against the rail as it appears",
+    "  on every other family's boards, and the rail is chassis shared by all four",
+    "  of these boards plus shell-default. Not re-settled from a state board.",
+    "",
+    "  the CANVAS TOOLBAR (463:3962 and its ~40 chips) — one floating component",
+    "  redrawn on all four boards; it belongs to the canvas family, not to a",
+    "  state. Board 202:2's own walk (boards.json, 2026-08-17) already fixed the",
+    "  real defect it exposed, which was the bar not wrapping at 1280.",
+    "",
+    "  the FOOTER BAR itself (65:196 / 66:196-equivalent) — the <footer> element",
+    "",
+    "REACHED LIVE through shipped controls only: dismiss the first-run coach,",
+    "insert a Section from Insert, dismiss the achievement prompt that step",
+    "completion opens, then press C — the keyboard-legend shortcut",
+    "(useEditorShortcuts.ts:106-110 -> `ui:comment-mode`), which CommentLayer",
+    "answers by mounting `comment-capture-layer`.",
+    "",
+    "The achievement dismissal is load-bearing, not tidying. AchievementPrompt",
+    "renders `role=\"dialog\" aria-modal=\"true\"`, and every global shortcut in",
+    "useEditorShortcuts stands down while a modal is open (its own comment says",
+    "so: 'C mounted the comment layer behind the shortcuts modal'). Measured:",
+    "insert a Section and press C and nothing happens; the keydown reaches",
+    "window un-prevented, `isModalOpen()` is simply true. Correct behaviour,",
+    "and worth writing down because it makes the state look unreachable.",
+    "",
+    "THIS BOARD'S SUBJECT is comment mode over an otherwise ordinary shell, and",
+    "the ordinary part is what can be measured: the inspector's header, name,",
+    "AI chip, context strip and three pills, plus the footer's three runs. All",
+    "ten match. The capture layer is measured and screenshotted (`comment-",
+    "layer`) but not joined — see below.",
+    "",
+    "NOT JOINED, this board only:",
+    "",
+    "  the comment CURSOR (200:207 / 200:208) — a 28px --color/accent puck at",
+    "  50% opacity carrying a 💬 glyph, drawn where the pointer is. The shipped",
+    "  layer expresses the same state as `cursor: crosshair` on a full-bleed",
+    "  capture layer (CommentLayer.tsx:416-422); there is no element to measure",
+    "  because a CSS cursor is not one. boards.json already carries",
+    "  'partial-comment-pins-not-reproduced' against this row and that stands.",
+    "",
+    "  the inspector BODY (LAYOUT / SPACING / TYPOGRAPHY / BACKGROUND / BORDER /",
+    "  EFFECTS with 88px labels and 172px controls) — this board redraws board",
+    "  159:2's six-section body, and 159:2 was RETIRED on 2026-09-02 in favour",
+    "  of 32:2 (the founder call is in the frame's own title). The shipped panel",
+    "  renders the eleven profile sections. Same adjudication the",
+    "  inspector-single-selection recipe records at length.",
+    "",
+    "  the Layers drawer (200:42-200:49) — this board draws Layers open at 280",
+    "  with its own search box. That is the Layers family's chrome and it has",
+    "  five recipes of its own in this same run (layers-tree, -filtered,",
+    "  -multi-select, -renaming, -display-settings), measured at the panel's own",
+    "  width. Asserting it a sixth time through a 1440 shell would add nothing",
+    "  and would fight the 143:* / 1082:* board conflicts already recorded",
+    "  there."
+  ]
+}

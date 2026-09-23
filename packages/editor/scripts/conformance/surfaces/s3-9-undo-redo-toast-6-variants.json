@@ -1,0 +1,127 @@
+{
+  "surface": "s3-9-undo-redo-toast-6-variants",
+  "board": "S3.9 \u00b7 undo-redo-toast \u00b7 6-variants (Figma 814:7027)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=undo-redo-toasts",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "toast-body-5"
+    }
+  ],
+  "contrastScope": "[data-testid=\"toast-item-0\"]",
+  "targets": [
+    {
+      "name": "v1-undo-delete",
+      "testId": "toast-body-0",
+      "spec": "s3-9-undo-redo-toast-6-variants",
+      "nodeId": "814:7033"
+    },
+    {
+      "name": "v2-undo-text-edit",
+      "testId": "toast-body-1"
+    },
+    {
+      "name": "v3-undo-move",
+      "testId": "toast-body-2"
+    },
+    {
+      "name": "v4-redo-delete",
+      "testId": "toast-body-3",
+      "spec": "s3-9-undo-redo-toast-6-variants",
+      "nodeId": "814:7051"
+    },
+    {
+      "name": "v5-undo-style",
+      "testId": "toast-body-4",
+      "spec": "s3-9-undo-redo-toast-6-variants",
+      "nodeId": "814:7057"
+    },
+    {
+      "name": "v6-stack-exhausted",
+      "testId": "toast-body-5",
+      "spec": "s3-9-undo-redo-toast-6-variants",
+      "nodeId": "814:7063"
+    },
+    {
+      "name": "v1-card",
+      "testId": "toast-item-0"
+    },
+    {
+      "name": "v6-card",
+      "testId": "toast-item-5"
+    }
+  ],
+  "_note": [
+    "SIX VARIANTS, FIRED THROUGH THE PRODUCT PATH. The toasts are not markup a",
+    "fixture can hand over: `useHistoryFeedback` subscribes to three engine",
+    "events and composes each message from a label table. So the probe gives it",
+    "a two-method event bus in place of a Composer and emits the six histories",
+    "the board draws \u2014 undo of a delete, a text edit and a move; redo of a",
+    "delete; undo of a style change; and \u2318Z on an empty stack. Every string,",
+    "tone, duration and reverse link measured here is produced by the shipping",
+    "hook. They are addressed per variant (`toast-body-0` \u2026 `-5`), which is the",
+    "queue order, so the six are measured as six.",
+    "",
+    "BOARD WON, three times \u2014 and this is the substance of the row:",
+    "  814:7032  the toast is DARK. All six frames are filled --color/ink with",
+    "            the message in --flowbite/gray/200. It shipped as `info`, the",
+    "            same pale accent-tint card a 'publish queued' notice uses. A",
+    "            sixth Toast tone, `dark`, carries the ground, the ink and a",
+    "            readable action together; the five tinted tones board 1177:4859",
+    "            catalogues are untouched, and each now carries its own ink so",
+    "            no two utilities fight for `color` on a plain element.",
+    "  814:7032  ONE line, 36 tall on an 8 radius at 11px. It shipped two lines",
+    "            (a '\u21a9 Undo' title over the sentence) inside 12/12 padding with",
+    "            32-high flowbite buttons, which measured 56. The message is now",
+    "            'Undo: Deleted element' on a single centred row and the two",
+    "            controls are inline links. Measured after: 36 tall, radius 8,",
+    "            ink ground \u2014 814:7032's three geometry numbers, exactly.",
+    "  814:7060  the empty-stack toast is dark too. Its CAPTION reads 'Grey",
+    "            toast, no action', but the frame that caption describes",
+    "            (814:7062) is filled --color/ink like the other five. The",
+    "            drawing is the design; the caption describes it (the same",
+    "            ruling LEDGER J-164:22 makes about note blocks). What the",
+    "            caption's second half says IS honoured: no reverse action.",
+    "",
+    "NOT CONFORMED \u2014 the reverse link's colour. 814:7034 draws it #80B2FF, which",
+    "is not a token; the nearest step in the generated scale is --bk-blue-300",
+    "#A4CAFE, and Gate 16's hex ratchet over chrome may only go down. Measured on",
+    "ink: #A4CAFE is 10.4:1 and #80B2FF would be 8.0:1, so both clear AA and the",
+    "token is the one this repo can hold. If #80B2FF is intended it enters",
+    "figma-tokens.json first. (The extractor reads that node's `text-[#80b2ff]`",
+    "as a FONT-SIZE, so it could not have been joined either way \u2014 worth a look",
+    "at extract.mjs's SINGLE map.)",
+    "",
+    "NOT JOINED, and why:",
+    "  814:7032/7038/7044/7050/7056/7062 the toast BOXES \u2014 every one carries",
+    "  `w-[196px]`, which is the documentation cell's own arithmetic (a 220 card",
+    "  less 2x12). The shipped toast is the viewport's 360. Their fill, height",
+    "  and radius now match and are in `measured/`; the join could not be taken",
+    "  without the width coming with it.",
+    "  v2 and v3 (814:7039 / 814:7045) \u2014 the only nodes those two variants have",
+    "  besides their boxes are their label <p>s, and BOTH carry `w-[140px]` for",
+    "  the same reason. Their message text, tone and reverse link are still",
+    "  driven and captured; four of the six variants are property-joined and the",
+    "  two that are not are named here rather than quietly dropped.",
+    "",
+    "TWO BOARDS, AND WHY THIS ONE WINS. Board 1177:4859 ('Reference \u00b7 toast",
+    "catalog \u2014 5 tones', verified `match`) is the authority for the TONE SET,",
+    "and it is not moved: all five tints are exactly as they were. This board's",
+    "boards.json authority is `board:814-7027` \u2014 it decides the undo/redo toast",
+    "specifically \u2014 and a dark transient bar is a sixth tone beside the five,",
+    "not a re-reading of any of them.",
+    "",
+    "FOUND, NOT FIXED \u2014 PLACEMENT. 814:7029 opens the board with 'Appears at",
+    "bottom-center of canvas for 2s after Cmd+Z / Cmd+Shift+Z'. The toast",
+    "viewport is bottom-RIGHT (`tw:fixed tw:bottom-4 tw:right-4 tw:w-[360px]`),",
+    "which is where all 34 call sites put every toast. Moving it is a change to",
+    "the shared viewport \u2014 board 1177:4859 is the 'toast catalog \u2014 5 tones \u00b7",
+    "STICKY CLASS' and is the frame that owns placement, not this one \u2014 so it is",
+    "reported rather than taken. Verified in the rendered surface capture: six",
+    "dark bars stacked at the bottom right."
+  ]
+}

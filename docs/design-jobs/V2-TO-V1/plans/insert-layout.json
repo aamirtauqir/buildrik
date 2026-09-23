@@ -1,0 +1,344 @@
+{
+  "task": "Resolve the Insert section split and re-grid 02 · Insert",
+  "why": "Assigned explicitly: two Insert group-expanded targets (COMPONENTS 1069:4790 and MINE 1069:4970) are parented in the holding pen 26 · REVIEW · Insert while the ELEMENTS (1069:4529) and BLOCKS (1069:4707) targets sit in the real section. Four boards of one family, two sections, 143,914px apart on the Y axis.",
+  "read_from_file_2026-09-07": {
+    "1776:8379": {
+      "name": "02 · Insert · 22",
+      "x": 0,
+      "y": 7053,
+      "w": 2480,
+      "h": 3747,
+      "children": [
+        {
+          "id": "137:2",
+          "name": "Insert · default",
+          "x": 100,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "1069:4707",
+          "name": "Insert · blocks-expanded",
+          "x": 500,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "138:153",
+          "name": "Insert · dragging — CONDITION-ONLY…",
+          "x": 900,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "1069:4529",
+          "name": "Insert · elements-expanded",
+          "x": 1300,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "138:2",
+          "name": "Insert · group-expanded",
+          "x": 1700,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "138:53",
+          "name": "Insert · searching",
+          "x": 2100,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "155:11",
+          "name": "caption/Insert · default",
+          "x": 100,
+          "y": 1052,
+          "w": 280,
+          "h": 54,
+          "type": "TEXT"
+        },
+        {
+          "id": "155:15",
+          "name": "caption/Insert · dragging",
+          "x": 900,
+          "y": 1052,
+          "w": 280,
+          "h": 72,
+          "type": "TEXT"
+        },
+        {
+          "id": "155:12",
+          "name": "caption/Insert · group-expanded",
+          "x": 1700,
+          "y": 1052,
+          "w": 280,
+          "h": 90,
+          "type": "TEXT"
+        },
+        {
+          "id": "155:13",
+          "name": "caption/Insert · searching",
+          "x": 2100,
+          "y": 1052,
+          "w": 280,
+          "h": 54,
+          "type": "TEXT"
+        },
+        {
+          "id": "138:244",
+          "name": "Insert · tip-dismissed",
+          "x": 100,
+          "y": 1262,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "155:17",
+          "name": "caption/Insert · tip-dismissed",
+          "x": 100,
+          "y": 2094,
+          "w": 280,
+          "h": 126,
+          "type": "TEXT"
+        },
+        {
+          "id": "1706:8501",
+          "name": "Modal · Add Child Element",
+          "x": 100,
+          "y": 2340,
+          "w": 380,
+          "h": 225
+        },
+        {
+          "id": "138:106",
+          "name": "Insert · no-results",
+          "x": 100,
+          "y": 2685,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "1138:13413",
+          "name": "Templates · empty",
+          "x": 500,
+          "y": 2685,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "138:198",
+          "name": "Insert · disabled-item — BUILT, MOUNTED NOWHERE…",
+          "x": 900,
+          "y": 2685,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "781:4154",
+          "name": "Insert · load-error — BUILT, MOUNTED NOWHERE…",
+          "x": 1300,
+          "y": 2685,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "775:4053",
+          "name": "Insert · loading — BUILT, MOUNTED NOWHERE…",
+          "x": 1700,
+          "y": 2685,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "155:14",
+          "name": "caption/Insert · no-results",
+          "x": 100,
+          "y": 3517,
+          "w": 280,
+          "h": 18,
+          "type": "TEXT"
+        },
+        {
+          "id": "788:4300",
+          "name": "caption/Insert · load-error",
+          "x": 1300,
+          "y": 3517,
+          "w": 280,
+          "h": 72,
+          "type": "TEXT"
+        },
+        {
+          "id": "155:16",
+          "name": "caption/Insert · disabled-item",
+          "x": 900,
+          "y": 3517,
+          "w": 280,
+          "h": 108,
+          "type": "TEXT"
+        },
+        {
+          "id": "788:4299",
+          "name": "caption/Insert · loading",
+          "x": 1700,
+          "y": 3517,
+          "w": 280,
+          "h": 72,
+          "type": "TEXT"
+        }
+      ],
+      "note": "13 FRAMEs + 9 TEXT captions = 22 children, which is what the section name counts."
+    },
+    "1090:4527": {
+      "name": "26 · REVIEW · Insert · 3",
+      "x": 0,
+      "y": 150967,
+      "w": 1200,
+      "h": 1326,
+      "children": [
+        {
+          "id": "1069:4790",
+          "name": "Insert · components-expanded",
+          "x": 100,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "1069:4970",
+          "name": "Insert · mine-expanded",
+          "x": 500,
+          "y": 220,
+          "w": 280,
+          "h": 812
+        },
+        {
+          "id": "1092:4527",
+          "name": "caption/REVIEW · Insert — NEW ONES (section label)",
+          "x": 100,
+          "y": 1152,
+          "w": 151,
+          "h": 34,
+          "type": "TEXT"
+        }
+      ]
+    }
+  },
+  "steps": [
+    {
+      "n": 1,
+      "op": "reparent",
+      "nodes": [
+        "1069:4790",
+        "1069:4970"
+      ],
+      "from": "1090:4527",
+      "to": "1776:8379",
+      "how": "sec.appendChild(node) on the 1776:8379 SECTION. Section children are positioned RELATIVE to the section, so set x/y AFTER the appendChild or the board lands 143,914px away — that is exactly the failure layout-section.mjs was written to clean up.",
+      "place": [
+        {
+          "id": "1069:4790",
+          "x": 2500,
+          "y": 220
+        },
+        {
+          "id": "1069:4970",
+          "x": 2900,
+          "y": 220
+        }
+      ],
+      "place_why": "Extends the existing y=220 group-expanded row rightwards rather than reordering live boards. Row y=220 is occupied at x=100/500/900/1300/1700/2100; the last board ends at x=2380 inside a 2480-wide section, so x=2500 and x=2900 are the next two free slots and the SECTION grows to accommodate them. Reordering the row into taxonomy order (default · elements · blocks · components · mine) is ARR-A-19's job, not this plan's — do not do both in one pass.",
+      "readback": "Re-read both nodes and assert parent.id === '1776:8379' and the absolute x/y land inside the section box."
+    },
+    {
+      "n": 2,
+      "op": "create-captions",
+      "why": "Six existing boards in 02 · Insert have no caption, and every new board needs one. The section's convention is a TEXT node named caption/<board name>, placed at the board's x and 832px below the board's y (measured: boards at y=220, captions at y=1052).",
+      "spec": "11px / leading 16 / --bk-ink-muted #6B7280, textAutoResize HEIGHT, width 280 (380 for the modal boards).",
+      "captions": [
+        {
+          "for": "1069:4529",
+          "name": "caption/Insert · elements-expanded",
+          "text": "ELEMENTS open — 53 rows, flat. Each row carries a written one-line description that the panel never shows: it reaches a tooltip only when the entry is disabled, and no catalog entry is (catalog/types.ts:12-14, GroupSection.tsx:186-187, catalog.ts:4) — UX-A-09; hover state on Insert · element-hover (description). Favourites are fully built and have no control anywhere: favs, toggleFav, favOpen, clearFavs, restoreFavs all live in useBuildTab.ts:104-168 behind BUILD_FAVORITES and BuildTab.tsx destructures none of them — UX-A-31; the ☆ toggle belongs on these rows. RECENTS ARE NOT BUILT — BUILD_RECENT (storageKeys.ts:59) is an orphan constant with zero consumers, so no recents band is drawn here (PHASE4-QA-REPORT §1.1). Reaching the group below costs 53 tab stops — UX-A-29."
+        },
+        {
+          "for": "1069:4707",
+          "name": "caption/Insert · blocks-expanded",
+          "text": "DESIGN-AHEAD. The one group drawn as a picture grid has no pictures: shared/types/block.ts:25 declares preview?: string and grep -rn preview packages/editor/src/blocks/ returns zero, so all 50 cards fall through to an empty 136x80 grey rectangle under an 11px label (GroupSection.tsx:234-262) — UX-A-05. Fifty blank rectangles are worse than fifty rows, so the shipping drawing is Insert · blocks-expanded · rows and this board is kept as the target for when previews exist. Cards are not draggable either — only ELEMENTS passes draggable — UX-A-06. Product Card / Product Grid / Product Detail open a CMS collection-setup modal on insert, unannounced and one-shot (useComposerInit.ts:735-763) — UX-A-28."
+        },
+        {
+          "for": "1069:4790",
+          "name": "caption/Insert · components-expanded",
+          "text": "COMPONENTS is the registry's 14 shipped component blocks (blockRegistry.ts:187-202). The user's own are under MINE, and the Components management tab is a third thing again — off the default rail, reachable only by ⇧A, the palette, or knowing it exists (tabsConfig.ts:151-170,349-351). One word, three meanings — UX-A-25. Rows carry no draggable — UX-A-06. The header count and the drawn list disagree: 14 is the code truth, so the list trims to fourteen (VIS-3-29)."
+        },
+        {
+          "for": "1069:4970",
+          "name": "caption/Insert · mine-expanded",
+          "text": "MINE — the user's own saved components, loaded from composer.components and refreshed on COMPONENT_LIST_UPDATED (BuildTab.tsx:56-70). Search cannot reach them: searchInsert is passed catalog + blockRows + componentRows and never mine, and InsertSearchHit has no MINE case (useBuildTab.ts:235-238, utils/search.ts:16-26) — UX-A-11. Rows carry no draggable — UX-A-06. Empty state on Insert · mine-expanded · empty — today an empty MINE renders a header reading 0 over nothing at all — UX-A-24."
+        },
+        {
+          "for": "1706:8501",
+          "name": "caption/Modal · Add Child Element",
+          "width": 380,
+          "text": "The canvas selection toolbar's + opens this, and it is a SECOND catalog: grouped by TYPE with Most Used / Recents / Favourites and per-element descriptions, reading the 64-entry registry directly, while the Insert panel groups by SOURCE off a hand-written 53-entry catalog — UX-A-03. It reports a success it has not had: useElementsState.ts:151-161 toasts \"Added {label} to canvas\" BEFORE calling the inserter, which then returns silently on a nesting / target / config failure and calls onClose() — UX-A-02. Refusal state on Modal · Add Child Element · refused."
+        },
+        {
+          "for": "1138:13413",
+          "name": "caption/Templates · empty",
+          "text": "STRANDED. This is the only Templates board filed under Insert; the rest of its async family (Templates · loading 778:4102, · load-error 781:4372, · no-results 782:4402) sits in section 1084:4527 · 11 · Templates. TEMPLATES is explicitly OUT of the Insert taxonomy — \"template ka apna poora flow hai\", founder-final 2026-08-07 (blocks/groups.ts:1-19), and buildInsertGroups() returns exactly four groups. ARR-A-18 asks for the move; it is the Templates module's call, not Insert's."
+        }
+      ],
+      "also": "Every board created by insert-new-boards.json needs its caption too; the caption text is the `why` + `decision` of its row in that plan."
+    },
+    {
+      "n": 3,
+      "op": "re-grid",
+      "command": "node scripts/figma/layout-section.mjs 1776:8379",
+      "why": "After the reparent and after add-state-board has added up to seven boards, the section needs one grid pass. layout-section.mjs measures its own pitch (GUTTER 120, PAD_X 100, PAD_TOP 220, MAX_PER_ROW 6), pairs captions to boards and shrink-wraps the section — which is exactly the arrangement work ARR-A-17/19/20 describe by hand.",
+      "caution": "MAX_PER_ROW defaults to 6. With 20 boards the section becomes ~4 rows. Run it ONCE, after all boards exist, not between steps."
+    },
+    {
+      "n": 4,
+      "op": "rename-sections",
+      "renames": [
+        {
+          "id": "1776:8379",
+          "from": "02 · Insert · 22",
+          "to": "02 · Insert · <recount>",
+          "how": "The count is CHILDREN, not frames — 13 frames + 9 captions = 22 today. After the move (+2 boards +2 captions), the seven new boards (+7 +7) and the six new captions (+6), the count is 22 + 4 + 14 + 6 = 46. Recount from the file rather than trusting this arithmetic."
+        },
+        {
+          "id": "1090:4527",
+          "from": "26 · REVIEW · Insert · 3",
+          "to": "26 · REVIEW · Insert — EMPTIED 2026-09-07: its two boards (Insert · components-expanded 1069:4790, Insert · mine-expanded 1069:4970) moved into 02 · Insert 1776:8379 where the rest of their family lives. Section kept, not deleted; the label node 1092:4527 remains its only child.",
+          "why": "Hard rule: never delete a board — and by extension do not delete the section that held them. ARR-D-28 separately notes the count 3 was always wrong because one child is the section label, not a board."
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "op": "move-section-label",
+      "node": "1092:4527",
+      "why": "ARR-D-27 — the node that names 1090:4527 sits at y=1152, 120px BELOW both boards it labels. With the boards gone it is the section's only child. Move it to (100,100) so the emptied section reads as a labelled empty pen rather than a stray line.",
+      "set": {
+        "x": 100,
+        "y": 100
+      },
+      "text": "REVIEW · Insert — EMPTIED 2026-09-07. Both boards moved to 02 · Insert (1776:8379).",
+      "id_source": "read from file — section 1090:4527 child list, 2026-09-07"
+    }
+  ],
+  "not_done_here": [
+    "ARR-A-19's taxonomy reorder of row y=220 (default · elements · blocks · components · mine). Left to the arrangement lane so two passes do not fight over the same row.",
+    "ARR-A-18's move of Templates · empty (1138:13413) into section 1084:4527. It is a Templates-module board; captioned as stranded instead.",
+    "The seven-deep hotspot stack on 137:2 — see insert-board-defects.json."
+  ]
+}

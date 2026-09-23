@@ -1,0 +1,224 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — band insertion. Run: node scripts/figma/add-settings-band-v2.mjs docs/design-jobs/V2-TO-V1/plans/gap-a-settings-bands.json --apply  (13 rows, CHUNK=11, so 2 calls. add-settings-blocks.mjs REFUSED all 13 on 2026-09-07 with slack=0 / NOHDR: a Settings pane holds a 44px header plus a body frame sized to fill the rest, so its 'content' ends exactly at the pane foot; the room is one level further in, and the root board has no pane at all. v2 measures the body's own children and takes explicit coordinates for the root board). Rows 1-11 are settings-notices.json carried forward unchanged — that plan was written and never run. Rows 12-13 are new in this pass and close the two settings findings that had no home at all: UX-I-41 (no plan file existed) and UX-I-39 (planned as an edit to a 600-instance component set, which the brief forbids). Every string uses typographic quotes only: a straight \" inside the sandbox template collapses to a bare quote and kills the payload.",
+ "structural": [
+  {
+   "board": "639:3092",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Custom domains are stored on the server, not in the project file, so restoring an earlier version of the site leaves domains exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12433",
+    "read_back": "1192x52@32,24 moved=1 newfoot=492/736",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "639:3795",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Locales are stored on the server, not in the project file, so restoring an earlier version of the site leaves localization exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12437",
+    "read_back": "1192x52@32,24 moved=1 newfoot=454/736",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:2440",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Redirect rules are stored on the server, not in the project file, so restoring an earlier version of the site leaves redirects exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12441",
+    "read_back": "1192x52@32,24 moved=1 newfoot=492/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:2789",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Security headers are stored on the server, not in the project file, so restoring an earlier version of the site leaves headers exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12445",
+    "read_back": "1192x52@32,24 moved=1 newfoot=580/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:3135",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Form submissions are stored on the server, not in the project file, so restoring an earlier version of the site leaves forms exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12449",
+    "read_back": "1192x52@32,24 moved=1 newfoot=506/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:3849",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. The endpoint and its events are stored on the server, not in the project file, so restoring an earlier version of the site leaves webhooks exactly as they are now — History’s “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 (Critical) — half of Settings is inside version history and half is outside it, and nothing says which",
+   "provenance": "board id from scratchpad_audit/mod/sections/21-settings-s7-46.txt; copy carried verbatim from plans/settings-notices.json, which was written by the settings module agent and never applied (no queue op inserts a band).",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12453",
+    "read_back": "1192x52@32,24 moved=1 newfoot=520/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "639:3092",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 (Major) — one savebar over three different commit models; a section that writes immediately must say so and not render the bar",
+   "provenance": "as above — settings-notices.json rows 7-9.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12457",
+    "read_back": "1192x52@32,24 moved=1 newfoot=560/736",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:3135",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 (Major) — one savebar over three different commit models; a section that writes immediately must say so and not render the bar",
+   "provenance": "as above — settings-notices.json rows 7-9.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12461",
+    "read_back": "1192x52@32,24 moved=1 newfoot=574/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "640:3849",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 (Major) — one savebar over three different commit models; a section that writes immediately must say so and not render the bar",
+   "provenance": "as above — settings-notices.json rows 7-9.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12465",
+    "read_back": "1192x52@32,24 moved=1 newfoot=588/756",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "1688:7195",
+   "kind": "field",
+   "name": "Filter · settings",
+   "tone": "info",
+   "text": "Filter settings…",
+   "why": "UX-I-37 (Major) — thirteen sections in three groups and no search. A grep for ‘search’ in SettingsTab.tsx returns only the SEO subtitle string.",
+   "provenance": "settings-notices.json row 10.",
+   "at": [
+    640,
+    24
+   ],
+   "w": 560,
+   "placement_note": "1688:7195 has NO pane: its nineteen rows sit absolutely positioned inside 1688:7197 'Middle band' (1440x812, layoutMode HORIZONTAL). Measured 2026-09-07: left column ends at y=530 (Row · Localization 478+52), right column at y=434 (three rows past the dump cap), nothing below either. The filter goes in the free band beside the 'Settings' title (right column top is PLUMBING at y=76); the two decisions go in the empty lower half. layoutPositioning is set to ABSOLUTE or the parent's layout would place them and the coordinates would mean nothing.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12467",
+    "read_back": "560x32@640,24 inBoard=true",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "1688:7195",
+   "kind": "notice",
+   "tone": "info",
+   "name": "Open decision · nav grouping",
+   "text": "OPEN DECISION — group names and membership. UX-I-37 asks for the groups to be renamed into the user’s vocabulary and for two rows to move: “PLUMBING” is an implementer’s word, Analytics is not distribution and Forms is not plumbing. Proposed: SITE (General, Branding, SEO, Canvas) · PUBLISHING (Export, Domains, Redirects, Localization) · VISITORS (Analytics, Forms) · ADVANCED (Custom code, Headers, Integrations, Webhooks) · WORKSPACE ↗ (Members, Billing). Drawn, not applied — renaming a group also rewrites the breadcrumb on 30 section boards, so it lands as one decision or none.",
+   "why": "UX-I-37 (Major) — group rename is a founder-level naming call and it invalidates 30 breadcrumbs; drawn as an open decision rather than half-applied",
+   "provenance": "settings-notices.json row 11.",
+   "at": [
+    40,
+    560
+   ],
+   "w": 1160,
+   "placement_note": "1688:7195 has NO pane: its nineteen rows sit absolutely positioned inside 1688:7197 'Middle band' (1440x812, layoutMode HORIZONTAL). Measured 2026-09-07: left column ends at y=530 (Row · Localization 478+52), right column at y=434 (three rows past the dump cap), nothing below either. The filter goes in the free band beside the 'Settings' title (right column top is PLUMBING at y=76); the two decisions go in the empty lower half. layoutPositioning is set to ABSOLUTE or the parent's layout would place them and the coordinates would mean nothing.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12469",
+    "read_back": "1160x88@40,560 inBoard=true",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "638:3070",
+   "kind": "notice",
+   "tone": "info",
+   "name": "Notice · SEO is edited in two places",
+   "text": "SEO is edited in two places and neither names the other. This screen sets the site-level title template, Twitter handle and default OG image (SeoScreen.tsx:76-141); each page’s own meta title, description and social image live in Pages › page settings › SEO, with their own unsaved-changes guard and their own Save. [design-ahead] The resolution is drawn nowhere: this screen does not say how many pages override the default, and the page field does not name the default it replaces.",
+   "why": "UX-I-41 (Major, duplicate-feature) — two editors for one output need to name each other. NEW in this pass: the settings module reported UX-I-41 as the one finding of its thirteen with no plan file at all, because it had neither a node id nor a matchable string. A band under the pane header needs neither.",
+   "provenance": "board id 638:3070 from D-C-25 / W-B-07 / W-B-18 / W-B-19 (all name it as S7 · Settings · SEO). Copy is new, written for this pass.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12473",
+    "read_back": "1192x70@32,24 moved=1 newfoot=560/736",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  },
+  {
+   "board": "1688:7195",
+   "kind": "notice",
+   "tone": "info",
+   "name": "Open decision · rows that leave the app",
+   "text": "OPEN DECISION — rows that leave the app. This list mixes three destinations wearing one row shape: most rows drill into a form; Export drills in to reach a single button that opens the exporter elsewhere; Members and Billing are anchors that open the dashboard in a new tab. Proposed: a Destination=leaves-app variant of the shared Settings nav row — trailing ↗, no chevron — applied to Members and Billing only, and Export’s row opening the exporter directly. Drawn, not applied: the shared row is component set 2041:19572 with about 600 instances and this pass checked none of them.",
+   "why": "UX-I-39 (Minor, confusing-nav) — recorded as a drawn decision rather than a variant add, because adding a variant to 2041:19572 introduces a property dimension on every one of its ~600 instances and the brief requires listing every instance checked.",
+   "provenance": "settings-root-nav.json row 3, converted from an unbuildable ‘add-variant-then-swap’ into the drawn-open-decision form this arc already uses for the merged nav row.",
+   "at": [
+    40,
+    700
+   ],
+   "w": 1160,
+   "placement_note": "1688:7195 has NO pane: its nineteen rows sit absolutely positioned inside 1688:7197 'Middle band' (1440x812, layoutMode HORIZONTAL). Measured 2026-09-07: left column ends at y=530 (Row · Localization 478+52), right column at y=434 (three rows past the dump cap), nothing below either. The filter goes in the free band beside the 'Settings' title (right column top is PLUMBING at y=76); the two decisions go in the empty lower half. layoutPositioning is set to ABSOLUTE or the parent's layout would place them and the coordinates would mean nothing.",
+   "applied": {
+    "status": "OK",
+    "node": "2876:12475",
+    "read_back": "1160x88@40,700 inBoard=true",
+    "at": "2026-09-07",
+    "by": "scripts/figma/add-settings-band-v2.mjs --apply"
+   }
+  }
+ ],
+ "applied_summary": "13 of 13 OK, each read back in the same call. 2 calls."
+}

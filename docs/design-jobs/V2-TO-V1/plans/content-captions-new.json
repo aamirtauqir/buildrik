@@ -1,0 +1,79 @@
+{
+  "_": "New caption/* nodes for boards in section 06 · Content that had none. Applier: scripts/figma/add-board-captions.mjs <this file> [--apply] — the Layers lane's script, which does exactly this job (clone a style donor, derive the gap from the donor's own offset below ITS board, collision-test, read back, skip a name that already exists). This pass wrote a second one and deleted it rather than ship two scripts for one job.",
+  "_ids": "Every `board` id was READ from the file this session (see content-section-read-2026-09-07.json). The two rows whose `board` is a NAME are unresolved-id: those boards do not exist yet. `from` 155:47 is a READ caption id; its font/size/colour were NOT read, which is exactly why the caption is cloned rather than created.",
+  "rows": [
+    {
+      "board": "2429:12111",
+      "name": "caption/Content · dynamic-pages",
+      "text": "Set here, generated on publish. There is no TEMPLATE PAGE control on this screen — pageTemplatePath is read once, to decide a warning, and ContentViews.tsx:630 says \"Nothing in this panel sets it\". The “Generates N pages” count reads LOCAL records while generation reads SERVER entries (:623 vs cms.service.ts:198-202), so a queued sync overstates it. Nothing outside this panel knows these pages exist.",
+      "why": "QA-A-11 + QA-A-13 + UX-C-19 — commentary moved out of the 280px panel into the section's caption channel.",
+      "_expectedSlot": "2320,1052  (board 2429:12111 read at 2320,220 280x812)",
+      "donor": "155:47"
+    },
+    {
+      "board": "2429:21243",
+      "name": "caption/Content · dynamic-pages · no-pattern",
+      "text": "Pattern empty. The input shows its placeholder /menu/{slug} (ContentViews.tsx:645); the line below is the plain muted branch at :670-672 — no warning colour, because nothing is wrong yet.",
+      "why": "QA-A-07 / QA-A-08 / QA-A-13",
+      "_expectedSlot": "900,4905  (board 2429:21243 read at 900,4073 280x812)",
+      "donor": "155:47"
+    },
+    {
+      "board": "2429:21262",
+      "name": "caption/Content · dynamic-pages · none-published",
+      "text": "Records exist, none published. The count that matters is PUBLISHED — generation filters on it (cms.service.ts:198-202), so the total would be a comforting number that produces nothing (ContentViews.tsx:664).",
+      "why": "QA-A-09 / QA-A-13",
+      "_expectedSlot": "1700,4905  (board 2429:21262 read at 1700,4073 280x812)",
+      "donor": "155:47"
+    },
+    {
+      "board": "2429:21281",
+      "name": "caption/Content · dynamic-pages · no-template",
+      "text": "Pattern valid, records published, zero pages. The publish selects only collections whose pageTemplatePath is NOT NULL (cms.service.ts:234), and the only writer in either tree is the create-collection wizard (CMSCollectionSetupModal.tsx:211).",
+      "why": "QA-A-13 + UX-C-09",
+      "_expectedSlot": "1300,4905  (board 2429:21281 read at 1300,4073 280x812)",
+      "donor": "155:47"
+    },
+    {
+      "board": "2850:12042",
+      "name": "caption/Content · dynamic-pages · unknown-key",
+      "text": "A brace naming no field. applyPattern substitutes \"\" for an unknown {key} (cms.service.ts:121), so every record resolves to the same URL and they collide instead of generating (ContentViews.tsx:675-681).",
+      "why": "QA-A-13 — one of the two variants the COMPILE-A N1 spec named and no pass drew.",
+      "_expectedSlot": "2500,4905  (board created by content-new-boards.json at 2500,4073; resolved by NAME — unresolved-id until it exists)",
+      "donor": "155:47"
+    },
+    {
+      "board": "2850:21351",
+      "name": "caption/Content · dynamic-pages · no-records",
+      "text": "No records at all — a distinct branch from “none published” (ContentViews.tsx:663), and the one a user reaches first, straight out of the create-collection wizard.",
+      "why": "QA-A-13 — second missing variant.",
+      "_expectedSlot": "2900,4905  (board created by content-new-boards.json at 2900,4073; resolved by NAME — unresolved-id until it exists)",
+      "donor": "155:47"
+    },
+    {
+      "board": "1170:4713",
+      "name": "caption/Content · collection-setup (modal)",
+      "text": "One of THREE screens that create a collection, and they disagree on what one is: five field types here (CMSCollectionSetupModal.tsx:47) against nine plus a required flag on the Fields screen (ContentViews.tsx:440), against a fixed eight-field Products schema in the e-commerce dialog — the only path that sets a display field. So the Slug field this wizard's own /{slug} default depends on cannot be created here. Step 1's Content type is read by nothing (:112 declared, :326 rendered, never read by handleCreate at :168-227); the field row's drag handle has no drag handlers (:378); Create is enabled on the name alone, and a duplicate name is never checked. This is also the only screen that can ever set a template page.",
+      "why": "UX-C-20, UX-C-22, UX-C-11, UX-C-09 — the modal had no caption at all.",
+      "_expectedSlot": "900,714  (board 1170:4713 read at 900,220 500x474)",
+      "donor": "155:47"
+    },
+    {
+      "board": "1170:4749",
+      "name": "caption/Content · records (modal)",
+      "text": "The SECOND record editor, reachable only from ⌘⇧P. Delete asks nothing here (CMSRecordsModal.tsx:168) while the panel confirms; neither view can be searched, filtered or paged; there is no record import or export anywhere (:426-432).",
+      "why": "UX-C-07, UX-C-23, UX-C-28 — the modal had no caption at all.",
+      "_expectedSlot": "100,2638  (board 1170:4749 read at 100,2268 640x350)",
+      "donor": "155:47"
+    },
+    {
+      "board": "1705:8408",
+      "name": "caption/Content · record · save-error",
+      "text": "Every retry leaves a draft behind. Saving with Published on creates the record as a draft FIRST and then flips its status, and only that second call validates (useContentPanel.ts:161-168, CollectionManager.ts:301-307); the form catches the error, marks the fields and still thinks it is composing a NEW record. Three fumbles, three hidden drafts.",
+      "why": "UX-C-08 (Critical) — the board that draws this state carried no caption.",
+      "_expectedSlot": "2100,4905  (board 1705:8408 read at 2100,4073 280x812)",
+      "donor": "155:47"
+    }
+  ],
+  "_donor": "155:47 caption/Content · root. Its own gap resolves to 20 (donor at 100,1052; the board above it in the same column is 148:2 at 100,220 h=812, so 1052 - 1032 = 20), which is the gap every slot in _expectedSlot assumes."
+}

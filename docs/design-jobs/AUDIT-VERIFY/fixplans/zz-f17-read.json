@@ -1,0 +1,10 @@
+{
+ "slug": "zz-f17-read",
+ "page": "1:3",
+ "note": "F17's named read landed. It answered the id question and disqualified the planned fix.",
+ "rows": [
+  {"op": "advisory", "hold": true, "id": "641:2506",
+   "holdWhy": "F17 · THE READ LANDED AND CHANGED THE ANSWER. resolve-and-read returned the three thumb frames the held row could not name — 641:2506, 641:2512, 641:2518, each 248x88, layoutMode=NONE (so a positioned add WOULD work), fill #F3F4F6. That confirms the audit exactly: the tiles are flat light grey. But the repair the hold proposed is now disqualified, for a reason only the read could show. TemplateCard.tsx:88-93 paints the tile with `style={{background: template.gradient}}` — a LINEAR GRADIENT, e.g. Restaurant's 'linear-gradient(145deg, #1a0a06, #2d0a00)' — and centres an emoji glyph over it. apply-queue's `fill` op writes a SOLID hex (hexToRgb -> one SOLID paint). Painting a flat dark colour where the product paints a gradient replaces one misrepresentation with another, and it would then be much harder to spot as wrong than the honest grey is. A SECOND unknown the read exposed: the board's three cards are 'Restaurant — one page', 'Menu + reservations' and 'Landing — offer', which are PAGE templates; templatesData.ts carries SITE templates (SaaS Landing, Portfolio, Agency, E-Commerce, Blog, Startup, Restaurant, Minimal, SaaS Pro, Coming Soon). Only card 1 has an unambiguous counterpart. So even with a gradient op, two of the three tiles would need a mapping nobody has written down. UNBLOCKED BY: a gradient-capable fill op (GRADIENT_LINEAR paint with two stops) plus the card-to-template mapping. NOT unblocked by another read.",
+   "why": "F17 — read landed; fix needs a gradient op the runner lacks"}
+ ]
+}

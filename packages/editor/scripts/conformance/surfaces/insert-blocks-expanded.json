@@ -1,0 +1,163 @@
+{
+  "surface": "insert-blocks-expanded",
+  "board": "Insert · blocks-expanded (Figma 1069:4707)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=insert-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "insert-group-elements"
+    },
+    {
+      "action": "click",
+      "testId": "insert-group-blocks"
+    },
+    {
+      "action": "waitFor",
+      "testId": "insert-blocks-grid"
+    },
+    {
+      "action": "hover",
+      "testId": "insert-search-wrap"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "search-band",
+      "testId": "insert-search-wrap",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4711"
+    },
+    {
+      "name": "group-header-elements",
+      "testId": "insert-group-elements",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4716"
+    },
+    {
+      "name": "group-label-elements",
+      "testId": "insert-group-label-elements",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4718"
+    },
+    {
+      "name": "group-header-blocks",
+      "testId": "insert-group-blocks",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4720"
+    },
+    {
+      "name": "group-label-blocks",
+      "testId": "insert-group-label-blocks",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4722"
+    },
+    {
+      "name": "card-thumb",
+      "testId": "insert-block-thumb-container",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4726"
+    },
+    {
+      "name": "card-label",
+      "testId": "insert-block-label-container",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4727"
+    },
+    {
+      "name": "paste-html-label",
+      "testId": "insert-row-label-insert-paste-html",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4786"
+    },
+    {
+      "name": "tips",
+      "testId": "insert-tips",
+      "spec": "insert-blocks-expanded",
+      "nodeId": "1069:4787"
+    },
+    {
+      "name": "blocks-grid",
+      "testId": "insert-blocks-grid"
+    }
+  ],
+  "_note": [
+    "PROBE, not the running editor: the board is the 280 drawer, and BuildTab is",
+    "`w-full` — measured in the 1440 shell it would report the viewport. One case",
+    "(`insert-panel`) serves all four Insert boards because they are the SAME",
+    "panel with a different group open, and `openGroups` is BuildTab's own state",
+    "with no prop to set it. Each recipe drives its own header clicks; mounting",
+    "four copies would put four `insert-group-blocks` anchors on one page and",
+    "measure.mjs refuses an ambiguous testid.",
+    "",
+    "CONFORMED to the board in this pass:",
+    "  .bld-search-wrap 36 -> 40 tall (1069:4533 and its three siblings agree).",
+    "    The band was the 28 field plus 4+4; the board centres the field in a 40",
+    "    band, so every group header sat 4px high of where all four boards put it.",
+    "  Group header vertical padding 1 -> 6 (1069:4538). 28-6-6 = 16 is the",
+    "    label's line box exactly, so the padded box and the previous centring",
+    "    render identically — the 1px it replaced was flowbite's, not a decision.",
+    "  TipsFooter strip 0 -> 6 top/bottom (1069:4704), same arithmetic.",
+    "",
+    "NOT JOINED, with reasons:",
+    "",
+    "  the drawer header (2100:10963) — 14px on a 44 bar with 12px vertical",
+    "  padding, from the 'Panel header' component that was widened 2026-09-05.",
+    "  The shipped header is 11px/16 ink-soft, measured on 148:2 (T3) and",
+    "  asserted by components-library and media-drawer against 208:* in this same",
+    "  harness. Two component versions in one file; a shared primitive six other",
+    "  boards measure is not re-settled by one screen board.",
+    "",
+    "  the search box (1069:4534) — this board fills it --color/bg-subtle with no",
+    "  border and 8px insets. SearchBar is shared by seven drawers and boards",
+    "  137:8, 781:4220 and 782:4263 draw the same control on --flowbite/gray/50",
+    "  with a --color/border stroke, which is what ships. Boards disagree, so the",
+    "  control does not move off this one.",
+    "",
+    "  the list rows (1069:4542 / 4811 / 4999) and the Paste-HTML band",
+    "  (1069:4702) — gap, height, and both horizontal insets already match; the",
+    "  only disagreement is vertical padding, and here the board's own arithmetic",
+    "  does not close: h-28 with py-5 leaves an 18px content box for a 20px line",
+    "  box (h-32/py-8 leaves 16 for 18). That is auto-layout export noise, not a",
+    "  box model, and `align-items: center` on a fixed-height row renders it",
+    "  identically either way. Same call `layers-component-instance` recorded for",
+    "  the Layers row. Their LABELS and ICONS are joined, which is where the",
+    "  visible contract (13/ink, 14px gray-600 square at radius 2) actually lives.",
+    "",
+    "  the group COUNT (1069:4541) — the board paints it --color/ink-placeholder,",
+    "  #9CA3AF, the same value as --bk-border-strong: 2.54:1 on white against a",
+    "  4.5 floor. GroupSection.tsx:38-42 already records the swap to ink-muted",
+    "  (4.83:1). Conforming would introduce a contrast failure.",
+    "",
+    "The Paste-HTML label and the tips strip are joined against the",
+    "",
+    "NOT JOINED, this board only:",
+    "",
+    "  the blocks GRID (1069:4724) — the board frames it at h-100 because it",
+    "  clips to one row of cards. The live grid holds all 50 and is 5500 tall.",
+    "  A clipped preview frame is not a height contract.",
+    "",
+    "  the CARD (1069:4725) — 136 wide, two to a row. The board's own",
+    "  arithmetic does not fit its own panel: 16 + 136 + 8 + 136 + 16 is 312",
+    "  in a 280 frame, and `.ls-panel`'s 1px border takes the content box to",
+    "  287 in the shell. GroupSection.tsx:250-262 already records the",
+    "  measured failure (50 cards, 50 rows, one card per row) and the",
+    "  auto-fill fix. The card's THUMB is joined and is exactly 136x80 at",
+    "  radius 6 on bg-subtle, which is the part of the card the board fixes.",
+    "",
+    "  TEMPLATES (the board's 5th group, count 10) is not built and will not",
+    "  be: authority=founder:no-templates-in-insert on boards.json 1069:4707,",
+    "  restated in catalog/groups.ts:1-8. Templates has its own flow.",
+    "",
+    "The last step hovers the search band. Without it the pointer is left on",
+    "the group header `click` put it on, and the header is then measured in a",
+    "hover state no board draws — flowbite's `color=\\\"light\\\"` fill.",
+    "That hover is also where a real contrast failure lives: 11px",
+    "--bk-ink-muted on gray-100 is 4.39:1. Fixed in this pass (BuildTab.css,",
+    "`.bld-group-header:hover span`), not baselined."
+  ]
+}

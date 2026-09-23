@@ -1,0 +1,579 @@
+{
+ "slug": "f-missed",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "move",
+   "id": "2838:12021",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 — measured on 144:2 (b09): board [100,21134,280,812]; Footer 144:46 [100,21591,280,182]; 'Aa Fonts' 2838:12021 abs [313,21605,50,40] = footer-rel (213,14) and TWO lines tall in a row of 16-20px labels; 'Accepts PNG...' 2838:12022 abs [116,21635,185,100] = rel (16,44), FIVE lines; 'Sort and list view...' 2838:12023 abs [116,21681,248,40] = rel (16,90). Overlap = x(116..301 n 116..364)=185 by y(21635..21735 n 21681..21721)=40 -> the verdict's 185x40 and .render-defects-after.json's 'by 185', same number. CAUSE: plans/media-05-node-edits.json created note/formats at width 248 rel (16,44); the <=60px overprint fixer then narrowed it 248->185 to clear its 50px horizontal overlap with the WRAPPED 'Aa Fonts' (313..363 n 116..364 = 51). Narrowing bought a line (4->5) and deepened the vertical collision it was not looking at. REPAIR, three bands, no frame grows: (1) un-wrap Fonts so the action row is one 20px line (rel 14..34); (2) restore formats to the template's 248 - a box cannot get TALLER when it gets wider, and 5 lines at 185 is at most 4 lines (80px) at 248, so its bottom is <= rel 124; (3) reseat the where-it-lives line at rel y 132, 8px clear of that worst case, bottom 172, i.e. 10px of slack inside the Footer's 182. BRIEF rule 5: nothing is added and no frame is resized taller, and the 10px is the shown slack."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12021",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 — measured on 144:2 (b09): board [100,21134,280,812]; Footer 144:46 [100,21591,280,182]; 'Aa Fonts' 2838:12021 abs [313,21605,50,40] = footer-rel (213,14) and TWO lines tall in a row of 16-20px labels; 'Accepts PNG...' 2838:12022 abs [116,21635,185,100] = rel (16,44), FIVE lines; 'Sort and list view...' 2838:12023 abs [116,21681,248,40] = rel (16,90). Overlap = x(116..301 n 116..364)=185 by y(21635..21735 n 21681..21721)=40 -> the verdict's 185x40 and .render-defects-after.json's 'by 185', same number. CAUSE: plans/media-05-node-edits.json created note/formats at width 248 rel (16,44); the <=60px overprint fixer then narrowed it 248->185 to clear its 50px horizontal overlap with the WRAPPED 'Aa Fonts' (313..363 n 116..364 = 51). Narrowing bought a line (4->5) and deepened the vertical collision it was not looking at. REPAIR, three bands, no frame grows: (1) un-wrap Fonts so the action row is one 20px line (rel 14..34); (2) restore formats to the template's 248 - a box cannot get TALLER when it gets wider, and 5 lines at 185 is at most 4 lines (80px) at 248, so its bottom is <= rel 124; (3) reseat the where-it-lives line at rel y 132, 8px clear of that worst case, bottom 172, i.e. 10px of slack inside the Footer's 182. BRIEF rule 5: nothing is added and no frame is resized taller, and the 10px is the shown slack."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12022",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 — measured on 144:2 (b09): board [100,21134,280,812]; Footer 144:46 [100,21591,280,182]; 'Aa Fonts' 2838:12021 abs [313,21605,50,40] = footer-rel (213,14) and TWO lines tall in a row of 16-20px labels; 'Accepts PNG...' 2838:12022 abs [116,21635,185,100] = rel (16,44), FIVE lines; 'Sort and list view...' 2838:12023 abs [116,21681,248,40] = rel (16,90). Overlap = x(116..301 n 116..364)=185 by y(21635..21735 n 21681..21721)=40 -> the verdict's 185x40 and .render-defects-after.json's 'by 185', same number. CAUSE: plans/media-05-node-edits.json created note/formats at width 248 rel (16,44); the <=60px overprint fixer then narrowed it 248->185 to clear its 50px horizontal overlap with the WRAPPED 'Aa Fonts' (313..363 n 116..364 = 51). Narrowing bought a line (4->5) and deepened the vertical collision it was not looking at. REPAIR, three bands, no frame grows: (1) un-wrap Fonts so the action row is one 20px line (rel 14..34); (2) restore formats to the template's 248 - a box cannot get TALLER when it gets wider, and 5 lines at 185 is at most 4 lines (80px) at 248, so its bottom is <= rel 124; (3) reseat the where-it-lives line at rel y 132, 8px clear of that worst case, bottom 172, i.e. 10px of slack inside the Footer's 182. BRIEF rule 5: nothing is added and no frame is resized taller, and the 10px is the shown slack."
+  },
+  {
+   "op": "move",
+   "id": "2838:12023",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 — measured on 144:2 (b09): board [100,21134,280,812]; Footer 144:46 [100,21591,280,182]; 'Aa Fonts' 2838:12021 abs [313,21605,50,40] = footer-rel (213,14) and TWO lines tall in a row of 16-20px labels; 'Accepts PNG...' 2838:12022 abs [116,21635,185,100] = rel (16,44), FIVE lines; 'Sort and list view...' 2838:12023 abs [116,21681,248,40] = rel (16,90). Overlap = x(116..301 n 116..364)=185 by y(21635..21735 n 21681..21721)=40 -> the verdict's 185x40 and .render-defects-after.json's 'by 185', same number. CAUSE: plans/media-05-node-edits.json created note/formats at width 248 rel (16,44); the <=60px overprint fixer then narrowed it 248->185 to clear its 50px horizontal overlap with the WRAPPED 'Aa Fonts' (313..363 n 116..364 = 51). Narrowing bought a line (4->5) and deepened the vertical collision it was not looking at. REPAIR, three bands, no frame grows: (1) un-wrap Fonts so the action row is one 20px line (rel 14..34); (2) restore formats to the template's 248 - a box cannot get TALLER when it gets wider, and 5 lines at 185 is at most 4 lines (80px) at 248, so its bottom is <= rel 124; (3) reseat the where-it-lives line at rel y 132, 8px clear of that worst case, bottom 172, i.e. 10px of slack inside the Footer's 182. BRIEF rule 5: nothing is added and no frame is resized taller, and the 10px is the shown slack."
+  },
+  {
+   "op": "move",
+   "id": "2838:12025",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:2 (Media · filtered). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12025",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:2 (Media · filtered). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12026",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:2 (Media · filtered). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12027",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:2 (Media · filtered). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12029",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:49 (Media · folder-scoped). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12029",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:49 (Media · folder-scoped). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12030",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:49 (Media · folder-scoped). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12031",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:49 (Media · folder-scoped). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12033",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:96 (Media · uploading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12033",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:96 (Media · uploading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12034",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:96 (Media · uploading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12035",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:96 (Media · uploading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12037",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:148 (Media · upload-failed). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12037",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:148 (Media · upload-failed). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12038",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:148 (Media · upload-failed). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12039",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:148 (Media · upload-failed). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12041",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:199 (Media · quota-warn). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12041",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:199 (Media · quota-warn). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12042",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:199 (Media · quota-warn). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12043",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:199 (Media · quota-warn). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12045",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:250 (Media · quota-full). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12045",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:250 (Media · quota-full). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12046",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:250 (Media · quota-full). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12047",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:250 (Media · quota-full). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12049",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 145:359 (Media · empty). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12049",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 145:359 (Media · empty). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12050",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 145:359 (Media · empty). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12051",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 145:359 (Media · empty). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12053",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 453:3931 (Media · load-error). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12053",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 453:3931 (Media · load-error). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12054",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 453:3931 (Media · load-error). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12055",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 453:3931 (Media · load-error). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12057",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 777:4093 (Media · loading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12057",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 777:4093 (Media · loading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12058",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 777:4093 (Media · loading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12059",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 777:4093 (Media · loading). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12061",
+   "x": 209,
+   "why": "F04 · Aa Fonts x. Footer-relative 213 -> 209 (move writes parent-relative x; the dump's 313 is absolute, minus the Footer origin 100). With w=58 the label runs rel 209..267: 6px clear of '⬡  Icons' (ends rel 203) and 13px inside the Footer's 280 right edge. F04 on 782:4353 (Media · no-results). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12061",
+   "w": 58,
+   "why": "F04 · Aa Fonts width 50 -> 58, which is what stops the wrap. 'Aa Fonts' at 13/Regular measures ~53px (compare '⬡  Icons', ar=WIDTH_AND_HEIGHT, which self-sized to 51 for eight glyphs plus two spaces); 50 is ~3px short, which is why the node is 40px tall - two lines - in a row whose other labels are 16-20. 58 leaves ~5px of slack. ar is already HEIGHT so the height recomputes to one line (20). F04 on 782:4353 (Media · no-results). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12062",
+   "w": 248,
+   "why": "F04 · accepted-formats width 185 -> 248, restoring the template value the <=60px fixer took away. Safe now only because the Aa Fonts row above no longer occupies the 44..124 band: unwrapped it is rel 14..34, and this paragraph starts at rel 44. 248 = the footer's own text column (16..264). F04 on 782:4353 (Media · no-results). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12063",
+   "y": 132,
+   "why": "F04 · where-it-lives y. Footer-relative 90 -> 132 (parent-relative; abs 21681 - footer origin 21591 = 90 on 144:2). 132 is 8px below the accepted-formats paragraph's WORST case bottom (44 + 80 = 124 at four lines); the node is 40 tall, so it ends at 172 and the Footer is 182 - 10px of slack, and the Footer is a fixed 182-tall clipping frame so nothing downstream moves. F04 on 782:4353 (Media · no-results). Sibling of 144:2: same footer template, same node stride. Parent-relative coords are not inferred - plans/media-05-node-edits.json clone-label wrote x/y for ALL TWELVE boards as note/formats (16,44) w248 and note/where-it-lives (16,90) w248, and 144:2's fresh dump reads back exactly those (abs 116,21635 and 116,21681 minus footer origin 100,21591). RENDER-DEFECTS-PAGE.txt:47-76 lists the identical 'by 50' + 'by 248' pair on every board and .render-defects-after.json the identical 'by 185' on every board, so the twelve are one layout, not twelve."
+  },
+  {
+   "op": "move",
+   "id": "2838:12064",
+   "x": 209,
+   "hold": true,
+   "holdWhy": "F04 board 12 of 12 (2430:21365, [not-implemented] Media · local-only) - HELD. Its Footer 2430:21397 is NOT at the template offset: .render-defects-after.json reads 'CONTAINER 2430:21365 ... 2430:21397 \"Footer\" bottom +100' and 'TEXTOVER 2838:12065 by 100', 'TEXTOVER 2838:12066 by 86' - the footer already hangs 100px below the board and two of its three labels are already outside it. Applying the +42 reseat there would deepen an 86px overflow. UNBLOCKED BY ONE READ: node scripts/figma/audit-verify-dump.mjs --ids=2430:21365 (board box + kids incl. the Footer + the three text boxes).",
+   "why": "F04 board 12 - same repair as the other eleven, held on geometry."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12064",
+   "w": 58,
+   "hold": true,
+   "holdWhy": "F04 board 12 - held with the row above; same read unblocks it.",
+   "why": "F04 board 12 - Aa Fonts width."
+  },
+  {
+   "op": "resize",
+   "id": "2838:12065",
+   "w": 248,
+   "hold": true,
+   "holdWhy": "F04 board 12 - held with the rows above; same read unblocks it.",
+   "why": "F04 board 12 - accepted-formats width."
+  },
+  {
+   "op": "move",
+   "id": "2838:12066",
+   "y": 132,
+   "hold": true,
+   "holdWhy": "F04 board 12 - held with the rows above; this is the row that would make the existing 86px overflow worse. Same read unblocks it.",
+   "why": "F04 board 12 - where-it-lives y."
+  },
+  {
+   "op": "text",
+   "id": "I220:847;16:17",
+   "text": "HOME",
+   "expect": "OPEN · HOME",
+   "why": "F08 · header format. 156:2 carries two section headers and they do not agree with each other: I220:847;16:17 'OPEN · HOME' [116,87198,233,16] (status · page) and I220:851;16:17 'MENU' [116,87354,233,16] (page). The grouping key is page identity (audit F08 Correction: 'Group comments by their actual page identity'); OPEN vs RESOLVED is already carried by the 'RESOLVED' 9 strip below the divider (156:40/156:41 at y87448). Dropping the status prefix makes the two headers one format. 11 chars -> 4 in a fixed 233-wide ar=HEIGHT box, so it shrinks and cannot reflow."
+  },
+  {
+   "op": "text",
+   "id": "I228:1007;17:39",
+   "text": "Sara · client · Home · 2d",
+   "expect": "Sara · client · Contact · 2d",
+   "why": "F08 · the contradiction itself. Under the 2-count HOME heading (I220:847;16:18 = '2') sit comment rows 228:1002 'Sara · client · Home · 2d' and 228:1007 'Sara · client · Contact · 2d'; the third comment 228:1012 'Sara · client · Menu · 1d' sits under 'MENU' count 1. Re-labelling the second comment Home makes every comment's page agree with its heading and keeps both counts true (2 Home, 1 Menu). Sample data, not shape - the panel still demonstrates page-grouped comments. 28 chars -> 25 in a fixed 236-wide ar=HEIGHT box, so no reflow. NOT TAKEN, and why: the audit's other half ('Contact comments appear under their own heading') needs a THIRD section header between rows 228:1002 and 228:1007. 156:2's children run contiguously 87076->87627 (44+44+28+28+64+64+28+64+32+1+70+40+44), i.e. a VERTICAL stack, and the only insert op available (clone-node) does appendChild - it lands at the END of the stack, not between two rows. There is no reorder op."
+  },
+  {
+   "op": "text",
+   "id": "1753:8433",
+   "text": "Add an internal note…",
+   "expect": "Reply to the client…",
+   "why": "F09 on 156:2 (Review panel · open). F09 · the lane split, decided for FIG-D-28 (change the placeholder) and against FIG-N-18 (change the hint). Reason: FIG-N-18's hint already landed and it is the TRUE half - ReviewService.postReply calls comments.create with {siteId, body, pageId} only, prisma Comment has no parentId/threadId, and the page is taken from comments[0].pageId, not from the comment being answered (FIG-N.jsonl:18 and FIG-D.jsonl:28, both 'measured'). So the hint 'Internal note - posts to this page's comments, not under a reply.' describes what happens; the placeholder 'Reply to the client...' is the string that contradicts the code, and it is exactly FIG-D-28's unlanded edit. This also answers the audit's first option ('label the action Add page comment') without drawing the second one (an explicit selected-thread context), which the schema cannot support. The node is ar=WIDTH_AND_HEIGHT and no width is passed, so it stays self-sizing; 20 chars -> 21."
+  },
+  {
+   "op": "text",
+   "id": "1705:8768",
+   "text": "Add an internal note…",
+   "expect": "Reply to the client…",
+   "why": "F09 on 1705:8704 (Review · reply-composer band). F09 · the lane split, decided for FIG-D-28 (change the placeholder) and against FIG-N-18 (change the hint). Reason: FIG-N-18's hint already landed and it is the TRUE half - ReviewService.postReply calls comments.create with {siteId, body, pageId} only, prisma Comment has no parentId/threadId, and the page is taken from comments[0].pageId, not from the comment being answered (FIG-N.jsonl:18 and FIG-D.jsonl:28, both 'measured'). So the hint 'Internal note - posts to this page's comments, not under a reply.' describes what happens; the placeholder 'Reply to the client...' is the string that contradicts the code, and it is exactly FIG-D-28's unlanded edit. This also answers the audit's first option ('label the action Add page comment') without drawing the second one (an explicit selected-thread context), which the schema cannot support. The node is ar=WIDTH_AND_HEIGHT and no width is passed, so it stays self-sizing; 20 chars -> 21."
+  },
+  {
+   "op": "text",
+   "id": "1705:8630",
+   "text": "Add an internal note…",
+   "expect": "Reply to the client…",
+   "why": "F09 on 1705:8566 (Review · reply-failed). F09 · the lane split, decided for FIG-D-28 (change the placeholder) and against FIG-N-18 (change the hint). Reason: FIG-N-18's hint already landed and it is the TRUE half - ReviewService.postReply calls comments.create with {siteId, body, pageId} only, prisma Comment has no parentId/threadId, and the page is taken from comments[0].pageId, not from the comment being answered (FIG-N.jsonl:18 and FIG-D.jsonl:28, both 'measured'). So the hint 'Internal note - posts to this page's comments, not under a reply.' describes what happens; the placeholder 'Reply to the client...' is the string that contradicts the code, and it is exactly FIG-D-28's unlanded edit. This also answers the audit's first option ('label the action Add page comment') without drawing the second one (an explicit selected-thread context), which the schema cannot support. The node is ar=WIDTH_AND_HEIGHT and no width is passed, so it stays self-sizing; 20 chars -> 21."
+  },
+  {
+   "op": "rename",
+   "id": "641:2505",
+   "name": "Card · Restaurant — one page — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.ts gradient/icon), not an image; the catalogue is a static in-bundle array, so there is no loading skeleton and no unavailable-preview state to draw",
+   "expect": "Card · Restaurant — one page",
+   "why": "F17 · CODE TRUTH first: a template tile has no image. TemplateCard.tsx:85-91 renders <div class='tpl-card-thumb' style={{background: template.gradient}}><span class='tpl-card-thumb-icon'>{template.icon}</span>, i.e. a CSS gradient plus an emoji glyph - templatesData.ts:180-261 gives each entry its icon and its linear-gradient(145deg, ...) pair. The catalogue is a static in-bundle array, so nothing is fetched, nothing can be 'loading' and nothing can be 'unavailable'. The arc already reached this conclusion once: hotspot 787:4347 on this very board is named 'Templates · loading - CUT 2026-09-02 (Templates · loading RETIRED, no producer)'. Recording it on the card so the next pass does not add the skeleton the audit asks for."
+  },
+  {
+   "op": "rename",
+   "id": "641:2511",
+   "name": "Card · Menu + reservations — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.ts gradient/icon), not an image; the catalogue is a static in-bundle array, so there is no loading skeleton and no unavailable-preview state to draw",
+   "expect": "Card · Menu + reservations",
+   "why": "F17 · CODE TRUTH first: a template tile has no image. TemplateCard.tsx:85-91 renders <div class='tpl-card-thumb' style={{background: template.gradient}}><span class='tpl-card-thumb-icon'>{template.icon}</span>, i.e. a CSS gradient plus an emoji glyph - templatesData.ts:180-261 gives each entry its icon and its linear-gradient(145deg, ...) pair. The catalogue is a static in-bundle array, so nothing is fetched, nothing can be 'loading' and nothing can be 'unavailable'. The arc already reached this conclusion once: hotspot 787:4347 on this very board is named 'Templates · loading - CUT 2026-09-02 (Templates · loading RETIRED, no producer)'. Recording it on the card so the next pass does not add the skeleton the audit asks for."
+  },
+  {
+   "op": "rename",
+   "id": "641:2517",
+   "name": "Card · Landing — offer — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.ts gradient/icon), not an image; the catalogue is a static in-bundle array, so there is no loading skeleton and no unavailable-preview state to draw",
+   "expect": "Card · Landing — offer",
+   "why": "F17 · CODE TRUTH first: a template tile has no image. TemplateCard.tsx:85-91 renders <div class='tpl-card-thumb' style={{background: template.gradient}}><span class='tpl-card-thumb-icon'>{template.icon}</span>, i.e. a CSS gradient plus an emoji glyph - templatesData.ts:180-261 gives each entry its icon and its linear-gradient(145deg, ...) pair. The catalogue is a static in-bundle array, so nothing is fetched, nothing can be 'loading' and nothing can be 'unavailable'. The arc already reached this conclusion once: hotspot 787:4347 on this very board is named 'Templates · loading - CUT 2026-09-02 (Templates · loading RETIRED, no producer)'. Recording it on the card so the next pass does not add the skeleton the audit asks for."
+  },
+  {
+   "op": "fill",
+   "id": "641:2505",
+   "hex": "#2D0A00",
+   "hold": true,
+   "holdWhy": "F17 · the visual half, HELD ON ONE READ. The three flat grey rectangles are the tpl-card-thumb frames INSIDE 641:2505/641:2511/641:2517, and their node ids exist nowhere on disk - b15 dumps only one level of children of 641:2487 (K rows: the three Card frames [100,60727,280,130], [100,60857,...], [100,60987,...]) and DISCOVERY.md's Templates section lists TEXT nodes only. I will not fill/add into the Card frame blind: the board is layout=VERTICAL with contiguous children, so the Cards are very likely auto-layout too, and add-rect/add-text append to the END of an auto-layout stack while their x/y are ignored. UNBLOCKED BY ONE READ: node scripts/figma/audit-verify-dump.mjs --ids=641:2505,641:2511,641:2517 --kids=30 (thumb frame ids, boxes and layoutMode). Then: fill each thumb with the template's own gradient end-stop (#2D0A00 restaurant, and its siblings) and add-text the icon glyph centred, per TemplateCard.tsx:85-91.",
+   "why": "F17 · paint the Restaurant preview tile instead of leaving it flat grey."
+  },
+  {
+   "op": "add-rect",
+   "parent": "641:2487",
+   "name": "skeleton · template thumb",
+   "x": 16,
+   "y": 16,
+   "w": 248,
+   "h": 94,
+   "color": "#F3F4F6",
+   "hold": true,
+   "holdWhy": "F17 · REFUSED, not deferred. The audit's 'draw a distinct loading skeleton and unavailable-preview fallback' asks the board to draw a capability the code does not have (BRIEF-FIX rule 4): TEMPLATES is a static array imported into the bundle, TemplateCard renders a gradient + glyph and never an <img>, so there is no load to skeleton and no image that can be missing. This row exists so the refusal is on the record with its op, not silently dropped. Do not un-hold it.",
+   "why": "F17 · the loading skeleton the audit asks for."
+  },
+  {
+   "op": "text",
+   "id": "1748:8391",
+   "text": "Tokens not saved",
+   "expect": "Brand is up to date",
+   "why": "F20 · the corroborated half only. DISCOVERY.md:4086 has 1748:8391 'Brand is up to date' on 1333:7162, and the Brand conformance scan's dirty-dot paint 1751:8403 #8E4B10 sits on the same panel beside the counts (SHOTS.md:70-79: 'The counts carry small status dots, which matches the dirty-dot paint the conformance scan found'). A global 'up to date' beside a dirty dot is the contradiction. It also claims a sync the code cannot do - the board's own name records that capture/push moves projectStyles CSS rules, not designTokens (theme.service.ts:79,184), 'so no brand syncs'. 'Tokens not saved' names the row the dot belongs to and the state it means, and says nothing about theme sync, which is the audit's second half ('local save status cannot be confused with theme sync status'). GEOMETRY: 1333:7162 is NOT in any fresh dump, so this row is deliberately chosen to need none - 19 chars -> 16, a string that can only get narrower."
+  },
+  {
+   "op": "add-text",
+   "parent": "1333:7162",
+   "name": "legend · token status",
+   "text": "● edited, not saved",
+   "x": 16,
+   "y": 740,
+   "size": 11,
+   "w": 248,
+   "hold": true,
+   "holdWhy": "F20 · the two halves that need the board's geometry, HELD. (a) a defined LABEL for the orange marker itself, and (b) the cramped Beginner-mode help 1747:8400 'Friendly · hides token IDs and empty foundations' clearing the divider. 1333:7162 is not in the fresh dumps - the F20 verdict says so in terms ('That half needs a fresh read of 1333:7162 and did not get one'). DISCOVERY.md:4065-4110 gives every string and its PARENT-relative x/y but no box sizes, no divider position and no dot geometry, and the board is layout=VERTICAL clipping at 812, so any add here is an unpaid height. The x/y on this row are a placeholder, not a measurement. UNBLOCKED BY ONE READ: node scripts/figma/audit-verify-dump.mjs --ids=1333:7162 --kids=30.",
+   "why": "F20 · give the orange dot a label."
+  },
+  {
+   "op": "rewire",
+   "id": "642:3538",
+   "from": "159:2",
+   "to": "32:2",
+   "why": "F21 · 1 of 3. b16: 'R 642:3538 -> 159:2 NAVIGATE Inspector', and 159:2's live name is 'Inspector · single-selection — RETIRED 2026-09-02'. DESTINATION JUSTIFIED FROM DISK: the retirement is the founder's, verbatim in-session 2026-09-02 'retire 159:2' (LEDGER.jsonl:269, BLOCKERS.md:257), and jobs.json J-159:2 records authority 'superseded-by:32:2' with the reason 'same state as 32:2 in older geometry'; BLOCKERS.md:119/354 make 32:2 the master for this state (807 geometry, collapsed tail + footer, elementProfiles.ts:47-66). 32:2 is live and is already a prototype destination in the fresh dumps: 'K 32:2 FRAME 1780,50250,300,812 ... Inspector · profile · CONTAINER (fallback)' and 'R 2865:22363 -> 32:2 NAVIGATE hotspot/select · Inspector · CONTAINER (fallback)'. rewire refuses unless the node currently carries the 159:2 edge, so 'from' is this row's expect."
+  },
+  {
+   "op": "rewire",
+   "id": "1172:4895",
+   "from": "1172:4867",
+   "to": "1688:7195",
+   "why": "F21 · 2 of 3. b16: 'R 1172:4895 -> 1172:4867 NAVIGATE hotspot/state · Project settings modal'; 1172:4867 reads 'RETIRED — Project settings modal (⌃,) · superseded'. DESTINATION JUSTIFIED FROM DISK: the full rename that landed (plans/settings-truth-marks.json row 0; queue-state.json settings-truth-marks#0 status OK at 2026-09-07T04:39:27) says 'superseded by the full-page Settings ... and ⌃, + the Site menu's \"Site settings\" row point there, so site configuration has one home'. The full-page Settings root is 1688:7195: on THIS board (642:3401) 'R 1688:16205 -> 1688:7195 NAVIGATE hotspot/state · S7 · Settings · root', and six further 'hotspot/back · S7 · Settings · root' edges in the fresh dumps all land on it; its sibling 638:2378 is dumped as 'S7 · Settings · General'. Note REFUTED-AUDIT.md:44-65: the rename's footnote cites UX-I-30, which is quarantined DO-NOT-IMPLEMENT - but the same file says 'The substance survives; only the citation is wrong', with the independent record at 2797:404-406 ('2 Settings surfaces ... a 3-tab modal and a 13-screen full page, no link between them'). So the retirement stands and the rewire is not resting on a refuted finding."
+  },
+  {
+   "op": "rename",
+   "id": "1172:4895",
+   "name": "hotspot/state · Settings (⌃,) → S7 · Settings · root — the 3-tab project-settings modal 1172:4867 is RETIRED; ⌃, and the Site menu's Site settings row both open the full-page Settings",
+   "expect": "hotspot/state · Project settings modal",
+   "why": "F21 · the label half of row 2. After the rewire the hotspot's own name would still promise a modal that is retired, and a name is how every other retirement on this page is read. Name only - no geometry."
+  },
+  {
+   "op": "rewire",
+   "id": "926:4484",
+   "from": "817:4774",
+   "to": "988:2",
+   "hold": true,
+   "holdWhy": "F21 · 3 of 3, HELD, AND THE 'to' IS A PLACEHOLDER - DO NOT UN-HOLD AS WRITTEN. b16: 'R 926:4484 -> 817:4774 NAVIGATE menu · Share preview link'; 817:4774 is '[not-implemented · superseded by 988:2 · Site · Access]'. The successor is real and identified - BLOCKERS.md:279 records that 988:2 had Site · Sharing but no Site · Access, that app/dashboard/sites/[id]/access/ + access-tab.tsx own share permissions, that three boards (Site · Access, · new-link, · empty) were drawn there cloned from Site · Sharing 1006:3128 (jobs.json:6183/6195/6207), and that the editor hands off deliberately (SiteMenu.tsx:261 openDashboard('/dashboard/sites/${siteId}?share=1')). But 988:2 is a DIFFERENT PAGE, and this file's own record is that Figma rejects cross-page NAVIGATE - that is the stated reason section 19 exists as 1:6 echoes at all (every 1339:71xx board name). So there is no destination on 1:3 to point at. UNBLOCKED BY ONE READ: a name search of page 1:3 for a 'Site · Access' / share echo (one get_metadata-class call on 1:3). If none exists - DISCOVERY.md covers 8 of 29 sections, so its silence is not proof - this becomes a founder call: echo the Site · Access board onto 1:3 the way section 19 echoes 1:6, or mark the menu row not-implemented and leave it unwired.",
+   "why": "F21 · repoint Share preview link away from the superseded 817:4774."
+  },
+  {
+   "op": "rename",
+   "id": "926:4484",
+   "name": "menu · Share preview link — [dead route] still NAVIGATEs to 817:4774, which is [not-implemented · superseded by 988:2 · Site · Access]; the editor hands share off to the dashboard (SiteMenu.tsx:261) and no 1:3 board draws Site · Access, so there is nothing on this page to repoint to yet",
+   "expect": "menu · Share preview link",
+   "why": "F21 · makes the held rewire visible in the file instead of only in this plan. b16 N row: '926:4484 menu · Share preview link FRAME 1860,147424,240,32'. Name only - no geometry, no reaction touched."
+  },
+  {
+   "op": "text",
+   "id": "1339:7173",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7171 · A · viewing (the audited board). F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7164",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7162 · A0 · identify. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7188",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7186 · D · approved. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7195",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7193 · C · changes-requested. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7202",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7200 · F · expired. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7209",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7207 · F · revoked. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7216",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7214 · F · not-found. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7223",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1339:7221 · F · conflict. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1340:7164",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1340:7162 · B · commenting. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1340:7176",
+   "text": "Ali's Studio",
+   "expect": "{Agency}",
+   "why": "F24 · {Agency} on 1340:7174 · E · post-approval-edited. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention. GEOMETRY, measured on the one board in the fresh dumps: 1339:7173 '{Agency}' [124,92609,59,16] 13/Semi Bold and 1339:7174 'is asking for your feedback' [220,92610,153,15] - board-relative (24,20) and (120,21), i.e. a 96px slot with the token filling 59 of it and 37px of air. \"Ali's Studio\" at 13/Semi Bold measures ~68px, so the label ends at rel 92 and keeps 28px of clearance. DISCOVERY.md:5237-5290 shows the SAME pair at rel (24,20)/(120,21) on all ten boards, so the slot is the template's, not this board's."
+  },
+  {
+   "op": "text",
+   "id": "1339:7176",
+   "text": "Bella Cucina",
+   "expect": "(the site, page tabs, and Your notes)",
+   "why": "F24 · the stage direction the audit names first. 1339:7176 [544,92789,392,24] 20/Semi Bold is the Card's heading and it reads as a parenthetical instruction, not product copy; on the real screen the card holds the SitePreview and no heading (review-client.tsx:305-320). The site being reviewed is the honest heading and it is the canonical sample ('Bella Cucina', 16/16 canonical S5.5 boards). 37 chars -> 12 in a fixed 392-wide ar=HEIGHT box: it can only get shorter, so no reflow. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1339:7177",
+   "text": "Signed as Sara. You are looking at the version sent to you 5 September 2026 — later edits will not change it.",
+   "expect": "Signed as {Name}. You are looking at the version sent to you {date} — later edits will not change it.",
+   "why": "F24 · {Name} and {date} on 1339:7171, node 1339:7177 [544,92821,392,32] 13/Regular, two lines, inside the Card. The sentence is the code's own (review-client.tsx:285-288 'Signed as {reviewer.name}. You are looking at the version sent to you {new Date(data.sentAt).toLocaleDateString()} — later edits will not change it.'), so only the two tokens change. 'Sara' is 156:2's client; the date is sample data consistent with 156:2's 'Sent 2d ago' against the 2026-09-07 capture. Two-line capacity at 392 is ~784px of advance; the new string is 108 chars at ~6.4px = ~691px, so it stays two lines. Slack shown anyway: the next thing below it in the dump is the action bar at y93205, 352px lower, and the board is layout=NONE, so even a third line moves nothing. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1339:7179",
+   "text": "Signed as Sara. You are looking at the version sent to you 5 September 2026 — later edits will not change it.",
+   "expect": "Signed as {Name}. You are looking at the version sent to you {date} — later edits will not change it.",
+   "why": "F24 · {Name} and {date} on 1339:7171, node 1339:7179 [188,93205,700,15] 12/Regular, one line, in the Action bar. The sentence is the code's own (review-client.tsx:285-288 'Signed as {reviewer.name}. You are looking at the version sent to you {new Date(data.sentAt).toLocaleDateString()} — later edits will not change it.'), so only the two tokens change. 'Sara' is 156:2's client; the date is sample data consistent with 156:2's 'Sent 2d ago' against the 2026-09-07 capture. One line at 700 holds ~118 chars at 12/Regular; the new string is 108. Slack shown: even if it wrapped, a second line ends at y93235 and the board bottom is 92589+720 = 93309 - 74px clear - and the board is layout=NONE, so nothing else moves. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1339:7167",
+   "text": "Bella Cucina is ready for you to look at",
+   "expect": "{Site} is ready for you to look at",
+   "why": "F24 · {Site} on 1339:7162 · A0 · identify, the heading (review-client.tsx:192 '{data.siteName} is ready for you to look at'). +6 characters in a heading on a 1280-wide board at board-rel x24; the board is layout=NONE so no sibling moves. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1339:7170",
+   "text": "Look at Bella Cucina",
+   "expect": "Look at {Site}",
+   "hold": true,
+   "holdWhy": "F24 · HELD on geometry, and it is the only F24 row that is. This is a BUTTON label (review-client.tsx:238 `Look at ${data.siteName}`) and a button frame is the one container in this family sized to its own label. 1339:7162 is not in any fresh dump - DISCOVERY.md gives '1339:7170 24,12 \"Look at {Site}\"' with no box and no parent box - so +6 characters against an unmeasured button is exactly the growth BRIEF-FIX rule 5 refuses to guess at. UNBLOCKED BY ONE READ: node scripts/figma/audit-verify-dump.mjs --ids=1339:7162 --kids=30. Until it lands, A0 carries 'Ali's Studio' and 'Bella Cucina is ready for you to look at' with '{Site}' still on the button - stated, not hidden.",
+   "why": "F24 · {Site} on the A0 primary button."
+  },
+  {
+   "op": "text",
+   "id": "1339:7192",
+   "text": "Thanks — Ali's Studio can take it from here. You'll hear from your designer when it goes live.",
+   "expect": "Thanks — {Agency} can take it from here. You'll hear from your designer when it goes live.",
+   "why": "F24 · inline {Agency} on 1339:7186 · D · approved. Same substitution as the header on the same board, or the board contradicts itself. Growth is +4 characters in an 89-character body paragraph; the board is layout=NONE, so nothing outside the card can move and the worst case is one extra wrapped line inside it. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1340:7180",
+   "text": "Heads up — Ali's Studio has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.",
+   "expect": "Heads up — {Agency} has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.",
+   "why": "F24 · inline {Agency} on 1340:7174 · E · post-approval-edited (review-client.tsx:265). Same +4 characters, same layout=NONE board, same reasoning as 1339:7192. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "text",
+   "id": "1340:7181",
+   "text": "Signed as Sara · sara@bellacucina.com",
+   "expect": "Signed as {Name} · {email}",
+   "why": "F24 · {Name} + {email} on 1340:7174 (review-client.tsx:270 'Signed as {reviewer.name} · {reviewer.email}'). 'Sara' is 156:2's client; the address is the one genuinely invented token in this plan - a sample mailbox on the canonical sample site - and it is sample data, not shape. +11 characters on a meta line at card-relative (24,150), the last text in its parent per DISCOVERY.md:5290-5291, on a layout=NONE board: the only thing a wrap can push is empty card. F24 · DECISION: RESOLVE the placeholders to sample content, applied to every sibling reachable offline, NOT 'mark it a schematic'. Two reasons. (a) The sample content is not invented - it is this file's own canonical values: VERDICTS.jsonl:59 (D-H-31, method 'figma string-presence test across all sixteen S5.5 canonical boards') reads '16/16 carry Ali's Studio, 16/16 carry Reviewing: Bella Cucina · v3', and 'Bella Cucina' is the site name everywhere else on 1:3 (DISCOVERY.md:20,159,256). 'Sara' is the client on the Review panel (156:2: 'Sara · client · Home · 2d', 'Sent 2d ago · Sara'). So the echoes are being conformed to the boards they echo. (b) 'Mark it a schematic' would author nothing: the ten board names ALREADY say 'echo of 1:6 ... Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state', which is the marking. Every other board in this family already mixes real sample content with tokens (1340:7162 draws 'Logo thora bara karein please' beside '{Agency}') - the tokens are the outlier, not the convention."
+  },
+  {
+   "op": "rename",
+   "id": "817:4856",
+   "name": "[not-implemented] Preview · interaction test — the in-shell PreviewOverlay strips every <script> (ExportUtils.ts:38-43) AND renders its iframe with sandbox=\"\" (PreviewOverlay.tsx:106), so no interaction, form or internal link can run there; the export-modal preview window (ExportUtils.ts:110) and PreviewFrame.tsx:147 are sandboxed differently. Interactions DO work on the published page (UX-E-17) — F25: the dark Preview console panel overprints the lower half of the Scroll & anchor and Broken element cards and truncates both mid-sentence; DESIGN-AUDIT.md:120 Q1 verdict on this board is CUT-and-re-file, 'a prose spec, not a screen'. Interior geometry unread, so the separation is planned and NOT applied",
+   "expect": "[not-implemented] Preview · interaction test",
+   "why": "F25 · the half that needs no geometry - the audit's 'retain clear proposed status until runtime validation'. The current name is known exactly: queue-state.json publish-marks#12 status OK at 2026-09-07T04:39:16 wrote '[not-implemented] Preview · interaction test — the in-shell PreviewOverlay strips every <script> (ExportUtils.ts:38-43) ...', so the expect prefix is safe and the whole existing code truth is carried forward unchanged, with the overprint and the DESIGN-AUDIT verdict appended."
+  },
+  {
+   "op": "move",
+   "id": "817:4856",
+   "y": 0,
+   "hold": true,
+   "holdWhy": "F25 · the geometry half, HELD, and this row's y is a PLACEHOLDER - do not un-hold as written. The repair is to move or shrink the dark 'Preview console' panel off the 'Scroll & anchor' and 'Broken element' cards, and I have neither the panel's node id nor a single box: 817:4856 is not in any b*.tsv (its read never landed before the daily cap), DISCOVERY.md does not cover section 1779:4, and reports/publish.md:180-184 says in the first person 'I never read inside ... 817:4856'. The F25 verdict is CONFIRMED-VIA-UNCHANGED-RENDER precisely because no writer touched the interior - which also means no writer recorded it. jobs.json J-817:4856 gives only 'width: 1080'. UNBLOCKED BY ONE READ: node scripts/figma/audit-verify-dump.mjs --ids=817:4856 --kids=30. Note the second finding inside the verdict: render-defects.mjs cannot see this class at all (its six checks are parent-to-child or title-vs-right-sibling, never opaque-sibling-over-card), so analyze.py cover() on the fresh dump - not the detector - is what must confirm the fix.",
+   "why": "F25 · separate the Preview console panel from the two explanatory cards."
+  }
+ ]
+}

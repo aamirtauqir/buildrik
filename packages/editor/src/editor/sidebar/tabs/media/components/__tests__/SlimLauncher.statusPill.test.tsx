@@ -44,10 +44,10 @@ describe("SlimLauncher — status pill", () => {
   });
 
   it("names the running job and announces it politely", () => {
-    mount({ statusPill: "Optimising → WebP…" });
+    mount({ statusPill: "Optimizing → WebP…" });
     const pill = screen.getByTestId("media-status-pill");
     expect(pill).toHaveAttribute("aria-live", "polite");
-    expect(screen.getByText("Optimising → WebP…")).toBeInTheDocument();
+    expect(screen.getByText("Optimizing → WebP…")).toBeInTheDocument();
   });
 
   // The editor modal's open state lives outside this tab, so a cancelled edit

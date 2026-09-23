@@ -81,10 +81,31 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
 
     /* add-page rides PROJECT_CHANGED's `page:created` — EVENTS.PAGE_CREATED is
        a declared constant nothing emits (useAutoMilestone documents the same
-       trap). The import parser emits the same type; loadingRef filters it. */
+       trap). The import parser emits the same type; loadingRef filters it.
+
+       THE EDITOR CREATES THE FIRST PAGE ITSELF, and that is not the user
+       adding one. `useComposerInit`'s bootstrap calls `elements.createPage`
+       when storage holds nothing, which emits this exact event outside any
+       import — so every brand-new project ticked "Add your first page" on
+       first paint, fired the achievement overlay over an empty canvas for
+       work nobody did, and (because `showCoach` needs `completedCount === 0`)
+       made the S1.1 rail coach unreachable for every user who ever existed.
+       Measured live at localhost:5050, 2026-09-08: 1/7 done and the prompt on
+       screen four seconds after boot, never touched.
+
+       The bootstrap is already known to lie in two other directions from the
+       same three lines — it raised the dirty flag and put itself on the undo
+       stack, and useComposerInit corrects both right there ("Seeding is not an
+       edit"). This is the third.
+
+       The test is the page COUNT, not the event: > 1 page means a page beyond
+       the one the editor makes for you. That is the same rule the seeding
+       effect below already uses, so the live wire and the catch-up read agree
+       instead of disagreeing by one page. */
     const onProjectChanged = (p?: unknown) => {
       if (loadingRef.current) return;
-      if ((p as { type?: string } | undefined)?.type === "page:created") {
+      if ((p as { type?: string } | undefined)?.type !== "page:created") return;
+      if ((composer.elements.getAllPages?.() ?? []).length > 1) {
         completeRef.current("add-page");
       }
     };
@@ -235,10 +256,18 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
      of the flag read. */
   const [coachDismissed, setCoachDismissed] = React.useState(railCoachDismissed);
 
-  if (o.phase === "done") return null;
+  /* View mode is stripped chrome, and the setup checklist is owner chrome.
+     Board 1343:7162 draws the read-only editor as topbar + canvas + a bare
+     footer and nothing else — the founder call it records is "rail, drawer,
+     inspector and owner controls all removed, Figma-viewer style". Measured at
+     `?view=readonly` on 2026-09-08: the rail, drawer and inspector were all
+     correctly gone and a "0/7 done" Get-started chip was still sitting in the
+     status band, telling someone who cannot edit the site to go set its brand.
+     The coach two lines below already carried this condition; the checklist it
+     belongs to never got it. */
+  if (o.phase === "done" || getEditorViewMode().readOnlyView) return null;
 
-  const showCoach =
-    o.completedCount === 0 && !coachDismissed && !getEditorViewMode().readOnlyView;
+  const showCoach = o.completedCount === 0 && !coachDismissed;
 
   return (
     <>

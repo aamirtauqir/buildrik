@@ -1,0 +1,95 @@
+{
+  "surface": "s7-settings-redirects",
+  "board": "S7 · Settings · Redirects (Figma 640:2440)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-redirects",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-redirects"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-redirects-title",
+      "testId": "set-card-title-redirects",
+      "spec": "s7-settings-redirects",
+      "nodeId": "640:2753"
+    },
+    {
+      "name": "card-redirects",
+      "testId": "set-card-redirects"
+    },
+    {
+      "name": "card-add",
+      "testId": "set-card-add-redirect"
+    },
+    {
+      "name": "field-from",
+      "testId": "set-field-from-path",
+      "spec": "s7-settings-redirects",
+      "nodeId": "640:2779"
+    },
+    {
+      "name": "field-from-label",
+      "testId": "set-field-label-from-path",
+      "spec": "s7-settings-redirects",
+      "nodeId": "640:2780"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE, in the board's own pane — `.bd-set-pane-body` at 824,",
+    "which is 760 (the card) plus its two 32 insets. Host and arithmetic settled",
+    "by s7-settings-general (638:2378); the ten S7 screens share one probe host",
+    "rather than ten.",
+    "The screen reads one tRPC procedure (siteDetail.redirects.list), and the",
+    "fixture is the board's own pair of rules.",
+    "",
+    "BOARD WON, and it fixed two contrast failures per row:",
+    "  640:2759  a row sits on the CARD'S OWN WHITE (--color/bg-panel), 12px gap,",
+    "            6px above and below, no fill and no border — the rows are a table",
+    "            under a thead, not a stack of tiles. Live drew each row as a",
+    "            bordered bg-subtle tile INSIDE the white card, i.e. a card inside",
+    "            a card, and that wash is what put both 11px strings each row",
+    "            carries under AA: the '→' (--bk-ink-muted) at 4.39:1 and 'Delete'",
+    "            (--bk-error) at 4.29:1, twice over for two rows. Both clear on",
+    "            the white the board asked for. 0 contrast failures now.",
+    "",
+    "ANCHOR PINNED, copy left alone: the card is titled 'Active redirects (2)'",
+    "live and 'REDIRECTS' on the board. The count is product data, not board copy,",
+    "and 14 tests in LocalizationScreen/RedirectsScreen wait on the equivalent",
+    "string, so the title stands and `Section` took an optional `anchor` instead —",
+    "`set-card-redirects` no longer changes with the row count. The COPY",
+    "difference is real and is reported, not silently kept.",
+    "",
+    "NOT JOINED, and why:",
+    "  640:2752 the REDIRECTS card BOX — drawn 940 wide against the 760 of the",
+    "  404 SUGGESTER card on the same board. Live cards are flex children of",
+    "  `.bd-set-pane-body` and STRETCH, so one screen cannot satisfy both widths;",
+    "  the family's settled probe host is 824 (760 + two 32s), fixed by",
+    "  s7-settings-general. A pane-layout decision — fixed-width cards",
+    "  left-aligned in a wider pane — that no single screen adopts on its own.",
+    "  Its TITLE is joined and passes.",
+    "  640:2754 the thead (FROM PATH / TO URL / TYPE, 220/380/80/90 columns) —",
+    "  live has no header row at all, so a reader sees '/menu-old → /menu 301'",
+    "  and must infer which is which. That is the board's clearest ask on this",
+    "  screen and it is a build, not a fix. REPORTED.",
+    "  640:2763 the row's Edit button — the board edits a rule in place; live",
+    "  offers Delete only, and re-adding is the way to change one.",
+    "  640:2777 the whole 404 SUGGESTER card (a toggle plus two suggested rules",
+    "  read from real 404s). Nothing in the product corresponds — there is no 404",
+    "  log. A feature, and the board is the first place it has been drawn.",
+    "",
+    "FOUND, NOT FIXED: live draws an ADD REDIRECT card the board does not, and",
+    "the board draws an inline Edit the product does not. The two disagree about",
+    "where a rule is authored, and only one of them can be right. Also: the screen",
+    "opens with 'Saved, not yet live… visitors hitting the old URL won't be",
+    "forwarded until deployment wiring ships', and the board's own annotation",
+    "(2876:12441) adds that redirects are not covered by version history. Neither",
+    "caveat is drawn on the board's cards."
+  ]
+}

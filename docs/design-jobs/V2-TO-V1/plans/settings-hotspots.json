@@ -1,0 +1,14 @@
+[
+ {
+  "op": "hotspot",
+  "over": "640:2763",
+  "to": null,
+  "unresolved_id": true,
+  "name": "hotspot/redirect-row-delete",
+  "pad": 6,
+  "board": "640:2440",
+  "boardName": "S7 · Settings · Redirects",
+  "idProvenance": "`over` = 640:2763, a LITERAL id from the COVER-1-03 lane row (the first redirect row's action button). `to` is unresolved until add-state-board.mjs prints the id of the new S7 · Settings · Redirects · delete-confirm board.",
+  "why": "UX-I-33 (Critical) — a confirm board nobody can reach is a picture, not a state. COVER-1-03 additionally says the three row buttons 640:2763 / 640:2769 / 640:2775 are drawn as 'Edit' and the row's only action is Delete; that relabel is COVER-1-03's row, not mine, but this hotspot hangs off the same node and should land after it."
+ }
+]

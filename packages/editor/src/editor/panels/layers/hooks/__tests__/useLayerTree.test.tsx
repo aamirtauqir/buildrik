@@ -81,17 +81,29 @@ function mount() {
 }
 
 describe("useLayerTree — tree build", () => {
-  it("builds a nested LayerItem tree rooted at the active page root", () => {
+  // The page root is EXCLUDED (2026-09-08, BLOCKERS.md B6). Its children are
+  // the top level; the root is a container the user never selects or names, and
+  // counting it made an empty page read "1 layer".
+  it("builds a nested LayerItem tree from the root's CHILDREN, not the root", () => {
     const { result } = mount();
-    expect(result.current.layers).toHaveLength(1);
-    expect(result.current.layers[0].id).toBe("root");
-    expect(result.current.layers[0].children.map((c) => c.id)).toEqual(["a", "b"]);
-    expect(result.current.layers[0].children[0].children.map((c) => c.id)).toEqual(["a1"]);
+    expect(result.current.layers.map((l) => l.id)).toEqual(["a", "b"]);
+    expect(result.current.layers[0].children.map((c) => c.id)).toEqual(["a1"]);
+    expect(result.current.layers.some((l) => l.id === "root")).toBe(false);
+  });
+
+  it("an empty page reads zero layers, so the empty state is reachable", () => {
+    const composer = makeComposer();
+    const emptyRoot = el("root");           // a page whose root has no children
+    composer.elements.getElement = ((id: string) =>
+      id === "root" ? emptyRoot : null) as never;
+    const { result } = renderHook(() => useLayerTree(composer));
+    expect(result.current.layers).toEqual([]);
+    expect(result.current.totalCount).toBe(0);
   });
 
   it("totalCount counts every node in the tree", () => {
     const { result } = mount();
-    expect(result.current.totalCount).toBe(4); // root, a, a1, b
+    expect(result.current.totalCount).toBe(3); // a, a1, b — the root is not a layer
   });
 
   it("returns no layers when composer is null", () => {
@@ -100,9 +112,14 @@ describe("useLayerTree — tree build", () => {
     expect(result.current.totalCount).toBe(0);
   });
 
-  it("auto-expands the root so its direct children are initially visible", () => {
+  // Nothing auto-expands now, and that IS the old behaviour: expanding the root
+  // only ever made the top-level elements visible, and with the root excluded
+  // they are visible already. Expanding layers[0] would open a level deeper
+  // than the panel ever did.
+  it("expands nothing on arrival — the top level is already visible", () => {
     const { result } = mount();
-    expect(result.current.expandedIds.has("root")).toBe(true);
+    expect(result.current.expandedIds.size).toBe(0);
+    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "b"]);
   });
 });
 
@@ -110,15 +127,17 @@ describe("useLayerTree — expansion controls", () => {
   it("expandAll then getVisibleLayerIds returns every node", () => {
     const { result } = mount();
     act(() => result.current.expandAll());
-    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "a1", "b", "root"]);
+    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "a1", "b"]);
   });
 
-  it("collapseAll leaves only the root expanded (grandchildren hidden)", () => {
+  it("collapseAll collapses every layer, leaving only the top level visible", () => {
     const { result } = mount();
     act(() => result.current.expandAll());
     act(() => result.current.collapseAll());
-    // root expanded → root + its direct children visible; a1 (grandchild) hidden
-    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "b", "root"]);
+    // Nothing expanded → only top-level layers visible; a1 (child of a) hidden.
+    // This kept the root expanded before the root stopped being a row, because
+    // collapsing it hid the whole page.
+    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "b"]);
     expect(result.current.expandedIds.has("a")).toBe(false);
   });
 
@@ -133,13 +152,13 @@ describe("useLayerTree — expansion controls", () => {
 
   it("expandIds adds ids without dropping existing ones (no-op on empty)", () => {
     const { result } = mount();
+    act(() => result.current.expandIds(["a"]));
     act(() => result.current.expandIds([]));
-    expect(result.current.expandedIds.has("root")).toBe(true); // untouched
+    expect(result.current.expandedIds.has("a")).toBe(true); // untouched
 
-    act(() => result.current.expandIds(["a", "b"]));
+    act(() => result.current.expandIds(["b"]));
     expect(result.current.expandedIds.has("a")).toBe(true);
     expect(result.current.expandedIds.has("b")).toBe(true);
-    expect(result.current.expandedIds.has("root")).toBe(true);
   });
 
   it("getVisibleLayerIds hides children of collapsed nodes", () => {
@@ -157,13 +176,14 @@ describe("useLayerTree — page switch", () => {
   it("rebuilds the tree when the active page changes", () => {
     const composer = makeComposer();
     const { result } = renderHook(() => useLayerTree(composer));
-    expect(result.current.layers[0].id).toBe("root");
+    expect(result.current.layers.map((l) => l.id)).toEqual(["a", "b"]);
 
     act(() => {
       composer._setPage("page-2");
       composer._emit(EVENTS.PROJECT_CHANGED);
     });
 
-    expect(result.current.layers[0].id).toBe("root-2");
+    // page-2's root is excluded too — its children are what the panel lists.
+    expect(result.current.layers.some((l) => l.id === "root-2")).toBe(false);
   });
 });

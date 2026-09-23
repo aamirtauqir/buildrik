@@ -1,0 +1,150 @@
+{
+  "surface": "cmdk-typing",
+  "board": "CmdK · typing (Figma 166:18)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "Control+k"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-input"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "press",
+      "key": "r"
+    },
+    {
+      "action": "press",
+      "key": "e"
+    },
+    {
+      "action": "press",
+      "key": "v"
+    },
+    {
+      "action": "press",
+      "key": "i"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-row-nav-review"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cmdk-palette\"]",
+  "targets": [
+    {
+      "name": "palette",
+      "testId": "cmdk-palette",
+      "spec": "cmdk-typing",
+      "nodeId": "166:18"
+    },
+    {
+      "name": "query-row",
+      "testId": "cmdk-query",
+      "spec": "cmdk-typing",
+      "nodeId": "166:19"
+    },
+    {
+      "name": "query-text",
+      "testId": "cmdk-input",
+      "spec": "cmdk-typing",
+      "nodeId": "166:20"
+    },
+    {
+      "name": "row-nav",
+      "testId": "cmdk-row-nav-review",
+      "spec": "cmdk-typing",
+      "nodeId": "166:21"
+    },
+    {
+      "name": "row-nav-label",
+      "testId": "cmdk-label-nav-review",
+      "spec": "cmdk-typing",
+      "nodeId": "166:22"
+    },
+    {
+      "name": "row-nav-kbd",
+      "testId": "cmdk-kbd-nav-review",
+      "spec": "cmdk-typing",
+      "nodeId": "166:23"
+    },
+    {
+      "name": "row-action",
+      "testId": "cmdk-row-view-preview",
+      "spec": "cmdk-typing",
+      "nodeId": "166:24"
+    },
+    {
+      "name": "row-action-label",
+      "testId": "cmdk-label-view-preview",
+      "spec": "cmdk-typing",
+      "nodeId": "166:25"
+    },
+    {
+      "name": "row-action-kbd",
+      "testId": "cmdk-kbd-view-preview",
+      "spec": "cmdk-typing",
+      "nodeId": "166:26"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at :5050. ⌘K, then four keypresses — the board's own query,",
+    "'revi'. The `wait 400` before them is load-bearing and was measured: the",
+    "palette focuses its input on a 30ms timeout, and pressing keys before that",
+    "lands them on the document, which reads as an UNFILTERED palette rather than",
+    "a missing element. Three exploratory runs lost their query exactly that way.",
+    "",
+    "SAMPLE DATA, not conformed literally: the board's two hits are 'Open Review",
+    "panel' and 'Review panel'. Live 'revi' returns 'Open Review panel'",
+    "(nav-review, chord R — the board's row and chord exactly) and 'Preview'",
+    "(view-preview, ⌘+P), because the filter matches label+group and 'Preview'",
+    "contains 'review'. Two rows, one with a chord each, which is the shape the",
+    "board draws.",
+    "",
+    "NOT CONFORMED — 166:18 draws NO band strips, and that is not adopted.",
+    "166:27 draws the same palette one keystroke later WITH two strips, and",
+    "303:1978 draws them too; nothing in the code could tell 'revi' from 'review'",
+    "anyway, so removing the strips here would remove them there. Two boards",
+    "disagree, so neither re-settles it (AGENT-BRIEF, 'When you may NOT conform')",
+    "and the strips stay. Consequence for THIS recipe: the pairing of board rows",
+    "to live rows is by ROW SHAPE, not by vertical position — 166:21 (a row with",
+    "a chord) is joined to the GO TO row and 166:24 to the ACTIONS row, which now",
+    "renders above it. Every compared property of the two board rows is identical,",
+    "so the pairing costs nothing.",
+    "",
+    "CODE CHANGED (shell/modals/CommandPalette.tsx, moves all five CmdK boards —",
+    "see cmdk-empty's recipe for the full account): row hover was flowbite",
+    "primary's #1E429F under --bk-ink at 1.97:1, now `variant=\"ghost\"`; and the",
+    "strips render in a fixed Recent · Suggested · Actions · Go to order, which is",
+    "adjudicated on 303:1978, not on this board.",
+    "",
+    "CONTRAST, REPORTED NOT HIDDEN — 4.38:1, the same pair cmdk-empty and",
+    "pages-command-palette-k both carry: --bk-ink-muted #6B7280 chord on the",
+    "selected row's --bk-accent-tint #EBF5FF at 11px. Here it is '⌘+P', because",
+    "Actions now leads and Preview is row 0. The chord colour is the board's",
+    "(166:26, --color/ink-muted, and diff compares it); the tint under it belongs",
+    "to no board at all. Recorded as a named pair, not silenced."
+  ]
+}

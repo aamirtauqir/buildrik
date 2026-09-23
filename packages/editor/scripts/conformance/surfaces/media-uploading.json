@@ -1,0 +1,27 @@
+{
+  "surface": "media-uploading",
+  "board": "Media · uploading (Figma 145:96)",
+  "_note": "Probe: an upload in flight at 62%. The waitFor is on `media-upload-row-0`, the row itself — the queue is empty on every other Media case and a fixture that dropped it would have been measured as the default board. NOT joined: 145:146 the progress track and 145:147 its fill. The track is w-248 on a board whose panel also carries a 1px stroke, and CSS borders consume layout where Figma strokes do not, so the shipped track measures 246 (see media-no-results for the full reason); the fill is worse — 138 of 248 is 56%, on a row the board labels 62%, so its width is mock geometry rather than a rule. Both DO carry the board's fills, heights and radii. Also skipped: 145:102 (inner search field, authority=open:input-fill) and 145:106 (the folder row's Select).",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-uploading",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-upload-row-0" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel",        "testId": "media-panel",         "spec": "media-uploading", "nodeId": "145:96" },
+    { "name": "panel-header", "testId": "panel-header",        "spec": "media-uploading", "nodeId": "208:301" },
+    { "name": "search",       "testId": "media-search",        "spec": "media-uploading", "nodeId": "145:101" },
+    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-uploading", "nodeId": "145:104" },
+    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-uploading", "nodeId": "145:107" },
+    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-uploading", "nodeId": "145:108" },
+    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-uploading", "nodeId": "145:111" },
+    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-uploading", "nodeId": "145:114" },
+    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-uploading", "nodeId": "145:117" },
+    { "name": "asset-grid",   "testId": "media-grid",          "spec": "media-uploading", "nodeId": "145:120" },
+    { "name": "progress-row", "testId": "media-upload-row-0",  "spec": "media-uploading", "nodeId": "145:143" },
+    { "name": "progress-name","testId": "media-upload-name-0", "spec": "media-uploading", "nodeId": "145:144" },
+    { "name": "progress-pct", "testId": "media-upload-pct-0",  "spec": "media-uploading", "nodeId": "145:145" },
+    { "name": "footer",       "testId": "media-footer",        "spec": "media-uploading", "nodeId": "145:140" }
+  ]
+}

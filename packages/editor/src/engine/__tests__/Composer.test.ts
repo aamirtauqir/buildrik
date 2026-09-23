@@ -158,6 +158,113 @@ describe("Composer listener hygiene", () => {
     expect(composer.getState().device).toBe("tablet");
     expect((composer as any).viewport.getDevice()).toBe("tablet");
   });
+
+  /* Site fonts — Clone 3686:42317 (Site fonts) / 3721:43423 (Fonts round
+     trip): a font file in the library is UPLOADED; it becomes a family the
+     pickers offer only once it is ADDED (`Add font` sets `siteFont`). The
+     Composer is the one place that hears the media events and knows the
+     FontManager, so the gate lives here: registered on the flag, never on
+     the upload; unregistered when the flag turns off or the file is deleted.
+     (Until Phase 5 every font asset was registered on add — the model the
+     Clone's "Existing text is unchanged until you choose this font" step
+     replaces.) */
+  class MockFontFace {
+    constructor(public family: string, public source: string) {}
+    load = vi.fn(async () => this);
+  }
+
+  function stubFontFaces() {
+    vi.stubGlobal("FontFace", MockFontFace);
+    const faces = new Set<unknown>();
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: {
+        add: (f: unknown) => faces.add(f),
+        delete: (f: unknown) => faces.delete(f),
+        forEach: (fn: (f: unknown) => void) => faces.forEach(fn),
+        load: () => Promise.resolve([]),
+        ready: Promise.resolve(),
+      },
+    });
+  }
+
+  const interVar = (over: Record<string, unknown>) => ({
+    id: "local-1", type: "font", originalName: "Inter-Var.woff2", src: "blob:http://x/1", ...over,
+  });
+
+  it("3686:42317 · an uploaded font is NOT registered until it is added; Remove and Delete unregister it", async () => {
+    stubFontFaces();
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+    const added = () => composer.fonts.getAllFonts({ source: "custom" });
+
+    // Uploaded (the file lands in the library) — the pickers offer nothing yet.
+    composer.media.emitEvent("media:added", interVar({}));
+    await Promise.resolve();
+    expect(added()).toHaveLength(0);
+
+    // Added — registered under the file's family.
+    composer.media.emitEvent("media:updated", { asset: interVar({ siteFont: true }), changes: { siteFont: true } });
+    await vi.waitFor(() => expect(added().map((f) => f.family)).toEqual(["Inter Var"]));
+
+    // The device-only upload reaches the server: new id, new url, same file — the face swaps in place.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: true }),
+      changes: {},
+    });
+    await vi.waitFor(() => expect(added()[0].variants[0].url).toBe("https://cdn/inter.woff2"));
+    expect(added()).toHaveLength(1);
+
+    // Removed — the flag turns off and the family leaves the pickers.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: false }),
+      changes: { siteFont: false },
+    });
+    expect(added()).toHaveLength(0);
+
+    // Added again, then the file is deleted from the library.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: true }),
+      changes: { siteFont: true },
+    });
+    await vi.waitFor(() => expect(added()).toHaveLength(1));
+    composer.media.emitEvent("media:deleted", { id: "srv-1" });
+    expect(added()).toHaveLength(0);
+    vi.unstubAllGlobals();
+  });
+
+  /* Seen live 2026-09-14: the library held two files both named
+     Inter-Var.woff2 — one added, one not. The FontManager keys a family by
+     FILE name, so the not-added duplicate's sync unregistered the added one:
+     the picker lost Inter Var and the preview shipped no @font-face. A file
+     name stays registered while ANY asset carrying it is added. */
+  it("a not-added duplicate of an added file's name does not unregister the family", async () => {
+    stubFontFaces();
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+    composer.media.emitEvent("media:added", interVar({ id: "a", src: "https://cdn/a.woff2", siteFont: true }));
+    await vi.waitFor(() => expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(1));
+    composer.media.emitEvent("media:added", interVar({ id: "b", src: "https://cdn/b.woff2", siteFont: false }));
+    composer.media.emitEvent("media:updated", { asset: interVar({ id: "b", src: "https://cdn/b.woff2", siteFont: false }), changes: {} });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]);
+    // Removing the ADDED one does unregister it — nothing else carries the name as added.
+    composer.media.emitEvent("media:updated", { asset: interVar({ id: "a", src: "https://cdn/a.woff2", siteFont: false }), changes: { siteFont: false } });
+    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(0);
+    vi.unstubAllGlobals();
+  });
+
+  it("3686:42317 · a font added on another device is registered when the library imports it", async () => {
+    stubFontFaces();
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+    // `importServerAssets` announces each row as media:added, carrying the flag it read back.
+    composer.media.emitEvent("media:added", interVar({ id: "srv-2", src: "https://cdn/inter.woff2", siteFont: true }));
+    await vi.waitFor(() =>
+      expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]),
+    );
+    vi.unstubAllGlobals();
+  });
 });
 
 /* A loaded project always has a page, and one of them is active. importPage
@@ -246,3 +353,4 @@ describe("Composer.importProject — the editor always has a page to insert into
     expect(composer.history.getHistoryStack().length).toBe(before);
   });
 });
+

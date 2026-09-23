@@ -1,0 +1,51 @@
+{
+  "slug": "brand",
+  "section": "1779:6",
+  "covers": ["QA-B-13", "ARR-C-33", "the section-name correction I was told to keep"],
+
+  "section_name_as_read_2026-09-07T05:07Z": "22 · Ecommerce · 5 — [not-implemented] ORDERS only. Narrower than first written: the cart and Stripe checkout runtimes exist and are wired into export (StripeInjector.ts via ExportEngine.ts:40), and are inert only because no screen writes config.stripe. What genuinely does not exist is any order, fulfilment or customer model.",
+  "qa_b_13_status": "ALREADY-CORRECT",
+  "qa_b_13_evidence": "QA-B-13 asked for the section to be rewritten from '[not-implemented] beyond 4 HTML blocks and the Products CMS collection; no cart, order or checkout exists, and Cart Button exports inert' to 'cart + Stripe checkout runtimes exist … but nothing writes config.stripe, so they export inert; orders have no model at all'. The name I READ FROM THE FILE at 05:07 already says exactly that. This is a read-back, not a claim.",
+
+  "code_re_verification_2026-09-07": {
+    "why": "the section name makes four behavioural claims. Rule 4 says a behavioural claim printed on a board must match the code. I re-derived all four locally, from source, at zero Figma cost.",
+    "claims": [
+      { "claim": "the cart runtime exists", "verdict": "TRUE", "evidence": "packages/editor/src/engine/export/StripeInjector.ts — generateCartScript() emits a full localStorage cart (CART_KEY 'aquibra_cart'), currency, success/cancel URLs and both checkout modes ('payment-links' | 'api')" },
+      { "claim": "the Stripe checkout runtime exists", "verdict": "TRUE", "evidence": "StripeInjector.ts:13 generateStripeSDK() emits <script src=\"https://js.stripe.com/v3/\">; :39 constructs Stripe(config.publishableKey); :173-174 redirectToCheckout({sessionId})" },
+      { "claim": "it is wired into export at ExportEngine.ts:40", "verdict": "TRUE", "evidence": "ExportEngine.ts:40 `import { generateStripeScripts } from \"./StripeInjector\";` — and the call site is :544-547, `const stripeScripts = generateStripeScripts(config.stripe); if (stripeScripts) head += stripeScripts + nl;`. Line 40 is the import, 544 the injection; both are accurate, and the name cites the import. If anyone tightens this string, cite BOTH." },
+      { "claim": "no screen writes config.stripe", "verdict": "TRUE", "evidence": "IntegrationsConfig.stripe is declared at shared/types/project.ts:375 and StripeConfig at :381-396. The only integrations key any code reads or reacts to is `email` (Composer.ts:744-748; StorageAdapter.ts:180-187). Settings' Integrations surface is IntegrationsScreen.tsx, whose own docblock says 'Real integration API not yet available; each row links to docs/external setup' — Stripe is one of those link rows (settings/constants.ts:31-36, category 'payments'). Nothing in either package writes integrations.stripe." },
+      { "claim": "no order, fulfilment or customer model exists", "verdict": "TRUE", "evidence": "prisma/schema.prisma holds 70 models. `grep -in 'model Order|model Customer|model Product|model Fulfil|model Cart'` returns nothing. The nearest neighbours are CmsCollection / CmsEntry (generic content) and the billing models (Subscription, PaymentMethod, Invoice) which are Buildrick's OWN billing, not the customer's site's commerce." }
+    ],
+    "conclusion": "The section name is correct as it stands and must NOT be widened back. The five boards below have to be read against it."
+  },
+
+  "board_truth_checks": {
+    "status": "BLOCKED-ON-QUOTA — I measured every board's geometry and text/binding counts but never read their COPY. The read that would have done it was killed by the account-wide seat-quota stop.",
+    "measured": [
+      { "id": "1719:8391", "name": "Ecommerce · collection-setup (modal)", "wh": "720x400", "text": 16, "bound": 0 },
+      { "id": "1719:8421", "name": "Ecommerce · bound · inspector", "wh": "300x243", "text": 13, "bound": 0 },
+      { "id": "1719:8414", "name": "Ecommerce · collection-created · toast", "wh": "280x812", "text": 4, "bound": 0 },
+      { "id": "1719:8443", "name": "Ecommerce · bind · popover · collections", "wh": "240x132", "text": 5, "bound": 0 },
+      { "id": "1719:8450", "name": "Ecommerce · bind · popover · fields", "wh": "240x300", "text": 20, "bound": 0 }
+    ],
+    "how_to_run_the_check": "walk all 58 TEXT nodes across the five boards and flag any string matching the patterns below. A hit is either an overstatement or an understatement of what the code does; neither may stand.",
+    "banned_understatements": [
+      "no cart", "no checkout", "cart .* inert", "Cart Button exports inert", "checkout .* (doesn't|does not) exist",
+      "COMMENT: these deny runtimes that DO exist and DO ship into the export. If a board says one, rewrite it to name the real gap — nothing writes config.stripe."
+    ],
+    "banned_overstatements": [
+      "orders?", "fulfil", "customers?", "refund", "shipping", "inventory", "abandoned cart", "revenue",
+      "COMMENT: these imply a model the schema does not have. If a board draws an order, an order list, a fulfilment status or a customer record, it must carry the [not-implemented] marker with the reason 'no order, fulfilment or customer model exists in prisma/schema.prisma'."
+    ],
+    "the_true_gap_to_draw": "The honest missing screen is a Stripe CONFIG screen — publishable key, checkout mode (payment-links | api), checkout endpoint, currency, success and cancel URLs — because that is the exact shape of StripeConfig (project.ts:381-396) and writing it is the single change that turns the shipped-but-inert cart runtime live. There is no such board in section 1779:6 and no such screen in the product. FILE IT as a missing-screen; do not draw it as though it ships."
+  },
+
+  "arrangement": "see brand-05-arrangement.json step_3 M1 — ARR-C-33, with exact coordinates confirmed against my own measurement",
+
+  "conformance": {
+    "text_style_binding": "58 TEXT nodes, 0 bound — 0.0%, the worst of my four sections and an exact independent confirmation of TYPE-COLOR-SYSTEM §3 step 5's 'Ecommerce (58)'. It is the smallest of the seven 0% sections on page 1:3, so it is the cheapest one to move to done. See brand-03-conformance.json bind_text_styles.priority_1_ecommerce.",
+    "sub_11px": "4 nodes at 10px — 1720:17546 (1719:8391), 1719:8416 (1719:8414), 1720:17558 (1719:8443), 1720:17550 (1719:8450). In brand-03-conformance.json promote.",
+    "off_token_paints": "none — zero #1A264D, #1A57DB, #9DA3AF, #111928, #6B7380, #333340 and #FAFCFF across all five boards, measured",
+    "weights_over_600": "none, measured"
+  }
+}

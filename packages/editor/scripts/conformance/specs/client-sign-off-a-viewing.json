@@ -1,0 +1,328 @@
+{
+  "surface": "client-sign-off-a-viewing",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1339:7171",
+  "boardName": "client-sign-off-a-viewing",
+  "figmaHash": "9bc7b62dfb85a0db8e195542e4e634ad85f062810c4638ed1dae0dd52ae3193a",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T05:32:32.708Z",
+  "copy": [
+    "Ali's Studio",
+    "is asking for your feedback",
+    "Bella Cucina",
+    "Request changes",
+    "Approve this design",
+    "We use cookies to improve your experience."
+  ],
+  "targets": [
+    {
+      "nodeId": "1339:7171",
+      "name": "Client sign-off · A · viewing · 1280 — echo of 1:6 at the 1280×720 minimum fold; canonical 23:21 is 1280×900. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state.",
+      "className": "bg-[#f9fafb] relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7172",
+      "name": "Agency header",
+      "className": "[word-break:break-word] absolute bg-white border-[#e5e7eb] border-b border-solid h-[56px] leading-[normal] left-0 not-italic overflow-clip top-0 w-[1280px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7173",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold left-[24px] text-[#111827] text-[13px] top-[20px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7174",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[120px] text-[#4b5563] text-[12px] top-[21px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7175",
+      "name": "Card",
+      "className": "[word-break:break-word] absolute bg-white border border-[#e5e7eb] border-solid h-[180px] leading-[normal] left-[420px] not-italic overflow-clip rounded-[8px] top-[176px] w-[440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "180px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7176",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold left-[23px] text-[#111827] text-[20px] top-[23px] w-[392px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "20px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7177",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[23px] text-[#4b5563] text-[13px] top-[55px] w-[392px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7178",
+      "name": "Action bar (clears the cookie banner)",
+      "className": "absolute bg-white border-[#e5e7eb] border-solid border-t h-[68px] left-0 overflow-clip top-[592px] w-[1280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "68px"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7179",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[88px] not-italic text-[#4b5563] text-[12px] top-[23px] w-[700px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "700px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7180",
+      "name": "Request changes (secondary)",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[36px] left-[878px] overflow-clip rounded-[6px] top-[15px] w-[143px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "143px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7181",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[15px] not-italic text-[#111827] text-[13px] top-[9px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7182",
+      "name": "Approve (primary)",
+      "className": "absolute bg-[#1a56db] h-[36px] left-[1033px] overflow-clip rounded-[6px] top-[15px] w-[157px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "157px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7183",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[16px] not-italic text-[13px] text-white top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7184",
+      "name": "Cookie banner (app-wide, must not overlap the bar)",
+      "className": "absolute bg-white border-[#e5e7eb] border-solid border-t h-[48px] left-0 overflow-clip top-[672px] w-[1280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "48px"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7185",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[64px] not-italic text-[#4b5563] text-[12px] top-[15px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7309",
+      "name": "hotspot/state · Client · B commenting",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[686px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7311",
+      "name": "hotspot/state · Client · C changes-requested",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[200px] opacity-0 top-[686px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7313",
+      "name": "hotspot/state · Client · D approved",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[400px] opacity-0 top-[686px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

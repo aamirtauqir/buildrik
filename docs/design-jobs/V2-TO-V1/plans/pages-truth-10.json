@@ -1,0 +1,21 @@
+[
+  {
+    "id": "787:4307",
+    "name": "hotspot/state · Pages · loading",
+    "why": "The CUT marker is STALE. It reads 'CUT 2026-09-02 (Pages · loading RETIRED, no producer)', and the loading state has a producer at HEAD: PageList.tsx:123 renders PagesLoadingSkeleton when pages.length === 0 && loading && !loadError, with usePages.ts:438 defining loading = !loaded && !loadError. The comment at PageList.tsx:118-122 records the door being added ('The skeleton was built for exactly this moment; it just had no door'). A board that is reachable must not carry a marker saying it cannot be produced.",
+    "_id_source": "READ — child of 140:2, abs 100,16712 160x34."
+  },
+  {
+    "id": "1171:4803",
+    "name": "hotspot/state · Pages · loading",
+    "why": "Same stale CUT marker on the command-palette board. Note that the third copy of this hotspot, 1171:4749 on the context-menu board, was never cut — so the file already disagreed with itself about whether Pages · loading is reachable.",
+    "_id_source": "READ — child of 1171:4767."
+  },
+  {
+    "id": "1776:8377",
+    "name": "04 · Pages · 32 — expanded drawer drawn at 700 (LeftSidebar.tsx:586-587); SPEC-NAVIGATION's 560 is an OPEN DECISION, not applied. ⚂ vs ⑂ on the Structure link is a second open decision (QA-A-32).",
+    "why": "The file's own convention for an unresolved question is the section name — see '13 · Command palette · 13 — two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open'. The BRIEF requires the 560 proposal to be filed as an open decision rather than applied, and QA-A-32 asks for the Structure glyph to be adjudicated rather than silently diverged. The count moves 26 → 32 because this arc adds six state boards.",
+    "_id_source": "READ — section 04 · Pages, 26 children, bounds 0,15750 3280x4318.",
+    "_caution": "Set the count to the ACTUAL child count after the six clones land; 32 assumes all six and no caption nodes. Re-read the section before applying this row."
+  }
+]

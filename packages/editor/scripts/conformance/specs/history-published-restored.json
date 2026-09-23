@@ -1,0 +1,235 @@
+{
+  "surface": "history-published-restored",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "184:45",
+  "boardName": "history-published-restored",
+  "figmaHash": "ac4623d3280ac5bea0fd789d5824d8fea2915ec6302813761636a1f6d0ba7b16",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:09:16.739Z",
+  "copy": [
+    "Rolled back",
+    "v7 is live — a re-publish of v5.",
+    "v6 is still in your history and can be rolled forward the same way.",
+    "Close"
+  ],
+  "targets": [
+    {
+      "nodeId": "184:45",
+      "name": "History · Published · restored",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "184:46",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:47",
+      "name": "modal/440",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[280px] left-[500px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[310px] w-[440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "280px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:48",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[18px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:49",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[404px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[18px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:51",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[213px] not-italic text-[16px] text-[color:var(--color\\/bg-card,white)] text-left top-[74px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "184:52",
+      "name": null,
+      "className": "-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[220px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-center top-[118px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:53",
+      "name": null,
+      "className": "-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[32px] leading-[16px] left-[220px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-center top-[144px] w-[392px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1176",
+      "name": "Button",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[var(--size\\/row,32px)] items-center justify-center left-[172px] px-[16px] py-[10px] rounded-[8px] top-[208px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1176;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4076",
+      "name": "hotspot/state · Rollback · failed",
+      "className": "absolute h-[34px] left-[1274px] top-[850px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7239",
+      "name": "hotspot/back · History · Published (Close)",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-0 opacity-0 top-[862px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

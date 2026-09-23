@@ -431,7 +431,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       isOpen: isCheatSheetOpen,
       open: openCheatSheet,
       close: closeCheatSheet,
-    } = useKeyboardCheatSheet();
+    } = useKeyboardCheatSheet(composer);
 
     // Emit hover events for LayersPanel sync
     React.useEffect(() => {

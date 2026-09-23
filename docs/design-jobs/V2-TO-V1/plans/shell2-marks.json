@@ -1,0 +1,104 @@
+{
+ "note": "Rows for the twenty-two shell findings that had no queue row. Renames append the claim to the board that answers the finding — the apply-truth-marks idiom this arc already uses — because an add-board row never reaches queue-state and therefore never credits the register: eleven boards were built on 2026-09-07 and every finding they answer still read PENDING. Every expect string is the board's exact current name, read back from page 1:3 on 2026-09-07.",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "rename",
+   "id": "2844:12158",
+   "expect": "Shell · Issues joins the grid (right column, not a slab)",
+   "name": "Shell · Issues joins the grid (right column, not a slab) — UX-F-08: today the panel is position:absolute top:56 right:0 width:360 z-index:45 (AquibraStudio.tsx:604-616), covering the whole 300 inspector plus 60 of canvas, with a hand-computed 56px offset that the recovery banner, the load-error banner and the 48px review bar each break. This board is the target: a real column in the grid with a ‹ Inspector back row.",
+   "why": "UX-F-08 — the Issues slab is the one right-hand surface outside the grid. The board that answers it was built on 2026-09-07 and carried no row, so the register still read PENDING."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12136",
+   "expect": "Shell · full-page mode — Back to canvas",
+   "name": "Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no rail seat, so the rail lights nothing while the work surface is swapped out, and closing hard-codes a jump to Insert (StudioPanels.tsx:364-372). The back control is shell-level and returns to the panel you came from.",
+   "why": "UX-F-13 — full-page mode has no way out. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12149",
+   "expect": "Shell · below 1024 — desktop-only",
+   "name": "Shell · below 1024 — desktop-only — UX-F-14: LayoutShell.css:353-358 reserves the breakpoint and its only content is a comment saying a warning overlay is “handled by component”. No such component exists. This board is that component’s design; the floor it names is BREAKPOINTS.desktop.minWidth (canvasStyles.ts:57).",
+   "why": "UX-F-14 — below 1024 the shell silently degrades. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12121",
+   "expect": "Topbar · location line — site › page › panel",
+   "name": "Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that survives canvas, full-page and preview, and two tab strips that stop reading as one list — “Editor sections” (LeftSidebar.tsx:606-610) vs “Site pages” (PageTabBar.tsx:220-235), whose accessible names put Home in the rail’s list.",
+   "why": "UX-F-36 and UX-F-16 — the shell never states its location, and its two tablists collapse into one for assistive tech. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12066",
+   "expect": "Topbar · Publish CTA states (five verbs · settled · refused)",
+   "name": "Topbar · Publish CTA states (five verbs · settled · refused) — UX-F-20: the refused state is grey with the reason printed beside the button, never only in a tooltip. SH-A-02 measured that the BOARD already drew it at 50% on grey and Topbar.tsx:295-321 is the off-system party (PUBLISH_BTN_CLASS changes no colour or opacity); this board states the target for both.",
+   "why": "UX-F-20 — a refused Publish looks ready. The finding blames the board; the measurement blames the code. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12104",
+   "expect": "Site menu (⋯) · regrouped — in-editor rows moved to More",
+   "name": "Site menu (⋯) · regrouped — in-editor rows moved to More — UX-F-29: eighteen rows doing three jobs at once (SiteMenu.tsx:189-308, six new-tab hand-offs at :117-119 and one unlabelled group at :220-229). Two groups now — THIS SITE, and LEAVES THE EDITOR ↗ with an external marker on every row that opens a tab.",
+   "why": "UX-F-29 — the ⋯ menu does three jobs. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12025",
+   "expect": "Rail · More index (popover · 240)",
+   "name": "Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where the user is, not only in a hover tooltip. Twelve are bare and Components is ⇧A (tabsConfig.ts:82-259). The missing modal guard — useSidebarKeyboard.ts:16-53 checks tagName, contenteditable and modifiers and never isModalOpen() — is a code fix and is stated on “Shortcuts · one screen” (2875:12449, section 13).",
+   "why": "UX-F-31 (and UX-F-01, UX-F-37) — twelve bare letters, no legend, no modal guard. Board built 2026-09-07, no row until now."
+  },
+  {
+   "op": "rename",
+   "id": "2844:12186",
+   "expect": "Shell · open decisions (700 vs 560 · two palettes · unpublish confirm)",
+   "name": "Shell · open decisions (700 vs 560 · two palettes · unpublish confirm) — UX-F-15’s 560 proposal is filed here and not applied; the handle itself, and what 700 costs at 1440, are drawn on “Drawer · width steps and the drag handle” (2875:12471).",
+   "why": "UX-F-15 — the drawer has two widths and no handle. The open decision was drawn 2026-09-07; the handle was not, and neither carried a row."
+  },
+  {
+   "op": "rename",
+   "id": "2855:12407",
+   "expect": "Canvas · keyboard, zoom and viewport (one owner each)",
+   "name": "Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-24 · F-27 · F-28 · F-32 · F-34: one owner for Tab, for zoom, for the device fit, for the overlay chords, for the two doorless surfaces, for the status footer and for what the session remembers.",
+   "why": "UX-F-18, UX-F-19, UX-F-22, UX-F-23, UX-F-24, UX-F-27, UX-F-28, UX-F-32, UX-F-34 — the eight-block canvas board, planned by the first shell pass and built 2026-09-07 with a ninth block added for UX-F-28 (the two viewport controls with no call site; verified at HEAD — DeviceSelector.tsx and useDeviceZoom.ts have no importer, and templates/TemplatePreview.tsx:79 declares a third, local one)."
+  },
+  {
+   "op": "rename",
+   "id": "2875:12449",
+   "expect": "Shortcuts · one screen (? and ⌘/)",
+   "name": "Shortcuts · one screen (? and ⌘/) — UX-F-05 · UX-F-31 · UX-F-32 · UX-F-18: one screen on both chords, the bare letters printed with “no modifier”, F6 named as the way out of the canvas, and ⌘R named as the browser’s.",
+   "why": "UX-F-05 — two incomplete keyboard-help screens; also carries UX-F-31's modal guard, UX-F-32's ⌘R and UX-F-18's F6, none of which any board printed. The first shell pass closed UX-F-05 as out-of-section because the SHIPPED overlay 815:4518 lives in section 23; the merged target had no drawing anywhere."
+  },
+  {
+   "op": "rename",
+   "id": "2875:12471",
+   "expect": "Drawer · width steps and the drag handle (280 ↔ 700)",
+   "name": "Drawer · width steps and the drag handle (280 ↔ 700) — UX-F-15: no resize affordance exists in the sidebar today (LeftSidebar.tsx and .css carry no resize, onMouseDown or drag); Media 560 and Templates 700 come from runtime events (LeftSidebar.tsx:580-587).",
+   "why": "UX-F-15 — the drag handle the first shell pass named as not drawn."
+  },
+  {
+   "op": "rename",
+   "id": "165:2",
+   "expect": "Notifications · unread",
+   "name": "Notifications · unread — UX-F-26 / UX-F-25: drawn 280 wide; the shipped dropdown is 360 (.bk-notifications, header.css:39) and is the ONLY consumer of --bk-size-panel-right. ONE right-hand class — 360 for notifications, Issues and Structure; 300 for the inspector column; --bk-size-nav (240) has zero consumers anywhere in the package. Slot proof: 963:4474.",
+   "why": "UX-F-26 and UX-F-25 — three right-hand surfaces, three widths, one token. Section 20 · Notifications received no work in the first shell pass, and it holds the token's only consumer."
+  },
+  {
+   "id": "1776:8377",
+   "verdict": "NOT-APPLICABLE",
+   "kind": "owned-elsewhere",
+   "reason": "UX-F-17 — page management exists twice (PageTabBar.tsx:212-410 vs PagesTab, plus a third picker at PageCommandPalette.tsx:140). SPEC-NAVIGATION §7 settles ownership in as many words: “the duplicate is real (UX-F-17, UX-B-15) and it is the Pages spec’s decision, not this one. This spec only asks that the two strips stop reading as one list.” Re-read at HEAD 2026-09-07. The half that IS navigation’s — the two tablists reading as one — is drawn on 2844:12121 and credited under UX-F-16. Drawing a shell answer to who owns page management would pre-empt section 04 · Pages (1776:8377).",
+   "why": "UX-F-17"
+  },
+  {
+   "id": "165:2",
+   "verdict": "DEFERRED",
+   "kind": "redraw-needs-a-hand",
+   "reason": "The six Notifications boards in section 1779:2 are all drawn 280 wide (165:2, 165:24, 165:44, 165:51, 165:71, 453:4051 — read back 2026-09-07 at 280x812 on a 400 pitch). The shipped dropdown is 360. A frame resize alone would leave a 280 interior inside a 360 box, which is a worse drawing than the one that ships, so this is a re-layout for someone with a cursor and not a resize row. The class statement is on 165:2’s name and on 963:4474. (UX-F-26, UX-F-25)",
+   "why": "UX-F-26"
+  }
+ ]
+}

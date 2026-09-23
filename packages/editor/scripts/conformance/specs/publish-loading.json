@@ -1,0 +1,636 @@
+{
+  "surface": "publish-loading",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "778:4238",
+  "boardName": "publish-loading",
+  "figmaHash": "e95c965ebaf131e389e782f6af74390306f59fe325e45d8736fd24e079df0042",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:22:22.875Z",
+  "copy": [
+    "Publish",
+    "ENVIRONMENT",
+    "CHANGES IN THIS SESSION",
+    "LAST DEPLOY",
+    "Publish to production"
+  ],
+  "targets": [
+    {
+      "nodeId": "778:4238",
+      "name": "Publish · loading",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4239",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I778:4239;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4240",
+      "name": "Section header",
+      "className": "[word-break:break-word] content-stretch flex font-medium gap-[8px] h-[28px] items-center leading-[16px] px-[16px] relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px] w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4241",
+      "name": "skeleton · row 0",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4294",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4295",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[132px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "132px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4246",
+      "name": "skeleton · row 1",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4296",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4297",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[96px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "96px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4251",
+      "name": "Section header",
+      "className": "[word-break:break-word] content-stretch flex font-medium gap-[8px] h-[28px] items-center leading-[16px] px-[16px] relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px] w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4252",
+      "name": "skeleton · row 2",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4298",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4299",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[150px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4256",
+      "name": "skeleton · row 3",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4300",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4301",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[110px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "110px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4260",
+      "name": "skeleton · row 4",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4302",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4303",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[86px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "86px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4264",
+      "name": "skeleton · row 5",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4304",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4305",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[124px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "124px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4268",
+      "name": "Section header",
+      "className": "[word-break:break-word] content-stretch flex font-medium gap-[8px] h-[28px] items-center leading-[16px] px-[16px] relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px] w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4269",
+      "name": "skeleton · row 6",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4306",
+      "name": "sk/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[3px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4307",
+      "name": "sk",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] relative rounded-[4px] shrink-0 w-[104px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4274",
+      "name": "Panel footer",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--color\\/border,#e5e7eb)] border-solid border-t content-stretch cursor-pointer flex items-start overflow-clip px-[16px] py-[10px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "778:4275",
+      "name": "Button",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[28px] items-center justify-center px-[12px] py-[6px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I778:4275;9:7",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[18px] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4369",
+      "name": "hotspot/back · Publish · panel",
+      "className": "absolute block cursor-pointer h-[34px] left-[-1px] top-[777px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "2863:12410",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[#6b7280] text-[10px] top-[723px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    }
+  ]
+}

@@ -40,12 +40,16 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer }) =>
     <div
       role="tablist"
       aria-label="Color mode"
+      data-testid="brand-colour-mode-seg"
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 2,
         padding: 2,
-        borderRadius: "var(--bk-radius-full)",
+        /* 6, not `--bk-radius-full` — 153:100. A pill track around two
+           radius-6 segments left a 12px crescent of `--bk-bg-subtle` at each
+           end that belonged to neither segment. */
+        borderRadius: 6,
         border: "1px solid var(--bk-border)",
         background: "var(--bk-bg-subtle)",
       }}
@@ -70,20 +74,32 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
     size="xs"
     role="tab"
     aria-selected={active}
+    data-testid={`brand-colour-mode-seg-${value}`}
     onClick={() => composer.colorMode.set(value)}
     /* Board 153:92: a 28-tall, radius-6 segment — white with ink when
        active, plain when not. The accent-filled pill it replaced measured 32
        tall and 11/600 against the board's 12/400. */
     style={{
       height: 28,
-      padding: "0 12px",
+      /* 5/20 and a 18px line — 153:101 / 153:102. A flat `0 12px` measured 24
+         wide of inset against the board's 40 and left the two labels touching
+         the track's own edge. */
+      padding: "5px 20px",
       fontSize: 12,
+      lineHeight: "18px",
       fontWeight: 400,
       border: "none",
       borderRadius: 6,
       cursor: "pointer",
       background: active ? "var(--bk-bg-elevated)" : "transparent",
-      color: active ? "var(--bk-ink)" : "var(--bk-ink-muted)",
+      /* `--bk-ink-soft` for the inactive label, NOT the board's
+         `--color/ink-muted`. 153:104 names ink-muted and the track under it is
+         `--color/bg-subtle`; that pair MEASURES 4.39:1 — under the 4.5 WCAG AA
+         floor, computed by measure.mjs. A board cannot authorise a contrast
+         failure, and this is the same substitution DesignTabFooter and the
+         Beginner note already document for the same pair on the same fill
+         (docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md). */
+      color: active ? "var(--bk-ink)" : "var(--bk-ink-soft)",
       boxShadow: active ? "var(--bk-shadow-raised)" : "none",
       transition: "background 80ms",
     }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"

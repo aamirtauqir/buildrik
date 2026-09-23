@@ -44,15 +44,32 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
      * the trap would see an empty list and give up. Filter on what actually
      * makes an element unreachable instead.
      */
+    /* `tabIndex -1` is out of the tab order by the author's own hand — a
+       roving tablist's unselected tabs (Tabs.tsx). Landing the opening focus
+       on one put the ring on `Crop` while `Optimise` was the selected tab. */
     const focusables = () =>
       Array.from(container?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []).filter(
-        (el) => !el.hasAttribute("hidden") && el.getAttribute("aria-hidden") !== "true",
+        (el) => !el.hasAttribute("hidden") && el.getAttribute("aria-hidden") !== "true" && el.tabIndex !== -1,
       );
 
     focusables()[0]?.focus();
 
+    /**
+     * Only the TOPMOST open dialog answers Escape. Every trap listens on the
+     * document, and `stopPropagation` does not stop a sibling listener on the
+     * same node — so with one dialog over another (the picker's From URL
+     * opens Import image from URL over the picker, Clone 3397:18835) a
+     * single Escape closed both. The overlay root appends in mount order, so
+     * the last `aria-modal` dialog in the document is the one on top.
+     */
+    const isTopmost = () => {
+      const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+      return dialogs.length === 0 || dialogs[dialogs.length - 1] === container;
+    };
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (!isTopmost()) return;
         e.stopPropagation();
         escapeRef.current?.();
         return;

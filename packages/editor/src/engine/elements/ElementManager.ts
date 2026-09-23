@@ -13,6 +13,7 @@ import type { Composer } from "../Composer";
 import { Element } from "./Element";
 import { PreviewLayer } from "./PreviewLayer";
 import { ElementCRUD } from "./manager/ElementCRUD";
+import type { SectionProgress } from "./manager/HTMLParser";
 import { HTMLParser } from "./manager/HTMLParser";
 import { PageManager } from "./manager/PageManager";
 import type { ElementManagerContext } from "./manager/types";
@@ -275,8 +276,8 @@ export class ElementManager {
   }
 
   /** Import raw HTML into the active page */
-  importHTMLToActivePage(html: string): void {
-    this.htmlParser.importHTMLToActivePage(html);
+  importHTMLToActivePage(html: string, onSection?: SectionProgress): void {
+    this.htmlParser.importHTMLToActivePage(html, onSection);
   }
 
   /** Insert HTML into an element at a specific index */
@@ -372,7 +373,10 @@ export class ElementManager {
    * @param opts Placement hints. `x`/`y` set the element's position (image
    *             and video elements only). `targetElementId` inserts into
    *             or replaces the src of a specific element. If omitted, the
-   *             same smart-insert logic as `insertMedia` applies.
+   *             same smart-insert logic as `insertMedia` applies. `alt` is
+   *             the asset's alt text — without it the element is created with
+   *             a src and nothing else, and every published image ships with
+   *             no alt no matter how carefully the library was captioned.
    * @returns    Result describing what happened, or `null` with
    *             `reason` set so the caller can emit INSERT_FAILED.
    */
@@ -383,6 +387,7 @@ export class ElementManager {
       x?: number;
       y?: number;
       targetElementId?: string;
+      alt?: string;
     },
   ):
     | { kind: "element"; elementId: string }
@@ -442,6 +447,7 @@ export class ElementManager {
           target.setStyle("background-image", `url(${src})`);
         } else {
           target.setAttribute("src", src);
+          if (opts.alt) target.setAttribute("alt", opts.alt);
         }
         this.composer.emit(EVENTS.ELEMENT_STYLE_UPDATED, {
           elementIds: [opts.targetElementId],
@@ -463,7 +469,7 @@ export class ElementManager {
     }
 
     const element = this.createElement(elementType, {
-      attributes: { src },
+      attributes: opts?.alt ? { src, alt: opts.alt } : { src },
       styles: type === "image" || type === "video"
         ? { width: "auto", "max-width": "100%", ...placementStyles }
         : placementStyles,

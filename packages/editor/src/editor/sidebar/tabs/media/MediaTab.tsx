@@ -6,6 +6,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import { PanelFrame, useToast, Button } from "@/editor/chrome-ui";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
@@ -14,7 +16,6 @@ import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { MediaContextMenu } from "./components/MediaContextMenu";
-import { StockSourceModal } from "./components/StockSourceModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
@@ -27,6 +28,7 @@ import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
+import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
 interface MediaTabProps {
@@ -37,7 +39,8 @@ interface MediaTabProps {
   onClose?: () => void;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -51,7 +54,7 @@ export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
       <PanelFrame className="med-tab">
-        <PanelFrame.Header title="Media" {...props} />
+        <PanelFrame.Header title="Assets" {...props} />
         <PanelFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
         </PanelFrame.Body>
@@ -65,17 +68,15 @@ function MediaTabWithComposer({
   composer,
   onClose,
   onOpenImageEditor,
-  onOpenIconPicker,
   onOpenLibrary,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
   const { addToast } = useToast();
-  const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
   /*
     Boards 303:1997 / 303:2032 draw a status pill over the grid while a
     long-running media job is happening: "Image editor — crop · rotate ·
-    adjust" while the editor is open, "Optimising → WebP…" while an optimised
+    adjust" while the editor is open, "Optimizing → WebP…" while an optimised
     copy is being written. Both spans are owned here.
 
     The editor pill has no close signal to hang off: the modal's open state
@@ -104,48 +105,49 @@ function MediaTabWithComposer({
     addToast({ description: msg, tone: type });
   }, [addToast]);
 
+  /* Clone 3681:20026 / 3695:45529 (Phase 6): a saved edit is a VERSION of the
+     same asset — the file lands flagged `versionOf` (hidden from the grid) with
+     the edits it was made with — the way the fullpage library saves one. This
+     used to upload a plain `<stem>_v1234` sibling that the grid showed as a
+     second card once the stem heuristic went. Done opens the fullpage library
+     on the parent, where Asset versions lives. */
   const handleEditImage = React.useCallback(
     (item: LibraryItem) => {
       if (!onOpenImageEditor) return;
+      const parentKey = item.versionOf ?? item.key;
       setStatusPill("Image editor — crop · rotate · adjust");
-      onOpenImageEditor(item.src, async (editedSrc) => {
+      const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
         try {
-          // Convert data URL to Blob
           const res = await fetch(editedSrc);
           const blob = await res.blob();
-          
-          // Non-destructive: Create a new filename with version/timestamp
-          const timestamp = new Date().getTime();
-          const cleanName = item.name.replace(/(_v\d+)?$/, ""); // Remove old version tag if any
-          const fileName = `${cleanName}_v${timestamp % 10000}`;
-          
-          const file = new File([blob], `${fileName}.${blob.type.split('/')[1]}`, { type: blob.type });
-          
-          // Upload new file — await so we only claim success when it lands.
-          const ok = await state.upload([file]);
-          if (ok) {
-            showToast(`New version of ${item.name} created ✓`, "success");
-            // Record a server-side restore point of the pre-edit asset (synced
-            // assets only). Lets the Versions tab roll the asset back to this
-            // state. Best-effort: never block the edit on a version write.
-            if (item.assetId) {
-              createAssetVersion({
-                assetId: item.assetId,
-                url: item.src,
-                bytes: item.size,
-                edits: { via: "image-editor", newFile: fileName },
-              }).catch(() => {});
-            }
+          const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
+          const stem = item.name.replace(/\.[^/.]+$/, "");
+          const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
+          const result = await composer.media.uploadFile(file, {
+            ...(item.folderId ? { folderId: item.folderId } : {}),
+            versionOf: parentKey,
+            ...(edits ? { edits } : {}),
+          });
+          if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
+          const saved = result.asset;
+          if (item.assetId && saved.serverId && !saved.localOnly) {
+            createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+              /* History is a convenience; the version itself has landed. */
+            });
           }
-        } catch (err) {
-          console.error("Failed to process edited image:", err);
-          showToast("Could not save edited version", "error");
         } finally {
           setStatusPill(null);
         }
+      };
+      onOpenImageEditor(item.src, onSave, {
+        fileName: item.displayName ?? item.name,
+        onDone: () => {
+          composer.media.selectAssets([parentKey]);
+          onOpenLibrary?.();
+        },
       });
     },
-    [onOpenImageEditor, state, showToast]
+    [onOpenImageEditor, composer, onOpenLibrary]
   );
 
   // §18 — Optimize is now a tab inside the §15 detail drawer. handleOptimized
@@ -154,7 +156,7 @@ function MediaTabWithComposer({
   const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
     const item = state.detailItem;
     if (!item) return;
-    setStatusPill("Optimising → WebP…");
+    setStatusPill("Optimizing → WebP…");
     try {
       const res = await fetch(optimizedSrc);
       const blob = await res.blob();
@@ -210,58 +212,14 @@ function MediaTabWithComposer({
     fileInput.click();
   }, [composer, state]);
 
-  // ─── Panel mode: slim launcher (320px) or expanded panel (560px) ────
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        const result = composer.mediaOps.insertMedia(icon.name, "icon");
-        if (result) {
-          showToast(`${icon.name} icon added ✓`, "success");
-        }
-      } catch {
-        showToast("Could not add icon", "error");
-      }
-    });
-  }, [onOpenIconPicker, composer, showToast]);
-
-  // Stock modal mounts in EVERY mode — SlimLauncher's "+ Stock" used to set
-  // state that only the fullpage branch rendered (dead button, found in the
-  // P5 live walk).
-  const stockModal = (
-    <StockSourceModal
-      open={stockModalOpen}
-      onClose={() => setStockModalOpen(false)}
-      activeType={state.activeType}
-      photos={state.stockPhotos}
-      videos={state.stockVideos}
-      icons={state.discIcons}
-      fonts={state.discFonts}
-      loading={state.discLoading}
-      searchQuery={state.discoverySearch}
-      searchFailed={state.searchFailed}
-      orientation={state.discOrientation}
-      color={state.discColor}
-      onSearch={state.discSearchAll}
-      onSetOrientation={state.setDiscOrientation}
-      onSetColor={state.setDiscColor}
-      onLoadMore={state.loadMoreDisc}
-      onSave={(type, item) => {
-        state.saveToLibrary(type, item);
-        // Don't close modal — let user save multiple items
-      }}
-      onInsert={state.insertToCanvas}
-      onOpenIconPicker={handleOpenIconPicker}
-    />
-  );
-
   /*
     Mounted by EVERY branch, not just the fullpage one. The detail overlay and
     the delete confirm used to live inside the fullpage return, so the drawer —
     the surface the board's five drill-ins hang off — could not reach
-    asset-detail, versions or used-in at all. Same shape as the `stockModal`
-    note above: a modal that only one of three renderers mounts is a feature
-    that exists for a third of its users.
+    asset-detail, versions or used-in at all. A modal that only one of three
+    renderers mounts is a feature that exists for a third of its users. (A
+    StockSourceModal mount sat here until Clone Phase 3 with nothing that ever
+    opened it — the drawer's Browse stock opens StockBrowserOverlay.)
   */
   const sharedOverlays = (
     <>
@@ -333,6 +291,8 @@ function MediaTabWithComposer({
         onDismissStatusPill={() => setStatusPill(null)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
+        failedUploads={state.failedUploads}
+        onDismissUpload={state.dismissUpload}
         loading={state.libraryLoading}
         loadError={state.libraryError}
         onRetryLoad={state.retryLibraryLoad}
@@ -345,6 +305,7 @@ function MediaTabWithComposer({
         allFolders={state.allFolders}
         onFolderChange={state.setCurrentFolderId}
         selectionMode={state.selMode}
+        onToggleSelection={state.toggleSelMode}
         selectedKeys={state.selectedKeys}
         onEnterSelection={(key) => {
           if (!state.selMode) state.toggleSelMode();
@@ -406,7 +367,6 @@ function MediaTabWithComposer({
           }}
         />
       )}
-      {stockModal}
       {sharedOverlays}
       </>
     );

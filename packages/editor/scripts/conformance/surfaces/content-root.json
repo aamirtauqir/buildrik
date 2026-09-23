@@ -1,0 +1,213 @@
+{
+  "surface": "content-root",
+  "board": "Content · root (Figma 148:2)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "content-section-collections"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-root",
+      "nodeId": "208:411"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-root",
+      "nodeId": "I208:411;16:7"
+    },
+    {
+      "name": "band-collections",
+      "testId": "content-section-collections",
+      "spec": "content-root",
+      "nodeId": "148:7"
+    },
+    {
+      "name": "row-menu",
+      "testId": "content-collection-menu-items",
+      "spec": "content-root",
+      "nodeId": "233:1279"
+    },
+    {
+      "name": "row-menu-label",
+      "testId": "row-label-content-collection-menu-items",
+      "spec": "content-root",
+      "nodeId": "I233:1279;232:8"
+    },
+    {
+      "name": "row-menu-count",
+      "testId": "row-count-content-collection-menu-items",
+      "spec": "content-root",
+      "nodeId": "I233:1279;232:9"
+    },
+    {
+      "name": "row-menu-chevron",
+      "testId": "row-chevron-content-collection-menu-items",
+      "spec": "content-root",
+      "nodeId": "I233:1279;232:10"
+    },
+    {
+      "name": "row-team",
+      "testId": "content-collection-team",
+      "spec": "content-root",
+      "nodeId": "233:1284"
+    },
+    {
+      "name": "row-team-label",
+      "testId": "row-label-content-collection-team",
+      "spec": "content-root",
+      "nodeId": "I233:1284;232:8"
+    },
+    {
+      "name": "row-team-count",
+      "testId": "row-count-content-collection-team",
+      "spec": "content-root",
+      "nodeId": "I233:1284;232:9"
+    },
+    {
+      "name": "row-team-chevron",
+      "testId": "row-chevron-content-collection-team",
+      "spec": "content-root",
+      "nodeId": "I233:1284;232:10"
+    },
+    {
+      "name": "new-collection",
+      "testId": "content-new-collection",
+      "spec": "content-root",
+      "nodeId": "148:20"
+    },
+    {
+      "name": "new-collection-plus",
+      "testId": "content-new-collection-plus",
+      "spec": "content-root",
+      "nodeId": "148:21"
+    },
+    {
+      "name": "new-collection-label",
+      "testId": "content-new-collection-label",
+      "spec": "content-root",
+      "nodeId": "148:22"
+    },
+    {
+      "name": "band-data",
+      "testId": "content-section-data",
+      "spec": "content-root",
+      "nodeId": "148:23"
+    },
+    {
+      "name": "row-sources",
+      "testId": "content-open-sources",
+      "spec": "content-root",
+      "nodeId": "233:1289"
+    },
+    {
+      "name": "row-sources-label",
+      "testId": "row-label-content-open-sources",
+      "spec": "content-root",
+      "nodeId": "I233:1289;232:8"
+    },
+    {
+      "name": "row-sources-count",
+      "testId": "row-count-content-open-sources",
+      "spec": "content-root",
+      "nodeId": "I233:1289;232:9"
+    },
+    {
+      "name": "row-sources-chevron",
+      "testId": "row-chevron-content-open-sources",
+      "spec": "content-root",
+      "nodeId": "I233:1289;232:10"
+    },
+    {
+      "name": "row-variables",
+      "testId": "content-open-variables",
+      "spec": "content-root",
+      "nodeId": "233:1294"
+    },
+    {
+      "name": "row-variables-label",
+      "testId": "row-label-content-open-variables",
+      "spec": "content-root",
+      "nodeId": "I233:1294;232:8"
+    },
+    {
+      "name": "row-variables-count",
+      "testId": "row-count-content-open-variables",
+      "spec": "content-root",
+      "nodeId": "I233:1294;232:9"
+    },
+    {
+      "name": "row-variables-chevron",
+      "testId": "row-chevron-content-open-variables",
+      "spec": "content-root",
+      "nodeId": "I233:1294;232:10"
+    },
+    {
+      "name": "row-conditions",
+      "testId": "content-open-conditions",
+      "spec": "content-root",
+      "nodeId": "233:1299"
+    },
+    {
+      "name": "row-conditions-label",
+      "testId": "row-label-content-open-conditions",
+      "spec": "content-root",
+      "nodeId": "I233:1299;232:8"
+    },
+    {
+      "name": "row-conditions-count",
+      "testId": "row-count-content-open-conditions",
+      "spec": "content-root",
+      "nodeId": "I233:1299;232:9"
+    },
+    {
+      "name": "row-conditions-chevron",
+      "testId": "row-chevron-content-open-conditions",
+      "spec": "content-root",
+      "nodeId": "I233:1299;232:10"
+    }
+  ],
+  "_note": [
+    "Board 148:2, the panel's landing screen. PROBE, and the reason is identity",
+    "rather than reach: CollectionManager mints ids from generateId() and persists",
+    "them, so `content-collection-<id>` would name a different element on every run",
+    "and a new collection would accumulate per page load. The probe stubs the",
+    "MANAGER and keeps everything above it — useContentPanel, ContentTab and all",
+    "seven views — as shipped. The same mount serves collection / record / fields /",
+    "variables / conditions / data-sources, navigated by the panel's own rows.",
+    "",
+    "BOARD won, in a shared primitive conformed to ITS OWN component board:",
+    "232:6 (List row) gives its three text nodes line-heights the shared row",
+    "classes leave to the face — label and chevron 13/20, count 11/16. Live the",
+    "label's box was 16 inside a 32 row, so every list in the panel sat 4px tighter",
+    "than the board. Fixed inside ListRow.tsx (and RecordRow.tsx, whose 240:14 says",
+    "the same), NOT in ROW_LABEL_CLASS/ROW_META_CLASS/ROW_CHEVRON_CLASS — NavItem,",
+    "TreeRow and VersionRow share those and are measured against their own boards.",
+    "Both rows also gained per-instance `row-<part>-<rowTestId>` ids so the text",
+    "nodes are addressable at all; the literal prefix is what check-anchors needs.",
+    "",
+    "NOT anchored, and why:",
+    "  148:2 the board frame — white fill and a gray-100 hairline on all four sides.",
+    "  That is the drawer's chrome in the shipped app, not ContentTab's; the panel",
+    "  paints neither. Measured on the shell's own boards.",
+    "  I…;232:7, the four 16px icon SLOTS, each carrying border-radius 2. A radius",
+    "  on a square holding a stroked Lucide glyph is a Figma frame artifact — the",
+    "  glyph has no corner to round and the live span has none.",
+    "  148:40 spacer (a Figma frame; the panel does it with flex) and the four",
+    "  hotspot/* nodes (prototype wiring).",
+    "",
+    "CONTRAST: 3 recorded, all ink-muted on bg-subtle at 4.39 — the two band labels",
+    "and the collections count. Specified by this board; the 39-instance token",
+    "defect in docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md."
+  ]
+}

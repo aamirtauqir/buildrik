@@ -1,0 +1,78 @@
+{
+  "slug": "brand",
+  "taken": "2026-09-07T05:07Z",
+  "how": "ONE successful use_figma read of page 1:3 (scratchpad brandmod/censusA.mjs) before the account-wide Figma MCP seat quota was exhausted. Everything in this file was READ FROM THE FILE. Nothing here is inferred from a lane row.",
+  "sections": {
+    "1776:8373": { "name": "07 · Brand · 51", "boards": 51, "x": 0, "y": 38180, "w": 3440, "h": 7671, "text_nodes": 628, "text_style_bound": 283, "bound_pct": 45.1 },
+    "1084:4527": { "name": "11 · Templates · 18", "boards": 18, "x": 0, "y": 59139, "w": 6320, "h": 4118, "text_nodes": 479, "text_style_bound": 293, "bound_pct": 61.2 },
+    "1938:8372": { "name": "10 · Components · 12 — the editor's saved-components panel; page 1:2 is the LIBRARY", "boards": 12, "x": 0, "y": 55699, "w": 2880, "h": 2958, "text_nodes": 229, "text_style_bound": 121, "bound_pct": 52.8 },
+    "1779:6": { "name": "22 · Ecommerce · 5 — [not-implemented] ORDERS only. Narrower than first written: the cart and Stripe checkout runtimes exist and are wired into export (StripeInjector.ts via ExportEngine.ts:40), and are inert only because no screen writes config.stripe. What genuinely does not exist is any order, fulfilment or customer model.", "boards": 5, "x": 0, "y": 107655, "w": 1220, "h": 2112, "text_nodes": 58, "text_style_bound": 0, "bound_pct": 0.0 }
+  },
+  "totals": { "boards": 86, "text_nodes": 1394, "text_style_bound": 697, "bound_pct": 50.0 },
+  "conformance_measured_in_these_four_sections": {
+    "hex_1A264D": {
+      "count": 0,
+      "note": "MEASURED ZERO. CONF-1-01 names 2476:12064 (2 paints) and 2476:12081 (1 paint) — both boards live in MY section 1938:8372 and both were walked by this census (their TEXT counts came back 11 and 6). No #1A264D paint was found on either. Either the drain already ran between the CONF-1 measurement and 05:07, or CONF-1-01's per-board attribution for those two is off. The page-wide count is UNMEASURED — the call that would have taken it was killed by the quota stop."
+    },
+    "hex_1A264D_page_wide": "UNMEASURED",
+    "weight_over_600": {
+      "count": 1,
+      "nodes": [{ "id": "813:4498", "board": "813:4489", "board_name": "S1.1e · template-preview (modal)", "font": "Inter|Bold", "size": 32, "leading": "AUTO", "chars": "Build something amazing" }],
+      "note": "ONE node in all four sections. It is a 32px marketing headline inside a TEMPLATE PREVIEW modal, i.e. probably customer SITE content, not chrome. TYPE-COLOR-SYSTEM rule 3 exempts the 13 nodes under a canvas/preview ancestor. This census did NOT capture the ancestor chain, so the chrome-vs-canvas classification of 813:4498 is UNVERIFIED and it is NOT counted as drained chrome debt."
+    },
+    "weight_over_600_page_wide": "UNMEASURED",
+    "sub_11px_text": {
+      "count": 39,
+      "all_exactly": "10px",
+      "by_board": {
+        "152:52": ["1749:8405", "1749:8407"],
+        "153:2": ["1720:17385"],
+        "153:29": ["1720:17388"],
+        "153:92": ["1751:8399", "1751:8401", "1751:8402"],
+        "1172:4840": ["1172:4843", "1172:4845", "1172:4847", "1172:4849", "1172:4851", "1172:4853", "1172:4855", "1172:4857", "1172:4858"],
+        "1333:7162": ["1720:17208", "1720:17211", "1720:17447"],
+        "1706:8467": ["1720:17451"],
+        "1706:8476": ["1720:17455", "1720:17459"],
+        "807:4299": ["807:6539", "807:6552"],
+        "1169:4725": ["1169:4728", "1169:4737", "1169:4746"],
+        "1169:4753": ["1169:4757"],
+        "1169:4764": ["1169:4768", "1169:4771", "1169:4772"],
+        "641:2599": ["2483:11988", "2483:11991"],
+        "1138:13394": ["1720:17245"],
+        "1170:4792": ["1170:4804"],
+        "1719:8391": ["1720:17546"],
+        "1719:8414": ["1719:8416"],
+        "1719:8443": ["1720:17558"],
+        "1719:8450": ["1720:17550"]
+      }
+    },
+    "near_miss_6B7380": {
+      "count": 2,
+      "nodes": [
+        { "id": "2483:11988", "board": "641:2599", "kind": "fill", "hex": "#6B7380", "bound": false, "layer_name": "Components · update-from-sel…" },
+        { "id": "2483:11991", "board": "641:2599", "kind": "fill", "hex": "#6B7380", "bound": false, "layer_name": "Components · delete-confirm" }
+      ],
+      "note": "CONF-1-10 names #6B7380 ×17 file-wide against ink-muted #6B7280. Two of them are in my sections, on Components · detail, and they are ALSO two of the 39 sub-11px nodes — one repaint plus one promotion fixes both findings on the same two nodes."
+    },
+    "pure_black_000000": {
+      "count": 37,
+      "verdict": "NOT-A-DEFECT",
+      "note": "All 37 are prototype markers: every layer name begins hotspot/back·, hotspot/state·, hotspot/row· or hotspot/alt·. Same exemption TYPE-COLOR-SYSTEM §2d already records for the 291 #0000FF hotspot nodes. CONF-1-07's population of 26 on page 1:3 must already exclude hotspot layers, since 37 sit in four sections alone. Recorded so it is not re-filed."
+    },
+    "hex_1A57DB": 0,
+    "hex_9DA3AF": 0,
+    "hex_111928": 0,
+    "hex_333340": 0,
+    "hex_FAFCFF": 0
+  },
+  "zero_bound_boards_over_4_text": {
+    "1776:8373": ["154:26(36)", "306:2217(37)", "781:4311(4)", "1138:13376(4)", "1172:4840(13)", "1333:7162(47)", "1706:8467(7)", "1706:8476(6)", "1706:8483(5)", "1706:8492(5)", "433:2391(27)"],
+    "1084:4527": ["807:7252(18)", "1169:4713(6)", "1169:4725(12)", "1169:4753(5)", "1169:4764(6)"],
+    "1938:8372": ["778:4173(6)", "781:4433(5)", "1138:13394(6)", "1170:4777(27)", "1170:4792(9)", "2476:12064(11)", "2476:12081(6)"],
+    "1779:6": ["1719:8391(16)", "1719:8421(13)", "1719:8414(4)", "1719:8443(5)", "1719:8450(20)"]
+  },
+  "corroborations": [
+    "TYPE-COLOR-SYSTEM §3 step 5 lists Ecommerce at 58 unbound TEXT nodes. This census measured 1779:6 at exactly 58 TEXT / 0 bound. Independent agreement.",
+    "CONF-1-11 puts 2476:12064 at 0/11 and 2476:12081 at 0/6 bound. This census measured 0/11 and 0/6. Independent agreement."
+  ]
+}

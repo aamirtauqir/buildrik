@@ -1,18 +1,35 @@
 /**
- * ConfirmDeleteModal — board 1175:4827.
+ * ConfirmDeleteModal — Clone 3708:20650 / 21082 / 22372 ("Delete <file>?")
+ * and 3701:20385 ("Delete 2 selected files?").
+ *
+ * One file: the title carries the full filename, the body counts its site
+ * placements and offers Replace instead when there are any. A checked set:
+ * every file with its use count in one sentence, then the total. The V1
+ * board 1175:4827's "Delete file?" title, 📄 name list and amber in-use alert
+ * are displaced by that copy; its type-DELETE gate past 20 files stays — a
+ * data-safety door the Clone never draws, code wins.
+ *
+ * The Clone draws no unused variant of the single confirm; "This file is not
+ * used on the site." stands in for the absent placement sentence.
  *
  * Styles are inline `tw:` utilities because the `.med-modal-*` CSS this file
  * referenced was deleted on 2026-04-11 (ab72ef18) while the classNames stayed:
- * the modal that guards deleting up to 34 files has been rendering unstyled
- * ever since — no warning tint, no red on the destructive button. Orphan
- * classes do not fail a build, so nothing said a word.
- * P5: on the shared Radix Modal substrate (focus trap, Esc, overlay) — the
- * hand-rolled overlay wrapper is gone — ModalRoot/ModalContent own it.
+ * the modal that guards deleting up to 34 files rendered unstyled for four
+ * months — no red on the destructive button. Orphan classes do not fail a
+ * build, so nothing said a word. Shared shape in `libraryModal.ts`.
+ * On the shared Radix Modal substrate (focus trap, Esc, overlay) —
+ * ModalRoot/ModalContent own it.
  * @license BSD-3-Clause
  */
 
-import * as React from "react";
-import { ModalContent, ModalRoot, Button, TextField } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalRoot, Button, TextField } from "@/editor/chrome-ui";
+import {
+  LIBRARY_MODAL_BODY,
+  LIBRARY_MODAL_BTN_DANGER,
+  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_FOOT,
+  LIBRARY_MODAL_TITLE,
+} from "@/editor/media/components/libraryModal";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
 
@@ -20,105 +37,104 @@ interface ConfirmDeleteModalProps {
   payload: ConfirmDeletePayload;
   onConfirm(): void;
   onCancel(): void;
+  /** 3708:20650's "Replace instead" — opens the replace-across picker for
+   *  the asset. Absent (the drawer's MediaTab) the button does not render. */
+  onReplaceInstead?(key: string): void;
 }
 
 const LARGE_BULK_THRESHOLD = 20;
+/* A checked set past this is named as "a, b, c, d, e and N more": the Clone's
+   one-sentence shape holds, and a 34-name paragraph does not. */
+const NAMED_FILES = 5;
 
-export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDeleteModalProps) {
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/** "a", "a and b", "a, b and c" — the Clone's list grammar. */
+function joinAnd(parts: string[]): string {
+  if (parts.length <= 1) return parts.join("");
+  return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+}
+
+export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInstead }: ConfirmDeleteModalProps) {
   const [confirmInput, setConfirmInput] = useState("");
-  const { keys, names, inUseCount, inUse, isBulk } = payload;
+  const { keys, names, inUse, isBulk } = payload;
   const isLargeBulk = isBulk && keys.length > LARGE_BULK_THRESHOLD;
   const canConfirm = !isLargeBulk || confirmInput === "DELETE";
+  const countFor = (key: string) => inUse.find((u) => u.key === key)?.count ?? 0;
 
-  const visibleNames = names.slice(0, 3);
-  const hiddenCount = names.length - visibleNames.length;
+  const n = keys.length;
+  const total = keys.reduce((sum, key) => sum + countFor(key), 0);
+  const named = keys.slice(0, NAMED_FILES).map((key, i) => {
+    const uses = countFor(key);
+    return `${names[i]} (${uses === 0 ? "unused" : plural(uses, "use")})`;
+  });
+  if (n > NAMED_FILES) named.push(`${n - NAMED_FILES} more`);
+
+  const title = isBulk ? `Delete ${plural(n, "selected file")}?` : `Delete ${names[0]}?`;
+  const body = isBulk
+    ? `${joinAnd(named)} will be permanently deleted. ${
+        total > 0 ? `This affects ${plural(total, "placement")}.` : "None of them is used on the site."
+      }`
+    : total > 0
+      ? `Used in ${plural(total, "site placement")}. Deleting this file permanently breaks those elements. Replace the file instead if you want to preserve them.`
+      : "This file is not used on the site.";
+  const confirmLabel = isBulk ? `Delete ${plural(n, "file")}` : "Delete permanently";
+  const replaceKey = !isBulk && total > 0 && onReplaceInstead ? keys[0] : null;
 
   return (
-    <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
-      <ModalContent srTitle="Delete files" className="tw:p-4">
-        <h3 className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
-          {/* `isBulk` means "reached from selection mode", not "more than one" —
-              selecting a single asset and hitting Delete printed "Delete 1
-              files?" directly above a warning line that says "1 file is
-              currently used on the canvas", so the modal disagreed with itself
-              in the same breath. Count decides the plural, not the entry path. */}
-          {isBulk
-            ? `Delete ${keys.length} file${keys.length === 1 ? "" : "s"}?`
-            : "Delete file?"}
-        </h3>
+    <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }} dismissOnScrimClick={false}>
+      <ModalContent size="form" srTitle={title} data-testid="media-delete">
+        <h2 className={LIBRARY_MODAL_TITLE} id="med-del-title" data-testid="media-delete-title">
+          {title}
+        </h2>
 
-        {/* File name list */}
-        <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-1">
-          {visibleNames.map((n) => (
-            <div key={n} className="tw:flex tw:items-center tw:gap-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-              <span aria-hidden="true">📄</span>
-              <span className="tw:min-w-0 tw:truncate">{n}</span>
-            </div>
-          ))}
-          {hiddenCount > 0 && (
-            <div className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
-              and {hiddenCount} more
+        <ModalBody>
+          <p className={LIBRARY_MODAL_BODY} data-testid="media-delete-body">
+            {body}
+          </p>
+
+          {/* Large bulk: require typing DELETE */}
+          {isLargeBulk && (
+            <div className="tw:mt-4">
+              <p className="tw:mb-1.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+                Type <strong>DELETE</strong> to confirm:
+              </p>
+              <TextField
+                className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px]"
+                value={confirmInput}
+                onChange={(e) => setConfirmInput(e.target.value)}
+                placeholder="DELETE"
+                autoFocus
+                aria-label="Type DELETE to confirm"
+              />
             </div>
           )}
-        </div>
+        </ModalBody>
 
-        {/* In-use warning */}
-        {inUseCount > 0 && (
-          <div
-            className="tw:mt-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text,var(--bk-warning))]"
-            role="alert"
-          >
-            ⚠ {inUseCount} {inUseCount === 1 ? "file is" : "files are"} currently used on the
-            canvas. Deleting will break those elements.
-            {/* The count alone is not a warning anyone can act on: with one
-                usage you can guess, with nine you cannot. Naming the file and
-                the pages it is on costs two lines and makes the sentence
-                above checkable. */}
-            {inUse.length > 0 && (
-              <ul className="tw:m-0 tw:mt-1.5 tw:list-none tw:p-0">
-                {inUse.map((u) => (
-                  <li key={u.name} className="tw:min-w-0 tw:truncate">
-                    {u.name}
-                    {u.pages.length > 0 ? ` — ${u.pages.join(", ")}` : ""}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {/* Large bulk: require typing DELETE */}
-        {isLargeBulk && (
-          <div className="tw:mt-4">
-            <p className="tw:mb-1.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-              Type <strong>DELETE</strong> to confirm:
-            </p>
-            <TextField
-              className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px]"
-              value={confirmInput}
-              onChange={(e) => setConfirmInput(e.target.value)}
-              placeholder="DELETE"
-              autoFocus
-              aria-label="Type DELETE to confirm"
-            />
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="tw:mt-4 tw:flex tw:justify-end tw:gap-2">
-          <Button
-            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
-            onClick={onCancel}
-          >
+        <div className={LIBRARY_MODAL_FOOT} data-testid="media-delete-foot">
+          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="media-delete-cancel" onClick={onCancel}>
             Cancel
           </Button>
+          {replaceKey !== null && (
+            <Button
+              size="xs"
+              variant="secondary"
+              className={LIBRARY_MODAL_BTN_SECONDARY}
+              data-testid="media-delete-replace"
+              onClick={() => onReplaceInstead?.(replaceKey)}
+            >
+              Replace instead
+            </Button>
+          )}
           <Button
-            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border-0 tw:bg-[var(--bk-error)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)]"
+            size="xs"
+            className={LIBRARY_MODAL_BTN_DANGER}
+            data-testid="media-delete-confirm"
             onClick={onConfirm}
             disabled={!canConfirm}
             aria-disabled={!canConfirm}
           >
-            Delete{keys.length > 1 ? ` ${keys.length} files` : ""}
+            {confirmLabel}
           </Button>
         </div>
 
@@ -129,7 +145,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
           reason is a bug." Here the reason is the typing gate.
         */}
         {isLargeBulk && !canConfirm && (
-          <p className="tw:mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          <p className="tw:m-0 tw:px-4 tw:pb-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="media-delete-gate-reason">
             Delete stays disabled until the word matches exactly.
           </p>
         )}

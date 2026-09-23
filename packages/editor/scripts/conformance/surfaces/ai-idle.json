@@ -1,0 +1,99 @@
+{
+  "surface": "ai-idle",
+  "board": "AI · idle (Figma 170:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-empty-ask-ai"
+    },
+    {
+      "action": "waitFor",
+      "testId": "ai-panel"
+    }
+  ],
+  "contrastScope": "[data-testid=\"ai-panel\"]",
+  "targets": [
+    {
+      "name": "back-row",
+      "testId": "ai-back-row",
+      "spec": "ai-idle",
+      "nodeId": "170:3"
+    },
+    {
+      "name": "header",
+      "testId": "ai-header",
+      "spec": "ai-idle",
+      "nodeId": "170:5"
+    },
+    {
+      "name": "scope-band",
+      "testId": "ai-scope",
+      "spec": "ai-idle",
+      "nodeId": "1625:7162"
+    },
+    {
+      "name": "prompt-block",
+      "testId": "ai-prompt",
+      "spec": "ai-idle",
+      "nodeId": "170:7"
+    },
+    {
+      "name": "panel",
+      "testId": "ai-panel"
+    },
+    {
+      "name": "prompt-input",
+      "testId": "ai-prompt-input"
+    },
+    {
+      "name": "draft-brief",
+      "testId": "ai-draft-brief"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, not through the probe. The idle panel is the one AI state a",
+    "standalone editor can actually reach: the inspector's empty state carries",
+    "`✦ Ask AI ›`, and `ui:switch-tab {tab:\"ai\"}` is routed to the INSPECTOR",
+    "column (StudioPanels.tsx:297), which is the column boards 170:2 and 66:225",
+    "draw with a `‹ Inspector` way back. thinking/planning/done each need an",
+    "answer from the dashboard's AI endpoint and are probed instead.",
+    "",
+    "THREE ANCHORED TARGETS CARRY NO SPEC, and the reason is the same for all",
+    "three: the AI boards are drawn on the 280 DRAWER frame while this panel",
+    "ships in the 300 INSPECTOR column (`--bk-size-inspector`, board 32:2's own",
+    "geometry: 16 pad + 88 label + 8 gap + 172 control). Measured live it is 299",
+    "— 300 less the column's 1px rule — so every absolute width on these boards",
+    "is 19px short of the shipped panel. The SHAPE (16px gutters both sides) is",
+    "what the code satisfies, and boards.json's own record already accepted this:",
+    "the 2026-08-17 walk of board 66:225 measured the AI panel `l=1140 w=300` and",
+    "called it a match.",
+    "",
+    "  panel        170:2   background-color passes; `border-color` is the",
+    "                       INSPECTOR COLUMN's left rule (LayoutShell.css:269,",
+    "                       --bk-border), not the panel's, and it is shared with",
+    "                       ProInspector. One AI board cannot restyle the shell.",
+    "  prompt-input 170:8   4 of 5 properties match after this pass (bg #FFF,",
+    "                       border-color --bk-border-input #9CA3AF, height 52,",
+    "                       radius 8). Only `width` disagrees: 267 against 248.",
+    "  draft-brief  921:4480  same — bg, border-color, height 40, padding 12/12",
+    "                       and radius 8 all match; `width` reads 243 against 248.",
+    "",
+    "Read those four numbers out of measured/ai-idle.json rather than taking this",
+    "note's word for them.",
+    "",
+    "NOT CONFORMED, deliberately:",
+    "  170:10 Suggestions (120) · 170:15 note (112) · 921:4478 Draft (92) — these",
+    "  block heights are set by the board's three sample prompts and its two",
+    "  paragraphs. The founder rule is explicit that sample data is never",
+    "  conformed to literally, and a prose block's height is sample data."
+  ]
+}

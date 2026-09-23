@@ -1,0 +1,121 @@
+{
+ "sections": [
+  "1776:8373 | 07 \u00b7 Brand (51)"
+ ],
+ "ux": [
+  {
+   "id": "UX-H-26",
+   "module": "brand",
+   "screen": "Brand \u203a Import / export \u00b7 IMPORT \u00b7 Resolve conflicts",
+   "kind": "destructive-confirm",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "Import a token file into a brand I have already customised",
+   "finding": "The conflict box says 'Choose how to handle them' when a choice has already been made for the user, and it is the overwriting one. Replace is pre-selected the moment a file parses and again on every reset, so a user who reads '12 tokens already exist with the same ID', presses the primary button and never touches the two chips has silently overwritten twelve of their own brand values. The button they press reads 'Apply 12 valid only' \u2014 the word 'only' reads as the cautious option while the active strategy is the destructive one.",
+   "evidence": "ImportCard.tsx:126 `React.useState<ConflictStrategy>(\"replace\")`; ImportCard.tsx:188 `setStrategy(\"replace\")` at the end of ingestRaw; ImportCard.tsx:208 the same on Cancel. ImportCard.tsx:213-221 handleApply sends every token unless strategy === 'keep-mine'. ImportCard.tsx:365-393 the resolve box and its two chips. ImportCard.tsx:400-403 the Apply button label. Searched: 'ConflictStrategy', 'setStrategy', 'keep-mine', 'handleApply', 'conflictCount'.",
+   "fix": "Default to the non-destructive strategy, or default to nothing and disable Apply until the user chooses. A screen that asks a question and pre-answers it with the irreversible option is not asking.",
+   "severity": "Critical",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-27",
+   "module": "brand",
+   "screen": "Brand \u203a Import / export \u00b7 IMPORT \u00b7 detail block",
+   "kind": "missing-screen",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "Decide whether to accept an incoming token file",
+   "finding": "The conflict is reported as a bare number \u2014 '12 ID collisions' \u2014 and never as a list. There is no way to see WHICH of your tokens are about to be overwritten, what their current values are, what the incoming values are, or to accept some and refuse others. The decision the screen asks for cannot be made from what the screen shows.",
+   "evidence": "ImportCard.tsx:356-362 renders `${conflictCount} ID collisions` and nothing else; conflictCount is `parsed.diff.modified.length` (:239). diffTokens already computes the full modified list (imported at :26 from importUtils, used at :180) \u2014 the per-token data exists and is never displayed. The strategy is a single global choice (ImportCard.tsx:41 `type ConflictStrategy = \"replace\" | \"keep-mine\"`). Searched: 'diff.modified', 'diffTokens', 'DiffResult', 'conflictCount'.",
+   "fix": "Show the collisions as rows \u2014 token name, your value, their value \u2014 with a per-row keep/take. The whole-file strategy chips can stay as bulk shortcuts over that list.",
+   "severity": "Major",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-28",
+   "module": "brand",
+   "screen": "Brand \u203a Import / export \u00b7 IMPORT \u00b7 drop zone",
+   "kind": "broken-flow",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "Bring a Tailwind config into the brand",
+   "finding": "The import zone invites a file format it cannot read. The drop target says 'Drop .json or .ts', the file picker accepts .ts and .js, the screen reader label names tailwind.config.ts explicitly, and the detail block will even identify the file back to the user as 'Tailwind config (AST)' \u2014 and then the parse fails, because the parser handles JSON only. A user follows the instruction on screen and gets an error about their own file.",
+   "evidence": "ImportCard.tsx:391-393 `accept=\"application/json,.json,.ts,.js\"`; ImportCard.tsx:255 aria-label 'Drop tokens.json or tailwind.config.ts, or click to browse'; ImportCard.tsx:390 the visible copy 'Drop .json or .ts'; ImportCard.tsx:98-104 detectFormat returns 'Tailwind config (AST)' for .ts/.js. ImportCard.tsx:92-95 the file's own comment: 'Parsing still routes through parseImportJSON (JSON only), so unsupported formats (Tailwind .ts AST) currently surface as parse errors.' Searched: 'parseImportJSON', 'detectFormat', 'accept=', 'Tailwind'.",
+   "fix": "Advertise only what parses. If Tailwind configs are the intended input, the format detector should say 'Tailwind configs aren't supported yet \u2014 export tokens as JSON' at the moment of drop, not after a failed parse.",
+   "severity": "Major",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-30",
+   "module": "brand",
+   "screen": "Brand \u203a Starters",
+   "kind": "destructive-confirm",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "See what one of the six starter brands would look like",
+   "finding": "Clicking a starter card IS applying it \u2014 there is no preview, no confirm and no Apply button. The screen carries a static warning line above the grid, but a single click on a card replaces every token in the brand. The only way back is the panel's global Discard, which throws away every other unsaved brand change made in the same session, so 'let me just look at Linear Dark' costs a user whatever else they had staged.",
+   "evidence": "StartersSection.tsx:8-12 'There is no Apply button on either board: the CARD is the control'; StartersSection.tsx:43 `applyStarter(id)` fires straight from onSelect. StartersSection.tsx:63-65 the warning band 'Applying a starter overwrites your tokens.' useApplyStarter.ts:2 'stage a starter's tokens as a pending change'. DesignSystemTab.tsx:562-578 handleDiscard calls discardAll() on every token AND preset registry, then toasts 'N changes discarded'. Searched: 'applyStarter', 'STARTER_DS_REGISTRY', 'discardAll', 'onSelect'.",
+   "fix": "Separate looking from committing. Select a card to preview it on the canvas, commit from an explicit 'Apply <name>' \u2014 and if a starter is applied over staged work, name what it will overwrite before it does.",
+   "severity": "Major",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-31",
+   "module": "brand",
+   "screen": "Brand \u203a Tokens \u203a token detail \u00b7 Rename ID",
+   "kind": "missing-screen",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "Rename a token so the brand reads clearly",
+   "finding": "Renaming a token opens the browser's native prompt dialog. It is unstyled, it sits outside the editor's own overlay and focus conventions, it validates nothing \u2014 an empty name, a duplicate id, a name with spaces all come back as-is \u2014 and it gives the user no view of what the rename will do to the elements already bound to that token, even though the same screen is showing that usage count two rows above.",
+   "evidence": "TokenDetailView.tsx:250-259 handleRenameId \u2014 `const next = window.prompt(\"Rename token ID:\", token.id); if (next && next !== token.id) onRename?.(token.id, next);` with a TODO above it: 'replace window.prompt with a proper modal once the confirm-dialog primitive is wired'. TokenDetailView.tsx:134-155 the live usage breakdown the screen already has. The repo elsewhere treats this as a defect \u2014 media/components/__tests__/NoNativeDialogs.test.tsx. Searched: 'window.prompt', 'onRename', 'handleRenameId', 'NoNativeDialogs'.",
+   "fix": "An in-app rename with live validation against the existing token ids and a line saying how many elements will be re-pointed. The usage data is already loaded on this screen.",
+   "severity": "Major",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-32",
+   "module": "brand",
+   "screen": "Brand \u00b7 root \u00b7 preview strip",
+   "kind": "missing-state",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "See what my brand looks like before saving it",
+   "finding": "The brand preview is ten colour swatches and two font names. Twelve of the fourteen token kinds the panel manages \u2014 spacing, radius, shadow, motion, border, opacity, z-index, breakpoints, grid, sizing, icons, imagery \u2014 have no preview anywhere, and nothing on the panel shows the brand applied to an actual component. A user changing a shadow or a radius token can only verify it by leaving Brand, finding an element on the canvas that happens to use it, and looking.",
+   "evidence": "BrandPreview.tsx:27-30 `BrandPreviewProps { colors: readonly DesignToken[] }` \u2014 colours are the only input; BrandPreview.tsx:34 MAX_SWATCHES = 10; BrandPreview.tsx:36-39 SPECIMENS is exactly Heading and Body. DesignSystemTab.tsx:134-148 the nine destinations and the fourteen registries behind them (:28-34 of ImportCard lists all fourteen kinds). BrandPreview.tsx:14-17 states the intent: 'It is a PREVIEW, not a control.' Searched: 'BrandPreview', 'MAX_SWATCHES', 'SPECIMENS', 'brand-preview'.",
+   "fix": "Preview the brand on something. A small specimen block \u2014 a button, a card, a heading over body copy on the current radius, spacing and shadow \u2014 answers 'what did I just change' for every kind at once, which a swatch row cannot.",
+   "severity": "Major",
+   "confidence": "medium",
+   "_lane": "UX-H.jsonl"
+  },
+  {
+   "id": "UX-H-29",
+   "module": "brand",
+   "screen": "Brand \u203a Import / export \u00b7 IMPORT \u00b7 detail block",
+   "kind": "missing-state",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "See whether part of my token file was rejected",
+   "finding": "The 'Errors' row in the import summary can only ever read 0. Any parse error clears the parsed state entirely and routes to a separate error box, so by the time the summary renders, its error list is guaranteed empty. A file where some tokens are valid and some are malformed reports as clean.",
+   "evidence": "ImportCard.tsx:172-186 ingestRaw \u2014 on `parsedJson.errors.length > 0` it sets parseErrors, calls setParsed(null) and returns; otherwise it builds the ParsedState with a literal `errors: []` (:183). ImportCard.tsx:346-354 renders the Errors row from `parsed.errors`, which is therefore always []. Searched: 'parsed.errors', 'parseErrors', 'ingestRaw', 'ParsedState'.",
+   "fix": "Carry per-token rejections into the summary and name them, so 'Valid tokens 40' can sit next to a truthful 'Errors 3 \u2014 heading-xl, radius-pill, shadow-soft'.",
+   "severity": "Minor",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  }
+ ],
+ "summary": [
+  {
+   "id": "UX-H-35",
+   "module": "brand",
+   "screen": "-",
+   "kind": "module-summary",
+   "purpose": "Brand is the site-builder design system \u2014 the colour, type, spacing and component tokens that style the CUSTOMER's published site, not the editor's own chrome.",
+   "task": "All brand tasks",
+   "finding": "PURPOSE: own the design system of the customer's published site \u2014 fourteen token kinds plus component style presets \u2014 as one place, so a site's look changes from one screen rather than element by element. NOTE THE BOUNDARY: this is `--buildrick-design-*`, the customer's tokens; the editor's own `--bk-*` chrome tokens are generated from Figma and are a different system entirely. PRIMARY TASKS: pick a starting point (6 starters); edit tokens by kind; manage component presets and shared classes; set light/dark values; read lint; import and export a token file. ENTRY POINTS: the rail's Design/Brand tab, which opens a drill-in root of nine destinations (DesignSystemTab.tsx:134-149); `ProjectTokensApplier` puts the site's tokens on the page at project load, independent of the panel. EXIT POINTS: the footer's Save (DesignTabFooter.tsx:20 APPLY_CHANGES_LABEL) commits through a Review modal to setProjectSettings + persistAll; Discard reverts every registry. HANDS OFF TO: canvas (every edit writes its CSS var to document.documentElement immediately, so the canvas IS the live preview \u2014 useTokenBase.ts:64), publish (projectSettings.designTokens), inspector (tokens offered as values). RECEIVES FROM: the engine's settings events and the token-usage tracker (which elements consume which token). THE STRUCTURAL PROBLEM: the staging model is sound \u2014 edits preview live and commit behind one Save \u2014 but the three doors that write the WHOLE brand at once (starters, import, and the AI generate button that ships past its own feature flag) all commit without showing the user what they are about to replace.",
+   "evidence": "DesignSystemTab.tsx:134-149 (the nine destinations), :562-578 (handleDiscard), :495-505 (the guard that was removed and why); useTokenBase.ts:64,124,145 (live CSS-var writes + discard restore); ProjectTokensApplier.tsx:29-60; DesignTabFooter.tsx:20-21. The FEATURE_DS_AI gap (useComposerInit.ts:132 gates the client, DesignSystemTab.tsx:890 does not gate the button) is carried from another lane and was not re-derived here. Searched: 'DesignSection', 'SECTIONS', 'discardAll', 'setProjectSettings', 'designTokens'.",
+   "fix": "Put a what-will-change step in front of every whole-brand write \u2014 starter, import, AI \u2014 using the diff data the panel already computes.",
+   "severity": "Major",
+   "confidence": "high",
+   "_lane": "UX-H.jsonl"
+  }
+ ]
+}

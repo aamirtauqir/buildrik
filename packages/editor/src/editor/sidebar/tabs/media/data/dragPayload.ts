@@ -8,6 +8,7 @@
  *   x-aquibra-media-src   blob/http/data URL of the asset
  *   x-aquibra-media-type  image | video | icon | svg | audio | lottie | font
  *   x-aquibra-media-name  human-readable name (for fallback filename)
+ *   x-aquibra-media-alt   alt text, so a dropped image is not published mute
  *
  * @license BSD-3-Clause
  */
@@ -41,6 +42,7 @@ export function setMediaDragData(dataTransfer: DataTransfer, item: LibraryItem):
   dataTransfer.setData("application/x-aquibra-media-src", item.src);
   dataTransfer.setData("application/x-aquibra-media-type", libraryTypeToInsertType(item.type));
   dataTransfer.setData("application/x-aquibra-media-name", item.name);
+  dataTransfer.setData("application/x-aquibra-media-alt", item.altText ?? "");
   // Also set text/plain as a universal fallback so drops into other apps
   // (text editors, chat) at least produce a readable URL.
   dataTransfer.setData("text/plain", item.src);
@@ -52,10 +54,11 @@ export function setMediaDragData(dataTransfer: DataTransfer, item: LibraryItem):
  */
 export function readMediaDragData(
   dataTransfer: DataTransfer,
-): { src: string; type: MediaInsertType; name: string } | null {
+): { src: string; type: MediaInsertType; name: string; alt: string } | null {
   const src = dataTransfer.getData("application/x-aquibra-media-src");
   const type = dataTransfer.getData("application/x-aquibra-media-type") as MediaInsertType;
   const name = dataTransfer.getData("application/x-aquibra-media-name");
+  const alt = dataTransfer.getData("application/x-aquibra-media-alt");
   if (!src || !type) return null;
-  return { src, type, name };
+  return { src, type, name, alt };
 }

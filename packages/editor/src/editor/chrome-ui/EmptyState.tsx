@@ -77,8 +77,8 @@ export function EmptyState({ size = "md", align = "center", title, body, icon, a
   return (
     <div className={[BASE, ALIGN[align], size !== "md" ? SIZE.sm : SIZE.md, className].filter(Boolean).join(" ")} {...rest}>
       {icon ? <span aria-hidden="true">{icon}</span> : null}
-      {title ? <span className={TITLE_CLASS}>{title}</span> : null}
-      {body ? <span className={BODY_CLASS}>{body}</span> : null}
+      {title ? <span className={TITLE_CLASS} data-testid="empty-state-title">{title}</span> : null}
+      {body ? <span className={BODY_CLASS} data-testid="empty-state-body">{body}</span> : null}
       {children}
       {action}
     </div>

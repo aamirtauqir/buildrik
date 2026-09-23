@@ -1,0 +1,210 @@
+{
+  "surface": "exit-workspace-leaves-the-editor",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "927:4474",
+  "boardName": "exit-workspace-leaves-the-editor",
+  "figmaHash": "acc038a90b7aca8134920d1ea1c59496879781d295f2fd3d76b4c124a7204e61",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:18:11.727Z",
+  "copy": [
+    "↗ Leaving the editor",
+    "Workspace settings open in the dashboard.",
+    "Members, billing and team permissions are workspace-level — they are",
+    "not part of this site's settings, and not part of the Editor.",
+    "← Back to Site settings"
+  ],
+  "targets": [
+    {
+      "nodeId": "927:4474",
+      "name": "Exit · Workspace (leaves the editor)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col items-start overflow-clip relative rounded-[12px] shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.04),0px_20px_25px_-5px_rgba(0,0,0,0.1)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4475",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] content-stretch flex h-[56px] items-center overflow-clip px-[24px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4476",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4477",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-px relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4478",
+      "name": "Frame",
+      "className": "content-stretch flex h-[40px] items-end overflow-clip pb-[4px] px-[24px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4479",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4480",
+      "name": "Frame",
+      "className": "content-stretch flex h-[58px] items-start overflow-clip px-[24px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "58px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4481",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[0] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4482",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-px relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4483",
+      "name": "Frame",
+      "className": "content-stretch flex h-[60px] items-center overflow-clip px-[24px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "60px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        }
+      }
+    },
+    {
+      "nodeId": "927:4484",
+      "name": null,
+      "className": "[word-break:break-word] block cursor-pointer font-['Inter:Medium'] font-medium leading-[0] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/accent-text,#1a56db)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1172:4891",
+      "name": "hotspot/state · Exit · guard",
+      "className": "absolute block cursor-pointer h-[34px] left-[195px] top-[177px] w-[320px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    }
+  ]
+}

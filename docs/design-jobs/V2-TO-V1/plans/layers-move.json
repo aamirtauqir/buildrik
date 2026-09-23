@@ -1,0 +1,295 @@
+[
+ {
+  "op": "move",
+  "id": "143:177",
+  "x": 0,
+  "y": 112,
+  "why": "UX-H-24 / COVER-1-62 — the refusal is not a tooltip beside the cursor. .bdc-layers-drop-alert is a full-width bar at the TOP of the panel (index.tsx:400-404), after the drop, cleared at 3s (index.tsx:87-93).",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. DragTooltip frame at 0,210 280x51 inside board 143:119.",
+  "_geometry_source": "y=112 seats it under the crumb frame 1750:8394 (0,80 280x32), which is where index.tsx renders it — the crumb is emitted immediately before the alert."
+ },
+ {
+  "op": "resize",
+  "target": "143:177",
+  "from": 51,
+  "to": 28,
+  "why": "UX-H-24 — full panel width; 6px vertical padding on 16px line-height = 28 (layers-v2.css:483-492).",
+  "_id_source": "",
+  "_normalizer_note": "written as {target,from,to} because that is the only resize shape normalize-plans.mjs classifies; width is unchanged on this node so the height-only op is exact."
+ },
+ {
+  "op": "copy-fill",
+  "id": "143:177",
+  "hex": "#111827",
+  "why": "UX-H-24 — the shipped bar is --bk-ink with --bk-accent-on text; the CSS comment records that a red-on-ink version measured 3.76:1 and was fixed.",
+  "_geometry_source": "tokens.generated.css:77 --bk-ink #111827.",
+  "_normalizer_note": "written as copy-fill because normalize-plans.mjs has no classifier for a bare {op:fill,id,hex} row — it drops it. copy-fill with an explicit hex normalizes to op:fill and resolves."
+ },
+ {
+  "op": "move",
+  "id": "143:178",
+  "x": 16,
+  "y": 6,
+  "why": "UX-H-24 — 16px left pad, 6px top, per layers-v2.css:485.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. TEXT inside 143:177; its node NAME is the old copy, “A button can’t contain a section”."
+ },
+ {
+  "op": "copy-fill",
+  "id": "143:178",
+  "hex": "#FFFFFF",
+  "why": "UX-H-24 — --bk-accent-on on --bk-ink.",
+  "_normalizer_note": "written as copy-fill because normalize-plans.mjs has no classifier for a bare {op:fill,id,hex} row — it drops it. copy-fill with an explicit hex normalizes to op:fill and resolves."
+ },
+ {
+  "op": "move",
+  "id": "245:1729",
+  "x": 0,
+  "y": 140,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=98.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1738",
+  "x": 0,
+  "y": 168,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=126.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1747",
+  "x": 0,
+  "y": 196,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=154.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1756",
+  "x": 0,
+  "y": 224,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=182.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1765",
+  "x": 0,
+  "y": 252,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=261.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1774",
+  "x": 0,
+  "y": 280,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=289.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1783",
+  "x": 0,
+  "y": 308,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=317.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "245:1792",
+  "x": 0,
+  "y": 336,
+  "why": "UX-H-24 — the alert takes 112..140, and the 51px hole the tooltip left in the row ladder closes.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:119, currently y=345.",
+  "_geometry_source": "ladder = 140 + i*28; row height 28 is layers-v2.css:22."
+ },
+ {
+  "op": "move",
+  "id": "143:174",
+  "x": 0,
+  "y": 364,
+  "why": "UX-H-24 — spacer follows the last row (140+8*28).",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. spacer on 143:119 at 0,373 280x411."
+ },
+ {
+  "op": "resize",
+  "target": "143:174",
+  "from": 411,
+  "to": 420,
+  "why": "UX-H-24 — 784 (count footer top) − 364.",
+  "_id_source": "",
+  "_normalizer_note": "written as {target,from,to} because that is the only resize shape normalize-plans.mjs classifies; width is unchanged on this node so the height-only op is exact."
+ },
+ {
+  "op": "move",
+  "id": "155:28",
+  "x": 1700,
+  "y": 3136,
+  "why": "UX-H-24 housekeeping — caption/Layers · invalid-drop sits at 100,3346 under the `empty` board while the board it captions, 143:119, is at 1700,2304. The section's reflow into three rows left it behind.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. caption TEXT at 100,3346 280x72.",
+  "_geometry_source": "board y 2304 + height 812 + the section's own 20px caption gap = 3136; x = the board's x. Slot 1700,3136 is EMPTY — that caption row holds only 500 (788:4305), 900 (788:4303) and 1300 (788:4304)."
+ },
+ {
+  "op": "move",
+  "id": "245:1945",
+  "x": 0,
+  "y": 134,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=98.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1954",
+  "x": 0,
+  "y": 162,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=126.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1963",
+  "x": 0,
+  "y": 190,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=154.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1972",
+  "x": 0,
+  "y": 218,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=182.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1981",
+  "x": 0,
+  "y": 246,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=210.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1990",
+  "x": 0,
+  "y": 274,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=238.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:1999",
+  "x": 0,
+  "y": 302,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=266.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "245:2008",
+  "x": 0,
+  "y": 330,
+  "why": "COVER-1-63 (supports UX-H-19/UX-H-20) — the 36px selection toolbar the shipped panel grows at 2+ selected takes 98..134 on 143:295; the rows follow it.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. tree-row INSTANCE on 143:295, currently y=294.",
+  "_geometry_source": "banner height 36 = 24px buttons + 6px padding top and bottom (layers-v2.css:271-288).",
+  "_depends_on": "the banner frame must be created first — see layers-structural.json step B."
+ },
+ {
+  "op": "move",
+  "id": "143:350",
+  "x": 0,
+  "y": 358,
+  "why": "COVER-1-63 — spacer follows the last row (134+8*28).",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. spacer on 143:295 at 0,322 280x462.",
+  "_depends_on": "step B"
+ },
+ {
+  "op": "resize",
+  "target": "143:350",
+  "from": 462,
+  "to": 426,
+  "why": "COVER-1-63 — 784 − 358.",
+  "_id_source": "",
+  "_normalizer_note": "written as {target,from,to} because that is the only resize shape normalize-plans.mjs classifies; width is unchanged on this node so the height-only op is exact.",
+  "_depends_on": "step B"
+ },
+ {
+  "op": "move",
+  "id": "1082:4615",
+  "x": 0,
+  "y": 184,
+  "why": "UX-H-18 — the 20px local-only hint under the rename field pushes the rows below it down.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. 'Tree row' FRAME on 1082:4589, currently y=164.",
+  "_depends_on": "the hint frame must be created first — see layers-structural.json step E."
+ },
+ {
+  "op": "move",
+  "id": "1082:4620",
+  "x": 0,
+  "y": 212,
+  "why": "UX-H-18 — the 20px local-only hint under the rename field pushes the rows below it down.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. 'Tree row' FRAME on 1082:4589, currently y=192.",
+  "_depends_on": "the hint frame must be created first — see layers-structural.json step E."
+ },
+ {
+  "op": "move",
+  "id": "1082:4626",
+  "x": 0,
+  "y": 240,
+  "why": "UX-H-18 — the 20px local-only hint under the rename field pushes the rows below it down.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. 'Tree row' FRAME on 1082:4589, currently y=220.",
+  "_depends_on": "the hint frame must be created first — see layers-structural.json step E."
+ },
+ {
+  "op": "move",
+  "id": "1082:4632",
+  "x": 0,
+  "y": 268,
+  "why": "UX-H-18 — the 20px local-only hint under the rename field pushes the rows below it down.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. 'Tree row' FRAME on 1082:4589, currently y=248.",
+  "_depends_on": "the hint frame must be created first — see layers-structural.json step E."
+ },
+ {
+  "op": "move",
+  "id": "1082:4637",
+  "x": 0,
+  "y": 296,
+  "why": "UX-H-18 — spacer follows the shifted rows.",
+  "_id_source": "READ — page 1:3 metadata dump scratchpad_audit/vis3/page-meta.txt (2026-09-06 14:20), re-confirmed live 2026-09-07 05:12: section 1776:8375 still reports 29 children and 2480x3696, identical to the dump, so every id below is current. spacer on 1082:4589 at 0,276 280x508.",
+  "_depends_on": "step E"
+ },
+ {
+  "op": "resize",
+  "target": "1082:4637",
+  "from": 508,
+  "to": 488,
+  "why": "UX-H-18 — 784 − 296.",
+  "_id_source": "",
+  "_normalizer_note": "written as {target,from,to} because that is the only resize shape normalize-plans.mjs classifies; width is unchanged on this node so the height-only op is exact.",
+  "_depends_on": "step E"
+ }
+]

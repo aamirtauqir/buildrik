@@ -140,14 +140,17 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
   it("rejects an SVG over the 1MB SVG limit", async () => {
     const manager = new MediaManager();
     mockStorage(manager);
+    const errors = captureEvents(manager, MEDIA_EVENTS.UPLOAD_ERROR);
 
     const result = await manager.uploadFile(
       makeFile("<svg/>", "big.svg", "image/svg+xml", 2 * 1024 * 1024),
     );
 
     expect(result.success).toBe(false);
-    // Board 145:148 names both numbers, so the assertion checks both.
-    expect(result.error).toMatch(/Upload failed — file is 2 MB, limit is 1 MB/);
+    // Clone 3584:45522 (re-draws board 145:148) names both numbers, so the assertion checks both.
+    expect(result.error).toMatch(/Upload failed — file is 2 MB, the limit is 1 MB per file/);
+    // The drawer's replacement flow reads the real numbers off the event, not the prose.
+    expect(errors[0]).toMatchObject({ fileName: "big.svg", size: 2 * 1024 * 1024, limit: 1024 * 1024 });
   });
 
   it("rejects a video over the 100MB video limit (limit is per-type, not global)", async () => {
@@ -159,7 +162,7 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/Upload failed — file is 101 MB, limit is 100 MB/);
+    expect(result.error).toMatch(/Upload failed — file is 101 MB, the limit is 100 MB per file/);
   });
 
   it("accepts an image over 1MB but under the 10MB image limit", async () => {
@@ -342,6 +345,76 @@ describe("uploadFile — server mirror (Phase B2)", () => {
   });
 });
 
+/* Clone 3695:45529 (Asset versions, Phase 6): the editor's Save lands through
+   this pipeline like any upload — a Blob upload always makes a row — so the
+   row is BORN a version. Flagging it afterwards would let the grid draw the
+   file as a library card for the whole upload (the row is in state and
+   MEDIA_UPDATED fires before uploadFile resolves). The server row is created
+   without its JSON column (`onUploadCompleted` may win the create race), so
+   the column is mirrored explicitly once the row has a server id. */
+describe("uploadFile — a version row is born flagged and its column mirrored (3695:45529)", () => {
+  const EDITS = {
+    width: 1200,
+    height: 800,
+    crop: "16:9",
+    preset: "None",
+    format: "WebP",
+    transform: "Original",
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    blur: 0,
+  };
+
+  it("carries versionOf and edits on the asset from the first persist, then mirrors { tags, versionOf, edits }", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    const storage = mockStorage(manager);
+
+    const result = await manager.uploadFile(makeFile("img", "hero-dark-v2.png", "image/png"), {
+      autoOptimize: false,
+      generateThumbnail: false,
+      versionOf: "hero",
+      edits: EDITS,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.asset?.versionOf).toBe("hero");
+    expect(result.asset?.edits).toEqual(EDITS);
+    const firstPersisted = (storage.saveAsset as ReturnType<typeof vi.fn>).mock.calls[0][0] as MediaAsset;
+    expect(firstPersisted.versionOf).toBe("hero");
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-1", {
+      userMetadata: { tags: [], versionOf: "hero", edits: EDITS },
+    });
+  });
+
+  it("a plain upload mirrors nothing extra", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+
+    await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+
+  it("a version that stays device-only keeps its flag locally and mirrors nothing", async () => {
+    const remote = makeRemoteSync({ uploadAndCreate: vi.fn(async () => null) });
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+
+    const result = await manager.uploadFile(makeFile("img", "hero-dark-v2.png", "image/png"), {
+      autoOptimize: false,
+      generateThumbnail: false,
+      versionOf: "hero",
+    });
+
+    expect(result.asset?.versionOf).toBe("hero");
+    expect(result.asset?.localOnly).toBe(true);
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+});
+
 describe("uploadFile — P1C tombstone (delete during in-flight upload)", () => {
   it("deletes the just-created server row when the asset was deleted mid-upload", async () => {
     let resolveUpload!: (v: { serverId: string; url: string } | null) => void;
@@ -442,6 +515,50 @@ describe("retry queue rebuild (Phase B5 P2 durability)", () => {
     expect((manager as any).retryQueue.size).toBe(1);
   });
 
+  // A record persisted mid-upload — no serverId, src still a session blob:
+  // URL — is a stranded upload, not a synced one. Ten of them sat under a
+  // "0 not on the server" pill on 2026-09-13.
+  it("treats a serverId-less blob: asset as local-only and queues it", () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    seedAsset(manager, { id: "a-stranded", src: "blob:http://localhost:3000/551dd30e" });
+    seedAsset(manager, { id: "a-stock", src: "https://images.pexels.com/x.jpg" });
+    seedAsset(manager, { id: "a-audio", type: "audio", src: "blob:http://localhost:3000/aud" });
+
+    manager.rebuildRetryQueueFromState();
+
+    expect((manager as any).retryQueue.has("a-stranded")).toBe(true);
+    expect((manager as any).state.assets.find((a: MediaAsset) => a.id === "a-stranded").localOnly).toBe(true);
+    expect((manager as any).retryQueue.has("a-stock")).toBe(false);
+    expect((manager as any).retryQueue.has("a-audio")).toBe(false);
+  });
+
+  // The queue survived reloads; nothing drained it until the network
+  // flapped or a NEW upload succeeded. init() now drains it itself.
+  it("init() drains a rebuilt retry queue while online", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    const s = mockStorage(manager);
+    s.getAllAssets = vi.fn(async () => [
+      {
+        id: "a-local",
+        type: "image",
+        name: "x",
+        originalName: "x.png",
+        src: "blob:http://localhost:3000/abc",
+        mimeType: "image/png",
+        size: 3,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        localOnly: true,
+      },
+    ]);
+
+    await manager.init();
+    await vi.waitFor(() => expect(remote.uploadAndCreate).toHaveBeenCalledTimes(1));
+  });
+
   it("rebuildFolderRetryQueueFromState seeds folderRetryQueue from localOnly folders", () => {
     const manager = new MediaManager(makeRemoteSync());
     mockStorage(manager);
@@ -533,5 +650,47 @@ describe("retry queue rebuild (Phase B5 P2 durability)", () => {
 
     expect(remote.deleteRemote).toHaveBeenCalledWith("srv-dead");
     expect((manager as any).pendingRemoteDeletes.size).toBe(0);
+  });
+});
+
+/* `download` on a cross-origin href is ignored and the tab navigates to the
+   file — the editor was replaced by the raw asset the first day assets had a
+   Blob-store src. Remote sources are fetched into a same-origin Object URL. */
+describe("downloadAssets", () => {
+  it("fetches a remote asset into an object URL before clicking the download link", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    const blob = new Blob(["png"], { type: "image/png" });
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, blob: async () => blob })));
+    const createObjectURL = vi.fn(() => "blob:http://localhost/dl");
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }));
+    const clicked: { href: string; download: string; target: string }[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push({ href: this.href, download: this.download, target: this.target });
+    });
+
+    const started = manager.downloadAssets([{ src: "https://cdn/hero.jpg", name: "hero-dark.jpg" }]);
+    expect(started).toBe(1);
+    await vi.waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0].href).toBe("blob:http://localhost/dl");
+    expect(clicked[0].download).toBe("hero-dark.jpg");
+    expect(clicked[0].target).toBe("");
+    click.mockRestore();
+    vi.unstubAllGlobals();
+  });
+
+  it("opens the file in a new tab when the host refuses the fetch, never in this one", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("CORS"); }));
+    const clicked: { href: string; target: string }[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push({ href: this.href, target: this.target });
+    });
+    manager.downloadAssets([{ src: "https://cdn/hero.jpg", name: "hero-dark.jpg" }]);
+    await vi.waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0].target).toBe("_blank");
+    click.mockRestore();
+    vi.unstubAllGlobals();
   });
 });

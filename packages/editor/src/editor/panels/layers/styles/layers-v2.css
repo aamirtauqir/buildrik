@@ -51,6 +51,21 @@
   background: var(--bk-accent);
 }
 
+/* Board 1082:4610 (Layers · renaming): the row being renamed drops the
+   selection tint back to the panel fill and takes a 1px accent stroke, so the
+   field reads as a field. `.bdc-editing` was applied by LayerTreeItem and had
+   no rule at all — the row simply stayed tinted and the only signal that a
+   rename was open was the input's own 1px bottom border.
+
+   The board writes the stroke #1A57DB. That is one digit off --color/accent
+   (`var(--bk-blue-700)`), i.e. an untokenised copy of the same blue, so the token is used.
+   Border-box keeps the row 28 tall with the stroke on. */
+.bdc-lr.bdc-editing {
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-accent);
+  box-sizing: border-box;
+}
+
 /* Board 143:179: a hidden layer is the WHOLE row at .45 — not five parts recoloured
    (the icon used to get a grey square painted behind its glyph). */
 .bdc-lr.bdc-hidden { opacity: 0.45; }
@@ -104,18 +119,39 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* 13 on a 20px line box — every Layers board draws the name node that way
+     (I244:1580;243:12 and its 56 siblings state height 20 AND leading 20).
+     `.bdc-lr`'s `font:` shorthand reset it to `normal`, so the name sat on
+     Inter's own ~16px and the row's text baseline was 2px high of the board. */
+  line-height: 20px;
 }
 
+/* Board 1082:4612: the field's text is the SAME 13/ink as the name it
+   replaces, not a step down — it was 500/11, so a name visibly shrank the
+   moment you started renaming it. The row now carries the accent stroke
+   (`.bdc-editing` above), so the field's own bottom border goes: two blue
+   rules around one control read as a nested box.
+
+   `.bdc-lr-edit` is the chrome-ui TextField's className, which lands on the
+   OUTER wrapper — the type has to be pushed to the real <input> explicitly,
+   the same className/style split SearchBar.tsx documents. */
 .bdc-lr-edit {
   flex: 1;
   min-width: 0;
+  /* MEASURED 2026-09-08: the field was 36px tall inside a 28px row — chrome-ui
+     TextField puts `bdc-lr-edit` on the real <input>, which carries flowbite's
+     `tw:h-9`, and this rule set no height at all, so h-9 stood. Same shape as
+     the 40px eye/lock defect: a `tw:` utility is only beaten by a rule that
+     sets the SAME property. 20 is the name's line box, which is what the field
+     replaces. */
+  height: 20px;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--bk-accent);
   outline: none;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
+  box-shadow: none;
   padding: 0;
+  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
 
 /* Inline tag/id/class/component/bp badges (display-settings controlled) */
@@ -148,7 +184,13 @@
 .bdc-lr-comp {
   font-size: var(--bk-text-11);
   line-height: 16px;
-  color: var(--bk-success);
+  /* `--bk-success` (`var(--bk-green-500)`) is a FILL token and reads 3.39:1 on the row's
+     white — measured by the conformance run, under the 4.5 floor for 11px
+     text. `--bk-success-text` (`var(--bk-green-600)`) is the same hue's text token and
+     reads 5.36:1. The diamond is the only thing in the tree that says a row
+     follows a component, so it has to be legible at rest — the same call
+     already recorded below for the eye and lock. */
+  color: var(--bk-success-text);
   flex-shrink: 0;
 }
 
@@ -187,7 +229,13 @@
 .bdc-lr:hover .bdc-lr-eye,
 .bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink); }
 
-.bdc-lr-eye.bdc-off { opacity: 0.6; }
+/* Board 143:179 dims a hidden row ONCE — 245:1837 carries `opacity-45` and
+   none of its five children carries an opacity of its own. This rule stacked
+   a second 0.6 on the eye, so inside a row already at .45 the one control
+   that undoes the state rendered at an effective .27: the least visible thing
+   in the row it belongs to. The slashed-eye glyph already says "off".
+   `.bdc-off` is kept as the state hook; it just no longer fades. */
+.bdc-lr-eye.bdc-off { opacity: 1; }
 .bdc-lr-eye:hover { color: var(--bk-ink); }
 
 .bdc-lr:hover .bdc-lr-lock { color: var(--bk-ink); }
@@ -240,8 +288,13 @@
   min-height: 0;
 }
 
+/* 8, not 6, on the right: every Layers board ends the lock cluster 8 from the
+   row's edge (1082:4610, 1082:4748 and the base `.bdc-lr` all say 8), and
+   compact — which is the SHIPPED DEFAULT (useLayersState.ts:43) — pulled it in
+   to 6. The left value never applied: LayerTreeItem writes padding-left inline
+   for the depth ladder. */
 .bdc-layers-tree.bdc-layers-tree-compact .bdc-lr {
-  padding: 2px 6px;
+  padding: 2px var(--bk-space-8);
 }
 
 /* ==========================================================================
@@ -353,16 +406,19 @@
    ========================================================================== */
 
 .bdc-menu {
-  /* Board 1082:4564: 180w card, radius 8, 4px vertical padding only —
-     items run full-bleed. */
+  /* Board 1082:4564: 140w card, radius 8, 4px vertical padding only — items
+     run full-bleed. The 180 here (and the comment claiming the board said so)
+     was stale: re-extracted 2026-09-08 the frame is w-[140px], and the widest
+     label, "Group selection", is ~103px at 13px + 24 of inset. `13px/normal`,
+     not `13px/18px`: every label node on the board is `leading-[normal]`. */
   position: fixed;
   z-index: 1000;
   background: var(--bk-bg-card);
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
   padding: var(--bk-space-4) 0;
-  width: 180px;
-  font: 400 13px/18px var(--bk-font-ui);
+  width: 140px;
+  font: 400 13px/normal var(--bk-font-ui);
 }
 
 .bdc-menu-item {
@@ -371,7 +427,9 @@
   align-items: center;
   justify-content: flex-start;
   height: 28px;
-  padding: 0 var(--bk-space-12);
+  /* 5/12 — 1082:4565. A 0 vertical pad let the 28px height do all the work,
+     which is the same thing right up until a label wraps. */
+  padding: 5px var(--bk-space-12);
   border-radius: 0;
   background: transparent;
   border: none;
@@ -388,8 +446,12 @@
 
 .bdc-menu-sep {
   height: 1px;
-  background: var(--bk-border);
-  margin: var(--bk-space-4) 0;
+  /* `--bk-bg-subtle` and NO margin — 1082:4571 / 4576 / 4581. The 4px above
+     and below was the one thing boards.json's row still had against this menu
+     ("only .bdc-menu-sep has 4px margins the board lacks"), and it also made
+     the menu 16px taller than the board's 260. */
+  background: var(--bk-bg-subtle);
+  margin: 0;
 }
 
 
@@ -552,14 +614,28 @@
    now ride as children of TabFrame.Header; layout sourced from
    PanelHeader's HeaderActions. */
 
-/* Board 142:7 Toolbar — 36h band: search box + ⊞ ⊟ ⚙ cluster. */
+/* Board 142:7 Toolbar — 36h band: search box + ⊞ ⊟ ⚙ cluster.
+   Measured 2026-09-08 against 142:7, which all five Layers state boards repeat:
+   the band is inset 12 on BOTH sides (it was 16 on the left, so the search box
+   started 4px inside where every board puts it) and the cluster is spaced 8,
+   not 4. `py-4` is the board's own box and 36 - 4 - 4 = 28 is the field's
+   height exactly, so it renders identically to the centring it replaces. */
 .bdc-ltoolbar {
   display: flex;
   align-items: center;
-  gap: var(--bk-space-4);
+  gap: var(--bk-space-8);
   height: var(--bk-space-36);
-  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  padding: var(--bk-space-4) var(--bk-space-12);
   flex-shrink: 0;
+}
+
+/* Board 143:10 / 143:303 / 1082:4597 / 1171:4834 put the ⊞ ⊟ ⚙ run on an 18px
+   line box in --color/ink-muted; `.bdc-icon-btn`'s shared 16/ink-soft is the
+   selection banner's and the popover header's, not the toolbar's. Two classes
+   deep so it outranks nothing it should not — the base rule is one class. */
+.bdc-ltoolbar .bdc-icon-btn {
+  line-height: 18px;
+  color: var(--bk-ink-muted);
 }
 
 /* Search field (board 142:8 — 28h subtle box inside the toolbar) */
@@ -570,7 +646,9 @@
   min-width: 0;
   gap: 6px;
   height: var(--bk-size-row-dense);
-  padding: 0 var(--bk-space-8);
+  /* Board 142:8: px-8 py-4 on a 28 box — 28 - 4 - 4 is the input's own 20px
+     line box, so the padded box and the centred one render the same. */
+  padding: var(--bk-space-4) var(--bk-space-8);
   background: var(--bk-bg-subtle);
   border: 1px solid transparent;
   border-radius: 6px;
@@ -583,8 +661,15 @@
   height: var(--bk-size-row-dense);
   display: flex;
   align-items: center;
-  padding: 0 var(--bk-space-16);
-  font: 400 var(--bk-text-12) var(--bk-font-ui);
+  /* 12, not 16: board 1082:4638 is the only Layers board that states the
+     footer's own insets and it says 12 — which is also the toolbar's inset
+     above it, so the panel now has one left edge instead of two. py-5 is that
+     board's box and 28 - 5 - 5 is the 18px line box exactly. */
+  padding: 5px var(--bk-space-12);
+  /* 18px line box — board 142:59, and 143:59 / 143:352 / 1171:4845 all repeat
+     it. The shorthand carried no line-height at all, so the count sat on
+     Inter's own ~15px normal. */
+  font: 400 var(--bk-text-12)/18px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 .bdc-psearch svg {

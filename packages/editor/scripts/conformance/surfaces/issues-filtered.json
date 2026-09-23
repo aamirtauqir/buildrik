@@ -1,0 +1,58 @@
+{
+  "surface": "issues-filtered",
+  "board": "Issues · filtered (Figma 164:22)",
+  "_note": [
+    "boards.json recorded `drift-filter-note-position-BOARD-CONFLICT`. Both",
+    "halves resolved here:",
+    "",
+    "POSITION — the board's frame orders Header · Filter row · Issue · note,",
+    "i.e. the 'two issues are hidden' line comes AFTER the rows. The panel",
+    "rendered it FIRST, inside the scroller, under a comment that cited this",
+    "same board. The board wins on layout (visual → board), and it sits outside",
+    "the scroller so a long list cannot push it out of sight — the same call",
+    "SavesChrome made for the History retention note.",
+    "",
+    "CONFLICT — the two Issues boards are drawn at different widths. 164:22's",
+    "art is 280 (close glyph x252, Fix x224, title w180); 164:2's is 360, and",
+    "boards.json's 2026-08-31 walk of 164:2 verified 360 against the running",
+    "panel. The panel is a right-hand panel (`--size/panel-right` = 360), so",
+    "360 is measured here and 164:30's w-180 — the only property that depends",
+    "on the 280 frame — is not anchored.",
+    "",
+    "NOT anchored, and why:",
+    "  164:22 root — the board fills it bg-card; the panel's own root is",
+    "  transparent and takes white from the shell slot it mounts into.",
+    "  164:23/164:24/164:25 Header — PanelHeader size=\"panel\" is already 48h /",
+    "  14px / ink per this board; the one delta is its 21px line box against the",
+    "  board's 20. That primitive is shared by every 360 panel and its 21 comes",
+    "  from the `ui/14 · panel title` type style, so a 1px screen-board delta",
+    "  does not get to move it.",
+    "  164:30 issue title — width 180 is the 280-frame measurement (see above).",
+    "  Its type is measured on `issue-message-0` via the 13/20 it shares with",
+    "  the row; the width is the only board property that does not survive the",
+    "  width conflict.",
+    "  164:29 the dot — the panel leads the row with a severity ICON (lucide",
+    "  AlertCircle, tinted by tone), which carries information the board's plain",
+    "  8px ellipse does not. Board 164:2's walk did not flag it either."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=issues-filtered",
+  "viewport": {
+    "width": 360,
+    "height": 812
+  },
+  "steps": [
+    { "action": "waitFor", "testId": "issues-filter" },
+    { "action": "click", "testId": "issues-filter" },
+    { "action": "waitFor", "testId": "issues-filter-note" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "filter-row", "testId": "issues-filter-row", "spec": "issues-filtered", "nodeId": "164:26" },
+    { "name": "filter-label", "testId": "issues-filter", "spec": "issues-filtered", "nodeId": "164:27" },
+    { "name": "issue-row", "testId": "issue-row-0", "spec": "issues-filtered", "nodeId": "164:28" },
+    { "name": "issue-location", "testId": "issue-location-0", "spec": "issues-filtered", "nodeId": "164:31" },
+    { "name": "issue-fix", "testId": "issue-fix-0", "spec": "issues-filtered", "nodeId": "164:32" },
+    { "name": "note-block", "testId": "issues-filter-note", "spec": "issues-filtered", "nodeId": "164:33" },
+    { "name": "note-text", "testId": "issues-filter-note", "spec": "issues-filtered", "nodeId": "164:34" }
+  ]
+}

@@ -14,7 +14,7 @@ import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog } from "@/editor/chrome-ui";
 
 interface FormBlockRow {
   id: string;
@@ -65,6 +65,9 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const [subsLoading, setSubsLoading] = React.useState(false);
   const [subsError, setSubsError] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  // A submission is a visitor's own data and the delete is a server mutation
+  // with no undo, so the row button opens this instead of firing it.
+  const [pendingDelete, setPendingDelete] = React.useState<SubmissionRow | null>(null);
   const [exporting, setExporting] = React.useState(false);
 
   // Reset form selection when the site changes — keeping a stale formBlockId
@@ -287,7 +290,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         </div>
       </Section>
 
-      <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
+      {/* Board 640:3463 heads this card SUBMISSIONS, flat. The count is the
+          product's own and is left standing; the ANCHOR is pinned so it does
+          not change with the rows. */}
+      <Section
+        title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}
+        anchor="submissions"
+      >
         <div className="tw:flex tw:justify-end tw:mb-2">
           <Button
             color="light"
@@ -301,7 +310,23 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         </div>
         {subsLoading && <div className={EMPTY}>Loading…</div>}
         {!subsLoading && subsError && (
-          <div role="alert" className={ERROR_BOX}>{subsError}</div>
+          /* F11 — the error used to be a dead end: it named the failure and
+             offered nothing, so a transient network blip cost the user the
+             whole screen. `loadSubs` is already a stable useCallback, so the
+             retry is the same call that failed, with the form and filter it
+             was made under still selected. */
+          <div role="alert" className={ERROR_BOX}>
+            <span>{subsError}</span>
+            <Button
+              size="xs"
+              color="light"
+              onClick={() => { void loadSubs(); }}
+              className="tw:ml-3 tw:border-transparent tw:bg-transparent tw:underline"
+              data-testid="subs-error-retry"
+            >
+              Retry
+            </Button>
+          </div>
         )}
         {!subsLoading && !subsError && submissions && submissions.data.length === 0 && (
           <div className={EMPTY}>No submissions in {filter}.</div>
@@ -361,7 +386,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                             Unarchive
                           </Button>
                         )}
-                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+                        <Button color="light" size="xs" type="button" onClick={() => setPendingDelete(s)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                           Delete
                         </Button>
                       </div>
@@ -398,6 +423,24 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
           </div>
         )}
       </Section>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => {
+          const target = pendingDelete;
+          setPendingDelete(null);
+          if (target) void handleDelete(target.id);
+        }}
+        title="Delete this submission?"
+        message={
+          pendingDelete
+            ? `"${summarize(pendingDelete.data)}" is a visitor's own message to you. Deleting removes it from the server for good — no copy is kept anywhere and it can't be recovered. Export CSV first if you might need it.`
+            : ""
+        }
+        confirmLabel="Delete submission"
+        tone="destructive"
+      />
     </Screen>
   );
 };

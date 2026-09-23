@@ -1,0 +1,204 @@
+{
+  "surface": "brand-token-detail",
+  "board": "Brand · token-detail (Figma 152:83)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "ds-mode-seg-pro"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-tokens"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-kind-color"
+    },
+    {
+      "action": "click",
+      "testId": "brand-kind-color"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-token-row-color-primary"
+    },
+    {
+      "action": "click",
+      "testId": "brand-token-row-color-primary"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-token-detail-name"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-token-detail",
+      "nodeId": "208:521"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-token-detail",
+      "nodeId": "I208:521;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-token-detail",
+      "nodeId": "152:88"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-token-detail",
+      "nodeId": "152:89"
+    },
+    {
+      "name": "token-header",
+      "testId": "brand-token-detail-header"
+    },
+    {
+      "name": "token-swatch",
+      "testId": "brand-token-detail-swatch",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6944"
+    },
+    {
+      "name": "token-name",
+      "testId": "brand-token-detail-name",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6945"
+    },
+    {
+      "name": "token-id",
+      "testId": "brand-token-detail-id",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6946"
+    },
+    {
+      "name": "usedby-value",
+      "testId": "brand-token-usedby-value"
+    },
+    {
+      "name": "lint-value",
+      "testId": "brand-token-lint-value"
+    },
+    {
+      "name": "actions",
+      "testId": "brand-token-actions"
+    },
+    {
+      "name": "action-replace",
+      "testId": "brand-token-action-replace",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6960"
+    },
+    {
+      "name": "action-rename",
+      "testId": "brand-token-action-rename",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6961"
+    },
+    {
+      "name": "action-delete",
+      "testId": "brand-token-action-delete",
+      "spec": "brand-token-detail",
+      "nodeId": "1700:6962"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: rail -> `b` -> Pro -> Tokens -> color -> `color-primary`.",
+    "PRO, deliberately: 1700:6946 draws the token ID (`color-primary`) and Beginner",
+    "hides token IDs by definition, so the board's own header cannot exist in the",
+    "default mode. The Pro segment is a step, not an assumption.",
+    "",
+    "THE BOARD REDREW THIS SCREEN (every 1700:* node is new) and boards.json's row",
+    "describes something else entirely — \"rows 54px vs board 44; adds an All/Issues",
+    "filter and a section header the board lacks\" is the token LIST inside a kind,",
+    "not the detail. Worth a status change.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  the three actions  1700:6960..6962 are 13px TEXT — accent, accent,",
+    "                     `--bk-error-text` — not a filled primary beside a light",
+    "                     beside a red plate. Three bordered buttons wrapped on a",
+    "                     280 drawer and the destructive one was the loudest thing",
+    "                     on a read-only screen.",
+    "  `Delete token`     1700:6962. Beside two actions that name their object, the",
+    "                     bare verb `Delete` was the only one that did not, on the",
+    "                     one control that cannot be undone.",
+    "  name leading       `leading-[normal]` (1700:6945). `leading-tight` is 1.25,",
+    "                     which at 16px is 20 and pushed the header block past the",
+    "                     board's 60.",
+    "  token id           11px (1700:6946), not `text-xs`'s 12.",
+    "  lint text          11px (1700:6958); the PASS tone is `--bk-success-text`",
+    "                     #057a55, not `--bk-success` #0E9F6E — which measures 3.0:1",
+    "                     on white and would have failed AA at 11px. The board names",
+    "                     the tone that passes.",
+    "  used-by value      11px (1700:6955).",
+    "",
+    "NOT JOINED — the drawer edge again. `.ls-panel` spends 1px of `--bk-size-drawer`",
+    "on `border-right`, so the panel content box is 279 and every node this board",
+    "states at `w-[280px]` measures one less: 152:83 (the frame), 1700:6943 (token",
+    "header), 1700:6947 / 6950 / 6953 / 6956 (the four field rows) and 1700:6959",
+    "(the action row). Their heights and type ARE conformed where they are",
+    "reachable; only the width kept them out of the join.",
+    "",
+    "NOT CONFORMED — the four field LABELS (1700:6948 / 6951 / 6954 / 6957) at 13px.",
+    "They are `chrome-ui/FieldRow`'s label, which is `text-xs` and is measured",
+    "against the Inspector on other boards. One screen board does not get to move a",
+    "shared primitive (brief §When you may NOT conform); the colour it already",
+    "paints, `--bk-ink-soft`, IS the board's #4b5563.",
+    "",
+    "NOT CONFORMED — the Light value / Dark value rows (1700:6947 h44 with an 11px",
+    "value, 1700:6950 the same). Live these are `TextInput`s, and BK_TEXT_INPUT_THEME",
+    "is 42 tall against a 44 row that also has to hold a label. boards.json already",
+    "holds that at `authority=open:input-fill` (see content-unsaved-record, where",
+    "1172:4867 and 1205:4804 disagree about exactly this), so it is not re-settled",
+    "here. The deeper question the board raises is a PRODUCT one: it draws the value",
+    "as read-only text with `Replace value` as the way to change it, while the code",
+    "edits inline. That is behaviour, and behaviour follows the code contract.",
+    "",
+    "NOT JOINED — two states the demo project cannot produce:",
+    "  1700:6955  `▸ 34 elements`. `color-primary` has ZERO usages here, so the",
+    "             Used-by control renders disabled — flowbite's gray-100 plate and",
+    "             muted text, which is the right answer for `0 elements` and is not",
+    "             the board's. 11px is conformed; the colour needs a bound element.",
+    "  1700:6958  `✓ pass` in #057a55. `color-primary` carries one live lint issue",
+    "             in this project, so the FAIL branch renders (#723b13). Both",
+    "             branches now carry the anchor and both are 11px; whichever one the",
+    "             data produces is measured."
+  ]
+}

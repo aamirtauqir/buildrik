@@ -5,7 +5,7 @@
  */
 
 import type { MediaAsset } from "../../../../../shared/types/media";
-import type { LibraryItem, MediaTypeFilter } from "./mediaTypes";
+import type { LibraryItem, MediaTypeFilter, VersionEntry } from "./mediaTypes";
 
 /** Format bytes to human-readable string e.g. "1.2 MB" */
 export function fmtSize(bytes: number): string {
@@ -56,16 +56,25 @@ const MIME_EXT: Record<string, string> = {
   "font/woff2": ".woff2",
 };
 
+/** The on-screen filename for a stored `name` — the extension restored from
+ * the MIME type unless the name already carries it. The rename modal runs the
+ * same rule on a candidate name, so "a file with that name exists" is judged
+ * on what the library would actually print. */
+export function displayNameFor(name: string, mimeType: string | undefined): string {
+  const ext = MIME_EXT[mimeType ?? ""] ?? "";
+  return ext && !name.toLowerCase().endsWith(ext) ? name + ext : name;
+}
+
 /** Map MediaAsset to LibraryItem (display-ready) */
 export function toLibraryItem(asset: MediaAsset): LibraryItem {
-  const ext = MIME_EXT[asset.mimeType ?? ""] ?? "";
   return {
     key: asset.id,
     name: asset.name,
-    displayName: ext && !asset.name.toLowerCase().endsWith(ext) ? asset.name + ext : asset.name,
+    displayName: displayNameFor(asset.name, asset.mimeType),
     type: assetTypeToFilter(asset.type),
     src: asset.src,
     thumb: asset.thumbnailSrc,
+    folderId: asset.folderId || null,
     size: asset.size,
     duration: asset.metadata?.duration,
     width: asset.width,
@@ -84,7 +93,35 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     // after a stock save. Verified live 2026-08-17 — a saved stock photo
     // landed in the library with no badge at all.
     assetSource: asset.assetSource,
+    tags: asset.tags,
+    siteFont: asset.siteFont,
+    versionOf: asset.versionOf,
+    edits: asset.edits,
   };
+}
+
+/** "Home and Menu" / "Home" / "Home, Menu and Contact" — the pages a
+ * placement set sits on, the way the Clone's dialogs read them
+ * (3695:45615 "Update 3 uses on Home and Menu", 3695:45529 "Currently used
+ * on Home and Menu"). Empty when none could be traced. */
+export function namePages(pages: string[]): string {
+  if (pages.length <= 1) return pages[0] ?? "";
+  return `${pages.slice(0, -1).join(", ")} and ${pages[pages.length - 1]}`;
+}
+
+/** `v2 · Latest saved` / `v1 · Original` / `v2 · Saved` — a family member's
+ * label, as the rail's VERSIONS rows and the Asset versions cards both print
+ * it (Clone 3695:45529). `total` is the family's size: the highest index is
+ * the latest saved. */
+export function versionLabel(entry: VersionEntry, total: number): string {
+  const kind = entry.index === 1 ? "Original" : entry.index === total ? "Latest saved" : "Saved";
+  return `v${entry.index} · ${kind}`;
+}
+
+/** Clone 3721:43697 — the TAGS chip filter: the files carrying exactly this tag. */
+export function filterByTag(items: LibraryItem[], tag: string | null): LibraryItem[] {
+  if (!tag) return items;
+  return items.filter((i) => i.tags?.includes(tag));
 }
 
 /** Filter library items by type pill */

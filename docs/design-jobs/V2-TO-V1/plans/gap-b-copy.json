@@ -1,0 +1,13 @@
+{
+  "_": "Gap-B copy fix. One row, one node, one finding — UX-C-10. The popover's dead end names a command-palette entry as the destination; the real label does not even match the quoted string, and the Content panel, which is on the rail and has its own record editor, is two clicks away and unmentioned. The replacement names the door that exists in code today (the Content panel), and is SHORTER than what it replaces, so the 240x158 popover cannot grow. The inline-add half of the fix is not written here, because nothing in the code adds a record from this popover and a board may not promise a control that does not exist.",
+  "page": "1:3",
+  "rows": [
+    {
+      "op": "text",
+      "id": "1707:8424",
+      "expect": "No records yet. Add records via the command palette",
+      "text": "No records yet. Open Content › this collection to add the first one.",
+      "why": "UX-C-10 — BindingPopover.tsx:292-295 sends the user to the hardest door in the product; useCanvasCommandPalette.ts:166-172 is its only emitter and its real label is 'Manage CMS records', so even copying the quoted string does not match"
+    }
+  ]
+}

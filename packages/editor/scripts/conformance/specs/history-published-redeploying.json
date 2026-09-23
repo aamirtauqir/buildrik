@@ -1,0 +1,186 @@
+{
+  "surface": "history-published-redeploying",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "184:37",
+  "boardName": "history-published-redeploying",
+  "figmaHash": "e34e1af1d733e787c5db9bdf7018c948cbd43bff1ecd7f8ad6b95b6e26b145da",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:09:00.111Z",
+  "copy": [
+    "Rolling back…",
+    "Publishing v5 as v7 · 18 of 27 pages"
+  ],
+  "targets": [
+    {
+      "nodeId": "184:37",
+      "name": "History · Published · redeploying",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "184:38",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:39",
+      "name": "modal/440",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[260px] left-[500px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[320px] w-[440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "260px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:40",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[18px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:41",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[404px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[18px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:42",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[6px] left-[24px] overflow-clip rounded-[4px] top-[76px] w-[392px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:43",
+      "name": "Frame",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] h-[6px] left-0 rounded-[4px] top-0 w-[230px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "230px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:44",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[24px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[96px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7233",
+      "name": "hotspot/state · Published · restored",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-0 opacity-0 top-[862px] w-[140px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "140px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7235",
+      "name": "hotspot/state · Published · failed",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[140px] opacity-0 top-[862px] w-[140px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "140px"
+        }
+      }
+    }
+  ]
+}

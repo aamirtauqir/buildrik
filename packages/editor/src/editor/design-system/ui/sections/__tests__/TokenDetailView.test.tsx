@@ -378,7 +378,7 @@ describe("TokenDetailView", () => {
     expect(labels.some((l) => l === "Dark value")).toBe(false);
   });
 
-  it("Action row renders Replace value, Rename ID, Delete buttons", () => {
+  it("Action row renders Replace value, Rename ID, Delete token buttons", () => {
     const composer = makeMockComposer({});
     const { getByText } = render(
       wrap(
@@ -391,7 +391,7 @@ describe("TokenDetailView", () => {
     );
     expect(getByText("Replace value")).toBeTruthy();
     expect(getByText("Rename ID")).toBeTruthy();
-    expect(getByText("Delete")).toBeTruthy();
+    expect(getByText("Delete token")).toBeTruthy();
   });
 
   it("Replace value click on color token opens ColorPicker inline", () => {
@@ -749,7 +749,7 @@ describe("TokenDetailView", () => {
           />,
         ),
       );
-      fireEvent.click(getByText("Delete"));
+      fireEvent.click(getByText("Delete token"));
       expect(onDelete).toHaveBeenCalledTimes(1);
       // Called with single id arg (hard delete) — no replaceWith.
       expect(onDelete).toHaveBeenCalledWith(colorToken.id);
@@ -771,7 +771,7 @@ describe("TokenDetailView", () => {
           />,
         ),
       );
-      fireEvent.click(getByText("Delete"));
+      fireEvent.click(getByText("Delete token"));
       // No deletion yet — user has to confirm via modal.
       expect(onDelete).not.toHaveBeenCalled();
       // Modal mounted in portal (OverlayMount-backed).
@@ -793,7 +793,7 @@ describe("TokenDetailView", () => {
           />,
         ),
       );
-      fireEvent.click(getByText("Delete"));
+      fireEvent.click(getByText("Delete token"));
       // Pick candidate by clicking its row label (modal renders ids).
       const candidateRow = document.querySelector(
         `[data-replace-candidate="${candidate.id}"]`,
@@ -821,7 +821,7 @@ describe("TokenDetailView", () => {
           />,
         ),
       );
-      fireEvent.click(getByText("Delete"));
+      fireEvent.click(getByText("Delete token"));
       // Self id must not appear as a selectable candidate row.
       expect(
         document.querySelector(`[data-replace-candidate="${colorToken.id}"]`),
@@ -846,7 +846,7 @@ describe("TokenDetailView", () => {
           />,
         ),
       );
-      fireEvent.click(getByText("Delete"));
+      fireEvent.click(getByText("Delete token"));
       expect(
         document.querySelector(`[data-replace-candidate="${soft.id}"]`),
       ).toBeNull();

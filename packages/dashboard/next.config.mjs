@@ -35,12 +35,24 @@ const contentSecurityPolicy = [
      fell back to default-src 'self' — blocking a locally-added video. */
   "img-src 'self' data: blob: https:",
   "media-src 'self' data: blob: https:",
-  "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net",
+  /* Uploaded fonts are served from the Blob store (Clone 3721:43423 — the
+     Media library's .woff2 is a family the Typography picker offers). Without
+     the host here FontFace.load() failed with "A network error occurred" on
+     every uploaded font, measured 2026-09-13. */
+  "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net https://*.blob.vercel-storage.com",
   /* The editor reads its own local media back through fetch() — the image
      editor loads a blob: source, and the optimizer decodes data: URLs. Neither
      scheme was listed, so the browser refused both with "Fetch API cannot load
      data:image/webp" and optimization failed with nothing on screen to say so. */
-  "connect-src 'self' data: blob: https://fonts.bunny.net",
+  /* Media uploads go from the BROWSER straight to Vercel Blob: the editor's
+     AssetUploadService calls @vercel/blob/client upload(), which mints its
+     token through /api/asset-upload (same origin) and then PUTs the bytes to
+     https://vercel.com/api/blob (multipart parts to *.blob.vercel-storage.com).
+     Neither host was listed, so with a valid BLOB_READ_WRITE_TOKEN every upload
+     was refused with "Connecting to 'https://vercel.com/api/blob/…' violates
+     … connect-src" and fell back to the device-only path — measured
+     2026-09-13, the first day the token existed in any env. */
+  "connect-src 'self' data: blob: https://fonts.bunny.net https://vercel.com https://blob.vercel-storage.com https://*.blob.vercel-storage.com",
   `frame-src 'self' ${videoFrameSrc}`,
 ].join("; ");
 

@@ -1,0 +1,241 @@
+{
+  "surface": "brand-components",
+  "board": "Brand · components (Figma 153:29)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-components"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-ai-row"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-components",
+      "nodeId": "208:561"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-components",
+      "nodeId": "I208:561;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-components",
+      "nodeId": "153:34"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-components",
+      "nodeId": "153:35"
+    },
+    {
+      "name": "row-button",
+      "testId": "brand-comp-row-button",
+      "spec": "brand-components",
+      "nodeId": "153:36"
+    },
+    {
+      "name": "row-button-label",
+      "testId": "brand-comp-label-button",
+      "spec": "brand-components",
+      "nodeId": "153:37"
+    },
+    {
+      "name": "row-button-meta",
+      "testId": "brand-comp-meta-button",
+      "spec": "brand-components",
+      "nodeId": "153:38"
+    },
+    {
+      "name": "row-input",
+      "testId": "brand-comp-row-input"
+    },
+    {
+      "name": "row-input-label",
+      "testId": "brand-comp-label-input",
+      "spec": "brand-components",
+      "nodeId": "153:40"
+    },
+    {
+      "name": "row-input-meta",
+      "testId": "brand-comp-meta-input",
+      "spec": "brand-components",
+      "nodeId": "153:41"
+    },
+    {
+      "name": "row-select",
+      "testId": "brand-comp-row-select",
+      "spec": "brand-components",
+      "nodeId": "153:42"
+    },
+    {
+      "name": "row-select-label",
+      "testId": "brand-comp-label-select",
+      "spec": "brand-components",
+      "nodeId": "153:43"
+    },
+    {
+      "name": "row-select-meta",
+      "testId": "brand-comp-meta-select",
+      "spec": "brand-components",
+      "nodeId": "153:44"
+    },
+    {
+      "name": "row-checkbox",
+      "testId": "brand-comp-row-checkbox",
+      "spec": "brand-components",
+      "nodeId": "153:45"
+    },
+    {
+      "name": "row-checkbox-label",
+      "testId": "brand-comp-label-checkbox",
+      "spec": "brand-components",
+      "nodeId": "153:46"
+    },
+    {
+      "name": "row-checkbox-meta",
+      "testId": "brand-comp-meta-checkbox",
+      "spec": "brand-components",
+      "nodeId": "153:47"
+    },
+    {
+      "name": "row-radio",
+      "testId": "brand-comp-row-radio",
+      "spec": "brand-components",
+      "nodeId": "153:48"
+    },
+    {
+      "name": "row-radio-label",
+      "testId": "brand-comp-label-radio",
+      "spec": "brand-components",
+      "nodeId": "153:49"
+    },
+    {
+      "name": "row-radio-meta",
+      "testId": "brand-comp-meta-radio",
+      "spec": "brand-components",
+      "nodeId": "153:50"
+    },
+    {
+      "name": "row-switch",
+      "testId": "brand-comp-row-switch",
+      "spec": "brand-components",
+      "nodeId": "153:51"
+    },
+    {
+      "name": "row-switch-label",
+      "testId": "brand-comp-label-switch",
+      "spec": "brand-components",
+      "nodeId": "153:52"
+    },
+    {
+      "name": "row-switch-meta",
+      "testId": "brand-comp-meta-switch",
+      "spec": "brand-components",
+      "nodeId": "153:53"
+    },
+    {
+      "name": "ai-row",
+      "testId": "brand-ai-row",
+      "spec": "brand-components",
+      "nodeId": "153:55"
+    },
+    {
+      "name": "ai-cta",
+      "testId": "brand-ai-cta",
+      "spec": "brand-components",
+      "nodeId": "153:56"
+    },
+    {
+      "name": "saved-header",
+      "testId": "brand-saved-header"
+    },
+    {
+      "name": "saved-empty",
+      "testId": "brand-saved-empty"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: rail -> `b` -> Component styles. 44/44.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  the AI strip  `--color/accent-tint` across the whole 44px row (153:55). It",
+    "                was white with a top rule, so the one ACTION on a screen full",
+    "                of things to look at was a row that happened to have a",
+    "                sparkle in it.",
+    "  the CTA       13/20 in `--color/accent-text` (153:56); it took flowbite's",
+    "                `size=\"xs\"` 12/16 and ran a size below the rows above it.",
+    "  the row       13/20 on the ROW itself (153:36 and its four siblings), not",
+    "                just on the label. flowbite's Button base is `text-sm`, the",
+    "                label overrode it and the trailing count did not — one row,",
+    "                two sizes.",
+    "",
+    "boards.json's row is STALE: \"the board PINS 'Generate with AI' to the panel",
+    "foot; live renders it at y1081 in scroll flow, 674px below the fold\". The list",
+    "is `flex-1 overflow-y-auto` and the strip is `flex-none` under it, so it is",
+    "pinned and was measured at the foot. What IS still true and the board does not",
+    "draw: the `Read-only by design` callout below the saved section.",
+    "",
+    "SIX ROWS JOINED BY SHAPE. The board names Hero / Menu card / Booking form /",
+    "Footer / Gallery / Testimonial; the catalogue ships button / input / select /",
+    "checkbox / radio / switch and 20 more. None of the board's six is a catalogue",
+    "entry — they are page BLOCKS, not components — so the names are sample data",
+    "and each board row is joined to the live row in the same position. All six",
+    "state identical properties.",
+    "",
+    "NOT JOINED — 153:39, the `Menu card` row's `border-radius: 8`. Its five",
+    "siblings state none and every live row is square. The sister board 152:112",
+    "does exactly the same thing to ITS second row (152:122), which is the",
+    "signature of a highlight state left switched on in two exports, not a design.",
+    "",
+    "NOT JOINED — the drawer edge, as everywhere in this family: 153:29 itself, and",
+    "the saved-components block (1748:8393 w280, 1748:8395 w256, 1748:8396 w51 —",
+    "the last is a fixed-width Figma text frame, the `w-500 inside a 528 column`",
+    "artifact). Both saved anchors are still measured; their evidence is in",
+    "measured/brand-components.json.",
+    "",
+    "FOUND, NOT FIXED — dead code in ComponentsSection.tsx: `CARD`, `PREVIEW_BOX`,",
+    "`AI_CTA`, `AI_DESC`, `SKETCH` and the whole `CatalogPreview` component (with",
+    "its `ComponentType` import) have no reader since the card grid became a row",
+    "list. CLAUDE.md bans dead code; deleting it is not this board's job and it is",
+    "one commit for whoever takes it."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+ "_what_this_is": "Findings I own whose V1 boards live OUTSIDE my two assigned sections (1776:8378 Publish, 1779:4 Preview). Every row here is unresolved-id: I never located the board, because locating it costs a Figma call and the seat quota was exhausted account-wide before I got to it. Each row carries a SELECTOR precise enough for whoever owns that section — or a later applier with quota — to resolve it.",
+ "_sections_named": {
+  "1776:8385": "01 · Shell · 34 — the topbar, and the preview overlay board 65:211",
+  "1776:8377": "04 · Pages · 26 — page settings SEO / Social / Advanced tabs",
+  "1776:8376": "06 · Content · 37 — collection setup, dynamic pages",
+  "1776:8387": "21 · Settings/S7 · 46 — Settings › SEO",
+  "1776:8374": "16 · History · 35 — History › Published, the destination Compare and All-versions need"
+ },
+ "rows": [
+  { "unresolved-id": true, "finding": "UX-E-02", "severity": "Critical",
+    "selector": { "section": "1776:8385", "board_name_matches": "Topbar", "text_matches": ["Publish changes", "Publish", "Up to date"] },
+    "action": "The topbar CTA and the Publish panel must print the same answer to 'is anything waiting to ship?'. On the topbar board, the CTA label stays 'Publish changes' (lifecycle.ts:117) and gains the note: derived from the durable clock (StudioHeader.tsx:592-596 isDirty || savedAtMs > publishedAtMs || serverHasUnpublishedChanges) — the SAME derivation the panel must read. The panel side of this is already applied in publish-text-1.json (SINCE LAST DEPLOY → CHANGES IN THIS SESSION on 641:2652 and 778:4238).",
+    "why": "UX-E-02 — two surfaces on screen together reading two sources. setProjectSettings marks the project dirty and records no history entry (Composer.ts:785), so a SEO-title-template edit moves the topbar and leaves the panel at 0 changes." },
+
+  { "unresolved-id": true, "finding": "UX-E-12", "severity": "Major",
+    "selector": { "section": "1776:8385", "board_name_matches": "Confirm publish|PublishConfirm|Topbar · publish" },
+    "action": "Either re-point the topbar's confirm door at board 833:4518 (the wizard's step 1) or give the confirm modal the two affordances the wizard has: the action that unblocks it and ALL failing rows, not just the first. Today PublishConfirmModal.tsx:98-100 prints the first blocker as red text, :111 disables the button, and the footer is Cancel + Publish only; PublishConfirmFacts.tsx:126-130 reports only the FIRST failing check.",
+    "note": "914:4507 'Publish · Confirm' has already been renamed in publish-marks.json to record that both doors reach it and only one carries a Fix and a Connect primary." },
+
+  { "unresolved-id": true, "finding": "UX-E-26", "severity": "Minor",
+    "selector": { "section": "1776:8374", "board_name_matches": "History · Published|Publish history" },
+    "action": "add-hotspots.mjs row: { over: \"784:4387\" (TEXT 'Compare v14 → v15' on board 784:4326 — id READ from the file), to: <the History › Published board id>, name: \"hotspot/compare-versions\", pad: 6 }. 784:4387 has NO reaction today.",
+    "why": "UX-E-26 — the button emits { tab: 'history' } only (PublishTab.tsx:498) and History needs a sub-view id to open its Published list; AquibraStudio.tsx:513 makes the correct call two files away." },
+
+  { "unresolved-id": true, "finding": "UX-E-29", "severity": "Minor",
+    "selector": { "section": "1776:8374", "board_name_matches": "History · Published|Publish history" },
+    "action": "add-hotspots.mjs row over the NEW node v2/all-versions on 641:2652 (created by publish-structure.json at x=16 y=360), to the same History › Published board, name \"hotspot/all-versions\", pad 6.",
+    "why": "UX-E-29 — the panel's one outbound version link is Compare, and it is itself broken." },
+
+  { "unresolved-id": true, "finding": "UX-E-17 (second half)", "severity": "Critical",
+    "selector": { "section": "1776:8385", "board": "65:211", "board_name_matches": "Shell state 7 · Preview" },
+    "action": "If preview must stay inert, the overlay says so ON SCREEN. Add one line under the device switcher: 'Links, forms and scripts are disabled in preview — this is the page, not the site.' If it is to show the real site instead, the board needs a PAGE SWITCHER beside the device row, which is a new control and a new decision.",
+    "why": "UX-E-17 — the sanitizer strips every <script> and every <form> (ExportUtils.ts:39), the iframe is sandbox=\"\" (PreviewOverlay.tsx:106), and the overlay renders one combined document with no page switcher (:99-114)." },
+
+  { "unresolved-id": true, "finding": "UX-E-18 (second half)", "severity": "Major",
+    "selector": { "section": "1776:8385", "board": "65:211" },
+    "action": "Same board: 'Whatever is dropped for safety is reported once at the top of the preview.' A banner slot, not a silent design change.",
+    "why": "UX-E-18" },
+
+  { "unresolved-id": true, "finding": "UX-E-19", "severity": "Major",
+    "selector": { "section": "1776:8377", "board_name_matches": "page settings · SEO|SEO tab", "text_matches": ["yoursite.com", "›", "How your page looks in Google"] },
+    "action": "Two edits on the Google-preview card. (1) The title line must be the TEMPLATED title: 'Acme — Home', not 'Home' (SeoTab.tsx:81 prints s.seoTitle || page.name raw; SEOInjector.ts:32-58 resolvePageTitle → applyTitleTemplate is what actually publishes). (2) The URL line must be the deployed filename: 'yoursite.com/about.html', not 'yoursite.com › about' (SeoTab.tsx:78; publish-urls.ts:38-45 — 'a sitemap of /about would be a list of 404s'). The same drift was already fixed for the export modal's title field.",
+    "why": "UX-E-19 — a preview that is not the output certifies the wrong thing." },
+
+  { "unresolved-id": true, "finding": "UX-E-20", "severity": "Major",
+    "selector": { "sections": ["1776:8377", "1776:8387"], "board_name_matches": "Settings · SEO|page settings · SEO|page settings · Social" },
+    "action": "Print the precedence on all three surfaces and link them. The injector's real order is page SEO → page settings → site defaults → template wrap (SEOInjector.ts:110-128). Site-level fields show inline on the page screens, greyed, labelled 'from site defaults', overridable in place. SeoScreen.tsx:131-145's grey paragraph naming the Pages tab becomes a link.",
+    "why": "UX-E-20 — three surfaces, two parts of the editor, no link and no statement of which wins." },
+
+  { "unresolved-id": true, "finding": "UX-E-21", "severity": "Major",
+    "selector": { "section": "1776:8377", "board_name_matches": "page settings · Advanced", "text_matches": ["Page is not linked in menus but reachable via direct URL", "Visitors must enter a password to view this page"] },
+    "action": "DELETE the per-mode helper line. Verified still present at HEAD: AdvancedTab.tsx:57-61 renders it directly under the honest helper at :49-56, and it is false — ExportEngine.ts:645-660 drops both hidden and password pages before the deploy is assembled. The confirm-step half of this fix is already applied in publish-text-2.json (914:4542 gains '1 hidden page will not be deployed').",
+    "why": "UX-E-21 — a user reading the nearer sentence believes they shipped a protected page and shipped nothing." },
+
+  { "unresolved-id": true, "finding": "UX-E-22", "severity": "Major",
+    "selector": { "section": "1776:8376", "board": "1170:4713", "board_name_matches": "Content · collection-setup (modal)", "text_matches": ["blog/_template/index.html", "Template page path"] },
+    "action": "Replace the free-text 'Template page path' field with a PICKER over the real page list, and show the generated-page count. cms.service.ts:240 matches the typed string against the exported page paths by exact equality, and the exporter names them '<slug>.html' — so the placeholder's own shape ('blog/_template/index.html') can never match and the collection is skipped silently. QA-A-01 already established that this field belongs on 1170:4713 and NOT on the four dynamic-pages boards (2429:12111, 2429:21243, 2429:21262, 2429:21281).",
+    "why": "UX-E-22 — a fully-configured collection contributes nothing to the deploy, the publish succeeds and the checklist stays green." },
+
+  { "unresolved-id": true, "finding": "UX-E-05", "severity": "Critical",
+    "selector": { "section": "1776:8376", "board_name_matches": "Content · collection · dynamic pages|dynamic-pages", "text_matches": ["URL pattern", "/{slug}"] },
+    "action": "The collection's page-generation settings need a PREVIEW of one real entry's rendered head — one <title>, one description, one og:title/twitter:title derived from the entry. Draw it as a small read-only card: 'Detail page head — Margherita | Bella Cucina · one title, one description'. Then mark the defect: cms.service.ts:206-215 appends <title> and <meta name=description> before </head> and keeps the template head whole, so browsers take the FIRST title and every generated page announces itself as the template; a blank SEO field ships a literal <title></title>. CORRECTION carried from UX-E-31: canonical and og:url are NOT the template's — the editor emits neither and publish-html.ts:88-97 injects a correct per-path pair. What IS the template's is the first <title>, og:title, og:description and twitter:*.",
+    "why": "UX-E-05" }
+ ]
+}

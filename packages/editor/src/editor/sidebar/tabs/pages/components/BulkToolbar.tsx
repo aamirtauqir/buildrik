@@ -36,7 +36,12 @@ export const BulkToolbar: React.FC<Props> = ({
   useClickOutside(pickerRef, () => setFolderPickerOpen(false), { enabled: folderPickerOpen });
 
   return (
-    <div className="bd-pg-bulk-toolbar" role="toolbar" aria-label={`${selectedCount} pages selected`}>
+    <div
+      className="bd-pg-bulk-toolbar"
+      role="toolbar"
+      aria-label={`${selectedCount} pages selected`}
+      data-testid="pages-bulk-bar"
+    >
       <span className="bd-pg-bulk-count tabular">
         <b>{selectedCount}</b> selected
       </span>

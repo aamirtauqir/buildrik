@@ -15,6 +15,8 @@
 import * as React from "react";
 import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
+import { EVENTS } from "@/shared/constants/events";
+import type { DrawerTab, PageSettingsOpenRequest } from "./types";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -37,6 +39,9 @@ export interface PagesTabProps {
   onClose?: () => void;
   /** Called when user clicks "From Template" — parent should switch to Templates tab */
   onRequestTemplates?: () => void;
+  /** `ui:pages-open-settings`, held by StudioPanels while this lazy panel
+   *  mounts (the emit fires before it exists); a fresh object per request. */
+  openSettingsRequest?: PageSettingsOpenRequest | null;
 }
 
 export const PagesTab: React.FC<PagesTabProps> = ({
@@ -46,6 +51,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   onHelpClick,
   onClose,
   onRequestTemplates,
+  openSettingsRequest,
 }) => {
   const p = usePages(composer);
 
@@ -91,6 +97,42 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const settingsPage = p.settingsPageId
     ? p.pages.find((pg) => pg.id === p.settingsPageId) ?? null
     : null;
+
+  /* The way back from Settings › Redirects' saved card — `Back to <Page> SEO`
+     (Clone 3519:20096) — and any other door that names a page and a tab. Two
+     routes into one handler: the prop, which StudioPanels holds while this
+     lazy panel mounts (the emit fires before it exists), and the live event,
+     for a door fired while the panel is already up (the Templates modal). An
+     id this panel does not list opens nothing — `settingsPage` above resolves
+     to null. The tab rides to the drawer as `initialTab` and is forgotten on
+     close, so a later context-menu open is not steered by a door that has
+     already closed. The handler is stable on purpose: the prop stays held for
+     the whole visit, and an effect that re-ran on every page re-sync would
+     reopen a drawer the user had just closed. */
+  const [doorTab, setDoorTab] = React.useState<DrawerTab | undefined>(undefined);
+  const { openSettings, closeSettings: closePageSettings } = p;
+  const onOpen = React.useCallback(
+    ({ pageId, tab }: PageSettingsOpenRequest) => {
+      openSettings(pageId);
+      setDoorTab(tab);
+    },
+    [openSettings],
+  );
+  React.useEffect(() => {
+    if (openSettingsRequest) onOpen(openSettingsRequest);
+  }, [openSettingsRequest, onOpen]);
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    return () => {
+      composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    };
+  }, [composer, onOpen]);
+
+  const closeSettings = React.useCallback(() => {
+    setDoorTab(undefined);
+    closePageSettings();
+  }, [closePageSettings]);
 
   const handleRenameCommit = React.useCallback(
     (pageId: string, name: string) => {
@@ -185,9 +227,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     if (deletable.length > 0) setBulkDeleteIds(deletable);
   }, [resolveBulkDeletable]);
 
+  /* The dialog is NOT closed here. Board 183:60 keeps it up long enough to
+     report what happened ("3 pages deleted." / "Closing…") and then closes
+     itself — the panel used to drop the modal on the same tick and leave the
+     result to whatever toast deletePage happened to raise, which is a report
+     from a different surface about a different unit of work. */
   const confirmBulkDelete = React.useCallback(() => {
     (bulkDeleteIds ?? []).forEach((id) => p.deletePage(id));
-    setBulkDeleteIds(null);
     bulk.clearSelection();
   }, [bulkDeleteIds, p.deletePage, bulk.clearSelection]);
 
@@ -347,6 +393,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           .join(", ")} are removed from this site. One undo (⌘Z) brings them all back.`}
         confirmLabel="Delete pages"
         tone="destructive"
+        testId="pages-bulk-delete"
+        success={{
+          title: "Deleted",
+          message: `${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"} deleted.`,
+        }}
       />
 
       {/* ⌘K command palette */}
@@ -361,12 +412,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           context menu ("Page settings…") or a Listings row. The per-row gear
           it used to name was deleted with the row action strip. */}
       {settingsPage && (
-        <SettingsErrorBoundary onClose={p.closeSettings}>
+        <SettingsErrorBoundary onClose={closeSettings}>
           <PageSettingsDrawer
             page={settingsPage}
             allPages={p.pages}
             composer={composer}
-            onClose={p.closeSettings}
+            onClose={closeSettings}
+            initialTab={doorTab}
           />
         </SettingsErrorBoundary>
       )}

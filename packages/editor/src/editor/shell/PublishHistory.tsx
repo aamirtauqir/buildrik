@@ -1,10 +1,14 @@
 /**
- * PublishHistory (P1) — the published-version list + rollback (contract §5).
+ * PublishHistory (P1) — the published-version list + republish (contract §5).
  *
- * Rollback is a NEW publish of a stored version, never a mutation of history.
- * The latest COMPLETED is the live version (no rollback to self). Older versions
- * roll back if their payload is still retained (the 20-most-recent keep it);
- * pruned ones are shown disabled with the reason.
+ * A republish ("Republish v5 as v7", the v3 IA's word for rollback — G1-052,
+ * owner decision 8 keeps the code's admin-only rule) is a NEW publish of a
+ * stored version, never a mutation of history. The latest COMPLETED is the
+ * live version (no republish of what is serving). Older versions republish if
+ * their payload is still retained (the 20-most-recent keep it); pruned ones
+ * are shown disabled with the reason. The action sits ON THE ROW — the
+ * version picker it replaced (board 184:2) was a second screen for a choice
+ * the list already makes visible.
  *
  * Load honours DF5: a failed load shows "couldn't load · Retry", never the empty
  * "no versions" state (fetchPublishHistory throws).
@@ -77,48 +81,53 @@ const LIVE_TITLE =
   "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-success-text)]";
 const LIVE_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-success)]";
 const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
-/* Board 949:4474 closes the list with the rule that makes rollback safe to
+/* Board 949:4474 closes the list with the rule that makes a republish safe to
    try. It sits under the rows, not in a tooltip on each one. */
 const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
-/* Board 184:24's info block — the accent-tinted box under the sentence. */
-const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5";
-const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:text-[var(--bk-accent)]";
-const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+const ROW_LINK = "tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:text-[var(--bk-accent)]";
+/* THE 24 GUTTER. Every modal in this family insets its content 24 from the
+   frame: 184:29 and 184:30 are 392 in a 440, 184:52/184:53 are 392, 453:4071/
+   453:4072 are 392, 184:42's progress track is 392, and 184:7's picker rows are
+   512 in a 560. `MODAL_BODY_CLASS` gives every modal body 16, which is the
+   chassis eight other boards are measured against and not something these five
+   get to move — so the extra 8 lives here, on the bodies that need it, and the
+   chassis is untouched. */
+const MODAL_INSET = "tw:px-2";
+/* 184:29 — the sentence is ink-MUTED and 13/20; the body's own face is
+   ink-soft, which is right for a paragraph and a shade too present for the
+   line that explains a consequence. */
+const CONFIRM_BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* Board 184:24's info block — the accent-tinted box under the sentence. 52
+   tall: 8 of lead, a 12/18 line, 2, an 11/16 line, 8. */
+const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2";
+const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
+const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
 const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
 const STATUS_DISC =
   "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
-/* Board 184:2's picker rows — a bordered, selectable band per version. */
-const PICK_ROW =
-  "tw:flex tw:w-full tw:h-14 tw:items-center tw:justify-between tw:gap-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-0 tw:text-left tw:disabled:opacity-100";
-const PICK_ROW_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
-const PICK_TITLE = "tw:text-[13px] tw:text-[var(--bk-ink)]";
-const PICK_META = "tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]";
-const PICK_LIVE = "tw:text-[11px] tw:font-medium tw:text-[var(--bk-success-text)]";
 const NOTICE = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
+/* Board 184:44 — the caption under the rollback progress bar. */
+const PROGRESS_CAPTION = "tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+/* Boards 184:52 / 453:4071 — the one sentence naming the outcome, 13/20, in
+   ink (success) or error-text (failure), REGULAR weight in both. 184:53 /
+   453:4072 are its footnote at 11/16, ink-muted and ink-soft respectively. */
+const OUTCOME_LEAD = "tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const OUTCOME_SUB = "tw:mt-1 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const OUTCOME_LEAD_ERROR =
+  "tw:text-center tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-error-text)]";
+const OUTCOME_REASON =
+  "tw:mt-2 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, rollbackJob = null }) => {
-  // P6 permissions boards: rollback is admin-scoped — non-admins see the
-  // button disabled with "Ask an admin to roll back", never hidden.
+  // P6 permissions boards: republish is admin-scoped (owner decision 8) —
+  // non-admins see the row action disabled with "Ask an admin", never hidden.
   const canRollback = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<PublishHistoryRow[]>([]);
   const [confirm, setConfirm] = React.useState<PublishHistoryRow | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
-  /* Board 184:2 — the version picker. `picking` doubles as its open flag's
-     seed, so a separate boolean tracks the modal itself: the user can clear
-     the selection without the modal closing under them. */
-  const [pickerOpen, setPickerOpen] = React.useState(false);
-  const [picking, setPickingRaw] = React.useState<PublishHistoryRow | null>(null);
-  const setPicking = React.useCallback((r: PublishHistoryRow | null) => {
-    setPickingRaw(r);
-    setPickerOpen(true);
-  }, []);
-  const closePicker = React.useCallback(() => {
-    setPickerOpen(false);
-    setPickingRaw(null);
-  }, []);
   /* Board 453:4064 answers a failed rollback with a MODAL, not a line of grey
      text under the header — and its copy carries the one fact the user needs
      first: the live site did not change. `failed` holds the version that was
@@ -196,7 +205,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       setFailed({
         target: rollingBack.target,
         live: rollingBack.live,
-        reason: "The re-publish did not finish. Nothing was overwritten — retry, or pick a different version.",
+        /* 453:4072's own sentence. This path had a second wording of its own
+           ("The re-publish did not finish…"), so the same failure read
+           differently depending on whether the request threw or the JOB
+           failed — and only the throw path matched the board. One sentence,
+           the board's. */
+        reason: "Nothing was overwritten. Retry the republish, or pick a different version.",
       });
       setRollingBack(null);
       setNotice(null);
@@ -210,7 +224,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
     try {
       setRollingBack({ target: target.version, live: rows[0]?.version });
       const { jobId } = await rollbackToVersion(siteId, target.id);
-      setNotice(`Rolling back to version ${target.version} — publishing a new version…`);
+      setNotice(`Republishing version ${target.version} — publishing a new version…`);
       /* Hand the shell the job the server just created. Until this carried an
          id there was nothing to poll, and the outcome boards read a stale
          "published" that predated the click. */
@@ -235,7 +249,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           ? "That version's snapshot is no longer stored, so it cannot be re-published."
           : /CONFLICT|in progress/i.test(msg)
             ? "A publish is already running. Wait for it to finish, then try again."
-            : "Nothing was overwritten. Retry the rollback, or pick a different version.",
+            : "Nothing was overwritten. Retry the republish, or pick a different version.",
       });
     }
   };
@@ -257,7 +271,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <EmptyState
         icon={<CheckCircle2 size={24} aria-hidden="true" />}
         title="No published versions yet"
-        body="Publish this site and each version shows up here — you can roll back to any of the last 20."
+        body="Publish this site and each version shows up here — you can republish any of the last 20."
       />
     );
   }
@@ -310,123 +324,92 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             currentLabel="Live"
             meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
             actions={
-              i < rows.length - 1 ? (
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => setCompare({ from: { id: rows[i + 1].id, version: rows[i + 1].version }, to: { id: r.id, version: r.version } })}
-                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:text-[var(--bk-accent)]"
-                  aria-label={`Compare v${rows[i + 1].version} to v${r.version}`}
-                >
-                  Compare
-                </Button>
-              ) : undefined
+              <>
+                {i < rows.length - 1 ? (
+                  <Button
+                    color="light"
+                    size="xs"
+                    onClick={() => setCompare({ from: { id: rows[i + 1].id, version: rows[i + 1].version }, to: { id: r.id, version: r.version } })}
+                    className={ROW_LINK}
+                    aria-label={`Compare v${rows[i + 1].version} to v${r.version}`}
+                  >
+                    Compare
+                  </Button>
+                ) : null}
+                {/* G1-052 — "Republish vN…" ON the row (Figma 6881:70883 /
+                    6881:71292), replacing the picker under the list. The live
+                    version carries none: republishing what is serving is a
+                    deploy that changes nothing, and its chip already says why.
+                    Disabled-with-reason, never hidden, for a pruned snapshot
+                    and for a role below ADMIN (P6; owner decision 8). */}
+                {!isLive ? (
+                  <Button
+                    color="light"
+                    size="xs"
+                    disabled={!canRollback || !r.rollbackable}
+                    title={
+                      !canRollback
+                        ? "Ask an admin to republish"
+                        : r.rollbackable
+                          ? undefined
+                          : "This version's snapshot is no longer stored"
+                    }
+                    onClick={() => setConfirm(r)}
+                    className={ROW_LINK}
+                    data-testid={`publish-republish-${r.version}`}
+                  >
+                    Republish v{r.version}…
+                  </Button>
+                ) : null}
+              </>
             }
-            /* Board 949:4474's rows carry no Roll back button — rollback
-               starts from the button under the list, which opens the picker
-               (board 184:2). A per-row button plus that one would be two
-               doors onto the same confirm. */
           />
         );
       })}
 
-      {/* Board 949:4474 states the rule that makes rollback safe to try, once,
-          under the list — rather than leaving the user to infer it from a
-          button labelled "Roll back". Both halves matter: nothing is lost,
-          AND rolling back is itself a deploy. */}
+      {/* Board 949:4474 states the rule that makes a republish safe to try,
+          once, under the list. Both halves matter: nothing is lost, AND a
+          republish is itself a deploy. */}
       <p className={FOOTER_NOTE}>
-        Every publish is restorable. Rolling back redeploys that version.
+        Every publish is restorable. Republishing a version redeploys it as a new one.
       </p>
-
-      {/* Board 949:4474 closes on this, full width, under the note. It is the
-          one entry into rollback, and it opens the picker rather than acting —
-          the board spends a whole screen (184:2) on choosing the version. */}
-      <Button
-        color="light"
-        size="xs"
-        className="tw:mt-1 tw:h-8 tw:w-full tw:justify-start"
-        disabled={!canRollback || rows.length < 2}
-        title={
-          !canRollback
-            ? "Ask an admin to roll back"
-            : rows.length < 2
-              ? "There is only one published version"
-              : undefined
-        }
-        onClick={() => setPicking(rows.find((r) => r.rollbackable && r.version !== liveVersion) ?? null)}
-      >
-        Roll back to a published version…
-      </Button>
-
-      {/* Board 184:2 — pick the version, THEN confirm it. */}
-      <Modal
-        open={pickerOpen}
-        onClose={closePicker}
-        kind="form"
-        title="Roll back to a published version"
-        footer={
-          <div className="tw:flex tw:justify-end tw:gap-2">
-            <Button color="light" size="xs" onClick={closePicker}>
-              Cancel
-            </Button>
-            <Button size="xs" disabled={!picking} onClick={() => { setConfirm(picking); closePicker(); }}>
-              Continue
-            </Button>
-          </div>
-        }
-      >
-        <div className="tw:flex tw:flex-col tw:gap-1" role="radiogroup" aria-label="Published versions">
-          {rows.map((r) => {
-            const isLive = r.version === liveVersion;
-            /* The live version is listed — the board shows it with its `live`
-               chip — but cannot be chosen: rolling back to what is already
-               serving is a deploy that changes nothing. A pruned version has
-               no payload to re-publish. */
-            const selectable = !isLive && r.rollbackable;
-            return (
-              /* chrome-ui's Button, not a bare <button> — Gate 24 is zero
-                 tolerance, and it caught this one. `role="radio"` rides on it
-                 because the picker is a single-choice list, not four
-                 independent actions. */
-              <Button
-                key={r.id}
-                type="button"
-                color="light"
-                role="radio"
-                aria-checked={picking?.id === r.id}
-                disabled={!selectable}
-                onClick={() => setPicking(r)}
-                title={isLive ? "This version is already live" : r.rollbackable ? undefined : "This version's snapshot is no longer stored"}
-                className={`${PICK_ROW} ${picking?.id === r.id ? PICK_ROW_ON : ""}`}
-              >
-                <span className="tw:flex tw:flex-col tw:items-start">
-                  <span className={PICK_TITLE}>
-                    v{r.version}
-                    {isLive ? " · current" : ""}
-                  </span>
-                  <span className={PICK_META}>published {relTime(r.completedAt)}</span>
-                </span>
-                {isLive && <span className={PICK_LIVE}>live</span>}
-              </Button>
-            );
-          })}
-        </div>
-      </Modal>
 
       {/* Board 184:37 — "Rolling back…", a determinate bar, and the caption
           naming both versions. Rendered only while the shell reports a job in
           flight; without a progress feed the panel keeps its notice line. */}
+      {/* `question`, not `form`: 184:39 is a modal/440 and `form` is the 560.
+          The width is the board's, and it was 120px wide of nobody's. */}
       <Modal
         open={rollingBack !== null && rollbackJob?.state === "publishing"}
         onClose={() => setRollingBack(null)}
-        kind="form"
-        title="Rolling back…"
+        kind="question"
+        testId="publish-rollback-progress"
+        title="Republishing…"
       >
-        <Progress progress={rollbackJob?.progress ?? 0} size="sm" />
-        <p className="tw:mt-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-          Publishing v{rollingBack?.target} as v
-          {rollingBack?.live !== undefined ? rollingBack.live + 1 : "…"}
-        </p>
+        <div className={MODAL_INSET}>
+          {/* 184:42 draws the track bg-subtle with a 4 radius and 184:43 fills it
+              --color/accent. flowbite's own defaults are gray-200, a full pill,
+              and `bg-primary-600` — which resolves to `var(--bk-blue-600)` (blue-600), one
+              step off the single accent `var(--bk-blue-700)` this product allows. Measured,
+              not assumed: the fill read rgb(28,100,242) before this.
+              `className` lands on the TRACK and `data-testid` on the root — the
+              two reach different elements (Progress.js:41) — and `theme.color`
+              has to be overridden rather than `theme.bar`, because the color
+              class is twMerged AFTER bar and would win. */}
+          <Progress
+            progress={rollbackJob?.progress ?? 0}
+            size="sm"
+            data-testid="publish-rollback-bar"
+            className="tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)]"
+            theme={{ bar: "tw:rounded-[4px]", color: { default: "tw:bg-[var(--bk-accent)]" } }}
+          />
+          {/* 184:44 is 12/18 ink-muted — the modal body's own 13/ink-soft is the
+              paragraph face, and this is a caption under a bar. */}
+          <p className={PROGRESS_CAPTION} data-testid="publish-rollback-caption">
+            Publishing v{rollingBack?.target} as v
+            {rollingBack?.live !== undefined ? rollingBack.live + 1 : "…"}
+          </p>
+        </div>
       </Modal>
 
       {/* Board 184:45 — the green confirmation. It names what is live now AND
@@ -435,8 +418,9 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <Modal
         open={rolledBack !== null}
         onClose={() => setRolledBack(null)}
-        kind="form"
-        title="Rolled back"
+        kind="question"
+        testId="publish-rolledback"
+        title="Republished"
         footer={
           <div className="tw:flex tw:justify-end">
             <Button onClick={() => setRolledBack(null)}>Close</Button>
@@ -451,14 +435,19 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <CheckCircle2 size={16} />
           </span>
         </div>
-        <p className="tw:text-center">
+        <div className={MODAL_INSET}>
+        {/* 184:52 is 13/20 in INK — the modal body paints ink-soft, which is
+            right for a paragraph and wrong for the one sentence naming what is
+            live now. */}
+        <p className={OUTCOME_LEAD} data-testid="publish-rolledback-lead">
           v{rolledBack?.newLive} is live — a re-publish of v{rolledBack?.target}.
         </p>
         {rolledBack?.previous !== undefined && (
-          <p className="tw:mt-1 tw:text-center tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-            v{rolledBack.previous} is still in your history and can be rolled forward the same way.
+          <p className={OUTCOME_SUB} data-testid="publish-rolledback-sub">
+            v{rolledBack.previous} is still in your history and can be republished the same way.
           </p>
         )}
+        </div>
       </Modal>
 
       {/* Board 453:4064 — the failure modal. "Try again" reopens the confirm
@@ -467,13 +456,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           are re-attempting. */}
       <ConfirmDialog
         open={failed !== null}
+        testId="publish-rollback-failed"
         onClose={() => setFailed(null)}
         onConfirm={() => {
           const again = rows.find((r) => r.version === failed?.target) ?? null;
           setFailed(null);
           setConfirm(again);
         }}
-        title="Rollback failed"
+        title="Republish failed"
         message={
           <>
             {/* Board 453:4064's red warning disc — the counterpart of the
@@ -483,11 +473,18 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                 <AlertCircle size={16} />
               </span>
             </div>
-            <p className="tw:font-medium tw:text-[var(--bk-error-text)] tw:text-center">
-              v{failed?.target} could not be re-published. Your live site is unchanged
-              {failed?.live !== undefined ? ` — still v${failed.live}` : ""}.
-            </p>
-            <p className="tw:mt-2 tw:text-center">{failed?.reason}</p>
+            {/* 453:4071 is 13/20 error-text at Inter REGULAR, and 453:4072
+                drops to 11/16 ink-soft. Both were the body's own type: the
+                lead was bolded and the reason was a second 13px line, so the
+                two sentences read as one weight-graded block instead of a
+                headline and its footnote. */}
+            <div className={MODAL_INSET}>
+              <p className={OUTCOME_LEAD_ERROR} data-testid="publish-rollback-failed-lead">
+                v{failed?.target} could not be re-published. Your live site is unchanged
+                {failed?.live !== undefined ? ` — still v${failed.live}` : ""}.
+              </p>
+              <p className={OUTCOME_REASON} data-testid="publish-rollback-failed-reason">{failed?.reason}</p>
+            </div>
           </>
         }
         confirmLabel="Try again"
@@ -505,12 +502,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           number the re-publish will take. */}
       <ConfirmDialog
         open={confirm !== null}
+        testId="publish-rollback-confirm"
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
-        title={confirm ? `Roll back to v${confirm.version}?` : "Roll back?"}
+        title={confirm ? `Republish v${confirm.version} as v${nextVersion}?` : "Republish?"}
         message={
           <>
-            <p className="tw:m-0">
+            <div className={MODAL_INSET}>
+            <p className={CONFIRM_BODY} data-testid="publish-rollback-confirm-body">
               This publishes v{confirm?.version} again as v{nextVersion}.
               {liveVersion !== undefined
                 ? ` Your current v${liveVersion} stays in history`
@@ -522,21 +521,22 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                 one says what happens to the LIST — it only ever grows, and
                 the new entry carries its source. That is the fact that makes
                 a rollback safe to try. */}
-            <div className={INFO_BOX}>
-              <p className={INFO_TITLE}>The publish list only ever grows.</p>
-              <p className={INFO_META}>
+            <div className={INFO_BOX} data-testid="publish-rollback-info">
+              <p className={INFO_TITLE} data-testid="publish-rollback-info-title">The publish list only ever grows.</p>
+              <p className={INFO_META} data-testid="publish-rollback-info-meta">
                 v{nextVersion} will name v{confirm?.version} as its source.
               </p>
             </div>
+            </div>
           </>
         }
-        /* Board 184:24's button is #C27803 — `--bk-warning`, measured off the
+        /* Board 184:24's button is `var(--bk-yellow-500)` — `--bk-warning`, measured off the
            board. Not red: the modal spends its whole body saying nothing is
            deleted or rewritten, and then a red button would contradict it.
            Re-publishing an older version over a live site is a decision, not
            a deletion. */
         tone="warning"
-        confirmLabel={confirm ? `Roll back to v${confirm.version}` : "Roll back"}
+        confirmLabel={confirm ? `Republish v${confirm.version}` : "Republish"}
         cancelLabel="Cancel"
       />
     </div>

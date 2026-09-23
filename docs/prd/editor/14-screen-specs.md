@@ -306,8 +306,8 @@
 ### S4.2 — Styles / presets
 - **Job/IA/Build:** J4 · BRAND › Design · EXISTS
 - **Features (verified):** **18 presets / 11 categories** (button3/card2/form1/link2/badge2/alert2/tooltip1/modal1/nav1/table1/layout1); StylesSection/Router, PresetDetailPane, PresetBindingRow, BindingRow; DraftChip (`design-system/ui/sections`).
-- **States:** list · bound · unbound · draft.
-- **Improvements:** ◆ component-level theming; **COMPLETE** binding picker (click no-op).
+- **States:** list · bound · unbound · draft — where **bound = the element carries a preset** (founder call 2026-09-08, B4). A preset property *resolves to* a token; that is a different relationship and no longer shares the word.
+- **Improvements:** ◆ component-level theming; **COMPLETE** the picker (click is still a no-op). Under the settled definition its target is now unambiguous: it picks a **preset for the selected element**, which is what its placement always implied.
 
 ### S4.3 — Starters
 - **Job/IA/Build:** J4 · BRAND › Design · EXISTS (🟡 scaffolds)

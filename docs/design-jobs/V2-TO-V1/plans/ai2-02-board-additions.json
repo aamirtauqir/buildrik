@@ -1,0 +1,24 @@
+{
+  "module": "AI experience — gap pass",
+  "slug": "ai2",
+  "written": "2026-09-07",
+  "page": "1:3",
+  "section": "1776:8380",
+  "note": "Two executable rows. Everything else in this pass is either already on a decision board (see ai2-01-verdicts.json) or drawn by scripts/figma/ai-gap-close.mjs and ai-gap-fix-quota-meter.mjs, which read their own writes back.",
+  "rows": [
+    {
+      "id": "172:33",
+      "add": " Its three TRY suggestions are page-wide jobs run against whatever scope is active: each must set its own scope when clicked and say so in the band, or be hidden when the scope cannot serve it (UX-G-19).",
+      "maxHeight": 150,
+      "why": "UX-G-19 — the panel's three starter prompts run against whatever scope happens to be active and the panel never warns when suggestion and scope disagree. The rule is on board B (2846:21567); this puts it on the caption of the board that draws the suggestions. Caption 172:33 read 2026-09-07 at @100,1052 280x54; the next row starts at y=1226, so 174px of gap — maxHeight 150 keeps a gutter and refuses rather than laying the caption across board 2476:12001."
+    },
+    {
+      "op": "hotspot",
+      "over": "2846:21471",
+      "to": "2476:12001",
+      "name": "hotspot/AI · in-canvas popover",
+      "pad": 8,
+      "why": "UX-G-11 (outside this pass's eighteen, carried because the pass measured it): board 2476:12001 'AI · in-canvas popover — 4 states' re-read 2026-09-07 with rx=0 — no node in the file reaches it. 2846:21471 is board A's decision cell for the canvas-toolbar door, whose text names that popover ('the popover shares the panel's state machine (UX-G-11)'). Wiring the row to the board it names gives the popover its first inbound edge without inventing a product flow."
+    }
+  ]
+}

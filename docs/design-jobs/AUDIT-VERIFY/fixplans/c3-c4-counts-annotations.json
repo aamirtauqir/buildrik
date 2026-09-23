@@ -1,0 +1,164 @@
+{
+ "slug": "fix-c3-c4-counts-annotations",
+ "page": "1:3",
+ "hold_note": "ROWS 4, 11, 12 AND 13 CARRY \"hold\": true. Neither normalize-plans.mjs NOR apply-queue.mjs contains the string \"hold\" — the key is dropped by classify() and never read by the applier — so a held row spelled with its real op WOULD BE EXECUTED. Those four rows therefore also carry op:\"advisory\", which normalize-plans classifies first-class (normalize-plans.mjs:148-152) and apply-queue reports as non-executable because \"advisory\" is not in its OPS set (apply-queue.mjs:67,88). The op that WOULD be needed is named in each row's would_op and the full intended row is inlined in detail.",
+ "rows": [
+  {
+   "op": "text",
+   "id": "1172:4841",
+   "text": "Review 3 staged changes · 1 not supported",
+   "expect": "Review 3 staged changes",
+   "width": 340,
+   "why": "M07 — DECISION: keep the labels at 3 and separate the unsupported row; do NOT count 4. The board's own name says '[not-implemented] for 11 of 14 token kinds; only colour, type and spacing reach the review (ReviewModal.tsx:17-30)', and the fourth row's parent frame 1172:4854 is named '[not-implemented] shadow/raised · removed'. Three of the four rows (color/accent, type/heading, spacing/lg) are exactly the three kinds the modal filters surface; the shadow row is not. Relabelling to 4 would promise an apply the code cannot perform (BRIEF-FIX rule 4, PLAN.md C6). ARITHMETIC: current box 161x16 at x=116 holds 23 chars at 13/Semi Bold = 7.0px/char; the new string is 40 chars = ~280px, so width 340 leaves 60px slack and stays one line. 116+340=456, and the board 1172:4840 [100,43784,520,259] has its inner right edge at 620-16=604 — 148px clear. AUTO-LAYOUT: the text op sets textAutoResize=HEIGHT, so one line keeps h=16 and the VERTICAL stack is unchanged (children run 43798->44029 inside 43784->44043, 14px pad top and bottom). No compensating shrink needed."
+  },
+  {
+   "op": "text",
+   "id": "1172:4855",
+   "text": "shadow/raised · not supported",
+   "expect": "shadow/raised",
+   "width": 200,
+   "why": "M07 — names WHICH of the four rows the title's '1 not supported' refers to, so the separation is visible and not just implied. Its own parent frame already says so in its name ('[not-implemented] shadow/raised · removed — ReviewModal's two filters iterate the CURRENT ...'); this puts it on the render. NOT deleted: apply-queue.mjs:236-238 records hiding a drawing because the code cannot produce it yet as a mistake made once in this arc (SH-CO-01), and '[not-implemented]' marking is this file's standing convention (six such History boards in b17, plus 1705:8704, 817:4774). ARITHMETIC: current 78x16 at x=126 holds 13 chars at 11/Medium = 6.0px/char; 29 chars = ~174px, width 200 -> right edge 326. The value text 1172:4857 'removed' starts at x=548 and the other rows' value column starts at x=483, so 157px clear; the row frame 1172:4854 spans 116..604, so 326 is inside it. One line, h stays 16, no stack growth."
+  },
+  {
+   "op": "rename",
+   "id": "1172:4863",
+   "name": "btn/Apply 3 changes",
+   "expect": "btn/Apply 4 changes",
+   "why": "M07 — this frame name is the only node in the modal still claiming four. Its own child label 1172:4864 reads 'Apply 3 changes' and the title reads 'Review 3 staged changes'; with the decision above (3 executable + 1 marked unsupported) the name is the last of the two numbers to reconcile. Node identified from b03.tsv:38 'R 1172:4863 1333:7162 NAVIGATE btn/Apply 4 changes' — the reaction row's trailing field is the from-node's name."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "would_op": "rename x13",
+   "severity": "Major",
+   "detail": "F22 — DO NOT hand-type section-title counts. scripts/figma/order-sections.mjs ALREADY derives them: line 59 `const n = s.children.filter(c => typeof c.width === \"number\").length;` and line 74 `s.name = num + \" · \" + label + \" · \" + n + (note ? \" — \" + note : \"\")`. Run `node scripts/figma/order-sections.mjs` (1 Figma call) and all 13 drifted titles regenerate correctly and idempotently. Caveat the operator must accept before running: the same script also restacks every section (`s.x = 0; s.y = y` with GUTTER 900), so it is a page re-layout, not a rename pass — it is designed to be re-run, but it is not a no-op on geometry.",
+   "why": "F22 — DECISION: one note saying 'run that script', not 13 (or 29) hand-typed rename rows. MEASURED: docs/design-jobs/findings/BOARD-BASELINE.json (working tree, taken 13:39 today) has 29 sections of which 13 drift between the count written into the name and the section's real child count — 1776:8373 Brand 51/52, 1776:8374 History 43/49, 1776:8376 Content 46/47, 1776:8378 Publish 24/25, 1776:8379 Insert 28/29, 1776:8381 Inspector 51/52, 1776:8382 Compare 16/17, 1776:8383 Review 38/39, 1776:8385 Shell 34/56, 1776:8387 Settings/S7 48/49, 1779:3 Command palette 13/15, 1779:5 Canvas 14/16, 1779:6 Ecommerce 5/6. `git show HEAD:docs/design-jobs/findings/BOARD-BASELINE.json` has the same 29 sections and 0 drifting (taken 2026-09-06) — the drift is one day old and is the arc adding boards. THE DECIDING FACT: the 13:39 baseline is ALREADY WRONG by 18:37. It records 1776:8381 Inspector as n=52; the fresh read b17.tsv taken at 18:37 records nkids=56, and the two counters are semantically identical (board-baseline.mjs:29 `(s.children||[]).length` vs audit-verify-dump.mjs:50 `n.children.length`). A hand-typed '· 52' would have shipped stale on the same day it was typed. Hand-typed counts cannot converge on a page that is still being built; a derived one can. The three numbers the audit cited are confirmed exactly by the fresh read: 1776:8385 titled 34 / 56 children, 1776:8381 titled 51 / 56, 1776:8374 titled 43 / 49."
+  },
+  {
+   "op": "delete",
+   "id": "2838:12104",
+   "expect": "UX-B-13 — '+ Add page' routes through th",
+   "why": "F03/C4 — engineering annotation rendering inside the product frame. 2838:12104 is a 248x117 visible TEXT whose parent is the board 140:2 'Pages · tree' itself [100,15970,280,812], sitting at y16548..16665 — squarely on the render. queue-state.json records it as `pages-nodes-02-tree#8 clone-node OK 2838:12104 248x117 @0,695`, i.e. it was cloned INTO the board. HIDE, not move: the delete op is `n.visible=false` (apply-queue.mjs:239-249), reversible; `move` cannot help because it only changes x/y within the same parent — it cannot reparent, and 140:2 has clipsContent=true, so any x/y outside the board would hide the text SILENTLY instead of explicitly. Nothing is lost: the finding text is preserved verbatim in docs/design-jobs/V2-TO-V1/REGISTER.md:63 (UX-B-13) and re-parked by held row 11. AUTO-LAYOUT: 140:2 is layout=VERTICAL with a fixed 812px height; hiding a child removes it from the stack, which shrinks rather than grows — BRIEF-FIX rule 5 does not apply."
+  },
+  {
+   "op": "delete",
+   "id": "2838:12105",
+   "expect": "UX-B-32 — Pages owns the per-page fact",
+   "why": "F03/C4 — the second 248x117 visible engineering paragraph child of board 140:2, at y16665..16782 (its bottom is exactly the board's bottom, 15970+812=16782). queue-state.json: `pages-nodes-02-tree#9 clone-node OK 2838:12105 248x117 @0,695`. Same reasoning as row 5; text preserved in REGISTER.md:64 (UX-B-32) and re-parked by held row 11."
+  },
+  {
+   "op": "delete",
+   "id": "2898:12679",
+   "expect": "UX-B-13 — '+ Add page' routes through th",
+   "why": "F03/C4 clone-propagated — board 2898:12617 'Pages · tree · drag · drop indicator (of 140:2)' [2500,15970,280,812] carries the same paragraph at [2500,16548,248,117], the identical rel offset (0,578) as 2838:12104 on the source board. The board's own name says '(of 140:2)', so the defect travelled with the clone."
+  },
+  {
+   "op": "delete",
+   "id": "2898:12680",
+   "expect": "UX-B-32 — Pages owns the per-page fact",
+   "why": "F03/C4 clone-propagated — 2898:12617's copy of 2838:12105, at [2500,16665,248,117], rel offset (0,695), bottom flush with the board bottom 16782."
+  },
+  {
+   "op": "delete",
+   "id": "2898:22043",
+   "expect": "UX-B-13 — '+ Add page' routes through th",
+   "why": "F03/C4 clone-propagated — board 2898:21981 'Pages · tree · homepage by position (of 140:2)' [2800,15970,280,812] carries the same paragraph at [2800,16548,248,117], rel offset (0,578)."
+  },
+  {
+   "op": "delete",
+   "id": "2898:22044",
+   "expect": "UX-B-32 — Pages owns the per-page fact",
+   "why": "F03/C4 clone-propagated — 2898:21981's copy of 2838:12105, at [2800,16665,248,117], rel offset (0,695)."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "would_op": "add-caption",
+   "severity": "Major",
+   "detail": "F03 re-park for board 140:2. Intended row once the section is measured: {\"op\":\"add-caption\",\"board\":\"140:2\",\"from\":\"155:18\",\"name\":\"caption/Pages · tree · UX-B-13 & UX-B-32\",\"w\":280,\"x\":100,\"y\":<MEASURED>,\"text\":\"UX-B-13 — '+ Add page' can create a second page with the same name and the same URL; the create path must use the uniqueness helpers duplicate already uses (uniqueCopyName / uniqueCopySlug, PageManager.ts:460-475). UX-B-32 — adding a page does not add it to the site's navigation and there is no bulk way to do it; either generate the primary nav from the page list with a per-page 'show in nav' toggle, or make the page-to-link relationship visible.\"} — full findings in REGISTER.md:63-64.",
+   "why": "F03 — HELD, one read short. The convention is settled and measured: captions are TEXT children of the SECTION (not the board), at x = board.x, y = board.y + board.height + 20. Verified twice in b17.tsv against History section 1776:8374 — board 163:64 [100,79452,280,812] bottom 80264, caption 172:4 at y80284 (gap 20); board 163:113 [500,80566,280,812] bottom 81378, caption 172:5 at y81398 (gap 20). That puts 140:2's slot at x=100, y = 15970+812+20 = 16802. WHAT IS MISSING: a caption named 'caption/Pages · tree' ALREADY EXISTS at that slot — node 155:18, cited by docs/design-jobs/findings/FIG-B.jsonl:2 as '1776:8377 / 155:18 (caption/Pages · tree)' — and its CURRENT y and height are not in this pass's fresh reads (section 1776:8377 was never dumped; only 1776:8374/8381/8385 were). apply-queue's add-caption has NO collision test, unlike add-board-captions.mjs which does (it computes the donor's own gap and rejects on `clash`). Guessing y here is exactly the incident reflow-caption-overflow.mjs was written for on 2026-09-07 — a caption grown past the fixed ~300px band lands on the row of boards below. ONE read of section 1776:8377's children unblocks all three re-park rows; nothing is lost meanwhile, because the hides in rows 5-10 are reversible and both findings are recorded in full in REGISTER.md."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "would_op": "add-caption",
+   "severity": "Minor",
+   "detail": "F03 re-park for clone board 2898:12617 'Pages · tree · drag · drop indicator'. Intended row: {\"op\":\"add-caption\",\"board\":\"2898:12617\",\"from\":\"155:18\",\"name\":\"caption/Pages · tree · drag · UX-B-13 & UX-B-32\",\"w\":280,\"x\":2500,\"y\":<MEASURED>,\"text\":\"<as row 11>\"}",
+   "why": "F03 — HELD for the same unmeasured section (1776:8377). Slot by the measured convention would be x=2500, y=15970+812+20=16802. Second question the operator must settle before this one runs: the clone boards sit at a 300px column pitch (2500 -> 2800), so a 280-wide caption at x=2500 ends at 2780 and clears 2898:21981 at 2800 by 20px — but reflow-caption-overflow.mjs's docstring states the page's column pitch as 400, so the Pages section's pitch is non-standard and the caption band's real height here is unknown. May also be unnecessary: this is a state clone of 140:2, and clone boards in this file do not each get their own copy of the source board's caption."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "would_op": "add-caption",
+   "severity": "Minor",
+   "detail": "F03 re-park for clone board 2898:21981 'Pages · tree · homepage by position'. Intended row: {\"op\":\"add-caption\",\"board\":\"2898:21981\",\"from\":\"155:18\",\"name\":\"caption/Pages · tree · homepage-by-position · UX-B-13 & UX-B-32\",\"w\":280,\"x\":2800,\"y\":<MEASURED>,\"text\":\"<as row 11>\"}",
+   "why": "F03 — HELD, same two open questions as row 12. Slot by the measured convention would be x=2800, y=16802."
+  },
+  {
+   "op": "move",
+   "id": "2838:12106",
+   "x": 201,
+   "y": 10,
+   "expect": "⚂ Structure",
+   "why": "[parent-relative correction] apply-queue's move writes node.x/node.y, which are PARENT-relative, while every box in b*.tsv is absoluteBoundingBox. This row carried the absolute target (301,16024); its parent frame 'Search' sits at abs (100,16014), so the executable value is (201,10). Written absolute it would have moved the chip ~10px down the canvas. F03 — the '⚂ Structure' chip escaped its clipping parent downward and now overprints the Marketing row's count. ARITHMETIC: 2838:12106 is [301,16068,66,18], bottom 16086; its parent is the 'Search' frame 140:7 [100,16014,280,36], bottom 16050; 16086-16050 = 36, which is our detector's own two rows verbatim — 'CONTAINER 140:2 140:7 \"Search\" bottom +36' and 'TEXTOVER 2838:12106 by 36' (.render-defects-after.json, section 1776:8377). It also intersects 140:16 '3' [350,16058,7,16]: x max(301,350)=350 to min(367,357)=357 = 7, y max(16068,16058)=16068 to min(16086,16074)=16074 = 6 — the audit's 7x6px, exact. TARGET y=16024 is derived, not chosen, from two independent nodes: (a) the hidden earlier copy 2433:11972 sits at exactly [301,16024,66,15], and (b) the chip's own click target, rect 2432:11973 'hotspot/state · Pages · structure' [295,16018,81,27], spans y16018..16045 — a label at 16024..16042 sits inside it, one at 16068..16086 does not, which is why the door and its label have been 44px apart. AFTER: 16024+18 = 16042 <= 16050, contained; and 16042 < 16058, so the collision with '3' is gone. x is unchanged at 301 (= board.x + 201, the same rel x as on both clones). RISK, stated: 140:7's layoutMode was not dumped, and apply-queue's move builder refuses an auto-layout child with an AUTOLAYOUT line rather than writing — a safe no-op, not damage. The three chips in 140:7 sit at x 126, 236 and 301 with gaps, which reads as layoutMode NONE."
+  },
+  {
+   "op": "move",
+   "id": "2898:12624",
+   "x": 201,
+   "y": 10,
+   "expect": "⚂ Structure",
+   "why": "[parent-relative correction] apply-queue's move writes node.x/node.y, which are PARENT-relative, while every box in b*.tsv is absoluteBoundingBox. This row carried the absolute target (2701,16024); its parent frame 'Search' sits at abs (2500,16014), so the executable value is (201,10). Written absolute it would have moved the chip ~10px down the canvas. F03 clone-propagated — identical defect on 2898:12617. Chip [2701,16068,66,18] bottom 16086; parent 'Search' 2898:12619 [2500,16014,280,36] bottom 16050; 16086-16050 = 36, matching the detector's 'CONTAINER 2898:12617 2898:12619 \"Search\" bottom +36' / 'TEXTOVER 2898:12624 by 36'. It hits 2898:12630 '3' [2750,16058,7,16] by the same 7x6px. Target y confirmed twice: hidden earlier copy 2898:12623 at [2701,16024,66,15], and hotspot rect 2898:12672 [2695,16018,81,27]. After: 16042 <= 16050 and 16042 < 16058. x unchanged (2500+201)."
+  },
+  {
+   "op": "move",
+   "id": "2898:21988",
+   "x": 201,
+   "y": 10,
+   "expect": "⚂ Structure",
+   "why": "[parent-relative correction] apply-queue's move writes node.x/node.y, which are PARENT-relative, while every box in b*.tsv is absoluteBoundingBox. This row carried the absolute target (3001,16024); its parent frame 'Search' sits at abs (2800,16014), so the executable value is (201,10). Written absolute it would have moved the chip ~10px down the canvas. F03 clone-propagated — identical defect on 2898:21981. Chip [3001,16068,66,18] bottom 16086; parent 'Search' 2898:21983 [2800,16014,280,36] bottom 16050; overflow 36, matching 'CONTAINER 2898:21981 2898:21983 \"Search\" bottom +36' / 'TEXTOVER 2898:21988 by 36'. It hits 2898:21994 '3' [3050,16058,7,16] by 7x6px. This clone has NO hidden predecessor copy, so the target y rests on the hotspot rect alone: 2898:22036 [2995,16018,81,27] spans 16018..16045, and rel x/y (201,54) is identical on all three boards. After: 16042 <= 16050 and 16042 < 16058. x unchanged (2800+201)."
+  },
+  {
+   "op": "delete",
+   "id": "2435:12145",
+   "expect": "dynamic-pages · no-pattern",
+   "why": "F12 partial — hotspot LABEL rendering visible inside the product panel 2429:12111 'Content · dynamic-pages' [2320,32529,280,812], at [2332,33227,148,12]. The convention to match is 140:2's, cited by the brief and confirmed in the fresh read: every one of its nine hotspot labels (2838:12171/12173/12175/12177/12179/12181, 1720:17467/17471/17530) is visible=false while its parent hotspot FRAME stays visible and keeps its reaction — b09 lists reactions on 2838:12170/12172/12174/12176/12178/12180, whose labels are the hidden ones. So hiding the label does NOT kill the door. HIDING THE LABEL ONLY: this row's id is the TEXT; the reaction lives on its parent frame 2435:12144 (-> 2429:21243), which is untouched. Note the audit's other half of F12 is deliberately NOT re-fixed: the two long red engineering paragraphs were already moved to captions at 16:23 and the fresh read of 2429:12111 returns 10 texts and neither of them."
+  },
+  {
+   "op": "delete",
+   "id": "2435:12148",
+   "expect": "dynamic-pages · none-published",
+   "why": "F12 partial — [2332,33259,148,24] inside 2429:12111. This is the one our detector logs as 'TEXTOVER 2429:12111 2435:12148 by 4' (.render-defects-after.json, section 1776:8376): the string wraps to two lines so the box is 24px where its siblings are 12px, and it overruns its own hotspot frame by 4px. Hiding it closes the C4 contamination and the TEXTOVER together. Reaction is on the parent frame 2435:12147 (-> 2429:21262), untouched."
+  },
+  {
+   "op": "delete",
+   "id": "2435:12151",
+   "expect": "dynamic-pages · no-template",
+   "why": "F12 partial — [2332,33291,148,12] inside 2429:12111. Reaction is on the parent frame 2435:12150 (-> 2429:21281 'Content · dynamic-pages · no-template'), untouched."
+  },
+  {
+   "op": "delete",
+   "id": "2483:11979",
+   "expect": "AI · in-canvas popover",
+   "why": "F03/F23 same treatment — hotspot label rendering visible inside product panel 170:2 'AI · idle' [100,64117,280,812], at [112,64815,148,12]. Reaction is on the parent frame 2483:11978 (-> 2476:12001), untouched. COUNT CORRECTION: the brief says four visible hotspot labels inside 170:2 and names three ids. The fresh read is three, not four — b-dump of 170:2 returns 15 texts, of which exactly three have a 'hotspot/state · …' parent (2483:11979, 2483:11982, 2483:11985). The only other candidate, 2846:21653 '7 left today' [254,64265,100,16], has parent 'AI · idle' and is the quota chip, i.e. product copy, not an annotation. No fourth row authored."
+  },
+  {
+   "op": "delete",
+   "id": "2483:11982",
+   "expect": "Brand · generate component with AI",
+   "why": "F03/F23 same treatment — [112,64847,148,24] inside 170:2, the two-line one; our detector logs it as 'TEXTOVER 170:2 AI · idle 2483:11982 by 4' (section 1776:8380), the same 24-in-a-20 overrun as 2435:12148. Reaction is on the parent frame 2483:11981 (-> 2476:12029), untouched. (Not in scope here: the same section's 'CONTAINER 170:2 170:15 \"note\" bottom +8' / 'TEXTOVER 170:16 by 8' — that is a C2 clipped-parent row, a different cause.)"
+  },
+  {
+   "op": "delete",
+   "id": "2483:11985",
+   "expect": "AI · publish confirm",
+   "why": "F03/F23 same treatment — [112,64879,148,12] inside 170:2. Reaction is on the parent frame 2483:11984 (-> 2476:12044), untouched."
+  },
+  {
+   "op": "delete",
+   "id": "2435:12154",
+   "expect": "Media · local-only assets",
+   "why": "F03/F23 same treatment — the single visible hotspot label inside product panel 144:2 'Media · grid' [100,21134,280,812], at [106,21748,148,12]. This board carries the convention and the violation side by side, which is the cleanest proof available: its four other hotspot labels — 1720:17526, 1720:17424, 1720:17421, 1720:17382 — are all visible=false, and their parent frames 1720:17525/17423/17420/17381 all still carry live reactions in the same fresh read. 2435:12154 is the only one left visible. Reaction is on its parent frame 2435:12153 (-> 2430:21365), untouched."
+  }
+ ]
+}

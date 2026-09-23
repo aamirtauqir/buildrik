@@ -1,0 +1,446 @@
+{
+  "surface": "history-saves-empty",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "163:64",
+  "boardName": "history-saves-empty",
+  "figmaHash": "115e34e2e1ca1aa126253c2ac4358c1c01aaf1668028f87749f90bfd1d3c63fb",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:09:33.524Z",
+  "copy": [
+    "Version History",
+    "Saves",
+    "Named milestones",
+    "Published",
+    "What's live",
+    "Saved versions",
+    "This session",
+    "Search saves...",
+    "No saved versions yet.",
+    "Versions are created whenever you name one, or when a template is applied.",
+    "50 versions kept. Auto-saves prune oldest first; named ones never prune.",
+    "+ Save a version"
+  ],
+  "targets": [
+    {
+      "nodeId": "163:64",
+      "name": "History · Saves · empty",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-l border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7141",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I1657:7141;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7151",
+      "name": "View switcher",
+      "className": "bg-white border-[#e5e7eb] border-b border-solid h-[40px] relative shrink-0 w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7152",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[28px] not-italic text-[#111827] text-[13px] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7153",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[28px] not-italic text-[#9ca3af] text-[11px] text-left top-[31px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7154",
+      "name": "active underline",
+      "className": "absolute bg-[#1a56db] h-[2px] left-[12px] top-[38px] w-[129px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "129px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7155",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[157px] not-italic text-[#6b7280] text-[13px] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7156",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[157px] not-italic text-[#9ca3af] text-[11px] text-left top-[31px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7157",
+      "name": "Saves filter",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7159",
+      "name": "chip",
+      "className": "absolute bg-[#1a56db] h-[24px] left-[12px] rounded-[12px] top-[8px] w-[79px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "79px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7158",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[8px] not-italic text-[12px] text-left text-white top-[4px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7161",
+      "name": "chip",
+      "className": "absolute border border-[#e5e7eb] border-solid h-[24px] left-[95px] rounded-[12px] top-[8px] w-[82px]",
+      "props": {
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "82px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7160",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[7px] not-italic text-[#6b7280] text-[12px] text-left top-[3px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7162",
+      "name": "Search bar",
+      "className": "bg-white border-[#e5e7eb] border-b border-solid h-[53px] relative shrink-0 w-[280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "53px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7163",
+      "name": "search box",
+      "className": "absolute bg-[#f3f4f6] h-[36px] left-[12px] rounded-[6px] top-[8px] w-[256px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "256px"
+        }
+      }
+    },
+    {
+      "nodeId": "1657:7164",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[10px] not-italic text-[#9ca3af] text-[12px] text-left top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:110",
+      "name": "Empty state",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[120px] not-italic overflow-clip relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] text-center w-full",
+      "props": {
+        "height": {
+          "value": "120px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "163:111",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[20px] left-[144px] text-[13px] top-[40px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:112",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[16px] left-[144px] text-[11px] top-[64px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:105",
+      "name": "spacer",
+      "className": "h-[403px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "403px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:106",
+      "name": "Prune note",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[40px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:107",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:108",
+      "name": "Footer",
+      "className": "h-[44px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "163:109",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "453:4047",
+      "name": "hotspot/state · Versions · load-error",
+      "className": "absolute h-[34px] left-[-1px] top-[742px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

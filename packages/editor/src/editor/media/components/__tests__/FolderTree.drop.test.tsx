@@ -17,9 +17,10 @@ const folders: MediaFolder[] = [
   { id: "f1", name: "Products", parentId: null } as MediaFolder,
 ];
 
-function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void) {
+function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void, assetDragActive = false) {
   return render(
     <FolderTree
+      assetDragActive={assetDragActive}
       folders={folders}
       currentFolderId={null}
       setCurrentFolderId={vi.fn()}
@@ -30,9 +31,10 @@ function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void) {
       inUseCount={2}
       unusedCount={1}
       allTags={[]}
-      libraryItems={[]}
-      setLibrarySearch={vi.fn()}
-      createFolder={vi.fn()}
+      tagFilter={null}
+      setTagFilter={vi.fn()}
+      folderCounts={new Map()}
+      onNewFolder={vi.fn()}
       deleteFolder={vi.fn()}
       onTrashClick={vi.fn()}
       onMoveAssetToFolder={onMoveAssetToFolder}
@@ -91,5 +93,27 @@ describe("FolderTree — drag an asset onto a folder", () => {
     const row = screen.getByText("Products").closest(".mgr-node")!;
     fireEvent.dragOver(row, { dataTransfer: dataTransfer("a1") });
     expect(row.className).not.toContain("dragover");
+  });
+});
+
+// Clone 4215:26635 — while an asset is in flight EVERY folder row (All assets
+// and each user folder) is outlined as a target; the smart rows, New folder
+// and Trash are not places a file can land.
+describe("FolderTree — every folder is a target while an asset is dragged (Clone 4215:26635)", () => {
+  it("outlines All assets and each folder, and nothing else", () => {
+    mount(vi.fn(), true);
+    expect(screen.getByTestId("mgr-row-all-assets")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-recent")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-row-trash")).not.toHaveAttribute("data-drop-target");
+  });
+
+  it("outlines nothing at rest, or without a move handler", () => {
+    const { unmount } = mount(vi.fn(), false);
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveAttribute("data-drop-target");
+    unmount();
+    mount(undefined, true);
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveAttribute("data-drop-target");
   });
 });

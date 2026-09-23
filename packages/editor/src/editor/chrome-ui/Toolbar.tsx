@@ -16,6 +16,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Sits above the content it filters (default) or below it. */
@@ -32,9 +33,16 @@ const EDGE: Record<"bottom" | "top", string> = {
   top: "tw:border-t",
 };
 
+/* twMerge, not a join. Both BASE and a caller's `className` can set the same
+   arbitrary utility — `border-[var(--bk-gray-200)]` here versus a caller's
+   `border-[var(--bk-gray-100)]` — and a plain join compiles BOTH, leaving
+   STYLESHEET order to decide. That is not a rule anyone can reason about at the
+   call site: Compare's bar asked for gray-100, shipped gray-200, and only a
+   board measurement caught it. Merging makes `className` win the property it
+   names, which is what every caller already assumes. */
 export function Toolbar({ edge = "bottom", className, children, ...rest }: ToolbarProps) {
   return (
-    <div className={[BASE, EDGE[edge], className].filter(Boolean).join(" ")} {...rest}>
+    <div className={twMerge(BASE, EDGE[edge], className)} {...rest}>
       {children}
     </div>
   );

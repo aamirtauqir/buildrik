@@ -1,0 +1,26 @@
+{
+ "slug": "zz-f11-resolved",
+ "page": "1:3",
+ "note": "F11's board half, closed against the code as it now stands — including the retry this session added to it.",
+ "rows": [
+  {
+   "op": "add-text",
+   "parent": "1703:9368",
+   "name": "error/retry",
+   "text": "Retry",
+   "x": 660,
+   "y": 8,
+   "size": 12,
+   "style": "Medium",
+   "color": "#9B1C1C",
+   "why": "F11 · THE BOARD MUST DEPICT THE CODE, AND THE CODE CHANGED THIS SESSION. The audit's F11 was NOT-APPLICABLE as a board defect when it was written: FormsScreen.tsx:306-308 rendered the error as a bare role=alert with no action, so the board was faithful. That is no longer true — this session added a Retry to FormsScreen, with a test asserting the screen recovers rather than that a handler fired. So the board is now the stale half, and the founder's precedence rule says it follows the code. GEOMETRY, read not guessed: SCREEN_ERROR 1703:9368 is 728x32 at (1908,100814) with layoutMode NONE, so x/y are honoured and add-text is the right op (insert-text would ignore them). Its message 1703:9369 sits at x1918, i.e. 10px inside. Retry goes at the band's right, parent-relative x660 — 1908+660 = 2568, leaving 68px to the band's right edge at 2636 — and y8 centres it against the 32px band the same way the message is. #9B1C1C is the darker red the family uses for text on a #FDE8E8 alert ground, so it reads as an action rather than as more error prose. [w=44 added after the first attempt threw 'in resize: Property \"width\" failed validation: Expected number, received null' — add-text always calls resize(w, …), so w is required, not optional. 'Retry' at 12px Medium sets to roughly 34px; 44 leaves headroom without crowding the band's 68px right margin.]",
+   "w": 44
+  },
+  {
+   "op": "resize",
+   "id": "1703:9368",
+   "w": 728,
+   "why": "F11 · a no-op guard, deliberately. The band is already 728 wide; asserting it means the applier reports SAME rather than silently letting a future width change orphan the Retry that was placed against this edge. If it ever reports OK instead, the band moved and the x660 above needs recomputing."
+  }
+ ]
+}

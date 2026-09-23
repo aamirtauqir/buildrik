@@ -1,0 +1,175 @@
+{
+  "surface": "client-sign-off-e-post-approval-edited",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1340:7174",
+  "boardName": "client-sign-off-e-post-approval-edited",
+  "figmaHash": "7094c51ef1415ff2b7aa4a516aded47cf763b6119bdb056d921549eae61621dc",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:50:48.598Z",
+  "copy": [
+    "Ali's Studio",
+    "You approved this",
+    "Signed as Sara · sara@bellacucina.com"
+  ],
+  "targets": [
+    {
+      "nodeId": "1340:7174",
+      "name": "Client sign-off · E · post-approval-edited · 1280 — reachable only via canvas save, rename, duplicate, theme or template writes (sites.service.ts:741,315,380; theme.service.ts:186,274); CMS record edits, page create/update/delete, media and component-library changes do NOT stamp site.lastEditedAt, so they never make an approval stale (cf. MOD-A-08) — echo of 1:6 at the 1280×720 minimum fold; canonical 120:50 is 1280×900. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state.",
+      "className": "bg-[#f9fafb] relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7175",
+      "name": "Agency header",
+      "className": "absolute bg-white border-[#e5e7eb] border-b border-solid h-[56px] left-0 overflow-clip top-0 w-[1280px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7176",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[24px] not-italic text-[#111827] text-[13px] top-[20px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7177",
+      "name": "Card",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[220px] left-[420px] overflow-clip rounded-[8px] top-[176px] w-[440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "220px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7178",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[23px] not-italic text-[#111827] text-[20px] top-[23px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "20px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7179",
+      "name": "Heads-up (edited since)",
+      "className": "absolute bg-[#fef3c7] h-[64px] left-[23px] overflow-clip rounded-[6px] top-[63px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#fef3c7"
+        },
+        "height": {
+          "value": "64px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7180",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[12px] not-italic text-[#111827] text-[12px] top-[10px] w-[368px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "368px"
+        }
+      }
+    },
+    {
+      "nodeId": "1340:7181",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[23px] not-italic text-[#4b5563] text-[12px] top-[149px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7209",
+      "name": "hotspot/state · Client · A0 identify",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[682px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+N	1706:8483	Modal · Brand · AI prompt · success	FRAME	2620,40540,720,236	false	NONE	4	true
+K	1706:8484	TEXT	2640,40556,652,17	true		Generate component with AI
+K	1706:8485	FRAME	3296,40552,32,32	true	false	Close
+K	1706:8413	FRAME	2636,40588,688,120	true	false	schema preview
+K	1706:8487	FRAME	2620,40724,720,52	true	false	ModalFooter
+C	1706:8483	texts=5
+T	1706:8490	3205,40743,44,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · Discard	Discard
+T	1706:8488	3281,40743,31,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · Retry	Retry
+T	1706:8414	2648,40600,664,70	11	Regular	true	HEIGHT	schema preview	{   "name": "PricingCard",   "props": { "tier": "string" },   "tokens": ["color-primary"] 
+T	1706:8486	3306,40558,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8484	2640,40556,652,17	14	Semi Bold	true	HEIGHT	Modal · Brand · AI prompt · success	Generate component with AI
+R	1706:8483	1706:8476	NAVIGATE	Modal · Brand · AI prompt · success
+N	1706:8492	Modal · Brand · AI prompt · error	FRAME	940,40540,720,147	false	NONE	4	true
+K	1706:8493	TEXT	960,40556,652,17	true		Generate component with AI
+K	1706:8494	FRAME	1616,40552,32,32	true	false	Close
+K	1706:8415	FRAME	956,40588,688,31	true	false	box
+K	1706:8496	FRAME	940,40635,720,52	true	false	ModalFooter
+C	1706:8492	texts=5
+T	1706:8499	1529,40654,40,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · Cancel	Cancel
+T	1706:8497	1601,40654,31,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · Retry	Retry
+T	1706:8416	966,40596,668,15	12	Regular	true	HEIGHT	box	AI service not configured
+T	1706:8495	1626,40558,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8493	960,40556,652,17	14	Semi Bold	true	HEIGHT	Modal · Brand · AI prompt · error	Generate component with AI
+R	1706:8492	1706:8476	NAVIGATE	Modal · Brand · AI prompt · error
+N	1706:8501	Modal · Add Child Element — [not-implemented] its refusal. useElementsState.ts:151-161 rai	FRAME	100,10131,380,225	false	NONE	4	true
+K	1706:8502	TEXT	120,10147,312,17	true		Add Child Element
+K	1706:8503	FRAME	436,10143,32,32	true	false	Close
+K	1706:8417	FRAME	116,10179,348,33	true	false	search
+K	1706:8419	FRAME	116,10220,348,120	true	false	categories
+C	1706:8501	texts=7
+T	1706:8423	116,10310,40,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	FORMS
+T	1706:8422	116,10280,45,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	LAYOUT
+T	1706:8421	116,10250,36,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	MEDIA
+T	1706:8420	116,10220,34,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	BASIC
+T	1706:8418	116,10187,129,16	13	Regular	true	WIDTH_AND_HEIGHT	search	⌕  Search elements...
+T	1706:8504	446,10149,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8502	120,10147,312,17	14	Semi Bold	true	HEIGHT	Modal · Add Child Element — [not-implemented] its refusal. useElementsState.ts:151-161 rai	Add Child Element
+R	1706:8501	1082:4527	NAVIGATE	Modal · Add Child Element — [not-implemented] its refusal. useElementsState.ts:151-161 rai
+N	1707:8427	Popover · Inspector · binding · no-records	FRAME	520,49961,240,158	false	NONE	5	true
+K	1707:8418	FRAME	520,49961,240,30	true	false	back
+K	1707:8420	FRAME	520,49991,240,1	true	false	sep
+K	1707:8421	FRAME	520,49992,240,26	true	false	label
+K	1707:8423	FRAME	520,50018,240,69	true	false	block
+K	1707:8425	FRAME	520,50087,240,32	true	false	footer link
+C	1707:8427	texts=4
+T	1707:8426	532,50095,110,15	12	Regular	true	WIDTH_AND_HEIGHT	footer link	+ Create Collection
+T	1707:8424	532,50030,216,30	12	Regular	true	HEIGHT	block	No records yet. Open Content › this collection to add the first one.
+T	1707:8422	532,49998,38,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	label	Record
+T	1707:8419	532,49968,47,15	12	Regular	true	WIDTH_AND_HEIGHT	back	←  Price
+R	1707:8427	807:8342	NAVIGATE	Popover · Inspector · binding · no-records
+END	done=1706:8483|1706:8492|1706:8501|1707:8427	stopped=false	bytes=3743

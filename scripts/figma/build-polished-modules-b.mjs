@@ -34,7 +34,31 @@ const F=(n,w,h,f,r)=>{const x=figma.createFrame();x.name=n;x.resize(w,h);x.fills
 const put=(p,n,x,y)=>{p.appendChild(n);n.x=x;n.y=y;return n;};
 const st=(n,c,w)=>{n.strokes=solid(c);n.strokeWeight=w||1;return n;};
 const chip=(p,l,x,y,f,i)=>{const c=F("chip",0,18,f,9);const t=T(l,9,"Medium",i);c.resize(Math.round(t.width)+16,18);put(p,c,x,y);put(c,t,8,4);return c;};
-const head=(p,t2,d)=>{put(p,T(t2,15,"Semi Bold",INK),20,16);put(p,T(d,11,"Regular",CRIT,p.width-40),20,40);};
+/* The defect line sat at a fixed y40 under a title whose rendered height
+   varies with the face and size, so on four boards it overlapped the title.
+   Place it under the MEASURED bottom of the title instead — the same rule
+   every other fix in this arc came down to. */
+/* AUTO LAYOUT, not computed offsets.
+   Three times now a fix has derived ONE y from a measured height and left the
+   rest fixed, so the shifted content collided further down. Computing a
+   vertical flow by hand is the bug; Figma already has one. These panels are
+   VERTICAL auto-layout frames — children are appended in order and Figma owns
+   every y, so a heading that wraps to four lines pushes what follows instead
+   of landing on it. This is also what the brief asks for.
+   flow(p, node) just appends; gap(p, n) inserts a spacer. */
+const vstack=(n,w,pad,space,fill)=>{
+  const f=figma.createFrame(); f.name=n; f.fills=fill?solid(fill):[];
+  f.layoutMode="VERTICAL"; f.primaryAxisSizingMode="AUTO"; f.counterAxisSizingMode="FIXED";
+  f.resize(w,10); f.paddingLeft=pad; f.paddingRight=pad; f.paddingTop=pad; f.paddingBottom=pad;
+  f.itemSpacing=space; f.clipsContent=false;
+  return f;
+};
+const flow=(p,n)=>{ p.appendChild(n); return n; };
+const gap=(p,h)=>{ const g=F("gap",1,h,null); p.appendChild(g); g.layoutAlign="STRETCH"; return g; };
+const head=(p,t2,d)=>{
+  flow(p,T(t2,15,"Semi Bold",INK));
+  flow(p,T(d,11,"Regular",CRIT,p.width-40));
+};
 const btn=(p,l,x,y,primary)=>{const b=F("btn",0,28,primary?ACCENT:PANEL,4);const t=T(l,10,"Medium",primary?"#FFFFFF":INK);
  b.resize(Math.round(t.width)+28,28); if(!primary) st(b,LMED,1); put(p,b,x,y); put(b,t,14,8); return b;};
 
@@ -48,8 +72,8 @@ const Y=3300;
 
 /* ============ HISTORY ============ */
 const hs=F("hst/panel · corrected",300,560,PANEL,4); st(hs,LINE,1); hs.clipsContent=true; put(sec,hs,40,Y);
-head(hs,"History · corrected","A timestamp labelled “Jump to 14:32” calls restoreEntry, which clears redo and truncates the undo stack. One click, no confirm, permanent. The word promises navigation; the click deletes work.");
-put(hs,T("TODAY",9,"Medium",FAINT),20,96);
+const HY_hs=head(hs,"History · corrected","A timestamp labelled “Jump to 14:32” calls restoreEntry, which clears redo and truncates the undo stack. One click, no confirm, permanent. The word promises navigation; the click deletes work.");
+put(hs,T("TODAY",9,"Medium",FAINT),20,HY_hs);
 const ents=[["14:41","Edited Hero heading",false],["14:32","Added Features section",false],["14:20","Named save · before menu",true],["13:58","Auto-save",false]];
 let y=114;
 for(const [t2,label,named] of ents){
@@ -71,8 +95,8 @@ btn(cf,"Cancel",176,146,false); btn(cf,"Restore",258,146,true);
 
 /* ============ REVIEW ============ */
 const rv=F("rev/panel · corrected",300,560,PANEL,4); st(rv,LINE,1); rv.clipsContent=true; put(sec,rv,760,Y);
-head(rv,"Review · corrected","The first send has one door, in an overflow menu — and the bar's Re-send calls onResend() with no argument, so submitReview mints no token and the client gets a link that does not work.");
-const rs=F("state",260,86,WASH,4); st(rs,ACCENT,1); put(rv,rs,20,92);
+const HY_rv=head(rv,"Review · corrected","The first send has one door, in an overflow menu — and the bar's Re-send calls onResend() with no argument, so submitReview mints no token and the client gets a link that does not work.");
+const rs=F("state",260,86,WASH,4); st(rs,ACCENT,1); put(rv,rs,20,HY_rv);
 put(rs,T("Sent — waiting on your client",11,"Medium",ACCENT),12,10);
 put(rs,T("sara@bellacucina.com · opened 2h ago, no comments yet",10,"Regular",SOFT,236),12,30);
 put(rs,T("Round 2 · sent 6 Sep",9,"Regular",MUTED),12,62);
@@ -87,8 +111,8 @@ put(rv,T("The address is named ON the button, so a re-send cannot silently go no
 
 /* ============ SETTINGS ============ */
 const se=F("set/panel · corrected",340,560,PANEL,4); st(se,LINE,1); se.clipsContent=true; put(sec,se,1100,Y);
-head(se,"Settings · corrected","Five meanings for “delete” in one tab — a first-click server delete on a live 301, a window.confirm, an inline band, a ConfirmDialog. And half the screens write outside version history.");
-put(se,T("ONE DESTRUCTIVE PATTERN",9,"Medium",FAINT),20,92);
+const HY_se=head(se,"Settings · corrected","Five meanings for “delete” in one tab — a first-click server delete on a live 301, a window.confirm, an inline band, a ConfirmDialog. And half the screens write outside version history.");
+put(se,T("ONE DESTRUCTIVE PATTERN",9,"Medium",FAINT),20,HY_se);
 const del=F("confirm",300,120,PANEL,4); st(del,CRIT,1); put(se,del,20,110);
 put(del,T("Delete redirect /old-menu → /menu?",11,"Semi Bold",INK),14,12);
 put(del,T("This rule is live. Visitors following the old link will get a 404 until you add another.",10,"Regular",SOFT,272),14,34);
@@ -107,8 +131,8 @@ put(se,T("Six screens skip composer.saveProject entirely, so restoring a version
 
 /* ============ AI ============ */
 const ai=F("aip/panel · corrected",320,560,PANEL,4); st(ai,LINE,1); ai.clipsContent=true; put(sec,ai,1480,Y);
-head(ai,"AI · corrected","14 entry points, 5 glyph vocabularies, 3 verbs, two panels with two independent threads — and a not-configured state offering “Open workspace settings”, a screen that cannot set an AI key.");
-put(ai,T("ONE CONTRACT — propose, diff, apply, one undo step",9,"Medium",FAINT),20,92);
+const HY_ai=head(ai,"AI · corrected","14 entry points, 5 glyph vocabularies, 3 verbs, two panels with two independent threads — and a not-configured state offering “Open workspace settings”, a screen that cannot set an AI key.");
+put(ai,T("ONE CONTRACT — propose, diff, apply, one undo step",9,"Medium",FAINT),20,HY_ai);
 const steps=[["1 · Prompt","Write a menu section for a trattoria",PANEL,INK],
              ["2 · Generating","streaming · Cancel",BG,MUTED],
              ["3 · Proposed","3 changes · review each",WASH,ACCENT],

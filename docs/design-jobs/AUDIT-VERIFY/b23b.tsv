@@ -1,0 +1,55 @@
+N	46:2	Modal instances — 3 widths · 5 states	FRAME	500,144658,1976,820	true	VERTICAL	3	true
+K	46:3	FRAME	548,144706,1660,366	true	true	One instance per width
+K	46:60	TEXT	548,145112,592,20	true		Every instance also has these four — error goes inline above the footer, never in a second
+K	46:61	FRAME	548,145172,1880,258	true	true	States
+C	46:2	texts=48
+T	46:113	2024,145241,368,18	12	Regular	true	HEIGHT	success	Reservations created — closing
+T	46:108	2396,145190,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:107	2012,145188,384,24	16	Semi Bold	true	HEIGHT	header	New page
+T	46:104	1833,145388,77,20	13	Medium	true	WIDTH_AND_HEIGHT	Create page	Create page
+T	46:102	1750,145388,43,20	13	Medium	true	WIDTH_AND_HEIGHT	Cancel	Cancel
+T	46:100	1544,145319,368,18	12	Regular	true	HEIGHT	inline error	A page called Menu already exists.
+T	I230:1104;10:11	1544,145266,368,22	14	Regular	true	NONE	Input	Menu
+T	46:96	1532,145232,392,18	12	Regular	true	HEIGHT	Page name	Page name
+T	46:91	1916,145190,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:90	1532,145188,384,24	16	Semi Bold	true	HEIGHT	header	New page
+T	46:87	1366,145370,64,20	13	Medium	true	WIDTH_AND_HEIGHT	Creating…	Creating…
+T	46:81	1052,145372,288,16	11	Regular	true	HEIGHT	footer	Creating…
+T	I230:1102;10:11	1064,145266,368,22	14	Regular	true	NONE	Input	Reservations
+T	46:83	1052,145232,392,18	12	Regular	true	HEIGHT	Page name	Page name
+T	46:78	1436,145190,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:77	1052,145188,384,24	16	Semi Bold	true	HEIGHT	header	New page
+T	46:74	873,145370,77,20	13	Medium	true	WIDTH_AND_HEIGHT	Create page	Create page
+T	46:68	572,145372,275,16	11	Regular	true	HEIGHT	footer	Unsaved — Esc and scrim clicks are ignored
+T	I230:1100;10:11	584,145266,368,22	14	Regular	true	NONE	Input	Reservations
+T	46:70	572,145232,392,18	12	Regular	true	HEIGHT	Page name	Page name
+T	46:65	956,145190,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:64	572,145188,384,24	16	Semi Bold	true	HEIGHT	header	New page
+T	46:60	548,145112,592,20	13	Regular	true	WIDTH_AND_HEIGHT	Modal instances — 3 widths · 5 states	Every instance also has these four — error goes inline above the footer, never in a second
+T	46:59	2139,145030,31,20	13	Medium	true	WIDTH_AND_HEIGHT	Save	Save
+T	46:57	2056,145030,43,20	13	Medium	true	WIDTH_AND_HEIGHT	Cancel	Cancel
+T	I230:1098;10:11	1664,144956,508,22	14	Regular	true	NONE	Input	Wood-fired pizza and small plates in Northgate.
+T	46:53	1652,144922,532,18	12	Regular	true	HEIGHT	Description	Description
+T	I230:1096;10:11	1664,144878,508,22	14	Regular	true	NONE	Input	/menu
+T	46:49	1652,144844,532,18	12	Regular	true	HEIGHT	URL	URL
+T	I230:1094;10:11	1664,144800,508,22	14	Regular	true	NONE	Input	Our menu
+T	46:45	1652,144766,532,18	12	Regular	true	HEIGHT	Page title	Page title
+T	46:40	2176,144724,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:39	1652,144722,524,24	16	Semi Bold	true	HEIGHT	header	Page settings
+T	46:36	1434,144928,116,20	13	Medium	true	WIDTH_AND_HEIGHT	Run in background	Run in background
+T	46:22	1052,144930,356,16	11	Regular	true	HEIGHT	footer	Started 4 seconds ago
+T	46:34	1564,144861,0,18	12	Regular	true	WIDTH_AND_HEIGHT	Waiting for the build	
+T	46:33	1070,144860,484,20	13	Regular	true	HEIGHT	Waiting for the build	Waiting for the build
+T	46:30	1554,144817,10,18	12	Regular	true	WIDTH_AND_HEIGHT	Uploading to Vercel	…
+T	46:29	1070,144816,474,20	13	Regular	true	HEIGHT	Uploading to Vercel	Uploading to Vercel
+T	46:26	1534,144773,30,18	12	Regular	true	WIDTH_AND_HEIGHT	Exporting 12 pages	Done
+T	46:25	1070,144772,454,20	13	Regular	true	HEIGHT	Exporting 12 pages	Exporting 12 pages
+T	46:19	1556,144724,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:18	1052,144722,504,24	16	Semi Bold	true	HEIGHT	header	Publishing Bella Cucina
+T	46:15	856,144904,94,20	13	Medium	true	WIDTH_AND_HEIGHT	Delete 3 pages	Delete 3 pages
+T	46:13	773,144904,43,20	13	Medium	true	WIDTH_AND_HEIGHT	Cancel	Cancel
+T	46:11	572,144766,392,40	13	Regular	true	HEIGHT	body	About, Contact and Menu will be deleted, along with everything on them. This cannot be und
+T	46:7	956,144724,12,20	13	Regular	true	WIDTH_AND_HEIGHT	header	✕
+T	46:6	572,144722,384,24	16	Semi Bold	true	HEIGHT	header	Delete 3 pages
+R	46:2	876:4532	NAVIGATE	Modal instances — 3 widths · 5 states
+END	done=46:2	stopped=false	bytes=4272

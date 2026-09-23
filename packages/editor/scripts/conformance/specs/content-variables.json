@@ -1,0 +1,449 @@
+{
+  "surface": "content-variables",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "151:62",
+  "boardName": "content-variables",
+  "figmaHash": "18f0b9920ff28309c7b36c7cef574c3a5718bc5c5ade4f0c79cf8974b7699188",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:18:02.726Z",
+  "copy": [
+    "Content",
+    "‹ Variables",
+    "{{site.name}}",
+    "Bella Cucina",
+    "{{site.phone}}",
+    "+44 20 7946 0912",
+    "{{site.address}}",
+    "12 Dean St, London",
+    "{{site.hours}}",
+    "Tue–Sun, from 5pm",
+    "+ New variable"
+  ],
+  "targets": [
+    {
+      "nodeId": "151:62",
+      "name": "[not-implemented] Content · variables — the value is stored in THIS BROWSER under a key built from the project NAME (useContentPanel.ts:81, contentPanelUtils.ts:21-23), so renaming the site orphans every variable and two sites sharing a name share theirs. The screen's own empty state admits pages do not read them.",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:481",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:481;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "151:67",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:68",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:69",
+      "name": "Var · site.name",
+      "className": "[word-break:break-word] font-normal h-[44px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:70",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Regular'] leading-[16px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[6px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:71",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] h-[16px] leading-[16px] left-[16px] not-italic overflow-hidden text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-ellipsis top-[25px] w-[200px]",
+      "props": {
+        "height": {
+          "value": "16px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:72",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] leading-[20px] left-[256px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:73",
+      "name": "Var · site.phone",
+      "className": "[word-break:break-word] font-normal h-[44px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:74",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Regular'] leading-[16px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[6px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:75",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] h-[16px] leading-[16px] left-[16px] not-italic overflow-hidden text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-ellipsis top-[25px] tracking-[0.5px] w-[200px]",
+      "props": {
+        "height": {
+          "value": "16px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:76",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] leading-[20px] left-[256px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:77",
+      "name": "Var · site.address",
+      "className": "[word-break:break-word] font-normal h-[44px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:78",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Regular'] leading-[16px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[6px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:79",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] h-[16px] leading-[16px] left-[16px] not-italic overflow-hidden text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-ellipsis top-[25px] w-[200px]",
+      "props": {
+        "height": {
+          "value": "16px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:80",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] leading-[20px] left-[256px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:81",
+      "name": "Var · site.hours",
+      "className": "[word-break:break-word] font-normal h-[44px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:82",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Regular'] leading-[16px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[6px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "151:83",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] h-[16px] leading-[16px] left-[16px] not-italic overflow-hidden text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-ellipsis top-[25px] w-[200px]",
+      "props": {
+        "height": {
+          "value": "16px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:84",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] leading-[20px] left-[256px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "151:85",
+      "name": "Add var",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "151:86",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7263",
+      "name": "hotspot/back · Content · root",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17393",
+      "name": "hotspot/state · variables · empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[-1px] top-[299px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17402",
+      "name": "hotspot/state · variables · key-error",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[331px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,653 @@
+[
+ {
+  "id": "M01",
+  "pri": "P1",
+  "area": "M01",
+  "kind": "Fresh screenshot + current node text",
+  "title": "Single-file delete is still the bulk-delete design",
+  "nodes": [
+   "2850:22371",
+   "1175:4827"
+  ],
+  "text": "P1 M01 Fresh screenshot + current node text Single-file delete is still the bulk-delete design Observed. The frame named Media \u00b7 delete-confirm \u00b7 single file says Delete 34 files, warns about 5 used files and requires DELETE. Its current text matches the bulk-delete specimen. Fix. Create a real single-asset state with the filename, one asset's usage impact and an action such as Delete hero-kitchen.jpg. Keep bulk typed-confirmation as a separate variant. Accept when. Frame name, asset count, affected usage and primary action all describe the same selection. 2850:22371 \u2197 \u00b7 1175:4827 \u2197"
+ },
+ {
+  "id": "M02",
+  "pri": "P1",
+  "area": "M02",
+  "kind": "Fresh node text + hierarchy",
+  "title": "All-failed rollback state contains success and partial success",
+  "nodes": [
+   "2881:12608",
+   "1174:4849"
+  ],
+  "text": "P1 M02 Fresh node text + hierarchy All-failed rollback state contains success and partial success Observed. The all-failed (rollback) frame contains Replaced 3 uses \u2713 and 2 replaced, 1 failed. Current children remain result-clean and result-partial; no all-failed outcome is drawn. Fix. Draw a dedicated rollback result: No replacements applied; original images restored, if that is the actual operation contract. Show failed targets and Retry failed. Use separate partial and complete success variants. Accept when. All-failed, partial and success states have distinct, internally consistent counts, status and recovery actions. 2881:12608 \u2197 \u00b7 1174:4849 \u2197"
+ },
+ {
+  "id": "M03",
+  "pri": "P1",
+  "area": "M03",
+  "kind": "Fresh node text + hierarchy",
+  "title": "Add Child refused state has no refusal message",
+  "nodes": [
+   "2850:21560",
+   "1706:8501"
+  ],
+  "text": "P1 M03 Fresh node text + hierarchy Add Child refused state has no refusal message Observed. The refused frame's complete current text is only Add Child Element, search and BASIC/MEDIA/LAYOUT/FORMS. It matches the default picker text. Fix. Add a visible reason such as This element cannot contain children, identify the selected target and provide Select another parent / Choose a compatible element. Keep the user's search and selection. Accept when. A reviewer can distinguish refusal from default without reading the Figma layer name. 2850:21560 \u2197 \u00b7 1706:8501 \u2197"
+ },
+ {
+  "id": "M04",
+  "pri": "P1",
+  "area": "M04",
+  "kind": "Retained full text comparison",
+  "title": "Page-deletion impact dialog is an unsaved-SEO copy",
+  "nodes": [
+   "2898:22178",
+   "1171:4820"
+  ],
+  "text": "P1 M04 Retained full text comparison Page-deletion impact dialog is an unsaved-SEO copy Observed. The frame named delete-page \u00b7 confirm \u00b7 inbound links contains exactly the same recorded text as the unsaved-warning dialog: Discard unsaved SEO changes? No page deletion or inbound links are described. Fix. Use Delete [page name]?; state affected internal links and navigation references; provide Review affected links plus Cancel / Delete page. Define home-page and dynamic-template restrictions as separate states. Accept when. The deletion dialog names the page, explains dependency impact and uses Delete page as its destructive action. 2898:22178 \u2197 \u00b7 1171:4820 \u2197"
+ },
+ {
+  "id": "M05",
+  "pri": "P1",
+  "area": "M05",
+  "kind": "Fresh exact geometry",
+  "title": "Create Component Cancel overlaps the primary button",
+  "nodes": [
+   "1170:4777",
+   "1712:8430",
+   "1712:8431"
+  ],
+  "text": "P1 M05 Fresh exact geometry Create Component Cancel overlaps the primary button Observed. Cancel text occupies x=520\u2013563, y=698\u2013714. Create component occupies x=548\u2013700, y=690\u2013724. Their rectangles overlap by 15\u00d716 pixels. Fix. Place both actions in one horizontal auto-layout footer with an explicit gap. Make Cancel a complete button instance and give the primary button content-based width. Accept when. Action hit areas and label bounds do not intersect; labels retain their padding after text changes. 1170:4777 \u2197 \u00b7 1712:8430 \u2197 \u00b7 1712:8431 \u2197 Element Horizontal bounds Vertical bounds Cancel text 520\u2013563 698\u2013714 Create component button 548\u2013700 690\u2013724 Intersection 15px 16px"
+ },
+ {
+  "id": "M06",
+  "pri": "P1",
+  "area": "M06",
+  "kind": "Fresh screenshot + geometry",
+  "title": "Destructive warning is clipped inside its alert",
+  "nodes": [
+   "2850:22371",
+   "2850:22373",
+   "1175:4827"
+  ],
+  "text": "P1 M06 Fresh screenshot + geometry Destructive warning is clipped inside its alert Observed. The delete warning is a 408\u00d725 region containing a long warning at 11px. The new screenshot cuts off the final word elements at the right edge. Fix. Use a wrapping alert body with an independent icon column and content-based height. Keep the entire dependency warning above the confirmation input. Accept when. The full warning fits at 440px modal width and with longer filenames/localized text. 2850:22371 \u2197 \u00b7 2850:22373 \u2197 \u00b7 1175:4827 \u2197"
+ },
+ {
+  "id": "M07",
+  "pri": "P1",
+  "area": "M07",
+  "kind": "Fresh complete node text",
+  "title": "Brand change review displays four changes but says three",
+  "nodes": [
+   "1172:4840"
+  ],
+  "text": "P1 M07 Fresh complete node text Brand change review displays four changes but says three Observed. Review 3 staged changes and Apply 3 changes are shown alongside four rows: color/accent, type/heading, spacing/lg and shadow/raised removed. Fix. Generate the title and CTA count from the same reviewed change set, including deletions. If a change is unsupported, separate it and explain whether it will be applied. Accept when. Visible applied rows and both counts agree; unsupported rows never look included in an executable action. 1172:4840 \u2197"
+ },
+ {
+  "id": "M08",
+  "pri": "P1",
+  "area": "M08",
+  "kind": "Retained complete text",
+  "title": "Single-image picker shows multiple selection",
+  "nodes": [
+   "1164:4713"
+  ],
+  "text": "P1 M08 Retained complete text Single-image picker shows multiple selection Observed. Choose an image / for Hero \u00b7 Image shares the same specimen with 2 selected and Use Selected. Fix. Define selection mode by destination. A single-image property gets a radio-style single choice and Use image; multi-asset insertion gets a separate plural title and count-aware action. Accept when. A single-image target cannot be represented as accepting two assets; title, count and CTA agree. 1164:4713 \u2197"
+ },
+ {
+  "id": "M09",
+  "pri": "P1",
+  "area": "M09",
+  "kind": "Retained complete text",
+  "title": "CMS publish error contradicts the record's own state",
+  "nodes": [
+   "1706:8451"
+  ],
+  "text": "P1 M09 Retained complete text CMS publish error contradicts the record's own state Observed. The publish-error record shows Margherita \u20ac9.00 published while the message says Can't publish: Price is required. Fix. Draw the actual invalid field empty, preserve the draft/unpublished status and highlight the affected price input with an Edit record action. Keep currency consistent with the collection example. Accept when. The displayed value, validation message and publish status describe one coherent failed transaction. 1706:8451 \u2197"
+ },
+ {
+  "id": "M10",
+  "pri": "P2",
+  "area": "M10",
+  "kind": "Retained complete text",
+  "title": "No-published-records state sends users to create more records",
+  "nodes": [
+   "1706:8437"
+  ],
+  "text": "P2 M10 Retained complete text No-published-records state sends users to create more records Observed. The dialog says Menu items \u2014 12 records and No records published yet, but its only task CTA is + Add record. Fix. Offer Review drafts / Select records to publish for the 12 existing records. Keep Add record secondary; show the missing-template dependency separately. Accept when. A user can publish an existing valid record from the recovery path without creating a thirteenth record. 1706:8437 \u2197"
+ },
+ {
+  "id": "M11",
+  "pri": "P2",
+  "area": "M11",
+  "kind": "Retained complete text",
+  "title": "No-collections dialog explains a detour without providing it",
+  "nodes": [
+   "1706:8433",
+   "148:2"
+  ],
+  "text": "P2 M11 Retained complete text No-collections dialog explains a detour without providing it Observed. The complete 720\u00d780 dialog says to create a collection from an element's CMS binding, with only a close symbol. Fix. Provide Create collection or Open Content with an explicit destination. Avoid sending users through an unrelated element-selection workflow when a direct Content route exists. Accept when. The empty state provides a direct, labeled path to its prerequisite. 1706:8433 \u2197 \u00b7 148:2 \u2197"
+ },
+ {
+  "id": "M12",
+  "pri": "P1",
+  "area": "M12",
+  "kind": "Retained complete text",
+  "title": "AI success has no way to use the result",
+  "nodes": [
+   "1706:8483"
+  ],
+  "text": "P1 M12 Retained complete text AI success has no way to use the result Observed. The AI success modal presents PricingCard JSON with Retry and Discard. There is no Add component, Apply or usable preview action in the recorded text. Fix. Replace raw schema with a rendered preview and a clear Apply/Add component action when supported. Otherwise label the result as unavailable/unsupported and explain what the user can do. Accept when. A successful generation can be previewed and applied, or is explicitly identified as non-applicable rather than success. 1706:8483 \u2197"
+ },
+ {
+  "id": "M13",
+  "pri": "P2",
+  "area": "M13",
+  "kind": "Retained complete text",
+  "title": "AI not-configured state suggests Retry",
+  "nodes": [
+   "1706:8492"
+  ],
+  "text": "P2 M13 Retained complete text AI not-configured state suggests Retry Observed. The error dialog says AI service not configured but offers Retry / Cancel. Fix. Use Configure AI or an appropriate Contact workspace admin path for a configuration problem. Reserve Retry for transient provider failures; preserve the prompt. Accept when. The recovery action addresses the actual failure category instead of repeating an unchanged request. 1706:8492 \u2197"
+ },
+ {
+  "id": "M14",
+  "pri": "P2",
+  "area": "M14",
+  "kind": "Retained measured dimensions",
+  "title": "CMS dialog width changes between default and error/empty variants",
+  "nodes": [
+   "1170:4749",
+   "1706:8433",
+   "1706:8437",
+   "1706:8444",
+   "1706:8451"
+  ],
+  "text": "P2 M14 Retained measured dimensions CMS dialog width changes between default and error/empty variants Observed. The records table is 640px wide; no-collections, none-published, empty and publish-error variants are 720px wide. The default frame explicitly says its width stays 640. Fix. Use one CMS records dialog shell across states. Let the body change while header, width and footer anchors remain stable. Accept when. Loading, populated, empty and failed states use the same width and do not jump sideways. 1170:4749 \u2197 \u00b7 1706:8433 \u2197 \u00b7 1706:8437 \u2197 \u00b7 1706:8444 \u2197 \u00b7 1706:8451 \u2197"
+ },
+ {
+  "id": "M15",
+  "pri": "P2",
+  "area": "M15",
+  "kind": "Retained text; sample-content inconsistency",
+  "title": "Collection wizard uses a mismatched example configuration",
+  "nodes": [
+   "1170:4713"
+  ],
+  "text": "P2 M15 Retained text; sample-content inconsistency Collection wizard uses a mismatched example configuration Observed. The collection is Menu items, with Title/Price/Photo/Description fields, while its generation line uses /blog/{slug}, blog/_template and an SEO title ending Blog. Fix. Use a consistent restaurant-menu example and expose editable template/URL fields. Make the required Slug field visible or explain which field supplies it. Accept when. Collection fields, generated URLs, template and SEO examples refer to the same content type. 1170:4713 \u2197"
+ },
+ {
+  "id": "M16",
+  "pri": "P2",
+  "area": "M16",
+  "kind": "Retained complete text",
+  "title": "No-records binding popover offers the wrong prerequisite",
+  "nodes": [
+   "1707:8427"
+  ],
+  "text": "P2 M16 Retained complete text No-records binding popover offers the wrong prerequisite Observed. The binding popover says No records yet. Open Content \u203a this collection to add the first one, but the visible CTA is + Create Collection. Fix. Use Add record to [collection] or Open collection. Only offer Create collection when no collection exists. Accept when. The primary action resolves the missing record in the selected collection. 1707:8427 \u2197"
+ },
+ {
+  "id": "M17",
+  "pri": "P2",
+  "area": "M17",
+  "kind": "Retained complete text; visible-label check",
+  "title": "Save-as-template field has no visible label",
+  "nodes": [
+   "1169:4753"
+  ],
+  "text": "P2 M17 Retained complete text; visible-label check Save-as-template field has no visible label Observed. The save-as-template specimen contains its title, Autumn menu layout, explanatory copy and Cancel / Save template, but no visible Template name field label. Fix. Add a persistent Template name label, required marker if appropriate, and an inline duplicate/invalid-name error state. Keep the user's entered name on error. Accept when. The field remains identifiable after its value is cleared, and validation appears beside the field. 1169:4753 \u2197"
+ },
+ {
+  "id": "M18",
+  "pri": "P2",
+  "area": "M18",
+  "kind": "Retained complete text",
+  "title": "Canvas AI error popover ends at a failure sentence",
+  "nodes": [
+   "1707:8455",
+   "1707:8433"
+  ],
+  "text": "P2 M18 Retained complete text Canvas AI error popover ends at a failure sentence Observed. The 248\u00d740 error specimen only says The AI service didn't respond. Fix. Retain the prompt and add Retry / Keep editing or an equivalent return route. Use a stable popover body/footer so the controls do not disappear after a request. Accept when. The user can recover or return to editing from the error state without losing their prompt. 1707:8455 \u2197 \u00b7 1707:8433 \u2197"
+ },
+ {
+  "id": "M19",
+  "pri": "P2",
+  "area": "M19",
+  "kind": "Fresh typography + geometry",
+  "title": "New modal specimens drift from the existing modal typography and control scale",
+  "nodes": [
+   "46:2",
+   "2850:22371",
+   "1172:4840"
+  ],
+  "text": "P2 M19 Fresh typography + geometry New modal specimens drift from the existing modal typography and control scale Observed. The reference kit uses 16/24 titles and 13/20 action text. The single-delete dialog uses a 14px title, 11px action text and 27px footer controls; Brand change review also has 11px action labels and a 27px footer. Fix. Reuse the established modal title/body/button styles and shared footer component. Keep compact technical metadata distinct from important action labels. Accept when. Equivalent modal roles reuse the same title, body and button styles rather than independent local values. 46:2 \u2197 \u00b7 2850:22371 \u2197 \u00b7 1172:4840 \u2197"
+ },
+ {
+  "id": "M20",
+  "pri": "Review",
+  "area": "M20",
+  "kind": "Measured geometry; viewport behavior requires visual/prototype verification",
+  "title": "Long Create Component modal needs a constrained-height state",
+  "nodes": [
+   "1170:4777"
+  ],
+  "text": "Review M20 Measured geometry; viewport behavior requires visual/prototype verification Long Create Component modal needs a constrained-height state Observed. The dialog is 720\u00d7740 before external margins. At a 720px-tall window the frame already exceeds the viewport. The current inspected hierarchy has absolute-positioned form groups and its footer at y=676\u2013724. Fix. Add a viewport-constrained variant with fixed header/footer and a scrolling form body. Test 1280\u00d7720 and increased text size, preserving visible Cancel/Create actions. Accept when. All form fields remain reachable and the primary action is visible at the agreed minimum editor window height. 1170:4777 \u2197"
+ },
+ {
+  "id": "F01",
+  "pri": "P1",
+  "area": "F01 \u00b7 Shell / Layers / Inspector",
+  "kind": "Visual",
+  "title": "Selection disagrees across the editor",
+  "nodes": [
+   "52:2",
+   "199:205"
+  ],
+  "figcaptions": [
+   "Open evidence frame 52:2 \u2197"
+  ],
+  "text": "P1 F01 \u00b7 Shell / Layers / Inspector Visual Selection disagrees across the editor Evidence. The assembled editor highlights \u201cheading-that-is-long\u201d in Layers, while the canvas selection label and Inspector identify \u201cSection\u201d. The selected-element variant retains \u201cSection\u201d while outlining the heading area. Impact. Users cannot confidently predict which element an Inspector edit will change. Correction. Bind the layer highlight, canvas outline, breadcrumb and Inspector header to one selected element. Draw a consistent heading-selected and section-selected pair. Accept when. All four locations identify the same element in each selection state. Frames: 52:2 \u2197 \u00b7 199:205 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F02",
+  "pri": "P1",
+  "area": "F02 \u00b7 Shell / Inspector",
+  "kind": "Visual",
+  "title": "The displayed fill does not match the selected section",
+  "nodes": [
+   "52:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 52:2 \u2197"
+  ],
+  "text": "P1 F02 \u00b7 Shell / Inspector Visual The displayed fill does not match the selected section Evidence. The assembled frame shows Inspector Background Fill #1A56DB with a blue swatch, while the selected hero section is light gray. Impact. The design communicates a property value that does not match its visible result. Correction. Correct the sample value or selected section fill; use the same document state throughout the composed screen. Accept when. Changing the fill specimen produces the same color on its selected canvas element. Frames: 52:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F03",
+  "pri": "P1",
+  "area": "F03 \u00b7 Pages",
+  "kind": "Visual",
+  "title": "Audit notes and overlapping blocks obscure the panel",
+  "nodes": [
+   "140:2",
+   "2898:12617",
+   "2898:21981"
+  ],
+  "figcaptions": [
+   "Open evidence frame 140:2 \u2197"
+  ],
+  "text": "P1 F03 \u00b7 Pages Visual Audit notes and overlapping blocks obscure the panel Evidence. The Pages tree render contains pale rectangular blocks across the lower panel and a long engineering/audit paragraph in the product area; the Structure entry is squeezed between them. Impact. Users and reviewers cannot distinguish intended controls from annotations or overlapping canvas material. Correction. Move audit text and prototype helpers outside the product frame; reparent stray elements and rebuild a clean Pages body/footer. Accept when. A frame export and prototype view show only Pages UI, with Structure legible and no overlapping content. Frames: 140:2 \u2197 \u00b7 2898:12617 \u2197 \u00b7 2898:21981 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F04",
+  "pri": "P1",
+  "area": "F04 \u00b7 Media",
+  "kind": "Visual",
+  "title": "Footer actions and accepted-format text overlap",
+  "nodes": [
+   "144:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 144:2 \u2197"
+  ],
+  "text": "P1 F04 \u00b7 Media Visual Footer actions and accepted-format text overlap Evidence. In Media grid, Upload / Stock / Icons / Fonts wrap awkwardly; the accepted-format paragraph collides with \u201cSort and list view live in the full library\u201d. Pale blocks and a local-only navigation label also appear in the bottom region. Impact. Primary asset actions are hard to scan and some copy is unreadable. Correction. Use separate auto-layout rows for source actions, upload guidance and full-library navigation. Move audit/prototype labels out of the rendered panel. Accept when. At the documented 280px width every action remains readable, with no collisions for normal and long copy. Frames: 144:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F05",
+  "pri": "P1",
+  "area": "F05 \u00b7 Notifications",
+  "kind": "Visual",
+  "title": "Message text overlaps timestamps",
+  "nodes": [
+   "165:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 165:2 \u2197"
+  ],
+  "text": "P1 F05 \u00b7 Notifications Visual Message text overlaps timestamps Evidence. The second notification's text collides with its \u201c4h\u201d timestamp; the failed-publish row collides with \u201c1d\u201d. Impact. Notifications lose the message/time distinction. Correction. Use a flexible message column and fixed trailing timestamp column; allow message wrapping and row height growth. Accept when. Long site names and two-line messages never enter the timestamp column. Frames: 165:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F06",
+  "pri": "P1",
+  "area": "F06 \u00b7 AI",
+  "kind": "Visual",
+  "title": "Explanatory and recovery content is clipped",
+  "nodes": [
+   "170:2",
+   "171:105",
+   "171:136",
+   "2846:21667"
+  ],
+  "figcaptions": [
+   "Open evidence frame 170:2 \u2197"
+  ],
+  "text": "P1 F06 \u00b7 AI Visual Explanatory and recovery content is clipped Evidence. AI idle cuts off the paragraph explaining exceptions to the diff/undo contract. Quota and not-configured frames have recovery text flagged outside clipping parents; their rendered quota state does not show the promised manual-continuation controls. Impact. Users lose important information and a route back to manual work. Correction. Let the message body hug content or scroll; keep recovery actions in a visible footer. Move developer/prototype notes outside the frame. Accept when. Full guidance and Continue in Inspector remain visible at 280\u00d7812 without scrolling the action out of reach. Frames: 170:2 \u2197 \u00b7 171:105 \u2197 \u00b7 171:136 \u2197 \u00b7 2846:21667 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F07",
+  "pri": "P1",
+  "area": "F07 \u00b7 History",
+  "kind": "Visual",
+  "title": "History retention warning is cut off",
+  "nodes": [
+   "163:2",
+   "2854:12294",
+   "2854:21739",
+   "2854:21814",
+   "2854:21854"
+  ],
+  "figcaptions": [
+   "Open evidence frame 163:2 \u2197"
+  ],
+  "text": "P1 F07 \u00b7 History Visual History retention warning is cut off Evidence. The Changes screen ends its warning after \u201cSave a version to keep a\u201d, losing the completion of the sentence. Impact. Users may misunderstand what survives reload and what must be saved explicitly. Correction. Increase the warning region height and reserve independent space for Save a version. Accept when. The complete retention warning and save action are visible together. Frames: 163:2 \u2197 \u00b7 2854:12294 \u2197 \u00b7 2854:21739 \u2197 \u00b7 2854:21814 \u2197 \u00b7 2854:21854 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F08",
+  "pri": "P1",
+  "area": "F08 \u00b7 Review",
+  "kind": "Visual",
+  "title": "Page grouping contradicts comment metadata",
+  "nodes": [
+   "156:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 156:2 \u2197"
+  ],
+  "text": "P1 F08 \u00b7 Review Visual Page grouping contradicts comment metadata Evidence. Under \u201cOPEN \u00b7 HOME\u201d, the second comment identifies its page as Contact. Impact. The visible grouping can lead the reviewer to the wrong page. Correction. Group comments by their actual page identity and keep group counts in sync. Accept when. Every comment's page label agrees with its group heading; Home and Contact comments appear under their own headings. Frames: 156:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F09",
+  "pri": "P1",
+  "area": "F09 \u00b7 Review",
+  "kind": "Visual",
+  "title": "The reply composer does not identify a recipient or thread",
+  "nodes": [
+   "156:2",
+   "1705:8704"
+  ],
+  "figcaptions": [
+   "Open evidence frame 156:2 \u2197"
+  ],
+  "text": "P1 F09 \u00b7 Review Visual The reply composer does not identify a recipient or thread Evidence. The composer says \u201cReply to the client\u2026\u201d while the adjacent explanation says the action posts to the page's comments, not under a reply. No target thread is selected in this view. Impact. A user may send a page comment believing it is a threaded reply. Correction. Either label the action Add page comment with the target page, or add an explicit selected-thread context and use real reply semantics. Accept when. The action label, destination and resulting comment location agree. Frames: 156:2 \u2197 \u00b7 1705:8704 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F10",
+  "pri": "P2",
+  "area": "F10 \u00b7 Review",
+  "kind": "Visual",
+  "title": "Re-send button has insufficient room for its label",
+  "nodes": [
+   "156:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 156:2 \u2197"
+  ],
+  "text": "P2 F10 \u00b7 Review Visual Re-send button has insufficient room for its label Evidence. The Re-send for review label touches or extends beyond the rounded blue button edges in the panel render. Impact. The primary action looks clipped and less trustworthy. Correction. Use a shared button instance with content-based width and consistent horizontal padding. Accept when. The full label has visible padding on both sides at the panel's minimum width. Frames: 156:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F11",
+  "pri": "P1",
+  "area": "F11 \u00b7 Settings",
+  "kind": "Visual",
+  "title": "Error states explain failure but offer no immediate recovery",
+  "nodes": [
+   "1703:9208",
+   "1703:9046"
+  ],
+  "figcaptions": [
+   "Open evidence frame 1703:9208 \u2197"
+  ],
+  "text": "P1 F11 \u00b7 Settings Visual Error states explain failure but offer no immediate recovery Evidence. The Forms action-error screen shows only \u201cFailed to load submissions.\u201d within the content card, without a retry action or a return to the submissions context. Impact. An error becomes a dead end inside the affected task. Correction. Add Retry and Preserve/Return to last loaded view where applicable; distinguish loading submissions from changing a submission. Accept when. The user can retry the failed request without leaving Settings or losing context. Frames: 1703:9208 \u2197 \u00b7 1703:9046 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F12",
+  "pri": "P1",
+  "area": "F12 \u00b7 CMS / Pages",
+  "kind": "Visual",
+  "title": "Dynamic-page configuration lacks a visible template-change path",
+  "nodes": [
+   "2429:12111",
+   "2429:21281",
+   "1170:4713"
+  ],
+  "figcaptions": [
+   "Open evidence frame 2429:12111 \u2197"
+  ],
+  "text": "P1 F12 \u00b7 CMS / Pages Visual Dynamic-page configuration lacks a visible template-change path Evidence. The dynamic-pages panel exposes URL Pattern, but describes the template as shown rather than set here, with a long code-level explanation. No template picker or link to the relevant setup is visible. Impact. A user cannot resolve the dependency from the screen where it matters. Correction. Add a readable Template page row with Change/Open setup; show resolved example URLs and the published-record count. Move server and source-code notes outside product UI. Accept when. A user can choose a template, fix missing dependencies and inspect an example generated path from this task. Frames: 2429:12111 \u2197 \u00b7 2429:21281 \u2197 \u00b7 1170:4713 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F13",
+  "pri": "P2",
+  "area": "F13 \u00b7 Insert",
+  "kind": "Visual",
+  "title": "Search-result category wraps into a clipped row",
+  "nodes": [
+   "138:53"
+  ],
+  "figcaptions": [
+   "Open evidence frame 138:53 \u2197"
+  ],
+  "text": "P2 F13 \u00b7 Insert Visual Search-result category wraps into a clipped row Evidence. The category COMPONENTS breaks across two lines and is cut at the lower edge of its search result. Impact. Search results appear broken and category information is lost. Correction. Reserve sufficient width for category text or use shorter unambiguous labels; make result rows grow when wrapping. Accept when. All three result categories fit at 280px, including long labels. Frames: 138:53 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F14",
+  "pri": "P2",
+  "area": "F14 \u00b7 Shell / Navigation",
+  "kind": "Visual + structural",
+  "title": "New navigation corrections are not consistently assembled into existing screens",
+  "nodes": [
+   "52:2",
+   "638:2378",
+   "2844:12025",
+   "2844:12121",
+   "2844:12136"
+  ],
+  "figcaptions": [
+   "Open evidence frame 52:2 \u2197"
+  ],
+  "text": "P2 F14 \u00b7 Shell / Navigation Visual + structural New navigation corrections are not consistently assembled into existing screens Evidence. The primary assembly still has the six-item rail and old chrome, while separate new boards document a More index, a persistent location line and Back to canvas. These additions are not visible in the sampled assembled frames. Impact. A complete-looking correction board can be mistaken for a corrected editor. Correction. Apply the accepted shared chrome to each relevant assembled screen and recheck state variants. Accept when. The same navigation model appears in returning, selected, offline, saving, Settings and preview states. Frames: 52:2 \u2197 \u00b7 638:2378 \u2197 \u00b7 2844:12025 \u2197 \u00b7 2844:12121 \u2197 \u00b7 2844:12136 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F15",
+  "pri": "P2",
+  "area": "F15 \u00b7 Settings / Shell",
+  "kind": "Visual",
+  "title": "Canvas-specific footer persists in full-page Settings",
+  "nodes": [
+   "638:2378"
+  ],
+  "figcaptions": [
+   "Open evidence frame 638:2378 \u2197"
+  ],
+  "text": "P2 F15 \u00b7 Settings / Shell Visual Canvas-specific footer persists in full-page Settings Evidence. General Settings still displays \u201cSection \u00b7 Hero 680 \u00d7 250\u201d and \u201cDesktop \u00b7 100%\u201d along the bottom although the canvas is not visible. Impact. The footer reports context unrelated to the current task. Correction. Define a full-page Settings shell with a clear return action and relevant save/status context. Accept when. Settings contains no misleading selected-element or canvas zoom readout. Frames: 638:2378 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F16",
+  "pri": "P2",
+  "area": "F16 \u00b7 Canvas",
+  "kind": "Visual",
+  "title": "Zoom and device controls have competing representations",
+  "nodes": [
+   "52:2",
+   "2855:12407"
+  ],
+  "figcaptions": [
+   "Open evidence frame 52:2 \u2197"
+  ],
+  "text": "P2 F16 \u00b7 Canvas Visual Zoom and device controls have competing representations Evidence. The assembled canvas has a bottom toolbar with W/D/T/M and a 100% control, plus a second Desktop \u00b7 100% readout in the global footer. Impact. Abbreviations and duplicated values make the active control owner unclear. Correction. Use one device/zoom control and explicitly label any secondary read-only status. Apply the accepted viewport ownership specification. Accept when. A user can identify the current viewport and change zoom from one consistent control. Frames: 52:2 \u2197 \u00b7 2855:12407 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F17",
+  "pri": "P2",
+  "area": "F17 \u00b7 Templates",
+  "kind": "Visual",
+  "title": "Gallery thumbnails are placeholders",
+  "nodes": [
+   "641:2487"
+  ],
+  "figcaptions": [
+   "Open evidence frame 641:2487 \u2197"
+  ],
+  "text": "P2 F17 \u00b7 Templates Visual Gallery thumbnails are placeholders Evidence. All three page-template previews are plain gray rectangles in the gallery. Impact. Users cannot compare the layout or visual character of templates. Correction. Use representative previews and draw a distinct loading skeleton and unavailable-preview fallback. Accept when. Loaded templates have meaningful previews; a missing image is visibly different from loading. Frames: 641:2487 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F18",
+  "pri": "P1",
+  "area": "F18 \u00b7 Components / Brand",
+  "kind": "Visual",
+  "title": "Unavailable brand components look linked and actionable",
+  "nodes": [
+   "641:2546"
+  ],
+  "figcaptions": [
+   "Open evidence frame 641:2546 \u2197"
+  ],
+  "text": "P1 F18 \u00b7 Components / Brand Visual Unavailable brand components look linked and actionable Evidence. The Components library labels a group \u201cFROM BRAND \u00b7 NOT IMPLEMENTED\u201d but shows Button / primary and Price row with \u201clinked\u201d status and chevrons. Impact. The screen simultaneously promises and denies a usable connection. Correction. Separate proposed content from the usable panel, or show an explicit disabled state and user-facing reason; remove implementation labels from production copy. Accept when. Each linked status corresponds to a demonstrable destination and a supported action. Frames: 641:2546 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F19",
+  "pri": "P2",
+  "area": "F19 \u00b7 Inspector",
+  "kind": "Visual",
+  "title": "Two adjacent motion systems compete for the same task",
+  "nodes": [
+   "807:8342",
+   "2865:22206"
+  ],
+  "figcaptions": [
+   "Open evidence frame 807:8342 \u2197"
+  ],
+  "text": "P2 F19 \u00b7 Inspector Visual Two adjacent motion systems compete for the same task Evidence. The Text profile contains separate INTERACTIONS and ANIMATION sections. A newer MOTION specimen exists elsewhere. Impact. A designer must guess which system owns a trigger or effect. Correction. Apply the accepted motion model consistently to each element profile and migrate examples to it. Accept when. Text, container, button, media and input profiles use the same motion structure and terminology. Frames: 807:8342 \u2197 \u00b7 2865:22206 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F20",
+  "pri": "P2",
+  "area": "F20 \u00b7 Brand",
+  "kind": "Visual",
+  "title": "Status and mode explanations are visually ambiguous",
+  "nodes": [
+   "1333:7162"
+  ],
+  "figcaptions": [
+   "Open evidence frame 1333:7162 \u2197"
+  ],
+  "text": "P2 F20 \u00b7 Brand Visual Status and mode explanations are visually ambiguous Evidence. The Brand root shows an orange dot beside Tokens, while its footer says Brand is up to date. The Beginner-mode explanation is cramped against the divider. Impact. The orange status has no clear relationship to the overall saved/synced state. Correction. Name the token status and distinguish edited, saved and synced. Allow mode help text to wrap without colliding with the following content. Accept when. The orange marker has a defined label, and local save status cannot be confused with theme sync status. Frames: 1333:7162 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F21",
+  "pri": "P1",
+  "area": "F21 \u00b7 Prototype",
+  "kind": "Structural",
+  "title": "The site-menu prototype still routes to retired destinations",
+  "nodes": [
+   "642:3401",
+   "642:3538",
+   "926:4484",
+   "1172:4895"
+  ],
+  "figcaptions": [],
+  "text": "P1 F21 \u00b7 Prototype Structural The site-menu prototype still routes to retired destinations Evidence. Prototype inspection found Inspector node 642:3538 targeting retired 159:2, Share preview link node 926:4484 targeting superseded 817:4774, and hotspot 1172:4895 targeting retired Project settings 1172:4867. Impact. Reviewers can enter obsolete designs while following a currently retained site-menu specimen. Correction. Rewire the controls to accepted destinations. Keep archived flows explicitly separate from the active prototype. Accept when. Following these three controls lands on the current Inspector, sharing and Settings surfaces. Frames: 642:3401 \u2197 \u00b7 642:3538 \u2197 \u00b7 926:4484 \u2197 \u00b7 1172:4895 \u2197"
+ },
+ {
+  "id": "F22",
+  "pri": "P2",
+  "area": "F22 \u00b7 File organization",
+  "kind": "Structural",
+  "title": "Section totals and content types are not reliable screen counts",
+  "nodes": [
+   "1776:8385",
+   "1776:8381",
+   "1776:8374"
+  ],
+  "figcaptions": [],
+  "text": "P2 F22 \u00b7 File organization Structural Section totals and content types are not reliable screen counts Evidence. Section titles include counts that differ from current children: Shell says 34 but has 56 children, Inspector says 51 but the audited batch contains 56, and History says 43 but has 49. Children include captions, specifications and retired states. Impact. Coverage appears more precise than it is and implementation handoff becomes difficult. Correction. Generate a screen inventory from node type and status; separate live screens, state variants, reference boards and annotations. Accept when. Every claimed screen count is reproducible, with retired/reference items counted separately. Frames: 1776:8385 \u2197 \u00b7 1776:8381 \u2197 \u00b7 1776:8374 \u2197"
+ },
+ {
+  "id": "F23",
+  "pri": "P2",
+  "area": "F23 \u00b7 File organization",
+  "kind": "Visual + structural",
+  "title": "Prototype and engineering material contaminates user-facing specimens",
+  "nodes": [
+   "170:2",
+   "2429:12111",
+   "140:2"
+  ],
+  "figcaptions": [
+   "Open evidence frame 170:2 \u2197"
+  ],
+  "text": "P2 F23 \u00b7 File organization Visual + structural Prototype and engineering material contaminates user-facing specimens Evidence. Gray navigation helpers appear in AI and CMS specimens, and technical implementation paragraphs occupy product UI. There are 912 descendants named hotspot/ in the editor page, though not all are necessarily visible. Impact. Design review conflates the user interface with the audit and its navigation scaffolding. Correction. Keep specifications beside frames and make prototype targets visually unobtrusive; inspect both frame exports and presentation mode. Accept when. Product screenshots contain only intentional user-facing copy and controls. Frames: 170:2 \u2197 \u00b7 2429:12111 \u2197 \u00b7 140:2 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F24",
+  "pri": "P2",
+  "area": "F24 \u00b7 Client sign-off",
+  "kind": "Visual; canonical external page not visually audited",
+  "title": "The editor-page client review echo is a schematic, not a complete viewing screen",
+  "nodes": [
+   "1339:7171"
+  ],
+  "figcaptions": [
+   "Open evidence frame 1339:7171 \u2197"
+  ],
+  "text": "P2 F24 \u00b7 Client sign-off Visual; canonical external page not visually audited The editor-page client review echo is a schematic, not a complete viewing screen Evidence. Its main content says \u201c(the site, page tabs, and Your notes)\u201d and shows unresolved {Agency}, {Name} and {date} placeholders. The node itself points to a canonical family on page 1:6. Impact. This frame cannot validate reviewing the actual site, navigating pages or placing a comment. Correction. Use the canonical reviewer frame for acceptance, or create a clearly labeled responsive instance with real sample content. Accept when. At 1280\u00d7720 the reviewer can view a realistic site, switch pages and leave feedback. Frames: 1339:7171 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F25",
+  "pri": "P2",
+  "area": "F25 \u00b7 Preview",
+  "kind": "Visual",
+  "title": "The interaction-testing reference covers content with its console",
+  "nodes": [
+   "817:4856"
+  ],
+  "figcaptions": [
+   "Open evidence frame 817:4856 \u2197"
+  ],
+  "text": "P2 F25 \u00b7 Preview Visual The interaction-testing reference covers content with its console Evidence. In the drawn interaction-testing board, the console overlaps the lower Scroll & anchor and Broken element cards. The frame is also explicitly marked not implemented. Impact. The reference is hard to read and should not be treated as proof of a working preview. Correction. Separate the explanatory cards from the console example, and retain clear proposed status until runtime validation. Accept when. Reference text is fully readable, and executable preview tests are tracked separately. Frames: 817:4856 \u2197 View screenshot evidence"
+ },
+ {
+  "id": "F26",
+  "pri": "P1",
+  "area": "F26 \u00b7 V2 proposal",
+  "kind": "Visual",
+  "title": "The final V2 shell still uses cryptic rail labels",
+  "nodes": [
+   "2797:22382"
+  ],
+  "figcaptions": [],
+  "text": "P1 F26 \u00b7 V2 proposal Visual The final V2 shell still uses cryptic rail labels Evidence. The V2 final screen visibly uses Inse, Laye, Page, Medi, Cont, Bran, Tmpl, Comp, Pub, Hist and Rev, with very small captions; lower destinations lack the icon treatment of upper destinations. Impact. The proposed solution introduces a navigation readability and consistency problem. Correction. Use recognizable icons, meaningful labels or an expandable rail, with a consistent selected state and tooltip contract. Accept when. Every destination can be identified without learning an arbitrary abbreviation. Frames: 2797:22382 \u2197"
+ },
+ {
+  "id": "F27",
+  "pri": "P2",
+  "area": "F27 \u00b7 V2 proposal",
+  "kind": "Structural",
+  "title": "Corrected-module documentation does not match the current board inventory",
+  "nodes": [
+   "2797:559",
+   "2797:560"
+  ],
+  "figcaptions": [],
+  "text": "P2 F27 \u00b7 V2 proposal Structural Corrected-module documentation does not match the current board inventory Evidence. The introduction still says Five panels, while the section's current children include additional CMS, Layers, Media, Brand, History, Review, Settings and AI panels. Impact. A reviewer cannot tell which module corrections are included in the proposal. Correction. Regenerate the proposal index and acceptance matrix from the actual frames, recording dependencies and verification status per module. Accept when. The module list, frame inventory and completion claims agree. Frames: 2797:559 \u2197 \u00b7 2797:560 \u2197"
+ },
+ {
+  "id": "F28",
+  "pri": "P2",
+  "area": "F28 \u00b7 Settings",
+  "kind": "Structural candidate; sampled visual corroboration",
+  "title": "Repeated subtitle bounds require a targeted cleanup pass",
+  "nodes": [
+   "640:2440",
+   "640:2789",
+   "640:3135",
+   "1703:9208"
+  ],
+  "figcaptions": [
+   "Open evidence frame 1703:9208 \u2197"
+  ],
+  "text": "P2 F28 \u00b7 Settings Structural candidate; sampled visual corroboration Repeated subtitle bounds require a targeted cleanup pass Evidence. The structural check flags subtitle text outside clipping parents across 31 audited Settings frames, including Forms, Headers, Redirects, Domains and Webhooks. The sampled Forms error screen omits the header subtitle visible in the node text. Impact. Repeated copies of the same header geometry can conceal useful task descriptions. Correction. Inspect the shared header container and fix its height/placement once, then verify every affected state. Treat the unrendered cases as candidates until checked. Accept when. All header subtitles are readable in the 31 candidate frames, with no overlap or clipping. Frames: 640:2440 \u2197 \u00b7 640:2789 \u2197 \u00b7 640:3135 \u2197 \u00b7 1703:9208 \u2197 View screenshot evidence"
+ }
+]

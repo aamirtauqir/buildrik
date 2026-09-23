@@ -1,0 +1,997 @@
+[
+ {
+  "op": "resize",
+  "id": "782:4381",
+  "width": 280,
+  "height": 297,
+  "why": "VIS-3-26 CRITICAL (board-level row inside 1776:8372) — 'Media · no-results has NO FOOTER': the spacer is 494 tall, pushing Footer 782:4382 to y827 inside an 812 board, clipped away entirely. 333+297=630, so the footer lands at y630 h182 and ends flush with the board bottom."
+ },
+ {
+  "op": "resize",
+  "id": "777:4121",
+  "width": 280,
+  "height": 116,
+  "why": "Same defect on Media · loading, which VIS-3-26 did not flag: spacer 777:4121 y514 h254 pushes Footer 777:4122 to y768 h182 = 950 on an 812 board. 514+116=630 seats it like every sibling. Found by measuring all twelve drawer footers, not by a probe."
+ },
+ {
+  "op": "resize",
+  "id": "2430:21396",
+  "width": 280,
+  "height": 208,
+  "why": "UX-H-05/06/08 — make room: spacer 492+208=700 so the footer can grow from 44 to 112 and still end at the 812 board bottom."
+ },
+ {
+  "op": "move",
+  "id": "2430:21397",
+  "x": 0,
+  "y": 700,
+  "why": "UX-H-05 — seat the enlarged footer."
+ },
+ {
+  "op": "resize",
+  "id": "2430:21397",
+  "width": 280,
+  "height": 112,
+  "why": "UX-H-05 — four doors plus the formats line and the where-it-lives line do not fit in 44."
+ },
+ {
+  "op": "move",
+  "id": "144:48",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 144:2. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "move",
+  "id": "1124:4588",
+  "x": 152,
+  "y": 14,
+  "why": "UX-H-05 — '⬡ Icons' currently sits at x156 and overlaps 'Browse stock' (x110 w104 ends at 214). Board 144:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "144:47",
+  "parent": "144:46",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 144:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "144:47",
+  "parent": "144:46",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 144:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "144:47",
+  "parent": "144:46",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 144:2."
+ },
+ {
+  "op": "move",
+  "id": "145:48",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:2. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:47",
+  "parent": "145:46",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:47",
+  "parent": "145:46",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:47",
+  "parent": "145:46",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:2."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:47",
+  "parent": "145:46",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:2."
+ },
+ {
+  "op": "move",
+  "id": "145:95",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:49. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:94",
+  "parent": "145:93",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:49."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:94",
+  "parent": "145:93",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:49."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:94",
+  "parent": "145:93",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:49."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:94",
+  "parent": "145:93",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:49."
+ },
+ {
+  "op": "move",
+  "id": "145:142",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:96. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:141",
+  "parent": "145:140",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:96."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:141",
+  "parent": "145:140",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:96."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:141",
+  "parent": "145:140",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:96."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:141",
+  "parent": "145:140",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:96."
+ },
+ {
+  "op": "move",
+  "id": "145:194",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:148. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:193",
+  "parent": "145:192",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:148."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:193",
+  "parent": "145:192",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:148."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:193",
+  "parent": "145:192",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:148."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:193",
+  "parent": "145:192",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:148."
+ },
+ {
+  "op": "move",
+  "id": "145:245",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:199. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:244",
+  "parent": "145:243",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:199."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:244",
+  "parent": "145:243",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:199."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:244",
+  "parent": "145:243",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:199."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:244",
+  "parent": "145:243",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:199."
+ },
+ {
+  "op": "move",
+  "id": "145:296",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:250. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:295",
+  "parent": "145:294",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:250."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:295",
+  "parent": "145:294",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:250."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:295",
+  "parent": "145:294",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:250."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:295",
+  "parent": "145:294",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:250."
+ },
+ {
+  "op": "move",
+  "id": "145:405",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 145:359. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:404",
+  "parent": "145:403",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 145:359."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:404",
+  "parent": "145:403",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 145:359."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:404",
+  "parent": "145:403",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 145:359."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:404",
+  "parent": "145:403",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 145:359."
+ },
+ {
+  "op": "move",
+  "id": "453:3959",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 453:3931. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "453:3958",
+  "parent": "453:3957",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 453:3931."
+ },
+ {
+  "op": "clone-label",
+  "src": "453:3958",
+  "parent": "453:3957",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 453:3931."
+ },
+ {
+  "op": "clone-label",
+  "src": "453:3958",
+  "parent": "453:3957",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 453:3931."
+ },
+ {
+  "op": "clone-label",
+  "src": "453:3958",
+  "parent": "453:3957",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 453:3931."
+ },
+ {
+  "op": "move",
+  "id": "777:4124",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 777:4093. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "777:4123",
+  "parent": "777:4122",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 777:4093."
+ },
+ {
+  "op": "clone-label",
+  "src": "777:4123",
+  "parent": "777:4122",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 777:4093."
+ },
+ {
+  "op": "clone-label",
+  "src": "777:4123",
+  "parent": "777:4122",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 777:4093."
+ },
+ {
+  "op": "clone-label",
+  "src": "777:4123",
+  "parent": "777:4122",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 777:4093."
+ },
+ {
+  "op": "move",
+  "id": "782:4384",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 782:4353. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "clone-label",
+  "src": "782:4383",
+  "parent": "782:4382",
+  "name": "⬡ Icons",
+  "text": "⬡ Icons",
+  "x": 152,
+  "y": 14,
+  "width": 52,
+  "why": "UX-H-05 — 'the Icons and Fonts entry points should sit in the same place as Upload and Browse stock — the footer — instead of being reachable only through the fullpage manager'. Cloned from the '↑ Upload' label beside it so the type is the footer's own, not hand-chosen. Board 782:4353."
+ },
+ {
+  "op": "clone-label",
+  "src": "782:4383",
+  "parent": "782:4382",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 782:4353."
+ },
+ {
+  "op": "clone-label",
+  "src": "782:4383",
+  "parent": "782:4382",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 782:4353."
+ },
+ {
+  "op": "clone-label",
+  "src": "782:4383",
+  "parent": "782:4382",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 782:4353."
+ },
+ {
+  "op": "move",
+  "id": "2430:21399",
+  "x": 89,
+  "y": 14,
+  "why": "UX-H-05 — footer re-gridded to four doors on a 280 panel: Upload x16 w64 · Stock x89 w54 · Icons x152 w52 · Fonts x213 w50, right edge 263 against the panel's 16px gutter. Board 2430:21365. Run AFTER media-02 renames the label to '☁ Stock'."
+ },
+ {
+  "op": "move",
+  "id": "2430:21400",
+  "x": 152,
+  "y": 14,
+  "why": "UX-H-05 — '⬡ Icons' currently sits at x156 and overlaps 'Browse stock' (x110 w104 ends at 214). Board 2430:21365."
+ },
+ {
+  "op": "clone-label",
+  "src": "2430:21398",
+  "parent": "2430:21397",
+  "name": "Aa Fonts",
+  "text": "Aa Fonts",
+  "x": 213,
+  "y": 14,
+  "width": 50,
+  "why": "UX-H-05 — the fourth door. Fonts is reachable today only through the fullpage manager's stock modal (MediaTab.tsx:73 mounts StockSourceModal behind a flag initialised false whose only setter sets it false again, so its Fonts tab renders for nobody in the sidebar). Destination is the new 'Media · stock · fonts · empty' board from media-04. Board 2430:21365."
+ },
+ {
+  "op": "clone-label",
+  "src": "2430:21398",
+  "parent": "2430:21397",
+  "name": "note/formats",
+  "text": "Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file",
+  "x": 16,
+  "y": 44,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-06 — 'the picker's accept-list and the client-side check must be the same closed list the server enforces, and the supported formats named in the upload zone BEFORE the user picks'. UploadZone.tsx:15 accepts image/*,video/* (so HEIC, .avi, .mkv all start uploading) against the server's closed set at app/api/asset-upload/route.ts:31-49; the enforced ceiling is 50 MB per file (UploadZone.tsx:16, route.ts:52). Board 2430:21365."
+ },
+ {
+  "op": "clone-label",
+  "src": "2430:21398",
+  "parent": "2430:21397",
+  "name": "note/where-it-lives",
+  "text": "Sort and list view live in the full library ⇱",
+  "x": 16,
+  "y": 90,
+  "width": 248,
+  "fontSize": 11,
+  "why": "UX-H-08 + UX-H-13 + UX-H-33 — the expand brackets do not widen the drawer, they close it and open a different application surface (MediaTab.tsx:87-96), and everything the drawer cannot do silently becomes possible there with no signposting. With Grid/List/Sort removed from the folder row this line is what names the destination. 'Every action the drawer cannot perform should either be present there or visibly point at where it lives.' Board 2430:21365."
+ },
+ {
+  "op": "move",
+  "id": "144:12",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 144:2. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:12",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:2. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:59",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:49. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:106",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:96. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:158",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:148. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:209",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:199. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:260",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:250. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:310",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:300. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:369",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 145:359. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "453:3938",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 453:3931. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "777:4100",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 777:4093. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "782:4360",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 782:4353. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "2430:21372",
+  "x": 200,
+  "y": 8,
+  "why": "UX-H-08 — '⊞ ⊟ ↑' was x196 w47 (right edge 243, off the panel's 264 gutter line). '☑ Select' at w64 from x200 ends at 264, aligned with the search box above it. Board 2430:21365. Run AFTER media-02."
+ },
+ {
+  "op": "move",
+  "id": "145:145",
+  "x": 206,
+  "y": 8,
+  "why": "UX-H-12 — make room for the cancel control on the drawer's in-flight row (145:143). UploadZone.tsx:163-192 renders name + percent + bar and NO control at all."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:145",
+  "parent": "145:143",
+  "name": "✕ cancel",
+  "text": "✕",
+  "x": 250,
+  "y": 8,
+  "width": 14,
+  "why": "UX-H-12 — 'every in-flight row needs a cancel'. A 48 MB video picked by accident occupies the footer until it finishes or fails."
+ },
+ {
+  "op": "move",
+  "id": "145:198",
+  "x": 206,
+  "y": 6,
+  "why": "UX-H-12 — make room for the dismiss beside Retry on the failed row (145:195)."
+ },
+ {
+  "op": "clone-label",
+  "src": "145:198",
+  "parent": "145:195",
+  "name": "✕ dismiss",
+  "text": "✕",
+  "x": 250,
+  "y": 6,
+  "width": 14,
+  "why": "UX-H-12 — 'every terminal row needs a dismiss'. state.dismissUpload exists and is passed only at LibraryManager.tsx:379; UploadZone.tsx:225-238 gives failed rows a Retry and no dismiss."
+ },
+ {
+  "op": "move",
+  "id": "1163:14192",
+  "x": 596,
+  "y": 13,
+  "why": "UX-H-12 — make room on the fullpage in-flight row for the cancel the q/err row already has as 'Dismiss'."
+ },
+ {
+  "op": "clone-label",
+  "src": "1163:14187",
+  "parent": "1163:14188",
+  "name": "Cancel",
+  "text": "Cancel",
+  "x": 738,
+  "y": 9.5,
+  "width": 38,
+  "why": "UX-H-12 — the fullpage queue's running row has no control either; its error sibling (1163:14187) already carries Dismiss, so the control shape is established on the same board."
+ },
+ {
+  "op": "resize",
+  "id": "1163:14197",
+  "width": 580,
+  "height": 6,
+  "why": "UX-H-12 — make room for the done row's dismiss."
+ },
+ {
+  "op": "clone-label",
+  "src": "1163:14187",
+  "parent": "1163:14194",
+  "name": "Dismiss",
+  "text": "Dismiss",
+  "x": 738,
+  "y": 9.5,
+  "width": 38,
+  "why": "UX-H-12 — a completed row is terminal and must be dismissible."
+ },
+ {
+  "op": "hide",
+  "id": "1162:4825",
+  "why": "UX-H-11 / COVER-1-21 — 'On the empty board it is doubly impossible: with zero assets localOnlyCount is zero, so no pill of any kind renders' (LibraryManager.tsx:449-455). Hidden, not deleted — this file's rule is that a drawing is never destroyed on the grounds that it is not yet real."
+ },
+ {
+  "op": "hide",
+  "id": "1758:8372",
+  "why": "VIS-3-18 CRITICAL (board-level row inside 1776:8372) — a 'sl-empty · folder-scoped' block is parked at y728 on Media · folder-scoped, whose grid already shows four assets, so the panel reads 'No assets matching this filter.' under a full grid. The empty state's home is 1704:8571 on 1704:8514. Hidden rather than deleted; if it was meant as a state link it must be a hotspot/state rect parked BELOW the board."
+ },
+ {
+  "op": "clone-row",
+  "src": "233:1274",
+  "parent": "146:2",
+  "name": "List row · Rename",
+  "text": "✎ Rename",
+  "textIndex": 0,
+  "x": 0,
+  "y": 480,
+  "why": "UX-H-10 — 'the detail screen is the natural home for rename, delete and download'. The hub renders exactly five buttons today (AssetDetailOverlay.tsx:415-465: media-detail-used / versions / edit / optimize / replace); a search of that file for Rename, Delete, Download and Copy URL returns nothing, while useMediaState.ts:379-381 exports renameItem and copyUrl to no consumer. Combined with UX-H-01 this is why a user who opens a file in the drawer and wants it gone has to leave for the fullpage manager. Cloned from the existing List row instance (233:1274) so the row keeps the shared chrome component. VERIFY on read-back that textIndex 0 is the row LABEL and not a trailing value."
+ },
+ {
+  "op": "clone-row",
+  "src": "233:1274",
+  "parent": "146:2",
+  "name": "List row · Copy URL",
+  "text": "🔗 Copy URL",
+  "textIndex": 0,
+  "x": 0,
+  "y": 512,
+  "why": "UX-H-10 — 'the detail screen is the natural home for rename, delete and download'. The hub renders exactly five buttons today (AssetDetailOverlay.tsx:415-465: media-detail-used / versions / edit / optimize / replace); a search of that file for Rename, Delete, Download and Copy URL returns nothing, while useMediaState.ts:379-381 exports renameItem and copyUrl to no consumer. Combined with UX-H-01 this is why a user who opens a file in the drawer and wants it gone has to leave for the fullpage manager. Cloned from the existing List row instance (233:1274) so the row keeps the shared chrome component. VERIFY on read-back that textIndex 0 is the row LABEL and not a trailing value."
+ },
+ {
+  "op": "clone-row",
+  "src": "233:1274",
+  "parent": "146:2",
+  "name": "List row · Download",
+  "text": "⤓ Download",
+  "textIndex": 0,
+  "x": 0,
+  "y": 544,
+  "why": "UX-H-10 — 'the detail screen is the natural home for rename, delete and download'. The hub renders exactly five buttons today (AssetDetailOverlay.tsx:415-465: media-detail-used / versions / edit / optimize / replace); a search of that file for Rename, Delete, Download and Copy URL returns nothing, while useMediaState.ts:379-381 exports renameItem and copyUrl to no consumer. Combined with UX-H-01 this is why a user who opens a file in the drawer and wants it gone has to leave for the fullpage manager. Cloned from the existing List row instance (233:1274) so the row keeps the shared chrome component. VERIFY on read-back that textIndex 0 is the row LABEL and not a trailing value."
+ },
+ {
+  "op": "clone-row",
+  "src": "233:1274",
+  "parent": "146:2",
+  "name": "List row · Delete",
+  "text": "🗑 Delete",
+  "textIndex": 0,
+  "x": 0,
+  "y": 576,
+  "why": "UX-H-10 — 'the detail screen is the natural home for rename, delete and download'. The hub renders exactly five buttons today (AssetDetailOverlay.tsx:415-465: media-detail-used / versions / edit / optimize / replace); a search of that file for Rename, Delete, Download and Copy URL returns nothing, while useMediaState.ts:379-381 exports renameItem and copyUrl to no consumer. Combined with UX-H-01 this is why a user who opens a file in the drawer and wants it gone has to leave for the fullpage manager. Cloned from the existing List row instance (233:1274) so the row keeps the shared chrome component. VERIFY on read-back that textIndex 0 is the row LABEL and not a trailing value."
+ },
+ {
+  "op": "clone-label",
+  "src": "147:76",
+  "parent": "147:74",
+  "name": "act/Insert · Save",
+  "text": "Insert · Save",
+  "x": 0,
+  "y": 104,
+  "width": 136,
+  "fontSize": 11,
+  "why": "UX-H-04 — 'One stock browser. If the drawer must be narrower, it should be the same component at a smaller size with the same actions, not a second surface missing the primary verb (place it on the page).' Today StockBrowserOverlay.tsx:148 offers onSave only and its props carry no onInsert. The board draws the unified action pair; the [not-implemented] clause in the board's new name (media-01) carries the fact that the insert half does not exist yet, so the board is not printing a behaviour the code lacks without saying so."
+ },
+ {
+  "op": "clone-label",
+  "src": "147:79",
+  "parent": "147:77",
+  "name": "act/Insert · Save",
+  "text": "Insert · Save",
+  "x": 0,
+  "y": 100,
+  "width": 96,
+  "fontSize": 11,
+  "why": "UX-H-04 — 'One stock browser. If the drawer must be narrower, it should be the same component at a smaller size with the same actions, not a second surface missing the primary verb (place it on the page).' Today StockBrowserOverlay.tsx:148 offers onSave only and its props carry no onInsert. The board draws the unified action pair; the [not-implemented] clause in the board's new name (media-01) carries the fact that the insert half does not exist yet, so the board is not printing a behaviour the code lacks without saying so."
+ },
+ {
+  "op": "clone-label",
+  "src": "147:83",
+  "parent": "147:81",
+  "name": "act/Insert · Save",
+  "text": "Insert · Save",
+  "x": 0,
+  "y": 104,
+  "width": 136,
+  "fontSize": 11,
+  "why": "UX-H-04 — 'One stock browser. If the drawer must be narrower, it should be the same component at a smaller size with the same actions, not a second surface missing the primary verb (place it on the page).' Today StockBrowserOverlay.tsx:148 offers onSave only and its props carry no onInsert. The board draws the unified action pair; the [not-implemented] clause in the board's new name (media-01) carries the fact that the insert half does not exist yet, so the board is not printing a behaviour the code lacks without saying so."
+ },
+ {
+  "op": "clone-label",
+  "src": "147:86",
+  "parent": "147:84",
+  "name": "act/Insert · Save",
+  "text": "Insert · Save",
+  "x": 0,
+  "y": 100,
+  "width": 96,
+  "fontSize": 11,
+  "why": "UX-H-04 — 'One stock browser. If the drawer must be narrower, it should be the same component at a smaller size with the same actions, not a second surface missing the primary verb (place it on the page).' Today StockBrowserOverlay.tsx:148 offers onSave only and its props carry no onInsert. The board draws the unified action pair; the [not-implemented] clause in the board's new name (media-01) carries the fact that the insert half does not exist yet, so the board is not printing a behaviour the code lacks without saying so."
+ },
+ {
+  "op": "clone-label",
+  "src": "1738:8406",
+  "parent": "1738:8394",
+  "name": "act/Try again",
+  "text": "Try again",
+  "x": 236,
+  "y": 238,
+  "width": 248,
+  "why": "UX-H-02 — of the three stock outcomes only 'could not reach the provider' is worth a retry. The genuinely-empty board (1716:8497) and the not-configured board (media-04) must NOT get this control."
+ },
+ {
+  "op": "resize",
+  "id": "1160:60",
+  "width": 121,
+  "height": 18,
+  "why": "UX-H-11 / COVER-1-21 — '⚠ 2 not on the server' is 3 characters longer than '⚠ This device only'; the pill frame is 107 wide and would clip it (the same fixed-pill clipping VIS-3-17 records for the STOCK badge). Board 1159:4593."
+ },
+ {
+  "op": "move",
+  "id": "1160:60",
+  "x": 1243,
+  "y": 7,
+  "why": "UX-H-11 — keep the pill's right edge at 1364 (the status bar's 16px gutter) after the widen. Board 1159:4593."
+ },
+ {
+  "op": "resize",
+  "id": "1163:4849",
+  "width": 121,
+  "height": 18,
+  "why": "UX-H-11 / COVER-1-21 — '⚠ 2 not on the server' is 3 characters longer than '⚠ This device only'; the pill frame is 107 wide and would clip it (the same fixed-pill clipping VIS-3-17 records for the STOCK badge). Board 1163:4641."
+ },
+ {
+  "op": "move",
+  "id": "1163:4849",
+  "x": 1243,
+  "y": 7,
+  "why": "UX-H-11 — keep the pill's right edge at 1364 (the status bar's 16px gutter) after the widen. Board 1163:4641."
+ },
+ {
+  "op": "resize",
+  "id": "1163:13903",
+  "width": 121,
+  "height": 18,
+  "why": "UX-H-11 / COVER-1-21 — '⚠ 2 not on the server' is 3 characters longer than '⚠ This device only'; the pill frame is 107 wide and would clip it (the same fixed-pill clipping VIS-3-17 records for the STOCK badge). Board 1163:13695."
+ },
+ {
+  "op": "move",
+  "id": "1163:13903",
+  "x": 1243,
+  "y": 7,
+  "why": "UX-H-11 — keep the pill's right edge at 1364 (the status bar's 16px gutter) after the widen. Board 1163:13695."
+ },
+ {
+  "op": "resize",
+  "id": "1163:14156",
+  "width": 121,
+  "height": 18,
+  "why": "UX-H-11 / COVER-1-21 — '⚠ 2 not on the server' is 3 characters longer than '⚠ This device only'; the pill frame is 107 wide and would clip it (the same fixed-pill clipping VIS-3-17 records for the STOCK badge). Board 1163:13948."
+ },
+ {
+  "op": "move",
+  "id": "1163:14156",
+  "x": 1243,
+  "y": 7,
+  "why": "UX-H-11 — keep the pill's right edge at 1364 (the status bar's 16px gutter) after the widen. Board 1163:13948."
+ }
+]

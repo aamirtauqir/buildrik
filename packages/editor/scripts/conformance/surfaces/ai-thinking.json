@@ -1,0 +1,55 @@
+{
+  "surface": "ai-thinking",
+  "board": "AI · thinking (Figma 170:29)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=ai-thinking",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "ai-thinking"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "thinking-band",
+      "testId": "ai-thinking",
+      "spec": "ai-thinking",
+      "nodeId": "170:39"
+    },
+    {
+      "name": "thinking-text",
+      "testId": "ai-thinking",
+      "spec": "ai-thinking",
+      "nodeId": "170:40"
+    }
+  ],
+  "_note": [
+    "The state needs a live SSE stream from the dashboard's AI endpoint, which a",
+    "standalone editor has no credentials for, so the probe mounts the branch",
+    "that renders it: `ChatThread` holding one assistant message that is",
+    "`streaming` with no text yet — exactly what `AITab.submit` puts in the",
+    "thread the moment a prompt is sent (AITab.tsx, `streaming: true, text: \"\"`).",
+    "",
+    "TWO TARGETS, ONE ELEMENT. The board splits the band (170:39, the fill and",
+    "the 56 height) from the sentence inside it (170:40, 12/18 in accent-text);",
+    "the code draws one `<p>` carrying both, so both nodes join to the same",
+    "anchor. That is the join working as intended, not a duplicate.",
+    "",
+    "THE PANEL CHROME IS NOT RE-MEASURED HERE. Back row (170:30), title row",
+    "(170:32), scope band (170:34) and prompt block (170:36) are byte-identical",
+    "to the idle board's, and `ai-idle` measures them against the LIVE editor.",
+    "Re-reading them off a probe that mounts a fragment would add a second,",
+    "weaker number for the same property.",
+    "",
+    "WHAT WAS NOT CONFORMED, and why the code wins: boards.json's census note",
+    "reads `drift-chat-transcript-vs-prompt-in-input`, and its premise does not",
+    "survive reading the board — 170:29 has no transcript node on it at all",
+    "(BLOCKERS.md B2, verified against the board 2026-09-03). The panel keeps its",
+    "transcript, per the wave-F ruling on J-170:29; what the board actually",
+    "specifies here is this band, and this band is what is measured."
+  ]
+}

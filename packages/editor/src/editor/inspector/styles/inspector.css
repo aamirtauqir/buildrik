@@ -20,9 +20,22 @@
   font: 500 11px var(--bk-font-ui);
   color: var(--bk-ink);
   overflow: hidden;
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  /* Boards 32:2 and 642:3249 both name the inspector's edge `--flowbite/gray/100`,
+     the same hairline the drawer and every panel header already use
+     (PanelHeader.tsx). It was `--bk-border` — one step darker than
+     every other panel edge on screen.
+
+     ONE EDGE, not four, and no radius or shadow. 32:2 and 807:8521 draw
+     `border-l` alone; 159:123 and every 1440 shell board draw the inspector
+     flush into its 300 column with square corners. The rounded, shadowed card
+     this was made it a floating panel inside a column that already has a
+     background, and it cost 2px of content width — which the body then paid
+     for out of the CONTROL, the one column every board fixes at 160. Nine
+     boards, none of them drawing a card. `border: 0 solid <colour>` keeps the
+     colour declared on all four sides (what the recipes read back) while only
+     the left edge has width. */
+  border: 0 solid var(--bk-gray-100);
+  border-left-width: 1px;
 }
 /* ux-fixes.css 40px button global deleted 2026-04-25 — override no longer needed. */
 .bdi-panel-scroll {
@@ -64,8 +77,16 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
-  padding: 10px var(--bk-space-12);
-  background: linear-gradient(180deg, var(--bk-bg-card, var(--bk-bg-card)) 0%, var(--bk-bg-panel) 100%);
+  /* Boards 32:3 and 642:3251 both draw this row 48h with a 16px inset — live
+     was 10px/12px, which measured 53h at x12. The gradient it used to carry
+     ran var(--bk-bg-card) -> var(--bk-bg-panel), and both tokens resolve to
+     the same white: a two-stop gradient between one colour and itself. Neither board
+     draws a fill here at all (32:3 has none, so the panel shows through), so
+     the flat token says the same thing the gradient did and one fewer gate
+     has to allow it. */
+  height: var(--bk-space-48);
+  padding: 0 var(--bk-space-16);
+  background: var(--bk-bg-panel);
   border-bottom: 1px solid var(--bk-border);
 }
 .bdi-ehdr .bdi-eic {
@@ -87,7 +108,10 @@
   gap: 2px;
 }
 .bdi-ehdr .bdi-ename .bdi-n {
-  font: 600 13px var(--bk-font-ui);
+  /* Board 32:4 — `ui/14`: Inter Medium 14/20 in ink. Was 600/13, which is the
+     panel-title style from a different molecule. 642:3112 draws the same
+     header at 14/20 medium, so two boards agree. */
+  font: 500 var(--bk-text-14) / 20px var(--bk-font-ui);
   color: var(--bk-ink);
   letter-spacing: -0.01em;
   overflow: hidden;
@@ -106,7 +130,7 @@
   gap: 6px;
   padding: 5px 10px;
   /* Boards 807:8342 + 160:412: grey strip, reach pill white, the other two bare
-     dark text. Was --bk-bg-panel (#FFFFFF) under three accent-tinted 10px pills
+     dark text. Was --bk-bg-panel (`var(--bk-bg-panel)`) under three accent-tinted 10px pills
      — same white as the pill meant to stand out of it, so nothing did.
      height/min-height: these are flowbite Buttons and their own min-height is
      40px, so padding alone could not reach the boards' 28px strip.
@@ -115,6 +139,15 @@
   border-bottom: 1px solid var(--bk-border);
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
+  /* Boards 32:7 and 642:3255: 32h, x16, gap 8. Live was 5px/10px with gap 6,
+     which measured 33h at x10 — inside a pixel of the height and 6px shy of
+     the inset, so the strip did not line up with the header above it or the
+     section rows below, both of which sit at 16. Board 956:6859 (the MEDIA
+     profile) draws the same strip at 40h; that is the one board of the three
+     that disagrees and it loses on count. Recorded in the recipe. */
+  height: var(--bk-size-row);
+  padding: 0 var(--bk-space-16);
+  gap: var(--bk-space-8);
 }
 .bdi-bpr .bdi-bpr-pill {
   display: inline-flex;
@@ -122,10 +155,15 @@
   gap: 3px;
   height: 22px;
   min-height: 0;
-  padding: 0 8px;
-  border-radius: 6px;
+  padding: 0 var(--bk-space-8);
+  /* Boards 32:8 / 956:6860 / 642:3256: `--radius/sm`, not 6. The two
+     non-scope pills are filled `--color/bg-subtle` there rather than left
+     transparent — the same colour the strip already is, so nothing moves on
+     screen, but it is the value the board states and the one a measurement
+     can read (transparent reads back as rgba(0,0,0,0), not as the strip). */
+  border-radius: var(--bk-radius-sm);
   font: 400 11px var(--bk-font-ui);
-  background: transparent;
+  background: var(--bk-bg-subtle);
   color: var(--bk-ink);
   border: none;
   cursor: pointer;
@@ -149,13 +187,30 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 16px;
+  /* PINNED, not derived from padding. Every profile board draws a shut
+     section's header row 28 tall (2069:20308..20317) and an open one's 20
+     (2069:20295, :20305), whatever the row contains — BACKGROUND measured 30
+     because its `+` action is 18px and the padding grew around it. */
+  height: var(--bk-size-row-dense);
+  padding: 0 var(--bk-space-16);
   cursor: pointer;
   user-select: none;
   position: relative;
   background: transparent;
   border: none;
   text-align: left;
+  /* The board declares ink-muted on the ROW and lets the label and chevron
+     inherit it; both were already muted here, but the row itself sat on the
+     panel's --bk-ink, so anything added to it would have arrived dark. */
+  color: var(--bk-ink-muted);
+}
+/* An OPEN section's header is tighter than a closed one's, on every profile
+   board: 807:8342's TYPOGRAPHY row is 20 tall (the 16px line plus 4 below it)
+   where its shut BACKGROUND / BORDER / EFFECTS rows are 28. The title belongs
+   to the rows under it once they are showing, and the 28 that shipped for both
+   put 8px of nothing between a heading and the field it heads. */
+.bdi-sec:not(.closed) > .bdi-sec-h {
+  height: 20px;
 }
 .bdi-sec-h:hover {
   background: rgba(15, 23, 42, 0.02);
@@ -176,7 +231,9 @@
   font: 600 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  /* 0.88px at 11px, which is what every profile board's section label carries
+     (`tracking-[0.88px]`). 0.06em resolved to 0.66. */
+  letter-spacing: 0.08em;
 }
 /* Collapsed-section value readout ("16px · solid", "fade-in 300ms").
    `.bdi-sec-name` has taken `flex: 1` since it shipped and this never had a
@@ -222,11 +279,20 @@
   color: var(--bk-accent);
   background: var(--bk-accent-tint);
 }
+  /* 0 top / 8 bottom: an open section on the boards runs header(20) → rows(34
+     each) → 8 of air → the next header, which is why their last row is drawn
+     42 rather than 34. It was 2/10. */
 .bdi-sec-body {
-  padding: 2px 20px 10px 16px;
+  padding: 0 var(--bk-space-20) var(--bk-space-8) var(--bk-space-16);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  /* 0 between property rows — `.bdi-row-ctrl` now carries the board's own
+     34-tall box, air included. Anything in a section body that is NOT a
+     property row (sub-labels, preset grids) carries its own margin already —
+     `SubTitle` ships `marginTop: 6` — so nothing needs the container gap back.
+     Rows wrapped in a positioning div (`tw:relative`, for the mixed-value dot)
+     inherit the row's own 34 through the wrapper and stay in the same rhythm. */
+  gap: 0;
 }
 .bdi-sec.closed .bdi-sec-body {
   display: none;
@@ -245,9 +311,25 @@
    Label is Inter Regular 12px, ink-soft (#485465), right-aligned to the control. */
 .bdi-row-ctrl {
   display: grid;
-  grid-template-columns: 96px 1fr;
+  /* 95, and the odd number is the point. Every profile board and 159:123 fix
+     the CONTROL — left 120, width 160, so its right edge lands on 280 in a 300
+     frame — and state nothing at all about the label column's width; the label
+     is just a text node at left 16. The panel's own left rule (`.bdi-panel`,
+     boards 32:2 / 807:8521) spends the first of those 300 pixels, so a 96px
+     label column put the control at 121..280 — 159 wide. The pixel has to come
+     out of one of the two columns, and it comes out of the one no board
+     measures. Control: 120..280, 160. */
+  grid-template-columns: 95px 1fr;
   align-items: center;
   gap: 8px;
+  /* 34, not the 28 the control alone gives. Boards 807:8342/8412/8475/8521/
+     8567/8614 and 159:123 all draw a property row as a 34-tall block holding a
+     28-tall control — 3px of air above and below it — and stack those blocks
+     contiguously. The live rhythm was already 34 (28 + the section body's 6px
+     gap), so nothing on screen moves; what changes is that the ROW is the box
+     the boards measure, which is what lets a recipe join it. `.bdi-sec-body`
+     drops its gap to 0 in the same change, or the pitch would become 40. */
+  min-height: 34px;
 }
 .bdi-row-ctrl button, .bdi-row-ctrl input, .bdi-row-ctrl select { height: var(--bk-size-row-dense); min-height: 0; }
 .bdi-row-ctrl .bdi-lb {
@@ -278,7 +360,13 @@
   height: var(--bk-size-row-dense);
   width: 100%;
   background: var(--bk-gray-50);
-  border: 1px solid transparent;
+  /* A RESTING EDGE, not a transparent placeholder revealed on hover. Every
+     control frame on boards 807:8342/8412/8475/8521/8567/8614 is drawn
+     `bg-[--flowbite/gray/50] border-[--flowbite/gray/100]` — the field has an
+     outline before you touch it. Transparent-until-hover meant a column of
+     values with no boxes around them, and the hover state then read as the
+     field APPEARING. */
+  border: 1px solid var(--bk-gray-100);
   border-radius: 4px;
   overflow: hidden;
   transition: background 120ms, border-color 120ms, box-shadow 120ms;
@@ -345,7 +433,11 @@
 /* ── Pair row (field | link | field) ──────────────────── */
 .bdi-pair {
   display: grid;
-  grid-template-columns: 1fr 14px 1fr;
+  /* 80 | 8 | 72, off boards 807:8342 (Size 14 | 1.5, frames at x120 w80 and
+     x208 w72) and 807:8384/8386 (Padding, the same split). It was `1fr 14px
+     1fr`, which divides the 160 column evenly at 73/73 — the first number in
+     each of these pairs is the one that carries a unit and needs the room. */
+  grid-template-columns: 80px 8px 1fr;
   align-items: center;
   gap: 0;
   flex: 1;
@@ -363,10 +455,14 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  height: 24px;
+  /* The third of the three control frames, and it was the odd one out twice:
+     24 tall against the boards' 28, and bg-subtle over a transparent border
+     against their gray-50 over gray-100. A Display dropdown and the Size field
+     under it are the same 160x28 box on every profile board. */
+  height: var(--bk-size-row-dense);
   padding: 0 6px 0 var(--bk-space-8);
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-gray-100);
   border-radius: 4px;
   font: 500 11px var(--bk-font-ui);
   color: var(--bk-ink);
@@ -469,7 +565,11 @@
   letter-spacing: 0.08em;
   background: var(--bk-bg-card, var(--bk-bg-card));
   padding: 0 var(--bk-space-4);
-  color: var(--bk-warning);
+  /* `--bk-warning` on the card white is 3.51:1 at 11px — measured on the FLEX
+     profile run, where the MARGIN tag failed. `--bk-warning-text` is the token
+     the system ships for warning INK on a light fill and reads 8.0:1;
+     --bk-warning stays what it is, a fill. */
+  color: var(--bk-warning-text);
   text-transform: uppercase;
 }
 .bdi-pbox > .bdi-tag {
@@ -605,7 +705,10 @@
   background: var(--bk-bg-subtle);
   border-radius: 4px;
   padding: 2px;
-  height: 24px;
+  /* Every control frame on the profile boards is 28 (807:8352, :8360, :8363,
+     :8370, :8373 …). A 24-tall segmented control in a column of 28-tall fields
+     was the one row that did not line up. */
+  height: var(--bk-size-row-dense);
   width: 100%;
 }
 .bdi-seg button {
@@ -613,7 +716,12 @@
   border: none;
   border-radius: 3px;
   cursor: pointer;
-  color: var(--bk-ink-muted);
+  /* MEASURED 2026-09-08 (inspector-single-selection run): --bk-ink-muted on
+     the track's --bk-bg-subtle is 4.39:1 at 11px, under the 4.5 floor —
+     "gradient" and "image" both failed. --bk-ink-soft on the same fill is
+     6.78:1. The selected segment is still unmistakable: it keeps --bk-ink at
+     600 on a white chip with a shadow. */
+  color: var(--bk-ink-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -637,10 +745,18 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 24px;
+  /* 28, the same `--bk-size-row-dense` box `.bdi-fld` uses. Boards 159:123
+     (238:1418) and 807:8521 (807:8531) both draw the colour control at 28 —
+     it was 24, four short, and read as a smaller control than the numeric
+     field directly under it in the same panel. */
+  height: var(--bk-size-row-dense);
   padding: 0 var(--bk-space-4) 0 2px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
+  /* Same frame as `.bdi-fld` above, for the same reason and off the same six
+     boards: gray-50 on a gray-100 hairline. It was `--bk-bg-subtle` with a
+     transparent border, one step darker than the numeric field sitting
+     directly under it in the same 160px column. */
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-gray-100);
   border-radius: 4px;
   width: 100%;
 }
@@ -860,7 +976,9 @@
   color: var(--bk-accent);
 }
 .bdi-adv .bdi-adv-c {
-  color: var(--bk-ink-muted);
+  /* Same measurement, same fill: the count rides inside a --bk-bg-subtle
+     chip, where --bk-ink-muted is 4.39:1 at 11px. */
+  color: var(--bk-ink-soft);
   display: inline-flex;
 }
 

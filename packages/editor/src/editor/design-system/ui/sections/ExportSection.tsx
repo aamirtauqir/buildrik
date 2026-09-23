@@ -44,9 +44,16 @@ const TOKEN_KINDS_COUNT = 14;
 const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)]";
 const BLOCK = "tw:flex tw:flex-col";
 /* Board 220:839 · 28-tall caps header. */
+/* Full-bleed `--color/bg-subtle`, 16 in — 220:839 / I220:839;220:6, the SHARED
+   Section header component, which is a tinted band and not a bare caps line.
+   `-mx-4` breaks out of the column's own 16 and `px-4` puts it back, so the
+   tint reaches the panel edge the way the board draws it.
+   `--bk-ink-soft` rather than the component's `--color/ink-muted`: on that
+   tint, muted measures 4.39:1 and fails AA at 11px. */
 const SECTION_HEAD =
-  "tw:flex tw:h-7 tw:items-center tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] " +
-  "tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:h-7 tw:items-center tw:gap-2 tw:-mx-4 tw:px-4 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:text-[11px] tw:leading-4 tw:font-semibold tw:tracking-[0.06em] " +
+  "tw:text-[var(--bk-ink-soft)]";
 /* Board 153:132/137/142 · 48 tall, full-bleed, 13/400 title over an 11/400
    description. `min-h` rather than `h` so the greyed Figma row (board
    153:147, 60 tall) still fits its longer reason line. */
@@ -229,7 +236,10 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
   /* SECTION_BODY already spends 12 of the board's 16 inset; this column adds
      the last 4 rather than a second full one (the pair measured 24 live). */
   return (
-    <div className="tw:flex tw:flex-col tw:gap-3 tw:px-1 tw:py-3">
+    /* `px-4`, not `px-1`: this leaned on the 12px pad `SECTION_BODY` used to
+       add, and that pad is gone (the boards inset list rows 16 from the panel
+       edge, not 28). Same 16px result, stated where it can be read. */
+    <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:py-3">
       {/* Board 153:120 leads with the one decision that changes every export —
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
@@ -241,8 +251,10 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           row's height. `BK_SELECT_BARE_VALUE_THEME` is the sanctioned variant
           for exactly this (SelectRow's dropdown pill), so the treatment comes
           from the design system rather than from a hardcoded height. */}
-      <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2">
-        <span className="tw:flex-1 tw:text-[13px] tw:text-[var(--bk-ink)]">Dark strategy</span>
+      <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2" data-testid="brand-export-dark-row">
+        {/* 12/18 — 153:128. It ran at 13, which is the LIST row size; this is a
+            field label above a value, and the board sizes it as one. */}
+        <span data-testid="brand-export-dark-label" className="tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">Dark strategy</span>
         <Select
           theme={BK_SELECT_BARE_VALUE_THEME}
           className="tw:flex-none"
@@ -259,7 +271,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
       </div>
 
       <div className={BLOCK}>
-        <div className={SECTION_HEAD}>
+        <div className={SECTION_HEAD} data-testid="brand-export-head">
           EXPORT
         </div>
         <div className="tw:flex tw:flex-col" role="radiogroup" aria-label="Export format">
@@ -270,7 +282,14 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
               <div
                 key={id}
                 data-testid={`format-row-${id}`}
-                className={`${FORMAT_ROW} ${disabled ? "tw:opacity-60" : ""}`}
+                /* No `opacity-60` on the unavailable row. The board does not
+                   dim it — 153:148 is `--color/ink` and 153:149 is
+                   `--color/ink-muted`, exactly like the three live rows; what
+                   marks it is that it carries no Copy and no Download. The
+                   opacity multiplied the muted description down to 2.32:1,
+                   measured, which is a contrast failure invented by a
+                   treatment the board never asked for. */
+                className={FORMAT_ROW}
               >
                 {/* No radio: board 153:120 gives each format its own Copy
                     and Download, so there is nothing to "select" — and the
@@ -283,12 +302,12 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                     and flex-1 alone collapsed it to 0 because the row had no
                     free space left. Found live 2026-08-13. */}
                 <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                  <span className="tw:truncate" title={label}>{label}</span>
+                  <span data-testid={`brand-format-title-${id}`} className="tw:truncate tw:leading-5" title={label}>{label}</span>
                   {/* Wraps rather than truncates: board 153:120 shows the whole
                       description under the title, and at this width `truncate`
                       was rendering "Custom prope…" — a subtitle that stops
                       before it says anything is worse than a second line. */}
-                  <span className="tw:text-[11px] tw:leading-snug tw:text-[var(--bk-ink-muted)]" title={desc}>
+                  <span data-testid={`brand-format-desc-${id}`} className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" title={desc}>
                     {desc}
                     {id === "tailwind" && droppedCount > 0 ? ` · ${droppedCount} dropped` : ""}
                   </span>
@@ -307,12 +326,14 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                     size="xs"
                     type="button"
                     data-download-format={id}
+                    data-testid={`brand-format-download-${id}`}
                     onClick={(e) => {
                       e.preventDefault();
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
                       onExported?.(label);
                     }}
-                    variant="link" className="tw:font-normal tw:text-[11px]"
+                    /* 11/16 in `--color/accent-text` — 153:136. */
+                    variant="link" className="tw:font-normal tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]"
                   >
                     Download
                   </Button>

@@ -1,0 +1,70 @@
+{
+  "slug": "sweep-b",
+  "sections": ["1084:4527 · 11 · Templates", "1938:8372 · 10 · Components"],
+  "why": "Both sections read 0% covered, and that is not a failure to apply: no UX finding in any V2 lane ever targeted them. This is the audit that was missing, run against the design-system rules and the code contract rather than against a finding list.",
+  "applied": [
+    {
+      "ref": "AUD-1 (FIG-F-57, re-derived and now FIXED)",
+      "board": "781:4433",
+      "node": "781:4468",
+      "what": "the board drew a live Panel footer (280x48) holding a Button instance 781:4469 labelled '+ Create component'. ComponentsTab.tsx:93-113 returns a PanelFrame holding only the header and PanelErrorState and RETURNS — the footer is never reached. The one primary '+ Create component' is at :278-287, in the normal branch.",
+      "action": "781:4468 set visible=false. Hidden, not removed: remove() is refused on instance children and this repo never deletes a design.",
+      "read_back": "OK-HIDE 781:4468 'Panel footer' visible=false on 781:4433"
+    },
+    {
+      "ref": "AUD-2",
+      "node": "788:4315",
+      "what": "the caption said 'Create component stays live because it does not depend on the list.' — the exact opposite of the code.",
+      "action": "rewritten to 'The error branch returns before the footer, so no Create button renders when the list fails — Retry is the only way out.'",
+      "read_back": "OK-TEXT 788:4315 54px -> 54px clash=0 parent=SECTION 1938:8372 — length matched deliberately so the caption could not grow into the board below (the twelve-caption overflow of 2026-09-07)"
+    },
+    {
+      "ref": "AUD-3",
+      "board": "781:4372",
+      "what": "titled 'Templates · load-error'. TemplatesTab.tsx has no fetch and no isLoading; its two effects sync appliedId and emit the panel width. What ships is an APPLY-error banner (:575-586) with Retry (gated on canRetry, :281) and Dismiss, raised applying a template to a page.",
+      "action": "board marked, not renamed. A bare rename would promise a banner the board does not draw. New name carries '[not-implemented] as drawn' plus the code citation.",
+      "read_back": "OK-MARK 781:4372 'Templates · load-error — [not-implemented] as drawn: TemplatesTab.tsx has no fetch and no isLoading; the shipped error is an apply-error banner (Retry / Dismiss) over the gallery, TemplatesTab.tsx:575-586'"
+    },
+    {
+      "ref": "AUD-4",
+      "node": "788:4312",
+      "action": "caption rewritten from 'Templates unreachable. Insert still works…' to 'There is no load, so there is no load error: TemplatesTab.tsx has no fetch. The shipped error is an apply-error banner with Retry and Dismiss over the gallery.'",
+      "read_back": "OK-TEXT 788:4312 36px -> 72px clash=0 parent=SECTION 1084:4527 — it doubled in height and was checked against every sibling in the section; no overlap created"
+    },
+    {
+      "ref": "AUD-5",
+      "nodes": ["1712:8391 15 -> 16/24", "807:7254 18 -> 20/30", "1711:8406 15 -> 16/24", "807:7269 18 -> 16/24"],
+      "what": "four TEXT nodes off the 11/12/13/14/16/20/24 scale. All four classified as CHROME first by ancestor chain, not assumed.",
+      "read_back": "OK-SIZE 1712:8391 16/24 bound board=1170:4777 Components · create (modal) · OK-SIZE 807:7254 20/30 bound board=807:7252 · OK-SIZE 1711:8406 16/24 bound board=813:4489 · OK-SIZE 807:7269 16/24 unbound board=807:7252",
+      "note": "the plan named board 1712:8388 for the first node and the real board is 1170:4777. The script derives the board by walking to the section child instead of trusting the id, which is why the overflow guard measured against the right box."
+    }
+  ],
+  "examined_and_conforms": [
+    {
+      "board": "782:4402 Templates · no-results",
+      "read": "'Nothing matches ‘pricing’.' + search field carrying 'pricing' + 'Clear search' + footer 'Browse all templates'",
+      "verdict": "CONFORMS. TemplatesTab.tsx:502-503 renders the search string when a search is active and the category string otherwise. This board draws the SEARCH state, which is the one it is named for. The category twin (1138:13413 Templates · empty) is stranded in the Insert section and was NOT read by me."
+    },
+    {
+      "board": "1138:13394 Components · empty",
+      "read": "'No components yet.' + 'Select an element on the canvas and save it as a component to reuse it everywhere.' + a Panel footer with '+ Create component'",
+      "verdict": "CONFORMS — and note it is the mirror image of 781:4433: here the footer is CORRECT, because the empty branch is in the normal render path."
+    },
+    {
+      "node": "813:4498 and its four siblings (813:4502/4505/4509/4513)",
+      "read": "ancestor chain TEXT < FRAME < FRAME 813:4495 'template-preview-scroll' < FRAME 1711:8404 'modal/1100 · template preview' < FRAME 813:4489 < SECTION 1084:4527",
+      "verdict": "CLASSIFIED AS CUSTOMER CONTENT, not chrome debt. Inter Bold 32 'Build something amazing' sits inside the scroll body of a template PREVIEW — it is the template being previewed. TYPE-COLOR-SYSTEM rule 3 exempts nodes under a canvas/preview ancestor. The brand pass left this unclassified in both directions; it is now classified, on a read, and is NOT counted as drained."
+    },
+    {
+      "nodes": "VIS-3-30 and its three siblings — 642:2928, 642:2652, 807:4330, 807:6778",
+      "read": "all four read HORIZONTAL/AUTO, 760x72 (800x72 for 807:4330), padding 8/8, content spanning 8..64 — FITS",
+      "verdict": "ALREADY-CORRECT. The brand plan carried this from the 2026-09-06 SWEEP-FULL cache as an open Major on four boards. It is fixed. Two further facts fall out: (a) the prescription in the finding — 'shift its children down 16' — could never have been applied, because all four toolbars are auto-layout frames whose children's x/y belong to the parent; (b) the correct fix, which the file already carries, is a hugging counter axis with 8px padding."
+    }
+  ],
+  "filed_not_fixed": [
+    "807:7252 S1.3b · new-page · template-picker — six template-card frames each overflow their container by 9px and each card's TEXT overprints by 9 (807:7280..7291). One card recipe, six instances: fix the recipe. Carried from the 2026-09-06 cache; NOT re-measured by me.",
+    "813:4489 — 1711:8404 'modal/1100 · template preview' overflows its board's bottom by 72. Cache figure, NOT re-measured.",
+    "778:4102 Templates · loading (RETIRED) — 4 CONTAINER + 4 OUT defects. Confirmed RETIRED-is-correct by the same code read that mis-titled 781:4372: there is no fetch, so nothing can produce a loading state. Fix only if the board stays.",
+    "1138:13413 Templates · empty is stranded in the Insert section (ARR-A-18) and needs the Insert owner's agreement to move. Not read by me."
+  ]
+}

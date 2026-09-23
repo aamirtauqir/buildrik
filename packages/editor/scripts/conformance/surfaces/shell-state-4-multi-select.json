@@ -1,0 +1,190 @@
+{
+  "surface": "shell-state-4-multi-select",
+  "board": "Shell state 4 · Multi-select (Figma 66:4)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Heading"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Text"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Button"
+    },
+    {
+      "action": "press",
+      "key": "Meta+a"
+    },
+    {
+      "action": "waitFor",
+      "testId": "multiselect-count"
+    },
+    {
+      "action": "hover",
+      "testId": "footer-selection-label"
+    }
+  ],
+  "contrastScope": "[data-testid=\"multiselect-panel\"]",
+  "targets": [
+    {
+      "name": "count",
+      "testId": "multiselect-count",
+      "spec": "shell-state-4-multi-select",
+      "nodeId": "66:203"
+    },
+    {
+      "name": "align-label",
+      "testId": "multiselect-align-label"
+    },
+    {
+      "name": "footer-selection",
+      "testId": "footer-selection-label",
+      "spec": "shell-state-4-multi-select",
+      "nodeId": "66:199"
+    },
+    {
+      "name": "footer-dims",
+      "testId": "footer-selection-dims",
+      "spec": "shell-state-4-multi-select",
+      "nodeId": "66:200"
+    },
+    {
+      "name": "footer-zoom",
+      "testId": "footer-device-zoom",
+      "spec": "shell-state-4-multi-select",
+      "nodeId": "66:202"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "multiselect-ai-chip"
+    },
+    {
+      "name": "batch-hint",
+      "testId": "batch-style-hint"
+    }
+  ],
+  "_note": [
+    "FULL-SHELL BOARD, measured live at 1440x900 — the board's own frame size.",
+    "",
+    "Per the brief: what is joined here is what this board is ABOUT (its state).",
+    "The chassis the four Shell-state boards redraw identically is skipped, with",
+    "the reason, rather than re-asserted four times:",
+    "",
+    "  the TOPBAR (682:2657 and its children) — boards.json carries",
+    "  authority=code:topbar against all twelve 'Shell state N' boards, decided",
+    "  2026-08-17 on evidence: they draw Exit | name | Saved pill | review pill |",
+    "  bell | Publish(disabled) and no Quick preview, Comments or Issues chip,",
+    "  while the shipped topbar has all three. The boards lose because they",
+    "  contradict the board SET — 200:2 is named 'Comment mode' and its own",
+    "  topbar has no comments control, and the Issues chip is what opens board",
+    "  1168:4732. The same snapshot also draws Publish grey/disabled on a",
+    "  returning user with content, which would mean nobody could ever publish.",
+    "  The topbar has its own spec (`topbar`) and its own recipe (shell-default).",
+    "",
+    "  the RAIL (2034:8392) — the board fills it --color/bg-app #F3F4F6; the",
+    "  shipped rail is white. That is one reading against the rail as it appears",
+    "  on every other family's boards, and the rail is chassis shared by all four",
+    "  of these boards plus shell-default. Not re-settled from a state board.",
+    "",
+    "  the CANVAS TOOLBAR (463:3962 and its ~40 chips) — one floating component",
+    "  redrawn on all four boards; it belongs to the canvas family, not to a",
+    "  state. Board 202:2's own walk (boards.json, 2026-08-17) already fixed the",
+    "  real defect it exposed, which was the bar not wrapping at 1280.",
+    "",
+    "  the FOOTER BAR itself (65:196 / 66:196-equivalent) — the <footer> element",
+    "",
+    "REACHED LIVE, entirely through shipped controls: dismiss the first-run",
+    "coach, insert three elements from Insert, then Cmd+A",
+    "(useCanvasKeyboard.ts:80-86 -> `composer.selection.selectAll()`). No",
+    "fixture sets the selection. `measure.mjs`'s click step carries no modifier",
+    "keys, which is why select-all rather than three shift-clicks.",
+    "",
+    "The coach must be dismissed FIRST and that is a finding, not a",
+    "convenience: RailCoach is a fixed bubble at 240x154 anchored beside the",
+    "rail (x 72..312, y 152..306) and the shell opens the Insert drawer on",
+    "session start, so on first run the coach sits ON TOP of the drawer's first",
+    "six rows and eats their clicks. Measured — Playwright's click on",
+    "`insert-el-Heading` times out on intercepted pointer events until 'Got it'",
+    "is pressed. See the report.",
+    "",
+    "CONFORMED in this pass:",
+    "  MultiSelectToolbar's count badge 14 -> 14/20 (66:203) and its band",
+    "  labels 11 -> 11/16 (66:204). Both declarations carried the size without",
+    "  a line-height, so they sat on Inter's own normal.",
+    "",
+    "NOT JOINED, this board only:",
+    "",
+    "  the ALIGN and DISTRIBUTE BUTTONS (66:205-66:223) — this board draws nine",
+    "  labelled text buttons ('Left', 'Centre', 'Right', 'Top', 'Middle',",
+    "  'Bottom', 'Horizontally', 'Vertically') stroked --color/border-input.",
+    "  Board 159:123 (Inspector · multi-select) draws the same control as icon",
+    "  buttons, and boards.json already settles this pair at",
+    "  authority=board:159-123 — MultiSelectToolbar.tsx cites 159:123 and",
+    "  159:134 line by line. Two boards disagree; the family board wins, the",
+    "  shell thumbnail loses, exactly as 66:225 lost to 170:70.",
+    "",
+    "  the batch style ROWS (1709:8395-8414) — Background / Text color / Radius",
+    "  / Padding / Font size with 24-tall 160-wide inputs. Those are ColorInput",
+    "  and InputWithUnit, shared with the single-selection inspector and every",
+    "  profile board; a state board does not re-size them. The panel's HINT is",
+    "  measured (and is 11px --bk-ink-muted as 1709:8415 asks) but not joined",
+    "  either: the board gives it width 272 against a 300 frame with no stroke,",
+    "  and the shipped inspector's own 1px border takes the same run to 270.",
+    "",
+    "  the canvas count badge and floating align toolbar — 66:4 draws neither,",
+    "  but it also draws only ONE selection ring for a three-element selection,",
+    "  so its canvas art is the single-select frame reused. boards.json recorded",
+    "  that on 2026-08-17 and it still holds.",
+    "",
+    "  the AI chip on this panel (measured as `ai-chip`, no join) — 66:4's",
+    "  inspector header has no AI entry at all; it comes from 159:123, the same",
+    "  board that settles the buttons.",
+    "",
+    "CONTRAST SWEEP IS SCOPED to the multi-select panel, not the whole shell,",
+    "and that is a deliberate narrowing with a report attached. Sweeping `body`",
+    "in this state surfaces 14 text failures and 1 icon failure that belong to",
+    "the CANVAS OVERLAY layer, not to this board: the floating align toolbar",
+    "inside `.bd-selection-box` (8 glyphs, rgb(184,181,173) on the box's",
+    "rgb(225,239,254), 1.75:1), the element badge (2 runs, --bk-ink on",
+    "rgb(10,10,10), 1.12:1), and CanvasBreadcrumb (4 runs, --bk-gray-400 on its",
+    "rgba(17,24,39,0.5) bar over white, 1.34:1), plus one 12x12 icon at 1.93:1",
+    "against the 3:1 non-text floor. boards.json already records that 66:4 draws",
+    "neither the badge nor the align toolbar, so none of them is this board",
+    "conforming to anything — they are an a11y arc of their own. They are NOT",
+    "baselined here; they are excluded by scope and named, in the recipe and in",
+    "the report.",
+    "",
+    "THE ALIGN LABEL IS MEASURED BUT NOT JOINED, and that is the one place on",
+    "this surface where a board loses on purpose. 66:204 names the label",
+    "--color/ink-muted. Board 159:123 fills the ALIGN band --bk-bg-subtle (a",
+    "reading measured off that frame and asserted by MultiSelectToolbar's own",
+    "test, 'tints the ALIGN section'), and 11px ink-muted on that fill is 4.39:1",
+    "against WCAG's 4.5 floor — measured in this run. Taking the board's token",
+    "would ship a contrast failure; --bk-ink-soft on the same band is 6.78:1 and",
+    "is what now ships. Said loudly here rather than baselined: the two boards",
+    "are individually right and jointly illegible, and the band is the half a",
+    "family board settled.",
+    "",
+    "CONFORMED in this pass:",
+    "  MultiSelectToolbar's count badge 14 -> 14/20 (66:203) and its band labels",
+    "  11 -> 11/16 (66:204's line box, which is not the property in dispute).",
+    "  Both declarations carried the size without a line-height, so they sat on",
+    "  Inter's own normal."
+  ]
+}

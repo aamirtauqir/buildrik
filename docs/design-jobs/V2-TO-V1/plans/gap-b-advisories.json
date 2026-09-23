@@ -1,0 +1,126 @@
+{
+  "_": "Gap-B register: one row per finding for all 24 that had NO queue row of any kind before this pass. Every row states a verdict and the reason for it, so a deliberate no-op can never again be mistaken for an oversight. Rows classify as `advisory` — the applier does not execute them and must not: a verdict is a record, not an edit. The edits themselves are in gap-b-notes.json, gap-b-copy.json and gap-b-sections.json.",
+  "page": "1:3",
+  "rows": [
+    {
+      "finding": "UX-C-10",
+      "action": "IMPLEMENTED · 1707:8427 / 1707:8424 — the popover's no-records dead end no longer names a command-palette entry; it names the Content panel, which is on the rail and owns a record editor. Design instruction (ask inline, offer the collection) also carried on note/Inspector.",
+      "why": "content lane handed it to Inspector because the popover board is 1707:8427; this pass placed it instead of handing it on again"
+    },
+    {
+      "finding": "UX-C-13",
+      "action": "IMPLEMENTED as a specification on note/Inspector (1776:8381) — the popover must ask WHICH property to bind, defaulted from element type and field type, offer only fields that can drive the selection, and keep the original content as the unbind fallback. Not drawn as a new popover board: three states (property picker, filtered field list, unbind restore) is a board family, not an annotation, and this pass had 15 calls for 24 findings.",
+      "why": "UX-C-13 — Image bound to a Photo field writes the URL into text content and the picture never changes"
+    },
+    {
+      "finding": "UX-C-21",
+      "action": "IMPLEMENTED · note/Ecommerce on 1779:6, anchored to 1719:8391 Ecommerce · collection-setup (modal) — finish the flow (bind the inserted block, show the sample products) and make the offer recoverable rather than one-shot.",
+      "why": "the content lane called it NOT-APPLICABLE because the dialog is not in 1776:8376; this pass owns 1779:6 and placed it"
+    },
+    {
+      "finding": "UX-C-26",
+      "action": "IMPLEMENTED as a specification on note/Inspector — + Create Collection must return the created collection to its caller, reopen the popover on it, and let the first record be created in the same flow; a success the user has to act on must not auto-dismiss.",
+      "why": "the wizard auto-closes ~1s after success and nothing reopens the popover or reselects anything"
+    },
+    {
+      "finding": "UX-C-27",
+      "action": "IMPLEMENTED · note/History on 1776:8374 — restoring persisted state is not a user action, so importing bindings must not mark history dirty; a refusal that must be shown has to name something the user did.",
+      "why": "the defect surfaces in History/undo, not in the Content section, which is why the content lane could not place it"
+    },
+    {
+      "finding": "UX-C-30",
+      "action": "IMPLEMENTED · note/Content on 1776:8376 — the module summary, stated as the one spine the section must be sequenced around: collection → fields → records → repeater on canvas → publish, plus the missing collection settings screen.",
+      "why": "module summary; a summary has no other form than a section-level statement"
+    },
+    {
+      "finding": "UX-I-03",
+      "action": "NOT-APPLICABLE to the board, on board evidence and on a COMPLETE read. All 31 TEXT nodes of 163:113 were read 2026-09-07: no Enter, no Esc, no arrow keys, no shortcut line anywhere. The only safety sentence is 163:166 “Nothing is written until Restore.” There is therefore nothing drawn that the finding contradicts. The code half is separately ALREADY-CORRECT (TimeTravelScrubber.tsx text-entry guard, founder's working tree). Recorded on note/History 2876:12478.",
+      "why": "the history lane reported ALREADY-CORRECT on code evidence only and said so; this pass checked the board it never read"
+    },
+    {
+      "finding": "UX-I-04",
+      "action": "IMPLEMENTED (panel half) · note/History — the drawer states that time-travel is a MODE: 'Time-travel is on. The canvas is read-only; ← → step the timeline.' Canvas half NOT-APPLICABLE to this section and NOT applied elsewhere: no History board draws the canvas under an open drawer; owner is 1779:5 / 1776:8385.",
+      "why": "one arrow press both walks the element selection and steps the timeline; the canvas stays interactive because the overlay is pointer-events:none"
+    },
+    {
+      "finding": "UX-I-11",
+      "action": "NOT-APPLICABLE, confirmed rather than inherited. 163:113 is 360 wide and draws no canvas-relative geometry, so a hardcoded left/right inset cannot be wrong on it; the only board that could carry the defect is a full-screen History board that does not exist and would duplicate 1776:8385. Reason recorded on note/History so the verdict is visible on the page, not only in a report.",
+      "why": "the history lane's verdict was correct; this pass verifies and publishes it rather than repeating it"
+    },
+    {
+      "finding": "UX-I-13",
+      "action": "BLOCKED · specified on note/History, not drawn. The change is mechanical — move the slider thumb to the right end of its track and re-point the Previewing label at the newest entry — but no lane ever recorded an id for the thumb, so it needs a shape resolution read inside 163:113 (the smallest ellipse/rect centred on the track) before any write. The label half is now resolved — 163:160 “Previewing v3” is the node that must name the newest entry once the thumb moves. That read was not affordable inside this pass's 15 calls alongside 23 other findings.",
+      "why": "TimeTravelScrubber.tsx:74-78 seeds initialIndex to the middle of the stack, which is both meaningless and, with the Enter default, dangerous"
+    },
+    {
+      "finding": "UX-I-14",
+      "action": "IMPLEMENTED (session-row half) · note/History 2876:12478 — the single existing door is 163:158 “+  Save a version”; 'Save this point as a version' belongs on every session row in this section. Topbar half NOT-APPLICABLE here and not applied elsewhere: the topbar lives in 1776:8385.",
+      "why": "the only durable restore-point control is a text link three navigations deep with no shortcut"
+    },
+    {
+      "finding": "UX-D-17",
+      "action": "IMPLEMENTED as a specification on note/Inspector — remove the 'N of M sections apply' line, or let a section report its own has-content. Six sections in a profile declare no CSS keys and are structurally incapable of counting.",
+      "why": "an element with three interactions and four classes still reads 2 of 13"
+    },
+    {
+      "finding": "UX-D-18",
+      "action": "IMPLEMENTED as a specification on note/Inspector — declare the real keys (--hide-desktop/tablet/mobile) so applies, auto-expand and the count describe what the section does. Carried with the finding's own qualifier: the write is honoured end to end, so this is a labelling defect, not a dead control.",
+      "why": "the one thing configured about an element is the one thing that stays shut"
+    },
+    {
+      "finding": "UX-D-22",
+      "action": "IMPLEMENTED as a specification on note/Inspector — the raw-CSS escape hatch ships as CUSTOM CSS, an ordinary collapsed section for everyone, and the two Border implementations resolve to one. Not drawn as a section inside the seven profile boards: that is seven board interiors, which this pass could not afford and which board 6 of the inspector-states arc (2865:22079) already renames to CUSTOM CSS.",
+      "why": "the escape hatch renders only when a localStorage key is set by hand and the page reloaded"
+    },
+    {
+      "finding": "UX-D-23",
+      "action": "IMPLEMENTED as a specification on note/Inspector — ID / Title / Tab Index is ADVANCED HTML, not 'Element properties'; hide it when it has nothing type-specific to say. Consistent with 2865:22079, which already draws the collapsed row as ADVANCED HTML.",
+      "why": "the section never returns nothing, so it always occupies a slot and a denominator"
+    },
+    {
+      "finding": "UX-D-29",
+      "action": "IMPLEMENTED · note/Inspector — the module summary published as the build order: missing editors → lock and multi-select → findability → collapse the two animation systems.",
+      "why": "module summary; the ten boards built earlier today are that sequence and it was nowhere stated on the page"
+    },
+    {
+      "finding": "UX-E-15",
+      "action": "ALREADY-CORRECT, on my own read-back and not on the publish lane's. Read 2026-09-07 from 1172:4825: its buttons are 1172:4835 'Cancel' and 1172:4837 'Export as HTML', and there is no Download All and no Download CSS anywhere in the modal. The board is already the corrected design; the defect is code-only. Recorded on note/Publish with the read-back.",
+      "why": "three unlabelled download doors to nearly the same file — ExportModal.tsx only"
+    },
+    {
+      "finding": "UX-E-28",
+      "action": "OPEN DECISION, recorded and deliberately not resolved · note/Publish. The fix offers drop the row or replace it with the draft-share link; SPEC-PUBLISH-PANEL §3 deletes ENVIRONMENT as a section and the share link is owned by the dashboard, so either move would settle an IA question this arc has no mandate to settle. The Preview — None row stands on all four boards until it is settled.",
+      "why": "founder instruction: record it as open; do not invent an IA edge"
+    },
+    {
+      "finding": "UX-E-31",
+      "action": "IMPLEMENTED · note/Publish — one state machine, one progress vocabulary shared with the worker, one merged gate, a named way out of every terminal and stuck state. Carries the sanctioned cancellation wording verbatim ('If the deploy had already started it may still finish. We will tell you which.') because no cancel check spans the Vercel deploy. The refuted half is explicitly NOT drawn: the server does inject a correct per-path canonical and og:url on CMS detail pages; what is the template's is the first title, og:title, og:description and twitter:* (UX-E-05).",
+      "why": "module summary; the copy rule for Publish boards is honoured in the drawn wording"
+    },
+    {
+      "finding": "UX-I-23",
+      "action": "NOT-APPLICABLE / NOT-TOUCHED, with the reason recorded on note/Compare and note/Review. It asks to drop the 'Opened · no reply' distinction, which DECISIONS-OPEN §17 has already settled as real; a settled decision is not re-opened here. Its pill and bar boards are in 1776:8388, which this pass does not own. What survives and is stated: one vocabulary, defined once, consumed by pill, bar and panel.",
+      "why": "founder instruction: leave it; record why"
+    },
+    {
+      "finding": "UX-I-24",
+      "action": "IMPLEMENTED as a specification · note/Compare — 'See what changed ›' belongs in the gate 1168:4713 and opens 168:2; StaleApprovalModal's own diff goes. Not drawn as a live label plus hotspot: 1168:4713 measures 520x262 with content already reaching 246, so a new row does not fit without restacking the modal, and a hotspot needs the id of a label that does not exist yet.",
+      "why": "the gate shows the weaker of two diffs at the moment the user actually has to decide"
+    },
+    {
+      "finding": "UX-I-29",
+      "action": "IMPLEMENTED as a corrected specification · note/Compare 2876:12481. The review lane's instruction — relabel the ‹ on 168:2 to ‹ Review — was written against a control that does not exist. Read back 2026-09-07: 168:2's bar is 168:4 Compare, 168:12 Home ▾, 168:13 the change count and 168:14 ✕, and there is NO back control on the board. What is owed is a named exit added to that bar (‹ Review) plus a second, conditional ‹ History › Saves shown only when Compare was entered from History. Not drawn: 168:2 is layout=VERTICAL and its bar 168:3 is an auto-layout child, so a new exit is a flow-index insert into a bar this pass had not measured.",
+      "why": "a cross-module deep link with no return address; Back lands in a module the user never asked for"
+    },
+    {
+      "finding": "UX-H-27",
+      "action": "IMPLEMENTED as a specification · note/Brand, anchored to 153:120 Brand · import-export — the collisions become rows (token, your value, their value) with a per-row keep/take and a + N more overflow, and the strategy chips become bulk shortcuts over that list. Not drawn as a new board: the brand lane already specifies board N1 for it in brand-04-boards.json, and drawing a second home for the same screen would fork it.",
+      "why": "the decision the screen asks for cannot be made from what the screen shows"
+    },
+    {
+      "finding": "UX-H-35",
+      "action": "IMPLEMENTED · note/Brand — the module summary published as one rule: a what-will-change step in front of every whole-brand write (starter, import, AI), with the note recording that the AI door already has the right shape and only starters and import owe it.",
+      "why": "module summary"
+    }
+  ]
+}

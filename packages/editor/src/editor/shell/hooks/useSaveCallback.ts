@@ -247,6 +247,19 @@ export function useSaveCallback({
           return "error";
         }
         if (isAuthSaveError(errorMessage)) {
+          /* KEEP THE SNAPSHOT. The network branch above already does this, and
+             `unsavedRecovery`'s own header says why: with a siteId nothing
+             local is written, the topbar reads "Save failed — retry", and on
+             the next load the seed puts "Saved just now" over work the product
+             discarded. A 401 lands in exactly that state — the modal below
+             even says so, "they live in this tab" — and it was the ONE
+             recoverable failure that kept nothing, so closing the tab (or the
+             reload the user is nudged toward) lost the work a network blip
+             would have preserved. `missing` and `forbidden` are deliberately
+             NOT given this: nothing can ever be saved to those sites, and
+             offering a restore later would be the lie this module exists to
+             stop. */
+          if (siteId) keepUnsaved(siteId, composer.exportProject());
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           if (onAuthExpired) {
             // The blocking surface (board 813:4870) owns the story now.

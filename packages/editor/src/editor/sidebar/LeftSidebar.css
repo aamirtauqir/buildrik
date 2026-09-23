@@ -110,7 +110,10 @@
   height: 36px;
   min-height: 36px;
   border: none;
-  border-radius: 7px;
+  /* Board 52:2 names `--radius/md` on every rail item (2034:8415 and its five
+     siblings). This was a hardcoded 7 — one pixel off the token, on six
+     controls. */
+  border-radius: var(--bk-radius-md);
   background: transparent;
   cursor: pointer;
   color: var(--bk-ink-soft);
@@ -230,7 +233,18 @@
      widths (Media 560, Templates/expand 700). See tabsConfig.width.test.ts. */
   width: var(--drawer-w, var(--bk-size-drawer));
   background: var(--bk-bg-card);
-  border-right: 1px solid var(--bk-border);
+  /* Boards 301:2019 / 301:2226 name the drawer's edge --flowbite/gray/100 —
+     the same hairline the topbar, the panel headers and (since 32:2) the
+     inspector already use. It was --bk-border `var(--bk-gray-200)`, one step darker than
+     every other panel edge beside it.
+
+     `border: 0 solid <colour>` rather than `border-right: 1px solid <colour>`,
+     which is the house pattern `.bdi-panel` already documents: a one-sided
+     shorthand leaves the other three sides at `currentColor`, so the computed
+     `border-top-color` a recipe reads back was `--bk-ink`, not this token.
+     Same pixels, honest read. */
+  border: 0 solid var(--bk-gray-100);
+  border-right-width: 1px;
   overflow: hidden;
   transition: width 0.2s ease, opacity 0.15s ease;
 }

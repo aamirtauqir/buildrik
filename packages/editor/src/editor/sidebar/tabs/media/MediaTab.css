@@ -74,27 +74,6 @@
   object-fit: cover;
 }
 
-.med-img-hover-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 36px;
-  background: var(--bk-bg-card);
-  display: flex;
-  justify-content: center;
-  gap: var(--bk-space-12);
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  backdrop-filter: blur(8px);
-  border-top: 1px solid var(--bk-border);
-}
-
-.med-img-card:hover .med-img-hover-bar {
-  opacity: 1;
-}
-
 /* §22 — Upload zone uploading state + queue errors */
 .med-upload-zone--uploading {
   border-color: var(--bk-accent, var(--bk-accent));
@@ -108,32 +87,6 @@
   flex-direction: column;
   gap: 4px;
 }
-.med-upload-queue-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  font-size: 11px;
-  border-radius: var(--bk-radius-sm, 4px);
-  border-left: 2px solid transparent;
-}
-.med-upload-queue-item__name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 40%;
-}
-.med-upload-queue-item__reason {
-  flex: 1;
-  opacity: 0.85;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.med-upload-queue-item__retry {
-  flex-shrink: 0;
-}
-
 /* §21 — Replace-across per-page selector */
 /* ── Replace-across dialog shell (board 1164:4738) ──────────────────────────
    These rules did not exist. Only the PAGE LIST below was ever styled, so the
@@ -157,27 +110,34 @@
   background: rgba(17, 24, 39, 0.6);
 }
 
+/* Board 1164:4738 — 12 radius on --color/bg-elevated with a --color/border
+   edge, 16/14 inset, and a 12 gap between blocks. It shipped on 8 radius, a
+   flat 24 pad, no edge, and per-child margins doing the gap's job. */
 .med-rx-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 301;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
   width: 520px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 96px);
   overflow-y: auto;
-  padding: var(--bk-space-24);
-  background: var(--bk-bg-card);
-  border-radius: var(--bk-radius-lg);
+  padding: 14px var(--bk-space-16);
+  background: var(--bk-bg-elevated);
+  border: 1px solid var(--bk-border);
+  border-radius: 12px;
   box-shadow: var(--bk-shadow-overlay);
   font: 400 13px/18px var(--bk-font-ui);
   color: var(--bk-ink);
 }
 
 .med-rx-title {
-  margin: 0 0 var(--bk-space-8);
-  font-size: 15px;
+  margin: 0;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bk-ink);
 }
@@ -188,12 +148,14 @@
   line-height: 20px;
 }
 
-/* Before → After. The board draws two square plates with the arrow between. */
+/* Before → After. Board 1164:4741 draws two 96x64 plates with the arrow
+   between them — landscape, not square, and the gap comes from the dialog's
+   own column rather than a margin of its own. */
 .med-rx-preview {
   display: flex;
   align-items: center;
   gap: var(--bk-space-12);
-  margin: var(--bk-space-16) 0;
+  margin: 0;
 }
 .med-rx-preview__before,
 .med-rx-preview__after {
@@ -207,63 +169,66 @@
 .med-rx-preview__before img,
 .med-rx-preview__after img {
   width: 96px;
-  height: 96px;
+  height: 64px;
   object-fit: cover;
-  border-radius: var(--bk-radius-md);
+  border-radius: var(--bk-radius-lg);
   border: 1px solid var(--bk-border);
-  background: var(--bk-bg-subtle);
+  background: var(--bk-gray-200);
 }
-/* The board rings the incoming asset in accent — it is the thing being chosen. */
+/* 1164:4744 — the board rings the incoming asset in accent AND tints its
+   plate: it is the thing being chosen. */
 .med-rx-preview__after img {
-  border: 2px solid var(--bk-accent);
+  border: 1px solid var(--bk-accent);
+  background: var(--bk-accent-tint);
 }
 .med-rx-preview__arrow {
   font-size: 16px;
   color: var(--bk-ink-muted);
 }
 
-.med-rx-failed {
-  margin: var(--bk-space-8) 0 0;
-  color: var(--bk-error);
-}
-
+/* 1164:4746 — 8 gap, 11px, and no margin of its own (the dialog column owns
+   the spacing). The result phases that shared this footer (1174:4860) are
+   the Clone's ReplaceResultModal now. */
 .med-rx-footer {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--bk-space-8);
-  margin-top: var(--bk-space-16);
+  margin-top: 0;
+  font-size: 11px;
 }
 
-/* Result phases reuse the body copy slot, tinted by outcome. */
-.med-rx-body--success { color: var(--bk-success-text); font-size: var(--bk-text-12); font-weight: 600; }
-.med-rx-body--warn { color: var(--bk-warning-text); font-size: var(--bk-text-12); font-weight: 600; }
-.med-rx-body--error { color: var(--bk-error-text); font-size: var(--bk-text-12); font-weight: 600; }
-
+/* Board 1174:4832 — a bare 4-gap list under a PAGES caption, not a bordered
+   scroll box. The box read as a second dialog inside the dialog. */
 .med-rx-pages {
   list-style: none;
-  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  margin: 0;
   padding: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: var(--bk-radius-lg, var(--bk-radius-md));
 }
-.med-rx-page-row {
-  border-bottom: 1px solid var(--bk-border, var(--bk-border));
-}
-.med-rx-page-row:last-child {
-  border-bottom: none;
+.med-rx-pages-label {
+  margin: 0;
+  font-size: 11px;
+  color: var(--bk-ink-soft);
 }
 .med-rx-page-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 4px 0 4px 8px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
 }
+/* A single-class rule ties a `tw:` utility on specificity and loses on source
+   order — this one competes with nothing, but the hover fill was
+   --bk-ink-muted, i.e. a TEXT token used as a background, which painted the
+   row mid-grey under its own grey text. */
 .med-rx-page-label:hover {
-  background: var(--bk-ink-muted);
+  background: var(--bk-bg-subtle);
 }
 .med-rx-page-name {
   flex: 1;
@@ -277,81 +242,6 @@
   text-align: center;
   color: var(--bk-ink-muted);
   padding: 12px;
-}
-
-/* §19 — stock tile attribution (photographer + source) */
-.med-img-attribution {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 4px 8px;
-  font-size: var(--bk-text-11);
-  color: var(--bk-bg-card);
-  background: linear-gradient(180deg, transparent, var(--bk-alpha-ink-40));
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  pointer-events: none;
-}
-.med-img-card:hover .med-img-attribution,
-.med-vid-card:hover .med-img-attribution {
-  opacity: 1;
-  pointer-events: auto;
-}
-.med-img-attribution a {
-  color: inherit;
-  text-decoration: underline;
-}
-.med-img-attribution__src {
-  text-transform: capitalize;
-  opacity: 0.75;
-}
-
-.med-img-hover-bar button {
-  background: none;
-  border: none;
-  color: var(--bk-ink-soft);
-  padding: 6px;
-  cursor: pointer;
-  display: flex;
-  transition: all 0.15s ease;
-}
-
-.med-img-hover-bar button:hover {
-  color: var(--bk-accent);
-}
-
-.med-vid-card {
-  position: relative;
-  aspect-ratio: 16/9;
-  border-radius: 10px;
-  border: 1px solid var(--bk-border);
-  background: var(--bk-bg-card);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.med-vid-card:hover {
-  box-shadow: var(--bk-shadow-drag);
-}
-
-.med-vid-play {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bk-alpha-ink-10);
-}
-
-.med-vid-play svg {
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 2px 4px var(--bk-alpha-ink-30));
 }
 
 .med-vid-dur {
@@ -401,48 +291,6 @@
   text-overflow: ellipsis;
 }
 
-.med-fnt-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--bk-space-16);
-  padding: var(--bk-space-20);
-}
-
-.med-fnt-card {
-  padding: var(--bk-space-16);
-  border-radius: 10px;
-  border: 1px solid var(--bk-border);
-  background: var(--bk-bg-card);
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.med-fnt-card:hover {
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-raised);
-}
-
-.med-fnt-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--bk-space-12);
-}
-
-.med-fnt-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--bk-ink);
-}
-
-.med-fnt-preview {
-  font-size: 24px;
-  color: var(--bk-ink-soft);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 
 .med-no-project {
   padding: var(--bk-space-48) var(--bk-space-24);
@@ -452,220 +300,11 @@
   line-height: 1.6;
 }
 
-.med-action-btn {
-  font-size: 11px;
-  font-weight: 600;
-  padding: var(--bk-space-4) var(--bk-space-12);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-accent);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.med-action-btn:hover {
-  opacity: 0.9;
-}
-
-.stock-modal {
-  width: min(720px, 90vw);
-  /* lift the .bd-modal 380px cap — this dialog is a browsing surface */
-  max-width: min(720px, 90vw);
-  max-height: 80vh;
-  background: var(--bk-bg-panel);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: var(--bk-shadow-overlay);
-}
-
-.stock-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--bk-space-16) var(--bk-space-20) var(--bk-space-12);
-  border-bottom: 1px solid var(--bk-border);
-}
-
-.stock-modal-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--bk-ink);
-  margin: 0;
-}
-
-.stock-modal-close {
-  background: none;
-  border: none;
-  color: var(--bk-ink-disabled);
-  cursor: pointer;
-  padding: var(--bk-space-4);
-  border-radius: var(--bk-radius-md);
-  display: flex;
-}
-
-.stock-modal-close:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-
-.stock-modal-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--bk-border);
-  padding: 0 var(--bk-space-20);
-}
-
-.stock-tab {
-  padding: 10px var(--bk-space-16);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--bk-ink-disabled);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.stock-tab:hover {
-  color: var(--bk-ink-soft);
-}
-
-.stock-tab.active {
-  color: var(--bk-accent);
-  border-bottom-color: var(--bk-accent);
-}
-
-.stock-modal-search {
-  padding: var(--bk-space-12) var(--bk-space-20) var(--bk-space-8);
-}
-
-.stock-modal-filters {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-12);
-  padding: var(--bk-space-4) var(--bk-space-20) 10px;
-}
-
-.stock-orientation-group {
-  display: flex;
-  background: var(--bk-bg-subtle);
-  border-radius: var(--bk-radius-md);
-  padding: 2px;
-}
-
-.stock-orient-btn {
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border: none;
-  border-radius: 4px;
-  font-size: var(--bk-text-11);
-  font-weight: 600;
-  cursor: pointer;
-  background: transparent;
-  color: var(--bk-ink-disabled);
-  transition: all 0.15s;
-}
-
-.stock-orient-btn.active {
-  background: var(--bk-bg-card);
-  color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-drag);
-}
-
-.stock-filter-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--bk-border);
-}
-
-.stock-color-row {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  flex: 1;
-}
-
-.stock-color-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: var(--bk-radius-full);
-  border: 1px solid var(--bk-border);
-  padding: 0;
-  flex-shrink: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-disabled);
-  box-sizing: border-box;
-}
-
-.stock-color-dot.active {
-  border: 2px solid var(--bk-accent);
-}
-
-.stock-modal-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--bk-space-12) var(--bk-space-20) var(--bk-space-20);
-}
-
-.stock-loading {
-  padding: var(--bk-space-24);
-  text-align: center;
-  color: var(--bk-accent);
-  font-size: 13px;
-}
-
 .stock-empty {
   padding: var(--bk-space-32);
   text-align: center;
   color: var(--bk-ink-disabled);
   font-size: 13px;
-}
-
-.stock-icon-header {
-  margin-bottom: var(--bk-space-12);
-}
-
-.stock-browse-all {
-  background: none;
-  border: none;
-  color: var(--bk-accent);
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-}
-
-.stock-load-more {
-  display: block;
-  width: 100%;
-  margin-top: var(--bk-space-16);
-  padding: 10px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  color: var(--bk-ink-soft);
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.stock-load-more:hover {
-  background: var(--bk-bg-card);
-}
-
-.stock-load-more:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .med-stock-btn {
@@ -977,43 +616,6 @@
    bordered tile, which is the square-tile look the board replaced; left in
    place they would have won on specificity and the redesign would have been
    invisible. */
-
-/* ─── §13 FolderBreadcrumb ─────────────────────────────────────────────── */
-.med-folder-breadcrumb {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-muted);
-  white-space: nowrap;
-  min-width: 0;
-  flex-shrink: 0;
-}
-.med-folder-breadcrumb__seg {
-  background: transparent;
-  border: 0;
-  padding: 4px 6px;
-  border-radius: var(--bk-radius-sm);
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  line-height: 1.2;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.med-folder-breadcrumb__seg:hover {
-  background: var(--bk-ink-muted);
-  color: var(--bk-ink);
-}
-.med-folder-breadcrumb__seg--current {
-  color: var(--bk-ink);
-  font-weight: 600;
-}
-.med-folder-breadcrumb__sep {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
 
 /* ── Drawer drag-over feedback ───────────────────────────────────────────────
    `med-drag-overlay` and `med-drag-label` had no rules, so dragging a file over

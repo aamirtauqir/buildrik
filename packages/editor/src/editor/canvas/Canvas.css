@@ -252,8 +252,18 @@
    at an element. It must beat the three rules above, all of which match the
    element under the pointer and so outrank a `cursor` inherited from the frame:
    `move` on hover, `grabbing` while dragging, `not-allowed` when locked. A
-   locked element is pickable — the pick reads it, it does not edit it. */
+   locked element is pickable — the pick reads it, it does not edit it.
+
+   `.buildrick-canvas` is the third selector because the page surface carries
+   an INLINE `cursor: default` (canvasStyles), and an own declaration always
+   beats an inherited one — !important on the frame cannot reach it. Measured
+   2026-09-08 with CDP: the frame and every element read `crosshair` while the
+   canvas BETWEEN elements read `default`, which is exactly the
+   `partial-trigger-exists-cursor-not-on-body` drift boards.json records
+   against 301:2186. It is a stylesheet !important against a plain inline
+   style, so it wins. */
 [data-bk-pick="true"],
+[data-bk-pick="true"] .buildrick-canvas,
 [data-bk-pick="true"] [data-buildrick-id] { cursor: crosshair !important; }
 
 [data-buildrick-id][data-hidden="true"] {
@@ -399,6 +409,10 @@
   padding: var(--bk-space-40);
   background: transparent;
   animation: bd-fade-in 0.4s ease-out;
+  /* Board 297:2008 expresses the 12 between the sentence and the buttons as a
+     GAP on the block, not as a margin under the sentence. Same picture, and
+     only one of the two can be measured. */
+  gap: var(--bk-space-12);
 }
 
 /* Board 65:2: one sentence, then the two routes side by side. The button
@@ -412,7 +426,7 @@
   line-height: 24px;
   letter-spacing: var(--bk-tracking-tight);
   color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-12);
+  margin: 0;
 }
 
 /* 65:203 draws a 10 gap between the two buttons. There is no 10 on the 4-base

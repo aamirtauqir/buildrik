@@ -1,0 +1,35 @@
+[
+ {
+  "op": "rename",
+  "id": "143:179",
+  "expect": "Layers · hidden",
+  "name": "Layers · hidden — EDITOR-ONLY DIM — the eye writes data-hidden on the canvas node and nothing else; the element publishes unchanged. Its own tooltip says so: “Dim in editor — the element still publishes”. Hiding on the SITE is the Inspector’s Visibility section (useLayerActions.ts:126-146, LayerTreeItem.tsx:285-306)",
+  "why": "UX-H-17",
+  "id_source": "page-meta dump; board at 500,1280 280x812"
+ },
+ {
+  "op": "rename",
+  "id": "143:237",
+  "expect": "Layers · locked",
+  "name": "Layers · locked — TWO SOURCES OF TRUTH — the padlock is drawn from a per-page localStorage set; the lock the canvas enforces is ElementData.locked on the document. Clicking writes both, the panel only ever re-reads storage, so a second machine draws an OPEN padlock over an element the canvas refuses (useLayerActions.ts:70-97,163-168; Element.ts:151-155; useSelectionBehavior.ts:88-95)",
+  "why": "UX-H-14 (Critical)",
+  "id_source": "page-meta dump; board at 900,1280 280x812"
+ },
+ {
+  "op": "rename",
+  "id": "1082:4527",
+  "expect": "Layers · context-menu",
+  "name": "Layers · context-menu — SCOPE SPLIT — with five rows selected every item except Group acts on the ONE right-clicked row (useLayerContextActions.ts:16-19 vs :97-99), and Delete removes the element and every descendant with no confirm, no count and no toast (useLayerActions.ts:208-217)",
+  "why": "UX-H-19 + UX-H-20",
+  "id_source": "page-meta dump; board at 900,220 280x812"
+ },
+ {
+  "op": "rename",
+  "id": "143:177",
+  "expect": "DragTooltip",
+  "name": "bdc-layers-drop-alert — a full-width bar at the top of the panel, after the drop, cleared at 3s (index.tsx:400-404, layers-v2.css:483-492). Not a tooltip and not beside the cursor",
+  "why": "UX-H-24 / COVER-1-62",
+  "id_source": "page-meta dump; frame inside board 143:119 at 0,210 280x51",
+  "note": "the rename is worth landing on its own: it makes the node honest even if the geometry step (fix-layers-ux.mjs --only=A) never runs."
+ }
+]

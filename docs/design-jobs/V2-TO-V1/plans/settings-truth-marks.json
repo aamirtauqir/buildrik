@@ -1,0 +1,10 @@
+[
+ {
+  "op": "rename",
+  "id": "1172:4867",
+  "name": "RETIRED — Project settings modal (⌃,) · superseded by the full-page Settings per UX-I-30. Canvas (grid size + snap-to-grid) folds in as a Settings › Canvas section and ⌃, + the Site menu's \"Site settings\" row point there, so site configuration has one home. Kept as the record of what shipped 2026-09; it is not a second surface to design against.",
+  "expect": "Project settings",
+  "idProvenance": "read from scratchpad_audit/mod/sections/21-settings-s7-46.txt (a committed 2026-09-06 dump of this section), NOT read from the file in this session",
+  "why": "UX-I-30 (Critical, duplicate-feature) — two site-settings surfaces with overlapping fields and no link between them. V2 section 6 · Navigation Structure states it as a census row: Settings surfaces = 2, \"a 3-tab modal and a 13-screen full page, no link between them\" (build-proposal-page.mjs:72). Hard rule 1 forbids deleting a board, so the decision is recorded as a RETIRED marker naming the successor — which is exactly what apply-truth-marks.mjs exists for and what it never deletes."
+ }
+]

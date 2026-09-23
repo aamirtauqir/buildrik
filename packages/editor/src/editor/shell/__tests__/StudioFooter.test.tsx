@@ -254,3 +254,27 @@ describe("StudioFooter (board 52:10)", () => {
     expect(onOpenStructure).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("full-page mode (F15)", () => {
+  /* A full-page tab replaces the canvas, so a selection readout and a zoom
+     percentage describe something the person cannot see. The audit found this
+     drawn on six Settings boards — "Section · Hero 680 × 250" and
+     "Desktop · 100%" printed under a screen with no canvas.
+
+     It is worth pinning why the fix is a prop rather than CSS: the footer
+     renders as a flex sibling OUTSIDE LayoutShell's grid, so every
+     `.layout-shell--fullpage` rule misses it. That is the actual bug, and a
+     stylesheet cannot reach it. */
+  it("drops the selection readout and the device/zoom control", () => {
+    render(<StudioFooter {...makeProps({ fullPage: true })} />);
+    expect(screen.queryByTestId("footer-selection-label")).toBeNull();
+    expect(screen.queryByTestId("footer-selection-dims")).toBeNull();
+    expect(screen.queryByTestId("footer-device-zoom")).toBeNull();
+  });
+
+  it("keeps both when a canvas is on screen", () => {
+    render(<StudioFooter {...makeProps({ fullPage: false })} />);
+    expect(screen.getByTestId("footer-selection-label")).toBeTruthy();
+    expect(screen.getByTestId("footer-device-zoom")).toBeTruthy();
+  });
+});

@@ -1,0 +1,84 @@
+N	2850:22371	Media · delete-confirm · single file	FRAME	6820,21134,440,202	true	VERTICAL	8	true
+K	2850:22372	TEXT	6836,21148,106,17	true		Delete 34 files?
+K	2850:22373	FRAME	6836,21175,408,25	true	true	in-use-warn
+K	2850:22375	TEXT	6836,21210,130,13	true		Type DELETE to confirm:
+K	2850:22376	FRAME	6836,21233,408,29	true	true	confirm-input
+K	2850:22378	FRAME	6836,21272,408,27	true	true	foot
+K	2850:22384	TEXT	6836,21309,277,13	true		Delete stays disabled until the word matches exactly.
+K	2850:22385	FRAME	6820,21299,320,34	true	false	hotspot/back
+K	2850:22386	FRAME	6820,21295,280,34	true	true	hotspot/back · Media · bulk-select
+C	2850:22371	texts=7
+T	2850:22384	6836,21309,277,13	11	Regular	true	WIDTH_AND_HEIGHT	Media · delete-confirm · single file	Delete stays disabled until the word matches exactly.
+T	2850:22383	7155,21279,77,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Delete 34 files	Delete 34 files
+T	2850:22381	7086,21279,37,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Cancel	Cancel
+T	2850:22377	6846,21241,28,13	11	Regular	true	WIDTH_AND_HEIGHT	confirm-input	DELE
+T	2850:22375	6836,21210,130,13	11	Medium	true	WIDTH_AND_HEIGHT	Media · delete-confirm · single file	Type DELETE to confirm:
+T	2850:22374	6846,21181,406,13	11	Regular	true	WIDTH_AND_HEIGHT	in-use-warn	⚠ 5 files are currently used on the canvas. Deleting will break those elements.
+T	2850:22372	6836,21148,106,17	14	Semi Bold	true	WIDTH_AND_HEIGHT	Media · delete-confirm · single file	Delete 34 files?
+R	2850:22386	145:300	NAVIGATE	hotspot/back · Media · bulk-select
+R	2850:22385	145:300	NAVIGATE	hotspot/back
+N	2850:22373	in-use-warn	FRAME	6836,21175,408,25	true	HORIZONTAL	1	true
+K	2850:22374	TEXT	6846,21181,406,13	true		⚠ 5 files are currently used on the canvas. Deleting will break those elements.
+C	2850:22373	texts=1
+T	2850:22374	6846,21181,406,13	11	Regular	true	WIDTH_AND_HEIGHT	in-use-warn	⚠ 5 files are currently used on the canvas. Deleting will break those elements.
+N	2881:12608	Media · modal · replace-across · all-failed (rollback)	FRAME	100,31790,948,80	true	HORIZONTAL	4	true
+K	2881:12609	FRAME	100,31790,300,52	true	true	[no-producer] committing — replace-across is SYNCHRONOUS (5 samples at 400ms all read 'Rep
+K	2881:12613	FRAME	424,31790,300,60	true	true	result-clean
+K	2881:12616	FRAME	748,31790,300,80	true	true	result-partial
+K	2881:12622	FRAME	100,31750,320,34	true	false	hotspot/back · fullpage library
+C	2881:12608	texts=7
+T	2881:12621	800,31845,61,13	11	Medium	true	WIDTH_AND_HEIGHT	btns	Retry failed
+T	2881:12620	762,31845,30,13	11	Medium	true	WIDTH_AND_HEIGHT	btns	Close
+T	2881:12618	762,31825,96,12	10	Regular	true	WIDTH_AND_HEIGHT	result-partial	▸ Failed elements (1)
+T	2881:12617	762,31802,112,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	result-partial	2 replaced, 1 failed.
+T	2881:12615	438,31825,28,13	11	Medium	true	WIDTH_AND_HEIGHT	result-clean	Done
+T	2881:12614	438,31802,109,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	result-clean	Replaced 3 uses ✓
+T	2881:12610	114,31802,67,15	12	Semi Bold	true	WIDTH_AND_HEIGHT	[no-producer] committing — replace-across is SYNCHRONOUS (5 samples at 400ms all read 'Rep	Replacing…
+R	2881:12622	1159:4593	NAVIGATE	hotspot/back · fullpage library
+N	148:2	Content · root	FRAME	100,32529,280,812	true	VERTICAL	14	true
+K	208:411	INSTANCE	100,32529,280,44	true	false	Panel header
+K	148:7	FRAME	100,32573,280,32	true	true	Group · COLLECTIONS
+K	233:1279	INSTANCE	100,32605,280,32	true	false	List row
+K	233:1284	INSTANCE	100,32637,280,32	true	false	List row
+K	148:20	FRAME	100,32669,280,32	true	true	Row · New collection
+K	148:23	FRAME	100,32701,280,32	true	true	Group · DATA
+K	233:1289	INSTANCE	100,32733,280,32	true	false	List row
+K	233:1294	INSTANCE	100,32765,280,32	true	false	List row
+K	233:1299	INSTANCE	100,32797,280,32	true	false	List row
+K	148:40	FRAME	100,32829,280,476	true	true	spacer
+K	633:3983	FRAME	100,33307,150,34	true	true	hotspot/state · Commerce · setup
+K	787:4335	FRAME	100,33271,280,34	true	false	hotspot/state · Content · loading
+K	873:4531	FRAME	100,33305,36,36	true	true	hotspot/back · to editor
+K	1670:7265	FRAME	240,33235,140,34	true	true	hotspot/row · Conditions
+C	148:2	texts=21
+T	I233:1299;232:10	359,32803,5,20	13	Regular	true	WIDTH_AND_HEIGHT	List row	›
+T	I233:1299;232:9	344,32805,7,16	11	Medium	true	WIDTH_AND_HEIGHT	List row	2
+T	I233:1299;232:8	140,32803,196,20	13	Regular	true	NONE	List row	Conditions
+T	I233:1294;232:10	359,32771,5,20	13	Regular	true	WIDTH_AND_HEIGHT	List row	›
+T	I233:1294;232:9	344,32773,7,16	11	Medium	true	WIDTH_AND_HEIGHT	List row	4
+T	I233:1294;232:8	140,32771,196,20	13	Regular	true	NONE	List row	Variables
+T	I233:1289;232:10	359,32739,5,20	13	Regular	true	WIDTH_AND_HEIGHT	List row	›
+T	I233:1289;232:9	344,32741,7,16	11	Medium	true	WIDTH_AND_HEIGHT	List row	1
+T	I233:1289;232:8	140,32739,196,20	13	Regular	true	NONE	List row	Sources
+T	148:24	116,32709,31,16	11	Regular	true	WIDTH_AND_HEIGHT	Group · DATA	DATA
+T	148:22	140,32675,91,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · New collection	New collection
+T	148:21	116,32676,8,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · New collection	+
+T	I233:1284;232:10	359,32643,5,20	13	Regular	true	WIDTH_AND_HEIGHT	List row	›
+T	I233:1284;232:9	344,32645,7,16	11	Medium	true	WIDTH_AND_HEIGHT	List row	6
+T	I233:1284;232:8	140,32643,196,20	13	Regular	true	NONE	List row	Team
+T	I233:1279;232:10	359,32611,5,20	13	Regular	true	WIDTH_AND_HEIGHT	List row	›
+T	I233:1279;232:9	337,32613,14,16	11	Medium	true	WIDTH_AND_HEIGHT	List row	24
+T	I233:1279;232:8	140,32611,189,20	13	Regular	true	NONE	List row	Menu items
+T	148:9	352,32581,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Group · COLLECTIONS	2
+T	148:8	116,32581,86,16	11	Regular	true	WIDTH_AND_HEIGHT	Group · COLLECTIONS	COLLECTIONS
+T	I208:411;16:7	116,32543,204,16	11	Medium	true	HEIGHT	Panel header	Content
+R	148:2	149:7	NAVIGATE	Content · root
+R	1670:7265	151:87	NAVIGATE	hotspot/row · Conditions
+R	873:4531	52:2	NAVIGATE	hotspot/back · to editor
+R	787:4335	775:4241	NAVIGATE	hotspot/state · Content · loading
+R	633:3983	304:2048	NAVIGATE	hotspot/state · Commerce · setup
+R	233:1294	151:62	NAVIGATE	List row
+R	233:1289	151:46	NAVIGATE	List row
+R	148:20	1170:4713	NAVIGATE	Row · New collection
+R	233:1279	149:50	NAVIGATE	List row
+END	done=2850:22371|2850:22373|2881:12608|148:2	stopped=false	bytes=6186

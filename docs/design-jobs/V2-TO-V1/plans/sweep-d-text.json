@@ -1,0 +1,18 @@
+[
+  { "id":"817:5229", "expect":"Build pages", "text":"Generating pages", "why":"UX-E-08 mirror — the worker's own step name (route.ts:22-28)" },
+  { "id":"817:5235", "expect":"Optimize images", "text":"Optimizing images", "why":"UX-E-08 mirror — the worker's own step name" },
+  { "id":"817:5236", "expect":"12 images → WebP, saved 3.2MB", "text":"Skipped — not run in the MVP", "why":"SKIPPED_STEPS route.ts:34-37 — a tick for work that did not happen is a false signal" },
+  { "id":"817:5233", "expect":"✓", "text":"–", "why":"same: step 1 reports skipped, never done" },
+  { "id":"817:5246", "expect":"Upload to CDN", "text":"Deploying to CDN", "why":"UX-E-08 mirror — the worker's own step name" },
+  { "id":"817:5250", "expect":"Provision SSL", "text":"Verifying SSL", "why":"UX-E-08 mirror — the worker's own step name" },
+  { "id":"817:5257", "expect":"Health check", "text":"Performance check", "why":"UX-E-08 mirror — the worker's own step name" },
+  { "id":"817:5258", "expect":"Verify live site responds", "text":"Skipped — Lighthouse is not run", "why":"SKIPPED_STEPS route.ts:34-37" },
+  { "id":"817:5241", "expect":"Generate CSS", "text":"Generate CSS [not-implemented]", "why":"not one of the worker's five steps" },
+  { "id":"817:5242", "expect":"Tree-shaken, minified", "text":"Not one of the five worker steps", "why":"not one of the worker's five steps" },
+  { "id":"817:5254", "expect":"DNS propagation", "text":"DNS propagation [not-implemented]", "why":"not one of the worker's five steps" },
+  { "id":"817:5255", "expect":"Waiting for SSL", "text":"Not one of the five worker steps", "why":"not one of the worker's five steps" },
+  { "id":"813:4850", "expect":"Green dot. Appears immediately after save completes.", "text":"Green dot, straight after the save. Not its own state — saved with a fresh savedAt.", "why":"SaveStatus.tsx:18 — fresh/stale are one state" },
+  { "id":"813:4856", "expect":"Green dot, grey text. Relative time updates every 60s.", "text":"Green dot, grey text. The same saved state as 2 — only savedAt is older. The resting default.", "why":"SaveStatus.tsx:18 — fresh/stale are one state" },
+  { "id":"813:4862", "expect":"Amber dot + amber text. Appears when auto-save is paused or offline.", "text":"Amber dot + amber text. Unsaved work. Offline is a SEPARATE state: Offline — not saved.", "why":"SaveStatus.tsx:40-51 — offline carries its own copy" },
+  { "id":"817:4651", "expect":"Footer bar (1440×32) toggles.", "text":"Footer bar (1440×32) toggles. Each icon has on/off state with blue highlight when active. Toggles persist per-user per-project. Chords are drawn on 2855:12407 and 2875:12449, not here.", "why":"UX-F-32 mirror — the board claimed chords were shown in parentheses and draws none" }
+]

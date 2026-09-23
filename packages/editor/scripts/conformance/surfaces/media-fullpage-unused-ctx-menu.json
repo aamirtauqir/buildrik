@@ -1,0 +1,116 @@
+{
+  "surface": "media-fullpage-unused-ctx-menu",
+  "board": "Media · fullpage · unused-scope · context-menu (Figma 1163:13695)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-fullpage-library",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "mgr-asset-mg0"
+    },
+    {
+      "action": "click",
+      "testId": "mgr-row-unused"
+    },
+    {
+      "action": "waitFor",
+      "testId": "mgr-scope-note"
+    },
+    {
+      "action": "contextmenu",
+      "testId": "mgr-asset-mg3"
+    },
+    {
+      "action": "waitFor",
+      "testId": "media-ctx-menu"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "A NEW STEP ACTION EXISTS BECAUSE OF THIS BOARD. `contextmenu` was not in",
+    "the recipe vocabulary, so a right-click state could only be reached by",
+    "faking it from a fixture — which measures the fixture, not the menu the",
+    "product opens. measure.mjs now issues a real right-click and lib.mjs's",
+    "STEP_ACTIONS admits it. Three boards in this family draw a context menu.",
+    "",
+    "THE STATE IS REACHED THE WAY A USER REACHES IT: click the Unused smart",
+    "folder, wait for the scope note that only that folder produces, then",
+    "right-click one of the three cards it left. `smartFolder` and `ctxMenu`",
+    "are both internal state and neither is a prop. The fixture's usage answers",
+    "make exactly three of ten assets unused, so the note's arithmetic is the",
+    "product's own rather than a number typed into a probe.",
+    "",
+    "BOARD WON:",
+    "  1163:13931  the menu is bg-elevated on a --color/border edge with a 6",
+    "              top/bottom pad. It had NO border at all, so its only",
+    "              separation from what it covers was a shadow.",
+    "  1163:13932  the rows HUG on a 12/7 pad and are 11px in --color/ink-soft;",
+    "              they shipped on a fixed --bk-size-row-dense height at 12px",
+    "              in full ink. The fixed height is why the board's 7 had never",
+    "              applied — a height and a padding do not conflict, so nothing",
+    "              won. Fourth surface in this batch with that same cause.",
+    "  1163:13929  the unused-scope note is 12/6 at 10px and sits in the grid",
+    "              column's own rhythm; it carried a 20-side margin of its own.",
+    "",
+    "MENU WIDTH IS 182, NOT 180, AND THAT IS DELIBERATE. 1163:13932 gives each",
+    "ROW w-180 and 1163:13931 gives the surface a stroke. Figma strokes do not",
+    "consume layout and a CSS border does, so a 180 box with a 1px edge leaves",
+    "178 inside it. The board's number is the row's; the box is the row plus",
+    "its edge.",
+    "",
+    "NOT JOINED: 1163:13947, the details rail's 'Select an asset to see",
+    "details.' — the board names --color/ink-placeholder, which is 2.5:1 on",
+    "white and fails AA; it shipped at --bk-ink-disabled, which is 1.47:1 and",
+    "fails harder. Neither is right, and the code is now --bk-ink-soft. The",
+    "chassis (rail, toolbar, status, columns) is measured on",
+    "media-fullpage-library and is not re-joined here, so one fix cannot report",
+    "itself five times.",
+    "",
+    "CONTRAST — one failure, the same `.mgr-kind` file-kind badge recorded on",
+    "media-fullpage-library: white on --color/bg-overlay (1161:66 / 1163:13834)",
+    "over the fixture's light grey placeholder thumb, 3.99:1. The ratio is a",
+    "function of the picture behind the scrim, and fixing it means a scrim",
+    "darker than the token the board names."
+  ],
+  "targets": [
+    {
+      "name": "scope-note",
+      "testId": "mgr-scope-note",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13929"
+    },
+    {
+      "name": "card-unused",
+      "testId": "mgr-asset-mg3",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13811"
+    },
+    {
+      "name": "card-unused-thumb",
+      "testId": "mgr-thumb-mg3",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13812"
+    },
+    {
+      "name": "card-unused-meta",
+      "testId": "mgr-meta-mg3",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13814"
+    },
+    {
+      "name": "ctx-menu",
+      "testId": "media-ctx-menu",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13931"
+    },
+    {
+      "name": "ctx-insert",
+      "testId": "media-ctx-insert",
+      "spec": "media-fullpage-unused-ctx-menu",
+      "nodeId": "1163:13932"
+    }
+  ]
+}

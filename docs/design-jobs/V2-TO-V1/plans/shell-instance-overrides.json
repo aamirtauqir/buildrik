@@ -1,0 +1,28 @@
+{
+ "note": "Instance-level overrides. No existing script in scripts/figma/ applies these; each row names the exact plugin-API call so a small applier is mechanical. Every row is unresolved-id because no instance id and no componentProperties map was ever read from the file — the quota ran out before that read.",
+ "page": "1:3",
+ "rows": [
+  {
+   "id": null,
+   "unresolved-id": true,
+   "selector": { "board": "199:2", "type": "INSTANCE", "childOfBoard": true, "maxHeight": 64 },
+   "op": "setProperties",
+   "properties": { "Publish": "ready" },
+   "property-names-are-a-guess": true,
+   "why": "SH-A-01 (Critical) + UX-F-21 — the Topbar's Publish=ready variant, the everyday pressable CTA, is used by ZERO of the 15 numbered Shell boards; all 15 instance Publish=disabled, so the state a user is in for most of a session is drawn nowhere. 199:2 'Shell state 2 · Returning (default)' is the board that should carry it: it is the default returning shell.",
+   "applier-must": "Read the instance's componentProperties FIRST and use the real property name and value strings. SH-B-19's census says one of the six variants is used by nothing and three quarters of the file draws publishing blocked, so the value set is known to exist; its spelling is not.",
+   "read-back": "the instance's componentProperties after the write, plus the rendered CTA label"
+  },
+  {
+   "id": null,
+   "unresolved-id": true,
+   "selector": { "board": "199:409", "type": "INSTANCE", "childOfBoard": true, "name": "Rail" },
+   "op": "setProperties+hideChild",
+   "properties": { "Active": "Insert" },
+   "hideChild": { "name": "active bar", "visible": false },
+   "why": "UX-F-02 + SH-C-03 — board 5 'Drawer closed' draws a completely neutral rail, so the file agrees with the code's bug rather than with the design. Selected and open are two signals: with the drawer shut the last tool keeps its tinted pill (ls-btn--last, LeftSidebar.css:189) and loses only the 3px bar. The variant carries both, so the bar is hidden as an instance override.",
+   "companion-board": "Rail · selected vs open (two signals) — the anatomy this override makes real on a state board",
+   "read-back": "the instance's Active property and the visibility of its 'active bar' child"
+  }
+ ]
+}

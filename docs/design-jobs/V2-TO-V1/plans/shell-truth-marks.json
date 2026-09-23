@@ -1,0 +1,50 @@
+[
+ {
+  "id": "1177:4804",
+  "name": "Canvas · command palette (⌘⇧P) — the CANVAS palette (Cmd+Shift+P, canvas/controls/CommandPalette). Also shipping; NOT the shell palette. OPEN DECISION: SPEC-NAVIGATION §2.5 proposes merging these commands into ⌘K and retiring this chord; not applied here, and neither palette is retired (UX-F-04).",
+  "why": "UX-F-04 — two palettes, two chords, two command sets. The brief names this an open decision, so the board records it instead of resolving it.",
+  "was": "Canvas · command palette (⌘⇧P) — the CANVAS palette (Cmd+Shift+P, canvas/controls/CommandPalette). Also shipping; NOT the shell palette.",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1779:3"
+ },
+ {
+  "id": "65:211",
+  "name": "Shell state 7 · Preview — the shipped overlay is the ACTIVE page only, inside <iframe sandbox=\"\"> behind a sanitizer that has already stripped every script, form and iframe (Composer.ts:707, PreviewOverlay.tsx:106, ExportUtils.ts:35-43). Links, forms and the engine's own interaction runtime cannot run, and there is no page switcher. Until those two code facts change the overlay has to say so on screen (UX-F-09, UX-E-17).",
+  "why": "UX-F-09 — 'Quick preview' previews one page with everything off, and the board says nothing about it.",
+  "was": "Shell state 7 · Preview",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1776:8385"
+ },
+ {
+  "id": "2476:11987",
+  "name": "Canvas · empty page — first run · after Start blank (anatomy) — after Start blank a session flag removes BOTH buttons permanently (CanvasEmptyCTA.tsx:44-60); close the drawer and the canvas instructs the user to use a panel that is not on screen, with no route back to the template choice (UX-F-33).",
+  "why": "UX-F-33 — the instruction points at something the user cannot see.",
+  "was": "Canvas · empty page — first run · after Start blank (anatomy)",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1779:5"
+ },
+ {
+  "id": "963:4474",
+  "name": "Shell · 360 overlay panel (slot proof) — ONE right-hand class: --bk-size-panel-right 360 for notifications, Issues and Structure; --bk-size-inspector 300 for the column itself. Today those three sit at 360, 400 and 300 and only one reads a token, and --bk-size-nav (240) has zero consumers (UX-F-08, UX-F-25, UX-F-26).",
+  "why": "UX-F-25/26 — three right-hand surfaces, three widths, one token.",
+  "was": "Shell · 360 overlay panel (slot proof)",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1776:8385"
+ },
+ {
+  "id": "2272:11904",
+  "name": "Exit · Editor (leaves to your sites) — the control must NAME this destination (“Exit to dashboard” / the workspace name) on the button and repeat it in the confirm. Today it reads “‹ Exit” and navigates to DASHBOARD_URL + /dashboard/projects, while every ⋯ deep link goes to /dashboard/sites/<id>; in a standalone build DASHBOARD_URL falls back to the current origin, so on localhost:5050 the loudest control in the shell walks to a route that does not exist there (UX-F-03, UX-F-35).",
+  "why": "UX-F-03 + UX-F-35 — the exit never says where it goes, and it disagrees with the menu about what the thing being edited is called.",
+  "was": "Exit · Editor (leaves to your sites)",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1776:8385"
+ },
+ {
+  "id": "66:225",
+  "name": "Shell state 9 · AI agent run — AI has ONE home: the inspector column. StudioPanels.tsx:494-501 renders AITab INSTEAD of ProInspector, so it REPLACES the column (SPEC-INSPECTOR §6’s “docked beside the inspector” is not what the cited code does — PHASE4-QA §2.2). Bare “I” and the ⌘K row “Open AI panel” must route here, and the ‘ai’ case leaves the left TabRouter (UX-F-10, UX-G-02). The persistent visible door the config has claimed since tabsConfig.ts:314 still does not exist anywhere in the top bar (UX-F-11).",
+  "why": "UX-F-10 + UX-F-11 — two AI homes, and a top-bar door the config declares and the Topbar has never had.",
+  "was": "Shell state 9 · AI agent run",
+  "id-source": "read from page 1:3 on 2026-09-07 (section inventory of 1776:8385 / 1779:3 / 1779:5)",
+  "section": "1776:8385"
+ }
+]

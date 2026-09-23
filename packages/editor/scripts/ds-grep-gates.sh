@@ -245,14 +245,30 @@ check_gate 13 "$RADIUS_COUNT" "$BASE_13" "A1.3 — panel-chrome border-radius �
 # NOTE: `//` is anchored to line start to avoid hiding real magic-literal
 # violations on code lines with trailing line comments like `height: 28, // 12px`
 # (revised 2026-04-27 after M5 code-quality review caught false-negative leak).
-LAYOUT_CSS=$(grep -rE '\b(28|32|36|40|44|48|56|60|240|300|320)px\b' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
-  | grep -vE "$CHROME_EXCLUDE" \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  | wc -l | tr -d ' ')
-LAYOUT_TSX=$(grep -rE '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
-  | grep -vE "$CHROME_EXCLUDE" \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  | wc -l | tr -d ' ')
+#
+# The two line-oriented filters above catch a `//` comment and a CSS comment
+# that OPENS on the line, and nothing else — so every CONTINUATION line of a
+# `/* ... */` or `{/* ... */}` block counted as a violation. On 2026-09-09 that
+# was 17 of a 26-line "regression": prose explaining why a row is 28 tall,
+# recorded next to the code the board drove. The gate was refusing its own
+# documentation, which is the fastest way to teach a team to stop writing it.
+# `chrome_stream` strips block comments first (replacing them with the same
+# number of newlines, so a comment between two violating lines cannot merge
+# them into one), then drops `^//` lines exactly as before.
+chrome_stream() {
+  find $CHROME_PATHS -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.css' \) 2>/dev/null \
+    | grep -vE "$CHROME_EXCLUDE" \
+    | xargs perl -0777 -ne '
+        s{/\*(.*?)\*/}{ "\n" x (($1 =~ tr/\n//)) }gse;
+        my $n = 0;
+        for my $l (split /\n/, $_, -1) { $n++; next if $l =~ m{^\s*//}; print "$ARGV:$n:$l\n"; }
+      ' 2>/dev/null
+}
+CHROME_STREAM=$(chrome_stream)
+LAYOUT_CSS=$(printf '%s\n' "$CHROME_STREAM" \
+  | grep -cE '\b(28|32|36|40|44|48|56|60|240|300|320)px\b')
+LAYOUT_TSX=$(printf '%s\n' "$CHROME_STREAM" \
+  | grep -cE '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]')
 LITERAL_COUNT=$((LAYOUT_CSS + LAYOUT_TSX))
 check_gate 14 "$LITERAL_COUNT" "$BASE_14" "layout literals → src/shared/constants/layout.ts" || exit 1
 

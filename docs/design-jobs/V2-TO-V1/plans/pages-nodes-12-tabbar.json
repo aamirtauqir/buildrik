@@ -1,0 +1,41 @@
+[
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "435:2348",
+    "name": "note/UX-B-15",
+    "text": "UX-B-15 — ONE page-actions menu, used by both surfaces. The panel's PageContextMenu is the implementation and this bar composes it, so three drifts cannot recur: Delete is disabled-with-a-reason at one page here as it is in the panel (today the bar HIDES it, PageTabBar.tsx:406, while PageContextMenu.tsx:99-106 disables it with a tooltip); 'Set as home' runs the same external-page guard and raises the same navigation warning (today PageTabBar.tsx:207-210 skips both, which usePages.ts:294-324 does); and one delete confirmation wording, not the two at PageTabBar.tsx:424 and PagesTab.tsx:329.",
+    "x": 20,
+    "y": 740,
+    "why": "UX-B-15",
+    "width": 1040,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "UNKNOWN — 435:2348 was READ as a board (1080x920 at abs 500,1334 in section 1776:8377) and NOT ONE OF ITS CHILDREN WAS EVER READ. y 740/800/860 keeps a wrapped 1040-wide note inside the 920-tall board, but whether that band is EMPTY is unknown. Read the board and re-place before --apply, or these three land on top of the drawing."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "435:2348",
+    "name": "note/UX-B-09",
+    "text": "UX-B-09 — the rename popover writes the URL it displays. It computes normalizeSlug(editName) and renders /{slug} (PageTabBar.tsx:64-74, :328-332), then submits updatePage(id, { name }) alone (:139-145): type 'Pricing', read '/pricing', keep /page-3. Either write it — for any page whose slug was never hand-edited, which the engine tracks as slugManuallySet (PageManager.ts:145) — or stop drawing it.",
+    "x": 20,
+    "y": 800,
+    "why": "UX-B-09",
+    "width": 1040,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "UNKNOWN — 435:2348 was READ as a board (1080x920 at abs 500,1334 in section 1776:8377) and NOT ONE OF ITS CHILDREN WAS EVER READ. y 740/800/860 keeps a wrapped 1040-wide note inside the 920-tall board, but whether that band is EMPTY is unknown. Read the board and re-place before --apply, or these three land on top of the drawing."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "435:2348",
+    "name": "note/UX-B-28",
+    "text": "UX-B-28 — switching pages clears the canvas selection, so the inspector is empty rather than editing something off-screen. Nothing clears it today: PageManager.ts:222-236 emits page:activated and PAGE_CHANGED, :254-278 removes a deleted page's descendants from the registry, and SelectionManager.clear() (:103) is called by neither — so edits made in the right-hand panel land on an element that is no longer on screen.",
+    "x": 20,
+    "y": 860,
+    "why": "UX-B-28",
+    "width": 1040,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "UNKNOWN — 435:2348 was READ as a board (1080x920 at abs 500,1334 in section 1776:8377) and NOT ONE OF ITS CHILDREN WAS EVER READ. y 740/800/860 keeps a wrapped 1040-wide note inside the 920-tall board, but whether that band is EMPTY is unknown. Read the board and re-place before --apply, or these three land on top of the drawing."
+  }
+]

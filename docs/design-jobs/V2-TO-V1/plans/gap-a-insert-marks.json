@@ -1,0 +1,14 @@
+{
+ "page": "1:3",
+ "note": "Queue rows. UX-A-28 was the only one of insert's seven gap findings that is applicable to a board in 1776:8379 and it had no row, because its planned home — the new Insert · blocks-expanded · rows board (insert-new-boards#0) — was never cloned. Its other named home, a caption for 1069:4707, does not exist: section 02's nine captions map to 137:2, the search states, the drag state and the two mounted-nowhere states, and none of them to the BLOCKS grid. So the claim goes on the board that actually draws the BLOCKS grid, by the truth-mark convention this arc uses everywhere else. The expect field is a PREFIX guard in apply-queue, so a short prefix is enough and is safer than the whole 500-char name.",
+ "rows": [
+  {
+   "op": "rename",
+   "id": "1069:4707",
+   "name": "Insert · blocks-expanded — [not-implemented] the thumbnails. shared/types/block.ts:25 declares preview?: string and nothing sets it: grep -rn preview packages/editor/src/blocks/ returns zero, so all 50 cards fall through to an empty 136x80 grey rectangle under an 11px label (GroupSection.tsx:234-262, UX-A-05). DESIGN-AHEAD: the picture grid is kept here as the target for when previews exist; the shipping drawing is the sibling Insert · blocks-expanded · rows. BLOCKS cards are also not draggable — only ELEMENTS passes draggable (UX-A-06). UX-A-28: three of these 50 — Product Card, Product Grid, Product Detail — start a data-modelling flow on insert and nothing on the card says so. useComposerInit.ts:735-763 listens for ELEMENT_INSERTED and opens the CMS collection-setup modal over the editor; hasPromptedForCollectionRef is set BEFORE the async collection lookup (:744-746), so one dismissal is permanent and the block is left bound to no collection with no route back to the offer.",
+   "expect": "Insert · blocks-expanded — [not-implemented] the thumbnails.",
+   "why": "UX-A-28 (Minor, missing-feedback) — inserting a Product Card / Grid / Detail from BLOCKS opens a full CMS collection-setup modal unannounced, one-shot",
+   "id_source": "1069:4707 read from file 2026-09-07 (section 1776:8379 child list); its current name is insert-truth-marks#1's, which landed OK per queue-state.json"
+  }
+ ]
+}

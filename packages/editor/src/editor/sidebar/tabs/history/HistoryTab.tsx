@@ -35,9 +35,17 @@ const HELPER_TEXT: Record<HistoryView, string> = {
   published: "What's live",
 };
 
+/* Boards 163:64 / 163:269 / 163:220 (nodes 1657:7158 / 1657:7160, redrawn
+   2026-09-05) settle a conflict two earlier boards had left open. 163:2 and
+   163:113 drew this filter as two BARE TEXT LABELS reading "Changes" / "Saves",
+   which the code refused because "Saves" is already the name of the view TAB
+   one row above — adopting it would have put two different "Saves" controls a
+   row apart. The redrawn boards keep the code's chips and rename them: the
+   filter says which SET of saves is listed, and neither word collides with the
+   tab. So the words come from the board and the control stays a chip. */
 const FILTER_LABEL: Record<SavesFilter, string> = {
-  milestones: "Milestones",
-  changes: "All changes",
+  milestones: "Saved versions",
+  changes: "This session",
 };
 
 const SEARCH_PLACEHOLDER: Record<SavesFilter, string> = {
@@ -69,22 +77,31 @@ const ClearXSvg = () => (
 /* Board 163:113's preview band — accent tint, actions inline with the title. */
 const PREVIEW_BAND =
   "tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-3 tw:bg-[var(--bk-accent-tint)] tw:px-4";
-const PREVIEW_TITLE = "tw:truncate tw:text-[12px] tw:text-[var(--bk-accent-text)]";
+const PREVIEW_TITLE = "tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
 /* The safety sentence, unchanged product copy, on its own row: the bar above
    it is board 163:159's single 44-tall row and cannot hold a second line.
    163:165 draws the same sentence but is a `note` block — an annotation, not a
    spec — so the row here is a code decision, not conformance. */
 const PREVIEW_NOTE =
-  "tw:m-0 tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
-/* Board 229:1138/229:1140 — both actions are the dense 28 row, not flowbite's
-   own xs height. A same-property utility is what beats it through twMerge. */
-const PREVIEW_ACTION = "tw:h-7";
+  "tw:m-0 tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Boards 229:1138 / 229:1140 — both actions are the dense 28 row (--size/row-dense),
+   inset 12 and 6, with the light one bordered `--bk-border`. flowbite's xs is
+   1px of block padding and a gray-300 edge, and only a same-property utility
+   beats either through twMerge. */
+const PREVIEW_ACTION = "tw:h-7 tw:px-3 tw:py-1.5 tw:border-[var(--bk-border)]";
 
 const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
+/* `shrink-0` and the explicit 12 radius are both measured, not tidying.
+   Without shrink-0 the Time-Travel button on the right squeezed both chips —
+   "This session" rendered 63px against the board's 82 — because a flex item's
+   default is to shrink before its neighbour does. `rounded-full` computes to
+   calc(infinity)px, which is visually the same pill on a 24-tall chip and is
+   not a number any spec can be compared against; 1657:7159 says 12.
+   `leading-normal`, not `leading-4`: 1657:7158/7160 carry no line-height. */
 const FILTER_CHIP =
   "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
-  "tw:h-6 tw:leading-4 tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
-  "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-full " +
+  "tw:h-6 tw:shrink-0 tw:leading-normal tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
+  "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-[12px] " +
   "tw:cursor-pointer tw:[transition:color_150ms_ease-out,background-color_150ms_ease-out,border-color_150ms_ease-out] " +
   "tw:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
   "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
@@ -211,7 +228,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const [preview, setPreview] = React.useState<{ id: string; label: string } | null>(null);
 
   return (
-    <PanelFrame className="bd-history-container">
+    <PanelFrame className="bd-history-container" data-testid="history-panel">
       <PanelFrame.Header
         title="Version History"
         isExpanded={isExpanded}
@@ -220,7 +237,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         onClose={onClose}
       />
       {/* View switcher — prototype tabs with helper text */}
-      <div className="view-switcher" role="tablist" aria-label="History view">
+      <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
         {(["saves", "published"] as const).map((view) => (
           <Button
             key={view}
@@ -228,10 +245,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             role="tab"
             aria-selected={activeView === view}
             className={`view-tab${activeView === view ? " active" : ""}`}
+            data-testid={`history-view-tab-${view}`}
             onClick={() => setActiveView(view)}
           >
             {VIEW_LABEL[view]}
-            <span className="tab-helper">{HELPER_TEXT[view]}</span>
+            <span className="tab-helper" data-testid={`history-view-helper-${view}`}>{HELPER_TEXT[view]}</span>
           </Button>
         ))}
       </div>
@@ -239,13 +257,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           query, so showing a dead search field over it would be a lie. */}
       {activeView === "saves" && (
         <>
-          <div className={FILTER_ROW} role="group" aria-label="Saves filter">
+          <div className={FILTER_ROW} role="group" aria-label="Saves filter" data-testid="history-filter-row">
             {(["milestones", "changes"] as const).map((f) => (
               <Button
                 key={f}
                 type="button"
                 aria-pressed={savesFilter === f}
                 className={`${FILTER_CHIP}${savesFilter === f ? ` ${FILTER_CHIP_ACTIVE}` : ""}`}
+                data-testid={`history-filter-${f}`}
                 onClick={() => setSavesFilter(f)}
               >
                 {FILTER_LABEL[f]}
@@ -259,7 +278,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             {savesFilter === "milestones" && (
               <Button
                 type="button"
-                className="tt-btn tw:ml-auto"
+                /* `tw:h-6` is load-bearing: flowbite's Button ships h-10 and
+                   `.tt-btn`'s padding cannot beat it (height:auto loses to a
+                   height utility), so this control was 40 tall in a row board
+                   1657:7157 draws at 32 — it set the row's height single-
+                   handedly. A same-property utility is the only thing twMerge
+                   drops flowbite's for. */
+                className="tt-btn tw:h-6 tw:min-h-0 tw:shrink tw:ml-auto"
+                data-testid="history-time-travel"
                 onClick={() => setShowScrubber(true)}
                 aria-label="Open Time-Travel scrubber (Ctrl+Shift+T)"
                 title="Time-Travel (Ctrl+Shift+T)"
@@ -269,7 +295,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               </Button>
             )}
           </div>
-          <div className="search-bar">
+          <div className="search-bar" data-testid="history-search-bar">
             <span className="search-icon" aria-hidden="true">
               <SearchIconSvg />
             </span>
@@ -280,6 +306,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={SEARCH_PLACEHOLDER[savesFilter]}
               aria-label={SEARCH_PLACEHOLDER[savesFilter]}
+              data-testid="history-search-input"
             />
             {searchQuery && (
               <Button
@@ -303,18 +330,39 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             and still carries the note. */}
         {showScrubber && preview && (
           <>
-            <div className={PREVIEW_BAND} role="status">
-              <span className={PREVIEW_TITLE}>Previewing {preview.label}</span>
+            <div className={PREVIEW_BAND} role="status" data-testid="history-tt-bar">
+              <span className={PREVIEW_TITLE} data-testid="history-tt-title">
+                Previewing {preview.label}
+              </span>
               <div className="tw:flex tw:items-center tw:gap-2">
-                <Button color="light" size="xs" className={PREVIEW_ACTION} onClick={handleScrubberExit}>
-                  Exit
+                <Button
+                  color="light"
+                  size="xs"
+                  className={PREVIEW_ACTION}
+                  data-testid="history-tt-exit"
+                  onClick={handleScrubberExit}
+                >
+                  Exit (Esc)
                 </Button>
-                <Button size="xs" className={PREVIEW_ACTION} onClick={() => handleScrubberRestore(preview.id)}>
+                <Button
+                  size="xs"
+                  className={PREVIEW_ACTION}
+                  data-testid="history-tt-restore"
+                  onClick={() => handleScrubberRestore(preview.id)}
+                >
                   Restore this version
                 </Button>
               </div>
             </div>
-            <p className={PREVIEW_NOTE}>Nothing is written until Restore.</p>
+            {/* Board 163:166 names the exit key in both places it appears —
+                the button and this sentence. Both were "Exit" alone, because
+                Escape did not exit: the drawer bound Ctrl+Shift+T and nothing
+                else, so the board's copy would have been a promise the code
+                did not keep. TimeTravelScrubber binds Escape now, so it is
+                printed because it holds. */}
+            <p className={PREVIEW_NOTE} data-testid="history-tt-note">
+              Nothing is written until Restore. Esc exits time-travel.
+            </p>
           </>
         )}
 
@@ -372,7 +420,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           ))}
         </div>
 
-        {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}
+        {activeView === "saves" && savesSettled && (
+          <SavesPruneNote composer={composer} filter={savesFilter} />
+        )}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       {showScrubber && (

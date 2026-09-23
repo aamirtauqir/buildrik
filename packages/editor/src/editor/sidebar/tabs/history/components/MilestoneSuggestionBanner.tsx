@@ -63,6 +63,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
   return (
     <div
       className="milestone-banner"
+      data-testid="milestone-banner"
       role="alert"
       aria-live="polite"
       style={{
@@ -80,15 +81,19 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
       }}
     >
       {/* Icon */}
-      <div style={{ flexShrink: 0, color: "var(--bk-accent)" }}>
+      <div data-testid="milestone-icon" style={{ flexShrink: 0, color: "var(--bk-accent)" }}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="8" cy="8" r="6" />
           <path d="M8 5v3l2 1" />
         </svg>
       </div>
       {/* Content */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 2 }}>
+      {/* 433:2352 — a flex column with a 2px gap. The three lines carried their own
+          margins instead, so the gap between them was a property of each child
+          rather than of the stack, and the middle one changed size when the
+          name became an input. */}
+      <div data-testid="milestone-content" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+        <div data-testid="milestone-trigger" style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
           {triggerLabel}
         </div>
         {isEditing ? (
@@ -114,6 +119,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           />
         ) : (
           <div
+            data-testid="milestone-name"
             style={{
               fontSize: 13,
               fontWeight: 500,
@@ -129,10 +135,10 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         )}
         {suggestion.reasoning && !isEditing && (
           <div
+            data-testid="milestone-reasoning"
             style={{
               fontSize: 11,
               color: "var(--bk-ink-muted)",
-              marginTop: 2,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -143,7 +149,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         )}
       </div>
       {/* Actions */}
-      <div style={{ display: "flex", gap: 6, flexShrink: 0, flexBasis: "100%" }}>
+      <div data-testid="milestone-actions" style={{ display: "flex", gap: 6, flexShrink: 0, flexBasis: "100%" }}>
         {isEditing ? (
           <Button
             onClick={handleEditSave}
@@ -157,14 +163,19 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             <Button
               onClick={() => onAccept(null)}
               className="milestone-btn milestone-btn--primary"
+              data-testid="milestone-save"
               disabled={isLoading}
             >
-              {isLoading ? "..." : "Save"}
+              {isLoading ? "…" : "Save"}
             </Button>
-            <Button onClick={handleEditStart} className="milestone-btn milestone-btn--ghost">
+            {/* Board 433:2359 draws Edit as btn/SECONDARY — a white chip with a
+                --bk-border edge — and only 433:2361 Dismiss as the ghost. Both
+                shipped ghost, so the action that keeps the suggestion and the
+                action that throws it away were the same control. */}
+            <Button onClick={handleEditStart} className="milestone-btn milestone-btn--secondary" data-testid="milestone-edit">
               Edit
             </Button>
-            <Button onClick={onDismiss} className="milestone-btn milestone-btn--ghost">
+            <Button onClick={onDismiss} className="milestone-btn milestone-btn--ghost" data-testid="milestone-dismiss">
               Dismiss
             </Button>
           </>

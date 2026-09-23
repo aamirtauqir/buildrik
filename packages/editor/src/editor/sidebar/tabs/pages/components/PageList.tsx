@@ -166,8 +166,8 @@ export const PageList: React.FC<Props> = ({
       {/* Board 140:7: 36h band with a bare 28h search box (no magnifier,
           no inline clear) plus the Listings text link on the right. Always
           visible - the old 5-page gate is gone. */}
-      <div className="bd-pg-search-wrap">
-        <div className="bd-pg-search">
+      <div className="bd-pg-search-wrap" data-testid="pages-search-band">
+        <div className="bd-pg-search" data-testid="pages-search-box">
           <TextInput
             ref={searchRef}
             type="text"
@@ -235,23 +235,40 @@ export const PageList: React.FC<Props> = ({
           <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
         </div>
       )}
+      {/* Board 141:203 draws the error as a full-width band between the search
+          row and the Add-page foot — a SIBLING of the tree, not a child of it.
+          Nested inside `.bd-pg-list` it inherited that container's 6px gutter,
+          so its 24px text column measured 220 against the board's 232, and it
+          scrolled with a list that was not there. */}
+      {loadError ? (
+        /* Board 141:203: centered — red fact, muted harm scope, accent retry. */
+        <div className="bd-pg-error" role="alert" aria-live="assertive" data-testid="pages-load-error">
+          <p className="bd-pg-error-title" data-testid="pages-load-error-title">
+            Couldn{"\u2019"}t load your pages.
+          </p>
+          <p className="bd-pg-error-desc" data-testid="pages-load-error-desc">
+            The site is fine {"\u2014"} this panel isn{"\u2019"}t.
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            className="bd-pg-error-retry"
+            data-testid="pages-load-error-retry"
+            onClick={onRetry}
+          >
+            Try again
+          </Button>
+        </div>
+      ) : (
       <div className="bd-pg-list">
-        {loadError ? (
-          /* Board 141:203: centered — red fact, muted harm scope, accent retry. */
-          <div className="bd-pg-error" role="alert" aria-live="assertive">
-            <p className="bd-pg-error-title">Couldn{"\u2019"}t load your pages.</p>
-            <p className="bd-pg-error-desc">The site is fine {"\u2014"} this panel isn{"\u2019"}t.</p>
-            <Button color="light" size="xs" className="bd-pg-error-retry" onClick={onRetry}>
-              Try again
-            </Button>
-          </div>
-        ) : visible.length === 0 && search ? (
+        {visible.length === 0 && search ? (
           <div className="bd-pg-nores" role="status" aria-live="polite" data-testid="pages-no-results">
-            <p>Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
+            <p data-testid="pages-no-results-text">Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
             <Button
               color="light"
               size="xs"
               className="bd-pg-nores-clear"
+              data-testid="pages-clear-search"
               onClick={() => setSearch("")}
             >
               Clear search
@@ -333,11 +350,12 @@ export const PageList: React.FC<Props> = ({
                 one-page note + a centered Add link under the row. */}
             {!search && pages.length === 1 && (
               <div className="bd-pg-onepage" data-testid="pages-onepage">
-                <p>This site has one page.</p>
+                <p data-testid="pages-onepage-text">This site has one page.</p>
                 <Button
                   color="light"
                   size="xs"
                   className="bd-pg-onepage-add"
+                  data-testid="pages-onepage-add"
                   onClick={onAddPage}
                 >
                   + Add page
@@ -350,6 +368,7 @@ export const PageList: React.FC<Props> = ({
         {/* Drop indicator placeholder — toggled via .show during dragover (CSS owns visibility) */}
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
+      )}
       {/* Board 141:78: the band appears with ANY checkbox selection —
           it replaces the Add-page footer. */}
       {selectedIds.size >= 1 && (
@@ -366,7 +385,7 @@ export const PageList: React.FC<Props> = ({
       {/* Board 140:38 footer vs board 141:78: when a bulk selection is
           active the bottom band IS the bulk bar — otherwise "+  Add page". */}
       {selectedIds.size === 0 && (
-        <div className="bd-pg-footer">
+        <div className="bd-pg-footer" data-testid="pages-footer">
           <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
         </div>
       )}

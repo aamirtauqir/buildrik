@@ -52,30 +52,50 @@ function getElementName(type: string, tagName?: string): string {
    forty pixels of the canvas wrapper, and live check showed it covering the
    bar's lower 16px — the scrim survived as a 12px tinted sliver nobody would
    read as a breadcrumb. */
+/* `rounded-lg` — 1175:4849 draws the bar as a radius-8 pill. It shipped square
+   and full-bleed; the board's own frame is 720 wide, i.e. a floating bar, which
+   is a layout call this pass did not take (see the recipe note). */
 const BAR =
   "tw:absolute tw:bottom-14 tw:left-0 tw:right-0 tw:flex tw:items-center tw:gap-2 " +
-  "tw:px-3 tw:py-1.5 tw:bg-[rgba(17,24,39,0.5)] tw:backdrop-blur-sm";
+  "tw:px-3 tw:py-1.5 tw:rounded-lg tw:bg-[rgba(17,24,39,0.75)] tw:backdrop-blur-sm";
 
 /* Flowbite's Button theme sets h-10 / justify-center / font-medium and beats
    plain tw: utilities, so the board's 10px pill has to restate geometry,
    padding and border here rather than rely on defaults. */
+/* 10px — 1175:4851 / 4854 / 4857 / 4860 all state it, and the pills are white,
+   so `--bk-ink-muted` on them is 4.83:1 at any size in this range. The 11px
+   floor of the type ramp is a CHROME rule; this is a canvas overlay label
+   inside a 20px pill. */
 const SEG_BASE =
-  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[length:var(--bk-text-11)] tw:leading-none " +
+  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[11px] tw:leading-[normal] " +
   "tw:whitespace-nowrap tw:border-0 tw:font-normal tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* `disabled:bg-white` is load-bearing, not defensive. The `Canvas` root
+   segment is rendered `disabled` (there is nowhere above it to go), and
+   flowbite's disabled variant paints gray-100 — a variant beats a plain
+   `bg-*` utility whatever twMerge does with the base, so the first pill in the
+   bar came out grey against 1175:4850's white. Same class of defect as the
+   DSModeToggle hover that repainted the selected segment. */
 const SEG =
-  SEG_BASE + " tw:bg-white tw:text-[color:var(--bk-ink-muted)] tw:cursor-pointer " +
+  SEG_BASE + " tw:bg-white tw:disabled:bg-white tw:text-[color:var(--bk-ink-muted)] tw:cursor-pointer " +
   "disabled:tw:cursor-default";
 const SEG_CURRENT =
   SEG_BASE + " tw:bg-[color:var(--bk-accent)] tw:text-[color:var(--bk-accent-on)] tw:font-medium";
-/* `--bk-ink-muted` is tuned for text on a light panel. On this bar — ink at 50%
-   over the canvas — it measured 3.67:1, under AA's 4.5 for normal text. The
-   gray-400 the hints already use measures 6.99:1 against the same bar. */
-const SEP = "tw:shrink-0 tw:text-[length:var(--bk-text-11)] tw:text-[color:var(--bk-gray-400)]";
+/* This comment used to claim gray-400 "measures 6.99:1 against the same bar".
+   It measures 1.34:1, and the reason is worth keeping: the bar is ink at 50%
+   over THE CANVAS, and the canvas is light, so it composites to #888C93 — a
+   mid grey, not the dark bar the number assumed. gray-400 on mid grey is very
+   nearly invisible. (A dark canvas only darkens the bar, so white is the worst
+   case and the one to compute against.)
+   Measured, not assumed: at 0.75 the bar composites to #4D525D, where gray-300
+   is 5.32:1 and clears AA while staying translucent and staying dimmer than
+   white, which is what these secondary labels are for. `--bk-ink-muted` is
+   tuned for a light panel and is not a candidate here at any alpha. */
+const SEP = "tw:shrink-0 tw:text-[length:var(--bk-text-11)] tw:text-[color:var(--bk-gray-300)]";
 /* Was 9px. The type ramp bottoms out at `--bk-text-11`, and these are the two
    controls that move the selection up and down the tree — not decoration. */
 const HINTS =
   "tw:ml-auto tw:flex tw:shrink-0 tw:gap-3 tw:text-[length:var(--bk-text-11)] " +
-  "tw:text-[color:var(--bk-gray-400)]";
+  "tw:text-[color:var(--bk-gray-300)]";
 
 export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
   composer,
@@ -141,7 +161,7 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
     // tw:z-30 painted the whole bar UNDER the canvas. checkVisibility said
     // true, the rect was right, elementFromPoint returned the canvas: only
     // the live screenshot showed an empty strip.
-    <div className={BAR} style={{ zIndex: Z_LAYERS.floatingToolbar }}>
+    <div className={BAR} data-testid="canvas-crumb-bar" style={{ zIndex: Z_LAYERS.floatingToolbar }}>
       <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
         {segments.map((segment, index) => (
           <React.Fragment key={segment.id}>
@@ -150,6 +170,12 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
               type="button"
               color="light"
               className={segment.isCurrent ? SEG_CURRENT : SEG}
+              /* ONE template, not a ternary between a literal and a
+                 template: `check-anchors` resolves a derived id through the
+                 text before the interpolation, and a bare literal in the other
+                 branch hides the template from it. `current` is a position in
+                 the path like any index. */
+              data-testid={`canvas-crumb-seg-${segment.isCurrent ? "current" : index}`}
               onClick={() => {
                 if (segment.id !== "canvas-root" && !segment.isCurrent) {
                   onSelectElement(segment.id);

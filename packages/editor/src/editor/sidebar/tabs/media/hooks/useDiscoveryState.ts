@@ -5,8 +5,13 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { displayNameFor } from "../data/mediaUtils";
 import type { Composer } from "../../../../../engine/Composer";
-import { stockService } from "../../../../../services/stock/StockService";
+import {
+  stockService,
+  StockSearchError,
+  type StockFailureReason,
+} from "../../../../../services/stock/StockService";
 import type {
   DiscFont,
   DiscIcon,
@@ -27,8 +32,10 @@ import type {
  * discarded mid-fetch (prototype §25 critical contract #4) + source provider
  * state (Unsplash / Pexels / Pixabay).
  *
- * Future: when dashboard.media.searchStock tRPC ships with quota+rate-limit,
- * swap stockService → tRPC client. Until then, stockService stub returns [].
+ * 2026-09-07: stockService throws a StockSearchError naming WHY a search
+ * failed instead of returning []. The catch below already existed and could
+ * never run — every failure arrived as an empty array, so the modal reported
+ * the user's query as fruitless whatever had actually gone wrong.
  */
 
 function isAbortError(err: unknown): boolean {
@@ -36,6 +43,41 @@ function isAbortError(err: unknown): boolean {
     err instanceof DOMException && err.name === "AbortError"
   );
 }
+
+function reasonOf(err: unknown): StockFailureReason {
+  return err instanceof StockSearchError ? err.reason : "request-failed";
+}
+
+const EXT_FOR_MIME: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+  "image/svg+xml": "svg",
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "video/quicktime": "mov",
+};
+
+/** "Restaurant interior" · image/jpeg → "restaurant-interior.jpg"; a video has no title, so its provider id names it. */
+function stockFileName(item: StockPhoto | StockVideo | DiscIcon, mime: string): string {
+  const title = "alt" in item ? item.alt : "name" in item ? item.name : "";
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  const ext = EXT_FOR_MIME[mime] ?? (mime.split("/")[1] || "bin");
+  return `${slug || item.id}.${ext}`;
+}
+
+/** One line each, because these are three different things to go and do. */
+const FAILURE_TOAST: Record<StockFailureReason, string> = {
+  "not-configured": "Stock search isn't set up on this site",
+  unauthorized: "The stock provider rejected our API key",
+  "request-failed": "Couldn't reach the stock library",
+};
 
 export function useDiscoveryState(
   composer: Composer,
@@ -46,9 +88,10 @@ export function useDiscoveryState(
   const [discIcons, setDiscIcons] = useState<DiscIcon[]>([]);
   const [discFonts, setDiscFonts] = useState<DiscFont[]>([]);
   const [discoverySearch, setDiscoverySearch] = useState("");
-  /** True when the last stock search threw. Distinguishes "the request failed"
-      from "there are genuinely no results" — the modal rendered both the same. */
-  const [searchFailed, setSearchFailed] = useState(false);
+  /** WHY the last stock search failed, or null. Distinguishes "not configured"
+      from "key refused" from "request failed" from "genuinely no results" —
+      the modal rendered all four the same. */
+  const [searchFailed, setSearchFailed] = useState<StockFailureReason | null>(null);
   const [discOrientation, setDiscOrientation_] = useState<DiscOrientation>("all");
   const [discColor, setDiscColor_] = useState<DiscColor>("all");
   const [discSource, setDiscSource_] = useState<DiscSource>("unsplash");
@@ -89,12 +132,12 @@ export function useDiscoveryState(
       if (!query.trim()) {
         setStockPhotos([]);
         setStockVideos([]);
-        setSearchFailed(false);
+        setSearchFailed(null);
         setPageState({ img: 1, vid: 1 });
         return;
       }
 
-      setSearchFailed(false);
+      setSearchFailed(null);
       setPageState({ img: 1, vid: 1 });
       setDiscLoading((prev) => ({ ...prev, img: true, vid: true }));
       // P5: stockService expects "landscape"|"portrait"|"squarish"|undefined.
@@ -113,13 +156,12 @@ export function useDiscoveryState(
         setStockVideos(videos as StockVideo[]);
       } catch (err) {
         if (isAbortError(err) || controller.signal.aborted) return;
-        /* The toast was the ONLY signal. `setStockPhotos` is never reached on
-           failure, so the modal fell through to its empty-result branch and
-           told the user "No photos found for …" — a failed request and a
-           genuinely empty result rendered identically, minus a toast that
-           auto-dismisses (blocker A-STOCK). */
-        setSearchFailed(true);
-        showToast("Discovery search failed", "error");
+        /* The toast used to be the ONLY signal, and it auto-dismissed. The
+           modal reads `searchFailed` for the persistent message, so the reason
+           has to outlive the toast (blocker A-STOCK). */
+        const reason = reasonOf(err);
+        setSearchFailed(reason);
+        showToast(FAILURE_TOAST[reason], "error");
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, img: false, vid: false }));
@@ -193,7 +235,9 @@ export function useDiscoveryState(
         setPageState((prev) => ({ ...prev, [type]: nextPage }));
       } catch (err) {
         if (isAbortError(err) || controller.signal.aborted) return;
-        showToast("Could not load more results", "error");
+        // Page 2+ keeps the results already on screen, so this reports through
+        // the toast only — replacing the grid with an error would discard them.
+        showToast(FAILURE_TOAST[reasonOf(err)], "error");
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, [type]: false }));
@@ -203,24 +247,29 @@ export function useDiscoveryState(
     [composer, discoverySearch, discOrientation, discColor, discSource, pageState, showToast]
   );
 
+  /* Clone 3695:45573 reads "restaurant-interior.jpg is now in your asset
+     library" — the file is named from the result's own title, with the
+     extension the body really has, not `<providerId>.jpg`. Resolves with the
+     asset the library now holds so the orchestrator can show that dialog and
+     select it on View asset; null when the engine refused (the toast says so,
+     the stock dialog stays open with its selection). An icon is a real save
+     too: its SVG data URL is fetched and lands through the same upload gate,
+     sanitizer included. */
   const saveToLibrary = useCallback(
-    async (type: "img" | "vid", item: StockPhoto | StockVideo) => {
+    async (type: "img" | "vid" | "ico", item: StockPhoto | StockVideo | DiscIcon): Promise<{ key: string; name: string } | null> => {
       setDiscLoading((prev) => ({ ...prev, [type]: true }));
       try {
-        // Fetch the actual file from URL and upload it to library
-        const response = await fetch(item.url);
+        const response = await fetch("svgDataUrl" in item ? item.svgDataUrl : item.url);
         const blob = await response.blob();
-        const file = new File([blob], `${item.id}.${type === "img" ? "jpg" : "mp4"}`, {
-          type: blob.type,
-        });
+        const file = new File([blob], stockFileName(item, blob.type), { type: blob.type });
         const result = await composer.media.uploadFile(file);
-        // Mark as stock source
-        if (result.success && result.asset) {
-          await composer.media.updateAsset(result.asset.id, { assetSource: "stock" });
-        }
-        showToast("Saved to library ✓", "success");
+        if (!result.success || !result.asset) throw new Error(result.error ?? "Upload failed");
+        await composer.media.updateAsset(result.asset.id, { assetSource: "stock" });
+        /* The name the library prints — the engine stores the stem. */
+        return { key: result.asset.id, name: displayNameFor(result.asset.name, result.asset.mimeType) };
       } catch (err) {
         showToast("Failed to save to library", "error");
+        return null;
       } finally {
         setDiscLoading((prev) => ({ ...prev, [type]: false }));
       }

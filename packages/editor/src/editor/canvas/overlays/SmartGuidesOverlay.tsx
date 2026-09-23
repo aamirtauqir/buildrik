@@ -35,18 +35,25 @@ export const SmartGuidesOverlay: React.FC<SmartGuidesOverlayProps> = ({ snapLine
       {snapLines.map((line, i) => {
         const isHorizontal = line.orientation === "horizontal";
         /* Board 815:4608: magenta (#FF00FF) alignment guides (scenarios 1-2,
-           no `kind`) vs red (#FF4444) spacing indicators (scenarios 3-4,
-           `kind` set) — same line geometry, different meaning, different
-           colour. `@lint-hex-policy: component-theme` at the top of this file
-           exempts these from the chrome token rules: this paints ON the
-           customer's canvas, not chrome. */
+           no `kind`) vs red spacing indicators (scenarios 3-4, `kind` set) —
+           same line geometry, different meaning, different colour.
+           `@lint-hex-policy: component-theme` at the top of this file exempts
+           these from the chrome token rules: this paints ON the customer's
+           canvas, not chrome.
+
+           The red is `var(--bk-red-600)`, which is what the board DRAWS — all four
+           spacing rects (815:4633/4635/4643/4645) are filled --color/error,
+           and that token is `var(--bk-red-600)`. The board's own blurb (815:4610) says
+           "#FF4444", and that sentence is what this code was built from. A
+           tokenised fill in the drawing beats an untokenised number in a
+           caption: the drawing is the design, the caption describes it. */
         const isSpacing = Boolean(line.kind);
-        const color = isSpacing ? "#FF4444" : "#FF00FF";
+        const color = isSpacing ? "#E02424" : "#FF00FF";
         const style: React.CSSProperties = {
           position: "absolute",
           backgroundColor: color,
           opacity: 0.85,
-          boxShadow: `0 0 3px ${isSpacing ? "rgba(255, 68, 68, 0.4)" : "rgba(255, 0, 255, 0.4)"}`,
+          boxShadow: `0 0 3px ${isSpacing ? "rgba(224, 36, 36, 0.4)" : "rgba(255, 0, 255, 0.4)"}`,
         };
 
         if (isHorizontal) {
@@ -78,11 +85,12 @@ export const SmartGuidesOverlay: React.FC<SmartGuidesOverlayProps> = ({ snapLine
         return (
           <React.Fragment key={i}>
             {/* The line itself */}
-            <div style={style} />
+            <div style={style} data-testid={`snap-guide-${i}`} />
 
             {/* Board 815:4608 scenarios 3-4: the gap/padding value, e.g. "60". */}
             {isSpacing && line.value != null && (
               <span
+                data-testid={`snap-guide-label-${i}`}
                 style={{
                   ...labelStyle,
                   fontSize: 11,

@@ -1,0 +1,8 @@
+[
+ { "op": "resize", "id": "163:213", "w": 280, "h": 136,
+   "why": "QA-C-01 (Critical) — the restore-confirm band is 280x96 with clipsContent true, and its body 163:215 already reaches y=32+64=96. The two buttons sit at y=58, inside the paragraph. Grow to 136 rather than shorten the copy: the shortening QA-C-01 also offers drops exactly the scope correction QA-C-09 asked for." },
+ { "op": "move", "id": "229:1144", "y": 98,
+   "why": "QA-C-01 — Cancel moves below the body (bottom 96) instead of overlapping it." },
+ { "op": "move", "id": "229:1146", "y": 98,
+   "why": "QA-C-01 — Restore moves below the body, level with Cancel." }
+]

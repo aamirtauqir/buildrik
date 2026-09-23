@@ -61,7 +61,14 @@ function describeUndo(label: string): string {
   };
   renderHook(() => useHistoryFeedback(composer as never, addToast as never));
   handlers[EVENTS.HISTORY_UNDO]?.forEach((h) => h({ entry: { label } }));
-  return (addToast.mock.calls[0][0] as { description: string }).description;
+  const { description } = addToast.mock.calls[0][0] as { description: string };
+  /* Board 814:7032 draws the whole message on ONE line — "Undo: Deleted
+     'Button'" — so the description now carries the direction as a prefix
+     where it used to be a separate `title`. This helper is about the SENTENCE
+     after it; `carries the direction on the same line` below is what checks
+     the prefix. */
+  expect(description.startsWith("Undo: ")).toBe(true);
+  return description.slice("Undo: ".length);
 }
 
 describe("undo toasts say what was undone", () => {
@@ -99,5 +106,24 @@ describe("undo toasts say what was undone", () => {
 
   it("still names the action when the entry carries no label", () => {
     expect(describeUndo("")).toBe("last action");
+  });
+
+  it("carries the direction on the same line, not as a second one", () => {
+    /* 814:7032 is a 36-high single-line bar. The toast used to put "↩ Undo"
+       on a title row above the sentence, which made it two lines and said
+       "Undo" twice. */
+    const addToast = vi.fn();
+    const handlers: Record<string, ((d?: unknown) => void)[]> = {};
+    const composer = {
+      on: (e: string, h: (d?: unknown) => void) => { (handlers[e] ??= []).push(h); },
+      off: () => {},
+      history: { undo: vi.fn(), redo: vi.fn() },
+    };
+    renderHook(() => useHistoryFeedback(composer as never, addToast as never));
+    handlers[EVENTS.HISTORY_REDO]?.forEach((h) => h({ entry: { label: "delete" } }));
+    const toast = addToast.mock.calls[0][0] as { description: string; title?: string; tone?: string };
+    expect(toast.description).toBe("Redo: Deleted element");
+    expect(toast.title).toBeUndefined();
+    expect(toast.tone).toBe("dark");
   });
 });

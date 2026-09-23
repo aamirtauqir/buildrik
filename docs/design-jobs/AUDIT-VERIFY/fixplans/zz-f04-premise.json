@@ -1,0 +1,10 @@
+{
+ "slug": "zz-f04-premise",
+ "page": "1:3",
+ "note": "The held premise for F04's twelfth board is contradicted by the fresh read. Recorded so nobody inherits a reason that is no longer true.",
+ "rows": [
+  {"op": "advisory", "hold": true, "id": "2430:21365",
+   "holdWhy": "F04 · THE HOLD'S PREMISE IS WRONG, AND THE BOARD IS PROBABLY FIXABLE. Board 12 was held because .render-defects-after.json reads 'CONTAINER 2430:21365 ... 2430:21397 \\\"Footer\\\" bottom +100' — the footer supposedly hanging 100px below the board, so applying the +42 reseat would deepen an existing 86px overflow. The read taken since says otherwise: 2430:21365 is 280x812 at y21134 (bottom 21946) and its Footer 2430:21397 sits at y21866 with height 44, i.e. 21866-21910 — thirty-six pixels ABOVE the board's bottom, comfortably inside it. The absolutely-positioned 'lo/note' 2430:21547 (256x165 at y21604) is inside too. So the reason this board was excluded from the 11 that were repaired does not hold. WHAT IS STILL MISSING: the three text nodes inside that Footer — the equivalents of 2838:12022 / 2838:12023 and the wrapped 'Aa Fonts' label — whose ids this one-level read does not carry. One read of 2430:21397's children supplies them and the same three-band repair that landed on the other eleven boards applies unchanged. Queued.",
+   "why": "F04 board 12 — held premise refuted by the fresh read; one read from completion"}
+ ]
+}

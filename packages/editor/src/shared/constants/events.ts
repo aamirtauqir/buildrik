@@ -341,12 +341,37 @@ export const EVENTS = {
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
+  /** Add panel expands one named group (`{ group: InsertGroupId }`). The
+   *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
+   *  switching the tab alone leaves the user at ELEMENTS. */
+  UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** Inspector expands one section and scrolls it into view
+   *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
+   *  other way to reach a collapsed section. */
+  UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
+  /** Toggle the keyboard cheat sheet. It lives in Canvas behind the `?` key
+   *  only; ⌘K "Keyboard shortcuts" needs a door that is not a keystroke. */
+  UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
   UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
+  /** Open the Issues panel. Its only door was the topbar Issues chip, which
+   *  decision 11 (2026-09-21) removes; the Publish panel's open-errors gate,
+   *  the site menu and a ⌘K command reach it through this instead. Handled
+   *  in AquibraStudio, which owns the panel. */
+  UI_OPEN_ISSUES: "ui:open-issues",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
+  /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
+   *  leaves Settings for the Export modal, and a toggle emitted with the modal
+   *  already up would close it. Handled beside `handleExport` in StudioHeader. */
+  UI_OPEN_EXPORTER: "ui:open-exporter",
+  /** Open Settings ON a named screen, with the Pages panel's URL-repair
+   *  draft riding along (Clone 3519:19920). Handled in StudioPanels, which
+   *  is mounted before Settings is — a listener inside the tab would miss an
+   *  emit fired in the same gesture as the tab switch. */
+  UI_SETTINGS_OPEN: "ui:settings-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
   UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
@@ -894,6 +919,7 @@ export interface EventPayloads {
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
+  [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };

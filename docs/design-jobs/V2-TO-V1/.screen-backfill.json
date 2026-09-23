@@ -1,0 +1,567 @@
+{
+ "UX-G-10": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "ai-05-owed-by-other-modules.json",
+   "ai-01-decision-boards.json",
+   "ai2-01-verdicts.json",
+   "ai-gap.md",
+   "ai.md"
+  ]
+ },
+ "UX-G-20": {
+  "boards": [
+   "AI · one mark, one verb, one contract",
+   "AI · placement — what earns a door, and what must never have one"
+  ],
+  "nodes": [],
+  "docs": [
+   "ai-05-owed-by-other-modules.json",
+   "ai-01-decision-boards.json",
+   "ai2-01-verdicts.json",
+   "ai-gap.md",
+   "ai.md"
+  ]
+ },
+ "UX-G-21": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "ai-05-owed-by-other-modules.json",
+   "ai-01-decision-boards.json",
+   "ai2-01-verdicts.json",
+   "ai-gap.md",
+   "ai.md"
+  ]
+ },
+ "UX-G-22": {
+  "boards": [
+   "AI · placement — what earns a door, and what must never have one"
+  ],
+  "nodes": [],
+  "docs": [
+   "ai-05-owed-by-other-modules.json",
+   "ai-01-decision-boards.json",
+   "ai2-01-verdicts.json",
+   "ai-gap.md",
+   "ai.md"
+  ]
+ },
+ "UX-G-24": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "ai-01-decision-boards.json",
+   "ai2-01-verdicts.json",
+   "ai-gap.md",
+   "ai.md"
+  ]
+ },
+ "UX-H-35": {
+  "boards": [],
+  "nodes": [
+   "153:120"
+  ],
+  "docs": [
+   "gap-b-advisories.json",
+   "brand-04-boards.json",
+   "gap-b-notes.json",
+   "brand.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-C-01": {
+  "boards": [],
+  "nodes": [
+   "155:50"
+  ],
+  "docs": [
+   "content-captions-append.json",
+   "content.md"
+  ]
+ },
+ "UX-C-05": {
+  "boards": [],
+  "nodes": [
+   "155:50"
+  ],
+  "docs": [
+   "content-captions-append.json",
+   "content.md"
+  ]
+ },
+ "UX-C-06": {
+  "boards": [],
+  "nodes": [
+   "155:49"
+  ],
+  "docs": [
+   "content-captions-append.json",
+   "content-deferred.json",
+   "content.md"
+  ]
+ },
+ "UX-C-15": {
+  "boards": [],
+  "nodes": [
+   "155:47"
+  ],
+  "docs": [
+   "content-captions-append.json",
+   "content.md"
+  ]
+ },
+ "UX-C-19": {
+  "boards": [],
+  "nodes": [
+   "2429:12111"
+  ],
+  "docs": [
+   "content-captions-new.json",
+   "content.md"
+  ]
+ },
+ "UX-C-20": {
+  "boards": [],
+  "nodes": [
+   "1170:4713",
+   "155:47"
+  ],
+  "docs": [
+   "content-captions-append.json",
+   "content-captions-new.json",
+   "content-marks.json",
+   "content.md"
+  ]
+ },
+ "UX-C-27": {
+  "boards": [],
+  "nodes": [
+   "162:2"
+  ],
+  "docs": [
+   "gap-b-advisories.json",
+   "gap-b-notes.json",
+   "content.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-C-28": {
+  "boards": [],
+  "nodes": [
+   "1170:4749"
+  ],
+  "docs": [
+   "content-captions-new.json",
+   "content-marks.json",
+   "content.md"
+  ]
+ },
+ "UX-C-30": {
+  "boards": [],
+  "nodes": [
+   "148:2"
+  ],
+  "docs": [
+   "gap-b-advisories.json",
+   "gap-b-notes.json",
+   "content.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-I-14": {
+  "boards": [],
+  "nodes": [
+   "162:2"
+  ],
+  "docs": [
+   "history-state-boards.json",
+   "gap-b-advisories.json",
+   "gap-b-notes.json",
+   "history.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-I-15": {
+  "boards": [],
+  "nodes": [
+   "2894:12612"
+  ],
+  "docs": [
+   "zz-receipts-bands.json",
+   "gap-e-rename-bands.json",
+   "gap-e-bands.json",
+   "history-state-boards.json",
+   "gap-c-history-bands.json",
+   "history-hotspots.json",
+   "history.md"
+  ]
+ },
+ "UX-A-03": {
+  "boards": [],
+  "nodes": [
+   "1706:8501"
+  ],
+  "docs": [
+   "insert-decision-note.json",
+   "insert-layout.json",
+   "gap-a-triage.json",
+   "insert-truth-marks.json",
+   "insert.md",
+   "gap-settings-insert.md"
+  ]
+ },
+ "UX-D-29": {
+  "boards": [],
+  "nodes": [
+   "807:8342"
+  ],
+  "docs": [
+   "gap-b-advisories.json",
+   "gap-b-notes.json",
+   "inspector.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-H-33": {
+  "boards": [],
+  "nodes": [
+   "1160:52",
+   "144:46",
+   "144:47",
+   "145:140",
+   "145:141",
+   "145:192",
+   "145:193",
+   "145:243",
+   "145:244",
+   "145:294",
+   "145:295",
+   "145:403",
+   "145:404",
+   "145:46",
+   "145:47",
+   "145:93",
+   "145:94",
+   "155:33",
+   "2430:21397",
+   "2430:21398",
+   "453:3957",
+   "453:3958",
+   "777:4122",
+   "777:4123",
+   "782:4382",
+   "782:4383"
+  ],
+  "docs": [
+   "media-05-node-edits.json",
+   "media-01-truth-marks.json",
+   "media-07-captions.json",
+   "media.md"
+  ]
+ },
+ "UX-B-15": {
+  "boards": [],
+  "nodes": [
+   "1717:17234",
+   "435:2348"
+  ],
+  "docs": [
+   "pages-nodes-12-tabbar.json",
+   "shell2-marks.json",
+   "pages.md",
+   "shell-gap.md"
+  ]
+ },
+ "UX-B-25": {
+  "boards": [],
+  "nodes": [
+   "140:15",
+   "140:16",
+   "140:2",
+   "1717:17220",
+   "1717:17234"
+  ],
+  "docs": [
+   "pages-nodes-02-tree.json",
+   "pages.md"
+  ]
+ },
+ "UX-B-28": {
+  "boards": [],
+  "nodes": [
+   "1717:17234",
+   "435:2348"
+  ],
+  "docs": [
+   "pages-nodes-12-tabbar.json",
+   "pages.md"
+  ]
+ },
+ "UX-B-31": {
+  "boards": [],
+  "nodes": [
+   "140:2"
+  ],
+  "docs": [
+   "pages-text-08-newboards.json",
+   "gap-e-captions.json",
+   "pages.md"
+  ]
+ },
+ "UX-B-32": {
+  "boards": [],
+  "nodes": [
+   "140:2",
+   "1717:17234"
+  ],
+  "docs": [
+   "pages-nodes-02-tree.json",
+   "pages-nodes-09-doors.json",
+   "pages.md"
+  ]
+ },
+ "UX-E-31": {
+  "boards": [],
+  "nodes": [
+   "641:2652"
+  ],
+  "docs": [
+   "sweep-d-captions.json",
+   "gap-b-advisories.json",
+   "publish-crosssection.json",
+   "gap-b-notes.json",
+   "sweep-journeys.md",
+   "publish.md",
+   "gap-content-history.md"
+  ]
+ },
+ "UX-F-04": {
+  "boards": [],
+  "nodes": [
+   "1177:4804"
+  ],
+  "docs": [
+   "shell-truth-marks.json",
+   "shell.md"
+  ]
+ },
+ "UX-F-05": {
+  "boards": [
+   "Shortcuts · one screen (? and ⌘/)"
+  ],
+  "nodes": [
+   "2875:12449"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell2-shortcuts-board.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-10": {
+  "boards": [],
+  "nodes": [
+   "66:225"
+  ],
+  "docs": [
+   "shell-truth-marks.json",
+   "shell.md"
+  ]
+ },
+ "UX-F-14": {
+  "boards": [
+   "Shell · below 1024 — desktop-only"
+  ],
+  "nodes": [
+   "2844:12149"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell-new-boards.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-16": {
+  "boards": [
+   "Topbar · location line — site › page › panel"
+  ],
+  "nodes": [
+   "2844:12121"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell-new-boards.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-23": {
+  "boards": [
+   "Canvas · keyboard, zoom and viewport (one owner each)"
+  ],
+  "nodes": [
+   "2855:12407"
+  ],
+  "docs": [
+   "shell-canvas-board.json",
+   "shell2-marks.json",
+   "shell2-canvas-board.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-26": {
+  "boards": [],
+  "nodes": [
+   "165:2",
+   "963:4474"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell-truth-marks.json",
+   "relay-notifications.json",
+   "sweep-review.md",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-28": {
+  "boards": [
+   "Canvas · keyboard, zoom and viewport (one owner each)"
+  ],
+  "nodes": [
+   "2855:12407",
+   "2875:12448"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell2-canvas-board.json",
+   "shell2-fix-overflow.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-31": {
+  "boards": [
+   "Shortcuts · one screen (? and ⌘/)"
+  ],
+  "nodes": [
+   "2844:12025",
+   "2875:12449"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell2-shortcuts-board.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-35": {
+  "boards": [],
+  "nodes": [
+   "2272:11904"
+  ],
+  "docs": [
+   "shell-truth-marks.json",
+   "shell-text-fixes.json",
+   "shell.md"
+  ]
+ },
+ "UX-F-36": {
+  "boards": [],
+  "nodes": [
+   "2844:12121"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell-new-boards.json",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-37": {
+  "boards": [],
+  "nodes": [
+   "2844:12025"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "history-geometry-and-arrangement.json",
+   "history.md",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-F-25": {
+  "boards": [],
+  "nodes": [
+   "165:2",
+   "963:4474",
+   "963:4761"
+  ],
+  "docs": [
+   "shell2-marks.json",
+   "shell-truth-marks.json",
+   "sweep-c-appends.json",
+   "shell-text-fixes.json",
+   "relay-notifications.json",
+   "gap-f-shell-slot.json",
+   "sweep-review.md",
+   "shell-gap.md",
+   "shell.md"
+  ]
+ },
+ "UX-A-30": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "insert-decision-note.json",
+   "gap-a-triage.json",
+   "insert.md",
+   "gap-settings-insert.md"
+  ]
+ },
+ "UX-A-33": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "gap-a-triage.json",
+   "insert.md",
+   "gap-settings-insert.md"
+  ]
+ },
+ "UX-H-34": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "gap-a-triage.json",
+   "layers.md",
+   "gap-settings-insert.md"
+  ]
+ },
+ "UX-B-34": {
+  "boards": [],
+  "nodes": [],
+  "docs": [
+   "gap-a-triage.json",
+   "pages.md",
+   "gap-settings-insert.md"
+  ]
+ },
+ "UX-I-17": {
+  "boards": [],
+  "nodes": [
+   "161:11",
+   "161:12"
+  ],
+  "docs": [
+   "review-captions.json",
+   "sweep-review.md",
+   "review.md"
+  ]
+ }
+}

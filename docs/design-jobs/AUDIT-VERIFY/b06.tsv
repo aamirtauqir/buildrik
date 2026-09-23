@@ -1,0 +1,40 @@
+N	1707:8433	Popover · Canvas · AI · prompt	FRAME	468,54851,248,96	false	NONE	2	true
+K	1707:8428	FRAME	468,54851,248,84	true	false	pad
+K	1720:17490	FRAME	468,54943,150,28	true	false	hotspot/state · AI · streaming
+C	1707:8433	texts=3
+T	1720:17491	474,54951,138,12	10	Medium	true	HEIGHT	hotspot/state · AI · streaming	AI · streaming
+T	1707:8432	646,54920,49,13	11	Medium	true	WIDTH_AND_HEIGHT	Button · Generate	Generate
+T	1707:8430	484,54867,216,13	11	Regular	true	HEIGHT	Textarea	Describe a change… e.g. make this dark
+R	1707:8433	1176:4824	NAVIGATE	Popover · Canvas · AI · prompt
+R	1720:17490	1707:8436	NAVIGATE	hotspot/state · AI · streaming
+N	1707:8455	Popover · Canvas · AI · error	FRAME	1665,55401,248,40	false	NONE	1	true
+K	1707:8453	FRAME	1665,55401,248,40	true	false	pad
+C	1707:8455	texts=1
+T	1707:8454	1673,55411,232,13	11	Regular	true	HEIGHT	pad	The AI service didn't respond.
+R	1707:8455	1707:8436	NAVIGATE	Popover · Canvas · AI · error
+N	2850:21560	Modal · Add Child Element · refused	FRAME	2900,7273,380,225	false	NONE	4	true
+K	2850:21561	TEXT	2920,7289,312,17	true		Add Child Element
+K	2850:21562	FRAME	3236,7285,32,32	true	false	Close
+K	2850:21564	FRAME	2916,7321,348,33	true	false	search
+K	2850:21566	FRAME	2916,7362,348,120	true	false	categories
+C	2850:21560	texts=7
+T	2850:21570	2916,7452,40,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	FORMS
+T	2850:21569	2916,7422,45,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	LAYOUT
+T	2850:21568	2916,7392,36,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	MEDIA
+T	2850:21567	2916,7362,34,13	11	Semi Bold	true	WIDTH_AND_HEIGHT	categories	BASIC
+T	2850:21565	2916,7329,129,16	13	Regular	true	WIDTH_AND_HEIGHT	search	⌕  Search elements...
+T	2850:21563	3246,7291,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	2850:21561	2920,7289,312,17	14	Semi Bold	true	HEIGHT	Modal · Add Child Element · refused	Add Child Element
+R	2850:21560	1082:4527	NAVIGATE	Modal · Add Child Element · refused
+N	2898:22178	Pages · delete-page · confirm · inbound links (of 1171:4820)	FRAME	4040,15970,440,117	true	VERTICAL	3	true
+K	2898:22179	TEXT	4056,15984,199,16	true		Discard unsaved SEO changes?
+K	2898:22180	TEXT	4056,16010,408,26	true		You edited the page title and description but didn't save. Leaving this tab throws those e
+K	2898:22181	FRAME	4056,16046,408,27	true	true	foot
+C	2898:22178	texts=4
+T	2898:22186	4364,16053,88,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Discard changes	Discard changes
+T	2898:22184	4266,16053,66,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Keep editing	Keep editing
+T	2898:22180	4056,16010,408,26	11	Regular	true	HEIGHT	Pages · delete-page · confirm · inbound links (of 1171:4820)	You edited the page title and description but didn't save. Leaving this tab throws those e
+T	2898:22179	4056,15984,199,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Pages · delete-page · confirm · inbound links (of 1171:4820)	Discard unsaved SEO changes?
+R	2898:22185	140:2	NAVIGATE	btn/Discard changes
+R	2898:22183	302:1978	NAVIGATE	btn/Keep editing
+END	done=1707:8433|1707:8455|2850:21560|2898:22178	stopped=false	bytes=2991

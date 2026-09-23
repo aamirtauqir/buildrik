@@ -1,0 +1,106 @@
+{
+  "surface": "s7-settings-general",
+  "board": "S7 \u00b7 Settings \u00b7 General (Figma 638:2378)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-general",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-site-identity"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "set-card-site-identity",
+      "spec": "s7-settings-general",
+      "nodeId": "638:2690"
+    },
+    {
+      "name": "card-title",
+      "testId": "set-card-title-site-identity",
+      "spec": "s7-settings-general",
+      "nodeId": "638:2691"
+    },
+    {
+      "name": "field",
+      "testId": "set-field-site-name",
+      "spec": "s7-settings-general",
+      "nodeId": "638:2692"
+    },
+    {
+      "name": "field-label",
+      "testId": "set-field-label-site-name",
+      "spec": "s7-settings-general",
+      "nodeId": "638:2693"
+    },
+    {
+      "name": "card-social",
+      "testId": "set-card-social-links"
+    },
+    {
+      "name": "field-favicon",
+      "testId": "set-field-favicon-url"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: SiteSettingsScreen reads and writes through",
+    "`composer.getProjectSettings()/setProjectSettings()` and touches nothing",
+    "else, so a two-method stub is the whole dependency. It is hosted inside the",
+    "board's own pane \u2014 `.bd-set-pane-body`, which SettingsTab owns \u2014 and 824 is",
+    "760 (the card) plus its two 32 insets, so the card's width is the board's",
+    "arithmetic rather than a number fitted.",
+    "",
+    "BOARD WON, four times \u2014 and this is a FAMILY-WIDE change, not a screen one.",
+    "`Section` and `Field` in settings/shared.tsx are what all thirteen S7",
+    "screens compose from, so every one of them moves with this. Flagged for the",
+    "orchestrator: anyone else holding an S7 board should re-measure.",
+    "  638:2690  a section is a CARD \u2014 white on a --color/border hairline, 8",
+    "            radius, 16 all round, 12 between rows. It shipped as a",
+    "            borderless block with a rule underneath and 12/12/16 padding,",
+    "            which read as one long scroll rather than as grouped settings.",
+    "  638:2691  the card title is 11/16 MEDIUM in ink-muted at 0.88 tracking,",
+    "            in caps. It shipped 12/600 in full ink, competing with the",
+    "            field labels under it instead of heading them.",
+    "  638:2692  a field is laid out SIDE BY SIDE: a 180 label column, 16 gap,",
+    "            then the control. It shipped as a label stacked over a",
+    "            full-width input.",
+    "  638:2693  the field label is 13/20 in ink-soft in Inter \u2014 not the 11px",
+    "            MONO it shipped as. Mono is the data face (DESIGN.md); a field",
+    "            label is not data.",
+    "  638:2689  the pane body is the ground those cards sit on: --color/bg-app,",
+    "            32 either side, 24 top and bottom, 16 between cards. It had no",
+    "            padding and no ground at all, which is why nothing read as a",
+    "            card even where one was drawn.",
+    "",
+    "CODE WON, and it was already adjudicated: the board's LEGAL card carries a",
+    "cookie-consent toggle and a privacy-page select. The product shows two",
+    "static links and keeps cookie consent on Analytics. LEDGER 2026-09-02",
+    "(J-638:2378) settles it against 14-screen-specs.md:489/500 \u2014 S6.4 General =",
+    "'site name/favicon/language, social links, legal links', S6.6 Analytics =",
+    "'GA4/Meta Pixel/cookie banner' \u2014 and the coordinator lists the move as a",
+    "designer-lane structural redraw (blocker D10). Nothing to do here.",
+    "",
+    "NOT JOINED, and why:",
+    "  638:2694 the Input \u2014 the board draws it 42 high, 320 wide, on a",
+    "  --color/ink (i.e. near-black) 1px border. The live control is flowbite's",
+    "  TextInput through `shared.tsx`'s SETTINGS_TEXT_INPUT_THEME, a shared",
+    "  primitive; and an ink-black border on every settings input is a reading",
+    "  no other board in the family supports (they draw --color/border). Left",
+    "  for the founder rather than taken off one frame.",
+    "  638:2682 the pane HEADER and its Save button \u2014 that is SettingsTab's",
+    "  DrillInHeader plus the savebar, which the drill-in model board (1344:7162,",
+    "  founder-locked) governs, and this probe mounts the screen, not the tab.",
+    "",
+    "FOUND, NOT FIXED: the board labels the first field 'Site name (social /",
+    "og:site_name)' \u2014 it names the tag the value feeds. The product says 'Site",
+    "Name'. The board's is the more useful string and the label column is now",
+    "180 wide with wrapping, so it would fit; it is copy rather than layout,",
+    "and the same sentence appears on the SEO board, so it wants one decision",
+    "across both."
+  ]
+}

@@ -60,6 +60,14 @@ export const createAssetSchema = z.object({
   mimeType: z.string(),
   filename: z.string().min(1).max(200),
   altText: z.string().nullable().optional(),
+  /* Intrinsic pixel dimensions, measured by the CLIENT at upload — the browser
+     has already decoded the image to preview it, so the number is free there
+     and would need a server-side decode otherwise. Optional because non-image
+     types have none and old clients send none; the columns are nullable for the
+     same reason. Boards 146:2 / 146:32 draw "2400x1600" and the model could not
+     supply it (BLOCKERS E7). */
+  width: z.number().int().positive().max(100000).optional(),
+  height: z.number().int().positive().max(100000).optional(),
   folderId: z.string().nullable().optional(),
   siteId: z.string().nullable().optional(),
   userMetadata: z.record(z.unknown()).optional(),

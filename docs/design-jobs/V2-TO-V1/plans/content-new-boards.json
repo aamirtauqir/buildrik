@@ -1,0 +1,28 @@
+{
+  "_": "Two Content · dynamic-pages state boards the code produces and no board drew (QA-A-13 / COMPILE-A N1). Applier: scripts/figma/add-state-board.mjs, one invocation per row, in this order. Then fill the bodies with content-dynamic-pages-body.json, then the captions, then the edges.",
+  "_ids": "source, wireFrom and the pinned slots were computed from the section read at content-section-read-2026-09-07.json. Row y=4073 is occupied at x=100/500/900/1300/1700/2100 (280 wide each, so up to x=2380); 2500 and 2900 are free and both sit inside the section's 3440 width. The unpinned scan would have taken (2900,220) and then (3300,220) — the second is 140px past the section's right edge, because the scan collides against siblings and not against the section.",
+  "boards": [
+    {
+      "name": "Content · dynamic-pages · unknown-key",
+      "source": "2429:12111",
+      "at": "2500,4073",
+      "wireFrom": "",
+      "cmd": "node scripts/figma/add-state-board.mjs 2429:12111 \"Content · dynamic-pages · unknown-key\" --at 2500,4073 --apply",
+      "why": "QA-A-13 — ContentViews.tsx:675-681, the only state that says every record resolves to the same URL"
+    },
+    {
+      "name": "Content · dynamic-pages · no-records",
+      "source": "2429:12111",
+      "at": "2900,4073",
+      "wireFrom": "",
+      "cmd": "node scripts/figma/add-state-board.mjs 2429:12111 \"Content · dynamic-pages · no-records\" --at 2900,4073 --apply",
+      "why": "QA-A-13 — ContentViews.tsx:663, the branch a user hits first, straight out of the wizard"
+    }
+  ],
+  "_wiring": "NO --wire-from. The four existing siblings have no inbound hotspot either: FIG-A-07 measured 149:50's `Dynamic pages ›` list row (instance I233:1309) as carrying NO reaction, and QA-A-15 records the ONE inbound edge as 233:1309 -> 2429:12111. Adding a second and third hotspot over the same one row would be wrong. The honest wiring is a hotspot per state on the PARENT board only if that board grows per-state affordances; until then these two are reached the way the other three are — from their family root. Recorded, not silently skipped.",
+  "_afterCreate": [
+    "node scripts/figma/build-dynamic-pages-boards.mjs --apply     # fills all six from content-dynamic-pages-body.json",
+    "node scripts/figma/add-board-captions.mjs docs/design-jobs/V2-TO-V1/plans/content-captions-new.json --apply",
+    "node scripts/figma/repoint-board-edges.mjs docs/design-jobs/V2-TO-V1/plans/content-dynamic-pages-edges.json --apply"
+  ]
+}

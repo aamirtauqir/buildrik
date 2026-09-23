@@ -1,0 +1,94 @@
+B	140:2	FRAME	100,15970,280,812	#FFFFFF	FIXED/FIXED	VERTICAL	true	Pages · tree	kids=38
+  K	208:121	INSTANCE	100,15970,280,44	#FFFFFF	FILL/FIXED	HORIZONTAL	true	Panel header
+  K	140:7	FRAME	100,16014,280,36	none	FILL/FIXED	NONE	true	Search
+  K	140:11	FRAME	100,16050,280,32	none	FILL/FIXED	NONE	true	Row · Marketing
+  K	140:17	FRAME	100,16082,280,32	none	FILL/FIXED	NONE	true	Row · Home
+  K	140:22	FRAME	100,16114,280,32	none	FILL/FIXED	NONE	true	Row · Menu
+  K	140:25	FRAME	100,16146,280,32	none	FILL/FIXED	NONE	true	Row · Contact
+  K	140:28	FRAME	100,16178,280,32	none	FILL/FIXED	NONE	true	Row · Legal
+  K	140:34	FRAME	100,16210,280,32	none	FILL/FIXED	NONE	true	Row · About
+  K	140:37	FRAME	100,16242,280,363	none	FILL/FILL	NONE	true	spacer
+  K	140:38	FRAME	100,16605,280,36	none	FILL/FIXED	NONE	true	Add page
+  K	633:3977	FRAME	100,16748,150,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · S3.7 · page-settings · SEO
+  K	787:4307	FRAME	100,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · loading
+  K	787:4311	FRAME	220,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · no-results
+  K	873:4522	FRAME	100,16641,36,36	#000000@0	FIXED/FIXED	NONE	true	hotspot/back · to editor
+  K	915:6886	FRAME	100,16677,140,28	none	FIXED/FIXED	NONE	true	hotspot/return · publish readiness
+  K	1171:4868	FRAME	100,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · context-menu
+  K	1171:4870	FRAME	100,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · command-palette
+  K	1668:7247	FRAME	270,16676,110,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · bulk-select
+  K	1668:7356	FRAME	100,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · empty
+  K	1668:7358	FRAME	240,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · load-error
+  K	1720:17466	FRAME	100,16726,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · save-failed
+  K	1720:17470	FRAME	230,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · crash
+  K	1720:17529	FRAME	230,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · rename · name-conflict
+  K	2432:11973	RECTANGLE	295,16018,81,27	#000000@0	FIXED/FIXED/ABS		true	hotspot/state · Pages · structure
+  K	2838:12098	TEXT	100,16705,248,13	#6B7280	FIXED/HUG		true	note/folders-are-local
+  K	2838:12099	RECTANGLE	100,16718,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-top
+  K	2838:12100	TEXT	100,16719,89,20	#111827	HUG/HUG		true	grp/from-blog
+  K	2838:12101	TEXT	100,16739,14,16	#6B7280	HUG/HUG		true	grp/from-blog-count
+  K	2838:12102	TEXT	100,16755,228,26	#6B7280	FIXED/HUG		true	grp/from-blog-sub
+  K	2838:12103	RECTANGLE	100,16781,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-end
+B	2898:12617	FRAME	2500,15970,280,812	#FFFFFF	FIXED/FIXED	VERTICAL	true	Pages · tree · drag · drop indicator (of 140:2)	kids=38
+  K	2898:12618	INSTANCE	2500,15970,280,44	#FFFFFF	FILL/FIXED	HORIZONTAL	true	Panel header
+  K	2898:12619	FRAME	2500,16014,280,36	none	FILL/FIXED	NONE	true	Search
+  K	2898:12625	FRAME	2500,16050,280,32	none	FILL/FIXED	NONE	true	Row · Marketing
+  K	2898:12631	FRAME	2500,16082,280,32	none	FILL/FIXED	NONE	true	Row · Home
+  K	2898:12636	FRAME	2500,16114,280,32	none	FILL/FIXED	NONE	true	Row · Menu
+  K	2898:12639	FRAME	2500,16146,280,32	none	FILL/FIXED	NONE	true	Row · Contact
+  K	2898:12643	FRAME	2500,16178,280,32	none	FILL/FIXED	NONE	true	Row · Legal
+  K	2898:12649	FRAME	2500,16210,280,32	none	FILL/FIXED	NONE	true	Row · About
+  K	2898:12653	FRAME	2500,16242,280,363	none	FILL/FILL	NONE	true	spacer
+  K	2898:12654	FRAME	2500,16605,280,36	none	FILL/FIXED	NONE	true	Add page
+  K	2898:12656	FRAME	2500,16748,150,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · S3.7 · page-settings · SEO
+  K	2898:12657	FRAME	2500,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · loading
+  K	2898:12658	FRAME	2620,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · no-results
+  K	2898:12659	FRAME	2500,16641,36,36	#000000@0	FIXED/FIXED	NONE	true	hotspot/back · to editor
+  K	2898:12660	FRAME	2500,16677,140,28	none	FIXED/FIXED	NONE	true	hotspot/return · publish readiness
+  K	2898:12661	FRAME	2500,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · context-menu
+  K	2898:12662	FRAME	2500,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · command-palette
+  K	2898:12663	FRAME	2670,16676,110,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · bulk-select
+  K	2898:12664	FRAME	2500,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · empty
+  K	2898:12665	FRAME	2640,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · load-error
+  K	2898:12666	FRAME	2500,16726,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · save-failed
+  K	2898:12668	FRAME	2630,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · crash
+  K	2898:12670	FRAME	2630,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · rename · name-conflict
+  K	2898:12672	RECTANGLE	2695,16018,81,27	#000000@0	FIXED/FIXED/ABS		true	hotspot/state · Pages · structure
+  K	2898:12673	TEXT	2500,16705,248,13	#6B7280	FIXED/HUG		true	note/folders-are-local
+  K	2898:12674	RECTANGLE	2500,16718,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-top
+  K	2898:12675	TEXT	2500,16719,89,20	#111827	HUG/HUG		true	grp/from-blog
+  K	2898:12676	TEXT	2500,16739,14,16	#6B7280	HUG/HUG		true	grp/from-blog-count
+  K	2898:12677	TEXT	2500,16755,228,26	#6B7280	FIXED/HUG		true	grp/from-blog-sub
+  K	2898:12678	RECTANGLE	2500,16781,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-end
+B	2898:21981	FRAME	2800,15970,280,812	#FFFFFF	FIXED/FIXED	VERTICAL	true	Pages · tree · homepage by position (of 140:2)	kids=38
+  K	2898:21982	INSTANCE	2800,15970,280,44	#FFFFFF	FILL/FIXED	HORIZONTAL	true	Panel header
+  K	2898:21983	FRAME	2800,16014,280,36	none	FILL/FIXED	NONE	true	Search
+  K	2898:21989	FRAME	2800,16050,280,32	none	FILL/FIXED	NONE	true	Row · Marketing
+  K	2898:21995	FRAME	2800,16082,280,32	none	FILL/FIXED	NONE	true	Row · Home
+  K	2898:22000	FRAME	2800,16114,280,32	none	FILL/FIXED	NONE	true	Row · Menu
+  K	2898:22003	FRAME	2800,16146,280,32	none	FILL/FIXED	NONE	true	Row · Contact
+  K	2898:22007	FRAME	2800,16178,280,32	none	FILL/FIXED	NONE	true	Row · Legal
+  K	2898:22013	FRAME	2800,16210,280,32	none	FILL/FIXED	NONE	true	Row · About
+  K	2898:22017	FRAME	2800,16242,280,363	none	FILL/FILL	NONE	true	spacer
+  K	2898:22018	FRAME	2800,16605,280,36	none	FILL/FIXED	NONE	true	Add page
+  K	2898:22020	FRAME	2800,16748,150,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · S3.7 · page-settings · SEO
+  K	2898:22021	FRAME	2800,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · loading
+  K	2898:22022	FRAME	2920,16712,160,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · no-results
+  K	2898:22023	FRAME	2800,16641,36,36	#000000@0	FIXED/FIXED	NONE	true	hotspot/back · to editor
+  K	2898:22024	FRAME	2800,16677,140,28	none	FIXED/FIXED	NONE	true	hotspot/return · publish readiness
+  K	2898:22025	FRAME	2800,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · context-menu
+  K	2898:22026	FRAME	2800,16744,280,34	none	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · command-palette
+  K	2898:22027	FRAME	2970,16676,110,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · bulk-select
+  K	2898:22028	FRAME	2800,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · empty
+  K	2898:22029	FRAME	2940,16642,140,34	#000000@0	FIXED/FIXED/ABS	NONE	true	hotspot/state · Pages · load-error
+  K	2898:22030	FRAME	2800,16726,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · save-failed
+  K	2898:22032	FRAME	2930,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · page-settings · crash
+  K	2898:22034	FRAME	2930,16754,150,28	#F3F4F6	FIXED/FIXED/ABS	NONE	true	hotspot/state · rename · name-conflict
+  K	2898:22036	RECTANGLE	2995,16018,81,27	#000000@0	FIXED/FIXED/ABS		true	hotspot/state · Pages · structure
+  K	2898:22037	TEXT	2800,16705,248,13	#6B7280	FIXED/HUG		true	note/folders-are-local
+  K	2898:22038	RECTANGLE	2800,16718,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-top
+  K	2898:22039	TEXT	2800,16719,89,20	#111827	HUG/HUG		true	grp/from-blog
+  K	2898:22040	TEXT	2800,16739,14,16	#6B7280	HUG/HUG		true	grp/from-blog-count
+  K	2898:22041	TEXT	2800,16755,228,26	#6B7280	FIXED/HUG		true	grp/from-blog-sub
+  K	2898:22042	RECTANGLE	2800,16781,280,1	#E5E7EB	FIXED/FIXED		true	rule/generated-end
+END	pairs=0	boards=3

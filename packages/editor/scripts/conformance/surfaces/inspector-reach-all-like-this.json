@@ -1,0 +1,133 @@
+{
+  "surface": "inspector-reach-all-like-this",
+  "board": "Inspector · reach-all-like-this (Figma 160:412)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "click",
+      "testId": "inspector-scope-pill"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-scope-all"
+    },
+    {
+      "action": "waitFor",
+      "testId": "reach-all-banner"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:412"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:413"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:414"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "920:4684"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:417"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:418"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:420"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:422"
+    },
+    {
+      "name": "reach-note",
+      "testId": "reach-all-banner",
+      "spec": "inspector-reach-all-like-this",
+      "nodeId": "160:510"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900 through the production path. TWO Sections, not one:",
+    "the reach pill's 'All like this' row is `disabled` while the selection has no",
+    "peers (ScopeDropdown — 'No other sections on this page'), so a single element",
+    "cannot enter this state at all and the step timed out on the first attempt.",
+    "That is the control being honest, not a bad selector.",
+    "",
+    "MATCHES AS DRAWN, 35 properties, no drift: the 48h/x16 header with the",
+    "element name at 14/20 and the `btn/ai` chip, the 32h bg-subtle strip with",
+    "three 22h radius-4 pills, and the reach note (160:510) — 36 tall on",
+    "`--color/warning-tint` with its line at 12/18 in `--color/warning-text`.",
+    "",
+    "THE BOARD'S COPY IS SAMPLE DATA IN TWO PLACES, and the shape is what is",
+    "conformed: it reads 'Editing all 12 sections' where the live count is",
+    "whatever is on the page, and it draws the reach PILL still reading 'This'",
+    "beside a banner announcing twelve elements. A control that misreports its own",
+    "state is the worse half to keep, so the pill reads 'All like this' — recorded",
+    "in ScopeDropdown.tsx at the call site as well as here.",
+    "",
+    "NOT JOINED:",
+    "",
+    "  160:424 onward — the section body under the banner. Those are the shared",
+    "  chassis rows, joined on the profile recipes (inspector-profile-text and its",
+    "  five siblings) against the boards that own them. This board redraws them",
+    "  only as context for the banner it is about.",
+    "",
+    "  92:8 / 92:11 / 92:13, a slider molecule the board carries but this state",
+    "  does not introduce; it belongs to the Effects section's opacity row."
+  ]
+}

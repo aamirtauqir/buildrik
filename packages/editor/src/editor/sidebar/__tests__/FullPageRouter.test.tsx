@@ -16,6 +16,10 @@ vi.mock("../tabs/settings/SettingsTab", () => ({
   ),
 }));
 
+vi.mock("../../media/LibraryManager", () => ({
+  LibraryManager: () => <div data-testid="fp-library" />,
+}));
+
 const common = { onClose: vi.fn() };
 
 function renderRouter(activeTab: string, extra = {}) {
@@ -42,5 +46,18 @@ describe("FullPageRouter", () => {
   it("forwards onSwitchToDesign to SettingsTab as onOpenDesignTab", async () => {
     renderRouter("settings", { onSwitchToDesign: vi.fn() });
     expect(await screen.findByTestId("fp-settings")).toHaveAttribute("data-design", "wired");
+  });
+
+  // Clone 3695:45155 — the Asset library covers the whole editor: no rail, no
+  // topbar, its own Close. The V1 board (1159:4593) drew it inside the shell's
+  // 1380×844 band; the Clone frames are edge-to-edge 1440×900. So "assets"
+  // does not render into the LayoutShell slot at all — it portals a fixed
+  // full-viewport host into the overlay root and leaves the slot empty.
+  it("routes Assets to a full-viewport host in the overlay root, not the fullpage slot", async () => {
+    const { container } = renderRouter("assets");
+    const host = await screen.findByTestId("mgr-host");
+    expect(container.contains(host)).toBe(false);
+    expect(host.className).toContain("mgr-host");
+    expect(screen.getByTestId("fp-library")).toBeInTheDocument();
   });
 });

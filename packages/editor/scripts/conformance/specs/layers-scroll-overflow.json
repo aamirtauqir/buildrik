@@ -1,0 +1,2389 @@
+{
+  "surface": "layers-scroll-overflow",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1082:4835",
+  "boardName": "layers-scroll-overflow",
+  "figmaHash": "15fddf89782a73a39a39afcdc5d0b4647e46079e2eaa7d3db0290c79816e88bb",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T05:29:04.437Z",
+  "copy": [
+    "Layers",
+    "Search",
+    "⊞ ⊟ ⚙",
+    "Header",
+    "👁",
+    "🔒",
+    "Logo",
+    "👁",
+    "🔒",
+    "Nav",
+    "👁",
+    "🔒",
+    "Hero",
+    "👁",
+    "🔒",
+    "Title",
+    "👁",
+    "🔒",
+    "Subtitle",
+    "👁",
+    "🔒",
+    "CTA",
+    "👁",
+    "🔒",
+    "Features",
+    "👁",
+    "🔒",
+    "Feature 1",
+    "👁",
+    "🔒",
+    "Feature 2",
+    "👁",
+    "🔒",
+    "Feature 3",
+    "👁",
+    "🔒",
+    "Feature 4",
+    "👁",
+    "🔒",
+    "Pricing",
+    "👁",
+    "🔒",
+    "Plan A",
+    "👁",
+    "🔒",
+    "Plan B",
+    "👁",
+    "🔒",
+    "Plan C",
+    "👁",
+    "🔒",
+    "Testimonials",
+    "👁",
+    "🔒",
+    "Quote 1",
+    "👁",
+    "🔒",
+    "Quote 2",
+    "👁",
+    "🔒",
+    "Footer",
+    "👁",
+    "🔒",
+    "Links",
+    "👁",
+    "🔒",
+    "Copyright",
+    "👁",
+    "🔒",
+    "42 layers"
+  ],
+  "targets": [
+    {
+      "nodeId": "2100:10968",
+      "name": null,
+      "className": "[word-break:break-word] content-stretch flex h-[44px] items-center leading-[normal] not-italic overflow-clip pl-[16px] pr-[12px] py-[12px] relative text-[14px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "2100:10965",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "2100:10966",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "2100:10967",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4835",
+      "name": "Layers · scroll-overflow — NOT A STATE — a scroll condition of .bdc-pbody-scroll (LayersTab.tsx:184)",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex flex-col items-start overflow-clip relative rounded-[8px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.08)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4840",
+      "name": "Toolbar",
+      "className": "content-stretch flex gap-[8px] h-[36px] items-center overflow-clip px-[12px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4841",
+      "name": "search box",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex flex-[1_0_0] h-[28px] items-center min-w-px overflow-clip px-[8px] py-[4px] relative rounded-[6px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4842",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4843",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4844",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4845",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4846",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4847",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4848",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4849",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4850",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4851",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4852",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4853",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4854",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4855",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4856",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4857",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4858",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4859",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4860",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4861",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4862",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4863",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4864",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4865",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4866",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4867",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4868",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4869",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4870",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4871",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4872",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4873",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4874",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4875",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4876",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4877",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4878",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4879",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4880",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4881",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4882",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4883",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4884",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4885",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4886",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4887",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4888",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4889",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4890",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4891",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4892",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4893",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4894",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4895",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4896",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4897",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4898",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4899",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4900",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4901",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4902",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4903",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4904",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4905",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4906",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4907",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4908",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4909",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4910",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4911",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4912",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4913",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4914",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4915",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4916",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4917",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4918",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4919",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4920",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4921",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4922",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4923",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4924",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4925",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4926",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4927",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4928",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4929",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4930",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4931",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4932",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4933",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4934",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4935",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4936",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4937",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4938",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4939",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4940",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4941",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4942",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4943",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4944",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[12px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4945",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4946",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4947",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4948",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4949",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4950",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4951",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4952",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4953",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4954",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4955",
+      "name": "Tree row",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center overflow-clip pl-[28px] pr-[8px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4956",
+      "name": "Frame",
+      "className": "bg-[var(--flowbite\\/gray\\/600,#4b5563)] relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/600",
+          "value": "#4b5563"
+        },
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4957",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal leading-[normal] min-w-px not-italic relative text-[13px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4958",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4959",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[10px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4960",
+      "name": "Scrollbar",
+      "className": "absolute bg-[#ccccd1] h-[200px] left-[274px] rounded-[2px] top-[80px] w-[4px]",
+      "props": {
+        "background-color": {
+          "value": "#ccccd1"
+        },
+        "height": {
+          "value": "200px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4962",
+      "name": "Count footer",
+      "className": "content-stretch flex h-[28px] items-center overflow-clip px-[12px] py-[5px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        }
+      }
+    },
+    {
+      "nodeId": "1082:4963",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+N	170:2	AI · idle	FRAME	100,64117,280,812	true	VERTICAL	15	true
+K	170:3	FRAME	100,64117,280,36	true	true	Back row
+K	170:5	FRAME	100,64153,280,44	true	true	Header
+K	1625:7162	FRAME	100,64197,280,32	true	true	Scope
+K	170:7	FRAME	100,64229,280,72	true	true	Prompt
+K	170:10	FRAME	100,64301,280,120	true	true	Suggestions
+K	170:15	FRAME	100,64421,280,96	true	true	note
+K	921:4478	FRAME	100,64517,280,92	true	false	Draft
+K	444:2388	FRAME	100,64609,280,34	true	true	hotspot/state · AI · error-quota
+K	444:2390	FRAME	100,64643,280,34	true	true	hotspot/state · AI · not-configured
+K	873:4544	FRAME	100,64677,280,36	true	true	hotspot/back · to editor
+K	1671:7241	FRAME	100,64823,280,34	true	true	hotspot/state · AI · planning (Draft a new section)
+K	2483:11978	FRAME	106,64807,160,28	true	false	hotspot/state · AI · in-canvas popover
+K	2483:11981	FRAME	106,64839,160,28	true	false	hotspot/state · Brand · generate component with AI
+K	2483:11984	FRAME	106,64871,160,28	true	false	hotspot/state · AI · publish confirm
+K	2846:21653	TEXT	254,64265,100,16	true		7 left today
+C	170:2	texts=15
+T	2846:21653	254,64265,100,16	11	Regular	true	HEIGHT	AI · idle	7 left today
+T	2483:11985	112,64879,148,12	10	Regular	true	HEIGHT	hotspot/state · AI · publish confirm	AI · publish confirm
+T	2483:11982	112,64847,148,24	10	Regular	true	HEIGHT	hotspot/state · Brand · generate component with AI	Brand · generate component with AI
+T	2483:11979	112,64815,148,12	10	Regular	true	HEIGHT	hotspot/state · AI · in-canvas popover	AI · in-canvas popover
+T	921:4481	128,64570,209,15	12	Medium	true	WIDTH_AND_HEIGHT	btn/draft-brief	✦  Draft a new section from a brief  ›
+T	921:4479	116,64533,37,13	11	Medium	true	WIDTH_AND_HEIGHT	Draft	DRAFT
+T	170:16	116,64429,248,96	11	Regular	true	HEIGHT	note	AI proposes a diff for anything you ask it to change, except two writes that land straight
+T	170:14	116,64385,175,18	12	Regular	true	WIDTH_AND_HEIGHT	Suggestions	Shorten the menu descriptions
+T	170:13	116,64359,164,18	12	Regular	true	WIDTH_AND_HEIGHT	Suggestions	Write alt text for every image
+T	170:12	116,64333,128,18	12	Regular	true	WIDTH_AND_HEIGHT	Suggestions	Make the hero warmer
+T	170:11	116,64309,22,16	11	Regular	true	WIDTH_AND_HEIGHT	Suggestions	TRY
+T	170:9	126,64245,169,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Ask AI to change something…
+T	1625:7163	116,64205,66,16	11	Regular	true	WIDTH_AND_HEIGHT	Scope	Scope: Page
+T	170:6	116,64165,14,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	AI
+T	170:4	116,64125,76,20	14	Medium	true	WIDTH_AND_HEIGHT	Back row	‹  Inspector
+R	170:2	170:17	NAVIGATE	AI · idle
+R	170:2	171:67	NAVIGATE	AI · idle
+R	2483:11984	2476:12044	NAVIGATE	hotspot/state · AI · publish confirm
+R	2483:11981	2476:12029	NAVIGATE	hotspot/state · Brand · generate component with AI
+R	2483:11978	2476:12001	NAVIGATE	hotspot/state · AI · in-canvas popover
+R	1671:7241	170:41	NAVIGATE	hotspot/state · AI · planning (Draft a new section)
+R	873:4544	52:2	NAVIGATE	hotspot/back · to editor
+R	444:2390	171:136	NAVIGATE	hotspot/state · AI · not-configured
+R	444:2388	171:105	NAVIGATE	hotspot/state · AI · error-quota
+R	921:4480	170:29	NAVIGATE	btn/draft-brief
+END	done=170:2	stopped=false	bytes=3124

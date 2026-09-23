@@ -1,17 +1,30 @@
 import dns from "node:dns/promises";
+import { createHash } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
+import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
 
-// Vercel's canonical CNAME target — what a domain should point at when we have
-// no live verification records yet. Replaces the old dead "sites.buildrik.app"
-// host that nothing ever served.
-const VERCEL_CNAME = "cname.vercel-dns.com";
+// Vercel's canonical targets — what a domain should point at when we have no
+// live verification records yet: the apex A record and the `www` CNAME
+// (replacing the old dead "sites.buildrik.app" host that nothing ever served).
+const VERCEL_CNAME = DNS_TARGETS.cname;
+const VERCEL_APEX_IP = DNS_TARGETS.apexIp;
+
+/**
+ * The `TXT _buildrick brk-verify-…` record the Add-a-domain dialog draws
+ * (Clone 3737:43669). Derived from the row id, so it is stable across reads
+ * without a column of its own; it proves the person editing the zone is the
+ * one who connected the domain here, nothing more.
+ */
+export function dnsVerificationToken(domainId: string): string {
+  return `brk-verify-${createHash("sha256").update(domainId).digest("hex").slice(0, 16)}`;
+}
 
 /**
  * Re-check a domain's DNS against its expected records (P6 "⟳ Check now",
- * Figma Domains boards). Resolves A/CNAME live via node:dns, marks each
+ * Figma Domains boards). Resolves A/CNAME/TXT live via node:dns, marks each
  * DnsRecord verified, and flips Domain.status PENDING → VERIFIED when every
  * record answers (FAILED when none do after a lookup). SSL issuance stays
  * with the deploy pipeline — status VERIFIED + sslStatus PENDING is the
@@ -36,6 +49,10 @@ export async function checkDomainDns(domainId: string) {
       } else if (rec.type.toUpperCase() === "CNAME") {
         const answers = await dns.resolveCname(fqdn);
         ok = answers.some((a) => a.replace(/\.$/, "") === rec.value.replace(/\.$/, ""));
+      } else if (rec.type.toUpperCase() === "TXT") {
+        // A TXT answer arrives as character-string chunks; the record is one value.
+        const answers = await dns.resolveTxt(fqdn);
+        ok = answers.some((chunks) => chunks.join("") === rec.value);
       }
     } catch {
       ok = false;
@@ -55,10 +72,38 @@ export async function checkDomainDns(domainId: string) {
   });
 }
 
+// Primary first (one Custom-domain card per domain, Clone 3397:32206); records
+// by type so the DNS table reads A · CNAME · TXT like the frame.
 export async function listDomains(siteId: string) {
   return prisma.domain.findMany({
     where: { siteId },
-    include: { dnsRecords: true },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+    include: { dnsRecords: { orderBy: { type: "asc" } } },
+  });
+}
+
+/**
+ * The Add-a-domain dialog's `Available` / `Already connected` tag. Availability
+ * here means "no site in this database has it" — `Domain.domain` compared
+ * case-insensitively (DNS names are). Whether the registrar has it for sale is
+ * an external lookup this deliberately does not make.
+ */
+export async function checkDomainAvailability(domain: string): Promise<DomainAvailability> {
+  const parsed = domainNameSchema.safeParse(domain.trim());
+  if (!parsed.success) return { available: false, reason: "invalid" };
+  const taken = await prisma.domain.findFirst({
+    where: { domain: { equals: parsed.data.replace(/\.$/, ""), mode: "insensitive" } },
+    select: { id: true },
+  });
+  return taken ? { available: false, reason: "connected" } : { available: true };
+}
+
+/** The card's Force HTTPS toggle. Stored only — see the publish note in phase2-backend.md. */
+export async function updateDomain(id: string, data: { forceHttps: boolean }) {
+  return prisma.domain.update({
+    where: { id },
+    data,
+    include: { dnsRecords: { orderBy: { type: "asc" } } },
   });
 }
 
@@ -91,7 +136,15 @@ export async function listWorkspaceDomains(workspaceId: string): Promise<Workspa
   return rows.map(({ site, ...r }) => ({ ...r, siteName: site.name }));
 }
 
-export async function connectDomain(siteId: string, domain: string) {
+export interface ConnectDomainOptions {
+  domain: string;
+  kind?: DomainKind;
+  dnsProvider?: string;
+  forceHttps?: boolean;
+}
+
+export async function connectDomain(siteId: string, input: ConnectDomainOptions) {
+  const { domain } = input;
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -113,17 +166,22 @@ export async function connectDomain(siteId: string, domain: string) {
       domain,
       status: "PENDING",
       sslStatus: "PENDING",
+      kind: input.kind ?? "PRIMARY",
+      forceHttps: input.forceHttps ?? true,
+      dnsProvider: input.dnsProvider ?? null,
     },
   });
 
   // Attach the domain to the workspace's Vercel project so it actually serves
   // traffic, and use Vercel's real verification records as the DNS instructions.
-  // Falls back to the canonical Vercel CNAME if the workspace has no Vercel
-  // connection (dev / not yet authed) or the API call fails — the domain stays
-  // PENDING and the dns-verify cron can re-attempt.
+  // Falls back to the three records the Add-a-domain dialog draws (apex A,
+  // `www` CNAME, our `_buildrick` TXT — Clone 3737:43669) if the workspace has
+  // no Vercel connection (dev / not yet authed) or the API call fails — the
+  // domain stays PENDING and the dns-verify cron can re-attempt.
   let dnsRecords: Array<{ type: string; host: string; value: string }> = [
-    { type: "CNAME", host: "@", value: VERCEL_CNAME },
+    { type: "A", host: "@", value: VERCEL_APEX_IP },
     { type: "CNAME", host: "www", value: VERCEL_CNAME },
+    { type: "TXT", host: "_buildrick", value: dnsVerificationToken(created.id) },
   ];
 
   try {
@@ -158,7 +216,12 @@ export async function connectDomain(siteId: string, domain: string) {
     data: dnsRecords.map((r) => ({ domainId: created.id, type: r.type, host: r.host, value: r.value })),
   });
 
-  return created;
+  // The dialog shows the provider's expected shape before and the REAL rows
+  // after — so the answer carries the records just written, not the bare row.
+  return prisma.domain.findUniqueOrThrow({
+    where: { id: created.id },
+    include: { dnsRecords: { orderBy: { type: "asc" } } },
+  });
 }
 
 export async function removeDomain(id: string) {

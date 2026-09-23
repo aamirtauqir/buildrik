@@ -1,0 +1,220 @@
+{
+  "slug": "gap-c-history-bands",
+  "rows": [],
+  "why": "The interiors the eight cloned 16 · History state boards are missing. Rows are carried under `structural` so apply-queue.mjs reads zero rows from this file — a band is an insert plus a compensating spacer resize, which the shared queue has no op for. Applied by scripts/figma/draw-history-state-bands.mjs.",
+  "boardIds": {
+    "2854:12294": "History · Saves · changes · restore-confirm (UX-I-01) — clone of 163:2",
+    "2854:21613": "[design-ahead] History · Saves · time-travel · restore-confirm (UX-I-02) — clone of 163:113",
+    "2854:21676": "[design-ahead] History · Saves · time-travel · no-preview (UX-I-12) — clone of 163:113",
+    "2854:21739": "[design-ahead] History · Saves · changes · start-of-history (UX-I-05) — clone of 163:2",
+    "2854:21779": "[design-ahead] History · Saves · changes · load-error (UX-I-06) — clone of 453:4031, TEXT-only, see gap-c-history-text.json",
+    "2854:21814": "[design-ahead] History · Saves · changes · clear-confirm (UX-I-07) — clone of 163:2",
+    "2854:21854": "[design-ahead] History · Saves · changes · undo-unavailable (UX-I-15) — clone of 163:2",
+    "2854:21894": "[design-ahead] History · Saves · overflow — Export / Import (UX-I-08) — clone of 162:2",
+    "_read": "ids read back from section 1776:8374 on 2026-09-07 by dump-board-interiors.mjs; all eight measure 280x812 at y=220, x=3400..5420"
+  },
+  "structural": [
+    {
+      "board": "2854:12294",
+      "name": "Restore confirm",
+      "tone": "confirm",
+      "afterName": "View toggle",
+      "why": "UX-I-01 (Critical) — the 'All changes' timestamp shipped labelled 'Jump to 14:32' and called composer.history.restoreEntry straight from the click; restoreEntry empties redo and does undoStack.slice(0, index+1) (HistoryManager.ts:757-775). The word 'Jump' promised navigation and performed an irreversible edit. Placed where 163:213 sits on 163:167 — directly under the panel chrome — because one restore contract means one drawing of it.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "Restore to 14:32?"
+        },
+        {
+          "t": "body",
+          "s": "This rewinds the project to Added block at 14:32. It permanently discards 12 later changes and everything you can currently redo. Some of that work has not been saved yet."
+        },
+        {
+          "t": "buttons",
+          "cancel": "Cancel",
+          "confirm": "Restore, discard 12 changes",
+          "destructive": true
+        }
+      ]
+    },
+    {
+      "board": "2854:21613",
+      "name": "Restore confirm",
+      "tone": "confirm",
+      "afterName": "note",
+      "why": "UX-I-02 (Critical) — 'Restore this point' fires into the same truncating restore with no confirmation (TimeTravelScrubber.tsx:264-268 → HistoryTab.tsx:195-201 → restoreEntry), while the identical operation on a named version two clicks away shows a confirm band. Placed under the drawer's own note, which already says 'Nothing is written until Restore' — this is the button honouring it.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "Restore to 14:32?"
+        },
+        {
+          "t": "body",
+          "s": "Your current work is saved as a version first. This discards 12 later changes and everything you can currently redo."
+        },
+        {
+          "t": "buttons",
+          "cancel": "Keep scrubbing",
+          "confirm": "Restore, discard 12 changes",
+          "destructive": true
+        }
+      ]
+    },
+    {
+      "board": "2854:21739",
+      "name": "First-hit notice",
+      "tone": "warning",
+      "afterName": "View toggle",
+      "why": "UX-I-05 (Major) — the once-only announcement when the 100-step cap is first hit. HISTORY_CAPACITY_WARNING (events.ts:133) has zero emitters and zero listeners, so this is design-ahead of the code and the board is named accordingly.",
+      "parts": [
+        {
+          "t": "body",
+          "s": "Undo now only reaches back 100 steps. Save a version to keep this point for good."
+        }
+      ]
+    },
+    {
+      "board": "2854:21739",
+      "name": "History boundary",
+      "tone": "notice",
+      "beforeName": "spacer",
+      "why": "UX-I-05 (Major) — undo is capped at 100 and trimHistory() shifts entries off the front with no emit (HistoryManager.ts:613-629; config.ts:108), so the list simply stops going back. The boundary terminates the list, which is why it is inserted immediately before the spacer rather than floated. NOT drawn on 163:269 'pruned-notice': that board states the VERSION store's 50-item rule, a different store with a different boundary, and reusing it would re-create the exact conflation UX-I-09 exists to break.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "History starts here"
+        },
+        {
+          "t": "body",
+          "s": "Earlier steps were dropped — this list keeps the last 100."
+        },
+        {
+          "t": "link",
+          "s": "Save a version to keep a point"
+        }
+      ]
+    },
+    {
+      "board": "2854:21814",
+      "name": "Clear confirm",
+      "tone": "confirm",
+      "afterName": "View toggle",
+      "why": "UX-I-07 (Major) — 'Clear' wipes the entire undo stack and the confirm is the same button re-labelled 'Clear all', which never states the consequence. The cost is now in both the sentence and the primary's own label.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "Clear this session’s history?"
+        },
+        {
+          "t": "body",
+          "s": "Undo will stop working for the 47 steps before now, and it cannot be brought back. Saved versions are not affected."
+        },
+        {
+          "t": "buttons",
+          "cancel": "Cancel",
+          "confirm": "Clear 47 steps",
+          "destructive": true
+        }
+      ]
+    },
+    {
+      "board": "2854:21854",
+      "name": "Undo unavailable notice",
+      "tone": "warning",
+      "afterName": "View toggle",
+      "why": "UX-I-15 (Major, HALF STALE) — the half that is stale is NOT drawn. useComposerInit.ts:705-716 has listened to HISTORY_UNRECORDED since de36af334 (2026-09-04) and already disables Undo, so the switch-off is no longer silent. What survives, and all this band claims, is that the disabled action is ANONYMOUS: the label is engine-supplied (noteUnrecordedAction's `label` argument, 'said the way the toast will say it'; BaseBindingManager.ts:106 passes 'binding a field to content') and nothing renders it.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "Undo isn’t covering your last action"
+        },
+        {
+          "t": "body",
+          "s": "Binding a field to content isn’t undoable. Undo starts working again with your next edit."
+        },
+        {
+          "t": "link",
+          "s": "Save a version first"
+        }
+      ]
+    },
+    {
+      "board": "2854:21676",
+      "name": "No preview notice",
+      "tone": "warning",
+      "afterName": "note",
+      "why": "UX-I-12 (Critical, not a gap-C finding — drawn because its board was cloned in the same batch and an empty named board asserts a state it does not draw). The scrub preview is the nearest NAMED version's screenshot; with none, the preview layer is opacity 0 (TimeTravelScrubber.tsx:237-241) while the drawer still prints 'Previewing: 14:32' (:131-133).",
+      "parts": [
+        {
+          "t": "title",
+          "s": "No preview for this point"
+        },
+        {
+          "t": "body",
+          "s": "The nearest saved frame is from 13:05. Scrub there to see it, or save a version now so this point has one."
+        },
+        {
+          "t": "disabled",
+          "s": "Restore this point"
+        },
+        {
+          "t": "note",
+          "s": "Nothing to compare against — restore would be blind."
+        },
+        {
+          "t": "link",
+          "s": "Go to 13:05"
+        }
+      ]
+    },
+    {
+      "board": "2854:21894",
+      "name": "Saves overflow menu",
+      "tone": "confirm",
+      "why": "UX-I-08 (not a gap-C finding — same reason as UX-I-12). Import defaults to MERGE and the destructive mode is a separate, explicitly-named row: importVersions(file, clearExisting=false) already has that default. Drawn as an ABSOLUTE popover, not a stack insert: the board's spacer measures 171 and the menu is 244 tall, and a menu opened from the panel header's ⋯ is a floating surface anyway — it costs the stack nothing.",
+      "parts": [
+        {
+          "t": "title",
+          "s": "Saves"
+        },
+        {
+          "t": "row",
+          "s": "Export version history…",
+          "sub": "A .json file of every saved version."
+        },
+        {
+          "t": "row",
+          "s": "Import version history…",
+          "sub": "Adds the imported versions to the ones you have."
+        },
+        {
+          "t": "row",
+          "s": "Replace everything with an import…",
+          "sub": "Deletes every version in this browser first. Cannot be undone."
+        },
+        {
+          "t": "note",
+          "s": "Versions are stored in this browser. Export before switching machines."
+        }
+      ],
+      "overlay": {
+        "x": 44,
+        "y": 56,
+        "w": 220
+      }
+    },
+    {
+      "board": "2854:21814",
+      "name": "Open decision · clear control",
+      "tone": "notice",
+      "beforeName": "Prune note",
+      "why": "UX-I-07's second branch, recorded rather than taken — deleting a control is a founder call and the costed confirm above is safe either way.",
+      "parts": [
+        {
+          "t": "note",
+          "s": "OPEN DECISION — UX-I-07 also offers dropping the control entirely: nothing about a session’s undo stack needs manual clearing, and its only reachable outcome is data loss. Not taken here; the costed confirm above is safe either way."
+        }
+      ]
+    }
+  ]
+}

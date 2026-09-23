@@ -1,0 +1,160 @@
+{
+  "surface": "shell-site-menu",
+  "board": "Site menu (⋯) (Figma 642:3401)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "waitFor",
+      "testId": "site-menu-trigger"
+    },
+    {
+      "action": "click",
+      "testId": "site-menu-trigger"
+    },
+    {
+      "action": "waitFor",
+      "testId": "site-menu"
+    }
+  ],
+  "contrastScope": "[data-testid=\"site-menu\"]",
+  "targets": [
+    {
+      "name": "menu",
+      "testId": "site-menu"
+    },
+    {
+      "name": "item-site-settings",
+      "testId": "site-menu-site-settings"
+    },
+    {
+      "name": "label-site-settings",
+      "testId": "site-menu-site-settings",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3666"
+    },
+    {
+      "name": "kbd-site-settings",
+      "testId": "site-menu-site-settings"
+    },
+    {
+      "name": "item-version-history",
+      "testId": "site-menu-version-history"
+    },
+    {
+      "name": "item-publish-history",
+      "testId": "site-menu-publish-history"
+    },
+    {
+      "name": "item-export-code",
+      "testId": "site-menu-export-code"
+    },
+    {
+      "name": "item-templates",
+      "testId": "site-menu-templates"
+    },
+    {
+      "name": "item-components",
+      "testId": "site-menu-components"
+    },
+    {
+      "name": "item-shortcuts",
+      "testId": "site-menu-shortcuts"
+    },
+    {
+      "name": "label-version-history",
+      "testId": "site-menu-version-history",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3670"
+    },
+    {
+      "name": "label-publish-history",
+      "testId": "site-menu-publish-history",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3674"
+    },
+    {
+      "name": "label-export-code",
+      "testId": "site-menu-export-code",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3677"
+    },
+    {
+      "name": "label-templates",
+      "testId": "site-menu-templates",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3681"
+    },
+    {
+      "name": "label-components",
+      "testId": "site-menu-components",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3685"
+    },
+    {
+      "name": "label-shortcuts",
+      "testId": "site-menu-shortcuts",
+      "spec": "shell-site-menu",
+      "nodeId": "642:3689"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: open the topbar's ⋯ and read the menu. 14/14 compared pass,",
+    "0 fail, 7 UNKNOWN (line-height, see below), 0 contrast failures.",
+    "",
+    "SCOPE: 642:3401 is a whole 1440x900 shell board and boards.json holds it as",
+    "`Site menu (⋯)` — the popover is what the row is about, and the rest of the",
+    "shell (rail, topbar, inspector, canvas, footer) is measured by shell-default,",
+    "shell-states-* and the inspector family. This recipe joins the popover only,",
+    "rather than re-measuring nine other recipes' subjects through a tenth.",
+    "",
+    "ANCHORS ADDED, no visual change needed for what IS joined: every item's 13px",
+    "size and `--color/ink` colour already match 642:3666 and its six siblings.",
+    "",
+    "NOT JOINED — the item FRAME (642:3665 and its six siblings), on the shared-",
+    "primitive rule. The frames state `px-[12px]`; `chrome-ui`'s `MenuItem` is",
+    "`px-2` (8), and that component is the menu row for Insert, Media, Pages,",
+    "Layers display-settings and the canvas dropdowns — six boards' worth of",
+    "surface that one board does not get to move (brief, §When you may NOT",
+    "conform). Everything else the frames state — `h-8` (32) and `gap-2` (8) —",
+    "the component already satisfies and the measurement records. THE 4px IS A",
+    "REAL FINDING and wants an `authority=open:menu-item-inset` row: it is the",
+    "same question on every chrome-ui menu, not this board's opinion.",
+    "",
+    "SEVEN UNKNOWNs, all the same cause and the same shared primitive: the board",
+    "gives every label `leading-[20px]` and `MENU_ITEM_BASE` sets no line-height",
+    "at all, so the label inherits `normal` (~15.7 at 13px) and the diff cannot",
+    "compare a keyword against a length. 20 is also the natural line for a 32px",
+    "row, so this is probably right AND probably chrome-ui's to change — same row",
+    "as the inset above.",
+    "",
+    "NOT JOINED — 642:3668, the `⌘,` chord. Its 11px `--color/ink-muted` IS what",
+    "`MenuItem` paints, but the chord is a span inside the button with no anchor",
+    "of its own, and adding one means editing chrome-ui. Anchoring the button and",
+    "calling it the chord would have measured the button.",
+    "",
+    "NOT JOINED — 642:3664, the popover surface (240 wide, `py-[6px]`, radius 8).",
+    "It is `chrome-ui`'s Popover, shared with every other menu in the editor.",
+    "",
+    "FOUND, NOT FIXED — the two menus have DIFFERENT CONTENTS, and the code's is",
+    "deliberate. The board draws ten flat items in two groups; live there are six",
+    "labelled groups (Site / — / Build / Share / Workspace / help) with Review,",
+    "Publish panel, Site health, Activity log, Brand, Plugins, view-mode, Copy",
+    "live URL, Share preview link, Invite teammates, Account settings and Getting",
+    "started as well. SiteMenu.tsx's own comments cite 642:3401 for several of",
+    "those additions, so the board is the older shape rather than a contradiction.",
+    "Structure is the thing this harness explicitly cannot see (README §What this",
+    "harness cannot see); recorded here so it is not mistaken for coverage."
+  ]
+}

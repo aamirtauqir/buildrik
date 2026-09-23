@@ -126,9 +126,21 @@ const ENTITIES = {
 };
 const decode = (s) => s.replace(/&[a-z]+;/gi, (e) => ENTITIES[e] ?? e);
 
+/*
+ * Two shapes, because `get_design_context` emits two. Plain text children come
+ * through as `>Save a version<`, but a string carrying a character JSX would
+ * have to escape comes back wrapped in a template literal — `` >{`What's
+ * live`}< ``. The original pattern excluded `{` and `}` outright, so it dropped
+ * exactly the strings most likely to be interesting: the ones with an
+ * apostrophe or a leading `+`.
+ *
+ * Found 2026-09-08 by check-board-copy reporting `What's live` and
+ * `+  Save a version` as "product renders, no board draws" when both are drawn
+ * on 1657:7204 and 163:314 — a false lead caused by the extractor, not drift.
+ */
 const copyFrom = (code) =>
-  [...code.matchAll(/>([^<>{}]{2,120})</g)]
-    .map((m) => decode(m[1]).replace(/\s+/g, " ").trim())
+  [...code.matchAll(/>(?:\{`([^`]{2,120})`\}|([^<>{}]{2,120}))</g)]
+    .map((m) => decode(m[1] ?? m[2]).replace(/\s+/g, " ").trim())
     .filter((t) => t.length >= 2);
 
 /** Extract every `data-node-id` element with its className. */
@@ -145,15 +157,66 @@ const elements = (code) => {
   return out;
 };
 
+/**
+ * Named utility values worth extracting, mapped to property + literal value.
+ *
+ * `propsFrom` only ever matched ARBITRARY values (`bg-[...]`), because the
+ * boards used to be exported that way. On 2026-09-02 the topbar board came
+ * back from Figma with `bg-white` instead of `bg-[#ffffff]`, and because a
+ * bare `bg-white` matches no bracket, the topbar's background silently
+ * stopped being compared. `diff.mjs` still said PASS — one fewer property is
+ * not a failure, it is an absence — and only the compared-count ratchet
+ * caught it, six days later. 57 `bg-white` and 8 `text-white` across the 123
+ * committed boards were invisible the same way.
+ *
+ * Kept deliberately tiny, to colours whose class name states the whole value:
+ *
+ *   - `w-full` / `h-full` are parent-relative. The measured side is px, so a
+ *     comparison would either false-fail or need the parent's box, and a
+ *     percentage that resolves correctly is not evidence the board agreed.
+ *   - The `border-*` family is the reason this is a table and not a regex.
+ *     `SINGLE` sends the `border-` prefix to `border-COLOR`, so a named
+ *     lookup keyed on the prefix would read `border-b` (a WIDTH) and
+ *     `border-solid` (a STYLE) as colours — 876 + 177 occurrences of
+ *     confidently wrong specs. Match whole class names only.
+ *   - `text-left` / `-right` / `-center` / `-ellipsis` share the `text-`
+ *     prefix with `text-white` and mean nothing like it, which is the same
+ *     trap one level down.
+ */
+const NAMED = {
+  "bg-white": ["background-color", "#ffffff"],
+  "bg-black": ["background-color", "#000000"],
+  "bg-transparent": ["background-color", "transparent"],
+  "text-white": ["color", "#ffffff"],
+  "text-black": ["color", "#000000"],
+};
+
 /** Turn a className string into { property -> {token?, value} }. */
 const propsFrom = (className) => {
   const props = {};
   for (const cls of className.split(/\s+/).filter(Boolean)) {
+    // Whole-name match first: see NAMED for why this is not prefix-keyed.
+    const named = NAMED[cls];
+    if (named) { props[named[0]] = { value: named[1] }; continue; }
     // text-[color:var(...)] and text-[13px] share a prefix but mean different things.
+    /* `text-[…]` is two different properties wearing one prefix, and the
+       explicit `color:` marker is only ONE of the ways a colour arrives.
+       `text-[#6b7280]` — a bare hex, which Figma emits whenever the layer has
+       no variable behind it — fell to the else branch and was recorded as
+       `{"font-size": "#6b7280"}`. That is worse than dropping it: the colour
+       check silently disappears AND a bogus font-size takes its place, which
+       `normalizeLength` then reads as null, so it degrades to UNKNOWN and never
+       fails. 123 of the committed raw-figma files carry a `text-[#…]`.
+       So decide by the VALUE, not by the marker. */
     const textArb = cls.match(/^text-\[(.+)\]$/);
     if (textArb) {
       const body = textArb[1];
+      const isColour = (v) =>
+        /^#[0-9a-f]{3,8}$/i.test(v) ||
+        /^(rgba?|hsla?|color|oklch|lab)\(/i.test(v) ||
+        /^var\(--[^)]*(colour|color|ink|accent|bg|border|success|warning|error|fill)/i.test(v);
       if (body.startsWith("color:")) props["color"] = parseValue(body.slice(6));
+      else if (isColour(unescapeTw(body))) props["color"] = parseValue(body);
       else props["font-size"] = parseValue(body);
       continue;
     }

@@ -1,0 +1,1614 @@
+{
+ "_what": "RAW output of the one successful use_figma read of page 1:3 taken at 2026-09-07T05:07Z, before the account-wide Figma seat quota was exhausted. Kept in the repo because the scratchpad is session-local and this is the only measurement of these four sections anyone took during the arc.",
+ "_script": "scratchpad brandmod/censusA.mjs — walks sections 1776:8373, 1084:4527, 1938:8372, 1779:6; per board records id/name/type/x/y/w/h, descendant count, TEXT count and text-style-bound count; and page-wide within those sections collects every SOLID fill/stroke matching a watch-list of off-token hexes, every TEXT node whose style is Bold/Extra Bold/Black, and every TEXT node under 11px.",
+ "_watchlist": [
+  "#1A264D",
+  "#1A57DB",
+  "#9DA3AF",
+  "#111928",
+  "#6B7380",
+  "#000000",
+  "#333340",
+  "#FAFCFF"
+ ],
+ "_legend": {
+  "hits": "[nodeId, boardId, fill|stroke, hex, BOUND|raw, layerName]",
+  "heavy": "[nodeId, boardId, family|style, size, leading, first40chars]",
+  "tiny": "[nodeId, boardId, fontSize]"
+ },
+ "sections": [
+  {
+   "id": "1776:8373",
+   "name": "07 · Brand · 51",
+   "x": 0,
+   "y": 38180,
+   "w": 3440,
+   "h": 7671,
+   "boards": [
+    {
+     "id": "152:52",
+     "name": "Brand · tokens",
+     "t": "FRAME",
+     "x": 900,
+     "y": 1316,
+     "w": 280,
+     "h": 812,
+     "n": 46,
+     "text": 24,
+     "bound": 19
+    },
+    {
+     "id": "152:83",
+     "name": "Brand · token-detail",
+     "t": "FRAME",
+     "x": 500,
+     "y": 1316,
+     "w": 280,
+     "h": 812,
+     "n": 35,
+     "text": 15,
+     "bound": 1
+    },
+    {
+     "id": "152:112",
+     "name": "[not-implemented] Brand · presets — read-only: updatePreset/addPreset/deletePreset have zero UI callers, so Draft and the dirty dot are unreachable",
+     "t": "FRAME",
+     "x": 2100,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 31,
+     "text": 14,
+     "bound": 13
+    },
+    {
+     "id": "152:137",
+     "name": "Brand · starters",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1316,
+     "w": 280,
+     "h": 812,
+     "n": 38,
+     "text": 9,
+     "bound": 8
+    },
+    {
+     "id": "153:2",
+     "name": "Brand · classes",
+     "t": "FRAME",
+     "x": 100,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 30,
+     "text": 13,
+     "bound": 11
+    },
+    {
+     "id": "153:29",
+     "name": "Brand · components",
+     "t": "FRAME",
+     "x": 900,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 40,
+     "text": 19,
+     "bound": 14
+    },
+    {
+     "id": "153:57",
+     "name": "Brand · typography — [not-implemented] \"+ Add a font\", the .woff2 drop zone and the licence checkbox: no font storage and no publish-time @font-face. The ACTIVE FONTS list above them DOES ship",
+     "t": "FRAME",
+     "x": 500,
+     "y": 5961,
+     "w": 280,
+     "h": 812,
+     "n": 42,
+     "text": 18,
+     "bound": 16
+    },
+    {
+     "id": "153:92",
+     "name": "Brand · colour-mode",
+     "t": "FRAME",
+     "x": 500,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 47,
+     "text": 20,
+     "bound": 11
+    },
+    {
+     "id": "153:120",
+     "name": "Brand · import-export",
+     "t": "FRAME",
+     "x": 1700,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 60,
+     "text": 30,
+     "bound": 18
+    },
+    {
+     "id": "154:2",
+     "name": "Brand · lint — [not-implemented] the Fix / Open row actions: no rule produces an autoFixHint, so the Fix branch is unreachable (LintSection.tsx:9-27)",
+     "t": "FRAME",
+     "x": 1660,
+     "y": 4578,
+     "w": 280,
+     "h": 812,
+     "n": 30,
+     "text": 12,
+     "bound": 11
+    },
+    {
+     "id": "154:26",
+     "name": "Brand · lint-warnings",
+     "t": "FRAME",
+     "x": 2100,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 72,
+     "text": 36,
+     "bound": 0
+    },
+    {
+     "id": "154:78",
+     "name": "Brand · dirty",
+     "t": "FRAME",
+     "x": 1300,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 79,
+     "text": 39,
+     "bound": 3
+    },
+    {
+     "id": "154:132",
+     "name": "Brand · root · Beginner mode",
+     "t": "FRAME",
+     "x": 100,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 74,
+     "text": 37,
+     "bound": 1
+    },
+    {
+     "id": "306:2049",
+     "name": "Brand · tokens · add",
+     "t": "FRAME",
+     "x": 900,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 39,
+     "text": 21,
+     "bound": 19
+    },
+    {
+     "id": "306:2080",
+     "name": "Brand · tokens · replace",
+     "t": "FRAME",
+     "x": 1300,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 38,
+     "text": 21,
+     "bound": 19
+    },
+    {
+     "id": "306:2111",
+     "name": "[not-implemented] Brand · presets · bound — elements carry no preset reference; TokenUsageTracker counts tokens (SectionStatusBadge.tsx:17-29)",
+     "t": "FRAME",
+     "x": 900,
+     "y": 5961,
+     "w": 280,
+     "h": 812,
+     "n": 32,
+     "text": 15,
+     "bound": 13
+    },
+    {
+     "id": "306:2136",
+     "name": "[not-implemented] Brand · presets · unbound — same cause as 306:2111",
+     "t": "FRAME",
+     "x": 1700,
+     "y": 5961,
+     "w": 280,
+     "h": 812,
+     "n": 32,
+     "text": 15,
+     "bound": 13
+    },
+    {
+     "id": "306:2161",
+     "name": "[not-implemented] Brand · presets · draft — updatePreset/addPreset/deletePreset have zero UI callers AND the editable binding row (ui/presets/BindingRow.tsx) has no importer, so isDirty is permanently false (usePresetsForCategory.ts:67-88; PresetBindingRow.tsx:5 “no-op v1”)",
+     "t": "FRAME",
+     "x": 1300,
+     "y": 5961,
+     "w": 280,
+     "h": 812,
+     "n": 32,
+     "text": 15,
+     "bound": 13
+    },
+    {
+     "id": "306:2186",
+     "name": "Brand · starters · applied",
+     "t": "FRAME",
+     "x": 500,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 40,
+     "text": 10,
+     "bound": 8
+    },
+    {
+     "id": "306:2217",
+     "name": "Brand · lint · suppressed",
+     "t": "FRAME",
+     "x": 2100,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 75,
+     "text": 37,
+     "bound": 0
+    },
+    {
+     "id": "306:2232",
+     "name": "Brand · export · exported",
+     "t": "FRAME",
+     "x": 1300,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 45,
+     "text": 22,
+     "bound": 18
+    },
+    {
+     "id": "306:2265",
+     "name": "Brand · export · imported",
+     "t": "FRAME",
+     "x": 1700,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 45,
+     "text": 22,
+     "bound": 18
+    },
+    {
+     "id": "306:2298",
+     "name": "Brand · export · error",
+     "t": "FRAME",
+     "x": 900,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 45,
+     "text": 22,
+     "bound": 18
+    },
+    {
+     "id": "775:4305",
+     "name": "[not-implemented] Brand · loading — the panel loads synchronously from project settings (DesignSystemTab.tsx:376-411); there is no async fetch to show",
+     "t": "FRAME",
+     "x": 1700,
+     "y": 3646,
+     "w": 280,
+     "h": 812,
+     "n": 33,
+     "text": 1,
+     "bound": 0
+    },
+    {
+     "id": "781:4311",
+     "name": "Brand · load-error",
+     "t": "FRAME",
+     "x": 1300,
+     "y": 1316,
+     "w": 280,
+     "h": 812,
+     "n": 17,
+     "text": 4,
+     "bound": 0
+    },
+    {
+     "id": "1138:13376",
+     "name": "Brand · empty — RETIRED 2026-09-02 (no producer)",
+     "t": "FRAME",
+     "x": 1260,
+     "y": 4578,
+     "w": 280,
+     "h": 812,
+     "n": 17,
+     "text": 4,
+     "bound": 0
+    },
+    {
+     "id": "1172:4840",
+     "name": "Brand · review-changes (modal) — [not-implemented] for 11 of 14 token kinds; only colour, type and spacing reach the review (ReviewModal.tsx:17-30)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 5602,
+     "w": 520,
+     "h": 239,
+     "n": 28,
+     "text": 13,
+     "bound": 0
+    },
+    {
+     "id": "1333:7162",
+     "name": "Brand · root — NEW 2026-08-27 (CURRENT) — [not-implemented] the shared-theme strip: capture/push moves projectStyles CSS rules, not designTokens (theme.service.ts:79,184), so no brand syncs",
+     "t": "FRAME",
+     "x": 100,
+     "y": 5961,
+     "w": 280,
+     "h": 812,
+     "n": 105,
+     "text": 47,
+     "bound": 0
+    },
+    {
+     "id": "1704:8575",
+     "name": "Brand · classes · empty",
+     "t": "FRAME",
+     "x": 100,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 15,
+     "text": 3,
+     "bound": 1
+    },
+    {
+     "id": "1704:8607",
+     "name": "Brand · components · saved-empty",
+     "t": "FRAME",
+     "x": 500,
+     "y": 2714,
+     "w": 280,
+     "h": 812,
+     "n": 17,
+     "text": 4,
+     "bound": 1
+    },
+    {
+     "id": "1706:8467",
+     "name": "Modal · Brand · AI prompt · idle",
+     "t": "FRAME",
+     "x": 100,
+     "y": 2358,
+     "w": 720,
+     "h": 228,
+     "n": 14,
+     "text": 7,
+     "bound": 0
+    },
+    {
+     "id": "1706:8476",
+     "name": "Modal · Brand · AI prompt · generating",
+     "t": "FRAME",
+     "x": 1780,
+     "y": 2358,
+     "w": 720,
+     "h": 227,
+     "n": 13,
+     "text": 6,
+     "bound": 0
+    },
+    {
+     "id": "1706:8483",
+     "name": "Modal · Brand · AI prompt · success",
+     "t": "FRAME",
+     "x": 2620,
+     "y": 2358,
+     "w": 720,
+     "h": 236,
+     "n": 10,
+     "text": 5,
+     "bound": 0
+    },
+    {
+     "id": "433:2391",
+     "name": "B9.5 · Migration progress modal — running · failed — [not-implemented] as drawn: the runner is fed projectStyles as project.tokens (useComposerInit.ts:196), so no token migrates and success is reported over a corrupted styles array",
+     "t": "FRAME",
+     "x": 100,
+     "y": 4578,
+     "w": 1040,
+     "h": 470,
+     "n": 52,
+     "text": 27,
+     "bound": 0
+    },
+    {
+     "id": "155:57",
+     "name": "caption/Brand · tokens",
+     "t": "TEXT",
+     "x": 900,
+     "y": 2148,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:58",
+     "name": "caption/Brand · token-detail",
+     "t": "TEXT",
+     "x": 500,
+     "y": 2148,
+     "w": 280,
+     "h": 90,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:59",
+     "name": "caption/Brand · presets",
+     "t": "TEXT",
+     "x": 100,
+     "y": 7321,
+     "w": 280,
+     "h": 18,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:60",
+     "name": "caption/Brand · starters",
+     "t": "TEXT",
+     "x": 100,
+     "y": 2148,
+     "w": 280,
+     "h": 72,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:61",
+     "name": "caption/Brand · classes",
+     "t": "TEXT",
+     "x": 100,
+     "y": 1052,
+     "w": 280,
+     "h": 18,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:62",
+     "name": "caption/Brand · components",
+     "t": "TEXT",
+     "x": 900,
+     "y": 1052,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:63",
+     "name": "caption/Brand · typography",
+     "t": "TEXT",
+     "x": 500,
+     "y": 6793,
+     "w": 280,
+     "h": 180,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:64",
+     "name": "caption/Brand · colour-mode",
+     "t": "TEXT",
+     "x": 500,
+     "y": 1052,
+     "w": 280,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:65",
+     "name": "caption/Brand · import-export",
+     "t": "TEXT",
+     "x": 1700,
+     "y": 1052,
+     "w": 280,
+     "h": 144,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:66",
+     "name": "caption/Brand · lint",
+     "t": "TEXT",
+     "x": 1660,
+     "y": 5410,
+     "w": 280,
+     "h": 72,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:67",
+     "name": "caption/Brand · lint-warnings",
+     "t": "TEXT",
+     "x": 2100,
+     "y": 1052,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:68",
+     "name": "caption/Brand · dirty",
+     "t": "TEXT",
+     "x": 1300,
+     "y": 1052,
+     "w": 280,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:69",
+     "name": "caption/Brand · beginner-vs-pro",
+     "t": "TEXT",
+     "x": 100,
+     "y": 7093,
+     "w": 280,
+     "h": 108,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "788:4309",
+     "name": "caption/Brand · loading",
+     "t": "TEXT",
+     "x": 100,
+     "y": 7459,
+     "w": 280,
+     "h": 72,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "788:4310",
+     "name": "caption/Brand · load-error",
+     "t": "TEXT",
+     "x": 1300,
+     "y": 2148,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "155:56",
+     "name": "caption/Brand · root",
+     "t": "TEXT",
+     "x": 100,
+     "y": 6793,
+     "w": 280,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "1706:8492",
+     "name": "Modal · Brand · AI prompt · error",
+     "t": "FRAME",
+     "x": 940,
+     "y": 2358,
+     "w": 720,
+     "h": 147,
+     "n": 10,
+     "text": 5,
+     "bound": 0
+    }
+   ]
+  },
+  {
+   "id": "1084:4527",
+   "name": "11 · Templates · 18",
+   "x": 0,
+   "y": 59139,
+   "w": 6320,
+   "h": 4118,
+   "boards": [
+    {
+     "id": "641:2487",
+     "name": "Templates · gallery",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1462,
+     "w": 280,
+     "h": 812,
+     "n": 64,
+     "text": 22,
+     "bound": 16
+    },
+    {
+     "id": "778:4102",
+     "name": "Templates · loading — RETIRED 2026-09-02 (no producer)",
+     "t": "FRAME",
+     "x": 2460,
+     "y": 2744,
+     "w": 280,
+     "h": 812,
+     "n": 42,
+     "text": 7,
+     "bound": 1
+    },
+    {
+     "id": "781:4372",
+     "name": "Templates · load-error",
+     "t": "FRAME",
+     "x": 500,
+     "y": 2744,
+     "w": 280,
+     "h": 812,
+     "n": 22,
+     "text": 6,
+     "bound": 1
+    },
+    {
+     "id": "782:4402",
+     "name": "Templates · no-results",
+     "t": "FRAME",
+     "x": 100,
+     "y": 2744,
+     "w": 280,
+     "h": 812,
+     "n": 21,
+     "text": 5,
+     "bound": 1
+    },
+    {
+     "id": "642:2556",
+     "name": "Templates · preview",
+     "t": "FRAME",
+     "x": 500,
+     "y": 1462,
+     "w": 1440,
+     "h": 900,
+     "n": 287,
+     "text": 105,
+     "bound": 82
+    },
+    {
+     "id": "642:2832",
+     "name": "Templates · applying",
+     "t": "FRAME",
+     "x": 4780,
+     "y": 220,
+     "w": 1440,
+     "h": 900,
+     "n": 289,
+     "text": 109,
+     "bound": 87
+    },
+    {
+     "id": "807:4299",
+     "name": "S1.1b · First run → Browse templates (Templates drawer open)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 220,
+     "w": 1440,
+     "h": 900,
+     "n": 150,
+     "text": 48,
+     "bound": 16
+    },
+    {
+     "id": "807:7252",
+     "name": "S1.3b · new-page · template-picker",
+     "t": "FRAME",
+     "x": 900,
+     "y": 2744,
+     "w": 1440,
+     "h": 900,
+     "n": 30,
+     "text": 18,
+     "bound": 0
+    },
+    {
+     "id": "813:4489",
+     "name": "S1.1e · template-preview (modal)",
+     "t": "FRAME",
+     "x": 3220,
+     "y": 220,
+     "w": 1440,
+     "h": 900,
+     "n": 35,
+     "text": 15,
+     "bound": 3
+    },
+    {
+     "id": "807:6694",
+     "name": "S1.1d - Template applied - First content + onboarding checklist",
+     "t": "FRAME",
+     "x": 1660,
+     "y": 220,
+     "w": 1440,
+     "h": 900,
+     "n": 294,
+     "text": 111,
+     "bound": 82
+    },
+    {
+     "id": "788:4311",
+     "name": "caption/Templates · loading",
+     "t": "TEXT",
+     "x": 2460,
+     "y": 3576,
+     "w": 280,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "788:4312",
+     "name": "caption/Templates · load-error",
+     "t": "TEXT",
+     "x": 500,
+     "y": 3576,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "788:4313",
+     "name": "caption/Templates · no-results",
+     "t": "TEXT",
+     "x": 100,
+     "y": 3576,
+     "w": 280,
+     "h": 36,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "807:7297",
+     "name": "caption/S1.3b - New page - Template picker",
+     "t": "TEXT",
+     "x": 900,
+     "y": 3664,
+     "w": 1440,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "1169:4713",
+     "name": "Templates · replace-confirm (modal) — [not-implemented] the backup checkbox: the backup page falls inside the same 500ms history coalesce as the apply, so the first Cmd+Z destroys template and backup together (TemplatesTab.tsx:611-632)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 3838,
+     "w": 480,
+     "h": 140,
+     "n": 11,
+     "text": 6,
+     "bound": 0
+    },
+    {
+     "id": "1169:4725",
+     "name": "Templates · create-page — confirm · success · error",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1240,
+     "w": 1068,
+     "h": 114,
+     "n": 27,
+     "text": 12,
+     "bound": 0
+    },
+    {
+     "id": "1169:4753",
+     "name": "Templates · save-as-template (modal)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 2482,
+     "w": 460,
+     "h": 142,
+     "n": 10,
+     "text": 5,
+     "bound": 0
+    },
+    {
+     "id": "1169:4764",
+     "name": "Templates · usage-drawer",
+     "t": "FRAME",
+     "x": 680,
+     "y": 2482,
+     "w": 380,
+     "h": 139,
+     "n": 8,
+     "text": 6,
+     "bound": 0
+    }
+   ]
+  },
+  {
+   "id": "1938:8372",
+   "name": "10 · Components · 12 — the editor's saved-components panel; page 1:2 is the LIBRARY",
+   "x": 0,
+   "y": 55699,
+   "w": 2880,
+   "h": 2958,
+   "boards": [
+    {
+     "id": "641:2546",
+     "name": "Components · library",
+     "t": "FRAME",
+     "x": 100,
+     "y": 220,
+     "w": 280,
+     "h": 812,
+     "n": 53,
+     "text": 24,
+     "bound": 18
+    },
+    {
+     "id": "641:2599",
+     "name": "Components · detail",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1640,
+     "w": 280,
+     "h": 812,
+     "n": 55,
+     "text": 24,
+     "bound": 15
+    },
+    {
+     "id": "642:3112",
+     "name": "Components · create",
+     "t": "FRAME",
+     "x": 500,
+     "y": 220,
+     "w": 1440,
+     "h": 900,
+     "n": 299,
+     "text": 109,
+     "bound": 86
+    },
+    {
+     "id": "778:4173",
+     "name": "Components · loading",
+     "t": "FRAME",
+     "x": 1800,
+     "y": 1640,
+     "w": 280,
+     "h": 812,
+     "n": 39,
+     "text": 6,
+     "bound": 0
+    },
+    {
+     "id": "781:4433",
+     "name": "Components · load-error",
+     "t": "FRAME",
+     "x": 2200,
+     "y": 1640,
+     "w": 280,
+     "h": 812,
+     "n": 19,
+     "text": 5,
+     "bound": 0
+    },
+    {
+     "id": "1138:13394",
+     "name": "Components · empty",
+     "t": "FRAME",
+     "x": 1400,
+     "y": 1640,
+     "w": 280,
+     "h": 812,
+     "n": 21,
+     "text": 6,
+     "bound": 0
+    },
+    {
+     "id": "1170:4777",
+     "name": "Components · create (modal)",
+     "t": "FRAME",
+     "x": 2060,
+     "y": 220,
+     "w": 720,
+     "h": 740,
+     "n": 42,
+     "text": 27,
+     "bound": 0
+    },
+    {
+     "id": "1170:4792",
+     "name": "Components · variant-picker · detach-confirm — [not-implemented] the variant-picker half: component.variants is always empty and addVariant/updateVariant/removeVariant have no callers (ComponentManager.ts:320,331,347). The detach-confirm half ships",
+     "t": "FRAME",
+     "x": 100,
+     "y": 2664,
+     "w": 684,
+     "h": 154,
+     "n": 18,
+     "text": 9,
+     "bound": 0
+    },
+    {
+     "id": "788:4314",
+     "name": "caption/Components · loading",
+     "t": "TEXT",
+     "x": 1800,
+     "y": 2472,
+     "w": 280,
+     "h": 72,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "788:4315",
+     "name": "caption/Components · load-error",
+     "t": "TEXT",
+     "x": 2200,
+     "y": 2472,
+     "w": 280,
+     "h": 54,
+     "n": 0,
+     "text": 1,
+     "bound": 1
+    },
+    {
+     "id": "2476:12064",
+     "name": "Components · update-from-selection — confirm · outcomes",
+     "t": "FRAME",
+     "x": 500,
+     "y": 1640,
+     "w": 780,
+     "h": 420,
+     "n": 16,
+     "text": 11,
+     "bound": 0
+    },
+    {
+     "id": "2476:12081",
+     "name": "Components · delete-confirm (modal)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1240,
+     "w": 780,
+     "h": 280,
+     "n": 9,
+     "text": 6,
+     "bound": 0
+    }
+   ]
+  },
+  {
+   "id": "1779:6",
+   "name": "22 · Ecommerce · 5 — [not-implemented] ORDERS only. Narrower than first written: the cart and Stripe checkout runtimes exist and are wired into export (StripeInjector.ts via ExportEngine.ts:40), and are inert only because no screen writes config.stripe. What genuinely does not exist is any order, fulfilment or customer model.",
+   "x": 0,
+   "y": 107655,
+   "w": 1220,
+   "h": 2112,
+   "boards": [
+    {
+     "id": "1719:8391",
+     "name": "Ecommerce · collection-setup (modal)",
+     "t": "FRAME",
+     "x": 100,
+     "y": 220,
+     "w": 720,
+     "h": 400,
+     "n": 24,
+     "text": 16,
+     "bound": 0
+    },
+    {
+     "id": "1719:8421",
+     "name": "Ecommerce · bound · inspector",
+     "t": "FRAME",
+     "x": 820,
+     "y": 740,
+     "w": 300,
+     "h": 243,
+     "n": 21,
+     "text": 13,
+     "bound": 0
+    },
+    {
+     "id": "1719:8414",
+     "name": "Ecommerce · collection-created · toast",
+     "t": "FRAME",
+     "x": 100,
+     "y": 1160,
+     "w": 280,
+     "h": 812,
+     "n": 5,
+     "text": 4,
+     "bound": 0
+    },
+    {
+     "id": "1719:8443",
+     "name": "Ecommerce · bind · popover · collections",
+     "t": "FRAME",
+     "x": 100,
+     "y": 740,
+     "w": 240,
+     "h": 132,
+     "n": 8,
+     "text": 5,
+     "bound": 0
+    },
+    {
+     "id": "1719:8450",
+     "name": "Ecommerce · bind · popover · fields",
+     "t": "FRAME",
+     "x": 460,
+     "y": 740,
+     "w": 240,
+     "h": 300,
+     "n": 30,
+     "text": 20,
+     "bound": 0
+    }
+   ]
+  }
+ ],
+ "hits": [
+  [
+   "866:6841",
+   "152:52",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · dirt"
+  ],
+  [
+   "1670:7229",
+   "152:83",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · token"
+  ],
+  [
+   "1670:7231",
+   "152:83",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · toke"
+  ],
+  [
+   "1670:7213",
+   "152:137",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7235",
+   "152:137",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · dirt"
+  ],
+  [
+   "1670:7215",
+   "153:2",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7217",
+   "153:29",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7219",
+   "153:57",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7221",
+   "153:92",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7237",
+   "153:92",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · dirt"
+  ],
+  [
+   "1670:7249",
+   "153:120",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · expo"
+  ],
+  [
+   "1670:7251",
+   "153:120",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · expo"
+  ],
+  [
+   "1670:7223",
+   "154:2",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7239",
+   "154:78",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · revi"
+  ],
+  [
+   "1670:7241",
+   "154:78",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root "
+  ],
+  [
+   "1670:7233",
+   "306:2049",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · token"
+  ],
+  [
+   "1670:7225",
+   "306:2232",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7253",
+   "306:2265",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "1670:7255",
+   "306:2298",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root"
+  ],
+  [
+   "881:4584",
+   "781:4311",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/alt · Brand · root"
+  ],
+  [
+   "1138:13384",
+   "1138:13376",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/alt · Brand · root"
+  ],
+  [
+   "1670:7243",
+   "1172:4840",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · dirty"
+  ],
+  [
+   "1670:7245",
+   "1172:4840",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/back · Brand · root "
+  ],
+  [
+   "1670:7195",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Tokens"
+  ],
+  [
+   "1670:7197",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Presets"
+  ],
+  [
+   "1670:7199",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Starters"
+  ],
+  [
+   "1670:7201",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Classes"
+  ],
+  [
+   "1670:7203",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Components"
+  ],
+  [
+   "1670:7205",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Typography"
+  ],
+  [
+   "1670:7207",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Colour mode"
+  ],
+  [
+   "1670:7209",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Lint"
+  ],
+  [
+   "1670:7211",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/row · Import / expor"
+  ],
+  [
+   "1670:7247",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · pro-"
+  ],
+  [
+   "1672:7225",
+   "1333:7162",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/state · Brand · lint"
+  ],
+  [
+   "881:4572",
+   "641:2487",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/alt · S1.1e · templa"
+  ],
+  [
+   "881:4587",
+   "807:4299",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/alt · S1.1d - Templa"
+  ],
+  [
+   "881:4593",
+   "807:6694",
+   "fill",
+   "#000000",
+   "raw",
+   "hotspot/alt · S1 · Editor — "
+  ],
+  [
+   "2483:11988",
+   "641:2599",
+   "fill",
+   "#6B7380",
+   "raw",
+   "Components · update-from-sel"
+  ],
+  [
+   "2483:11991",
+   "641:2599",
+   "fill",
+   "#6B7380",
+   "raw",
+   "Components · delete-confirm"
+  ]
+ ],
+ "heavy": [
+  [
+   "813:4498",
+   "813:4489",
+   "Inter|Bold",
+   32,
+   "AUTO",
+   "Build something amazing"
+  ]
+ ],
+ "tiny": [
+  [
+   "1749:8405",
+   "152:52",
+   10
+  ],
+  [
+   "1749:8407",
+   "152:52",
+   10
+  ],
+  [
+   "1720:17385",
+   "153:2",
+   10
+  ],
+  [
+   "1720:17388",
+   "153:29",
+   10
+  ],
+  [
+   "1751:8399",
+   "153:92",
+   10
+  ],
+  [
+   "1751:8401",
+   "153:92",
+   10
+  ],
+  [
+   "1751:8402",
+   "153:92",
+   10
+  ],
+  [
+   "1172:4843",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4845",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4847",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4849",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4851",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4853",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4855",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4857",
+   "1172:4840",
+   10
+  ],
+  [
+   "1172:4858",
+   "1172:4840",
+   10
+  ],
+  [
+   "1720:17208",
+   "1333:7162",
+   10
+  ],
+  [
+   "1720:17211",
+   "1333:7162",
+   10
+  ],
+  [
+   "1720:17447",
+   "1333:7162",
+   10
+  ],
+  [
+   "1720:17451",
+   "1706:8467",
+   10
+  ],
+  [
+   "1720:17455",
+   "1706:8476",
+   10
+  ],
+  [
+   "1720:17459",
+   "1706:8476",
+   10
+  ],
+  [
+   "807:6539",
+   "807:4299",
+   10
+  ],
+  [
+   "807:6552",
+   "807:4299",
+   10
+  ],
+  [
+   "1169:4728",
+   "1169:4725",
+   10
+  ],
+  [
+   "1169:4737",
+   "1169:4725",
+   10
+  ],
+  [
+   "1169:4746",
+   "1169:4725",
+   10
+  ],
+  [
+   "1169:4757",
+   "1169:4753",
+   10
+  ],
+  [
+   "1169:4768",
+   "1169:4764",
+   10
+  ],
+  [
+   "1169:4771",
+   "1169:4764",
+   10
+  ],
+  [
+   "1169:4772",
+   "1169:4764",
+   10
+  ],
+  [
+   "2483:11988",
+   "641:2599",
+   10
+  ],
+  [
+   "2483:11991",
+   "641:2599",
+   10
+  ],
+  [
+   "1720:17245",
+   "1138:13394",
+   10
+  ],
+  [
+   "1170:4804",
+   "1170:4792",
+   10
+  ],
+  [
+   "1720:17546",
+   "1719:8391",
+   10
+  ],
+  [
+   "1719:8416",
+   "1719:8414",
+   10
+  ],
+  [
+   "1720:17558",
+   "1719:8443",
+   10
+  ],
+  [
+   "1720:17550",
+   "1719:8450",
+   10
+  ]
+ ]
+}

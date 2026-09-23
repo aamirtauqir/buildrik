@@ -14,8 +14,16 @@
 }
 
 /* Board 1069:4533 — search band, box inset 12 each side. */
+/* Board 1069:4533 (and 4711 / 4794 / 4974, which agree): a 40-tall band, 12
+   inset, 4 top and bottom around the 28-tall field. The band was 36 — the
+   28 field plus 4+4 — so every Insert group header sat 4px high of where all
+   four boards put it. Height is stated because 28+4+4 is 36, not 40: the
+   board centres the field in a 32 content box. */
 .bld-search-wrap {
-  padding: var(--bk-space-4) var(--bk-space-12) var(--bk-space-4);
+  display: flex;
+  align-items: center;
+  height: var(--bk-space-40);
+  padding: var(--bk-space-4) var(--bk-space-12);
   flex-shrink: 0;
 }
 
@@ -75,4 +83,19 @@
 
 .bld-change-callout-text strong {
   font-weight: 600;
+}
+
+/* Group header hover, measured 2026-09-08. The header inherits flowbite's
+   `color="light"` hover fill — gray-100, the same `var(--bk-gray-100)` the list rows use —
+   and its three spans stay --bk-ink-muted, which is 4.39:1 on that fill
+   against a 4.5 floor for 11px text. Every one of the four Insert boards
+   draws the label at rest only, so there is no board reading to conform to;
+   the list rows beside it already carry --bk-ink on the same fill, so the
+   header follows them.
+
+   Two selectors deep on purpose: a single-class rule ties a `tw:` utility on
+   specificity and loses on source order (chrome routing rules, editor
+   CLAUDE.md). Class + pseudo-class + type element outranks it. */
+.bld-group-header:hover span {
+  color: var(--bk-ink);
 }

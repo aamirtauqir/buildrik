@@ -1,0 +1,12 @@
+{
+ "page": "1:3",
+ "why": "Sweep A repair. Appending the UX-D-02 clause grew caption 161:15 from 288 to 378 tall (100,2178 -> bottom 2556), and 1176:4804 Inspector · token-picker popover is parked at 100,2490 inside the same caption band — a board overlap this sweep created. Moved the popover down 90px; its new bottom 2794 still clears row 3 at 2824, and its column x=100..336 is empty between 2580 and 2794. Vertical only, x untouched.",
+ "rows": [
+  {
+   "op": "move",
+   "id": "1176:4804",
+   "y": 2580,
+   "why": "clear the grown caption 161:15; measured room 2580..2794 against row 3 at 2824"
+  }
+ ]
+}

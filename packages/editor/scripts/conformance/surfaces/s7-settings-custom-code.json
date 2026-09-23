@@ -1,0 +1,109 @@
+{
+  "surface": "s7-settings-custom-code",
+  "board": "S7 · Settings · Custom code (Figma 639:4144)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-custom-code",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-head-scripts"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-head",
+      "testId": "set-card-head-scripts",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4456"
+    },
+    {
+      "name": "card-head-title",
+      "testId": "set-card-title-head-scripts",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4457"
+    },
+    {
+      "name": "card-body",
+      "testId": "set-card-body-scripts-end",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4462"
+    },
+    {
+      "name": "card-body-title",
+      "testId": "set-card-title-body-scripts-end",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4463"
+    },
+    {
+      "name": "card-css",
+      "testId": "set-card-global-css",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4468"
+    },
+    {
+      "name": "card-css-title",
+      "testId": "set-card-title-global-css",
+      "spec": "s7-settings-custom-code",
+      "nodeId": "639:4469"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: AdvancedScreen reads and writes through",
+    "`composer.getProjectSettings()/setProjectSettings()`, so a four-method stub",
+    "is the whole dependency. Hosted in the board's own pane —",
+    "`.bd-set-pane-body` at 824, which is 760 (the card) plus its two 32 insets.",
+    "Same host and arithmetic as s7-settings-general.",
+    "  A trap worth writing down: the stub passes NO `customCode` key. The screen",
+    "  reads `s.customCode ?? DEFAULT_CUSTOM_CODE`, so an empty object is TRUTHY",
+    "  and hands it three undefined strings — the case threw on `.trim()` and",
+    "  rendered nothing, which looks exactly like a broken selector.",
+    "",
+    "ALREADY CONFORMANT on all three cards: 24 properties. The chassis arrived",
+    "with s7-settings-general's family-wide move to settings/shared.tsx and this",
+    "screen inherited it whole. The card titles match the board's exactly —",
+    "HEAD SCRIPTS / BODY SCRIPTS (END) / GLOBAL CSS — because the CSS uppercases",
+    "them; nothing was renamed.",
+    "",
+    "CODE CHANGED — A MEASURED CONTRAST FAILURE, not drift. The screen opens with",
+    "a warning banner, and it painted --bk-warning (#C27803, which is the FILL",
+    "colour of a warning) as TEXT over its own hand-mixed rgba(217,119,6,0.08)",
+    "wash: 2.94:1 at 12px, on the two longest strings on the screen (the ⚠ line",
+    "and the `<script src=\"…\">` inside it). The token system already carries the",
+    "right pair — --bk-warning-tint as ground, --bk-warning-text #723B13 as ink,",
+    "8.69:1 — and the two hand-mixed rgba()s were the only reason the composite",
+    "differed from it. Now tokens, same shape as SCREEN_ERROR / SCREEN_SUCCESS in",
+    "shared.tsx. NO BOARD DRAWS THIS BANNER, so conforming did not cause it and",
+    "nothing on the Figma side constrains the fix. This is the class of failure",
+    "the harness's new oklab/oklch reader surfaces: the composite was unreadable",
+    "to the old parser, so the surface would have passed silently.",
+    "",
+    "NOT JOINED, and this is the substance of what the board wants that the",
+    "product does not have:",
+    "  639:4458 / 639:4464 / 639:4470 — each card holds a FIELD (the 180 label",
+    "  column, 16 gap) whose control is a 520-wide `code` block on --color/bg-subtle",
+    "  at radius 6, 12/10 padding, 12px Geist Mono in ink-soft. Live puts a",
+    "  full-width flowbite <Textarea> straight into the card with no label column",
+    "  at all — the card title is the only label, and the aria-label is the only",
+    "  thing naming the field to a screen reader. So the board draws a labelled,",
+    "  fixed-width, mono code well and the product draws an unlabelled textarea.",
+    "  That is a control swap plus a layout change, on three cards, and it wants",
+    "  a decision about whether a settings TEXTAREA gets the 180 column the way",
+    "  an input does — a chassis question of the same size as the one",
+    "  s7-settings-general settled, not a per-screen one. FLAGGED, not taken.",
+    "  639:4460 / 639:4466 / 639:4472 — the code blocks themselves, for the same",
+    "  reason: there is no live element at that address to measure.",
+    "",
+    "FOUND, NOT FIXED: the board draws no warning banner at all, while the screen",
+    "leads with one saying inline JavaScript is stripped at publish. That caveat",
+    "is load-bearing — the export sanitizer really does drop inline scripts — so",
+    "it stays; but the board is drawing a custom-code screen that accepts custom",
+    "code, and the product ships one that accepts only external <script src>.",
+    "Same shape as the Headers board's missing 'Not yet enforced' banner and the",
+    "Analytics board's missing consent caveat: three boards in this family draw",
+    "features whose product versions carry a disclaimer the board never got."
+  ]
+}

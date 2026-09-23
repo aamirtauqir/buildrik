@@ -1,0 +1,167 @@
+{
+  "surface": "export-html-modal",
+  "board": "Export · HTML (modal) (Figma 1172:4825)",
+  "_note": [
+    "boards.json recorded `drift-export-modal-cards-not-pills-oversized`. The",
+    "pills half was already drained (ExportOptions' FormatGrid cites this board",
+    "in its own header); this recipe is what proves it, and the oversized half",
+    "is fixed here: ModalContent went `lg` (720) → `form` (560), which is the",
+    "width the board draws, and the foot went from a full-width 44px accent bar",
+    "plus a second row to the board's one right-aligned gap-8 row.",
+    "",
+    "One duplicate died with that row. With the default `cssStyle: \"embedded\"`,",
+    "\"Download All\" wrote the same single file the primary writes, under a",
+    "different name; it now renders only for `external`, where it genuinely",
+    "emits the page AND its stylesheet — which is also the only state the",
+    "board's foot has room for.",
+    "",
+    "`composer={null}` in the probe: the export RESULT needs a real engine run,",
+    "and every node measured here renders before and regardless of it.",
+    "",
+    "The primary is DISABLED under that probe (no result to download), and it",
+    "still measures the board's accent fill: flowbite's disabled swap to",
+    "gray-100/gray-500 is overridden back to the accent at 60% opacity, which",
+    "is what this button shipped as before the foot was rebuilt.",
+    "",
+    "NOT anchored, and why:",
+    "  1172:4825 root — the board's card carries its own 16/14 padding, 10 gap",
+    "  and a 1px border. MODAL_FRAME_BASE_CLASS has none of those and is shared",
+    "  by every dialog in the editor; ModalTitle/ModalBody own the insets in",
+    "  this system. Radius 12 and the bg-elevated fill already match.",
+    "  1172:4826 title — 13px here; MODAL_TITLE_CLASS is 14, measured across",
+    "  six boards (Modal.tsx's own note). Screen board loses to the primitive.",
+    "  1172:4827 blurb / 1174:4831 stats — both carry width 500 inside a 560",
+    "  card whose own padding is 16, i.e. a 528 column. The 500 is Figma text-",
+    "  frame slack, not an inset the code can hold.",
+    "  1174:4824 tabs + 1174:4825/4827/4829 — chrome-ui's Tabs is a shared",
+    "  primitive whose own comment cites THREE boards for its pill treatment",
+    "  (1172:4867, 1172:4825, 1164:4713). It is 13px on an h-8 row; this board",
+    "  wants 11px on 10/5. One of the three does not get to move it.",
+    "  1174:4817/1174:4822 the Soon tag — board pads it 5, and the spacing scale",
+    "  has no 5 (SOON_TAG's own comment records the same call for its 8px type,",
+    "  which the type ratchet locks at zero). A 1px arbitrary-value class on a",
+    "  4px grid is not worth trading that for.",
+    "  1172:4828 code-preview — only rendered with an export result, i.e. with a",
+    "  live engine run behind it. Out of the probe's reach by construction.",
+    "",
+    "FOUND, NOT FIXED — the board's own frame name records three behavioural",
+    "defects that are not visual drift and are not this row's subject:",
+    "  UX-E-13 both download handlers swallow failure into a dev-only log",
+    "  (ExportModal.tsx handleDownloadZip / handleDownloadReact), so a failed",
+    "  export returns from its spinner looking like a success.",
+    "  UX-E-14 nothing on screen says WHICH page HTML writes as index.html, and",
+    "  the ZIP chip silently changes the scope to every page.",
+    "  UX-E-16 OptionsPanel is called without `hasCMSBindings`, so the CMS",
+    "  bindings option never renders."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=export-html-modal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "export-foot"
+    }
+  ],
+  "contrastScope": "[data-testid=\"export-modal\"]",
+  "targets": [
+    {
+      "name": "format-grid",
+      "testId": "export-format-grid",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4804"
+    },
+    {
+      "name": "fmt-html",
+      "testId": "export-fmt-html",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4805"
+    },
+    {
+      "name": "fmt-html-label",
+      "testId": "export-fmt-html",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4807"
+    },
+    {
+      "name": "fmt-zip",
+      "testId": "export-fmt-zip",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4808"
+    },
+    {
+      "name": "fmt-zip-label",
+      "testId": "export-fmt-zip",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4810"
+    },
+    {
+      "name": "fmt-react",
+      "testId": "export-fmt-react",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4811"
+    },
+    {
+      "name": "fmt-react-label",
+      "testId": "export-fmt-react",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4813"
+    },
+    {
+      "name": "fmt-vue",
+      "testId": "export-fmt-vue",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4814"
+    },
+    {
+      "name": "fmt-vue-label",
+      "testId": "export-fmt-vue",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4816"
+    },
+    {
+      "name": "fmt-nextjs",
+      "testId": "export-fmt-nextjs",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4819"
+    },
+    {
+      "name": "fmt-nextjs-label",
+      "testId": "export-fmt-nextjs",
+      "spec": "export-html-modal",
+      "nodeId": "1174:4821"
+    },
+    {
+      "name": "foot",
+      "testId": "export-foot",
+      "spec": "export-html-modal",
+      "nodeId": "1172:4838"
+    },
+    {
+      "name": "btn-cancel",
+      "testId": "export-cancel",
+      "spec": "export-html-modal",
+      "nodeId": "1172:4834"
+    },
+    {
+      "name": "btn-cancel-label",
+      "testId": "export-cancel",
+      "spec": "export-html-modal",
+      "nodeId": "1172:4835"
+    },
+    {
+      "name": "btn-export",
+      "testId": "export-primary",
+      "spec": "export-html-modal",
+      "nodeId": "1172:4836"
+    },
+    {
+      "name": "btn-export-label",
+      "testId": "export-primary",
+      "spec": "export-html-modal",
+      "nodeId": "1172:4837"
+    }
+  ]
+}

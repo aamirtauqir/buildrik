@@ -1,0 +1,118 @@
+{
+  "surface": "issues-empty",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "164:35",
+  "boardName": "issues-empty",
+  "figmaHash": "3ee37f449075d787de5003d1c41b01789ec68848704ca46a2bda90bed330b9e7",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:24:57.458Z",
+  "copy": [
+    "Issues",
+    "No issues.",
+    "This page is ready to publish."
+  ],
+  "targets": [
+    {
+      "nodeId": "164:35",
+      "name": "Issues · empty",
+      "className": "[word-break:break-word] bg-[var(--color\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start not-italic relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "164:36",
+      "name": "Header",
+      "className": "h-[48px] leading-[20px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "48px"
+        },
+        "line-height": {
+          "value": "20px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:37",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium left-[16px] text-[14px] text-[color:var(--color\\/ink,#111827)] top-[14px]",
+      "props": {
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "164:38",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[252px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "164:39",
+      "name": "Empty state",
+      "className": "font-['Inter:Regular'] font-normal h-[120px] overflow-clip relative shrink-0 text-center w-full",
+      "props": {
+        "height": {
+          "value": "120px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:40",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[20px] left-[144px] text-[13px] text-[color:var(--color\\/success-text,#057a55)] top-[40px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:41",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[16px] left-[144px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[64px] w-[240px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "240px"
+        }
+      }
+    }
+  ]
+}

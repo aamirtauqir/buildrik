@@ -48,6 +48,23 @@ export interface ProjectData {
    * Migration runner reads this to decide whether to bump and seed.
    */
   dsSchemaVersion?: number;
+  /**
+   * CMS element bindings — which canvas element shows which collection field.
+   *
+   * These lived only in two in-memory Maps (BaseBindingManager.ts:72,
+   * CMSBindingManager.ts:68) and were absent from this type, so every reload
+   * silently unbound every element and the next publish shipped the
+   * pre-binding placeholder copy with nothing said. The managers' own
+   * export()/import() pair was written for exactly this and never called.
+   *
+   * Optional, so a project saved before this field loads unchanged.
+   */
+  cmsBindings?: {
+    /** element id -> field bindings (BaseBindingManager.export()) */
+    field?: Record<string, unknown[]>;
+    /** element id -> collection binding (CMSBindingManager) */
+    collection?: Record<string, unknown>;
+  };
 }
 
 export interface ProjectMetadata {
@@ -91,11 +108,20 @@ export interface AnalyticsConfig {
     enabled: boolean;
     /** GA4 Measurement ID (e.g., G-XXXXXXXXXX) */
     measurementId: string;
+    /**
+     * ISO timestamp of the last Verify (Settings · Analytics, Clone
+     * 3397:32295): the id's shape checked and the tracker's status read.
+     * Cleared when the id changes. Rides the settings save — no mutation of
+     * its own (phase2-backend §1).
+     */
+    verifiedAt?: string;
   };
   /** Facebook Pixel configuration (P1-2) */
   facebookPixel?: {
     enabled: boolean;
     pixelId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Google Ads configuration (P1-2) */
   googleAds?: {
@@ -106,11 +132,15 @@ export interface AnalyticsConfig {
   microsoftClarity?: {
     enabled: boolean;
     projectId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Google Tag Manager — one container for all tags/pixels (head script). */
   googleTagManager?: {
     enabled: boolean;
     containerId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Cookie consent banner configuration (GDPR) */
   cookieConsent?: {
@@ -259,6 +289,27 @@ export interface ProjectSettings {
   designPresets?: DesignPresetRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
   customCode?: CustomCodeConfig;
+  /**
+   * The site's locales as the Site row holds them, mirrored on load for the
+   * export engine (Clone 3397:32376 `Auto-redirect by browser`). Read-only
+   * here — the Localization screen writes the row through
+   * `siteDetail.settings.update`; nothing in the editor writes this slot.
+   */
+  localization?: {
+    defaultLocale: string;
+    enabledLocales: string[];
+    /** First visit on a default-locale page → `/<browser locale>/…` when enabled. */
+    autoRedirect: boolean;
+  };
+  /**
+   * Settings · Redirects (Clone 3397:32517) — the 404 suggester's switch.
+   * Absent = on. A per-site preference saved through the shell's Save like
+   * the other composer-backed settings; the redirect rules themselves are
+   * server rows (`siteDetail.redirects.*`), never in here.
+   */
+  redirects?: {
+    suggestFrom404s: boolean;
+  };
 }
 
 /**
@@ -323,6 +374,10 @@ export interface SiteSEO {
   touchIcon?: string;
   /** Default language (e.g., "en") */
   language?: string;
+  /** [Site column] Search engines may index the published site (robots meta + robots.txt) */
+  allowIndexing?: boolean;
+  /** [Site column] Custom robots.txt, shipped verbatim when set; the editor only previews it */
+  robotsTxt?: string;
   /** [Site column] Social media profile links (server: socialLinks JSON) */
   socialLinks?: {
     twitter?: string;

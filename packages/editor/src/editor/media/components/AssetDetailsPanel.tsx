@@ -17,27 +17,65 @@
  * @license BSD-3-Clause
  */
 
-import { Download, FolderOpen, Gauge, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
-import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
+  IconButton,
   ModalBody,
   ModalClose,
   ModalContent,
   ModalRoot,
   ModalTitle,
+  TextInput,
   Textarea,
   VersionRow,
 } from "@/editor/chrome-ui";
+import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
 const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
+/* The rail's tag chip — the same pill the folder rail draws (1160:44 /
+   3695:45155: 8/3, full radius, --bk-border edge on bg-panel, 11 ink-soft),
+   with a 16 × inside it. A span, not a button: the × is the control. */
+const TAG_CHIP =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] " +
+  "tw:py-[3px] tw:pl-2 tw:pr-1 tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:text-[var(--bk-ink-soft)]";
+const TAG_CHIP_REMOVE = "tw:h-4 tw:w-4 tw:rounded-full tw:text-[var(--bk-ink-muted)]";
+/** A tag is one word or two, never a sentence. */
+const TAG_MAX = 24;
 const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
+/* The rail's full-width 32 buttons (3705:20396 / 4215:26635 / 3699:20381):
+   flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
+   quiet grey Clear selection is the same fill as the dialogs' Cancel. */
+const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
+const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
+/* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
+const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
+
+/** "PNG" / "MP4" / "WOFF2" — the filename's own extension, else the MIME subtype. */
+function fileExt(item: LibraryItem): string {
+  const fromName = (item.displayName ?? item.name).match(/\.([a-z0-9]+)$/i)?.[1];
+  const raw = fromName ?? item.mimeType.split("/")[1]?.split("+")[0] ?? item.type;
+  return (raw === "jpeg" ? "jpg" : raw).toUpperCase();
+}
+
+/** "220 KB" / "1.1 MB" — one decimal only past a megabyte, as the board prints. */
+function shortBytes(bytes: number): string {
+  return formatBytes(bytes, bytes >= 1024 * 1024 ? 1 : 0);
+}
+
+/** "Aug 4" — the board's added-on date. */
+function shortDate(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
 
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
@@ -52,12 +90,44 @@ interface ToastInput {
 
 export interface AssetDetailsPanelProps {
   selectedItem: LibraryItem | null;
-  versions: LibraryItem[];
+  /** Clone 3695:19968 / 4215:26635 — while the library is in select mode the
+   *  rail is about the CHECKED set, not one file: "No assets selected" with
+   *  its hint, or "N assets selected" with the filenames, Move to folder
+   *  (primary) and Clear selection. Exactly one checked file is that file's
+   *  full rail (3705:21059) — the orchestrator passes it as `selectedItem`
+   *  with `bulk` null; Phase 1's "1 asset selected" hint (3695:20154) is
+   *  displaced by the later section. */
+  bulk?: { names: string[]; onMove(): void; onClear(): void } | null;
+  /** Clone 3699:20381 / 3683:19964 — the result of the last move, on top of
+   *  every other state until the selection or the scope changes: "Moved to
+   *  <Folder>", which files moved and which were already there, the file
+   *  list, View destination (primary) and Clear selection. */
+  moveResult?: {
+    folderName: string;
+    names: string[];
+    moved: string[];
+    alreadyThere: string[];
+    onView(): void;
+    onClear(): void;
+  } | null;
+  /** Clone 4207:26629 — the rail is dimmed and inert while an asset is
+   *  being dragged over the folders. */
+  dimmed?: boolean;
+  /** Clone 3695:45529 — the selected file's family, the original first,
+   *  each member with the placements it carries. The VERSIONS block draws it
+   *  once a saved version exists; the replace picker moves every member's
+   *  placements, not just the original's. */
+  versions: VersionEntry[];
+  /** Placements across the whole family — the rail's USED IN follows the
+   *  placements, whichever version they carry. */
   usageCount: number;
+  /** Page names the asset is placed on — the USED IN line names them
+   *  ("1 place — Menu preview"). Empty when the pages cannot be traced. */
+  usedIn: string[];
   /** All library items (for the replace-all picker). */
   libraryItems: LibraryItem[];
-  /** Pass-through to set the highlighted version row in versions tab. */
-  onSelectAsset(key: string): void;
+  /** A VERSIONS row opens Asset versions for this file (3695:45529). */
+  onOpenVersions(): void;
   /** Insert into canvas (orchestrator's state.insertToCanvas). */
   onInsert(key: string): void;
   /** "Edit" button on image assets — orchestrator routes to image editor. */
@@ -71,7 +141,16 @@ export interface AssetDetailsPanelProps {
   onOpenRename(item: LibraryItem): void;
   /** Delete request (orchestrator's state.requestDelete). */
   onRequestDelete(key: string): void;
-  /** Composer for replaceAcross + (transitively) the version revert button. */
+  /** Clone 3708:20650 — the delete confirm's "Replace instead" opens THIS
+   *  rail's replace-across picker for the asset, so the orchestrator may own
+   *  the picker's open state. Omitted, the panel keeps it itself. */
+  replacePickerOpen?: boolean;
+  onReplacePickerOpenChange?(open: boolean): void;
+  /** Clone 3695:43897 → 3695:43900 — the picked replacement is handed to the
+   *  orchestrator, whose result dialogs report the run per page. Omitted,
+   *  the panel runs `replaceAcross` itself and toasts the counts. */
+  onReplaceAcross?(candidate: LibraryItem): void;
+  /** Composer for the replace picker's replaceAcross. */
   composer: Composer;
   addToast(t: ToastInput): void;
   /**
@@ -87,39 +166,137 @@ export interface AssetDetailsPanelProps {
    * preserved an existing user-typed alt text.
    */
   onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
+  /**
+   * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
+   * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
+   * (3721:43697) but no editor, and nothing wrote a tag; the block only
+   * renders when the orchestrator hands it this writer.
+   */
+  onUpdateTags?(key: string, tags: string[]): void;
+  /**
+   * Clone 3696:21550 / 3705:21059 — a font's `Manage font` opens the Site
+   * fonts dialog (3686:42317) on THIS file. The orchestrator answers it
+   * with the composer event the dialog listens for; the row is drawn only
+   * when it does.
+   */
+  onManageFont?(item: LibraryItem): void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
 
 export function AssetDetailsPanel({
   selectedItem,
+  bulk = null,
+  moveResult = null,
+  dimmed = false,
   versions,
   usageCount,
+  usedIn,
   libraryItems,
-  onSelectAsset,
+  onOpenVersions,
   onInsert,
   onEditImage,
   onOptimizeImage,
   onOpenRename,
   onRequestDelete,
+  replacePickerOpen,
+  onReplacePickerOpenChange,
+  onReplaceAcross,
   composer,
   addToast,
   onUpdateAltText,
   onRegenerateAltText,
+  onUpdateTags,
+  onManageFont,
 }: AssetDetailsPanelProps) {
-  const [detailTab, setDetailTab] = React.useState<"details" | "versions" | "used">("details");
-  const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
+  const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
+  const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
+  const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
+  /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
+     the drop is the only thing the pointer is doing. */
+  const railClass = `mgr-details${dimmed ? " tw:pointer-events-none tw:opacity-50" : ""}`;
+
+  if (moveResult) {
+    const { moved, alreadyThere } = moveResult;
+    /* 3699:20381 names the files when some were already in the destination;
+       3683:19964 counts them when every one moved. */
+    const body =
+      alreadyThere.length === 0
+        ? `${moved.length} ${moved.length === 1 ? "asset" : "assets"} moved successfully. Their existing site placements are unchanged.`
+        : `${moved.length > 0 ? `${moved.join(", ")} moved; ` : ""}${alreadyThere.join(", ")} ${
+            alreadyThere.length === 1 ? "was" : "were"
+          } already here. Site placements are unchanged.`;
+    return (
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
+        <div className="mgr-det-body" data-testid="mgr-det-move-result">
+          <h3 className="mgr-det-heading" data-testid="mgr-det-move-result-title">
+            Moved to {moveResult.folderName}
+          </h3>
+          <p className="mgr-det-hint" data-testid="mgr-det-move-result-body">
+            {body}
+          </p>
+          <ul className={FILE_LIST} data-testid="mgr-det-files">
+            {moveResult.names.map((name) => (
+              <li key={name} className="tw:truncate">{name}</li>
+            ))}
+          </ul>
+          <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+            <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-view-destination" onClick={moveResult.onView}>
+              View destination
+            </Button>
+            <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={moveResult.onClear}>
+              Clear selection
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (bulk) {
+    const n = bulk.names.length;
+    return (
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
+        <div className="mgr-det-body" data-testid="mgr-det-bulk">
+          <h3 className="mgr-det-heading">{n === 0 ? "No assets selected" : `${n} ${n === 1 ? "asset" : "assets"} selected`}</h3>
+          <p className="mgr-det-hint">
+            {n === 0
+              ? "Select a file to inspect it. Select checkboxes to manage multiple assets."
+              : `Actions apply to ${n === 2 ? "both" : `all ${n}`} selected files. Moving files only changes library organisation.`}
+          </p>
+          {/* 4215:26635 — the files, then Move to folder (primary) and Clear
+              selection, right under the hint. Delete stays in the bar. */}
+          {n > 0 && (
+            <>
+              <ul className={FILE_LIST} data-testid="mgr-det-files">
+                {bulk.names.map((name) => (
+                  <li key={name} className="tw:truncate">{name}</li>
+                ))}
+              </ul>
+              <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+                <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-move-to-folder" onClick={bulk.onMove}>
+                  Move to folder
+                </Button>
+                <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={bulk.onClear}>
+                  Clear selection
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedItem) {
     return (
-      <div className="mgr-details">
-        <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:p-8">
-          <div className="tw:text-center tw:text-[var(--bk-ink-disabled)]">
-            <FolderOpen size={32} className="tw:mb-3 tw:opacity-40" />
-            {/* Board 1163:13947 — "see", and the sentence ends. */}
-            <div className="tw:text-[13px]">Select an asset to see details.</div>
-          </div>
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
+        {/* Clone 3695:45155 — one line at the rail's top, no icon, where the
+            details will appear. --bk-ink-disabled on white is 1.47:1, so the
+            line is ink-soft. */}
+        <div className="tw:p-4 tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
+          Select an asset to see details.
         </div>
       </div>
     );
@@ -128,176 +305,172 @@ export function AssetDetailsPanel({
   const replaceCandidates = libraryItems.filter(
     (i) => i.key !== selectedItem.key && i.type === selectedItem.type,
   );
+  /* What the site actually carries for this file: every family member with
+     placements (an applied version is on the elements, the original is
+     not). A rail handed no family replaces the file's own src. */
+  const placedSources = versions.filter((v) => v.placements > 0).map((v) => v.item.src);
+  const replaceSources = placedSources.length > 0 ? placedSources : [selectedItem.src];
+
+  /* Clone 3695:20340 — one column, top to bottom: preview · filename · meta
+     line · ALT TEXT · VERSIONS · USED IN · stacked actions. The V1 rail's
+     three tabs and its Type/Dimensions/MIME grid are displaced: the meta line
+     says the same in one row ("1600 × 1200 · 220 KB · PNG · added Aug 4"),
+     and a version or a usage is on screen without a tab click first. */
+  const ext = fileExt(selectedItem);
+  const isImage = selectedItem.type === "img" || selectedItem.type === "ico";
+  const isFont = selectedItem.type === "fnt";
+  /* 3696:21550 (Phase 5): a font's line says which of the model's two states
+     it is in — uploaded (in the library) or added (a site font the pickers
+     offer) — since the two look identical in the grid. */
+  const metaLine =
+    selectedItem.width && selectedItem.height
+      ? `${selectedItem.width} × ${selectedItem.height} · ${shortBytes(selectedItem.size)} · ${ext} · added ${shortDate(selectedItem.createdAt)}`
+      : isFont
+        ? `${selectedItem.siteFont ? "Site font · added" : "Uploaded · not added"} · ${ext}`
+        : `Selected asset · ${ext}`;
+  const usedLine =
+    usageCount === 0
+      ? "Not used on this site"
+      : usedIn.length > 0
+        ? `${usageCount} ${usageCount === 1 ? "place" : "places"} — ${usedIn.join(", ")}`
+        : `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`;
 
   return (
     <>
-      <div className="mgr-details">
-        <div className="mgr-det-head">
-          <div className="mgr-det-filename">{selectedItem.name}</div>
-          <div className="mgr-det-sub">
-            {selectedItem.type.toUpperCase()} · {formatBytes(selectedItem.size)}
-          </div>
-        </div>
-        <div className="mgr-det-preview">
-          {selectedItem.type === "img" || selectedItem.type === "vid" ? (
-            <img src={selectedItem.src} alt={selectedItem.name} />
-          ) : selectedItem.type === "ico" ? (
-            <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
-          ) : selectedItem.type === "fnt" ? (
-            <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
-          ) : null}
-        </div>
-        <div className="mgr-det-tabs">
-          <Button
-            className={`mgr-det-tab${detailTab === "details" ? " active" : ""}`}
-            onClick={() => setDetailTab("details")}
-          >
-            Details
-          </Button>
-          {versions.length > 1 && (
-            <Button
-              className={`mgr-det-tab${detailTab === "versions" ? " active" : ""}`}
-              onClick={() => setDetailTab("versions")}
-            >
-              Versions · {versions.length}
-            </Button>
-          )}
-          <Button
-            className={`mgr-det-tab${detailTab === "used" ? " active" : ""}`}
-            onClick={() => setDetailTab("used")}
-          >
-            Used in · {usageCount}
-          </Button>
-        </div>
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body">
-          {detailTab === "details" && (
-            <>
-              <div className="mgr-kv">
-                <span className="mgr-kv-key">Type</span>
-                <span className="mgr-kv-val">{selectedItem.type.toUpperCase()}</span>
-                {selectedItem.width && selectedItem.height && (
-                  <>
-                    <span className="mgr-kv-key">Dimensions</span>
-                    <span className="mgr-kv-val">
-                      {selectedItem.width} × {selectedItem.height} px
-                    </span>
-                  </>
-                )}
-                <span className="mgr-kv-key">File size</span>
-                <span className="mgr-kv-val">{formatBytes(selectedItem.size)}</span>
-                <span className="mgr-kv-key">MIME</span>
-                <span className="mgr-kv-val">{selectedItem.mimeType}</span>
-                <span className="mgr-kv-key">Added</span>
-                <span className="mgr-kv-val">
-                  {new Date(selectedItem.createdAt).toLocaleDateString()}
-                </span>
+          <div className="mgr-det-preview">
+            {selectedItem.type === "img" ? (
+              <img src={selectedItem.src} alt={selectedItem.name} />
+            ) : selectedItem.type === "vid" ? (
+              /* A video is not an <img>: that rendered a broken image with the
+                 filename as its alt (measured, Clone walk 2026-09-13). The
+                 first frame is the preview the board's grey tile stands for. */
+              <video src={selectedItem.src} muted playsInline preload="metadata" data-testid="mgr-det-video" />
+            ) : selectedItem.type === "ico" ? (
+              <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
+            ) : isFont ? (
+              <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
+            ) : null}
+          </div>
+          <div className="mgr-det-filename">{selectedItem.displayName ?? selectedItem.name}</div>
+          <div className="mgr-det-meta" data-testid="mgr-det-meta">{metaLine}</div>
+
+          {selectedItem.type === "img" && onUpdateAltText && (
+            <AltTextSection
+              item={selectedItem}
+              regenerating={regenerating}
+              onUpdateAltText={onUpdateAltText}
+              onRegenerateAltText={onRegenerateAltText}
+              setRegenerating={setRegenerating}
+              addToast={addToast}
+            />
+          )}
+
+          {onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
+
+          {/* Clone 3695:45529 / 3697:20326 (Phase 6): the family, newest
+              first — `v2 · Latest saved` over `v1 · Original` — drawn only
+              once a version has been saved. The member whose src the site's
+              placements carry is marked APPLIED; the marker follows the
+              placements, not a flag on the row. A row is the door to Asset
+              versions, where applying is the explicit step; the `_v1234`
+              stem heuristic and its Revert button are gone with it. */}
+          {versions.length > 1 && (
+            <section className="mgr-det-section" data-testid="mgr-det-versions">
+              <h4 className="mgr-det-label">Versions</h4>
+              <div className="mgr-version-list">
+                {[...versions].reverse().map((entry) => (
+                  <VersionRow
+                    key={entry.item.key}
+                    title={versionLabel(entry, versions.length)}
+                    meta={shortDate(entry.item.createdAt)}
+                    current={entry.placements > 0}
+                    currentLabel="APPLIED"
+                    onClick={onOpenVersions}
+                    data-testid={`mgr-det-version-${entry.item.key}`}
+                    leading={
+                      <span className="mgr-version-thumb">
+                        {entry.item.thumb || entry.item.type === "img" ? (
+                          <img src={entry.item.thumb || entry.item.src} alt={entry.item.name} />
+                        ) : (
+                          <span className="tw:text-[length:var(--bk-text-11)]">{entry.item.type.toUpperCase()}</span>
+                        )}
+                      </span>
+                    }
+                  />
+                ))}
               </div>
-              {selectedItem.type === "img" && onUpdateAltText && (
-                <AltTextSection
-                  item={selectedItem}
-                  regenerating={regenerating}
-                  onUpdateAltText={onUpdateAltText}
-                  onRegenerateAltText={onRegenerateAltText}
-                  setRegenerating={setRegenerating}
-                  addToast={addToast}
-                />
-              )}
-            </>
+            </section>
           )}
-          {detailTab === "versions" && (
-            <div className="mgr-version-list">
-              {versions.map((v, i) => (
-                <VersionRow
-                  key={v.key}
-                  title={v.name}
-                  meta={`${formatBytes(v.size)} · ${new Date(v.createdAt).toLocaleString()}`}
-                  current={i === 0}
-                  selected={v.key === selectedItem.key}
-                  onClick={() => onSelectAsset(v.key)}
-                  leading={
-                    <span className="mgr-version-thumb">
-                      {v.thumb ? (
-                        <img src={v.thumb || v.src} alt={v.name} />
-                      ) : (
-                        <span className="tw:text-[length:var(--bk-text-11)]">{v.type.toUpperCase()}</span>
-                      )}
-                    </span>
-                  }
-                  actions={
-                    i > 0 && v.key !== selectedItem.key ? (
-                      <Button
-                        className={`mgr-btn ${MINI_BTN}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Revert: replace all usages of current version with this one.
-                          if (versions[0]) {
-                            composer.mediaOps.replaceAcross(versions[0].src, v.src);
-                            addToast({ description: `Reverted to ${v.name}`, tone: "success" });
-                          }
-                        }}
-                      >
-                        Revert
-                      </Button>
-                    ) : undefined
-                  }
-                />
-              ))}
-            </div>
-          )}
-          {detailTab === "used" && (
-            <div>
-              <div className="mgr-used-head">
-                Used in <span className="mgr-used-count">{usageCount} places</span>
-              </div>
-              {usageCount === 0 ? (
-                <div className={`tw:p-2 ${MUTED_SM}`}>Not used on any page yet</div>
-              ) : (
-                <div className={`tw:p-2 ${MUTED_SM}`}>
-                  {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
-                </div>
-              )}
-            </div>
-          )}
-          <div className="mgr-det-actions">
-            <Button className="mgr-btn" onClick={() => onInsert(selectedItem.key)}>
-              <Download size={12} />
-              Insert
+
+          <section className="mgr-det-section" data-testid="mgr-det-used">
+            <h4 className="mgr-det-label">Used in</h4>
+            <p className="mgr-det-used-line">{usedLine}</p>
+          </section>
+        </div>
+
+        {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
+            full set; a video has no Edit image; a font is neither inserted
+            nor replaced across the site — Manage font · Rename · Delete
+            (3696:21550 / 3705:21059; Manage font opens the Site fonts
+            dialog, 3686:42317, on this file, and is drawn in the board's
+            quiet fill). Insert to canvas is the PRIMARY: 3705:20396 and
+            4207:26629 (the later section) draw it filled, over
+            3695:20340's outlined one. */}
+        <div className="mgr-det-actions" data-testid="mgr-det-actions">
+          {!isFont && (
+            <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
+              Insert to canvas
             </Button>
-            {/* Bug #1 fix: Edit → image editor for images, rename overlay otherwise. */}
+          )}
+          {isFont && onManageFont && (
+            <Button
+              size="xs"
+              variant="secondary"
+              className={RAIL_QUIET}
+              onClick={() => onManageFont(selectedItem)}
+              data-testid="mgr-det-manage-font"
+            >
+              Manage font
+            </Button>
+          )}
+          {isImage ? (
+            <div className="mgr-det-actions-row">
+              <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
+                Edit image
+              </Button>
+              <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
+                Rename
+              </Button>
+            </div>
+          ) : (
+            <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
+              Rename
+            </Button>
+          )}
+          {!isFont && (
             <Button
               className="mgr-btn"
-              onClick={() => {
-                if (selectedItem.type === "img") {
-                  onEditImage(selectedItem);
-                } else {
-                  onOpenRename(selectedItem);
-                }
-              }}
+              disabled={usageCount === 0}
+              title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
+              onClick={() => setReplaceAllPickerOpen(true)}
             >
-              <Pencil size={12} />
-              {selectedItem.type === "img" ? "Edit" : "Rename"}
+              Replace across site…
             </Button>
-            {selectedItem.type === "img" && onOptimizeImage && (
-              <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
-                <Gauge size={12} />
-                Optimize
-              </Button>
-            )}
-            {/* Bug #5 fix: Replace all opens library picker instead of URL prompt. */}
-            {usageCount > 0 && (
-              <Button className="mgr-btn" onClick={() => setReplaceAllPickerOpen(true)}>
-                <Replace size={12} />
-                Replace all
-              </Button>
-            )}
-            <Button
-              className="mgr-btn danger"
-              onClick={() => onRequestDelete(selectedItem.key)}
-            >
-              <Trash2 size={12} />
-              Delete
+          )}
+          {/* Not on the Clone. The optimiser's only other door is the picker
+              modal, which is reachable only mid-way through choosing an image
+              for an element; Phase 6 folds Optimise into the editor dialog and
+              this row goes with it. */}
+          {selectedItem.type === "img" && onOptimizeImage && (
+            <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
+              Optimize
             </Button>
-          </div>
+          )}
+          <Button className="mgr-btn danger" onClick={() => onRequestDelete(selectedItem.key)}>
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -306,7 +479,7 @@ export function AssetDetailsPanel({
       <ModalRoot open={replaceAllPickerOpen} onOpenChange={setReplaceAllPickerOpen}>
         <ModalContent size="lg">
           <ModalTitle>
-            Replace "{selectedItem.name}" across {usageCount} use
+            Replace "{selectedItem.displayName ?? selectedItem.name}" across {usageCount} use
             {usageCount !== 1 ? "s" : ""}
           </ModalTitle>
           <ModalClose aria-label="Close replace picker">
@@ -323,16 +496,23 @@ export function AssetDetailsPanel({
                   key={i.key}
                   className="med-img-card"
                   onClick={() => {
-                    const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
-                    if (result.replaced.length > 0) {
+                    if (onReplaceAcross) {
+                      setReplaceAllPickerOpen(false);
+                      onReplaceAcross(i);
+                      return;
+                    }
+                    const results = replaceSources.map((src) => composer.mediaOps.replaceAcross(src, i.src));
+                    const replaced = results.reduce((n, r) => n + r.replaced.length, 0);
+                    const failed = results.reduce((n, r) => n + r.failed.length, 0);
+                    if (replaced > 0) {
                       addToast({
-                        description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
+                        description: `Replaced in ${replaced} element${replaced > 1 ? "s" : ""}`,
                         tone: "success",
                       });
                     }
-                    if (result.failed.length > 0) {
+                    if (failed > 0) {
                       addToast({
-                        description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
+                        description: `${failed} replacement${failed > 1 ? "s" : ""} failed`,
                         tone: "error",
                       });
                     }
@@ -407,11 +587,8 @@ function AltTextSection({
   };
 
   return (
-    <div data-testid="alt-text-section" className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-4">
-      <label
-        htmlFor={`alt-text-${item.key}`}
-        className="tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)]"
-      >
+    <div data-testid="alt-text-section" className="mgr-det-section">
+      <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Alt text
       </label>
       <Textarea
@@ -420,7 +597,7 @@ function AltTextSection({
         value={item.altText ?? ""}
         maxLength={ALT_TEXT_MAX}
         rows={2}
-        placeholder="Describe this image for screen readers"
+        placeholder="Add a description for this image"
         onChange={(e) => onUpdateAltText(item.key, e.target.value)}
       />
       <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
@@ -446,5 +623,74 @@ function AltTextSection({
         )}
       </div>
     </div>
+  );
+}
+
+// ─── TagsSection (BLOCKERS C3, authority code:tag-writer) ───────────────────
+
+interface TagsSectionProps {
+  item: LibraryItem;
+  onUpdateTags(key: string, tags: string[]): void;
+}
+
+/**
+ * The file's tags as chips with ×, and an Add tag field: Enter adds the
+ * entry lower-cased and trimmed, capped at TAG_MAX, never empty, never a
+ * duplicate (a repeat just clears the field — the chip is already there).
+ * Under ALT TEXT, above VERSIONS / USED IN; drawn for every file type.
+ */
+function TagsSection({ item, onUpdateTags }: TagsSectionProps) {
+  const [draft, setDraft] = React.useState("");
+  const tags = item.tags ?? [];
+
+  const add = () => {
+    const tag = draft.trim().toLowerCase().slice(0, TAG_MAX);
+    if (!tag) return;
+    setDraft("");
+    if (tags.includes(tag)) return;
+    onUpdateTags(item.key, [...tags, tag]);
+  };
+
+  return (
+    <section className="mgr-det-section" data-testid="mgr-det-tags">
+      <label htmlFor={`tag-input-${item.key}`} className="mgr-det-label">
+        Tags
+      </label>
+      {tags.length > 0 && (
+        <div className="tw:flex tw:flex-wrap tw:gap-1.5" data-testid="mgr-det-tag-list">
+          {tags.map((tag) => (
+            <span key={tag} className={TAG_CHIP} data-testid={`mgr-det-tag-${tag}`}>
+              {tag}
+              <IconButton
+                size="sm"
+                label={`Remove tag ${tag}`}
+                className={TAG_CHIP_REMOVE}
+                onClick={() =>
+                  onUpdateTags(
+                    item.key,
+                    tags.filter((t) => t !== tag),
+                  )
+                }
+              >
+                <X size={10} />
+              </IconButton>
+            </span>
+          ))}
+        </div>
+      )}
+      <TextInput
+        id={`tag-input-${item.key}`}
+        data-testid="mgr-det-tag-input"
+        value={draft}
+        maxLength={TAG_MAX}
+        placeholder="Add tag"
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          add();
+        }}
+      />
+    </section>
   );
 }

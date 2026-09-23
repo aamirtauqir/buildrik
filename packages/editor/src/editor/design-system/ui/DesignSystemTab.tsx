@@ -24,7 +24,6 @@ import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState"
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {
   useColorRegistry,
@@ -74,6 +73,7 @@ import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ExportSection } from "./sections/ExportSection";
 import { STARTER_DS_REGISTRY } from "../starters";
 import { CATALOG } from "../../components-catalog/catalog";
@@ -86,8 +86,18 @@ import { ColourModeSection } from "./sections/ColourModeSection";
 import { useDSLint } from "../state/useDSLint";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
-const PANEL = "tw:relative tw:flex tw:flex-col tw:h-full tw:bg-[var(--bk-bg-subtle)]";
-const SECTION_BODY = "tw:flex-1 tw:overflow-auto tw:p-3";
+/* `--bk-bg-panel`, not `--bk-bg-subtle`: every board in this family — 154:26,
+   154:78, 154:132, 306:2217, 152:137, 153:2, 306:2049, 781:4311 — fills the
+   Brand frame `--color/bg-panel` (white). The drawer under it (`.ls-panel`)
+   is already `--bk-bg-card` white, so the grey was this panel's own override
+   and made Brand the one drawer in the shell with a tinted body. */
+const PANEL = "tw:relative tw:flex tw:flex-col tw:h-full tw:bg-[var(--bk-bg-panel)]";
+/* No padding of its own. The boards inset EVERY list row `px-[16px]` from the
+   panel edge, and each section below already supplies that inset itself — so a
+   12px body pad put the root list at 28 and shrank the Basic-mode note from
+   the board's 248 to 224. Sections that leaned on it (Export, Lint) carry
+   their own now. */
+const SECTION_BODY = "tw:flex-1 tw:overflow-auto";
 /** Header strip shared by the brand banner, the toolbar and the crumb. */
 const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-[var(--bk-gray-200)]";
 /** Square icon button in the toolbar (themes, AI). */
@@ -95,9 +105,13 @@ const TOOL_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:w-7 tw:h-6 tw:p-0 tw:rounded-md " +
   "tw:border tw:border-[var(--bk-gray-200)] tw:bg-transparent tw:text-sm tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
 /** Back crumb inside a destination — board 153:2 draws `‹ <Section>` in accent. */
+/* `leading-5` is load-bearing, not decoration: flowbite's Button base sets
+   `text-sm`, whose 20px line-height only survives while the font size is 14.
+   At the board's 13px the utility no longer implies it, and the boards state
+   13/20 on every crumb they draw (153:8, 152:143, 306:2052, 306:2189). */
 const CRUMB =
   "tw:flex tw:items-center tw:gap-[5px] tw:h-auto tw:px-0 tw:border-0 tw:bg-transparent " +
-  "tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline";
+  "tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline";
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
@@ -148,12 +162,13 @@ const SECTIONS = [
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
 ] satisfies ReadonlyArray<{ id: DesignSection; label: string; hint: string }>;
 
-/* The header renders `Brand › ${SECTIONS.find(...)?.label ?? ""}`, so a section
-   id that reaches the drill level without a row here would print "Brand › " —
-   a header that is worse than the constant it replaced. The annotation this
-   list used to carry could not catch that: it constrained each entry's id to a
-   DesignSection but never required every DesignSection to appear. `satisfies`
-   keeps the literal ids, so this line fails the build instead. */
+/* The back row renders `‹ ${SECTIONS.find(...)?.label}`, so a section id that
+   reaches the drill level without a row here would print a bare `‹` — a crumb
+   that names nowhere, on the one control the boards rely on to say where you
+   are. The annotation this list used to carry could not catch that: it
+   constrained each entry's id to a DesignSection but never required every
+   DesignSection to appear. `satisfies` keeps the literal ids, so this line
+   fails the build instead. */
 type UncoveredSection = Exclude<DesignSection, (typeof SECTIONS)[number]["id"]>;
 const _everySectionHasARow: UncoveredSection extends never ? true : UncoveredSection = true;
 void _everySectionHasARow;
@@ -606,22 +621,28 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     addToast({ description: `Token "${name}" added`, tone: "success" });
   };
 
-  /* The header tracks the drill level. It was the constant "Brand", justified
-     by "the section tablist below the toolbar row already shows Tokens /
-     Styles / Components" — and that tablist is gone: line 473 records the tab
-     bar's removal and its handler going with it. So at Brand › Tokens › color
-     the only location cue left was a small in-body back link, and the fixed
-     header a user glances at for "where am I" said Brand at every depth.
-     Measured live across all nine destinations, 2026-09-04.
+  /* The header is the constant "Brand" at every depth, and that is the BOARDS'
+     call rather than this file's preference. Six destination frames state the
+     title text directly — I208:551;16:7 (classes), I208:541;16:7 (starters),
+     I306:2050;16:7 (tokens · add), I306:2081;16:7 (tokens · replace),
+     I306:2162;16:7 (presets · draft), I306:2187;16:7 (starters · applied) —
+     and every one of them reads "Brand". Copy on screen is decided by the
+     board (CLAUDE.md precedence, founder 2026-08-06), and here the boards do
+     not merely fail to contradict the code: they say the word.
 
-     The token KIND stays out of the title: the header is an 11px caps label in
-     a fixed 44px bar, and the body crumb below already carries "· color". */
-  const headerTitle = activeSection
-    ? `Brand › ${SECTIONS.find((sec) => sec.id === activeSection)?.label ?? ""}`
-    : "Brand";
+     REVERSES a 2026-09-04 change, and the argument it reversed is kept because
+     it is a good one: the section tablist that used to name the current screen
+     is gone, so a constant header leaves "where am I" to the back link alone.
+     What settles it is that the board answers that question in the same frame
+     — 152:142, 153:7, 306:2051, 306:2163 and 306:2188 all draw a 36px Back row
+     carrying `‹ <Section>` at 13/20 in accent, which is a full-width row and
+     not a small link. The location cue is there; it is one row lower than the
+     reverted change put it. Caught by check-board-copy.mjs, which reported
+     "board draws, product does not render: brand" on six surfaces at once. */
+  const headerTitle = "Brand";
 
   return (
-    <div data-ds-preview={resolvedMode} className={PANEL}>
+    <div data-ds-preview={resolvedMode} className={PANEL} data-testid="brand-panel">
       <PanelHeader
         title={headerTitle}
         isExpanded={isExpanded}
@@ -641,32 +662,23 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           screen's own content began. They belong to the root. */}
       {activeSection === null && (
         <>
-      {/* Redesign P4 (ds2): two homes for styling. Everyday styling = these tokens
-          (the 3-reach editor). The brand source = the workspace shared theme, which
-          lives dashboard-side and client sites sync from or override. Surface that
-          relationship + a link out, instead of pretending the DS tab is the only home. */}
-      <div
-        className={`${STRIP} tw:gap-2 tw:px-3 tw:py-2`}
-      >
-        <div className="tw:flex-1 tw:min-w-0">
-          <div className="tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)]">Brand &amp; shared theme</div>
-          {/* gray-600, not gray-500: on this strip's --bk-bg-subtle background,
-              gray-500 measures 4.39:1 — under AA for text this size. Measured
-              with axe on the live Brand panel. */}
-          <div className="tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-            Everyday styling lives here. The brand syncs from your workspace shared theme.
-          </div>
-        </div>
-        <Button
-          color="light"
-          size="xs"
-          onClick={() => window.open(`${DASHBOARD_URL}/dashboard/agency/theme`, "_blank", "noopener")}
-          title="Open the workspace shared theme"
-          className="tw:flex-none tw:whitespace-nowrap"
-        >
-          Open Shared theme ↗
-        </Button>
-      </div>
+      {/* The "Brand & shared theme" strip that opened this panel is gone.
+          Four boards of this family draw the root — 154:26 (lint-warnings),
+          154:78 (dirty), 154:132 (Basic) and 306:2217 (lint suppressed) — and
+          all four go panel header (44) -> Brand preview (82) -> the nine rows,
+          with nothing between. The strip spent ~56px of an 812px panel above
+          the fold on a link OUT of the editor, and the workspace shared theme
+          it pointed at keeps its own routes dashboard-side (Agency tabs,
+          `agency-tabs.tsx:15`, and the command palette, `command-palette.tsx:80`),
+          so nothing became unreachable. boards.json already carried the
+          finding against the root board: "140px of unboarded chrome (theme
+          strip + mode toggle) hides 2 of 9 rows".
+
+          The mode toggle below STAYS, and that is a deliberate exception:
+          board 154:132 is the root in Basic mode and its own footnote tells
+          the user to "Switch to Pro", while no board in the family draws a
+          control that would let them. Deleting the only route to a state two
+          boards specify would conform the pixels by breaking the screen. */}
 
       {/* Board 1333:7162 draws the root as a preview band above the list. What used to
           sit above it has a destination of its own on the boards: Light/Dark
@@ -675,12 +687,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           and the lint card repeated the Lint row's count. Only the mode
           toggle stays, because Basic/Pro changes what the rest of the panel
           offers and has no other route. */}
-      <div
-        className={`${STRIP} tw:flex-wrap tw:gap-1.5 tw:px-3 tw:py-1.5 tw:bg-[var(--bk-bg-subtle)]`}
-      >
-        <DSModeToggle />
-        <span className="tw:flex-1" />
-      </div>
+      {/* No wrapper: 1747:8395 is one 40px frame and `DSModeToggle` is it. The
+          `STRIP` band that used to hold it added a `--bk-bg-subtle` fill the
+          board does not draw, directly under the panel header — two grey bars
+          stacked before any content. */}
+      <DSModeToggle />
 
         </>
       )}
@@ -688,10 +699,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       {/* Breadcrumb — only inside a destination. Board 1333:7162 draws no crumb at
           the root, and 153:2 draws `‹ <Section>` inside one. */}
       {activeSection && (
-        <div className={`${STRIP} tw:px-3 tw:py-2 tw:bg-[var(--bk-bg-subtle)]`}>
+        /* 36px, inset 16, no fill of its own — 152:142, 153:7, 306:2051,
+           306:2163 and 306:2188 all draw the Back row that way. It shipped as
+           a 12/8-padded strip on `--bk-bg-subtle`, which is a band the boards
+           do not have; on a white panel it read as a second header. */
+        <div className={`${STRIP} tw:h-9 tw:px-4 tw:py-0`} data-testid="brand-back-row">
           <Button
             color="light"
             data-crumb-back=""
+            data-testid="brand-back-link"
             onClick={() => {
               /* Back walks ONE level: out of the open token kind first, then
                  out of the destination. */
@@ -737,15 +753,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             <SectionStatusBadge status={importOutcome} />
           )}
           {/* Brand root — the preview band + drill-in list (M5, board 1333:7162) */}
+          {/* 306:2217's own Badge instance (333:2360), not a second pill built
+              beside it. This rendered its own span with `px-2` and
+              `leading-none` while `SectionStatusBadge` — same component on the
+              board, same 10/2 inset — sat one import away. */}
           {activeSection === null && suppressedCount > 0 ? (
-            <div className="tw:px-4 tw:pb-2">
-              <span
-                role="status"
-                className="tw:inline-flex tw:h-5 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-yellow-100)] tw:px-2 tw:text-xs tw:font-medium tw:leading-none tw:text-[var(--bk-warning-text)]"
-              >
-                Warnings suppressed
-              </span>
-            </div>
+            <SectionStatusBadge status="warnings-suppressed" role="status" />
           ) : null}
 
           {/* The brand, before the list of places to change it. Nine rows of
@@ -766,8 +779,14 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                     <Button
                       color="light"
                       data-section-id={s.id}
+                      data-testid={`brand-row-${s.id}`}
                       onClick={() => handleSectionClick(s.id)}
-                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-13 tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
+                      /* `leading-[normal]` because the boards say so — every
+                         List row on 1691:7353..7397 is `leading-[normal]`, and
+                         flowbite's Button base ships `text-sm`, whose 20px
+                         line-height the 13px label then inherited. It stacked
+                         label+hint 36px tall inside a 52px row. */
+                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-13 tw:px-4 tw:py-0 tw:leading-[normal] tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
                     >
                       {/* `hint` has been written for all nine rows since the
                           board landed and rendered for none of them — the row
@@ -775,7 +794,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                           "Starters" are not words a first-time user can rank
                           without them. */}
                       <span className="tw:flex tw:flex-col tw:gap-px tw:min-w-0 tw:text-left">
-                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
+                        <span
+                          data-testid={`brand-row-label-${s.id}`}
+                          className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-[var(--bk-ink)]"
+                        >
                           {s.label}
                           {dirtyHere && (
                             <span
@@ -784,17 +806,32 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                             />
                           )}
                         </span>
-                        <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-soft)]">
+                        <span
+                          data-testid={`brand-row-hint-${s.id}`}
+                          className="tw:truncate tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-soft)]"
+                        >
                           {s.hint}
                         </span>
                       </span>
                       <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
+                        {/* 12px, not 11: the boards draw the row count and the
+                            chevron at the same size (1691:7357 / 7358 and its
+                            eight siblings), which is what makes them read as one
+                            trailing cluster rather than a number with a bigger
+                            arrow after it. */}
                         {(s.id === "lint" ? lintIssues.length : sectionCounts[s.id]) ? (
-                          <span className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-soft)]">
+                          <span
+                            data-testid={`brand-row-count-${s.id}`}
+                            className="tw:font-mono tw:tabular-nums tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
+                          >
                             {s.id === "lint" ? lintIssues.length : sectionCounts[s.id]}
                           </span>
                         ) : null}
-                        <span aria-hidden="true" className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">›</span>
+                        <span
+                          aria-hidden="true"
+                          data-testid={`brand-row-chevron-${s.id}`}
+                          className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]"
+                        >›</span>
                       </span>
                     </Button>
                   </li>
@@ -805,16 +842,57 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   shows less with no reason given, which reads as missing
                   features rather than a setting the user can change. */}
               {isBeginner && (
-                <li className="tw:mt-auto tw:flex tw:h-10 tw:items-center tw:px-4 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-bg-subtle)]" data-basic-mode-note>
-                  Basic mode hides what you cannot edit yet. Switch to Pro to unlock.
+                <li
+                  className="tw:mt-auto tw:flex tw:h-10 tw:items-center tw:px-4 tw:bg-[var(--bk-bg-subtle)]"
+                  data-basic-mode-note
+                  data-testid="brand-basic-note"
+                >
+                  {/* 154:186 verbatim. The line shipped as "Basic mode hides
+                      what you cannot edit yet. Switch to Pro to unlock." — it
+                      named the mode by a word the toggle beside it does not use
+                      (the control says Beginner), and "what you cannot edit
+                      yet" is vaguer than the two things actually hidden. On a
+                      248 measure at 11/16, which is where the second line
+                      breaks. */}
+                  {/* `--bk-ink-soft`, and this is the ONE place this note does
+                      not do what 154:186 says. The board colours it
+                      `--color/ink-muted` on the `--color/bg-subtle` fill of
+                      154:185, and that pair MEASURES 4.39:1
+                      at 11px — under the 4.5 WCAG AA floor, computed by
+                      measure.mjs, not eyeballed. `--bk-ink-soft` is the same
+                      substitution `DesignTabFooter` already documents for the
+                      same pair on the same fill. A board cannot authorise a
+                      contrast failure, so the fill, the size, the line and the
+                      248 measure are the board's and the colour is not —
+                      recorded in surfaces/brand-pro-locked.json, which skips
+                      154:186 for exactly this reason. */}
+                  <span
+                    data-testid="brand-basic-note-text"
+                    className="tw:block tw:w-full tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+                  >
+                    Beginner hides token IDs and empty foundations. Switch to Pro to show them.
+                  </span>
                 </li>
               )}
             </ul>
           )}
 
           {isFirstLoad && activeSection === "tokens" && (
-            <div className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]">
-              <span className="tw:text-xs tw:leading-relaxed tw:text-[var(--bk-ink)]">
+            /* 1751:8390 — board 152:52 DOES draw this banner. boards.json still
+               carries the opposite finding ("an unboarded info banner pushes
+               the first kind +89px"); the board has moved since, and the 17xx
+               node ids are the revision that moved it. */
+            <div
+              data-testid="brand-tokens-first-load-banner"
+              className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]"
+            >
+              {/* `leading-[normal]`, not `leading-relaxed` — 1751:8391. The 1.625
+                  line spread two lines of a 12px sentence over 40px inside a
+                  56px card, which is the whole card. */}
+              <span
+                data-testid="brand-tokens-first-load-text"
+                className="tw:text-xs tw:leading-[normal] tw:text-[var(--bk-ink)]"
+              >
                 These are your site's default design tokens. Customize them and click{" "}
                 <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
               </span>
@@ -834,7 +912,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "components" && (
             <ComponentsSection
               composer={composer}
-              onOpenAIAssist={() => setAiOpen(true)}
+              /* Gated on the SAME flag that decides whether an AIClient is
+                 built at all (useComposerInit.ts:132), the way the sidebar's
+                 publish action is gated on the flag behind the Topbar's
+                 dropdown (TabRouter.tsx:195). The flag guarded the client and
+                 nothing guarded this entry, so the modal opened over a service
+                 with no client and Generate answered every user with
+                 AIAssistService's developer string. Absent callback → the
+                 section blocks the CTA and says why. */
+              onOpenAIAssist={isFeatureEnabled("dsAi") ? () => setAiOpen(true) : undefined}
             />
           )}
           {activeSection === "starters"   && <StartersSection projectId={projectId} />}

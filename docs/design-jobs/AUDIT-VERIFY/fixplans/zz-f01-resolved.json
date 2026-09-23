@@ -1,0 +1,11 @@
+{
+ "slug": "zz-f01-resolved",
+ "page": "1:3",
+ "note": "F01 — the audit's first finding — closed on 52:2 with the set-prop op added for it. Recorded-only through the whole arc because nothing could set an instance variant.",
+ "rows": [
+  {"op": "set-prop", "id": "2143:20605", "prop": "State", "value": "rest",
+   "why": "F01 · MOVE THE HIGHLIGHT OFF THE HEADING. The assembled editor named two different selections at once: the Layers panel highlighted 'heading-that-is-long' while the canvas badge, the inspector header and the footer all said 'Section · Hero'. WHY IT WAS STUCK: the Layers rows are INSTANCES with fills:none — the highlight is a component VARIANT, read back as Depth=5;State=selected on this row — so neither fill nor text could move it, and this runner had no op for instance properties. That is why F01 sat recorded-only. WHY THIS DIRECTION: the outlined canvas frame is itself named 'Hero — SELECTED', so the outline already agrees with the three text surfaces and the Layers highlight is the single outlier; moving one highlight is one edit, whereas renaming the other three would still leave the outline contradicting them and no op moves an outline."},
+  {"op": "set-prop", "id": "2143:20597", "prop": "State", "value": "selected",
+   "why": "F01 · put the highlight on the section row. Identified by position, not by guess: the Panel — Layers list runs 111183, 111211, 111239, 111267, 111295, 111323, 111351, 111379, 111407 for body, section, container, grid, column, heading-that-is-long, paragraph, button, footer — matching the rendered order exactly — so 2143:20597 at y111211 is 'section'. It independently matches the id the c8 author named while holding this row. The variant carries its own #E1EFFE fill, so the highlight travels with the state rather than needing a separate paint."}
+ ]
+}

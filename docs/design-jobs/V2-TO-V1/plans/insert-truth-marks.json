@@ -1,0 +1,51 @@
+[
+  {
+    "id": "138:153",
+    "name": "Insert · dragging — CONDITION-ONLY — leaves on drop/dragend, no control (GroupSection.tsx:189-190; ELEMENTS rows only). [not-implemented] the drop it promises: handleBlockDrop re-reads e.dataTransfer past an await and gets \"\", returns false, and useDropExecution.ts:302-303 hardcodes dropSucceeded = true anyway — a drag can place nothing and be reported as a success (UX-A-01). The valid/invalid indicator is computed for a generic container, not for the thing being dragged (dragCalculations.ts:145-156, UX-A-19). The drop path has no needs-asset branch, so a dragged Image lands with no src while a clicked Image opens Media (dropOperations.tsx:375-527 vs useBlockInsertion.ts:144-153, UX-A-18). Refusal state: sibling board Insert · drop-refused.",
+    "why": "UX-A-01 / UX-A-18 / UX-A-19",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07",
+    "current_name_read_back": "Insert · dragging — CONDITION-ONLY — leaves on drop/dragend, no control (GroupSection.tsx:189-190; ELEMENTS rows only)"
+  },
+  {
+    "id": "1069:4707",
+    "name": "Insert · blocks-expanded — [not-implemented] the thumbnails. shared/types/block.ts:25 declares preview?: string and nothing sets it: grep -rn preview packages/editor/src/blocks/ returns zero, so all 50 cards fall through to an empty 136x80 grey rectangle under an 11px label (GroupSection.tsx:234-262, UX-A-05). DESIGN-AHEAD: the picture grid is kept here as the target for when previews exist; the shipping drawing is the sibling Insert · blocks-expanded · rows. BLOCKS cards are also not draggable — only ELEMENTS passes draggable (UX-A-06).",
+    "why": "UX-A-05 / UX-A-06",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07",
+    "current_name_read_back": "Insert · blocks-expanded"
+  },
+  {
+    "id": "1706:8501",
+    "name": "Modal · Add Child Element — [not-implemented] its refusal. useElementsState.ts:151-161 raises \"Added {label} to canvas\" BEFORE calling the inserter; BlockPickerModal.tsx:41-63,91-100 then returns silently on a nesting / target-not-found / config-not-found failure and calls onClose(), so the modal disappears leaving a green success toast over an unchanged canvas (UX-A-02). This picker also groups by TYPE with Most Used / Recents / Favourites and per-element descriptions while the Insert panel groups by SOURCE — one product, two catalogs (UX-A-03). Refusal state: sibling Modal · Add Child Element · refused.",
+    "why": "UX-A-02 / UX-A-03",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07",
+    "current_name_read_back": "Modal · Add Child Element"
+  },
+  {
+    "id": "1069:4790",
+    "name": "Insert · components-expanded — COMPONENTS here is the registry's 14 shipped component blocks (blockRegistry.ts:187-202), NOT the user's own — those are MINE (board 1069:4970) — and NOT the Components management tab, which is off the default rail and reachable only by ⇧A, the command palette, or prior knowledge (tabsConfig.ts:151-170,349-351). One word, two things one click apart (UX-A-25). Rows carry no draggable and no onDragStart (GroupSection.tsx:206-212, UX-A-06).",
+    "why": "UX-A-25 / UX-A-06",
+    "id_source": "read from file — section 1090:4527 child list, 2026-09-07",
+    "current_name_read_back": "Insert · components-expanded"
+  },
+  {
+    "id": "1069:4970",
+    "name": "Insert · mine-expanded — [not-implemented] finding one of these by name. searchInsert is passed catalog + blockRows + componentRows and never mine (useBuildTab.ts:235-238), and the InsertSearchHit union has no MINE case (utils/search.ts:16-26), so a component you saved yourself returns \"Nothing matches\" while it sits on the same screen (UX-A-11). Rows carry no draggable (GroupSection.tsx:216-222, UX-A-06). Empty state: sibling Insert · mine-expanded · empty.",
+    "why": "UX-A-11 / UX-A-06 / UX-A-24",
+    "id_source": "read from file — section 1090:4527 child list, 2026-09-07",
+    "current_name_read_back": "Insert · mine-expanded"
+  },
+  {
+    "id": "787:4299",
+    "name": "hotspot/state · Insert · loading — the 2026-09-02 \"CUT (RETIRED, no producer)\" was withdrawn: InsertStateBlocks.tsx:55 InsertLoadingSkeleton is built and unit-tested and simply has zero mounts (BuildTab.tsx never imports InsertStateBlocks). Edge kept (QA-B-22).",
+    "why": "QA-B-22 — the hotspot name still carries the withdrawn RETIRED claim its own destination board no longer makes",
+    "id_source": "read from file — full node tree of 137:2, 2026-09-07",
+    "current_name_read_back": "hotspot/state · Insert · loading — CUT 2026-09-02 (Insert · loading RETIRED, no producer)"
+  },
+  {
+    "id": "787:4303",
+    "name": "hotspot/state · Insert · load-error — the 2026-09-02 \"CUT (RETIRED, no producer)\" was withdrawn: InsertStateBlocks.tsx:79 InsertLoadError is built and unit-tested with zero mounts. Edge kept (QA-B-22).",
+    "why": "QA-B-22 — same withdrawn claim as 787:4299",
+    "id_source": "read from file — full node tree of 137:2, 2026-09-07",
+    "current_name_read_back": "hotspot/state · Insert · load-error — CUT 2026-09-02 (Insert · load-error RETIRED, no producer)"
+  }
+]

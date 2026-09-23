@@ -1,0 +1,381 @@
+{
+  "surface": "brand-pro-locked",
+  "board": "Brand \u00b7 root \u00b7 Beginner mode (Figma 154:132)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-basic-note"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-row-count-lint"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-pro-locked",
+      "nodeId": "208:631"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-pro-locked",
+      "nodeId": "I208:631;16:7"
+    },
+    {
+      "name": "preview-swatches",
+      "testId": "brand-preview-swatches",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7220"
+    },
+    {
+      "name": "specimen-heading",
+      "testId": "brand-specimen-heading",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7225"
+    },
+    {
+      "name": "specimen-heading-aa",
+      "testId": "brand-specimen-aa-heading",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7226"
+    },
+    {
+      "name": "specimen-heading-label",
+      "testId": "brand-specimen-label-heading",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7227"
+    },
+    {
+      "name": "specimen-body",
+      "testId": "brand-specimen-body",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7228"
+    },
+    {
+      "name": "specimen-body-aa",
+      "testId": "brand-specimen-aa-body",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7229"
+    },
+    {
+      "name": "specimen-body-label",
+      "testId": "brand-specimen-label-body",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7230"
+    },
+    {
+      "name": "row-tokens",
+      "testId": "brand-row-tokens",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7231"
+    },
+    {
+      "name": "row-tokens-label",
+      "testId": "brand-row-label-tokens",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7233"
+    },
+    {
+      "name": "row-tokens-hint",
+      "testId": "brand-row-hint-tokens",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7234"
+    },
+    {
+      "name": "row-tokens-count",
+      "testId": "brand-row-count-tokens",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7235"
+    },
+    {
+      "name": "row-tokens-chevron",
+      "testId": "brand-row-chevron-tokens",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7236"
+    },
+    {
+      "name": "row-styles",
+      "testId": "brand-row-styles",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7237"
+    },
+    {
+      "name": "row-styles-label",
+      "testId": "brand-row-label-styles",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7239"
+    },
+    {
+      "name": "row-styles-hint",
+      "testId": "brand-row-hint-styles",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7240"
+    },
+    {
+      "name": "row-styles-count",
+      "testId": "brand-row-count-styles",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7241"
+    },
+    {
+      "name": "row-styles-chevron",
+      "testId": "brand-row-chevron-styles",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7242"
+    },
+    {
+      "name": "row-starters",
+      "testId": "brand-row-starters",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7243"
+    },
+    {
+      "name": "row-starters-label",
+      "testId": "brand-row-label-starters",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7245"
+    },
+    {
+      "name": "row-starters-hint",
+      "testId": "brand-row-hint-starters",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7246"
+    },
+    {
+      "name": "row-starters-count",
+      "testId": "brand-row-count-starters",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7247"
+    },
+    {
+      "name": "row-starters-chevron",
+      "testId": "brand-row-chevron-starters",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7248"
+    },
+    {
+      "name": "row-classes",
+      "testId": "brand-row-classes",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7249"
+    },
+    {
+      "name": "row-classes-label",
+      "testId": "brand-row-label-classes",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7251"
+    },
+    {
+      "name": "row-classes-hint",
+      "testId": "brand-row-hint-classes",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7252"
+    },
+    {
+      "name": "row-classes-chevron",
+      "testId": "brand-row-chevron-classes",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7253"
+    },
+    {
+      "name": "row-components",
+      "testId": "brand-row-components",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7254"
+    },
+    {
+      "name": "row-components-label",
+      "testId": "brand-row-label-components",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7256"
+    },
+    {
+      "name": "row-components-hint",
+      "testId": "brand-row-hint-components",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7257"
+    },
+    {
+      "name": "row-components-chevron",
+      "testId": "brand-row-chevron-components",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7258"
+    },
+    {
+      "name": "row-typography",
+      "testId": "brand-row-typography",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7259"
+    },
+    {
+      "name": "row-typography-label",
+      "testId": "brand-row-label-typography",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7261"
+    },
+    {
+      "name": "row-typography-hint",
+      "testId": "brand-row-hint-typography",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7262"
+    },
+    {
+      "name": "row-typography-chevron",
+      "testId": "brand-row-chevron-typography",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7263"
+    },
+    {
+      "name": "row-colour-mode",
+      "testId": "brand-row-colour-mode",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7264"
+    },
+    {
+      "name": "row-colour-mode-label",
+      "testId": "brand-row-label-colour-mode",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7266"
+    },
+    {
+      "name": "row-colour-mode-hint",
+      "testId": "brand-row-hint-colour-mode",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7267"
+    },
+    {
+      "name": "row-colour-mode-chevron",
+      "testId": "brand-row-chevron-colour-mode",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7268"
+    },
+    {
+      "name": "row-lint",
+      "testId": "brand-row-lint",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7269"
+    },
+    {
+      "name": "row-lint-label",
+      "testId": "brand-row-label-lint",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7271"
+    },
+    {
+      "name": "row-lint-hint",
+      "testId": "brand-row-hint-lint",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7272"
+    },
+    {
+      "name": "row-lint-count",
+      "testId": "brand-row-count-lint",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7273"
+    },
+    {
+      "name": "row-lint-chevron",
+      "testId": "brand-row-chevron-lint",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7274"
+    },
+    {
+      "name": "row-export",
+      "testId": "brand-row-export",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7275"
+    },
+    {
+      "name": "row-export-label",
+      "testId": "brand-row-label-export",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7277"
+    },
+    {
+      "name": "row-export-hint",
+      "testId": "brand-row-hint-export",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7278"
+    },
+    {
+      "name": "row-export-chevron",
+      "testId": "brand-row-chevron-export",
+      "spec": "brand-pro-locked",
+      "nodeId": "1691:7279"
+    },
+    {
+      "name": "basic-note",
+      "testId": "brand-basic-note",
+      "spec": "brand-pro-locked",
+      "nodeId": "154:185"
+    },
+    {
+      "name": "basic-note-text",
+      "testId": "brand-basic-note-text"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE. 154:132 is the same root list as 154:26 in Beginner mode, and",
+    "Beginner is the panel's default (`useDSModeOptional()?.mode !== \"pro\"`), so",
+    "the state needs no interaction beyond opening the panel. The one thing that",
+    "distinguishes the board is the footnote at 154:185/154:186.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  the footnote's words. It shipped as \"Basic mode hides what you cannot edit",
+    "  yet. Switch to Pro to unlock.\" \u2014 a sentence that named the mode by a word",
+    "  the toggle beside it does not use (the control says Beginner) and described",
+    "  what is hidden as \"what you cannot edit yet\". 154:186 says \"Beginner hides",
+    "  token IDs and empty foundations. Switch to Pro to show them.\", which names",
+    "  both of the things the mode actually hides (`filterTokensByMode` drops",
+    "  non-semantic tokens; TokensSection folds empty foundation kinds behind one",
+    "  disclosure row).",
+    "  Everything in surfaces/brand-lint-warnings.json's `WHAT THE BOARD WON`",
+    "  applies here too \u2014 it is one chassis under four state boards.",
+    "",
+    "NOT CONFORMED \u2014 A CONTRAST FLOOR THE BOARD CANNOT WAIVE:",
+    "  154:186 colours the footnote `--color/ink-muted` (#6B7280) on 154:185's",
+    "  `--color/bg-subtle` (#F3F4F6) fill. Measured by measure.mjs, that pair is",
+    "  4.39:1 at 11px against a 4.5 WCAG AA floor \u2014 a FAIL, and it is what shipped",
+    "  before this pass too, unmeasured. The code now paints `--bk-ink-soft`",
+    "  (#4B5563), the same substitution `DesignTabFooter` already documents for the",
+    "  same pair on the same fill. The board keeps the fill, the 11/16 type and the",
+    "  248 measure; it does not get the colour.",
+    "  So 154:186 is SKIPPED rather than joined: its four properties are one node,",
+    "  and three of them agree. Joining it would fail on `color`; conforming to it",
+    "  would put a measured AA failure behind a green gate.",
+    "",
+    "NOT JOINED, same as the sibling recipes:",
+    "  154:132 itself (the drawer's edge, not the panel's) and 1691:7219 (the",
+    "  preview band's 82px Figma text-metric height). See",
+    "  surfaces/brand-lint-warnings.json for the full reasoning."
+  ]
+}

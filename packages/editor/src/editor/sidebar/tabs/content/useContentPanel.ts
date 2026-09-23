@@ -61,12 +61,17 @@ export interface UseContentPanelReturn {
   addCondition: (elementId: string, expr: ConditionExpression) => void;
 }
 
+/** Board 151:87 names the row after the element itself — "Happy hour banner",
+ *  "Sold-out badge" — not after its tag. The type was prefixed onto every row
+ *  ("badge · Sold out"), which is the one word the reader already knows least
+ *  about the thing being hidden, and it pushed the words that identify it
+ *  towards the truncation. The type is still the whole label when the element
+ *  carries no text of its own, which is the case the prefix was there for. */
 function elementLabel(composer: Composer, id: string): string {
   const el = composer.elements.getElement(id);
   if (!el) return id;
-  const type = el.getType?.() ?? "element";
   const content = (el.getContent?.() ?? "").replace(/<[^>]*>/g, "").trim().slice(0, 24);
-  return content ? `${type} · ${content}` : type;
+  return content || el.getType?.() || "element";
 }
 
 export function useContentPanel(composer: Composer | null): UseContentPanelReturn {

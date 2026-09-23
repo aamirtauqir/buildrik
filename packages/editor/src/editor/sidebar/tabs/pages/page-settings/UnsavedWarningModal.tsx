@@ -22,8 +22,9 @@ import { Button, ModalBody, ModalContent as BaseModalContent, ModalRoot, ModalTi
 // ModalContentProps per Contract E2; ModalContent still spreads them at
 // runtime. The cast bypasses the narrowed type without changing behavior.
 type ModalContentEscapeProps = {
-  size?: "lg" | "xl";
+  size?: "question" | "lg" | "xl";
   onOpenAutoFocus?: (e: { preventDefault: () => void }) => void;
+  "data-testid"?: string;
   children: React.ReactNode;
 };
 const ModalContent =
@@ -58,7 +59,12 @@ export const UnsavedWarningModal: React.FC<Props> = ({
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onCancel()}>
       <ModalContent
-        size="lg"
+        /* 440, not 720 — board 1171:4820 is a 440x117 frame and this dialog
+           carries a title, one sentence and two buttons. `size="lg"` gave it
+           720, so a two-line confirm was wider than the Brand review modal
+           that lists every staged token change. */
+        size="question"
+        data-testid="pages-unsaved-modal"
         onOpenAutoFocus={(e) => {
           // Focus the SAFE action — the destructive one should never be one
           // stray Enter away.
@@ -70,20 +76,33 @@ export const UnsavedWarningModal: React.FC<Props> = ({
       >
         <ModalBody>
           <div className="tw:flex tw:flex-col tw:gap-2.5">
-            <ModalTitle className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Discard unsaved {copy.label} changes?
+            {/* `inset={false}`: this title already sits inside ModalBody's own
+                16px inset, and ModalTitle's default adds pl-5/pr-12/pt-4 — the
+                exact double-inset its `inset` prop exists to prevent. */}
+            <ModalTitle inset={false} className="tw:m-0 tw:font-semibold tw:text-[var(--bk-ink)]">
+              {/* The 13px lives on a SPAN. `MODAL_TITLE_CLASS` is
+                  `text-[length:var(--bk-text-14)]` and a caller `className`
+                  font-size is a second arbitrary utility on a plain <h2> —
+                  two classes, one property, resolved by stylesheet order. The
+                  `tw:text-[13px]` this file passed never applied and the
+                  heading measured 14. Same defect found on ReviewModal today. */}
+              <span data-testid="pages-unsaved-title" className="tw:text-[13px] tw:leading-[normal]">
+                Discard unsaved {copy.label} changes?
+              </span>
             </ModalTitle>
 
-            <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+            {/* `leading-[normal]` — 1171:4822. */}
+            <p data-testid="pages-unsaved-body" className="tw:m-0 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink-soft)]">
               You edited {copy.fields} but didn&apos;t save. Leaving this tab throws those edits
               away.
             </p>
 
-            <div className="tw:flex tw:justify-end tw:gap-2">
+            <div className="tw:flex tw:justify-end tw:gap-2" data-testid="pages-unsaved-foot">
               <Button
                 ref={keepRef}
                 className={`${BTN} tw:border-0 tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]`}
                 onClick={onCancel}
+                data-testid="pages-unsaved-keep"
                 aria-label="Keep editing and stay on this tab"
               >
                 Keep editing
@@ -91,6 +110,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
               <Button
                 className={`${BTN} tw:border tw:border-[var(--bk-error)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-error-text,var(--bk-error))] tw:enabled:hover:bg-[var(--bk-error-tint)]`}
                 onClick={onDiscard}
+                data-testid="pages-unsaved-discard"
                 aria-label="Discard the unsaved changes and switch tab"
               >
                 Discard changes

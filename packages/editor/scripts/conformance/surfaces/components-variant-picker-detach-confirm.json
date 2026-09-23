@@ -1,0 +1,88 @@
+{
+  "surface": "components-variant-picker-detach-confirm",
+  "board": "Components · variant-picker · detach-confirm (Figma 1170:4792)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=components-detach-confirm",
+  "viewport": {
+    "width": 684,
+    "height": 400
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "component-detach-confirm"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "confirm-foot",
+      "testId": "modal-foot-component-detach-confirm",
+      "spec": "components-variant-picker-detach-confirm",
+      "nodeId": "1170:4809"
+    },
+    {
+      "name": "confirm",
+      "testId": "component-detach-confirm"
+    },
+    {
+      "name": "detach-action",
+      "testId": "component-detach"
+    }
+  ],
+  "_note": [
+    "HALF THIS BOARD HAS NO CODE TO CONFORM, and the board says so itself. Its",
+    "own title reads '[not-implemented] the variant-picker half:",
+    "component.variants is always empty and addVariant/updateVariant/",
+    "removeVariant have no callers (ComponentManager.ts:320,331,347). The",
+    "detach-confirm half ships.' Confirmed 2026-09-08: ComponentsTab renders a",
+    "variant-picker modal from `state.variantPicker`, whose `variants` array",
+    "can only ever be empty, so nodes 1170:4793-4801 have no reachable",
+    "counterpart. Nothing measured, nothing invented.",
+    "",
+    "The detach half is reached through the probe: three conditions gate it —",
+    "a saved component, an INSTANCE of it selected on canvas, and the design",
+    "system in `pro` mode (ComponentDetailScreen.tsx, DSModeContext) — and none",
+    "of the three can be arranged by clicking in the demo. The probe mounts the",
+    "real ComponentDetailScreen and AutoOpen presses its own Detach button, so",
+    "the dialog measured is the shipped one, not a re-creation.",
+    "",
+    "THE COPY DRIFT boards.json recorded ('drift-detach-copy-rewritten') IS",
+    "FIXED and verified in the probe: title 'Detach from component?', body",
+    "'This copy stops receiving updates from \"Menu card\". The component itself",
+    "is untouched.', buttons 'Cancel' and 'Detach' — the board's four lines.",
+    "",
+    "WHAT IS NOT CONFORMED, and why the board loses on it:",
+    "1170:4802 draws a 340-wide popover, 14/16 padding, 10px gap, 12px title,",
+    "11/16 body, and buttons at 12/7 with a 6px radius. The shipped confirm is",
+    "chrome-ui's ConfirmDialog -> Modal kind='question': 440 wide, 16px insets,",
+    "a 14/600 title and 28h buttons at 12/6 with an 8px radius. That geometry",
+    "is not a local choice — Modal.tsx records it as measured against",
+    "1164:4713, 1175:4827, 1205:4804, 1170:4713, 1170:4749, 1172:4840 and",
+    "184:24, and the button figures agree with the design system's own Button",
+    "9:102 wherever a board instantiates it (641:2597, 642:3397, 642:3399).",
+    "So this frame's numbers are outvoted by ten nodes across nine boards, and",
+    "one confirm dialog cannot have its own dialect: ConfirmDialog is the",
+    "single home for every destructive confirm in the product.",
+    "",
+    "Like 1170:4777 in the same family, this frame instantiates no component",
+    "from the file — every node is a raw rectangle — which is the signature of",
+    "a sketch rather than a composed design.",
+    "",
+    "ONE NODE IS JOINED, and it is the one the two readings agree on: the",
+    "footer's 8px gap between Cancel and Detach (1170:4809). Thin on purpose —",
+    "asserting more would mean asserting numbers this surface has just argued",
+    "should not hold.",
+    "",
+    "TWO CONTRAST FAILURES ARE RECORDED IN THE BASELINE, and neither is in this",
+    "board: they are in the ComponentDetailScreen BEHIND the dialog, which is",
+    "board 641:2599's surface (no recipe yet, marked unreachable in boards.json).",
+    "  4.39  'No Preview'  --bk-ink-muted #6B7280 on the preview box's",
+    "        --bk-bg-subtle #F3F4F6 — the same gray-500-on-gray-100 pair the",
+    "        harness README already documents on the add-page and zoom controls.",
+    "  1.34  the '/' breadcrumb separator, #D1D5DB on the same fill.",
+    "They are baselined rather than fixed here because the fix lands in shared",
+    "drill-in chrome that another board owns; recorded so the count cannot grow",
+    "and whoever takes 641:2599 inherits the measurement instead of rediscovering",
+    "it."
+  ]
+}

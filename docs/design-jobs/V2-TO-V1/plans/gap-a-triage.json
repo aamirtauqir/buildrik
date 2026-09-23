@@ -1,0 +1,68 @@
+{
+ "page": "1:3",
+ "note": "Triage rows for gap findings that end as decisions rather than edits. The first eight use the {id, verdict, reason} shape, which normalize-plans.mjs classifies as a DEFERRED advisory and register-status.mjs credits as DEFERRED-BY-DECISION rather than leaving as PENDING — a deliberate no-op and an oversight must not look the same in the checklist. The ninth is a live instruction to another lane's owner and is deliberately NOT deferred.",
+ "rows": [
+  {
+   "id": "—",
+   "severity": "Major",
+   "why": "UX-A-21 (Major, missing-feedback) — nothing scrolls a newly inserted element into view",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE",
+   "reason": "Pure viewport behaviour with no visual state. The defect is that no insert path calls scrollIntoView (useBlockInsertion.ts:118-127, dropOperations.tsx:494-514); a board is a still frame and cannot draw a scroll that does not happen. Neither of insert's two sections (1776:8379, 1090:4527) contains a canvas board — the canvas is section 01 · Shell. Confirms the insert module agent's own verdict; recorded here so the finding has a row instead of a silence."
+  },
+  {
+   "id": "—",
+   "severity": "Minor",
+   "why": "UX-A-26 (Minor, missing-action) — the command palette can open the Insert panel and nothing more",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (cross-module)",
+   "reason": "The subject is shell/modals/CommandPalette.tsx:53-56 and its board lives in section 13 · Command palette, not in 1776:8379 or 1090:4527. Drawing per-element palette commands on an Insert board would put the claim on a surface that does not render it. Owner: shell. Recorded in the insert OPEN DECISIONS frame's code-dependency footer."
+  },
+  {
+   "id": "—",
+   "severity": "Minor",
+   "why": "UX-A-27 (Minor, missing-action) — the context-menu Insert submenu places a hard-coded ‘New element’ div",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (cross-module)",
+   "reason": "insertActions.ts:13-19 / contextMenuRegistry.ts:57-63 — the canvas right-click menu, owned by section 01 · Shell. It is already folded into insert OPEN DECISION 5 with UX-A-03 (one catalog, one picker, three doors), which is the correct home: all three doors must change together or the split gets worse."
+  },
+  {
+   "id": "—",
+   "severity": "Minor",
+   "why": "UX-A-30 (Minor, duplicate-feature) — a fourth insert implementation, wired from the shell and thrown away",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE",
+   "reason": "The fix is ‘delete it’ — a code deletion of handleQuickAdd (useStudioHandlers.ts:74-92, StudioPanels.tsx:156-157 destructures it to _onQuickAdd and never uses it). It renders nothing, so it reaches no board in any section; there is no drawing to add, mark or retire. Recorded in insert OPEN DECISION 5 so the deletion is not forgotten."
+  },
+  {
+   "id": "—",
+   "severity": "Minor",
+   "why": "UX-A-32 (Minor, missing-feedback) — the insert toast has no Undo and does not name where the element went",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (cross-module, and contested)",
+   "reason": "The toast is raised by useBlockInsertion.ts:155 and drawn on the shell's toast boards, not on any Insert board. It also collides with insert OPEN DECISION 8: SPEC-INSERT-PANEL §4's ‘highlight both’ deletes the click toast outright, which would delete the surface UX-A-32's Undo lives on. Drawing the Undo now would build the thing another open decision proposes to remove."
+  },
+  {
+   "id": "—",
+   "severity": "Major",
+   "why": "UX-A-33 (module summary) — Insert is the editor's create door",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (module summary)",
+   "reason": "The row carries no fix field (‘fix’: ‘-’). It is the module's purpose/tasks/entry-points inventory and was used as the checklist the other 32 insert findings were walked against — all five named entry points resolve to the same panel, and the one involuntary exit (media picker, no return on cancel) is UX-A-17. Filing it as work would double-count its constituents."
+  },
+  {
+   "id": "—",
+   "severity": "Major",
+   "why": "UX-B-34 (module summary) — Pages & Routing",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (module summary)",
+   "reason": "No fix field. Its thesis is the union of the pages module's own 33 findings, every one of which is planned in pages-nodes-02..12, pages-text-01/08, pages-truth-10 and pages-hotspots-11. The pages agent reached the same verdict independently (reports/pages.md:164). Checked, not invented: no constituent of UX-B-34 is missing a plan."
+  },
+  {
+   "id": "—",
+   "severity": "Major",
+   "why": "UX-H-34 (module summary) — Layers",
+   "verdict": "NOT PLANNED — NOT-APPLICABLE (module summary)",
+   "reason": "It is exactly the union of UX-H-14/17/18 (lock, hide and layer names live in localStorage, not the document) and UX-H-21/22 (the tree's role=tree markup promises roving focus it does not implement). All five are planned in layers-structural / layers-text / layers-rename and the layers agent recorded the same verdict (reports/layers.md:38). Note COVER-1-61's half-truth, already filed: hide IS local, lock is NOT — useLayerActions.ts:163-168 writes data.locked onto ElementData, which is what makes UX-H-14 a real defect."
+  },
+  {
+   "finding": "COVER-1-11 (Major, measured) — amended by this pass, on two of its four boards",
+   "severity": "Major",
+   "action": "AMENDMENT, not a deferral. COVER-1-11 asks 1703:7914 and 1703:7445 to be redrawn as the full screen with the save error at the foot ‘beside Save headers’ / ‘beside Save locales’. UX-I-32 deletes those two buttons (applied this pass via gap-a-settings-duplicates.json). Both cannot land as written. Resolution: COVER-1-11's substance stands — a save failure is never an early return, the whole form stays on screen (HeadersScreen.tsx:158-271, LocalizationScreen.tsx:206-297) — but the error line anchors to the savebar's single Save, not to an in-body one. COVER-1-11's other two boards (1703:10185 Webhooks, 1703:9208 Forms) are untouched by UX-I-32 and need no amendment. Whoever draws COVER-1-11 must read this row first or the duplicate Save comes back.",
+   "why": "COVER-1-11 / UX-I-32 — the conflict the settings report flagged as unresolved"
+  }
+ ]
+}

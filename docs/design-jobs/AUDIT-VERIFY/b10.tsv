@@ -1,0 +1,121 @@
+N	156:2	Review panel · open	FRAME	100,87076,280,812	true	VERTICAL	30	true
+K	208:641	INSTANCE	100,87076,280,44	true	false	Panel header
+K	156:8	FRAME	100,87120,280,44	true	true	Progress
+K	156:12	FRAME	100,87164,280,28	true	true	Sent meta
+K	220:847	INSTANCE	100,87192,280,28	true	false	Section header
+K	228:1002	INSTANCE	100,87220,280,64	true	false	Comment row
+K	228:1007	INSTANCE	100,87284,280,64	true	false	Comment row
+K	220:851	INSTANCE	100,87348,280,28	true	false	Section header
+K	228:1012	INSTANCE	100,87376,280,64	true	false	Comment row
+K	156:39	FRAME	100,87440,280,32	true	true	Resolved collapsed
+K	156:43	FRAME	100,87472,280,1	true	true	spacer
+K	156:44	FRAME	100,87473,280,70	true	true	Round history
+K	156:48	FRAME	100,87543,280,40	true	true	Compare
+K	156:51	FRAME	100,87583,280,44	true	true	Re-send
+K	444:2362	FRAME	100,87627,150,34	true	true	hotspot/state · Review panel · detached-present
+K	444:2364	FRAME	100,87661,150,34	true	true	hotspot/state · Review panel · revoke-confirm
+K	873:4547	FRAME	100,87695,36,36	true	true	hotspot/back · to editor
+K	873:4549	FRAME	100,87731,36,36	true	true	hotspot/menu · share permissions
+K	1138:13542	FRAME	100,87850,280,34	true	false	hotspot/state · Review panel · loading
+K	1669:7195	FRAME	100,87818,140,34	true	true	hotspot/state · Review · all-resolved
+K	1669:7197	FRAME	240,87818,140,34	true	true	hotspot/state · Review · resolved-expanded
+K	1669:7199	FRAME	100,87782,140,34	true	true	hotspot/state · Review · older-round
+K	1669:7201	FRAME	240,87782,140,34	true	true	hotspot/state · Review · re-send-confirm
+K	1720:17405	FRAME	100,87860,150,28	true	false	hotspot/state · Review · comment-update-failed
+K	1720:17408	FRAME	230,87860,150,28	true	false	hotspot/state · Review · reply-failed
+K	1720:17411	FRAME	230,87860,150,28	true	false	hotspot/state · round-history · load-error
+K	1720:17414	FRAME	230,87860,150,28	true	false	hotspot/state · Review · reply-composer band
+K	1720:17417	FRAME	230,87860,150,28	true	false	hotspot/state · foot · revoke + invite
+K	1720:17537	FRAME	230,87860,150,28	true	false	hotspot/state · compare · loading
+K	1753:8431	FRAME	100,87767,280,123	true	false	reply-composer
+K	1753:8437	FRAME	100,87890,91,32	true	false	hotspot/spare · btn/Revoke link
+C	156:2	texts=31
+T	1753:8438	112,87900,60,13	11	Medium	true	WIDTH_AND_HEIGHT	hotspot/spare · btn/Revoke link	Revoke link
+T	1753:8436	323,87866,27,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Send	Send
+T	1753:8434	112,87841,184,26	11	Regular	true	HEIGHT	reply-composer	Internal note — posts to this page’s comments, not under a reply.
+T	1753:8433	122,87785,113,15	12	Regular	true	WIDTH_AND_HEIGHT	TextInput · reply	Reply to the client…
+T	1720:17538	236,87868,138,12	10	Medium	false	HEIGHT	hotspot/state · compare · loading	compare · loading
+T	1720:17418	236,87868,138,12	10	Medium	false	HEIGHT	hotspot/state · foot · revoke + invite	foot · revoke + invite
+T	1720:17415	236,87868,138,24	10	Medium	false	HEIGHT	hotspot/state · Review · reply-composer band	Review · reply-composer band
+T	1720:17412	236,87868,138,12	10	Medium	false	HEIGHT	hotspot/state · round-history · load-error	round-history · load-error
+T	1720:17409	236,87868,104,12	10	Medium	false	HEIGHT	hotspot/state · Review · reply-failed	Review · reply-failed
+T	1720:17406	106,87868,138,24	10	Medium	false	HEIGHT	hotspot/state · Review · comment-update-failed	Review · comment-update-failed
+T	I229:1088;9:19	112,87593,127,20	14	Medium	true	WIDTH_AND_HEIGHT	Button	Re-send for review
+T	I229:1086;9:31	128,87552,149,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with approved
+T	156:47	356,87481,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Round history	›
+T	156:46	210,87481,74,18	12	Regular	true	WIDTH_AND_HEIGHT	Round history	Round 3 of 3
+T	156:45	116,87481,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Round history	‹
+T	156:42	356,87448,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Resolved collapsed	›
+T	156:41	336,87448,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Resolved collapsed	9
+T	156:40	116,87448,63,16	11	Regular	true	WIDTH_AND_HEIGHT	Resolved collapsed	RESOLVED
+T	I228:1012;17:39	132,87408,236,18	12	Regular	true	HEIGHT	Body	Sara · client · Menu · 1d
+T	I228:1012;17:38	132,87386,236,20	13	Regular	true	TRUNCATE	Body	“add gluten-free icons”
+T	I220:851;16:18	357,87354,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Section header	1
+T	I220:851;16:17	116,87354,233,16	11	Medium	true	HEIGHT	Section header	MENU
+T	I228:1007;17:39	132,87316,236,18	12	Regular	true	HEIGHT	Body	Sara · client · Contact · 2d
+T	I228:1007;17:38	132,87294,236,20	13	Regular	true	TRUNCATE	Body	“wrong phone number”
+T	I228:1002;17:39	132,87252,236,18	12	Regular	true	HEIGHT	Body	Sara · client · Home · 2d
+T	I228:1002;17:38	132,87230,236,20	13	Regular	true	TRUNCATE	Body	“hero photo is too dark”
+T	I220:847;16:18	357,87198,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Section header	2
+T	I220:847;16:17	116,87198,233,16	11	Medium	true	HEIGHT	Section header	OPEN · HOME
+T	156:13	116,87170,96,16	11	Regular	true	WIDTH_AND_HEIGHT	Sent meta	Sent 2d ago · Sara
+T	156:11	270,87137,47,16	11	Medium	true	WIDTH_AND_HEIGHT	Progress	9 of 12
+T	I208:641;16:7	116,87090,204,16	11	Medium	true	HEIGHT	Panel header	Review
+R	156:2	157:58	NAVIGATE	Review panel · open
+R	1720:17537	1717:17246	NAVIGATE	hotspot/state · compare · loading
+R	1720:17417	1705:8773	NAVIGATE	hotspot/state · foot · revoke + invite
+R	1720:17414	1705:8704	NAVIGATE	hotspot/state · Review · reply-composer band
+R	1720:17411	1705:8636	NAVIGATE	hotspot/state · round-history · load-error
+R	1720:17408	1705:8566	NAVIGATE	hotspot/state · Review · reply-failed
+R	1720:17405	1705:8494	NAVIGATE	hotspot/state · Review · comment-update-failed
+R	1669:7201	158:2	NAVIGATE	hotspot/state · Review · re-send-confirm
+R	1669:7199	157:169	NAVIGATE	hotspot/state · Review · older-round
+R	1669:7197	157:109	NAVIGATE	hotspot/state · Review · resolved-expanded
+R	1669:7195	157:58	NAVIGATE	hotspot/state · Review · all-resolved
+R	1138:13542	1138:4527	NAVIGATE	hotspot/state · Review panel · loading
+R	873:4549	817:5069	NAVIGATE	hotspot/menu · share permissions
+R	873:4547	52:2	NAVIGATE	hotspot/back · to editor
+R	444:2364	158:105	NAVIGATE	hotspot/state · Review panel · revoke-confirm
+R	444:2362	157:2	NAVIGATE	hotspot/state · Review panel · detached-present
+N	163:2	History · Saves · changes	FRAME	1300,79452,280,812	true	VERTICAL	13	true
+K	163:3	FRAME	1300,79452,280,48	true	true	Header
+K	163:6	FRAME	1300,79500,280,36	true	true	View toggle
+K	163:9	FRAME	1300,79536,280,88	true	true	Approved anchor
+K	163:15	FRAME	1300,79624,280,40	true	true	Now row
+K	163:48	FRAME	1300,79664,280,44	true	true	Change · 0
+K	163:52	FRAME	1300,79708,280,44	true	true	Change · 1
+K	163:56	FRAME	1300,79752,280,44	true	true	Change · 2
+K	163:60	FRAME	1300,79796,280,44	true	true	Change · 3
+K	163:43	FRAME	1300,79840,280,340	true	true	spacer
+K	163:44	FRAME	1300,80180,280,40	true	true	Prune note
+K	163:46	FRAME	1300,80220,280,44	true	true	Footer
+K	1671:7219	FRAME	1440,80190,124,34	true	true	hotspot/state · History · time-travel
+K	1671:7223	FRAME	1300,80190,280,34	true	true	hotspot/back · History · Saves (Milestones)
+C	163:2	texts=23
+T	163:47	1316,80234,106,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	+  Save a version
+T	163:45	1316,80188,248,48	11	Regular	true	HEIGHT	Prune note	This session only — the last 100 steps, cleared when you reload. Save a version to keep a 
+T	163:63	1520,79803,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 3	15:58
+T	163:62	1316,79821,24,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Sara
+T	163:61	1316,79802,91,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Footer link fixed
+T	163:59	1520,79759,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 2	16:05
+T	163:58	1316,79777,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Ali
+T	163:57	1316,79758,121,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Menu prices updated
+T	163:55	1520,79715,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 1	16:12
+T	163:54	1316,79733,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 1	Ali
+T	163:53	1316,79714,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 1	2 images replaced
+T	163:51	1520,79671,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 0	16:20
+T	163:50	1316,79689,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Ali
+T	163:49	1316,79670,98,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Hero copy edited
+T	163:18	1332,79646,146,16	11	Regular	true	WIDTH_AND_HEIGHT	Now row	hero copy · 2 images · menu
+T	163:17	1332,79628,132,18	12	Regular	true	WIDTH_AND_HEIGHT	Now row	Now — edited since v3
+T	I229:1136;9:31	1328,79593,136,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with current
+T	163:12	1316,79566,127,16	11	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	Sara Khan · 18 Jul, 15:42
+T	163:11	1316,79546,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	⚑  APPROVED · v3
+T	163:8	1410,79510,51,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	▣  Saves
+T	163:7	1316,79510,73,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	⟳  Changes
+T	163:5	1552,79466,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	163:4	1316,79466,58,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Versions
+R	163:2	163:113	NAVIGATE	History · Saves · changes
+R	1671:7223	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	1671:7219	163:113	NAVIGATE	hotspot/state · History · time-travel
+END	done=156:2|163:2	stopped=false	bytes=9211

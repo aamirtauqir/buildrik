@@ -1,0 +1,124 @@
+{
+  "surface": "media-drill-in-icon-picker",
+  "board": "Media · drill-in · icon-picker (Figma 147:2)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-icon-picker",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-icon-group-recent"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE WAIT NAMES THE RECENT BAND, not the overlay root. The band only",
+    "renders when a recent list EXISTS (`showRecent`), and the probe case had",
+    "no stored list, so the screen the board draws — RECENT · 12 over a tile",
+    "grid — had never been on screen. `withRecentIcons` seeds it from",
+    "`getAllIcons()` rather than from typed-out names, because `readRecent`",
+    "resolves each through `getIconByName` and silently drops what it cannot",
+    "find: a renamed icon would shrink the band without failing anything.",
+    "",
+    "BOARD WON: 147:2 gives this drill-in the drawer's --flowbite/gray/100",
+    "edge and the overlay drew no border at all, so its computed border-color",
+    "was #000000, the initial value. Third time this defect has been found on",
+    "the same family (144:2 on SlimLauncher, 146:2 on the asset detail).",
+    "Also 147:13, the category trigger: 12/18 where it shipped 13; 147:14, the",
+    "'N categories' mono count, which had no line-height at all and computed",
+    "`normal`; and 220:827's 8 gap on the section header, absent because the",
+    "label grows with flex-1 and hides the difference until the count is short.",
+    "",
+    "THE TILE GRID IS NOT JOINED, and it is the one thing this board most looks",
+    "like it should settle. 147:18/147:19 draw FIVE tiles up on a 16 inset with",
+    "an 11.2 gap and 1.6 side padding — fractions that are the export of a",
+    "space-between row, not a designed gutter (5x40 = 200 inside 248 leaves 48,",
+    "which is exactly 2x1.6 + 4x11.2). Board 75:25 draws the same grid SIX up",
+    "on a 12 gutter with tiles that fill their track, IconBrowserOverlay's own",
+    "docstring has said '6-up grid' since it was written, and boards.json has",
+    "75:2 recorded drift-fixed against the shipped six-up markup as of",
+    "2026-09-08. Two boards disagree; the verified one stands.",
+    "",
+    "NOT JOINED, and why: 147:10, the search field — chrome-ui TextInput, which",
+    "boards.json holds at authority=open:input-fill; its w-248 is also the 280",
+    "frame less the row's own 16 inset, i.e. the row's arithmetic and not a",
+    "decision about the control. 147:9, the row AROUND it, carries a",
+    "border + radius on a full-bleed 36-high frame while the 28-high field",
+    "inside it carries its own — two nested rounded rectangles is an export",
+    "artifact, not a design, and the only real fact in the node (h36) is joined",
+    "through the code's own row anyway. 147:11 is the placeholder, which lives",
+    "on the same control. 1720:17378 is a hotspot.",
+    "",
+    "FOUND AND FIXED, and it was shipping: the RECENT band measured 16 tall",
+    "against its own `tw:h-7`. It is a flex item in a column whose content",
+    "overflows and it carried no `shrink-0`, so the browser compressed it — on",
+    "every screen that has recents, in the live product, invisibly to the test",
+    "suite. `h-7` was right; nothing was enforcing it.",
+    "",
+    "CONTRAST, BOARD-MANDATED AND DECLARED — 2 failures at 4.39:1 on the band's",
+    "own label and count. 220:827 pins both halves: its tint-bg child is",
+    "--color/bg-subtle #F3F4F6 and 16:17 / 16:18 are --color/ink-muted #6B7280.",
+    "Pre-existing (GROUP_HDR has always used that pair; the band was simply too",
+    "squashed to read before), and unfixable from the call site — the standing",
+    "CONTRAST-INK-MUTED.md token defect. The fix is ink-soft at 7.0:1, which",
+    "deviates from a board that names the token, so it is a founder call."
+  ],
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-icon-browser",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "147:2"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "208:391"
+    },
+    {
+      "name": "back-row",
+      "testId": "media-icon-back",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "147:7"
+    },
+    {
+      "name": "category-row",
+      "testId": "media-icon-categories",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "147:12"
+    },
+    {
+      "name": "category-trigger",
+      "testId": "icon-category-scope",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "147:13"
+    },
+    {
+      "name": "category-count",
+      "testId": "media-icon-category-count",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "147:14"
+    },
+    {
+      "name": "group-header",
+      "testId": "media-icon-group-recent",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "220:827"
+    },
+    {
+      "name": "group-label",
+      "testId": "media-icon-group-label",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "I220:827;16:17"
+    },
+    {
+      "name": "group-count",
+      "testId": "media-icon-group-count",
+      "spec": "media-drill-in-icon-picker",
+      "nodeId": "I220:827;16:18"
+    }
+  ]
+}

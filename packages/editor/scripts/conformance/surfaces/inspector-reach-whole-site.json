@@ -1,0 +1,157 @@
+{
+  "surface": "inspector-reach-whole-site",
+  "board": "Inspector · reach-whole-site (Figma 189:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-scope-pill"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-scope-site"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-whole-site"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:2"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:3"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:4"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "920:4687"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:7"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:8"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:10"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:12"
+    },
+    {
+      "name": "reach-note",
+      "testId": "whole-site-note",
+      "spec": "inspector-reach-whole-site",
+      "nodeId": "189:14"
+    },
+    {
+      "name": "site-hint",
+      "testId": "whole-site-hint"
+    },
+    {
+      "name": "actions",
+      "testId": "whole-site-actions"
+    },
+    {
+      "name": "open-brand",
+      "testId": "whole-site-open-brand"
+    },
+    {
+      "name": "back",
+      "testId": "whole-site-back"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900 through the production path: Insert a Section, open",
+    "the reach pill in the context strip, choose 'Whole site'. The panel replaces",
+    "its eleven sections with the takeover this board draws.",
+    "",
+    "MATCHES AS DRAWN: the 48h/x16 header with the element's name at 14/20 and",
+    "the `btn/ai` chip, the 32h `--color/bg-subtle` strip with its three 22h",
+    "radius-4 pills, the warning-tint reach note at 12/18 in `--color/warning-",
+    "text`, and the accent-tint site hint at 11/16 in `--color/accent-text`. 35",
+    "properties, no drift. The takeover itself (189:14, 189:102, 1698:6943) was",
+    "built to this board in an earlier pass; this recipe is the measurement that",
+    "was missing.",
+    "",
+    "ONE THING CHANGED: the two action buttons carried `px-3` and measured 98 and",
+    "152 against the board's 88 and 146. 1698:6944 is 88 wide around a 13px",
+    "'Open Brand', and 13px Inter measures that label ~73 — so the board's inset",
+    "is 8 a side, not 12. `px-2` now, and both land within 2px.",
+    "",
+    "NOT JOINED, and why:",
+    "",
+    "  1698:6944 / 1698:6946's WIDTH (88 / 146 against 90 / 144). What is left",
+    "  after the padding fix is Figma's text metric against the browser's on a",
+    "  13px string — the board's 88 is in fact 1.7px NARROWER than the label needs",
+    "  here, so pinning it would clip 'Open Brand'. That is the same class as the",
+    "  46px button the brief names as export noise. Their FILL, HEIGHT and RADIUS",
+    "  are measured (accent #1a56db, 28, 6) and match; only the join is withheld,",
+    "  because a target joins all of its node's properties or none.",
+    "",
+    "  189:102's HEIGHT (52 against 64). Same cause, one line further on: the",
+    "  hint's 105-character sentence wraps to THREE 16px lines in a 267px column",
+    "  in the browser, and the board's own text node (189:103) is 36 tall — two",
+    "  lines — for the same string at the same size in the same width. Two lines",
+    "  of that sentence would need ~284px of line, which the 268 box does not",
+    "  have. The band's fill and inset are what the board is asserting and both",
+    "  match.",
+    "",
+    "  1698:6943's WIDTH (300 against 299) — the panel's own left rule, the same",
+    "  pixel recorded on every recipe in this family.",
+    "",
+    "  189:101, a 2px full-height 'reach edge' stripe down the panel. It is drawn",
+    "  on the FRAME, not in the flow, and boards 160:412 / 160:510 (the",
+    "  all-like-this state, which is the same reach mechanism one step less broad)",
+    "  draw no such edge — so one board of the pair adds a rule the other omits,",
+    "  and neither the code nor a recipe should settle that off a single frame."
+  ]
+}

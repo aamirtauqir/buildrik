@@ -39,13 +39,20 @@ export interface LoadErrorBannerProps {
   onDismiss?: () => void;
 }
 
+/* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
+   which computes to 21px, and board 297:2244 says the keyword. */
 const BAR =
   "tw:flex tw:items-center tw:gap-3 tw:px-5 tw:py-3 tw:rounded-lg " +
-  "tw:bg-[var(--bk-error-tint)] tw:text-sm tw:font-medium tw:leading-normal " +
+  "tw:bg-[var(--bk-error-tint)] tw:text-sm tw:font-medium tw:leading-[normal] " +
   "tw:text-[var(--bk-error-text)] tw:[font-family:var(--bk-font-ui)]";
 
-/** Board 297:2246 — white surface, `--bk-border-medium` hairline, error label. */
-const ACTION = "tw:text-[var(--bk-error-text)]";
+/** Board 297:2246 — white surface, `--bk-border-medium` hairline, error label
+ *  at 13 on radius 6 with 12/6 insets. flowbite's `size="xs"` supplies h-8 and
+ *  text-xs and the base supplies rounded-lg, and each of those only yields to
+ *  a SAME-property utility — `h-auto` for the height, not `min-h`. */
+const ACTION =
+  "tw:h-auto tw:px-3 tw:py-1.5 tw:rounded-md tw:text-[13px] tw:leading-[normal] " +
+  "tw:text-[var(--bk-error-text)]";
 
 const QUIET =
   "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
@@ -78,8 +85,12 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         ? "You don't have access to this site"
         : "Load failed";
   return (
-    <div className={BAR} role="alert" aria-label={label}>
-      <div className="tw:flex-1">
+    <div className={BAR} role="alert" aria-label={label} data-testid="load-error-banner">
+      <div className="tw:flex-1" data-testid="load-error-message">
+        {/* Board 297:2244 opens the line with a warning glyph. Decorative — the
+            banner's role and its `aria-label` already say "alert" and name the
+            failure, and a screen reader repeating "warning sign" adds nothing. */}
+        <span aria-hidden="true">⚠&nbsp;&nbsp;</span>
         {isAuth
           ? "Session expired. Sign in to load this site from the dashboard — you're seeing local changes for now."
           : isMissing
@@ -104,6 +115,7 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
             title={reconnecting ? "Reaching the server — this usually takes a moment." : undefined}
             onClick={() => { setReconnecting(true); onRetry(); }}
             className={ACTION}
+            data-testid="load-error-retry"
           >
             {reconnecting ? "Reconnecting…" : "Retry"}
           </Button>

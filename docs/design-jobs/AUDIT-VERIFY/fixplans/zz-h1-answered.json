@@ -1,0 +1,19 @@
+{
+ "slug": "zz-h1-answered",
+ "page": "1:3",
+ "note": "H1 — the open question the C2 author raised and could not settle from geometry — is answered by looking at the rendered board. The paragraph is an engineering note, not product copy.",
+ "rows": [
+  {"op": "delete", "id": "2846:21652", "expect": "The thread and the prompt",
+   "why": "H1 ANSWERED BY THE SCREENSHOT. The C2 author revealed three paragraphs by growing their clipping parents, and flagged the open question in writing: are they product copy or C4-class annotation? Geometry cannot tell — both look identical to a containment check, which is exactly why the author refused to guess. The rendered board settles it. The string is \\\"The thread and the prompt you typed stay on screen behind this state. Losing the user's words is a second failure on top of the first.\\\" No product tells a user that a failure is 'a second failure on top of the first'; it is third-person reasoning ABOUT the design, addressed to whoever is building it — the same shape as the UX-B-32 paragraphs that F03 hid inside the Pages panel. So the C2 grow was right to reveal what was clipped, and this hides the part that should never have been drawn on a product board. delete is visible=false, so the note is preserved, not destroyed. The recovery control 2846:21651 'Continue by hand in the inspector' STAYS revealed — that is the affordance F06 was about."},
+  {"op": "delete", "id": "2846:21650", "expect": "The thread and the prompt",
+   "why": "H1 — the same annotation on 171:136 'AI · not-configured', the board whose screenshot answered the question."},
+  {"op": "delete", "id": "2846:21682", "expect": "The thread and the prompt",
+   "why": "H1 — the same annotation on 2846:21667 'AI · error-provider'."},
+  {"op": "resize", "id": "171:132", "h": 156,
+   "why": "H1 — reclaim the height the hidden note was given. Computed from the CURRENT state, not the pre-edit dump: 171:132 sits at abs y67231 and was grown to 240 by c2-clipping#0. With 2846:21652 hidden, the last visible child is 2846:21651, ending at abs 67371, so the content run is 67371-67231 = 140, plus the frame's own 16px bottom inset (derived from its original 108 height against content ending at 67323) = 156. Leaving it at 240 would open 84px of empty space under the recovery link."},
+  {"op": "resize", "id": "171:163", "h": 230,
+   "why": "H1 — same on 171:136. This parent was grown to 304 AND its tail was moved by c2-clipping#2/3/4, so the arithmetic must use the post-move positions: 2846:21649 now sits at parent-rel 178, i.e. abs 65853, ending 65889. 65889-65675 = 214, plus the 16px bottom inset = 230."},
+  {"op": "resize", "id": "2846:21677", "h": 188,
+   "why": "H1 — same on 2846:21667, also grown (to 272) and moved. Post-move, 2846:21681 sits at parent-rel 136 = abs 64437, ending 64473. 64473-64301 = 172, plus 16 = 188."}
+ ]
+}

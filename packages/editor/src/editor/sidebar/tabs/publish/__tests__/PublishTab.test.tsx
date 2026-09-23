@@ -24,6 +24,22 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
+import { deriveLifecycleState } from "../../../../shell/lifecycle";
+
+/* A site with no review in the path and nothing blocking — the plain `confirm`
+   gate. Every case here is about the panel's wiring, not the gate; the gate's
+   own cases are PublishTab.gate.test.tsx. */
+const OPEN_MOVE = deriveLifecycleState({
+  reviewState: "none",
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: false,
+  hasUnpublishedChanges: null,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+});
 
 /** The real provider, so chrome-ui components that reach toast through their
  *  own internal import find a context instead of throwing. */
@@ -61,17 +77,13 @@ describe("PublishTab readiness source", () => {
   // never the server's contract (runPrePublishChecks returns a different six with
   // severity) and are gone. Readiness coverage now lives in
   // PublishTab.checks.test.tsx against the real endpoint shape.
-  /* Moved with the checklist: "open this site from the dashboard" is what the
-     wizard's step 1 says when there is no site to run checks against. The panel
-     itself, with a publish path wired, shows the board's three sections. */
+  /* The checks are inline (board B3-10): with no site to run them against the
+     section says so, in the panel, before anything is clicked. */
   it("asks the user to open the site from the dashboard when there is no site id", () => {
-    const { container, getByText } = renderTab(
-      <PublishTab composer={composer} onVercelPublish={vi.fn()} />,
+    const { container } = renderTab(
+      <PublishTab composer={composer} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
     );
-    fireEvent.click(getByText("Publish to production"));
-    expect(container.textContent + document.body.textContent).toContain(
-      "Open this site from the dashboard",
-    );
+    expect(container.textContent).toContain("Open this site from the dashboard");
     expect(container.textContent).not.toContain("SEO title set");
   });
 });
@@ -80,28 +92,28 @@ describe("PublishTab readiness source", () => {
    ("Publish to production"), not the verb ("Publish Site"), and lives pinned
    at the panel's bottom rather than inside the scroll body. */
 describe("PublishTab — canonical publish wiring (B1)", () => {
-  it("shows 'not configured' when no canonical handler is wired (flag off / inert)", () => {
-    const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} />);
+  it("shows 'not configured' when no publish door is wired (flag off / inert)", () => {
+    const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} nextMove={OPEN_MOVE} />);
     // Board 784:4480: with no publish path the panel is that one sentence.
     expect(container.textContent).toContain("Connect Vercel to publish.");
   });
 
-  it("enables Publish and fires the canonical handler when wired", () => {
-    const onVercelPublish = vi.fn().mockResolvedValue(undefined);
+  it("enables Publish and opens the ONE door when wired — the same door the topbar opens", () => {
+    const onRequestPublish = vi.fn();
     const { getByText } = renderTab(
-      <PublishTab composer={composer} publishJob={makeJob()} onVercelPublish={onVercelPublish} />
+      <PublishTab composer={composer} publishJob={makeJob()} nextMove={OPEN_MOVE} onRequestPublish={onRequestPublish} />
     );
-    /* The CTA opens the gate; the deploy fires from the wizard's last step.
-       Board 833:4518 → 914:4507: nothing publishes without passing Confirm. */
+    /* The CTA opens the door; the dialog behind it (B3-10's facts confirm) is
+       AquibraStudio's, so nothing publishes from here. The panel's own two-step
+       wizard is gone (B4). */
     fireEvent.click(getByText("Publish to production"));
-    fireEvent.click(getByText("Continue to Confirm →"));
-    fireEvent.click(getByText("Publish now"));
-    expect(onVercelPublish).toHaveBeenCalledTimes(1);
+    expect(onRequestPublish).toHaveBeenCalledTimes(1);
+    expect(document.body.textContent).not.toContain("Continue to Confirm");
   });
 
   it("reflects the canonical 'publishing' state (no second state machine)", () => {
     const { container } = renderTab(
-      <PublishTab composer={composer} publishJob={makeJob({ uiState: "publishing", progress: 40 })} onVercelPublish={vi.fn()} />
+      <PublishTab composer={composer} publishJob={makeJob({ uiState: "publishing", progress: 40 })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />
     );
     expect(container.textContent).toContain("Publishing…");
     expect(container.textContent).toContain("40%");
@@ -109,7 +121,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
 
   it("shows the published URL + Update label from canonical state", () => {
     const { container, getByText } = renderTab(
-      <PublishTab composer={composer} publishJob={makeJob({ uiState: "published", publishedUrl: "https://x.vercel.app" })} onVercelPublish={vi.fn()} />
+      <PublishTab composer={composer} publishJob={makeJob({ uiState: "published", publishedUrl: "https://x.vercel.app" })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />
     );
     expect(getByText("Publish to production")).toBeTruthy();
     expect(container.textContent).toContain("x.vercel.app");
@@ -123,7 +135,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
      that a deployment is still serving. */
   it("a failed republish leaves the live deployment on screen", () => {
     const { container } = renderTab(
-      <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} onVercelPublish={vi.fn()} />
+      <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />
     );
     expect(container.textContent).toContain("x.vercel.app");
     expect(container.textContent).toContain("deploy failed");

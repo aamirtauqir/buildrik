@@ -77,34 +77,27 @@ export function useMediaState(composer: Composer): MediaStateResult {
   // Returns null on offline / unconfigured / auth-fail — useUploadState falls back to local.
   const serverQuota = useServerStorageQuota(composer);
   const upload = useUploadState(composer, showToast, serverQuota.quota);
-  const selection = useSelectionState(composer, library.libraryItems, showToast);
+  const selection = useSelectionState(composer, library.libraryItems, showToast, library.versionsOf);
   const discovery = useDiscoveryState(composer, showToast);
 
   // Recompute usageMap when library or page graph changes.
   // Equality-check guards against infinite re-renders from new Map identity.
+  //
+  // Read through `checkInUse` — the same `findByMediaSrc` answer the delete
+  // confirm and the library's rail read. This used to walk
+  // `page.root.getDescendants()` and match `el.attrs.src`, neither of which
+  // the engine's page roots or elements carry (a root is `{id, type, classes,
+  // tagName, children}`), so no drawer card ever showed its pips (measured
+  // live 2026-09-14 against three used files). A placement on a saved
+  // version counts for the file it belongs to — usage is the family's
+  // (Clone 3695:45529), as the library reads it.
   useEffect(() => {
     const map = new Map<string, number>();
-    const elementsApi = (composer as unknown as {
-      elements?: { getAllPages?: () => unknown[] };
-    }).elements;
-    const pages = elementsApi?.getAllPages?.() ?? [];
-    for (const page of pages) {
-      const pageTyped = page as { root?: { getDescendants?: () => unknown[] } };
-      const elements = pageTyped?.root?.getDescendants?.() ?? [];
-      const usedInThisPage = new Set<string>();
-      for (const el of elements) {
-        const elTyped = el as {
-          styles?: { backgroundImage?: string };
-          attrs?: { src?: string };
-        };
-        const assetSrc = elTyped.styles?.backgroundImage ?? elTyped.attrs?.src ?? "";
-        if (!assetSrc) continue;
-        const item = library.libraryItems.find((i) => i.src && assetSrc.includes(i.src));
-        if (item) usedInThisPage.add(item.key);
-      }
-      for (const key of usedInThisPage) {
-        map.set(key, (map.get(key) ?? 0) + 1);
-      }
+    for (const item of library.libraryItems) {
+      const family = library.versionsOf(item.key);
+      const members = (family.length > 0 ? family : [item]).map((m) => m.key);
+      const pages = new Set(selection.checkInUse(members).flatMap((u) => u.pages));
+      if (pages.size > 0) map.set(item.key, pages.size);
     }
     setUsageMap((prev) => {
       if (prev.size !== map.size) return map;
@@ -113,7 +106,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
       }
       return prev;
     });
-  }, [composer, library.libraryItems]);
+  }, [library.libraryItems, library.versionsOf, selection.checkInUse]);
 
   // Listen for selection mode requests from other parts of the UI
   useEffect(() => {
@@ -177,7 +170,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const insertToCanvas = useCallback(
     async (key: string) => {
       let asset:
-        | { src: string; type: string; name: string; localOnly?: boolean }
+        | { src: string; type: string; name: string; localOnly?: boolean; altText?: string }
         | undefined = composer.media.getAsset(key);
       let isStock = false;
 
@@ -189,7 +182,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
         } else {
           const photo = discovery.stockPhotos.find(p => p.id === key);
           if (photo) {
-            asset = { src: photo.url, type: "img", name: photo.alt };
+            /* The provider already wrote alt text for this photo; carrying it
+               is the difference between a published image with a description
+               and one with none. */
+            asset = { src: photo.url, type: "img", name: photo.alt, altText: photo.alt };
             isStock = true;
           } else {
             const font = discovery.discFonts.find((f) => f.id === key);
@@ -218,11 +214,30 @@ export function useMediaState(composer: Composer): MediaStateResult {
         return;
       }
 
+      /* Clone 3695:20614 — "Canvas · Menu preview image replaced". With an
+         image (or video) element selected on the canvas, Insert to canvas
+         REPLACES that element's src; it used to add a second image beside
+         it while the selected one kept its old src, so applying looked
+         exactly like cancelling (audit A03). An explicit selection context
+         (the inspector's Choose image, a dropped empty Image) still wins. */
+      const selectedEl = composer.selection.getCount() === 1 ? composer.selection.getSelected() : null;
+      const assetKind =
+        asset.type === "vid" || asset.type === "video"
+          ? "video"
+          : asset.type === "img" || asset.type === "image"
+            ? "image"
+            : asset.type === "svg"
+              ? "svg"
+              : null;
+      const replaceTarget =
+        selectionContext?.elementId ??
+        (selectedEl && assetKind && selectedEl.getType() === assetKind ? selectedEl.getId() : null);
+
       try {
-        if (selectionContext) {
+        if (replaceTarget) {
           // SELECTION MODE: Replace existing element's media via command layer
           const result = composer.mediaOps.replaceMedia(
-            selectionContext.elementId,
+            replaceTarget,
             asset.src
           );
           if (result) {
@@ -255,6 +270,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
           const mediaType = typeMap[asset.type] || "image";
           const result = composer.mediaOps.insertMediaAt(asset.src, mediaType, {
             path: "click",
+            alt: asset.altText,
           });
           if (result) {
             const insertedEl = composer.elements.getElement(result.elementId);
@@ -317,13 +333,16 @@ export function useMediaState(composer: Composer): MediaStateResult {
     [library.setLibrarySearch, discovery.discSearchAll]
   );
 
-  const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem) => {
+  const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem, anchor?: { x: number; y: number }) => {
     e.preventDefault();
     // Clamp position so menu doesn't render off-screen (~160px wide, ~140px tall)
     const MENU_W = 160;
     const MENU_H = 140;
-    const x = Math.min(e.clientX, window.innerWidth - MENU_W - 8);
-    const y = Math.min(e.clientY, window.innerHeight - MENU_H - 8);
+    /* The card's `···` (Clone 3721:43552) anchors the menu to itself; a
+       right-click anchors it to the pointer. A keyboard-fired click has no
+       pointer at all, which is why the button passes its own box. */
+    const x = Math.min(anchor?.x ?? e.clientX, window.innerWidth - MENU_W - 8);
+    const y = Math.min(anchor?.y ?? e.clientY, window.innerHeight - MENU_H - 8);
     setCtxMenu({ x, y, item });
   }, []);
 
@@ -345,8 +364,11 @@ export function useMediaState(composer: Composer): MediaStateResult {
     loadMoreError: library.loadMoreError,
     loadMoreAssets: library.loadMoreAssets,
     libraryItems: library.libraryItems,
+    allLibraryItems: library.allLibraryItems,
+    versionsOf: library.versionsOf,
     folders: library.folders,
     allFolders: library.allFolders,
+    folderCounts: library.folderCounts,
     createFolder: library.createFolder,
     inspectFolder: library.inspectFolder,
     deleteFolder: library.deleteFolder,
@@ -370,6 +392,8 @@ export function useMediaState(composer: Composer): MediaStateResult {
     selectAll: selection.selectAll,
     shiftSelect: selection.shiftSelect,
     enterSelectModeWith: selection.enterSelectModeWith,
+    checkInUse: selection.checkInUse,
+    clearSelection: selection.clearSelection,
     failedUploads: upload.failedUploads,
     dismissFailedUploads: upload.dismissFailedUploads,
     upload: upload.upload,
@@ -415,6 +439,9 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // Shared
     librarySearch: library.librarySearch,
     setLibrarySearch: setUnifiedSearch,
+    setLibraryQuery: library.setLibrarySearch,
+    tagFilter: library.tagFilter,
+    setTagFilter: library.setTagFilter,
     storage: { used: upload.storageUsed, total: upload.storageTotal },
 
     // Clipboard

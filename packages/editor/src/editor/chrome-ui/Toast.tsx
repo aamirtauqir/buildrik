@@ -21,25 +21,39 @@ import { getOverlayRoot } from "./OverlayRoot";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
-export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
+export type ToastTone = "info" | "success" | "warning" | "error" | "neutral" | "dark";
 
 /**
  * The tone fills the card and colours the title — board 1177:4859, the toast
  * catalog. It was a 3px left border on a white card, which reads as the same
  * toast five times with a coloured tick mark; the board tints the whole
  * surface, and every value it draws is already a token pair: measured off the
- * frame, #DEF7EC/#057A55, #EBF5FF/#1A56DB, #FDE8E8/#C81E1E, #FDFDEA/#723B13
- * and #F3F4F6 for the neutral one, in that order.
+ * frame, `var(--bk-green-100)`/`var(--bk-green-600)`, `var(--bk-blue-50)`/`var(--bk-blue-700)`, `var(--bk-red-100)`/`var(--bk-red-700)`, `var(--bk-yellow-50)`/`var(--bk-yellow-800)`
+ * and `var(--bk-gray-100)` for the neutral one, in that order.
  *
  * Same-property values can't be additive (Row/PanelFrame precedent), so each
  * tone carries its own complete pair rather than layering on a base.
  */
+/* Each entry carries BOTH the fill and the ink. They are listed whole rather
+   than layered on a shared `text-[var(--bk-ink)]` because two utilities for
+   the same property on a PLAIN element do not merge — source order in the
+   compiled sheet would pick the winner, not the order they are concatenated
+   in (CLAUDE.md, "Overriding a flowbite default depends on WHERE the class
+   lands"). Same rule Row's SIZE table already follows. */
 const TONE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:bg-[var(--bk-gray-100)]",
-  info: "tw:bg-[var(--bk-accent-tint)]",
-  success: "tw:bg-[var(--bk-success-tint)]",
-  warning: "tw:bg-[var(--bk-warning-tint)]",
-  error: "tw:bg-[var(--bk-error-tint)]",
+  neutral: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)]",
+  info: "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-ink)]",
+  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-ink)]",
+  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-ink)]",
+  error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-ink)]",
+  /* `dark` is the SIXTH tone and it does not touch the five above. Board
+     814:7027 draws all six undo/redo toasts on --color/ink with the message
+     in --flowbite/gray/200 — a transient "here is what just happened" bar,
+     not one of the five semantic tints board 1177:4859 catalogues. It is
+     declared here rather than at the call site so the ink ground, the ink
+     type colour and the readable action all move together; a caller that set
+     only the fill would have shipped ink-soft body text on ink. */
+  dark: "tw:bg-[var(--bk-ink)] tw:text-[var(--bk-gray-200)]",
 };
 
 const TONE_TITLE_CLASS: Record<ToastTone, string> = {
@@ -48,7 +62,29 @@ const TONE_TITLE_CLASS: Record<ToastTone, string> = {
   success: "tw:text-[var(--bk-success-text)]",
   warning: "tw:text-[var(--bk-warning-text)]",
   error: "tw:text-[var(--bk-error-text)]",
+  dark: "tw:text-white",
 };
+
+/* The body line. Every tinted tone keeps ink-soft on its own pale ground;
+   `dark` takes the board's --flowbite/gray/200 at 11 (814:7033/7063), which
+   is 12.6:1 on ink. */
+const TONE_BODY_CLASS: Record<ToastTone, string> = {
+  neutral: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
+  info: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
+  success: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
+  warning: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
+  error: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
+  dark: "tw:text-[var(--bk-gray-200)] tw:text-[11px]",
+};
+
+/* The reverse-action link. 814:7034 draws it #80B2FF, which is NOT a token —
+   the nearest step in the generated scale is --bk-blue-300 `var(--bk-blue-300)`, and
+   Gate 16's hex ratchet over chrome may only go down, so the literal cannot
+   be introduced. Measured on ink: `var(--bk-blue-300)` is 10.4:1, #80B2FF would be 8.0:1;
+   both clear AA, and the token is the one this repo can hold. */
+const DARK_BTN_CLASS =
+  "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-semibold tw:border-transparent tw:bg-transparent " +
+  "tw:text-[var(--bk-blue-300)] tw:hover:text-white tw:enabled:hover:bg-transparent";
 
 export interface ToastActionPayload {
   label: string;
@@ -172,16 +208,28 @@ function ToastViewport({ toasts, onDismiss }: { toasts: QueuedToast[]; onDismiss
       aria-live={hasError ? "assertive" : "polite"}
       aria-atomic="false"
     >
-      {toasts.map((t) => (
-        <ToastItem key={t.id} toast={t} onDismiss={onDismiss} />
+      {toasts.map((t, i) => (
+        <ToastItem key={t.id} toast={t} index={i} onDismiss={onDismiss} />
       ))}
     </div>,
     getOverlayRoot(),
   );
 }
 
-function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: string) => void }) {
+function ToastItem({
+  toast,
+  index,
+  onDismiss,
+}: {
+  toast: QueuedToast;
+  /* Position in the viewport, so a measurement can address one toast out of a
+     stack. The queue is the only stable identity a toast has — its own id is a
+     module-level counter that restarts per session. */
+  index: number;
+  onDismiss: (id: string) => void;
+}) {
   const { id, tone = "info", title, description, action, duration = 5000 } = toast;
+  const ghost = tone === "dark" ? DARK_BTN_CLASS : GHOST_BTN_CLASS;
 
   React.useEffect(() => {
     if (!Number.isFinite(duration)) return;
@@ -191,25 +239,35 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
 
   return (
     <div
+      data-testid={`toast-item-${index}`}
       className={[
-        "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg " +
-          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]",
+        /* `dark` is a one-line bar (814:7032 is 36 tall with its text at y=10
+           and the reverse action as an inline LINK, not a 32-high button), so
+           it takes 10/10 insets and centres its row. The tinted tones keep
+           the 12 they had — they carry a title over a body and top-align. */
+        tone === "dark"
+          ? "tw:pointer-events-auto tw:flex tw:items-center tw:gap-2 tw:px-2.5 tw:py-2.5 tw:rounded-lg " +
+            "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[11px]"
+          : "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg " +
+          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px]",
         TONE_CLASS[tone],
       ].join(" ")}
     >
       <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
         {title ? <span className={`tw:font-medium ${TONE_TITLE_CLASS[tone]}`}>{title}</span> : null}
-        <span className="tw:text-[var(--bk-ink-soft)] tw:text-xs">{description}</span>
+        <span className={TONE_BODY_CLASS[tone]} data-testid={`toast-body-${index}`}>
+          {description}
+        </span>
       </div>
       {action ? (
-        <Button color="light" size="xs" onClick={action.onClick} className={GHOST_BTN_CLASS}>
+        <Button color="light" size="xs" onClick={action.onClick} className={ghost}>
           {action.label}
         </Button>
       ) : null}
       <Button
         color="light"
         size="xs"
-        className={`tw:flex-none ${GHOST_BTN_CLASS}`}
+        className={`tw:flex-none ${ghost}`}
         aria-label="Dismiss notification"
         onClick={() => onDismiss(id)}
       >

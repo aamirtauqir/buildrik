@@ -1,0 +1,28 @@
+{
+  "slug": "sweep-b",
+  "date": "2026-09-07",
+  "scope": "sibling SWEEP of 07 · Brand (1776:8373) + gap AUDIT of 11 · Templates (1084:4527), 10 · Components (1938:8372), 28 · Library · shared chrome (2040:8372)",
+  "budget": "at most 15 Figma calls. 11 spent; call 11 returned the daily-cap string and took no measurement.",
+  "calls": [
+    { "n": 1, "what": "sweep-b-read.mjs — one batched read: Library sets + variants, four un-audited boards' full node lists, two captions, one ancestor chain, type-ramp conformance for three sections", "result": "SUCCEEDED" },
+    { "n": 2, "what": "drain-offtoken.mjs --only=repaint (auto-selected)", "result": "2/2 OK" },
+    { "n": 3, "what": "drain-offtoken.mjs promote, --chunk=39", "result": "39/39 OK, 0 MISMATCH, 0 escaped a board" },
+    { "n": 4, "what": "apply-text-fixes.mjs sweep-b-01-brand-text.json --apply", "result": "3 SAME — already correct, read back" },
+    { "n": 5, "what": "sweep-b-library-layout.mjs --apply", "result": "3/3 OK; 0 set overlaps, 0 leaving the section" },
+    { "n": 6, "what": "sweep-b-audit-fixes.mjs --apply", "result": "6/6 OK" },
+    { "n": 7, "what": "sweep-b-toolbar-fit.mjs --apply", "result": "4 AUTOLAYOUT refusals (correct) + 2 OK-SIZE" },
+    { "n": 8, "what": "sweep-b-toolbar-fit.mjs --apply, auto-layout branch", "result": "all 4 toolbars read FITS — ALREADY-CORRECT" },
+    { "n": 9, "what": "sweep-b-bind-sections.mjs --apply", "result": "1 newly bound; 496 have no exact style — see sweep-b-04" },
+    { "n": 10, "what": "verify-invariants.mjs", "result": "77 loose · 2 section overlaps · 0 board overlaps · 1 OOB · 0 dangling — every class at the stated baseline" },
+    { "n": 11, "what": "sweep-b-section-scan.mjs (post-sweep DS re-measure of all four sections)", "result": "QUOTA — UNMEASURED. The 'after' DS numbers for these four sections do not exist." }
+  ],
+  "scripts_added": [
+    "scripts/figma/sweep-b-read.mjs — one batched read, replaces six",
+    "scripts/figma/sweep-b-library-layout.mjs — variant grid for a stacked component set, with set-overlap and leaves-section checks",
+    "scripts/figma/sweep-b-audit-fixes.mjs — the six Templates/Components audit edits, each read back, board derived not trusted",
+    "scripts/figma/sweep-b-toolbar-fit.mjs — container-fits-content for the floating toolbar, with an auto-layout branch that hugs instead of moving children",
+    "scripts/figma/sweep-b-bind-sections.mjs — exact-match style binding, section-scoped, instance-safe, re-counts from the file",
+    "scripts/figma/sweep-b-section-scan.mjs — post-sweep DS re-measure. WRITTEN, PREFLIGHTED, NEVER SUCCESSFULLY RUN."
+  ],
+  "script_modified": "scripts/figma/drain-offtoken.mjs — added --chunk=N. Its CHUNK was 12 for payload safety; these rows are node ids and the real payload at 39 rows is 3,854 chars against a ~20,000 cap. At 200 calls a day the batch size IS the budget: 39 promotions cost 1 call instead of 4."
+}

@@ -1,0 +1,827 @@
+{
+  "surface": "s1-1-coach-dismissed",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "297:1972",
+  "boardName": "s1-1-coach-dismissed",
+  "figmaHash": "11d1f3be7c1e64b17627f814a68b120ddb3e162884b9081739b25def9335334b",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:12:22.451Z",
+  "copy": [
+    "Insert",
+    "Layers",
+    "Pages",
+    "Media",
+    "Content",
+    "Brand",
+    "More",
+    "Saved 2m ago",
+    "‹ Exit",
+    "Bella Cucina",
+    "Publish",
+    "Start with a template, or drop your first section.",
+    "Browse templates",
+    "Start blank",
+    "Select something on the canvas to edit it.",
+    "Nothing selected",
+    "Desktop · 100%"
+  ],
+  "targets": [
+    {
+      "nodeId": "2034:8392",
+      "name": null,
+      "className": "bg-[var(--color\\\\/bg-app,#f3f4f6)] content-stretch flex flex-col gap-[4px] h-[812px] items-center overflow-clip pt-[10px] relative w-[var(--size\\\\/rail,60px)]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "812px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "width": {
+          "token": "--size/rail",
+          "value": "60px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8373",
+      "name": "rail/Insert",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center overflow-clip relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8375",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8376",
+      "name": "rail/Layers",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8378",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8380",
+      "name": "rail/Pages",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center overflow-clip relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8382",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8383",
+      "name": "rail/Media",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center overflow-clip relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8385",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8386",
+      "name": "rail/Content",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center overflow-clip relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8388",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8389",
+      "name": "rail/Brand",
+      "className": "content-stretch cursor-pointer flex flex-col gap-[2px] items-center justify-center overflow-clip relative rounded-[var(--radius\\/md,6px)] shrink-0 size-[44px]",
+      "props": {
+        "gap": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "token": "--radius/md",
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "2034:8391",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "3334:12646",
+      "name": "rail/divider",
+      "className": "bg-[#e5e7eb] h-px relative shrink-0 w-[28px]",
+      "props": {
+        "background-color": {
+          "value": "#e5e7eb"
+        },
+        "width": {
+          "value": "28px"
+        }
+      }
+    },
+    {
+      "nodeId": "3334:12647",
+      "name": "rail/More",
+      "className": "[word-break:break-word] block cursor-pointer not-italic relative shrink-0 size-[44px] text-[#6b7280] text-center",
+      "props": {
+        "color": {
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "3334:12648",
+      "name": null,
+      "className": "-translate-x-1/2 absolute font-['Inter:Medium'] font-medium leading-[18px] left-[22px] text-[14px] top-[4px] w-[18px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "width": {
+          "value": "18px"
+        }
+      }
+    },
+    {
+      "nodeId": "3334:12649",
+      "name": null,
+      "className": "-translate-x-1/2 absolute font-['Inter:Regular'] font-normal leading-[16px] left-[22px] text-[11px] top-[24px] w-[44px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "692:421",
+      "name": null,
+      "className": "h-[24px] overflow-clip relative rounded-[9999px] w-px",
+      "props": {
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "697:444",
+      "name": null,
+      "className": "bg-[var(--color\\\\/success-tint,#def7ec)] content-stretch flex gap-[6px] items-center overflow-clip px-[8px] py-[2px] relative rounded-[9999px]",
+      "props": {
+        "background-color": {
+          "token": "--color/success-tint",
+          "value": "#def7ec"
+        },
+        "gap": {
+          "value": "6px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "697:443",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/success-text,#057a55)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "297:1972",
+      "name": "S1.1 · coach-dismissed",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "682:5053",
+      "name": "Topbar",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-b border-solid content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[12px] relative shadow-[0px_1px_1px_0px_rgba(0,0,0,0.04)] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "12px"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;698:488",
+      "name": "btn/exit",
+      "className": "content-stretch cursor-pointer flex h-[28px] items-center justify-center px-[12px] py-[6px] relative rounded-[8px] shrink-0",
+      "props": {
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;698:488;9:55",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[18px] not-italic relative shrink-0 text-[13px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;681:69",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-ellipsis text-left w-[200px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;681:76",
+      "name": "spacer",
+      "className": "flex-[1_0_0] h-[8px] min-w-px relative",
+      "props": {
+        "height": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;698:491",
+      "name": "Icon button",
+      "className": "absolute content-stretch flex items-center justify-center left-0 overflow-clip rounded-[6px] size-[32px] top-0",
+      "props": {
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;681:80",
+      "name": "btn/publish",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch cursor-pointer drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;681:80;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "I682:5053;698:498",
+      "name": "btn/more",
+      "className": "content-stretch cursor-pointer flex items-center justify-center overflow-clip relative rounded-[6px] shrink-0 size-[32px]",
+      "props": {
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2006",
+      "name": "Canvas",
+      "className": "bg-[var(--flowbite\\/gray\\/50,#f9fafb)] content-stretch flex flex-[1_0_0] flex-col h-full items-center min-w-px overflow-clip pb-[32px] relative",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "padding-bottom": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2008",
+      "name": "empty-canvas CTA",
+      "className": "content-stretch flex flex-col gap-[12px] items-center justify-center overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2009",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--color\\/ink,#111827)] text-left tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2010",
+      "name": "actions",
+      "className": "content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "338:2326",
+      "name": "Button",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I338:2326;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2013",
+      "name": "Start blank",
+      "className": "border border-[var(--color\\/border-input,#9ca3af)] border-solid content-stretch flex h-[34px] items-center overflow-clip px-[14px] relative rounded-[var(--radius\\/sm,4px)] shrink-0",
+      "props": {
+        "border-color": {
+          "token": "--color/border-input",
+          "value": "#9ca3af"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "padding-left": {
+          "value": "14px"
+        },
+        "padding-right": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2014",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2015",
+      "name": "Inspector",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-l border-solid content-stretch flex flex-col gap-[10px] h-full items-center justify-center overflow-clip px-[28px] relative shrink-0 w-[300px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "10px"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "300px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2016",
+      "name": "Frame",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] relative rounded-[6px] shrink-0 size-[32px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2017",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[20px] min-w-full not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/ink-soft,#4b5563)] text-center w-[min-content]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2018",
+      "name": "Footer",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid border-t content-stretch flex gap-[16px] h-[32px] items-center overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "16px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2019",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2020",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2021",
+      "name": "Frame",
+      "className": "flex-[1_0_0] h-[8px] min-w-px relative",
+      "props": {
+        "height": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "297:2022",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "881:4548",
+      "name": "hotspot/alt · S1 · Editor — ASSEMBLED (1",
+      "className": "bg-[rgba(0,0,0,0)] h-[32px] opacity-0 relative shrink-0 w-[220px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "220px"
+        }
+      }
+    }
+  ]
+}

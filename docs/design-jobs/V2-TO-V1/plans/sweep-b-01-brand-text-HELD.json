@@ -1,0 +1,8 @@
+{
+  "slug": "sweep-b",
+  "status": "DELIBERATELY NOT APPLIED",
+  "source": "brand-01-text.json rows 4-8",
+  "held": ["152:145", "306:2191", "155:60", "155:58", "155:56"],
+  "why": "Each of these five strings describes a design that is NOT drawn on the board it sits on, and in two cases contradicts the shipped code. 152:145 and 306:2191 would print 'Selecting a starter previews it on the canvas. Applying replaces…' on boards that draw no Apply control at all, while StartersSection.tsx:43 fires applyStarter(id) straight from onSelect — so the band would be false about the board AND false about the code (BRIEF hard rule 4). 155:60 promises a footer 'Apply <name>' that board E3 was going to draw and does not exist. 155:58 promises an in-app rename modal (planned board N3, not built). 155:56 promises a live specimen block (planned E5, not built). The brand pass authored all five as the caption half of board work that was blocked on quota; applying the caption without the board is exactly the failure RUNBOOK §3 names — 'a board asserting something false, invisible to five clean render sweeps'.",
+  "unblocks_when": "boards N1/N3/N4 and edits E3/E3b/E5/E5b from brand-04-boards.json land. Apply these five in the SAME commit as those boards, never before."
+}

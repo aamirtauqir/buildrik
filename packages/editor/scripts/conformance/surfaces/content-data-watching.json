@@ -1,0 +1,81 @@
+{
+  "surface": "content-data-watching",
+  "board": "Content · data · watching (Figma 303:2083)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "content-open-sources"
+    },
+    {
+      "action": "waitFor",
+      "testId": "sources-watching"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-data-watching",
+      "nodeId": "303:2084"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-data-watching",
+      "nodeId": "I303:2084;16:7"
+    },
+    {
+      "name": "crumb",
+      "testId": "content-crumb",
+      "spec": "content-data-watching",
+      "nodeId": "303:2086"
+    },
+    {
+      "name": "badge",
+      "testId": "sources-watching",
+      "spec": "content-data-watching",
+      "nodeId": "333:2346"
+    },
+    {
+      "name": "badge-label",
+      "testId": "sources-watching",
+      "spec": "content-data-watching",
+      "nodeId": "I333:2346;12:9"
+    },
+    {
+      "name": "add-source",
+      "testId": "content-add-source",
+      "spec": "content-data-watching",
+      "nodeId": "303:2093"
+    }
+  ],
+  "_note": [
+    "Board 303:2083 — the Sources screen with something registered, whose whole",
+    "subject is the green Badge. Reached with the panel's own Sources row on the",
+    "standard fixture (one source), so the pill renders because ContentTab really",
+    "is subscribed to DataManager's events, which is what makes the words true.",
+    "",
+    "Nothing drifted: the pill is green-100 on a green-500 hairline, 10/2 insets,",
+    "fully round, 12/16 medium in green-700 — settled by an earlier pass and",
+    "re-measured here against the board that draws it.",
+    "",
+    "NOT anchored, and why:",
+    "  303:2087 the source ROW at 96. Its twin on board 151:46 (151:53) draws the",
+    "  same row at 64, and boards.json records 64 walked and matching on",
+    "  2026-08-31, so the row is measured there. Two boards disagreeing settle",
+    "  nothing.",
+    "  303:2088 / 303:2090 the name and status lines (`w-[123px]` / `w-[107px]`",
+    "  drawn frames — see the content-data-sources note), 303:2091 the `⋯`,",
+    "  303:2094/95 the note frame, and the two 36 back/add frames whose controls",
+    "  ARE anchored (303:2086, 303:2093).",
+    "  303:2083 the board frame itself — `--color/bg-card` on the ROOT here where",
+    "  every other Content board says `--color/bg-panel`; that is drawer chrome",
+    "  either way and ContentTab paints neither."
+  ]
+}

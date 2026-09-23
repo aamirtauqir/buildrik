@@ -1,0 +1,9 @@
+[
+ {
+  "id": "1736:8397",
+  "page": "1:6",
+  "name": "S5.5 · dead-link · not-found — UX-I-18: this is also the screen a ReviewBar Re-send produces — it calls the shell with no client email, so the new round ships token: null, the old link is already revoked, and the editor reports success while the client's link resolves to nothing.",
+  "why": "REPAIR. review-marks-page1-6#0 carried the sentence 'APPEND to whatever the current name is: \"…\"' in its `name` field, together with its own warning that apply-truth-marks sets the FULL name and does not append. It was applied anyway, so the board's real name was overwritten with the instruction, and queue-state logged OK because the read-back matched the string it was asked for. Read on 1:6 this session at 7600,0 1280x720, between 1736:8389 (S5.5 · dead-link · revoked) and 1736:8405 ([unreachable] S5.5 · dead-link · conflict); 121:25's own name calls this state the not-found dead-link. Restores the name and applies the suffix that was intended.",
+  "read_back_before": "APPEND to whatever the current name is: \" UX-I-18: this is also the screen a ReviewBar Re-"
+ }
+]

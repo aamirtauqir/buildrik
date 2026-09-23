@@ -235,7 +235,14 @@ async function createAssetAtomic(
         if (input.bytes > row.bytes) {
           return tx.mediaAsset.update({
             where: { id: row.id },
-            data: { bytes: input.bytes },
+            data: {
+              bytes: input.bytes,
+              /* A re-upload that finally carries dimensions fills them in.
+                 Only ever writes, never clears: an older client that sends no
+                 width must not erase a measurement already on the row. */
+              ...(input.width != null ? { width: input.width } : {}),
+              ...(input.height != null ? { height: input.height } : {}),
+            },
             select: { id: true, url: true, bytes: true },
           });
         }
@@ -255,6 +262,8 @@ async function createAssetAtomic(
           mimeType: input.mimeType,
           filename: input.filename,
           altText: input.altText ?? null,
+          width: input.width ?? null,
+          height: input.height ?? null,
           userMetadata: (input.userMetadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
         },
         select: { id: true, url: true, bytes: true },
@@ -426,6 +435,10 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
         url: input.url,
         bytes: input.bytes,
         edits: input.edits as Prisma.InputJsonValue,
+        /* Board 146:32 draws an author line the model could not supply
+           (BLOCKERS E7). Taken from the authenticated caller, never from
+           client input — a client-supplied author is a claim, not a fact. */
+        createdBy: userId,
       },
     });
 

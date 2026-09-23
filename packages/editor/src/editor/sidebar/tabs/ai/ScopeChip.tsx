@@ -17,8 +17,8 @@ function describeScope(scope: AIScope): string {
    said "Scoped to <x>" with a status dot. */
 export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status }) => {
   return (
-    <div className="bd-ai-scope" role="status" aria-live="polite">
-      <span className="bd-ai-scope-text">
+    <div className="bd-ai-scope" role="status" aria-live="polite" data-testid="ai-scope">
+      <span className="bd-ai-scope-text" data-testid="ai-scope-text">
         Scope: <span className="bd-ai-scope-target">{describeScope(scope)}</span>
       </span>
       {status === "locked" && (

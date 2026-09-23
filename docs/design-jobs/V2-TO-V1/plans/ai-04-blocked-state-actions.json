@@ -1,0 +1,61 @@
+{
+  "module": "AI experience",
+  "slug": "ai",
+  "findings": ["UX-G-23 (Major)", "UX-G-04 (Major)"],
+  "applyWith": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=D",
+  "target": { "page": "1:3", "section": "1776:8380" },
+  "state": "NOT APPLIED — quota. Payload verified locally at 4568 chars.",
+  "purelyAdditive": true,
+  "idempotent": "every row is skipped when a sibling TEXT already holds the same characters, so a re-run after a rate-limit failure cannot produce a second copy.",
+
+  "changes": [
+    {
+      "board": "171:136 (AI · not-configured)",
+      "boardIdSource": "read — @100,1666 280x812, 1 reaction",
+      "anchor": "171:166",
+      "anchorIdSource": "inferred — W-K-14. If getNodeByIdAsync returns nothing the step reports MISSING<TAB>171:166 and moves on rather than guessing a position.",
+      "add": [
+        {
+          "text": "Continue by hand in the inspector",
+          "style": "12px Inter Medium, #1A56DB",
+          "position": "same x as the anchor, 12px below it, width max(160, anchor width)",
+          "why": "UX-G-23 — both blocked states offer exactly one button and it leaves the editor. Neither says 'you can still change this yourself in the inspector'. A user who hits the daily cap on their tenth edit is shown a pricing page and nothing else."
+        },
+        {
+          "text": "The thread and the prompt you typed stay on screen behind this state. Losing the user's words is a second failure on top of the first.",
+          "style": "11px Inter Regular, #6B7280",
+          "position": "below the row above, +8px",
+          "why": "UX-G-23 — AITab.tsx:249 is a ternary that replaces ChatThread entirely, so the conversation and the typed prompt disappear behind the state. This line is the rule the eventual redraw must obey. It is stated, not drawn: drawing the thread behind the card is a re-layout of a 280x812 board whose child ids this agent never read."
+        }
+      ]
+    },
+    {
+      "board": "171:105 (AI · error-quota)",
+      "boardIdSource": "read — @2100,3150 280x812, 1 reaction",
+      "anchor": "171:135",
+      "anchorIdSource": "inferred — W-K-14 names 171:135 as 'See plans'.",
+      "add": [
+        { "text": "Continue by hand in the inspector", "style": "12px Inter Medium, #1A56DB" },
+        { "text": "The thread and the prompt you typed stay on screen behind this state. Losing the user's words is a second failure on top of the first.", "style": "11px Inter Regular, #6B7280" }
+      ],
+      "alreadyCorrect": "the title and body on this board (171:133 'AI is out of credit.', 171:134 'Nothing was changed. Daily limit reached (10). Resets at midnight UTC.') were fixed by FIG-K-02 and applied via docs/design-jobs/applied/plan-text.json, and QA-C-28 confirmed them. Nothing in this plan touches them."
+    },
+    {
+      "board": "170:2 (AI · idle)",
+      "boardIdSource": "read — @100,220 280x812, 2 reactions",
+      "anchor": "resolved at write time — the board is walked for the first descendant frame whose NAME matches /prompt/i; the step reports NO-PROMPT-FRAME and skips rather than guessing if none is found",
+      "anchorIdSource": "unresolved-id — findings/FIG-K.jsonl FIG-K-08 names the pair on this board as 170:7 (frame) / 170:8 (text), inferred not read, which is why the step resolves by name instead of by id",
+      "add": [
+        {
+          "text": "7 left today",
+          "style": "11px Inter Regular, #6B7280, right-aligned",
+          "position": "x = promptFrame.x + promptFrame.width − 116, y = promptFrame.y − 20, width 100",
+          "why": "UX-G-04 — the editor never shows AI quota and learns the limit exists only when a prompt is refused. A FREE workspace gets 10 in-editor prompts a day; the tenth looks exactly like the first. ai.getQuotaStatus is declared at server/trpc/routers/ai.ts:273-275 and a repo-wide grep returns ZERO call sites in packages/editor/src, so the procedure to feed this already exists.",
+          "sampleData": "'7 left today' is sample data, not a contract. The SHAPE is: a quiet remaining count beside the send control, amber (#C27803) near zero.",
+          "riskAccepted": "this places a text node 20px above the prompt frame, inside the thread area. On the IDLE board that area holds EmptyThread's TRY prompts, which end well above the composer, so the risk of visual collision is low — but it was not verified against a render, and verify-invariants checks board-level overlap, not intra-board. If it collides, move it inside the prompt frame and grow that frame by 20px, moving it up by 20 so the board stays 812 tall."
+        }
+      ],
+      "notDoneHere": "UX-G-19 also lives on this board — the three TRY prompts run against whatever scope is active and the panel does not warn when the suggestion and the scope disagree. The rule is stated on decision board B ('Suggestions carry their own scope'); annotating the three individual TRY rows needs their node ids, which were never read."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+4418:45432|REFERENCE · Specifications and behavior notes|47
+4418:48329|REFERENCE · Earlier UX analysis|1
+4418:48372|ARCHIVE · Superseded designs|33
+4418:52982|Create or replace a page · Templates|32
+4418:58060|REFERENCE · Insert review notes|1
+4418:58291|Manage and choose assets · Media|76
+4418:66500|Set site styles · Brand|36
+4418:73419|Save and restore work · History|36
+4418:79138|Select and organise · Layers|53
+4418:84645|ARCHIVE · Manage structured content · Content — superseded by CMS (v3 · Phase 6 · CMS 4428:140485)|20
+4418:90377|Manage site pages · Pages|52
+4418:96852|Review and release · Publish|19
+4418:99587|Build pages · Insert|24
+4418:104264|Request and review changes · AI|42
+4418:107427|Edit selected elements · Inspector|48
+4418:115485|Inspect differences · Compare|8
+4418:115731|Manage feedback and approval · Review|35
+4418:121885|Inspect and sign off · Client review|15
+4418:122213|Edit and navigate · Editor shell|39
+4418:127312|Configure site and workspace · Settings|79
+4418:135551|REFERENCE · Additional journey variants|45
+4418:140309|REFERENCE · Captions and annotations|1
+4418:140491|Stay informed · Notifications and activity|13
+4418:141141|Find editor actions · Commands|7
+4418:141361|Inspect the result · Preview|5
+4418:141767|Work on the page · Canvas|24
+4418:142142|Reuse site elements · Components|15
+4418:144789|LIBRARY · Clone-owned editor components|1
+4418:145074|Set up product data · Commerce|4
+4418:145833|REFERENCE · Design decisions and implementation notes|68
+4418:146475|START HERE · Jobs, roles, recovery and audit implementation|6
+4418:147640|Find and fix site issues|13
+4418:148284|PROPOSED · Reference designs by owning job|25
+4418:149159|Assets · Edit, organise and return · Flowbite|2
+4418:149946|Assets · Deep audit · OPEN issues · 10 Sep 2026|1
+4418:150117|CURRENT · Assets selection and browsing · verified task states|26
+4418:154165|CURRENT DESIGN · Assets import and recovery · A06–A08, A21–A23|0
+4418:154230|CURRENT DESIGN · Assets · Editing and version outcomes|1
+4418:154684|CURRENT · Assets organisation and actions · audit fixes|32
+4418:159969|QA fixture · Generated restaurant image|0
+4418:159971|CMS · Media field integration|15
+4418:160590|Media QA · Site fonts and heading integration|1
+4418:160620|Media · Upload import stock · verified return states|3
+4418:161200|Media · Menu and tag completion|7
+4418:162551|Media QA · Typed video and SVG insertion|5
+4418:163389|CMS · Pages, CMS and template completion|11
+4418:165562|Release · completed design journeys|6
+4418:166008|CURRENT DESIGN · Builder completion|26
+4418:176306|AUDIT · 11 Sep 2026 · Flow integrity, access and system findings|9
+4418:176607|AUDIT · Settings · flow, IA and completeness · 11 Sep 2026|7
+4418:176726|LIBRARY · State panels · sources of the STATE host boards (parts, not screens)|174
+4428:43691|v3 · Phase 5 · Canvas|13
+4428:139920|v3 · Phase 4 · Templates & Blocks|11
+4428:140485|v3 · Phase 6 · CMS|56
+4428:141169|v3 · Phase 2 · Inspector|28
+4428:143803|v3 · Phase 3 · Brand|18
+4433:46539|v3 · Phase 7–8 · Discoverability & Verify|4
+6767:58664|OVERLAYS · wrapped 19 Sep 2026 · media & CMS dialogs|151
+6771:61079|OVERLAYS · wrapped 19 Sep 2026 · editor dialogs & popovers|237
+-|(loose page-level frames)|45

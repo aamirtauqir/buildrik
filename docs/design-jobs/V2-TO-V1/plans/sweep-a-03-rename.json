@@ -1,0 +1,13 @@
+{
+ "page": "1:3",
+ "why": "Sibling sweep A — the same false-copy marker the layers pass applied to 1082:5004 and 143:355, applied to the board that earns it and never got it.",
+ "rows": [
+  {
+   "op": "rename",
+   "id": "1171:4829",
+   "expect": "Layers · display-settings",
+   "name": "[not-implemented] Layers · display-settings — three of the four options drawn do not exist. LayerDisplaySettings.tsx ships exactly three rows — Show HTML tags, Show element IDs, Compact rows — against LayerDisplayPrefs (types.ts:60-67); Show hidden layers, Show lock badges and Highlight CMS-bound are invented, and the popover title is Display Settings",
+   "why": "The board asserts a feature set the code does not have — the class of defect this arc marks, unswept until now"
+  }
+ ]
+}

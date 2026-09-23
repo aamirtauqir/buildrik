@@ -1,0 +1,118 @@
+{
+  "surface": "pages-context-menu",
+  "board": "Pages \u00b7 context-menu (Figma 1171:4713)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-context-menu",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "pages-context-menu"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4714"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "pages-context-menu",
+      "nodeId": "I1171:4714;16:7"
+    },
+    {
+      "name": "row-home",
+      "testId": "page-row-home",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4725"
+    },
+    {
+      "name": "row-home-checkbox",
+      "testId": "page-row-checkbox-home",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4726"
+    },
+    {
+      "name": "row-home-name",
+      "testId": "page-row-name-home",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4728"
+    },
+    {
+      "name": "row-menu",
+      "testId": "page-row-menu",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4730"
+    },
+    {
+      "name": "row-menu-name",
+      "testId": "page-row-name-menu",
+      "spec": "pages-context-menu",
+      "nodeId": "1171:4732"
+    },
+    {
+      "name": "footer",
+      "testId": "pages-footer"
+    },
+    {
+      "name": "menu",
+      "testId": "pages-context-menu"
+    },
+    {
+      "name": "menu-rename",
+      "testId": "pages-menu-rename"
+    },
+    {
+      "name": "menu-delete",
+      "testId": "pages-menu-delete"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: PageContextMenu is a portal whose position is computed",
+    "from the click, so the probe hands it the board's own coordinates and",
+    "mounts it over the same PageList fixture pages-bulk-select uses. The panel",
+    "underneath is the real composition PagesTab renders.",
+    "",
+    "BOARD WON \u2014 the chords. 1171:4753's 2026-09 revision draws F2, \u2318D and \u232b",
+    "beside Rename / Duplicate / Delete (2838:12148/12149/12150). The menu",
+    "shipped with none, and PageContextMenu's own comment asserted 'It draws no",
+    "shortcut hints' \u2014 stale since the board moved. MenuItem has carried a",
+    "`kbd` slot all along, so this is three props. \u2318, opens Page settings from",
+    "the row, but the board leaves that item bare and so does the code.",
+    "",
+    "NOT JOINED \u2014 the context menu itself, and this is the whole adjudication.",
+    "1171:4753 wants a 136-wide surface with 6/0 padding on an 8 radius, and",
+    "its items 11px on 12/7 insets. Live is POPOVER_BASE_CLASS (min-w-180,",
+    "p-2, rounded-lg) around chrome-ui `Menu` + `MenuItem` (h-8, px-2, 13px).",
+    "SIX boards draw that menu \u2014 807:7775 (verified `match`), 1176:4866",
+    "('Canvas \u00b7 context-menu \u00b7 submenu anatomy', the anatomy board for this",
+    "primitive), 1082:4527, 642:3401, 1163:13695 and this one. One screen board",
+    "does not re-settle a primitive five others are measured against, so the",
+    "menu, its items and its separator are measured and reported here rather",
+    "than joined. If 1171:4713 is the intended direction, 1176:4866 moves first",
+    "and every menu follows.",
+    "",
+    "NOT JOINED \u2014 1171:4746 'Add page'. The board draws a plain 36-high row",
+    "with a 13/20 accent link. Live is `.bd-pg-footer`: an absolutely-pinned",
+    "band with a gradient scrim and a SPLIT button (blank / from template / add",
+    "folder), 54 tall, and PageList's own comment cites board 140:38 for it.",
+    "Two boards, one control; the one already verified wins and this is",
+    "recorded, not silently passed.",
+    "",
+    "NOT JOINED \u2014 1171:4715/4716 the search band. Same call pages-load-error",
+    "already recorded: the box's 166 width is `flex: 1` leftovers on the board,",
+    "not a spec.",
+    "",
+    "FOUND, NOT FIXED: the board's rows carry a status column the code has no",
+    "producer for \u2014 'Draft' on Contact (2838:12144) and \"Won't publish\" on",
+    "About (2838:12145), both Geist Mono 11 in ink-muted at the row's right.",
+    "PageRow renders the dirty dot and the folder count there, never a",
+    "visibility word. That is a new fact per page, not a restyle."
+  ]
+}

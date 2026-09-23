@@ -138,10 +138,17 @@ const DEFAULT_ROOT: ElementData = {
  * `siteDetail.settings.get` returns these alongside name/slug/etc.
  */
 interface SiteColumnSettings {
+  name?: string;
+  favicon?: string | null;
+  defaultLocale?: string;
+  enabledLocales?: string[];
+  localeAutoRedirect?: boolean;
   metaTitle?: string | null;
   metaDescription?: string | null;
   metaTitleTemplate?: string | null;
   ogImage?: string | null;
+  allowIndexing?: boolean;
+  robotsTxt?: string | null;
   headCode?: string | null;
   bodyCode?: string | null;
   socialLinks?: Record<string, string> | null;
@@ -155,15 +162,26 @@ interface SiteColumnSettings {
  * null out untouched server values via partial update semantics.
  *
  * Editor → server name mapping:
+ *   settings.seo.siteName           → name
+ *   settings.seo.favicon            → favicon
+ *   settings.seo.language           → defaultLocale
  *   settings.seo.metaTitle          → metaTitle
  *   settings.seo.metaDescription    → metaDescription
  *   settings.seo.metaTitleTemplate  → metaTitleTemplate
  *   settings.seo.defaultOgImage     → ogImage
+ *   settings.seo.allowIndexing      → allowIndexing
+ *   settings.seo.robotsTxt          → robotsTxt
  *   settings.seo.touchIcon          → touchIcon
  *   settings.seo.socialLinks        → socialLinks
  *   settings.customCode.headScripts → headCode
  *   settings.customCode.bodyScripts → bodyCode
  *   settings.publishing.publishedPassword → publishedPassword
+ *
+ * The first three joined 2026-09-14 (Settings · Clone S1): the General screen
+ * had written `seo.siteName` / `seo.favicon` / `seo.language` into the
+ * project JSON for months while `Site.name`, `Site.favicon` and
+ * `Site.defaultLocale` — the columns the dashboard, the publish worker and
+ * the document `lang` read — never heard about it.
  */
 /** "" is how a text input says "cleared"; null is how the server hears it. */
 function emptyToNull(value: string | null | undefined): string | null {
@@ -178,6 +196,16 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const customCode = settings.customCode;
   const publishing = settings.publishing;
   const patch: SiteColumnSettings = {};
+  /* `name` and `defaultLocale` are required columns (`z.string().min(2)` /
+     `.min(2)`, no null) — "cleared" cannot be sent, so an empty field leaves
+     the column as it is. A too-short value IS sent: the server refuses it and
+     the screen's banner says so, which is the honest answer to a one-letter
+     site name (the field warns first). */
+  const name = emptyToNull(seo?.siteName);
+  if (name !== null) patch.name = name;
+  if (seo?.favicon !== undefined) patch.favicon = emptyToNull(seo.favicon);
+  const defaultLocale = emptyToNull(seo?.language);
+  if (defaultLocale !== null) patch.defaultLocale = defaultLocale;
   if (seo?.metaTitle !== undefined) patch.metaTitle = emptyToNull(seo.metaTitle);
   if (seo?.metaDescription !== undefined) patch.metaDescription = emptyToNull(seo.metaDescription);
   if (seo?.metaTitleTemplate !== undefined) patch.metaTitleTemplate = emptyToNull(seo.metaTitleTemplate);
@@ -189,6 +217,10 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
      (the SEO screen writes "" for an untouched field) saved under a red
      banner. Measured live — batch 207, `ogImage: Invalid url`. */
   if (seo?.defaultOgImage !== undefined) patch.ogImage = emptyToNull(seo.defaultOgImage);
+  if (seo?.allowIndexing !== undefined) patch.allowIndexing = seo.allowIndexing;
+  /* Round-trips what the row carried: the editor only previews robots.txt
+     (Clone 3397:32076), the dashboard's SEO tab edits it. */
+  if (seo?.robotsTxt !== undefined) patch.robotsTxt = emptyToNull(seo.robotsTxt);
   if (seo?.touchIcon !== undefined) patch.touchIcon = emptyToNull(seo.touchIcon);
   if (seo?.socialLinks !== undefined) patch.socialLinks = seo.socialLinks as Record<string, string>;
   if (customCode?.headScripts !== undefined) patch.headCode = customCode.headScripts;
@@ -211,10 +243,15 @@ function mergeSiteColumnsIntoSettings(
   const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
   const publishing = { ...(settings.publishing ?? {}) };
 
+  if (siteCols.name != null) seo.siteName = siteCols.name;
+  if (siteCols.favicon != null) seo.favicon = siteCols.favicon;
+  if (siteCols.defaultLocale != null) seo.language = siteCols.defaultLocale;
   if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
   if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
   if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
   if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
+  if (siteCols.allowIndexing != null) seo.allowIndexing = siteCols.allowIndexing;
+  if (siteCols.robotsTxt != null) seo.robotsTxt = siteCols.robotsTxt;
   if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
   if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
   if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
@@ -228,6 +265,15 @@ function mergeSiteColumnsIntoSettings(
   settings.seo = seo;
   settings.customCode = customCode;
   settings.publishing = publishing;
+  /* Read-only mirror for the export engine's auto-redirect snippet; the
+     Localization screen writes these columns itself. */
+  if (siteCols.defaultLocale != null) {
+    settings.localization = {
+      defaultLocale: siteCols.defaultLocale,
+      enabledLocales: siteCols.enabledLocales ?? [siteCols.defaultLocale],
+      autoRedirect: siteCols.localeAutoRedirect ?? false,
+    };
+  }
   return settings;
 }
 
@@ -446,6 +492,9 @@ export async function loadServerMedia(
     folderId: string | null;
     createdAt: string | Date;
     updatedAt: string | Date;
+    /** The row's JSON column, passed through whole — `importServerAssets`
+     *  reads `tags` (BLOCKERS C3) and `siteFont` (3686:42317) out of it. */
+    userMetadata?: unknown;
   }>;
   folders: ReadonlyArray<{
     id: string;
@@ -504,6 +553,7 @@ export async function loadServerMedia(
       folderId: string | null;
       createdAt: string | Date;
       updatedAt: string | Date;
+      userMetadata?: unknown;
     }>;
     const folders = foldersResult as unknown as ReadonlyArray<{
       id: string;

@@ -1,0 +1,101 @@
+{
+  "surface": "s3-4-responsive-viewport-breakpoint-bar",
+  "board": "S3.4 \u00b7 responsive-viewport \u00b7 breakpoint-bar (Figma 807:8069)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=canvas-breakpoint-bar",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "bp-cell-desktop"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "cell-active",
+      "testId": "bp-cell-desktop",
+      "spec": "s3-4-responsive-viewport-breakpoint-bar",
+      "nodeId": "807:8326"
+    },
+    {
+      "name": "cell-tablet",
+      "testId": "bp-cell-tablet",
+      "spec": "s3-4-responsive-viewport-breakpoint-bar",
+      "nodeId": "807:8329"
+    },
+    {
+      "name": "cell-mobile",
+      "testId": "bp-cell-mobile",
+      "spec": "s3-4-responsive-viewport-breakpoint-bar",
+      "nodeId": "807:8332"
+    },
+    {
+      "name": "switcher",
+      "testId": "breakpoint-switcher"
+    },
+    {
+      "name": "cell-wide",
+      "testId": "bp-cell-wide"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: the switcher only renders when the toolbar is given",
+    "`device` + `onDeviceChange`, so the probe mounts the real",
+    "CanvasFooterToolbar with them. Nothing about the switcher is re-implemented.",
+    "",
+    "BOARD WON \u2014 the chip. 807:8322/8325 draw it 24 high on a 4 radius with an",
+    "11px label: ink-muted at rest, and the SELECTED chip FILLED --color/accent",
+    "with its label white and Semi Bold. It shipped a 6 radius, 12px labels in",
+    "ink-soft, and the selected state inverted the other way \u2014 a white cell with",
+    "blue-700 text on a raised shadow. The board's reading is also the one the",
+    "rest of the editor already uses for a chosen thing (Row's aria-selected,",
+    "the rail's active bar, the publish stepper).",
+    "",
+    "CONTRAST \u2014 a failure this change WOULD have introduced, caught and closed.",
+    "Moving the resting label to the board's --color/ink-muted #6B7280 measures",
+    "4.39:1 on the well's old --bk-gray-100 #F3F4F6, i.e. an AA failure the board",
+    "itself never had: 807:8321 sits its chips on --flowbite/gray/50 #F9FAFB,",
+    "where the same ink is 5.0:1. So the well moved to gray-50 with the label.",
+    "Both numbers measured, not eyeballed; the run now reports 0 contrast",
+    "failures where the first pass reported 3.",
+    "",
+    "NOT JOINED, and why:",
+    "  807:8322/8325/8328/8331/8334 the chip BOXES \u2014 every one carries an",
+    "  explicit width (58, 108, 104, 117, 93) that is its own label plus the",
+    "  range text. Label-driven, i.e. sample data; the live cells are w-8 glyphs",
+    "  in the toolbar and w-auto in preview. Height 24 and radius 4 ARE",
+    "  conformed; what is joined is each chip's LABEL node (807:8326/8329/8332),",
+    "  which carries the type with no width attached.",
+    "  807:8153 the canvas toolbar \u2014 the board gives it height 40 with 8/8",
+    "  vertical padding, which needs 24-tall content; every live control in it is",
+    "  28 (h-7 buttons, a p-0.5 well around h-6 cells). Conforming the padding",
+    "  alone would make it 44. Shrinking the whole toolbar to a 24 content row is",
+    "  a change to a control this board shares with the toolbar's own family, and",
+    "  no recipe measures that yet. Recorded, not taken.",
+    "",
+    "NOT BUILT \u2014 and this is the board's namesake. 807:8321 is a 32-high",
+    "--flowbite/gray/50 STRIP across the top of the canvas (760 wide on the",
+    "board) holding FIVE chips that each name their range on screen:",
+    "  Base      'All'          ink-placeholder 10px",
+    "  Desktop   '>=992px'      white-ish #D9E5FF 10px, chip filled accent",
+    "  Tablet    '768-991px'",
+    "  Mobile L  '480-767px'",
+    "  Mobile    (807:8334)",
+    "plus a 120x20 viewport-width-indicator (807:8339). The product has none of",
+    "it: the switcher lives in the floating canvas toolbar, has no `Base` cell",
+    "and no `Mobile L`, and shows each range only in the title/aria-label \u2014",
+    "BreakpointSwitcher's `widthHint` already computes them and already cites",
+    "THIS board for doing so. Two reasons it is reported rather than built:",
+    "  (1) it is a new surface plus two new breakpoints, which is a feature and",
+    "      a change to the media queries the exporter writes (widthHint's own",
+    "      comment refuses the board's 992/480 for exactly that reason);",
+    "  (2) the range labels are drawn at 10px, and",
+    "      `check-design-debt-ratchet`'s offscale-font-size rule is locked at",
+    "      zero \u2014 the same wall the pages-command-palette and smart-guides",
+    "      recipes hit.",
+    "Founder call. If the bar is wanted, the breakpoint SET moves first."
+  ]
+}

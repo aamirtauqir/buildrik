@@ -75,13 +75,13 @@ function FilterDropdown<T extends string>({
   value,
   options,
   onPick,
-  testid,
+  testId,
 }: {
   label: string;
   value: T;
   options: Array<{ id: T; label: string }>;
   onPick(id: T): void;
-  testid: string;
+  testId: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const current = options.find((o) => o.id === value);
@@ -102,7 +102,7 @@ function FilterDropdown<T extends string>({
           size="xs"
           className={DROPDOWN}
           aria-expanded={open}
-          data-testid={testid}
+          data-testid={testId}
           onClick={() => setOpen((v) => !v)}
         >
           <span className="tw:truncate">{shown}</span>
@@ -186,16 +186,21 @@ export function StockBrowserOverlay({
   return (
     <div
       ref={overlayRef}
-      className="tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:bg-[var(--bk-bg-panel,white)]"
+      /* Board 147:55 gives the drill-in frame the drawer's own
+         --flowbite/gray/100 edge; with no border at all the computed
+         border-color is #000000, the initial value. Same defect as 144:2,
+         146:2 and 147:2. */
+      className="tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel,white)]"
       role="dialog"
       aria-modal="true"
       aria-label="Stock browser"
       data-testid="media-stock-browser"
     >
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} />
 
       <Button
         variant="link" className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:px-4 tw:text-left"
+        data-testid="media-stock-back"
         onClick={onClose}
         aria-label="Back to media grid"
       >
@@ -217,7 +222,7 @@ export function StockBrowserOverlay({
       </div>
 
       {/* Board 147:59 — three 88w dropdowns on a horizontally scrolling row. */}
-      <div className="tw:flex tw:shrink-0 tw:gap-2 tw:overflow-x-auto tw:px-4 tw:py-1" data-testid="stock-filter-row">
+      <div className="tw:flex tw:shrink-0 tw:gap-2 tw:overflow-x-auto tw:px-4 tw:py-0.5" data-testid="stock-filter-row">
         <FilterDropdown
           label="Orientation"
           value={orientation}
@@ -226,7 +231,7 @@ export function StockBrowserOverlay({
             autoLoadsRef.current = 0;
             onSetOrientation(o);
           }}
-          testid="stock-filter-orientation"
+          testId="stock-filter-orientation"
         />
         <FilterDropdown
           label="Colour"
@@ -236,7 +241,7 @@ export function StockBrowserOverlay({
             autoLoadsRef.current = 0;
             onSetColor(c);
           }}
-          testid="stock-filter-colour"
+          testId="stock-filter-colour"
         />
         <FilterDropdown
           label="Type"
@@ -246,7 +251,7 @@ export function StockBrowserOverlay({
             autoLoadsRef.current = 0;
             setType(t);
           }}
-          testid="stock-filter-type"
+          testId="stock-filter-type"
         />
       </div>
 
@@ -258,11 +263,16 @@ export function StockBrowserOverlay({
       >
         {/* The caption's law: reuse the 136×104 grid EXACTLY — plus the 24h
             credit both providers require. */}
-        <div className="tw:grid tw:grid-cols-2 tw:justify-items-start tw:gap-4 tw:px-4 tw:py-3">
+        {/* Board 75:6 draws the stock results THREE up on a 12 gutter with an
+            8 gap (75:11's body, 75:14's grid), which makes each track 93.33
+            wide and each thumb 66 tall. It shipped two up at a 16 gutter with
+            a 16 gap, i.e. two big cards where the board shows a contact
+            sheet. */}
+        <div className="tw:grid tw:grid-cols-3 tw:gap-2 tw:px-3 tw:pt-1.5 tw:pb-3">
           {items.map((item) => (
             <Button
               key={item.id}
-              className="tw:flex tw:h-[128px] tw:w-34 tw:flex-col tw:items-stretch tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:p-0 tw:text-left"
+              className="tw:flex tw:w-full tw:flex-col tw:items-stretch tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:p-0 tw:text-left"
               aria-label={`Save ${("alt" in item && item.alt) || "stock asset"} to library`}
               onClick={() => onSave(type, item)}
             >
@@ -270,7 +280,8 @@ export function StockBrowserOverlay({
                 src={item.thumb}
                 alt={"alt" in item ? item.alt : ""}
                 loading="lazy"
-                className="tw:h-19 tw:w-34 tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:object-cover"
+                data-testid={`stock-thumb-${item.id}`}
+                className="tw:h-[66px] tw:w-full tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:object-cover"
               />
               <span className="tw:flex tw:h-6 tw:items-center tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                 {credit(item)}
@@ -280,13 +291,21 @@ export function StockBrowserOverlay({
         </div>
 
         {isLoading ? (
-          <p className="tw:px-4 tw:pb-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-            Loading 8 more…
-          </p>
+          <div
+            className="tw:flex tw:h-8 tw:w-full tw:shrink-0 tw:items-center tw:px-4"
+            data-testid="stock-loading-more"
+          >
+            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+              Loading 8 more…
+            </span>
+          </div>
         ) : null}
 
         {items.length > 0 && !isLoading ? (
-          <div className="tw:flex tw:justify-center tw:pb-4">
+          <div
+            className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-center"
+            data-testid="stock-load-more-row"
+          >
             <Button
               type="button"
               color="light"

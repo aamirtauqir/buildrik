@@ -49,6 +49,17 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
     () => new Set<InsertGroupId>(["elements"]),
   );
+  // Context menu "Replace with block…" (v3 IA Q8) opens this panel AND asks
+  // for BLOCKS; without this the door lands on ELEMENTS and the user scrolls.
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = ({ group }: { group: InsertGroupId }) =>
+      setOpenGroups((prev) => (prev.has(group) ? prev : new Set(prev).add(group)));
+    composer.on(EVENTS.UI_INSERT_OPEN_GROUP, open);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_OPEN_GROUP, open);
+    };
+  }, [composer]);
   const { addToast } = useToast();
 
   // MINE (board 1069:4970): the user's own components, inline. Same load +
@@ -144,7 +155,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           action is the corner-brackets expand (founder-confirmed 2026-08-06;
           the component description's "Pin" text is stale). */}
       <PanelFrame.Header
-        title="Insert"
+        title="Add"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
@@ -154,6 +165,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       <div className="bld-content">
         <div
           className="bld-search-wrap"
+          data-testid="insert-search-wrap"
           onKeyDown={(e) => {
             if (e.key === "Escape" && tab.searchQuery.length > 0) {
               e.stopPropagation();
@@ -168,6 +180,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             placeholder="Search elements"
             debounceMs={150}
             kbdHint="⌘F"
+            testId="insert-search-box"
           />
         </div>
 

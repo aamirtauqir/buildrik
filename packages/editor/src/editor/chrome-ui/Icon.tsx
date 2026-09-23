@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   size?: number | string;
@@ -47,7 +48,11 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
     <button
       ref={ref}
       type="button"
-      className={[
+      /* twMerge, not a join: this is a plain element, so a later `tw:h-6`
+         (size="sm") or a caller's `tw:bg-*` did NOT beat the base `tw:h-8` /
+         `tw:bg-transparent` — both compiled and the stylesheet's order decided.
+         The library's card `···` measured 32px and transparent live. */
+      className={twMerge(
         // 32x32 (h-8), per the board's Icon button component (697:440), whose
         // own note gives the reason: "32x32 so it clears the 24px touch
         // minimum." Was h-7 (28) with no decision record anywhere — 28 does
@@ -61,9 +66,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
         "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed",
         size === "sm" && "tw:h-6 tw:w-6",
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
       aria-label={label}
       title={label}
       aria-pressed={pressed}

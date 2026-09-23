@@ -1,0 +1,153 @@
+{
+  "surface": "review-panel-review-closed",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "158:213",
+  "boardName": "review-panel-review-closed",
+  "figmaHash": "64f06080e0bbcfe7f6b9ebaebd204933177af8ec0ae58d569a4f1325c1aecd50",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:12:10.701Z",
+  "copy": [
+    "The Review panel is gone.",
+    "Review closed — Sara approved v3",
+    "The Review panel has been removed."
+  ],
+  "targets": [
+    {
+      "nodeId": "158:213",
+      "name": "[unreachable] Review panel · review-closed — the panel does not disappear on approval: ReviewTab renders a round in ANY status. And Review has NO rail row at all — tabsConfig.figma.test.ts:46-49 pins its absence — so the earlier note claiming the row is 'unconditional' said the opposite of the code. Only the ReviewBar strip under the topbar hides (ReviewBar.tsx:50,116). REDRAW as 'Review panel · approved', cloned from 157:58.",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "158:214",
+      "name": "Gone",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[160px] not-italic overflow-clip relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] text-center w-full",
+      "props": {
+        "height": {
+          "value": "160px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "158:215",
+      "name": null,
+      "className": "-translate-x-1/2 absolute leading-[20px] left-[140px] text-[13px] top-[48px] w-[232px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "232px"
+        }
+      }
+    },
+    {
+      "nodeId": "158:216",
+      "name": null,
+      "className": "-translate-x-1/2 absolute h-[48px] leading-[16px] left-[140px] text-[11px] top-[76px] w-[232px]",
+      "props": {
+        "height": {
+          "value": "48px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "232px"
+        }
+      }
+    },
+    {
+      "nodeId": "158:218",
+      "name": "Toast",
+      "className": "h-[102px] overflow-clip relative rounded-[8px] shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "102px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "158:219",
+      "name": "toast",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/ink,#111827)] font-['Inter:Regular'] font-normal h-[90px] left-[16px] not-italic overflow-clip rounded-[8px] text-left top-[6px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "90px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "158:220",
+      "name": null,
+      "className": "absolute leading-[18px] left-[12px] text-[12px] text-[color:var(--color\\/bg-card,white)] top-[8px] w-[161px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "width": {
+          "value": "161px"
+        }
+      }
+    },
+    {
+      "nodeId": "158:221",
+      "name": null,
+      "className": "absolute leading-[16px] left-[12px] text-[11px] text-[color:var(--color\\/ink-disabled,#d1d5db)] top-[50px] w-[154px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-disabled",
+          "value": "#d1d5db"
+        },
+        "width": {
+          "value": "154px"
+        }
+      }
+    }
+  ]
+}

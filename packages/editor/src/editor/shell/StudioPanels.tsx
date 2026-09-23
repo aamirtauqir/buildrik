@@ -9,6 +9,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "./hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
@@ -24,6 +26,8 @@ import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
+import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
+import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -32,6 +36,8 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import type { NextMove } from "./lifecycle";
+import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 // ============================================================================
@@ -83,7 +89,8 @@ export interface StudioPanelsProps {
   onResendReview?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   canvasRef?: React.RefObject<CanvasRef | null>;
   composerContainerRef?: React.RefObject<HTMLDivElement | null>;
@@ -91,10 +98,16 @@ export interface StudioPanelsProps {
   isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
-  /** Canonical publish state machine (shared with the Topbar) + its fire
-   *  handler, forwarded to the sidebar PublishTab so both drive ONE flow. */
+  /** Canonical publish state machine (shared with the Topbar), forwarded to
+   *  the sidebar PublishTab so both drive ONE flow. */
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move (`useLifecycle`, derived once in
+   *  AquibraStudio) — the same object the topbar CTA reads. The Publish
+   *  panel's footer, its gate banner and its CTA read `nextMove.gate`. */
+  nextMove?: NextMove | null;
+  /** The ONE publish door — AquibraStudio's `requestPublish`, which routes on
+   *  `nextMove.gate`. Absent = no publish path is wired (flag off). */
+  onRequestPublish?: () => void;
 }
 
 // ============================================================================
@@ -109,7 +122,7 @@ const styles = {
   } as React.CSSProperties,
 
   /* The dots were `rgba(255,255,255,0.03)`, painted over `--bk-bg-panel`, which
-     the token file sets to `#FFFFFF`. White at 3% on white is not faint, it is
+     the token file sets to ``var(--bk-bg-panel)``. White at 3% on white is not faint, it is
      absent — the backdrop grid has drawn nothing at all since the theme flipped
      from dark to light. `--bk-border` is the faint-line token and reads as a
      light grey dot on the panel. */
@@ -175,7 +188,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   isFullPageMode = false,
   drawerWidth,
   publishJob,
-  onVercelPublish,
+  nextMove = null,
+  onRequestPublish,
 }) => {
   /* The site whose brand/tokens/publish state these panels edit.
      This was a prop, and `AquibraStudio` never passed it — so every consumer
@@ -249,6 +263,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      FullPageView mounts the SettingsTab that raises it, and LeftSidebar's
      rail draws the dirty dot and guards the tab switch against it. */
   const [settingsDirty, setSettingsDirty] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
+  const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
@@ -277,18 +293,47 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
 
+    /* Clone 3519:19920 — the Pages panel's `Add redirect` opens Settings ON
+       Redirects with the draft. Held here, not in the tab: Settings mounts
+       on the switch, after the emit, so a listener inside it would miss the
+       request. A fresh object per request → the tab re-navigates each time. */
+    const openSettings = (data: SettingsOpenRequest) => {
+      setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
+      onLeftPanelTabChange?.("settings");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+    /* The way back (3519:20096 `Back to <Page> SEO`): the same shape — the
+       Pages panel is lazy and unmounted under the Settings fullpage, so the
+       request waits here for it. */
+    const openPageSettings = (data: PageSettingsOpenRequest) => {
+      setPagesOpen({ pageId: data.pageId, tab: data.tab });
+      onLeftPanelTabChange?.("pages");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+
     composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
     composer.on(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
+    composer.on(EVENTS.UI_SETTINGS_OPEN, openSettings);
+    composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
     return () => {
       composer.off(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
       composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
+      composer.off(EVENTS.UI_SETTINGS_OPEN, openSettings);
+      composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+
+  /* A request is one visit's: leaving the tab drops it, so the next plain
+     visit does not land on that screen again. */
+  React.useEffect(() => {
+    if (activeTabId !== "settings") setSettingsOpen(null);
+    if (activeTabId !== "pages") setPagesOpen(null);
+  }, [activeTabId]);
 
   // Listen for tab switch events
   React.useEffect(() => {
     if (!composer) return;
-    const handler = (data: { tab: string }) => {
+    const handler = (data: { tab: string; fullPage?: boolean }) => {
       /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
          "‹ Inspector" way back — not in the left sidebar. Every existing
          entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
@@ -300,6 +345,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       }
       onLeftPanelTabChange?.(data.tab);
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
+         LIBRARY (the fullpage), not the drawer; the file to select rides on
+         the engine's media selection the way the drawer's own door hands it. */
+      if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
     };
     composer.on("ui:switch-tab", handler);
     return () => {
@@ -439,9 +488,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             canvasHoveredId={canvasHoveredId}
             settingsDirty={settingsDirty}
             onSettingsDirtyChange={setSettingsDirty}
+            pagesOpen={pagesOpen}
             projectId={projectId}
             publishJob={publishJob}
-            onVercelPublish={onVercelPublish}
+            nextMove={nextMove}
+            onRequestPublish={onRequestPublish}
             onOpenLibrary={handleOpenLibrary}
             onCreateCollection={onOpenCreateCollection}
             onResendReview={onResendReview}
@@ -515,7 +566,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}
+        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area).
+            Mounted ONLY in fullpage mode. It used to render on every tab and
+            rely on the slot's display:none, so the Media DRAWER kept a whole
+            second LibraryManager (and its media state) mounted invisibly —
+            and once the library became a portaled overlay (Clone
+            3695:45155) that invisible copy was on screen at boot. */}
+        {effectiveFullPageMode && (
         <LayoutShell.FullPage>
           <FullPageView
             activeTab={activeTabId}
@@ -523,19 +580,26 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onClose={handleFullPageClose}
             onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
-            onReplayTour={undefined}
             /* The deep-link sub-tab reached the DRAWER and stopped there. Every
                fullpage tab — Settings above all — got nothing, so the site
                menu's "Plugins" landed on the Settings root and looked like a
                dead door. */
             activeSubTab={leftPanelSubTab}
             onSettingsDirtyChange={setSettingsDirty}
+            settingsOpen={settingsOpen}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}
           />
         </LayoutShell.FullPage>
+        )}
       </LayoutShell>
+
+      {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by
+          `ui:site-fonts` from every door (the rail's Manage font, the
+          drawer's Aa Fonts, the Typography picker's Manage site fonts row),
+          so no door owns a dialog and nothing threads through AquibraStudio. */}
+      {composer ? <SiteFontsModal composer={composer} /> : null}
     </StylePresetRegistryProvider>
     </TokenRegistryProvider>
     </DSModeProvider>

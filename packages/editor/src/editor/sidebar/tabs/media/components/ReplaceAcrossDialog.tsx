@@ -1,22 +1,34 @@
 /**
- * ReplaceAcrossDialog — confirms and surfaces results of replace-across-canvas.
+ * ReplaceAcrossDialog — the drawer's Replace across site.
  *
- * Two states:
- *   1. Pre-commit  — preview (before/after thumbs) + "Replace N uses" button.
- *   2. Post-commit — summary: "N replaced, M failed" with Retry-failed CTA
- *                    when `failed.length > 0`.
+ * Two halves:
+ *   1. Pre-commit  — board 1164:4738 (the Clone does not re-draw it): preview
+ *                    (before/after thumbs), the per-page checkbox list and the
+ *                    "Replace N uses on M pages" button.
+ *   2. The result  — the Clone's `ReplaceResultModal` (3695:43897 Replacing
+ *                    image → 3695:43900 Replacement complete / 3695:43903 Some
+ *                    uses could not update → 3695:43906 Retrying failed use).
+ *                    V1 board 1174:4849's states are displaced. The card
+ *                    stands alone: this frame unmounts while it shows.
  *
  * Engine enforces atomicity: either the whole batch commits or it's rolled back
  * (see MediaCommandLayer.replaceAcross). The `failed[]` array is produced for
- * per-element error reporting, not transactional rollback.
+ * per-element error reporting, not transactional rollback. A retry runs the
+ * SAME page scope again — the elements already updated no longer match the
+ * old src, the unchecked pages were never in scope.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "../../../../../engine/Composer";
-import type { ReplaceAcrossResult } from "../../../../../engine/media/MediaCommandLayer";
 import { Button, Checkbox } from "@/editor/chrome-ui";
+import { ReplaceResultModal, replacingLabel, resultIds } from "@/editor/media/components/ReplaceResultModal";
+/* `.med-rx-*` lives in MediaTab.css, which only MediaTab imported — so this
+   dialog drew as unstyled block flow anywhere it was mounted without its
+   panel. Same defect board 1205:4829 found on FolderTree, same fix: the
+   component owns its own styles. */
+import "../MediaTab.css";
 
 interface ReplaceAcrossDialogProps {
   composer: Composer;
@@ -27,20 +39,19 @@ interface ReplaceAcrossDialogProps {
   newLabel?: string;
   /** Called after dialog closes, regardless of commit result. */
   onClose(): void;
-  /** Called with the engine result after a commit (for toasts, telemetry). */
-  onComplete?(result: ReplaceAcrossResult): void;
 }
 
 interface PageRow {
   id: string;
   name: string;
-  useCount: number;
+  /** The placements on this page — what the commit is about to update. */
+  elementIds: string[];
 }
 
 type DialogState =
   | { phase: "preview"; pages: PageRow[]; selected: Set<string> }
-  | { phase: "committing" }
-  | { phase: "result"; result: ReplaceAcrossResult };
+  | { phase: "committing"; pageIds: string[]; targets: string[] }
+  | { phase: "result"; pageIds: string[]; replaced: string[]; failed: string[] };
 
 function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   const byPage = composer.mediaOps.getUsagesByPage(oldSrc);
@@ -51,7 +62,7 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
     rows.push({
       id: pageId,
       name: nameById.get(pageId) ?? pageId,
-      useCount: elements.length,
+      elementIds: elements.map((el) => el.getId()),
     });
   }
   return rows;
@@ -63,11 +74,15 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   stylesheet — but a chrome-ui Button's geometry is exactly what the caller
   className is for, per chrome-ui/__tests__/className-precedence.test.tsx.
 */
+/* Boards 1164:4748 / 1164:4750 — the confirm buttons HUG on a 12/8 pad at 11px
+   rather than sitting on a fixed 32 row at 13px. The fixed height is the
+   reason the board's 8 vertical pad measured 0: a set height and a padding
+   are not the same property, so nothing conflicted and nothing won. */
 const RX_BTN =
-  "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-12)] tw:border " +
+  "tw:px-[var(--bk-space-12)] tw:py-2 tw:border " +
   "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-md)] " +
-  "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:text-[13px] " +
-  "tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
+  "tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] " +
+  "tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
   "tw:cursor-pointer tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:cursor-not-allowed " +
   "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
@@ -84,7 +99,6 @@ export function ReplaceAcrossDialog({
   oldLabel,
   newLabel,
   onClose,
-  onComplete,
 }: ReplaceAcrossDialogProps) {
   const [state, setState] = React.useState<DialogState>(() => {
     const pages = buildPageRows(composer, oldSrc);
@@ -109,7 +123,7 @@ export function ReplaceAcrossDialog({
      just the pages currently ticked — that number is what the sentence is
      warning about. */
   const totalUses = React.useMemo(
-    () => (state.phase === "preview" ? state.pages.reduce((n, p) => n + p.useCount, 0) : 0),
+    () => (state.phase === "preview" ? state.pages.reduce((n, p) => n + p.elementIds.length, 0) : 0),
     [state],
   );
 
@@ -119,7 +133,7 @@ export function ReplaceAcrossDialog({
     let pages = 0;
     for (const p of state.pages) {
       if (state.selected.has(p.id)) {
-        uses += p.useCount;
+        uses += p.elementIds.length;
         pages += 1;
       }
     }
@@ -128,32 +142,34 @@ export function ReplaceAcrossDialog({
 
   const handleCommit = React.useCallback(() => {
     if (state.phase !== "preview") return;
-    const pageIds = state.pages
-      .filter((p) => state.selected.has(p.id))
-      .map((p) => p.id);
-    setState({ phase: "committing" });
-    Promise.resolve().then(() => {
-      const result = composer.mediaOps.replaceAcrossSelective(
-        oldSrc,
-        newSrc,
-        pageIds,
-      );
-      setState({ phase: "result", result });
-      onComplete?.(result);
-    });
-  }, [composer, oldSrc, newSrc, onComplete, state]);
+    const checked = state.pages.filter((p) => state.selected.has(p.id));
+    const pageIds = checked.map((p) => p.id);
+    const targets = checked.flatMap((p) => p.elementIds);
+    setState({ phase: "committing", pageIds, targets });
+    /* A microtask later, so the busy card paints before the synchronous run.
+       A throw is the engine's rollback — nothing changed, so every target is
+       a failed placement the card can offer to retry. */
+    Promise.resolve()
+      .then(() => resultIds(composer.mediaOps.replaceAcrossSelective(oldSrc, newSrc, pageIds)))
+      .catch(() => ({ replaced: [], failed: targets }))
+      .then((result) => setState({ phase: "result", pageIds, ...result }));
+  }, [composer, oldSrc, newSrc, state]);
 
-  const handleRetryFailed = React.useCallback(() => {
-    if (state.phase !== "result") return;
-    // Retry: re-run against ALL pages with the asset (elements that succeeded
-    // on round 1 already have newSrc and are filtered out by findByMediaSrc).
-    setState({ phase: "committing" });
-    Promise.resolve().then(() => {
-      const result = composer.mediaOps.replaceAcross(oldSrc, newSrc);
-      setState({ phase: "result", result });
-      onComplete?.(result);
-    });
-  }, [composer, oldSrc, newSrc, onComplete, state]);
+  if (state.phase !== "preview") {
+    const { pageIds } = state;
+    return (
+      <ReplaceResultModal
+        open
+        composer={composer}
+        title="Replacement complete"
+        replaced={state.phase === "result" ? state.replaced : []}
+        failed={state.phase === "result" ? state.failed : []}
+        busy={state.phase === "committing" ? { label: replacingLabel(composer, state.targets) } : undefined}
+        onRetry={async () => resultIds(composer.mediaOps.replaceAcrossSelective(oldSrc, newSrc, pageIds))}
+        onDone={onClose}
+      />
+    );
+  }
 
   return (
     <>
@@ -163,186 +179,86 @@ export function ReplaceAcrossDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="med-rx-title"
+        data-testid="rx-dialog"
       >
-        <h2 id="med-rx-title" className="med-rx-title">
+        <h2 id="med-rx-title" className="med-rx-title" data-testid="rx-title">
           Replace across site
         </h2>
 
-        {state.phase === "preview" ? (
-          <>
-            <p className="med-rx-body">
-              Every place that uses {oldLabel ? <strong>{oldLabel}</strong> : "this asset"}
-              {" "}— {totalUses} in total — will switch to the image you pick. This can be
-              undone.
-            </p>
-            <div className="med-rx-preview">
-              <div className="med-rx-preview__before">
-                <img src={oldSrc} alt="" />
-                <span>Before</span>
-              </div>
-              <div className="med-rx-preview__arrow" aria-hidden="true">
-                →
-              </div>
-              <div className="med-rx-preview__after">
-                <img src={newSrc} alt="" />
-                <span>After</span>
-              </div>
-            </div>
-            {state.pages.length === 0 ? (
-              <p className="med-rx-body med-rx-body--empty">
-                This asset is not used on any page.
-              </p>
-            ) : (
-              <ul
-                className="med-rx-pages"
-                role="list"
-                aria-label="Pages to replace on"
-                data-testid="rx-pages-list"
-              >
-                {state.pages.map((p) => (
-                  <li key={p.id} className="med-rx-page-row">
-                    <label className="med-rx-page-label">
-                      <Checkbox
-                        color="blue"
-                        className="tw:bg-white"
-                        checked={state.selected.has(p.id)}
-                        onChange={() => handleTogglePage(p.id)}
-                        data-testid={`rx-page-${p.id}`}
-                        aria-label={`Replace on ${p.name}`}
-                      />
-                      <span className="med-rx-page-name">{p.name}</span>
-                      <span className="med-rx-page-count">
-                        {p.useCount} use{p.useCount === 1 ? "" : "s"}
-                      </span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <footer className="med-rx-footer">
-              <Button type="button" className={RX_BTN} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
-                onClick={handleCommit}
-                disabled={selectedTotals.uses === 0}
-              >
-                Replace {selectedTotals.uses} use
-                {selectedTotals.uses === 1 ? "" : "s"} on {selectedTotals.pages}{" "}
-                page{selectedTotals.pages === 1 ? "" : "s"}
-              </Button>
-            </footer>
-          </>
-        ) : null}
-
-        {state.phase === "committing" ? (
-          <p className="med-rx-body" role="status" aria-live="polite">
-            Replacing…
+        <p className="med-rx-body">
+          Every place that uses {oldLabel ? <strong>{oldLabel}</strong> : "this asset"}
+          {" "}— {totalUses} in total — will switch to the image you pick. This can be
+          undone.
+        </p>
+        <div className="med-rx-preview" data-testid="rx-swap">
+          <div className="med-rx-preview__before">
+            <img src={oldSrc} alt="" data-testid="rx-thumb-before" />
+            <span>Before</span>
+          </div>
+          <div className="med-rx-preview__arrow" aria-hidden="true" data-testid="rx-swap-arrow">
+            →
+          </div>
+          <div className="med-rx-preview__after">
+            <img src={newSrc} alt="" data-testid="rx-thumb-after" />
+            <span>After</span>
+          </div>
+        </div>
+        {state.pages.length === 0 ? (
+          <p className="med-rx-body med-rx-body--empty">
+            This asset is not used on any page.
           </p>
-        ) : null}
-
-        {state.phase === "result" ? (
-          <ResultView
-            result={state.result}
-            onRetryFailed={handleRetryFailed}
-            onClose={onClose}
-          />
-        ) : null}
-      </div>
-    </>
-  );
-}
-
-function ResultView({
-  result,
-  onRetryFailed,
-  onClose,
-}: {
-  result: ReplaceAcrossResult;
-  onRetryFailed(): void;
-  onClose(): void;
-}) {
-  const { replaced, failed, clean } = result;
-
-  if (clean && replaced.length > 0) {
-    return (
-      <>
-        <p className="med-rx-body med-rx-body--success" role="status">
-          Replaced {replaced.length} use{replaced.length === 1 ? "" : "s"} ✓
-        </p>
-        <footer className="med-rx-footer">
-          {/* Board 1174:4849's clean result closes on an 11/500 text link, not
-              on the filled 32-tall button the confirm and partial phases use:
-              there is nothing left to decide, so nothing to weight. */}
-          <Button
-            type="button"
-            variant="link"
-            className="tw:text-[length:var(--bk-text-11)] tw:font-medium"
-            onClick={onClose}
+        ) : (
+          <>
+          {/* 1174:4833 — the list is captioned. Without it the checkbox
+              column reads as a second confirmation rather than a scope
+              picker. */}
+          <p className="med-rx-pages-label" id="med-rx-pages-label" data-testid="rx-pages-label">
+            PAGES
+          </p>
+          <ul
+            className="med-rx-pages"
+            role="list"
+            aria-labelledby="med-rx-pages-label"
+            data-testid="rx-pages-list"
           >
-            Done
-          </Button>
-        </footer>
-      </>
-    );
-  }
-
-  if (replaced.length === 0) {
-    return (
-      <>
-        <p className="med-rx-body med-rx-body--error" role="alert">
-          Nothing replaced — all {failed.length} update{failed.length === 1 ? "" : "s"}{" "}
-          failed. No changes committed.
-        </p>
-        <details className="med-rx-failed">
-          <summary>Show errors ({failed.length})</summary>
-          <ul>
-            {failed.map((f) => (
-              <li key={f.elementId}>
-                <code>{f.elementId}</code>: {f.error}
+            {state.pages.map((p) => (
+              <li key={p.id}>
+                <label className="med-rx-page-label" data-testid={`rx-page-label-${p.id}`}>
+                  <Checkbox
+                    color="blue"
+                    className="tw:bg-white"
+                    checked={state.selected.has(p.id)}
+                    onChange={() => handleTogglePage(p.id)}
+                    data-testid={`rx-page-${p.id}`}
+                    aria-label={`Replace on ${p.name}`}
+                  />
+                  <span className="med-rx-page-name">{p.name}</span>
+                  <span className="med-rx-page-count">
+                    {p.elementIds.length} use{p.elementIds.length === 1 ? "" : "s"}
+                  </span>
+                </label>
               </li>
             ))}
           </ul>
-        </details>
-        <footer className="med-rx-footer">
-          <Button type="button" className={RX_BTN} onClick={onClose}>
-            Close
+          </>
+        )}
+        <footer className="med-rx-footer" data-testid="rx-foot">
+          <Button type="button" className={RX_BTN} data-testid="rx-cancel" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
+            data-testid="rx-commit"
+            onClick={handleCommit}
+            disabled={selectedTotals.uses === 0}
+          >
+            Replace {selectedTotals.uses} use
+            {selectedTotals.uses === 1 ? "" : "s"} on {selectedTotals.pages}{" "}
+            page{selectedTotals.pages === 1 ? "" : "s"}
           </Button>
         </footer>
-      </>
-    );
-  }
-
-  // Partial failure: some replaced, some failed.
-  return (
-    <>
-      <p className="med-rx-body med-rx-body--warn" role="alert">
-        {replaced.length} replaced, {failed.length} failed.
-      </p>
-      <details className="med-rx-failed" open>
-        <summary>Failed elements ({failed.length})</summary>
-        <ul>
-          {failed.map((f) => (
-            <li key={f.elementId}>
-              <code>{f.elementId}</code>: {f.error}
-            </li>
-          ))}
-        </ul>
-      </details>
-      <footer className="med-rx-footer">
-        <Button type="button" className={RX_BTN} onClick={onClose}>
-          Close
-        </Button>
-        <Button
-          type="button"
-          className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
-          onClick={onRetryFailed}
-        >
-          Retry failed
-        </Button>
-      </footer>
+      </div>
     </>
   );
 }

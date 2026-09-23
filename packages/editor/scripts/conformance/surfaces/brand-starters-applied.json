@@ -1,0 +1,228 @@
+{
+  "surface": "brand-starters-applied",
+  "board": "Brand \u00b7 starters \u00b7 applied (Figma 306:2186)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-starters"
+    },
+    {
+      "action": "waitFor",
+      "testId": "starter-grid"
+    },
+    {
+      "action": "click",
+      "testId": "starter-card-stripe-blue"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-section-status-starter-applied"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2187"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-starters-applied",
+      "nodeId": "I306:2187;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2188"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2189"
+    },
+    {
+      "name": "badge-row",
+      "testId": "brand-section-status",
+      "spec": "brand-starters-applied",
+      "nodeId": "2173:11816"
+    },
+    {
+      "name": "badge",
+      "testId": "brand-section-status-starter-applied",
+      "spec": "brand-starters-applied",
+      "nodeId": "333:2358"
+    },
+    {
+      "name": "badge-label",
+      "testId": "brand-section-status-starter-applied",
+      "spec": "brand-starters-applied",
+      "nodeId": "I333:2358;12:9"
+    },
+    {
+      "name": "warning",
+      "testId": "brand-starters-warning",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2190"
+    },
+    {
+      "name": "warning-text",
+      "testId": "brand-starters-warning-text"
+    },
+    {
+      "name": "gallery",
+      "testId": "starter-grid",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2192"
+    },
+    {
+      "name": "card-cobalt-default",
+      "testId": "starter-card-cobalt-default"
+    },
+    {
+      "name": "name-cobalt-default",
+      "testId": "starter-name-cobalt-default",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2196"
+    },
+    {
+      "name": "card-stripe-blue",
+      "testId": "starter-card-stripe-blue",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2197"
+    },
+    {
+      "name": "name-stripe-blue",
+      "testId": "starter-name-stripe-blue",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2199"
+    },
+    {
+      "name": "card-notion-warm",
+      "testId": "starter-card-notion-warm"
+    },
+    {
+      "name": "name-notion-warm",
+      "testId": "starter-name-notion-warm",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2203"
+    },
+    {
+      "name": "card-apple-minimal",
+      "testId": "starter-card-apple-minimal",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2204"
+    },
+    {
+      "name": "name-apple-minimal",
+      "testId": "starter-name-apple-minimal",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2206"
+    },
+    {
+      "name": "card-linear-dark",
+      "testId": "starter-card-linear-dark"
+    },
+    {
+      "name": "name-linear-dark",
+      "testId": "starter-name-linear-dark",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2210"
+    },
+    {
+      "name": "card-vercel-mono",
+      "testId": "starter-card-vercel-mono",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2211"
+    },
+    {
+      "name": "name-vercel-mono",
+      "testId": "starter-name-vercel-mono",
+      "spec": "brand-starters-applied",
+      "nodeId": "306:2213"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, and the starter is really applied: the step list clicks",
+    "`starter-card-stripe-blue` and waits for the pill the click produces. This is",
+    "the state 152:137's own prototype hotspot (1670:7235) points at.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  the pill PERSISTS. It cleared itself after 4s, on the reasoning that a",
+    "  second starter should read as its own event. 306:2186 draws it as a standing",
+    "  part of the screen, and the timer cost more than it bought: the staged",
+    "  change the pill reports outlives it by however long the user takes to reach",
+    "  Save, so the screen stopped saying what state it was in while still being in",
+    "  it. It is still per-VISIT \u2014 `applied` is local state and StartersSection",
+    "  unmounts the moment the panel walks back to the root \u2014 and a second click",
+    "  overwrites it, so a second starter still reads as its own event.",
+    "  the pill is the family's Badge (333:2358), not a fourth hand-rolled span:",
+    "  it had no `font-medium`, a 12px inset against the board's 10, and",
+    "  `--bk-success-text` (#057A55) where the board names `green/700` (#046C4E).",
+    "  radius unit     `rounded-full` -> `rounded-[9999px]`. Tailwind v4 compiles",
+    "                  `rounded-full` to `calc(infinity * 1px)`, which the browser",
+    "                  reports as `3.35544e+07px` \u2014 a value no length parser reads,",
+    "                  so the radius came back UNCOMPARABLE rather than equal. Same",
+    "                  pixel, a number the diff can see. All four Badge instances",
+    "                  state `rounded-[9999px]` on the board anyway.",
+    "  Plus everything in surfaces/brand-starters.json \u2014 same screen, same cards.",
+    "",
+    "NOT JOINED \u2014 TWO BOARDS DISAGREE, and the panel's own arithmetic settles it:",
+    "  306:2194 / 306:2201 / 306:2208, the LEFT column of cards, carry",
+    "  `width: 136px` here while 152:148 and its five siblings carry `width: 116px`",
+    "  for the same six cards one board over. 116 is the one that can be true:",
+    "  the gallery is 280 wide on 16px gutters with a 16px column gap, so a card is",
+    "  (280 - 32 - 16) / 2 = 116, and two 136s plus the gap and the gutters is 320",
+    "  in a 280 panel. 136 is the thumb frame's width leaking onto the card frame \u2014",
+    "  152:149 carries exactly that number on the board where the card carries 116.",
+    "  So the card width is measured on brand-starters, where all six agree, and",
+    "  the three left-column frames here are skipped. Their right-column twins",
+    "  (306:2197 / 2204 / 2211) carry no width and ARE joined, so the gap, height",
+    "  and radius are still checked on this board.",
+    "",
+    "NOT JOINED, same reasons as brand-starters.json:",
+    "  306:2191, the warning paragraph (`width: 248` against the drawer's 247),",
+    "  and the six thumb frames (the flat grey fill is a placeholder, not a",
+    "  decision). 306:2186 itself is the drawer's edge.",
+    "",
+    "HEADER TITLE REVERSED TO THE BOARD: the panel header now reads `Brand` at",
+    "every depth, not `Brand \u203a <Section>`. Six destination frames state the title",
+    "text and all six say `Brand`; check-board-copy.mjs reported it on all six at",
+    "once. This undoes a deliberate 2026-09-04 change whose argument is kept in",
+    "DesignSystemTab.tsx \u2014 the boards answer `where am I` one row lower, in the",
+    "36px Back row they all draw."
+  ]
+}

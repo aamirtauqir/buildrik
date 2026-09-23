@@ -1,0 +1,53 @@
+[
+  {
+    "finding": "UX-I-27",
+    "page": "1:3",
+    "over": "UNRESOLVED-ID",
+    "unresolved-id": true,
+    "over_selector": "Board 168:48 (VERIFIED, 'Compare · list', 1080x776, section 1776:8382). Take the FIRST change-row label — the topmost TEXT node inside the change list whose characters match /^(Added|Removed|Content|Moved|Changed)\\b/. If several share the same y, take the leftmost. Its parent row frame is the hotspot's true bounds; if the label was appended straight to the board, keep add-hotspots' label-bounds behaviour and pad 8.",
+    "to": "169:2",
+    "to_name": "Compare · single-page",
+    "to_id_source": "read-from-file 2026-09-07 (section listing)",
+    "name": "hotspot/change-row → that page",
+    "pad": 8,
+    "why": "List mode names every change and none of them is clickable — the rows are plain divs (ApprovedCompareView.tsx:211-226). Making the row a destination is the finding's fix. 'Compare · single-page' is the in-family destination that means 'this change, on its own page'; the full fix in code is switch-page-and-select-element, which no board can express on its own.",
+    "caveat": "Do NOT use wire-edges.mjs here. The label may sit directly on the board, in which case wire-edges walks to the nearest frame ancestor — the board — and makes the whole 1080x776 screen clickable. That is the exact defect add-hotspots exists to avoid."
+  },
+  {
+    "finding": "UX-I-29",
+    "page": "1:3",
+    "over": "UNRESOLVED-ID",
+    "unresolved-id": true,
+    "over_selector": "Board 162:2 (VERIFIED, 'History · Saves', section 1776:8374 '16 · History · 35'). Take the TEXT node whose characters match /Compare with current/. If the approval band is not drawn on 162:2, try its siblings 163:2 'History · Saves · changes' then 163:113 'History · Saves · time-travel' — SavesChrome.tsx:129-138 renders the band only under isApproved, so the band may live on whichever Saves board draws an approved round. If it is on NO Saves board, that is a missing-state finding for the history module, not a hotspot: report it, do not draw the band.",
+    "to": "168:2",
+    "to_name": "Compare · side-by-side",
+    "to_id_source": "read-from-file 2026-09-07 (section listing)",
+    "name": "hotspot/compare-with-current → Compare",
+    "pad": 8,
+    "why": "History's approval band emits UI_PANEL_OPEN {panel:'review', screen:'compare'} and lands the user in another module (SavesChrome.tsx:129-138, TabRouter.tsx:226-236). Today the prototype does not draw that edge at all, so the cross-module jump the finding is about is invisible on the boards. Drawing the inbound edge makes the jump inspectable; the RETURN address is the second half and is specced below.",
+    "return_address_REQUIRED": {
+      "note": "This row alone does not close UX-I-29. Compare's only exit is Back, which lands in the Review panel's comment thread — a module the user never asked for. A static prototype cannot carry a dynamic return address, so the honest expression is a SECOND, labelled exit.",
+      "steps": [
+        "On 168:2, 168:26, 168:48 and 169:2 (all VERIFIED), the back control currently reads as a single '‹' / 'Back'. Relabel it '‹ Review' so the destination is named rather than assumed.",
+        "Add a second exit in the same row, 12px to its right: '‹ History › Saves', Inter Medium 13/20, #1A56DB, shown only on the arrived-from-History path. Draw it on 168:2 alone and caption it as the conditional exit; drawing it on all four states it as unconditional would be a different lie.",
+        "Hotspot that second label back to 162:2.",
+        "Node ids for the back control were NEVER read. Selector: within each board, the TEXT whose characters match /^(‹|<|Back)/ in the top-left 200x56 of the board."
+      ]
+    }
+  },
+  {
+    "finding": "UX-I-24",
+    "page": "1:3",
+    "over": "DOES-NOT-EXIST-YET",
+    "unresolved-id": true,
+    "blocked_on": "a draw, not a read — the label this hotspot needs is not on the board",
+    "over_selector": "Board 1168:4713 (VERIFIED by name search 2026-09-07, 'Publish · stale-approval (modal)', section 1776:8378 '15 · Publish · 20'). The modal's footer draws 'Re-send for approval' and 'Publish anyway' and NO compare door (StaleApprovalModal.tsx:162-181). A 'See what changed' text link must be DRAWN first, left-aligned in the footer row, Inter Medium 13/20, #1A56DB, opposite the two existing buttons.",
+    "to": "168:2",
+    "to_name": "Compare · side-by-side",
+    "to_id_source": "read-from-file 2026-09-07 (section listing)",
+    "name": "hotspot/see-what-changed → Compare",
+    "pad": 8,
+    "why": "Two independent answers to 'what changed since approval' ship. The publish gate computes its own page-level diff and lists page names with a bare edited/added/removed, capped at six (StaleApprovalModal.tsx:38-50,162-181); Compare computes a typed, itemised diff with side-by-side and overlay rendering (ApprovedCompareView.tsx:113-116, compareApprovedToCurrent). The gate is the moment the decision is actually made and it shows the weaker of the two with no door to the stronger one.",
+    "cross_module": "1168:4713 belongs to section 1776:8378, the PUBLISH module's board, not mine. The inbound edge and the link label are additive and touch no publish content, but the publish owner should be told: the second diff implementation is theirs to delete, and only they can decide whether the gate keeps its own page list once the door exists."
+  }
+]

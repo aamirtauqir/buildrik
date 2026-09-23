@@ -100,6 +100,7 @@ export function ScopeDropdown({
       <Button
         type="button"
         className="bdi-bpr-pill tw:bg-[var(--bk-bg-card)]"
+        data-testid="inspector-scope-pill"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -132,6 +133,7 @@ export function ScopeDropdown({
           <Button
             color="light"
             style={reachAll ? optionRow : { ...optionRow, background: "var(--bk-accent-tint)" }}
+            data-testid="inspector-scope-this"
             title="Just this element"
             onClick={() => {
               onReachAllChange?.(false);
@@ -145,6 +147,7 @@ export function ScopeDropdown({
           <Button
             color="light"
             style={reachAll ? { ...optionRow, background: "var(--bk-accent-tint)" } : optionRow}
+            data-testid="inspector-scope-all"
             disabled={peers.length === 0}
             onClick={() => {
               onReachAllChange?.(true);
@@ -163,6 +166,7 @@ export function ScopeDropdown({
           <Button
             color="light"
             style={optionRow}
+            data-testid="inspector-scope-site"
             title="Site-wide colors & fonts live in the Styles tab"
             onClick={() => {
               setOpen(false);

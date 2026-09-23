@@ -1,0 +1,250 @@
+{
+  "surface": "issues-fix-failed",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "164:57",
+  "boardName": "issues-fix-failed",
+  "figmaHash": "be1509b18e9008fe65ea71ff3c810f70b3175ff37ee43a78ef6eea73a84b185a",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:25:15.383Z",
+  "copy": [
+    "Issues",
+    "All · 3",
+    "Couldn’t fix the contrast automatically.",
+    "This colour comes from your brand tokens, so fixing it here would change every site using them.",
+    "Open Brand",
+    "Ignore once",
+    "Image has no alt text",
+    "Home › hero",
+    "Fix ›"
+  ],
+  "targets": [
+    {
+      "nodeId": "164:57",
+      "name": "[not-implemented] Issues · fix-failed — generic autofix failure; no generic autofix producer exists (LintSection.tsx has no fix door; the only one is contrast at ColorTokenList.tsx:294-306)",
+      "className": "bg-[var(--color\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "164:58",
+      "name": "Header",
+      "className": "[word-break:break-word] h-[48px] leading-[20px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "48px"
+        },
+        "line-height": {
+          "value": "20px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:59",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium left-[16px] text-[14px] text-[color:var(--color\\/ink,#111827)] top-[14px]",
+      "props": {
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "164:60",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[252px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[14px]",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "164:61",
+      "name": "Filter row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:62",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[10px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "164:63",
+      "name": "Fix failed",
+      "className": "[word-break:break-word] bg-[var(--color\\/warning-tint,#fdfdea)] font-['Inter:Regular'] font-normal h-[118px] not-italic overflow-clip relative shrink-0 text-left w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "118px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:64",
+      "name": null,
+      "className": "absolute leading-[18px] left-[16px] text-[12px] text-[color:var(--color\\/error-text,#c81e1e)] top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        }
+      }
+    },
+    {
+      "nodeId": "164:65",
+      "name": null,
+      "className": "absolute leading-[16px] left-[16px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[32px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:66",
+      "name": null,
+      "className": "absolute leading-[18px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "164:67",
+      "name": null,
+      "className": "absolute leading-[18px] left-[100px] text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "164:68",
+      "name": "Issue · Image has no alt",
+      "className": "h-[56px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "56px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:70",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[32px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-left top-[8px] w-[180px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "180px"
+        }
+      }
+    },
+    {
+      "nodeId": "164:71",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[32px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[30px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "164:72",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[224px] not-italic text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    }
+  ]
+}

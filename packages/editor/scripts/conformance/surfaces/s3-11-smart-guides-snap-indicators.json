@@ -1,0 +1,125 @@
+{
+  "surface": "s3-11-smart-guides-snap-indicators",
+  "board": "S3.11 \u00b7 smart-guides-snap-indicators (Figma 815:4608)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=canvas-smart-guides",
+  "viewport": {
+    "width": 1080,
+    "height": 680
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "snap-guide-0"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "center-h",
+      "testId": "snap-guide-0",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4616"
+    },
+    {
+      "name": "center-v",
+      "testId": "snap-guide-1",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4617"
+    },
+    {
+      "name": "edge-v",
+      "testId": "snap-guide-2",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4625"
+    },
+    {
+      "name": "gap-left",
+      "testId": "snap-guide-3",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4633"
+    },
+    {
+      "name": "gap-right",
+      "testId": "snap-guide-4",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4635"
+    },
+    {
+      "name": "pad-h",
+      "testId": "snap-guide-5",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4643"
+    },
+    {
+      "name": "pad-v",
+      "testId": "snap-guide-6",
+      "spec": "s3-11-smart-guides-snap-indicators",
+      "nodeId": "815:4645"
+    },
+    {
+      "name": "gap-left-label",
+      "testId": "snap-guide-label-3"
+    },
+    {
+      "name": "gap-right-label",
+      "testId": "snap-guide-label-4"
+    },
+    {
+      "name": "pad-h-label",
+      "testId": "snap-guide-label-5"
+    },
+    {
+      "name": "pad-v-label",
+      "testId": "snap-guide-label-6"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE, and deliberately: a guide exists only mid-drag, and",
+    "`calculateSnapping` derives it from sibling geometry read out of a real",
+    "canvas DOM \u2014 a fixture canvas would make the measurement a statement about",
+    "the fixture's rectangles, not about the guide. What the board actually",
+    "specifies is the LINE: colour, thickness, extent. So the REAL",
+    "SmartGuidesOverlay is mounted over the board's own seven line geometries,",
+    "transcribed from 815:4616/4617/4625 and 815:4633/4635/4643/4645 in the",
+    "board's own 464x180 cell coordinates. Every pixel measured is drawn by the",
+    "component from the same SnapLine shape the drag hands it; nothing is",
+    "hardcoded to look like a guide. All four scenarios are covered \u2014 centre",
+    "alignment, edge alignment, equal spacing and parent padding.",
+    "",
+    "BOARD WON \u2014 the spacing red. The four spacing rects are filled",
+    "--color/error, which is #E02424; the overlay painted #FF4444. Note the",
+    "board CONTRADICTS ITSELF here: its own blurb (815:4610) reads 'Red",
+    "(#FF4444) spacing indicators', and that sentence is what the component was",
+    "built from. A tokenised fill in the DRAWING beats an untokenised number in",
+    "a CAPTION \u2014 the drawing is the design, the caption describes it \u2014 so the",
+    "four rects win. The magenta #FF00FF alignment guides and the 1px thickness",
+    "already matched.",
+    "",
+    "CONTRAST \u2014 this change IMPROVED it, and it is still short. Measured on the",
+    "probe's bg-subtle cell (the board's own cell fill): the gap labels went",
+    "from #FF4444 on #F3F4F6 = 3.04:1 to #E02424 on #F3F4F6 = 4.29:1, against",
+    "a 4.5 floor. Two things about that number: it is BETTER than what shipped,",
+    "and it is not really the product's number \u2014 in the app these labels sit",
+    "over the CUSTOMER's canvas, whose background is theirs, not ours. Recorded",
+    "in the baseline as measured rather than argued away, and flagged: a label",
+    "chip (white pill behind the number) is the only thing that would make this",
+    "legible at every canvas colour, and that is a design decision.",
+    "",
+    "NOT CONFORMED \u2014 the four label nodes (815:4634/4636/4644/4646). The board",
+    "sets them 10px Inter Medium; the overlay draws 11px/500. 10 is not a step",
+    "of the type scale, and `check-design-debt-ratchet`'s `offscale-font-size`",
+    "rule (which matches the literal `fontSize: 10`) is locked at ZERO over",
+    "src/editor \u2014 a 10 here fails the build. The colour and weight DID move",
+    "with the lines. Worth a founder ruling: the ratchet already excludes",
+    "CatalogCard, BrandPreview and TypographySection on the grounds that they",
+    "draw at a scale that is not chrome type, and this file carries the same",
+    "argument in its own header (`@lint-hex-policy: component-theme` \u2014 'this",
+    "paints ON the customer's canvas, not chrome'). Adding it to that list is",
+    "a gate change, so it is reported, not taken.",
+    "",
+    "NOT JOINED \u2014 the board's rectangles, cards and captions (815:4611 etc.).",
+    "They are the documentation sheet's own furniture: four 496x280 explainer",
+    "cards drawn to describe the guides, with sample elements in blue-100. No",
+    "product surface renders them."
+  ]
+}

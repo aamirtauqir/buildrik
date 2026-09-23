@@ -1,0 +1,201 @@
+{
+  "surface": "content-collection",
+  "board": "Content · collection (Figma 149:50)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "content-collection-menu-items"
+    },
+    {
+      "action": "waitFor",
+      "testId": "content-collection-meta"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-collection",
+      "nodeId": "208:431"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-collection",
+      "nodeId": "I208:431;16:7"
+    },
+    {
+      "name": "crumb",
+      "testId": "content-crumb",
+      "spec": "content-collection",
+      "nodeId": "149:56"
+    },
+    {
+      "name": "meta",
+      "testId": "content-collection-meta",
+      "spec": "content-collection",
+      "nodeId": "149:57"
+    },
+    {
+      "name": "meta-count",
+      "testId": "content-collection-count",
+      "spec": "content-collection",
+      "nodeId": "149:58"
+    },
+    {
+      "name": "meta-add",
+      "testId": "content-collection-add",
+      "spec": "content-collection",
+      "nodeId": "149:59"
+    },
+    {
+      "name": "rec-margherita",
+      "testId": "content-record-rec-margherita",
+      "spec": "content-collection",
+      "nodeId": "241:1665"
+    },
+    {
+      "name": "rec-margherita-label",
+      "testId": "row-label-content-record-rec-margherita",
+      "spec": "content-collection",
+      "nodeId": "I241:1665;240:16"
+    },
+    {
+      "name": "rec-margherita-chevron",
+      "testId": "row-chevron-content-record-rec-margherita",
+      "spec": "content-collection",
+      "nodeId": "I241:1665;240:17"
+    },
+    {
+      "name": "rec-quattro",
+      "testId": "content-record-rec-quattro",
+      "spec": "content-collection",
+      "nodeId": "241:1669"
+    },
+    {
+      "name": "rec-quattro-label",
+      "testId": "row-label-content-record-rec-quattro",
+      "spec": "content-collection",
+      "nodeId": "I241:1669;240:16"
+    },
+    {
+      "name": "rec-quattro-chevron",
+      "testId": "row-chevron-content-record-rec-quattro",
+      "spec": "content-collection",
+      "nodeId": "I241:1669;240:17"
+    },
+    {
+      "name": "rec-diavola",
+      "testId": "content-record-rec-diavola",
+      "spec": "content-collection",
+      "nodeId": "241:1673"
+    },
+    {
+      "name": "rec-diavola-label",
+      "testId": "row-label-content-record-rec-diavola",
+      "spec": "content-collection",
+      "nodeId": "I241:1673;240:16"
+    },
+    {
+      "name": "rec-diavola-chevron",
+      "testId": "row-chevron-content-record-rec-diavola",
+      "spec": "content-collection",
+      "nodeId": "I241:1673;240:17"
+    },
+    {
+      "name": "rec-marinara",
+      "testId": "content-record-rec-marinara",
+      "spec": "content-collection",
+      "nodeId": "241:1677"
+    },
+    {
+      "name": "rec-marinara-label",
+      "testId": "row-label-content-record-rec-marinara",
+      "spec": "content-collection",
+      "nodeId": "I241:1677;240:16"
+    },
+    {
+      "name": "rec-marinara-chevron",
+      "testId": "row-chevron-content-record-rec-marinara",
+      "spec": "content-collection",
+      "nodeId": "I241:1677;240:17"
+    },
+    {
+      "name": "row-fields",
+      "testId": "content-open-fields",
+      "spec": "content-collection",
+      "nodeId": "233:1304"
+    },
+    {
+      "name": "row-fields-label",
+      "testId": "row-label-content-open-fields",
+      "spec": "content-collection",
+      "nodeId": "I233:1304;232:8"
+    },
+    {
+      "name": "row-fields-count",
+      "testId": "row-count-content-open-fields",
+      "spec": "content-collection",
+      "nodeId": "I233:1304;232:9"
+    },
+    {
+      "name": "row-fields-chevron",
+      "testId": "row-chevron-content-open-fields",
+      "spec": "content-collection",
+      "nodeId": "I233:1304;232:10"
+    },
+    {
+      "name": "row-dynamic",
+      "testId": "content-open-dynamic",
+      "spec": "content-collection",
+      "nodeId": "233:1309"
+    },
+    {
+      "name": "row-dynamic-label",
+      "testId": "row-label-content-open-dynamic",
+      "spec": "content-collection",
+      "nodeId": "I233:1309;232:8"
+    },
+    {
+      "name": "row-dynamic-chevron",
+      "testId": "row-chevron-content-open-dynamic",
+      "spec": "content-collection",
+      "nodeId": "I233:1309;232:10"
+    }
+  ],
+  "_note": [
+    "Board 149:50, reached from the root by the panel's own row click — see the",
+    "content-root recipe for why the manager is stubbed and everything above it is",
+    "the shipped code.",
+    "",
+    "BOARD won once: 149:57 states 12/18 on the meta STRIP, not only on the two",
+    "words inside it. The strip was inheriting the document's 16 — invisible while",
+    "both children override it, and wrong the moment anything else lands in the row.",
+    "The record rows and the two footer List rows needed nothing beyond the",
+    "232:6 / 240:14 line-heights already landed for content-root.",
+    "",
+    "ONE UNKNOWN, deliberately left: 233:1309 (the Dynamic pages row) states",
+    "line-height 20 on the ROW, and its twin 233:1304 on the same board does not.",
+    "That is Figma hoisting a text style to the parent when an instance's children",
+    "all share it — the Dynamic pages instance has no count, the Fields one does.",
+    "The DOM row paints no text of its own, so there is nothing to compare; making",
+    "it pass would mean putting a line-height on chrome-ui Row's `default` size,",
+    "which every family's rows share and no other board asks for.",
+    "",
+    "NOT anchored: 149:50 the board frame (drawer chrome), 149:55 / the Back row",
+    "frame at 36 — Crumb is an h-8 Button inside a my-0.5 margin, which is the same",
+    "36 the board draws, but as margin+control rather than one 36 box, and the",
+    "control is anchored on its own at 149:56. Three hotspot/* nodes.",
+    "",
+    "BOARD-COPY: 4 leads, none drift. \"‹ Menu items\" and \"4 records\" render",
+    "exactly (read back from the DOM); the checker splits them because JSX emits",
+    "`‹ {label}` and `{n} record{s}` as separate text nodes. The board's own \"24\"",
+    "is sample data against a 4-record fixture."
+  ]
+}

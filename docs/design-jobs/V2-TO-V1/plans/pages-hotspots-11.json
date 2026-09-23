@@ -1,0 +1,55 @@
+[
+  {
+    "over": "hotspot/state · Pages · delete-confirm",
+    "_over_note": "SELECTOR, not an id — this is the rect pages-edits-09-doors.json creates on 140:2. add-hotspots.mjs resolves `over` by id, so before running this file replace each `over` with the id that plan reported. `name` matches the same rect, so the script finds it via board.children.find(c => c.name === name), re-places it over its own bounds with pad 0 and wires it.",
+    "to": "UNRESOLVED — the board id add-state-board reports for 'Pages · delete-page · confirm · inbound links (of 1171:4820)'",
+    "name": "hotspot/state · Pages · delete-confirm",
+    "pad": 0,
+    "unresolved-id": true,
+    "why": "UX-B-04 — a board with no inbound edge is not a screen, it is a picture. The context-menu row 1171:4765 also gets an edge, via add-state-board --wire-from in pages-boards-07-new.sh, so the confirm is reachable from the verb that raises it as well as from the root board."
+  },
+  {
+    "over": "hotspot/state · Pages · drag",
+    "to": "UNRESOLVED — board id for 'Pages · tree · drag · drop indicator (of 140:2)'",
+    "name": "hotspot/state · Pages · drag", "pad": 0, "unresolved-id": true,
+    "why": "UX-B-06 / UX-B-07 — a drag is not a click, so the state needs an explicit door on the root board; that is what the file's hotspot/state convention exists for."
+  },
+  {
+    "over": "hotspot/state · Pages · home-by-position",
+    "to": "UNRESOLVED — board id for 'Pages · tree · homepage by position (of 140:2)'",
+    "name": "hotspot/state · Pages · home-by-position", "pad": 0, "unresolved-id": true,
+    "why": "UX-B-05"
+  },
+  {
+    "over": "hotspot/state · Pages · local-only",
+    "to": "UNRESOLVED — board id for 'Pages · local-only · project load failed (of 141:124)'",
+    "name": "hotspot/state · Pages · local-only", "pad": 0, "unresolved-id": true,
+    "why": "UX-B-27"
+  },
+  {
+    "over": "hotspot/state · Pages · bulk-toast",
+    "to": "UNRESOLVED — board id for 'Pages · bulk · one toast per action (of 141:78)'",
+    "name": "hotspot/state · Pages · bulk-toast", "pad": 0, "unresolved-id": true,
+    "why": "UX-B-11 / UX-B-12"
+  },
+  {
+    "over": "hotspot/state · Pages · rename-url-offer",
+    "to": "UNRESOLVED — board id for 'Pages · rename · URL offer (of 1717:17217)'",
+    "name": "hotspot/state · Pages · rename-url-offer", "pad": 0, "unresolved-id": true,
+    "why": "UX-B-08 / UX-B-09"
+  },
+  {
+    "over": "787:4307",
+    "to": "774:4044",
+    "name": "hotspot/state · Pages · loading",
+    "pad": 0,
+    "why": "Re-wires the door pages-truth-10.json un-cuts. Both ids were READ: 787:4307 is the hotspot rect on 140:2 (abs 100,16712 160x34) and 774:4044 is the Pages · loading board. If the reaction survived the CUT rename, add-hotspots reports ALREADY and changes nothing — which is the answer this row is asking for."
+  },
+  {
+    "over": "1171:4803",
+    "to": "774:4044",
+    "name": "hotspot/state · Pages · loading",
+    "pad": 0,
+    "why": "Same, on the command-palette board 1171:4767. Both ids READ."
+  }
+]

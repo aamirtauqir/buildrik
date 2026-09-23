@@ -1,0 +1,295 @@
+{
+  "surface": "orphan-comments-detected",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "184:56",
+  "boardName": "orphan-comments-detected",
+  "figmaHash": "fd18b08f04c989ebcd4f78197951a30593210b4c3c02373ed5f2a11d5b121b80",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:11:16.650Z",
+  "copy": [
+    "2 comments lost their element",
+    "“is the terrace open in winter?”",
+    "was on: “Book a table”",
+    "“can we make this bigger?”",
+    "was on: “Hero heading”",
+    "Open Review panel"
+  ],
+  "targets": [
+    {
+      "nodeId": "184:56",
+      "name": "Orphan comments · detected",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "184:57",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:58",
+      "name": "modal/560",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[340px] left-[440px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[280px] w-[560px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "340px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "560px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:59",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[18px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:60",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[524px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[18px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:61",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[60px] leading-[20px] left-[24px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[64px] w-[512px]",
+      "props": {
+        "height": {
+          "value": "60px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:62",
+      "name": "Frame",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/warning-tint,#fdfdea)] font-['Inter:Regular'] font-normal h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[140px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:63",
+      "name": null,
+      "className": "absolute leading-[18px] left-[12px] text-[12px] text-[color:var(--color\\/ink,#111827)] top-[10px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:64",
+      "name": null,
+      "className": "absolute leading-[16px] left-[12px] text-[11px] text-[color:var(--color\\/warning-text,#723b13)] top-[32px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "184:65",
+      "name": "Frame",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/warning-tint,#fdfdea)] font-['Inter:Regular'] font-normal h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[200px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:66",
+      "name": null,
+      "className": "absolute leading-[18px] left-[12px] text-[12px] text-[color:var(--color\\/ink,#111827)] top-[10px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:67",
+      "name": null,
+      "className": "absolute leading-[16px] left-[12px] text-[11px] text-[color:var(--color\\/warning-text,#723b13)] top-[32px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1178",
+      "name": "Button",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[var(--size\\/row,32px)] items-center justify-center left-[376px] px-[16px] py-[10px] rounded-[8px] top-[268px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1178;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "1682:7245",
+      "name": "hotspot/state · Review panel · detached (Open Review panel)",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-0 opacity-0 top-[862px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

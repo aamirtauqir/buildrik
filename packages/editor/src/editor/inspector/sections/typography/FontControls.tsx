@@ -17,7 +17,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
-import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
+import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator, labelTestId, rowTestId } from "../../shared/controls";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_SLOT, CHAIN_TRIGGER } from "../../shared/controls/controlClasses";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
 // Font weight options
@@ -135,8 +135,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Board 807:8342 pairs the two type numbers on one row — "Size 14 | 1.5"
           — because line height is read against the size it belongs to, never
           on its own. Both keep their type-token chain. */}
-      <div className="bdi-row-ctrl" role="group" aria-label="Size and line height">
-        <label className="bdi-lb">Size</label>
+      <div className="bdi-row-ctrl" role="group" aria-label="Size and line height" data-testid={rowTestId("Size")}>
+        <label className="bdi-lb" data-testid={labelTestId("Size")}>Size</label>
         <div className="bdi-pair">
           {/* Board 807:8342 pairs the numbers with no second label; a hover
               title says which is which when both read in px (designer walk

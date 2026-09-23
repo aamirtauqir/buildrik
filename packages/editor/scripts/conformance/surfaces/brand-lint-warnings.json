@@ -1,0 +1,416 @@
+{
+  "surface": "brand-lint-warnings",
+  "board": "Brand \u00b7 lint-warnings (Figma 154:26)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-row-count-lint"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-lint-warnings",
+      "nodeId": "208:611"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-lint-warnings",
+      "nodeId": "I208:611;16:7"
+    },
+    {
+      "name": "preview-swatches",
+      "testId": "brand-preview-swatches",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7342"
+    },
+    {
+      "name": "specimen-heading",
+      "testId": "brand-specimen-heading",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7347"
+    },
+    {
+      "name": "specimen-heading-aa",
+      "testId": "brand-specimen-aa-heading",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7348"
+    },
+    {
+      "name": "specimen-heading-label",
+      "testId": "brand-specimen-label-heading",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7349"
+    },
+    {
+      "name": "specimen-body",
+      "testId": "brand-specimen-body",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7350"
+    },
+    {
+      "name": "specimen-body-aa",
+      "testId": "brand-specimen-aa-body",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7351"
+    },
+    {
+      "name": "specimen-body-label",
+      "testId": "brand-specimen-label-body",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7352"
+    },
+    {
+      "name": "row-tokens",
+      "testId": "brand-row-tokens",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7353"
+    },
+    {
+      "name": "row-tokens-label",
+      "testId": "brand-row-label-tokens",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7355"
+    },
+    {
+      "name": "row-tokens-hint",
+      "testId": "brand-row-hint-tokens",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7356"
+    },
+    {
+      "name": "row-tokens-count",
+      "testId": "brand-row-count-tokens",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7357"
+    },
+    {
+      "name": "row-tokens-chevron",
+      "testId": "brand-row-chevron-tokens",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7358"
+    },
+    {
+      "name": "row-styles",
+      "testId": "brand-row-styles",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7359"
+    },
+    {
+      "name": "row-styles-label",
+      "testId": "brand-row-label-styles",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7361"
+    },
+    {
+      "name": "row-styles-hint",
+      "testId": "brand-row-hint-styles",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7362"
+    },
+    {
+      "name": "row-styles-count",
+      "testId": "brand-row-count-styles",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7363"
+    },
+    {
+      "name": "row-styles-chevron",
+      "testId": "brand-row-chevron-styles",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7364"
+    },
+    {
+      "name": "row-starters",
+      "testId": "brand-row-starters",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7365"
+    },
+    {
+      "name": "row-starters-label",
+      "testId": "brand-row-label-starters",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7367"
+    },
+    {
+      "name": "row-starters-hint",
+      "testId": "brand-row-hint-starters",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7368"
+    },
+    {
+      "name": "row-starters-count",
+      "testId": "brand-row-count-starters",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7369"
+    },
+    {
+      "name": "row-starters-chevron",
+      "testId": "brand-row-chevron-starters",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7370"
+    },
+    {
+      "name": "row-classes",
+      "testId": "brand-row-classes",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7371"
+    },
+    {
+      "name": "row-classes-label",
+      "testId": "brand-row-label-classes",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7373"
+    },
+    {
+      "name": "row-classes-hint",
+      "testId": "brand-row-hint-classes",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7374"
+    },
+    {
+      "name": "row-classes-chevron",
+      "testId": "brand-row-chevron-classes",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7375"
+    },
+    {
+      "name": "row-components",
+      "testId": "brand-row-components",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7376"
+    },
+    {
+      "name": "row-components-label",
+      "testId": "brand-row-label-components",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7378"
+    },
+    {
+      "name": "row-components-hint",
+      "testId": "brand-row-hint-components",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7379"
+    },
+    {
+      "name": "row-components-chevron",
+      "testId": "brand-row-chevron-components",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7380"
+    },
+    {
+      "name": "row-typography",
+      "testId": "brand-row-typography",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7381"
+    },
+    {
+      "name": "row-typography-label",
+      "testId": "brand-row-label-typography",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7383"
+    },
+    {
+      "name": "row-typography-hint",
+      "testId": "brand-row-hint-typography",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7384"
+    },
+    {
+      "name": "row-typography-chevron",
+      "testId": "brand-row-chevron-typography",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7385"
+    },
+    {
+      "name": "row-colour-mode",
+      "testId": "brand-row-colour-mode",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7386"
+    },
+    {
+      "name": "row-colour-mode-label",
+      "testId": "brand-row-label-colour-mode",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7388"
+    },
+    {
+      "name": "row-colour-mode-hint",
+      "testId": "brand-row-hint-colour-mode",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7389"
+    },
+    {
+      "name": "row-colour-mode-chevron",
+      "testId": "brand-row-chevron-colour-mode",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7390"
+    },
+    {
+      "name": "row-lint",
+      "testId": "brand-row-lint",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7391"
+    },
+    {
+      "name": "row-lint-label",
+      "testId": "brand-row-label-lint",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7393"
+    },
+    {
+      "name": "row-lint-hint",
+      "testId": "brand-row-hint-lint",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7394"
+    },
+    {
+      "name": "row-lint-count",
+      "testId": "brand-row-count-lint",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7395"
+    },
+    {
+      "name": "row-lint-chevron",
+      "testId": "brand-row-chevron-lint",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7396"
+    },
+    {
+      "name": "row-export",
+      "testId": "brand-row-export",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7397"
+    },
+    {
+      "name": "row-export-label",
+      "testId": "brand-row-label-export",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7399"
+    },
+    {
+      "name": "row-export-hint",
+      "testId": "brand-row-hint-export",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7400"
+    },
+    {
+      "name": "row-export-chevron",
+      "testId": "brand-row-chevron-export",
+      "spec": "brand-lint-warnings",
+      "nodeId": "1691:7401"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE. The Brand panel is a rail destination with a `B` shortcut, so",
+    "every root state this family draws is reachable in the running editor \u2014 no",
+    "probe, and no fixture standing in for the panel.",
+    "",
+    "154:26 is the ROOT in Beginner mode with lint findings present. That reading",
+    "is not from the frame's name, it is from its own rows: Classes and Components",
+    "carry no count on this board, and the only mode in which they carry none is",
+    "Beginner (`sectionCounts` omits both \u2014 DesignSystemTab.tsx). Tokens 4,",
+    "Presets 18, Starters 6 and Lint 2 are the board's sample numbers; the live",
+    "panel answers 4 / 18 / 6 / 17 from the real registries and the real linter,",
+    "and only the SHAPE (which rows carry a number at all) is conformed.",
+    "",
+    "WHAT THE BOARD WON, changed in code this pass:",
+    "  panel fill        `--bk-bg-subtle` -> `--bk-bg-panel`. Every frame in the",
+    "                    family fills the Brand panel white; the grey was this",
+    "                    panel's own override and made it the one tinted drawer.",
+    "  body padding      SECTION_BODY's `p-3` is gone. The boards inset every list",
+    "                    row 16 from the PANEL edge and each section already adds",
+    "                    that itself, so the rows shipped at 28 and the Basic-mode",
+    "                    note measured 224 against the board's 248.",
+    "  row line-height   the nine rows are `leading-[normal]` on the board and",
+    "                    inherited flowbite's `text-sm` 20px, which stacked",
+    "                    label+hint 36 tall inside a 52 row.",
+    "  row count size    11 -> 12. The board draws the count and the chevron at one",
+    "                    size (1691:7357 / 7358), which is what makes them read as",
+    "                    a single trailing cluster.",
+    "  swatch edge       an 8%-ink inset box-shadow -> a real 1px --bk-gray-200",
+    "                    border, which is what 1691:7343..7346 draw.",
+    "  preview inset     `px-2 pb-3` -> `px-4 py-3` (1691:7341).",
+    "  specimen stack    Heading and Body were nested in a `gap-0.5` sub-column;",
+    "                    the board makes them peers of the swatch row inside the",
+    "                    band's own 8px gap.",
+    "",
+    "REMOVED, and the board is why: the `Brand & shared theme` strip. None of the",
+    "four root frames draws anything between the 44px header and the preview band,",
+    "and the strip spent ~56px above the fold on a link OUT of the editor that the",
+    "dashboard already routes to twice (agency-tabs.tsx:15, command-palette.tsx:80).",
+    "",
+    "NOT CONFORMED, deliberately:",
+    "  the Beginner/Pro toggle strip. No board in this family draws it, and",
+    "  boards.json already records it against the root board as unboarded chrome.",
+    "  It stays because 154:132 IS the Beginner state and its own footnote tells",
+    "  the reader to `Switch to Pro`, while nothing on any board offers a control",
+    "  that would. Deleting the only route to a state two boards specify would",
+    "  conform the pixels by breaking the screen. Founder call to make, not this",
+    "  agent's.",
+    "",
+    "NOT JOINED:",
+    "  154:26 itself \u2014 its `border-color` is the DRAWER's edge, not the panel's:",
+    "  `.ls-panel` paints `border-right: 1px solid var(--bk-border)` and the DS",
+    "  panel inside it has no border of its own. Giving it one would draw a second",
+    "  hairline on three sides to make a number match. Same call, same reason, as",
+    "  surfaces/components-library.json.",
+    "  1691:7341, the preview band \u2014 `height: 82px` is a Figma text-metric artifact.",
+    "  The band is `overflow-clip` at a fixed 82 over three children whose own",
+    "  frame heights are 20 / 11 / 11; an 11px-tall row of 15px type does not exist",
+    "  in CSS, and reproducing 82 in the browser means clipping the specimens by 8.",
+    "  Its gap and its 16/12 inset ARE conformed, and its gap is measured through",
+    "  1691:7342 and the two specimen rows.",
+    "  1691:7343..7346, the four swatches \u2014 their fills are the demo project's own",
+    "  palette (#1A56DB / #F8FAFC / #334155 / #EF4444 against the board's #1a56db /",
+    "  #ffffff / #1f2937 / #ef4444). That is sample data by the founder's rule, and",
+    "  every one of the four carries `background-color` since the 2026-09-08",
+    "  extractor change, so there is no fill-free swatch left to join. Their border",
+    "  and radius are conformed in code regardless.",
+    "",
+    "CHECK-BOARD-COPY, triaged (advisory, exits 0):",
+    "  `components` \u2014 the board draws that word on the fifth row; the code says",
+    "    `Component styles`. Board 154:132 \u2014 the SAME chassis, one state over \u2014",
+    "    also says `Component styles`, so two boards of this family disagree and",
+    "    neither re-settles the label (agent brief, `Two boards disagree`). The",
+    "    code keeps the one that also has a reason written down: four doors in",
+    "    this product were labelled Components and led three different places,",
+    "    and this one is the brand's STYLES for them. Recorded, not changed.",
+    "  `beginner` / `pro` \u2014 the mode toggle, the documented exception above.",
+    "  `beginner hides token ids and empty foundations...` \u2014 154:132's own",
+    "    footnote (154:186), verbatim. It renders on every Beginner root; this",
+    "    board and 154:78 omit it while 154:132 draws it. Boards inconsistent,",
+    "    code follows the one that draws it.",
+    "  `brand is up to date` \u2014 the CLEAN save bar. 154:78 draws only the dirty",
+    "    state, so the clean line has no board at all and DesignTabFooter says so",
+    "    in its own comment."
+  ]
+}

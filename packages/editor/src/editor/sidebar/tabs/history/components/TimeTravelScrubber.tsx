@@ -265,9 +265,24 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
     }
   }, [currentEntry, onRestore]);
 
-  // Keyboard shortcuts: Left/Right step, Enter restore, Ctrl+Shift+T exit
+  // Keyboard shortcuts: Left/Right step, Enter restore, Esc / Ctrl+Shift+T exit
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      /* Not while the user is typing. The drawer registers this on the
+         document, and the History panel's search field stays mounted and
+         focusable underneath it — so Enter at the end of a search term used to
+         restore whatever the slider sat on (the MIDDLE of the stack by
+         default), truncating every step after it. */
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const typing =
+        tag === "TEXTAREA" ||
+        target?.isContentEditable === true ||
+        // The drawer's OWN control is an <input type="range"> — arrows and
+        // Enter have to keep working there, so only text entry is excluded.
+        (tag === "INPUT" && (target as HTMLInputElement).type !== "range");
+      if (typing) return;
+
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.preventDefault();
         const delta = e.key === "ArrowLeft" ? -1 : 1;
@@ -275,7 +290,12 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
       } else if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey) {
         e.preventDefault();
         handleRestore();
-      } else if (e.key === "T" && e.ctrlKey && e.shiftKey) {
+      } else if (e.key === "Escape" || (e.key === "T" && e.ctrlKey && e.shiftKey)) {
+        /* Board 163:113 labels the exit "Exit  (Esc)" and repeats it in the
+           note under the bar. Only Ctrl+Shift+T was bound, so the drawer —
+           role="dialog" aria-modal — swallowed the one key every other overlay
+           in the editor closes on, and the board's copy could not be printed
+           without lying. */
         e.preventDefault();
         onExit();
       }

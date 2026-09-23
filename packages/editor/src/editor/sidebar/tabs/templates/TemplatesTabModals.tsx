@@ -162,6 +162,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
     open
     onClose={onCancel}
     dismissOnScrimClick
+    testId="tpl-create-confirm"
     title={`Create a page from ‘${templateName}’?`}
     footer={
       <>
@@ -201,6 +202,7 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
     open
     onClose={onClose}
     dismissOnScrimClick
+    testId="tpl-create-success"
     title="Page created"
     footer={
       <>
@@ -212,7 +214,11 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
     }
   >
     <p className="tw:m-0 tw:flex tw:items-center tw:gap-2">
-      <span className="tw:text-[var(--bk-success)]" aria-hidden="true">✓</span>
+      {/* success-TEXT, not success: board 1169:4736 colours this line
+          --color/success-text `var(--bk-green-600)`, and the raw `var(--bk-green-500)` measured 3.39:1 on
+          the modal's white ground — under the 4.5 floor the conformance run
+          enforces. The board's own token is the accessible one. */}
+      <span className="tw:text-[var(--bk-success-text)]" aria-hidden="true">✓</span>
       ‘{pageName}’ is ready — you&rsquo;re on it now.
     </p>
   </Modal>
@@ -240,6 +246,7 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
     open
     onClose={onCancel}
     dismissOnScrimClick
+    testId="tpl-create-error"
     title="Couldn't create the page"
     footer={
       <>

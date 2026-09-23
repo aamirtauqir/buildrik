@@ -1,0 +1,107 @@
+{
+ "section": "1776:8374",
+ "sectionName": "16 · History",
+ "howToApply": "Node moves and section re-lay. The arrangement block runs LAST, after history-state-boards.json has added 8 boards — re-laying first means re-laying twice. layout-section.mjs / order-sections.mjs own the moves; verify-invariants.mjs is the read-back.",
+ "geometry": [
+  {
+   "finding": "UX-I-13",
+   "severity": "Minor",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "target": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:113",
+     "shape": "the slider thumb — the smallest ELLIPSE or RECTANGLE whose vertical centre is within 8px of the slider track's vertical centre, inside the frame that also holds the start-of-range and end-of-range timestamps"
+    },
+    "unresolved-id": true,
+    "note": "No lane ever recorded an id for the thumb. It is the one row in this module with no id and no text to match, which is why it is a shape selector and not a `contains`."
+   },
+   "change": "Move the thumb to the RIGHT end of the track (value = now) and re-point the 'Previewing …' label at the newest entry. The timeline then runs BACK from the present.",
+   "why": "TimeTravelScrubber.tsx:74-78 seeds `initialIndex = Math.floor(historyStack.length / 2)` and `sliderValue` from it, so the drawer opens with an arbitrary past moment ARMED. Combined with the Enter default (UX-I-03) and the invisible preview (UX-I-12) the default position is both meaningless and dangerous. Open at the current state, so the first thing the user sees matches the canvas.",
+   "readBack": [
+    "thumb.x + thumb.width >= track.x + track.width - 2",
+    "the preview label names the newest entry, not a mid-stack one"
+   ]
+  },
+  {
+   "finding": "UX-I-04",
+   "severity": "Major",
+   "partial": true,
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "change": "Panel-side half only: the drawer band states that time-travel is a MODE and that the canvas is not editable while it is on — 'Time-travel is on. The canvas is read-only; ← → step the timeline.'",
+   "why": "TimeTravelScrubber.tsx:271-275 registers ArrowLeft/ArrowRight on the document with no defaultPrevented test, while useCanvasKeyboard.ts:78 checks defaultPrevented and :280-300 claims the same keys for selection and 1px/10px nudges. The canvas handler runs first (React root) and calls preventDefault, so ONE arrow press both walks the element selection AND steps the timeline. The canvas stays fully interactive because the overlay layer is pointer-events:none (TimeTravelScrubber.tsx:178; history.css:914-926) and the preview layer sits at opacity 0 when it has no snapshot.",
+   "notCovered": "The canvas half of the fix — the canvas visibly non-editable, with the mode said ON the canvas where the user's attention is — has no board in this section. Every History board here is a 280/360-wide panel board; there is no full-screen History board that draws the canvas under an open drawer. Owner: 1779:5 '09 · Canvas' and 1776:8385 '01 · Shell'. NOT applied by this module."
+  },
+  {
+   "finding": "UX-I-11",
+   "severity": "Minor",
+   "verdict": "NOT-APPLICABLE",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "boardSize": "360x776",
+   "why": "history.css:928-934 sets .tt-drawer { left: var(--bk-space-48); right: 320px; height: 200px }, so ~232px of the drawer — including the start-of-range timestamp — sits under the 280px (700px expanded) History panel that opened it, and the right inset assumes an inspector that is always exactly 320px and always present.",
+   "reason": "163:113 is a PANEL-width board. It does not draw the drawer's position relative to the canvas, the panel or the inspector, so there is no geometry on it that can be wrong in the way the finding describes. Carrying the finding here would mean inventing a full-screen History board, duplicating the shell family in 1776:8385. Filed as a shell-section item instead; NOT applied anywhere by this module."
+  }
+ ],
+ "verification": [
+  {
+   "finding": "UX-I-42",
+   "kind": "check-not-change",
+   "claim": "UX-I-42's ENTRY POINTS paragraph calls History a \"rail tab 'History' (280px drawer, shortcut H)\".",
+   "truth": "History is a registered tab with `shortcut: \"H\"` and NO rail button. RAIL_FIGMA (tabsConfig.ts:349-351) is an explicit allow-list rendering exactly six ids — add, layers, pages, assets, content, design. The history entry is tabsConfig.ts:218-227 (id 'history', tool 'site', iconName 'Timer', section 'bottom', pattern 'standalone', shortcut 'H', mode 'panel'). Doors: Cmd/Ctrl+H, SiteMenu.tsx:200 'Version history', SiteMenu.tsx:206 'Publish history' (which deep-links the Published sub-view via AquibraStudio.tsx:513), and Cmd+K.",
+   "alreadyRuled": "docs/design-jobs/UX-FLOW-MAP.md §'Contradictions, corrections and closures' ¶1 already rules UX-F-01 / UX-F-37 over UX-I-42 on exactly this point.",
+   "checkToRun": [
+    "Over every board in 1776:8374 that instances the shared Rail component 2040:8372: count the rail buttons. Expect 6. A seventh reading 'History' is a board defect and must be removed.",
+    "Over every TEXT node in 1776:8374: search for 'rail'. Any caption describing History's door as a rail seat gets rewritten to '⌘H · Site menu › Version history'.",
+    "Both checks are one call together with the history-text.json resolve — add 'rail' and 'Rail' to the needle list."
+   ],
+   "status": "NOT RUN — the quota refused every call. The conclusion above is from the code and from UX-FLOW-MAP, NOT from counting buttons on a board."
+  }
+ ],
+ "arrangement": [
+  {
+   "finding": "ARR-C-07",
+   "severity": "Major",
+   "kind": "section-shape",
+   "do": "Wrap the five 1440x900 Published boards onto two rows of 3+2 — 453:4064, 184:37, 184:24 then 184:45, 184:2.",
+   "effect": "Section width drops from ~9080 to roughly 4900.",
+   "evidence": "section 9080x3574, 6 rows (y=220,1152,1457,2377,2527,3359); row y=1457 spans x100→8980 because of the five full-screen boards; rows y=220/1152/2527/3359 end at x=2380/2860/3180/3180."
+  },
+  {
+   "finding": "ARR-C-08",
+   "severity": "Major",
+   "kind": "family-split",
+   "do": "Break row y=220 up: lead each tab block with its own root — 162:2 above the Saves row, 949:4474 above the Published rows, 950:4474 above the Backups row.",
+   "evidence": "row y=220 pools 949:4474 Published(tab) @x900, 162:2 Saves @x1300, 950:4474 Backups(tab) @x1700; their states sit at y=1457, y=2527 and y=1152 respectively."
+  },
+  {
+   "finding": "ARR-C-09",
+   "severity": "Major",
+   "kind": "family-split",
+   "do": "Move 1704:8256 (Published · load-error, 280w) to x=900 so the three 280-wide Published states — 1704:8309 empty, 1704:8205 loading, 1704:8256 load-error — sit adjacent, and start the 1440-wide boards after them.",
+   "evidence": "row y=1457 currently reads empty(280) loading(280) failed(1440) load-error(280) redeploying(1440)."
+  },
+  {
+   "finding": "ARR-C-10",
+   "severity": "Major",
+   "kind": "retired-mixed",
+   "do": "Collect all seven [design-ahead] Backups boards — 950:4474, 1156:4620, 879:4536, 879:4518, 879:4526, 879:4531, 1156:4665 — into ONE contiguous design-ahead block placed after the Saves caption row (below y=3359).",
+   "note": "The 8 boards history-state-boards.json adds are also design-ahead (7 of 8) and belong in the SAME block, beside their own live siblings' captions. Sequence this after the state-board pass."
+  },
+  {
+   "finding": "ARR-C-11",
+   "severity": "Minor",
+   "kind": "row-order",
+   "do": "Lead the section with 162:2 History · Saves (the default tab) and demote 433:2348 'History · milestone suggestion banner' (680x402, a component fragment) to a fragments band at the foot."
+  },
+  {
+   "finding": "ARR-C-12",
+   "severity": "Minor",
+   "kind": "caption",
+   "do": "No move. Rename the seven drifted caption frames at y=3359 (172:4, 453:4046, 172:3, 172:8, 172:6, 172:7, 172:5) from caption/Versions·* to caption/Saves·*, rename 453:4075 caption/Rollback·failed to caption/Published·failed, and ADD the four missing Published captions for 184:37, 184:24, 184:45, 184:2.",
+   "note": "Renaming 172:3 and 172:6 is compatible with the copy rewrites in history-text.json — those change the caption's CHARACTERS, this changes the frame NAME. Do the copy pass first so a caption is never named for content it no longer carries."
+  }
+ ]
+}

@@ -1,0 +1,110 @@
+{
+  "surface": "history-saves-pruned-notice",
+  "board": "History \u00b7 Saves \u00b7 pruned-notice (Figma 163:269)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-saves-pruned-notice",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "history-pruned-notice"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "pruned-block",
+      "testId": "history-pruned-notice",
+      "spec": "history-saves-pruned-notice",
+      "nodeId": "163:315"
+    },
+    {
+      "name": "pruned-title",
+      "testId": "history-pruned-title",
+      "spec": "history-saves-pruned-notice",
+      "nodeId": "163:316"
+    },
+    {
+      "name": "pruned-sub",
+      "testId": "history-pruned-sub",
+      "spec": "history-saves-pruned-notice",
+      "nodeId": "163:317"
+    },
+    {
+      "name": "prune-note-text",
+      "testId": "history-prune-note-text",
+      "spec": "history-saves-pruned-notice",
+      "nodeId": "163:312"
+    }
+  ],
+  "_note": [
+    "The notice is not a prop. `pruneIfNeeded` emits VERSION_PRUNED only after",
+    "storage has actually dropped rows, and the panel renders the block from that",
+    "payload \u2014 so the probe seeds a real event through the stub's listener table",
+    "(the stub's `on` was a no-op until now, which is why every previous History",
+    "run measured the branch where this block is absent).",
+    "",
+    "280 \u2014 see history-saves-changes.",
+    "",
+    "WHAT DRIFTED: the block. 163:315 is 56 tall, inset 16, with a 12/18 statement",
+    "over an 11/16 qualifier. Live it was 44 tall, inset 12, with BOTH lines at",
+    "11px \u2014 so the notice read as one grey paragraph and the sentence that says",
+    "what happened had no more weight than the sentence that qualifies it.",
+    "",
+    "COPY, and this one is a correctness fix as well as a conformance one. The",
+    "board's second line is 'Past 50. Named versions were kept.' The code said",
+    "'Past 50. Named versions AND THE APPROVED ONE were kept.' \u2014 a protection the",
+    "engine does not implement: `pruneVersions` (VersionHistoryStorage.ts:223)",
+    "filters on `isAutoCheckpoint` and knows nothing about approval, so an",
+    "approved auto-checkpoint prunes like any other. The panel was promising a",
+    "guarantee at the exact moment it announced a deletion. Board and code agree",
+    "once the clause is gone.",
+    "",
+    "NOT anchored, and why:",
+    "  163:276 Approved anchor + 163:282 Now row \u2014 both need `reviews.status` to",
+    "  come back approved for a real workspace, which is a live tRPC round and not",
+    "  a fixture. Same call history-saves-changes recorded; SavesChrome's own",
+    "  tests cover their content.",
+    "  241:1597 / 241:1605 / 241:1613 / 241:1621 Version rows \u2014 the Milestones",
+    "  list, which is board 162:2's own surface. This board reuses it as",
+    "  background; measuring it here would double-gate one component from a screen",
+    "  that is not about it.",
+    "  1657:7189\u20267212 header / switcher / filter / search \u2014 the same chrome, and",
+    "  it is anchored once, on 163:64, which is the board that is about it.",
+    "  163:311 Prune note BLOCK \u2014 40 here, 64 on 163:2, same component and same",
+    "  sentence; the text node 163:312 is anchored instead.",
+    "  163:313/163:314 Footer \u2014 anchored on 163:64.",
+    "",
+    "PLACEMENT, seen and left: the board puts this notice ABOVE the approved",
+    "anchor; live it renders below, because the band is panel chrome (SavesChrome,",
+    "lifted out of the list on purpose) and the notice belongs to the list. Moving",
+    "it would put a transient event banner above the panel's standing chrome. Not",
+    "a property diff can see either way \u2014 recorded so it is not mistaken for",
+    "covered.",
+    "",
+    "CONTRAST: one failure, 4.39 \u2014 the prune note's ink-muted on bg-subtle, the",
+    "token pair 163:312-on-163:311 names. Already baselined on",
+    "history-saves-time-travel; not introduced here.",
+    "",
+    "BOARD-COPY (2026-09-08). Every lead resolved to something already recorded",
+    "above or to an instrument limit; none was product drift:",
+    "  \u00b7 'search saves...' \u2014 a placeholder attribute, not a text node.",
+    "  \u00b7 the approval band, the Now row and the four Auto-save rows \u2014 the fixtures",
+    "    this recipe deliberately does not have (see NOT anchored).",
+    "  \u00b7 'past #. named versions were kept.' appears on both sides; the live half",
+    "    is split across two text nodes by the interpolated cap, so the fold sees",
+    "    'past' and '. named versions were kept.' separately.",
+    "  \u00b7 \"what's live\" and '+ save a version' are reported as rendered-but-not-",
+    "    drawn, and both ARE on the board (1657:7204, 163:314). Both are JSX",
+    "    template literals in the captured code, which `extract.mjs` does not put",
+    "    into `copy[]` \u2014 an extractor gap, reported to the orchestrator.",
+    "  \u00b7 'time-travel' is genuinely rendered and genuinely undrawn: the",
+    "    Time-Travel entry in the filter row, recorded on 163:64's note.",
+    "  \u00b7 'no saved versions yet.' \u2014 the probe's stub reports four UNDO entries and",
+    "    zero saved versions, so the Milestones list under the notice is empty",
+    "    where the board draws four rows. The rows are board 162:2's surface and",
+    "    are not measured here either way; the notice above them is."
+  ]
+}

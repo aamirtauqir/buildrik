@@ -1,0 +1,17 @@
+{
+ "slug": "zz-final-two",
+ "page": "1:3",
+ "note": "The last read closes the two remaining held halves. F04 reaches 12 of 12; F24's button label is safe to resolve.",
+ "rows": [
+  {"op": "move", "id": "2838:12064", "x": 209, "expect": "3469,21880,50,40",
+   "why": "F04 board 12 of 12 — the same three-band repair that landed on the other eleven, now that the read shows this board is structurally identical to them and that the hold's premise was wrong. The Footer 2430:21397 is 280x44 at (3256,21866), INSIDE a board ending 21946 — not hanging 100px below it as the stale detector row claimed. Its children carry the identical names and footer-relative offsets as board 1: 'Aa Fonts' 2838:12064 at rel (213,14) measuring 50x40, i.e. WRAPPED onto two lines exactly like 144:2's was. Moving it to rel x209 gives the label the run it needs; paired with the resize below."},
+  {"op": "resize", "id": "2838:12064", "w": 58, "expect": "3469,21880,50,40",
+   "why": "F04 board 12 — un-wrap 'Aa Fonts'. The label measures ~53px at 13/Regular against a 50px box, which is why it broke to two lines and grew to 40px tall. 58 gives it one line, matching the fix applied to the other eleven boards."},
+  {"op": "resize", "id": "2838:12065", "w": 248, "expect": "3272,21910,185,100",
+   "why": "F04 board 12 — restore note/formats to its created width. This is the root cause the f-missed author traced: plans/media-05-node-edits.json created these at width 248, and a later <=60px overprint fixer narrowed this one to 185 to clear its horizontal overlap with the wrapped 'Aa Fonts'. Narrowing bought a fifth line and deepened the VERTICAL collision it was not measuring — 185x100 here, overlapping note/where-it-lives at 21956-21996 completely. A box cannot get taller when it gets wider, so 5 lines at 185 is at most 4 lines at 248."},
+  {"op": "move", "id": "2838:12066", "y": 132, "expect": "3272,21956,248,40",
+   "why": "F04 board 12 — reseat note/where-it-lives below the restored formats block. rel y 90 -> 132, the same offset the other eleven boards took. move writes PARENT-relative y and the parent Footer sits at abs 21866, so 132 puts it at abs 21998, clear of note/formats which ends at rel 124 once it is 248 wide."},
+  {"op": "text", "id": "1339:7170", "text": "Look at Bella Cucina", "expect": "Look at {Site}",
+   "why": "F24 — the last unresolved placeholder, now safe to write. It was held because a button label is the one container sized to its own text and 1339:7162's box was unknown, so +6 characters was a guess. The read settles it: the button is the CTA frame 1339:7169, 392x40 at (1944,93081) — a fixed 392px, not a hug. 'Look at Bella Cucina' sets to roughly 130px at 13px, well inside it. The site name is not invented either: the sibling headline 1339:7167 on this same card already reads 'Bella Cucina is ready for you to look at', landed earlier in this arc, and D-H-31 measured 'Bella Cucina' across all sixteen canonical S5.5 boards."}
+ ]
+}

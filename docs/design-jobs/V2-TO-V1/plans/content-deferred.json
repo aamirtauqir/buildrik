@@ -1,0 +1,38 @@
+{
+  "_": "Rows inside section 1776:8376 that this pass deliberately did NOT plan an edit for, each with the reason. Silence about a finding is indistinguishable from missing it, which is why they are written down.",
+  "rows": [
+    {
+      "id": "ARR-A-21",
+      "kind": "family-split",
+      "verdict": "DEFERRED — conflicts with this pass",
+      "reason": "Re-homing the five sub-state boards (1705:8286/8339/8378/8408/8454) next to their parents moves half the section. Nine new caption/* nodes are placed in this pass at slots computed from the CURRENT geometry (content-section-read-2026-09-07.json); moving boards afterwards orphans every one of them. Arrangement and annotation cannot both go first. Recommend: apply the annotation plans, then re-lay the whole section with layout-section.mjs and re-run add-board-captions.mjs (it skips a name that already exists, so it will not re-home an existing caption — a re-home step would have to be added to it)."
+    },
+    { "id": "ARR-A-22", "kind": "family-split", "verdict": "DEFERRED — same reason as ARR-A-21", "reason": "Moving 1170:4749 to y=2723 would strand caption/Content · records (modal), which this pass places at 100,2638." },
+    { "id": "ARR-A-23", "kind": "row-order", "verdict": "DEFERRED — same reason as ARR-A-21", "reason": "Moving 1170:4713 out of the panel row would strand caption/Content · collection-setup (modal), placed at 900,714." },
+    { "id": "ARR-A-24", "kind": "row-order", "verdict": "DEFERRED — same reason as ARR-A-21", "reason": "Reordering the y=220 row moves six boards and six captions together." },
+    {
+      "id": "CONF-1-04",
+      "kind": "colour",
+      "verdict": "NOT PLANNED — needs a read this pass never got",
+      "reason": "87.2% of the paints on the 22 new boards are unbound to color/* variables, and the four Content · dynamic-pages boards are among the FIVE exceptions (they were built from instances). The nodes this pass creates are clones of existing nodes (add-state-board clones a board; add-board-captions clones a caption), so they inherit whatever binding the source carries — the pass adds no new hand-authored paint except the dp/* text fills in build-dynamic-pages-boards.mjs, which were already unbound before it. Binding them needs the color/* variable ids, which requires a read."
+    },
+    {
+      "id": "CONF-1-13",
+      "kind": "type",
+      "verdict": "PARTLY ADDRESSED, unverified",
+      "reason": "Three sub-11px nodes were measured on 2429:12111 (Inter|Regular|10|AUTO). The two audit paragraphs this pass removes from the panel (dp/hint-template, dp/note-count) are the likely two of the three; the third is unidentified. The rewritten generator draws only 11px and 12px. Verify by re-reading the board after applying — do not record this as fixed without that read."
+    },
+    {
+      "id": "QA-A-43",
+      "kind": "count",
+      "verdict": "NOT MINE",
+      "reason": "Target 2357:11981 is the Module Interaction Map, in a Reference section, not in 1776:8376. Note for its owner: the section is named '06 · Content · 37' and the count is CHILDREN (26 boards + 11 captions), not boards — this pass takes it to 48 (28 boards + 20 captions), and add-state-board.mjs rewrites the number itself."
+    },
+    {
+      "id": "UX-C-06 / FIG-A-01",
+      "kind": "missing-screen",
+      "verdict": "ABSENCE RECORDED, SCREEN NOT DRAWN — deliberate",
+      "reason": "FIG-A-01 is a measured NO-EDIT instruction: 'Do not create a repeater board and do not rename anything. Record as covered so the next wave does not discover the missing screen and design it.' The task brief asked for a decision rather than silence, so the decision is: no board, and the absence is stated on caption/Content · collection (155:49) in the same terms the code supports — RepeaterRenderer.ts and CMSBindingManager.bindCollection (:215) have no UI caller, verified again this session by grep over packages/editor/src excluding __tests__."
+    }
+  ]
+}

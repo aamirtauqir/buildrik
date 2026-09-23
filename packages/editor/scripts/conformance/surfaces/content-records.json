@@ -1,0 +1,120 @@
+{
+  "surface": "content-records",
+  "board": "Content · records (modal) (Figma 1170:4749)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-records",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "cms-records-add"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cms-records-modal\"]",
+  "targets": [
+    {
+      "name": "modal",
+      "testId": "cms-records-modal"
+    },
+    {
+      "name": "title",
+      "testId": "cms-records-title"
+    },
+    {
+      "name": "collection-select",
+      "testId": "cms-records-collection"
+    },
+    {
+      "name": "thead",
+      "testId": "cms-records-thead"
+    },
+    {
+      "name": "row-margherita",
+      "testId": "cms-records-row-rec-margherita"
+    },
+    {
+      "name": "row-carbonara",
+      "testId": "cms-records-row-rec-carbonara"
+    },
+    {
+      "name": "foot",
+      "testId": "cms-records-foot",
+      "spec": "content-records",
+      "nodeId": "1170:4775"
+    },
+    {
+      "name": "add-record",
+      "testId": "cms-records-add",
+      "spec": "content-records",
+      "nodeId": "1170:4773"
+    },
+    {
+      "name": "add-record-label",
+      "testId": "cms-records-add",
+      "spec": "content-records",
+      "nodeId": "1170:4774"
+    }
+  ],
+  "_note": [
+    "Board 1170:4749 — the records TABLE, a second record editor reachable only",
+    "from ⌘⇧P. Mounted directly on the probe: `isOpen` is owned by AquibraStudio,",
+    "which no agent session may stage.",
+    "",
+    "BOARD won on everything the board and the DOM can both express:",
+    "  the table's SCALE. 10px semibold column heads, 11px cells, 7px of vertical",
+    "  air and a 10px row inset (1170:4751/4756 and their cell nodes). It was 13px",
+    "  cells on 10px padding — the panel's scale inside a 640 modal holding four",
+    "  columns and three buttons, so the widest column wrapped before the table",
+    "  filled its frame.",
+    "  the row's HIERARCHY. 1170:4757/58/59: display value in --color/ink, the next",
+    "  column ink-soft, a media column at 10px ink-muted. Every cell was one flat",
+    "  --bk-ink.",
+    "  the row ACTIONS. 1744:8396/8398/8400 draw bordered white buttons — 22 tall,",
+    "  radius 4, gray-300 hairline, 11px. They were borderless ghosts, which on a",
+    "  tinted row read as text rather than as controls.",
+    "  the FOOT and its CTA. gap 8 (1170:4775), and 12/7 insets at radius 6 with an",
+    "  11px label (1170:4773/4774) against flowbite xs's 1px, radius 8 and 12px.",
+    "  Rows are rounded at 6 now, which needed the table off `border-collapse` — a",
+    "  collapsed table cannot round a <tr>.",
+    "",
+    "NOT anchored, and why. Six targets, and the first four are one cause:",
+    "  1170:4751 thead, 1170:4756 / 1170:4761 the rows. The board draws them as",
+    "  FLEX rows and states gap / padding-left / padding-top on the row itself. CSS",
+    "  applies none of the three to a <tr>: the air lives in the cells. The visual",
+    "  values ARE conformed above (the 12 gap read as `px-1.5` per cell, the 10",
+    "  inset as `first:pl-2.5`, the 7 as the cells' `py`), but the property pair the",
+    "  harness would compare does not exist on either side. Keeping a real <table>",
+    "  is deliberate — a four-column grid with row actions is what table semantics",
+    "  are for, and a board is a picture, not a markup instruction.",
+    "  Their four th and twelve td text nodes carry `w-[170px]` / `w-[56px]` /",
+    "  `w-[88px]` / `w-[72px]` — column widths for the board's own sample",
+    "  collection. A table sizes columns from content, and this modal renders the",
+    "  leading three fields of WHATEVER collection is picked.",
+    "  1744:8390 the collection Select: 32 tall at radius 4 on the board, 42 at",
+    "  radius 8 live. That is chrome-ui Select's own theme, the same 10px and the",
+    "  same radius step as the text input boards.json holds at",
+    "  `authority=open:input-fill` — a chrome-wide control is not re-settled by one",
+    "  screen. Recorded in the report beside the 42-vs-32 input.",
+    "  1170:4750 the title: 13 on the board, 14 live, from the shared",
+    "  MODAL_TITLE_CLASS that every modal board is measured against.",
+    "  1170:4749 the frame: the board states px16/py14/gap10 on the dialog box,",
+    "  where the compound ModalContent puts its insets on ModalTitle and ModalBody",
+    "  and measures 0 on the frame itself. Shared primitive, different composition.",
+    "  1170:4771/4772 Import JSON — not built, and the board's own node name says",
+    "  so. The engine creates content items one at a time; parsing and fanning a",
+    "  file over N creates is a feature, not this modal's layout.",
+    "  1170:4776 a 6px spacer frame; four hotspot/* nodes.",
+    "",
+    "contrastScope is the modal itself, not `[data-probe]`: ModalRoot portals to",
+    "the overlay root, which sits OUTSIDE the probe wrapper — scoped to the wrapper",
+    "the contrast sweep and the copy check both read an empty subtree and reported",
+    "zero of everything.",
+    "",
+    "That scope fix immediately paid: the media cell's \"— missing\" was painted",
+    "--bk-warning (#C27803, the status DOT's amber) at 3.51:1 on white, under AA for",
+    "the one cell whose job is to report a gap. 1170:4769 names --color/warning-text",
+    "(#723B13, 9.9:1) and now so does the code. 0 contrast failures recorded."
+  ]
+}

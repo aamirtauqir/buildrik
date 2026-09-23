@@ -34,14 +34,20 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
 }) => (
   <div
     data-screen-savebar="true"
+    data-testid="brand-save-bar"
     /* Board 154:78: a 44-tall warning-tint bar, status and both actions on
-       one line as text — no bordered buttons, no grey plate. */
+       one line as text — no bordered buttons, no grey plate. 154:128 sets the
+       type for all three at 12/18; they shipped at 11 with the line inherited,
+       which put the status and its two actions a size below every other label
+       in the panel. */
     style={{
       display: "flex",
       alignItems: "center",
       gap: 16,
       height: 44,
       padding: "0 16px",
+      fontSize: 12,
+      lineHeight: "18px",
       background: isDirty ? "var(--bk-warning-tint)" : "var(--bk-bg-subtle)",
       flexShrink: 0,
       whiteSpace: "nowrap",
@@ -54,7 +60,10 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         controls saying "saved" about two different buffers, six hundred pixels
         apart, is a question the user should not have to answer. This one names
         its own subject; the topbar keeps the document. */}
-    <div style={{ flex: 1, fontSize: 11, color: isDirty ? "var(--bk-warning-text)" : "var(--bk-ink-soft)" }}>
+    <div
+      data-testid="brand-save-bar-status"
+      style={{ flex: 1, fontSize: 12, lineHeight: "18px", color: isDirty ? "var(--bk-warning-text)" : "var(--bk-ink-soft)" }}
+    >
       {/* "Unsaved brand changes" is board 154:78's wording, and it replaces
           "N previewing". The count is not lost: the root list still marks each
           dirty destination with its own dot, which is where a number belongs —
@@ -74,7 +83,8 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
           size="xs"
           variant="link"
           onClick={onDiscard}
-          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]"
+          data-testid="brand-save-bar-discard"
+          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]"
         >
           Discard
         </Button>
@@ -82,7 +92,11 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
           size="xs"
           variant="link"
           onClick={onReview}
-          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+          data-testid="brand-save-bar-save"
+          /* `font-normal`: 154:131 is Inter Regular like the other two. The
+             medium weight made "Save" the only bold word on a bar the board
+             draws in one voice. */
+          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-accent-text)]"
         >
           {APPLY_CHANGES_LABEL}
         </Button>

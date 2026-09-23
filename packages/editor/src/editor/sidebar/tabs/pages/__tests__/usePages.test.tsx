@@ -25,6 +25,8 @@ import {
   pg,
   type MockComposer,
 } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
+import { isPageLive } from "@/engine/export/ExportEngine";
+import { getStatusLabel } from "../utils/statusLabel";
 
 interface ToastArg {
   title?: string;
@@ -85,10 +87,12 @@ describe("usePages initial sync", () => {
     expect(result.current.loadError).toBeNull();
   });
 
-  it('defaults status to "draft" when settings.visibility is unset (CAN-013)', () => {
+  it('defaults status to "live" when settings.visibility is unset', () => {
+    // The exporter publishes such a page; calling it "draft" here made the
+    // panel announce a page the deploy ships. See the agreement test below.
     const composer = createMockComposer({ pages: [pg("p1", "Home")] });
     const { result } = setup(composer);
-    expect(result.current.pages[0].status).toBe("draft");
+    expect(result.current.pages[0].status).toBe("live");
   });
 
   it("derives slug from name when the page has no slug", () => {
@@ -98,6 +102,28 @@ describe("usePages initial sync", () => {
     const { result } = setup(composer);
     expect(result.current.pages[0].slug).toBe("my-big-page");
   });
+});
+
+// ── Panel badge vs. what the deploy ships ───────────────────────────
+
+describe("the status the panel shows agrees with what the exporter ships", () => {
+  /* Both sides read the one field, `page.settings.visibility`, so they must
+     not disagree about what an unset one means. They did: this hook turned
+     unset into "draft", which reaches the user as the word "Draft" in the row
+     chip and in PageRow's aria-label, while `isPageLive` published the page. */
+  for (const visibility of [undefined, "live", "hidden", "password"]) {
+    it(`visibility=${visibility} reads Live exactly when it is published`, () => {
+      const settings = visibility ? { visibility } : undefined;
+      const composer = createMockComposer({
+        pages: [pg("p1", "Home", settings ? { settings } : {})],
+      });
+      const { result } = setup(composer);
+
+      const published = isPageLive({ id: "p1", name: "Home", settings } as never);
+      const label = getStatusLabel(result.current.pages[0].status);
+      expect(label === "Live").toBe(published);
+    });
+  }
 });
 
 // ── PROJECT_CHANGED filtering ────────────────────────────────────────────────

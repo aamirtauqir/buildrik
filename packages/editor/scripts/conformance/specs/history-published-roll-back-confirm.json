@@ -1,0 +1,454 @@
+{
+  "surface": "history-published-roll-back-confirm",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "184:2",
+  "boardName": "history-published-roll-back-confirm",
+  "figmaHash": "be273d36d4f0ea7c80ea77f3a8d1d562d39f2679963593b02b56031bf0291e86",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:09:25.434Z",
+  "copy": [
+    "Roll back to a published version",
+    "v6 · current",
+    "published 2h ago · Ali",
+    "live",
+    "v5",
+    "published 2d ago · Ali",
+    "v4",
+    "published 1w ago · Sara",
+    "v3 · approved",
+    "published 2w ago · Ali",
+    "Continue",
+    "Cancel"
+  ],
+  "targets": [
+    {
+      "nodeId": "184:2",
+      "name": "History · Published · roll-back confirm",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "184:3",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:4",
+      "name": "modal/560",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[400px] left-[440px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[250px] w-[560px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "400px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "560px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:5",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[18px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:6",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[0] left-[524px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[18px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:7",
+      "name": "Publish · 0",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[64px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:8",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[20px] left-[11px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[9px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:9",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[11px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[31px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:10",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[459px] text-[11px] text-[color:var(--color\\/success-text,#057a55)] top-[11px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "184:11",
+      "name": "Publish · 1",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/accent-tint,#ebf5ff)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[122px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:12",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[20px] left-[11px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[9px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:13",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[11px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[31px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:14",
+      "name": "Publish · 2",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[180px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:15",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[20px] left-[11px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[9px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:16",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[11px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[31px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "184:17",
+      "name": "Publish · 3",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[56px] left-[24px] not-italic overflow-clip rounded-[8px] text-left top-[238px] w-[512px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "512px"
+        }
+      }
+    },
+    {
+      "nodeId": "184:18",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[20px] left-[11px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[9px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "184:19",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[11px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[31px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1170",
+      "name": "Button",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[var(--size\\/row,32px)] items-center justify-center left-[426px] px-[16px] py-[10px] rounded-[8px] top-[332px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1170;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1172",
+      "name": "Button",
+      "className": "absolute bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[var(--size\\/row,32px)] items-center justify-center left-[330px] px-[16px] py-[10px] rounded-[8px] top-[332px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1172;9:43",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "surface": "pages-unsaved-warning",
+  "board": "Pages · settings · unsaved-warning (modal) (Figma 1171:4820)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-settings-seo",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "seo-input-title"
+    },
+    {
+      "action": "click",
+      "testId": "seo-input-title"
+    },
+    {
+      "action": "press",
+      "key": "a"
+    },
+    {
+      "action": "click",
+      "testId": "pg-drawer-tabbtn-social"
+    },
+    {
+      "action": "waitFor",
+      "testId": "pages-unsaved-modal"
+    }
+  ],
+  "contrastScope": "[data-testid=\"pages-unsaved-modal\"]",
+  "targets": [
+    {
+      "name": "modal",
+      "testId": "pages-unsaved-modal"
+    },
+    {
+      "name": "title",
+      "testId": "pages-unsaved-title",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4821"
+    },
+    {
+      "name": "body",
+      "testId": "pages-unsaved-body",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4822"
+    },
+    {
+      "name": "foot",
+      "testId": "pages-unsaved-foot",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4823"
+    },
+    {
+      "name": "btn-keep",
+      "testId": "pages-unsaved-keep",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4825"
+    },
+    {
+      "name": "btn-keep-label",
+      "testId": "pages-unsaved-keep",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4826"
+    },
+    {
+      "name": "btn-discard",
+      "testId": "pages-unsaved-discard",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4827"
+    },
+    {
+      "name": "btn-discard-label",
+      "testId": "pages-unsaved-discard",
+      "spec": "pages-unsaved-warning",
+      "nodeId": "1171:4828"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE on the probe host the rest of the page-settings family uses",
+    "(`probe.html?case=pages-settings-seo`), and the guard is FIRED, not faked:",
+    "focus the meta-title field, type one character, click the Social tab. The",
+    "modal that appears is the drawer's own.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  modal width  440 (1171:4820 is a 440x117 frame), via `size=\"question\"`. It",
+    "               was `size=\"lg\"` = 720, which made a two-line confirm wider",
+    "               than the Brand review dialog that lists every staged token",
+    "               change. boards.json's \"modal is 720w vs board 440\" — fixed.",
+    "  title size   13px (1171:4821). It measured 14 — see the finding below.",
+    "  body leading `normal` (1171:4822); it was `leading-4`.",
+    "",
+    "boards.json's other half — \"buttons 40h vs 27\" — no longer reproduces: both",
+    "buttons are `px-3 py-[7px]` with `min-h-0` and an 11px label, which is",
+    "1171:4825's 12/7 exactly, and both were measured passing.",
+    "",
+    "FOUND AND FIXED, second sighting today: a caller CANNOT set a ModalTitle's",
+    "font size through `className`. `MODAL_TITLE_CLASS` is",
+    "`text-[length:var(--bk-text-14)]`; a caller's is a second arbitrary font-size",
+    "utility on a plain <h2>, and two classes on one property resolve by",
+    "STYLESHEET order — so `tw:text-[13px]` did nothing and the heading measured",
+    "14. The size now lives on a span, which is what the recipe anchors. The",
+    "identical defect is recorded in surfaces/brand-review-changes.json. TWO",
+    "callers is a component problem: ModalTitle wants a `size` prop, the way it",
+    "already has `inset` for the same class of collision — and this file needed",
+    "`inset={false}` too, because ModalBody's own 16px inset plus ModalTitle's",
+    "default pl-5/pt-4 is exactly the double-inset that prop exists to prevent.",
+    "",
+    "NOT JOINED — 1171:4820, the dialog frame. Its `--color/bg-elevated` fill,",
+    "`--color/border` edge and radius 12 belong to `ModalContent`, a shared",
+    "primitive; and its `px-16 / py-14 / gap-10` describe the padded BODY, which",
+    "is `ModalBody` — a different element. Same skip, same reasons, as",
+    "brand-review-changes.",
+    "",
+    "ONE UNKNOWN: 1171:4822's `width: min-content`. Figma exports a hug as a",
+    "keyword the length normaliser cannot read, and the live paragraph is a block",
+    "in a 440 dialog. Its 11px size and `--color/ink-soft` colour both pass.",
+    "",
+    "CONTRAST SCOPE, deliberately the modal and not `body`: this dialog PORTALS to",
+    "the overlay root, so `body` sweeps the SEO tab behind it as well and reported",
+    "nine failures that belong to s3-flows-page-settings-seo, not here — `+30 pts`",
+    "and `Required` at `--bk-ink-muted` on `--bk-bg-subtle` (4.39:1, the systemic",
+    "pair), the yellow SEO-score banner at 3.41:1, and the `32/60` counter in",
+    "`--bk-success` on white at 3.39:1. Not mine to fix; recorded so the SEO",
+    "board's owner has them."
+  ]
+}

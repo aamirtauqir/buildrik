@@ -1,0 +1,102 @@
+N	2844:12025	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	FRAME	100,6200,240,320	true	NONE	19	true
+K	2844:12026	RECTANGLE	100,6200,240,320	true		rect
+K	2844:12027	TEXT	116,6212,208,20	true		More
+K	2844:12028	TEXT	116,6240,208,16	true		BUILD
+K	2844:12029	TEXT	116,6260,150,20	true		Templates
+K	2844:12030	TEXT	280,6260,44,16	true		T
+K	2844:12031	TEXT	116,6288,150,20	true		Components
+K	2844:12032	TEXT	280,6288,44,16	true		⇧A
+K	2844:12033	TEXT	116,6320,208,16	true		SHIP
+K	2844:12034	TEXT	116,6340,150,20	true		Publish
+K	2844:12035	TEXT	280,6340,44,16	true		U
+K	2844:12036	TEXT	116,6368,150,20	true		History
+K	2844:12037	TEXT	280,6368,44,16	true		H
+K	2844:12038	TEXT	116,6396,150,20	true		Review
+K	2844:12039	TEXT	280,6396,44,16	true		R
+K	2844:12040	TEXT	116,6424,208,16	true		CONFIGURE
+K	2844:12041	TEXT	116,6444,150,20	true		Settings
+K	2844:12042	TEXT	280,6444,44,16	true		S
+K	2844:12043	RECTANGLE	116,6476,208,1	true		rect
+K	2844:12044	TEXT	116,6484,208,32	true		Bare letters — no modifier. 
+C	2844:12025	texts=17
+T	2844:12044	116,6484,208,32	11	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Bare letters — no modifier. AI is not here: it opens in the inspector column.
+T	2844:12042	280,6444,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	S
+T	2844:12041	116,6444,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Settings
+T	2844:12040	116,6424,208,16	11	Medium	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	CONFIGURE
+T	2844:12039	280,6396,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	R
+T	2844:12038	116,6396,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Review
+T	2844:12037	280,6368,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	H
+T	2844:12036	116,6368,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	History
+T	2844:12035	280,6340,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	U
+T	2844:12034	116,6340,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Publish
+T	2844:12033	116,6320,208,16	11	Medium	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	SHIP
+T	2844:12032	280,6288,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	⇧A
+T	2844:12031	116,6288,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Components
+T	2844:12030	280,6260,44,16	12	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	T
+T	2844:12029	116,6260,150,20	13	Regular	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	Templates
+T	2844:12028	116,6240,208,16	11	Medium	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	BUILD
+T	2844:12027	116,6212,208,20	13	Semi Bold	true	HEIGHT	Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where	More
+N	2844:12121	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	FRAME	3220,6200,1440,320	true	NONE	13	true
+K	2844:12122	RECTANGLE	3220,6216,1440,56	true		rect
+K	2844:12123	TEXT	3236,6236,180,20	true		‹ Exit to dashboard
+K	2844:12124	RECTANGLE	3428,6228,1,32	true		rect
+K	2844:12125	TEXT	3448,6236,420,20	true		Bella Cucina  ›  Home  ›  In
+K	2844:12126	TEXT	3236,6296,180,16	true		on canvas
+K	2844:12127	TEXT	3448,6296,600,20	true		Bella Cucina  ›  Home  ›  In
+K	2844:12128	TEXT	3236,6328,180,16	true		in full-page mode
+K	2844:12129	TEXT	3448,6328,600,20	true		Bella Cucina  ›  —  ›  Setti
+K	2844:12130	TEXT	3236,6360,180,16	true		in preview
+K	2844:12131	TEXT	3448,6360,600,20	true		Bella Cucina  ›  Home  ›  Pr
+K	2844:12132	TEXT	3236,6404,1408,16	true		No surface states site / pag
+K	2844:12133	TEXT	3236,6444,1408,16	true		The canvas breadcrumb (board
+K	2844:12134	TEXT	3236,6476,1408,16	true		Two tab strips, two names: t
+C	2844:12121	texts=11
+T	2844:12134	3236,6476,1408,16	11	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	Two tab strips, two names: the rail is “Editor sections”, the page bar at the canvas foot 
+T	2844:12133	3236,6444,1408,16	11	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	The canvas breadcrumb (board 1175:4849) describes the selected ELEMENT’s ancestry and keep
+T	2844:12132	3236,6404,1408,16	11	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	No surface states site / page / panel together: the site name is in the top bar, the page 
+T	2844:12131	3448,6360,600,20	13	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	Bella Cucina  ›  Home  ›  Preview
+T	2844:12130	3236,6360,180,16	11	Medium	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	in preview
+T	2844:12129	3448,6328,600,20	13	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	Bella Cucina  ›  —  ›  Settings · Domains
+T	2844:12128	3236,6328,180,16	11	Medium	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	in full-page mode
+T	2844:12127	3448,6296,600,20	13	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	Bella Cucina  ›  Home  ›  Insert
+T	2844:12126	3236,6296,180,16	11	Medium	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	on canvas
+T	2844:12125	3448,6236,420,20	13	Regular	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	Bella Cucina  ›  Home  ›  Insert
+T	2844:12123	3236,6236,180,20	13	Medium	true	HEIGHT	Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that	‹ Exit to dashboard
+N	2844:12136	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	FRAME	4780,6200,1440,320	true	NONE	11	true
+K	2844:12137	RECTANGLE	4780,6216,1440,56	true		rect
+K	2844:12138	RECTANGLE	4796,6228,160,32	true		rect
+K	2844:12139	TEXT	4796,6236,160,20	true		‹ Back to canvas
+K	2844:12140	TEXT	4980,6236,480,20	true		Bella Cucina  ›  —  ›  Setti
+K	2844:12141	RECTANGLE	4780,6272,1440,152	true		rect
+K	2844:12142	RECTANGLE	4780,6272,60,152	true		rect
+K	2844:12143	TEXT	4784,6280,52,48	true		rail nothing lit
+K	2844:12144	TEXT	4864,6304,1200,16	true		Settings — full page. The ca
+K	2844:12145	TEXT	4864,6352,1200,16	true		After the More index, Settin
+K	2844:12146	TEXT	4796,6444,1408,16	true		There is no shell-level way 
+K	2844:12147	TEXT	4796,6484,1408,16	true		Media library in library mod
+C	2844:12136	texts=7
+T	2844:12147	4796,6484,1408,16	11	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	Media library in library mode is the second full-page surface and takes the same control.
+T	2844:12146	4796,6444,1408,16	11	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	There is no shell-level way out today, and closing hard-codes a jump to the Insert tab (St
+T	2844:12145	4864,6352,1200,16	12	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	After the More index, Settings has a persistent seat — printed with its key, S — and the r
+T	2844:12144	4864,6304,1200,16	12	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	Settings — full page. The canvas and the inspector are gone and one full-width surface has
+T	2844:12143	4784,6280,52,48	11	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	rail nothing lit
+T	2844:12140	4980,6236,480,20	13	Regular	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	Bella Cucina  ›  —  ›  Settings · Domains
+T	2844:12139	4796,6236,160,20	13	Medium	true	HEIGHT	Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no 	‹ Back to canvas
+N	2846:21667	AI · error-provider	FRAME	1220,64117,280,812	true	VERTICAL	5	true
+K	2846:21668	FRAME	1220,64117,280,36	true	true	Back row
+K	2846:21670	FRAME	1220,64153,280,44	true	true	Header
+K	2846:21672	FRAME	1220,64197,280,32	true	true	Scope
+K	2846:21674	FRAME	1220,64229,280,72	true	true	Prompt
+K	2846:21677	FRAME	1220,64301,280,108	true	true	Error
+C	2846:21667	texts=9
+T	2846:21682	1236,64449,160,80	11	Regular	true	HEIGHT	Error	The thread and the prompt you typed stay on screen behind this state. Losing the user's wo
+T	2846:21681	1236,64405,160,36	12	Medium	true	HEIGHT	Error	Continue by hand in the inspector
+T	2846:21680	1236,64375,56,18	12	Regular	true	HEIGHT	Error	Try again
+T	2846:21679	1236,64333,248,64	11	Regular	true	HEIGHT	Error	Nothing was changed. This is usually the model provider, not your site — the editor stoppe
+T	2846:21678	1236,64311,100,36	12	Regular	true	HEIGHT	Error	The AI service didn’t respond.
+T	2846:21676	1246,64245,128,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Make the hero warmer
+T	2846:21673	1236,64205,105,16	11	Regular	true	WIDTH_AND_HEIGHT	Scope	Scope: Hero section
+T	2846:21671	1236,64165,14,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	AI
+T	2846:21669	1236,64125,76,20	14	Medium	true	WIDTH_AND_HEIGHT	Back row	‹  Inspector
+R	2846:21667	170:2	NAVIGATE	AI · error-provider
+END	done=2844:12025|2844:12121|2844:12136|2846:21667	stopped=false	bytes=10303

@@ -1,0 +1,187 @@
+N	2854:12294	History · Saves · changes · restore-confirm	FRAME	3400,77354,280,812	true	VERTICAL	14	true
+K	2854:12295	FRAME	3400,77354,280,48	true	true	Header
+K	2854:12298	FRAME	3400,77402,280,36	true	true	View toggle
+K	2887:12608	FRAME	3400,77438,280,146	true	false	Restore confirm
+K	2854:12301	FRAME	3400,77584,280,88	true	true	Approved anchor
+K	2854:12306	FRAME	3400,77672,280,40	true	true	Now row
+K	2854:12310	FRAME	3400,77712,280,44	true	true	Change · 0
+K	2854:12314	FRAME	3400,77756,280,44	true	true	Change · 1
+K	2854:12318	FRAME	3400,77800,280,44	true	true	Change · 2
+K	2854:12322	FRAME	3400,77844,280,44	true	true	Change · 3
+K	2854:12326	FRAME	3400,77888,280,194	true	true	spacer
+K	2854:12327	FRAME	3400,78082,280,40	true	true	Prune note
+K	2854:12329	FRAME	3400,78122,280,44	true	true	Footer
+K	2854:12331	FRAME	3540,78092,124,34	true	true	hotspot/state · History · time-travel
+K	2854:12332	FRAME	3400,78092,280,34	true	true	hotspot/back · History · Saves (Milestones)
+C	2854:12294	texts=27
+T	2854:12330	3416,78136,106,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	+  Save a version
+T	2854:12328	3416,78090,248,48	11	Regular	true	HEIGHT	Prune note	This session only — the last 100 steps, cleared when you reload. Save a version to keep a 
+T	2854:12325	3620,77851,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 3	15:58
+T	2854:12324	3416,77869,24,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Sara
+T	2854:12323	3416,77850,91,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Footer link fixed
+T	2854:12321	3620,77807,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 2	16:05
+T	2854:12320	3416,77825,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Ali
+T	2854:12319	3416,77806,121,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Menu prices updated
+T	2854:12317	3620,77763,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 1	16:12
+T	2854:12316	3416,77781,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 1	Ali
+T	2854:12315	3416,77762,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 1	2 images replaced
+T	2854:12313	3620,77719,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 0	16:20
+T	2854:12312	3416,77737,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Ali
+T	2854:12311	3416,77718,98,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Hero copy edited
+T	2854:12309	3432,77694,146,16	11	Regular	true	WIDTH_AND_HEIGHT	Now row	hero copy · 2 images · menu
+T	2854:12308	3432,77676,160,18	12	Regular	true	WIDTH_AND_HEIGHT	Now row	Now — 12 changes since v3
+T	I2854:12305;9:31	3428,77641,136,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with current
+T	2854:12304	3416,77614,127,16	11	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	Sara Khan · 18 Jul, 15:42
+T	2854:12303	3416,77594,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	⚑  APPROVED · v3
+T	2887:12613	3443,77550,37,16	11	Medium	true	WIDTH_AND_HEIGHT	Restore confirm	Cancel
+T	2887:12612	3504,77550,148,16	11	Medium	true	WIDTH_AND_HEIGHT	Button · primary destructive	Restore, discard 12 changes
+T	2887:12610	3416,77474,248,64	11	Regular	true	HEIGHT	Restore confirm	This rewinds the project to Added block at 14:32. It permanently discards 12 later changes
+T	2887:12609	3416,77450,248,18	12	Regular	true	HEIGHT	Restore confirm	Restore to 14:32?
+T	2854:12300	3510,77412,51,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	▣  Saves
+T	2854:12299	3416,77412,73,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	⟳  Changes
+T	2854:12297	3652,77368,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	2854:12296	3416,77368,58,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Versions
+R	2854:12294	163:113	NAVIGATE	History · Saves · changes · restore-confirm
+R	2854:12332	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:12331	163:113	NAVIGATE	hotspot/state · History · time-travel
+N	2854:21739	[design-ahead] History · Saves · changes · start-of-history	FRAME	4300,77354,280,812	true	VERTICAL	15	true
+K	2854:21740	FRAME	4300,77354,280,48	true	true	Header
+K	2854:21743	FRAME	4300,77402,280,36	true	true	View toggle
+K	2887:12620	FRAME	4300,77438,280,56	true	false	First-hit notice
+K	2854:21746	FRAME	4300,77494,280,88	true	true	Approved anchor
+K	2854:21751	FRAME	4300,77582,280,40	true	true	Now row
+K	2854:21755	FRAME	4300,77622,280,44	true	true	Change · 0
+K	2854:21759	FRAME	4300,77666,280,44	true	true	Change · 1
+K	2854:21763	FRAME	4300,77710,280,44	true	true	Change · 2
+K	2854:21767	FRAME	4300,77754,280,44	true	true	Change · 3
+K	2887:12622	FRAME	4300,77798,280,102	true	false	History boundary
+K	2854:21771	FRAME	4300,77900,280,182	true	true	spacer
+K	2854:21772	FRAME	4300,78082,280,40	true	true	Prune note
+K	2854:21774	FRAME	4300,78122,280,44	true	true	Footer
+K	2854:21776	FRAME	4440,78092,124,34	true	true	hotspot/state · History · time-travel
+K	2854:21777	FRAME	4300,78092,280,34	true	true	hotspot/back · History · Saves (Milestones)
+C	2854:21739	texts=27
+T	2854:21775	4316,78136,106,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	+  Save a version
+T	2854:21773	4316,78090,248,48	11	Regular	true	HEIGHT	Prune note	This session only — the last 100 steps, cleared when you reload. Save a version to keep a 
+T	2887:12625	4316,77872,158,16	11	Medium	true	WIDTH_AND_HEIGHT	History boundary	Save a version to keep a point
+T	2887:12624	4316,77834,248,32	11	Regular	true	HEIGHT	History boundary	Earlier steps were dropped — this list keeps the last 100.
+T	2887:12623	4316,77810,248,18	12	Regular	true	HEIGHT	History boundary	History starts here
+T	2854:21770	4520,77761,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 3	15:58
+T	2854:21769	4316,77779,24,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Sara
+T	2854:21768	4316,77760,91,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Footer link fixed
+T	2854:21766	4520,77717,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 2	16:05
+T	2854:21765	4316,77735,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Ali
+T	2854:21764	4316,77716,121,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Menu prices updated
+T	2854:21762	4520,77673,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 1	16:12
+T	2854:21761	4316,77691,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 1	Ali
+T	2854:21760	4316,77672,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 1	2 images replaced
+T	2854:21758	4520,77629,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 0	16:20
+T	2854:21757	4316,77647,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Ali
+T	2854:21756	4316,77628,98,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Hero copy edited
+T	2854:21754	4332,77604,146,16	11	Regular	true	WIDTH_AND_HEIGHT	Now row	hero copy · 2 images · menu
+T	2854:21753	4332,77586,160,18	12	Regular	true	WIDTH_AND_HEIGHT	Now row	Now — 12 changes since v3
+T	I2854:21750;9:31	4328,77551,136,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with current
+T	2854:21749	4316,77524,127,16	11	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	Sara Khan · 18 Jul, 15:42
+T	2854:21748	4316,77504,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	⚑  APPROVED · v3
+T	2887:12621	4316,77450,248,32	11	Regular	true	HEIGHT	First-hit notice	Undo now only reaches back 100 steps. Save a version to keep this point for good.
+T	2854:21745	4410,77412,51,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	▣  Saves
+T	2854:21744	4316,77412,73,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	⟳  Changes
+T	2854:21742	4552,77368,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	2854:21741	4316,77368,58,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Versions
+R	2854:21739	163:113	NAVIGATE	[design-ahead] History · Saves · changes · start-of-history
+R	2854:21777	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21776	163:113	NAVIGATE	hotspot/state · History · time-travel
+N	2854:21814	[design-ahead] History · Saves · changes · clear-confirm	FRAME	4860,77354,280,812	true	VERTICAL	15	true
+K	2854:21815	FRAME	4860,77354,280,48	true	true	Header
+K	2854:21818	FRAME	4860,77402,280,36	true	true	View toggle
+K	2887:12626	FRAME	4860,77438,280,130	true	false	Clear confirm
+K	2854:21821	FRAME	4860,77568,280,88	true	true	Approved anchor
+K	2854:21826	FRAME	4860,77656,280,40	true	true	Now row
+K	2854:21830	FRAME	4860,77696,280,44	true	true	Change · 0
+K	2854:21834	FRAME	4860,77740,280,44	true	true	Change · 1
+K	2854:21838	FRAME	4860,77784,280,44	true	true	Change · 2
+K	2854:21842	FRAME	4860,77828,280,44	true	true	Change · 3
+K	2854:21846	FRAME	4860,77872,280,90	true	true	spacer
+K	2889:12630	FRAME	4860,77962,280,120	true	false	Open decision · clear control
+K	2854:21847	FRAME	4860,78082,280,40	true	true	Prune note
+K	2854:21849	FRAME	4860,78122,280,44	true	true	Footer
+K	2854:21851	FRAME	5000,78092,124,34	true	true	hotspot/state · History · time-travel
+K	2854:21852	FRAME	4860,78092,280,34	true	true	hotspot/back · History · Saves (Milestones)
+C	2854:21814	texts=28
+T	2854:21850	4876,78136,106,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	+  Save a version
+T	2854:21848	4876,78090,248,48	11	Regular	true	HEIGHT	Prune note	This session only — the last 100 steps, cleared when you reload. Save a version to keep a 
+T	2889:12631	4876,77974,248,96	11	Regular	true	HEIGHT	Open decision · clear control	OPEN DECISION — UX-I-07 also offers dropping the control entirely: nothing about a session
+T	2854:21845	5080,77835,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 3	15:58
+T	2854:21844	4876,77853,24,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Sara
+T	2854:21843	4876,77834,91,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Footer link fixed
+T	2854:21841	5080,77791,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 2	16:05
+T	2854:21840	4876,77809,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Ali
+T	2854:21839	4876,77790,121,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Menu prices updated
+T	2854:21837	5080,77747,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 1	16:12
+T	2854:21836	4876,77765,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 1	Ali
+T	2854:21835	4876,77746,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 1	2 images replaced
+T	2854:21833	5080,77703,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 0	16:20
+T	2854:21832	4876,77721,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Ali
+T	2854:21831	4876,77702,98,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Hero copy edited
+T	2854:21829	4892,77678,146,16	11	Regular	true	WIDTH_AND_HEIGHT	Now row	hero copy · 2 images · menu
+T	2854:21828	4892,77660,160,18	12	Regular	true	WIDTH_AND_HEIGHT	Now row	Now — 12 changes since v3
+T	I2854:21825;9:31	4888,77625,136,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with current
+T	2854:21824	4876,77598,127,16	11	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	Sara Khan · 18 Jul, 15:42
+T	2854:21823	4876,77578,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	⚑  APPROVED · v3
+T	2887:12631	4974,77534,37,16	11	Medium	true	WIDTH_AND_HEIGHT	Clear confirm	Cancel
+T	2887:12630	5035,77534,77,16	11	Medium	true	WIDTH_AND_HEIGHT	Button · primary destructive	Clear 47 steps
+T	2887:12628	4876,77474,248,48	11	Regular	true	HEIGHT	Clear confirm	Undo will stop working for the 47 steps before now, and it cannot be brought back. Saved v
+T	2887:12627	4876,77450,248,18	12	Regular	true	HEIGHT	Clear confirm	Clear this session’s history?
+T	2854:21820	4970,77412,51,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	▣  Saves
+T	2854:21819	4876,77412,73,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	⟳  Changes
+T	2854:21817	5112,77368,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	2854:21816	4876,77368,58,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Versions
+R	2854:21814	163:113	NAVIGATE	[design-ahead] History · Saves · changes · clear-confirm
+R	2854:21852	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21851	163:113	NAVIGATE	hotspot/state · History · time-travel
+N	2854:21854	[design-ahead] History · Saves · changes · undo-unavailable	FRAME	5140,77354,280,812	true	VERTICAL	14	true
+K	2854:21855	FRAME	5140,77354,280,48	true	true	Header
+K	2854:21858	FRAME	5140,77402,280,36	true	true	View toggle
+K	2887:12632	FRAME	5140,77438,280,102	true	false	Undo unavailable notice
+K	2854:21861	FRAME	5140,77540,280,88	true	true	Approved anchor
+K	2854:21866	FRAME	5140,77628,280,40	true	true	Now row
+K	2854:21870	FRAME	5140,77668,280,44	true	true	Change · 0
+K	2854:21874	FRAME	5140,77712,280,44	true	true	Change · 1
+K	2854:21878	FRAME	5140,77756,280,44	true	true	Change · 2
+K	2854:21882	FRAME	5140,77800,280,44	true	true	Change · 3
+K	2854:21886	FRAME	5140,77844,280,238	true	true	spacer
+K	2854:21887	FRAME	5140,78082,280,40	true	true	Prune note
+K	2854:21889	FRAME	5140,78122,280,44	true	true	Footer
+K	2854:21891	FRAME	5280,78092,124,34	true	true	hotspot/state · History · time-travel
+K	2854:21892	FRAME	5140,78092,280,34	true	true	hotspot/back · History · Saves (Milestones)
+C	2854:21854	texts=26
+T	2854:21890	5156,78136,106,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	+  Save a version
+T	2854:21888	5156,78090,248,48	11	Regular	true	HEIGHT	Prune note	This session only — the last 100 steps, cleared when you reload. Save a version to keep a 
+T	2854:21885	5360,77807,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 3	15:58
+T	2854:21884	5156,77825,24,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Sara
+T	2854:21883	5156,77806,91,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 3	Footer link fixed
+T	2854:21881	5360,77763,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 2	16:05
+T	2854:21880	5156,77781,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Ali
+T	2854:21879	5156,77762,121,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 2	Menu prices updated
+T	2854:21877	5360,77719,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 1	16:12
+T	2854:21876	5156,77737,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 1	Ali
+T	2854:21875	5156,77718,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 1	2 images replaced
+T	2854:21873	5360,77675,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Change · 0	16:20
+T	2854:21872	5156,77693,13,16	11	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Ali
+T	2854:21871	5156,77674,98,18	12	Regular	true	WIDTH_AND_HEIGHT	Change · 0	Hero copy edited
+T	2854:21869	5172,77650,146,16	11	Regular	true	WIDTH_AND_HEIGHT	Now row	hero copy · 2 images · menu
+T	2854:21868	5172,77632,160,18	12	Regular	true	WIDTH_AND_HEIGHT	Now row	Now — 12 changes since v3
+T	I2854:21865;9:31	5168,77597,136,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Compare with current
+T	2854:21864	5156,77570,127,16	11	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	Sara Khan · 18 Jul, 15:42
+T	2854:21863	5156,77550,104,18	12	Regular	true	WIDTH_AND_HEIGHT	Approved anchor	⚑  APPROVED · v3
+T	2887:12635	5156,77512,101,16	11	Medium	true	WIDTH_AND_HEIGHT	Undo unavailable notice	Save a version first
+T	2887:12634	5156,77474,248,32	11	Regular	true	HEIGHT	Undo unavailable notice	Binding a field to content isn’t undoable. Undo starts working again with your next edit.
+T	2887:12633	5156,77450,248,18	12	Regular	true	HEIGHT	Undo unavailable notice	Undo isn’t covering your last action
+T	2854:21860	5250,77412,51,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	▣  Saves
+T	2854:21859	5156,77412,73,18	12	Regular	true	WIDTH_AND_HEIGHT	View toggle	⟳  Changes
+T	2854:21857	5392,77368,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	2854:21856	5156,77368,58,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Versions
+R	2854:21854	163:113	NAVIGATE	[design-ahead] History · Saves · changes · undo-unavailable
+R	2854:21892	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21891	163:113	NAVIGATE	hotspot/state · History · time-travel
+END	done=2854:12294|2854:21739|2854:21814|2854:21854	stopped=false	bytes=15283

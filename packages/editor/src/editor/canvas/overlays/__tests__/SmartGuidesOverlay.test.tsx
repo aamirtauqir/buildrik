@@ -47,7 +47,7 @@ describe("SmartGuidesOverlay — alignment guides vs spacing indicators", () => 
     // container > wrapper div > line div — the wrapper carries no
     // backgroundColor, so the line is the second div in document order.
     const line = container.querySelectorAll("div")[1] as HTMLElement;
-    expect(line.style.backgroundColor).toBe("rgb(255, 68, 68)");
+    expect(line.style.backgroundColor).toBe("rgb(224, 36, 36)");
     expect(screen.getByText("60")).toBeTruthy();
   });
 
@@ -64,6 +64,6 @@ describe("SmartGuidesOverlay — alignment guides vs spacing indicators", () => 
     ];
     render(<SmartGuidesOverlay snapLines={lines} zoom={100} />);
     const label = screen.getByText("150");
-    expect(label.style.color).toBe("rgb(255, 68, 68)");
+    expect(label.style.color).toBe("rgb(224, 36, 36)");
   });
 });

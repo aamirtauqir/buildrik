@@ -1,0 +1,1706 @@
+{
+ "rows": {
+  "c1-clones#0": {
+   "status": "OK",
+   "detail": "Delete “hero-dark.jpg”?",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#1": {
+   "status": "OK",
+   "detail": "⚠ Used by 3 elements on Home and Menu. Deleting breaks them.",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#2": {
+   "status": "OK",
+   "detail": "Delete",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#10": {
+   "status": "OK",
+   "detail": "Nothing replaced — all 3 updates failed.",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#11": {
+   "status": "OK",
+   "detail": "▸ Show errors (3)",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#19": {
+   "status": "OK",
+   "detail": "Delete “Menu”?",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#20": {
+   "status": "OK",
+   "detail": "This page and everything on it is removed. Undo (⌘Z) brings it back.",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#21": {
+   "status": "OK",
+   "detail": "Cancel",
+   "at": "2026-09-07T15:04:22.205Z",
+   "op": "text"
+  },
+  "c1-clones#22": {
+   "status": "OK",
+   "detail": "Delete page",
+   "at": "2026-09-07T15:04:22.206Z",
+   "op": "text"
+  },
+  "c3-c4-counts-annotations#0": {
+   "status": "OK",
+   "detail": "Review 3 staged changes · 1 not supported",
+   "at": "2026-09-07T15:04:22.206Z",
+   "op": "text"
+  },
+  "c3-c4-counts-annotations#1": {
+   "status": "OK",
+   "detail": "shadow/raised · not supported",
+   "at": "2026-09-07T15:04:22.206Z",
+   "op": "text"
+  },
+  "c5-c6-c7-code-truth#12": {
+   "status": "OK",
+   "detail": "AI drafting isn’t configured yet. No API key is set for this workspace, so nothing here will run.",
+   "at": "2026-09-07T15:04:22.206Z",
+   "op": "text"
+  },
+  "c1-clones#3": {
+   "status": "OK",
+   "detail": "Type DELETE to confirm: ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#4": {
+   "status": "OK",
+   "detail": "confirm-input ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#5": {
+   "status": "OK",
+   "detail": "Delete stays disabled until the word matches exactly. ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#9": {
+   "status": "OK",
+   "detail": "result-clean ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#12": {
+   "status": "OK",
+   "detail": "Retry failed ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#27": {
+   "status": "OK",
+   "detail": "foot ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#4": {
+   "status": "OK",
+   "detail": "note/UX-B-13 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#5": {
+   "status": "OK",
+   "detail": "note/UX-B-32 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#6": {
+   "status": "OK",
+   "detail": "note/UX-B-13 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#7": {
+   "status": "OK",
+   "detail": "note/UX-B-32 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#8": {
+   "status": "OK",
+   "detail": "note/UX-B-13 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#9": {
+   "status": "OK",
+   "detail": "note/UX-B-32 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#16": {
+   "status": "OK",
+   "detail": "dynamic-pages · no-pattern ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#17": {
+   "status": "OK",
+   "detail": "dynamic-pages · none-published ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#18": {
+   "status": "OK",
+   "detail": "dynamic-pages · no-template ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#19": {
+   "status": "OK",
+   "detail": "AI · in-canvas popover ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#20": {
+   "status": "OK",
+   "detail": "Brand · generate component with AI ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#21": {
+   "status": "OK",
+   "detail": "AI · publish confirm ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c3-c4-counts-annotations#22": {
+   "status": "OK",
+   "detail": "Media · local-only assets ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c5-c6-c7-code-truth#6": {
+   "status": "OK",
+   "detail": "Section header ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c5-c6-c7-code-truth#7": {
+   "status": "OK",
+   "detail": "Row · Button / primary ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c5-c6-c7-code-truth#8": {
+   "status": "OK",
+   "detail": "Row · Price row ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#9": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#10": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#11": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#12": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#13": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#14": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#15": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#16": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#17": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#18": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#19": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#20": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#21": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#22": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#23": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#24": {
+   "status": "OK",
+   "detail": "Section · Hero ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#25": {
+   "status": "OK",
+   "detail": "680 × 250 ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c8-assembled#26": {
+   "status": "OK",
+   "detail": "Desktop · 100% ",
+   "at": "2026-09-07T15:09:44.982Z",
+   "op": "delete"
+  },
+  "c1-clones#6": {
+   "status": "SAME",
+   "detail": "440x117",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c1-clones#14": {
+   "status": "SAME",
+   "detail": "300x95",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c1-clones#15": {
+   "status": "SAME",
+   "detail": "624x95",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c1-clones#17": {
+   "status": "OK",
+   "detail": "380x277",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#0": {
+   "status": "OK",
+   "detail": "280x240",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#1": {
+   "status": "OK",
+   "detail": "280x304",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#5": {
+   "status": "OK",
+   "detail": "248x18",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#6": {
+   "status": "OK",
+   "detail": "280x272",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#10": {
+   "status": "OK",
+   "detail": "280x112",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#11": {
+   "status": "OK",
+   "detail": "280x316",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#12": {
+   "status": "OK",
+   "detail": "280x64",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#13": {
+   "status": "OK",
+   "detail": "280x170",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#14": {
+   "status": "OK",
+   "detail": "280x64",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#15": {
+   "status": "OK",
+   "detail": "280x158",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#16": {
+   "status": "OK",
+   "detail": "280x64",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#17": {
+   "status": "OK",
+   "detail": "280x66",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#18": {
+   "status": "OK",
+   "detail": "280x64",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#19": {
+   "status": "OK",
+   "detail": "280x214",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#20": {
+   "status": "OK",
+   "detail": "280x64",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#21": {
+   "status": "OK",
+   "detail": "92x16",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#28": {
+   "status": "OK",
+   "detail": "388x26",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#29": {
+   "status": "OK",
+   "detail": "408x40",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c2-clipping#30": {
+   "status": "SAME",
+   "detail": "440x229",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c5-c6-c7-code-truth#1": {
+   "status": "OK",
+   "detail": "720x720",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c5-c6-c7-code-truth#9": {
+   "status": "SAME",
+   "detail": "280x564",
+   "at": "2026-09-07T15:15:00.162Z",
+   "op": "resize"
+  },
+  "c1-clones#13": {
+   "status": "OK",
+   "detail": "result-all-failed",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c1-clones#18": {
+   "status": "OK",
+   "detail": "Modal · Add Child Element · refused — [not-implemented] the product never draws this. BlockPickerModal.tsx:42-50, :53-62",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c1-clones#23": {
+   "status": "OK",
+   "detail": "btn/Cancel",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c1-clones#24": {
+   "status": "OK",
+   "detail": "btn/Delete page",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c3-c4-counts-annotations#2": {
+   "status": "OK",
+   "detail": "btn/Apply 3 changes",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c5-c6-c7-code-truth#10": {
+   "status": "OK",
+   "detail": "Modal · Brand · AI prompt · generated (no destination) — [not-implemented] the artifact is a preset BINDING schema with ",
+   "at": "2026-09-07T15:17:45.420Z",
+   "op": "rename"
+  },
+  "c1-clones#16": {
+   "status": "OK",
+   "detail": "3182:12646 348x40 @16,221",
+   "at": "2026-09-07T15:20:23.506Z",
+   "op": "add-text"
+  },
+  "c2-clipping#2": {
+   "status": "OK",
+   "detail": "16,148",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#3": {
+   "status": "OK",
+   "detail": "16,178",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#4": {
+   "status": "OK",
+   "detail": "16,222",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#7": {
+   "status": "OK",
+   "detail": "16,106",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#8": {
+   "status": "OK",
+   "detail": "16,136",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#9": {
+   "status": "OK",
+   "detail": "16,180",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#22": {
+   "status": "OK",
+   "detail": "164,8",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#23": {
+   "status": "OK",
+   "detail": "164,8",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c2-clipping#24": {
+   "status": "OK",
+   "detail": "164,8",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c3-c4-counts-annotations#13": {
+   "status": "OK",
+   "detail": "201,10",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c3-c4-counts-annotations#14": {
+   "status": "OK",
+   "detail": "201,10",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c3-c4-counts-annotations#15": {
+   "status": "OK",
+   "detail": "201,10",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c5-c6-c7-code-truth#0": {
+   "status": "OK",
+   "detail": "497,698",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c5-c6-c7-code-truth#2": {
+   "status": "OK",
+   "detail": "0,656",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c5-c6-c7-code-truth#3": {
+   "status": "OK",
+   "detail": "497,678",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "c5-c6-c7-code-truth#4": {
+   "status": "OK",
+   "detail": "548,670",
+   "at": "2026-09-07T15:25:38.789Z",
+   "op": "move"
+  },
+  "qa-hotfix#0": {
+   "status": "OK",
+   "detail": "0,76",
+   "at": "2026-09-07T15:46:24.179Z",
+   "op": "move"
+  },
+  "qa-hotfix#1": {
+   "status": "OK",
+   "detail": "0,76",
+   "at": "2026-09-07T15:46:24.179Z",
+   "op": "move"
+  },
+  "qa-hotfix#2": {
+   "status": "OK",
+   "detail": "140:2,140:2",
+   "at": "2026-09-07T15:52:13.502Z",
+   "op": "rewire"
+  },
+  "m-missed#0": {
+   "status": "OK",
+   "detail": "640x132",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#1": {
+   "status": "OK",
+   "detail": "572x17",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#3": {
+   "status": "OK",
+   "detail": "608x16",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#6": {
+   "status": "OK",
+   "detail": "640x188",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#7": {
+   "status": "OK",
+   "detail": "572x17",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#9": {
+   "status": "OK",
+   "detail": "608x46",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#10": {
+   "status": "OK",
+   "detail": "588x30",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#13": {
+   "status": "OK",
+   "detail": "640x52",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#16": {
+   "status": "OK",
+   "detail": "640x188",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#17": {
+   "status": "OK",
+   "detail": "572x17",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#19": {
+   "status": "OK",
+   "detail": "608x72",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#20": {
+   "status": "OK",
+   "detail": "608x16",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#21": {
+   "status": "OK",
+   "detail": "640x52",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#23": {
+   "status": "OK",
+   "detail": "640x180",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#24": {
+   "status": "OK",
+   "detail": "572x17",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#26": {
+   "status": "OK",
+   "detail": "608x64",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#29": {
+   "status": "OK",
+   "detail": "640x52",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#34": {
+   "status": "OK",
+   "detail": "248x66",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "m-missed#35": {
+   "status": "OK",
+   "detail": "248x66",
+   "at": "2026-09-07T15:56:32.230Z",
+   "op": "resize"
+  },
+  "f-missed#0": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#3": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#4": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#7": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#8": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#11": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#12": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#15": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#16": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#19": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#20": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#23": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#24": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#27": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#28": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#31": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#32": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#35": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#36": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#39": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#40": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#43": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#2": {
+   "status": "OK",
+   "detail": "596,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#8": {
+   "status": "OK",
+   "detail": "596,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#14": {
+   "status": "OK",
+   "detail": "0,136",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#15": {
+   "status": "OK",
+   "detail": "525,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#18": {
+   "status": "OK",
+   "detail": "596,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#22": {
+   "status": "OK",
+   "detail": "525,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#25": {
+   "status": "OK",
+   "detail": "596,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "m-missed#30": {
+   "status": "OK",
+   "detail": "525,12",
+   "at": "2026-09-07T16:00:46.233Z",
+   "op": "move"
+  },
+  "f-missed#1": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#2": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#5": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#6": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#9": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#10": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#13": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#14": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#17": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#18": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#21": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#22": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#25": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#26": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#29": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#30": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#33": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#34": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#37": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#38": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#41": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#42": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T16:03:31.068Z",
+   "op": "resize"
+  },
+  "f-missed#48": {
+   "status": "OK",
+   "detail": "HOME",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#49": {
+   "status": "OK",
+   "detail": "Sara · client · Home · 2d",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#50": {
+   "status": "OK",
+   "detail": "Add an internal note…",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#51": {
+   "status": "OK",
+   "detail": "Add an internal note…",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#52": {
+   "status": "OK",
+   "detail": "Add an internal note…",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#58": {
+   "status": "OK",
+   "detail": "Tokens not saved",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#65": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#66": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#67": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#68": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#69": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#70": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#71": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#72": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#73": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#74": {
+   "status": "OK",
+   "detail": "Ali's Studio",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#75": {
+   "status": "OK",
+   "detail": "Bella Cucina",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#76": {
+   "status": "OK",
+   "detail": "Signed as Sara. You are looking at the version sent to you 5 September 2026 — later edits will not change it.",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#77": {
+   "status": "OK",
+   "detail": "Signed as Sara. You are looking at the version sent to you 5 September 2026 — later edits will not change it.",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#78": {
+   "status": "OK",
+   "detail": "Bella Cucina is ready for you to look at",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#80": {
+   "status": "OK",
+   "detail": "Thanks — Ali's Studio can take it from here. You'll hear from your designer when it goes live.",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#81": {
+   "status": "OK",
+   "detail": "Heads up — Ali's Studio has made changes since you approved. If you were sent a new link, use that one; your approval co",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#82": {
+   "status": "OK",
+   "detail": "Signed as Sara · sara@bellacucina.com",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "m-missed#4": {
+   "status": "OK",
+   "detail": "No collections yet. Create one to start adding records.",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "m-missed#27": {
+   "status": "OK",
+   "detail": "Margherita          —          ✓ photo          today",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "m-missed#31": {
+   "status": "OK",
+   "detail": "Slug pattern — /menu/{title} · Template — menu/_template · SEO title — {title} — Menu",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "m-missed#32": {
+   "status": "OK",
+   "detail": "+ Add record",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "m-missed#33": {
+   "status": "OK",
+   "detail": "No records yet. Add the first one to bind it here.",
+   "at": "2026-09-07T16:11:14.902Z",
+   "op": "text"
+  },
+  "f-missed#53": {
+   "status": "OK",
+   "detail": "Card · Restaurant — one page — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.t",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#54": {
+   "status": "OK",
+   "detail": "Card · Menu + reservations — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.ts ",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#55": {
+   "status": "OK",
+   "detail": "Card · Landing — offer — the preview tile is a CSS gradient + emoji glyph (TemplateCard.tsx:85-91, templatesData.ts grad",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#62": {
+   "status": "OK",
+   "detail": "hotspot/state · Settings (⌃,) → S7 · Settings · root — the 3-tab project-settings modal 1172:4867 is RETIRED; ⌃, and the",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#64": {
+   "status": "OK",
+   "detail": "menu · Share preview link — [dead route] still NAVIGATEs to 817:4774, which is [not-implemented · superseded by 988:2 · ",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#83": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · interaction test — the in-shell PreviewOverlay strips every <script> (ExportUtils.ts:38-43) ",
+   "at": "2026-09-07T16:16:29.618Z",
+   "op": "rename"
+  },
+  "f-missed#60": {
+   "status": "OK",
+   "detail": "32:2,32:2",
+   "at": "2026-09-07T16:21:44.767Z",
+   "op": "rewire"
+  },
+  "f-missed#61": {
+   "status": "OK",
+   "detail": "1688:7195,1688:7195",
+   "at": "2026-09-07T16:21:44.767Z",
+   "op": "rewire"
+  },
+  "m-missed#5": {
+   "status": "OK",
+   "detail": "3236:12646 116x15 @496,99",
+   "at": "2026-09-07T16:27:01.026Z",
+   "op": "add-text"
+  },
+  "m-missed#11": {
+   "status": "OK",
+   "detail": "3236:12647 340x16 @28,104",
+   "at": "2026-09-07T16:27:01.026Z",
+   "op": "add-text"
+  },
+  "m-missed#28": {
+   "status": "OK",
+   "detail": "3236:12648 64x13 @560,59",
+   "at": "2026-09-07T16:27:01.026Z",
+   "op": "add-text"
+  },
+  "m-missed#37": {
+   "status": "OK",
+   "detail": "3236:12649 70x13 @86,40",
+   "at": "2026-09-07T16:27:01.026Z",
+   "op": "add-text"
+  },
+  "m-missed#12": {
+   "status": "OK",
+   "detail": "3241:12646 54x22 @570,101",
+   "at": "2026-09-07T16:35:00.961Z",
+   "op": "clone-node"
+  },
+  "m-missed#36": {
+   "status": "OK",
+   "detail": "3241:12648 72x24 @168,34",
+   "at": "2026-09-07T16:35:00.961Z",
+   "op": "clone-node"
+  },
+  "zz-qa-final#0": {
+   "status": "OK",
+   "detail": "172x16",
+   "at": "2026-09-07T16:48:26.568Z",
+   "op": "resize"
+  },
+  "zz-f02-resolved#0": {
+   "status": "OK",
+   "detail": "#F3F4F6",
+   "at": "2026-09-07T17:00:57.688Z",
+   "op": "text"
+  },
+  "zz-f02-resolved#1": {
+   "status": "OK",
+   "detail": "#F3F4F6",
+   "at": "2026-09-07T17:00:57.688Z",
+   "op": "text"
+  },
+  "zz-f22-counts#0": {
+   "status": "OK",
+   "detail": "07 · Brand · 52",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#1": {
+   "status": "OK",
+   "detail": "16 · History · 49",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#2": {
+   "status": "OK",
+   "detail": "03 · Layers · 35",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#3": {
+   "status": "OK",
+   "detail": "06 · Content · 49",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#4": {
+   "status": "OK",
+   "detail": "15 · Publish · 25",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#5": {
+   "status": "OK",
+   "detail": "02 · Insert · 29",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#6": {
+   "status": "OK",
+   "detail": "08 · Inspector · 56",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#7": {
+   "status": "OK",
+   "detail": "17 · Compare · 17",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#8": {
+   "status": "OK",
+   "detail": "18 · Review · 39",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#9": {
+   "status": "OK",
+   "detail": "01 · Shell · 56",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#10": {
+   "status": "OK",
+   "detail": "21 · Settings/S7 · 49",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#11": {
+   "status": "OK",
+   "detail": "23 · Journeys · S-flows · 109 — S-numbers are a journey narrative, not a screen index",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#12": {
+   "status": "OK",
+   "detail": "13 · Command palette · 15 — two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#13": {
+   "status": "OK",
+   "detail": "09 · Canvas · 16",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f22-counts#14": {
+   "status": "OK",
+   "detail": "22 · Ecommerce · 6 — [not-implemented] ORDERS only. Narrower than first written: the cart and Stripe checkout runtimes e",
+   "at": "2026-09-07T17:10:39.715Z",
+   "op": "rename"
+  },
+  "zz-f25-resolved#0": {
+   "status": "OK",
+   "detail": "32,540",
+   "at": "2026-09-07T17:13:23.065Z",
+   "op": "move"
+  },
+  "zz-f25-resolved#1": {
+   "status": "OK",
+   "detail": "1080x660",
+   "at": "2026-09-07T17:16:09.517Z",
+   "op": "resize"
+  },
+  "zz-m13-resolved#0": {
+   "status": "OK",
+   "detail": "Button · Retry ",
+   "at": "2026-09-07T17:23:43.630Z",
+   "op": "delete"
+  },
+  "zz-m13-resolved#1": {
+   "status": "OK",
+   "detail": "640,12",
+   "at": "2026-09-07T17:23:49.430Z",
+   "op": "move"
+  },
+  "zz-final-two#0": {
+   "status": "OK",
+   "detail": "209,14",
+   "at": "2026-09-07T17:42:34.381Z",
+   "op": "move"
+  },
+  "zz-final-two#3": {
+   "status": "OK",
+   "detail": "16,132",
+   "at": "2026-09-07T17:42:34.381Z",
+   "op": "move"
+  },
+  "zz-final-two#1": {
+   "status": "OK",
+   "detail": "58x20",
+   "at": "2026-09-07T17:42:42.741Z",
+   "op": "resize"
+  },
+  "zz-final-two#2": {
+   "status": "OK",
+   "detail": "248x60",
+   "at": "2026-09-07T17:42:42.741Z",
+   "op": "resize"
+  },
+  "zz-final-two#4": {
+   "status": "OK",
+   "detail": "Look at Bella Cucina",
+   "at": "2026-09-07T17:42:50.962Z",
+   "op": "text"
+  },
+  "zz-m17-resolved#0": {
+   "status": "OK",
+   "detail": "3307:12646 at index 1 of 5",
+   "at": "2026-09-07T17:47:42.448Z",
+   "op": "insert-text"
+  },
+  "zz-m17-resolved#1": {
+   "status": "SAME",
+   "detail": "460x169",
+   "at": "2026-09-07T17:47:49.522Z",
+   "op": "resize"
+  },
+  "zz-h1-answered#0": {
+   "status": "OK",
+   "detail": "The thread and the prompt you typed stay on screen behind th ",
+   "at": "2026-09-07T17:52:00.838Z",
+   "op": "delete"
+  },
+  "zz-h1-answered#1": {
+   "status": "OK",
+   "detail": "The thread and the prompt you typed stay on screen behind th ",
+   "at": "2026-09-07T17:52:00.838Z",
+   "op": "delete"
+  },
+  "zz-h1-answered#2": {
+   "status": "OK",
+   "detail": "The thread and the prompt you typed stay on screen behind th ",
+   "at": "2026-09-07T17:52:00.838Z",
+   "op": "delete"
+  },
+  "zz-h1-answered#3": {
+   "status": "OK",
+   "detail": "280x156",
+   "at": "2026-09-07T17:52:07.328Z",
+   "op": "resize"
+  },
+  "zz-h1-answered#4": {
+   "status": "OK",
+   "detail": "280x230",
+   "at": "2026-09-07T17:52:07.328Z",
+   "op": "resize"
+  },
+  "zz-h1-answered#5": {
+   "status": "OK",
+   "detail": "280x188",
+   "at": "2026-09-07T17:52:07.328Z",
+   "op": "resize"
+  },
+  "zz-m01-visual#0": {
+   "status": "OK",
+   "detail": "0.5 -> 1",
+   "at": "2026-09-07T17:53:35.902Z",
+   "op": "opacity"
+  },
+  "zz-m01-visual#1": {
+   "status": "OK",
+   "detail": "btn/Delete",
+   "at": "2026-09-07T17:53:42.314Z",
+   "op": "rename"
+  },
+  "zz-decisions#0": {
+   "status": "OK",
+   "detail": "[not-implemented] Inspector · MOTION · one section — no Motion section exists in code: elementProfiles.ts:70-85 renders ",
+   "at": "2026-09-07T17:57:08.450Z",
+   "op": "rename"
+  },
+  "zz-decisions#8": {
+   "status": "OK",
+   "detail": "menu · Share preview link — [dead route] successor Site · Access lives on page 988:2 and Figma rejects cross-page NAVIGA",
+   "at": "2026-09-07T17:57:08.450Z",
+   "op": "rename"
+  },
+  "zz-decisions#1": {
+   "status": "OK",
+   "detail": "14 -> 16",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#2": {
+   "status": "OK",
+   "detail": "11 -> 13",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#3": {
+   "status": "OK",
+   "detail": "11 -> 13",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#4": {
+   "status": "OK",
+   "detail": "13 -> 16",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#5": {
+   "status": "OK",
+   "detail": "11 -> 13",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#6": {
+   "status": "OK",
+   "detail": "11 -> 13",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-decisions#7": {
+   "status": "OK",
+   "detail": "11 -> 13",
+   "at": "2026-09-07T17:57:15.370Z",
+   "op": "font-size"
+  },
+  "zz-f14-location#0": {
+   "status": "OK",
+   "detail": "Bella Cucina › Home › Layers",
+   "at": "2026-09-07T18:02:10.634Z",
+   "op": "text"
+  },
+  "zz-f02-swatch#0": {
+   "status": "OK",
+   "detail": "#F3F4F6 got 243,244,246",
+   "at": "2026-09-07T18:04:33.820Z",
+   "op": "fill"
+  },
+  "zz-f02-swatch#1": {
+   "status": "OK",
+   "detail": "#F3F4F6 got 243,244,246",
+   "at": "2026-09-07T18:04:33.820Z",
+   "op": "fill"
+  },
+  "zz-f01-resolved#0": {
+   "status": "OK",
+   "detail": "State selected -> rest",
+   "at": "2026-09-07T18:07:05.288Z",
+   "op": "set-prop"
+  },
+  "zz-f01-resolved#1": {
+   "status": "OK",
+   "detail": "State rest -> selected",
+   "at": "2026-09-07T18:07:05.288Z",
+   "op": "set-prop"
+  },
+  "zz-f01-board2#0": {
+   "status": "OK",
+   "detail": "State selected -> rest",
+   "at": "2026-09-07T18:08:11.081Z",
+   "op": "set-prop"
+  },
+  "zz-f01-board2#1": {
+   "status": "OK",
+   "detail": "State rest -> selected",
+   "at": "2026-09-07T18:08:11.081Z",
+   "op": "set-prop"
+  },
+  "zz-f10-resolved#0": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#1": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#2": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#3": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#4": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#5": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f10-resolved#6": {
+   "status": "OK",
+   "detail": "HUG w=151",
+   "at": "2026-09-07T18:09:15.946Z",
+   "op": "hug-width"
+  },
+  "zz-f14-back#0": {
+   "status": "OK",
+   "detail": "‹ Back to canvas",
+   "at": "2026-09-07T18:14:26.469Z",
+   "op": "text"
+  },
+  "zz-f14-back2#0": {
+   "status": "OK",
+   "detail": "‹ Back to canvas",
+   "at": "2026-09-07T18:14:55.665Z",
+   "op": "text"
+  },
+  "zz-f14-back2#1": {
+   "status": "OK",
+   "detail": "‹ Back to canvas",
+   "at": "2026-09-07T18:14:55.665Z",
+   "op": "text"
+  },
+  "zz-f14-back2#2": {
+   "status": "OK",
+   "detail": "‹ Back to canvas",
+   "at": "2026-09-07T18:14:55.665Z",
+   "op": "text"
+  },
+  "zz-f14-back2#3": {
+   "status": "OK",
+   "detail": "‹ Back to canvas",
+   "at": "2026-09-07T18:14:55.665Z",
+   "op": "text"
+  },
+  "zz-f11-resolved#1": {
+   "status": "SAME",
+   "detail": "728x32",
+   "at": "2026-09-07T18:17:46.293Z",
+   "op": "resize"
+  },
+  "zz-f11-resolved#0": {
+   "status": "OK",
+   "detail": "3340:13063 44x15 @660,8",
+   "at": "2026-09-07T18:20:18.598Z",
+   "op": "add-text"
+  }
+ },
+ "spend": {
+  "2026-09-07": 80
+ },
+ "capSeenAt": "2026-09-07T17:13:28.029Z"
+}

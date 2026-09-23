@@ -301,7 +301,9 @@ describe("ContentTab", () => {
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Conditions"));
     expect(await screen.findByText("when available is false")).toBeInTheDocument();
-    expect(screen.getByText(/badge · Sold out/)).toBeInTheDocument();
+    /* Board 151:87 names the row after the element, not after its tag — the
+       label was "badge · Sold out" until 2026-09-08. */
+    expect(screen.getByText("Sold out")).toBeInTheDocument();
     /* Board 151:87 puts the row actions behind a `⋯`, so removal is two
        clicks now: open the row menu, then choose. */
     fireEvent.click(screen.getByRole("button", { name: /Actions for/ }));

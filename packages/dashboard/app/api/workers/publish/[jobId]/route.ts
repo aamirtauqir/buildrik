@@ -114,6 +114,20 @@ export async function POST(
       },
     });
 
+    /* DEPLOYING is written HERE, and until 2026-09-09 nothing ever wrote it.
+       The enum carried the state and `publish.service.ts:206,227` FILTERED on
+       it — a read with no writer — so four boards drew a phase the product
+       could never enter (BLOCKERS E1, confirmed 2026-09-03, taken 2026-09-08).
+       The transition belongs at exactly this line: everything above is page
+       generation, everything below is the deploy the provider is running. The
+       stale-job sweeps that already look for BUILDING/DEPLOYING past a cutoff
+       now see a state that actually occurs, which is what they were written
+       for. Step 2 is "Deploying to CDN", so the progress row moves with it. */
+    await prisma.publishBuildJob.update({
+      where: { id: jobId },
+      data: { status: "DEPLOYING", progress: stepProgress(2), steps: buildSteps(2) },
+    });
+
     const publicUrl = useVercel
       ? await runVercelDeployJob(jobId, job.siteId, job.workspaceId, pages)
       : await runSimulation(jobId, job.siteId);
@@ -275,9 +289,37 @@ async function runVercelDeployJob(
 ): Promise<string> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { slug: true, name: true, publishedPassword: true, favicon: true, touchIcon: true, ogImage: true, canonicalUrl: true, allowIndexing: true, robotsTxt: true },
+    select: {
+      slug: true,
+      name: true,
+      publishedPassword: true,
+      favicon: true,
+      touchIcon: true,
+      ogImage: true,
+      canonicalUrl: true,
+      allowIndexing: true,
+      robotsTxt: true,
+      // Settings S3: the Headers screen's columns ship in vercel.json.
+      cspPolicy: true,
+      hstsMaxAge: true,
+      xFrameOptions: true,
+      referrerPolicy: true,
+      permissionsPolicy: true,
+    },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
+
+  /* Settings S3: the Redirects screen's rules and the REDIRECT-kind domains
+     become vercel.json redirects (publish-files.ts). Until now neither left
+     the database — a redirect saved in Settings never redirected anything. */
+  const [redirects, domains] = await Promise.all([
+    prisma.redirect.findMany({
+      where: { siteId },
+      orderBy: { createdAt: "asc" },
+      select: { fromPath: true, toUrl: true, type: true, matchQuery: true },
+    }),
+    prisma.domain.findMany({ where: { siteId }, select: { domain: true, kind: true, isPrimary: true } }),
+  ]);
 
   // Enforce the published-site password on the live URL via Vercel deployment
   // protection. null = no/legacy password → clears protection on deploy.
@@ -359,6 +401,15 @@ async function runVercelDeployJob(
     robotsTxt: site.robotsTxt,
     appScripts,
     showBadge,
+    redirects,
+    domains,
+    headers: {
+      cspPolicy: site.cspPolicy,
+      hstsMaxAge: site.hstsMaxAge,
+      xFrameOptions: site.xFrameOptions,
+      referrerPolicy: site.referrerPolicy,
+      permissionsPolicy: site.permissionsPolicy,
+    },
   });
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.

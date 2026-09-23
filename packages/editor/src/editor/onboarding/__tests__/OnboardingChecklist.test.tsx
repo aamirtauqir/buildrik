@@ -46,7 +46,7 @@ describe("minimized pill", () => {
     const pill = screen.getByRole("button", {
       name: "Get started — 3 of 7 complete. Click to expand.",
     });
-    expect(pill).toHaveTextContent("3 / 7 done");
+    expect(pill).toHaveTextContent("3/7 done");
 
     fireEvent.click(pill);
     expect(props.onRestore).toHaveBeenCalledTimes(1);
@@ -117,7 +117,7 @@ describe("full panel header + progress", () => {
     // Board 296:2030's all-done copy.
     expect(screen.getByText("You\u2019re all set")).toBeInTheDocument();
     expect(
-      screen.getByText(/You have completed all the getting started steps/)
+      screen.getByText(/You\u2019ve finished every getting-started step/)
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Close checklist"));
@@ -151,7 +151,7 @@ describe("step items", () => {
     const row = screen.getByRole("button", { name: "Set your brand" });
     expect(row).toHaveAttribute("aria-expanded", "true");
     expect(
-      screen.getByText(/Apply your fonts and colors/)
+      screen.getByText(/Pick a starter or set your six colours/)
     ).toBeInTheDocument();
 
     // CTA fires onAction with the step's actionKey
@@ -192,7 +192,7 @@ describe("step items", () => {
         })}
       />
     );
-    expect(screen.queryByText(/Apply your fonts and colors/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pick a starter or set your six colours/)).not.toBeInTheDocument();
   });
 });
 

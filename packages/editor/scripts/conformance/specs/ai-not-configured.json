@@ -1,0 +1,210 @@
+{
+  "surface": "ai-not-configured",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "171:136",
+  "boardName": "ai-not-configured",
+  "figmaHash": "3f5b494302fcc89613baacd2a86501c8c7776657f16abf3a09fe2ff8a101c882",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:43:15.879Z",
+  "copy": [
+    "‹ Inspector",
+    "AI",
+    "Scope: Hero section",
+    "AI isn’t available on this workspace.",
+    "Contact your workspace owner",
+    "Continue by hand in the inspector"
+  ],
+  "targets": [
+    {
+      "nodeId": "171:136",
+      "name": "AI · not-configured",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-l border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "171:137",
+      "name": "Back row",
+      "className": "border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-b border-solid h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "171:138",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[20px] left-[16px] not-italic text-[14px] text-[color:var(--color\\/ink,#111827)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "171:139",
+      "name": "Header",
+      "className": "h-[44px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "171:140",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[20px] left-[16px] not-italic text-[14px] text-[color:var(--color\\/ink,#111827)] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "171:141",
+      "name": "Scope",
+      "className": "bg-[var(--color\\/accent-tint,#ebf5ff)] h-[32px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "171:142",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "171:163",
+      "name": "Not configured",
+      "className": "[word-break:break-word] bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[230px] not-italic overflow-clip relative shrink-0 text-left w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "230px"
+        }
+      }
+    },
+    {
+      "nodeId": "171:164",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "171:165",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[44px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "171:166",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[148px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "2846:21649",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[18px] left-[16px] text-[#1a56db] text-[12px] top-[178px] w-[178px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "color": {
+          "value": "#1a56db"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "178px"
+        }
+      }
+    }
+  ]
+}

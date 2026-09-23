@@ -50,9 +50,17 @@ interface OptimizationState {
 const LABEL = "tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 const MONO =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums";
-const CHIP = "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
+/* `tw:h-6`, not `tw:min-h-6` — flowbite's Button is `h-10` and only a
+   SAME-property utility beats it through twMerge, so the format chips shipped
+   40 tall against board 1124:4570's 24. Identical trap, identical fix, in
+   ImageEditorModal's own CHIP. */
+const CHIP = "tw:h-6 tw:min-h-0 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
+/* `--bk-accent-tint` (`var(--bk-blue-50)`), which is what board 1124:4570's
+   `--color/bg-selected` names. The class carried that hex as the FALLBACK of a
+   token that resolves to `var(--bk-blue-100)`, so the fallback was right, the token was
+   wrong, and the fallback never applies. */
 const CHIP_ACTIVE =
-  "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
+  "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent-text)]";
 const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]";
 const ROW = "tw:flex tw:items-center tw:justify-between tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
@@ -76,6 +84,24 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
   });
   // §18 — Max-dimension override (longest-side clamp). Empty / 0 / NaN → no clamp.
   const [maxDim, setMaxDim] = React.useState<string>("");
+
+  /* Board 1124:4568's line is `{w}x{h} · {bytes}`. The pixels are read off the
+     decoded image rather than taken from the library record, because this panel
+     takes only a `src` — the drill-in that hosts it holds the LibraryItem. Null
+     until the image decodes, and the byte half renders on its own meanwhile. */
+  const [dimensions, setDimensions] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!imageSrc) return;
+    let alive = true;
+    const img = new Image();
+    img.onload = () => {
+      if (alive && img.naturalWidth) setDimensions(`${img.naturalWidth}×${img.naturalHeight}`);
+    };
+    img.src = imageSrc;
+    return () => {
+      alive = false;
+    };
+  }, [imageSrc]);
 
   // Check format support
   const [formatSupport, setFormatSupport] = React.useState({ webp: true, avif: false });
@@ -175,7 +201,10 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* Board 1124: one 160h well — the optimised result once it exists, the
           original until then. Two side-by-side thumbnails were the old shape;
           at 320 they were 130px each and proved nothing. */}
-      <div className="tw:relative tw:h-40 tw:w-full tw:shrink-0 tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]">
+      <div
+        data-testid="opt-preview"
+        className="tw:relative tw:h-40 tw:w-full tw:shrink-0 tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]"
+      >
         {state.isProcessing ? (
           <span className="tw:flex tw:h-full tw:items-center tw:justify-center">
             <Spinner size="sm" />
@@ -187,7 +216,15 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
             className="tw:size-full tw:object-contain"
           />
         )}
-        <span className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO} tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]`}>
+        {/* Board 1124:4568 reads `2400x1600 - 840 KB`: the pixel dimensions
+            come FIRST and the byte size second. This printed the bytes alone,
+            so the one line that tells you what you are about to shrink never
+            said how big it is on screen. */}
+        <span
+          data-testid="opt-preview-dims"
+          className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO} tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]`}
+        >
+          {dimensions ? `${dimensions} · ` : ""}
           {formatBytes(state.originalSize)}
         </span>
       </div>
@@ -195,13 +232,14 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:pt-3">
         {/* Format */}
         <div>
-          <span className={LABEL} id="opt-format-label">
+          <span className={LABEL} id="opt-format-label" data-testid="opt-format-label">
             Format
           </span>
           <div className="tw:mt-1.5 tw:flex tw:flex-wrap tw:gap-2" role="group" aria-labelledby="opt-format-label">
             {formats.map(({ id, label, supported }) => (
               <Button
                 key={id}
+                data-testid={`opt-format-${id}`}
                 className={`${CHIP} ${state.format === id ? CHIP_ACTIVE : CHIP_RESTING}`}
                 aria-pressed={state.format === id}
                 onClick={() => supported && handleFormatChange(id)}
@@ -216,8 +254,10 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         {/* Quality — label left, mono value right, slider under (board 1124). */}
         <div>
           <div className="tw:flex tw:items-center tw:justify-between">
-            <span className={LABEL}>Quality</span>
-            <span className={`${MONO} tw:text-[var(--bk-ink-soft)]`}>{state.quality}%</span>
+            <span className={LABEL} data-testid="opt-quality-label">Quality</span>
+            <span className={`${MONO} tw:text-[var(--bk-ink-soft)]`} data-testid="opt-quality-value">
+              {state.quality}%
+            </span>
           </div>
           <div className="tw:mt-1.5">
             <Slider
@@ -253,17 +293,25 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         {/* Size rows — the saving rides the optimised number, in success. */}
         <div className="tw:flex tw:flex-col tw:gap-1.5">
           <div className={ROW}>
-            <span>Original</span>
-            <span className={`${MONO} tw:text-[var(--bk-ink-muted)]`}>
+            <span data-testid="opt-original-label">Original</span>
+            <span className={`${MONO} tw:text-[var(--bk-ink-muted)]`} data-testid="opt-original-size">
               {formatBytes(state.originalSize)}
             </span>
           </div>
           <div className={ROW}>
-            <span>Optimised</span>
+            <span data-testid="opt-optimised-label">Optimised</span>
             {/* Success green means "this saved you something". A wash (0%) or
-                a bigger file is not a success and must not read as one. */}
+                a bigger file is not a success and must not read as one.
+
+                The TEXT tokens, not the raw signal colours: board 1124:4584
+                names `--color/success-text` `var(--bk-green-600)`, and the `--bk-success`
+                `var(--bk-green-500)` this carried measures 3.39:1 on white at 11px — a WCAG
+                failure the board's own choice fixes. `--bk-warning` `var(--bk-yellow-500)`
+                (3.51:1) is the same defect on the branch no board draws, so it
+                moves with it rather than being left as the one inaccessible
+                readout in the panel. */}
             <span
-              className={`${MONO} ${savings > 0 ? "tw:text-[var(--bk-success)]" : savings < 0 ? "tw:text-[var(--bk-warning)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+              className={`${MONO} ${savings > 0 ? "tw:text-[var(--bk-success-text)]" : savings < 0 ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
               data-testid="opt-result"
             >
               {state.isProcessing
@@ -278,6 +326,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         {/* CTA — full-width per the board. */}
         <Button
           className="tw:h-9 tw:w-full tw:rounded tw:border-0 tw:bg-[var(--bk-accent)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]"
+          data-testid="opt-apply"
           onClick={handleApply}
           disabled={state.isProcessing || !state.optimizedSrc}
         >
@@ -285,7 +334,10 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         </Button>
 
         <div className="tw:flex tw:items-center tw:gap-2 tw:pb-4">
-          <span className="tw:min-w-0 tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+          <span
+            data-testid="opt-version-note"
+            className="tw:min-w-0 tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+          >
             Optimised copy saves as a new version.
           </span>
           {onClose && (

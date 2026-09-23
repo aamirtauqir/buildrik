@@ -1,0 +1,156 @@
+{
+ "slug": "sweep-c",
+ "applier": "node scripts/figma/sweep-append-marks.mjs docs/design-jobs/V2-TO-V1/plans/sweep-c-appends.json --apply",
+ "why_this_shape": "The rows sit under `sweep`, not `rows`. normalize-plans.mjs reads `add`/`key` rows as an append-text op and would hand these FRAME ids to the TEXT-node appender; with the fields renamed it dropped all 15 into neither the queue nor queue-needs-review. An object with no recognised row array is REPORTED by normalize-plans (line 340), which is the difference between a skip and a silent drop.",
+ "sweep": [
+  {
+   "id": "165:24",
+   "page": "1:3",
+   "section": "1779:2",
+   "skip_if_name_contains": "UX-F-25/26",
+   "append_to_name": " — UX-F-25/26: drawn 280; ships 360 (.bk-notifications → --bk-size-panel-right 360px, header.css:39, its only consumer at HEAD; --bk-size-nav 240 has none). Full statement on 165:2. The 280→360 re-lay is NOT taken here — a frame resize alone leaves a 280 interior in a 360 box.",
+   "why": "Sibling of 165:2. Measured this session: 280x812 while the shipped panel is 360. Notifications · all-read.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "165:44",
+   "page": "1:3",
+   "section": "1779:2",
+   "skip_if_name_contains": "UX-F-25/26",
+   "append_to_name": " — UX-F-25/26: drawn 280; ships 360 (.bk-notifications → --bk-size-panel-right 360px, header.css:39, its only consumer at HEAD; --bk-size-nav 240 has none). Full statement on 165:2. The 280→360 re-lay is NOT taken here — a frame resize alone leaves a 280 interior in a 360 box.",
+   "why": "Sibling of 165:2. Measured this session: 280x812 while the shipped panel is 360. Notifications · empty.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "165:51",
+   "page": "1:3",
+   "section": "1779:2",
+   "skip_if_name_contains": "UX-F-25/26",
+   "append_to_name": " — UX-F-25/26: drawn 280; ships 360 (.bk-notifications → --bk-size-panel-right 360px, header.css:39, its only consumer at HEAD; --bk-size-nav 240 has none). Full statement on 165:2. The 280→360 re-lay is NOT taken here — a frame resize alone leaves a 280 interior in a 360 box.",
+   "why": "Sibling of 165:2. Measured this session: 280x812 while the shipped panel is 360. Notifications · loading.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "165:71",
+   "page": "1:3",
+   "section": "1779:2",
+   "skip_if_name_contains": "UX-F-25/26",
+   "append_to_name": " — UX-F-25/26: drawn 280; ships 360 (.bk-notifications → --bk-size-panel-right 360px, header.css:39, its only consumer at HEAD; --bk-size-nav 240 has none). Full statement on 165:2. The 280→360 re-lay is NOT taken here — a frame resize alone leaves a 280 interior in a 360 box.",
+   "why": "Sibling of 165:2. Measured this session: 280x812 while the shipped panel is 360. Notifications · no-jump-target.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "453:4051",
+   "page": "1:3",
+   "section": "1779:2",
+   "skip_if_name_contains": "UX-F-25/26",
+   "append_to_name": " — UX-F-25/26: drawn 280; ships 360 (.bk-notifications → --bk-size-panel-right 360px, header.css:39, its only consumer at HEAD; --bk-size-nav 240 has none). Full statement on 165:2. The 280→360 re-lay is NOT taken here — a frame resize alone leaves a 280 interior in a 360 box.",
+   "why": "Sibling of 165:2. Measured this session: 280x812 while the shipped panel is 360. Notifications · load-error.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "168:26",
+   "page": "1:3",
+   "section": "1776:8382",
+   "skip_if_name_contains": "UX-I-24",
+   "append_to_name": " — UX-I-24: this diff is compareApprovedToCurrent (shared/utils/html/approvedCompare.ts:220), a DIFFERENT engine from the publish gate's own diffPages (StaleApprovalModal.tsx:38). Two answers to “what changed since approval” ship and the gate draws the weaker one. Same claim as 168:2.",
+   "why": "Sibling of 168:2. Renders a result of the same diff engine (Compare · overlay). Verified at HEAD.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "168:48",
+   "page": "1:3",
+   "section": "1776:8382",
+   "skip_if_name_contains": "UX-I-24",
+   "append_to_name": " — UX-I-24: this diff is compareApprovedToCurrent (shared/utils/html/approvedCompare.ts:220), a DIFFERENT engine from the publish gate's own diffPages (StaleApprovalModal.tsx:38). Two answers to “what changed since approval” ship and the gate draws the weaker one. Same claim as 168:2.",
+   "why": "Sibling of 168:2. Renders a result of the same diff engine (Compare · list). Verified at HEAD.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "168:82",
+   "page": "1:3",
+   "section": "1776:8382",
+   "skip_if_name_contains": "UX-I-24",
+   "append_to_name": " — UX-I-24: this diff is compareApprovedToCurrent (shared/utils/html/approvedCompare.ts:220), a DIFFERENT engine from the publish gate's own diffPages (StaleApprovalModal.tsx:38). Two answers to “what changed since approval” ship and the gate draws the weaker one. Same claim as 168:2.",
+   "why": "Sibling of 168:2. Renders a result of the same diff engine (Compare · no-changes). Verified at HEAD.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "169:2",
+   "page": "1:3",
+   "section": "1776:8382",
+   "skip_if_name_contains": "UX-I-24",
+   "append_to_name": " — UX-I-24: this diff is compareApprovedToCurrent (shared/utils/html/approvedCompare.ts:220), a DIFFERENT engine from the publish gate's own diffPages (StaleApprovalModal.tsx:38). Two answers to “what changed since approval” ship and the gate draws the weaker one. Same claim as 168:2.",
+   "why": "Sibling of 168:2. Renders a result of the same diff engine (Compare · single-page). Verified at HEAD.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "168:2",
+   "page": "1:3",
+   "section": "1776:8382",
+   "skip_if_name_contains": "UX-I-24",
+   "append_to_name": " — UX-I-24: and a further pairing, the one this sweep carries to the four sibling boards — the publish gate computes its OWN page-level diff (StaleApprovalModal.tsx:38 diffPages) rather than opening this one (shared/utils/html/approvedCompare.ts:220), and offers no door to it.",
+   "why": "CORRECTION to this sweep's first pass: 168:2's pre-existing note names DIFFERENT engines (FIG-G-12 Saves compare, W-N-23 published-version diff), so the siblings' 'Same claim as 168:2' was not yet true. Now it is.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "1339:7207",
+   "page": "1:3",
+   "section": "1776:8384",
+   "skip_if_name_contains": "UX-I-18",
+   "append_to_name": " — UX-I-18 also lands here: the ReviewBar Re-send calls the shell with no client email (ReviewBar.tsx:108 → AquibraStudio.tsx:401-421), which revokes the token the client is already holding, so the link in their inbox resolves to THIS screen while the editor reports success. Not-found (1339:7214) is its twin — one defect, two dead-link states.",
+   "why": "Sibling of 1339:7214. UX-I-18's mechanism produces BOTH dead-link states: token: null gives not-found, and the revoke of the old token gives revoked. Only the not-found half was marked.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  },
+  {
+   "id": "1736:8389",
+   "page": "1:6",
+   "section": "(loose on 1:6)",
+   "skip_if_name_contains": "UX-I-18",
+   "append_to_name": " — UX-I-18 also lands here: the ReviewBar Re-send calls the shell with no client email (ReviewBar.tsx:108 → AquibraStudio.tsx:401-421), revoking the token the client already holds, so their link resolves to THIS screen while the editor reports success. Not-found (1736:8397) is its twin — one defect, two dead-link states.",
+   "why": "The canonical of 1339:7207 on page 1:6. Editing only the 1:3 echo leaves the canonical silent.",
+   "applier": "scripts/figma/sweep-append-marks.mjs",
+   "status": "OK — read back 2026-09-07"
+  }
+ ],
+ "examined_and_cleared_by_the_dry_run": [
+  {
+   "id": "1339:7171",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (23:21 (S5.5 · landing-viewing)) matched what the board already said."
+  },
+  {
+   "id": "1340:7162",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (114:2 (S5.5 · commenting)) matched what the board already said."
+  },
+  {
+   "id": "1339:7193",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (122:3 (S5.5 · changes-requested)) matched what the board already said."
+  },
+  {
+   "id": "1339:7186",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (117:58 (S5.5 · approved)) matched what the board already said."
+  },
+  {
+   "id": "1340:7174",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (120:50 (S5.5 · post-approval-edited-since)) matched what the board already said."
+  },
+  {
+   "id": "1339:7200",
+   "why_cleared": "ALREADY-CORRECT — the dry run read the full name and it already carries its 1:6 canonical id. The 74-char section listing hid the clause; the mapping I had derived (121:2 (S5.5 · expired-token)) matched what the board already said."
+  }
+ ],
+ "examined_and_cleared_note": "1340:7174 (E · post-approval-edited) is NOT in this plan: its name is long enough that the dry run truncated before any canonical clause, so whether it shows the defect was not established. Not swept, not claimed clear — unread.",
+ "first_pass_rows_already_applied": "165:24 165:44 165:51 165:71 453:4051 168:26 168:48 168:82 169:2 1339:7207 (1:3) · 1736:8389 (1:6) — all OK, read back 2026-09-07",
+ "applied": "2026-09-07 — 11 rows OK, 0 SAME, 0 MISSING, 0 MISMATCH, every name read back from the file"
+}

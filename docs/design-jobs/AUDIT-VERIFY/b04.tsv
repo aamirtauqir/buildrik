@@ -1,0 +1,45 @@
+N	1706:8433	Modal · CMS records · no-collections	FRAME	940,36074,720,80	false	NONE	3	true
+K	1706:8434	TEXT	960,36090,652,17	true		Records
+K	1706:8435	FRAME	1616,36086,32,32	true	false	Close
+K	1706:8394	FRAME	956,36122,688,16	true	false	p
+C	1706:8433	texts=3
+T	1706:8395	956,36122,688,16	13	Regular	true	HEIGHT	p	No collections yet. Create one from an element's CMS binding first.
+T	1706:8436	1626,36092,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8434	960,36090,652,17	14	Semi Bold	true	HEIGHT	Modal · CMS records · no-collections	Records
+R	1706:8433	1170:4749	NAVIGATE	Modal · CMS records · no-collections
+N	1706:8437	Modal · CMS records · none-published	FRAME	1780,36074,720,162	false	NONE	4	true
+K	1706:8438	TEXT	1800,36090,652,17	true		Menu items — 12 records
+K	1706:8439	FRAME	2456,36086,32,32	true	false	Close
+K	1706:8396	FRAME	1796,36122,688,46	true	false	box
+K	1706:8441	FRAME	1780,36184,720,52	true	false	ModalFooter
+C	1706:8437	texts=4
+T	1706:8442	2397,36203,75,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · + Add record	+ Add record
+T	1706:8397	1806,36130,668,30	12	Regular	true	HEIGHT	box	No records published yet. Dynamic pages generate only from published records — and only on
+T	1706:8440	2466,36092,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8438	1800,36090,652,17	14	Semi Bold	true	HEIGHT	Modal · CMS records · none-published	Menu items — 12 records
+R	1706:8437	1170:4749	NAVIGATE	Modal · CMS records · none-published
+N	1706:8444	Modal · CMS records · empty	FRAME	100,36074,720,188	false	NONE	4	true
+K	1706:8445	TEXT	120,36090,652,17	true		Menu items — 0 records
+K	1706:8446	FRAME	776,36086,32,32	true	false	Close
+K	1706:8398	FRAME	116,36122,688,72	true	false	table
+K	1706:8448	FRAME	100,36210,720,52	true	false	ModalFooter
+C	1706:8444	texts=5
+T	1706:8449	717,36229,75,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · + Add record	+ Add record
+T	1706:8400	116,36158,688,16	13	Regular	true	HEIGHT	table	No records yet.
+T	1706:8399	128,36130,253,13	11	Regular	true	WIDTH_AND_HEIGHT	table	TITLE           PRICE           PHOTO           UPDATED
+T	1706:8447	786,36092,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8445	120,36090,652,17	14	Semi Bold	true	HEIGHT	Modal · CMS records · empty	Menu items — 0 records
+R	1706:8444	1170:4749	NAVIGATE	Modal · CMS records · empty
+N	1706:8451	Modal · CMS records · publish-error	FRAME	2620,36074,720,180	false	NONE	4	true
+K	1706:8452	TEXT	2640,36090,652,17	true		Menu items — 12 records
+K	1706:8453	FRAME	3296,36086,32,32	true	false	Close
+K	1706:8401	FRAME	2636,36122,688,64	true	false	rows
+K	1706:8455	FRAME	2620,36202,720,52	true	false	ModalFooter
+C	1706:8451	texts=5
+T	1706:8456	3237,36221,75,15	12	Medium	true	WIDTH_AND_HEIGHT	Button · + Add record	+ Add record
+T	1706:8403	2648,36160,172,15	12	Regular	true	WIDTH_AND_HEIGHT	rows	Can't publish: Price is required
+T	1706:8402	2648,36132,315,16	13	Regular	true	WIDTH_AND_HEIGHT	rows	Margherita          €9.00          published          2d ago
+T	1706:8454	3306,36092,12,16	13	Regular	true	WIDTH_AND_HEIGHT	Close	✕
+T	1706:8452	2640,36090,652,17	14	Semi Bold	true	HEIGHT	Modal · CMS records · publish-error	Menu items — 12 records
+R	1706:8451	1170:4749	NAVIGATE	Modal · CMS records · publish-error
+END	done=1706:8433|1706:8437|1706:8444|1706:8451	stopped=false	bytes=3223

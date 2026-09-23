@@ -57,20 +57,32 @@ function widthHint(id: Breakpoint): string {
   return `${minWidth}\u2013${maxWidth}px`;
 }
 
+/* The well is gray-50, which is the ground board 807:8321 sits its chips on
+   — and it is load-bearing for legibility, not decoration. Moving the resting
+   label to the board's ink-muted `var(--bk-gray-500)` (below) measures 4.39:1 on gray-100
+   `var(--bk-gray-100)`, i.e. an AA failure the board never had; on gray-50 `var(--bk-gray-50)` the same
+   ink is 5.0:1. Measured, not guessed. */
 const WELL_CLASS =
-  "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-[var(--bk-gray-100)] tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)]";
+  "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-[var(--bk-gray-50)] tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)]";
 
 /* Icon-only cells are fixed-size (w-8); labelled cells hug their text
    (w-auto + horizontal padding) — the `labelled` prop is known at render
    time, so branching in JS reproduces the old `.bk-bp-switcher--labelled
    .bk-bp-switcher__btn` descendant override without a modifier class. */
+/* Board 807:8069's breakpoint chips: 24 high on a 4 radius, the label 11px —
+   ink-muted at rest (807:8322/8323), and the SELECTED one filled --color/accent
+   with the label in white Semi Bold (807:8325/8326). It shipped a 6 radius,
+   12px labels in ink-soft, and a selected state that inverted the other way:
+   a WHITE cell with blue-700 text raised on a shadow. Both readings are legible;
+   the board's is the one the rest of the editor uses for a chosen thing
+   (Row's aria-selected, the rail's active bar, the publish stepper). */
 const BTN_BASE_CLASS =
-  "tw:h-6 tw:rounded-md tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
-  "tw:inline-flex tw:items-center tw:justify-center tw:font-medium tw:text-xs tw:leading-none " +
+  "tw:h-6 tw:rounded tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-[var(--bk-ink-muted)] " +
+  "tw:inline-flex tw:items-center tw:justify-center tw:font-medium tw:text-[11px] tw:leading-none " +
   "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)] tw:hover:text-[var(--bk-ink)] " +
   "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] " +
-  "tw:aria-[pressed=true]:bg-white tw:aria-[pressed=true]:text-blue-700 " +
-  "tw:aria-[pressed=true]:[box-shadow:var(--bk-shadow-raised)]";
+  "tw:aria-[pressed=true]:bg-[var(--bk-accent)] tw:aria-[pressed=true]:text-white " +
+  "tw:aria-[pressed=true]:font-semibold";
 
 export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwitcherProps>(
   function BreakpointSwitcher(
@@ -92,6 +104,12 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
           <button
             key={bp.id}
             type="button"
+            /* Per-cell anchor. The component has two call sites — the canvas
+               toolbar and PreviewOverlay — but they are mutually exclusive
+               states of the app (preview REPLACES the editor), so a target can
+               never resolve to two cells at once. measure.mjs refuses an
+               ambiguous target, which is the backstop if that ever changes. */
+            data-testid={`bp-cell-${bp.id}`}
             className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
             aria-pressed={value === bp.id}
             aria-label={`${bp.label} (${widthHint(bp.id)})`}

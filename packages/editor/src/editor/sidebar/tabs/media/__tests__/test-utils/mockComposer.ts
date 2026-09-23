@@ -29,6 +29,10 @@ export function mockComposer(opts: MockComposerOpts = {}): Composer {
     getStorage: vi.fn(() => opts.storage ?? { used: 0, total: 5_000_000_000 }),
     renameFolder: vi.fn(async () => {}),
     deleteFolder: vi.fn(async () => {}),
+    /* Clone 3585:23337 — "Manage in full library" hands the uploaded file to
+       the fullpage manager through the engine's own selection. */
+    selectAssets: vi.fn(),
+    getSelectedAssets: vi.fn(() => []),
   };
   return {
     media,

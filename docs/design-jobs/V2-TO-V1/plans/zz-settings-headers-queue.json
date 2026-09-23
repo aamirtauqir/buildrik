@@ -1,0 +1,567 @@
+[
+ {
+  "op": "text",
+  "id": "1703:10579",
+  "text": "DISTRIBUTION / Analytics",
+  "expect": "Analytics",
+  "why": "COVER-1-01 + UX-I-31 on 1703:10515 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10580",
+  "why": "COVER-1-01 on 1703:10515 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "Plausible",
+  "why": "COVER-1-01 on 1703:10515 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "PostHog",
+  "why": "COVER-1-01 on 1703:10515 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "'",
+  "why": "COVER-1-01 on 1703:10515 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10582",
+  "why": "COVER-1-01 on 1703:10515 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1702:7159",
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "why": "COVER-1-01 + UX-I-31 on 1702:7095 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7160",
+  "why": "COVER-1-01 on 1702:7095 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7162",
+  "why": "COVER-1-01 on 1702:7095 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1702:7325",
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "why": "COVER-1-01 + UX-I-31 on 1702:7261 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7326",
+  "why": "COVER-1-01 on 1702:7261 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7328",
+  "why": "COVER-1-01 on 1702:7261 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1702:6995",
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "why": "COVER-1-01 + UX-I-31 on 1702:6931 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1702:6996",
+  "why": "COVER-1-01 on 1702:6931 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1702:6998",
+  "why": "COVER-1-01 on 1702:6931 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1702:7489",
+  "text": "DISTRIBUTION / Domains",
+  "expect": "Domains",
+  "why": "COVER-1-01 + UX-I-31 on 1702:7425 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7490",
+  "why": "COVER-1-01 on 1702:7425 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1702:7492",
+  "why": "COVER-1-01 on 1702:7425 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "640:3441",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 640:3135 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "640:3442",
+  "why": "COVER-1-01 on 640:3135 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "640:3444",
+  "why": "COVER-1-01 on 640:3135 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9272",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9208 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9273",
+  "why": "COVER-1-01 on 1703:9208 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9275",
+  "why": "COVER-1-01 on 1703:9208 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8946",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8882 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8947",
+  "why": "COVER-1-01 on 1703:8882 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8949",
+  "why": "COVER-1-01 on 1703:8882 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9110",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9046 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9111",
+  "why": "COVER-1-01 on 1703:9046 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9113",
+  "why": "COVER-1-01 on 1703:9046 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9596",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9532 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9597",
+  "why": "COVER-1-01 on 1703:9532 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9599",
+  "why": "COVER-1-01 on 1703:9532 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9434",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9370 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9435",
+  "why": "COVER-1-01 on 1703:9370 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9437",
+  "why": "COVER-1-01 on 1703:9370 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8784",
+  "text": "PLUMBING / Forms",
+  "expect": "Forms",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8720 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8785",
+  "why": "COVER-1-01 on 1703:8720 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8787",
+  "why": "COVER-1-01 on 1703:8720 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "640:3095",
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "why": "COVER-1-01 + UX-I-31 on 640:2789 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "640:3096",
+  "why": "COVER-1-01 on 640:2789 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "HSTS",
+  "why": "COVER-1-01 on 640:2789 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "security poli'",
+  "why": "COVER-1-01 on 640:2789 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "640:3098",
+  "why": "COVER-1-01 on 640:2789 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7824",
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7760 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7825",
+  "why": "COVER-1-01 on 1703:7760 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "HSTS",
+  "why": "COVER-1-01 on 1703:7760 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "security poli'",
+  "why": "COVER-1-01 on 1703:7760 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7827",
+  "why": "COVER-1-01 on 1703:7760 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7670",
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7606 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7671",
+  "why": "COVER-1-01 on 1703:7606 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "HSTS",
+  "why": "COVER-1-01 on 1703:7606 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "security poli'",
+  "why": "COVER-1-01 on 1703:7606 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7673",
+  "why": "COVER-1-01 on 1703:7606 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7978",
+  "text": "PLUMBING / Headers",
+  "expect": "Headers",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7914 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7979",
+  "why": "COVER-1-01 on 1703:7914 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "HSTS",
+  "why": "COVER-1-01 on 1703:7914 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "security poli'",
+  "why": "COVER-1-01 on 1703:7914 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7981",
+  "why": "COVER-1-01 on 1703:7914 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7350",
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7286 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7351",
+  "why": "COVER-1-01 on 1703:7286 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7353",
+  "why": "COVER-1-01 on 1703:7286 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7191",
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7127 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7192",
+  "why": "COVER-1-01 on 1703:7127 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7194",
+  "why": "COVER-1-01 on 1703:7127 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:7509",
+  "text": "DISTRIBUTION / Localization",
+  "expect": "Localization",
+  "why": "COVER-1-01 + UX-I-31 on 1703:7445 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7510",
+  "why": "COVER-1-01 on 1703:7445 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:7512",
+  "why": "COVER-1-01 on 1703:7445 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "640:2746",
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "why": "COVER-1-01 + UX-I-31 on 640:2440 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "640:2747",
+  "why": "COVER-1-01 on 640:2440 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "640:2749",
+  "why": "COVER-1-01 on 640:2440 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8296",
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8232 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8297",
+  "why": "COVER-1-01 on 1703:8232 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8299",
+  "why": "COVER-1-01 on 1703:8232 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8458",
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8394 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8459",
+  "why": "COVER-1-01 on 1703:8394 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8461",
+  "why": "COVER-1-01 on 1703:8394 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8134",
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8070 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8135",
+  "why": "COVER-1-01 on 1703:8070 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8137",
+  "why": "COVER-1-01 on 1703:8070 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:8620",
+  "text": "PLUMBING / Redirects",
+  "expect": "Redirects",
+  "why": "COVER-1-01 + UX-I-31 on 1703:8556 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8621",
+  "why": "COVER-1-01 on 1703:8556 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:8623",
+  "why": "COVER-1-01 on 1703:8556 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "640:4155",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 640:3849 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "640:4156",
+  "why": "COVER-1-01 on 640:3849 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "640:4158",
+  "why": "COVER-1-01 on 640:3849 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9921",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9857 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9922",
+  "why": "COVER-1-01 on 1703:9857 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9924",
+  "why": "COVER-1-01 on 1703:9857 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:10416",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 1703:10352 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10417",
+  "why": "COVER-1-01 on 1703:10352 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10419",
+  "why": "COVER-1-01 on 1703:10352 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:10086",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 1703:10022 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10087",
+  "why": "COVER-1-01 on 1703:10022 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10089",
+  "why": "COVER-1-01 on 1703:10022 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:9758",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 1703:9694 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9759",
+  "why": "COVER-1-01 on 1703:9694 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:9761",
+  "why": "COVER-1-01 on 1703:9694 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ },
+ {
+  "op": "text",
+  "id": "1703:10249",
+  "text": "PLUMBING / Webhooks",
+  "expect": "Webhooks",
+  "why": "COVER-1-01 + UX-I-31 on 1703:10185 \u2014 DrillInHeader renders no subtitle and no primary; the title becomes the breadcrumb."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10250",
+  "why": "COVER-1-01 on 1703:10185 \u2014 the drawn subtitle is a thing DrillInHeader cannot render (DrillInHeader.tsx:12-47). Hidden, not deleted."
+ },
+ {
+  "op": "hide",
+  "id": "1703:10252",
+  "why": "COVER-1-01 on 1703:10185 \u2014 the drawn header primary is a thing DrillInHeader cannot render; the sticky savebar at the foot of the pane IS the control (SettingsTab.tsx:883-903)."
+ }
+]

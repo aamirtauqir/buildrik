@@ -1,0 +1,46 @@
+[
+  {
+    "finding": "UX-I-22",
+    "page": "1:3",
+    "section": "1776:8383",
+    "source_board": "156:2",
+    "source_name": "Review panel · open",
+    "source_id_source": "read-from-file 2026-09-07 (section listing) — 280x812, section 1776:8383",
+    "new_name": "Review panel · viewer — read-only",
+    "apply_with": "node scripts/figma/add-state-board.mjs 156:2 \"Review panel · viewer — read-only\" --apply",
+    "wire_from": "NONE — add-state-board's --wire-from needs a node id inside a board and no verified id exists for a role/permission control. Wire it after the follow-up pass below, from the Send-for-review disabled row.",
+    "why": "The panel computes the user's role and spends it in exactly one place — Send for review's disabledReason (ReviewTab.tsx:146,479). Resolve, Reopen, Reattach, Revoke/Withdraw and Re-send all render live for a VIEWER and are refused by the server after the click. The pattern the codebase already uses (a named disabled reason) sits two lines away. A control that is live for someone who cannot use it is worse than one that is visibly shut.",
+    "follow_up_pass_REQUIRED": {
+      "note": "The clone alone does not express the finding. A second pass must draw the shut state. No node ids inside 156:2 were ever read, so every target below is a SELECTOR, not an id.",
+      "steps": [
+        "Set every mutating control on the clone to the disabled treatment: label #6B7280 (ink-muted), fill #F3F4F6 (bg-app), border #E5E7EB, opacity 1 (never opacity-fade — the DS has a disabled token set, not a dimmer).",
+        "Controls to shut, by label text within the clone: 'Resolve', 'Reopen', 'Reattach', 'Revoke link', 'Withdraw request', 'Re-send for review', and the reply composer's send.",
+        "Add ONE named reason line, Inter Regular 12/18, #6B7280, directly under the panel header, full width less 16px padding each side: \"You have view-only access to this site. Ask an editor to resolve or re-send.\"",
+        "Do NOT hide any control. The finding is that they are live and unexplained; hiding them replaces one unexplained state with another."
+      ]
+    },
+    "status_if_applied": "IMPLEMENTED only after the follow-up pass AND a read-back of the clone's id, name, section parent and the reason line's characters."
+  },
+  {
+    "finding": "UX-I-26",
+    "page": "1:3",
+    "section": "1776:8383",
+    "source_board": "157:109",
+    "source_name": "Review panel · resolved-expanded",
+    "source_id_source": "read-from-file 2026-09-07 (section listing) — 280x812, section 1776:8383; chosen because it is the state that already draws expanded comment rows, which is where an inline reply has to live",
+    "new_name": "[design-ahead] Review panel · per-comment reply — the reply box moves onto the comment row beside Resolve; comments are flat today (no parentId in the schema) so nothing can produce this yet (ReviewTab.tsx:242-258,793-812)",
+    "apply_with": "node scripts/figma/add-state-board.mjs 157:109 \"[design-ahead] Review panel · per-comment reply — the reply box moves onto the comment row beside Resolve; comments are flat today (no parentId in the schema) so nothing can produce this yet (ReviewTab.tsx:242-258,793-812)\" --apply",
+    "wire_from": "NONE",
+    "why": "One reply box at the foot posts against comments[0].pageId, so an answer to the third comment attaches to the first comment's page. The recommendation is a reply per comment, inline on the row the way Resolve already is. It is marked [design-ahead], not [not-implemented], because the blocker is a schema field rather than a missing renderer — apply-truth-marks' three markers make exactly this distinction and collapsing them loses it.",
+    "follow_up_pass_REQUIRED": {
+      "note": "Selectors only — no node id inside 157:109 was read.",
+      "steps": [
+        "On the clone, remove the global composer band at the foot (the Textarea + send that sits outside every group).",
+        "On ONE expanded comment row, add an inline reply affordance beside the existing Resolve control: a 'Reply' text button, Inter Medium 12/18, #1A56DB, 8px to the left of Resolve.",
+        "Under that row only, draw the open composer: a 1px #D1D5DB box, radius 6, 248 wide (280 less 16px padding each side), 64 tall, placeholder 'Reply to Sara…' Inter Regular 12/18 #6B7280, with a 'Post reply' primary 32-high button right-aligned beneath it.",
+        "Replace the old helper text 'Replies are internal notes on the thread' with 'Internal note on this comment — the client does not see it.' The old string does not say which thread, which is half the finding."
+      ]
+    },
+    "status_if_applied": "IMPLEMENTED only after the follow-up pass AND a read-back."
+  }
+]

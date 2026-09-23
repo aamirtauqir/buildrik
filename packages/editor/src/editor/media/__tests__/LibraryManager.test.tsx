@@ -21,7 +21,8 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
-import type { LibraryItem, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import { makeComposer, makeItem, makeMediaState } from "./libraryFixture";
 
 // ─── Hoisted mock state ──────────────────────────────────────────────────────
 
@@ -60,118 +61,6 @@ vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({
 vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({
   AssetDetailOverlay: () => null,
 }));
-
-// ─── Factory: minimal valid MediaStateResult ─────────────────────────────────
-
-function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
-  return {
-    key: "asset-1",
-    name: "logo.png",
-    type: "img",
-    src: "https://example.com/logo.png",
-    size: 1024,
-    createdAt: new Date().toISOString(),
-    mimeType: "image/png",
-    assetSource: "uploaded",
-    ...over,
-  };
-}
-
-function makeMediaState(over: Partial<MediaStateResult> = {}): MediaStateResult {
-  const noop = vi.fn();
-  const noopAsync = vi.fn(() => Promise.resolve());
-  return {
-    activeType: "all",
-    activeTypes: new Set(),
-    toggleType: vi.fn(),
-    setFmtFilter: vi.fn(),
-    setGridN: vi.fn(),
-    setType: noop,
-    currentFolderId: null,
-    setCurrentFolderId: noop,
-    libraryItems: [],
-    folders: [],
-    createFolder: noopAsync,
-    deleteFolder: noopAsync,
-    moveAsset: noopAsync,
-    bulkMoveAssets: noopAsync,
-    uploadQueue: [],
-    counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
-    sort: "date",
-    sortDir: "desc",
-    gridN: 3,
-    fmtFilter: "all",
-    selMode: false,
-    selectedKeys: new Set<string>(),
-    setSort: noop,
-    toggleSelMode: noop,
-    toggleSelect: noop,
-    selectAll: noop,
-    upload: noop,
-    failedUploads: [],
-    dismissFailedUploads: noop,
-    requestDelete: noop,
-    requestBulkDelete: noop,
-    executeDelete: noopAsync,
-    cancelDelete: noop,
-    confirmDelete: null,
-    insertToCanvas: noop,
-    renameItem: noopAsync,
-    updateItem: noopAsync,
-    stockPhotos: [],
-    stockVideos: [],
-    discIcons: [],
-    discFonts: [],
-    discLoading: { img: false, vid: false, ico: false, fnt: false },
-    discoverySearch: "",
-    isDiscoveryEmpty: true,
-    discOrientation: "all",
-    discColor: "all",
-    discSearchAll: noop,
-    setDiscOrientation: noop,
-    setDiscColor: noop,
-    loadMoreDisc: noopAsync,
-    saveToLibrary: noopAsync,
-    panelDragOver: false,
-    handlePanelDragEnter: noop,
-    handlePanelDragLeave: noop,
-    handlePanelDragOver: noop,
-    handlePanelDrop: noop,
-    librarySearch: "",
-    setLibrarySearch: noop,
-    storage: { used: 0, total: 1024 * 1024 * 1024 },
-    copyUrl: noop,
-    ctxMenu: null,
-    openCtxMenu: noop,
-    closeCtxMenu: noop,
-    detailItem: null,
-    openDetail: noop,
-    closeDetail: noop,
-    selectionContext: null,
-    setSelectionContext: noop,
-    ...over,
-  } as MediaStateResult;
-}
-
-// ─── Composer mock ───────────────────────────────────────────────────────────
-
-function makeComposer(usages: Record<string, number> = {}) {
-  return {
-    mediaOps: {
-      getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
-      insertMedia: vi.fn(),
-      // Real shape: `{ replaced: ElementId[]; failed: ElementId[] }`.
-      // The replace-all picker reads `result.replaced.length` and
-      // `result.failed.length` — returning a number here would crash the
-      // first test that exercises the picker click path.
-      replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
-    },
-    media: {
-      getAssets: () => [] as Array<{ key: string; tags?: string[] }>,
-      getAssetSrc: vi.fn(() => Promise.resolve(null)),
-    },
-  } as unknown as Parameters<typeof import("../LibraryManager").LibraryManager>[0]["composer"];
-}
 
 // ─── Mount helper ────────────────────────────────────────────────────────────
 
@@ -232,7 +121,7 @@ describe("LibraryManager — D5 baseline", () => {
     expect(screen.getByText(/No assets match "asdf"/)).toBeInTheDocument();
   });
 
-  it("shows the asset count in the grid footer", async () => {
+  it("shows the asset count and scope in the toolbar count line", async () => {
     const items = [
       makeItem({ key: "a", name: "one.png" }),
       makeItem({ key: "b", name: "two.png", src: "https://example.com/two.png" }),
@@ -243,9 +132,8 @@ describe("LibraryManager — D5 baseline", () => {
         counts: { all: 2, img: 2, vid: 0, ico: 0, fnt: 0 },
       })
     );
-    // Footer reads "Showing N of M"
-    expect(screen.getByText(/Showing/)).toBeInTheDocument();
-    const strong = screen.getAllByText("2");
-    expect(strong.length).toBeGreaterThan(0);
+    // Clone 3695:45155 — "2 files · All assets"; the grid foot that used to
+    // read "Showing N of M" is gone (LibraryManager.clone.test.tsx).
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
   });
 });

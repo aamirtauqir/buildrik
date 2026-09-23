@@ -81,6 +81,12 @@ const ALLOWED = {
   "templates.cloneFromSite": "\"Save this site as a template\" has no entry point. FOUNDER DECISION.",
   "media.moveFolder": "Re-parents a folder; the media UI is deliberately a flat folder list.",
   "userTemplates.delete": "Editor lane: templateSync saves and lists user templates but never deletes one.",
+  "sites.schedulePublish":
+    "Scheduled publish: service + cron route + ScheduledPublish table landed 2026-09-09; the editor's scheduling UI is the next step. FOUNDER DECISION — build the UI or drop the three endpoints.",
+  "sites.cancelScheduledPublish":
+    "Scheduled publish: cancel half of the same unbuilt UI. See sites.schedulePublish.",
+  "sites.getScheduledPublish":
+    "Scheduled publish: read half of the same unbuilt UI. See sites.schedulePublish.",
 };
 
 /** Every procedure the app router exposes, as its full dotted path. */

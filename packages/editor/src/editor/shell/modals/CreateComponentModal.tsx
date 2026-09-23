@@ -137,8 +137,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg">
-        <ModalTitle>Create Component</ModalTitle>
+      <ModalContent size="lg" data-testid="create-component-modal">
+        <ModalTitle data-testid="create-component-title">Create Component</ModalTitle>
         <ModalClose aria-label="Close modal">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -147,7 +147,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <ModalBody>
     <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
       <div>
-        <label className={FIELD_LABEL}>
+        <label className={FIELD_LABEL} data-testid="create-component-name-label">
           Name <span className="tw:text-[var(--bk-accent-text)]">*</span>
         </label>
         <TextInput
@@ -155,6 +155,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Hero Section"
+          data-testid="create-component-name"
           autoFocus
         />
       </div>
@@ -165,6 +166,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Optional description..."
+          data-testid="create-component-description"
           rows={3}
           className="tw:min-h-15 tw:resize-y tw:bg-white"
         />
@@ -177,6 +179,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="e.g., Headers, Footers, Cards"
+          data-testid="create-component-category"
         />
       </div>
 
@@ -187,17 +190,21 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="e.g., responsive, dark-mode (comma-separated)"
+          data-testid="create-component-tags"
         />
-        <small className={HINT}>Comma-separated tags for easier searching</small>
+        <small className={HINT} data-testid="create-component-tags-hint">
+          Comma-separated tags for easier searching
+        </small>
       </div>
 
       {/* GAP-FIX: Variant Options Section */}
       <div className={SUB_SECTION}>
-        <label className={FIELD_LABEL}>Variant Options</label>
-        <label className={CHECK_LABEL}>
+        <label className={FIELD_LABEL} data-testid="create-component-variant-label">Variant Options</label>
+        <label className={CHECK_LABEL} data-testid="create-component-variant-check-label">
           <Checkbox
             color="blue"
             className="tw:bg-white tw:size-4 tw:cursor-pointer"
+            data-testid="create-component-variant-toggle"
             checked={isVariantSet}
             onChange={(e) => setIsVariantSet(e.target.checked)}
           />
@@ -205,13 +212,25 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         </label>
 
         {isVariantSet && (
-          <div className="tw:mt-3 tw:p-3 tw:rounded-lg tw:bg-[var(--bk-bg-subtle)]">
-            <small className={HINT}>Select variant properties:</small>
+          <div
+            /* Board 1712:8412 fills this panel --flowbite/gray/50, not
+               --bk-bg-subtle, and the difference is not cosmetic: its two
+               hints are --bk-ink-muted (`var(--bk-gray-500)`), which lands at 4.39:1 on
+               `var(--bk-gray-100)` — under the 4.5 floor — and 4.66:1 on `var(--bk-gray-50)`. The
+               conformance run flagged both lines; the board's own fill is the
+               fix. */
+            className="tw:mt-3 tw:p-3 tw:rounded-lg tw:bg-[var(--bk-gray-50)]"
+            data-testid="create-component-variant-panel"
+          >
+            <small className={HINT} data-testid="create-component-variant-hint">
+              Select variant properties:
+            </small>
             <div className="tw:flex tw:flex-wrap tw:gap-2 tw:mt-2">
               {VARIANT_PRESETS.map((preset) => (
                 <Button
                   key={preset.name}
                   type="button"
+                  data-testid={`create-component-variant-chip-${preset.name}`}
                   onClick={() => toggleVariantProp(preset.name)}
                   className={`${CHIP} ${
                     selectedVariantProps.includes(preset.name)
@@ -220,7 +239,14 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   }`}
                 >
                   {preset.name}
-                  <span className="tw:ml-0.5 tw:text-xs tw:opacity-70">({preset.values.join(", ")})</span>
+                  {/* `tw:opacity-70` was here. --bk-ink-soft on --bk-bg-subtle is 6.4:1;
+                      at 70% it folds to 3.4:1, under the 4.5 floor for 12px text —
+                      measured once the contrast sweep was pointed at the real
+                      dialog (it had been scoped to a subtree the portalled modal
+                      is not in, so this read as a clean screen). No board draws
+                      this chip's value list, so nothing is conformed away: the
+                      smaller size already says it is secondary. */}
+                  <span className="tw:ml-0.5 tw:text-xs">({preset.values.join(", ")})</span>
                 </Button>
               ))}
             </div>
@@ -231,10 +257,11 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
       {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
       <div className={SUB_SECTION}>
-        <label className={CHECK_LABEL}>
+        <label className={CHECK_LABEL} data-testid="create-component-prefill-label">
           <Checkbox
             color="blue"
             className="tw:bg-white tw:size-4 tw:cursor-pointer"
+            data-testid="create-component-prefill-toggle"
             checked={prefillFromDs}
             onChange={(e) => setPrefillFromDs(e.target.checked)}
           />
@@ -251,10 +278,10 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
     </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+          <Button color="light" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+          <Button data-testid="create-component-submit" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
             {isCreating ? "Creating..." : "Create component"}
           </Button>
         </ModalFooter>
@@ -272,6 +299,12 @@ const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 /** Section separated by a rule — variant options, DS prefill. */
 const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]";
 const CHECK_LABEL = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
-const CHIP = "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-[var(--bk-gray-200)] tw:text-xs tw:font-medium";
+/* `tw:h-7` is load-bearing and must set HEIGHT, not padding. These are flowbite
+   Buttons, whose own `tw:h-10` only loses to a utility setting the SAME
+   property — the class list here had px/py and no height, so every variant chip
+   shipped 40px tall against board 1712:8416's 28 (CLAUDE.md §Chrome, "a
+   DIFFERENT property does not conflict and loses"). The modal footer's
+   `[&_button]:h-7` does not reach these; they sit in the body. */
+const CHIP = "tw:flex tw:h-7 tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-[var(--bk-gray-200)] tw:text-xs tw:font-medium";
 
 export default CreateComponentModal;

@@ -106,8 +106,13 @@ export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
    merge — two `tw:h-*` classes would both compile and source order, not
    intent, would pick the winner. */
 const SIZE_CLASS: Record<"drawer" | "panel", string> = {
+  /* `leading-4` is the missing half of the T3 measurement below: every board
+     that draws this bar gives its title 11px on a 16px line box
+     (`I208:171;16:7`, `I781:4490;16:7`, `I1138:13414;16:7`), and the class
+     list carried the size without the line-height, so the label sat on the
+     font's own ~13px normal. */
   drawer:
-    "tw:h-11 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)]",
+    "tw:h-11 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)]",
   panel:
     "tw:h-12 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
 };
@@ -118,7 +123,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
       className={[
         // T3 — MEASURED, not read off a PNG (2026-08-04). Figma `148:2`'s header
         // instance `208:411`, title node `I208:411;16:7`: Inter Medium (500),
-        // 11px, 16px line-height, 0.88px tracking, ink-soft #4B5563, and the
+        // 11px, 16px line-height, 0.88px tracking, ink-soft `var(--bk-gray-600)`, and the
         // layer's own text is "Content" — Title Case, no transform.
         //
         // So the size, weight, tracking and colour here were already right and
@@ -144,7 +149,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
           beside it, the heading's accessible name became "SEOSearch & social
           preview", and any action label in here would have joined it. Caught by
           SettingsTab's pending-nav test, which asserted the heading read "SEO". */}
-      <span className="tw:flex-1" role="heading" aria-level={2}>
+      <span className="tw:flex-1" role="heading" aria-level={2} data-testid="panel-header-title">
         {title}
       </span>
       <PanelHeaderActions

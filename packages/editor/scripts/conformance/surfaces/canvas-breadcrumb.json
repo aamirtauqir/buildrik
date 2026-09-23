@@ -1,0 +1,123 @@
+{
+  "surface": "canvas-breadcrumb",
+  "board": "Canvas · breadcrumb bar (Figma 1175:4849)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "canvas-crumb-bar"
+    }
+  ],
+  "contrastScope": "[data-testid=\"canvas-crumb-bar\"]",
+  "targets": [
+    {
+      "name": "bar",
+      "testId": "canvas-crumb-bar",
+      "spec": "canvas-breadcrumb",
+      "nodeId": "1175:4849"
+    },
+    {
+      "name": "seg-root",
+      "testId": "canvas-crumb-seg-0",
+      "spec": "canvas-breadcrumb",
+      "nodeId": "1175:4850"
+    },
+    {
+      "name": "seg-root-label",
+      "testId": "canvas-crumb-seg-0",
+      "spec": "canvas-breadcrumb",
+      "nodeId": "1175:4851"
+    },
+    {
+      "name": "seg-current",
+      "testId": "canvas-crumb-seg-current",
+      "spec": "canvas-breadcrumb",
+      "nodeId": "1175:4859"
+    },
+    {
+      "name": "seg-current-label",
+      "testId": "canvas-crumb-seg-current",
+      "spec": "canvas-breadcrumb",
+      "nodeId": "1175:4860"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE at 1440x900 (the board's own frame is 720x36 — a component",
+    "board, not a screen), reached by inserting a Section, which selects it and is",
+    "what makes the bar render at all. 23/23, 0 contrast failures.",
+    "",
+    "THE ALPHA QUESTION, SETTLED AGAINST THE BOARD AND AGAINST A CALCULATOR. The",
+    "board fills the bar `--color/bg-overlay` = rgba(17,24,39,0.5); the code runs",
+    "0.75. `lib.mjs` drops alpha before comparing (Figma cannot export a layer",
+    "opacity), so both read #111827 and the join passes either way — which means",
+    "the diff CANNOT decide this and the contrast sweep has to. At 0.5 over a light",
+    "canvas the bar composites to #888C93; at 0.75 to #4D525D. The code's own",
+    "comment already records that a previous claim of 6.99:1 was really 1.34:1 for",
+    "exactly this reason. Everything on the bar is legible at 0.75 and the",
+    "secondary labels would not be at 0.5, so the code's 0.75 stands and the",
+    "board's 0.5 is recorded here rather than adopted. The founder's question in",
+    "the brief — verify the breadcrumb fix against this board — answers: the fix is",
+    "right, and the board is where the 0.5 came from.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  bar radius   8 (1175:4849). It shipped square.",
+    "  segment type 10px on `leading-[normal]` (1175:4851 and its three siblings).",
+    "               It ran at `--bk-text-11` with `leading-none`. The 11px floor of",
+    "               the type ramp is a CHROME rule; these are canvas-overlay labels",
+    "               inside 20px pills, and at 4.83:1 on white the size costs no",
+    "               legibility.",
+    "  root pill    WHITE (1175:4850). The `Canvas` segment renders `disabled` —",
+    "               there is nowhere above it to go — and flowbite's disabled",
+    "               variant paints gray-100 straight through a plain `bg-white`",
+    "               utility, so the FIRST pill in the bar was grey. Same defect",
+    "               class as the DSModeToggle hover that repainted its own selected",
+    "               segment; `disabled:bg-white` is the fix.",
+    "",
+    "NOT CONFORMED — three groups, all of them because the board asks for text",
+    "nobody can read. Computed, not eyeballed, against the bar's composited",
+    "#4D525D or the pills' white:",
+    "  1175:4854 / 4857  the `Section · Hero` and `Container` labels in",
+    "            `--flowbite/gray/300` #d1d5db — INSIDE a white pill. That is",
+    "            1.47:1. Their sibling 1175:4851 is gray-500 on the same white",
+    "            pill (4.83:1), which is what all three live segments use, so the",
+    "            board contradicts itself within one bar and only one of the two",
+    "            answers is legible.",
+    "  1175:4852 / 4855 / 4858  the `›` separators in gray-500 ON THE BAR: 1.76:1.",
+    "            Live they are gray-300, which is 5.32:1 there.",
+    "  1175:4862 / 4863  `← Parent` / `→ Child` at 9px in gray-400 on the bar:",
+    "            3.12:1, and 9px is below the ramp. Live they are 11px gray-300.",
+    "  Every one of these is a case of the board specifying a colour for the wrong",
+    "  surface — gray-500 belongs on white, gray-300 belongs on the bar, and the",
+    "  board has them swapped. A board cannot authorise a contrast failure.",
+    "",
+    "NOT TAKEN — the board's frame is 720 wide with a radius, i.e. a FLOATING bar;",
+    "live it spans the canvas column edge to edge. The radius is now there, the",
+    "floating layout is not: 1175:4849's width is also just the board's own frame",
+    "size, so there is no way to tell a 720 pill from a full-bleed bar drawn at 720.",
+    "Left alone deliberately rather than guessed at.",
+    "",
+    "boards.json's row is confirmed on its own terms: live prints `← Parent` /",
+    "`→ Child` and both work, while the board's `Alt+↑ / Alt+↓` are not bound.",
+    "This board draws the arrows too, so that half is no longer a disagreement."
+  ]
+}

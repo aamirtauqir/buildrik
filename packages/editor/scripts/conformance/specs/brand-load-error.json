@@ -1,0 +1,171 @@
+{
+  "surface": "brand-load-error",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "781:4311",
+  "boardName": "brand-load-error",
+  "figmaHash": "fdb9357d2a6bdc32a6db18c8a0f64a033a54511d75d19b4af3bfd60acd4ed034",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:07:23.258Z",
+  "copy": [
+    "Brand",
+    "Couldn’t load your brand system.",
+    "Your tokens are safe — only this list failed to load.",
+    "Try again"
+  ],
+  "targets": [
+    {
+      "nodeId": "781:4311",
+      "name": "Brand · load-error",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4312",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I781:4312;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4368",
+      "name": "Load error",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-[280px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-bottom": {
+          "value": "32px"
+        },
+        "padding-top": {
+          "value": "36px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4369",
+      "name": null,
+      "className": "relative shrink-0 text-[13px] text-[color:var(--color\\/error-text,#c81e1e)] w-full",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4370",
+      "name": null,
+      "className": "relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] w-full",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4371",
+      "name": null,
+      "className": "relative shrink-0 text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] w-full",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4345",
+      "name": "hotspot/back · Brand · root",
+      "className": "absolute h-[34px] left-[-1px] top-[777px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "881:4584",
+      "name": "hotspot/alt · Brand · root",
+      "className": "bg-[rgba(0,0,0,0)] h-[32px] opacity-0 relative shrink-0 w-[220px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "220px"
+        }
+      }
+    }
+  ]
+}

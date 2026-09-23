@@ -1,0 +1,112 @@
+{
+  "surface": "media-drill-in-stock-browser",
+  "board": "Media · drill-in · stock-browser (Figma 147:55)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-stock-browser",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "stock-loading-more"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE WAIT NAMES THE LOADING ROW, not the overlay root. The probe case runs",
+    "with `loading={{ img: true }}` because the board draws BOTH the results",
+    "and the 'Loading 8 more…' row, and that row is the one state on this",
+    "screen a click cannot produce — a wait on `media-stock-browser` would have",
+    "resolved before it rendered and measured a screen without it.",
+    "",
+    "BOARD WON, four times: 147:55 gives the frame the drawer's",
+    "--flowbite/gray/100 edge (the overlay drew none, so border-color computed",
+    "#000000 — fourth time in this family); 147:65 puts the filter row at 2",
+    "top/bottom where it shipped 4; 147:87 makes the loading line a 32-high row",
+    "of its own; 147:88 puts that line at 12/18 where it shipped 13/20; and",
+    "147:89 gives Load more a 36-high row where it was a bare centred link on a",
+    "16 bottom pad.",
+    "",
+    "THE RESULTS GRID IS NOT JOINED, and that is the largest thing on the",
+    "board. 147:72 / 147:73 / 147:74 / 147:75 draw two 136-wide cards per row",
+    "on a 16 gutter with a 16 gap and a 76-tall thumb. Board 75:6 draws the",
+    "same results THREE up on a 12 gutter with an 8 gap and a 66-tall thumb —",
+    "a contact sheet rather than two big cards — and boards.json has 75:2",
+    "recorded drift-fixed against the shipped three-up markup as of 2026-09-08.",
+    "Two boards disagree; the verified one stands. The 136 is also the",
+    "superseded 320 drawer's arithmetic (320 less a 16 gutter, halved), the",
+    "same frame-scale supersession PageCommandPalette's own comment records.",
+    "",
+    "NOT JOINED, and why: 147:63, the search field — chrome-ui TextInput,",
+    "boards.json authority=open:input-fill. 147:62, the row around it, repeats",
+    "147:9's export artifact: a border and radius on a full-bleed 36-high frame",
+    "wrapping a 28-high field that carries its own. 147:67 / 147:69 / 147:71,",
+    "the dropdown labels, have no anchor of their own — FilterDropdown takes",
+    "one `testid` and the trigger owns it; the three triggers ARE joined.",
+    "147:90 is a text frame at w-248, which is the row's width less its inset,",
+    "not a decision about the label. 1720:17505 and 2865:21976 are hotspots —",
+    "and 2865:21976's own name records that Insert-to-canvas does not exist in",
+    "this 280 overlay at all (StockBrowserOverlay saves only), which is a",
+    "missing verb, not drift.",
+    "",
+    "147:89 (Load more) IS BUILT BUT NOT MEASURED HERE, and the reason is the",
+    "board rather than the code: 147:87 and 147:89 are drawn stacked, and in the",
+    "product they are mutually exclusive — `Loading 8 more…` renders while",
+    "`isLoading`, `Load more` renders while it is not. No single screen can show",
+    "both, so a recipe pinned to one state can only anchor one of them, and the",
+    "loading row is the one no click can reach. The 36-high row it now sits in",
+    "is the board's (147:89) and is anchored `stock-load-more-row` for whoever",
+    "boards the idle state."
+  ],
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-stock-browser",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:55"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "208:401"
+    },
+    {
+      "name": "back-row",
+      "testId": "media-stock-back",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:60"
+    },
+    {
+      "name": "filter-row",
+      "testId": "stock-filter-row",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:65"
+    },
+    {
+      "name": "filter-orientation",
+      "testId": "stock-filter-orientation",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:66"
+    },
+    {
+      "name": "filter-colour",
+      "testId": "stock-filter-colour",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:68"
+    },
+    {
+      "name": "filter-type",
+      "testId": "stock-filter-type",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:70"
+    },
+    {
+      "name": "loading-row",
+      "testId": "stock-loading-more",
+      "spec": "media-drill-in-stock-browser",
+      "nodeId": "147:87"
+    }
+  ]
+}

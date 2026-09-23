@@ -364,6 +364,70 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     },
   );
 
+  /* THE ONE RECOVERABLE FAILURE THAT KEPT NOTHING. With a siteId the save is a
+     bare RPC, so a refused save leaves the work in the tab and nowhere else —
+     which is exactly why the network branch writes a recovery snapshot, and
+     why `unsavedRecovery`'s header says a reload otherwise seeds "Saved just
+     now" over discarded work. A 401 lands in the same state and can still be
+     saved once the user signs in, and it was the only such branch that kept
+     no copy. `missing` and `forbidden` stay uncovered on purpose: nothing can
+     ever be saved to those sites. */
+  it.each(AUTH_ERRORS)("%s keeps the work for the reload, like a network failure does", async (raw) => {
+    const url = new URL("http://localhost:3000/edit/site_auth");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site_auth");
+    try {
+      const opts = makeOpts();
+      svc.saveProject.mockRejectedValueOnce(new Error(raw));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+          onAuthExpired: vi.fn(),
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      const kept = localStorage.getItem("bk-unsaved-v1-site_auth");
+      expect(kept).not.toBeNull();
+      expect(JSON.parse(kept!).project).toEqual({ pages: [] });
+    } finally {
+      localStorage.removeItem("bk-unsaved-v1-site_auth");
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
+  it("FORBIDDEN keeps nothing — a site you cannot save to has no work to restore", async () => {
+    const url = new URL("http://localhost:3000/edit/site_forbidden");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    localStorage.removeItem("bk-unsaved-v1-site_forbidden");
+    try {
+      const opts = makeOpts();
+      svc.saveProject.mockRejectedValueOnce(new Error("FORBIDDEN"));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).toBeNull();
+    } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
   it.each(["FORBIDDEN", "403 Forbidden"])(
     "%s tells the role truth — no Sign in, no recovery surface",
     async (raw) => {

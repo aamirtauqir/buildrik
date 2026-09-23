@@ -1,0 +1,94 @@
+{
+  "surface": "pages-load-error",
+  "board": "Pages · load-error (Figma 141:165)",
+  "_note": [
+    "`usePages` only sets `loadError` from a failed project sync, which no click",
+    "reaches, so the probe mounts the composition PagesTab itself renders —",
+    "PanelFrame(bd-pg-panel) > Header > Body(noScroll) > PageList — with the props",
+    "the tab would have computed. The board's whole point is that the frame SURVIVES",
+    "the error: the search band and the Add-page foot both stay, with the error",
+    "between them. PagesTab.css is loaded by the probe for the same reason it loads",
+    "history.css — the stylesheet reaches the app through PagesTab.tsx, and without",
+    "it this measured 16px black text on a 0-radius search box.",
+    "",
+    "MEASURED but NOT joined, and why:",
+    "  141:171 (search box) — bg, border, 28h and radius 6 all match; its width does",
+    "  not, by 1.58px. That width is not a spec: the box is `flex: 1`, so 166 is",
+    "  whatever the board's own '⊞ Listings' label left over. Pinning 166 would",
+    "  freeze the box at the 280 drawer and break the 700 expand. 1.6px of font",
+    "  metrics is not drift worth a fixed width.",
+    "  141:201 (Add-page foot) — 36 on the board, 54 shipped. The board draws one",
+    "  '+ Add page' link; the shipped foot also carries 'From template' (founder",
+    "  call 2026-08-28, after the template route proved invisible in the ⋮) and the",
+    "  ⋮ that holds 'New folder'. The extra height is those controls, not padding",
+    "  drift — the label inside it (141:202) matches exactly and IS joined.",
+    "  141:170 (the Search band) — the board gives the band a 1px border and a 6px",
+    "  radius of its own, which would draw a second box around the box. Nothing in",
+    "  the board's own screenshot shows two frames; the inner control is the one",
+    "  that carries the treatment, and it is measured above."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-load-error",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "pages-load-error"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "pages-load-error",
+      "nodeId": "208:171"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "pages-load-error",
+      "nodeId": "I208:171;16:7"
+    },
+    {
+      "name": "search-box",
+      "testId": "pages-search-box"
+    },
+    {
+      "name": "error-block",
+      "testId": "pages-load-error",
+      "spec": "pages-load-error",
+      "nodeId": "141:203"
+    },
+    {
+      "name": "error-title",
+      "testId": "pages-load-error-title",
+      "spec": "pages-load-error",
+      "nodeId": "141:204"
+    },
+    {
+      "name": "error-desc",
+      "testId": "pages-load-error-desc",
+      "spec": "pages-load-error",
+      "nodeId": "141:205"
+    },
+    {
+      "name": "error-retry",
+      "testId": "pages-load-error-retry",
+      "spec": "pages-load-error",
+      "nodeId": "141:206"
+    },
+    {
+      "name": "add-page-foot",
+      "testId": "pages-footer"
+    },
+    {
+      "name": "add-page-link",
+      "testId": "pages-add-page",
+      "spec": "pages-load-error",
+      "nodeId": "141:202"
+    }
+  ]
+}

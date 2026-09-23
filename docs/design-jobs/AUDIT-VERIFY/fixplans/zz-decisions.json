@@ -1,0 +1,24 @@
+{
+ "slug": "zz-decisions",
+ "page": "1:3",
+ "note": "Four of the five items parked as 'founder decisions' are settled by the founder's OWN precedence rule — behaviour is decided by the code, the visual by the board — or by a convention this file already uses. Applying the rule is not the same as inventing a decision.",
+ "rows": [
+  {"op": "rename", "id": "2865:22206", "name": "[not-implemented] Inspector · MOTION · one section — no Motion section exists in code: elementProfiles.ts:70-85 renders Interactions and Animation, and SectionId has 17 ids of which Motion is not one",
+   "expect": "Inspector · MOTION · one section",
+   "why": "F19 · SETTLED BY THE PRECEDENCE RULE, NOT BY A NEW DECISION. The question was posed as 'ship or retire Motion'. But whether Motion ships is a BEHAVIOUR question, and the founder rule is explicit that behaviour is decided by the code contract. The code answers it: elementProfiles.ts:70-85 renders 'Interactions' and 'Animation' as separate adjacent sections and SectionId has seventeen ids, none of them Motion. So the board draws a section the product does not have, which is the F18/M12 pattern, and this file already has one convention for that — the [not-implemented] name marker it carries on 1706:8501, 2430:21365, 817:4856 and others. Marking it is the rule applied, not a preference exercised. What is NOT done here, and genuinely is a design call: deleting the board, or migrating Interactions+Animation into it. Marking keeps both open while stopping the board from reading as shipped."},
+
+  {"op": "font-size", "id": "2850:22372", "size": 16, "expect": "Delete",
+   "why": "M19 · the audit's actual ask, on the two specimens it actually names. The reference kit 46:2 measures 16px Semi Bold titles and 13px action text (48 texts, read fresh). This title is 14. The board's buttons are HUG/HUG (r-delbtn: 2850:22380 and 2850:22382), so a larger label grows its button rather than overflowing it — which is why this is safe here and why the family-wide re-scale is not. NOTE the separate finding, deliberately left open: a census of all 26 modal and popover boards shows titles at 12/13/14/16 and actions at 11/12/13, with the kit's scale used by exactly one board. Re-scaling all 26 IS a design decision and is not taken here; the font-size op now exists to execute it in one pass when it is made."},
+  {"op": "font-size", "id": "2850:22381", "size": 13, "expect": "Cancel", "why": "M19 · action text to the kit's 13. Button 2850:22380 is HUG/HUG, so it grows to fit."},
+  {"op": "font-size", "id": "2850:22383", "size": 13, "expect": "Delete", "why": "M19 · action text to the kit's 13. Button 2850:22382 is HUG/HUG, so it grows to fit."},
+  {"op": "font-size", "id": "1172:4841", "size": 16, "expect": "Review 3 staged changes",
+   "why": "M19 · the second named specimen's title, 13 -> the kit's 16. The string is ar=WIDTH_AND_HEIGHT starting at x116 inside a 520-wide modal whose content runs to 604, and at 16px it sets to roughly 308px, ending near 424 — inside with room."},
+  {"op": "font-size", "id": "1172:4860", "size": 13, "expect": "Discard all", "why": "M19 · action text to the kit's 13."},
+  {"op": "font-size", "id": "1172:4862", "size": 13, "expect": "Keep editing", "why": "M19 · action text to the kit's 13."},
+  {"op": "font-size", "id": "1172:4864", "size": 13, "expect": "Apply 3 changes", "why": "M19 · action text to the kit's 13."},
+
+  {"op": "rename", "id": "926:4484", "name": "menu · Share preview link — [dead route] successor Site · Access lives on page 988:2 and Figma rejects cross-page NAVIGATE; the editor hands off to the dashboard (SiteMenu.tsx:261)",
+   "expect": "menu · Share preview link",
+   "why": "F21 · the third edge, closed the only way it can be. The other two rewires landed (642:3538 -> 32:2, 1172:4895 -> 1688:7195). This one cannot: its successor Site · Access sits on page 988:2, and this file's own record is that Figma rejects cross-page NAVIGATE — that is why section 19 exists as 1:6 echoes at all. Leaving a live control pointed at a superseded board is the defect F21 reported; leaving it pointed there SILENTLY is worse. The rename makes the gap visible in the layer tree, which is what this file does elsewhere for routes it cannot wire. Echoing the 988:2 board onto 1:3 remains open, and is a real design call rather than a repair."}
+ ]
+}

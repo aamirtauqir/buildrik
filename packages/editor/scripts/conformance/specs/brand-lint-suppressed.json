@@ -1,0 +1,944 @@
+{
+  "surface": "brand-lint-suppressed",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "306:2217",
+  "boardName": "brand-lint-suppressed",
+  "figmaHash": "c7f699d18f3237784f504e62a7a2ed0204db23b25ef22c5d0fc1a7363946dd6e",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:07:06.697Z",
+  "copy": [
+    "Brand",
+    "Aa",
+    "Heading",
+    "Aa",
+    "Body",
+    "Tokens",
+    "Colours, type, spacing",
+    "Presets",
+    "Component style presets",
+    "18",
+    "Starters",
+    "Whole-brand starting points",
+    "Classes",
+    "Names shared across elements",
+    "Components",
+    "What the brand ships",
+    "Typography",
+    "The fonts this site uses",
+    "Colour mode",
+    "Light and dark values",
+    "Lint",
+    "What breaks the brand",
+    "Import / export",
+    "Move the brand in and out",
+    "Warnings suppressed"
+  ],
+  "targets": [
+    {
+      "nodeId": "306:2217",
+      "name": "Brand · lint · suppressed",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2218",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I306:2218;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7402",
+      "name": "Brand preview (NEW)",
+      "className": "content-stretch flex flex-col gap-[8px] h-[82px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "82px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7403",
+      "name": "Swatches",
+      "className": "content-stretch flex gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7404",
+      "name": "swatch",
+      "className": "bg-[#1a56db] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7405",
+      "name": "swatch",
+      "className": "bg-white border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7406",
+      "name": "swatch",
+      "className": "bg-[#1f2937] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1f2937"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7407",
+      "name": "swatch",
+      "className": "bg-[#ef4444] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ef4444"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7408",
+      "name": "Specimen · Heading",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7409",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7410",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7411",
+      "name": "Specimen · Body",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7412",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7413",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7414",
+      "name": "List row · Tokens",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7416",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7417",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7418",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7419",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7420",
+      "name": "List row · Presets",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7422",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7423",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7424",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7425",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7426",
+      "name": "List row · Starters",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7428",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7429",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7430",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7431",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7432",
+      "name": "List row · Classes",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7434",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7435",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7436",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7437",
+      "name": "List row · Components",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7439",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7440",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7441",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7442",
+      "name": "List row · Typography",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7444",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7445",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7446",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7447",
+      "name": "List row · Colour mode",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7449",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7450",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7451",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7452",
+      "name": "List row · Lint",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7454",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7455",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7456",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7457",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7458",
+      "name": "List row · Import / export",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7460",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7461",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7462",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2228",
+      "name": "spacer",
+      "className": "h-[196px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "196px"
+        }
+      }
+    },
+    {
+      "nodeId": "333:2360",
+      "name": "Badge",
+      "className": "absolute bg-[var(--flowbite\\/yellow\\/100,#fdf6b2)] border border-[var(--flowbite\\/yellow\\/500,#c27803)] border-solid content-stretch flex items-center left-[15px] px-[10px] py-[2px] rounded-[9999px] top-[95px] w-[105px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/yellow/100",
+          "value": "#fdf6b2"
+        },
+        "border-color": {
+          "token": "--flowbite/yellow/500",
+          "value": "#c27803"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        },
+        "width": {
+          "value": "105px"
+        }
+      }
+    },
+    {
+      "nodeId": "I333:2360;12:11",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/warning-text,#723b13)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        }
+      }
+    },
+    {
+      "nodeId": "444:2444",
+      "name": "hotspot/back · S1 · Editor — ASSEMBLED (1440, dra",
+      "className": "absolute block cursor-pointer h-[34px] left-[-1px] top-[777px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

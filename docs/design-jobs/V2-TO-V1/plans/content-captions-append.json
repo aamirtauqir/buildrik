@@ -1,0 +1,58 @@
+[
+  {
+    "id": "155:47",
+    "key": "removed from none",
+    "add": "A collection can be created from three screens and removed from none — the rows are plain navigation and deleteCollection (CollectionManager.ts:154) has no UI caller. No CMS surface checks role: a VIEWER can create, publish and delete, and the refusal arrives as a sync-failure toast.",
+    "maxHeight": 174,
+    "why": "UX-C-02 (Critical), UX-C-15 (Major), UX-C-20 (Major)"
+  },
+  {
+    "id": "155:49",
+    "key": "repeater, no collection-bound list",
+    "add": "One binding serves one record. No repeater, no collection-bound list and no “Repeat with collection” control exists in this file or the product — RepeaterRenderer.ts and bindCollection (CMSBindingManager.ts:215) have no UI caller. No search, no filter, no paging.",
+    "maxHeight": 174,
+    "why": "UX-C-06 (Critical), UX-C-23 (Minor), UX-C-29 (Minor), FIG-A-01 (absence recorded, not drawn)"
+  },
+  {
+    "id": "155:50",
+    "key": "strips cmsBindings",
+    "add": "Published governs dynamic pages, not bindings: export resolves with no status filter (CMSBindingManager.ts:120-123), so a draft's copy ships. Flipping the switch refreshes nothing on canvas; deleting a record blanks every element bound to it, uncounted. And on a real site the binding does not survive a reload — sites.ts:192-214 strips cmsBindings in transit.",
+    "maxHeight": 210,
+    "why": "UX-C-01 (Critical), UX-C-04, UX-C-05, UX-C-12"
+  },
+  {
+    "id": "155:52",
+    "key": "updateField and reorderFields",
+    "add": "Fields can be added and deleted and nothing else: updateField and reorderFields (CollectionManager.ts:201,232) have no UI caller, so a mistyped field name is permanent unless the field is destroyed.",
+    "maxHeight": 210,
+    "why": "UX-C-11 (Major)"
+  },
+  {
+    "id": "155:53",
+    "key": "in-memory Map",
+    "add": "Sources live in an in-memory Map (DataManager.ts:47); ProjectData has no field for them, so every source is gone on reload and everything built on it stops resolving silently. A duplicate top-level key throws and is reported as “Not valid JSON”.",
+    "maxHeight": 1686,
+    "why": "UX-C-16, UX-C-17 (Major)"
+  },
+  {
+    "id": "155:54",
+    "key": "project NAME",
+    "add": "The store key is built from the project NAME in this browser (useContentPanel.ts:81, contentPanelUtils.ts:21-23), so renaming the site orphans every variable at once and two sites sharing a name share theirs.",
+    "maxHeight": 195,
+    "why": "UX-C-18 (Major)"
+  },
+  {
+    "id": "155:55",
+    "key": "data-condition-hidden",
+    "add": "A condition's only effect is a data-condition-hidden attribute nothing reads (DataManager.ts:482-491), evaluated once at creation — the element stays visible on canvas and on the published site. Pick mode arms with no notice and no Cancel until after a pick.",
+    "maxHeight": 1686,
+    "why": "UX-C-03 (Critical), UX-C-24 (Minor)"
+  },
+  {
+    "id": "155:51",
+    "key": "plain text box in both",
+    "add": "The type a field was given does not decide the input it gets: an Image field is a plain text box in both record editors, with no route to the media library (useContentModals.ts:89 exists; neither imports it), and date and select are free text here and real widgets in the ⌘⇧P modal.",
+    "maxHeight": 195,
+    "why": "UX-C-14 (Major), UX-C-07 (Critical)"
+  }
+]

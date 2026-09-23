@@ -36,17 +36,24 @@ interface GroupSectionProps {
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
  *
  *  The count is --bk-ink-muted, not the board's ink-placeholder. That token is
- *  #9CA3AF — the SAME value as --bk-border-strong and --bk-border-input — so
+ *  `var(--bk-gray-400)` — the SAME value as --bk-border-strong and --bk-border-input — so
  *  the board asks a border colour to paint a number: 2.54:1 on white, measured
  *  on four counts, against a 4.5 floor. --bk-ink-muted measures 4.83 and is the
- *  chrome-furniture ink DESIGN.md:518 already names for exactly this. */
+ *  chrome-furniture ink DESIGN.md:518 already names for exactly this.
+ *
+ *  `py-[6px]` is the board's own box, not a number chased for a diff: 28 - 6 - 6
+ *  is 16, exactly the label's line box, so the padded box and `align-items:
+ *  center` render identically. What was there instead was flowbite's own 1px,
+ *  which is nobody's decision. Where a board's vertical padding does NOT close
+ *  like that — the list rows below say h-28 with py-5 around a 20px line box —
+ *  it is auto-layout noise and the centring stands. */
 const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () => void }> = ({
   group, isOpen, onToggle,
 }) => (
   <Button
     type="button"
     color="light"
-    className="tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-12)] tw:pr-[var(--bk-space-16)] tw:gap-[6px] tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none"
+    className="bld-group-header tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] tw:py-[6px] tw:pl-[var(--bk-space-12)] tw:pr-[var(--bk-space-16)] tw:gap-[6px] tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none"
     aria-expanded={isOpen}
     data-testid={`insert-group-${group.id}`}
     onClick={onToggle}
@@ -54,11 +61,17 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
     <span className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
       {isOpen ? "▾" : "▸"}
     </span>
-    <span className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-semibold tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+    <span
+      data-testid={`insert-group-label-${group.id}`}
+      className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-semibold tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+    >
       {group.label}
     </span>
     {group.count != null && (
-      <span className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:tabular-nums">
+      <span
+        data-testid={`insert-group-count-${group.id}`}
+        className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:tabular-nums"
+      >
         {group.count}
       </span>
     )}
@@ -68,7 +81,12 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
 /** Board 1069:4999 list row: dense · rounded-4 · 14 icon · 13/400 label,
  *  indented past the group chevron. `pinned` switches to board 1069:5011's
  *  ⌥ Paste HTML… band, which is a full-height row at the panel inset with
- *  12/400 soft-ink text and no icon slot. Exported for BuildTab. */
+ *  12/400 soft-ink text and no icon slot. Exported for BuildTab.
+ *
+ *  The label and icon carry conformance anchors derived from the row's own
+ *  testId. `insert-row-label-${testId}` and not `${testId}-label`, because
+ *  check-anchors resolves a template only through the text BEFORE the
+ *  interpolation — a trailing suffix greps as an absent anchor. */
 export const Row: React.FC<{
   label: string;
   /**
@@ -138,15 +156,17 @@ export const Row: React.FC<{
           strokeLinecap="round"
           strokeLinejoin="round"
           className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]"
+          data-testid={`insert-row-icon-${testId}`}
           aria-hidden="true"
           /* Static markup compiled into the bundle from our own catalog — no
              user input reaches this, and no request fetches it. */
           dangerouslySetInnerHTML={{ __html: iconHtml }}
         />
       ) : (
-        <span className="tw:size-[14px] tw:rounded-[2px] tw:bg-[var(--bk-ink-soft)] tw:shrink-0" aria-hidden="true" />
+        <span className="tw:size-[14px] tw:rounded-[2px] tw:bg-[var(--bk-ink-soft)] tw:shrink-0" data-testid={`insert-row-icon-${testId}`} aria-hidden="true" />
       )}
       <span
+        data-testid={`insert-row-label-${testId}`}
         className={`tw:flex-1 tw:min-w-0 tw:truncate ${
           pinned
             ? "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]"
@@ -232,7 +252,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         the card width cannot lose that way, and it earns the expanded drawer
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
-      <div className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
+      <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
         {blocks?.map((b) => (
           <div
             key={b.id}
@@ -250,11 +270,12 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
                 src={b.preview}
                 alt=""
                 className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:object-cover"
+                data-testid={`insert-block-thumb-${b.id}`}
               />
             ) : (
-              <div className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)]" aria-hidden="true" />
+              <div className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)]" data-testid={`insert-block-thumb-${b.id}`} aria-hidden="true" />
             )}
-            <p className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate">
+            <p data-testid={`insert-block-label-${b.id}`} className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate">
               {b.label}
             </p>
           </div>

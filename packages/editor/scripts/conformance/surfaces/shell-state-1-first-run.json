@@ -1,0 +1,147 @@
+{
+  "surface": "shell-state-1-first-run",
+  "board": "Shell state 1 · First run (Figma 65:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "canvas-empty-cta"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach"
+    }
+  ],
+  "contrastScope": "body",
+  "targets": [
+    {
+      "name": "empty-cta",
+      "testId": "canvas-empty-cta",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:201"
+    },
+    {
+      "name": "empty-cta-title",
+      "testId": "canvas-empty-cta-title",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:202"
+    },
+    {
+      "name": "rail-coach",
+      "testId": "rail-coach",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:208"
+    },
+    {
+      "name": "rail-coach-got-it",
+      "testId": "rail-coach-got-it",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:210"
+    },
+    {
+      "name": "footer-selection",
+      "testId": "footer-selection-label",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:197"
+    },
+    {
+      "name": "footer-zoom",
+      "testId": "footer-device-zoom",
+      "spec": "shell-state-1-first-run",
+      "nodeId": "65:200"
+    },
+    {
+      "name": "empty-cta-actions",
+      "testId": "canvas-empty-cta-actions"
+    },
+    {
+      "name": "browse-templates",
+      "testId": "canvas-empty-browse"
+    },
+    {
+      "name": "start-blank",
+      "testId": "canvas-empty-start-blank"
+    }
+  ],
+  "_note": [
+    "FULL-SHELL BOARD, measured live at 1440x900 — the board's own frame size.",
+    "",
+    "Per the brief: what is joined here is what this board is ABOUT (its state).",
+    "The chassis the four Shell-state boards redraw identically is skipped, with",
+    "the reason, rather than re-asserted four times:",
+    "",
+    "  the TOPBAR (682:2657 and its children) — boards.json carries",
+    "  authority=code:topbar against all twelve 'Shell state N' boards, decided",
+    "  2026-08-17 on evidence: they draw Exit | name | Saved pill | review pill |",
+    "  bell | Publish(disabled) and no Quick preview, Comments or Issues chip,",
+    "  while the shipped topbar has all three. The boards lose because they",
+    "  contradict the board SET — 200:2 is named 'Comment mode' and its own",
+    "  topbar has no comments control, and the Issues chip is what opens board",
+    "  1168:4732. The same snapshot also draws Publish grey/disabled on a",
+    "  returning user with content, which would mean nobody could ever publish.",
+    "  The topbar has its own spec (`topbar`) and its own recipe (shell-default).",
+    "",
+    "  the RAIL (2034:8392) — the board fills it --color/bg-app #F3F4F6; the",
+    "  shipped rail is white. That is one reading against the rail as it appears",
+    "  on every other family's boards, and the rail is chassis shared by all four",
+    "  of these boards plus shell-default. Not re-settled from a state board.",
+    "",
+    "  the CANVAS TOOLBAR (463:3962 and its ~40 chips) — one floating component",
+    "  redrawn on all four boards; it belongs to the canvas family, not to a",
+    "  state. Board 202:2's own walk (boards.json, 2026-08-17) already fixed the",
+    "  real defect it exposed, which was the bar not wrapping at 1280.",
+    "",
+    "  the FOOTER BAR itself (65:196 / 66:196-equivalent) — the <footer> element",
+    "  is written in `src/editor/shell/AquibraStudio.tsx`, which this workstream",
+    "  is under standing instruction never to stage. Its two text runs already",
+    "  carry anchors and ARE joined; the bar's own 32/16/16 box is not, because",
+    "  adding the testid would mean touching that file.",
+    "",
+    "THIS BOARD'S SUBJECT is the first-run empty canvas and the rail coach",
+    "mark, and both are on screen and measured.",
+    "",
+    "boards.json's note against 65:2 says the coach mark 'is not built' and",
+    "that the drawer therefore stays open ('the two land together'). The first",
+    "half of that is now STALE: `editor/onboarding/RailCoach.tsx` renders it,",
+    "and it measures exactly to 65:208 — 240 wide, --color/ink fill, radius 6,",
+    "12 padding, 6 gap — with 'Got it' at 11/16 on white per 65:210. The row",
+    "warrants a status change; reporting it rather than editing boards.json.",
+    "",
+    "NOT JOINED, this board only:",
+    "",
+    "  the actions row (65:203) — a 10 gap. There is no 10 on the 4-base scale",
+    "  and no token for it; Canvas.css records the same call and ships 12.",
+    "",
+    "  the two CTA buttons (65:204 / 65:206) — this board draws them 34 tall,",
+    "  14 across, radius 4. Board 338:2326 is a real Button COMPONENT instance",
+    "  and says 32/16/radius 8, which is what CanvasEmptyCTA cites and ships",
+    "  (`PRIMARY`/`SECONDARY` in that file). A component instance outranks a",
+    "  screen frame's redrawing of it — and it is the DS button besides.",
+    "",
+    "  the coach's body line (65:209) — 12/18. The shipped bubble leads with",
+    "  that sentence at 13/20 and adds a second 12/18 line explaining what the",
+    "  six actually are (RailCoach.tsx says why it is kept). Flattening the lead",
+    "  to 12 to match a board that draws only one line would make the two lines",
+    "  indistinguishable.",
+    "",
+    "  the Canvas frame (65:70) — --flowbite/gray/50 with 32 bottom padding. The",
+    "  element carrying `data-testid=\"canvas\"` is the scroll host and reads",
+    "  --bk-bg-app with 20 padding; the board's node is the column above it,",
+    "  which has no anchor of its own. Recorded rather than mis-joined.",
+    "",
+    "  the inspector's no-selection block (66:2 / 66:3) — board 159:99",
+    "  (Inspector · no-selection) owns it and boards.json already marks that row",
+    "  verified=driven.",
+    "",
+    "`ignore` drops the dev-only Agentation overlay from the contrast sweep, the",
+    "same one shell-default excludes: it is `demo/main.tsx`'s DEV widget, not",
+    "editor chrome, and its 'v3.0.2' at white/40% is its own design."
+  ],
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ]
+}

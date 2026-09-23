@@ -316,7 +316,19 @@ export class CollectionManager extends EventEmitter {
 
     if (updates.status === "published" && existing.status !== "published") {
       this.emit(EVENTS.CMS_CONTENT_PUBLISHED, updated);
-    } else if (updates.status !== "published" && existing.status === "published") {
+      /* `updates.status !== "published"` was true when `updates` carried no
+         status key at all, because `undefined !== "published"`. So every
+         ordinary data-only edit to a live record emitted `unpublished` rather
+         than `updated` — and the two canvas refresh paths
+         (CMSBindingManager.ts:75-77, useCMSPreview.ts:123-124) subscribe only
+         to created/updated/deleted, so the canvas went stale whenever anyone
+         edited the text of a published record. Only an explicit status change
+         away from published is an unpublish. */
+    } else if (
+      updates.status !== undefined &&
+      updates.status !== "published" &&
+      existing.status === "published"
+    ) {
       this.emit(EVENTS.CMS_CONTENT_UNPUBLISHED, updated);
     } else {
       this.emit(EVENTS.CMS_CONTENT_UPDATED, updated);

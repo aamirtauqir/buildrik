@@ -1,0 +1,26 @@
+[
+  {
+    "id": "2430:21523",
+    "expect": "5 pages",
+    "text": "7 pages, by route.",
+    "width": 200,
+    "why": "QA-A-26 — the board draws SEVEN pages (Home, Menu, Lunch, Dinner, Privacy, Terms, Contact) plus one inferred segment, and SiteStructureTree.tsx:78 prints pages.length. The board contradicts its own tree.",
+    "_id_source": "READ from file 2026-09-07 (dump of 2430:12214)"
+  },
+  {
+    "id": "2430:21532",
+    "expect": "▾  legal/",
+    "text": "▾  legal/ (no page)",
+    "width": 150,
+    "why": "QA-A-28 — SiteStructureTree.tsx:55-60 renders the (no page) span and the mono {node.path} span as siblings in the same row. The board dropped the path for that row and put (no page) in the mono column instead.",
+    "_id_source": "READ from file 2026-09-07"
+  },
+  {
+    "id": "2430:21533",
+    "expect": "(no page)",
+    "text": "/legal",
+    "width": 90,
+    "why": "QA-A-28 — the mono column carries the route, which is the whole point of the mono column.",
+    "_id_source": "READ from file 2026-09-07"
+  }
+]

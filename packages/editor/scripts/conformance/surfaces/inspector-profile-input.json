@@ -1,0 +1,225 @@
+{
+  "surface": "inspector-profile-input",
+  "board": "Inspector · profile · INPUT (Figma 807:8614)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Input"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8614"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-input",
+      "nodeId": "920:4711"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-input",
+      "nodeId": "956:6876"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-input",
+      "nodeId": "956:6878"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-input",
+      "nodeId": "956:6880"
+    },
+    {
+      "name": "sechead-typography",
+      "testId": "inspector-sechead-typography",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20381"
+    },
+    {
+      "name": "secname-typography",
+      "testId": "inspector-secname-typography",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8621"
+    },
+    {
+      "name": "row-family",
+      "testId": "inspector-row-family",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20382"
+    },
+    {
+      "name": "field-family",
+      "testId": "inspector-field-family",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8624"
+    },
+    {
+      "name": "label-family",
+      "testId": "inspector-label-family",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8623"
+    },
+    {
+      "name": "label-size",
+      "testId": "inspector-label-size",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8626"
+    },
+    {
+      "name": "sechead-border",
+      "testId": "inspector-sechead-border",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20384"
+    },
+    {
+      "name": "secname-border",
+      "testId": "inspector-secname-border",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8629"
+    },
+    {
+      "name": "row-width",
+      "testId": "inspector-row-width",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20385"
+    },
+    {
+      "name": "field-width",
+      "testId": "inspector-field-width",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8632"
+    },
+    {
+      "name": "label-width",
+      "testId": "inspector-label-width",
+      "spec": "inspector-profile-input",
+      "nodeId": "807:8631"
+    },
+    {
+      "name": "sechead-effects",
+      "testId": "inspector-sechead-effects",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20391"
+    },
+    {
+      "name": "sechead-element-properties",
+      "testId": "inspector-sechead-element-properties",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20392"
+    },
+    {
+      "name": "sechead-interactions",
+      "testId": "inspector-sechead-interactions",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20393"
+    },
+    {
+      "name": "sechead-animation",
+      "testId": "inspector-sechead-animation",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20394"
+    },
+    {
+      "name": "sechead-visibility",
+      "testId": "inspector-sechead-visibility",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20395"
+    },
+    {
+      "name": "sechead-css-classes",
+      "testId": "inspector-sechead-css-classes",
+      "spec": "inspector-profile-input",
+      "nodeId": "2069:20396"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900: Insert's Input row (Forms group) creates an input",
+    "and selects it, which is the production path into the INPUT profile.",
+    "",
+    "SHARED CHASSIS. This board is one of six that draw the same section",
+    "chassis (807:8342 TEXT, :8412 FLEX, :8475 GRID, :8521 MEDIA, :8567 BUTTON,",
+    ":8614 INPUT). It was conformed once, on inspector-profile-text, and that",
+    "recipe's _note carries the full account: 20-tall open / 28-tall shut section",
+    "headers, ink-muted on the header ROW, 0.08em tracking, section-body padding",
+    "0/8, the Family row moved onto the shared control frame, the colour row's",
+    "duplicate chip removed so the field keeps its 160, segmented tracks at 28,",
+    "and the three-anchor row (`inspector-row-`/`-label-`/`-field-<slug>`).",
+    "",
+    "NOT JOINED on every board in this family, censused across all committed",
+    "specs rather than counted board-to-board:",
+    "",
+    "  the header's `--flowbite/gray/50` fill — 37 boards draw this 48h row with",
+    "  NO fill, 6 draw it gray-50 (these six), 1 draws it accent-tinted. White",
+    "  ships; a header that changed colour with the selection would be a defect.",
+    "",
+    "  the context strip at 40 tall — 38 boards draw it 32, these 6 draw it 40.",
+    "  32 ships. One strip, not a per-profile one.",
+    "",
+    "  the accent-tint chip carrying the PROFILE name. 32:2 and 642:3112 put the",
+    "  ELEMENT's own name there and so does live.",
+    "",
+    "  the footer's `--color/ink-placeholder` #9CA3AF, which is 2.54:1 on white",
+    "  at 11px against a 4.5 floor. It ships --bk-ink-muted (4.83:1). Said loudly",
+    "  because it is a contrast refusal, not a taste call.",
+    "",
+    "  every `hotspot/…` node — prototype wiring, not chrome.",
+    "",
+    "NOT JOINED on THIS board specifically:",
+    "",
+    "  SPACING, SIZE, BACKGROUND and CORNER RADIUS (2069:20387..20390) are drawn",
+    "  shut and arrive open, because the default input the Insert row creates",
+    "  carries padding, a size, a fill and a radius where the board's sample",
+    "  input carries two things. A section opens when the element has a value for",
+    "  it, which is the rule this board's own footer counts. The eight headers",
+    "  whose state DOES agree are joined — TYPOGRAPHY and BORDER open at 20,",
+    "  EFFECTS, ELEMENT PROPERTIES, INTERACTIONS, ANIMATION, VISIBILITY and CSS",
+    "  CLASSES shut at 28.",
+    "",
+    "  2069:20383 (Size) and 2069:20386 (Colour), both 42 — the board's",
+    "  last-row-in-section form, 34 plus 8 of trailing air that the DOM keeps in",
+    "  the section body's padding-bottom. Size's LABEL is joined and matches.",
+    "  Colour's row is not addressable here: this board spells it 'Colour' where",
+    "  807:8342 and every other colour row in the panel spell it 'Color', and",
+    "  with both TYPOGRAPHY and BORDER open live there are two rows on that id.",
+    "  The boards disagree on the spelling; the panel is internally consistent."
+  ]
+}

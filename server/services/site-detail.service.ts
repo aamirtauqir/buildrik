@@ -1,5 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import type { SiteOverview } from "@buildrik/shared/schemas/site-detail";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import type {
+  LocaleStatus,
+  LocalesSummary,
+  RedirectSuggestion,
+  SettingsOverview,
+  SiteOverview,
+} from "@buildrik/shared/schemas/site-detail";
+import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
+
+const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+
+/** The page columns `suggestRedirects` reads — shared by the query and the Overview's count. */
+const SUGGESTION_PAGE_SELECT = { id: true, name: true, slug: true, isHomePage: true, slugHistory: true } as const;
+
+type SuggestionPage = { id: string; name: string; slug: string; isHomePage: boolean; slugHistory: unknown };
 
 export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
   const site = await prisma.site.findUnique({
@@ -92,7 +107,6 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     ? Math.round(((monthlyVisitors - previousVisitors) / previousVisitors) * 100)
     : 0;
 
-  const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
   const pagesWithSeoCount = pagesWithSeo.filter((page) => {
     const seo =
       typeof page.settings === "object" && page.settings !== null
@@ -171,4 +185,316 @@ async function shapeActivity(
     out.push({ id: r.id, action: r.action, description: r.description, createdAt: r.createdAt, actorName, count: 1 });
   }
   return out.slice(0, 5);
+}
+
+/**
+ * The editor's Settings Overview (Clone 3397:32915): one line per settings
+ * section plus the NEEDS ATTENTION rows, every fact from a column that already
+ * exists. One site read, then one `Promise.all` over the tables behind the
+ * lines. `pages` is the only per-row read — translations live in a JSON
+ * column, so "no page has translations[locale]" cannot be a count; a site's
+ * pages are tens, not thousands.
+ */
+export async function getSettingsOverview(siteId: string): Promise<SettingsOverview> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: {
+      name: true,
+      workspaceId: true,
+      defaultLocale: true,
+      enabledLocales: true,
+      allowIndexing: true,
+      robotsTxt: true,
+      headCode: true,
+      bodyCode: true,
+      cspPolicy: true,
+      hstsMaxAge: true,
+      projectSettings: true,
+      workspace: {
+        select: {
+          plan: true,
+          subscription: { select: { plan: true, price: true, interval: true } },
+        },
+      },
+    },
+  });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  const { workspaceId } = site;
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const [
+    pages,
+    primaryDomain,
+    pendingDns,
+    redirects,
+    analyticsDays,
+    forms,
+    submissions,
+    connected,
+    webhook,
+    members,
+  ] = await Promise.all([
+    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true } }),
+    prisma.domain.findFirst({ where: { siteId, isPrimary: true }, select: { domain: true } }),
+    prisma.dnsRecord.findMany({
+      where: { verified: false, domain: { siteId } },
+      orderBy: [{ domainId: "asc" }, { type: "asc" }],
+      select: { type: true, host: true, domain: { select: { domain: true } } },
+    }),
+    prisma.redirect.findMany({ where: { siteId }, select: { fromPath: true } }),
+    prisma.siteAnalytics.count({ where: { siteId, date: { gte: sevenDaysAgo } } }),
+    prisma.formBlock.count({ where: { siteId } }),
+    prisma.formSubmission.count({ where: { siteId } }),
+    prisma.workspaceIntegration.count({ where: { workspaceId, isActive: true } }),
+    prisma.workspaceWebhook.findUnique({
+      where: { workspaceId },
+      select: {
+        deliveries: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { status: true, event: true, httpStatus: true, error: true, createdAt: true },
+        },
+      },
+    }),
+    prisma.workspaceMember.count({ where: { workspaceId, status: "ACTIVE" } }),
+  ]);
+
+  // Translations exist only for non-default locales — the default locale's
+  // content is Page.blocks (page.service `DEFAULT_LOCALE_USES_BLOCKS`), so it
+  // can never be "not started".
+  const translatedPages = new Map<string, number>();
+  for (const page of pages) {
+    if (!isRecord(page.translations)) continue;
+    for (const [locale, entry] of Object.entries(page.translations)) {
+      if (isTranslation(entry)) translatedPages.set(locale, (translatedPages.get(locale) ?? 0) + 1);
+    }
+  }
+  const notStarted = site.enabledLocales.filter(
+    (locale) => locale !== site.defaultLocale && !translatedPages.has(locale),
+  );
+
+  // S1 counted `SlugHistory` rows (site-slug renames) here; the Redirects
+  // screen's suggester (S3) reads the PAGE slug history, so the count and the
+  // screen come from the same rule.
+  const suggestions = suggestRedirects(pages, redirects).length;
+
+  // `projectSettings` is the editor's ProjectSettings JSON: analytics is keyed
+  // by provider id (googleAnalytics, facebookPixel, …) with an `enabled` flag;
+  // cookieConsent sits beside them but is a banner, not a provider.
+  const settings = isRecord(site.projectSettings) ? site.projectSettings : {};
+  const analytics = isRecord(settings.analytics) ? settings.analytics : {};
+  const providers = Object.entries(analytics)
+    .filter(([id, config]) => id !== "cookieConsent" && isRecord(config) && config.enabled === true)
+    .map(([id]) => id);
+  const customCode = isRecord(settings.customCode) ? settings.customCode : {};
+
+  const plan = planOf(site.workspace.plan);
+  const limits = PLAN_LIMITS[plan];
+  // A cancelled subscription keeps its row (status CANCELLED, plan still PRO)
+  // while the workspace drops to FREE — its price belongs to a plan the
+  // workspace no longer has.
+  const subscription = site.workspace.subscription;
+  const subscriptionMonthly =
+    subscription && subscription.plan === plan ? monthlyPrice(subscription.price, subscription.interval) : null;
+  const priceMonthly = subscriptionMonthly ?? Number(limits.priceMonthly);
+
+  const lastDelivery = webhook?.deliveries[0] ?? null;
+  const lastDeliveryStatus = lastDelivery ? (lastDelivery.status === "OK" ? "ok" : "failed") : null;
+
+  const attention: SettingsOverview["attention"] = notStarted.map((locale) => ({
+    kind: "locale-not-started",
+    title: `${localeName(locale)} locale has no translated pages`,
+    detail: `0 of ${pages.length} ${pages.length === 1 ? "page" : "pages"} · not started`,
+    section: "localization",
+  }));
+  if (pendingDns.length > 0) {
+    attention.push({
+      kind: "dns-pending",
+      title:
+        pendingDns.length === 1
+          ? "One DNS record is still pending"
+          : `${pendingDns.length} DNS records are still pending`,
+      detail: pendingDns.map((r) => `${r.type} ${r.host} for ${r.domain.domain}`).join(" · "),
+      section: "domains",
+    });
+  }
+  if (lastDelivery && lastDeliveryStatus === "failed") {
+    // `error` already reads "502 Bad Gateway" for an HTTP failure and the
+    // exception message for a transport one; the bare status is the fallback.
+    const reason = lastDelivery.error ?? (lastDelivery.httpStatus === null ? "failed" : String(lastDelivery.httpStatus));
+    attention.push({
+      kind: "webhook-failed",
+      title: "A webhook delivery failed",
+      detail: `${lastDelivery.event} · ${reason} · ${shortDate(lastDelivery.createdAt)}`,
+      section: "webhooks",
+    });
+  }
+
+  return {
+    site: { name: site.name, defaultLocale: site.defaultLocale, plan },
+    general: { siteName: site.name, language: site.defaultLocale },
+    localization: { locales: site.enabledLocales.length, notStarted },
+    seo: { allowIndexing: site.allowIndexing, robotsTxtSet: filled(site.robotsTxt) },
+    domains: { primary: primaryDomain?.domain ?? null, pendingDns: pendingDns.length },
+    redirects: { rules: redirects.length, suggestions },
+    analytics: { providers, receiving: analyticsDays > 0 },
+    forms: { forms, submissions },
+    customCode: { head: filled(site.headCode), body: filled(site.bodyCode), css: filled(customCode.globalCss) },
+    headers: { csp: filled(site.cspPolicy), hsts: (site.hstsMaxAge ?? 0) > 0 },
+    integrations: { connected, available: INTEGRATION_CATALOG.length },
+    webhooks: { endpoints: webhook ? 1 : 0, lastDelivery: lastDeliveryStatus },
+    members: { used: members, seats: Number(limits.teamMembers) },
+    billing: { plan, priceMonthly },
+    attention,
+  };
+}
+
+/**
+ * The editor's Settings → Localization (Clone 3397:32376 Locales table,
+ * 3737:44869 Translation checklist): one row per enabled locale. The default
+ * locale's content is `Page.blocks`, so it is always fully translated and its
+ * path is `/`; every other locale is served under `/<code>` and counts the
+ * pages carrying a `translations[code]` entry (`page.service setTranslation`
+ * writes `{ blocks }` there). `pending` lists the untranslated page names in
+ * site order — the checklist's "Begin with Home, then Menu, …" line.
+ */
+export async function getLocales(siteId: string): Promise<LocalesSummary> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { defaultLocale: true, enabledLocales: true, deletedAt: true },
+  });
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  const pages = await prisma.page.findMany({
+    where: { siteId },
+    orderBy: { position: "asc" },
+    select: { name: true, translations: true },
+  });
+  const total = pages.length;
+
+  const locales = site.enabledLocales.map((code) => {
+    if (code === site.defaultLocale) {
+      return { code, path: "/", translated: total, total, status: "LIVE" as LocaleStatus, pending: [] };
+    }
+    const pending = pages
+      .filter((page) => !(isRecord(page.translations) && isTranslation(page.translations[code])))
+      .map((page) => page.name);
+    const translated = total - pending.length;
+    const status: LocaleStatus = translated === total ? "LIVE" : translated === 0 ? "NOT_STARTED" : "PENDING";
+    return { code, path: `/${code}`, translated, total, status, pending };
+  });
+
+  return { locales, total };
+}
+
+/**
+ * Settings → Redirects, the "404 suggester" card (Clone 3397:32517).
+ *
+ * The published site sends no 404 events, so the source is what the editor
+ * already records: `Page.slugHistory`, the `{ slug, changedAt }` entries
+ * PageManager.updatePage appends (the OLD slug, on every change). One row per
+ * old slug that no page serves any more and no `Redirect.fromPath` covers.
+ */
+export async function getRedirectSuggestions(siteId: string): Promise<RedirectSuggestion[]> {
+  const [pages, redirects] = await Promise.all([
+    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: SUGGESTION_PAGE_SELECT }),
+    prisma.redirect.findMany({ where: { siteId }, select: { fromPath: true } }),
+  ]);
+  return suggestRedirects(pages, redirects);
+}
+
+/**
+ * The rule behind the suggester and the Overview's "<n> suggestions" line.
+ *
+ * - A page's current path is `/<slug>`; the home page's is `/`. Which page is
+ *   home follows the export (`resolveHomePageId`): the `isHomePage` row, else
+ *   the first in site order — the flag is not guaranteed to be set.
+ * - An old slug that is now some page's current path is live, not a 404, and
+ *   is skipped; an old slug that already has a redirect is done.
+ * - The same old slug can recur (a → b → a → b): one suggestion, the newest.
+ * - Newest change first. An entry without a string `slug` or a parseable
+ *   `changedAt` is not a row the card can draw ("renamed <d MMM>") and is
+ *   skipped.
+ */
+function suggestRedirects(
+  pages: ReadonlyArray<SuggestionPage>,
+  redirects: ReadonlyArray<{ fromPath: string }>,
+): RedirectSuggestion[] {
+  const homeId = (pages.find((p) => p.isHomePage) ?? pages[0])?.id;
+  const currentPath = (page: SuggestionPage) => (page.id === homeId ? "/" : `/${page.slug}`);
+  const covered = new Set([...redirects.map((r) => r.fromPath), ...pages.map(currentPath)]);
+
+  const newest = new Map<string, RedirectSuggestion>();
+  for (const page of pages) {
+    if (!Array.isArray(page.slugHistory)) continue;
+    for (const entry of page.slugHistory) {
+      if (!isRecord(entry) || typeof entry.slug !== "string" || !entry.slug) continue;
+      const changedAt = typeof entry.changedAt === "string" ? new Date(entry.changedAt) : null;
+      if (!changedAt || Number.isNaN(changedAt.getTime())) continue;
+      const fromPath = `/${entry.slug.replace(/^\/+/, "")}`;
+      if (covered.has(fromPath)) continue;
+      const prior = newest.get(fromPath);
+      if (prior && prior.changedAt >= changedAt.toISOString()) continue;
+      newest.set(fromPath, {
+        fromPath,
+        toUrl: currentPath(page),
+        pageId: page.id,
+        pageName: page.name,
+        changedAt: changedAt.toISOString(),
+      });
+    }
+  }
+  return [...newest.values()].sort((a, b) => b.changedAt.localeCompare(a.changedAt));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** A page counts as translated into a locale when its entry is a non-empty object. */
+function isTranslation(entry: unknown): boolean {
+  return isRecord(entry) && Object.keys(entry).length > 0;
+}
+
+function planOf(raw: string): PlanName {
+  return raw === "PRO" || raw === "BUSINESS" ? raw : "FREE";
+}
+
+/**
+ * `Subscription.price` is Stripe's `unit_amount` — minor units for the whole
+ * billing period. A yearly plan is reported as its monthly equivalent, the way
+ * PLAN_LIMITS.priceYearly is ("$23/mo billed yearly"). Rows have carried both
+ * our MONTHLY/YEARLY and Stripe's month/year spellings (see plan-card.tsx);
+ * an interval that is neither is unpriceable and falls back to PLAN_LIMITS.
+ */
+function monthlyPrice(priceMinor: number, interval: string): number | null {
+  switch (interval.trim().toUpperCase()) {
+    case "MONTHLY":
+    case "MONTH":
+      return priceMinor / 100;
+    case "YEARLY":
+    case "YEAR":
+    case "ANNUAL":
+      return Math.round(priceMinor / 12) / 100;
+    default:
+      return null;
+  }
+}
+
+/** "ar" → "Arabic". A tag Intl cannot parse (an underscore, say) reads as its code. */
+function localeName(locale: string): string {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "language" }).of(locale) ?? locale.toUpperCase();
+  } catch {
+    return locale.toUpperCase();
+  }
+}
+
+/** "1 Jul" — three-letter month (en-GB would say "Sept"); the year joins only when it is not this year. */
+function shortDate(date: Date): string {
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(date);
+  const year = date.getFullYear();
+  return `${date.getDate()} ${month}${year === new Date().getFullYear() ? "" : ` ${year}`}`;
 }

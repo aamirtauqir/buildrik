@@ -37,12 +37,19 @@ export interface BatchStylePanelProps {
 // ============================================================================
 
 const styles = {
+  /* Board 159:123 runs the five property rows CONTIGUOUSLY out of the
+     DISTRIBUTE row — its first row (238:1416) opens at y164, which is exactly
+     Header 48 + Align 72 + Distribute 44 with no rule and no gap between them.
+     This had a 1px top border and 12/14 of padding, so the rows sat inside a
+     second box and the control column came out 166 wide against the 160 the
+     board fixes. The insets it uses now are `.bdi-sec-body`'s own 16 left /
+     20 right, which is the same x16 label and x120 control every property row
+     in this panel already lines up on. */
   container: {
     display: "flex" as const,
     flexDirection: "column" as const,
-    gap: 4,
-    padding: "12px 14px",
-    borderTop: `1px solid ${"var(--bk-border)"}`,
+    gap: 0,
+    padding: "0 var(--bk-space-20) 0 var(--bk-space-16)",
   },
   label: {
     fontSize: 11,
@@ -52,11 +59,15 @@ const styles = {
     letterSpacing: "0.04em",
     marginBottom: 6,
   },
+  /* 159:158/159:159 — the note sits in a 40-tall block at x16, 11px on a 16px
+     line box, its text frame the panel's full 268 content width. `lineHeight:
+     1.4` computed 15.4. */
   hint: {
     fontSize: 11,
     color: "var(--bk-ink-muted)",
     marginTop: 8,
-    lineHeight: 1.4,
+    marginBottom: 16,
+    lineHeight: "16px",
   },
 };
 
@@ -122,7 +133,7 @@ export const BatchStylePanel: React.FC<BatchStylePanelProps> = ({
         units={["px", "rem", "em", "%"]}
       />
 
-      <p style={styles.hint}>
+      <p style={styles.hint} data-testid="batch-style-hint">
         {mixed.size > 0
           ? `Editing a Mixed field applies it to all ${selectedIds.length}.`
           : `Edits apply to all ${selectedIds.length} elements in one action.`}

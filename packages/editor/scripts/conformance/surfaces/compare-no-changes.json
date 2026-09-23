@@ -1,0 +1,107 @@
+{
+  "surface": "compare-no-changes",
+  "board": "Compare \u00b7 no-changes (Figma 168:82)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=compare-no-changes",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "compare-no-changes"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "title",
+      "testId": "compare-title",
+      "spec": "compare-no-changes",
+      "nodeId": "168:84"
+    },
+    {
+      "name": "seg-split-label",
+      "testId": "compare-mode-split",
+      "spec": "compare-no-changes",
+      "nodeId": "168:87"
+    },
+    {
+      "name": "seg-overlay-label",
+      "testId": "compare-mode-overlay",
+      "spec": "compare-no-changes",
+      "nodeId": "168:89"
+    },
+    {
+      "name": "seg-list-label",
+      "testId": "compare-mode-list",
+      "spec": "compare-no-changes",
+      "nodeId": "168:91"
+    },
+    {
+      "name": "count",
+      "testId": "compare-count",
+      "spec": "compare-no-changes",
+      "nodeId": "168:93"
+    },
+    {
+      "name": "close",
+      "testId": "compare-close",
+      "spec": "compare-no-changes",
+      "nodeId": "168:94"
+    },
+    {
+      "name": "empty-title",
+      "testId": "empty-state-title"
+    },
+    {
+      "name": "empty-body",
+      "testId": "empty-state-body"
+    }
+  ],
+  "_note": [
+    "Zero changes replaces the whole body in every mode, and the board says why:",
+    "'an empty diff view reads as broken'. The fixture hands the same page to both",
+    "sides, which is the only way to reach `nothingChanged` \u2014 a real diff of zero,",
+    "not a flag.",
+    "",
+    "280, not the board's 1080 \u2014 see compare-side-by-side and BLOCKERS B1",
+    "(`owner: founder`). 168:95 Body is 700 tall on a 1080 frame, so it is not",
+    "anchored.",
+    "",
+    "WHAT THIS BOARD ASSERTS AND THE RECIPE LOCKS: the compare bar survives into",
+    "the empty state complete \u2014 title, all three mode segments, the change count",
+    "and the close \u2014 while the body under it is one message. A first reading of",
+    "this board could as easily have removed the mode strip (there is nothing to",
+    "switch between); the board keeps it, so the recipe measures it here as well",
+    "as on 168:2.",
+    "",
+    "NOT anchored, and why:",
+    "  168:96 / 168:97 the message and its second line \u2014 the elements are",
+    "  addressed (they are targets, and SKIPPED rather than dropped) but not",
+    "  joined to the board. Two reasons and either alone is enough:",
+    "    \u00b7 16/24 semibold is chrome-ui `EmptyState` (Figma 17:18), the primitive",
+    "      behind eleven empty states in this editor; live it is 13. One screen",
+    "      board does not re-settle a chrome-ui-wide primitive \u2014 the same ruling",
+    "      boards.json records for BK_TEXT_INPUT_THEME.",
+    "    \u00b7 both nodes are 1080 wide with a 20px fixed height, i.e. the B1 surface.",
+    "      At 280 a 16px centred headline is not the same design decision.",
+    "  The COPY is a separate question and was read: 168:96 says 'Nothing changed",
+    "  since v3.' and the code says 'Nothing changed since the approved version.'",
+    "  \u2014 same shape, and the version number is sample data the component has no",
+    "  source for. 168:97 says 'No panes render \u2014 an empty diff view reads as",
+    "  broken', which is the designer's rationale for the state, not a sentence",
+    "  the product shows a user; the code's second line ('Every page matches what",
+    "  the client approved.') is the product's.",
+    "",
+    "CONTRAST: two inactive mode segments at 4.39 against 4.5 \u2014 ink-muted on the",
+    "bg-subtle trough, exactly as 168:89/168:91 draw it, and already baselined on",
+    "the three sibling Compare surfaces. Not introduced here; in the report.",
+    "",
+    "BOARD-COPY (2026-09-08): three leads, all already adjudicated above \u2014",
+    "'nothing changed since v#' (the version number the component has no source",
+    "for), 'no panes render \u2014 an empty diff view reads as broken' (the designer's",
+    "rationale, not product copy) and '# changes \u00b7 # of #' (sample counts; live",
+    "reads '0 changes' because there are none)."
+  ]
+}

@@ -372,6 +372,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
               color="light"
               onClick={handleDetach}
               title="Detach this instance from the component"
+              data-testid="component-detach"
               className={ACTION_BTN}
             >
               <Unlink size={14} />
@@ -438,6 +439,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           the link. */}
       <ConfirmDialog
         open={pendingDetach !== null}
+        testId="component-detach-confirm"
         onClose={() => setPendingDetach(null)}
         onConfirm={confirmDetach}
         title="Detach from component?"

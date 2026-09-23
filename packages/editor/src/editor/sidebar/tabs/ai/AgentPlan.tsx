@@ -5,9 +5,17 @@ import { Button, Checkbox } from "@/editor/chrome-ui";
 
 /* Utilities, not a stylesheet: this panel's CSS file is on the styling
    ratchet and new chrome belongs inline (DS SSOT §3). */
+/* The shared "Section header" instance the run boards use (220:947 planning,
+   220:967 done): 28 tall, 16 gutters, an 8 gap before whatever the row's
+   trailing slot holds. */
 const BAND =
-  "tw:flex tw:h-7 tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
-const STEP_ROW = "tw:flex tw:h-10 tw:items-center tw:gap-2 tw:px-4 tw:text-[12px] tw:text-[var(--bk-ink)]";
+  "tw:flex tw:h-7 tw:items-center tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
+/* 12/18 on the row (boards 170:54-56, 171:80-82); the mono index inside it is
+   11/16 (170:55, 171:81). The row inherited `line-height: normal` from
+   `.bd-ai-agent`'s font shorthand, so every step row sat ~3px short of the
+   board's leading. */
+const STEP_ROW =
+  "tw:flex tw:h-10 tw:items-center tw:gap-2 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const PANEL = "tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3";
 const PANEL_TITLE = "tw:m-0 tw:text-[13px] tw:font-medium";
 const PANEL_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
@@ -152,7 +160,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
 
   return (
     <div className="bd-ai-agent">
-      <div className={BAND}>{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
+      <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
 
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
@@ -160,12 +168,24 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
             key={`${i}-${s.plan.title}`}
             className={STEP_ROW}
             data-step-status={s.status}
+            data-testid={`ai-run-step-${i + 1}`}
           >
-            <span className="tw:w-3 tw:flex-none tw:text-center" style={{ color: STEP_COLOR[s.status] }} aria-hidden="true">
+            <span
+              className="tw:w-3 tw:flex-none tw:text-center"
+              style={{ color: STEP_COLOR[s.status] }}
+              aria-hidden="true"
+              data-testid={`ai-run-glyph-${i + 1}`}
+            >
               {STEP_GLYPH[s.status]}
             </span>
-            <span className="tw:min-w-2.5 tw:text-[11px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]">{i + 1}</span>
-            <span className="tw:flex-1">{s.plan.title}</span>
+            {/* min-w-3, not 2.5: the boards put the glyph at 16, the index at
+                36 and the step title at 56, and a 10-wide index landed the
+                title at 54 — the row read 2px tight of every run board. */}
+            <span
+              className="tw:min-w-3 tw:text-[11px] tw:leading-4 tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]"
+              data-testid={`ai-run-index-${i + 1}`}
+            >{i + 1}</span>
+            <span className="tw:flex-1" data-testid={`ai-run-title-${i + 1}`}>{s.plan.title}</span>
             {STEP_WORD[s.status] ? (
               <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{STEP_WORD[s.status]}</span>
             ) : null}

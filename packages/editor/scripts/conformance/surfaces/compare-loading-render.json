@@ -1,0 +1,137 @@
+{
+  "surface": "compare-loading-render",
+  "board": "Compare \u00b7 loading-render (Figma 169:28)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=compare-loading-render",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "compare-pane-current-hint"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "title",
+      "testId": "compare-title",
+      "spec": "compare-loading-render",
+      "nodeId": "169:30"
+    },
+    {
+      "name": "seg-split-label",
+      "testId": "compare-mode-split",
+      "spec": "compare-loading-render",
+      "nodeId": "169:33"
+    },
+    {
+      "name": "seg-overlay-label",
+      "testId": "compare-mode-overlay",
+      "spec": "compare-loading-render",
+      "nodeId": "169:35"
+    },
+    {
+      "name": "seg-list-label",
+      "testId": "compare-mode-list",
+      "spec": "compare-loading-render",
+      "nodeId": "169:37"
+    },
+    {
+      "name": "count",
+      "testId": "compare-count",
+      "spec": "compare-loading-render",
+      "nodeId": "169:39"
+    },
+    {
+      "name": "close",
+      "testId": "compare-close",
+      "spec": "compare-loading-render",
+      "nodeId": "169:40"
+    },
+    {
+      "name": "pane-approved-label",
+      "testId": "compare-pane-approved-label",
+      "spec": "compare-loading-render",
+      "nodeId": "169:43"
+    },
+    {
+      "name": "pane-approved-hint",
+      "testId": "compare-pane-approved-hint",
+      "spec": "compare-loading-render",
+      "nodeId": "169:52"
+    },
+    {
+      "name": "pane-current-label",
+      "testId": "compare-pane-current-label",
+      "spec": "compare-loading-render",
+      "nodeId": "169:53"
+    },
+    {
+      "name": "pane-current-hint",
+      "testId": "compare-pane-current-hint",
+      "spec": "compare-loading-render",
+      "nodeId": "169:54"
+    }
+  ],
+  "_note": [
+    "The right pane is still exporting while the left renders from a stored",
+    "snapshot \u2014 `currentPages={null}` IS that branch, and no click reaches it in a",
+    "standalone editor because Compare only has states when the dashboard returns",
+    "an approved round.",
+    "",
+    "280, not the board's 1080. See compare-side-by-side's note: the review drawer",
+    "is where this view ships (ReviewTab.tsx:517) and moving it to a 1080 overlay",
+    "is BLOCKERS B1, `owner: founder`. So every property that depends on that",
+    "surface is left out rather than measured against a surface the product does",
+    "not have \u2014 169:41 Body (656), 169:42/169:46 panes (660 x 516), 169:44/169:55",
+    "-57 the skeleton bars inside them.",
+    "",
+    "WHAT WAS CONFORMED \u2014 the pane HEADS, which are the subject of this board and",
+    "depend on no width. 168:16/168:17 and 169:42/169:43 agree: 12/18 Inter",
+    "Regular, sentence case, the approved side in success-text and the current",
+    "side in ink. Live they were one shared 11px semibold UPPERCASE ink-muted",
+    "caption on both sides. And 169:52/169:54 add the pair of hints this board",
+    "exists for \u2014 'instant \u2014 stored snapshot' beside 'rendering\u2026' \u2014 which the",
+    "component's own header docstring calls 'the per-side loading asymmetry \u00a73'",
+    "and then never said on screen: the right half spun with nothing telling you",
+    "the left half was already done. They render only while the current side is",
+    "unresolved, because 168:2 (both sides ready) draws neither.",
+    "",
+    "NOT anchored, and why:",
+    "  169:43 reads 'v3 \u00b7 approved'. `approvedPages` is ComparePage[] and carries",
+    "  no version number, so the clause is absent rather than invented \u2014 the SHAPE",
+    "  is the contract. The label's type and colour ARE anchored to that node.",
+    "  169:29 Compare bar \u2014 48 tall on the board; `Toolbar` is min-h-12 here",
+    "  because at 280 the strip wraps to three rows and clamping it put those rows",
+    "  over the diff. Same B1 dependency; and its rule is a `border-b` while",
+    "  measure.mjs reads border-color off border-TOP-color, so even a correct fix",
+    "  would not register.",
+    "  169:38 'Home \u25be' \u2014 the page dropdown renders only with two or more pages and",
+    "  this fixture is one page (same as compare-side-by-side).",
+    "  169:58/169:59 note \u2014 a 44-tall annotation block carrying the design",
+    "  rationale ('Saying which is which stops it reading as a hang'). It is why",
+    "  the hints exist, not a row the product draws.",
+    "",
+    "CONTRAST: the two inactive mode segments read 4.39 against a 4.5 floor \u2014",
+    "ink-muted on the bg-subtle trough, which is what 169:35 and 169:37 draw. NOT",
+    "introduced here: the identical pair is already baselined on compare-side-by-",
+    "side, compare-overlay and compare-list. Called out in the report.",
+    "",
+    "BOARD-COPY (2026-09-08). Leads and what they are:",
+    "  \u00b7 'v# \u00b7 approved' and '# changes \u00b7 # of #' \u2014 the version number the",
+    "    component has no source for (recorded above) and a count whose live half",
+    "    is split across text nodes.",
+    "  \u00b7 'wood-fired pizza\u2026' \u2014 page content, which renders inside a sandboxed",
+    "    iframe and is not in this document at all.",
+    "  \u00b7 'added / removed / moved / content' rendered with no board drawing them \u2014",
+    "    the change-kind LEGEND. No Compare board draws one. It is deliberate",
+    "    code-ahead, of a piece with LEDGER J-168:48 (`skipped-code-ahead`): the",
+    "    board encodes change kind by colour dot alone, and design codex #6 says",
+    "    colour may not be the sole encoding, so the code keeps icon + label and",
+    "    the legend that decodes them.",
+    "  \u00b7 'rendering current\u2026' \u2014 the pane-body placeholder where the board draws",
+    "    skeleton bars (169:55-57), which are the 1080 pane's internals."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "finding": "UX-I-20",
+  "page": "1:3",
+  "section": "1776:8382",
+  "script": "scripts/figma/add-compare-decision-footer.mjs",
+  "written": "2026-09-07, never run against the file — the Figma seat quota was exhausted account-wide before it could be applied",
+  "apply_with": [
+    "node scripts/figma/add-compare-decision-footer.mjs            # dry run first, always",
+    "node scripts/figma/add-compare-decision-footer.mjs --apply"
+  ],
+  "targets": [
+    { "id": "168:2",  "name": "Compare · side-by-side", "geometry": "1080x776", "id_source": "read-from-file 2026-09-07 (section listing)" },
+    { "id": "168:26", "name": "Compare · overlay",      "geometry": "1080x776", "id_source": "read-from-file 2026-09-07 (section listing)" },
+    { "id": "168:48", "name": "Compare · list",         "geometry": "1080x776", "id_source": "read-from-file 2026-09-07 (section listing)" },
+    { "id": "169:2",  "name": "Compare · single-page",  "geometry": "1080x776", "id_source": "read-from-file 2026-09-07 (section listing)" }
+  ],
+  "deliberately_excluded": [
+    { "id": "168:82", "name": "Compare · no-changes",    "reason": "no drift, so nothing to decide. An action row offering to send zero changes for approval is worse than no action row. Recorded on its caption 172:12 so nobody adds it by pattern-matching." },
+    { "id": "169:28", "name": "Compare · loading-render", "reason": "the comparison does not exist yet" },
+    { "id": "169:92", "name": "Compare · resend-confirm", "reason": "SUPERSEDED 2026-09-02 by 158:2" },
+    { "id": "169:60", "name": "Compare · restore-confirm", "reason": "RETIRED 2026-09-02, no producer" }
+  ],
+  "draws": {
+    "frame": "compare/decision-footer — 1080x56 at x0, y = boardHeight - 56 = 720; fill #FFFFFF; bottom edge lands exactly on the board bottom (776), so verify-invariants sees no out-of-bounds child",
+    "rule": "compare/decision-footer/rule — 1080x1 at y0, fill #E5E7EB",
+    "lead": "compare/decision-footer/lead — 'N changes since Sara approved v3', Inter Regular 12, #6B7280, x16, vertically centred. Sample data is shape, not truth: the family already uses 'Sara' and 'v3' (158:213's toast).",
+    "buttons_right_to_left": [
+      "Send these changes for approval — primary, fill #1A56DB, radius 6, h32, label Inter Medium 13 #FFFFFF, 12px side padding, rightmost at x = 1080-16-width",
+      "Publish anyway — secondary, fill #FFFFFF, 1px #D1D5DB, radius 6, h32, label Inter Medium 13 #111827, 12px side padding, 8px gap",
+      "Dismiss — ghost, no fill, label Inter Regular 13 #6B7280, 8px side padding, 8px gap"
+    ]
+  },
+  "wires": [
+    { "from": "compare/decision-footer/btn-primary",   "to": "158:2",     "to_name": "Review panel · re-send-confirm",   "why": "the single re-send owner established by UX-I-18/19 — sending changes for approval IS a re-send, and it must land on the confirm that says the old link dies" },
+    { "from": "compare/decision-footer/btn-secondary", "to": "1168:4713", "to_name": "Publish · stale-approval (modal)", "why": "publishing over an old approval is exactly the gate's job; this closes UX-I-24's loop from the other direction" },
+    { "from": "compare/decision-footer/btn-ghost",     "to": null,        "why": "Dismiss closes and goes nowhere. An invented destination is worse than an honest absence." }
+  ],
+  "refusal_path_EXPECTED": {
+    "note": "The compare stage renders at flex-1 and may well run to the board's bottom edge. The script MEASURES the lowest existing child and REFUSES any board where the footer would overprint, naming the offending child and the overlap in pixels. This is the likely outcome on some or all four boards, and it is the correct outcome.",
+    "then": "Shorten the compare stage on that board by the reported number of pixels (56 if the stage runs full height), re-run the dry run, then --apply. Do not raise the footer, and do not let it overlap: three earlier writes in this arc dropped controls onto rendered content and each had to be undone."
+  },
+  "mechanics_verified": {
+    "how": "The payload was captured through a stubbed transport and executed against a mock Figma plugin API (four boards, two with content ending at y700/y690 and two running the full 776) — no Figma call was made.",
+    "results": [
+      "dry run: 2 WOULD-draw, 2 REFUSED with the correct 56px overlap and the offending child named",
+      "apply: footer at 0,720 1080x56, bottom 776/776 (no out-of-bounds), children=5, primary -> 158:2, secondary -> 1168:4713",
+      "idempotence: passes 2 and 3 report '(wiped 1 prior)' and land at identical geometry — the wipe happens BEFORE the content is measured, so the footer never measures against its own previous output"
+    ],
+    "what_this_does_NOT_prove": "the real boards' geometry. The mock proves the script's logic; only a dry run against the file proves whether the four boards have room."
+  },
+  "why": "Compare shows what changed since approval and offers no next move — no 'Re-send for approval', no 'Publish anyway', no way to mark a change as intended (ApprovedCompareView.tsx:146-296; ReviewTab.tsx:498-540 wraps it with a Back button and nothing else). The comparison is only useful if it ends on a decision.",
+  "conflict_half_NOT_drawn": "UX-I-20's second half ('no conflict state at all') is deliberately not drawn here. A conflict board already exists at 807:6965 and is marked [not-implemented] because nothing can produce that state — the only conflict code is OTEngine, engine-internal and behind the off-by-default collab flag (see scripts/figma/fix-compare-conflict-board.mjs). Drawing a second one would manufacture a duplicate of an unbuildable screen. Recorded on caption 172:10 instead."
+}

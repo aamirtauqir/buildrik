@@ -1,0 +1,62 @@
+{
+ "_tool": "scripts/figma/add-state-board.mjs <sourceBoardId> \"<name>\" --apply   (one call per row), then scripts/figma/apply-publish-v2-states.mjs --apply for copy + hotspots + final names",
+ "_page": "1:3",
+ "_section": "1776:8378  (15 · Publish · 20 → 24 after this plan)",
+ "_placement_note": "Section grid measured from the live file before the quota cap: xs = 100,500,780,900,1140,1300,1420,1700,2340 · ys = 220,1152,1633,2465,2693,3075,3907,4081 · pitchX resolves to 280 for a 280-wide clone. Row y=220 holds one board (641:2652 at x=100..380), so add-state-board's own collision scan lands these four at x=380 / 660 / 940 / 1220, y=220. All four ids below were read from the live file; the CLONE ids are not knowable until the clone runs, which is why the copy pass addresses them by name and by current characters.",
+ "boards": [
+  {
+   "create_from": "784:4403",
+   "create_from_name": "Publish · failed",
+   "create_name": "Publish · cancelled",
+   "final_name": "[not-implemented] Publish · cancelled — usePublishJob exposes cancel (usePublishJob.ts:97, :228-236) and no UI calls it, so a job can only reach CANCELLED from outside the editor; PublishTab branches on publishing / published / failed only (UX-E-10). The copy does NOT promise 'nothing was deployed': publish.service.ts:414 allows cancel in QUEUED/BUILDING only and no worker step re-checks across runVercelDeploy, so a late cancel can still land a deploy (PHASE4-QA-REPORT §1.2)",
+   "why": "UX-E-10",
+   "text": [
+    { "match": "Publish failed.", "text": "Cancellation requested." },
+    { "match": "VERCEL_TOKEN_INVALID Nothing was deployed.", "alt_match": "Vercel rejected the token · step 4 of 5. Nothing was deployed.", "text": "If the deploy had already started it may still finish. We will tell you which." },
+    { "match": "Try again", "text": "Check status" },
+    { "match": "View log", "text": "Publish again" }
+   ],
+   "inbound": [{ "from_board": "784:4250", "hotspot": "hotspot/state · Publish · cancelled", "bounds": "x=0 y=642 w=280 h=34" }]
+  },
+  {
+   "create_from": "784:4403",
+   "create_from_name": "Publish · failed",
+   "create_name": "Publish · lost contact",
+   "final_name": "[not-implemented] Publish · lost contact — a poll throw sets error and stops polling while the last known status is still BUILDING, so uiState stays \"publishing\" forever, the failure block never renders, the elapsed timer keeps counting and the CTA stays disabled (UX-E-03: usePublishJob.ts:162-170, :299-306; PublishTab.tsx:710). Reloading the editor is the only escape today and nothing on screen says so",
+   "why": "UX-E-03",
+   "text": [
+    { "match": "Publish failed.", "text": "Lost contact with the deploy." },
+    { "match": "VERCEL_TOKEN_INVALID Nothing was deployed.", "alt_match": "Vercel rejected the token · step 4 of 5. Nothing was deployed.", "text": "It may still be running. Last seen at \"Deploying to CDN\", 40s ago." },
+    { "match": "Try again", "text": "Check status" },
+    { "match": "View log", "text": "Start over" }
+   ],
+   "inbound": [{ "from_board": "784:4250", "hotspot": "hotspot/state · Publish · lost contact", "bounds": "x=0 y=676 w=280 h=34" }]
+  },
+  {
+   "create_from": "784:4326",
+   "create_from_name": "Publish · live",
+   "create_name": "Publish · published (simulated)",
+   "final_name": "[not-implemented] Publish · published (simulated) — under PUBLISH_ALLOW_SIMULATION the worker walks all five steps on a timer, marks the job COMPLETED and stores a .dev-simulated.invalid URL; the editor then toasts \"Published — site is live\" with a View-live button exactly as for a real deploy (UX-E-24: route.ts:406-440, :100-105; useExportHandlers.ts:175-185). The deploy mode never reaches the client",
+   "why": "UX-E-24",
+   "text": [
+    { "match": "Published to production.", "text": "Simulated publish — nothing was deployed." },
+    { "match": "v15 · live · just now", "alt_match": "v15 · live · just now · published in this session", "text": "PUBLISH_ALLOW_SIMULATION is on. The URL is on .dev-simulated.invalid and can never resolve." }
+   ],
+   "hide": [{ "match": "View live site", "why": "UX-E-24 — suppress the View-live action when the URL cannot resolve" }],
+   "inbound": [{ "from_board": "784:4326", "hotspot": "hotspot/state · Publish · published (simulated)", "bounds": "x=0 y=710 w=280 h=34" }]
+  },
+  {
+   "create_from": "784:4480",
+   "create_from_name": "Publish · unavailable (feature off)",
+   "create_name": "Publish · no Vercel connection",
+   "final_name": "Publish · no Vercel connection — the honest home for the copy the shipping panel prints in the FEATURE-OFF state instead (PublishTab.tsx:336, :436). Three states were one: feature off, no connection, connection lost — the third is board Publish · load-error (UX-E-04)",
+   "why": "UX-E-04",
+   "_order": "MUST be cloned BEFORE publish-text-1.json runs. The clone inherits 784:4480's CURRENT copy ('Connect Vercel to publish.' / 'Buildrick deploys into your own Vercel account — we host nothing.' / 'Connect Vercel'), which is correct for THIS state; publish-text-1 then rewrites the ORIGINAL to the feature-off sentence.",
+   "text": [],
+   "inbound": [
+    { "from_board": "784:4480", "hotspot": "hotspot/state · Publish · no Vercel connection", "bounds": "x=0 y=710 w=280 h=34" },
+    { "from_board": "893:4518", "over_node": "893:4585", "over_text": "Connect", "note": "893:4585 currently has no reaction; 893:4577 (the footer Connect Vercel button) already points at 784:4480 and should be re-pointed at this new board once it exists — UX-E-04" }
+   ]
+  }
+ ]
+}

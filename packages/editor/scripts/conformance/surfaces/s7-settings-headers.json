@@ -1,0 +1,168 @@
+{
+  "surface": "s7-settings-headers",
+  "board": "S7 · Settings · Headers (Figma 640:2789)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-headers",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-content-security-policy"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-csp",
+      "testId": "set-card-content-security-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3101"
+    },
+    {
+      "name": "card-csp-title",
+      "testId": "set-card-title-content-security-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3102"
+    },
+    {
+      "name": "field-csp",
+      "testId": "set-field-csp-header-value",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3103"
+    },
+    {
+      "name": "field-csp-label",
+      "testId": "set-field-label-csp-header-value",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3104"
+    },
+    {
+      "name": "card-xfo",
+      "testId": "set-card-x-frame-options",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3107"
+    },
+    {
+      "name": "card-xfo-title",
+      "testId": "set-card-title-x-frame-options",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3108"
+    },
+    {
+      "name": "field-xfo",
+      "testId": "set-field-x-frame-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3109"
+    },
+    {
+      "name": "field-xfo-label",
+      "testId": "set-field-label-x-frame-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3110"
+    },
+    {
+      "name": "card-ref",
+      "testId": "set-card-referrer-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3115"
+    },
+    {
+      "name": "card-ref-title",
+      "testId": "set-card-title-referrer-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3116"
+    },
+    {
+      "name": "field-ref",
+      "testId": "set-field-referrer-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3117"
+    },
+    {
+      "name": "field-ref-label",
+      "testId": "set-field-label-referrer-policy",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3118"
+    },
+    {
+      "name": "card-hsts",
+      "testId": "set-card-hsts-http-strict-transport-security",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3123"
+    },
+    {
+      "name": "card-hsts-title",
+      "testId": "set-card-title-hsts-http-strict-transport-security",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3124"
+    },
+    {
+      "name": "field-maxage",
+      "testId": "set-field-max-age",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3129"
+    },
+    {
+      "name": "field-maxage-label",
+      "testId": "set-field-label-max-age",
+      "spec": "s7-settings-headers",
+      "nodeId": "640:3130"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: HeadersScreen reads and writes ONE tRPC row",
+    "(siteDetail.settings.get / .update), so the probe answers that procedure and",
+    "lets the real screen run. Hosted in the board's own pane —",
+    "`.bd-set-pane-body`, which SettingsTab owns — at 824, which is 760 (the card)",
+    "plus its two 32 insets. Same host and same arithmetic as",
+    "s7-settings-general; the ten S7 screens share one pane rather than ten.",
+    "",
+    "ALREADY CONFORMANT, and this recipe is what proves it: 56 properties across",
+    "four cards and four fields. The chassis moved on s7-settings-general",
+    "(638:2378) — cards, the 180 label column, uppercase 11px card titles, the",
+    "bg-app pane — and this screen inherited every bit of it through",
+    "settings/shared.tsx. Nothing visual changed here.",
+    "",
+    "CODE CHANGED — AN ANCHOR DEFECT, not a visual one, and it was blocking the",
+    "measurement rather than showing up in it. `Field` derives its test id from",
+    "its LABEL, and this board names TWO fields 'Policy' (640:3109 under",
+    "X-FRAME-OPTIONS, 640:3117 under REFERRER-POLICY). Both rendered",
+    "`data-testid=\"set-field-policy\"`, so the id resolved to two elements and the",
+    "Referrer-Policy field could not be addressed by any probe or test — a",
+    "selector that matches two things measures the first and reports success.",
+    "`Field` now takes an optional `anchor` stem (defaulting to the label, so the",
+    "other twelve screens are byte-identical) and HeadersScreen passes",
+    "`x-frame-policy` / `referrer-policy`. The on-screen copy is untouched: the",
+    "board says 'Policy' twice and it still says 'Policy' twice.",
+    "",
+    "ALSO CHANGED, same file, same reason: `<Section title=\"\">` — which Headers",
+    "and Localization both use for their trailing save row — rendered an EMPTY",
+    "<h3> (an unlabelled heading in the a11y tree) and derived `set-card-` /",
+    "`set-card-title-` from the empty string, a junk anchor two screens both",
+    "claimed. Section now omits the heading and both ids when the title is empty.",
+    "",
+    "NOT JOINED, and why:",
+    "  640:3125 Field · Enable HSTS — the board draws a TOGGLE above Max age;",
+    "  live folds 'off' into the Max age select's own null preset, so there is no",
+    "  second control to measure. That is a control-count difference, not drift in",
+    "  a control that exists, and adding a toggle whose only job is to set the",
+    "  select to null is a product call, not a conformance one. Reported.",
+    "  640:3111 / 640:3119 / 640:3131, the Selects — 220 wide, 36 high, 10px",
+    "  gutters, radius 8 on a --flowbite/gray/300 edge. Live is",
+    "  SETTINGS_SELECT_THEME in shared.tsx: 5px radius, --bk-gray-200, 7/9",
+    "  padding. This is a SHARED primitive behind all thirteen S7 screens and the",
+    "  board's reading is NOT isolated — 638:2702 on the General board draws the",
+    "  identical box, so four instances across two boards agree and nothing",
+    "  contradicts them. FLAGGED FOR THE ORCHESTRATOR as a family-wide move worth",
+    "  making deliberately, not taken off one screen mid-pass.",
+    "",
+    "FOUND, NOT FIXED: live draws a fifth card, PERMISSIONS-POLICY, that this",
+    "board does not — a header the product supports and the board never got.",
+    "And the screen opens with a 'Not yet enforced' banner saying the values save",
+    "but are never applied to HTTP responses; the board draws no such banner and",
+    "no such caveat, so the board describes a screen that works and the product",
+    "ships one that stores. That is the more important of the two."
+  ]
+}

@@ -11,10 +11,11 @@
 
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SlimLauncher } from "../SlimLauncher";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
+import { makeAsset, makeFile } from "@/editor/media/__tests__/libraryFixture";
 import type { LibraryItem, MediaBucket } from "../../data/mediaTypes";
 
 const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
@@ -51,9 +52,11 @@ const baseProps = () => ({
 });
 
 describe("SlimLauncher — §10 default 280px experience", () => {
-  it("renders panel header with 'Media' title", () => {
+  // v3 IA Q4 (2026-09-14): the panel is "Assets" — rail label, header and
+  // the Webflow/Framer term the target user already uses.
+  it("renders panel header with 'Assets' title", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByRole("heading", { name: /^Media$/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Assets$/ })).toBeInTheDocument();
   });
 
   it("renders TypePills row", () => {
@@ -110,11 +113,10 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
   });
 
-  it("one door, one name — stock is worded the same everywhere", () => {
-    // The footer said "Stock" while the empty and error states said "Browse
-    // stock", in the same panel.
+  it("the footer door is 'Stock' (Clone 3437:36027) and the empty CTA says what pressing it does", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Browse stock");
+    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Stock");
+    expect(screen.getByTestId("media-stock-action")).not.toHaveTextContent("Browse");
     expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
   });
 
@@ -173,6 +175,8 @@ describe("SlimLauncher — §10 default 280px experience", () => {
 
   // The drawer had no retry at all before T9 — MediaTab wired state.retryUpload
   // into the fullpage branch only, so a failed upload here was a dead end.
+  // Clone 3584:45522 keeps Retry for a failure that is not the size gate —
+  // a size failure's door is "Choose a smaller file…" (UploadZone.test).
   it("a failed upload keeps a working Retry", async () => {
     const onRetryUpload = vi.fn();
     const user = userEvent.setup();
@@ -180,11 +184,140 @@ describe("SlimLauncher — §10 default 280px experience", () => {
       <SlimLauncher
         {...baseProps()}
         onRetryUpload={onRetryUpload}
-        uploadQueue={[{ fileName: "poster.png", progress: 0, status: "error", error: "Upload failed — file is 24 MB, limit is 10 MB" }]}
+        uploadQueue={[{ fileName: "poster.png", progress: 0, status: "error", error: "Server rejected" }]}
+        failedUploads={[{ fileName: "poster.png", reason: "Server rejected" }]}
       />,
     );
     await user.click(screen.getByRole("button", { name: /Retry poster.png/i }));
     expect(onRetryUpload).toHaveBeenCalledWith("poster.png");
+  });
+});
+
+/* ─── P3-U · the drawer against the Clone ──────────────────────────────── */
+
+const MB = 1024 * 1024;
+
+/* Clone 3437:36027 (Build · Choose media) — the drawer baseline. */
+describe("Clone 3437:36027 · drawer baseline", () => {
+  it("the footer names the kinds and the code's own limits — not the board's 50 MB", () => {
+    render(<SlimLauncher {...baseProps()} />);
+    expect(screen.getByTestId("media-footer-accepts")).toHaveTextContent(
+      "Images, videos and fonts · up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
+    );
+    // The Clone draws one line under the links; V1 2838:12023's second line is gone.
+    expect(screen.queryByTestId("media-footer-hint")).toBeNull();
+  });
+
+  /* The footer row is `↑ Upload · Stock · Icons · Aa Fonts`. The fourth door
+     is Phase 5's (3686:42317): it opens the Site fonts dialog through the
+     one composer event the dialog listens for, with no file to highlight. */
+  it("'Aa Fonts' closes the footer row and opens Site fonts through ui:site-fonts", () => {
+    const composer = mockComposer();
+    render(<SlimLauncher {...baseProps()} composer={composer} onOpenIconPicker={vi.fn()} />);
+    const links = within(screen.getByTestId("media-footer-links"));
+    expect(links.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Upload", "Stock", "Icons", "Aa Fonts"]);
+    fireEvent.click(screen.getByTestId("media-fonts-action"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:site-fonts", {});
+  });
+
+  it("'Manage assets ↗' sits under the header and opens the full library", async () => {
+    const onOpenLibrary = vi.fn();
+    const user = userEvent.setup();
+    render(<SlimLauncher {...baseProps()} onOpenLibrary={onOpenLibrary} />);
+    const manage = screen.getByTestId("media-manage-assets");
+    expect(manage).toHaveTextContent("Manage assets");
+    // Under the header, above the search — the later Clone frames (3584/3585) place it there.
+    expect(manage.compareDocumentPosition(screen.getByTestId("media-search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(manage);
+    expect(onOpenLibrary).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* Clone 3584:45522 → 3585:23326 → 3584:45876 → 3585:23337: the rejected
+   row's replacement flow, end to end, in the drawer. */
+describe("Clone 3585:23326 / 3585:23337 · replacement upload from the drawer", () => {
+  const rejected = {
+    fileName: "pasta-2.jpg",
+    reason: "Upload failed — file is 62 MB, the limit is 10 MB per file",
+    size: 62 * MB,
+    limit: 10 * MB,
+  };
+  const queueRow = { fileName: "pasta-2.jpg", progress: 0, status: "error" as const, error: rejected.reason };
+
+  function pickReplacement(file: File) {
+    const click = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
+    fireEvent.click(screen.getByTestId("media-upload-error-replace"));
+    click.mockRestore();
+    fireEvent.change(screen.getByTestId("media-replacement-input"), { target: { files: [file] } });
+  }
+
+  it("Choose a smaller file… → the confirm names the pick; Cancel keeps the rejected row", () => {
+    render(<SlimLauncher {...baseProps()} uploadQueue={[queueRow]} failedUploads={[rejected]} onDismissUpload={vi.fn()} />);
+    pickReplacement(makeFile("pasta-2-small.jpg", 8 * MB));
+    expect(screen.getByTestId("media-replacement-modal")).toBeInTheDocument();
+    expect(screen.getByTestId("media-replacement-file")).toHaveTextContent("pasta-2-small.jpg · 8 MB");
+    fireEvent.click(screen.getByTestId("media-replacement-cancel"));
+    expect(screen.queryByTestId("media-replacement-modal")).toBeNull();
+    expect(screen.getByTestId("media-upload-error-row")).toBeInTheDocument();
+  });
+
+  it("Upload file uploads the replacement, drops the rejected row, and the banner reads the result", async () => {
+    const landed = makeAsset({ id: "srv-1", name: "pasta-2-small", originalName: "pasta-2-small.jpg", mimeType: "image/webp", size: 8 * MB });
+    const onUpload = vi.fn(() => Promise.resolve([{ success: true, asset: landed, fileName: "pasta-2-small.jpg" }]));
+    const onDismissUpload = vi.fn();
+    const onOpenLibrary = vi.fn();
+    const composer = mockComposer();
+    render(
+      <SlimLauncher
+        {...baseProps()}
+        composer={composer}
+        uploadQueue={[queueRow]}
+        failedUploads={[rejected]}
+        onUpload={onUpload}
+        onDismissUpload={onDismissUpload}
+        onOpenLibrary={onOpenLibrary}
+      />,
+    );
+    const smaller = makeFile("pasta-2-small.jpg", 8 * MB);
+    pickReplacement(smaller);
+    fireEvent.click(screen.getByTestId("media-replacement-confirm"));
+    expect(onDismissUpload).toHaveBeenCalledWith("pasta-2.jpg");
+    expect(onUpload).toHaveBeenCalledWith([smaller]);
+    expect(screen.queryByTestId("media-replacement-modal")).toBeNull();
+    // 3585:23337 — the banner at the top of the drawer. It names the file the
+    // LIBRARY prints: the pipeline landed a WebP (code:auto-webp), so the
+    // banner and the rail cannot disagree on what the file is called.
+    const banner = await screen.findByTestId("media-replacement-banner");
+    expect(within(banner).getByTestId("media-replacement-name")).toHaveTextContent("pasta-2-small.webp");
+    expect(within(banner).getByTestId("media-replacement-meta")).toHaveTextContent("Uploaded · WEBP · 8 MB · In site library");
+    // Above the search, below Manage assets.
+    expect(banner.compareDocumentPosition(screen.getByTestId("media-search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId("media-manage-assets").compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Manage in full library → the fullpage with this file selected.
+    fireEvent.click(within(banner).getByTestId("media-replacement-manage"));
+    expect(composer.media.selectAssets).toHaveBeenCalledWith(["srv-1"]);
+    expect(onOpenLibrary).toHaveBeenCalledTimes(1);
+  });
+
+  it("a replacement that stayed on this device says so instead of 'In site library'", async () => {
+    const landed = makeAsset({ id: "loc-1", name: "pasta-2-small", originalName: "pasta-2-small.jpg", mimeType: "image/jpeg", size: 8 * MB, localOnly: true });
+    const onUpload = vi.fn(() => Promise.resolve([{ success: true, asset: landed, fileName: "pasta-2-small.jpg" }]));
+    render(<SlimLauncher {...baseProps()} uploadQueue={[queueRow]} failedUploads={[rejected]} onUpload={onUpload} onDismissUpload={vi.fn()} />);
+    pickReplacement(makeFile("pasta-2-small.jpg", 8 * MB));
+    fireEvent.click(screen.getByTestId("media-replacement-confirm"));
+    const banner = await screen.findByTestId("media-replacement-banner");
+    expect(within(banner).getByTestId("media-replacement-meta")).toHaveTextContent("Uploaded · JPG · 8 MB · On this device only");
+  });
+
+  it("a replacement the engine refuses draws no banner — its own rejected row is the door", async () => {
+    const onUpload = vi.fn(() =>
+      Promise.resolve([{ success: false, error: "Upload failed — file is 12 MB, the limit is 10 MB per file", fileName: "pasta-2-medium.jpg" }]),
+    );
+    render(<SlimLauncher {...baseProps()} uploadQueue={[queueRow]} failedUploads={[rejected]} onUpload={onUpload} onDismissUpload={vi.fn()} />);
+    pickReplacement(makeFile("pasta-2-medium.jpg", 9 * MB));
+    fireEvent.click(screen.getByTestId("media-replacement-confirm"));
+    await vi.waitFor(() => expect(onUpload).toHaveBeenCalledTimes(1));
+    expect(screen.queryByTestId("media-replacement-banner")).toBeNull();
   });
 });
 

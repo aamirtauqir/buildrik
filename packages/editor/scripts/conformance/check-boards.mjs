@@ -97,6 +97,42 @@ for (const id of recipeIds) {
   }
 }
 
+/* 2b. A board's `recipe` must be a recipe that actually measures THAT board.
+ *
+ * The two are written by different hands — recipes by whoever conforms a
+ * surface, the `recipe` field on a board row by whoever records the verdict —
+ * and nothing tied them together. On 2026-09-08 eleven Brand rows were recorded
+ * from an agent's prose rather than from the recipes, and six node ids were
+ * simply wrong: `152:112` (Brand · presets) was stamped `recipe:
+ * brand-starters` with the starters verdict, over a row that was still
+ * `driven`. Every gate passed. The wrong claim was caught by hand, which is not
+ * a control.
+ *
+ * A row claiming a recipe is a claim that the board was measured. This checks
+ * the claim against the join the recipe actually makes. */
+for (const board of manifest.boards) {
+  if (!board.recipe) continue;
+  const path = join(SURFACES, `${board.recipe}.json`);
+  if (!existsSync(path)) {
+    fail(`board "${board.name}" (${board.nodeId}) names recipe "${board.recipe}", which does not exist.\n` +
+         `         fix:   correct the recipe name, or clear the field.`);
+    continue;
+  }
+  const recipe = JSON.parse(readFileSync(path, "utf8"));
+  const joined = new Set();
+  for (const t of recipe.targets ?? []) {
+    if (!t.spec) continue;
+    const sp = join(SPECS, `${t.spec}.json`);
+    if (existsSync(sp)) joined.add(JSON.parse(readFileSync(sp, "utf8")).nodeId);
+  }
+  // A recipe may join several boards; it need only include this one.
+  if (joined.size && !joined.has(board.nodeId)) {
+    fail(`board "${board.name}" (${board.nodeId}) names recipe "${board.recipe}", but that recipe measures ` +
+         `${[...joined].join(", ")} — not this board.\n` +
+         `         fix:   point the row at the recipe that joins ${board.nodeId}, or clear the field.`);
+  }
+}
+
 // 3. No orphaned ratchets: a baseline key whose recipe is gone protects nothing.
 const live = new Set(recipeIds);
 for (const key of Object.keys(readBaseline())) {

@@ -1,0 +1,97 @@
+{
+  "surface": "media-quota-full",
+  "board": "Media · quota-full (Figma 145:250)",
+  "_note": "Probe: used == total, the ≥100% branch. The waitFor is on `media-quota-full-band`, which exists only in that branch. The board splits this state into TWO blocks where the code had one: a 40h band of --color/error at 12% (145:297, no content — it is the track at 100%) over an 84h --color/bg-subtle block carrying the reason and the reassurance at 11/16 ink-muted (145:298), and the whole footer goes bg-subtle with it (145:294). The code drew one red-50 card with the reason at 13px red-700 — a colour outside the token set — and left the footer white. Board won on all of it. NOT joined: 145:299 (w-239) and 155:6 (w-174), text-frame auto-widths; 145:299 also reads `font-size: #6b7280` in the spec, which is an extract.mjs defect, not a board value — see the report. NOT conformed: the board greys `⬡ Icons` in the footer alongside Upload. Icons run `mediaOps.insertMedia(name, \"icon\")` and store no blob, so the quota does not gate them; greying a control that still works is the lie the disabled state exists to avoid. Upload IS disabled, as the board draws it. CONTRAST, DECLARED AND NOT QUIETLY BASELINED: this board asks for --color/ink-muted (#6B7280) on --color/bg-subtle (#F3F4F6), which computes 4.39:1 against a 4.5 floor. Both lines of 145:298 fail it. That is the standing --bk-ink-muted defect (docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md): the token passes on white and fails on every tint the system ships, the boards themselves specify the pair, and a call site cannot fix it — the same call boards.json already records for media-used-sub-* on board 75:2. The fix is a token value, not a class here. TWO MORE failures in the same block were avoidable and were avoided: the footer's accept list and library hint are ink-SOFT (7.0 on this tint), because no board asserts a colour for them that could be conformed either way.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-quota-full",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-quota-full-band"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-quota-full",
+      "nodeId": "145:250"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-quota-full",
+      "nodeId": "208:331"
+    },
+    {
+      "name": "search",
+      "testId": "media-search",
+      "spec": "media-quota-full",
+      "nodeId": "145:255"
+    },
+    {
+      "name": "folder-row",
+      "testId": "media-folder-row",
+      "spec": "media-quota-full",
+      "nodeId": "145:258"
+    },
+    {
+      "name": "type-chips",
+      "testId": "media-type-chips",
+      "spec": "media-quota-full",
+      "nodeId": "145:261"
+    },
+    {
+      "name": "chip-image",
+      "testId": "media-type-chip-img",
+      "spec": "media-quota-full",
+      "nodeId": "145:262"
+    },
+    {
+      "name": "chip-video",
+      "testId": "media-type-chip-vid",
+      "spec": "media-quota-full",
+      "nodeId": "145:265"
+    },
+    {
+      "name": "chip-svg",
+      "testId": "media-type-chip-ico",
+      "spec": "media-quota-full",
+      "nodeId": "145:268"
+    },
+    {
+      "name": "chip-icon",
+      "testId": "media-type-chip-fnt",
+      "spec": "media-quota-full",
+      "nodeId": "145:271"
+    },
+    {
+      "name": "asset-grid",
+      "testId": "media-grid",
+      "spec": "media-quota-full",
+      "nodeId": "145:274"
+    },
+    {
+      "name": "quota-band",
+      "testId": "media-quota-full-band",
+      "spec": "media-quota-full",
+      "nodeId": "145:297"
+    },
+    {
+      "name": "quota-copy",
+      "testId": "media-quota-bar",
+      "spec": "media-quota-full",
+      "nodeId": "145:298"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-quota-full",
+      "nodeId": "145:294"
+    }
+  ]
+}

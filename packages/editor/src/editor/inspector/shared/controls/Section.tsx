@@ -63,10 +63,11 @@ export const Section: React.FC<SectionProps> = ({
     onToggle?.(newState);
   };
 
-  const contentId = `section-content-${title.toLowerCase().replace(/\s+/g, "-")}`;
+  const slug = title.toLowerCase().replace(/\s+/g, "-");
+  const contentId = `section-content-${slug}`;
 
   return (
-    <div className={`bdi-sec${isOpen ? "" : " closed"}`} id={id}>
+    <div className={`bdi-sec${isOpen ? "" : " closed"}`} id={id} data-testid={`inspector-section-${slug}`}>
       {/* The header row is a container. The TOGGLE inside it carries the
           button role, and the action slot (e.g. BackgroundSection's bdi-plus,
           which is a real button) is its SIBLING — not its child.
@@ -79,7 +80,7 @@ export const Section: React.FC<SectionProps> = ({
           flowbite's own height — measured, the header row grew by twenty
           points — and Gate 24 keeps raw <button> out of chrome, so the role
           stays on a span.) */}
-      <div className="bdi-sec-h">
+      <div className="bdi-sec-h" data-testid={`inspector-sechead-${slug}`}>
         <span
           role="button"
           tabIndex={0}
@@ -95,7 +96,7 @@ export const Section: React.FC<SectionProps> = ({
           aria-controls={contentId}
           aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
         >
-          <span className="bdi-sec-name">{title}</span>
+          <span className="bdi-sec-name" data-testid={`inspector-secname-${slug}`}>{title}</span>
           {/* A summary of what is inside is worth a line only while it is shut.
               Open, the rows say it better, and the boards' expanded headers
               (807:8342, 807:8567) carry nothing but their chevron. */}

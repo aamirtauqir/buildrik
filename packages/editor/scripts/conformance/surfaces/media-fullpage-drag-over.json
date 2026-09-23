@@ -1,0 +1,84 @@
+{
+  "surface": "media-fullpage-drag-over",
+  "board": "Media · fullpage · drag-over · uploading (Figma 1163:13948)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-fullpage-drag-over",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "mgr-dropzone"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE DRAG IS REAL, NOT A PROP. `isDragOver` is LibraryManager's own state",
+    "and its handler tests `dataTransfer.types.includes(\"Files\")`, so the",
+    "probe dispatches an actual `dragenter` carrying an actual File on the",
+    "manager root. A synthetic event with an empty DataTransfer is ignored —",
+    "correctly — and forcing the state through AssetGrid's `isDragOver` prop",
+    "would have skipped the counter logic LibraryManager needs to know when the",
+    "pointer has really left rather than crossed a card boundary. Nothing about",
+    "the component is faked; the pointer is. The wait names the DROPZONE, which",
+    "exists only in this state.",
+    "",
+    "BOARD WON: 1163:14201 puts the veil's headline at 15, where it shipped 16.",
+    "The veil itself (1163:14198) was already the board's — accent-tint on a",
+    "dashed accent edge, covering the 820x760 grid column and not the rail —",
+    "and is joined here as the first measurement it has ever had.",
+    "",
+    "NOT JOINED — THE UPLOAD QUEUE, which is most of what this board draws.",
+    "1163:14186-14197 are three rows mid-flight: 'dinner-menu-fall.pdf → not",
+    "supported' with a Dismiss, 'terrace-night.jpg → uploading…' over a 74/120",
+    "progress bar, and a success-tint 'front-of-house.jpg' row. They come from",
+    "`state.uploadQueue`, which useUploadState owns and fills from a real",
+    "upload; there is no seam to hand it a queue, and inventing one would be a",
+    "prop that exists only for the probe. The rows ARE built (`.mgr-upload*`,",
+    "AssetGrid:428-452) and their own board pass belongs with a fixture that",
+    "can drive an upload. Recorded rather than quietly dropped.",
+    "",
+    "1163:14199, the veil's copy block, is not joined either: its only",
+    "distinguishing fill is `#ffffff`, which is Figma's default frame colour on",
+    "a group that visibly sits ON the tint. Its gap of 8 is the dropzone's own",
+    "and IS measured. The chassis (rail, toolbar, status, columns) is measured",
+    "on media-fullpage-library and not re-joined here.",
+    "",
+    "CONTRAST — five, all the `.mgr-kind` file-kind badge behind the veil, the",
+    "same board-mandated scrim recorded on media-fullpage-library. Nothing on",
+    "this board's own subject fails."
+  ],
+  "targets": [
+    {
+      "name": "drop-veil",
+      "testId": "mgr-dropzone",
+      "spec": "media-fullpage-drag-over",
+      "nodeId": "1163:14198"
+    },
+    {
+      "name": "veil-title",
+      "testId": "mgr-dropzone-title",
+      "spec": "media-fullpage-drag-over",
+      "nodeId": "1163:14201"
+    },
+    {
+      "name": "col-grid",
+      "testId": "mgr-grid-col",
+      "spec": "media-fullpage-drag-over",
+      "nodeId": "1163:14026"
+    },
+    {
+      "name": "status",
+      "testId": "mgr-status",
+      "spec": "media-fullpage-drag-over",
+      "nodeId": "1163:14149"
+    },
+    {
+      "name": "quota-bar",
+      "testId": "mgr-quota-bar",
+      "spec": "media-fullpage-drag-over",
+      "nodeId": "1163:14154"
+    }
+  ]
+}

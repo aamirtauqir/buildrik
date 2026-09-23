@@ -34,8 +34,15 @@ export const MODAL_FOOT_CLASS =
      sit directly in it or one div down, and missed every modal that wraps them
      in its own flex row — the delete confirm shipped 40-tall buttons against a
      board drawing 28 because of exactly that. There is no case where a button
-     inside a modal footer should keep flowbite's 40. */
-  "tw:[&_button]:h-7 tw:[&_button]:min-h-0";
+     inside a modal footer should keep flowbite's 40.
+
+     The INSET is the same fact and was missing: the design system's Button
+     (9:102) is 28h with 12/6 padding wherever a board instantiates it —
+     641:2597 in the Components library footer, 642:3397 and 642:3399 in the
+     create-component modal's own footer — and flowbite's default 20/10 was
+     surviving here because h-7 only constrains height. Height and inset travel
+     together or the button is not the board's button. */
+  "tw:[&_button]:h-7 tw:[&_button]:min-h-0 tw:[&_button]:px-3 tw:[&_button]:py-1.5";
 
 const KIND_WIDTH_CLASS: Record<ModalKind, string> = {
   question: "tw:w-[440px]",
@@ -54,15 +61,34 @@ export interface ModalProps {
   dismissOnScrimClick?: boolean;
   /** Board 183:16 — a form with unsaved input pulses instead of closing. */
   dirty?: boolean;
+  /**
+   * Conformance anchor. Every measured element in this editor is addressed by
+   * `data-testid` — recipes may not name a CSS class (lib.mjs `validateRecipe`)
+   * — and this primitive was the one overlay with no anchor at all, so no
+   * modal board could be measured without wrapping the thing under test.
+   * Stamps the frame; the foot gets `modal-foot-<testId>`.
+   *
+   * The foot's PREFIX, and the fact that the attribute value STARTS with the
+   * template literal, are both load-bearing rather than cosmetic.
+   * `check-anchors` can only see a derived id through the literal text before
+   * the interpolation (lib.mjs `anchorForm`, which matches
+   * ``data-testid={`…${``), so neither `${testId}-foot` nor
+   * ``testId ? `modal-foot-${testId}` : undefined`` greps as anything, and
+   * every recipe naming the foot was reported as an anchor that does not
+   * exist. Two surfaces hit that on the same afternoon. Hence the fallback
+   * name: the foot is always anchored, so the attribute never has to be
+   * written conditionally.
+   */
+  testId?: string;
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick, dirty,
+  open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick, dirty, testId,
 }: ModalProps) {
   const titleId = React.useId();
   return (
     <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
-      <div className={[MODAL_FRAME_BASE_CLASS, KIND_WIDTH_CLASS[kind]].join(" ")}>
+      <div className={[MODAL_FRAME_BASE_CLASS, KIND_WIDTH_CLASS[kind]].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
             {title}
@@ -70,7 +96,11 @@ export function Modal({
           {subtitle ? <span className={MODAL_SUBTITLE_CLASS}>{subtitle}</span> : null}
         </div>
         {children ? <div className={MODAL_BODY_CLASS}>{children}</div> : null}
-        {footer ? <div className={MODAL_FOOT_CLASS}>{footer}</div> : null}
+        {footer ? (
+          <div className={MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
+            {footer}
+          </div>
+        ) : null}
       </div>
     </OverlayMount>
   );

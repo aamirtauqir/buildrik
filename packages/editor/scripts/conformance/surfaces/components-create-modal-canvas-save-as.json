@@ -1,0 +1,169 @@
+{
+ "surface": "components-create-modal-canvas-save-as",
+ "board": "Components · create (modal) — canvas save-as (Figma 1170:4777)",
+ "url": "http://localhost:5050/",
+ "viewport": {
+  "width": 1440,
+  "height": 900
+ },
+ "steps": [
+  {
+   "action": "clickIfPresent",
+   "testId": "rail-coach-got-it"
+  },
+  {
+   "action": "waitFor",
+   "testId": "insert-el-Container"
+  },
+  {
+   "action": "click",
+   "testId": "insert-el-Container"
+  },
+  {
+   "action": "press",
+   "key": "Shift+A"
+  },
+  {
+   "action": "waitFor",
+   "testId": "comp-create"
+  },
+  {
+   "action": "click",
+   "testId": "comp-create"
+  },
+  {
+   "action": "waitFor",
+   "testId": "create-component-modal"
+  },
+  {
+   "action": "click",
+   "testId": "create-component-variant-toggle"
+  },
+  {
+   "action": "waitFor",
+   "testId": "create-component-variant-panel"
+  }
+ ],
+ "contrastScope": "body",
+ "targets": [
+  {
+   "name": "name-label",
+   "testId": "create-component-name-label",
+   "spec": "components-create-modal-canvas-save-as",
+   "nodeId": "1712:8394"
+  },
+  {
+   "name": "variant-label",
+   "testId": "create-component-variant-label",
+   "spec": "components-create-modal-canvas-save-as",
+   "nodeId": "1712:8409"
+  },
+  {
+   "name": "variant-check-label",
+   "testId": "create-component-variant-check-label",
+   "spec": "components-create-modal-canvas-save-as",
+   "nodeId": "1712:8411"
+  },
+  {
+   "name": "variant-hint",
+   "testId": "create-component-variant-hint"
+  },
+  {
+   "name": "prefill-label",
+   "testId": "create-component-prefill-label",
+   "spec": "components-create-modal-canvas-save-as",
+   "nodeId": "1712:8427"
+  },
+  {
+   "name": "modal",
+   "testId": "create-component-modal"
+  },
+  {
+   "name": "name-input",
+   "testId": "create-component-name"
+  },
+  {
+   "name": "description",
+   "testId": "create-component-description"
+  },
+  {
+   "name": "variant-panel",
+   "testId": "create-component-variant-panel"
+  },
+  {
+   "name": "variant-chip",
+   "testId": "create-component-variant-chip-Size"
+  },
+  {
+   "name": "prefill-checkbox",
+   "testId": "create-component-prefill-toggle"
+  },
+  {
+   "name": "submit",
+   "testId": "create-component-submit"
+  }
+ ],
+ "_note": [
+  "ONE MODAL, TWO TRIGGERS — StudioModals.tsx:242 opens the same",
+  "CreateComponentModal for the sidebar's '+ Create component' and for the",
+  "canvas context menu's 'Save as component'. Only the second passes",
+  "selectionContext, which is why THIS board (the canvas one) draws the hint",
+  "as '2 styles will bind to your DS tokens…' while the sidebar path reads",
+  "'Lift matching values into token / preset bindings on save.' That is the",
+  "documented branch at CreateComponentModal.tsx:56, not drift. The recipe",
+  "drives the sidebar trigger because measure.mjs has no right-click step;",
+  "everything it measures is identical between the two.",
+  "",
+  "WHY MOST OF THIS BOARD IS NOT JOINED — the adjudication, not a shortcut.",
+  "",
+  "1170:4777 is a FLATTENED REDRAW of the shipped modal. Every one of its 42",
+  "nodes is a raw rectangle or text layer; it instantiates no component from",
+  "the file at all. Compare 641:2546 (Components · library) in the same",
+  "family, which instantiates Panel header 16:6, Section header 16:16 and",
+  "Button 9:102 — its numbers ARE the design system's. This board's",
+  "primitives carry Figma defaults instead: inputs 36h / radius 4, modal",
+  "radius 8 with a 20px body inset, title 16/24, a rule under the title.",
+  "",
+  "Each of those is contradicted by boards that DO speak the design system:",
+  "  input height   642:3380 draws the same modal's Input at 42h. Ours is 42.",
+  "  modal insets   MODAL_HEAD/BODY are 16, measured on 1164:4713, 1175:4827,",
+  "                 1205:4804, 1170:4713, 1170:4749, 1172:4840 and 184:24 —",
+  "                 the comment in Modal.tsx says '16/14, not 20'. Taking 20",
+  "                 here would break seven boards to satisfy one.",
+  "  title          14/600 from that same set of seven; this board says 16/24.",
+  "  title rule     no other modal board draws one, 642:3375 included.",
+  "So the board wins on STRUCTURE and COPY — which it already has, field for",
+  "field, placeholder for placeholder, down to 'Comma-separated tags for",
+  "easier searching' — and loses on primitive geometry to chrome-ui.",
+  "boards.json already recorded this shape as",
+  "'drift-same-modal-two-triggers-neither-matches'.",
+  "",
+  "WHAT IS JOINED is the part of the board that is NOT a Figma default: its",
+  "type scale. 12px for field labels and section hints, 13px for the two",
+  "checkbox rows. Those the code matches exactly.",
+  "(`line-height: normal` on those nodes reads back as UNKNOWN, not PASS —",
+  "the board states no line box, so there is nothing to compare against.)",
+  "",
+  "TWO REAL DEFECTS FOUND AND FIXED against this board:",
+  "  variant chips shipped 40px tall against 1712:8416's 28. CHIP set px/py",
+  "    and no height, so flowbite's own tw:h-10 survived — the exact trap",
+  "    CLAUDE.md §Chrome documents ('a DIFFERENT property does not conflict",
+  "    and loses'). The footer's [&_button]:h-7 does not reach into the body.",
+  "  the footer buttons carried flowbite's 20/10 inset; 1712:8431 and the two",
+  "    Button instances on 642:3112 all draw 12/6. Fixed in MODAL_FOOT_CLASS",
+  "    beside the h-7 that was already there for the same reason.",
+  "",
+  "The chip is measured but not joined: at 28h, --bk-bg-subtle fill and the",
+  "board's 16px radius it now matches 1712:8416 on every property except",
+  "width — 104.1 against 100 for the same string at the same size and inset,",
+  "which is Figma's text metrics against Chrome's, not a padding the code",
+  "could change without fitting itself to one sample label.",
+  "",
+  "variant-hint is measured but not joined for a different reason: the",
+  "extractor parked a COLOUR in 1712:8413's `font-size` (\"#6b7280\"), so the",
+  "only verdict that node can produce is UNKNOWN. A spec bug on one text",
+  "node, not a product one; 1712:8423 has the same shape.",
+  "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"create-component-modal\\\"]\", which resolved to a subtree holding none of the text under test — ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero.",
+  "COACH DISMISSAL ADDED 2026-09-08. This recipe passed until the S1 arc FIXED the onboarding credit bug: useComposerInit's bootstrap emitted page:created for a page the user never made, so the checklist started at 1/7 and `showCoach` — which requires completedCount === 0 — was false for every user who ever existed. With the credit corrected the coach finally renders, and it is a fixed 240x154 bubble at x72-312 / y152-306 that covers the Insert drawer's first six rows. `waitFor` on an Insert row still passes; the CLICK times out on an intercepted pointer. Dismissing it first is what a person does. That the coach covers the drawer at all is the live half of authority=open:first-run-drawer and is NOT fixed by this step."
+ ]
+}

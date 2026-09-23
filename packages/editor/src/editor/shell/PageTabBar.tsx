@@ -263,10 +263,12 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
                 }
               }}
               className={`${TAB} ${page.id === activePageId ? TAB_ACTIVE : TAB_RESTING}`}
+              data-testid={`page-tab-${page.id}`}
             >
               {page.isHome && (
                 <span
                   className={`tw:text-[12px] tw:font-medium ${page.id === activePageId ? "tw:text-[var(--bk-ink-soft)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+                  data-testid={`page-tab-home-${page.id}`}
                   aria-hidden="true"
                 >
                   {"\u2302"}
@@ -335,7 +337,9 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
                   )}
                 </span>
               ) : (
-                <span className={TAB_NAME}>{page.name}</span>
+                <span className={TAB_NAME} data-testid={`page-tab-name-${page.id}`}>
+                  {page.name}
+                </span>
               )}
               {dirtyPages.has(page.id) && (
                 <span className={DIRTY_DOT} aria-hidden="true" title="Unsaved changes" />
@@ -348,6 +352,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
         <Button
           onClick={handleAddPage}
           className={ADD_BTN}
+          data-testid="page-tab-add"
           title="Add page"
           aria-label="Add new page"
         >
@@ -448,8 +453,10 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
 const BAR = "tw:relative tw:border-y tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-app)]";
 const ROW = "tw:flex tw:items-end tw:gap-2 tw:px-2 tw:pt-1";
 const TABS = "tw:flex tw:min-w-0 tw:items-end tw:gap-0.5 tw:overflow-x-auto";
+/* gap 6, not 4: board 435:2352/2365/2369 all draw the home glyph, the label
+   and the dirty dot 6px apart. */
 const TAB =
-  "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:whitespace-nowrap tw:cursor-pointer " +
+  "tw:flex tw:items-center tw:gap-1.5 tw:px-3 tw:py-1.5 tw:whitespace-nowrap tw:cursor-pointer " +
   "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
 const TAB_RESTING = "tw:mb-1 tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
 const TAB_ACTIVE =

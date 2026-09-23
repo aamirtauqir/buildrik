@@ -1,0 +1,50 @@
+[
+  {
+    "id": null,
+    "unresolved-id": true,
+    "selector": {
+      "page": "1:3",
+      "section": "1776:8379",
+      "board": "138:53",
+      "boardName": "Insert · searching",
+      "match": "⌘F",
+      "hint": "The kbd hint inside the search box. On board 137:2 the equivalent node is TEXT 137:10 '⌘F' at (218,7 16x16) inside frame 137:8 'search box' inside 137:7 'Search'. 138:53 is the same 280x812 panel at x=2100,y=220, so expect the same structure with different ids."
+    },
+    "text": "✕",
+    "expect": "⌘F",
+    "why": "UX-A-12 — the field must offer a clear control whenever it holds text. The ⌘F hint is correct on the EMPTY field (137:2 keeps it); on the searching state it must become the ✕ the code's own tip #2 already promises. SearchBar.tsx:76-101 currently renders kbdHint and nothing else, so this is a design change the board makes first.",
+    "id_source": "INFERRED — 138:53's inner nodes were never read (quota stop). Resolve by reading 138:53 and matching characters '⌘F'."
+  },
+  {
+    "id": null,
+    "unresolved-id": true,
+    "selector": {
+      "page": "1:3",
+      "section": "1090:4527 (moving to 1776:8379 — see insert-layout.json)",
+      "board": "1069:4790",
+      "boardName": "Insert · components-expanded",
+      "match": "14",
+      "hint": "The COMPONENTS group-header count, right-aligned. On 137:2 the equivalent is TEXT 137:31 '14' at (244,8 14x16) inside frame 137:28 'Group header · COMPONENTS'."
+    },
+    "text": "14",
+    "expect": "14",
+    "why": "VIS-3-29 — the header reads 14 and 21 rows are drawn beneath it. 14 is the code truth (blockRegistry.ts:187-202 componentBlockDefinitions has exactly 14 entries), so the COUNT is right and the LIST is wrong. This row is a no-op guard: the real edit is deleting the 7 surplus rows — see insert-row-labels.json.",
+    "id_source": "INFERRED — 1069:4790's inner nodes were never read (quota stop)."
+  },
+  {
+    "id": null,
+    "unresolved-id": true,
+    "selector": {
+      "page": "1:3",
+      "section": "1776:8379",
+      "board": "138:106",
+      "boardName": "Insert · no-results",
+      "match": "Nothing matches",
+      "hint": "The zero-results sentence. Code string (SearchResults.tsx:44-46) is: Nothing matches ‘{query}’.  — curly quotes, trailing period."
+    },
+    "text": "Nothing matches ‘hero’.",
+    "expect": "Nothing matches",
+    "why": "UX-A-11 — sample query changed to 'hero' so the board demonstrates the worst case: 'hero' is a real registry block with no ELEMENTS row (UX-A-10) and it is one of the two things the onboarding step names (UX-A-07). Board sample data is not conformed literally; this is a deliberate choice of sample, not a copy correction.",
+    "id_source": "INFERRED — 138:106's inner nodes were never read (quota stop). OPTIONAL row: skip if the existing sample already reads well."
+  }
+]

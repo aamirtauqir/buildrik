@@ -1,0 +1,226 @@
+{
+  "surface": "content-collection-setup",
+  "board": "Content · collection-setup (modal) (Figma 1170:4713)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-collection-setup",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "cms-setup-name"
+    },
+    {
+      "action": "press",
+      "key": "M"
+    },
+    {
+      "action": "click",
+      "testId": "cms-setup-next"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cms-add-field"
+    },
+    {
+      "action": "click",
+      "testId": "cms-add-field"
+    },
+    {
+      "action": "click",
+      "testId": "cms-add-field"
+    },
+    {
+      "action": "click",
+      "testId": "cms-add-field"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cms-setup-fieldrow-3"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cms-setup-modal\"]",
+  "targets": [
+    {
+      "name": "steps",
+      "testId": "cms-setup-steps",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4815"
+    },
+    {
+      "name": "step1",
+      "testId": "cms-setup-step1",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4816"
+    },
+    {
+      "name": "step1-dot",
+      "testId": "cms-setup-step1-dot"
+    },
+    {
+      "name": "step1-label",
+      "testId": "cms-setup-step1-label",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4819"
+    },
+    {
+      "name": "step2",
+      "testId": "cms-setup-step2",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4821"
+    },
+    {
+      "name": "step2-dot",
+      "testId": "cms-setup-step2-dot",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4822"
+    },
+    {
+      "name": "step2-label",
+      "testId": "cms-setup-step2-label",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4824"
+    },
+    {
+      "name": "caption",
+      "testId": "cms-setup-caption",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4715"
+    },
+    {
+      "name": "name-group",
+      "testId": "cms-setup-name-group",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4716"
+    },
+    {
+      "name": "name-label",
+      "testId": "cms-setup-name-label",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4717"
+    },
+    {
+      "name": "fields-list",
+      "testId": "cms-setup-fields"
+    },
+    {
+      "name": "fieldrow-0",
+      "testId": "cms-setup-fieldrow-0",
+      "spec": "content-collection-setup",
+      "nodeId": "1753:8390"
+    },
+    {
+      "name": "fieldrow-1",
+      "testId": "cms-setup-fieldrow-1",
+      "spec": "content-collection-setup",
+      "nodeId": "1753:8398"
+    },
+    {
+      "name": "fieldrow-2",
+      "testId": "cms-setup-fieldrow-2",
+      "spec": "content-collection-setup",
+      "nodeId": "1753:8406"
+    },
+    {
+      "name": "fieldrow-3",
+      "testId": "cms-setup-fieldrow-3",
+      "spec": "content-collection-setup",
+      "nodeId": "1753:8414"
+    },
+    {
+      "name": "pages-block",
+      "testId": "cms-setup-pages-block",
+      "spec": "content-collection-setup",
+      "nodeId": "1173:4825"
+    },
+    {
+      "name": "foot",
+      "testId": "cms-setup-foot",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4747"
+    },
+    {
+      "name": "cancel",
+      "testId": "cms-setup-cancel"
+    },
+    {
+      "name": "cancel-label",
+      "testId": "cms-setup-cancel",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4744"
+    },
+    {
+      "name": "create",
+      "testId": "cms-setup-create"
+    },
+    {
+      "name": "create-label",
+      "testId": "cms-setup-create",
+      "spec": "content-collection-setup",
+      "nodeId": "1170:4746"
+    }
+  ],
+  "_note": [
+    "Board 1170:4713 draws the wizard's SECOND step, so the recipe walks it there",
+    "through the wizard's own controls — click the name field, type one character",
+    "(step 1 will not advance without a name), Next, then three '＋ Add field'",
+    "clicks for the board's four rows. Mounted directly on the probe because",
+    "`isOpen` is owned by AquibraStudio.",
+    "",
+    "BOARD won, four times:",
+    "  1173:4817/4822 the step markers are PILLS — 8/2 insets at radius 999 — not",
+    "  a fixed 20px circle. `rounded-[999px]`, the number the board states.",
+    "  1173:4824 the CURRENT step's word is --color/ink. It was accent-text, which",
+    "  says the same thing the blue dot beside it already says and made the step",
+    "  bar the loudest element in a modal whose subject is a form.",
+    "  1173:4816 the step words are 11, not `text-xs`'s 12.",
+    "  1170:4743 Cancel is a BORDERED white button (--color/border hairline,",
+    "  bg-panel fill) at radius 6 with an 11px label, not the borderless ghost it",
+    "  was; a modal's two exits should read as two controls. 1170:4745 Create takes",
+    "  the same radius and label size.",
+    "The 468-wide 54-tall field rows, the tinted dynamic-pages block, the caption,",
+    "the NAME group and its label all measured clean on arrival.",
+    "",
+    "NOT anchored, and why:",
+    "  1170:4743 / 1170:4745 as BOXES — everything on them matches except 7px of",
+    "  vertical padding against 6. That 6 is `MODAL_FOOT_CLASS`'s",
+    "  `[&_button]:h-7 [&_button]:py-1.5`, a two-class-deep cap that every modal",
+    "  footer in the product inherits and whose own comment cites three boards",
+    "  (641:2597, 642:3397, 642:3399) drawing 28-29. One screen board asking for 7",
+    "  does not re-settle it. Their LABEL nodes (1170:4744/4746) are anchored and",
+    "  pass, so the 11px and the two colours are still compared.",
+    "  1173:4817 the step-1 dot: the same board draws its two dots at 7 and 8 px of",
+    "  inset. Two instances of one marker disagreeing settle nothing, so the shared",
+    "  dot takes the 8 and step 2 is what is measured.",
+    "  1170:4720 the fields list at 216. The board's own children contradict it:",
+    "  four 54-tall rows at gap 6 sum to 234, which is what live renders. 216 is",
+    "  4 x 54 with the gaps dropped — a clipped Figma frame.",
+    "  1170:4718 the NAME input (bg-subtle fill, --color/border, 10/8 insets,",
+    "  radius 6) and 1753:8392/8400/8408/8416 + 1753:8394/… the row inputs and",
+    "  type selects (42 tall at radius 4). Chrome-wide TextInput/Select, held at",
+    "  `authority=open:input-fill`. Worth recording for that decision: THIS board",
+    "  draws the control 42 tall — agreeing with the shipped theme and",
+    "  disagreeing with 149:108's 32 — and asks for radius 4 where 149:108 asks",
+    "  for 6 and the theme ships 8. Three boards, three answers.",
+    "  1170:4713 the frame and 1170:4714 the title — shared ModalContent /",
+    "  ModalTitle, measured on every modal board (see the content-records note).",
+    "  1170:4748 a 6px spacer frame.",
+    "",
+    "The board's `[not-implemented]` header is not this recipe's subject and is",
+    "still true: step 1's Content type is written and never read, the field row's",
+    "grab cursor has no drag handlers, and the five types here cannot create the",
+    "Slug field this wizard's own /{slug} default depends on.",
+    "",
+    "contrastScope is the modal itself, not `[data-probe]`: ModalRoot portals to",
+    "the overlay root, which sits OUTSIDE the probe wrapper — scoped to the wrapper",
+    "the contrast sweep and the copy check both read an empty subtree and reported",
+    "zero of everything.",
+    "",
+    "CONTRAST: 4 recorded, all the field rows' `⠿` drag handle at ink-muted on the",
+    "row's bg-subtle fill = 4.39 — the 39-instance token defect in",
+    "docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md, specified by the board",
+    "and fixable only by moving the token value in Figma. Pre-existing; the sweep",
+    "could not see it until the scope above was corrected."
+  ]
+}

@@ -109,7 +109,7 @@ describe("useUploadState — upload() quota cap", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("big.png", 200)]);
+      ok = (await result.current.upload([makeFile("big.png", 200)])).every((r) => r.success);
     });
 
     expect(ok).toBe(false);
@@ -128,7 +128,7 @@ describe("useUploadState — upload() quota cap", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("more.png", 100)]);
+      ok = (await result.current.upload([makeFile("more.png", 100)])).every((r) => r.success);
     });
 
     expect(ok).toBe(false);
@@ -142,7 +142,7 @@ describe("useUploadState — upload() quota cap", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("small.png", 50)]);
+      ok = (await result.current.upload([makeFile("small.png", 50)])).every((r) => r.success);
     });
 
     expect(ok).toBe(true);
@@ -157,7 +157,7 @@ describe("useUploadState — upload() quota cap", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("huge.mp4", 5000)]);
+      ok = (await result.current.upload([makeFile("huge.mp4", 5000)])).every((r) => r.success);
     });
 
     expect(ok).toBe(true);
@@ -173,7 +173,7 @@ describe("useUploadState — duplicate names + failures", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("logo.png", 10)]);
+      ok = (await result.current.upload([makeFile("logo.png", 10)])).every((r) => r.success);
     });
 
     expect(showToast).toHaveBeenCalledWith(
@@ -190,7 +190,7 @@ describe("useUploadState — duplicate names + failures", () => {
 
     let ok: boolean | undefined;
     await act(async () => {
-      ok = await result.current.upload([makeFile("fail.png", 10)]);
+      ok = (await result.current.upload([makeFile("fail.png", 10)])).every((r) => r.success);
     });
 
     expect(ok).toBe(false);
@@ -232,6 +232,75 @@ describe("useUploadState — duplicate names + failures", () => {
     });
 
     expect(uploadFile).not.toHaveBeenCalled();
+  });
+
+  /* Clone 3724:20832 reads what landed; 3585:23326 needs the refused file's
+     own numbers. `upload` resolves the engine's per-file results. */
+  it("upload resolves the engine's result per file — the asset that landed, or the reason", async () => {
+    const { uploadFile, result } = setup();
+    uploadFile
+      .mockResolvedValueOnce({ success: true, asset: { id: "a1" }, fileName: "ok.png" })
+      .mockResolvedValueOnce({ success: false, error: "Upload failed — file is 62 MB, the limit is 10 MB per file", fileName: "big.jpg" })
+      .mockRejectedValueOnce(new Error("disk full"));
+
+    let results: Awaited<ReturnType<typeof result.current.upload>> = [];
+    await act(async () => {
+      results = await result.current.upload([makeFile("ok.png", 10), makeFile("big.jpg", 10), makeFile("boom.png", 10)]);
+    });
+
+    expect(results).toEqual([
+      { success: true, asset: { id: "a1" }, fileName: "ok.png" },
+      { success: false, error: "Upload failed — file is 62 MB, the limit is 10 MB per file", fileName: "big.jpg" },
+      { success: false, error: "disk full", fileName: "boom.png" },
+    ]);
+  });
+
+  it("a file the engine refused (resolved, not thrown) is retained for retry too", async () => {
+    /* Only a THROWN upload was retained, so Retry on an oversized file — the
+       common failure — silently did nothing. */
+    const { uploadFile, result } = setup();
+    uploadFile.mockResolvedValueOnce({ success: false, error: "too big", fileName: "big.jpg" });
+    await act(async () => {
+      await result.current.upload([makeFile("big.jpg", 10)]);
+    });
+    await act(async () => {
+      result.current.retryUpload("big.jpg");
+    });
+    expect(uploadFile).toHaveBeenCalledTimes(2);
+  });
+
+  it("UPLOAD_ERROR's size and limit ride along on the failure record (Clone 3584:45522)", () => {
+    const { composer, result } = setup();
+    act(() => {
+      composer._emitMedia(MEDIA_EVENTS.UPLOAD_ERROR, {
+        fileName: "pasta-2.jpg",
+        error: "Upload failed — file is 62 MB, the limit is 10 MB per file",
+        size: 62 * 1024 * 1024,
+        limit: 10 * 1024 * 1024,
+      });
+    });
+    expect(result.current.failedUploads).toEqual([
+      {
+        fileName: "pasta-2.jpg",
+        reason: "Upload failed — file is 62 MB, the limit is 10 MB per file",
+        size: 62 * 1024 * 1024,
+        limit: 10 * 1024 * 1024,
+      },
+    ]);
+  });
+
+  it("dismissUpload drops the failure from the queue AND the failure record", () => {
+    const { composer, result } = setup();
+    act(() => {
+      composer._emitMedia(MEDIA_EVENTS.UPLOAD_ERROR, { fileName: "pasta-2.jpg", error: "too big" });
+    });
+    expect(result.current.uploadQueue).toHaveLength(1);
+    expect(result.current.failedUploads).toHaveLength(1);
+    act(() => {
+      result.current.dismissUpload("pasta-2.jpg");
+    });
+    expect(result.current.uploadQueue).toEqual([]);
+    expect(result.current.failedUploads).toEqual([]);
   });
 });
 
@@ -318,7 +387,7 @@ describe("useUploadState — media event listeners", () => {
     });
   });
 
-  it("UPLOAD_COMPLETE toasts success for files, info for fonts, and recalcs storage", () => {
+  it("UPLOAD_COMPLETE toasts success for every file type and recalcs storage", () => {
     const { composer, getAssets, showToast, result } = setup();
     expect(result.current.storageUsed).toBe(0);
 
@@ -332,16 +401,17 @@ describe("useUploadState — media event listeners", () => {
     expect(showToast).toHaveBeenCalledWith("pic.png uploaded ✓", "success");
     expect(result.current.storageUsed).toBe(250);
 
+    /* A font used to get "Use it via Text Style → Font → My Fonts" — a path
+       that does not exist (nothing calls FontManager.uploadFont, and no
+       picker has a My Fonts group). Until the Site fonts flow lands (Clone
+       Phase 5), a font is an upload like any other. */
     act(() => {
       composer._emitMedia(MEDIA_EVENTS.UPLOAD_COMPLETE, {
         fileName: "brand.ttf",
         mimeType: "font/ttf",
       });
     });
-    expect(showToast).toHaveBeenCalledWith(
-      "Font uploaded! Use it via Text Style → Font → My Fonts",
-      "info"
-    );
+    expect(showToast).toHaveBeenCalledWith("brand.ttf uploaded ✓", "success");
   });
 
   /* "uploaded ✓" over a file that never left the browser. The server mirror is

@@ -18,6 +18,19 @@ import * as React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PublishTab } from "../PublishTab";
+import { deriveLifecycleState } from "../../../../shell/lifecycle";
+
+const OPEN_MOVE = deriveLifecycleState({
+  reviewState: "none",
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: false,
+  hasUnpublishedChanges: null,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+});
 import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
 import { ToastProvider } from "@/editor/chrome-ui";
 /* PublishTab hosts the unpublish confirm and reports its outcome through the
@@ -78,7 +91,7 @@ const renderFailed = (steps: UsePublishJobResult["steps"]) =>
     <PublishTab
       composer={composer}
       projectId="site_1"
-      onVercelPublish={vi.fn()}
+      nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       publishJob={failedJob(steps)}
     />,
   );
@@ -101,7 +114,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
 
   it("names the running step and its position, per the board", async () => {
     renderTab(
-      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(IN_FLIGHT)} />,
+      <PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} publishJob={publishing(IN_FLIGHT)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
     const meta = screen.getByLabelText("Publish progress").querySelector("p");
@@ -114,7 +127,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
   it("falls back to the percentage when no step is running yet", async () => {
     const pending = STEPS.map((s) => ({ ...s, status: "pending" }));
     renderTab(
-      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(pending)} />,
+      <PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} publishJob={publishing(pending)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
     expect(screen.getByText(/50%/)).toBeTruthy();
@@ -122,7 +135,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
 
   it("falls back when the job carries no steps at all", async () => {
     renderTab(
-      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(null)} />,
+      <PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} publishJob={publishing(null)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
     expect(screen.getByText(/50%/)).toBeTruthy();

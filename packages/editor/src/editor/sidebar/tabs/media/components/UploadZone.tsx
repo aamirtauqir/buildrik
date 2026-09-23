@@ -1,83 +1,78 @@
 /**
  * Media Tab — Upload Zone
  *
- * Phase D state machine: idle / drag / near-limit (>=80% used) /
- * full / rejected (file-type / size violation).
+ * Phase D state machine: idle / drag / near-limit (>=80% used) / full.
+ *
+ * The zone no longer refuses files on its own. It used to flash
+ * `"x" exceeds 50MB limit` for four seconds and drop the whole batch — 50 MB
+ * was a number the engine never had (10 MB per image, 1 per SVG, 100 per
+ * video, 5 per font), so a 20 MB JPG passed here and was refused there, while
+ * a 60 MB MP4 the engine would take was blocked here; and the flash was gone
+ * before anyone could act on it. `validateFile` in the engine is the one
+ * gate, and its refusal is the persistent row below with the real numbers
+ * (Clone 3584:45522).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Upload, AlertTriangle, XCircle } from "lucide-react";
-import type { UploadZoneProps } from "../data/mediaTypes";
+import { Upload, AlertTriangle } from "lucide-react";
+import type { FailedUpload, UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
 import { Button, TextInput } from "@/editor/chrome-ui";
 const ACCEPT_TYPES = "image/*,video/*,.ttf,.otf,.woff,.woff2,.svg";
-const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard ceiling at the UI layer
-
-function isAccepted(file: File): boolean {
-  if (file.type.startsWith("image/")) return true;
-  if (file.type.startsWith("video/")) return true;
-  if (file.type.startsWith("font/")) return true;
-  if (/\.(ttf|otf|woff2?|svg)$/i.test(file.name)) return true;
-  return false;
-}
 
 export function UploadZone({
   storage,
   onUpload,
   disabled = false,
   uploadQueue,
+  failedUploads,
   onRetryUpload,
+  onReplacementPicked,
   onOptimize,
   inputRef: externalInputRef,
   compact = false,
 }: UploadZoneProps) {
   // The drawer footer's "Upload" link opens THIS input (board 144:46). A second
-  // input would mean a second accept-list and a second size guard to keep in
-  // step with `isAccepted`, so the caller borrows the one that already exists.
+  // input would mean a second accept-list to keep in step, so the caller
+  // borrows the one that already exists.
   const localInputRef = React.useRef<HTMLInputElement>(null);
   const inputRef = externalInputRef ?? localInputRef;
+  /* Clone 3584:45522 → 3585:23326: `Choose a smaller file…` picks ONE
+     replacement for one refused file. Its own input (single, same accept
+     list, same file) so the multi-file picker above never has to change
+     shape under a click. */
+  const replacementRef = React.useRef<HTMLInputElement>(null);
+  const replacingRef = React.useRef<FailedUpload | null>(null);
   const [isDragOver, setIsDragOver] = React.useState(false);
-  const [rejectedReason, setRejectedReason] = React.useState<string | null>(null);
-  const rejectedTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isFull = storage.used >= storage.total;
   const usedPercent = storage.total > 0 ? (storage.used / storage.total) * 100 : 0;
   const isNearLimit = !isFull && usedPercent >= 80;
 
-  React.useEffect(() => {
-    return () => {
-      if (rejectedTimerRef.current) clearTimeout(rejectedTimerRef.current);
-    };
-  }, []);
-
-  const flashRejection = (reason: string) => {
-    setRejectedReason(reason);
-    if (rejectedTimerRef.current) clearTimeout(rejectedTimerRef.current);
-    rejectedTimerRef.current = setTimeout(() => setRejectedReason(null), 4000);
-  };
-
   const handleFiles = (files: FileList | null) => {
     if (!files?.length || disabled || isFull) return;
-    const fileArr = Array.from(files);
-    const tooBig = fileArr.find((f) => f.size > MAX_FILE_BYTES);
-    if (tooBig) {
-      flashRejection(`"${tooBig.name}" exceeds 50MB limit`);
-      return;
-    }
-    const wrongType = fileArr.find((f) => !isAccepted(f));
-    if (wrongType) {
-      flashRejection(`"${wrongType.name}" type not allowed`);
-      return;
-    }
-    onUpload(fileArr);
+    onUpload(Array.from(files));
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
     if (!isFull) handleFiles(e.dataTransfer.files);
+  };
+
+  const chooseReplacement = (original: FailedUpload) => {
+    replacingRef.current = original;
+    replacementRef.current?.click();
+  };
+
+  const handleReplacementChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const original = replacingRef.current;
+    replacingRef.current = null;
+    e.target.value = "";
+    if (file && original) onReplacementPicked?.(original, file);
   };
 
   // §22 — active upload state (any queue item still in-flight)
@@ -97,39 +92,34 @@ export function UploadZone({
     (q) => q.status === "pending" || q.status === "uploading" || q.status === "optimizing" || q.status === "processing",
   );
 
-  // Visual state priority: rejected > full > uploading > near-limit > drag > idle.
-  const stateClass = rejectedReason
-    ? "med-upload-zone--rejected"
-    : isFull
-      ? "med-upload-zone--disabled"
-      : hasActiveUploads
-        ? "med-upload-zone--uploading"
-        : isNearLimit
-          ? "med-upload-zone--near-limit"
-          : isDragOver
-            ? "med-upload-zone--drag-active"
-            : "";
-
-  const Icon = rejectedReason ? XCircle : isNearLimit ? AlertTriangle : Upload;
-
-  const label = rejectedReason
-    ? rejectedReason
-    : isFull
-      ? "Storage full"
+  // Visual state priority: full > uploading > near-limit > drag > idle.
+  const stateClass = isFull
+    ? "med-upload-zone--disabled"
+    : hasActiveUploads
+      ? "med-upload-zone--uploading"
       : isNearLimit
-        ? `Almost full (${Math.round(usedPercent)}%)`
-        : "Drag files or click to browse";
+        ? "med-upload-zone--near-limit"
+        : isDragOver
+          ? "med-upload-zone--drag-active"
+          : "";
+
+  const Icon = isNearLimit ? AlertTriangle : Upload;
+
+  const label = isFull
+    ? "Storage full"
+    : isNearLimit
+      ? `Almost full (${Math.round(usedPercent)}%)`
+      : "Drag files or click to browse";
 
   return (
     <div className="med-upload-zone-wrap" data-testid="media-upload-zone-wrap">
       {/*
         COMPACT is the drawer (board 144:2), which draws no drop box at all —
         just the two footer links. The zone still has to exist: it owns the file
-        input, the drag target, the accept-list and the rejection copy. So in
-        compact mode it collapses to nothing at rest and only paints while a
-        drag is over it, or when it has something to say (storage full, a
-        rejected file). Hiding it outright would have deleted drag-and-drop to
-        match a static frame.
+        input, the drag target and the accept-list. So in compact mode it
+        collapses to nothing at rest and only paints while a drag is over it, or
+        when it has something to say (storage full). Hiding it outright would
+        have deleted drag-and-drop to match a static frame.
       */}
       <div
         className={[
@@ -137,21 +127,21 @@ export function UploadZone({
           compact && "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:px-4 tw:text-[12px]",
           // Quota pressure paints in StorageQuotaBar's band (boards 145:199 /
           // 145:250) — repeating it here doubled the message. The strip only
-          // surfaces for a drag-over or a rejection flash.
-          compact && (isDragOver || rejectedReason
+          // surfaces for a drag-over.
+          compact && (isDragOver
             ? "tw:h-9 tw:border tw:border-dashed tw:border-[var(--bk-gray-300)] tw:text-[var(--bk-ink-soft)]"
             : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
         ].filter(Boolean).join(" ")}
         data-testid="media-upload-zone"
-        onClick={() => !isFull && !disabled && !rejectedReason && inputRef.current?.click()}
+        onClick={() => !isFull && !disabled && inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
         role="button"
         tabIndex={compact ? -1 : 0}
-        aria-hidden={compact && !isDragOver && !rejectedReason}
+        aria-hidden={compact && !isDragOver}
         aria-label={label}
-        aria-live={rejectedReason ? "assertive" : "polite"}
+        aria-live="polite"
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
       >
         <Icon size={compact ? 14 : 20} className="med-upload-zone-icon" />
@@ -161,30 +151,43 @@ export function UploadZone({
           type="file"
           multiple
           accept={ACCEPT_TYPES}
-          style={{ display: "none" }}
+          className="tw:hidden"
+          data-testid="media-upload-input"
           onChange={(e) => handleFiles(e.target.files)}
+        />
+        <TextInput
+          ref={replacementRef}
+          type="file"
+          accept={ACCEPT_TYPES}
+          className="tw:hidden"
+          data-testid="media-replacement-input"
+          onChange={handleReplacementChange}
         />
       </div>
       <StorageQuotaBar used={storage.used} total={storage.total} onOptimize={onOptimize} compact={compact} />
       {/*
-        Board `145:143` — one 44h row per upload in flight: name, mono percent,
-        and a 4px accent track. Mono because the number changes several times a
-        second and proportional digits make the row twitch while it counts.
+        Clone 3584:45876 (re-draws board 145:143) — one 44h row per upload in
+        flight: name, mono percent, and a 4px accent track. Mono because the
+        number changes several times a second and proportional digits make the
+        row twitch while it counts. The board's ✕ on this row is not drawn:
+        the upload pipeline has no cancel, and a ✕ that only hid the row while
+        the file still landed would say the opposite of what it does.
       */}
       {activeItems.length > 0 && (
         <ul className="tw:m-0 tw:list-none tw:p-0" role="list" aria-label="Uploads in progress" data-testid="media-upload-progress">
-          {activeItems.map((item) => (
-            <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4">
+          {activeItems.map((item, i) => (
+            <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4" data-testid={`media-upload-row-${i}`}>
               <span className="tw:flex tw:items-baseline tw:gap-2">
-                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid={`media-upload-name-${i}`}>
                   {item.fileName}
                 </span>
-                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
+                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid={`media-upload-pct-${i}`}>
                   {Math.round(item.progress)}%
                 </span>
               </span>
               <span
                 className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-[2px] tw:bg-[var(--bk-gray-100)]"
+                data-testid={`media-upload-track-${i}`}
                 role="progressbar"
                 aria-label={`Uploading ${item.fileName}`}
                 aria-valuenow={Math.round(item.progress)}
@@ -202,13 +205,15 @@ export function UploadZone({
       )}
 
       {/*
-        T9 — board `145:195`. A 44h row on warning-tint, filename over the
-        reason, Retry on the right. It is NOT a toast: an upload that failed is
-        still failed thirty seconds later, and the board draws it persisting
-        above the footer with the actual limit named ("file is 24 MB, limit is
-        10 MB"), because "Upload failed" alone tells the user nothing they can
-        act on. Restyled, not rebuilt — this list, its retry handler and its
-        `aria-label` predate the redesign.
+        Clone 3584:45522 (re-draws board 145:195). A warning-tint band above
+        the footer: filename, the engine's reason in full (it wraps — the
+        numbers are the point), and the way out under it. It is NOT a toast:
+        an upload that failed is still failed thirty seconds later.
+
+        The way out depends on WHY. The size gate's record carries the limit,
+        and its door is `Choose a smaller file…` — a replacement picker; the
+        V1 board's Retry stays for every other failure (a retry of a 62 MB
+        file against a 10 MB limit could only fail the same way).
       */}
       {failedItems.length > 0 && (
         <ul
@@ -217,38 +222,60 @@ export function UploadZone({
           aria-label="Failed uploads"
           data-testid="upload-queue-errors"
         >
-          {failedItems.map((item) => (
-            <li
-              key={item.fileName}
-              className="med-upload-queue-item med-upload-queue-item--error tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:bg-yellow-50 tw:px-4 tw:py-1.5"
-              data-testid="media-upload-error-row"
-            >
-              <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+          {failedItems.map((item) => {
+            const record = failedUploads?.find((f) => f.fileName === item.fileName);
+            const sizeGate = record?.limit !== undefined && onReplacementPicked ? record : null;
+            return (
+              <li
+                key={item.fileName}
+                /* Clone 3584:45522 — a COLUMN: name over the reason over the
+                   door, all flush left. The legacy `.med-upload-queue-item` row
+                   rules (flex row, centred, 40% name, one-line reason) beat
+                   these utilities on source order and centred the name while
+                   the reason ran off the band (measured live 2026-09-13), so
+                   the error row no longer carries them. */
+                className="med-upload-queue-item--error tw:flex tw:flex-col tw:items-start tw:gap-1 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3"
+                data-testid="media-upload-error-row"
+              >
+                <span className="tw:w-full tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="media-upload-error-name">
                   {item.fileName}
                 </span>
-                <span className="med-upload-queue-item__reason tw:truncate tw:text-[11px] tw:leading-4 tw:text-amber-800">
+                {/* Board 145:197 — --color/warning-text, the token this system
+                    already ships as `--bk-warning-text`. */}
+                <span className="tw:w-full tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]" data-testid="media-upload-error-reason">
                   {item.error ?? "Upload failed"}
                 </span>
-              </span>
-              {onRetryUpload ? (
-                <Button
-                  type="button"
-                  color="light"
-                  size="xs"
-                  variant="link" className="med-upload-queue-item__retry tw:shrink-0 tw:text-[12px]"
-                  onClick={() => onRetryUpload(item.fileName)}
-                  aria-label={`Retry ${item.fileName}`}
-                >
-                  {/* Board 145:148 draws "Retry" as bare accent text. The
-                      glyph that used to sit here also rendered flush against
-                      the word — flowbite puts children in one span with no
-                      gap — so it read as "↻Retry". */}
-                  Retry
-                </Button>
-              ) : null}
-            </li>
-          ))}
+                {sizeGate ? (
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink)]"
+                    data-testid="media-upload-error-replace"
+                    onClick={() => chooseReplacement(sizeGate)}
+                    aria-label={`Choose a smaller file to replace ${item.fileName}`}
+                  >
+                    Choose a smaller file…
+                  </Button>
+                ) : onRetryUpload ? (
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                    data-testid="media-upload-error-retry"
+                    onClick={() => onRetryUpload(item.fileName)}
+                    aria-label={`Retry ${item.fileName}`}
+                  >
+                    {/* Board 145:148 draws "Retry" as bare accent text. */}
+                    Retry
+                  </Button>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

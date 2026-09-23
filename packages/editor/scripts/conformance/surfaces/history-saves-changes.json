@@ -1,0 +1,64 @@
+{
+  "surface": "history-saves-changes",
+  "board": "History · Saves · changes (Figma 163:2)",
+  "_note": [
+    "boards.json recorded this row as `drift-undo-empty-branch-only`: the panel",
+    "was only ever measured with an EMPTY undo stack, so the four change rows",
+    "the board is mostly made of had never been compared to anything. The demo",
+    "app boots with nothing in the stack and no click can seed one that",
+    "survives a reload, so the probe mounts the real HistoryTab over a manager",
+    "that reports four entries — the same branch ActivityView takes in the app.",
+    "",
+    "280 wide: 360 in boards.json is the Figma frame, the art is the 280 drawer",
+    "(`--size/drawer`) — the close glyph sits at x252 and the prune note's text",
+    "is 248 = 280 - 2x16.",
+    "",
+    "NOT anchored, and why:",
+    "  163:9-163:12 + 229:1136 Approved anchor, 163:15-163:18 Now row — both",
+    "  render only for a site whose `reviews.status` comes back approved. That",
+    "  is a live tRPC round against a real workspace, not a fixture, so the",
+    "  probe cannot reach them. SavesChrome's own tests cover their content.",
+    "  163:3 Header — 48h/14px on the board, 44h/11px caps in the code, which is",
+    "  component board 16:6 shared by all seven drawers. Screen board loses to",
+    "  component board (same call boards.json recorded for BK_TEXT_INPUT_THEME).",
+    "  163:6 View toggle — the board draws the filter as two bare text labels",
+    "  ('⟳ Changes' / '▣ Saves'); HistoryTab draws chips deliberately, and its",
+    "  labels differ because 'Saves' is already the name of the view TAB above",
+    "  it, which the board omits. Adopting the board's words would put two",
+    "  different 'Saves' controls one row apart. Live conflict, left open.",
+    "  163:44 Prune note BLOCK — 64 tall here and 40 on 163:113 for the same",
+    "  component and the same two-line sentence, so its height is not a",
+    "  contract; the text node (163:45) is anchored instead.",
+    "  163:46/163:47 Footer '+ Save a version' — there is no save door under the",
+    "  changes filter at all (the FAB lives inside the Milestones list). Adding",
+    "  one is a second createVersion entry point, not a restyle, and is not the",
+    "  drift this row names."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-saves-changes",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "history-change-3"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "change-0", "testId": "history-change-0", "spec": "history-saves-changes", "nodeId": "163:48" },
+    { "name": "change-0-label", "testId": "history-change-label-0", "spec": "history-saves-changes", "nodeId": "163:49" },
+    { "name": "change-0-time", "testId": "history-change-time-0", "spec": "history-saves-changes", "nodeId": "163:51" },
+    { "name": "change-1", "testId": "history-change-1", "spec": "history-saves-changes", "nodeId": "163:52" },
+    { "name": "change-1-label", "testId": "history-change-label-1", "spec": "history-saves-changes", "nodeId": "163:53" },
+    { "name": "change-1-time", "testId": "history-change-time-1", "spec": "history-saves-changes", "nodeId": "163:55" },
+    { "name": "change-2", "testId": "history-change-2", "spec": "history-saves-changes", "nodeId": "163:56" },
+    { "name": "change-2-label", "testId": "history-change-label-2", "spec": "history-saves-changes", "nodeId": "163:57" },
+    { "name": "change-2-time", "testId": "history-change-time-2", "spec": "history-saves-changes", "nodeId": "163:59" },
+    { "name": "change-3", "testId": "history-change-3", "spec": "history-saves-changes", "nodeId": "163:60" },
+    { "name": "change-3-label", "testId": "history-change-label-3", "spec": "history-saves-changes", "nodeId": "163:61" },
+    { "name": "change-3-time", "testId": "history-change-time-3", "spec": "history-saves-changes", "nodeId": "163:63" },
+    { "name": "prune-note", "testId": "history-prune-note-text", "spec": "history-saves-changes", "nodeId": "163:45" }
+  ]
+}

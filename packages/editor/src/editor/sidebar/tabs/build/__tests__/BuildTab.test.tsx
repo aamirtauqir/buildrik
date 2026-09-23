@@ -37,7 +37,7 @@ const renderTab = (props: Partial<BuildTabProps> = {}) =>
 describe("BuildTab — board 137:2 taxonomy", () => {
   it("renders the title with no count subtitle", () => {
     renderTab();
-    expect(screen.getByText("Insert")).toBeTruthy();
+    expect(screen.getByText("Add")).toBeTruthy();
     expect(screen.queryByText(/categories/)).toBeNull();
   });
 

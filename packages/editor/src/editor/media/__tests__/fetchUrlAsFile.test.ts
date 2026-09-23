@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { fetchUrlAsFile, isFetchableUrl } from "../fetchUrlAsFile";
+import { UrlImportError, fetchUrlAsFile, isFetchableUrl } from "../fetchUrlAsFile";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -49,9 +49,25 @@ describe("fetchUrlAsFile", () => {
     expect(file.name).toBe("imported.mp4");
   });
 
-  it("throws on a non-OK response — callers own the message", async () => {
+  it("throws `unreachable` on a non-OK response or a network failure — callers own the dialog", async () => {
     stubFetch({ ok: false, status: 404, blob: async () => new Blob([]) });
+    await expect(fetchUrlAsFile("https://example.com/missing.png")).rejects.toMatchObject({ reason: "unreachable" });
 
-    await expect(fetchUrlAsFile("https://example.com/missing.png")).rejects.toThrow("HTTP 404");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
+    await expect(fetchUrlAsFile("https://example.com/offline.png")).rejects.toBeInstanceOf(UrlImportError);
+  });
+
+  // Clone 3695:43876 — "This URL does not return a supported image." What
+  // "supported" means is the upload gate's own table, so an HTML page, or a
+  // video handed to an image-only field, is refused HERE with a reason the
+  // dialog can name, instead of by the upload with a bare "Unsupported file
+  // type: text/html".
+  it("throws `unsupported` when the body is not a kind the caller accepts", async () => {
+    stubFetch({ ok: true, blob: async () => new Blob(["<html>"], { type: "text/html" }) });
+    await expect(fetchUrlAsFile("https://example.com/page")).rejects.toMatchObject({ reason: "unsupported" });
+
+    stubFetch({ ok: true, blob: async () => new Blob(["x"], { type: "video/mp4" }) });
+    await expect(fetchUrlAsFile("https://example.com/clip.mp4", ["image"])).rejects.toMatchObject({ reason: "unsupported" });
+    await expect(fetchUrlAsFile("https://example.com/clip.mp4", ["video"])).resolves.toHaveProperty("name", "clip.mp4");
   });
 });

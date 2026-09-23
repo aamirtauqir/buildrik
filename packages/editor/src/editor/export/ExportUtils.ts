@@ -67,12 +67,26 @@ export function sanitizeHTMLForPreview(html: string): string {
        visitor sees" — showed the page without its CSS. The same token filter
        the style ATTRIBUTES get is applied to the sheet, and script-bearing
        elements were already removed above. */
+    /* The site's own fonts (Clone 3721:43423): an added font is declared in
+       the sheet as `@font-face { src: url("https://…") }`, and the token
+       filter below reads `url(` as a reason to drop the WHOLE sheet — so a
+       page using one previewed with no CSS at all. A face whose every url is
+       https is lifted out and kept; the rest of the sheet is filtered as
+       before, and a face pointing anywhere else goes with it. */
     const styles = [...doc.head.querySelectorAll("style"), ...doc.body.querySelectorAll("style")]
       .map((el) => el.textContent ?? "")
-      .filter((css) => {
-        const flat = css.replace(/\s+/g, "").toLowerCase();
-        return !FORBIDDEN_STYLE_TOKENS.some((t) => flat.includes(t));
+      .map((css) => {
+        const faces: string[] = [];
+        const rest = css.replace(/@font-face\s*\{[^}]*\}/gi, (rule) => {
+          const urls = [...rule.matchAll(/url\(\s*["']?([^"')]*)["']?\s*\)/gi)].map((m) => m[1].trim().toLowerCase());
+          if (urls.length && urls.every((u) => u.startsWith("https://"))) faces.push(rule);
+          return "";
+        });
+        const flat = rest.replace(/\s+/g, "").toLowerCase();
+        const kept = FORBIDDEN_STYLE_TOKENS.some((t) => flat.includes(t)) ? "" : rest;
+        return faces.join("") + kept;
       })
+      .filter(Boolean)
       .map((css) => `<style>${css}</style>`)
       .join("");
     /* And the font stylesheet, for the same reason and by the same shape: the

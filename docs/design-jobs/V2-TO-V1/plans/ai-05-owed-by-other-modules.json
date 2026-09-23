@@ -1,0 +1,160 @@
+{
+  "module": "AI experience",
+  "slug": "ai",
+  "purpose": "AI is a layer, not a module. Fourteen of its doors live on boards this agent does not own. Every row below is a change another module's agent must make; NONE of them was made here, and no board outside section 1776:8380 was touched in any way. Section ids are from docs/design-jobs/DESIGN-AUDIT.md's 'Ground truth — 27 sections, read live 2026-09-04' table.",
+  "rule": "The governing decision for every row is decision board A (one home), B (one mark / one verb / one contract) or C (placement) in section 1776:8380 — see ai-01-decision-boards.json. Do not re-decide these locally.",
+
+  "owed": [
+    {
+      "board": "159:123",
+      "boardName": "Inspector · multi-select",
+      "section": "1776:8381",
+      "module": "Inspector",
+      "finding": "UX-G-03",
+      "change": "The '✦ AI' chip keeps its place but changes what it promises: relabel to 'Ask AI' with the lucide Sparkles mark, and wire it to the new board 'AI · scoped-multi' (section 1776:8380) with add-hotspots.mjs over the LABEL, not wire-edges.mjs over the board.",
+      "blockedFor": "unresolved-id — the label's node id inside 159:123 was never read by this agent."
+    },
+    {
+      "board": "32:2",
+      "boardName": "Inspector · profile · CONTAINER (fallback)",
+      "section": "1776:8381",
+      "module": "Inspector",
+      "finding": "UX-G-10, UX-G-12",
+      "change": "Two things. (1) The header chip's mark and label become Sparkles + 'Ask AI' (Secondary tier). (2) UX-G-12: opening AI must not evict this panel. Either dock the AI panel beside the inspector, or — cheaper, and what decision board B specifies — keep the affected properties visible inside the AI diff card with their live current values, so the diff is judged with the values it overwrites on screen.",
+      "note": "ProInspector.tsx:368-370 already records the intent — 'The rail omits ai deliberately … the 2026-08-05 Figma arc put this chip on every inspector header instead.' Decision board A keeps that intent and makes the rest of the product agree with it."
+    },
+    {
+      "board": "Inspector · no-selection (empty state; its caption is 161:13)",
+      "section": "1776:8381",
+      "module": "Inspector",
+      "finding": "UX-G-10, and UX-D-01 which is the same chain",
+      "change": "'✦ Ask AI ›' becomes Sparkles + 'Ask AI'. Selecting an element while AI is open must restore the inspector rather than stranding the user behind a small '‹ Back'.",
+      "blockedFor": "unresolved-id — the empty-state board's own id was not read; only its caption id (161:13) appears in the local findings."
+    },
+    {
+      "board": "160:512",
+      "boardName": "Inspector · ai-agent-run (caption 161:21)",
+      "section": "1776:8381",
+      "module": "Inspector",
+      "finding": "UX-G-14",
+      "change": "The auto-apply toggle is drawn on NO board anywhere in the file (W-K-15). Wherever it lands, its label states the stakes, not the mechanic: 'Steps change the page without asking. You can undo the whole run.' — plus the line that privileged actions still stop for an explicit dialog even under auto-apply, which is true today (useAiActionGate) and is the reassurance the toggle is missing. 'Undo this run' must be available on a FINISHED run, not only a stopped one."
+    },
+    {
+      "board": "canvas selection toolbar (Canvas family)",
+      "section": "1779:5",
+      "module": "Canvas",
+      "finding": "UX-G-10, UX-G-11",
+      "change": "'Edit with AI' becomes 'Ask AI' (Secondary tier, Sparkles). The board should carry an edge to 2476:12001 (AI · in-canvas popover — 4 states) in section 1776:8380, which FIG-K-11 asked for and which the popover board still has zero reactions on (read: rx0)."
+    },
+    {
+      "board": "2476:12001",
+      "boardName": "AI · in-canvas popover — 4 states",
+      "section": "1776:8380",
+      "module": "AI — MINE, but not applied",
+      "finding": "UX-G-11",
+      "change": "The popover's four states must become the panel's: a Stop while thinking (useStreamPrompt already exports stop() and the popover never calls it), the three typed failure states instead of one red line of the raw server string, a Try again that re-uses the brief, and one line naming the element it is scoped to. The board currently draws the raw-string error deliberately, 'as the defect it is'.",
+      "blockedFor": "unresolved-id — the board's child node ids were never read. This is the largest single piece of MY OWN work that quota stopped."
+    },
+    {
+      "board": "302:1978",
+      "boardName": "S3.7 · page-settings · SEO",
+      "section": "1776:8377 (Pages) / referenced from 140:2 and 1171:4713",
+      "module": "Pages",
+      "finding": "UX-G-05, UX-G-10",
+      "change": "'Write with AI' (a play-triangle SVG) becomes the Inline tier: Sparkles + 'Generate' when empty, 'Regenerate' when it has produced one, sitting in the field's own row. Add the shared inline failure row — reason inline beside the control, not a toast, with Retry — for the three cases the transport already distinguishes: not configured / out of credit / everything else. Today SeoTab.tsx:52-67 catches and discards every error and only aiBusy exists, so a broken AI is indistinguishable from a button that does nothing. Also add the SEO description, which passes the same rule and is not offered.",
+      "extra": "QA-C-04 recorded that 'Write with AI' is a SECOND automatic write with no diff and no Apply. Whatever this board draws must not claim otherwise; AI board 170:2's note (170:16) was already corrected to name both exceptions."
+    },
+    {
+      "board": "146:2",
+      "boardName": "Media · drill-in · asset-detail",
+      "section": "1776:8372",
+      "module": "Media",
+      "finding": "UX-G-06, UX-G-05, UX-G-10",
+      "change": "RETIRE the filename-guessing alt-text generator this board draws. AssetDetailOverlay.tsx:270-289 sends only the FILE NAME to the generic text endpoint, has no provenance, no skip case and fails silently — while the full library's details panel calls a vision path that looks at the image, shows a provenance chip, handles 'you already wrote alt text, I kept yours' and toasts on failure. Both are mounted inside the same full-page library (LibraryManager.tsx:395 and :532), so one asset can get two different answers. One generator, the vision one, reached from both surfaces, with one contract: provenance chip, skip-if-user-wrote-it, visible failure, Regenerate.",
+      "why": "Alt text produced from a filename is worse than no alt text: it looks authoritative and is unverifiable."
+    },
+    {
+      "board": "the full-library asset details panel (inside the Media fullpage family, 1159:4593 / 1163:4641)",
+      "section": "1776:8372",
+      "module": "Media",
+      "finding": "UX-G-06, UX-G-10",
+      "change": "This is the path to keep. Relabel to the Inline tier's exact words — 'Generate' / 'Regenerate' — and keep the Sparkles mark it already uses. It is already the reference implementation for provenance and the skip case.",
+      "blockedFor": "unresolved-id — the panel is a child of a 1440x900 board and its own id was not read."
+    },
+    {
+      "board": "the Brand → Components section board (Brand family)",
+      "section": "1776:8373",
+      "module": "Brand",
+      "finding": "UX-G-07 (Critical), UX-G-08",
+      "change": "The '✨ Generate with AI' CTA must be gated on the SAME flag as the client behind it, or hidden. Today ComponentsSection.tsx:166-176 renders it unconditionally while useComposerInit.ts:132-140 builds the client only when isFeatureEnabled('dsAi'), and FEATURE_DS_AI is set in no env file in the repo — so every user gets the button and the only reachable outcome is the developer sentence 'no AIClient configured (stub the service in tests; wire a real provider in production)'. Board 2476:12029 in the AI section already carries the [not-implemented] name and the four modal states; the Brand board is where the CTA itself has to change.",
+      "blockedFor": "unresolved-id — the Brand board holding the CTA was not identified in this pass."
+    },
+    {
+      "board": "the ⌘K shell palette boards",
+      "section": "1779:3",
+      "module": "Command palette",
+      "finding": "UX-G-16, UX-G-10",
+      "change": "One AI row, always present, labelled 'Ask AI', routing to the inspector column. Delete the Navigation-group 'Open AI panel' row that lands in the left drawer. Keep the no-results '✨ Ask AI instead ›' offer, but as a shortcut into that same row rather than a second destination — and give it the Sparkles mark. CommandPalette.tsx:296-304's own comment ('UI_PANEL_OPEN is allow-listed to real LEFT tabs and \"ai\" is not one — this offer has been a no-op since it shipped') is now stale and should not be transcribed onto a board."
+    },
+    {
+      "board": "the keyboard-shortcuts sheet board",
+      "section": "1776:8385 (Shell)",
+      "module": "Shell",
+      "finding": "UX-G-15",
+      "change": "The Panels group drops 'I — Open AI panel'. AI's shortcut is ⌘J and it is taught beside the inspector chip, not in the panel list — because the panel list is an index of rail panels and AI deliberately has no rail seat (RAIL_FIGMA omits it and rail/__tests__/tabsConfig.figma.test.ts:48 asserts its absence)."
+    },
+    {
+      "board": "History · version compare",
+      "section": "1776:8374 (History) / 1776:8382 (Compare)",
+      "module": "History",
+      "finding": "UX-G-09 (Critical)",
+      "change": "RETIRE 'Get AI Summary' and the AI milestone-name suggestion rather than repairing their transport. Decision board C puts both under MUST NEVER HAVE ONE: the summary fails placement clause 4 (the diff is already rendered, structured and readable) and milestone naming fails clause 1 (it is three words the user types).",
+      "importantCorrection": "Do NOT record ai.summarize as having no editor caller. It HAS one, at useAISummary.ts:109. D-F-38's claim was refuted at findings/VERDICTS.jsonl:199 and is still being carried wrongly at DESIGN-AUDIT-SUMMARY.md:99. The transport defect is real and separate: both features post a bare JSON body to a tRPC endpoint configured with the superjson transformer (server/trpc/trpc.ts:57), so the input deserialises to undefined and fails Zod before any handler runs. Retire them because of placement, not because they are doorless — and fix DESIGN-AUDIT-SUMMARY.md:99 while you are there.",
+      "boardStatus": "NO BOARD DRAWS EITHER FEATURE. A grep of the whole findings corpus for 'Get AI Summary' returns only UX-G.jsonl, and 'milestone' returns only 1776:8380 / 171:105. So this row is a code-and-doc retirement with no board to un-draw — which is why it can be closed cheaply."
+    },
+    {
+      "board": "Content / CMS panel boards",
+      "section": "1776:8376",
+      "module": "Content",
+      "finding": "UX-G-21 (Major) — the highest-value gap in the whole AI layer",
+      "change": "Add the AI doors that are missing: Primary 'Draft with AI' on a record, and a bulk 'Fill this column for 12 records'; Secondary 'Suggest fields' when creating a collection. Both pass all four placement clauses — each field is its own diff row, the scope is one record or one column, and this is the single most repetitive typing in the product. There is currently NO AI affordance anywhere under tabs/content."
+    },
+    {
+      "board": "Insert panel boards",
+      "section": "1776:8379",
+      "module": "Insert",
+      "finding": "UX-G-21",
+      "change": "Add a Primary 'Describe a section'. The server commands already ship — add-section and insert-component (server/services/ai.service.ts:704,739; client mirror applySetStyle.ts:606,608) — and the insert is one undo step. The command ships; the door does not."
+    },
+    {
+      "board": "Pages panel boards",
+      "section": "1776:8377",
+      "module": "Pages",
+      "finding": "UX-G-22",
+      "change": "Put 'Regenerate this page' in the Pages panel. It exists today only on the onboarding preview screen, which the user can never return to."
+    },
+    {
+      "board": "Settings screens",
+      "section": "1776:8387",
+      "module": "Settings",
+      "finding": "UX-G-20",
+      "change": "One short 'What AI can change' disclosure, reachable from the AI panel, listing the command categories in plain words — and an owner-level AI on/off at site level. There is no AI screen under tabs/settings/screens today (16 files; a grep for 'AI' in that directory returns only the string 'FAILED').",
+      "doNotDo": "This is NOT a licence to put AI affordances into Settings. Decision board C puts Settings, Domains, Redirects, Headers, Webhooks and Analytics under MUST NEVER HAVE ONE. The disclosure is a page ABOUT AI, not a surface where AI acts."
+    },
+    {
+      "board": "History version / activity lists",
+      "section": "1776:8374",
+      "module": "History",
+      "finding": "UX-G-20",
+      "change": "Carry the 'AI edit' label into the visible history. applySetStyle.ts:642 already opens the transaction as 'ai-edit' and useHistoryFeedback.ts:51 already maps it to 'Applied an AI edit' — but only as a transient toast. A user must be able to find and reverse an AI change an hour later, not only in the next ten seconds."
+    },
+    {
+      "board": "— (dashboard, not on page 1:3)",
+      "section": "none",
+      "module": "Dashboard — outside this Figma page entirely",
+      "finding": "UX-G-17, UX-G-18",
+      "change": "UX-G-17: the AI-credits settings page lists Content Generation, Design Suggestions and SEO Optimization as coming soon on the same page that meters the prompts those shipping features spend. Make it the honest index. UX-G-18: /onboarding/ai/* and /dashboard/sites/new?method=ai are two wizards feeding one mutation with different briefs; make the short one the collapsed state of the same form, not a second, weaker wizard.",
+      "status": "NOT-APPLICABLE as a page 1:3 board edit — page 1:3 is the editor and has no dashboard family. Both are recorded in the footer of decision board C so the decision is written down somewhere, and both need a dashboard design surface that does not exist in this file."
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "surface": "s1-1b-first-run-browse-templates-templates-d",
+  "board": "S1.1b · First run → Browse templates, Templates drawer open (Figma 807:4299)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "canvas-empty-cta"
+    },
+    {
+      "action": "click",
+      "testId": "canvas-empty-browse"
+    },
+    {
+      "action": "waitFor",
+      "testId": "tpl-footer"
+    },
+    {
+      "action": "hover",
+      "testId": "topbar"
+    }
+  ],
+  "contrastScope": "body",
+  "targets": [
+    {
+      "name": "cta",
+      "testId": "canvas-empty-cta",
+      "spec": "s1-1b-first-run-browse-templates-templates-d",
+      "nodeId": "807:4323"
+    },
+    {
+      "name": "cta-title",
+      "testId": "canvas-empty-cta-title",
+      "spec": "s1-1b-first-run-browse-templates-templates-d",
+      "nodeId": "807:4324"
+    },
+    {
+      "name": "cta-actions",
+      "testId": "canvas-empty-cta-actions"
+    },
+    {
+      "name": "browse-templates",
+      "testId": "canvas-empty-browse"
+    },
+    {
+      "name": "start-blank",
+      "testId": "canvas-empty-start-blank"
+    },
+    {
+      "name": "drawer",
+      "testId": "sidebar-panel"
+    }
+  ],
+  "_note": [
+    "Board 807:4299 — first run, Templates drawer opened from the canvas CTA.",
+    "Measured LIVE: the whole point of the frame is that one press of `Browse",
+    "templates` on an empty canvas puts the drawer on screen, and a probe that",
+    "mounted the drawer would skip the press. The press is a real step here and",
+    "it works.",
+    "",
+    "A SMALL RECIPE, and the reason is the finding rather than an excuse: almost",
+    "every element this board draws is already settled by a board that owns it",
+    "better, and this frame agrees with none of them. Named one by one so nobody",
+    "re-opens them:",
+    "",
+    "  · The CTA's two BUTTONS. 807:4326 draws `Browse templates` 34 tall, 14",
+    "    across, on --radius/sm 4 with a 13px label; 807:4328 draws `Start blank`",
+    "    the same with a --color/border-input #9CA3AF rule. The code cites board",
+    "    338:2326 — a real Button COMPONENT instance — for 32 / 16 / radius 8 /",
+    "    14px, and records that 297:2013 (the sibling `Start blank` frame) is",
+    "    hand-drawn, 'not a component instance', disagreeing with its own",
+    "    neighbour on every shared property. 807:4326/4328 are a third and fourth",
+    "    hand-drawn frame in that argument. A component board beats a screen",
+    "    frame; both buttons are anchored and SKIPPED.",
+    "  · The action row's GAP. 807:4325 says 10, so does 65:203, and the code",
+    "    says 12 with its reason at the call site: there is no 10 on the 4px base",
+    "    scale DESIGN.md mandates and no token for it. That is a design-system",
+    "    argument, not a board one, and two boards drawing an off-scale value do",
+    "    not make it on-scale.",
+    "  · The DRAWER frame. 807:6534 is 280 x 812 with a --flowbite/gray/100 rule.",
+    "    Live it is 780 tall (this shell has a page-tab bar the board does not",
+    "    draw) and its right-hand rule lives on `.layout-shell__drawer`, not on",
+    "    the panel — so a `border-color` read off the panel returns #111827, the",
+    "    initial value, which is the same trap the Media panel hit. Shell",
+    "    geometry, shell boards.",
+    "  · The CANVAS ground. 807:4321 draws --flowbite/gray/50 with 32 of bottom",
+    "    padding; the shell paints --color/bg-app gray-100 with 20. Another",
+    "    shell-wide fact on a Templates board.",
+    "  · The template CARDS (807:6540/6544/6548 — 248x100, bordered, radius 8,",
+    "    over a 56-tall thumb, 12px title). The gallery's own board is 641:2487,",
+    "    which the code cites for a full-width 88-tall thumb and a 13/20 title,",
+    "    and `templates-empty` measures that family against 1138:13413. Two",
+    "    boards, one card: neither re-settles it.",
+    "",
+    "WHAT IS LEFT IS GENUINELY THIS BOARD'S: the empty-canvas CTA block itself —",
+    "807:4323's 12 gap and 807:4324's 16/24 ink headline — measured in the state",
+    "this frame is about, with the Templates drawer open beside it.",
+    "",
+    "TWO BOARD-LEVEL BLOCKERS, neither settleable from code:",
+    "  · PLACEMENT. This frame draws the Templates drawer at x=1120, to the RIGHT",
+    "    of the canvas, where DESIGN.md:231 puts every drawer at x=60. LEDGER",
+    "    2026-09-02 lists it as designer-redraw D2 ('canvas must move with it')",
+    "    and BLOCKERS C7. Measured where the product puts it; x is not compared.",
+    "  · EXISTENCE. The same entry records a live contradiction about whether",
+    "    this surface should exist: DESIGN.md:286 and 14-screen-specs.md:174 say",
+    "    Templates was 'dissolved into the New-Page flow + Insert',",
+    "    12-feature-catalog.md:77 ships it, 12:177 leaves 'F2 collapse still",
+    "    open'. Owner: founder.",
+    "",
+    "FOR THE NEXT AGENT WHO MEASURES ANY TEMPLATES ANCHOR HERE: every `tpl-*`",
+    "testId resolves TWICE in the live shell. `StudioPanels` renders",
+    "`LayoutShell.FullPage` unconditionally, so `FullPageRouter` mounts a SECOND",
+    "TemplatesTab (and DrawerGallery) whenever `templates` is the active tab;",
+    "LayoutShell.css `display:none`s the slot, so the copy measures 0x0. It is",
+    "deliberate — the neighbouring rule says 'preserve internal state' — but it",
+    "makes measure.mjs refuse the anchor as ambiguous, and it means",
+    "`hydrateUserTemplatesFromServer()` runs twice per open."
+  ]
+}

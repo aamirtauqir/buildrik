@@ -10,11 +10,13 @@ import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { getSiteIdFromUrl, loadServerMedia } from "../../../../../services/BuildrikSyncProvider";
 import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
+import type { MediaAsset } from "../../../../../shared/types/media";
 import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
 import {
   countByType,
   filterByFmt,
   filterBySearch,
+  filterByTag,
   filterByType,
   toLibraryItem,
 } from "../data/mediaUtils";
@@ -63,6 +65,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   const activeType: MediaTypeFilter = activeTypes.size === 1 ? [...activeTypes][0] : "all";
   const [fmtFilter, setFmtFilter_] = useState("");
   const [librarySearch, setLibrarySearch_] = useState("");
+  /* Clone 3721:43697 — a TAGS chip is a filter of its own, not a search
+     string (which is what the chips wrote until Phase 3): it survives typing,
+     combines with the scope, and clears from the search field's token. */
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
 
   // Subscribe to engine events
   useEffect(() => {
@@ -110,27 +116,70 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     };
   }, [composer]);
 
-  const allLibraryItems = useMemo(() => rawAssets.map(toLibraryItem), [rawAssets]);
+  /* Clone 3695:45529 — a saved version is a row flagged with its parent
+     (`versionOf`), and it is NOT a library file: never a card, a count, a
+     search hit or a folder's child. `rawAssets` keeps the engine's whole
+     list; everything the library draws derives from this narrowing, so a
+     version can only be reached through `versionsOf`. */
+  const libraryAssets = useMemo(() => rawAssets.filter((a) => !a.versionOf), [rawAssets]);
+  const allLibraryItems = useMemo(() => libraryAssets.map(toLibraryItem), [libraryAssets]);
+
+  /* The original first, then its saved versions oldest to newest — the
+     latest saved is the last. Asked with a version's own key, it answers for
+     the family that version belongs to, so "Edit latest saved version" can
+     save a v3 of the same parent. */
+  const versionsOf = useCallback(
+    (key: string): LibraryItem[] => {
+      const asked = rawAssets.find((a) => a.id === key);
+      if (!asked) return [];
+      const parentId = asked.versionOf ?? asked.id;
+      const parent = asked.versionOf ? rawAssets.find((a) => a.id === parentId) : asked;
+      if (!parent) return [];
+      const children = rawAssets
+        .filter((a) => a.versionOf === parentId)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      return [parent, ...children].map(toLibraryItem);
+    },
+    [rawAssets],
+  );
 
   // Folder lookup map — avoids O(n*m) `rawAssets.find` per item per render.
   // Keyed by asset id, value is folderId or null for root.
   const folderByAssetId = useMemo(() => {
     const m = new Map<string, string | null>();
-    for (const a of rawAssets) m.set(a.id, a.folderId || null);
+    for (const a of libraryAssets) m.set(a.id, a.folderId || null);
     return m;
-  }, [rawAssets]);
+  }, [libraryAssets]);
+
+  /* Clone 3698:20337 — every FOLDERS row carries its own count ("Products 8"),
+     and a folder just created reads 0 (3700:20353). Direct children only —
+     the same set `libraryItems` shows when that folder is the scope — and a
+     folder with nothing in it is simply absent. */
+  const folderCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const folderId of folderByAssetId.values()) {
+      if (folderId) m.set(folderId, (m.get(folderId) ?? 0) + 1);
+    }
+    return m;
+  }, [folderByAssetId]);
 
   const libraryItems = useMemo(() => {
     const d = sortDir === "asc" ? 1 : -1;
 
-    // Filter by folder first — O(n) lookup via Map (was O(n*m) via .find)
-    const inFolder = allLibraryItems.filter(
-      (i) => folderByAssetId.get(i.key) === currentFolderId,
-    );
+    // Scope first — a folder narrows to its direct children (O(n) via the
+    // Map); the root is the whole library, the way "All assets 24" counts it
+    // (Clone 3698:20337).
+    const inFolder = currentFolderId
+      ? allLibraryItems.filter((i) => folderByAssetId.get(i.key) === currentFolderId)
+      : allLibraryItems;
 
+    // The tag after the scope and before the search (Clone 3721:43697):
+    // "1 matching assets · Tag: menu" inside whatever folder is open, and a
+    // search typed while the tag is active searches within it.
+    const byTag = filterByTag(inFolder, tagFilter);
     const byType = activeTypes.size
-      ? inFolder.filter((i) => activeTypes.has(i.type as MediaBucket))
-      : inFolder;
+      ? byTag.filter((i) => activeTypes.has(i.type as MediaBucket))
+      : byTag;
     const byFmt = filterByFmt(byType, fmtFilter);
     const bySearch = filterBySearch(byFmt, librarySearch);
     return [...bySearch].sort((a, b) => {
@@ -151,6 +200,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     allLibraryItems,
     folderByAssetId,
     currentFolderId,
+    tagFilter,
     activeTypes,
     fmtFilter,
     librarySearch,
@@ -207,9 +257,12 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const setLibrarySearch = useCallback((q: string) => setLibrarySearch_(q), []);
 
-  const createFolder = useCallback(async (name: string) => {
-    await composer.media.createFolder(name, currentFolderId);
-  }, [composer, currentFolderId]);
+  /* Resolves with the folder the engine made: the library scopes to it the
+     moment it exists (Clone 3700:20353), and only the engine knows its id. */
+  const createFolder = useCallback(
+    (name: string) => composer.media.createFolder(name, currentFolderId),
+    [composer, currentFolderId],
+  );
 
   /**
    * Inspect a folder before deleting. Returns counts so the caller (component
@@ -276,9 +329,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const updateItem = useCallback(
     async (key: string, updates: Partial<LibraryItem>) => {
-      const assetUpdates: any = {};
+      const assetUpdates: Partial<MediaAsset> = {};
       if (updates.name) assetUpdates.name = updates.name;
       if (updates.altText !== undefined) assetUpdates.altText = updates.altText;
+      if (updates.tags !== undefined) assetUpdates.tags = updates.tags;
       await composer.media.updateAsset(key, assetUpdates);
     },
     [composer]
@@ -412,8 +466,11 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     libraryError,
     retryLibraryLoad,
     libraryItems,
+    allLibraryItems,
+    versionsOf,
     folders,
     allFolders,
+    folderCounts,
     currentFolderId,
     setCurrentFolderId,
     createFolder,
@@ -430,6 +487,8 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     activeTypes,
     librarySearch,
     setLibrarySearch,
+    tagFilter,
+    setTagFilter,
     setSort,
     setGridN,
     setFmtFilter,

@@ -57,6 +57,36 @@ export interface UploadBlobResult {
  * Throws on auth failure, quota rejection, oversized file, or network error.
  * Caller decides retry behavior.
  */
+/**
+ * Intrinsic pixel size of an image blob, or `null`.
+ *
+ * Measured on the CLIENT because the browser decodes the file anyway to show a
+ * preview, so the number is already paid for; doing it server-side would mean
+ * decoding the bytes a second time in a route that currently never looks at
+ * them. Boards 146:2 / 146:32 draw "2400x1600" and `MediaAsset` had no column
+ * for it — BLOCKERS E7, taken 2026-09-08.
+ *
+ * Never throws and never blocks the upload: a codec the browser cannot decode,
+ * an SVG with no intrinsic size, or a video simply yields `null`, and the
+ * columns stay empty rather than carrying a guess. An asset with no measurement
+ * is honest; an asset with an invented one is not.
+ */
+async function imageDimensions(
+  blob: Blob,
+  type: "image" | "video" | "icon" | "font",
+): Promise<{ width: number; height: number } | null> {
+  if (type !== "image" && type !== "icon") return null;
+  if (typeof createImageBitmap !== "function") return null;
+  try {
+    const bmp = await createImageBitmap(blob);
+    const { width, height } = bmp;
+    bmp.close?.();
+    return width > 0 && height > 0 ? { width, height } : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function uploadBlob(
   blob: Blob,
   filename: string,
@@ -110,7 +140,7 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
   const siteId = opts?.siteId ?? null;
 
   return {
-    async uploadAndCreate(blob, meta) {
+    async uploadAndCreate(blob: Blob, meta) {
       try {
         // Forward server-row metadata via clientPayload so the route's
         // onUploadCompleted handler can create the canonical MediaAsset
@@ -124,12 +154,14 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
         // server-side. If onUploadCompleted already created the row,
         // this returns the existing one. If completion hasn't fired
         // yet, this creates and the completion handler is the no-op.
+        const dims = await imageDimensions(blob, meta.type);
         const created = (await getClient().media.createAsset.mutate({
           url: uploaded.url,
           bytes: meta.bytes,
           type: meta.type,
           mimeType: meta.mimeType,
           filename: meta.filename,
+          ...(dims ?? {}),
           folderId: meta.folderId ?? null,
           siteId: meta.siteId ?? siteId,
         })) as { id: string; url: string; bytes: number };
@@ -197,6 +229,7 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
           // untouched rather than nulling it.
           ...(patch.filename !== undefined ? { filename: patch.filename } : {}),
           ...(patch.altText !== undefined ? { altText: patch.altText } : {}),
+          ...(patch.userMetadata !== undefined ? { userMetadata: patch.userMetadata } : {}),
         });
         return true;
       } catch {

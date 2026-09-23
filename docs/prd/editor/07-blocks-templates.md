@@ -26,7 +26,7 @@ A. Registry blocks = inert HTML. B. **ContactForm React** (6 default fields, req
 
 - **Full-page ×18** (`TemplateLibrary.tsx:55-185`): blank, contact-1, landing-1, pricing-1, portfolio-1, business-1 + 12 section-templates. ⚠ id `hero-split` reused across tabs — React key collision possible.
 - **Section quick-insert ×11** (`SectionTemplates.tsx:42-144`); ⚠ SectionType enum includes `content` but no template/tab uses it (`:31`).
-- **Apply pipeline**: `applyTemplate` = transaction → `importHTMLToActivePage` (`templateActions.ts:4-11`); ⚠ artificial 500ms loading delay (`TemplateLibrary.tsx:269-276`).
+- **Apply pipeline**: `applyTemplate` = transaction → `importHTMLToActivePage`. **The artificial 500ms is gone, and so are both files this line cited** — `templateActions.ts` and `TemplateLibrary.tsx` no longer exist; the line was stale, not a live defect. The apply now runs four real phases in the order it performs them (tokens → import → render → save), and the import reports **each top-level landmark as it converts**, labelled from the template's own markup (`<nav>` → "Navigation"). Reporting happens inside the import's single transaction, so a template apply remains one undo step. Measured 2026-09-09: the largest shipped template is 3,488 chars with 3 landmarks and the loop is single-digit milliseconds, so the section rows are a record of what ran — **no delay is added to make them visible** (founder call 2026-09-08, closing `BLOCKERS.md` B5).
 - **My Templates**: localStorage only; `useTemplateManager` composer path wired-but-unused ("future when formats unified", `:202-204`); rename local-only; SaveTemplate html prop unused; thumbnail XSS guard (`:26-34`).
 - L0 stubs: TemplateCard, TemplateSelector (`templates/index.ts:6`).
 

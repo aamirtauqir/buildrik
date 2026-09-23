@@ -1,0 +1,248 @@
+{
+  "surface": "brand-presets-draft",
+  "board": "Brand \u00b7 presets \u00b7 draft (Figma 306:2161)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-styles"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-preset-row-layout"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2162"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-presets-draft",
+      "nodeId": "I306:2162;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2163"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2164"
+    },
+    {
+      "name": "preset-list",
+      "testId": "brand-preset-list"
+    },
+    {
+      "name": "row-button",
+      "testId": "brand-preset-row-button",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2165"
+    },
+    {
+      "name": "row-button-label",
+      "testId": "brand-preset-label-button",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2166"
+    },
+    {
+      "name": "row-button-count",
+      "testId": "brand-preset-count-button",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2167"
+    },
+    {
+      "name": "row-card",
+      "testId": "brand-preset-row-card"
+    },
+    {
+      "name": "row-card-label",
+      "testId": "brand-preset-label-card",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2169"
+    },
+    {
+      "name": "row-card-count",
+      "testId": "brand-preset-count-card",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2170"
+    },
+    {
+      "name": "row-form",
+      "testId": "brand-preset-row-form",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2171"
+    },
+    {
+      "name": "row-form-label",
+      "testId": "brand-preset-label-form",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2172"
+    },
+    {
+      "name": "row-form-count",
+      "testId": "brand-preset-count-form",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2173"
+    },
+    {
+      "name": "row-link",
+      "testId": "brand-preset-row-link",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2174"
+    },
+    {
+      "name": "row-link-label",
+      "testId": "brand-preset-label-link",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2175"
+    },
+    {
+      "name": "row-link-count",
+      "testId": "brand-preset-count-link",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2176"
+    },
+    {
+      "name": "row-badge",
+      "testId": "brand-preset-row-badge",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2177"
+    },
+    {
+      "name": "row-badge-label",
+      "testId": "brand-preset-label-badge",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2178"
+    },
+    {
+      "name": "row-badge-count",
+      "testId": "brand-preset-count-badge",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2179"
+    },
+    {
+      "name": "row-alert",
+      "testId": "brand-preset-row-alert",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2180"
+    },
+    {
+      "name": "row-alert-label",
+      "testId": "brand-preset-label-alert",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2181"
+    },
+    {
+      "name": "row-alert-count",
+      "testId": "brand-preset-count-alert",
+      "spec": "brand-presets-draft",
+      "nodeId": "306:2182"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: Brand -> Presets. The LIST this board draws is one click from",
+    "the root; the badge on top of it is not reachable at all, and the board says",
+    "so itself \u2014 its Figma title begins `[not-implemented]` and names the reason:",
+    "`updatePreset` / `addPreset` / `deletePreset` have zero UI callers and the",
+    "editable binding row (ui/presets/BindingRow.tsx) has no importer, so every",
+    "preset registry's `isDirty` is permanently false and `presetsStatus(...)`",
+    "always answers null.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  row name        13/20 (306:2166). It inherited flowbite `size=\"xs\"`'s 12/16",
+    "                  under an inline `fontSize: 13`, so the size was right by",
+    "                  accident and the line was four pixels short.",
+    "  variant count   12/16 -> 11/16 (306:2167).",
+    "  rows are FLUSH  the list had `gap: 2` and an `8px 0` pad; 306:2161 puts the",
+    "                  first row at the back row's own baseline and the six rows",
+    "                  against each other. Twenty pixels across six rows.",
+    "  back row        36/16/no fill (306:2163) and the crumb 13/20 accent",
+    "                  (306:2164) \u2014 the family's shared back row.",
+    "  draft pill      gray, not blue. 333:2356 fills it `--flowbite/gray/200` with",
+    "                  a `gray/400` edge and a `gray/700` label; it shipped on",
+    "                  `--bk-accent`, which reads as a call to action on a state",
+    "                  that is only a fact. Changed in SectionStatusBadge.tsx even",
+    "                  though nothing can currently show it \u2014 the component is one",
+    "                  component, and its three reachable siblings measure the same",
+    "                  10/2 inset, 16px line and 9999 radius on this board's own",
+    "                  Badge instance.",
+    "",
+    "THE ROW JOIN IS BY POSITION, and that is a decision worth stating: the board's",
+    "six categories are Buttons / Cards / Sections / Forms / Nav / Footers, and the",
+    "code's eleven are the eleven registries (button, card, form, link, badge,",
+    "alert, tooltip, modal, nav, table, layout). `Sections` and `Footers` have no",
+    "registry at all, so the SET is a code contract \u2014 which categories exist is",
+    "behaviour, and behaviour is the code's call. What the board settles is the",
+    "ROW, and every row on both sides is the same component. So board row N is",
+    "joined to code row N and the six measurements are six reads of one shape. The",
+    "labels are NOT conformed: singular/plural aside, four of the board's six name",
+    "things that do not exist, and 152:112 (`Brand \u00b7 presets`, another agent's",
+    "board, verified `driven`) draws the same list \u2014 one board does not get to",
+    "rename a control two boards share.",
+    "",
+    "NOT JOINED:",
+    "  333:2356, the `Draft preset` Badge \u2014 the state is unreachable, per the",
+    "  board's own title. Rendering the pill unconditionally to make a number",
+    "  match would be a lie wearing the right label, which is the exact phrase",
+    "  SectionStatusBadge's docblock already uses about this board's two siblings.",
+    "  Its geometry IS measured, on 333:2358 (brand-starters-applied) and",
+    "  I333:2360;12:11 (brand-lint-suppressed) \u2014 one component, three instances.",
+    "  306:2168, the `Preset \u00b7 Cards` row \u2014 it carries `border-radius: 8px` and",
+    "  its five identical siblings carry none. A radius on one row of six is an",
+    "  artifact; the same thing happens on 153:13 in `Brand \u00b7 classes`. Its height",
+    "  is measured on the other five.",
+    "  306:2161 itself \u2014 the drawer's edge, see brand-lint-warnings.json.",
+    "",
+    "CHECK-BOARD-COPY, triaged: `buttons`, `cards`, `sections`, `forms`,",
+    "`footers` are the board's own category names, and the row-join note above",
+    "explains why the code's eleven registries win on WHICH categories exist.",
+    "`draft preset` is the unreachable Badge. `\u2039  Presets` reads as unmatched only",
+    "because extract.mjs's copy[] cannot see text inside a template literal \u2014 the",
+    "board does draw it (306:2164).",
+    "",
+    "HEADER TITLE REVERSED TO THE BOARD: the panel header now reads `Brand` at",
+    "every depth, not `Brand \u203a <Section>`. Six destination frames state the title",
+    "text and all six say `Brand`; check-board-copy.mjs reported it on all six at",
+    "once. This undoes a deliberate 2026-09-04 change whose argument is kept in",
+    "DesignSystemTab.tsx \u2014 the boards answer `where am I` one row lower, in the",
+    "36px Back row they all draw."
+  ]
+}

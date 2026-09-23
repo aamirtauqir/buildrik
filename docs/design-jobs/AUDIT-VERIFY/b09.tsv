@@ -1,0 +1,177 @@
+N	140:2	Pages · tree	FRAME	100,15970,280,812	true	VERTICAL	38	true
+K	208:121	INSTANCE	100,15970,280,44	true	false	Panel header
+K	140:7	FRAME	100,16014,280,36	true	true	Search
+K	140:11	FRAME	100,16050,280,32	true	true	Row · Marketing
+K	140:17	FRAME	100,16082,280,32	true	true	Row · Home
+K	140:22	FRAME	100,16114,280,32	true	true	Row · Menu
+K	140:25	FRAME	100,16146,280,32	true	true	Row · Contact
+K	140:28	FRAME	100,16178,280,32	true	true	Row · Legal
+K	140:34	FRAME	100,16210,280,32	true	true	Row · About
+K	140:37	FRAME	100,16242,280,129	true	true	spacer
+K	140:38	FRAME	100,16371,280,36	true	true	Add page
+K	633:3977	FRAME	100,16748,150,34	true	true	hotspot/state · S3.7 · page-settings · SEO
+K	787:4307	FRAME	100,16712,160,34	true	false	hotspot/state · Pages · loading
+K	787:4311	FRAME	220,16712,160,34	true	false	hotspot/state · Pages · no-results
+K	873:4522	FRAME	100,16407,36,36	true	true	hotspot/back · to editor
+K	915:6886	FRAME	100,16443,140,28	true	false	hotspot/return · publish readiness
+K	1171:4868	FRAME	100,16744,280,34	true	false	hotspot/state · Pages · context-menu
+K	1171:4870	FRAME	100,16744,280,34	true	false	hotspot/state · Pages · command-palette
+K	1668:7247	FRAME	270,16676,110,34	true	true	hotspot/state · Pages · bulk-select
+K	1668:7356	FRAME	100,16642,140,34	true	true	hotspot/state · Pages · empty
+K	1668:7358	FRAME	240,16642,140,34	true	true	hotspot/state · Pages · load-error
+K	1720:17466	FRAME	100,16726,150,28	true	false	hotspot/state · page-settings · save-failed
+K	1720:17470	FRAME	230,16754,150,28	true	false	hotspot/state · page-settings · crash
+K	1720:17529	FRAME	230,16754,150,28	true	false	hotspot/state · rename · name-conflict
+K	2432:11973	RECTANGLE	295,16018,81,27	true		hotspot/state · Pages · structure
+K	2838:12098	TEXT	100,16471,248,13	true		note/folders-are-local
+K	2838:12099	RECTANGLE	100,16484,280,1	true		rule/generated-top
+K	2838:12100	TEXT	100,16485,89,20	true		grp/from-blog
+K	2838:12101	TEXT	100,16505,14,16	true		grp/from-blog-count
+K	2838:12102	TEXT	100,16521,228,26	true		grp/from-blog-sub
+K	2838:12103	RECTANGLE	100,16547,280,1	true		rule/generated-end
+C	140:2	texts=36
+T	2838:12181	122,16558,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · rename-url-offer	Pages · rename · URL offer
+T	2838:12179	122,16522,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · bulk-toast	Pages · bulk · one toast
+T	2838:12177	122,16486,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · local-only	Pages · local-only
+T	2838:12175	122,16450,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · home-by-position	Pages · home by position
+T	2838:12173	122,16414,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · drag	Pages · drag
+T	2838:12171	122,16378,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · delete-confirm	Pages · delete-confirm
+T	2838:12105	100,16665,248,117	11	Regular	true	HEIGHT	Pages · tree	UX-B-32 — Pages owns the per-page fact ('show in nav') and the visibility of which pages n
+T	2838:12104	100,16548,248,117	11	Regular	true	HEIGHT	Pages · tree	UX-B-13 — '+ Add page' routes through the uniqueness helpers duplicate already uses (PageM
+T	2838:12102	100,16521,228,26	11	Regular	true	HEIGHT	Pages · tree	/blog/{slug} · template: Blog post · read-only
+T	2838:12101	100,16505,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Pages · tree	12
+T	2838:12100	100,16485,89,20	13	Regular	true	WIDTH_AND_HEIGHT	Pages · tree	▾  FROM BLOG
+T	2838:12098	100,16471,248,13	11	Regular	true	HEIGHT	Pages · tree	Folders are yours only, on this browser.
+T	1720:17530	236,16762,138,12	10	Medium	false	HEIGHT	hotspot/state · rename · name-conflict	rename · name-conflict
+T	1720:17471	236,16762,104,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · crash	page-settings · crash
+T	1720:17467	106,16734,138,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · save-failed	page-settings · save-failed
+T	140:39	116,16379,76,20	13	Regular	true	WIDTH_AND_HEIGHT	Add page	+  Add page
+T	2838:12097	288,16218,86,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · About	Won't publish
+T	140:36	156,16216,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · About	About
+T	140:33	350,16186,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Legal	2
+T	140:32	176,16184,34,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	Legal
+T	140:31	156,16186,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	📁
+T	140:30	140,16186,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	▸
+T	2838:12096	332,16154,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Contact	Draft
+T	140:27	156,16152,49,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Contact	Contact
+T	140:24	156,16120,35,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Menu	Menu
+T	140:20	174,16088,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Home	Home
+T	140:19	156,16089,9,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Home	⌂
+T	140:16	350,16058,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Marketing	3
+T	140:15	176,16056,62,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	Marketing
+T	140:14	156,16058,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	📁
+T	140:13	140,16058,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	▾
+T	2838:12106	301,16068,66,18	12	Regular	true	WIDTH_AND_HEIGHT	Search	⚂ Structure
+T	2433:11972	301,16024,66,15	12	Regular	false	WIDTH_AND_HEIGHT	Search	⚂ Structure
+T	140:10	236,16024,57,18	12	Regular	true	WIDTH_AND_HEIGHT	Search	⊞ Listings
+T	140:9	126,16023,43,20	13	Regular	true	WIDTH_AND_HEIGHT	search box	Search
+T	I208:121;16:7	116,15984,204,16	11	Medium	true	HEIGHT	Panel header	Pages
+R	140:2	141:2	NAVIGATE	Pages · tree
+R	2838:12180	1706:8505	NAVIGATE	hotspot/state · Pages · rename-url-offer
+R	2838:12178	1706:8505	NAVIGATE	hotspot/state · Pages · bulk-toast
+R	2838:12176	1706:8505	NAVIGATE	hotspot/state · Pages · local-only
+R	2838:12174	1706:8505	NAVIGATE	hotspot/state · Pages · home-by-position
+R	2838:12172	1706:8505	NAVIGATE	hotspot/state · Pages · drag
+R	2838:12170	1706:8505	NAVIGATE	hotspot/state · Pages · delete-confirm
+R	2432:11973	2430:12214	NAVIGATE	hotspot/state · Pages · structure
+R	1720:17529	1717:17217	NAVIGATE	hotspot/state · rename · name-conflict
+R	1720:17470	1706:8509	NAVIGATE	hotspot/state · page-settings · crash
+R	1720:17466	1706:8505	NAVIGATE	hotspot/state · page-settings · save-failed
+R	1668:7358	141:165	NAVIGATE	hotspot/state · Pages · load-error
+R	1668:7356	141:124	NAVIGATE	hotspot/state · Pages · empty
+R	1668:7247	141:78	NAVIGATE	hotspot/state · Pages · bulk-select
+R	1171:4870	1171:4767	NAVIGATE	hotspot/state · Pages · command-palette
+R	1171:4868	1171:4713	NAVIGATE	hotspot/state · Pages · context-menu
+R	915:6886	833:4518	NAVIGATE	hotspot/return · publish readiness
+R	873:4522	52:2	NAVIGATE	hotspot/back · to editor
+R	787:4311	782:4212	NAVIGATE	hotspot/state · Pages · no-results
+R	633:3977	302:1978	NAVIGATE	hotspot/state · S3.7 · page-settings · SEO
+R	140:38	295:1972	NAVIGATE	Add page
+R	140:17	302:1978	NAVIGATE	Row · Home
+R	140:13	141:2	NAVIGATE	▾
+R	2838:12106	141:207	NAVIGATE	Structure link (ink)
+R	140:10	141:207	NAVIGATE	⊞ Listings
+N	144:2	Media · grid	FRAME	100,21134,280,812	true	VERTICAL	25	true
+K	208:271	INSTANCE	100,21134,280,44	true	false	Panel header
+K	144:7	FRAME	100,21178,280,36	true	true	Search
+K	144:10	FRAME	100,21214,280,32	true	true	Folder row
+K	144:13	FRAME	100,21246,280,60	true	true	Type pills
+K	144:26	FRAME	100,21306,280,248	true	true	Asset grid
+K	1311:11	FRAME	100,21554,280,36	true	false	Load more
+K	144:45	FRAME	100,21590,280,1	true	true	spacer
+K	144:46	FRAME	100,21591,280,182	true	true	Footer
+K	444:2352	FRAME	100,21773,150,34	true	true	hotspot/state · Media · filtered
+K	444:2354	FRAME	100,21807,150,34	true	true	hotspot/state · Media · drill-in · versions
+K	444:2356	FRAME	100,21841,150,34	true	true	hotspot/state · Media · drill-in · used-in
+K	444:2358	FRAME	100,21875,150,34	true	true	hotspot/state · Media · drill-in · icon-picker
+K	444:2360	FRAME	100,21909,150,34	true	true	hotspot/state · Media · drill-in · stock-browser
+K	787:4327	FRAME	100,21876,160,34	true	false	hotspot/state · Media · loading
+K	787:4331	FRAME	220,21876,160,34	true	false	hotspot/state · Media · no-results
+K	873:4528	FRAME	100,21943,36,36	true	true	hotspot/back · to editor
+K	1165:4713	FRAME	100,21908,280,34	true	false	hotspot/state · ⬚ expand does NOT widen the drawer — it CLOSES it and opens the fullpage l
+K	1671:7213	FRAME	100,21306,280,60	true	true	hotspot/gesture · right-click a card → per-asset menu (Rename / Copy URL / Copy alt text /
+K	1672:7215	FRAME	100,21840,140,34	true	true	hotspot/state · Media · quota-warn
+K	1672:7217	FRAME	240,21840,140,34	true	true	hotspot/state · Media · quota-full
+K	1720:17381	FRAME	100,21748,150,28	true	false	hotspot/state · Media · filter-empty
+K	1720:17420	FRAME	230,21780,150,28	true	false	hotspot/state · search-scope · truncated
+K	1720:17423	FRAME	230,21812,150,28	true	false	hotspot/state · search-scope · failed
+K	1720:17525	FRAME	230,21844,150,28	true	false	hotspot/state · move-to-folder · no-folders
+K	2435:12153	FRAME	100,21740,160,28	true	false	hotspot/state · Media · local-only assets
+C	144:2	texts=31
+T	2435:12154	106,21748,148,12	10	Regular	true	HEIGHT	hotspot/state · Media · local-only assets	Media · local-only assets
+T	1720:17526	236,21852,138,12	10	Medium	false	HEIGHT	hotspot/state · move-to-folder · no-folders	move-to-folder · no-folders
+T	1720:17424	236,21820,138,12	10	Medium	false	HEIGHT	hotspot/state · search-scope · failed	search-scope · failed
+T	1720:17421	236,21788,104,24	10	Medium	false	HEIGHT	hotspot/state · search-scope · truncated	search-scope · truncated
+T	1720:17382	106,21756,138,12	10	Medium	false	HEIGHT	hotspot/state · Media · filter-empty	Media · filter-empty
+T	2838:12023	116,21681,248,40	13	Regular	true	HEIGHT	Footer	Sort and list view live in the full library ⇱
+T	2838:12022	116,21635,185,100	13	Regular	true	HEIGHT	Footer	Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per 
+T	2838:12021	313,21605,50,40	13	Regular	true	HEIGHT	Footer	Aa Fonts
+T	1124:4588	252,21605,51,16	13	Regular	true	WIDTH_AND_HEIGHT	Footer	⬡  Icons
+T	144:48	189,21605,54,20	13	Regular	true	HEIGHT	Footer	☁ Stock
+T	144:47	116,21605,64,20	13	Regular	true	WIDTH_AND_HEIGHT	Footer	↑  Upload
+T	1311:13	298,21562,66,20	13	Regular	true	WIDTH_AND_HEIGHT	Load more	Load more
+T	1311:12	116,21564,128,16	11	Medium	true	WIDTH_AND_HEIGHT	Load more	Showing 200 of 412
+T	I218:702;17:8	248,21518,116,18	12	Regular	true	TRUNCATE	Card / media	team.jpg
+T	I218:697;218:7	127,21494,11,16	11	Regular	true	WIDTH_AND_HEIGHT	badge	AI
+T	I218:697;17:8	116,21518,116,18	12	Regular	true	TRUNCATE	Card / media	pasta.jpg
+T	I218:691;17:8	182,21398,50,18	12	Regular	true	TRUNCATE	Card / media	menu-01.jpg
+T	I218:686;218:7	127,21374,40,16	11	Regular	true	WIDTH_AND_HEIGHT	badge	STOCK
+T	I218:686;17:8	116,21398,50,18	12	Regular	true	TRUNCATE	Card / media	hero-dark.jpg
+T	144:25	150,21283,21,16	11	Medium	true	WIDTH_AND_HEIGHT	pill/icon	370
+T	144:24	124,21283,22,16	11	Regular	true	WIDTH_AND_HEIGHT	pill/icon	icon
+T	144:22	292,21253,14,16	11	Medium	true	WIDTH_AND_HEIGHT	pill/svg	24
+T	144:21	269,21253,19,16	11	Regular	true	WIDTH_AND_HEIGHT	pill/svg	svg
+T	144:19	238,21253,7,16	11	Medium	true	WIDTH_AND_HEIGHT	pill/video	6
+T	144:18	205,21253,29,16	11	Regular	true	WIDTH_AND_HEIGHT	pill/video	video
+T	144:16	160,21253,21,16	11	Medium	true	WIDTH_AND_HEIGHT	pill/image	128
+T	144:15	124,21253,32,16	11	Regular	true	WIDTH_AND_HEIGHT	pill/image	image
+T	144:12	300,21222,64,18	11	Regular	true	HEIGHT	Folder row	☑ Select
+T	144:11	116,21221,44,20	13	Regular	true	WIDTH_AND_HEIGHT	Folder row	📁  All ▾
+T	144:9	126,21187,43,20	13	Regular	true	WIDTH_AND_HEIGHT	search box	Search
+T	I208:271;16:7	116,21148,204,16	11	Medium	true	HEIGHT	Panel header	Media
+R	144:2	146:2	NAVIGATE	Media · grid
+R	2435:12153	2430:21365	NAVIGATE	hotspot/state · Media · local-only assets
+R	1720:17525	1717:17203	NAVIGATE	hotspot/state · move-to-folder · no-folders
+R	1720:17423	1705:8889	NAVIGATE	hotspot/state · search-scope · failed
+R	1720:17420	1705:8842	NAVIGATE	hotspot/state · search-scope · truncated
+R	1720:17381	1704:8514	NAVIGATE	hotspot/state · Media · filter-empty
+R	1672:7217	145:250	NAVIGATE	hotspot/state · Media · quota-full
+R	1672:7215	145:199	NAVIGATE	hotspot/state · Media · quota-warn
+R	1671:7213	145:300	NAVIGATE	hotspot/gesture · right-click a card → per-asset menu (Rename / Copy URL / Copy alt text /
+R	1165:4713	1159:4593	NAVIGATE	hotspot/state · ⬚ expand does NOT widen the drawer — it CLOSES it and opens the fullpage l
+R	873:4528	52:2	NAVIGATE	hotspot/back · to editor
+R	787:4331	782:4353	NAVIGATE	hotspot/state · Media · no-results
+R	787:4327	777:4093	NAVIGATE	hotspot/state · Media · loading
+R	444:2360	147:55	NAVIGATE	hotspot/state · Media · drill-in · stock-browser
+R	444:2358	147:2	NAVIGATE	hotspot/state · Media · drill-in · icon-picker
+R	444:2356	146:68	NAVIGATE	hotspot/state · Media · drill-in · used-in
+R	444:2354	146:32	NAVIGATE	hotspot/state · Media · drill-in · versions
+R	444:2352	145:2	NAVIGATE	hotspot/state · Media · filtered
+R	2865:21920	147:2	NAVIGATE	hotspot/footer · ⬡ Icons
+R	2865:21896	147:55	NAVIGATE	hotspot/footer · ☁ Stock
+R	2838:12023	145:96	NAVIGATE	note/where-it-lives
+R	2838:12022	145:96	NAVIGATE	note/formats
+R	2838:12021	145:96	NAVIGATE	Aa Fonts
+R	144:47	145:96	NAVIGATE	↑ Upload
+R	2865:21894	52:2	NAVIGATE	hotspot/card · click inserts onto the canvas
+END	done=140:2|144:2	stopped=false	bytes=13273

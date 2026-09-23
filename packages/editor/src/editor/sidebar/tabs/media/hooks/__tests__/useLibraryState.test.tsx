@@ -24,6 +24,8 @@ function asset(over: Partial<MediaAsset> = {}): MediaAsset {
     size: over.size ?? 100,
     createdAt: over.createdAt ?? "2026-01-01T00:00:00.000Z",
     folderId: over.folderId,
+    tags: over.tags ?? [],
+    versionOf: over.versionOf,
   } as MediaAsset;
 }
 
@@ -69,14 +71,20 @@ beforeEach(() => {
 });
 
 describe("useLibraryState — folder scoping", () => {
-  it("shows only root assets by default (folderId null)", () => {
+  /* Clone 3698:20337 — "All assets 24" is the whole library: In use 14 +
+     Unused 10, and Products 8 + Hero shots 5 + Icons 6 sit inside it. The
+     root scope lists every file; a folder is a narrower view of the same
+     set, never a sibling of "unfiled". (This read "only root assets" until
+     the first live move put two files in a folder and made "23 files · All
+     assets" list 21.) */
+  it("the root scope is every asset, foldered or not", () => {
     const composer = makeComposer([
       asset({ id: "root1" }),
       asset({ id: "nested1", folderId: "f1" }),
     ]);
     const { result } = renderHook(() => useLibraryState(composer));
     const keys = result.current.libraryItems.map((i) => i.key);
-    expect(keys).toEqual(["root1"]);
+    expect(keys).toEqual(["root1", "nested1"]);
   });
 
   it("scopes to a folder when currentFolderId is set", () => {
@@ -153,6 +161,111 @@ describe("useLibraryState — filters", () => {
   });
 });
 
+/* Clone 3721:43697 / 43902 / 44107 — a TAGS chip is a FILTER of its own, not
+   a search string: it narrows to the files carrying the tag, combines with
+   the folder scope and with typed search, and clears on its own. */
+describe("useLibraryState — tag filter (Clone 3721:43697)", () => {
+  const tagged = () => [
+    asset({ id: "menu", name: "menu-cover", tags: ["menu"] }),
+    asset({ id: "team", name: "team-photo", tags: ["team"] }),
+    asset({ id: "pasta", name: "pasta-closeup", tags: ["food", "menu"], folderId: "f1" }),
+    asset({ id: "plain", name: "plain" }),
+  ];
+
+  it("is off by default and narrows to the files carrying the tag", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.tagFilter).toBeNull();
+    act(() => result.current.setTagFilter("menu"));
+    expect(result.current.tagFilter).toBe("menu");
+    expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["menu", "pasta"]);
+  });
+
+  it("combines with the folder scope and with typed search", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setTagFilter("menu"));
+    act(() => result.current.setCurrentFolderId("f1"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["pasta"]);
+    act(() => result.current.setCurrentFolderId(null));
+    act(() => result.current.setLibrarySearch("cover"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["menu"]);
+  });
+
+  it("swaps to another tag and clears back to everything", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setTagFilter("menu"));
+    act(() => result.current.setTagFilter("team"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["team"]);
+    act(() => result.current.setTagFilter(null));
+    expect(result.current.libraryItems).toHaveLength(4);
+  });
+
+  it("carries each asset's tags onto its library item, and updateItem writes them back", async () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.allLibraryItems.find((i) => i.key === "pasta")?.tags).toEqual(["food", "menu"]);
+    await act(() => result.current.updateItem("pasta", { tags: ["food"] }));
+    expect((composer as unknown as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media.updateAsset).toHaveBeenCalledWith(
+      "pasta",
+      { tags: ["food"] },
+    );
+  });
+});
+
+/* Clone 3695:45529 (Asset versions, Phase 6): a saved edit is a row of its
+   own, flagged `versionOf = <parent id>`. Such rows are reachable only
+   through their parent — never a card, never a count, never a search hit —
+   and `versionsOf(parent)` lists the family, the original first. */
+describe("useLibraryState — versions (Clone 3695:45529)", () => {
+  const family = () => [
+    asset({ id: "hero", name: "hero-dark", folderId: "f1", createdAt: "2026-08-01T00:00:00.000Z" }),
+    asset({ id: "hero-v3", name: "hero-dark-v3", folderId: "f1", versionOf: "hero", createdAt: "2026-09-03T00:00:00.000Z" }),
+    asset({ id: "hero-v2", name: "hero-dark-v2", folderId: "f1", versionOf: "hero", createdAt: "2026-09-02T00:00:00.000Z" }),
+    asset({ id: "menu", name: "menu-cover" }),
+  ];
+
+  it("hides version rows from the grid, the unscoped list, the type counts and the folder counts", () => {
+    const composer = makeComposer(family(), [{ id: "f1" }]);
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["hero", "menu"]);
+    expect(result.current.allLibraryItems.map((i) => i.key).sort()).toEqual(["hero", "menu"]);
+    expect(result.current.counts).toEqual({ all: 2, img: 2, vid: 0, ico: 0, fnt: 0 });
+    expect(result.current.folderCounts.get("f1")).toBe(1);
+  });
+
+  it("a search never surfaces a version row", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setLibrarySearch("v2"));
+    expect(result.current.libraryItems).toEqual([]);
+  });
+
+  it("versionsOf(parent) is the original first, then the saved versions oldest to newest, each carrying its parent", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    const versions = result.current.versionsOf("hero");
+    expect(versions.map((v) => v.key)).toEqual(["hero", "hero-v2", "hero-v3"]);
+    expect(versions[0].versionOf).toBeUndefined();
+    expect(versions[1].versionOf).toBe("hero");
+  });
+
+  it("versionsOf(a version) resolves to its parent's family; an unknown key is empty; a lone file is itself", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.versionsOf("hero-v2").map((v) => v.key)).toEqual(["hero", "hero-v2", "hero-v3"]);
+    expect(result.current.versionsOf("nope")).toEqual([]);
+    expect(result.current.versionsOf("menu").map((v) => v.key)).toEqual(["menu"]);
+  });
+
+  it("the raw engine list still holds the version rows — the engine's truth is not narrowed", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.rawAssets).toHaveLength(4);
+  });
+});
+
 describe("useLibraryState — sort", () => {
   it("sorts by name ascending", () => {
     const composer = makeComposer([
@@ -224,6 +337,24 @@ describe("useLibraryState — counts", () => {
     const { result } = renderHook(() => useLibraryState(composer));
     act(() => result.current.setLibrarySearch("hero"));
     expect(result.current.counts).toMatchObject({ all: 2, img: 1, vid: 1 });
+  });
+
+  // Clone 3698:20337 — every FOLDERS row carries its own count ("Products 8"),
+  // and 3700:20353 draws a just-created folder at 0. Direct children only: the
+  // same set the grid shows when that folder is the scope.
+  it("folderCounts counts the direct children of each folder, whatever the scope", () => {
+    const composer = makeComposer([
+      asset({ id: "root1" }),
+      asset({ id: "p1", folderId: "f1" }),
+      asset({ id: "p2", folderId: "f1" }),
+      asset({ id: "h1", folderId: "f2" }),
+    ]);
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.folderCounts.get("f1")).toBe(2);
+    expect(result.current.folderCounts.get("f2")).toBe(1);
+    expect(result.current.folderCounts.get("f9")).toBeUndefined();
+    act(() => result.current.setCurrentFolderId("f2"));
+    expect(result.current.folderCounts.get("f1")).toBe(2);
   });
 });
 

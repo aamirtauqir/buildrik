@@ -1,15 +1,27 @@
 /**
- * Advanced screen — custom code injection (head scripts, body scripts, global CSS)
+ * Custom code — Clone 3397:32456 (`Advanced / Custom code`): three cards,
+ * each one code field beside its side label — Head scripts (`<head>`), Body
+ * scripts (end) (`</body>`) and Global CSS (`styles`).
+ *
+ * Head and body come from the Site row on open (3953:49260 loading,
+ * 3953:49386 load-error) — those two columns are what the publish worker
+ * injects; the CSS lives in the project JSON and the client export engine
+ * injects it. Edits stay here until Save: the flush writes
+ * `projectSettings.customCode`, and the sync provider's dual-save map carries
+ * head and body on to `Site.headCode` / `Site.bodyCode`. A refused save shows
+ * the banner (3951:26607). On a FREE plan the shell mounts `LockedScreen`
+ * instead (3397:32859).
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { CustomCodeConfig } from "../../../../../shared/types/project";
-import { validateHtml, type HtmlValidationResult } from "../../../../../shared/utils/validateHtml";
-import { validateCss, type CssValidationResult } from "../../../../../shared/utils/validateCss";
+import type { CustomCodeConfig } from "@/shared/types/project";
+import { validateHtml, type HtmlValidationResult } from "@/shared/utils/validateHtml";
+import { validateCss, type CssValidationResult } from "@/shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { Input, Screen, Section, Textarea } from "../shared";
-
+import { useServerLoad } from "../hooks/useServerLoad";
+import { LoadCard, SaveErrorBanner, Screen, Section, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 
 const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
@@ -17,6 +29,31 @@ const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
   bodyScripts: "",
   globalCss: "",
 };
+
+/** The two columns this screen reads off `siteDetail.settings.get`. */
+interface CustomCodeRow {
+  headCode?: string | null;
+  bodyCode?: string | null;
+}
+
+const FEEDBACK_LINE = "tw:py-0.5";
+/* `--bk-warning` is the FILL colour of a warning, not its text colour — at
+   12px over white it measured under AA. The token system carries the pair;
+   `--bk-warning-text` is the ink. Same for success. */
+const FEEDBACK_ERROR = `${FEEDBACK_LINE} tw:text-[var(--bk-error)]`;
+const FEEDBACK_WARNING = `${FEEDBACK_LINE} tw:text-[var(--bk-warning-text)]`;
+const FEEDBACK_SUCCESS = `${FEEDBACK_LINE} tw:text-[var(--bk-success-text)]`;
+
+const Feedback: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => (
+  <div
+    id={id}
+    role="status"
+    aria-live="polite"
+    className="tw:mt-2 tw:text-[length:var(--bk-text-12)] tw:leading-normal"
+  >
+    {children}
+  </div>
+);
 
 /**
  * The errors/warnings/success block under a code field. Head and body render
@@ -28,20 +65,70 @@ const HtmlFeedback: React.FC<{ id: string; result: HtmlValidationResult | null }
   result,
 }) =>
   result ? (
-    <div id={id} role="status" aria-live="polite" style={validationContainerStyles}>
+    <Feedback id={id}>
       {result.errors.map((err, i) => (
-        <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
+        <div key={`e${i}`} className={FEEDBACK_ERROR}>✗ {err}</div>
       ))}
       {result.warnings.map((warn, i) => (
-        <div key={`w${i}`} style={validationWarningStyles}>⚠ {warn}</div>
+        <div key={`w${i}`} className={FEEDBACK_WARNING}>⚠ {warn}</div>
       ))}
       {result.valid && result.warnings.length === 0 && (
-        <div style={validationSuccessStyles}>✓ HTML looks good</div>
+        <div className={FEEDBACK_SUCCESS}>✓ HTML looks good</div>
       )}
-    </div>
+    </Feedback>
   ) : null;
 
-export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
+/**
+ * One card = one code field beside its side label (`<head>` / `</body>` /
+ * `styles`), mono 12, the frame's row. `col-span-full` keeps the row whole
+ * should the card lay its children out as a grid.
+ */
+const CodeCard: React.FC<{
+  title: string;
+  anchor?: string;
+  side: string;
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  describedBy?: string;
+  onChange: (next: string) => void;
+  children?: React.ReactNode;
+}> = ({ title, anchor, side, id, label, value, placeholder, describedBy, onChange, children }) => (
+  <Section title={title} anchor={anchor}>
+    <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
+      <label
+        htmlFor={id}
+        className="tw:w-48 tw:shrink-0 tw:pt-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+      >
+        {side}
+      </label>
+      <div className="tw:min-w-0 tw:flex-1">
+        <Textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
+          aria-describedby={describedBy}
+          placeholder={placeholder}
+          spellCheck={false}
+          className="tw:min-h-[120px] tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5"
+        />
+        {children}
+      </div>
+    </div>
+  </Section>
+);
+
+export const AdvancedScreen: React.FC<ScreenProps> = ({
+  composer,
+  projectId,
+  onDirtyChange,
+  registerFlushHandler,
+  onLoadStateChange,
+  registerRetryLoad,
+  saveError,
+}) => {
   const { value: savedCode } = useSettingsScreen(
     composer,
     (s) => s.customCode ?? DEFAULT_CUSTOM_CODE,
@@ -105,6 +192,18 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
 
+  // Head and body as the Site row holds them now — the columns the publish
+  // worker reads. CSS is not a Site column; the composer's copy stands.
+  const load = useServerLoad<CustomCodeRow>(
+    projectId,
+    (client, siteId) => client.siteDetail.settings.get.query({ siteId }),
+    (row) => {
+      setHeadCode(row.headCode ?? "");
+      setBodyCode(row.bodyCode ?? "");
+    },
+    { onLoadStateChange, registerRetryLoad }
+  );
+
   // Flush local buffer → composer on Save (see SettingsTab).
   const stateRef = React.useRef({ headCode, bodyCode, cssCode });
   stateRef.current = { headCode, bodyCode, cssCode };
@@ -125,107 +224,84 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
 
+  if (load.state !== "ready") {
+    return (
+      <Screen>
+        <LoadCard
+          title="Custom code"
+          line="Head, body and CSS injections for this site."
+          state={load.state}
+          errorLine="Couldn't load your custom code. Check your connection, then try again."
+          onRetry={load.retry}
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen>
-      {/* Said "Custom code runs on all pages. Test thoroughly." while the
-          placeholder below invited `<script>…</script>` and the validator
-          answered "✓ HTML looks good" — and then the export sanitizer dropped
-          every inline script without a word. Walked live: typed an inline
-          script and an external one, saved, and only the external one is in
-          the exported head. The banner now says which half runs. */}
-      <div style={warningBannerStyles}>
-        ⚠️ Custom code runs on every page. Scripts must load from a file —
-        <code> &lt;script src=&quot;…&quot;&gt;</code> — inline JavaScript is removed when the
-        site is published.
-      </div>
+      {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
-      <Section title="Head Scripts">
-        <Textarea
-          id="section-head-scripts"
-          value={headCode}
-          onChange={(e) => {
-            setHeadCode(e.target.value);
-            setIsDirty(true);
-          }}
-          aria-label="Head Scripts"
-          aria-describedby={headValidation ? "head-validation-feedback" : undefined}
-          /* The old placeholder was `<script>...</script>`, i.e. the exact
-             form the exporter strips. */
-          placeholder={'<script src="https://…/analytics.js"></script>\n<link rel="preconnect" href="https://…">'} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
-        />
+      <CodeCard
+        title="Head scripts"
+        side="<head>"
+        id="code-head"
+        label="Head scripts"
+        value={headCode}
+        onChange={(next) => {
+          setHeadCode(next);
+          setIsDirty(true);
+        }}
+        describedBy={headValidation ? "head-validation-feedback" : undefined}
+        /* `<script src>`, never `<script>…</script>`: the export sanitizer
+           strips inline scripts, and the validator under the field says so
+           the moment one is typed. */
+        placeholder={'<script src="https://…/analytics.js"></script>\n<link rel="preconnect" href="https://…">'}
+      >
         <HtmlFeedback id="head-validation-feedback" result={headValidation} />
-      </Section>
+      </CodeCard>
 
-      <Section title="Body Scripts (End)">
-        <Textarea
-          id="section-body-scripts"
-          value={bodyCode}
-          onChange={(e) => {
-            setBodyCode(e.target.value);
-            setIsDirty(true);
-          }}
-          aria-label="Body Scripts"
-          aria-describedby={bodyValidation ? "body-validation-feedback" : undefined}
-          placeholder={'<script src="https://…/widget.js"></script>'} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
-        />
+      <CodeCard
+        title="Body scripts (end)"
+        anchor="body-scripts"
+        side="</body>"
+        id="code-body"
+        label="Body scripts"
+        value={bodyCode}
+        onChange={(next) => {
+          setBodyCode(next);
+          setIsDirty(true);
+        }}
+        describedBy={bodyValidation ? "body-validation-feedback" : undefined}
+        placeholder={'<script src="https://…/widget.js"></script>'}
+      >
         <HtmlFeedback id="body-validation-feedback" result={bodyValidation} />
-      </Section>
+      </CodeCard>
 
-      <Section title="Global CSS">
-        <Textarea
-          id="section-global-css"
-          value={cssCode}
-          onChange={(e) => {
-            setCssCode(e.target.value);
-            setIsDirty(true);
-          }}
-          aria-label="Global CSS"
-          aria-describedby={cssValidation ? "css-validation-feedback" : undefined}
-          placeholder={"/* Custom CSS */\n.my-class { color: red; }"} style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
-        />
+      <CodeCard
+        title="Global CSS"
+        side="styles"
+        id="code-css"
+        label="Global CSS"
+        value={cssCode}
+        onChange={(next) => {
+          setCssCode(next);
+          setIsDirty(true);
+        }}
+        describedBy={cssValidation ? "css-validation-feedback" : undefined}
+        placeholder={"/* Custom CSS */\n.my-class { color: red; }"}
+      >
         {cssValidation && (
-          <div id="css-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
+          <Feedback id="css-validation-feedback">
             {cssValidation.errors.map((err, i) => (
-              <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
+              <div key={`e${i}`} className={FEEDBACK_ERROR}>✗ {err}</div>
             ))}
             {cssValidation.valid && (
-              <div style={validationSuccessStyles}>✓ CSS brace balance looks good</div>
+              <div className={FEEDBACK_SUCCESS}>✓ CSS brace balance looks good</div>
             )}
-          </div>
+          </Feedback>
         )}
-      </Section>
-
+      </CodeCard>
     </Screen>
   );
-};
-
-const warningBannerStyles: React.CSSProperties = {
-  padding: "10px 12px",
-  background: "rgba(217, 119, 6, 0.08)",
-  border: "1px solid rgba(217, 119, 6, 0.3)",
-  borderRadius: "var(--bk-radius-sm)",
-  font: "500 12px var(--bk-font-ui)",
-  color: "var(--bk-warning)",
-  lineHeight: 1.5,
-};
-
-const validationContainerStyles: React.CSSProperties = {
-  marginTop: 8,
-  fontSize: 12,
-  lineHeight: 1.5,
-};
-
-const validationErrorStyles: React.CSSProperties = {
-  color: "var(--bk-error)",
-  padding: "2px 0",
-};
-
-const validationWarningStyles: React.CSSProperties = {
-  color: "var(--bk-warning)",
-  padding: "2px 0",
-};
-
-const validationSuccessStyles: React.CSSProperties = {
-  color: "var(--bk-success)",
-  padding: "2px 0",
 };

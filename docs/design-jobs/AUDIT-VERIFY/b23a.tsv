@@ -1,0 +1,41 @@
+N	2429:12111	Content · dynamic-pages	FRAME	2320,32529,280,812	true	VERTICAL	8	true
+K	2429:12112	INSTANCE	2320,32529,280,44	true	false	Panel header
+K	2429:12113	FRAME	2320,32573,280,32	true	false	Crumb
+K	2429:12115	FRAME	2320,32605,280,28	true	false	meta
+K	2429:12118	FRAME	2320,32633,280,37	true	false	block
+K	2429:12120	FRAME	2320,32670,280,671	true	false	spacer
+K	2435:12144	FRAME	2326,33219,160,28	true	false	hotspot/state · dynamic-pages · no-pattern
+K	2435:12147	FRAME	2326,33251,160,28	true	false	hotspot/state · dynamic-pages · none-published
+K	2435:12150	FRAME	2326,33283,160,28	true	false	hotspot/state · dynamic-pages · no-template
+C	2429:12111	texts=10
+T	2435:12151	2332,33291,148,12	10	Regular	true	HEIGHT	hotspot/state · dynamic-pages · no-template	dynamic-pages · no-template
+T	2435:12148	2332,33259,148,24	10	Regular	true	HEIGHT	hotspot/state · dynamic-pages · none-published	dynamic-pages · none-published
+T	2435:12145	2332,33227,148,12	10	Regular	true	HEIGHT	hotspot/state · dynamic-pages · no-pattern	dynamic-pages · no-pattern
+T	2987:21957	2332,32740,256,30	11	Regular	true	HEIGHT	spacer	One page per record. Use a field slug in braces — {slug} — to build the URL.
+T	2987:21956	2342,32710,236,16	12	Regular	true	HEIGHT	spacer	/menu/{slug}
+T	2987:21954	2332,32682,256,16	12	Regular	true	HEIGHT	spacer	URL pattern
+T	2429:12119	2332,32645,256,13	11	Regular	true	HEIGHT	block	Generates 4 pages from published records.
+T	2429:12116	2332,32611,80,13	11	Regular	true	WIDTH_AND_HEIGHT	meta	Dynamic pages
+T	2429:12114	2336,32579,188,16	13	Regular	true	WIDTH_AND_HEIGHT	Crumb	‹  Menu items · dynamic pages
+T	I2429:12112;16:7	2336,32543,204,16	11	Medium	true	HEIGHT	Panel header	Content
+R	2429:12111	149:50	NAVIGATE	Content · dynamic-pages
+R	2435:12150	2429:21281	NAVIGATE	hotspot/state · dynamic-pages · no-template
+R	2435:12147	2429:21262	NAVIGATE	hotspot/state · dynamic-pages · none-published
+R	2435:12144	2429:21243	NAVIGATE	hotspot/state · dynamic-pages · no-pattern
+N	2429:21281	Content · dynamic-pages · no-template	FRAME	1300,36382,280,812	true	VERTICAL	5	true
+K	2429:21282	INSTANCE	1300,36382,280,44	true	false	Panel header
+K	2429:21283	FRAME	1300,36426,280,32	true	false	Crumb
+K	2429:21285	FRAME	1300,36458,280,28	true	false	meta
+K	2429:21288	FRAME	1300,36486,280,37	true	false	block
+K	2429:21290	FRAME	1300,36523,280,671	true	false	spacer
+C	2429:21281	texts=8
+T	2987:21970	1312,36635,256,30	11	Regular	true	HEIGHT	spacer	No template page is bound, so publishing emits none of these yet.
+T	2987:21969	1312,36593,256,30	11	Regular	true	HEIGHT	spacer	One page per record. Use a field slug in braces — {slug} — to build the URL.
+T	2987:21968	1322,36563,236,16	12	Regular	true	HEIGHT	spacer	/menu/{slug}
+T	2987:21966	1312,36535,256,16	12	Regular	true	HEIGHT	spacer	URL pattern
+T	2429:21289	1312,36498,256,13	11	Regular	true	HEIGHT	block	Generates 4 pages from published records.
+T	2429:21286	1312,36464,80,13	11	Regular	true	WIDTH_AND_HEIGHT	meta	Dynamic pages
+T	2429:21284	1316,36432,188,16	13	Regular	true	WIDTH_AND_HEIGHT	Crumb	‹  Menu items · dynamic pages
+T	I2429:21282;16:7	1316,36396,204,16	11	Medium	true	HEIGHT	Panel header	Content
+R	2429:21281	149:50	NAVIGATE	Content · dynamic-pages · no-template
+END	done=2429:12111|2429:21281	stopped=false	bytes=3223

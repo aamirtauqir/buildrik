@@ -7,12 +7,15 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "../../shared/types/media";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { FullPageRouter } from "./FullPageRouter";
+import type { SettingsOpenRequest } from "./tabs/settings/types";
 
 export interface FullPageViewProps {
   activeTab: GroupedTabId;
@@ -22,13 +25,15 @@ export interface FullPageViewProps {
   onClose: () => void;
   onSwitchToAdd?: () => void;
   onSwitchToDesign?: () => void;
-  onReplayTour?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
+  settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -43,9 +48,9 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   onClose,
   onSwitchToAdd,
   onSwitchToDesign,
-  onReplayTour,
   projectId,
   onSettingsDirtyChange,
+  settingsOpen,
   onTemplatesSwitchTab,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -74,9 +79,9 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             commonTabProps={commonTabProps}
             onSwitchToAdd={onSwitchToAdd}
             onSwitchToDesign={onSwitchToDesign}
-            onReplayTour={onReplayTour}
             projectId={projectId}
             onSettingsDirtyChange={onSettingsDirtyChange}
+            settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
           />
         </React.Suspense>

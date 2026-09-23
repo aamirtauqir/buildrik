@@ -6,9 +6,11 @@ import { StorageQuotaBar } from "../StorageQuotaBar";
 describe("StorageQuotaBar", () => {
   // Board copy: "X of Y used" — MB-precise under a gigabyte (145:199).
   it("renders board quota copy — GB above 1 GB, MB below", () => {
-    const { getByText, rerender } = render(<StorageQuotaBar used={2.4e9} total={5e9} />);
+    // Server-shaped bytes: PLAN_LIMITS.storageMB * 1024 * 1024.
+    const MIB = 1024 * 1024;
+    const { getByText, rerender } = render(<StorageQuotaBar used={2.4 * 1024 * MIB} total={5120 * MIB} />);
     expect(getByText(/2\.4 GB of 5 GB used/)).toBeInTheDocument();
-    rerender(<StorageQuotaBar used={842e6} total={1e9} />);
+    rerender(<StorageQuotaBar used={842 * MIB} total={1024 * MIB} />);
     expect(getByText(/842 MB of 1 GB used/)).toBeInTheDocument();
   });
 
@@ -16,7 +18,7 @@ describe("StorageQuotaBar", () => {
   it("near-limit shows the Optimise link when wired", async () => {
     const onOptimize = vi.fn();
     const { getByTestId } = render(
-      <StorageQuotaBar used={842e6} total={1e9} onOptimize={onOptimize} />,
+      <StorageQuotaBar used={842 * 1024 * 1024} total={1024 * 1024 * 1024} onOptimize={onOptimize} />,
     );
     await userEvent.setup().click(getByTestId("media-quota-optimize"));
     expect(onOptimize).toHaveBeenCalledOnce();

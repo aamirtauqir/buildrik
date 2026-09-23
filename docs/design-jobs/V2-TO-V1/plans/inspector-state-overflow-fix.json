@@ -1,0 +1,8 @@
+[
+ { "op":"move",   "id":"2866:12467", "y":628,
+   "why":"UX-D-08 — SLIDER footer note ran 10px past its 812 board (readback contentExtent=822 of 812)" },
+ { "op":"resize", "id":"2864:21821", "width":300, "height":1200,
+   "why":"UX-D-09 — shifting the inherited CSS stack down by 320 to seat WHERE IT GOES first put its tail at 1165 in a 960 board; 2824+1200=4024 still clears the 4101 row below" },
+ { "op":"move",   "id":"2866:21825", "y":520,
+   "why":"UX-D-10/11/25/26 — findability footer note ran to 897 in an 812 board; content above ends at 288, so 520 seats it with room" }
+]

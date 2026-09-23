@@ -152,13 +152,23 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
         position: "fixed",
         top: y,
         left: x,
-        padding: 6,
+        /* Vertical only — 1176:4867 / 1176:4902 give the surface `py-[6px]` and
+           put the 12px inset on the ROWS, so a highlight runs the full 200.
+           `padding: 6` inset the rows twice and left a white gutter each side
+           of every hover. */
+        padding: "6px 0",
+        /* 8, not PANEL_STYLE's 10 (1176:4867 / 4902). Overridden here rather
+           than in PANEL_STYLE, which twenty-six other canvas surfaces read.
+           Through the token, not the literal: both files are on the
+           green-panel allowlist, where a raw radius is a hard zero. */
+        borderRadius: "var(--bk-radius-lg)",
         zIndex: Z_INDEX.contextMenu,
         minWidth: MENU_WIDTH,
         color: CANVAS_COLORS.textPrimary,
         outline: "none", // Remove focus outline - we show focus via item highlight
       }}
       role="menu"
+      data-testid="canvas-ctx-menu"
       aria-label="Element context menu"
       aria-activedescendant={allItems[focusedIndex]?.id}
     >

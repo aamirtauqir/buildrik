@@ -20,6 +20,7 @@ import type { Composer } from "@/engine";
 import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
 import { EVENTS } from "@/shared/constants/events";
 import { Button } from "@/editor/chrome-ui";
+import type { SavesFilter } from "../types";
 
 /* Board 162:2 draws the approval band as a full-bleed strip with a 3px success
    rail on its left, weight 400 — not a rounded tinted card with a bold title. */
@@ -35,7 +36,12 @@ const NOW_COL = "tw:flex tw:flex-col";
 /* Aligned under the count, past the dot and its gap (8px + 8px). */
 const NOW_SUMMARY =
   "tw:px-1 tw:pb-2 tw:pl-[calc(0.25rem+16px)] tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:truncate";
-const PRUNE_NOTE = "tw:m-0 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+/* Board 163:44/163:45 — a bg-subtle block with the sentence inset 16 on both
+   sides. Split in two because the board measures the TEXT (248 wide in a 280
+   panel, 11/16), not the padded block: one element carrying both would report
+   the block's 280 and there would be nothing to compare the type against. */
+const PRUNE_NOTE = "tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-2";
+const PRUNE_NOTE_TEXT = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* Boards 163:2 / 163:113 hang one action off the approval anchor. It sat
    unbuilt: "Compare with current" had ZERO occurrences in src/, while the view
    that renders exactly that comparison — ApprovedCompareView — was already
@@ -153,17 +159,33 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
 /**
  * The retention rule, under the list.
  *
- * The cap is read off VersionTimelineManager rather than written into the
- * copy, so it cannot go on claiming 50 the day the config changes — and
- * nothing is said at all when no cap can be read, because a number invented
- * here is a claim about retention that nothing backs.
+ * TWO rules, because the two filters retain different things and the note sat
+ * under both saying only the first. Milestones lists saved versions, which
+ * survive a reload and prune oldest-first; "All changes" lists the UNDO stack,
+ * which is capped at `maxHistory` and is gone the moment the page reloads.
+ * Board 163:2 — the changes filter — spells that out: "This session only — the
+ * last 100 steps, cleared when you reload. Save a version to keep a point."
+ * The panel printed the versions sentence there instead, which is not merely
+ * off-board: it promises durability for a list that has none.
+ *
+ * Both caps are read off their manager rather than written into the copy, so
+ * neither can go on claiming a number the config has moved past — and nothing
+ * is said at all when no cap can be read, because a number invented here is a
+ * claim about retention that nothing backs.
  */
-export const SavesPruneNote: React.FC<{ composer: Composer | null }> = ({ composer }) => {
-  const max = composer?.versions?.maxVersions;
-  if (typeof max !== "number") return null;
+export const SavesPruneNote: React.FC<{ composer: Composer | null; filter: SavesFilter }> = ({
+  composer,
+  filter,
+}) => {
+  const cap = filter === "changes" ? composer?.history?.maxHistory : composer?.versions?.maxVersions;
+  if (typeof cap !== "number") return null;
   return (
-    <p className={PRUNE_NOTE}>
-      {max} versions kept. Auto-saves prune oldest first; named ones never prune.
-    </p>
+    <div className={PRUNE_NOTE} data-testid="history-prune-note">
+      <p className={PRUNE_NOTE_TEXT} data-testid="history-prune-note-text">
+        {filter === "changes"
+          ? `This session only — the last ${cap} steps, cleared when you reload. Save a version to keep a point.`
+          : `${cap} versions kept. Auto-saves prune oldest first; named ones never prune.`}
+      </p>
+    </div>
   );
 };

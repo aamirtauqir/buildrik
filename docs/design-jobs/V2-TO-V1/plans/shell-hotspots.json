@@ -1,0 +1,62 @@
+{
+ "note": "Prototype wiring. Rows whose BOTH ends are boards this pass creates are fully mechanical — the applier resolves them by board name from the build-spec-boards output. Rows that leave the shell section name only a destination SECTION, because no panel-root board id was ever read; a hotspot pointing at the wrong board is worse than no hotspot, so those are left unresolved on purpose.",
+ "page": "1:3",
+ "rows": [
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Site menu (⋯) · regrouped — in-editor rows moved to More", "type": "TEXT", "equals": "Unpublish site…" },
+   "to-selector": { "section": "1776:8385", "boardName": "Site menu · Unpublish confirm (modal · 440)" },
+   "name": "hotspot/unpublish-confirm", "pad": 6,
+   "why": "UX-F-30 — a destructive row owns its confirmation at the point of invocation. Both ends are boards this pass creates, so this row resolves without any prior knowledge of the file."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Site menu · Unpublish confirm (modal · 440)", "type": "TEXT", "equals": "Cancel" },
+   "to-selector": { "section": "1776:8385", "boardName": "Site menu (⋯) · regrouped — in-editor rows moved to More" },
+   "name": "hotspot/unpublish-cancel", "pad": 6,
+   "why": "The confirm's way back. Without it the modal is a dead end, which is the defect SH-D-07 recorded on the exit guard's stranded variant."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "Templates" },
+   "to-selector": { "section": "1084:4527", "boardName": "__ROOT__" },
+   "name": "hotspot/more-templates", "pad": 8,
+   "why": "UX-F-01 — the More index is only a door if its rows go somewhere. DESTINATION UNRESOLVED: section 11 · Templates is 1084:4527 (read), but which of its 18 boards is the panel root was never read. Resolve before applying; do not guess."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "Components" },
+   "to-selector": { "section": "1938:8372", "boardName": "__ROOT__" },
+   "name": "hotspot/more-components", "pad": 8,
+   "why": "UX-F-01. Section 10 · Components is 1938:8372 (read); its root board was not."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "Publish" },
+   "to-selector": { "section": "1776:8378", "boardName": "__ROOT__" },
+   "name": "hotspot/more-publish", "pad": 8,
+   "why": "UX-F-01. Section 15 · Publish is 1776:8378 (read); its root board was not."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "History" },
+   "to-selector": { "section": "1776:8374", "boardName": "__ROOT__" },
+   "name": "hotspot/more-history", "pad": 8,
+   "why": "UX-F-01. Section 16 · History is 1776:8374 (read); its root board was not."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "Review" },
+   "to-selector": { "section": "1776:8383", "boardName": "__ROOT__" },
+   "name": "hotspot/more-review", "pad": 8,
+   "why": "UX-F-01. Section 18 · Review is 1776:8383 (read); its root board was not."
+  },
+  {
+   "over": null, "to": null, "unresolved-id": true,
+   "over-selector": { "section": "1776:8385", "boardName": "Rail · More index (popover · 240)", "type": "TEXT", "equals": "Settings" },
+   "to-selector": { "section": "1776:8387", "boardName": "1688:7195" },
+   "name": "hotspot/more-settings", "pad": 8,
+   "why": "UX-F-01 + UX-F-12. Section 21 · Settings/S7 is 1776:8387 (read). COVER-1-01 names 1688:7195 as the Settings ROOT board — that id comes from the findings lane, not from a read of the file, so it is an inference and must be confirmed before wiring."
+  }
+ ]
+}

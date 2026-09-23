@@ -21,10 +21,14 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { NextMove } from "../shell/lifecycle";
+import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import { exportPublishPages } from "../shell/exportPublishPages";
 
@@ -67,17 +71,25 @@ export interface TabRouterProps {
    *  because TabRouter mounts one tab at a time, so the listener did not
    *  exist yet when the emit fired from the Pages tab. */
   templatesNewPageMode?: boolean;
+  /** Site menu › Unpublish asked for the confirm before PublishTab existed.
+   *  Same one-tab-at-a-time race as above; same answer — a prop the always-
+   *  mounted sidebar owns, consumed once by the tab it was meant for. */
+  unpublishIntent?: boolean;
+  onUnpublishIntentConsumed?: () => void;
   onCreateComponent: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
+  nextMove?: NextMove | null;
+  onRequestPublish?: () => void;
   onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
   onOpenIconPicker?: (
@@ -97,6 +109,8 @@ export interface TabRouterProps {
    *  every sub-tab deep link opened the right panel at the wrong screen. Only
    *  History reads it today; other tabs ignore it until they need it. */
   activeSubTab?: string;
+  /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
+  pagesOpen?: PageSettingsOpenRequest | null;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -109,10 +123,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSwitchToAdd,
   onSwitchToTemplates,
   templatesNewPageMode,
+  unpublishIntent,
+  onUnpublishIntentConsumed,
   onCreateComponent,
   projectId,
   publishJob,
-  onVercelPublish,
+  nextMove,
+  onRequestPublish,
   onTemplatesSwitchTab,
   onOpenLibrary,
   onOpenImageEditor,
@@ -120,6 +137,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onResendReview,
   onCreateCollection,
   activeSubTab,
+  pagesOpen,
 }) => {
   switch (activeTab) {
     case "add":
@@ -158,6 +176,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           composer={composer}
           {...commonTabProps}
           onRequestTemplates={onSwitchToTemplates}
+          openSettingsRequest={pagesOpen}
         />
       );
 
@@ -184,15 +203,18 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "publish":
-      // onVercelPublish gated on the same flag as the Topbar Publish dropdown
-      // so the sidebar action only lights up when publishing is enabled.
+      // The publish door is gated on the same flag as the topbar CTA, so the
+      // sidebar action only lights up when publishing is enabled.
       return (
         <PublishTab
           composer={composer}
           {...commonTabProps}
           projectId={projectId}
           publishJob={publishJob}
-          onVercelPublish={isFeatureEnabled("publish") ? onVercelPublish : undefined}
+          nextMove={nextMove ?? null}
+          onRequestPublish={isFeatureEnabled("publish") ? onRequestPublish : undefined}
+          initialUnpublish={unpublishIntent}
+          onUnpublishIntentConsumed={onUnpublishIntentConsumed}
         />
       );
 
@@ -229,8 +251,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           {...commonTabProps}
           composer={composer}
           onResend={onResendReview}
-          /* Board 200:213's ReviewBar links straight to Compare, the same way
-             the history tab deep-links to "published" two cases above. */
+          /* A deep link into Compare (`openLeftPanelToTab("review",
+             "compare")`), the same way the history tab deep-links to
+             "published" two cases above. */
           initialCompare={activeSubTab === "compare"}
           onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />

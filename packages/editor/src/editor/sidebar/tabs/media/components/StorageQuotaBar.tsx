@@ -29,16 +29,19 @@ interface StorageQuotaBarProps {
 /**
  * Board copy is MB-precise under a gigabyte: "842 MB of 1 GB used".
  *
- * DECIMAL, not binary, and exported so there is one quota formatter rather
- * than two. Plans are sold in decimal GB — a 5 GB plan is 5,000,000,000 bytes —
- * so `formatBytes` (1024-based, from shared/utils/helpers/number) renders the
- * same allowance as "4.66 GB". The fullpage library footer used it, so the
- * drawer said "of 5 GB" and the library said "/ 4.66 GB" for one quota, which
- * reads as the allowance shrinking when you expand the panel.
+ * BINARY, because that is what the server sells: `checkStorageQuota` turns
+ * PLAN_LIMITS.storageMB into bytes with `* 1024 * 1024`, so the FREE plan's
+ * "500 MB" arrives as 524,288,000. This formatter was decimal — on the belief
+ * that plans are sold in decimal GB — and printed that same allowance as
+ * "524 MB" (and PRO's 5 GB as "5.4 GB"): the library promised more than the
+ * plan grants. Measured 2026-09-13 with the first server quota this env
+ * ever answered. One formatter, exported, so the drawer and the fullpage
+ * library never disagree about the same number.
  */
+const MIB = 1024 * 1024;
 export function formatQuotaSize(bytes: number): string {
-  if (bytes < 1e9) return `${Math.round(bytes / 1e6)} MB`;
-  const gb = bytes / 1e9;
+  if (bytes < 1024 * MIB) return `${Math.round(bytes / MIB)} MB`;
+  const gb = bytes / (1024 * MIB);
   return `${gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "")} GB`;
 }
 
@@ -50,58 +53,96 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
 
   if (compact && !isExhausted && !isNearLimit) return null;
 
-  const tone = isExhausted
-    ? "tw:text-red-700"
-    : isNearLimit
-      ? "tw:text-amber-700"
-      : "tw:text-[var(--bk-ink-muted)]";
-  const fill = isExhausted
-    ? "tw:bg-red-600"
-    : isNearLimit
-      ? "tw:bg-amber-500"
-      : "tw:bg-[var(--bk-gray-400)]";
+  /*
+    Board 145:250 — quota-full. Two blocks, not one: a 40h band of
+    --color/error at 12% (145:297, empty — it is the track at 100%), then an
+    84h --color/bg-subtle block carrying the reason and the reassurance at
+    11/16 ink-muted (145:298). This used to be a single red-50 card with the
+    reason in 13px red-700, which said the same thing twice and in a colour
+    the token set does not contain.
+  */
+  if (isExhausted) {
+    return (
+      <div className="med-quota-bar med-quota-bar--exhausted tw:shrink-0">
+        <div
+          className="tw:h-10 tw:w-full tw:bg-[var(--bk-error)] tw:opacity-12"
+          data-testid="media-quota-full-band"
+          aria-hidden="true"
+        />
+        <div
+          className="tw:h-21 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:pt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          data-testid="media-quota-bar"
+        >
+          {/* Board 145:299 — the reason rides the number, never hidden. */}
+          <p className="tw:m-0 tw:tabular-nums" data-testid="media-quota-reason">
+            {formatQuotaSize(used)} of {formatQuotaSize(total)} used — upload is off until you free space
+          </p>
+          {/* Board 155:6, at top 44 of the same block. */}
+          <p className="tw:m-0 tw:mt-5" data-testid="media-quota-reassurance">
+            Nothing already on your sites is affected.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
+  /*
+    Board 145:199 — quota-warn. A 78h --color/warning-tint band: the number at
+    12/18 warning-text, the track 2px under it, and the way out 8px under that
+    at 11/16 accent. The offsets are the board's own (6 / 26 / 38), which is
+    why they are three explicit margins rather than one flex gap.
+  */
+  if (isNearLimit) {
+    return (
+      <div
+        className="med-quota-bar med-quota-bar--near-limit tw:h-19.5 tw:shrink-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:pt-1.5"
+        data-testid="media-quota-band"
+      >
+        <div
+          data-testid="media-quota-bar"
+          className="med-quota-text tw:text-[12px] tw:leading-[18px] tw:tabular-nums tw:text-[var(--bk-warning-text)]"
+        >
+          {formatQuotaSize(used)} of {formatQuotaSize(total)} used
+        </div>
+        <div
+          className="med-quota-track tw:mt-0.5 tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-[2px] tw:bg-[var(--bk-bg-subtle)]"
+          data-testid="media-quota-track"
+        >
+          <div
+            className="med-quota-fill tw:h-full tw:bg-[var(--bk-warning)]"
+            style={{ width: `${clampedPct}%` }}
+            data-testid="media-quota-fill"
+          />
+        </div>
+        {onOptimize ? (
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            variant="link"
+            className="tw:mt-2 tw:min-h-5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]"
+            data-testid="media-quota-optimize"
+            onClick={onOptimize}
+          >
+            {"Optimise images to free space \u203A"}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  /* Fullpage library: no band, just the line and its track. */
   return (
-    <div
-      className={[
-        "med-quota-bar tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-1.5",
-        isExhausted && "med-quota-bar--exhausted tw:bg-red-50 tw:py-3",
-        isNearLimit && "med-quota-bar--near-limit tw:bg-yellow-50 tw:py-2",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    <div className="med-quota-bar tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-1.5">
       <div
         data-testid="media-quota-bar"
-        className={`med-quota-text ${isExhausted ? "tw:text-[13px]" : "tw:text-[11px]"} tw:leading-4 tw:tabular-nums ${tone}`}
+        className="med-quota-text tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]"
       >
         {formatQuotaSize(used)} of {formatQuotaSize(total)} used
-        {/* Board 145:250: the reason rides the number — disabled, never hidden. */}
-        {isExhausted ? " — upload is off until you free space" : null}
       </div>
-      {!isExhausted && (
-        <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-[var(--bk-gray-100)]">
-          <div className={`med-quota-fill tw:h-full ${fill}`} style={{ width: `${clampedPct}%` }} />
-        </div>
-      )}
-      {isExhausted && (
-        /* Board 145:250's reassurance line: existing files are untouched. */
-        <div className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-          Nothing already on your sites is affected.
-        </div>
-      )}
-      {isNearLimit && onOptimize && (
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)] tw:self-start"
-          data-testid="media-quota-optimize"
-          onClick={onOptimize}
-        >
-          {"Optimise images to free space \u203A"}
-        </Button>
-      )}
+      <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-[var(--bk-gray-100)]">
+        <div className="med-quota-fill tw:h-full tw:bg-[var(--bk-gray-400)]" style={{ width: `${clampedPct}%` }} />
+      </div>
     </div>
   );
 }

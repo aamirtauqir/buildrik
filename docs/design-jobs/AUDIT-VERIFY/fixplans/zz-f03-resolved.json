@@ -1,0 +1,10 @@
+{
+ "slug": "zz-f03-resolved",
+ "page": "1:3",
+ "note": "F03's named read landed and answers both open questions — one favourably, one not. It also clears QA's highest-consequence open risk (R1).",
+ "rows": [
+  {"op": "advisory", "hold": true, "id": "140:2",
+   "holdWhy": "F03 · THE READ LANDED. TWO ANSWERS.\n\n(1) R1 IS CLEARED — NO REGRESSION. QA's largest open risk was that 140:2, 2898:12617 and 2898:21981 might HUG: the hidden annotations were the last in-flow children and their bottom edge WAS the board's bottom edge, so if those boards hugged they shrank ~234px and roughly ten absolute hotspots per board would now sit outside the clip — the same shape as the 2850:22371 regression this arc had to repair. The read settles it: all three are FIXED/FIXED (280x812). Hiding the annotations shrank nothing and clipped nothing. The hides stand, and F03's product defect — two 248x117px engineering paragraphs rendering inside the Pages panel — is closed by them.\n\n(2) THE RE-PARK CANNOT BE DONE IN THAT BAND. The caption slot the convention names, x=100 y=16802, is not merely occupied — it is full. 155:18 'caption/Pages · tree' runs 16802-16964 (280x162) and 2894:12614 'caption/UX-B-31 · there is no recently-deleted' runs 16976-17174 (280x198). The next board row begins at y17198, so 24px remain in a band that would need ~234px for the two paragraphs. Adding there is precisely the incident reflow-caption-overflow.mjs was written for on 2026-09-07: a caption grown past the fixed band lands on the row of boards below.\n\nDISPOSITION: leave them hidden. The product defect is fixed, the notes' content is preserved verbatim in REGISTER.md and in the nodes themselves (hidden, not deleted — apply-queue's delete is visible=false), and re-parking would either overflow the band or require reflowing the whole Pages section. That is a bigger, riskier change than preserving a note justifies, and the note is not lost.",
+   "why": "F03 — hides confirmed safe (boards are FIXED, not hug); re-park declined, band is full"}
+ ]
+}

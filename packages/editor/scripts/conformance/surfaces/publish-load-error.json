@@ -1,0 +1,30 @@
+{
+  "surface": "publish-load-error",
+  "board": "Publish · load-error (Figma 781:4489)",
+  "_note": [
+    "The deploy service being unreachable is a server condition — `sites.publishHistory`",
+    "throwing — so no click in the app produces it. The probe refuses the page's own",
+    "fetch and mounts the real PublishTab, which is the shipped branch (`snapshot.error`).",
+    "",
+    "NOT joined, and why:",
+    "  781:4489 (the panel frame) draws a gray-100 border. The shipped PanelFrame",
+    "  carries none: in the running shell that edge belongs to the drawer host, and",
+    "  giving the frame its own would double it. Nothing measurable to compare.",
+    "  I781:4526;9:7 (the CTA's label) has no anchor of its own — flowbite renders the",
+    "  label as the button's own text node, and the button IS the `cta` target below."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=publish-load-error",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [{ "action": "waitFor", "testId": "publish-load-error" }],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel-header", "testId": "panel-header", "spec": "publish-load-error", "nodeId": "781:4490" },
+    { "name": "panel-header-title", "testId": "panel-header-title", "spec": "publish-load-error", "nodeId": "I781:4490;16:7" },
+    { "name": "error-block", "testId": "publish-load-error", "spec": "publish-load-error", "nodeId": "781:4545" },
+    { "name": "error-title", "testId": "publish-load-error-title", "spec": "publish-load-error", "nodeId": "781:4546" },
+    { "name": "error-desc", "testId": "publish-load-error-desc", "spec": "publish-load-error", "nodeId": "781:4547" },
+    { "name": "error-retry", "testId": "publish-load-error-retry", "spec": "publish-load-error", "nodeId": "781:4548" },
+    { "name": "footer", "testId": "publish-footer", "spec": "publish-load-error", "nodeId": "781:4525" },
+    { "name": "cta", "testId": "publish-cta", "spec": "publish-load-error", "nodeId": "781:4526" }
+  ]
+}

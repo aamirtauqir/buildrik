@@ -1,0 +1,106 @@
+{
+  "module": "AI experience",
+  "slug": "ai",
+  "target": { "page": "1:3", "section": "1776:8380" },
+  "state": "NOT APPLIED — quota. Neither clone was made; neither copy pass ran.",
+  "why": "Two states the panel actually ships and the file does not draw. Both are cloned from the board they should be built from, with the sanctioned tool, and then re-lettered by a step that matches CHARACTER PREFIX inside the board found BY NAME — because a clone's node ids are new and unknown, and spending a read pass to learn them is a call this module could not afford.",
+
+  "boards": [
+    {
+      "name": "AI · scoped-multi",
+      "finding": "UX-G-03 (Major) — restates FIG-K-18, which was filed 2026-09-06 and never built",
+      "clone": {
+        "cmd": "node scripts/figma/add-state-board.mjs 170:17 \"AI · scoped-multi\" --apply",
+        "sourceId": "170:17",
+        "sourceIdSource": "read — 170:17 'AI · scoped' @500,3150 280x812, from the 2026-09-07 section listing",
+        "expectedSlot": "the tool measures the section's own grid (xs = 100,500,900,1300,1700,2100 · pitchX 400) and walks rows top-down, so it should land at 900,220 — the first free cell in the row that holds 170:2 and 171:67. If the applier prefers it beside the other state boards, 1300,4174 was also free at the read.",
+        "captionSlot": "a caption TEXT belongs under it at the same x, y = boardY + 832, matching every other pair in this section"
+      },
+      "copy": {
+        "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=E",
+        "rows": [
+          {
+            "selector": { "section": "1776:8380", "board": "AI · scoped-multi", "textPrefix": "Scope: Hero section" },
+            "idSource": "unresolved-id — on the clone. The equivalent node on the SOURCE board is 170:22 per findings/FIG-K.jsonl FIG-K-18, which is inferred, not read.",
+            "text": "Scope: 3 selected",
+            "why": "ScopeChip.tsx:11 renders '3 selected'; useAIScope.ts:37-39 sets {kind:'multi',count} on SELECTION_MULTIPLE."
+          },
+          {
+            "selector": { "section": "1776:8380", "board": "AI · scoped-multi", "textPrefix": "Scoped runs edit only" },
+            "idSource": "unresolved-id — on the clone. Source node 170:28, inferred from FIG-K-01 and confirmed rewritten by docs/design-jobs/applied/plan-text.json.",
+            "text": "AI edits ONE element at a time in v1. The composer is disabled while more than one element is selected — the refusal is stated here, before a prompt is written, not after it is sent. Select a single element, or clear the selection to widen the scope to the page.",
+            "why": "UX-G-03: toServerScope returns null for 'multi' (useStreamPrompt.ts:47-51) and AITab.tsx:82-93 pushes the refusal without calling the server. The scope band already knows the answer before the user types. Refusing after the prompt is the worst of the three options."
+          },
+          {
+            "selector": { "section": "1776:8380", "board": "AI · scoped-multi", "frameNameMatches": "/prompt/i", "firstTextDescendant": true },
+            "idSource": "unresolved-id — resolved at write time by walking the board for a frame whose name matches /prompt/i and taking its first TEXT descendant.",
+            "text": "Select one element to use AI here",
+            "fill": "#D1D5DB (--bk-ink-disabled, DESIGN.md:192) — the composer is drawn disabled, which is the point of the board",
+            "why": "UX-G-03's preferred fix: 'disable the composer with the reason stated up front'."
+          }
+        ]
+      },
+      "inboundEdge": {
+        "status": "unresolved-id — NOT specified, and not guessed",
+        "want": "a hotspot/* rect over the '✦ AI' label on Inspector board 159:123 (Inspector · multi-select), wired to this board",
+        "tool": "node scripts/figma/add-hotspots.mjs <plan> --apply with a row {over:<label node id>, to:<new board id>, name:'hotspot/multi-select ✦ AI', pad:6, why:'UX-G-03'}",
+        "blocker": "the label's node id is inside board 159:123, which belongs to the Inspector module and was never read by this agent. Board-level wiring (wire-edges.mjs) is explicitly refused by the brief because it makes the whole board clickable.",
+        "owedTo": "Inspector module — see ai-05-owed-by-other-modules.json"
+      }
+    },
+
+    {
+      "name": "AI · error-provider",
+      "finding": "UX-G-11 (Major) and UX-G-23 (Major); restates FIG-K-03, filed Critical on 2026-09-06 and never built",
+      "clone": {
+        "cmd": "node scripts/figma/add-state-board.mjs 171:105 \"AI · error-provider\" --apply",
+        "sourceId": "171:105",
+        "sourceIdSource": "read — 171:105 'AI · error-quota' @2100,3150 280x812, from the 2026-09-07 section listing",
+        "expectedSlot": "after the scoped-multi clone takes 900,220, the next free cell top-down is 1300,220",
+        "why": "The panel ships THREE authored failure states and the file draws two. The one it omits — provider failure — is the state reached after the SSE reconnect budget is spent, which is the failure a user is most likely to actually see. AITab.tsx:297-330 is the state; AiPromptPopover.tsx:82-86 is the same failure printed as a raw server string, which is the defect this board's existence is meant to end."
+      },
+      "copy": {
+        "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=F",
+        "rows": [
+          {
+            "selector": { "section": "1776:8380", "board": "AI · error-provider", "textPrefix": "AI is out of credit" },
+            "idSource": "unresolved-id — on the clone. Source node 171:133, inferred from FIG-K-02 and confirmed rewritten by applied/plan-text.json.",
+            "text": "The AI service didn’t respond."
+          },
+          {
+            "selector": { "section": "1776:8380", "board": "AI · error-provider", "textPrefix": "Nothing was changed. Daily limit" },
+            "idSource": "unresolved-id — on the clone. Source node 171:134, same provenance.",
+            "text": "Nothing was changed. This is usually the model provider, not your site — the editor stopped after its reconnect budget was spent. Your prompt is still in the composer."
+          },
+          {
+            "selector": { "section": "1776:8380", "board": "AI · error-provider", "textPrefix": "See plans" },
+            "idSource": "unresolved-id — on the clone. Source node 171:135, inferred from findings/W-K.jsonl W-K-14.",
+            "text": "Try again",
+            "why": "AITab.tsx:76 lastPromptRef is the reference implementation: retry re-uses the brief. The popover has no retry at all."
+          },
+          {
+            "add": "Continue by hand in the inspector",
+            "placement": "a new TEXT sibling of the retry link, same x, 12px below it, 12px Inter Medium, #1A56DB",
+            "why": "UX-G-23 — every blocked state needs a second action that does not leave the editor."
+          },
+          {
+            "restyle": "the error card frame (the retry link's parent)",
+            "fill": "#FDE8E8 (--bk-error-tint, tokens.generated.css:95)",
+            "was": "#FDFDEA (--bk-warning-tint, tokens.generated.css:92) — correct for a quota block, wrong for a provider outage",
+            "guard": "skipped with NO-FILL if the clone's card carries no fill, rather than inventing one"
+          }
+        ]
+      },
+      "inboundEdges": {
+        "status": "unresolved-id",
+        "want": "170:29 (AI · thinking) and 170:41 (AI · planning) each need a second outcome edge to this board — a run that fails at the provider, not only one that succeeds",
+        "blocker": "the hotspot source nodes inside 170:29 / 170:41 were never read"
+      }
+    }
+  ],
+
+  "notInThisPlan": {
+    "AI · run-stalled": "FIG-K-04 (Critical, 2026-09-06, never built) — the fifth run outcome, where the provider goes silent and phase stays pinned on 'running' forever with no timeout. It is a real missing state and it belongs to this section, but it is a FIG-K finding, not one of the 23 V2 rows this agent owns. Flagged so the next pass does not read its absence as coverage.",
+    "AI · proposal": "W-K-01 — the chat job's diff card, which resolves the common path and is drawn on no board. Same reason: not in this agent's 23 rows. UX-G-13's Undo button belongs ON it, so the two should be built together."
+  }
+}

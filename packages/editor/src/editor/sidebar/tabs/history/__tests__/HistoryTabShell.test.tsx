@@ -123,7 +123,7 @@ const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {})
   );
 
 /** Saves is the default view; the changes list sits behind a filter chip. */
-const showChanges = () => fireEvent.click(screen.getByRole("button", { name: "All changes" }));
+const showChanges = () => fireEvent.click(screen.getByRole("button", { name: "This session" }));
 
 describe("HistoryTab shell", () => {
   beforeEach(() => {
@@ -343,7 +343,7 @@ describe("HistoryTab — board 163:113 preview band", () => {
   beforeEach(() => window.localStorage.clear());
 
   const openScrubber = () => {
-    fireEvent.click(screen.getByRole("button", { name: "All changes" }));
+    fireEvent.click(screen.getByRole("button", { name: "This session" }));
     fireEvent.click(screen.getByTestId("tt-trigger"));
   };
 
@@ -359,14 +359,18 @@ describe("HistoryTab — board 163:113 preview band", () => {
     fireEvent.click(screen.getByTestId("tt-preview"));
 
     expect(screen.getByText("Previewing Auto-save")).toBeInTheDocument();
-    expect(screen.getByText("Nothing is written until Restore.")).toBeInTheDocument();
+    /* Board 163:166 names the exit key here and on the button. Both said only
+       "Exit" while Escape did nothing; the scrubber binds it now. */
+    expect(
+      screen.getByText("Nothing is written until Restore. Esc exits time-travel."),
+    ).toBeInTheDocument();
   });
 
   it("Exit leaves time-travel without restoring", () => {
     renderTab();
     openScrubber();
     fireEvent.click(screen.getByTestId("tt-preview"));
-    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Exit (Esc)" }));
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
   });
 });

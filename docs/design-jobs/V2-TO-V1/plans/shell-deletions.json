@@ -1,0 +1,15 @@
+{
+ "note": "Node removals. No script in scripts/figma/ removes nodes — deliberately, because apply-truth-marks' own header records that deleting a design because it was never built is a call this arc already got wrong once (SH-CO-01). These are row-level duplicates inside a board, not designs, but they still need a human decision and a purpose-built applier.",
+ "page": "1:3",
+ "rows": [
+  {
+   "id": null,
+   "unresolved-id": true,
+   "selector": { "board": "166:27", "type": "TEXT", "matches": "Undo last action" },
+   "op": "remove-row",
+   "remove": "the TEXT node and its row frame",
+   "why": "UX-F-06 — the ⌘K palette lists Undo twice: 'Undo' under Edit and 'Undo last action' under History (shell/modals/CommandPalette.tsx:68-88 vs :139-148), both calling composer.history.undo(). One command, one row. CONDITIONAL: if the board never drew the duplicate, this row reports NOMATCH and the defect is code-only.",
+   "if-nomatch": "close as code-only; the board is not the offender"
+  }
+ ]
+}

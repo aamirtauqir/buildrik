@@ -1,0 +1,59 @@
+{
+  "surface": "history-saves-loading",
+  "board": "History · Saves · loading (Figma 1138:4573)",
+  "_note": [
+    "Measured against the PROBE. `isLoading` is true only while",
+    "VersionTimelineManager's storage read is in flight — a window no click can",
+    "hold open and no measurement pause can land inside. The probe mounts the",
+    "real HistoryTab with a manager whose getLoadState() answers \"loading\",",
+    "which is the exact branch VersionHistoryPanel takes in production.",
+    "",
+    "280 wide, not the 360 boards.json records for this family: 360 is the",
+    "Figma frame, the art inside it is the 280 drawer (`--size/drawer`), which",
+    "is why the header's close glyph sits at x252 and the prune note's text is",
+    "248 = 280 - 2x16.",
+    "",
+    "NOT anchored, and why:",
+    "  1138:4574 Header — the board draws 48h / 14px / ink. PanelHeader is built",
+    "  to component board 16:6 (44h, 11/600 caps), which every drawer in the",
+    "  editor shares. Two boards disagree about one primitive, so the screen",
+    "  board does not get to move it — same call boards.json already recorded",
+    "  for BK_TEXT_INPUT_THEME.",
+    "  1138:4577 View toggle — the board draws the Milestones/Changes filter as",
+    "  two bare text labels. HistoryTab draws chips on purpose (its own comment:",
+    "  \"Chips, not tabs, so it cannot read as a third destination next to Saves",
+    "  / Published\"), and the board can afford text because it omits the",
+    "  Saves/Published switcher the code has above it. Left as a live conflict.",
+    "  1138:4573 root — its border-color comes from a `border-l` the shell draws,",
+    "  not the panel; the panel itself has no border to compare."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-saves-loading",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "saves-skeleton"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "sk-row-0", "testId": "saves-sk-row-0", "spec": "history-saves-loading", "nodeId": "1138:4590" },
+    { "name": "sk-icon-0", "testId": "saves-sk-icon-0", "spec": "history-saves-loading", "nodeId": "1138:4591" },
+    { "name": "sk-bar-0", "testId": "saves-sk-bar-0", "spec": "history-saves-loading", "nodeId": "1138:4592" },
+    { "name": "sk-row-1", "testId": "saves-sk-row-1", "spec": "history-saves-loading", "nodeId": "1138:4593" },
+    { "name": "sk-icon-1", "testId": "saves-sk-icon-1", "spec": "history-saves-loading", "nodeId": "1138:4594" },
+    { "name": "sk-bar-1", "testId": "saves-sk-bar-1", "spec": "history-saves-loading", "nodeId": "1138:4595" },
+    { "name": "sk-row-2", "testId": "saves-sk-row-2", "spec": "history-saves-loading", "nodeId": "1138:4596" },
+    { "name": "sk-icon-2", "testId": "saves-sk-icon-2", "spec": "history-saves-loading", "nodeId": "1138:4597" },
+    { "name": "sk-bar-2", "testId": "saves-sk-bar-2", "spec": "history-saves-loading", "nodeId": "1138:4598" },
+    { "name": "sk-row-3", "testId": "saves-sk-row-3", "spec": "history-saves-loading", "nodeId": "1138:4599" },
+    { "name": "sk-icon-3", "testId": "saves-sk-icon-3", "spec": "history-saves-loading", "nodeId": "1138:4600" },
+    { "name": "sk-bar-3", "testId": "saves-sk-bar-3", "spec": "history-saves-loading", "nodeId": "1138:4601" },
+    { "name": "sk-row-4", "testId": "saves-sk-row-4", "spec": "history-saves-loading", "nodeId": "1138:4602" },
+    { "name": "sk-icon-4", "testId": "saves-sk-icon-4", "spec": "history-saves-loading", "nodeId": "1138:4603" },
+    { "name": "sk-bar-4", "testId": "saves-sk-bar-4", "spec": "history-saves-loading", "nodeId": "1138:4604" }
+  ]
+}

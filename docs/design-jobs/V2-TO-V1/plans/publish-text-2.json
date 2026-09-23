@@ -1,0 +1,30 @@
+[
+ { "id": "833:4580",
+   "expect": "⚠ 4 warnings — none block. Client approval is a separate gate.",
+   "text": "⚠ 4 warnings — none block. Client approval is checked on this list, not after it.",
+   "width": 440,
+   "why": "UX-E-06 — 'All checks pass' can sit over a publish the server refuses. The approval gate becomes row 7 of the same list instead of a sentence excusing its absence." },
+
+ { "id": "914:4524",
+   "expect": "Pages",
+   "text": "Deploy manifest",
+   "why": "UX-E-23 — the number the user approves must be the number that deploys. The server appends one generated page per published CMS entry after this count is taken (publish.service.ts:329)." },
+
+ { "id": "914:4542",
+   "expect": "⚠ This replaces the live site immediately for all visitors.",
+   "text": "⚠ This replaces the live site immediately for all visitors. 1 hidden page will not be deployed.",
+   "width": 440,
+   "why": "UX-E-21 — surface the consequence where the decision to publish is made: the confirm counts pages, so it says which pages are dropped (ExportEngine.ts:645-660 isPageLive)." },
+
+ { "id": "1172:4827",
+   "expect": "One HTML file with styles inlined",
+   "text": "One HTML file, styles inlined — the page open now (About), saved as index.html.",
+   "width": 500,
+   "why": "UX-E-14 — HTML exports engine.export(), which renders the ACTIVE page only, and names it index.html. The modal never said which page." },
+
+ { "id": "1174:4831",
+   "expect": "12 elements · 48 KB HTML · 12 KB CSS",
+   "text": "12 elements · 48 KB HTML · 12 KB CSS · 1 of 12 pages — pick ZIP for the whole site",
+   "width": 500,
+   "why": "UX-E-14 — scope is an explicit, visible choice, not an invisible consequence of the format chip. ZIP silently switches to every page while the preview above still shows one." }
+]

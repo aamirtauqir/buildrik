@@ -10,6 +10,26 @@
  * reached 100% while the work had not started. The caller now advances it as
  * each stage actually completes.
  *
+ * The card is board 642:3095's `modal/440`: a title block (18/12 over 20),
+ * a body (4/16 over 20, 12px rhythm) and a bordered footer (14 over 20) with
+ * a 28-tall secondary button. It used to be one 20/24/16 box with the three
+ * regions run together, which is why the Cancel sat hard against the last
+ * step row.
+ *
+ * The step rows carry their state in WORDS ("— done", "— applying…",
+ * "— queued") on the board's two-tone scale: ink-soft while a step is done or
+ * running, ink-muted while it is still queued. The previous treatment used a
+ * glyph plus a per-state colour (green / accent / disabled), which said the
+ * same thing three times and said it in colour alone.
+ *
+ * The board lists SIX steps — the four phases plus "Testimonials" and
+ * "Footer". Those two are not adopted: the board queues them AFTER "Saving
+ * applied state", i.e. after the work it would be reporting has finished, so
+ * its own ordering contradicts the phases beside them; and `templatesData`
+ * exposes a section COUNT (`getSectionCount`), never section names, so the
+ * labels could only be invented. Rendering stays the board's, the step list
+ * stays the code's — the arc's standing split.
+ *
  * @license BSD-3-Clause
  */
 
@@ -32,16 +52,11 @@ export interface ApplyProgressOverlayProps {
   onCancel?: () => void;
 }
 
-const STEP_COLOR: Record<ApplyStepState, string> = {
-  done: "var(--bk-success)",
-  active: "var(--bk-accent)",
-  queued: "var(--bk-ink-disabled)",
-};
-
-const STEP_GLYPH: Record<ApplyStepState, string> = {
-  done: "✓",
-  active: "→",
-  queued: "○",
+/** Board 642:3102-3107 — the state is the suffix, not an icon. */
+const STEP_WORD: Record<ApplyStepState, string> = {
+  done: "done",
+  active: "applying…",
+  queued: "queued",
 };
 
 export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
@@ -55,45 +70,53 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   return (
     <Portal>
       <div className="tmpl-progress" role="status" aria-label="Applying template" aria-live="polite">
-        <div className="tmpl-progress__inner">
-          <h3 className="tmpl-progress__title">Applying {templateName}…</h3>
-          <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-            Do not close the editor
-          </p>
-          <span
-            className="tw:mt-3 tw:block tw:h-1.5 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-[var(--bk-bg-subtle)]"
-            role="progressbar"
-            aria-valuenow={done}
-            aria-valuemin={0}
-            aria-valuemax={steps.length}
-          >
+        <div className="tmpl-progress__inner" data-testid="tpl-applying-card">
+          <div className="tmpl-progress__head" data-testid="tpl-applying-head">
+            <h3 className="tmpl-progress__title" data-testid="tpl-applying-title">
+              Applying {templateName}…
+            </h3>
+            <p className="tmpl-progress__sub" data-testid="tpl-applying-sub">
+              Do not close the editor
+            </p>
+          </div>
+          <div className="tmpl-progress__body" data-testid="tpl-applying-body">
             <span
-              className="tw:block tw:h-full tw:rounded-full tw:bg-[var(--bk-accent)]"
-              style={{ width: `${pct}%` }}
-            />
-          </span>
-          <ol className="tw:m-0 tw:mt-3 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0 tw:text-left tw:text-[12px]">
+              className="tmpl-progress__track"
+              data-testid="tpl-applying-track"
+              role="progressbar"
+              aria-valuenow={done}
+              aria-valuemin={0}
+              aria-valuemax={steps.length}
+            >
+              <span
+                className="tmpl-progress__fill"
+                data-testid="tpl-applying-fill"
+                style={{ width: `${pct}%` }}
+              />
+            </span>
             {steps.map((s) => (
-              <li
+              <p
                 key={s.id}
-                className="tw:flex tw:items-center tw:gap-2"
+                className="tmpl-progress__step"
                 data-step-state={s.state}
-                /* The one genuinely varying value stays inline — VersionRow
-                   precedent; three utility classes that differ only by colour
-                   would say less. */
-                style={{ color: STEP_COLOR[s.state], fontWeight: s.state === "active" ? 500 : 400 }}
+                data-testid={`tpl-applying-step-${s.id}`}
               >
-                <span className="tw:inline-flex tw:w-3.5 tw:justify-center" aria-hidden="true">
-                  {STEP_GLYPH[s.state]}
-                </span>
-                {s.label}
-              </li>
+                {s.label} — {STEP_WORD[s.state]}
+              </p>
             ))}
-          </ol>
+          </div>
           {onCancel && (
-            <Button className="tmpl-progress__cancel" onClick={onCancel}>
-              Cancel
-            </Button>
+            <div className="tmpl-progress__foot" data-testid="tpl-applying-foot">
+              <Button
+                color="light"
+                size="xs"
+                className="tmpl-progress__cancel"
+                data-testid="tpl-applying-cancel"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+            </div>
           )}
         </div>
       </div>

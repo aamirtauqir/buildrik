@@ -1,0 +1,2 @@
+
+render defects >= 4px: 0 (across 1 of 1 sections)
