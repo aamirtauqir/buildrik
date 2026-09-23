@@ -99,6 +99,16 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const [hsb, setHsb] = React.useState<ColorHSB>(() => hexToHsb(initialHex));
   const [hexInput, setHexInput] = React.useState(initialHex.toUpperCase());
   const [hexError, setHexError] = React.useState(false);
+  /* The hex the user GAVE (the token's value on open, or what they typed) —
+     kept verbatim until a canvas control moves. HSB is lossy: #1A56DB comes
+     back from hexToHsb → hsbToHex as #1A57DB, so opening the picker and
+     pressing Set color without touching anything saved a different colour
+     (QA, 2026-09-24). A drag is a new colour; only then does HSB speak. */
+  const [exactHex, setExactHex] = React.useState<string | null>(() => initialHex.toUpperCase());
+  const moveHsb = (update: (prev: ColorHSB) => ColorHSB) => {
+    setExactHex(null);
+    setHsb(update);
+  };
 
   const sbCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const hueCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -108,7 +118,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const isDraggingHue = React.useRef(false);
   const isDraggingAlpha = React.useRef(false);
 
-  const currentHex = hsbToHex(hsb);
+  const currentHex = exactHex ?? hsbToHex(hsb);
   const contrastRatio = calcContrastRatio(currentHex.slice(0, 7), background);
 
   // Sync hex input when hsb changes externally
@@ -140,7 +150,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const y = clamp(e.clientY - rect.top, 0, rect.height);
     const s = x / rect.width;
     const b = 1 - y / rect.height;
-    setHsb((prev) => ({ ...prev, s, b }));
+    moveHsb((prev) => ({ ...prev, s, b }));
   };
 
   const handleSbDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -165,7 +175,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const rect = canvas.getBoundingClientRect();
     const x = clamp(e.clientX - rect.left, 0, rect.width);
     const h = Math.round((x / rect.width) * 360);
-    setHsb((prev) => ({ ...prev, h }));
+    moveHsb((prev) => ({ ...prev, h }));
   };
 
   const handleHueDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -190,7 +200,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const rect = canvas.getBoundingClientRect();
     const x = clamp(e.clientX - rect.left, 0, rect.width);
     const a = Math.round((x / rect.width) * 100) / 100;
-    setHsb((prev) => ({ ...prev, a }));
+    moveHsb((prev) => ({ ...prev, a }));
   };
 
   const handleAlphaDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -217,6 +227,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const expanded = expandShorthand(full);
     if (isValidHex(expanded)) {
       setHexError(false);
+      setExactHex(expanded.toUpperCase());
       setHsb(hexToHsb(expanded));
     } else {
       setHexError(true);
@@ -262,18 +273,22 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       </div>
 
       {/* Alpha slider */}
-      <div className="buildrick-design-picker__slider-wrap">
-        <canvas
-          ref={alphaCanvasRef}
-          width={228}
-          height={12}
-          className="buildrick-design-picker__slider-canvas"
-          onPointerDown={handleAlphaDown}
-          onPointerMove={handleAlphaMove}
-          onPointerUp={handleAlphaUp}
-        />
-        <div className="buildrick-design-picker__knob" style={{ left: alphaX }} aria-hidden />
-        <span className="buildrick-design-picker__alpha-label">{Math.round(hsb.a * 100)}%</span>
+      {/* The % sits beside the bar, inside the picker — it was translated
+          past the bar's right edge and clipped by the token card (QA). */}
+      <div className="buildrick-design-picker__alpha-row">
+        <div className="buildrick-design-picker__slider-wrap">
+          <canvas
+            ref={alphaCanvasRef}
+            width={228}
+            height={12}
+            className="buildrick-design-picker__slider-canvas"
+            onPointerDown={handleAlphaDown}
+            onPointerMove={handleAlphaMove}
+            onPointerUp={handleAlphaUp}
+          />
+          <div className="buildrick-design-picker__knob" style={{ left: alphaX }} aria-hidden />
+        </div>
+        <span className="buildrick-design-picker__alpha-label" data-testid="picker-alpha-label">{Math.round(hsb.a * 100)}%</span>
       </div>
 
       {/* Hex input row */}
