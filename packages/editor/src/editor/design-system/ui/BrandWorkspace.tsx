@@ -100,7 +100,7 @@ import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSect
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ExportSection } from "./sections/ExportSection";
-import { LintSection } from "./sections/LintSection";
+import { LintSection, brandChecksCaption, contrastFixFor } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
@@ -625,9 +625,13 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
      workspace, cleared on a page change; a row click on any token page sets
      it. The card is a sibling of the table, not a drill-in. */
   const [selectedTokenId, setSelectedTokenId] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    setSelectedTokenId(null);
-  }, [page]);
+  /* A page change drops the selection — unless the move is FOR a token
+     (Brand checks' Open), which lands on its page with its card open. */
+  const openPage = (id: BrandPageId, tokenId: string | null = null) => {
+    setPage(id);
+    setSelectedTokenId(tokenId);
+    if (id.startsWith("kind-")) setShowMoreKinds(true);
+  };
   const allTokens = React.useMemo(
     () => allRegistries.flatMap((r) => r.tokens),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -681,7 +685,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
-      case "brand-checks":     return `${lintIssues.length} issue${lintIssues.length === 1 ? "" : "s"}`;
+      case "brand-checks":     return brandChecksCaption(lintIssues);
       case "starters":         return "Pick a starter, then apply it to the draft";
       case "spacing":          return `${spacing.tokens.length} tokens`;
       case "export":           return "Move the brand in and out";
@@ -769,7 +773,33 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "presets":
         return <StylesSection />;
       case "brand-checks":
-        return <LintSection issues={lintIssues} />;
+        return (
+          <LintSection
+            issues={lintIssues}
+            onFix={(issue) => {
+              const tok = tokenById(issue.tokenId);
+              if (!tok) return;
+              if (issue.rule === "contrast") {
+                const fix = contrastFixFor(tok, color.tokens, resolvedMode);
+                if (fix) changeToken(tok.id, fix.value, fix.darkValue);
+                return;
+              }
+              const fixed = composer?.designSystem?.computeAutoFix(tok.value, issue.autoFixHint);
+              if (fixed && fixed !== tok.value) changeToken(tok.id, fixed);
+            }}
+            onOpen={(tokenId) => {
+              const tok = tokenById(tokenId);
+              const k = tok ? kindOf(tok) : undefined;
+              const target: BrandPageId | null =
+                k === "color" ? "colours"
+                : k === "type" ? "fonts"
+                : k === "spacing" ? "spacing"
+                : isMoreKind(k) ? `kind-${k}`
+                : null;
+              if (target) openPage(target, tokenId);
+            }}
+          />
+        );
       case "starters":
         return <StartersSection projectId={projectId} />;
       case "spacing":
@@ -793,7 +823,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => setPage(id)}
+        onClick={() => openPage(id)}
         data-section-id={id}
         data-testid={`brand-row-${id}`}
       >
@@ -1000,10 +1030,10 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
                     <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
                   </span>
                   <span className="tw:flex tw:gap-2">
-                    <Button size="xs" variant="secondary" onClick={() => setPage("starters")} data-testid="brand-empty-starters">
+                    <Button size="xs" variant="secondary" onClick={() => openPage("starters")} data-testid="brand-empty-starters">
                       Browse starters
                     </Button>
-                    <Button size="xs" variant="secondary" onClick={() => setPage("export")} data-testid="brand-empty-import">
+                    <Button size="xs" variant="secondary" onClick={() => openPage("export")} data-testid="brand-empty-import">
                       Import
                     </Button>
                   </span>
