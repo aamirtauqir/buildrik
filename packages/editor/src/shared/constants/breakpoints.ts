@@ -116,12 +116,6 @@ const DEVICE_BREAKPOINTS = {
     label: "Mobile",
     icon: "mobile",
   },
-  watch: {
-    width: 196,
-    height: 230,
-    label: "Watch",
-    icon: "watch",
-  },
 } as const;
 
 export type DevicePreviewType = keyof typeof DEVICE_BREAKPOINTS;

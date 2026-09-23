@@ -25,14 +25,17 @@ const LINK =
   "tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
 
 /** The door the gate offers. Every review gate's next move is the Review
- *  panel; the open-errors gate's is the Issues panel. */
+ *  panel; the open-errors gate's is the Issues panel; a failed status read's
+ *  is asking again. */
 function openDoor(composer: Composer | null, gate: NextMove["gate"]): void {
   if (gate === "open-errors") composer?.emit(EVENTS.UI_OPEN_ISSUES, undefined);
+  else if (gate === "unchecked") composer?.emit(EVENTS.REVIEW_STATUS_RETRY, undefined);
   else composer?.emit("ui:switch-tab", { tab: "review" });
 }
 
 function doorLabel(gate: NextMove["gate"]): string {
-  return gate === "open-errors" ? "Open Issues ›" : "Open Review ›";
+  if (gate === "open-errors") return "Open Issues ›";
+  return gate === "unchecked" ? "Retry ›" : "Open Review ›";
 }
 
 /** The gates that have something to say. `confirm` and `none` do not. */
@@ -67,10 +70,10 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
       <CheckIcon status={blocks ? "fail" : "warning"} />
       <span className={CHECK_LABEL}>Client approval</span>
       <span className={CHECK_DETAIL} data-testid="publish-check-approval-detail">
-        {blocks ? "Blocks publish" : "Advisory"}
+        {nextMove.gate === "unchecked" ? "Couldn't check" : blocks ? "Blocks publish" : "Advisory"}
       </span>
       <Button color="light" size="xs" className={LINK} onClick={() => openDoor(composer, nextMove.gate)}>
-        Open ›
+        {nextMove.gate === "unchecked" ? "Retry ›" : "Open ›"}
       </Button>
     </div>
   );
@@ -82,7 +85,8 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
  */
 export const PublishGateBanner: React.FC<PublishGateProps> = ({ nextMove, composer }) => {
   if (!speaks(nextMove)) return null;
-  const blocks = nextMove.gate === "waiting" || nextMove.gate === "changes-requested";
+  const blocks =
+    nextMove.gate === "waiting" || nextMove.gate === "changes-requested" || nextMove.gate === "unchecked";
   return (
     <div
       className="tw:flex tw:items-start tw:justify-between tw:gap-3"

@@ -11,7 +11,8 @@
  *   Workspace  — invite · account · start collaboration (flag-gated)
  *   (footer)   — keyboard shortcuts
  *
- * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments, Issues.
+ * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments. Issues
+ * came back IN (C3): the topbar chip was removed and this row replaced it.
  * Removed (D8): "Exit to dashboard" — the bar's ‹ Exit is always visible; a
  * second door in the overflow was dead weight.
  *
@@ -37,6 +38,7 @@
 import * as React from "react";
 import { IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, SiteMenuIcon } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { PreviewShareModal } from "./PreviewShareModal";
 
 export interface SiteMenuProps {
   // ── Site ──────────────────────────────────────────────────────────────────
@@ -73,6 +75,13 @@ export interface SiteMenuProps {
    */
   onOpenPublish?: () => void;
   onOpenPublishHistory?: () => void;
+  /** History · Activity, in the editor (B6, G1-019). Omitted = the row
+   *  deep-links to the dashboard's activity section as before. */
+  onOpenActivity?: () => void;
+  /** The Issues panel (C3: the topbar chip that opened it is gone). */
+  onOpenIssues?: () => void;
+  /** The row's tooltip — the issue count sentence (`formatIssueSummary`). */
+  issuesTitle?: string;
   /** Take the site down. Only offered while a published URL exists; the
    *  Publish panel hosts the confirm. unpublishSite was fully built with
    *  Vercel teardown and exposed only in the dashboard, so taking a site down
@@ -95,10 +104,8 @@ export interface SiteMenuProps {
    *  owns it — this menu has no way to tell the user it didn't work. */
   onCopyLiveUrl?: () => void;
   /**
-   * The site this menu belongs to, for the dashboard hand-offs that need one.
-   * Board 642:3401's "Share preview link" is the case: the flow exists — the
-   * dashboard's ShareDraftModal, on `siteDetail.sharing.create` — and the
-   * editor had no way to reach it.
+   * The site this menu belongs to: the share link is minted for it, and the
+   * dashboard hand-offs (Site health, Activity log) land on it.
    */
   siteId?: string | null;
   // ── Workspace ─────────────────────────────────────────────────────────────
@@ -146,6 +153,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenReview,
   onOpenPublish,
   onOpenPublishHistory,
+  onOpenIssues,
+  issuesTitle,
+  onOpenActivity,
   onUnpublish,
   onExportCode,
   onOpenTemplates,
@@ -163,18 +173,20 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onReplayOnboarding,
 }) => {
   const [open, setOpen] = React.useState(false);
+  const [shareOpen, setShareOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
     setOpen(false);
     fn?.();
   };
 
   const hasSite = Boolean(
-    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onExportCode,
+    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onOpenIssues || onExportCode,
   );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
   const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
 
   return (
+    <>
     <Popover
       open={open}
       onClose={() => setOpen(false)}
@@ -202,6 +214,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             ) : null}
             {onOpenReview ? <MenuItem onClick={run(onOpenReview)}>Review</MenuItem> : null}
             {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
+            {onOpenIssues ? (
+              <MenuItem onClick={run(onOpenIssues)} title={issuesTitle} data-testid="site-menu-issues">Issues</MenuItem>
+            ) : null}
             {onOpenPublishHistory ? (
               <MenuItem onClick={run(onOpenPublishHistory)} data-testid="site-menu-publish-history">Publish history</MenuItem>
             ) : null}
@@ -222,7 +237,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
               Site health
             </MenuItem>
-            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#activity-log`))}>
+            <MenuItem
+              onClick={run(onOpenActivity ?? (() => openDashboard(`/dashboard/sites/${siteId}#activity-log`)))}
+              data-testid="site-menu-activity-log"
+            >
               Activity log
             </MenuItem>
           </MenuGroup>
@@ -265,14 +283,12 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               </MenuItem>
             ) : null}
             {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
-            {/* Board 642:3401. A private link to the current DRAFT — a
-                different thing from the live URL above it, and the one a
-                client is sent before anything is published. The flow is the
-                dashboard's ShareDraftModal; this hands off to it directly,
-                the way "Invite teammates" below hands off to team settings,
-                rather than landing the user on a page to hunt for a button. */}
+            {/* Board 642:3401 → 4418:165739 (B1 / G1-022). A private link,
+                a different thing from the live URL above it and the one a
+                client is sent before anything is published. The in-editor
+                share modal — the preview overlay's Share opens the same one. */}
             {siteId && !readOnlyView ? (
-              <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}?share=1`))}>
+              <MenuItem onClick={run(() => setShareOpen(true))}>
                 Share preview link
               </MenuItem>
             ) : null}
@@ -308,6 +324,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         ) : null}
       </Menu>
     </Popover>
+    {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} /> : null}
+    </>
   );
 };
 

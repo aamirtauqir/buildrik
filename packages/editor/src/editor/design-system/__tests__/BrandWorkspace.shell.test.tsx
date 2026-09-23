@@ -22,6 +22,7 @@ import {
   installDomShims,
   makeFakeComposer,
   openPage,
+  renderOnRadius,
   renderWorkspace,
   wrap,
 } from "../ui/__tests__/brandWorkspaceHarness";
@@ -74,9 +75,8 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
   it("raises the discard overlay; Keep editing stays with the edit intact", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
-    const utils = renderWorkspace(composer, { onClose });
-    openPage(utils, "kind-radius");
-    const input = (await waitFor(() => utils.getByLabelText("Small radius value"))) as HTMLInputElement;
+    const utils = await renderOnRadius(composer, { onClose });
+    const input = utils.radiusInput;
     fireEvent.change(input, { target: { value: "10px" } });
     await utils.findByText("Unsaved brand changes");
 
@@ -90,15 +90,14 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
     fireEvent.click(screen.getByTestId("brand-discard-keep"));
     await waitFor(() => expect(screen.queryByTestId("brand-discard")).toBeNull());
     expect(onClose).not.toHaveBeenCalled();
-    expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
+    expect((utils.getByLabelText("Value") as HTMLInputElement).value).toBe("10px");
   });
 
   it("Discard changes reverts the staged edits and leaves", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
-    const utils = renderWorkspace(composer, { onClose });
-    openPage(utils, "kind-radius");
-    const input = (await waitFor(() => utils.getByLabelText("Small radius value"))) as HTMLInputElement;
+    const utils = await renderOnRadius(composer, { onClose });
+    const input = utils.radiusInput;
     const original = input.value;
     fireEvent.change(input, { target: { value: "10px" } });
     await utils.findByText("Unsaved brand changes");
@@ -108,7 +107,7 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
 
     expect(onClose).toHaveBeenCalledTimes(1);
     await waitFor(() => {
-      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
+      expect((utils.getByLabelText("Value") as HTMLInputElement).value).toBe(original);
     });
     expect(utils.queryByText("Unsaved brand changes")).toBeNull();
     // The footer's own discard, with its Undo toast.
@@ -118,9 +117,8 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
   it("Escape is the same door, guarded the same way", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
-    const utils = renderWorkspace(composer, { onClose });
-    openPage(utils, "kind-radius");
-    const input = (await waitFor(() => utils.getByLabelText("Small radius value"))) as HTMLInputElement;
+    const utils = await renderOnRadius(composer, { onClose });
+    const input = utils.radiusInput;
     fireEvent.change(input, { target: { value: "12px" } });
     await utils.findByText("Unsaved brand changes");
 

@@ -475,18 +475,20 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
+      /* The footer word bar's Inspector toggle lives here now (B12, G2-037),
+         beside the ✕ in the inspector header; both emit the one event the
+         shell acts on. No chord — nothing on the board prints one. */
+      id: "toggle-inspector",
+      label: "Toggle inspector",
+      group: "Panels",
+      run: () => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR),
+    },
+    {
       id: "ui-open-ai",
       label: "Open AI assistant",
       group: "Panels",
       shortcut: "ctrl+shift+a",
       run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
-    },
-    {
-      id: "ui-toggle-component-view",
-      label: "Toggle component view",
-      group: "View",
-      shortcut: "ctrl+shift+c",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_COMPONENT_VIEW),
     },
 
     // ============================================
@@ -549,12 +551,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Mobile view",
       group: "View",
       run: (c) => c.setDevice("mobile"),
-    },
-    {
-      id: "device-watch",
-      label: "Watch view",
-      group: "View",
-      run: (c) => c.setDevice("watch"),
     },
 
     // ============================================

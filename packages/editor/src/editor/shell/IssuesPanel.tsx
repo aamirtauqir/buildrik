@@ -271,10 +271,15 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                   >
                     <span className={`tw:flex-none tw:mt-px ${TONE[i.type].className}`}>{TONE[i.type].icon}</span>
                     <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
-                      <span className="tw:leading-5" data-testid={`issue-message-${idx}`}>{i.message}</span>
+                      {/* One line each: the row is a fixed 56 (board 164:28), and
+                          a lint message wrapped to three lines pushed the
+                          location into the next row. Full text: title + DOM. */}
+                      <span className="tw:leading-5 tw:truncate" title={i.message} data-testid={`issue-message-${idx}`}>
+                        {i.message}
+                      </span>
                       {i.location && (
                         <span
-                          className="tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5"
+                          className="tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5 tw:truncate"
                           data-testid={`issue-location-${idx}`}
                         >
                           {i.location}

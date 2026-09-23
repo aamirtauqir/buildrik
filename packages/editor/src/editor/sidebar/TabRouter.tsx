@@ -30,7 +30,6 @@ import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
-import { exportPublishPages } from "../shell/exportPublishPages";
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
@@ -198,7 +197,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          initialView={activeSubTab === "published" ? "published" : undefined}
+          initialView={activeSubTab === "published" || activeSubTab === "activity" ? activeSubTab : undefined}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={
@@ -226,11 +225,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           {...commonTabProps}
           composer={composer}
           onResend={onResendReview}
-          /* A deep link into Compare (`openLeftPanelToTab("review",
-             "compare")`), the same way the history tab deep-links to
-             "published" two cases above. */
-          initialCompare={activeSubTab === "compare"}
-          onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />
       );
 

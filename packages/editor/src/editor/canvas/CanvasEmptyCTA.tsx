@@ -31,6 +31,7 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
+import type { FrameSpan } from "./hooks/useVisibleFrameSpan";
 
 interface CanvasEmptyCTAProps {
   onBrowseTemplates: () => void;
@@ -43,6 +44,10 @@ interface CanvasEmptyCTAProps {
    * buttons, because the Insert drawer it just opened is where the next act is.
    */
   started?: boolean;
+  /** The part of the frame on screen (useVisibleFrameSpan). The frame can be
+   *  wider than its viewport, and a CTA centred on the frame hid "Start blank"
+   *  under the inspector. Absent → the whole frame. */
+  span?: FrameSpan | null;
 }
 
 /** The board's three cards. */
@@ -54,10 +59,17 @@ export function CanvasEmptyCTA({
   onDescribe,
   onStartBlank,
   started,
+  span,
 }: CanvasEmptyCTAProps): React.ReactElement {
   const cards = SITE_TEMPLATES.slice(0, CARD_COUNT);
   return (
-    <div className="bd-canvas-empty-cta" role="status" aria-label="Canvas is empty" data-testid="canvas-empty-cta">
+    <div
+      className="bd-canvas-empty-cta"
+      role="status"
+      aria-label="Canvas is empty"
+      data-testid="canvas-empty-cta"
+      style={span ? { left: span.left, width: span.width, right: "auto" } : undefined}
+    >
       {started ? (
         <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
           Drop an element from the Insert panel, or drag a section.

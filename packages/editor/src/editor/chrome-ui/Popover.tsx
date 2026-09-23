@@ -53,6 +53,8 @@ export interface PopoverProps {
 /** Keep this much clear of every viewport edge when nudging back into view. */
 const VIEWPORT_MARGIN = 8;
 
+const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
 export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block }: PopoverProps) {
   const wrap = React.useRef<HTMLSpanElement | null>(null);
   const panel = React.useRef<HTMLDivElement | null>(null);
@@ -91,8 +93,21 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
     const onDown = (e: PointerEvent) => {
       if (wrap.current && !wrap.current.contains(e.target as Node)) onClose();
     };
+    /* Escape from inside the panel returns focus to the trigger (WAI-ARIA
+       menu button). Without it the panel unmounted under the focused item
+       and focus fell to <body> — QA, integration 5e0d47902, Layers ⋯. Focus
+       that is somewhere else entirely is left where it is. */
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      const focusInside = !!panel.current?.contains(document.activeElement);
+      onClose();
+      if (!focusInside) return;
+      const trigger = wrap.current?.firstElementChild;
+      const target =
+        trigger instanceof HTMLElement && trigger.matches(FOCUSABLE)
+          ? trigger
+          : trigger?.querySelector<HTMLElement>(FOCUSABLE);
+      target?.focus();
     };
     document.addEventListener("pointerdown", onDown, true);
     document.addEventListener("keydown", onKey, true);

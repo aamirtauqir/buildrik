@@ -10,6 +10,9 @@
  * Page-level on purpose: a client does not read a line diff of generated
  * HTML. "Pricing changed, About was added" answers the question they asked.
  *
+ * The body of the one Compare (CompareHost) when both sides are published
+ * versions; the host's bar carries the title, the pickers and the way out.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -20,7 +23,6 @@ export interface PublishDiffViewProps {
   siteId: string;
   from: { id: string; version: number };
   to: { id: string; version: number };
-  onBack: () => void;
 }
 
 const BADGE: Record<PublishPageChange, { label: string; cls: string }> = {
@@ -32,7 +34,7 @@ const BADGE: Record<PublishPageChange, { label: string; cls: string }> = {
 
 const kb = (n: number | null) => (n === null ? "—" : `${(n / 1024).toFixed(1)} KB`);
 
-export const PublishDiffView: React.FC<PublishDiffViewProps> = ({ siteId, from, to, onBack }) => {
+export const PublishDiffView: React.FC<PublishDiffViewProps> = ({ siteId, from, to }) => {
   const [state, setState] = React.useState<"loading" | "ready" | "error">("loading");
   const [diff, setDiff] = React.useState<PublishDiff | null>(null);
   const [retry, setRetry] = React.useState(0);
@@ -49,13 +51,6 @@ export const PublishDiffView: React.FC<PublishDiffViewProps> = ({ siteId, from, 
   const title = `v${from.version} → v${to.version}`;
   return (
     <div className="tw:flex tw:flex-col tw:gap-2" data-testid="publish-diff" aria-label={`Compare ${title}`}>
-      <div className="tw:flex tw:items-center tw:justify-between">
-        <Button color="light" size="xs" onClick={onBack} className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
-          ‹ Versions
-        </Button>
-        <span className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">{title}</span>
-      </div>
-
       {state === "loading" && <SkeletonBlock className="tw:h-16 tw:w-full" />}
 
       {state === "error" && (

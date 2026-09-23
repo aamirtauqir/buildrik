@@ -137,3 +137,21 @@ export function TimeTravelIcon() {
     </svg>
   );
 }
+
+export function CompareIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <rect x="2" y="2" width="4" height="10" rx="1" />
+      <rect x="8" y="2" width="4" height="10" rx="1" />
+      <path d="M6 5h2" />
+      <path d="M6 9h2" />
+    </svg>
+  );
+}

@@ -29,6 +29,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
 }));
 
 import { ReviewTab } from "../ReviewTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const round = (over: Record<string, unknown> = {}) => ({
   id: "r1",
@@ -83,7 +84,11 @@ beforeEach(() => {
 afterEach(cleanup);
 
 const mount = (composer: unknown = makeComposer(), props: Record<string, unknown> = {}) =>
-  render(<ReviewTab composer={composer as never} onResend={vi.fn(() => Promise.resolve())} {...props} />);
+  render(
+    <ToastProvider>
+      <ReviewTab composer={composer as never} onResend={vi.fn(() => Promise.resolve())} {...props} />
+    </ToastProvider>,
+  );
 
 describe("the banner — when the board's band exists", () => {
   it("shows the count and the walk; Compare and Re-send are the panel's own", async () => {

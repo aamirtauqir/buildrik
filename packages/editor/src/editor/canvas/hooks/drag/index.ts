@@ -6,7 +6,6 @@
  * @license BSD-3-Clause
  */
 
-export { useTouchDrag, type UseTouchDragOptions, type UseTouchDragResult } from "./useTouchDrag";
 // Drag calculation utilities (extracted from useCanvasDragDrop)
 export {
   calculateDropPositionFromCursor,

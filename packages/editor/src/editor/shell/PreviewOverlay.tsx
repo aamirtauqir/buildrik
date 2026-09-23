@@ -16,33 +16,41 @@
  * The bezel is `DeviceFramePreview`, the frame the canvas already uses; a
  * second device-frame renderer would be two answers to one question.
  *
- * The board also draws a "Share preview" button here. Not built: the door
- * exists already and lands on the same flow — SiteMenu's "Share preview link"
- * (board 642:3401 → the dashboard's ShareDraftModal). A second entry point to
- * one flow is a duplicate, not a feature.
+ * The board also draws a "Share preview" button here (B1 / G1-022). It opens
+ * `PreviewShareModal` — the same dialog the site menu's "Share preview link"
+ * row opens, so both doors land on one flow.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Share2 } from "lucide-react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
+import { PreviewShareModal } from "./PreviewShareModal";
 
 interface PreviewOverlayProps {
   /** Sanitized page HTML. null → overlay hidden. */
   html: string | null;
   onDone: () => void;
+  /** The site whose share link the Share button mints; no site, no button. */
+  siteId?: string | null;
 }
 
 const REGION_CLASS =
   "tw:fixed tw:left-0 tw:right-0 tw:bottom-0 tw:top-[var(--bk-size-topbar)] " +
   "tw:flex tw:flex-col tw:bg-[var(--bk-bg-app)]";
 
-/** Board 807:8707 — a 40-tall gray-50 strip with a hairline under it. */
+/** Board 807:8707 — a 40-tall gray-50 strip with a hairline under it. The
+ *  device switcher sits centred; the Share button is pinned to the right
+ *  edge so it never crowds the breakpoint pills. */
 const DEVICE_BAR_CLASS =
-  "tw:shrink-0 tw:h-10 tw:flex tw:items-center tw:justify-center " +
+  "tw:shrink-0 tw:h-10 tw:flex tw:items-center tw:justify-between tw:gap-2 " +
   "tw:bg-[var(--bk-gray-50)] tw:border-b tw:border-[var(--bk-border)]";
+
+const DEVICE_BAR_INNER_CLASS =
+  "tw:flex-1 tw:flex tw:items-center tw:justify-center";
 
 /* Board 65:211 presents the site as a PAGE on the app ground, not edge-to-edge
    chrome-less browser fill: the preview is of a page, and a page has edges.
@@ -67,8 +75,14 @@ const DONE_CLASS =
   "tw:rounded-full tw:bg-[var(--bk-ink)] tw:border-[var(--bk-ink)] tw:text-white " +
   "tw:[box-shadow:var(--bk-shadow-overlay)]";
 
-export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) => {
+const SHARE_BTN_CLASS =
+  "tw:absolute tw:right-3 tw:top-1/2 tw:-translate-y-1/2 tw:h-7 tw:px-2.5 " +
+  "tw:rounded-sm tw:bg-white tw:border tw:border-[var(--bk-gray-400)] " +
+  "tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)]";
+
+export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, siteId }) => {
   const [device, setDevice] = React.useState<Breakpoint>("desktop");
+  const [shareOpen, setShareOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (html == null) return;
@@ -97,7 +111,23 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
       style={{ zIndex: Z_LAYERS.floatingPanel }}
     >
       <div className={DEVICE_BAR_CLASS}>
-        <BreakpointSwitcher labelled value={device} onChange={setDevice} />
+        <div className={DEVICE_BAR_INNER_CLASS}>
+          <BreakpointSwitcher labelled value={device} onChange={setDevice} />
+        </div>
+        {siteId && (
+          <Button
+            size="xs"
+            color="light"
+            type="button"
+            onClick={() => setShareOpen(true)}
+            aria-label="Share preview"
+            data-testid="preview-share-button"
+            className={SHARE_BTN_CLASS}
+          >
+            <Share2 size={14} aria-hidden="true" />
+            <span className="tw:ml-1.5">Share</span>
+          </Button>
+        )}
       </div>
       <div className={STAGE_CLASS}>
         <DeviceFramePreview device={device as DeviceType} active={framed}>
@@ -112,6 +142,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
       <Button onClick={onDone} className={DONE_CLASS}>
         Done
       </Button>
+      {siteId && shareOpen && (
+        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} />
+      )}
     </div>
   );
 };

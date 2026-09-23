@@ -1,41 +1,46 @@
 /**
- * LintSection — the Lint destination on the Brand root (M5).
+ * LintSection — Brand › Brand checks, board 7316:84555 (C1 (ii); was the
+ * drawer's Lint destination, 154:2).
  *
- * Board `Brand · lint` (g4Gz… 154:2): one row per finding — severity dot,
- * message, the token it is about — and a closing note explaining when an
- * auto-fix is offered.
+ * One card, a 48px row per finding: what is wrong over the token it is about,
+ * ending in `Fix` (red) when the finding carries an auto-fix hint, `Open`
+ * (accent) otherwise. Errors sort first — a banned hue is a shipping blocker,
+ * a missing dark variant is a gap.
  *
- * **The board draws a `Fix ›` link on two rows and `Open` on the third. Neither
- * ships here, and that is deliberate.** A `LintIssue` carries an optional
- * `autoFixHint`, and re-checked 2026-08-18: **no rule anywhere sets one.** The
- * engine's `applyAutoFix` and the Issues panel's Fix button both exist and both
- * hang off that field, so neither can fire either — a capability with no
- * producer rather than no capability. Drawing a Fix link here would claim what
- * nothing can deliver.
+ * The drawer's note said no rule sets `autoFixHint`. That stopped being true:
+ * contrast findings carry `darken-22` / `lighten-22` (utils/contrastLint).
+ * Fix STAGES the fixed value in the draft, the same as any edit on these
+ * pages — the Draft chip lights, the live preview repaints, Save applies it.
+ * For contrast the value is `suggestContrastFix`'s — searched to AA against
+ * the customer's page — not the hint's fixed 22% shift, which measured live
+ * took #EEEEEE to #B6B6B6 (still ~2:1) and left the finding standing.
+ * Open goes to the token's own page with its card open.
  *
- * The closing note therefore does NOT copy the board's sentence ("Auto-fix only
- * appears where a nearest token exists"), which implies a Fix that sometimes
- * appears. Recorded as `authority: "blocked:no-autofix-producer"` on 154:2.
- *
- * Wiring it is a real design question, not a gap to plug: the hint grammar the
- * engine understands is `darken-22` / `lighten-22`, one fixed L-shift, which is
- * not guaranteed to reach AA — while `suggestContrastFix` (used by the colour
- * list, which prints the current ratio, the target, and the hex that meets it)
- * binary-searches to the target. A Fix button on
- * the crude hint would be a fix that sometimes does not fix.
+ * Departure, recorded: the board's header "Run checks" is not drawn. The
+ * checks run by themselves on every staged edit (useDSLint, debounced), and
+ * there is no re-run entry on that hook (state/ is read-only for C1).
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { LintIssue, LintRuleId } from "../../../../engine/designSystem/linter";
+import type { DesignToken } from "../../types";
+import { suggestContrastFix } from "../../utils/contrastFix";
+import { findSurfaceToken, resolveSurface } from "../../utils/contrastLint";
+import { Button } from "@/editor/chrome-ui";
+import { BrandCard, BrandRow } from "../BrandCard";
 
 export interface LintSectionProps {
   issues: readonly LintIssue[];
+  /** Stage the auto-fix for a finding that carries a hint. */
+  onFix?: (issue: LintIssue) => void;
+  /** Go to the finding's token. */
+  onOpen?: (tokenId: string) => void;
 }
 
-/** Human labels, kept in step with `DSLintBanner`'s RULE_LABEL. */
+/** What is wrong, as the row's title (7316:84555: "Banned hue — purple / violet"). */
 const RULE_LABEL: Record<LintRuleId, string> = {
-  contrast: "Fails WCAG AA on the page background",
+  contrast: "Contrast — fails WCAG AA on the page",
   "banned-hue": "Banned hue — purple, violet or indigo",
   "pure-black": "Pure black",
   "empty-value": "Empty value",
@@ -45,55 +50,90 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "semantic-needs-alias": "Semantic token needs an alias",
 };
 
-export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
+const ACTION = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5";
+
+/**
+ * The staged edit a Fix makes — the value the page SHOWS in `mode` (light
+ * value, or the dark one in dark mode) searched to AA against the page colour.
+ * Null when there is nothing to change.
+ */
+export function contrastFixFor(
+  token: DesignToken,
+  colorTokens: readonly DesignToken[],
+  mode: "light" | "dark",
+): { value: string; darkValue?: string } | null {
+  const surface = resolveSurface(findSurfaceToken(colorTokens), mode);
+  if (mode === "dark" && token.darkValue) {
+    const dark = suggestContrastFix(token.darkValue, surface);
+    return dark ? { value: token.value, darkValue: dark } : null;
+  }
+  const value = suggestContrastFix(token.value, surface);
+  return value ? { value } : null;
+}
+
+/** "N issues · auto-fix available" — the page header's caption. */
+export function brandChecksCaption(issues: readonly LintIssue[]): string {
+  const n = issues.length;
+  const base = `${n} issue${n === 1 ? "" : "s"}`;
+  return issues.some((i) => i.autoFixHint) ? `${base} · auto-fix available` : base;
+}
+
+export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen }) => {
   if (issues.length === 0) {
     return (
-      <div className="tw:px-4 tw:py-6 tw:text-center">
-        <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">Nothing to fix</div>
-        <div className="tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
+      <div className="tw:py-6 tw:text-center" data-testid="brand-checks-empty">
+        <div className="tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">Nothing to fix</div>
+        <div className="tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
           Every token passes the brand rules.
         </div>
       </div>
     );
   }
 
-  /* Errors first: a banned hue is a shipping blocker, a missing dark variant is
-     a gap. Sorting by severity keeps the blocker above the fold when the list
-     is long. */
   const ordered = [...issues].sort((a, b) =>
     a.severity === b.severity ? 0 : a.severity === "error" ? -1 : 1,
   );
 
   return (
-    <div>
-      <ul className="tw:flex tw:flex-col tw:list-none tw:m-0 tw:p-0">
-        {ordered.map((issue) => (
-          <li
-            key={`${issue.rule}:${issue.tokenId}`}
-            className="tw:flex tw:items-start tw:gap-2 tw:px-4 tw:py-2"
-          >
-            <span
-              aria-hidden="true"
-              className="tw:mt-[6px] tw:size-[6px] tw:flex-none tw:rounded-full"
-              style={{
-                background:
-                  issue.severity === "error" ? "var(--bk-error)" : "var(--bk-warning)",
-              }}
-            />
-            <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-              <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{issue.message}</span>
-              <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
-                {RULE_LABEL[issue.rule] ?? issue.rule} · {issue.tokenId}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
-      <p className="tw:mt-3 tw:px-4 tw:text-xs tw:text-[var(--bk-ink-muted)]">
-        Auto-fix isn&apos;t available yet — the linter reports what is wrong, not
-        what to replace it with. Edit the token in Tokens.
-      </p>
-    </div>
+    <BrandCard label="Brand checks" data-testid="brand-checks-list">
+      {ordered.map((issue) => {
+        const key = `${issue.rule}:${issue.tokenId}`;
+        const fixable = Boolean(issue.autoFixHint && onFix);
+        return (
+          <BrandRow
+            key={key}
+            data-lint-row={key}
+            data-severity={issue.severity}
+            title={issue.message}
+            name={RULE_LABEL[issue.rule] ?? issue.rule}
+            sub={issue.tokenId}
+            trailing={
+              fixable ? (
+                <Button
+                  size="xs"
+                  variant="link"
+                  onClick={() => onFix?.(issue)}
+                  data-testid={`brand-check-fix-${issue.tokenId}`}
+                  className={`${ACTION} tw:text-[var(--bk-error-text)]`}
+                >
+                  Fix
+                </Button>
+              ) : onOpen ? (
+                <Button
+                  size="xs"
+                  variant="link"
+                  onClick={() => onOpen(issue.tokenId)}
+                  data-testid={`brand-check-open-${issue.tokenId}`}
+                  className={`${ACTION} tw:text-[var(--bk-accent-text)]`}
+                >
+                  Open
+                </Button>
+              ) : undefined
+            }
+          />
+        );
+      })}
+    </BrandCard>
   );
 };
 

@@ -105,7 +105,7 @@ describe("BrandWorkspace — pages", () => {
 
     openPage(utils, "kind-radius");
     await waitFor(() => {
-      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
     });
   });
 
@@ -120,7 +120,7 @@ describe("BrandWorkspace — pages", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe(original);
     });
     expect(utils.queryByText("Unsaved brand changes")).toBeNull();
   });
@@ -253,7 +253,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("10px");
       expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
@@ -267,7 +267,7 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("4px");
+      expect(utils.getByTestId("brand-token-value-radius-sm").textContent).toBe("4px");
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
     });
   });

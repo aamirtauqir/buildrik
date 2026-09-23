@@ -1,5 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "../../../../engine";
 import { SelectionBoxOverlay } from "../SelectionBoxOverlay";
@@ -101,6 +103,25 @@ describe("SelectionBoxOverlay — rotation handle accessibility", () => {
     globalThis.MutationObserver = originalMutationObserver;
     querySelectorSpy.mockRestore();
     vi.clearAllMocks();
+  });
+
+  /* QA (integration 5e0d47902): the full-canvas positioning wrapper carried
+     `.bd-selection-box`, which Canvas.css paints with an --bk-accent-subtle
+     fill, a border and a focus shadow — selecting a Heading laid an opaque
+     1024x697 #E1EFFE sheet over the whole page. jsdom never loads Canvas.css,
+     so the cascade fact is asserted against the stylesheet: no class on the
+     100%x100% wrapper may be a rule that paints. */
+  it("the full-size wrapper carries no class Canvas.css paints", () => {
+    const composer = makeComposer();
+    const { container } = render(<SelectionBoxOverlay composer={composer} elementId="el-1" />);
+    const wrapper = container.firstElementChild as HTMLElement;
+    expect(wrapper.style.width).toBe("100%");
+    expect(wrapper.style.height).toBe("100%");
+    const css = readFileSync(join(__dirname, "../../Canvas.css"), "utf8");
+    for (const cls of Array.from(wrapper.classList)) {
+      const rule = new RegExp(`\\.${cls}(::?[a-z-]+)?\\s*[,{][^}]*\\b(background|border|box-shadow)\\s*:`);
+      expect(css, `.${cls} paints the full-canvas wrapper`).not.toMatch(rule);
+    }
   });
 
   it("rotation handle has aria-valuenow attribute", () => {

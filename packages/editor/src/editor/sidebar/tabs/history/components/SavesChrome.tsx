@@ -20,7 +20,7 @@ import type { Composer } from "@/engine";
 import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
 import { EVENTS } from "@/shared/constants/events";
 import { Button } from "@/editor/chrome-ui";
-import type { SavesFilter } from "../types";
+import type { HistoryView } from "../types";
 
 /* Board 162:2 draws the approval band as a full-bleed strip with a 3px success
    rail on its left, weight 400 — not a rounded tinted card with a bold title. */
@@ -127,17 +127,18 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
               .join(" · ")}
           </div>
         )}
-        {/* Routed, not rebuilt: UI_PANEL_OPEN carries a `screen`, TabRouter maps
-            `activeSubTab === "compare"` to ReviewTab's `initialCompare`, and
-            ReviewTab opens straight into ApprovedCompareView. A second copy of
-            that view here would need its own snapshot + live-export plumbing
-            and would drift from the one the boards describe. */}
+        {/* One of the one Compare's doors (B8): the shell's CompareHost
+            renders it; this band only says where it starts. */}
         <Button
           color="light"
           size="xs"
           className={BAND_ACTION}
           onClick={() =>
-            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "review", screen: "compare" })
+            composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+              left: { kind: "approved" },
+              right: { kind: "current" },
+              from: "History",
+            })
           }
         >
           Compare with current
@@ -159,11 +160,11 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
 /**
  * The retention rule, under the list.
  *
- * TWO rules, because the two filters retain different things and the note sat
- * under both saying only the first. Milestones lists saved versions, which
- * survive a reload and prune oldest-first; "All changes" lists the UNDO stack,
+ * TWO rules, because the two tabs retain different things and the note sat
+ * under both saying only the first. Saves lists saved versions, which
+ * survive a reload and prune oldest-first; Session lists the UNDO stack,
  * which is capped at `maxHistory` and is gone the moment the page reloads.
- * Board 163:2 — the changes filter — spells that out: "This session only — the
+ * Board 163:2 — the session list — spells that out: "This session only — the
  * last 100 steps, cleared when you reload. Save a version to keep a point."
  * The panel printed the versions sentence there instead, which is not merely
  * off-board: it promises durability for a list that has none.
@@ -173,16 +174,16 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
  * is said at all when no cap can be read, because a number invented here is a
  * claim about retention that nothing backs.
  */
-export const SavesPruneNote: React.FC<{ composer: Composer | null; filter: SavesFilter }> = ({
+export const SavesPruneNote: React.FC<{ composer: Composer | null; view: Extract<HistoryView, "session" | "saves"> }> = ({
   composer,
-  filter,
+  view,
 }) => {
-  const cap = filter === "changes" ? composer?.history?.maxHistory : composer?.versions?.maxVersions;
+  const cap = view === "session" ? composer?.history?.maxHistory : composer?.versions?.maxVersions;
   if (typeof cap !== "number") return null;
   return (
     <div className={PRUNE_NOTE} data-testid="history-prune-note">
       <p className={PRUNE_NOTE_TEXT} data-testid="history-prune-note-text">
-        {filter === "changes"
+        {view === "session"
           ? `This session only — the last ${cap} steps, cleared when you reload. Save a version to keep a point.`
           : `${cap} versions kept. Auto-saves prune oldest first; named ones never prune.`}
       </p>

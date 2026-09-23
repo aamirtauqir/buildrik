@@ -72,10 +72,9 @@ import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSe
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
-/* ChatThread/AgentPlan carry `.bd-ai-*` styles that only AITab imports, so
-   the probe loads the panel's stylesheet the way production does. */
+/* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
+   loads the panel's stylesheet the way production does. */
 import "@/editor/sidebar/tabs/ai/AITab.css";
-import { ChatThread } from "@/editor/sidebar/tabs/ai/ChatThread";
 import { AgentPlan } from "@/editor/sidebar/tabs/ai/AgentPlan";
 import type { RunStep } from "@/editor/sidebar/tabs/ai/hooks/useAgentRunner";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
@@ -1475,8 +1474,9 @@ const APPLY_STEPS = [
  * reached there at all: each one needs an answer from the dashboard's AI
  * endpoint, which the standalone editor has no credentials for. So the probe
  * mounts the ONE block each state adds, in the branch production renders it
- * from — `ChatThread` with a streaming, textless message for the Thinking band,
- * and `AgentPlan` at the run phase for the band and the step rows.
+ * from — `AgentPlan` at phase "planning" for the Thinking band (decision #23
+ * retired the chat bubble that used to carry it), and at the run phase for the
+ * band and the step rows.
  *
  * 280 is the board frame. Nothing compared from these three depends on it (the
  * anchored properties are heights, fills and type), and it keeps a probe
@@ -1985,16 +1985,7 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
 
 const CASES: Record<string, () => React.ReactElement> = {
   // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
-  "ai-thinking": () =>
-    aiHost(
-      "ai-thinking",
-      <ChatThread
-        messages={[{ id: "a1", role: "assistant", text: "", streaming: true, createdAt: 0 }]}
-        onAccept={() => {}}
-        onReject={() => {}}
-        onRegenerate={() => {}}
-      />,
-    ),
+  "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
   /* Planning has NO step rows in the shipped runner: `start()` clears `steps`,
      awaits the plan, then sets steps and phase "running" in the same breath.
      The board draws a plan-review gate over three pending rows, which is a new
@@ -3237,7 +3228,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
@@ -3253,7 +3243,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub()}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },

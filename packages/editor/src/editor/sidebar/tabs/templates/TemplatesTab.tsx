@@ -499,29 +499,17 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           backupCurrentPage={backupCurrentPage}
           onBackupChange={setBackupCurrentPage}
           onCancel={() => sel.setShowReplace(false)}
-          onApply={() => {
+          onApply={async () => {
             sel.setShowReplace(false);
-            // P2 fix (codex A4): if user opted in, duplicate current page first.
-            if (backupCurrentPage && composer) {
-              const active = composer.elements.getActivePage();
-              if (active) {
-                const backup = composer.elements.duplicatePage(active.id);
-                /* Name it what the checkbox PROMISED. `duplicatePage` names its
-                   output "<name> Copy", which is also exactly what the Pages
-                   menu's Duplicate produces — so the backup was
-                   indistinguishable from an ordinary duplicate, while the hint
-                   above it said `Keeps your work as "Home (backup)"`. The
-                   suffix is numbered on collision so a second backup does not
-                   overwrite the first in the reader's eye. */
-                if (backup) {
-                  const taken = new Set(
-                    composer.elements.getAllPages().map((p) => p.name),
-                  );
-                  let name = `${active.name} (backup)`;
-                  for (let n = 2; taken.has(name); n++) name = `${active.name} (backup ${n})`;
-                  composer.elements.updatePage(backup.id, { name });
-                }
-              }
+            /* Owner decision #25 (C4): the backup is a History auto-version,
+               not a "<page> (backup)" page — it restores the whole site from
+               History › Saves instead of leaving a stray page in the
+               sitemap. Taken BEFORE the apply, so it holds the page the user
+               is about to lose. A failed snapshot must not cost the apply
+               the user asked for; the version list simply lacks the row. */
+            if (backupCurrentPage && composer?.versions) {
+              const t = SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0];
+              await composer.versions.autoCheckpoint(`Before template “${t.name}”`).catch(() => null);
             }
             startApply();
           }}

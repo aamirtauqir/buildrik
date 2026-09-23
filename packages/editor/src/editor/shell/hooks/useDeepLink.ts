@@ -16,7 +16,17 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
-import { getDOMElement } from "../../../engine/canvas/resize/utils";
+import { locateComment } from "@/editor/sidebar/tabs/review/locate";
+
+/** The link `useDeepLink` consumes: this editor's URL with the element (and
+ *  its page — the registry only holds the active page) riding along. No
+ *  element = a link to the page alone. */
+export function elementDeepLink(elId: string | null, pageId: string | null): string {
+  const url = new URL(window.location.href);
+  if (elId) url.searchParams.set("el", elId);
+  if (pageId) url.searchParams.set("page", pageId);
+  return url.toString();
+}
 
 export function useDeepLink(composer: Composer | null): void {
   const doneRef = React.useRef(false);
@@ -31,18 +41,9 @@ export function useDeepLink(composer: Composer | null): void {
       if (!elId) { doneRef.current = true; return; }
       doneRef.current = true;
 
-      const pageId = params.get("page");
-      if (pageId && composer.elements.getActivePage?.()?.id !== pageId) {
-        composer.elements.setActivePage(pageId);
-      }
-      /* The page switch re-renders the canvas; select on the next frame so the
-         DOM node exists to scroll to. */
-      window.setTimeout(() => {
-        const el = composer.elements.getElement(elId);
-        if (!el) return;
-        composer.selection.select(el);
-        getDOMElement(elId)?.scrollIntoView({ block: "center" });
-      }, 60);
+      /* The same page-then-select-then-scroll act as the Review panel's
+         Locate ›. A dead id selects nothing: the editor still opens. */
+      locateComment(composer, { pageId: params.get("page"), targetSelector: elId });
     };
 
     composer.on(EVENTS.PROJECT_LOADED, apply);
