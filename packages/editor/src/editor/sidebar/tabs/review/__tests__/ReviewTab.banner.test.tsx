@@ -225,6 +225,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
     fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test"));
   });
 
@@ -234,6 +235,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
     fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined));
   });
 
@@ -244,6 +246,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
     fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
     expect(await screen.findByRole("button", { name: /Sending round 2…/ })).toBeTruthy();
     release();
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalledTimes(2));

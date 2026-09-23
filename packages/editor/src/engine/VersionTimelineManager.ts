@@ -196,7 +196,7 @@ export class VersionTimelineManager {
   /**
    * Create an auto-checkpoint
    */
-  async autoCheckpoint(label: string): Promise<NamedVersion | null> {
+  async autoCheckpoint(label: string, options: { title?: string } = {}): Promise<NamedVersion | null> {
     if (!this.config.enabled) return null;
 
     const snapshot = await this.captureSnapshotAsync();
@@ -222,8 +222,11 @@ export class VersionTimelineManager {
        project, there is nothing new to restore to. A NAMED version is never
        treated as the same thing: those are decisions, and a checkpoint taken
        after one is the "before I started today" point. */
+    /* A TITLED auto-version marks a moment the user will look for by name
+       (the template backup, #25) — it is taken even when the project matches
+       the newest auto-save, or the backup a toast promised would not exist. */
     const newest = this.versions[0];
-    if (newest?.isAutoCheckpoint && sameProject(newest.snapshot, snapshot)) {
+    if (!options.title && newest?.isAutoCheckpoint && sameProject(newest.snapshot, snapshot)) {
       return null;
     }
 
@@ -233,6 +236,7 @@ export class VersionTimelineManager {
       snapshot,
       createdAt: Date.now(),
       isAutoCheckpoint: true,
+      ...(options.title ? { title: options.title } : {}),
       projectId: this.projectId,
       visualSnapshot: null, // Skip visual snapshot for auto-checkpoints to save storage
       userId: this.currentUserId,

@@ -98,6 +98,8 @@ export interface StudioHeaderProps {
   onOpenShortcuts?: () => void;
   /** Site menu destinations from Figma 642:3664. */
   onOpenPublishHistory?: () => void;
+  /** The site crumb's door — the Pages panel (C5 G1-004). */
+  onOpenPages?: () => void;
   /** History · Activity (B6) — the site menu's "Activity log" stays in the editor. */
   onOpenActivity?: () => void;
   onOpenTemplates?: () => void;
@@ -231,6 +233,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenShortcuts,
   onOpenPublishHistory,
   onOpenActivity,
+  onOpenPages,
   onOpenTemplates,
   onOpenComponents,
   onOpenReview,
@@ -246,7 +249,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   nextMove,
   addToast,
 }) => {
-  const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
+  const { users, currentUser, state: collaborationState, isConnected, room } = useCollaboration(composer);
+  /* The page crumb (G1-004) follows the active page: a switch, a load, a
+     rename (PROJECT_CHANGED carries page:updated). */
+  const [pageName, setPageName] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const read = () => setPageName(composer.elements?.getActivePage?.()?.name ?? null);
+    read();
+    const events = [EVENTS.PAGE_CHANGED, EVENTS.PROJECT_LOADED, EVENTS.PROJECT_CHANGED] as const;
+    events.forEach((e) => composer.on(e, read));
+    return () => events.forEach((e) => composer.off(e, read));
+  }, [composer]);
   const editorRole = useEditorRole();
   /* Unpublish is ADMIN on the server (sites.ts:425) and the row was shown to
      every role, so a VIEWER or EDITOR could open it and collect a 403. The
@@ -716,6 +730,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       </div>
       <Topbar
         siteName={siteName}
+        pageName={pageName}
+        onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
@@ -732,10 +748,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         presence={
           // A reconnecting session still has collaborators in it — hiding them
           // mid-drop reads as "everyone left", which is the wrong alarm.
-          collabOn && collaborationState !== "disconnected"
+          /* A room that is still held while the socket is `disconnected` is a
+             session that DROPPED — "Offline" (CI-84, C5 G1-011). No room =
+             never joined or deliberately left: no pill at all. */
+          collabOn && (collaborationState !== "disconnected" || Boolean(room))
             ? {
                 users: toPresenceUsers(users, currentUser, collaborationState),
-                connection: collaborationState === "connected" ? "live" : "reconnecting",
+                connection:
+                  collaborationState === "connected"
+                    ? "live"
+                    : collaborationState === "disconnected"
+                      ? "offline"
+                      : "reconnecting",
                 // T8 compact tier 3 (plan §7): two faces, then "+N". Not
                 // width-conditional on purpose — CSS can hide a third avatar
                 // but it cannot re-count the overflow badge, and a "+N" that
