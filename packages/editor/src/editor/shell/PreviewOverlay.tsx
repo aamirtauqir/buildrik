@@ -16,12 +16,9 @@
  * The bezel is `DeviceFramePreview`, the frame the canvas already uses; a
  * second device-frame renderer would be two answers to one question.
  *
- * The board also draws a "Share preview" button here. Plan row G1-022:
- * the button opens `PreviewShareModal`, an in-editor dialog with a read-only
- * Link row + Copy → toast + Open ↗ (new tab). The site menu's
- * "Share preview link" entry stays as a separate hand-off to the
- * dashboard's share modal — one in-editor affordance while the preview is
- * on screen, not a duplicate.
+ * The board also draws a "Share preview" button here (B1 / G1-022). It opens
+ * `PreviewShareModal` — the same dialog the site menu's "Share preview link"
+ * row opens, so both doors land on one flow.
  *
  * @license BSD-3-Clause
  */
@@ -29,7 +26,6 @@ import * as React from "react";
 import { Share2 } from "lucide-react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { DeviceType } from "@/shared/types";
-import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Button, BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
@@ -38,8 +34,7 @@ interface PreviewOverlayProps {
   /** Sanitized page HTML. null → overlay hidden. */
   html: string | null;
   onDone: () => void;
-  /** Site id sourced from the dashboard hand-off. Required when overlay is
-   *  shown so the Share button has a URL to share. */
+  /** The site whose share link the Share button mints; no site, no button. */
   siteId?: string | null;
 }
 
@@ -107,8 +102,6 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
      straight through for them, which is also what `active` says here. */
   const framed = device === "tablet" || device === "mobile";
 
-  const shareUrl = siteId ? `${DASHBOARD_URL}/share/${siteId}` : "";
-
   return (
     <div
       role="region"
@@ -149,12 +142,8 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
       <Button onClick={onDone} className={DONE_CLASS}>
         Done
       </Button>
-      {siteId && (
-        <PreviewShareModal
-          open={shareOpen}
-          onOpenChange={setShareOpen}
-          shareUrl={shareUrl}
-        />
+      {siteId && shareOpen && (
+        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} />
       )}
     </div>
   );

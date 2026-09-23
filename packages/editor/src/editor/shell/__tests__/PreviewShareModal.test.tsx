@@ -1,107 +1,113 @@
 /**
- * PreviewShareModal tests — G1-022 in-editor share dialog (SH-43, SH-87).
+ * PreviewShareModal — B1 / G1-022 (SH-43, SH-87), boards 4418:165739 (share
+ * link) → 6930:82841 ("Link copied" toast).
  *
- * Coverage:
- *   - Render: link row + Copy + Open + Done appear when open=true.
- *   - Gate 24: zero raw <button>/<input>/<select>/<textarea> — the link row
- *     is a <code> element, copy is delegated to chrome-ui CopyButton.
- *   - Close paths: Done → onOpenChange(false); ModalClose → onOpenChange(false).
- *   - Open button: window.open(url, "_blank", "noopener,noreferrer").
- *   - Copy delegates to CopyButton (which owns clipboard + toast).
+ * The link is a real draft share link: `siteDetail.sharing.list` is reused
+ * when it holds an open link, otherwise `siteDetail.sharing.create` mints one.
+ * The URL is `/share/<token>` — never `/share/<siteId>`, which is not a route.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { PreviewShareModal } from "../PreviewShareModal";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-const SHARE_URL = "https://app.buildrick.io/share/site-abc";
+const list = vi.fn();
+const create = vi.fn();
+vi.mock("@/services/api-client", () => ({
+  getBuildrikClient: () => ({
+    siteDetail: { sharing: { list: { query: list }, create: { mutate: create } } },
+  }),
+}));
+
+import { PreviewShareModal } from "../PreviewShareModal";
+
+const link = (token: string, over: Record<string, unknown> = {}) => ({
+  id: `id-${token}`,
+  token,
+  name: "Draft preview",
+  passwordHash: null,
+  expiresAt: null,
+  ...over,
+});
+
+beforeEach(() => {
+  list.mockReset();
+  create.mockReset();
+});
 
 afterEach(() => {
   cleanup();
-  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
-const wrap = (ui: React.ReactNode) => <ToastProvider>{ui}</ToastProvider>;
+const renderModal = (onOpenChange = vi.fn()) =>
+  render(
+    <ToastProvider>
+      <PreviewShareModal open onOpenChange={onOpenChange} siteId="site-abc" />
+    </ToastProvider>,
+  );
 
 describe("PreviewShareModal", () => {
-  it("renders link row, Copy, Open, Done when open", () => {
-    render(
-      wrap(
-        <PreviewShareModal
-          open
-          onOpenChange={vi.fn()}
-          shareUrl={SHARE_URL}
-        />
-      )
-    );
-
-    const link = screen.getByTestId("preview-share-link");
-    expect(link.tagName).toBe("CODE");
-    expect(link.textContent).toBe(SHARE_URL);
-    expect(link.getAttribute("aria-readonly")).toBe("true");
-
-    expect(screen.getByRole("button", { name: "Copy Copy" })).toBeTruthy();
-    expect(
-      screen.getByRole("button", { name: /open share link in new tab/i })
-    ).toBeTruthy();
-    expect(screen.getByRole("button", { name: /^Done$/ })).toBeTruthy();
+  it("reuses an open share link and shows /share/<token>", async () => {
+    list.mockResolvedValue([link("tok-open")]);
+    renderModal();
+    const row = await screen.findByTestId("preview-share-link");
+    expect(row.textContent).toMatch(/\/share\/tok-open$/);
+    expect(row.textContent).not.toContain("site-abc");
+    expect(create).not.toHaveBeenCalled();
+    expect(list).toHaveBeenCalledWith({ siteId: "site-abc" });
   });
 
-  it("'Done' closes via onOpenChange(false)", () => {
-    const onOpenChange = vi.fn();
-    render(
-      wrap(
-        <PreviewShareModal
-          open
-          onOpenChange={onOpenChange}
-          shareUrl={SHARE_URL}
-        />
-      )
-    );
-    fireEvent.click(screen.getByRole("button", { name: /^Done$/ }));
-    expect(onOpenChange).toHaveBeenCalledWith(false);
+  it("mints a link when every existing one is expired or password-locked", async () => {
+    list.mockResolvedValue([
+      link("tok-old", { expiresAt: new Date(Date.now() - 1000) }),
+      link("tok-locked", { passwordHash: "x" }),
+    ]);
+    create.mockResolvedValue(link("tok-new"));
+    renderModal();
+    const row = await screen.findByTestId("preview-share-link");
+    expect(row.textContent).toMatch(/\/share\/tok-new$/);
+    expect(create).toHaveBeenCalledWith({ siteId: "site-abc", name: "Draft preview" });
   });
 
-  it("'Open' calls window.open with noopener + noreferrer", () => {
+  it("a failed load says so and Try again reloads", async () => {
+    list.mockRejectedValueOnce(new Error("Editors cannot create share links"));
+    renderModal();
+    expect(await screen.findByText(/couldn.t get a preview link/i)).toBeInTheDocument();
+    expect(screen.getByText("Editors cannot create share links")).toBeInTheDocument();
+    list.mockResolvedValueOnce([link("tok-retry")]);
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect((await screen.findByTestId("preview-share-link")).textContent).toMatch(/tok-retry$/);
+  });
+
+  it("Copy link puts the URL on the clipboard and toasts 'Link copied'", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    list.mockResolvedValue([link("tok-copy")]);
+    renderModal();
+    await screen.findByTestId("preview-share-link");
+    fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringMatching(/\/share\/tok-copy$/)));
+    expect(await screen.findByText("Link copied")).toBeInTheDocument();
+  });
+
+  it("Open ↗ opens the link in a new tab", async () => {
     const open = vi.fn();
     vi.stubGlobal("open", open);
-
-    render(
-      wrap(
-        <PreviewShareModal
-          open
-          onOpenChange={vi.fn()}
-          shareUrl={SHARE_URL}
-        />
-      )
-    );
-    fireEvent.click(
-      screen.getByRole("button", { name: /open share link in new tab/i })
-    );
-    expect(open).toHaveBeenCalledWith(
-      SHARE_URL,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    list.mockResolvedValue([link("tok-open")]);
+    renderModal();
+    await screen.findByTestId("preview-share-link");
+    fireEvent.click(screen.getByRole("button", { name: /open preview link in a new tab/i }));
+    expect(open).toHaveBeenCalledWith(expect.stringMatching(/\/share\/tok-open$/), "_blank", "noopener,noreferrer");
   });
 
-  it("Copy button copies the URL to clipboard", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
-
-    render(
-      wrap(
-        <PreviewShareModal
-          open
-          onOpenChange={vi.fn()}
-          shareUrl={SHARE_URL}
-        />
-      )
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Copy Copy" }));
-    expect(writeText).toHaveBeenCalledWith(SHARE_URL);
+  it("renders no raw form controls (Gate 24) — the link row is a <code>", async () => {
+    list.mockResolvedValue([link("tok")]);
+    renderModal();
+    const row = await screen.findByTestId("preview-share-link");
+    expect(row.tagName).toBe("CODE");
+    expect(document.querySelectorAll("input, select, textarea").length).toBe(0);
   });
 });

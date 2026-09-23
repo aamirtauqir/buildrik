@@ -37,6 +37,7 @@
 import * as React from "react";
 import { IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, SiteMenuIcon } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { PreviewShareModal } from "./PreviewShareModal";
 
 export interface SiteMenuProps {
   // ── Site ──────────────────────────────────────────────────────────────────
@@ -95,10 +96,8 @@ export interface SiteMenuProps {
    *  owns it — this menu has no way to tell the user it didn't work. */
   onCopyLiveUrl?: () => void;
   /**
-   * The site this menu belongs to, for the dashboard hand-offs that need one.
-   * Board 642:3401's "Share preview link" is the case: the flow exists — the
-   * dashboard's ShareDraftModal, on `siteDetail.sharing.create` — and the
-   * editor had no way to reach it.
+   * The site this menu belongs to: the share link is minted for it, and the
+   * dashboard hand-offs (Site health, Activity log) land on it.
    */
   siteId?: string | null;
   // ── Workspace ─────────────────────────────────────────────────────────────
@@ -163,6 +162,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onReplayOnboarding,
 }) => {
   const [open, setOpen] = React.useState(false);
+  const [shareOpen, setShareOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
     setOpen(false);
     fn?.();
@@ -175,6 +175,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
 
   return (
+    <>
     <Popover
       open={open}
       onClose={() => setOpen(false)}
@@ -265,14 +266,12 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               </MenuItem>
             ) : null}
             {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
-            {/* Board 642:3401. A private link to the current DRAFT — a
-                different thing from the live URL above it, and the one a
-                client is sent before anything is published. The flow is the
-                dashboard's ShareDraftModal; this hands off to it directly,
-                the way "Invite teammates" below hands off to team settings,
-                rather than landing the user on a page to hunt for a button. */}
+            {/* Board 642:3401 → 4418:165739 (B1 / G1-022). A private link,
+                a different thing from the live URL above it and the one a
+                client is sent before anything is published. The in-editor
+                share modal — the preview overlay's Share opens the same one. */}
             {siteId && !readOnlyView ? (
-              <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}?share=1`))}>
+              <MenuItem onClick={run(() => setShareOpen(true))}>
                 Share preview link
               </MenuItem>
             ) : null}
@@ -308,6 +307,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         ) : null}
       </Menu>
     </Popover>
+    {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} /> : null}
+    </>
   );
 };
 

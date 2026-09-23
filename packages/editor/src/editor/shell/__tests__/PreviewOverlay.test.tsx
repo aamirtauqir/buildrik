@@ -7,6 +7,12 @@
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+vi.mock("@/services/api-client", () => ({
+  getBuildrikClient: () => ({
+    siteDetail: { sharing: { list: { query: () => new Promise(() => {}) }, create: { mutate: vi.fn() } } },
+  }),
+}));
+
 import { PreviewOverlay } from "../PreviewOverlay";
 import { ToastProvider } from "@/editor/chrome-ui";
 
@@ -67,27 +73,21 @@ describe("PreviewOverlay", () => {
     expect(screen.getByRole("group", { name: "Breakpoint" })).toBeInTheDocument();
   });
 
-  /* G1-022: in-editor Share button on the preview bar. Hidden when siteId is
-     null (preview launched without a site hand-off). Opens the share modal
-     with the public /share/<siteId> URL. */
+  /* B1 / G1-022: the preview bar carries Share (boards 4418:165611 · 165563 ·
+     120075), which opens the same share modal as the site menu row. Hidden
+     without a site — there is no share link to mint. */
   it("hides Share button when siteId is null", () => {
     render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId={null} />);
     expect(screen.queryByTestId("preview-share-button")).toBeNull();
   });
 
-  it("Share button opens modal with share URL built from siteId + DASHBOARD_URL", () => {
-    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+  it("Share opens the share modal", async () => {
     render(
       <ToastProvider>
-        <PreviewOverlay
-          html="<p>x</p>"
-          onDone={vi.fn()}
-          siteId="site-abc"
-        />
+        <PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="site-abc" />
       </ToastProvider>
     );
     fireEvent.click(screen.getByTestId("preview-share-button"));
-    const link = screen.getByTestId("preview-share-link");
-    expect(link.textContent).toContain("/share/site-abc");
+    expect(await screen.findByTestId("preview-share-modal")).toHaveTextContent("Share preview");
   });
 });

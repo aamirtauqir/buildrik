@@ -1,24 +1,22 @@
 /**
- * PreviewShareModal — in-editor share dialog opened from the preview
- * overlay's Share button. Plan row G1-022 (SH-43, SH-87).
+ * PreviewShareModal — B1 / G1-022 (SH-43, SH-87). Board 4418:165739 ("Share
+ * preview" · Preview link · Open ↗ · Copy link) → 6930:82841 ("Link copied").
  *
- * Surfaces:
- *   · Link (read-only display) — the public URL for this site.
- *   · Copy — pushes the link to the clipboard + fires a success toast via
- *     chrome-ui's CopyButton (which already owns the toast wiring).
- *   · Open ↗ — window.open(url, "_blank", "noopener,noreferrer"). New tab.
+ * Two doors open it: the site menu's "Share preview link" row and the preview
+ * overlay's Share button. Sharing no longer leaves the editor.
  *
- * The existing SiteMenu "Share preview link" entry hands off to the
- * dashboard's share modal at `${DASHBOARD_URL}/dashboard/sites/${siteId}
- * ?share=1`. That surface is intentionally separate: this is the
- * in-editor affordance while the preview is on screen, not a duplicate.
+ * The link is a real draft share link from the dashboard's own procedures —
+ * `siteDetail.sharing.list` is reused when it holds a link a client can open
+ * (not expired, no password), otherwise `siteDetail.sharing.create` mints one
+ * with the dashboard modal's default name. The URL is `/share/<token>`, the
+ * route the dashboard serves; a site id is not a token.
  *
- * Built from chrome-ui ModalParts (ModalRoot/Content/Title/Description/
- * Body/Footer) — no new chrome primitive, no flowbite-react import
- * outside chrome-ui. The link row is a `<code>` (read-only, selectable)
- * rather than a raw `<input>` — Gate 24 forbids inline form controls in
- * chrome, and the input would not let users open in a new tab anyway;
- * copy is delegated to CopyButton.
+ * Copy follows the code contract, not the board's sample line "current saved
+ * design": `/share/<token>` renders the PUBLISHED site (the dashboard's
+ * ShareDraftModal says so too), so the body says what the link shows.
+ *
+ * Password and expiry stay in the dashboard's modal — the board carries
+ * neither.
  *
  * @license BSD-3-Clause
  */
@@ -26,7 +24,6 @@ import * as React from "react";
 import { ExternalLink } from "lucide-react";
 import {
   Button,
-  CopyButton,
   ModalRoot,
   ModalContent,
   ModalTitle,
@@ -34,86 +31,141 @@ import {
   ModalBody,
   ModalFooter,
   ModalClose,
+  useToast,
 } from "@/editor/chrome-ui";
+import { getBuildrikClient } from "@/services/api-client";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface PreviewShareModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Absolute share URL shown in the link row. */
-  shareUrl: string;
+  siteId: string;
 }
 
+interface ShareLinkRow {
+  token: string;
+  passwordHash: string | null;
+  expiresAt: Date | string | null;
+}
+
+type LinkState =
+  | { kind: "loading" }
+  | { kind: "ready"; url: string }
+  | { kind: "error"; message: string };
+
+/** The dashboard modal's default link name — one link list, one naming. */
+const DEFAULT_LINK_NAME = "Draft preview";
+
+function isOpenToAnyone(row: ShareLinkRow, now: number): boolean {
+  if (row.passwordHash) return false;
+  return row.expiresAt == null || new Date(row.expiresAt).getTime() > now;
+}
+
+async function resolveShareToken(siteId: string): Promise<string> {
+  const sharing = getBuildrikClient(DASHBOARD_URL).siteDetail.sharing;
+  const rows: ShareLinkRow[] = await sharing.list.query({ siteId });
+  const reusable = rows.find((row) => isOpenToAnyone(row, Date.now()));
+  if (reusable) return reusable.token;
+  const created = await sharing.create.mutate({ siteId, name: DEFAULT_LINK_NAME });
+  return created.token;
+}
+
+const LINK_LABEL_CLASS =
+  "tw:block tw:mb-1.5 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)]";
+
 const LINK_BOX_CLASS =
-  "tw:flex-1 tw:min-w-0 tw:h-9 tw:px-3 tw:flex tw:items-center tw:rounded-sm " +
+  "tw:flex tw:items-center tw:h-9 tw:px-3 tw:min-w-0 tw:rounded-sm " +
   "tw:border tw:border-[var(--bk-gray-400)] tw:bg-[var(--bk-gray-50)] " +
   "tw:text-[var(--bk-ink)] tw:text-xs tw:[font-family:var(--bk-font-mono)] " +
-  "tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:select-all " +
-  "tw:cursor-text";
+  "tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:select-all tw:cursor-text";
 
-export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({
-  open,
-  onOpenChange,
-  shareUrl,
-}) => {
+const STATUS_CLASS = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)]";
+
+export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOpenChange, siteId }) => {
+  const { addToast } = useToast();
+  const [state, setState] = React.useState<LinkState>({ kind: "loading" });
+  const [attempt, setAttempt] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!open) return;
+    let live = true;
+    setState({ kind: "loading" });
+    resolveShareToken(siteId).then(
+      (token) => live && setState({ kind: "ready", url: `${DASHBOARD_URL}/share/${token}` }),
+      (err: unknown) =>
+        live && setState({ kind: "error", message: err instanceof Error ? err.message : String(err) }),
+    );
+    return () => {
+      live = false;
+    };
+  }, [open, siteId, attempt]);
+
+  const url = state.kind === "ready" ? state.url : null;
+
+  const copy = React.useCallback(() => {
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(
+      () =>
+        addToast({
+          title: "Link copied",
+          description: "The preview link is on your clipboard. Anyone with it can view this site.",
+          tone: "success",
+        }),
+      () => addToast({ description: "Couldn't copy the link", tone: "error" }),
+    );
+  }, [url, addToast]);
+
   return (
     <ModalRoot open={open} onOpenChange={onOpenChange}>
-      <ModalContent size="md" srTitle="Share preview">
-        <ModalTitle inset={false} className="tw:text-base tw:font-semibold">
-          Share preview
-        </ModalTitle>
-        <ModalDescription inset={false} className="tw:mt-1 tw:text-[var(--bk-ink-muted)] tw:text-[length:var(--bk-text-11)]">
-          Anyone with this link can view the current preview of your site.
+      <ModalContent size="question" srTitle="Share preview" data-testid="preview-share-modal">
+        <ModalTitle>Share preview</ModalTitle>
+        <ModalDescription>
+          Anyone with the preview link can view this site. Until it is published, the link says so instead of
+          showing the draft.
         </ModalDescription>
+        <ModalClose label="Close share dialog" />
 
         <ModalBody>
-          <div className="tw:flex tw:items-stretch tw:gap-2">
-            <code
-              role="textbox"
-              aria-readonly="true"
-              aria-label="Share link"
-              data-testid="preview-share-link"
-              title={shareUrl}
-              className={LINK_BOX_CLASS}
-            >
-              {shareUrl}
+          <span className={LINK_LABEL_CLASS}>Preview link</span>
+          {state.kind === "loading" && (
+            <p className={STATUS_CLASS} role="status">
+              Getting the link…
+            </p>
+          )}
+          {state.kind === "error" && (
+            <div role="alert" className="tw:flex tw:flex-col tw:gap-2">
+              <p className="tw:m-0 tw:text-xs tw:font-medium tw:text-[var(--bk-ink)]">
+                Couldn&rsquo;t get a preview link
+              </p>
+              <p className={STATUS_CLASS}>{state.message}</p>
+              <Button size="xs" color="light" className="tw:self-start" onClick={() => setAttempt((n) => n + 1)}>
+                Try again
+              </Button>
+            </div>
+          )}
+          {url && (
+            <code role="textbox" aria-readonly="true" aria-label="Preview link" data-testid="preview-share-link" title={url} className={LINK_BOX_CLASS}>
+              {url}
             </code>
-            <CopyButton
-              content={shareUrl}
-              label="Copy"
-              size="md"
-              variant="outline"
-              className="tw:shrink-0"
-            />
-          </div>
+          )}
         </ModalBody>
 
         <ModalFooter>
           <Button
             size="sm"
-            type="button"
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                window.open(shareUrl, "_blank", "noopener,noreferrer");
-              }
-            }}
-            aria-label="Open share link in new tab"
-          >
-            <ExternalLink size={14} aria-hidden="true" />
-            <span className="tw:ml-1.5">Open</span>
-          </Button>
-          <Button
-            size="sm"
             color="light"
-            type="button"
-            onClick={() => onOpenChange(false)}
+            disabled={!url}
+            aria-label="Open preview link in a new tab"
+            onClick={() => url && window.open(url, "_blank", "noopener,noreferrer")}
           >
-            Done
+            Open
+            <ExternalLink size={14} aria-hidden="true" className="tw:ml-1.5" />
           </Button>
-          <ModalClose label="Close share dialog" className="tw:sr-only" />
+          <Button size="sm" disabled={!url} onClick={copy}>
+            Copy link
+          </Button>
         </ModalFooter>
       </ModalContent>
     </ModalRoot>
   );
 };
-
-export default PreviewShareModal;
