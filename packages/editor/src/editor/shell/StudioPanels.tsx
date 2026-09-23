@@ -71,7 +71,6 @@ export interface StudioPanelsProps {
   showGuides?: boolean;
   showGrid?: boolean;
   showRulers?: boolean;
-  showComponentView?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
   devMode?: boolean;
@@ -173,7 +172,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showGuides = true,
   showGrid = false,
   showRulers = false,
-  showComponentView = false,
   showXRay = false,
   devMode = false,
   onOverlayChange,
@@ -543,7 +541,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGuides={showGuides}
               showGrid={showGrid}
               showRulers={showRulers}
-              showComponentView={showComponentView}
               showXRay={showXRay}
               devMode={devMode}
               onAIRequest={onAIRequest}

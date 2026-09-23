@@ -503,34 +503,6 @@
   animation: bd-canvas-drop-fade-in 180ms ease-out;
 }
 
-.bd-canvas--component-view [data-buildrick-type] {
-  position: relative;
-  outline: 1px dashed var(--bk-accent);
-  outline-offset: -1px;
-}
-
-.bd-canvas--component-view [data-buildrick-type]::after {
-  content: attr(data-buildrick-type);
-  position: absolute;
-  top: -18px;
-  left: 0;
-  background: rgba(17, 17, 27, 0.85);
-  border: 1px solid var(--bk-accent);
-  border-radius: 4px;
-  padding: 2px var(--bk-space-8);
-  font-size: var(--bk-text-11);
-  font-weight: 600;
-  color: var(--bk-accent);
-  pointer-events: none;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-  white-space: nowrap;
-  text-transform: capitalize;
-}
-
-.bd-canvas--component-view [data-buildrick-type] [data-buildrick-type] {
-  outline-color: var(--bk-accent);
-}
-
 .buildrick-canvas {
 }
 

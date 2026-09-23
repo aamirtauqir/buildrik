@@ -493,13 +493,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+shift+a",
       run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
     },
-    {
-      id: "ui-toggle-component-view",
-      label: "Toggle component view",
-      group: "View",
-      shortcut: "ctrl+shift+c",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_COMPONENT_VIEW),
-    },
 
     // ============================================
     // Zoom
@@ -561,12 +554,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Mobile view",
       group: "View",
       run: (c) => c.setDevice("mobile"),
-    },
-    {
-      id: "device-watch",
-      label: "Watch view",
-      group: "View",
-      run: (c) => c.setDevice("watch"),
     },
 
     // ============================================

@@ -70,11 +70,16 @@ beforeEach(() => {
 });
 
 describe("remaining UI toggles", () => {
-  it("ui-open-exporter and ui-toggle-component-view emit their events", () => {
+  it("ui-open-exporter emits its event", () => {
     run("ui-open-exporter");
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_EXPORTER);
-    run("ui-toggle-component-view");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_COMPONENT_VIEW);
+  });
+
+  /* Decision #26: Component view (⌘⇧C, ⌘K only) is deleted — X-Ray and
+     Badges are the structure views. */
+  it("has no component-view toggle", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(ids).not.toContain("ui-toggle-component-view");
   });
 });
 

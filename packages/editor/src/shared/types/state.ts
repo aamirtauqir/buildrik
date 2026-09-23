@@ -31,7 +31,7 @@ export interface ComposerState {
   isPreviewMode: boolean;
 }
 
-export type DeviceType = "desktop" | "tablet" | "mobile" | "watch" | "wide";
+export type DeviceType = "desktop" | "tablet" | "mobile" | "wide";
 
 /**
  * Device configuration for viewport preview

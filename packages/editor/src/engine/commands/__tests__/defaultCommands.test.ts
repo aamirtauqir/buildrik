@@ -342,7 +342,6 @@ describe("device presets", () => {
     ["device-desktop", "desktop"],
     ["device-tablet", "tablet"],
     ["device-mobile", "mobile"],
-    ["device-watch", "watch"],
   ])("%s sets device %s", (commandId, device) => {
     run(commandId);
     expect(composer.setDevice).toHaveBeenCalledWith(device);
@@ -448,9 +447,11 @@ describe("device presets carry no shortcut", () => {
 
   it("still exposes the presets by name for the palette", () => {
     const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
-    for (const id of ["device-desktop", "device-tablet", "device-mobile", "device-watch"]) {
+    for (const id of ["device-desktop", "device-tablet", "device-mobile"]) {
       expect(ids).toContain(id);
     }
+    // Decision #26: "Watch view" is deleted with the device.
+    expect(ids).not.toContain("device-watch");
   });
 });
 

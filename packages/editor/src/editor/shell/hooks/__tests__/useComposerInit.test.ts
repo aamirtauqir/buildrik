@@ -146,7 +146,6 @@ describe("useComposerInit — autosave debounce SSOT", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty,
         setSaveState,
       })
@@ -190,7 +189,6 @@ describe("useComposerInit — autosave debounce SSOT", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty,
         setSaveState,
       })
@@ -223,7 +221,6 @@ describe("useComposerInit — autosave debounce SSOT", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty,
         setSaveState,
       })
@@ -284,7 +281,6 @@ describe("useComposerInit — engine viewport changes reach React", () => {
         setDevice,
         setZoom,
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -355,7 +351,6 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -412,7 +407,6 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -456,7 +450,6 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -501,7 +494,6 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -572,7 +564,6 @@ describe("useComposerInit — alias validation runs at load (A.2)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -628,7 +619,6 @@ describe("useComposerInit — alias validation runs at load (A.2)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })
@@ -672,7 +662,6 @@ describe("useComposerInit — alias validation runs at load (A.2)", () => {
         setDevice: vi.fn(),
         setZoom: vi.fn(),
         setShowExporter: vi.fn(),
-        setShowComponentView: vi.fn(),
         setIsDirty: vi.fn(),
         setSaveState: vi.fn(),
       })

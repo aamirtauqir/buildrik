@@ -68,7 +68,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       device,
       zoom,
       onAIRequest,
-      showComponentView = false,
       showSpacing = false,
       showBadges = false,
       showGuides = true,
@@ -690,7 +689,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {/* Canvas Content */}
           <div
             ref={canvasRef}
-            className={`buildrick-canvas${showComponentView ? " bd-canvas--component-view" : ""}`}
+            className="buildrick-canvas"
             data-buildrick-canvas="true"
             // Conformance anchor, deliberately separate from the engine markers
             // above. `data-buildrick-canvas` and `.buildrick-canvas` are queried
@@ -823,7 +822,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
-              device={device === "watch" ? "mobile" : device}
+              device={device}
               onDeviceChange={onDeviceChange}
               canUndo={canUndo}
               canRedo={canRedo}

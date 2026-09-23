@@ -29,12 +29,6 @@ export {
   type UseDragAutoScrollResult,
 } from "./useDragAutoScroll";
 
-// Element drag sub-hooks
-export {
-  useTouchDrag,
-  type UseTouchDragOptions,
-  type UseTouchDragResult,
-} from "./drag";
 export {
   useCanvasInlineEdit,
   type UseCanvasInlineEditOptions,

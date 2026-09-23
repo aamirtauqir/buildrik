@@ -184,7 +184,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setDevice: state.setDevice,
     setZoom: state.setZoom,
     setShowExporter: modals.setShowExporter,
-    setShowComponentView: state.setShowComponentView,
     setIsDirty: state.setIsDirty,
     setSaveState: state.setSaveState,
     openCollectionSetup: modals.openCollectionSetup,
@@ -625,7 +624,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showGuides={state.overlays.showGuides}
         showGrid={state.overlays.showGrid}
         showRulers={state.overlays.showRulers}
-        showComponentView={state.overlays.showComponentView}
         showXRay={state.overlays.showXRay}
         devMode={state.overlays.devMode}
         onOverlayChange={(overlay, enabled) => {

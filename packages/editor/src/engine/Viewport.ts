@@ -25,7 +25,6 @@ export class Viewport {
     desktop: { name: "Desktop", width: 1280 },
     tablet: { name: "Tablet", width: 768, height: 1024 },
     mobile: { name: "Mobile", width: 375, height: 812 },
-    watch: { name: "Watch", width: 196, height: 230 },
     wide: { name: "Wide", width: 1920 },
   };
 
@@ -64,6 +63,9 @@ export class Viewport {
    * Set device type
    */
   setDevice(device: DeviceType): void {
+    /* A device this editor no longer has — "watch", deleted by decision #26,
+       can still arrive from saved state — leaves the viewport where it is. */
+    if (!(device in this.devices)) return;
     if (this.currentDevice !== device) {
       this.currentDevice = device;
       this.applyDeviceSize();
