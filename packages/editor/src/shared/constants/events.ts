@@ -529,6 +529,8 @@ export const EVENTS = {
    *  the only thing that knows, and the topbar sits outside the provider that
    *  holds the staging — so it is announced rather than read. */
   BRAND_DIRTY_CHANGED: "brand:dirty-changed",
+  /** Brand checks' "Run checks": lint now, skipping the edit debounce. */
+  BRAND_CHECKS_RUN: "brand:checks-run",
   /** A review round went out (send or re-send, any of the three send sites). */
   REVIEW_SENT: "review:sent",
   /** Re-ask `reviews.status` after a failed read — the Publish panel's
@@ -934,6 +936,7 @@ export interface EventPayloads {
   [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
+  [EVENTS.BRAND_CHECKS_RUN]: void;
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.REVIEW_STATUS_RETRY]: void;
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };

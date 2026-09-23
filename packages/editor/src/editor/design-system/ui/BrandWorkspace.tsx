@@ -752,6 +752,21 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           </Tooltip>
         );
       }
+      case "brand-checks":
+        /* 7316:84555's page action. The checks also run by themselves on
+           every staged edit; this runs them now (useDSLint's one trigger). */
+        return (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className={PAGE_ACTION}
+            onClick={() => composer?.emit?.(EVENTS.BRAND_CHECKS_RUN, undefined)}
+            data-testid="brand-page-action"
+          >
+            Run checks
+          </Button>
+        );
       case "fonts":
         /* The fonts a site can pick from are its Site fonts — the same door
            the font picker's "Manage site fonts" opens. */
