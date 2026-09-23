@@ -94,6 +94,14 @@ export class CommandCenter {
   // ─── Registration ───────────────────────────────────────────────────────────
 
   register(command: CommandData): void {
+    /* One id, one command. `Map.set` silently replaced an earlier registration,
+       so two callers registering the same id would leave the palette running
+       whichever came last, with nothing on screen to say so. The registry is
+       the single command list now (the canvas palette folded into it), so a
+       collision is a programming error, not a fallback. */
+    if (this.commands.has(command.id)) {
+      throw new Error(`CommandCenter: command id "${command.id}" is already registered`);
+    }
     this.commands.set(command.id, command);
     this.keybindings.indexCommand(command);
     this.composer.emit(EVENTS.COMMAND_REGISTERED, command);

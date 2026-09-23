@@ -1,102 +1,102 @@
 {
-  "surface": "layers-loading",
-  "board": "Layers \u00b7 loading (Figma 775:4130)",
-  "_note": [
-    "The real path: `composer && !projectLoading` is false while the editor boots,",
-    "which no measurement pause can catch in the live app \u2014 the probe mounts",
-    "LayersTab with composer={null}, the exact production branch (LayersTab.tsx:189).",
-    "",
-    "THE 2026-08-31 ROW NOTE IS STALE. It reads 'skeleton NEVER renders \u2014 composer",
-    "exists before the payload, so the empty state shows during a 25s stall;",
-    "LayersTab.tsx:182 false branch is dead'. That was true and is not: the gate is",
-    "now `composer && !projectLoading`, and the comment above it records the fix",
-    "(blocker A2 \u2014 `projectLoading` is the flag Canvas, ProInspector and",
-    "StudioFooter already agreed on, and Layers was the one surface not reading",
-    "it). The skeleton is reachable in the running editor. boards.json 775:4130",
-    "wants re-recording.",
-    "",
-    "DEEPENED in this pass: the recipe joined three skeleton nodes and nothing",
-    "else, so it certified the placeholder's own bars and none of the panel the",
-    "board draws around them. The 44px header, its 11/16 ink-soft title, the 36px",
-    "toolbar band and the 28px count footer are now joined too \u2014 the board draws",
-    "all four during load, and all four render.",
-    "",
-    "NOT JOINED, with reasons:",
-    "",
-    "  the search box (776:4090) \u2014 width 166 on a 280 panel, the same frame",
-    "  geometry `layers-no-results` records for 782:4263. The fill and stroke",
-    "  agree with what ships.",
-    "",
-    "  the \u229e\u229f\u2699 run (776:4092) \u2014 11px --color/ink-soft, against 143:10 / 143:303 /",
-    "  1082:4597 / 1171:4834 at 13px --color/ink-muted, which is what ships.",
-    "  Four boards to one.",
-    "",
-    "  the count TEXT (776:4094) \u2014 12px --color/ink-muted here; 143:59, 143:352",
-    "  and 1171:4845 say 11px --color/ink-placeholder, 142:59 says 12px. The",
-    "  family's root board settles the size and `layers-tree` joins it there.",
-    "  The band's own 28px height IS joined here.",
-    "",
-    "  the panel ROOT (775:4130) and the back hotspot (787:4317) \u2014 floating-frame",
-    "  dressing and a prototype hitbox.",
-    "",
-    "The footer reads '0 layers' during load against the board's '12 layers'.",
-    "Sample data; the SHAPE is the contract, and the shape is a footer that is",
-    "present while the tree is coming."
-  ],
-  "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-loading",
-  "viewport": {
-    "width": 280,
-    "height": 812
+ "surface": "layers-loading",
+ "board": "Layers · loading (Figma 775:4130)",
+ "_note": [
+  "The real path: `composer && !projectLoading` is false while the editor boots,",
+  "which no measurement pause can catch in the live app — the probe mounts",
+  "LayersTab with composer={null}, the exact production branch (LayersTab.tsx:189).",
+  "",
+  "THE 2026-08-31 ROW NOTE IS STALE. It reads 'skeleton NEVER renders — composer",
+  "exists before the payload, so the empty state shows during a 25s stall;",
+  "LayersTab.tsx:182 false branch is dead'. That was true and is not: the gate is",
+  "now `composer && !projectLoading`, and the comment above it records the fix",
+  "(blocker A2 — `projectLoading` is the flag Canvas, ProInspector and",
+  "StudioFooter already agreed on, and Layers was the one surface not reading",
+  "it). The skeleton is reachable in the running editor. boards.json 775:4130",
+  "wants re-recording.",
+  "",
+  "DEEPENED in this pass: the recipe joined three skeleton nodes and nothing",
+  "else, so it certified the placeholder's own bars and none of the panel the",
+  "board draws around them. The 44px header, its 11/16 ink-soft title, the 36px",
+  "toolbar band and the 28px count footer are now joined too — the board draws",
+  "all four during load, and all four render.",
+  "",
+  "NOT JOINED, with reasons:",
+  "",
+  "  the search box (776:4090) — width 166 on a 280 panel, the same frame",
+  "  geometry `layers-no-results` records for 782:4263. The fill and stroke",
+  "  agree with what ships.",
+  "",
+  "  the ⊞⊟⚙ run (776:4092) — 11px --color/ink-soft, against 143:10 / 143:303 /",
+  "  1082:4597 / 1171:4834 at 13px --color/ink-muted, which is what ships.",
+  "  Four boards to one.",
+  "",
+  "  the count TEXT (776:4094) — 12px --color/ink-muted here; 143:59, 143:352",
+  "  and 1171:4845 say 11px --color/ink-placeholder, 142:59 says 12px. The",
+  "  family's root board settles the size and `layers-tree` joins it there.",
+  "  The band's own 28px height IS joined here.",
+  "",
+  "  the panel ROOT (775:4130) and the back hotspot (787:4317) — floating-frame",
+  "  dressing and a prototype hitbox.",
+  "",
+  "The footer reads '0 layers' during load against the board's '12 layers'.",
+  "Sample data; the SHAPE is the contract, and the shape is a footer that is",
+  "present while the tree is coming."
+ ],
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-loading",
+ "viewport": {
+  "width": 280,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "layers-loading"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "panel-header",
+   "testId": "panel-header",
+   "spec": "layers-loading",
+   "nodeId": "775:4131"
   },
-  "steps": [
-    {
-      "action": "waitFor",
-      "testId": "layers-loading"
-    }
-  ],
-  "contrastScope": "[data-probe]",
-  "targets": [
-    {
-      "name": "panel-header",
-      "testId": "panel-header",
-      "spec": "layers-loading",
-      "nodeId": "775:4131"
-    },
-    {
-      "name": "panel-header-title",
-      "testId": "panel-header-title",
-      "spec": "layers-loading",
-      "nodeId": "I775:4131;16:7"
-    },
-    {
-      "name": "toolbar",
-      "testId": "layers-toolbar",
-      "spec": "layers-loading",
-      "nodeId": "776:4089"
-    },
-    {
-      "name": "count-footer",
-      "testId": "layers-count",
-      "spec": "layers-loading",
-      "nodeId": "776:4093"
-    },
-    {
-      "name": "skeleton-row",
-      "testId": "layers-sk-row",
-      "spec": "layers-loading",
-      "nodeId": "775:4220"
-    },
-    {
-      "name": "skeleton-icon",
-      "testId": "layers-sk-icon",
-      "spec": "layers-loading",
-      "nodeId": "775:4221"
-    },
-    {
-      "name": "skeleton-bar",
-      "testId": "layers-sk-bar",
-      "spec": "layers-loading",
-      "nodeId": "775:4222"
-    }
-  ]
+  {
+   "name": "panel-header-title",
+   "testId": "panel-header-title",
+   "spec": "layers-loading",
+   "nodeId": "I775:4131;16:7"
+  },
+  {
+   "name": "toolbar",
+   "testId": "layers-toolbar",
+   "spec": "layers-loading",
+   "nodeId": "776:4089"
+  },
+  {
+   "name": "count-footer",
+   "testId": "layers-count",
+   "spec": "layers-loading",
+   "nodeId": "776:4093"
+  },
+  {
+   "name": "skeleton-row",
+   "testId": "layers-sk-row",
+   "spec": "layers-loading",
+   "nodeId": "775:4220"
+  },
+  {
+   "name": "skeleton-icon",
+   "testId": "layers-sk-icon",
+   "spec": "layers-loading",
+   "nodeId": "775:4221"
+  },
+  {
+   "name": "skeleton-bar",
+   "testId": "layers-sk-bar",
+   "spec": "layers-loading",
+   "nodeId": "775:4222"
+  }
+ ]
 }

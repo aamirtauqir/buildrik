@@ -120,13 +120,12 @@ import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { TemplateUsageDrawer } from "@/editor/sidebar/tabs/templates/components/TemplateUsageDrawer";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
-import { PageCommandPalette } from "@/editor/sidebar/tabs/pages/components/PageCommandPalette";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar } from "@/editor/chrome-ui";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
-import { KeyboardShortcutsPanel } from "@/editor/panels/KeyboardShortcutsPanel";
+import { KeyboardCheatSheet } from "@/editor/canvas/controls/KeyboardCheatSheet";
 import { AnimationEditor } from "@/editor/animation/AnimationEditor";
 import { useHistoryFeedback } from "@/editor/shell/hooks/useHistoryFeedback";
 import {
@@ -768,7 +767,7 @@ function layerRow(layer: LayerItem) {
       onSelect={noop}
       onContextMenu={noop}
       getVisibleLayerIds={() => ["l0", "l1"]}
-      displayPrefs={{ showHtmlBadges: false, showElementIds: false, treeDensity: "compact" }}
+      displayPrefs={{ showDimmed: true, showLockBadges: true, treeDensity: "compact", highlightCmsBound: false, showHtmlBadges: false }}
     />
   );
 }
@@ -1166,7 +1165,6 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
-          onOpenListings={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -3341,19 +3339,10 @@ const CASES: Record<string, () => React.ReactElement> = {
         onDuplicate={() => {}}
         onDelete={() => {}}
         onSetHomepage={() => {}}
+        onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
       />
-    </div>
-  ),
-  /* Board 1171:4767 — ⌘K over the Pages panel. The palette is anchored INSIDE
-     the panel (PagesTab.css positions it at top 59 / left 12), so the probe
-     mounts it inside the same relatively-positioned panel the tab renders it
-     in; hoisting it to the page would move every number this measures. */
-  "pages-command-palette": () => (
-    <div data-probe="pages-command-palette" style={{ width: 280, height: 812, position: "relative" }}>
-      {pagesPanel()}
-      <PageCommandPalette pages={PAGES_FIXTURE} onSelect={() => {}} onClose={() => {}} />
     </div>
   ),
   /* Boards 302:1978 / 302:2004 / 302:2026 — S3.7 page settings, one 580x520
@@ -3446,13 +3435,14 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
-  /* Board 815:4518 — the shell's keyboard-shortcuts modal (LEDGER 2026-09-02
-     settles that this board is the SHELL panel, not the canvas cheat sheet:
-     it draws Save/Undo/Redo, which are app-wide chords). Controlled by one
+  /* Board 815:4518 → 7575:195538 "Keyboard shortcuts · full" — the ONE
+     keyboard sheet (B7, 2026-09-22; the ⌘/ panel this case used to mount is
+     deleted). Its rows derive from the command registry, so it takes a REAL
+     Composer — the registry is built in the constructor. Controlled by one
      boolean, so the probe opens it the way ⌘/ does. */
   "keyboard-shortcuts": () => (
     <div data-probe="keyboard-shortcuts">
-      <KeyboardShortcutsPanel isOpen onClose={() => {}} />
+      <KeyboardCheatSheet isOpen onClose={() => {}} composer={layersComposer()} />
     </div>
   ),
   /* Board 429:2350 — the animation editor's Entrance card. The editor takes

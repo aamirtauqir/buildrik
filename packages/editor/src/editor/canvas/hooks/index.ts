@@ -154,7 +154,6 @@ export {
 export { useSelectionAnimation } from "./useSelectionAnimation";
 
 // Extracted toolbar / palette / inline command hooks
-export { useCanvasCommandPalette } from "./useCanvasCommandPalette";
 export { useCanvasToolbarActions } from "./useCanvasToolbarActions";
 export { useCanvasInlineCommands } from "./useCanvasInlineCommands";
 

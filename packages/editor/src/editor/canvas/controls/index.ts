@@ -16,11 +16,7 @@ export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
 export { InspectorToggle, useInspectorMode } from "./InspectorToggle";
 export type { InspectorToggleProps } from "./InspectorToggle";
 
-export { CommandPalette } from "./CommandPalette";
-export type { CommandPaletteProps, CommandAction } from "./CommandPalette";
-
-
-export { KeyboardCheatSheet, useKeyboardCheatSheet } from "./KeyboardCheatSheet";
+export { KeyboardCheatSheet } from "./KeyboardCheatSheet";
 export type { KeyboardCheatSheetProps } from "./KeyboardCheatSheet";
 
 export { BlockPickerModal } from "./BlockPickerModal";

@@ -7,7 +7,10 @@
  *   Cmd/Ctrl+Z            → composer.history.undo()
  *   Cmd/Ctrl+Shift+Z      → composer.history.redo()
  *   Cmd/Ctrl+Y            → composer.history.redo()
- *   Cmd/Ctrl+/            → modals.setShowShortcuts(true)
+ *   Cmd/Ctrl+/  and  ?    → modals.setShowShortcuts(true) — the one keyboard sheet
+ *   Cmd/Ctrl+Shift+P      → UI_TOGGLE_COMMAND_PALETTE — an alias of ⌘K (the
+ *                           retired canvas palette's chord; one palette now)
+ *   Cmd/Ctrl+P            → toggle preview
  *   Cmd/Ctrl+J            → open the AI tab (composer ui:switch-tab → AITab)
  *   Escape                → close shortcuts modal
  *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
@@ -25,20 +28,16 @@
  * editable surface (input/textarea/select/contenteditable) so users
  * typing don't trigger global shortcuts.
  *
- * Cmd/Ctrl+K is intentionally NOT handled here — Topbar owns it and opens
- * the shell CommandPalette. (Binding it here too opened a second, canvas-level
- * palette on the same keypress.) The canvas palette is Cmd/Ctrl+Shift+P,
- * registered inside useCanvasCommandPalette.
+ * Cmd/Ctrl+K is intentionally NOT handled here — StudioHeader owns it and the
+ * palette's open state. ⌘⇧P reaches that same state through
+ * UI_TOGGLE_COMMAND_PALETTE, so the two chords can never open two palettes
+ * (they did: the canvas mounted its own behind ⌘⇧P until 2026-09-22).
  *
- * Bare "?" is NOT handled here for the same reason. The editor ships two help
- * surfaces on purpose — this panel for app-wide chords, the canvas cheat sheet
- * for gestures and selection — and the panel prints the split itself
- * ("Ctrl+/ · This shortcuts panel", "? · Canvas gestures & selection",
- * KeyboardShortcutsPanel.tsx:56-57). This hook also bound "?" to the panel,
- * and preventDefault does not stop the cheat sheet's own window listener
- * (useKeyboardCheatSheet), so one press opened both overlays on top of each
- * other. "?" belongs to the cheat sheet; this panel answers to Cmd/Ctrl+/ and
- * the site-menu row.
+ * Bare "?" IS handled here now. Until 2026-09-22 the editor shipped two help
+ * surfaces — this hook's ⌘/ panel and the canvas cheat sheet behind `?`, each
+ * with its own window listener and its own hand-written table, and
+ * TODOS.md:512 recorded that they contradicted each other. One sheet, one
+ * state (`useGlobalModals.showShortcuts`), two chords into it.
  *
  * @license BSD-3-Clause
  */
@@ -54,6 +53,9 @@ import { EVENTS } from "../../../shared/constants/events";
 export interface ShortcutModals {
   setShowShortcuts: (v: boolean) => void;
 }
+
+/** Bare "?" — Shift+/ on most layouts, so the shift flag is not a tell. */
+const isQuestionMark = (e: KeyboardEvent) => e.key === "?" && !e.metaKey && !e.ctrlKey && !e.altKey;
 
 export interface UseEditorShortcutsOptions {
   composer: Composer | null;
@@ -116,6 +118,23 @@ export function useEditorShortcuts({
       // open the left panel's settings tab while "Site settings" opened the
       // project-settings modal — one printed shortcut, two destinations, and no
       // way for the user to know which they would get.
+      /* ⌘⇧P — alias of ⌘K. The shell palette is the only palette; its state
+         lives in StudioHeader, which listens for this. Checked before ⌘P
+         below, whose `!e.shiftKey` guard is what keeps the two apart. */
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        composer?.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {});
+        return;
+      }
+
+      /* "?" — the keyboard sheet. The sheet's own listener closes it on a
+         second press (this handler stands down while a modal is open). */
+      if (isQuestionMark(e)) {
+        e.preventDefault();
+        modals.setShowShortcuts(true);
+        return;
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.key === ",") {
         e.preventDefault();
         openSiteSettings?.();

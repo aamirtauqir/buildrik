@@ -42,7 +42,7 @@ export interface UseEditorEventListenersOptions {
   composer: Composer | null;
   modals: Pick<
     UseStudioModalsReturn,
-    "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords" | "openSaveTemplate"
+    "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords" | "openSaveTemplate" | "toggleShortcuts"
   >;
   state: EditorEventListenerStateSetters;
   /** Tracks whether the user has manually toggled spacing indicators
@@ -57,7 +57,7 @@ export function useEditorEventListeners({
   hasManuallyToggledSpacingRef,
 }: UseEditorEventListenersOptions): void {
   // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
-  const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate } = modals;
+  const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate, toggleShortcuts } = modals;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { elementId: string }) => {
@@ -107,6 +107,18 @@ export function useEditorEventListeners({
       composer.off(EVENTS.TEMPLATE_SAVE_REQUESTED, handle);
     };
   }, [composer, openSaveTemplate]);
+
+  // 2e) UI_TOGGLE_CHEAT_SHEET → the one keyboard sheet (StudioModals). The
+  // ⌘K "Keyboard shortcuts" row, the site-menu row and the footer help button
+  // emit it; `?` and ⌘/ flip the same state from useEditorShortcuts.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => toggleShortcuts();
+    composer.on(EVENTS.UI_TOGGLE_CHEAT_SHEET, handle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_CHEAT_SHEET, handle);
+    };
+  }, [composer, toggleShortcuts]);
 
   // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
   const { setLeftPanelTab, setIsLeftPanelOpen } = state;

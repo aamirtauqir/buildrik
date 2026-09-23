@@ -1,201 +1,102 @@
 /**
- * Keyboard Shortcuts Cheat Sheet
- * Floating overlay triggered by '?' key showing all available shortcuts
+ * KeyboardCheatSheet — the editor's ONE keyboard sheet.
  *
- * Design: Figma-inspired modal with grouped shortcuts
- * Accessibility: Focus trap, Escape to close, screen reader support
+ * Board 7575:195538 "CURRENT DESIGN · Keyboard shortcuts · full" (640×934,
+ * cloned from the parked 4418:139807 overlay): a search field over ONE column
+ * of groups — Selection · Edit · View · Panels · Regions — each heading over a
+ * hairline with its rows under it, the chord as a 24-high mono chip.
+ *
+ * Doors: `?` and ⌘/ (useEditorShortcuts), the ⌘K "Keyboard shortcuts" row and
+ * the site-menu row (both emit UI_TOGGLE_CHEAT_SHEET → useEditorEventListeners),
+ * the footer's help button. All of them flip `useGlobalModals.showShortcuts`,
+ * and StudioModals mounts this once — there is no second state to drift.
+ *
+ * Rows come from `keyboardSheetRows.ts`: the command registry first (a chord
+ * change there changes the sheet), then the chords chrome binds outside it.
+ * Two sheets with two hand-written tables shipped until 2026-09-22
+ * (`panels/KeyboardShortcutsPanel` behind ⌘/ and this one behind `?`;
+ * TODOS.md:512 recorded that they contradicted each other).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Kbd, ModalContent, ModalRoot, Button, TextInput } from "@/editor/chrome-ui";
+import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
-import { EVENTS } from "@/shared/constants/events";
-import { tokens } from "../shared/tokens";
+import { buildSheetGroups, formatKeys, type SheetGroup } from "./keyboardSheetRows";
 
 export interface KeyboardCheatSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Source of the registry rows. Without one only the chrome-bound chords show. */
+  composer: Composer | null;
 }
 
-interface ShortcutGroup {
-  title: string;
-  shortcuts: {
-    keys: string[];
-    description: string;
-  }[];
+const isMacPlatform = () =>
+  typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
+/** A stable anchor per row: the description, kebab-cased — the recipe
+ *  `s3-10-keyboard-shortcuts-overlay` measures `kb-label-undo`,
+ *  `kb-badge-copy` and friends by this scheme. */
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/* Board 815:4527/4528 (the parked overlay this board was cloned from) draws
+   the chord as a 24-high chip on a 4 radius: bg-subtle inside a
+   --color/border-medium hairline, the glyphs 12px mono in ink-soft at a 7
+   inset. */
+const KeyChip: React.FC<{ keys: string; testId: string; isMac: boolean }> = ({ keys, testId, isMac }) => (
+  <span
+    data-testid={testId}
+    className="tw:inline-flex tw:h-6 tw:shrink-0 tw:items-center tw:whitespace-nowrap tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)] tw:px-[7px] tw:text-xs tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]"
+  >
+    {formatKeys(keys, isMac)}
+  </span>
+);
+
+/** Rows whose description, stored chord or DISPLAYED chord contains the query
+ *  — someone on a Mac searches the ⌘ the chip shows, not the "ctrl" the
+ *  registry stores. Groups whose every row is filtered out take their heading
+ *  with them. */
+function filterGroups(groups: SheetGroup[], query: string, isMac: boolean): SheetGroup[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return groups;
+  return groups
+    .map((g) => ({
+      ...g,
+      rows: g.rows.filter(
+        (r) =>
+          r.description.toLowerCase().includes(q) ||
+          r.keys.toLowerCase().includes(q) ||
+          formatKeys(r.keys, isMac).toLowerCase().includes(q) ||
+          g.title.toLowerCase().includes(q),
+      ),
+    }))
+    .filter((g) => g.rows.length > 0);
 }
 
-const SHORTCUT_GROUPS: ShortcutGroup[] = [
-  {
-    title: "Selection",
-    shortcuts: [
-      { keys: ["Click"], description: "Select element" },
-      { keys: ["Double-click"], description: "Select child / deep select" },
-      { keys: ["Triple-click"], description: "Select innermost element" },
-      { keys: ["⌘", "Click"], description: "Cycle through overlapping" },
-      { keys: ["⇧", "Click"], description: "Add to selection" },
-      { keys: ["⌘", "A"], description: "Select all elements" },
-      { keys: ["Escape"], description: "Clear selection" },
-      { keys: ["Tab"], description: "Next element" },
-      { keys: ["⇧", "Tab"], description: "Previous element" },
-    ],
-  },
-  {
-    title: "Navigation",
-    shortcuts: [
-      { keys: ["↑"], description: "Select previous sibling" },
-      { keys: ["↓"], description: "Select next sibling" },
-      { keys: ["←"], description: "Select parent" },
-      { keys: ["→"], description: "Select first child" },
-      { keys: ["Home"], description: "Select first sibling" },
-      { keys: ["End"], description: "Select last sibling" },
-    ],
-  },
-  {
-    title: "Positioning",
-    shortcuts: [
-      { keys: ["⇧", "↑/↓/←/→"], description: "Move element 10px" },
-      { keys: ["⌘", "↑/↓/←/→"], description: "Move element 1px" },
-      { keys: ["⌥", "↑"], description: "Reorder up in DOM" },
-      { keys: ["⌥", "↓"], description: "Reorder down in DOM" },
-      { keys: ["⌥", "Home"], description: "Move to first position" },
-      { keys: ["⌥", "End"], description: "Move to last position" },
-    ],
-  },
-  {
-    title: "Editing",
-    shortcuts: [
-      { keys: ["⌘", "C"], description: "Copy element" },
-      { keys: ["⌘", "⌥", "C"], description: "Copy styles only" },
-      { keys: ["⌘", "V"], description: "Paste element" },
-      { keys: ["⌘", "⌥", "V"], description: "Paste styles" },
-      { keys: ["⌘", "X"], description: "Cut element" },
-      { keys: ["⌘", "D"], description: "Duplicate element" },
-      { keys: ["Delete"], description: "Delete element" },
-      { keys: ["⌘", "Z"], description: "Undo" },
-      { keys: ["⌘", "⇧", "Z"], description: "Redo" },
-    ],
-  },
-  {
-    title: "View",
-    shortcuts: [
-      { keys: ["⌘", "+"], description: "Zoom in" },
-      { keys: ["⌘", "-"], description: "Zoom out" },
-      /* ⌘0 is 100%, ⌘1 fits and ⌘2 zooms to the selection — the three the zoom
-         flyout itself binds, measured at 1440x900. This listed ⌘0 as "Zoom to
-         fit" and never mentioned the other two. */
-      { keys: ["⌘", "0"], description: "Zoom to 100%" },
-      { keys: ["⌘", "1"], description: "Zoom to fit" },
-      { keys: ["⌘", "2"], description: "Zoom to selection" },
-      /* Two palettes, two chords: ⌘K opens the shell's, ⌘⇧P this canvas one. */
-      { keys: ["⌘", "⇧", "P"], description: "Canvas command palette" },
-      { keys: ["⌘", "K"], description: "Command palette" },
-      { keys: ["?"], description: "Show this cheat sheet" },
-      { keys: ["⌘", "/"], description: "App shortcuts panel" },
-    ],
-  },
-  {
-    title: "Context Menu",
-    shortcuts: [
-      { keys: ["Right-click"], description: "Open context menu" },
-      { keys: ["⇧", "F10"], description: "Open context menu (a11y)" },
-    ],
-  },
-];
-
-/**
- * Renders a single keyboard key badge
- */
-const KeyBadge: React.FC<{ keyName: string }> = ({ keyName }) => (
-  <Kbd
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      minWidth: 24,
-      height: 24,
-      padding: "0 6px",
-      background: tokens.colors.surface3,
-      borderRadius: tokens.radius.sm,
-      border: `1px solid ${tokens.colors.borderSubtle}`,
-      fontSize: tokens.typography.fontXs,
-      fontFamily: tokens.typography.fontFamily,
-      fontWeight: 500,
-      color: tokens.colors.textPrimary,
-      boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-    }}
-  >
-    {keyName}
-  </Kbd>
-);
-
-/**
- * Renders a shortcut row with keys and description
- */
-const ShortcutRow: React.FC<{ keys: string[]; description: string }> = ({ keys, description }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "6px 0",
-      gap: 12,
-    }}
-  >
-    <span
-      style={{
-        flex: 1,
-        fontSize: tokens.typography.fontSm,
-        color: tokens.colors.textSecondary,
-      }}
-    >
-      {description}
-    </span>
-    <div style={{ display: "flex", gap: 4 }}>
-      {keys.map((key, i) => (
-        <KeyBadge key={i} keyName={key} />
-      ))}
-    </div>
-  </div>
-);
-
-/**
- * Main Keyboard Cheat Sheet component
- */
-export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose }) => {
-  /* A search field, because six groups of chords is more than anyone scans
-     for one of them. Matches the description OR the keys, so "cmd" and
-     "duplicate" both find ⌘D.
-
-     This cited board 815:4518, which belongs to the SHELL panel
-     (`panels/KeyboardShortcutsPanel.tsx`) — the board draws "Save ⌘S",
-     app-wide chords this surface does not own. `helpChords.test.ts` settled
-     that on 2026-09-02 and this citation was the copy it missed. The canvas
-     cheat sheet has no board of its own. */
+export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose, composer }) => {
+  const isMac = isMacPlatform();
   const [query, setQuery] = React.useState("");
-  const groups = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return SHORTCUT_GROUPS;
-    return SHORTCUT_GROUPS
-      .map((g) => ({
-        ...g,
-        shortcuts: g.shortcuts.filter(
-          (sc) =>
-            sc.description.toLowerCase().includes(q) ||
-            sc.keys.join(" ").toLowerCase().includes(q) ||
-            g.title.toLowerCase().includes(q),
-        ),
-      }))
-      .filter((g) => g.shortcuts.length > 0);
-  }, [query]);
+  /* Cleared each open — yesterday's query is not today's question. */
+  React.useEffect(() => {
+    if (isOpen) setQuery("");
+  }, [isOpen]);
 
-  // Escape, focus trap and the overlay come from the shared Radix Modal
-  // substrate (P5). '?' also closes — the toggle key mirrors open/close.
+  /* Read on every open: the registry changes while panels mount and unmount
+     (the Pages panel registers its rows only while it is open). */
+  const groups = React.useMemo(
+    () => (isOpen ? buildSheetGroups(composer?.commands.getAll() ?? []) : []),
+    [isOpen, composer],
+  );
+  const visible = filterGroups(groups, query, isMac);
+
+  // Escape, focus trap and the overlay come from the shared Modal substrate.
+  // '?' also closes — the toggle key mirrors open/close.
   React.useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.tagName === "INPUT") return;
       if (e.key === "?") {
         e.preventDefault();
         onClose();
@@ -206,222 +107,67 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
   }, [isOpen, onClose]);
 
   return (
-    <ModalRoot open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <ModalContent
-        srTitle="Keyboard shortcuts"
-        aria-labelledby="keyboard-cheatsheet-title"
-        style={{
-          width: "min(900px, 90vw)",
-          maxWidth: "min(900px, 90vw)",
-          maxHeight: "85vh",
-          background: tokens.colors.surface1,
-          borderRadius: tokens.radius.lg,
-          border: `1px solid ${tokens.colors.borderSubtle}`,
-          boxShadow: tokens.shadows.lg,
-          overflow: "hidden",
-          gap: 0,
-          animation: "bd-scale-in 0.2s ease",
-          outline: "none",
-        }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 20px",
-            borderBottom: `1px solid ${tokens.colors.borderSubtle}`,
-          }}
-        >
-          <h2
-            id="keyboard-cheatsheet-title"
-            style={{
-              margin: 0,
-              fontSize: tokens.typography.fontXl,
-              fontWeight: 600,
-              color: tokens.colors.textPrimary,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span style={{ fontSize: 20 }}>⌨️</span>
-            Keyboard Shortcuts
-          </h2>
-          <Button
-            onClick={onClose}
-            aria-label="Close keyboard shortcuts"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 32,
-              height: 32,
-              background: "transparent",
-              border: "none",
-              borderRadius: tokens.radius.sm,
-              cursor: "pointer",
-              color: tokens.colors.textSecondary,
-              transition: tokens.transitions.fast,
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.background = tokens.colors.surface3)}
-            onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
-          >
-            <span style={{ fontSize: 16 }}>✕</span>
-          </Button>
-        </div>
-
-        {/* Board 815:4518 — the search sits above the groups. */}
-        <div style={{ padding: "12px 20px 0" }}>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="table" data-testid="keyboard-sheet">
+        <ModalTitle>Keyboard shortcuts</ModalTitle>
+        <ModalClose aria-label="Close keyboard shortcuts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <ModalBody>
           <TextInput
-            type="text"
+            type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search shortcuts…"
             aria-label="Search shortcuts"
+            className="tw:mb-3"
+            data-testid="kb-search"
           />
-        </div>
-
-        {/* Content - Scrollable grid of shortcut groups.
-            tabIndex/role: the list itself holds no focusable element, so a
-            keyboard user had no way to scroll it (axe:
-            scrollable-region-focusable). Making the region focusable gives the
-            arrow keys somewhere to land. */}
-        <div
-          tabIndex={0}
-          role="group"
-          aria-label="Shortcut list"
-          style={{
-            flex: 1,
-            overflow: "auto",
-            padding: 20,
-          }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: 24,
-            }}
-          >
-            {groups.map((group) => (
-              <div
-                key={group.title}
-                style={{
-                  background: tokens.colors.surface2,
-                  borderRadius: tokens.radius.md,
-                  padding: 16,
-                }}
-              >
-                <h3
-                  style={{
-                    margin: "0 0 12px 0",
-                    fontSize: tokens.typography.fontMd,
-                    fontWeight: 600,
-                    color: tokens.colors.primary,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                  }}
+          {query.trim() && visible.length === 0 && (
+            <p className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
+              Nothing matches &lsquo;{query.trim()}&rsquo;.
+            </p>
+          )}
+          {/* ONE column, 24 between groups — the board stacks them; a grid
+              packed four groups side by side and made every row 200 wide. */}
+          <div className="tw:flex tw:max-h-[60vh] tw:flex-col tw:gap-6 tw:overflow-y-auto tw:py-2">
+            {visible.map((group) => (
+              <div key={group.title}>
+                {/* Heading in Title case at 12/600 ink-muted over a 1px
+                    bg-subtle rule (815:4524/4525). */}
+                <div
+                  data-testid={`kb-group-${slug(group.title)}`}
+                  className="tw:mb-2 tw:border-b tw:border-[var(--bk-bg-subtle)] tw:pb-1.5 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-muted)]"
                 >
                   {group.title}
-                </h3>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  {group.shortcuts.map((shortcut, i) => (
-                    <ShortcutRow key={i} keys={shortcut.keys} description={shortcut.description} />
+                </div>
+                <div className="tw:flex tw:flex-col tw:gap-2">
+                  {group.rows.map((row) => (
+                    <div
+                      key={row.id}
+                      data-testid={`kb-row-${row.id}`}
+                      className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:py-[3px]"
+                    >
+                      {/* 13 in gray-700 (815:4526). */}
+                      <span
+                        data-testid={`kb-label-${slug(row.description)}`}
+                        className="tw:min-w-0 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[13px] tw:text-[var(--bk-gray-700)]"
+                      >
+                        {row.description}
+                      </span>
+                      <KeyChip keys={row.keys} testId={`kb-badge-${slug(row.description)}`} isMac={isMac} />
+                    </div>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          {groups.length === 0 && (
-            <p style={{ margin: 0, fontSize: tokens.typography.fontSm, color: tokens.colors.textTertiary }}>
-              Nothing matches “{query}”.
-            </p>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div
-          style={{
-            padding: "12px 20px",
-            borderTop: `1px solid ${tokens.colors.borderSubtle}`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontSize: tokens.typography.fontSm,
-            color: tokens.colors.textTertiary,
-          }}
-        >
-          <span>
-            Press <KeyBadge keyName="?" /> or <KeyBadge keyName="Esc" /> to close
-          </span>
-          <span>
-            Pro tip: <KeyBadge keyName="⌘" /> <KeyBadge keyName="⇧" /> <KeyBadge keyName="P" />{" "}
-            opens command palette
-          </span>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );
 };
-
-/**
- * Hook to manage cheat sheet state and keyboard trigger
- */
-export function useKeyboardCheatSheet(composer?: Composer | null): {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-  toggle: () => void;
-} {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  // ⌘K "Keyboard shortcuts" (v3 IA Q8). Until this, the sheet's only door was
-  // the `?` key — a shortcut you have to already know to learn the shortcuts.
-  React.useEffect(() => {
-    if (!composer) return;
-    const toggle = () => setIsOpen((prev) => !prev);
-    composer.on(EVENTS.UI_TOGGLE_CHEAT_SHEET, toggle);
-    return () => {
-      composer.off(EVENTS.UI_TOGGLE_CHEAT_SHEET, toggle);
-    };
-  }, [composer]);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip if in input or editing
-      const target = e.target as HTMLElement;
-      if (
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        target?.isContentEditable
-      ) {
-        return;
-      }
-
-      // '?' key opens cheat sheet (Shift+/)
-      if (e.key === "?" && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        e.preventDefault();
-        setIsOpen((prev) => !prev);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  return {
-    isOpen,
-    open: React.useCallback(() => setIsOpen(true), []),
-    close: React.useCallback(() => setIsOpen(false), []),
-    toggle: React.useCallback(() => setIsOpen((prev) => !prev), []),
-  };
-}
 
 export default KeyboardCheatSheet;

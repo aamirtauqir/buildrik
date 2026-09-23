@@ -37,6 +37,43 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           ×
         </Button>
       </div>
+      {/* Board 4418:84113's four rows, then the owner's HTML tags (decision 18). */}
+      <label className="bdc-toggle-row">
+        <span>Show dimmed layers</span>
+        <Checkbox
+          color="blue"
+          className="bdc-switch"
+          checked={prefs.showDimmed}
+          onChange={(e) => onChange({ showDimmed: e.target.checked })}
+          aria-label="Show dimmed layers" />
+      </label>
+      <label className="bdc-toggle-row">
+        <span>Show lock badges</span>
+        <Checkbox
+          color="blue"
+          className="bdc-switch"
+          checked={prefs.showLockBadges}
+          onChange={(e) => onChange({ showLockBadges: e.target.checked })}
+          aria-label="Show lock badges" />
+      </label>
+      <label className="bdc-toggle-row">
+        <span>Compact rows</span>
+        <Checkbox
+          color="blue"
+          className="bdc-switch"
+          checked={prefs.treeDensity === "compact"}
+          onChange={(e) => onChange({ treeDensity: e.target.checked ? "compact" : "comfortable" })}
+          aria-label="Compact row density" />
+      </label>
+      <label className="bdc-toggle-row">
+        <span>Highlight CMS-bound</span>
+        <Checkbox
+          color="blue"
+          className="bdc-switch"
+          checked={prefs.highlightCmsBound}
+          onChange={(e) => onChange({ highlightCmsBound: e.target.checked })}
+          aria-label="Highlight CMS-bound layers" />
+      </label>
       <label className="bdc-toggle-row">
         <span>
           Show HTML tags
@@ -48,27 +85,6 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           checked={prefs.showHtmlBadges}
           onChange={(e) => onChange({ showHtmlBadges: e.target.checked })}
           aria-label="Show HTML tags" />
-      </label>
-      <label className="bdc-toggle-row">
-        <span>
-          Show element IDs
-          <span> #abc123 format</span>
-        </span>
-        <Checkbox
-          color="blue"
-          className="bdc-switch"
-          checked={prefs.showElementIds}
-          onChange={(e) => onChange({ showElementIds: e.target.checked })}
-          aria-label="Show element IDs" />
-      </label>
-      <label className="bdc-toggle-row">
-        <span>Compact rows</span>
-        <Checkbox
-          color="blue"
-          className="bdc-switch"
-          checked={prefs.treeDensity === "compact"}
-          onChange={(e) => onChange({ treeDensity: e.target.checked ? "compact" : "comfortable" })}
-          aria-label="Compact row density" />
       </label>
     </div>
   );

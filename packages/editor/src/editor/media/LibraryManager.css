@@ -582,6 +582,14 @@
 .mgr-node:hover .mgr-node-del {
   display: inline-flex;
 }
+/* A viewer's trash (audit G3-064) is always on show, muted, so the reason on
+   its tooltip is reachable by keyboard without a hover first. */
+.mgr-node-del--view-only {
+  display: inline-flex;
+  cursor: default;
+  opacity: 0.55;
+}
+.mgr-node-del--view-only:hover { color: var(--bk-ink-muted); }
 
 .mgr-node-del:hover {
   color: var(--bk-error, var(--bk-error));

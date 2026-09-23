@@ -23,7 +23,6 @@ import {
   contentStyles,
   footerToolbarContainerStyles,
 } from "./canvasStyles";
-import { CommandPalette, KeyboardCheatSheet, useKeyboardCheatSheet } from "./controls";
 import { useInspectorMode } from "./controls/InspectorToggle";
 import {
   useCanvasDragDrop,
@@ -42,7 +41,6 @@ import {
   useSelectionBehavior,
   useCursorIntelligence,
   useCanvasSnapping,
-  useCanvasCommandPalette,
   useCanvasToolbarActions,
   useCanvasInlineCommands,
   useCanvasSize,
@@ -400,11 +398,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
     }, [composer, zoom]);
 
-    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. BOTH command palettes emit
-       them — the shell's ⌘K (CommandPalette.tsx:125,132) and the canvas's own
-       ⌘⇧P (useCanvasCommandPalette.ts:113,121) — so "Zoom in" was a command you
-       could find, read and run, and nothing moved. Steps by THRESHOLDS.ZOOM_STEP
-       on the same percent scale ZoomControls uses. */
+    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
+       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
+       command you could find, read and run, and nothing moved. Steps by
+       THRESHOLDS.ZOOM_STEP on the same percent scale ZoomControls uses. */
     React.useEffect(() => {
       if (!composer) return;
       const step = (delta: number) => () => {
@@ -420,18 +417,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       };
     }, [composer]);
 
-    // Command palette + cheat sheet (delegated to hooks)
-    const { isPaletteOpen, closePalette, commands } = useCanvasCommandPalette({
-      composer,
-      selectedId,
-      clear,
-      readOnly,
-    });
-    const {
-      isOpen: isCheatSheetOpen,
-      open: openCheatSheet,
-      close: closeCheatSheet,
-    } = useKeyboardCheatSheet(composer);
+    /* The canvas palette (⌘⇧P) and the canvas-mounted cheat sheet (`?`) are
+       gone — one palette (shell ⌘K, ⌘⇧P aliases it) and one sheet
+       (StudioModals) since 2026-09-22. The footer help button opens the
+       sheet through its event door. */
+    const openCheatSheet = React.useCallback(() => {
+      composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {});
+    }, [composer]);
 
     // Emit hover events for LayersPanel sync
     React.useEffect(() => {
@@ -852,17 +844,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             onClose={closeContextMenu}
           />
         )}
-
-        {/* Command Palette (Cmd+Shift+P) */}
-        <CommandPalette
-          isOpen={isPaletteOpen}
-          onClose={closePalette}
-          commands={commands}
-          selectedId={selectedId}
-        />
-
-        {/* Keyboard Cheat Sheet ('?' key) */}
-        <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
 
         {/* ONE polite region for the canvas, not two. A successful drop selects
             the new element and then reports the insert, so a second region meant

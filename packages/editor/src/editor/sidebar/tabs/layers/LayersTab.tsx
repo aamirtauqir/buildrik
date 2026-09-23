@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, TextInput } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover, TextInput } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -107,6 +107,10 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   // Local state (lifted from LayersPanel per spec §6)
   const [search, setSearch] = React.useState("");
   const [displaySettingsOpen, setDisplaySettingsOpen] = React.useState(false);
+  /* Board 7059:78962 "Layers · Panel menu (⋯)": Expand all · Collapse all ·
+     Display settings…. The three used to sit as ⊞ ⊟ ⚙ glyphs on the toolbar
+     row (audit G2-058: pattern, not capability). */
+  const [menuOpen, setMenuOpen] = React.useState(false);
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
@@ -134,28 +138,58 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     [composer]
   );
 
-  const handleExpandAll = React.useCallback(() => {
-    composer?.emit("layers:expand-all", {});
-  }, [composer]);
-
-  const handleCollapseAll = React.useCallback(() => {
-    composer?.emit("layers:collapse-all", {});
-  }, [composer]);
+  const runMenu = (fn: () => void) => () => {
+    setMenuOpen(false);
+    fn();
+  };
 
   return (
     <PanelFrame className="bdc-panel bdc-layers">
-      {/* Board 142:2 — header is the bare 16:6 Panel header. Help/close come
-          from PanelHeader's own props (children are silently dropped by this
-          API — the old expand/cog "header buttons" never rendered at all);
-          tree tools live on the toolbar row, the count in the footer. */}
+      {/* Board 142:2 — header is the bare 16:6 Panel header; the ⋯ panel menu
+          (7059:78962) rides in its actions slot — `actions`, not children,
+          which PanelHeader drops. The count lives in the footer. */}
       <PanelFrame.Header
         title="Layers"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
+        actions={
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label="Layers options"
+            trigger={
+              <IconButton
+                label="Layers options"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                data-testid="layers-panel-menu"
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label="Layers options">
+              <MenuItem data-testid="layers-expand-all" onClick={runMenu(() => composer?.emit("layers:expand-all", {}))}>
+                Expand all
+              </MenuItem>
+              <MenuItem data-testid="layers-collapse-all" onClick={runMenu(() => composer?.emit("layers:collapse-all", {}))}>
+                Collapse all
+              </MenuItem>
+              <MenuItem
+                data-testid="layers-display-settings-toggle"
+                onClick={runMenu(() => setDisplaySettingsOpen((v) => !v))}
+              >
+                Display settings…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
       />
-      {/* Board 142:7 Toolbar — search box + ⊞ ⊟ ⚙ on one 36-tall band. */}
+      {/* Board 142:7 Toolbar — the search box on a 36-tall band. */}
       <div className="bdc-ltoolbar" data-testid="layers-toolbar">
         {/* Board 142:8: bare box — no magnifier glyph. */}
         <label className="bdc-psearch" data-testid="layers-search">
@@ -171,17 +205,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             style={searchInputStyles}
           />
         </label>
-        {/* Board 142:10 draws these as TEXT glyphs — "⊞ ⊟ ⚙", 13px
-            ink-soft — not stroked SVG icons. */}
-        <Button className="bdc-icon-btn" data-testid="layers-expand-all" title="Expand all" aria-label="Expand all layers" onClick={handleExpandAll}>
-          <span aria-hidden="true">⊞</span>
-        </Button>
-        <Button className="bdc-icon-btn" data-testid="layers-collapse-all" title="Collapse all" aria-label="Collapse all layers" onClick={handleCollapseAll}>
-          <span aria-hidden="true">⊟</span>
-        </Button>
-        <Button className="bdc-icon-btn" data-testid="layers-display-settings-toggle" title="Display settings" aria-label="Layer display settings" aria-expanded={displaySettingsOpen} onClick={() => setDisplaySettingsOpen((v) => !v)}>
-          <span aria-hidden="true">⚙</span>
-        </Button>
       </div>
       <div className="bdc-pbody bdc-pbody-scroll">
         {/* `composer` alone is not "ready": useComposerInit sets it

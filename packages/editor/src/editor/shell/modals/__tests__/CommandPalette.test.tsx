@@ -70,20 +70,23 @@ describe("CommandPalette", () => {
        This stub composer has no registry, so here they simply go; live the
        registry supplies them, guarded. 22 -> 21 in the same arc when the
        hardcoded "Delete element" row went the same way — it duplicated the
-       registry's `delete` and, like it, removed exactly one element. */
-    it("with a composer: exactly 21 hardcoded commands, banded the way the boards band them", () => {
+       registry's `delete` and, like it, removed exactly one element.
+       21 -> 23 with the v3 IA doors ("Replace page layout with template…",
+       "Keyboard shortcuts") — this pin sat red on main from then until the
+       B7 merge (2026-09-22). The Insert tab is labelled "Add" now. */
+    it("with a composer: exactly 23 hardcoded commands, banded the way the boards band them", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(21);
+      expect(commandButtons()).toHaveLength(23);
       expect(screen.getByText("Suggested")).toBeInTheDocument();
       for (const internal of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.queryByText(internal)).toBeNull();
       }
       // Representative hardcoded entries (id → label):
-      // nav-add → "Open Insert panel", edit-undo → "Undo",
+      // nav-add → "Open Add panel", edit-undo → "Undo",
       // view-zoom-in → "Zoom in", history-clear → "Clear history".
       // "Delete element" is deliberately NOT here any more: it comes from the
       // registry, which this stub composer does not have.
-      expect(screen.getByText("Open Insert panel")).toBeInTheDocument();
+      expect(screen.getByText("Open Add panel")).toBeInTheDocument();
       expect(screen.queryByText("Delete element")).toBeNull();
       expect(screen.getByText("Zoom in")).toBeInTheDocument();
       expect(screen.getByText("Clear history")).toBeInTheDocument();
@@ -110,9 +113,12 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       const labels = commandButtons().map((b) => b.textContent);
-      expect(labels).toHaveLength(2);
+      /* Three since the fit row reads "Zoom to fit" (it was "Fit to view",
+         the one label in the product that did not say zoom). */
+      expect(labels).toHaveLength(3);
       expect(labels[0]).toContain("Zoom in");
       expect(labels[1]).toContain("Zoom out");
+      expect(labels[2]).toContain("Zoom to fit");
     });
 
     it("matches against the group name too", () => {
@@ -143,7 +149,7 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(21);
+      expect(commandButtons()).toHaveLength(23);
     });
   });
 
@@ -151,7 +157,7 @@ describe("CommandPalette", () => {
   describe("executing", () => {
     it("clicking a navigation command emits UI_PANEL_OPEN with the tab id and closes", () => {
       const { composer, onClose } = renderPalette();
-      fireEvent.click(screen.getByText("Open Insert panel"));
+      fireEvent.click(screen.getByText("Open Add panel"));
       expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "add" });
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -221,7 +227,7 @@ describe("CommandPalette", () => {
         selection: { getSelectedIds: vi.fn(() => []), getSelected: vi.fn(() => null) },
         clipboard: null,
         commands: { run: vi.fn(), getAll: () => [
-          { id: "copy", label: "Copy", run: vi.fn() },
+          { id: "copy", label: "Copy", requiresSelection: true, run: vi.fn() },
           { id: "paste", label: "Paste", run: vi.fn() },
         ] },
       };
@@ -419,7 +425,10 @@ describe("CommandPalette", () => {
     const withDelete = (ids: string[]) => ({
       ...makeComposer(),
       selection: { getSelectedIds: vi.fn(() => ids), getSelected: vi.fn(() => null) },
-      commands: { run: vi.fn(), getAll: () => [{ id: "delete", label: "Delete element", run: vi.fn() }] },
+      commands: {
+        run: vi.fn(),
+        getAll: () => [{ id: "delete", label: "Delete element", requiresSelection: true, run: vi.fn() }],
+      },
     });
 
     it("shows Delete element with its reason when nothing is selected", () => {
@@ -527,15 +536,17 @@ describe("CommandPalette — the keyboard highlight is announced", () => {
  * nothing selected each looked available, ran, and did nothing.
  */
 describe("CommandPalette — registry commands say when they cannot run", () => {
-  /* The palette's own composer stub has no registry, so these build one: the
-     four ids the guard covers, shaped the way CommandCenter.getAll() returns
-     them. */
+  /* The palette's own composer stub has no registry, so these build one,
+     shaped the way CommandCenter.getAll() returns them. `requiresSelection`
+     is the registry's own flag (defaultCommands sets it on the nudges,
+     reorders, copy/cut/delete/duplicate) — the palette used to keep a
+     hand-written id list instead, which the registry could outgrow. */
   const REGISTRY = [
     { id: "group", label: "Group", shortcut: "ctrl+g" },
     { id: "ungroup", label: "Ungroup", shortcut: "ctrl+shift+g" },
-    { id: "nudge-up", label: "Nudge Up" },
-    { id: "bring-forward", label: "Bring Forward" },
-    { id: "send-to-back", label: "Send to Back" },
+    { id: "nudge-up", label: "Nudge Up", requiresSelection: true },
+    { id: "bring-forward", label: "Bring Forward", requiresSelection: true },
+    { id: "send-to-back", label: "Send to Back", requiresSelection: true },
   ];
 
   const withSelection = (ids: string[], type = "heading") =>

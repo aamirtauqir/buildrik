@@ -3019,7 +3019,7 @@
    "authority": "board:815-4518",
    "recipe": "s3-10-keyboard-shortcuts-overlay",
    "verified": "drift-fixed",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe s3-10-keyboard-shortcuts-overlay): 24 properties, board won on six, code kept the list. REAL DEFECT FOUND BY check-board-copy, not by diff: `Save ⌘S` is bound (useEditorShortcuts:135) and the shortcuts sheet NEVER LISTED IT. Also `Fit to view` → `Zoom to fit`, matching the flyout and the cheat sheet. NOT SETTLED: chord-chip typeface — 815:4528 says Inter Medium, 2838:12148 says Geist Mono, neither verified, left as it ships."
+   "verifiedNote": "conformed + measured 2026-09-08 (recipe s3-10-keyboard-shortcuts-overlay): 24 properties, board won on six, code kept the list. REAL DEFECT FOUND BY check-board-copy, not by diff: `Save ⌘S` is bound (useEditorShortcuts:135) and the shortcuts sheet NEVER LISTED IT. Also `Fit to view` → `Zoom to fit`, matching the flyout and the cheat sheet. NOT SETTLED: chord-chip typeface — 815:4528 says Inter Medium, 2838:12148 says Geist Mono, neither verified, left as it ships. 2026-09-22 (B7, decision #37): the ⌘/ panel this board measured is deleted; the recipe now measures the ONE sheet (KeyboardCheatSheet, board 7575:195538 'Keyboard shortcuts · full' = this board + a search field), whose rows derive from the command registry."
   },
   {
    "nodeId": "815:4608",
@@ -5164,11 +5164,11 @@
    "state": "command-palette",
    "width": 280,
    "height": 812,
-   "status": "active",
+   "status": "retired",
    "authority": "board:1171-4767",
-   "recipe": "pages-command-palette-k",
-   "verified": "drift-fixed",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe pages-command-palette-k): 32 properties. Already conformant, now PROVEN rather than assumed. FOUND, NOT FIXED: two ⌘K bindings still stack (StudioHeader.tsx:259 + PagesTab.tsx:127), exactly as board note 2838:12152 says. The palette's 10px home glyph is blocked by offscale-font-size."
+   "recipe": null,
+   "verified": "unreachable",
+   "verifiedNote": "RETIRED 2026-09-22 (B7, decision #38, TODOS.md:393): the Pages panel's own ⌘K palette is deleted — one palette, the shell ⌘K, which bands the page rows under PAGES while the Pages panel is open. Recipe pages-command-palette-k and its spec removed with the component."
   },
   {
    "nodeId": "1171:4820",
@@ -5372,11 +5372,11 @@
    "state": "command palette",
    "width": 520,
    "height": 426,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
    "recipe": null,
-   "verifiedNote": "2026-08-31 — canvas palette: 'Zoom to Fit ⌘0' was a wrong chord — FIXED to ⌘1; 19 Title Case labels FIXED to sentence case; highlight indexes the sorted array while the list renders grouped, so Enter on open runs the wrong command (NOT fixed)",
-   "verified": "drift-fixed"
+   "verifiedNote": "RETIRED 2026-09-22 (B7, G1-093 / G2-038): the canvas ⌘⇧P palette is deleted; its Edit/View/Insert/Tools rows live in the engine registry and ⌘⇧P is an alias of ⌘K. Spec canvas-command-palette removed with the component.",
+   "verified": "unreachable"
   },
   {
    "nodeId": "1177:4859",

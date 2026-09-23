@@ -27,7 +27,8 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
-import { Button } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "../../sidebar/tabs/media/hooks/useMediaWriteAccess";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
    this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
    probe, a test, board 1205:4829's own measurement, which read every padding
@@ -75,6 +76,12 @@ interface TreeNodeProps {
   onClick: () => void;
   onToggleExpand?: () => void;
   onDelete?: () => void;
+  /** Audit G3-064: the row's OWN action is denied to this member (the
+   *  New-folder door) — `aria-disabled`, click and Enter swallowed, the
+   *  reason on the caller's tooltip. Never hidden. */
+  viewOnlyReason?: string;
+  /** Same, for the row's trash: it stays on show, muted, with this reason. */
+  deleteViewOnlyReason?: string;
   /** Drop target: assets dragged from the grid land in this folder. */
   dropFolderId?: string | null;
   /** The pointer is over THIS row with an asset. */
@@ -136,6 +143,8 @@ function TreeNode({
   onClick,
   onToggleExpand,
   onDelete,
+  viewOnlyReason,
+  deleteViewOnlyReason,
   dropFolderId,
   isDropTarget = false,
   dragActive = false,
@@ -164,13 +173,15 @@ function TreeNode({
       role="button"
       tabIndex={0}
       aria-current={active ? "true" : undefined}
-      onClick={onClick}
+      aria-disabled={viewOnlyReason ? true : undefined}
+      onClick={viewOnlyReason ? undefined : onClick}
       onKeyDown={(e) => {
         if (e.key !== "Enter" && e.key !== " ") return;
         // Space scrolls the rail otherwise, and the chevron button inside this
         // row handles its own keys — don't fire the row for those.
         if (e.target !== e.currentTarget) return;
         e.preventDefault();
+        if (viewOnlyReason) return;
         onClick?.();
       }}
       onDragOver={droppable ? (e) => onAssetDragOver?.(e, dropFolderId ?? null) : undefined}
@@ -194,7 +205,7 @@ function TreeNode({
       {icon}
       <span className="mgr-node-name">{label}</span>
       {count !== undefined && <span className="mgr-node-count">{count}</span>}
-      {onDelete && (
+      {onDelete && !deleteViewOnlyReason && (
         <Button
           className="mgr-node-del"
           onClick={(e) => {
@@ -205,6 +216,18 @@ function TreeNode({
         >
           <Trash2 size={11} />
         </Button>
+      )}
+      {onDelete && deleteViewOnlyReason && (
+        <Tooltip content={deleteViewOnlyReason} placement="right">
+          <Button
+            className="mgr-node-del mgr-node-del--view-only"
+            aria-label="Delete folder"
+            aria-disabled="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Trash2 size={11} />
+          </Button>
+        </Tooltip>
       )}
     </div>
   );
@@ -233,6 +256,9 @@ export function FolderTree({
   assetDragActive = false,
 }: FolderTreeProps) {
   const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
+  /* Audit G3-064: viewers see New folder and each folder's trash disabled
+     with the reason (board 6289:148485 pattern). */
+  const write = useMediaWriteAccess();
 
   const toggleCollapsed = React.useCallback((folderId: string) => {
     setCollapsedFolders((prev) => {
@@ -313,6 +339,7 @@ export function FolderTree({
               }}
               onToggleExpand={hasChildren ? () => toggleCollapsed(folder.id) : undefined}
               onDelete={() => deleteFolder(folder.id)}
+              deleteViewOnlyReason={write.reason("delete")}
               dropFolderId={folder.id}
               isDropTarget={dropTargetId === folder.id}
               {...dropProps}
@@ -322,7 +349,7 @@ export function FolderTree({
         );
       });
     },
-    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder, assetDragActive]
+    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder, assetDragActive, write]
   );
 
   return (
@@ -400,13 +427,26 @@ export function FolderTree({
             had itself displaced a native prompt(). Same row shape as every
             other row in this rail — a TreeNode, so it is reachable by Tab and
             fires on Enter — and never a scope: it has no `active` state. */}
-        <TreeNode
-          icon={<Plus size={14} className="mgr-node-ico" />}
-          label="New folder"
-          testId="mgr-new-folder-open"
-          active={false}
-          onClick={onNewFolder}
-        />
+        {write.canWrite ? (
+          <TreeNode
+            icon={<Plus size={14} className="mgr-node-ico" />}
+            label="New folder"
+            testId="mgr-new-folder-open"
+            active={false}
+            onClick={onNewFolder}
+          />
+        ) : (
+          <Tooltip content={write.reason("upload")} placement="right">
+            <TreeNode
+              icon={<Plus size={14} className="mgr-node-ico" />}
+              label="New folder"
+              testId="mgr-new-folder-open"
+              active={false}
+              onClick={onNewFolder}
+              viewOnlyReason={write.reason("upload")}
+            />
+          </Tooltip>
+        )}
 
         {folders.length === 0 && (
           <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>

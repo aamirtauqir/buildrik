@@ -43,25 +43,39 @@
   border-color: var(--bk-accent);
 }
 
-/* Board 140:7 band: search + the Listings link on one 36h row. */
+/* Board 140:7 band: the search box on one 36h row. */
 .bd-pg-search-wrap {
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
 }
 
-.bd-pg-listings-link,
 .bd-pg-listings-back {
   flex-shrink: 0;
+  align-self: flex-start;
   border: none;
   background: transparent;
   font: 400 12px/18px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  color: var(--bk-accent-text);
   box-shadow: none;
 }
-.bd-pg-listings-back {
-  align-self: flex-start;
-  color: var(--bk-accent-text);
+
+/* Header ⌘K keycap (board 4418:90494): a 26×22 ghost button holding an
+   11px mono chip. */
+.bd-pg-kbd-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 22px;
+  padding: 0;
+}
+.bd-pg-kbd {
+  font: 500 11px var(--bk-font-mono);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--bk-border);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink-muted);
 }
 .bd-pg-search input {
   flex: 1;
@@ -507,63 +521,6 @@
   height: 1px;
   margin: var(--bk-space-4) 6px;
   background: var(--bk-border);
-}
-
-/* ─── COMMAND PALETTE ─────────────────────────────────────────────────── */
-.bd-pg-palette-overlay {
-  /* Board 1171:4807 anchors the palette INSIDE the panel, under the header —
-     not a screen-centred modal on a scrim. The overlay only exists to catch
-     the click that dismisses it. */
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-}
-.bd-pg-palette {
-  position: absolute;
-  top: 59px;
-  left: 12px;
-  width: 256px;
-  max-width: calc(100% - 24px);
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: 10px;
-  box-shadow: var(--bk-shadow-overlay);
-  overflow: hidden;
-}
-.bd-pg-palette-input {
-  width: 100%;
-  padding: 10px var(--bk-space-12);
-  border: 0;
-  border-bottom: 1px solid var(--bk-border);
-  background: transparent;
-  font: 400 12px var(--bk-font-ui);
-  color: var(--bk-ink);
-  outline: 0;
-}
-.bd-pg-palette-list {
-  max-height: 320px;
-  overflow: auto;
-}
-.bd-pg-palette-item {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  cursor: pointer;
-  font: 400 11px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-}
-.bd-pg-palette-item.active,
-.bd-pg-palette-item:hover {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent-text);
-}
-.bd-pg-palette-item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bd-pg-palette-item-home { font-size: var(--bk-text-11); color: var(--bk-ink-muted); }
-.bd-pg-palette-empty {
-  padding: var(--bk-space-12);
-  font: 400 11px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
 }
 
 .bd-pg-drawer-scrim {

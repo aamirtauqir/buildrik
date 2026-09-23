@@ -1,6 +1,14 @@
 /**
  * useLayerContextActions - Handles actions dispatched from the right-click context menu.
  * Bridges LayerContextMenu → useLayerActions / useLayerSelection / useLayerTree.
+ *
+ * With the clicked row inside a multi-selection (board 6881:71323), cut / copy
+ * / duplicate / delete act on the WHOLE selection through the engine's own
+ * commands — `composer.selection` is the single source of truth the tree
+ * mirrors, and the registry commands prune to top-most elements and wrap one
+ * transaction (defaultCommands.ts). Delete of N > 1 asks first (board
+ * 6887:78291), which is the panel's dialog: `requestDeleteSelection`.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -9,20 +17,34 @@ import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
 
-export function useLayerContextActions(state: UseLayersStateReturn) {
+export interface LayerContextActionOptions {
+  /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
+  requestDeleteSelection: () => void;
+}
+
+export function useLayerContextActions(
+  state: UseLayersStateReturn,
+  { requestDeleteSelection }: LayerContextActionOptions,
+) {
   const { composer, actionsHook, treeHook, selectionHook } = state;
   const { addToast } = useToast();
   return React.useCallback(
     (action: LayerAction, nodeId: string) => {
       const syntheticEvent = { stopPropagation: () => {} } as unknown as React.MouseEvent;
+      /* The clicked row is one of two or more selected rows: the menu was the
+         selection's, so the action is too. */
+      const multi = selectionHook.selectedIds.size >= 2 && selectionHook.selectedIds.has(nodeId);
       switch (action) {
         // Board 1082:4527 Cut/Copy/Paste — the same composer.clipboard
         // contract the canvas ⌘X/⌘C/⌘V path uses (useCanvasKeyboard).
         case "copy": {
-          if (composer) {
-            const data = composer.elements.serializeElement(nodeId);
-            composer.clipboard = data ? [data] : null;
+          if (!composer) break;
+          if (multi) {
+            composer.commands.run("copy");
+            break;
           }
+          const data = composer.elements.serializeElement(nodeId);
+          composer.clipboard = data ? [data] : null;
           break;
         }
         case "copyLink": {
@@ -43,6 +65,10 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         }
         case "cut": {
           if (!composer) break;
+          if (multi) {
+            composer.commands.run("cut");
+            break;
+          }
           const cutData = composer.elements.serializeElement(nodeId);
           composer.clipboard = cutData ? [cutData] : null;
           actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
@@ -73,7 +99,8 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           break;
         }
         case "duplicate":
-          actionsHook.duplicateLayer(nodeId);
+          if (multi) composer?.commands.run("duplicate");
+          else actionsHook.duplicateLayer(nodeId);
           break;
         case "hide":
         case "show":
@@ -84,7 +111,10 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           actionsHook.toggleLock(nodeId, syntheticEvent);
           break;
         case "delete":
-          actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
+          /* One element goes at once with the Undo toast (decision 17);
+             two or more ask first. */
+          if (multi) requestDeleteSelection();
+          else actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
           break;
         case "group":
           actionsHook.groupLayers([...selectionHook.selectedIds], treeHook.layers);
@@ -106,6 +136,6 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           break;
       }
     },
-    [composer, actionsHook, treeHook, selectionHook, addToast]
+    [composer, actionsHook, treeHook, selectionHook, addToast, requestDeleteSelection]
   );
 }

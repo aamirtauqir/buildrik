@@ -19,7 +19,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const row = readFileSync(join(__dirname, "..", "LayerTreeItem.tsx"), "utf8");
-const banner = readFileSync(join(__dirname, "..", "components", "LayerSelectionBanner.tsx"), "utf8");
+/* The selection banner that carried a second eye is gone (2026-09-22, audit
+   G2-068) — the row's eye is the one visibility control. */
 const actions = readFileSync(join(__dirname, "..", "hooks", "useLayerActions.ts"), "utf8");
 const canvasCss = readFileSync(join(__dirname, "..", "..", "..", "canvas", "Canvas.css"), "utf8");
 
@@ -32,12 +33,10 @@ const labels = (src: string) =>
 describe("layers visibility control", () => {
   it("does not call itself hide, which is what a page does", () => {
     expect(labels(row)).not.toMatch(/Hide element/);
-    expect(labels(banner)).not.toMatch(/^Hide$/m);
   });
 
   it("says the elements still publish", () => {
     expect(row).toMatch(/still publishes/);
-    expect(banner).toMatch(/still publish/);
   });
 
   it("matches the code: the toggle only writes a canvas attribute", () => {

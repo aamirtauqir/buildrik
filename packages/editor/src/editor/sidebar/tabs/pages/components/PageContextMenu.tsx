@@ -24,6 +24,8 @@ interface Props {
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
   onSetHomepage: (id: string) => void;
+  /** Board 6883:69504 — "Replace layout with template…" (audit G2-078). */
+  onReplaceLayout: (id: string) => void;
   onCopyLink: (id: string) => void;
   onSettings: (id: string) => void;
 }
@@ -38,6 +40,7 @@ export const PageContextMenu: React.FC<Props> = ({
   onDuplicate,
   onDelete,
   onSetHomepage,
+  onReplaceLayout,
   onCopyLink,
   onSettings,
 }) => {
@@ -108,6 +111,9 @@ export const PageContextMenu: React.FC<Props> = ({
             Set as homepage
           </MenuItem>
         )}
+        <MenuItem data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
+          Replace layout with template…
+        </MenuItem>
         <MenuItem data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
           Copy link
         </MenuItem>

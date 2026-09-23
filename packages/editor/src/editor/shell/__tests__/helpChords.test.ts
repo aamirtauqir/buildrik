@@ -1,56 +1,63 @@
 /**
- * Every printed help chord opens the screen it names.
+ * Every printed help chord opens the screen it names — and there is ONE of
+ * each screen.
  *
- * The editor ships two help surfaces on purpose — the canvas cheat sheet
- * (gestures and selection) and the shell's shortcuts panel (app-wide chords)
- * — but the printed chords crossed over.
- *
- * Board 815:4518 belongs to the SHELL PANEL, not the cheat sheet. This
- * docblock attributed it to the cheat sheet while
- * `KeyboardShortcutsPanel.tsx:126` claimed it for itself — one board cited by
- * two files for two different screens. The board's own copy settles it: it
- * draws "Search shortcuts… / General / Save ⌘S / Undo ⌘Z / Redo ⌘⇧Z", which
- * are app-wide chords. The cheat sheet's groups are Selection · Navigation ·
- * Positioning · Editing · View · Context Menu and it has no Save. Corrected
- * 2026-09-02. The canvas cheat sheet has NO board of its own. Measured in the
- * running editor: "?" drew "⌨️ Keyboard Shortcuts · SELECTION · Select
- * element" (the cheat sheet), while ⌘/ and the site-menu row drew "Keyboard
- * Shortcuts · PANELS · Open Insert panel" (the shell panel) — and the menu row
- * printed "?" next to itself. The cheat sheet also advertised ⌘0 as "Zoom to
- * fit" (it is 100%; ⌘1 fits, ⌘2 zooms to the selection) and named ⌘⇧P plainly
- * "Command palette" when ⌘K opens the shell's.
+ * Until 2026-09-22 the editor shipped two help surfaces (the shell's ⌘/
+ * panel and the canvas `?` cheat sheet, with two hand-written tables that
+ * contradicted each other — TODOS.md:512) and two command palettes (shell
+ * ⌘K and canvas ⌘⇧P — audit G1-093). Decisions #37/#38 folded both pairs:
+ * one sheet (`canvas/controls/KeyboardCheatSheet`, board 7575:195538) whose
+ * rows derive from `defaultCommands`, one palette (`shell/modals/CommandPalette`)
+ * that reads the same registry, ⌘⇧P an alias of ⌘K.
  *
  * @license BSD-3-Clause
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const read = (p: string) => readFileSync(join(__dirname, "..", "..", p), "utf8");
+const editor = (p: string) => join(__dirname, "..", "..", p);
+const read = (p: string) => readFileSync(editor(p), "utf8");
 const siteMenu = readFileSync(join(__dirname, "../SiteMenu.tsx"), "utf8");
-const shellPanel = read("panels/KeyboardShortcutsPanel.tsx");
-const cheatSheet = read("canvas/controls/KeyboardCheatSheet.tsx");
+const shortcuts = readFileSync(join(__dirname, "../hooks/useEditorShortcuts.ts"), "utf8");
+const palette = readFileSync(join(__dirname, "../modals/CommandPalette.tsx"), "utf8");
+const sheetRows = read("canvas/controls/keyboardSheetRows.ts");
 
 describe("help chords", () => {
   it("the site-menu row prints the chord that opens IT", () => {
     expect(siteMenu).toMatch(/const SHORTCUTS_KBD = IS_MAC \? "⌘\/"/);
     expect(siteMenu).toMatch(/kbd=\{SHORTCUTS_KBD\} onClick=\{run\(onOpenShortcuts\)\}/);
-    expect(siteMenu).not.toMatch(/kbd="\?" onClick=\{run\(onOpenShortcuts\)\}/);
   });
 
-  it("the shell panel distinguishes the two surfaces", () => {
-    expect(shellPanel).toMatch(/\{ key: "Ctrl\+\/", desc: "This shortcuts panel" \}/);
-    expect(shellPanel).toMatch(/\{ key: "\?", desc: "Canvas gestures & selection" \}/);
+  it("⌘/ and ? both flip the one sheet state, from the one hook", () => {
+    expect(shortcuts).toMatch(/e\.key === "\/"\) \{\s*e\.preventDefault\(\);\s*modals\.setShowShortcuts\(true\)/);
+    expect(shortcuts).toMatch(/isQuestionMark\(e\)\) \{\s*e\.preventDefault\(\);\s*modals\.setShowShortcuts\(true\)/);
   });
 
-  it("the cheat sheet's zoom rows match the keys the flyout binds", () => {
-    expect(cheatSheet).toMatch(/keys: \["⌘", "0"\], description: "Zoom to 100%"/);
-    expect(cheatSheet).toMatch(/keys: \["⌘", "1"\], description: "Zoom to fit"/);
-    expect(cheatSheet).toMatch(/keys: \["⌘", "2"\], description: "Zoom to selection"/);
+  it("the sheet's zoom rows match the keys the flyout binds", () => {
+    expect(sheetRows).toMatch(/keys: "ctrl\+0", description: "Zoom to 100%"/);
+    expect(sheetRows).toMatch(/keys: "ctrl\+1", description: "Zoom to fit"/);
+    expect(sheetRows).toMatch(/keys: "ctrl\+2", description: "Zoom to selection"/);
   });
 
-  it("names both palettes", () => {
-    expect(cheatSheet).toMatch(/"⌘", "⇧", "P"\], description: "Canvas command palette"/);
-    expect(cheatSheet).toMatch(/"⌘", "K"\], description: "Command palette"/);
+  it("names ONE palette, on ⌘K with ⌘⇧P as its alias", () => {
+    expect(sheetRows).toMatch(/keys: "ctrl\+k \/ ctrl\+shift\+p", description: "Command palette"/);
+    expect(shortcuts).toMatch(/e\.shiftKey && e\.key\.toLowerCase\(\) === "p"\) \{\s*e\.preventDefault\(\);\s*composer\?\.emit\(EVENTS\.UI_TOGGLE_COMMAND_PALETTE/);
+  });
+
+  it("the ⌘K palette's fit row prints the chord that fits (G1-093 / SH-90)", () => {
+    expect(palette).toMatch(/label: "Zoom to fit",\s*group: "View",\s*shortcut: "Ctrl\+1"/);
+    expect(palette).not.toMatch(/label: "Fit to view"/);
+  });
+
+  it("the second sheet and the second and third palettes are gone", () => {
+    for (const gone of [
+      "panels/KeyboardShortcutsPanel.tsx",
+      "canvas/controls/CommandPalette.tsx",
+      "canvas/hooks/useCanvasCommandPalette.ts",
+      "sidebar/tabs/pages/components/PageCommandPalette.tsx",
+    ]) {
+      expect(existsSync(editor(gone)), gone).toBe(false);
+    }
   });
 });

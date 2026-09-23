@@ -13,11 +13,22 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame, Button } from "@/editor/chrome-ui";
+import {
+  Button,
+  ConfirmDialog,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDesc,
+  EmptyStateTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  PanelFrame,
+  Popover,
+} from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";
-import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
@@ -26,6 +37,7 @@ import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
+import { usePageCommands } from "./usePageCommands";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
@@ -84,13 +96,27 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Name conflict error state (Screen GoEJk)
   const [nameError, setNameError] = React.useState<string | null>(null);
 
-  // ⌘K command palette
-  const [paletteOpen, setPaletteOpen] = React.useState(false);
+  /* The panel's rows in the one ⌘K palette (New page · Go to <page>), live
+     while this panel is mounted. The panel-local palette and its own ⌘K
+     listener are gone — decision #38, TODOS.md:393. */
+  usePageCommands(composer, p.pages, p.selectPage, p.addPage);
 
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
   const [view, setView] = React.useState<"pages" | "listings" | "structure">("pages");
+
+  /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
+     Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
+     used to be text links on the search band (audit G2-070: pattern, not
+     capability). "Select pages…" (7069:78984) turns the row checkboxes on
+     before anything is ticked; a selection turns them on by itself. */
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [selectMode, setSelectMode] = React.useState(false);
+  const runMenu = (fn: () => void) => () => {
+    setMenuOpen(false);
+    fn();
+  };
 
   // Settings drawer — resolve the active page from the id stored in usePages
   const dirtyPages = useDirtyPages(composer);
@@ -163,20 +189,31 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     setDeleteTargetId(pageId); // show confirm dialog
   };
 
-  // ⌘K / Ctrl+K shortcut — open command palette; Escape — clear bulk selection
+  // Escape — leave select mode and clear the bulk selection
+  const bulkMode = selectMode || bulk.hasSelection;
+  const leaveSelectMode = React.useCallback(() => {
+    setSelectMode(false);
+    bulk.clearSelection();
+  }, [bulk.clearSelection]);
   React.useEffect(() => {
+    if (!bulkMode) return;
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen((open) => !open);
-      }
-      if (e.key === "Escape" && bulk.hasSelection) {
-        bulk.clearSelection();
-      }
+      if (e.key === "Escape") leaveSelectMode();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [bulk.hasSelection, bulk.clearSelection]);
+  }, [bulkMode, leaveSelectMode]);
+
+  /* Board 6883:69504 row menu "Replace layout with template…": the flow lives
+     in Templates and works on the ACTIVE page, so the row's page goes active
+     first (audit G2-078 — the door existed only in ⌘K). */
+  const handleReplaceLayout = React.useCallback(
+    (pageId: string) => {
+      p.selectPage(pageId);
+      composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, {});
+    },
+    [p, composer],
+  );
 
   // Ordered page ids for shift-range selection
   const orderedPageIds = React.useMemo(() => p.pages.map((pg) => pg.id), [p.pages]);
@@ -257,26 +294,65 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     // `.bulk-mode` toggle activates the row checkbox column when selection exists.
     // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
     // controls sizing. TabFrame fills the host via width:100%.
-    <PanelFrame className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
+    <PanelFrame className={`bd-pg-panel${bulkMode ? " bulk-mode" : ""}`}>
+      {/* Board 4418:90494 header: the ⌘K keycap and the ⋯ panel menu ride in
+          the header's `actions` slot — as children they were dropped on the
+          floor and the keycap never rendered. */}
       <PanelFrame.Header
         title="Pages"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
-      >
-        <Button
-          color="light"
-          size="xs"
-          style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
-          onClick={() => setPaletteOpen(true)}
-          aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-        >
-          <span style={{ font: "500 11px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
-            ⌘K
-          </span>
-        </Button>
-      </PanelFrame.Header>
+        actions={
+          <>
+            {/* The keycap opens THE palette — the shell's ⌘K, which bands
+                this panel's rows under PAGES (B7). */}
+            <Button
+              color="light"
+              size="xs"
+              className="bd-pg-kbd-btn tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              data-testid="pages-open-palette"
+              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {})}
+              aria-label="Open command palette"
+            >
+              <span className="bd-pg-kbd">⌘K</span>
+            </Button>
+            <Popover
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)}
+              placement="bottom-end"
+              label="Pages options"
+              trigger={
+                <IconButton
+                  label="Pages options"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  data-testid="pages-panel-menu"
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  ⋯
+                </IconButton>
+              }
+            >
+              <Menu label="Pages options">
+                <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
+                  Select pages…
+                </MenuItem>
+                <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
+                  Show structure
+                </MenuItem>
+                <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
+                  Reload
+                </MenuItem>
+                <MenuItem data-testid="pages-open-listings" onClick={runMenu(() => setView("listings"))}>
+                  Listings
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </>
+        }
+      />
       {/* Board 141:165 keeps the search band and the Add-page footer either
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}
@@ -313,8 +389,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             loadError={p.loadError}
             loading={p.loading}
             onRetry={p.retrySync}
-            onOpenListings={() => setView("listings")}
-            onOpenStructure={() => setView("structure")}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
             composer={composer}
             folders={f.folders}
@@ -328,7 +402,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkMoveToFolder={handleBulkMoveToFolder}
             onBulkRemoveFromFolders={handleBulkRemoveFromFolders}
             onBulkDelete={handleBulkDelete}
-            onClearSelection={bulk.clearSelection}
+            onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
@@ -355,6 +429,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onDuplicate={p.duplicatePage}
           onDelete={handleDeleteRequest}
           onSetHomepage={p.setHomepage}
+          onReplaceLayout={handleReplaceLayout}
           onCopyLink={p.copyPageLink}
           onSettings={p.openSettings}
         />
@@ -400,14 +475,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }}
       />
 
-      {/* ⌘K command palette */}
-      {paletteOpen && (
-        <PageCommandPalette
-          pages={p.pages}
-          onSelect={p.selectPage}
-          onClose={() => setPaletteOpen(false)}
-        />
-      )}
       {/* Page settings drawer — opened via openSettings, from the row's
           context menu ("Page settings…") or a Listings row. The per-row gear
           it used to name was deleted with the row action strip. */}

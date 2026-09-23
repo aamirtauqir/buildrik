@@ -308,6 +308,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     return () => document.removeEventListener("keydown", onKey);
   }, [viewMode.readOnlyView]);
 
+  /* The palette's non-keystroke door — ⌘⇧P (useEditorShortcuts, alias of ⌘K
+     since the canvas palette was retired) and the Pages panel's ⌘K keycap
+     emit UI_TOGGLE_COMMAND_PALETTE. Same guards as the chord above. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onToggle = () => {
+      if (viewMode.readOnlyView) return;
+      if (isModalOpen()) return;
+      setCmdOpen((v) => !v);
+    };
+    composer.on(EVENTS.UI_TOGGLE_COMMAND_PALETTE, onToggle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_COMMAND_PALETTE, onToggle);
+    };
+  }, [composer, viewMode.readOnlyView]);
+
   useRefetchOnFocus(refreshUnread);
 
   // Keeps "Saved · 2m ago" honest without a render on every tick.

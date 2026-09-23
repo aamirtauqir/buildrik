@@ -531,6 +531,9 @@ export interface UploadZoneProps {
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
   disabled?: boolean;
+  /** Audit G3-064: set for a VIEWER — the zone refuses files and says why
+   *  (board 6289:148485 "View only — ask an editor to upload"). */
+  viewOnlyReason?: string;
   /** Currently-uploading files. When any item has status "uploading"/"optimizing"/"processing",
    *  the zone applies med-upload-zone--uploading. Failed items render below the zone. */
   uploadQueue?: UploadProgress[];

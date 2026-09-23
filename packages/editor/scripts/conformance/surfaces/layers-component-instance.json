@@ -1,80 +1,92 @@
 {
-  "surface": "layers-component-instance",
-  "board": "Layers · component-instance (Figma 1082:4739)",
-  "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-component-instance",
-  "viewport": {
-    "width": 280,
-    "height": 400
+ "surface": "layers-component-instance",
+ "board": "Layers · component-instance (Figma 1082:4739)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-component-instance",
+ "viewport": {
+  "width": 280,
+  "height": 400
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "layer-instance-badge-l1"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "root-row-name",
+   "testId": "layer-name-l0",
+   "spec": "layers-component-instance",
+   "nodeId": "1082:4751"
   },
-  "steps": [
-    { "action": "waitFor", "testId": "layer-instance-badge-l1" }
-  ],
-  "contrastScope": "[data-probe]",
-  "targets": [
-    {
-      "name": "root-row-name",
-      "testId": "layer-name-l0",
-      "spec": "layers-component-instance",
-      "nodeId": "1082:4751"
-    },
-    {
-      "name": "instance-row-name",
-      "testId": "layer-name-l1",
-      "spec": "layers-component-instance",
-      "nodeId": "1082:4756"
-    },
-    { "name": "root-row", "testId": "layer-row-l0" },
-    { "name": "instance-row", "testId": "layer-row-l1" },
-    { "name": "instance-badge", "testId": "layer-instance-badge-l1" }
-  ],
-  "_note": [
-    "The board's own title is the adjudication: 'Layers · component-instance —",
-    "NOT A STATE — a per-row badge gated on composer.components.isInstance",
-    "(LayerTreeItem.tsx:115,256-264)'. It was corrected to the code, and the",
-    "badge ships. Reaching it in the demo would take a saved component and a",
-    "placed instance of it, so the probe mounts the real LayerTreeItem with the",
-    "one composer call it makes — `isInstance` — true for the child row.",
-    "The row renders its own children, so the case mounts the ROOT only.",
-    "",
-    "The indent ladder is verified by the measurement: root at 12, child at 28,",
-    "which is 1082:4748's pl-12 and 1082:4754's pl-28 exactly (the code derives",
-    "it as 12 + depth*16 from board 1082:4640).",
-    "",
-    "JOINED: the two row labels (1082:4751, 1082:4756) — 13px, `normal` line",
-    "box, --color/ink. That is the row type contract and the code matches it.",
-    "",
-    "NOT JOINED, with reasons:",
-    "",
-    "  instance-badge (1082:4757) — the board draws the diamond at 10px with no",
-    "  colour of its own. The code renders it at --bk-text-11 in --bk-success.",
-    "  10px is BELOW the token scale: --bk-text-11 is the smallest chrome text",
-    "  token there is, and the badge is the only thing in the tree that says a",
-    "  row follows a component, so shrinking it under the scale to match a",
-    "  frame is the wrong trade. The colour is already recorded in code:",
-    "  'Board badge colors are off-palette for chrome, so the token stands in.'",
-    "",
-    "  the rows (1082:4748 / 1082:4754) — two properties disagree.",
-    "    gap: this board says 6px. The Layers rows drawn on 642:3112",
-    "      (2143:21047 onward) say 8px AS A TOKEN, --spacing/8. A token",
-    "      reference is a stronger statement of intent than a bare 6, and the",
-    "      code is on 8, so the token reading holds.",
-    "    padding-y: the board says 4. `.bdc-lr` fixes the row at 28px and",
-    "      centres its children, so 4px of vertical padding would move nothing",
-    "      on screen; adding it to make a number match would be fitting the",
-    "      code to the instrument.",
-    "",
-    "  eye and lock (1082:4758 / 1082:4759) — drawn as 10px --color/ink-",
-    "  placeholder glyphs. They ship as real buttons in --bk-ink-muted, and",
-    "  layers-v2.css records why: '142:2: legible at rest. gray-300 was 1.47:1;",
-    "  1.4.11 wants 3.' Founder a11y call, unchanged. It is also the whole",
-    "  cause of the badge x-offset boards.json records (219 live vs 229 on the",
-    "  board): buttons occupy more of the row's right edge than glyphs do. The",
-    "  2026-09-02 re-measure at 280 confirmed the gap does not close with width.",
-    "",
-    "  the panel header (2100:10968) — drawn 14px semibold ink here, from the",
-    "  'Panel header' component 2100:11651 that was widened 2026-09-05. The",
-    "  shipped drawer header is 11px ink-soft, measured on 148:2 and asserted",
-    "  by components-library against 641:2547 in this same run. Two component",
-    "  versions in one file; not this surface's call, and not mounted here."
-  ]
+  {
+   "name": "instance-row-name",
+   "testId": "layer-name-l1",
+   "spec": "layers-component-instance",
+   "nodeId": "1082:4756"
+  },
+  {
+   "name": "root-row",
+   "testId": "layer-row-l0"
+  },
+  {
+   "name": "instance-row",
+   "testId": "layer-row-l1"
+  },
+  {
+   "name": "instance-badge",
+   "testId": "layer-instance-badge-l1"
+  }
+ ],
+ "_note": [
+  "The board's own title is the adjudication: 'Layers · component-instance —",
+  "NOT A STATE — a per-row badge gated on composer.components.isInstance",
+  "(LayerTreeItem.tsx:115,256-264)'. It was corrected to the code, and the",
+  "badge ships. Reaching it in the demo would take a saved component and a",
+  "placed instance of it, so the probe mounts the real LayerTreeItem with the",
+  "one composer call it makes — `isInstance` — true for the child row.",
+  "The row renders its own children, so the case mounts the ROOT only.",
+  "",
+  "The indent ladder is verified by the measurement: root at 12, child at 28,",
+  "which is 1082:4748's pl-12 and 1082:4754's pl-28 exactly (the code derives",
+  "it as 12 + depth*16 from board 1082:4640).",
+  "",
+  "JOINED: the two row labels (1082:4751, 1082:4756) — 13px, `normal` line",
+  "box, --color/ink. That is the row type contract and the code matches it.",
+  "",
+  "NOT JOINED, with reasons:",
+  "",
+  "  instance-badge (1082:4757) — the board draws the diamond at 10px with no",
+  "  colour of its own. The code renders it at --bk-text-11 in --bk-success.",
+  "  10px is BELOW the token scale: --bk-text-11 is the smallest chrome text",
+  "  token there is, and the badge is the only thing in the tree that says a",
+  "  row follows a component, so shrinking it under the scale to match a",
+  "  frame is the wrong trade. The colour is already recorded in code:",
+  "  'Board badge colors are off-palette for chrome, so the token stands in.'",
+  "",
+  "  the rows (1082:4748 / 1082:4754) — two properties disagree.",
+  "    gap: this board says 6px. The Layers rows drawn on 642:3112",
+  "      (2143:21047 onward) say 8px AS A TOKEN, --spacing/8. A token",
+  "      reference is a stronger statement of intent than a bare 6, and the",
+  "      code is on 8, so the token reading holds.",
+  "    padding-y: the board says 4. `.bdc-lr` fixes the row at 28px and",
+  "      centres its children, so 4px of vertical padding would move nothing",
+  "      on screen; adding it to make a number match would be fitting the",
+  "      code to the instrument.",
+  "",
+  "  eye and lock (1082:4758 / 1082:4759) — drawn as 10px --color/ink-",
+  "  placeholder glyphs. They ship as real buttons in --bk-ink-muted, and",
+  "  layers-v2.css records why: '142:2: legible at rest. gray-300 was 1.47:1;",
+  "  1.4.11 wants 3.' Founder a11y call, unchanged. It is also the whole",
+  "  cause of the badge x-offset boards.json records (219 live vs 229 on the",
+  "  board): buttons occupy more of the row's right edge than glyphs do. The",
+  "  2026-09-02 re-measure at 280 confirmed the gap does not close with width.",
+  "",
+  "  the panel header (2100:10968) — drawn 14px semibold ink here, from the",
+  "  'Panel header' component 2100:11651 that was widened 2026-09-05. The",
+  "  shipped drawer header is 11px ink-soft, measured on 148:2 and asserted",
+  "  by components-library against 641:2547 in this same run. Two component",
+  "  versions in one file; not this surface's call, and not mounted here."
+ ]
 }

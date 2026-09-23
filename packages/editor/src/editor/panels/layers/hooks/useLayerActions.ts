@@ -6,7 +6,7 @@
  * - Toggle visibility/lock with DOM attribute sync
  * - Inline rename editing
  * - Delete with child count confirmation
- * - Duplicate, moveToTop, moveToBottom, hideMultiple, groupLayers
+ * - Duplicate, moveToTop, moveToBottom, groupLayers
  *
  * @license BSD-3-Clause
  */
@@ -41,7 +41,6 @@ export interface UseLayerActionsReturn {
   duplicateLayer: (id: string) => void;
   moveToTop: (id: string, layers: LayerItem[]) => void;
   moveToBottom: (id: string, layers: LayerItem[]) => void;
-  hideMultiple: (ids: string[]) => void;
   groupLayers: (ids: string[], layers: LayerItem[]) => void;
 }
 
@@ -253,17 +252,6 @@ export function useLayerActions(
     [composer]
   );
 
-  const hideMultiple = React.useCallback((ids: string[]) => {
-    setHiddenIds((prev) => {
-      const next = new Set(prev);
-      ids.forEach((id) => {
-        next.add(id);
-        const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
-        if (el) el.setAttribute("data-hidden", "true");
-      });
-      return next;
-    });
-  }, []);
 
   const groupLayers = React.useCallback(
     (ids: string[], _layers: LayerItem[]) => {
@@ -304,7 +292,6 @@ export function useLayerActions(
     duplicateLayer,
     moveToTop,
     moveToBottom,
-    hideMultiple,
     groupLayers,
   };
 }

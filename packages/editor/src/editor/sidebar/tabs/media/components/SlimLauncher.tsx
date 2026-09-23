@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField, Tooltip } from "@/editor/chrome-ui";
 import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare, ArrowUpRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
@@ -37,6 +37,7 @@ import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import { ReplacementUploadModal } from "./ReplacementUploadModal";
+import { useMediaWriteAccess } from "../hooks/useMediaWriteAccess";
 import "./SlimLauncher.css";
 
 interface SlimLauncherProps {
@@ -154,6 +155,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
   // The footer's Upload link drives UploadZone's file input rather than
   // duplicating one: two inputs would mean two accept-lists to keep in step.
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
+  /* Audit G3-064: a viewer sees Upload and Delete disabled with the reason
+     (board 6289:148485), never hidden. */
+  const write = useMediaWriteAccess();
   const [folderMenuOpen, setFolderMenuOpen] = React.useState(false);
 
   /* Clone 3584:45522 → 3585:23326 → 3585:23337. The rejected row's `Choose a
@@ -726,16 +730,32 @@ export function SlimLauncher(props: SlimLauncherProps) {
               Move to…
             </Button>
           )}
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
-            onClick={props.onBulkDelete}
-            disabled={!props.selectedKeys?.size}
-          >
-            Delete
-          </Button>
+          {write.canWrite ? (
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+              data-testid="media-bulk-delete"
+              onClick={props.onBulkDelete}
+              disabled={!props.selectedKeys?.size}
+            >
+              Delete
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("delete")} placement="top">
+              <Button
+                type="button"
+                color="light"
+                size="xs"
+                variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white tw:opacity-55"
+                data-testid="media-bulk-delete"
+                aria-disabled="true"
+              >
+                Delete
+              </Button>
+            </Tooltip>
+          )}
           <Button
             type="button"
             color="light"
@@ -763,6 +783,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           uploadQueue={props.uploadQueue}
           failedUploads={props.failedUploads}
           disabled={props.storage.used >= props.storage.total}
+          viewOnlyReason={write.reason("upload")}
         />
         {/*
           Clone 3437:36027 / 3585:23337 (re-draws board `144:46`): the links
@@ -792,18 +813,34 @@ export function SlimLauncher(props: SlimLauncherProps) {
           className="tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-2 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
           data-testid="media-footer-links"
         >
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
-            data-testid="media-upload-action"
-            onClick={() => uploadInputRef.current?.click()}
-            disabled={props.storage.used >= props.storage.total}
-          >
-            <Upload size={14} aria-hidden="true" />
-            Upload
-          </Button>
+          {write.canWrite ? (
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
+              data-testid="media-upload-action"
+              onClick={() => uploadInputRef.current?.click()}
+              disabled={props.storage.used >= props.storage.total}
+            >
+              <Upload size={14} aria-hidden="true" />
+              Upload
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("upload")} placement="top">
+              <Button
+                type="button"
+                color="light"
+                size="xs"
+                variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal tw:opacity-55"
+                data-testid="media-upload-action"
+                aria-disabled="true"
+              >
+                <Upload size={14} aria-hidden="true" />
+                Upload
+              </Button>
+            </Tooltip>
+          )}
           <Button
             type="button"
             color="light"

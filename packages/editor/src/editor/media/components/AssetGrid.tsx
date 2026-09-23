@@ -60,7 +60,8 @@ import type {
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
-import { Button, IconButton } from "@/editor/chrome-ui";
+import { Button, IconButton, Tooltip } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "../../sidebar/tabs/media/hooks/useMediaWriteAccess";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
@@ -232,6 +233,9 @@ export function AssetGrid({
   addToast,
 }: AssetGridProps) {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  /* Audit G3-064: a viewer's Upload CTAs and bulk Delete stay on screen,
+     `aria-disabled`, with the reason on a tooltip (board 6289:148485). */
+  const write = useMediaWriteAccess();
   /* Clone 4207:26629 / 4215:26635 — the drag image is the library's own
      ghost: the thumb (grid) or the row(s) (list) with an "N items" badge.
      `setDragImage` reads the element the moment dragstart fires, so the
@@ -519,16 +523,25 @@ export function AssetGrid({
           >
             Download
           </Button>
-          <Button
-            variant="link"
-            className={BULK_LINK_DANGER}
-            onClick={() => {
-              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
-              state.requestBulkDelete(items);
-            }}
-          >
-            Delete
-          </Button>
+          {write.canWrite ? (
+            <Button
+              variant="link"
+              className={BULK_LINK_DANGER}
+              data-testid="mgr-bulk-delete"
+              onClick={() => {
+                const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+                state.requestBulkDelete(items);
+              }}
+            >
+              Delete
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("delete")} placement="top">
+              <Button variant="link" className={`${BULK_LINK_MUTED} tw:cursor-default`} data-testid="mgr-bulk-delete" aria-disabled="true">
+                Delete
+              </Button>
+            </Tooltip>
+          )}
           <Button variant="link" className={BULK_LINK_MUTED} onClick={state.clearSelection}>
             ✕ Clear
           </Button>
@@ -812,9 +825,17 @@ export function AssetGrid({
           </p>
           {/* flowbite's `xs` IS the chrome's 32 (founder:density-32; the
               Clone's 44 is refused) — no height override to fight. */}
-          <Button size="xs" data-testid="mgr-empty-folder-upload" onClick={onUploadClick}>
-            Upload files
-          </Button>
+          {write.canWrite ? (
+            <Button size="xs" data-testid="mgr-empty-folder-upload" onClick={onUploadClick}>
+              Upload files
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("upload")} placement="top">
+              <Button size="xs" data-testid="mgr-empty-folder-upload" aria-disabled="true" className="tw:opacity-55">
+                Upload files
+              </Button>
+            </Tooltip>
+          )}
         </div>
       ) : (
         <div className="mgr-empty" data-testid="mgr-empty">
@@ -833,10 +854,19 @@ export function AssetGrid({
             </p>
             {!state.librarySearch && (
               <div className="mgr-empty-actions" data-testid="mgr-empty-actions">
-                <Button className="mgr-btn-primary" data-testid="mgr-empty-upload" onClick={onUploadClick}>
-                  <Upload size={14} />
-                  Upload
-                </Button>
+                {write.canWrite ? (
+                  <Button className="mgr-btn-primary" data-testid="mgr-empty-upload" onClick={onUploadClick}>
+                    <Upload size={14} />
+                    Upload
+                  </Button>
+                ) : (
+                  <Tooltip content={write.reason("upload")} placement="top">
+                    <Button className="mgr-btn-primary tw:opacity-55" data-testid="mgr-empty-upload" aria-disabled="true">
+                      <Upload size={14} />
+                      Upload
+                    </Button>
+                  </Tooltip>
+                )}
                 <Button className="mgr-btn" data-testid="mgr-empty-stock" onClick={onOpenStockModal}>
                   <Search size={14} />
                   Browse stock

@@ -32,8 +32,8 @@ vi.mock("../../media", () => ({
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-icon-picker" /> : null,
 }));
-vi.mock("../../panels/KeyboardShortcutsPanel", () => ({
-  KeyboardShortcutsPanel: ({ isOpen }: { isOpen: boolean }) =>
+vi.mock("../../canvas/controls/KeyboardCheatSheet", () => ({
+  KeyboardCheatSheet: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-shortcuts" /> : null,
 }));
 vi.mock("../modals/CMSCollectionSetupModal", () => ({

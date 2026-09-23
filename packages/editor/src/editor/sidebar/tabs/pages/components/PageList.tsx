@@ -26,10 +26,6 @@ interface Props {
   pages: PageItem[];
   renamingPageId: string | null;
   nameError: string | null;
-  /** Opens the whole-site listings view — board 140:10's toolbar link. */
-  onOpenListings?: () => void;
-  /** The site as a tree of routes — the only site-wide view was a flat SEO table. */
-  onOpenStructure?: () => void;
   openContextMenuPageId?: string | null;
   composer: Composer | null;
   folders: FolderItem[];
@@ -67,8 +63,6 @@ export const PageList: React.FC<Props> = ({
   pages,
   renamingPageId,
   nameError,
-  onOpenListings,
-  onOpenStructure,
   openContextMenuPageId = null,
   composer,
   folders,
@@ -164,8 +158,9 @@ export const PageList: React.FC<Props> = ({
   return (
     <div className="bd-pg-list-shell">
       {/* Board 140:7: 36h band with a bare 28h search box (no magnifier,
-          no inline clear) plus the Listings text link on the right. Always
-          visible - the old 5-page gate is gone. */}
+          no inline clear). Always visible - the old 5-page gate is gone. The
+          Listings / Structure links that sat on its right moved under the
+          header ⋯ menu (board 7069:79383, audit G2-070). */}
       <div className="bd-pg-search-wrap" data-testid="pages-search-band">
         <div className="bd-pg-search" data-testid="pages-search-box">
           <TextInput
@@ -180,28 +175,6 @@ export const PageList: React.FC<Props> = ({
             aria-label="Search pages"
           />
         </div>
-        {onOpenListings && (
-          <Button
-            color="light"
-            size="xs"
-            className="bd-pg-listings-link"
-            data-testid="pages-open-listings"
-            onClick={onOpenListings}
-          >
-            {"\u229E"} Listings
-          </Button>
-        )}
-        {onOpenStructure && (
-          <Button
-            color="light"
-            size="xs"
-            className="bd-pg-listings-link"
-            data-testid="pages-open-structure"
-            onClick={onOpenStructure}
-          >
-            {"\u2442"} Structure
-          </Button>
-        )}
       </div>
       {showSelectAll && (
         <div
