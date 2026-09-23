@@ -256,7 +256,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
       <>
-        <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
+        <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-2 tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
           {/* Board 4428:140817 / 4428:145110: a card is its thumbnail over its
               name; hovered, it names what it is and offers "Add <name>" or the
               drag. The card IS the drag source — the board's grip is a hint,
@@ -281,13 +281,13 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
                 <img
                   src={b.preview}
                   alt=""
-                  className="tw:h-[80px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:object-cover tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                  className="tw:h-[65px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:object-cover tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
                   data-testid={`insert-block-thumb-${b.id}`}
                 />
               ) : (
                 <BlockThumb
                   blockId={b.id}
-                  className="tw:h-[80px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                  className="tw:h-[65px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
                 />
               )}
               <div className="tw:flex tw:items-center tw:justify-between tw:gap-1 tw:min-w-0">

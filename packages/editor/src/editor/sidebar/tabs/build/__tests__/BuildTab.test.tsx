@@ -156,8 +156,8 @@ describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
       .map((el) => el.getAttribute("data-testid")!)
       .filter((t) => /^insert-block-[a-z-]+$/.test(t) && !/thumb|label|pill/.test(t))
       .map((t) => t.replace("insert-block-", ""));
-    expect(ids).toEqual(["hero", "features", "footer", "navbar", "cta"]);
-    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("5");
+    expect(ids).toEqual(["hero", "features", "menu-grid", "testimonials-section", "cta", "contact", "footer", "navbar"]);
+    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("8");
   });
 
   it("draws a thumbnail on every card — no blank grey box", () => {
@@ -185,7 +185,7 @@ describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
       effectAllowed: "",
     };
     fireEvent.dragStart(card, { dataTransfer });
-    expect(JSON.parse(data.block)).toMatchObject({ id: "hero", label: "Hero Section", category: "Sections" });
+    expect(JSON.parse(data.block)).toMatchObject({ id: "hero", label: "Hero", category: "Sections" });
     expect(data["text/plain"]).toBe("hero");
     expect(dataTransfer.effectAllowed).toBe("copy");
   });
@@ -223,5 +223,18 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
       </ToastProvider>,
     );
     expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+/* Parity V1, board 4428:140817: BLOCKS is 8 sections in a two-column grid,
+   in the board's order. */
+describe("BuildTab — BLOCKS to board 4428:140817", () => {
+  it("lists the board's 8 blocks in order, two columns", () => {
+    renderTab();
+    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("8");
+    const labels = Array.from(document.querySelectorAll('[data-testid^="insert-block-label-"]')).map((e) => e.textContent);
+    expect(labels).toEqual(["Hero", "Features", "Menu grid", "Testimonials", "CTA", "Contact", "Footer", "Navbar"]);
+    expect(screen.getByTestId("insert-blocks-grid").className).toMatch(/tw:grid-cols-2/);
   });
 });

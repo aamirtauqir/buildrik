@@ -251,8 +251,8 @@ describe("insertBlock — elementType fallback branch", () => {
 // ---------------------------------------------------------------------------
 
 describe("blockDefinitions — registry integrity", () => {
-  it("registers exactly 64 blocks (11 Basic + 9 Media + 5 Layout + 16 Forms + 5 Sections + 14 Components + 4 Ecommerce)", () => {
-    expect(blockDefinitions).toHaveLength(64);
+  it("registers exactly 67 blocks (11 Basic + 9 Media + 5 Layout + 16 Forms + 8 Sections + 14 Components + 4 Ecommerce)", () => {
+    expect(blockDefinitions).toHaveLength(67);
   });
 
   it("has no duplicate block ids", () => {
@@ -265,7 +265,7 @@ describe("blockDefinitions — registry integrity", () => {
   });
 
   it("getBlockById finds a registered block and returns undefined for unknown ids", () => {
-    expect(getBlockById("hero")?.label).toBe("Hero Section");
+    expect(getBlockById("hero")?.label).toBe("Hero");
     expect(getBlockById("does-not-exist")).toBeUndefined();
   });
 
