@@ -27,6 +27,13 @@ function makeComposer(activePageId = "page-9") {
 }
 
 describe("locateComment", () => {
+  it("resolves a stored pin selector to its element — the shape real comments carry", () => {
+    const { composer, api, el } = makeComposer("page-1");
+    const outcome = locateComment(composer, { pageId: "page-1", targetSelector: '[data-buildrick-id="el-1"]' });
+    expect(api.selection.select).toHaveBeenCalledWith(el);
+    expect(outcome).toBe("located");
+  });
+
   it("switches page and selects the anchor (ported from ReviewBar.test.tsx:140)", () => {
     const { composer, api, el } = makeComposer("page-9");
     const outcome = locateComment(composer, { pageId: "page-1", targetSelector: "el-1" });
@@ -57,6 +64,20 @@ describe("locateComment", () => {
     expect(api.selection.select).not.toHaveBeenCalled();
     expect(api.elements.setActivePage).not.toHaveBeenCalled();
     expect(outcome).toBe("gone");
+  });
+
+  it("scrolls the selected anchor into view once the page has rendered", () => {
+    vi.useFakeTimers();
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    node.scrollIntoView = vi.fn();
+    document.body.appendChild(node);
+    const { composer } = makeComposer("page-9");
+    locateComment(composer, { pageId: "page-1", targetSelector: "el-1" });
+    vi.advanceTimersByTime(100);
+    expect(node.scrollIntoView).toHaveBeenCalledWith({ block: "center" });
+    node.remove();
+    vi.useRealTimers();
   });
 
   it("an unpinned comment moves the page and selects nothing", () => {

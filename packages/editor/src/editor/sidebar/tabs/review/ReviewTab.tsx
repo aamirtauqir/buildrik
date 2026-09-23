@@ -33,7 +33,7 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Crosshair, MoreHorizontal, Link as LinkIcon } from "lucide-react";
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, MoreHorizontal, Link as LinkIcon } from "lucide-react";
 import {
   Button,
   CommentRow,
@@ -53,7 +53,8 @@ import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
-import { locateComment } from "./locate";
+import { anchorId, locateComment } from "./locate";
+import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
 import {
   fetchCurrentRound,
   fetchRounds,
@@ -365,42 +366,30 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     />
   );
 
-  /* Locate — reuses the next-logic from ReviewBar.tsx (the bar is being
-     retired in C2, but the behaviour is what the comment-pin needs): switch
-     to the comment's page when it differs from the active one, then select
-     the element the pin was on. A comment whose target was deleted is left
-     in the detached group and the ⋯ menu shows no Locate entry. */
+  /* Locate › (B3, board rows of 4418:115784): `locateComment` is the one
+     page-then-select seam (C2, #39). An anchor deleted since the list loaded
+     moves the row into the Detached group — where it has Reattach, not
+     Locate (#27) — and a toast says why nothing was selected. */
   const { addToast } = useToast();
   const locate = React.useCallback(
     (c: ReviewComment) => {
       if (!composer) return;
-      if (c.pageId && composer.elements.getActivePage()?.id !== c.pageId) {
-        composer.elements.setActivePage(c.pageId);
-      }
-      const el = c.targetSelector ? composer.elements.getElement(c.targetSelector) : null;
-      if (el) {
-        composer.selection.select(el);
-      } else if (c.targetSelector) {
-        /* Comment had an anchor but the element is gone — pin survives in
-           detached, the menu item stays enabled (so reviewers don't have to
-           re-open the ⋯ on a different row just to learn why), and a toast
-           tells them why nothing happened. */
-        addToast({
-          tone: "warning",
-          description: "This comment lost its anchor — the element it was on has been removed.",
-        });
-      }
+      if (locateComment(composer, c) !== "gone") return;
+      setDetachedIds((prev) => new Set(prev).add(c.id));
+      addToast({
+        tone: "warning",
+        description: "This comment lost its anchor — the element it was on has been removed.",
+      });
     },
     [composer, addToast],
   );
 
-  /* Copy link — write the editor's current URL to the clipboard so a reviewer
-     (or the editor themselves) can paste a link to this exact view. The plan
-     row says "puts the URL on the clipboard" without a deep-link obligation;
-     `window.location.href` is the editor's URL for the current site. */
-  const copyLink = React.useCallback(async () => {
+  /* Copy link (G1-031) — the `?el=&page=` deep link `useDeepLink` opens:
+     the editor on this comment's page with its element selected. An
+     unanchored comment links to its page. */
+  const copyLink = React.useCallback(async (c: ReviewComment) => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(elementDeepLink(c.targetSelector ? anchorId(c.targetSelector) : null, c.pageId));
       setNotice("Link copied");
     } catch {
       setNotice("Couldn't copy the link — copy it from the address bar.");
@@ -412,7 +401,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      (Gate 22). Popover is controlled, so the parent owns `menuForId` and the
      trigger toggles it. */
   const rowMenu = (c: ReviewComment) => {
-    const canLocate = Boolean(c.targetSelector) && !detachedIds.has(c.id);
     const open = menuForId === c.id;
     return (
       <Popover
@@ -437,22 +425,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       >
         <Menu label="Comment actions">
           <MenuItem
-            icon={<Crosshair size={14} aria-hidden="true" />}
-            disabled={!canLocate}
-            {...(!canLocate ? { title: c.targetSelector ? "This comment lost its anchor." : "No element to locate" } : {})}
-            onClick={() => {
-              setMenuForId(null);
-              locate(c);
-            }}
-            data-row-locate
-          >
-            Locate
-          </MenuItem>
-          <MenuItem
             icon={<LinkIcon size={14} aria-hidden="true" />}
             onClick={() => {
               setMenuForId(null);
-              void copyLink();
+              void copyLink(c);
             }}
             data-row-copy-link
           >
@@ -788,6 +764,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       actions={
         extra?.actions ?? (
           <>
+            {c.targetSelector && c.status !== "RESOLVED" ? (
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => locate(c)}
+                className={GHOST}
+                data-row-locate
+              >
+                Locate ›
+              </Button>
+            ) : null}
             {rowMenu(c)}
             {resolveButton(c)}
           </>
