@@ -304,13 +304,16 @@
 /* ─── HOME CHIP + STATUS CHIP ─────────────────────────────────────────── */
 .bd-pg-home-chip,
 .bd-pg-chip {
+  /* 4418:93381 row "Contact" (7469:170014): a 22-tall pill, 8 inset, 11/16
+     Regular — not the old 16-tall medium chip. */
   display: inline-flex;
   align-items: center;
-  gap: var(--bk-space-4);
-  height: 16px;
-  padding: 0 6px;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--bk-space-8);
   border-radius: var(--bk-radius-full);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
+  white-space: nowrap;
   flex-shrink: 0;
 }
 .bd-pg-home-chip {
@@ -321,7 +324,6 @@
 .bd-pg-chip.draft     { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
 .bd-pg-chip.scheduled { background: #FEF3C7; color: #92400E; }
 .bd-pg-chip.hidden    { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); } /* contrast-fix per design review */
-.bd-pg-chip.external  { background: var(--bk-bg-panel); color: var(--bk-ink-soft); }
 .bd-pg-chip.error     { background: var(--bk-error-tint); color: var(--bk-error); }
 .bd-pg-chip .dot,
 .bd-pg-home-chip .dot {
@@ -764,6 +766,25 @@
 .bd-pg-onepage p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
 
 /* Board 141:40 — search result's owning folder, muted right. */
+/* 4418:93381 row "Home" (7505:172898) — a 6px dirty dot, then an
+   unfilled 22-tall pill (8 inset) reading "Unpublished" in warning-text. */
+.bd-pg-row-unpublished {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bk-space-4);
+  flex-shrink: 0;
+}
+.bd-pg-row-unpublished > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--bk-space-8);
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
+  color: var(--bk-warning-text);
+  white-space: nowrap;
+}
+.bd-pg-row-unpublished .bd-pg-row-dirty { width: 6px; height: 6px; margin-right: 0; }
+.bd-pg-row-dirty { width: 6px; height: 6px; margin-right: 0; }
 .bd-pg-row-dirty {
   /* Boards 140:21 / 1171:4729 — 8px warning dot, right of the name. */
   width: 8px;

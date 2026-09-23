@@ -1,5 +1,7 @@
 /**
- * statusLabel — 6-variant + unknown-guard. C4 #26: no Password status.
+ * statusLabel — 5-variant + unknown-guard. C4 #26: no Password status;
+ * G2-071: no External (it had no creator), and Hidden reads as the v3 board
+ * chip, "Hidden from publish".
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
@@ -11,8 +13,7 @@ describe("getStatusLabel", () => {
     ["live", "Live"],
     ["draft", "Draft"],
     ["scheduled", "Scheduled"],
-    ["hidden", "Hidden"],
-    ["external", "External"],
+    ["hidden", "Hidden from publish"],
     ["error", "Error"],
   ])("maps %s to %s", (status, expected) => {
     expect(getStatusLabel(status as PageStatus)).toBe(expected);
@@ -24,6 +25,10 @@ describe("getStatusLabel", () => {
 
   it("has no Password label — C4 #26 removed Password pages", () => {
     expect(getStatusLabel("password" as PageStatus)).toBeNull();
+  });
+
+  it("has no External label (G2-071)", () => {
+    expect(getStatusLabel("external" as PageStatus)).toBeNull();
   });
 
   it("returns null for undefined", () => {

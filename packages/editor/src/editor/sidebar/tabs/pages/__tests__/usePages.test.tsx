@@ -136,7 +136,7 @@ describe("usePages — legacy password pages", () => {
     });
     const { result } = setup(composer);
     expect(result.current.pages[0].status).toBe("hidden");
-    expect(getStatusLabel(result.current.pages[0].status)).toBe("Hidden");
+    expect(getStatusLabel(result.current.pages[0].status)).toBe("Hidden from publish");
   });
 });
 
@@ -312,24 +312,6 @@ describe("usePages duplicatePage", () => {
 // ── setHomepage ──────────────────────────────────────────────────────────────
 
 describe("usePages setHomepage", () => {
-  it("blocks external-status pages with a warning toast", () => {
-    const composer = createMockComposer({
-      pages: [
-        pg("p1", "Home", { isHome: true }),
-        pg("p2", "Docs", { settings: { visibility: "external" } }),
-      ],
-    });
-    const { result } = setup(composer);
-
-    act(() => result.current.setHomepage("p2"));
-
-    expect(composer.elements.setHomePage).not.toHaveBeenCalled();
-    expect(lastToast()).toMatchObject({
-      description: "External link pages can't be set as the homepage.",
-      tone: "warning",
-    });
-  });
-
   it("calls elements.setHomePage and toasts success for a normal page", () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "About")],

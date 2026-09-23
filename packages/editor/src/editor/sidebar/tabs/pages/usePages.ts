@@ -29,7 +29,7 @@ import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvi
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
  *  were removed reads as "hidden" — it is unpublished, like a hidden page. */
-const PAGE_STATUSES: ReadonlyArray<PageStatus> = ["live", "draft", "hidden", "scheduled", "error", "external"];
+const PAGE_STATUSES: ReadonlyArray<PageStatus> = ["live", "draft", "hidden", "scheduled", "error"];
 function pageStatus(visibility: string | undefined): PageStatus {
   if (visibility === "password") return "hidden";
   return PAGE_STATUSES.find((s) => s === visibility) ?? "live";
@@ -285,14 +285,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     (pageId: string) => {
       const page = pages.find((p) => p.id === pageId);
       setContextMenu(null);
-      if (page?.status === "external") {
-        addToast({
-          description: "External link pages can't be set as the homepage.",
-          tone: "warning",
-          duration: 4000,
-        });
-        return;
-      }
       if (!composer) return;
       try {
         composer.elements.setHomePage?.(pageId);

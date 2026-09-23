@@ -1,6 +1,7 @@
 /**
- * LayersEmptyState — board 143:355 (Layers · empty): two centered muted
- * lines and the one accent "Open Insert" link. No icon, no button chrome.
+ * LayersEmptyState — board 4418:83911 (S·Layers · empty; audit G2-063):
+ * "No layers yet. Add an element…" and the one accent "Open Add" link — the
+ * rail item is Add, not Insert. No icon, no button chrome.
  * @license BSD-3-Clause
  */
 
@@ -18,7 +19,7 @@ export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockCl
       data-testid="layers-empty"
     >
       <p className="tw:m-0 tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-        This page is empty. Drop something on the canvas to see it here.
+        No layers yet. Add an element to start building.
       </p>
       {onAddBlockClick && (
         <Button
@@ -26,10 +27,10 @@ export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockCl
           color="light"
           size="xs"
           variant="link"
-          data-testid="layers-open-insert"
+          data-testid="layers-open-add"
           onClick={onAddBlockClick}
         >
-          Open Insert
+          Open Add
         </Button>
       )}
     </div>
