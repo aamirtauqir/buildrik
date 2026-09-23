@@ -67,3 +67,17 @@ describe("Rename token (G3-137)", () => {
     expect(item.getAttribute("title")).toMatch(/keep their IDs/);
   });
 });
+
+describe("Delete token with no delete path (G3-138)", () => {
+  it("is disabled with the reason, never a silent no-op", () => {
+    render(
+      <DSModeProvider initialMode="pro">
+        <TokenDetailView token={token} composer={composer} allTokens={[token, other]} />
+      </DSModeProvider>,
+    );
+    fireEvent.click(screen.getByTestId("brand-token-menu"));
+    const item = screen.getByTestId("brand-token-action-delete") as HTMLButtonElement;
+    expect(item.disabled).toBe(true);
+    expect(item.getAttribute("title")).toMatch(/cannot be deleted/);
+  });
+});

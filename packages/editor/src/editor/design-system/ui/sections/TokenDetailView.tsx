@@ -262,7 +262,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const [replaceOpen, setReplaceOpen] = React.useState(false);
   const handleDelete = () => {
     setMenuOpen(false);
-    if (!isPro) return; // Beginner-blocked.
+    if (!isPro || !onDelete) return; // Beginner-blocked, or no delete path.
     if (consumerCount === 0) {
       onDelete?.(token.id);
       onDeleted?.();
@@ -335,9 +335,15 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               <MenuItem
                 danger
                 onClick={handleDelete}
-                aria-disabled={!isPro || undefined}
-                disabled={!isPro}
-                title={isPro ? undefined : "Delete is blocked in Beginner mode. Switch to Pro to delete tokens."}
+                aria-disabled={!isPro || !onDelete || undefined}
+                disabled={!isPro || !onDelete}
+                title={
+                  !isPro
+                    ? "Delete is blocked in Beginner mode. Switch to Pro to delete tokens."
+                    : onDelete
+                      ? undefined
+                      : "Type and spacing tokens are part of the scale and cannot be deleted."
+                }
                 data-testid="brand-token-action-delete"
               >
                 Delete token…

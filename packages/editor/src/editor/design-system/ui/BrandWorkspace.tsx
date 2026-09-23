@@ -606,14 +606,21 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (guardOpen || showReview || showAddToken || aiOpen) return;
+      /* An open popover, menu or dialog owns this Escape (the token card's ⋯
+         menu, the font picker, the rename / replace dialogs). Leaving the
+         workspace on the same keypress that closed a menu was found live. */
+      if (document.querySelector('[role="menu"], [role="dialog"], [role="listbox"]')) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
       e.preventDefault();
       requestLeave();
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    /* Window, capture phase: ahead of the Popover's own document-capture
+       Escape, which closes the menu and (microtasks run between listeners)
+       unmounts it before a later listener could see it was open. */
+    window.addEventListener("keydown", handler, true);
+    return () => window.removeEventListener("keydown", handler, true);
   }, [guardOpen, showReview, showAddToken, aiOpen, requestLeave]);
 
   // ─ Pane content ─
@@ -1098,7 +1105,12 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               allTokens={allTokens}
               mode={resolvedMode}
               onValueChange={changeToken}
-              onDelete={deleteToken}
+              /* Same gate as rename (G3-138): type and spacing have no delete
+                 path; offering Delete for them was a silent no-op. */
+              onDelete={(() => {
+                const k = kindOf(selectedToken);
+                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
+              })()}
               /* Only colour and the generic kinds can rename; type and spacing
                  have no rename path, and a Rename that silently did nothing
                  was G3-137's defect — the item is disabled for them. */
