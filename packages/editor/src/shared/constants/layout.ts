@@ -52,7 +52,7 @@
 export const TOOLBAR_H = 36;
 
 /** Status-bar footer height. Figma 32-2 footer = 32 (was 40; converged with
- *  LayoutShell.css `--layout-footer-height` = `--buildrick-size-footer`). */
+ *  `--bk-size-footer`). */
 
 // ============================================================================
 // ROW DENSITY — sidebar + inspector rows
