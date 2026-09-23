@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
-import { useMediaWriteAccess } from "../../sidebar/tabs/media/hooks/useMediaWriteAccess";
+import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { Button, Tooltip } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
    this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
