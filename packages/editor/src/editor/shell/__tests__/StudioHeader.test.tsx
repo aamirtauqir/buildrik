@@ -222,7 +222,7 @@ describe("StudioHeader", () => {
     it("the breadcrumb: site opens Pages, page is the current crumb", () => {
       const onOpenPages = vi.fn();
       const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
-      render(<StudioHeader {...makeProps({ onOpenPages, composer: composer as never, siteName: "Bella Cucina" })} />);
+      render(<StudioHeader {...makeProps({ onOpenPages, composer: composer as never })} />);
       expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
       expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
       fireEvent.click(screen.getByTestId("topbar-crumb-site"));
