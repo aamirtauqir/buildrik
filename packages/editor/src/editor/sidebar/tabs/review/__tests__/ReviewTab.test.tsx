@@ -38,6 +38,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
 
 import { fetchRounds } from "../../../../../services/ReviewService";
 import { ReviewTab } from "../ReviewTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const ROUND = {
   id: "r1",
@@ -59,7 +60,11 @@ const COMMENTS = [
 ];
 
 function renderTab(props = {}) {
-  return render(<ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />);
+  return render(
+    <ToastProvider>
+      <ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />
+    </ToastProvider>,
+  );
 }
 
 beforeEach(() => {
@@ -375,6 +380,116 @@ describe("the previous-rounds history (board 157:169, the buildable half)", () =
     fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
     expect(await screen.findByText(/Couldn't load the history/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+  });
+});
+
+describe("B3 — per-row Locate › (G1-030) and the ⋯ menu's Copy link (G1-031)", () => {
+  /* Locate › goes through `locateComment` (page first, then select); Copy
+     link writes window.location.href to the clipboard. */
+
+  function makeComposer() {
+    const handlers: Record<string, ((p: unknown) => void)[]> = {};
+    const activePage = { id: "page-home", name: "Home" };
+    const target = { id: "el-hero", type: "image", name: "Hero" };
+    return {
+      on: (evt: string, fn: (p: unknown) => void) => {
+        (handlers[evt] ||= []).push(fn);
+      },
+      off: () => {},
+      emit: vi.fn(),
+      selection: { select: vi.fn() },
+      elements: {
+        getAllPages: () => [{ id: "page-home", name: "Home" }, { id: "page-menu", name: "Menu" }],
+        getActivePage: () => activePage,
+        setActivePage: vi.fn((id: string) => {
+          activePage.id = id;
+        }),
+        getElement: vi.fn((sel: string) => (sel === "el-hero" ? target : null)),
+      },
+    };
+  }
+
+  beforeEach(() => {
+    Object.assign(window, { location: { ...window.location, href: "http://localhost:5051/?siteId=abc" } });
+  });
+
+  it("an anchored row shows Locate › on the row; the ⋯ menu carries Copy link", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    expect(within(row).getByRole("button", { name: "Locate ›" })).toBeInTheDocument();
+    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
+    expect(await within(row).findByRole("menuitem", { name: /copy link/i })).toBeInTheDocument();
+    expect(within(row).queryByRole("menuitem", { name: "Locate" })).toBeNull();
+  });
+
+  it("Locate › switches page when the comment lives on another one, then selects its element", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-menu" },
+    ]);
+    const composer = makeComposer();
+    const order: string[] = [];
+    composer.elements.setActivePage.mockImplementation(() => order.push("page"));
+    composer.selection.select.mockImplementation(() => order.push("select"));
+    renderTab({ composer });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Locate ›" }));
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-menu");
+    expect(composer.selection.select).toHaveBeenCalledWith({ id: "el-hero", type: "image", name: "Hero" });
+    expect(order).toEqual(["page", "select"]);
+  });
+
+  it("Locate › on an anchor deleted since load moves the row to Detached and says why (#27)", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-gone"]`, pageId: "page-home" },
+    ]);
+    const composer = makeComposer();
+    renderTab({ composer });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Locate ›" }));
+    expect(composer.selection.select).not.toHaveBeenCalled();
+    expect(await screen.findByText(/lost its anchor/i)).toBeInTheDocument();
+    const moved = (await screen.findByTestId("review-detached-band")).parentElement as HTMLElement;
+    expect(within(moved).getByText(/hero photo is too dark/)).toBeInTheDocument();
+    expect(within(moved).queryByRole("button", { name: "Locate ›" })).toBeNull();
+  });
+
+  it("an unanchored comment has no Locate ›", async () => {
+    fetchReviewComments.mockResolvedValue([COMMENTS[0]]); // targetSelector: null
+    renderTab({ composer: makeComposer() });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    expect(within(row).queryByRole("button", { name: "Locate ›" })).toBeNull();
+  });
+
+  it("Copy link writes the comment's ?el=&page= deep link to the clipboard", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    Object.assign(navigator, { clipboard: { writeText } });
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
+    fireEvent.click(await within(row).findByRole("menuitem", { name: /copy link/i }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const url = new URL(writeText.mock.calls[0][0]);
+    expect(url.searchParams.get("el")).toBe("el-hero");
+    expect(url.searchParams.get("page")).toBe("page-home");
+    expect(await screen.findByText("Link copied")).toBeInTheDocument();
+  });
+
+  it("Copy link falls back to the address-bar notice when the clipboard throws", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(() => Promise.reject(new Error("denied"))) } });
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
+    fireEvent.click(await within(row).findByRole("menuitem", { name: /copy link/i }));
+    expect(await screen.findByText(/Couldn't copy the link/i)).toBeInTheDocument();
   });
 });
 

@@ -369,6 +369,9 @@ export const EVENTS = {
    *  the site menu and a ⌘K command reach it through this instead. Handled
    *  in AquibraStudio, which owns the panel. */
   UI_OPEN_ISSUES: "ui:open-issues",
+  /** Open the one Compare (B8) on two sides. Every Compare door emits this;
+   *  `CompareHost`, mounted by the shell, is the only listener. */
+  UI_COMPARE_OPEN: "ui:compare-open",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
@@ -530,6 +533,9 @@ export const EVENTS = {
   BRAND_DIRTY_CHANGED: "brand:dirty-changed",
   /** A review round went out (send or re-send, any of the three send sites). */
   REVIEW_SENT: "review:sent",
+  /** Re-ask `reviews.status` after a failed read — the Publish panel's
+   *  "Retry ›" on the unchecked gate. `useLifecycle` listens. */
+  REVIEW_STATUS_RETRY: "review:status-retry",
 
   // ============================================
   // Device/Zoom Events
@@ -928,8 +934,10 @@ export interface EventPayloads {
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
+  [EVENTS.REVIEW_STATUS_RETRY]: void;
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
 }
 

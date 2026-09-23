@@ -11,7 +11,8 @@
  *   Workspace  — invite · account · start collaboration (flag-gated)
  *   (footer)   — keyboard shortcuts
  *
- * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments, Issues.
+ * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments. Issues
+ * came back IN (C3): the topbar chip was removed and this row replaced it.
  * Removed (D8): "Exit to dashboard" — the bar's ‹ Exit is always visible; a
  * second door in the overflow was dead weight.
  *
@@ -73,6 +74,13 @@ export interface SiteMenuProps {
    */
   onOpenPublish?: () => void;
   onOpenPublishHistory?: () => void;
+  /** History · Activity, in the editor (B6, G1-019). Omitted = the row
+   *  deep-links to the dashboard's activity section as before. */
+  onOpenActivity?: () => void;
+  /** The Issues panel (C3: the topbar chip that opened it is gone). */
+  onOpenIssues?: () => void;
+  /** The row's tooltip — the issue count sentence (`formatIssueSummary`). */
+  issuesTitle?: string;
   /** Take the site down. Only offered while a published URL exists; the
    *  Publish panel hosts the confirm. unpublishSite was fully built with
    *  Vercel teardown and exposed only in the dashboard, so taking a site down
@@ -146,6 +154,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenReview,
   onOpenPublish,
   onOpenPublishHistory,
+  onOpenIssues,
+  issuesTitle,
+  onOpenActivity,
   onUnpublish,
   onExportCode,
   onOpenTemplates,
@@ -169,7 +180,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   };
 
   const hasSite = Boolean(
-    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onExportCode,
+    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onOpenIssues || onExportCode,
   );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
   const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
@@ -202,6 +213,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             ) : null}
             {onOpenReview ? <MenuItem onClick={run(onOpenReview)}>Review</MenuItem> : null}
             {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
+            {onOpenIssues ? (
+              <MenuItem onClick={run(onOpenIssues)} title={issuesTitle} data-testid="site-menu-issues">Issues</MenuItem>
+            ) : null}
             {onOpenPublishHistory ? (
               <MenuItem onClick={run(onOpenPublishHistory)} data-testid="site-menu-publish-history">Publish history</MenuItem>
             ) : null}
@@ -222,7 +236,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
               Site health
             </MenuItem>
-            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#activity-log`))}>
+            <MenuItem
+              onClick={run(onOpenActivity ?? (() => openDashboard(`/dashboard/sites/${siteId}#activity-log`)))}
+              data-testid="site-menu-activity-log"
+            >
               Activity log
             </MenuItem>
           </MenuGroup>

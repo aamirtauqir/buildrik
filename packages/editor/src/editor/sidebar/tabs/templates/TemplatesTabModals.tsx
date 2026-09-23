@@ -118,7 +118,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       checked={backupCurrentPage}
       onChange={onBackupChange}
       title="Save the current page as a backup version first"
-      hint={`Keeps your work as “${currentPageName || "Current"} (backup)”.`}
+      hint="Keeps your work as a version in History › Saves."
     />
     {/* Not on the board, kept because it does something the board's sentence
         does not cover: it clears the project's global styles outright.

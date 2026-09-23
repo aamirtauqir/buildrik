@@ -127,6 +127,15 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       handler: () => { composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {}); onClose(); },
     },
     {
+      /* C3: the topbar Issues chip is gone; ⌘K and the site menu are the
+         Issues panel's doors. */
+      id: "view-issues",
+      label: "Show issues",
+      group: "View",
+      keywords: ["problems", "errors", "warnings", "checks"],
+      handler: () => { composer.emit(EVENTS.UI_OPEN_ISSUES, undefined); onClose(); },
+    },
+    {
       id: "view-zoom-in",
       label: "Zoom in",
       group: "View",

@@ -240,3 +240,26 @@ describe("useLifecycle — one derivation", () => {
     expect(result.current.nextMove?.label).toBe("Publish changes");
   });
 });
+
+/* QA 2026-09-24 — the B4 gate stuck on "Checking…" when reviews.status
+   errored. The failure is a state the panel can Retry out of. */
+describe("useLifecycle — a failed status read", () => {
+  it("lands on the unchecked gate, and Retry re-asks and clears it", async () => {
+    fetchCurrentRound.mockResolvedValue(null);
+    fetchReviewStatus.mockResolvedValueOnce({
+      state: "none", reviewerName: null, at: null, reviewsEnabled: null, editsRequireApproval: null, readFailed: true,
+    });
+    const composer = makeComposer();
+    const { result } = renderHook(() => useLifecycle(input({ composer: composer as never })));
+    await act(async () => {});
+    expect(result.current.nextMove?.gate).toBe("unchecked");
+
+    fetchReviewStatus.mockResolvedValueOnce(status({ state: "approved", reviewsEnabled: true, editsRequireApproval: true }));
+    await act(async () => {
+      composer.emit(EVENTS.REVIEW_STATUS_RETRY);
+    });
+    expect(result.current.nextMove?.gate).not.toBe("unchecked");
+    expect(result.current.nextMove?.blockedReason).toBeNull();
+  });
+});
+

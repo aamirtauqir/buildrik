@@ -8,17 +8,26 @@
  * call this; it is the REGRESSION-guarded seam.
  *
  * Decision #27: cross-page → the page switches FIRST, then the selection;
- * a deleted anchor → nothing is selected and the caller says so ("No longer
- * on the page"), never a silent no-op.
+ * a deleted anchor → nothing is selected and the caller says so, never a
+ * silent no-op. The `?el=&page=` deep link (useDeepLink) is the same act on
+ * load and calls this too.
  *
  * @license BSD-3-Clause
  */
 import type { Composer } from "@/engine";
+import { getDOMElement } from "@/engine/canvas/resize/utils";
+import { elementIdFromSelector } from "@/editor/canvas/comments/commentAnchors";
 
 export interface LocatableComment {
   pageId: string | null;
-  /** The anchor element's id (`targetSelector` on the comment row). */
+  /** The anchor: a stored pin selector (`[data-buildrick-id="…"]`, what
+   *  CommentLayer writes) or a bare element id (the `?el=` deep link). */
   targetSelector: string | null;
+}
+
+/** The engine id behind an anchor — the selector's id, or the id itself. */
+export function anchorId(targetSelector: string): string {
+  return elementIdFromSelector(targetSelector) ?? targetSelector;
 }
 
 /**
@@ -38,9 +47,17 @@ export function locateComment(composer: Composer, c: LocatableComment): LocateOu
     composer.elements.setActivePage(c.pageId);
   }
   if (!c.targetSelector) return "page-only";
-  const el = composer.elements.getElement(c.targetSelector);
+  /* The comment row stores a SELECTOR; the registry is keyed by id. Looking
+     the selector up as an id (what the retired ReviewBar did) found nothing
+     for every real pin. */
+  const id = anchorId(c.targetSelector);
+  const el = composer.elements.getElement(id);
   if (!el) return "gone";
   /* `select` takes the element, not its id — the same shape ContentTab uses. */
   composer.selection.select(el);
+  /* Selecting does not move the canvas; on a long page the anchor stays off
+     screen. A page switch re-renders the canvas first, so the scroll waits a
+     beat for the node to exist. */
+  window.setTimeout(() => getDOMElement(id)?.scrollIntoView({ block: "center" }), 60);
   return "located";
 }
