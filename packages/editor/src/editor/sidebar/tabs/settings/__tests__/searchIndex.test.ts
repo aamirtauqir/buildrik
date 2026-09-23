@@ -55,7 +55,7 @@ describe("SETTINGS_SEARCH_INDEX", () => {
     expect(sections.map((s) => s.id)).toEqual(NAV_ORDER);
     expect(titles(sections)).toEqual([
       "General",
-      "Fonts & colours",
+      "Brand",
       "Localization",
       "SEO defaults",
       "Domains",

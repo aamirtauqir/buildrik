@@ -104,6 +104,7 @@ import { ExportSection } from "./sections/ExportSection";
 import { LintSection, brandChecksCaption, contrastFixFor } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
+import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { StartersSection } from "./sections/StartersSection";
@@ -247,6 +248,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [guardOpen, setGuardOpen] = React.useState(false);
+  const [classAddOpen, setClassAddOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = React.useState(false);
   /* The saved brand is in the registries — the auto-draft may restore on top. */
@@ -605,16 +607,23 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || showReview || showAddToken || aiOpen) return;
+      if (guardOpen || showReview || showAddToken || aiOpen || classAddOpen) return;
+      /* An open popover, menu or dialog owns this Escape (the token card's ⋯
+         menu, the font picker, the rename / replace dialogs). Leaving the
+         workspace on the same keypress that closed a menu was found live. */
+      if (document.querySelector('[role="menu"], [role="dialog"], [role="listbox"]')) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
       e.preventDefault();
       requestLeave();
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, showReview, showAddToken, aiOpen, requestLeave]);
+    /* Window, capture phase: ahead of the Popover's own document-capture
+       Escape, which closes the menu and (microtasks run between listeners)
+       unmounts it before a later listener could see it was open. */
+    window.addEventListener("keydown", handler, true);
+    return () => window.removeEventListener("keydown", handler, true);
+  }, [guardOpen, showReview, showAddToken, aiOpen, classAddOpen, requestLeave]);
 
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
@@ -745,6 +754,27 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           </Tooltip>
         );
       }
+      case "classes":
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setClassAddOpen(true)} data-testid="brand-page-action">
+            + Add class
+          </Button>
+        );
+      case "brand-checks":
+        /* 7316:84555's page action. The checks also run by themselves on
+           every staged edit; this runs them now (useDSLint's one trigger). */
+        return (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className={PAGE_ACTION}
+            onClick={() => composer?.emit?.(EVENTS.BRAND_CHECKS_RUN, undefined)}
+            data-testid="brand-page-action"
+          >
+            Run checks
+          </Button>
+        );
       case "fonts":
         /* The fonts a site can pick from are its Site fonts — the same door
            the font picker's "Manage site fonts" opens. */
@@ -1098,13 +1128,26 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               allTokens={allTokens}
               mode={resolvedMode}
               onValueChange={changeToken}
-              onDelete={deleteToken}
-              onRename={renameToken}
+              /* Same gate as rename (G3-138): type and spacing have no delete
+                 path; offering Delete for them was a silent no-op. */
+              onDelete={(() => {
+                const k = kindOf(selectedToken);
+                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
+              })()}
+              /* Only colour and the generic kinds can rename; type and spacing
+                 have no rename path, and a Rename that silently did nothing
+                 was G3-137's defect — the item is disabled for them. */
+              onRename={(() => {
+                const k = kindOf(selectedToken);
+                return k === "color" || isMoreKind(k) ? renameToken : undefined;
+              })()}
               onDeleted={() => setSelectedTokenId(null)}
             />
           )}
         </aside>
       </div>
+
+      <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
       <BrandDiscardDialog
         open={guardOpen}

@@ -40,7 +40,7 @@ const SR_STATUS: Record<CheckStatus, string> = {
    board settles it the way the legend says. */
 export const CheckIcon: React.FC<{ status: CheckStatus }> = ({ status }) => (
   <span
-    className={`tw:flex tw:size-4 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-[10px] tw:font-semibold tw:text-white ${
+    className={`tw:flex tw:size-4 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-[11px] tw:font-semibold tw:text-white ${
       status === "pass"
         ? "tw:bg-[var(--bk-success)]"
         : status === "fail"

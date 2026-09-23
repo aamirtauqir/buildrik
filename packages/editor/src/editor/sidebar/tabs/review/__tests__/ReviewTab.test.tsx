@@ -194,8 +194,9 @@ describe("load states", () => {
   it("asks to withdraw, not to revoke a link, when there is no client link", async () => {
     fetchCurrentRound.mockResolvedValue({ ...ROUND, invitedEmail: null, reviewerName: null });
     renderTab();
-    fireEvent.click(await screen.findByRole("button", { name: "Withdraw request" }));
-    expect(await screen.findByRole("alertdialog", { name: "Withdraw this review request?" })).toBeInTheDocument();
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Withdraw request" }));
+    expect(await screen.findByText("Withdraw this review request?")).toBeInTheDocument();
     expect(screen.queryByText(/lose access/i)).not.toBeInTheDocument();
   });
 
@@ -218,7 +219,7 @@ describe("actions", () => {
   it("posts an internal reply then reloads the thread", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    fireEvent.change(screen.getByPlaceholderText(/reply/i), { target: { value: "fixed the contrast" } });
+    fireEvent.change(screen.getByPlaceholderText(/internal note/i), { target: { value: "fixed the contrast" } });
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
     await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "page-home"));
     await waitFor(() => expect(fetchReviewComments.mock.calls.length).toBeGreaterThan(1));
@@ -244,19 +245,18 @@ describe("actions", () => {
     await waitFor(() => expect(composer.emit).toHaveBeenCalledWith("comments:refresh", {}));
   });
 
-  /* Board 158:2. Two live re-send affordances at once is how a client's link
-     gets invalidated by the wrong click, so the confirm REPLACES the button. */
-  it("re-sending with open comments asks first, and the confirm replaces the primary", async () => {
+  /* Board 4418:120052 (G1-058): the re-send asks in a modal, which names
+     who gets the new link and what round it starts. */
+  it("re-sending asks in a modal first, then sends", async () => {
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
     await screen.findByText(/hero photo is too dark/);
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
-
-    expect(screen.getByText(/2 comments are still open\. Re-send anyway\?/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Re-send for review" })).not.toBeInTheDocument();
+    expect(await screen.findByText(/^Send a new review to /)).toBeInTheDocument();
+    expect(screen.getByText(/the previous link stops working/)).toBeInTheDocument();
+    expect(screen.getByText(/2 comments are still open/)).toBeInTheDocument();
     expect(onResend).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Re-send" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalled());
   });
 
@@ -269,6 +269,7 @@ describe("actions", () => {
     renderTab({ onResend });
     await screen.findByText("Everything is resolved.");
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
 
     const btn = await screen.findByRole("button", { name: "Sending round 3…" });
     expect(btn).toBeDisabled();
@@ -278,26 +279,43 @@ describe("actions", () => {
     );
   });
 
-  it("a clean round re-sends without a confirm", async () => {
+  it("a clean round asks too — the re-send still kills the current link", async () => {
     fetchReviewComments.mockResolvedValue([COMMENTS[2]]);
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
     await screen.findByText("Everything is resolved.");
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalled());
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
+    expect(onResend).not.toHaveBeenCalled();
   });
 
-  /* Board 158:105 — the revoke confirm is an inline panel at the top of the
-     panel, not a modal, and it carries the revision so a re-send that landed
+  /* Board 7071:79114 + 6879:67202 (G1-059): revoke lives in the panel's ⋯
+     menu and asks in a modal, carrying the revision so a re-send that landed
      first cannot be revoked by a stale click. */
-  it("revoke asks inline and passes the revision", async () => {
+  it("revoke is a ⋯ menu row with a modal, and passes the revision", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    expect(screen.queryByText("Revoke this review link?")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Revoke link" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke link" }));
+    expect(await screen.findByText("Revoke this review link?")).toBeInTheDocument();
+    expect(screen.getByText("Revoking does not change the approval lock or any comment.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Revoke link" }));
-    expect(screen.getByText("Revoke this review link?")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Revoke" }));
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
+  });
+
+  it("the ⋯ menu's Re-send opens the same modal", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Re-send review link" }));
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
+  });
+
+  it("the note composer says it is internal (G1-056)", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    expect(screen.getByPlaceholderText("Add an internal note…")).toBeInTheDocument();
   });
 
   /* The harness supplies onResend by default, which is exactly why nothing
@@ -383,7 +401,7 @@ describe("the previous-rounds history (board 157:169, the buildable half)", () =
   });
 });
 
-describe("B3 — per-row Locate › (G1-030) and the ⋯ menu's Copy link (G1-031)", () => {
+describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as board 4418:115784", () => {
   /* Locate › goes through `locateComment` (page first, then select); Copy
      link writes window.location.href to the clipboard. */
 
@@ -413,16 +431,16 @@ describe("B3 — per-row Locate › (G1-030) and the ⋯ menu's Copy link (G1-03
     Object.assign(window, { location: { ...window.location, href: "http://localhost:5051/?siteId=abc" } });
   });
 
-  it("an anchored row shows Locate › on the row; the ⋯ menu carries Copy link", async () => {
+  it("an anchored row: Locate › trailing, Resolve and Copy link under it, no per-row ⋯", async () => {
     fetchReviewComments.mockResolvedValue([
       { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
     ]);
     renderTab();
     const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
     expect(within(row).getByRole("button", { name: "Locate ›" })).toBeInTheDocument();
-    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
-    expect(await within(row).findByRole("menuitem", { name: /copy link/i })).toBeInTheDocument();
-    expect(within(row).queryByRole("menuitem", { name: "Locate" })).toBeNull();
+    expect(within(row).getByRole("button", { name: "Copy link" })).toBeInTheDocument();
+    expect(within(row).getByRole("button", { name: "Resolve" })).toBeInTheDocument();
+    expect(within(row).queryByRole("button", { name: "More actions" })).toBeNull();
   });
 
   it("Locate › switches page when the comment lives on another one, then selects its element", async () => {
@@ -471,8 +489,7 @@ describe("B3 — per-row Locate › (G1-030) and the ⋯ menu's Copy link (G1-03
     Object.assign(navigator, { clipboard: { writeText } });
     renderTab();
     const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
-    fireEvent.click(await within(row).findByRole("menuitem", { name: /copy link/i }));
+    fireEvent.click(within(row).getByRole("button", { name: "Copy link" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     const url = new URL(writeText.mock.calls[0][0]);
     expect(url.searchParams.get("el")).toBe("el-hero");
@@ -487,8 +504,7 @@ describe("B3 — per-row Locate › (G1-030) and the ⋯ menu's Copy link (G1-03
     Object.assign(navigator, { clipboard: { writeText: vi.fn(() => Promise.reject(new Error("denied"))) } });
     renderTab();
     const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: "More actions" }));
-    fireEvent.click(await within(row).findByRole("menuitem", { name: /copy link/i }));
+    fireEvent.click(within(row).getByRole("button", { name: "Copy link" }));
     expect(await screen.findByText(/Couldn't copy the link/i)).toBeInTheDocument();
   });
 });

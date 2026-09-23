@@ -24,7 +24,7 @@ import {
   TextField,
 } from "@/editor/chrome-ui";
 
-export const UNPUBLISH_WORD = "UNPUBLISH";
+const UNPUBLISH_WORD = "UNPUBLISH";
 
 export interface UnpublishConfirmModalProps {
   open: boolean;

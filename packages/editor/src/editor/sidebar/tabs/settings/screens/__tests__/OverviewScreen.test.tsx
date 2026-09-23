@@ -144,7 +144,7 @@ describe("OverviewScreen — the frame", () => {
     ]);
     const line = (id: string) => screen.getByTestId(`set-ov-row-line-${id}`).textContent;
     expect(line("general")).toBe("Bella Cucina · English (en-US)");
-    expect(line("branding")).toBe("Site fonts and colour tokens");
+    expect(line("branding")).toBe("Colours, fonts, spacing and presets");
     expect(line("localization")).toBe("3 locales · Arabic not started");
     expect(line("analytics")).toBe("GA4 receiving data");
     expect(line("forms")).toBe("3 forms · 38 submissions");

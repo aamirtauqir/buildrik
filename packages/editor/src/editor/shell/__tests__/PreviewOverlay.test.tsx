@@ -1,6 +1,6 @@
 /**
  * PreviewOverlay tests — in-shell preview (shell state 7): sandboxed iframe
- * render, Done + Escape exits, hidden when no html.
+ * render, "‹ Back to canvas" + Escape exit, hidden when no html.
  *
  * @license BSD-3-Clause
  */
@@ -31,10 +31,16 @@ describe("PreviewOverlay", () => {
     expect(frame.getAttribute("sandbox")).toBe("");
   });
 
-  it("'Done' exits", () => {
+  /* Board 4418:165611 (C5 G1-086): the way out is "‹ Back to canvas" in the
+     preview's own bar; the Done pill is gone, and each device names its width. */
+  it("'‹ Back to canvas' exits, and each device names its width", () => {
     const onDone = vi.fn();
     render(<PreviewOverlay html="<p>x</p>" onDone={onDone} />);
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveTextContent("Desktop1320px");
+    expect(screen.getByTestId("bp-cell-tablet")).toHaveTextContent("Tablet768px");
+    expect(screen.getByTestId("bp-cell-mobile")).toHaveTextContent("Mobile375px");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 

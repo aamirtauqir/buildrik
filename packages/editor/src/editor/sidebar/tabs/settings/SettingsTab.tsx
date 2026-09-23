@@ -17,7 +17,7 @@
  * `Changes not saved` + `Retry save` · `Loading settings…` · `Settings could
  * not load`), the save path, the Settings saved dialog, the Unsaved settings
  * guard (Back to canvas / Cancel / Done / Escape / any nav click while
- * dirty), the plan gate's `Upgrade`, and the doors: Fonts & colours → the
+ * dirty), the plan gate's `Upgrade`, and the doors: Brand ↗ → the
  * Brand panel, Export → the Export modal, Members / Billing → the dashboard.
  * The screen owns its cards, its load card and its save-error banner
  * (`ScreenProps.onLoadStateChange` / `saveError`).
@@ -123,7 +123,7 @@ const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
 
 export const SettingsTab: React.FC<
   SettingsTabProps & {
-    /** Switch to the Brand (`design`) tab — the `Fonts & colours` door. */
+    /** Switch to the Brand (`design`) tab — the `Brand ↗` door. */
     onOpenDesignTab?: () => void;
     /** Deep-link screen id from `openLeftPanelToTab("settings", <id>)`. */
     initialScreen?: string;

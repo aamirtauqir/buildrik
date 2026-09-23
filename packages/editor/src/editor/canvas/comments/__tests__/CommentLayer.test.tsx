@@ -148,6 +148,35 @@ describe("CommentLayer", () => {
     expect(screen.getByText("was pinned to a deleted element")).toBeInTheDocument();
   });
 
+  /* QA 2026-09-24 (HIGH): switching to a page raced the orphan scan — the
+     PREVIOUS page was still rendered, the new page's anchors read as deleted,
+     and live comments moved to Detached. The scan waits for the active
+     page's own root. */
+  it("does not judge a page that has not rendered yet", async () => {
+    comments.push(
+      openComment({ id: "a", targetSelector: anchorSelector("about-heading") }),
+      openComment({ id: "b", targetSelector: anchorSelector("about-text") }),
+    );
+    const composer = makeComposer();
+    composer.elements.getActivePage = () => ({ id: "p1", root: { id: "root-about" } }) as never;
+    const { container } = mount(composer);
+    // The canvas still shows the previous page (root-home + el-1) well past the old 150 ms.
+    const host = container.querySelector('[data-buildrick-id="el-1"]')!.parentElement!;
+    const oldRoot = document.createElement("div");
+    oldRoot.setAttribute("data-buildrick-id", "root-home");
+    host.appendChild(oldRoot);
+    await new Promise((r) => setTimeout(r, 600));
+    expect(composer.emit).not.toHaveBeenCalledWith("comments:orphans", expect.anything());
+    // The About page lands, anchors and all: nothing is an orphan.
+    oldRoot.remove();
+    const newRoot = document.createElement("div");
+    newRoot.setAttribute("data-buildrick-id", "root-about");
+    newRoot.innerHTML = '<h1 data-buildrick-id="about-heading">About</h1><p data-buildrick-id="about-text">x</p>';
+    host.appendChild(newRoot);
+    await waitFor(() => expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: [] }));
+    expect(screen.queryByText(/lost (its|their) element/)).toBeNull();
+  });
+
   it("names the deleted element when ELEMENT_DELETED captured it this session (board 184:56 'was on:')", async () => {
     // A second, still-anchored comment keeps `pinnedHere !== ids.length` — the
     // "everything vanished at once" render-not-ready guard would otherwise
