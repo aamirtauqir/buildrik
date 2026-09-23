@@ -2,8 +2,8 @@
  * StartersSection — Brand › Starters, board 7316:85139 (C1 (ii); was the
  * drawer's 152:137 / 306:2186 grid).
  *
- * One card, a 48px row per starter: its name over its one-line description,
- * ending in ›. The ROW is the control, as the card was: a click stages the
+ * One card, a 48px row per starter: its name over "<fonts> · <colour>"
+ * (the description rides in the row's title), ending in ›. The ROW is the control, as the card was: a click stages the
  * starter's colour, type and spacing tokens in the draft (useApplyStarter) —
  * the header's caption says so ("Pick a starter, then apply it to the draft"),
  * the Draft chip lights, the live preview repaints, Save's review names every
@@ -18,13 +18,35 @@
 import * as React from "react";
 import { STARTER_DS_REGISTRY } from "../../starters";
 import { useApplyStarter } from "../../state/useApplyStarter";
+import { useTypeRegistry } from "../../state/TokenRegistryContext";
+import type { StarterDS } from "../../starters/types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 
 export interface StartersSectionProps {
   projectId?: string | null;
 }
 
+const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
+
+/**
+ * 7316:85139's line under a starter: "<fonts> · <colour>" ("Playfair + Inter ·
+ * terracotta"). Starters carry no font tokens — applying one keeps the site's
+ * fonts — so the fonts are the site's own (heading + body when they differ),
+ * and the colour is the starter's primary on its page colour.
+ */
+export function starterLine(starter: StarterDS, headingFont: string, bodyFont: string): string {
+  const fonts = headingFont && headingFont !== bodyFont ? `${headingFont} + ${bodyFont}` : bodyFont;
+  const hex = (id: string) => starter.tokens.find((t) => t.id === id)?.value?.toUpperCase();
+  const primary = hex("color-primary");
+  const page = hex("color-background");
+  const colour = primary ? (page ? `${primary} on ${page}` : primary) : "";
+  return [fonts, colour].filter(Boolean).join(" · ");
+}
+
 export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) => {
+  const type = useTypeRegistry();
+  const headingFont = family(type.tokens.find((t) => t.id === "font-heading")?.value);
+  const bodyFont = family(type.tokens.find((t) => t.id === "font-body")?.value);
   const [selectedId, setSelectedId] = React.useState<string>("");
   const applyStarter = useApplyStarter(projectId);
 
@@ -44,7 +66,8 @@ export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) =
           }}
           trailing={<BrandChevron />}
           name={<span data-testid={`starter-name-${s.id}`}>{s.name}</span>}
-          sub={s.description}
+          title={s.description}
+          sub={<span data-testid={`starter-line-${s.id}`}>{starterLine(s, headingFont, bodyFont)}</span>}
         />
       ))}
     </BrandCard>

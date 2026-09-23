@@ -1,75 +1,13 @@
 /**
- * Layout Submenu Actions
- * Flex, Grid, Center, Space Between, Layer Ordering
+ * Layout Submenu Actions — layer ordering.
+ * The flex/grid/center/space-between presets were deleted (G2-053): layout
+ * is set in the inspector, where it can be seen and undone field by field.
  * @license BSD-3-Clause
  */
 
-import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 
 export const layoutSubmenu: ContextAction[] = [
-  {
-    id: "layout-flex-row",
-    label: "Make flex row",
-    icon: "arrow-right",
-    group: "Layout",
-    isVisible: (ctx) => ctx.element.isContainer(),
-    handler: ({ composer, element }) =>
-      runTransaction(composer, "layout-flex-row", () => {
-        element.setStyle("display", "flex");
-        element.setStyle("flexDirection", "row");
-      }),
-  },
-  {
-    id: "layout-flex-column",
-    label: "Make flex column",
-    icon: "arrow-down",
-    group: "Layout",
-    isVisible: (ctx) => ctx.element.isContainer(),
-    handler: ({ composer, element }) =>
-      runTransaction(composer, "layout-flex-column", () => {
-        element.setStyle("display", "flex");
-        element.setStyle("flexDirection", "column");
-      }),
-  },
-  {
-    id: "layout-grid",
-    label: "Make grid (2 cols)",
-    icon: "grid",
-    group: "Layout",
-    isVisible: (ctx) => ctx.element.isContainer(),
-    handler: ({ composer, element }) =>
-      runTransaction(composer, "layout-grid", () => {
-        element.setStyle("display", "grid");
-        element.setStyle("gridTemplateColumns", "repeat(2, minmax(0, 1fr))");
-        element.setStyle("gap", element.getStyle("gap") || "16px");
-      }),
-  },
-  {
-    id: "layout-center",
-    label: "Center content",
-    icon: "align-center",
-    group: "Layout",
-    isVisible: (ctx) => ctx.element.isContainer(),
-    handler: ({ composer, element }) =>
-      runTransaction(composer, "layout-center", () => {
-        element.setStyle("display", "flex");
-        element.setStyle("alignItems", "center");
-        element.setStyle("justifyContent", "center");
-      }),
-  },
-  {
-    id: "layout-space-between",
-    label: "Space between",
-    icon: "maximize-2",
-    group: "Layout",
-    isVisible: (ctx) => ctx.element.isContainer(),
-    handler: ({ composer, element }) =>
-      runTransaction(composer, "layout-space-between", () => {
-        element.setStyle("display", "flex");
-        element.setStyle("justifyContent", "space-between");
-      }),
-  },
   // ── Layer ordering ───────────────────────────────────────────────────────────
   {
     id: "bring-to-front",

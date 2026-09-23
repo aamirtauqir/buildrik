@@ -89,6 +89,23 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
      error card carries Undo all. */
   const failedKind = agent.steps.some((s) => s.status === "applied") ? null : agent.errorKind;
 
+  /* Boards 4418:106671/106796/106919 all end on the way out of AI: back to
+     the inspector (in the inspector column) or close the panel. */
+  const continueByHand = (
+    <Button
+      color="light"
+      size="xs"
+      className={STATE_LINK}
+      data-testid="ai-continue-by-hand"
+      onClick={() => {
+        agent.reset();
+        (onBack ?? onClose)();
+      }}
+    >
+      Continue by hand in the inspector
+    </Button>
+  );
+
   const retry = () => {
     const again = lastPrompt.current;
     agent.reset();
@@ -156,27 +173,32 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           (PRECONDITION_FAILED vs TOO_MANY_REQUESTS); the panel used to print
           either as grey text under a composer that still looked ready. */}
       {failedKind === "not-configured" ? (
-        <div className={STATE_BLOCK}>
-          <p className={STATE_TITLE}>AI drafting isn&rsquo;t configured yet.</p>
+        /* Board 4418:106796. */
+        <div className={STATE_BLOCK} data-testid="ai-state-not-configured">
+          <p className={STATE_TITLE}>AI isn&rsquo;t available on this workspace.</p>
           <p className={STATE_BODY}>
-            No API key is set for this workspace, so nothing here will run. This is the real
-            message — not a silent fallback that pretends to work.
+            No AI provider is configured for this deployment, so nothing here will run.
           </p>
           <Button
             color="light"
             size="xs"
             className={STATE_LINK}
-            onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings`, "_blank")}
+            onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/team`, "_blank")}
           >
-            Open workspace settings
+            View workspace owner ↗
           </Button>
+          {continueByHand}
+          {lastPrompt.current ? (
+            <p className={STATE_BODY} data-testid="ai-state-prompt">Your prompt: {lastPrompt.current.text}</p>
+          ) : null}
         </div>
       ) : failedKind === "quota" ? (
-        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-warning-tint)]`}>
+        /* Board 4418:106671. */
+        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-warning-tint)]`} data-testid="ai-state-quota">
           <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>AI is out of credit.</p>
           <p className={STATE_BODY}>
             {/* The server's own sentence carries the real limit and reset time
-                — the board's "1 Aug" is sample data. */}
+                — the board's "(10…" is sample data. */}
             Nothing was changed. {agent.error}
           </p>
           <Button
@@ -185,35 +207,24 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             className={STATE_LINK}
             onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank")}
           >
-            See plans
+            Workspace billing ↗
           </Button>
+          {continueByHand}
         </div>
       ) : failedKind === "other" ? (
-        /* The third state the boards do not draw, because it is the one the
-           server was never supposed to reach: the provider itself failed. It
-           used to arrive as a raw code printed where the assistant's reply
-           goes ("UNAUTHORIZED", "Connection error."), after the panel had sat
-           on "Thinking…" through an unbounded reconnect loop. */
-        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-error-tint)]`}>
+        /* Board 4418:106919. The server's own line follows the sentence: an
+           "other" error is the bucket for everything the two named states do
+           not cover, and some carry the only useful detail there is. */
+        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-error-tint)]`} data-testid="ai-state-failed">
           <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>The AI service didn&rsquo;t respond.</p>
           <p className={STATE_BODY}>
-            Nothing was changed. This is usually the model provider, not your site — try again in a
-            moment.
+            Nothing changed. This is usually the model provider, not your site — try again in a moment.
           </p>
-          {/* The server's own line, kept: an "other" error is the bucket for
-              everything the two boarded states do not name, and some of those
-              carry the only useful detail there is ("Daily limit reached (10).
-              Resets at …"). Printing it under our sentence keeps the detail
-              without letting a raw code stand in for the assistant's reply. */}
           {agent.error ? <p className={STATE_BODY}>{agent.error}</p> : null}
-          <Button
-            color="light"
-            size="xs"
-            className={STATE_LINK}
-            onClick={retry}
-          >
+          <Button color="light" size="xs" className={STATE_LINK} onClick={retry}>
             Try again
           </Button>
+          {continueByHand}
         </div>
       ) : agent.phase === "idle" && !briefing ? (
         <div className="bd-ai-thread">

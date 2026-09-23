@@ -44,7 +44,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           {/* The board's sample says "This cannot be undone", which is not true
               of this editor — a delete is one undo step. The code contract wins on
               behaviour, so the sentence says what actually happens. */}
-          <strong>{elementLabel}</strong> is removed from the page. You can undo it with{" "}
+          <strong>{elementLabel}</strong> will be removed from the page. You can undo it with{" "}
           <Kbd>Ctrl+Z</Kbd>.
         </p>
       </ModalBody>

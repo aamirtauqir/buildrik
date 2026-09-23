@@ -64,7 +64,7 @@ const ZOOMS = [
 ] as const;
 
 /** Every `--buildrick-design-*` the draft carries, resolved for the mode. */
-export function stagedTokensCSS(tokens: readonly DesignToken[], mode: "light" | "dark"): string {
+function stagedTokensCSS(tokens: readonly DesignToken[], mode: "light" | "dark"): string {
   return siteTokensCSS(
     tokens.map((t) => ({
       cssVar: t.cssVar,
@@ -172,7 +172,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           </Select>
           <span
             aria-hidden="true"
-            className="tw:pointer-events-none tw:absolute tw:right-0 tw:text-[9px] tw:leading-none tw:text-[var(--bk-ink-muted)]"
+            className="tw:pointer-events-none tw:absolute tw:right-0 tw:text-[length:var(--bk-text-11)] tw:leading-none tw:text-[var(--bk-ink-muted)]"
           >
             ▾
           </span>
@@ -185,7 +185,10 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           data-testid="brand-live-preview-frame"
         >
           {controls && (
-            <div className="tw:absolute tw:left-1/2 tw:top-0.5 tw:z-10 tw:-translate-x-1/2" data-testid="brand-live-preview-controls">
+            /* 7316:80949 sets the switch 96px in from the page's left edge
+               (x=1100 at 1440), not centred — it sits in the page's nav
+               band, left of the page's own links. */
+            <div className="tw:absolute tw:left-[98px] tw:top-0.5 tw:z-10" data-testid="brand-live-preview-controls">
               {controls}
             </div>
           )}

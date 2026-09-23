@@ -43,6 +43,7 @@ import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
+import { TokenRenameDialog } from "./TokenRenameDialog";
 import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 
 export interface TokenDetailViewProps {
@@ -236,13 +237,10 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const handleIgnore = () => lintState?.suppress(token.id);
 
   // ─ Menu actions.
+  const [renameOpen, setRenameOpen] = React.useState(false);
   const handleRenameId = () => {
     setMenuOpen(false);
-    // TODO(T8 follow-up): replace window.prompt with a proper modal once the
-    // confirm-dialog primitive is wired into TokensSection.
-    if (typeof window === "undefined") return;
-    const next = window.prompt("Rename token ID:", token.id);
-    if (next && next !== token.id) onRename?.(token.id, next);
+    setRenameOpen(true);
   };
 
   // B4 follow-up (2026-05-17): per-token consumer count drives the delete
@@ -264,7 +262,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const [replaceOpen, setReplaceOpen] = React.useState(false);
   const handleDelete = () => {
     setMenuOpen(false);
-    if (!isPro) return; // Beginner-blocked.
+    if (!isPro || !onDelete) return; // Beginner-blocked, or no delete path.
     if (consumerCount === 0) {
       onDelete?.(token.id);
       onDeleted?.();
@@ -277,7 +275,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     onDeleted?.();
   };
 
-  const subtitle = isPro ? token.id : (token.description ?? "");
+  const subtitle = token.description ?? "";
   const issue = lintIssues[0];
 
   return (
@@ -292,19 +290,26 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         {previewTile(token)}
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
           <span
-            className="tw:truncate tw:text-[15px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+            className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
             data-testid="brand-token-detail-name"
           >
             {token.friendlyName ?? token.name}
           </span>
-          {subtitle && (
+          {/* Pro prints the id (the anchor the conformance spec measures),
+              Beginner the description — two literal elements, so the anchor
+              check can see the testid rather than a ternary. */}
+          {isPro ? (
             <span
-              className={`tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${isPro ? MONO : ""}`}
-              data-testid={isPro ? "brand-token-detail-id" : undefined}
+              className={`tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${MONO}`}
+              data-testid="brand-token-detail-id"
             >
+              {token.id}
+            </span>
+          ) : subtitle ? (
+            <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
               {subtitle}
             </span>
-          )}
+          ) : null}
         </div>
         <div data-testid="brand-token-actions">
           <Popover
@@ -322,6 +327,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               <MenuItem
                 onClick={handleRenameId}
                 disabled={!onRename}
+                title={onRename ? undefined : "Type and spacing tokens keep their IDs."}
                 data-testid="brand-token-action-rename"
               >
                 Rename token…
@@ -329,9 +335,15 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               <MenuItem
                 danger
                 onClick={handleDelete}
-                aria-disabled={!isPro || undefined}
-                disabled={!isPro}
-                title={isPro ? undefined : "Delete is blocked in Beginner mode. Switch to Pro to delete tokens."}
+                aria-disabled={!isPro || !onDelete || undefined}
+                disabled={!isPro || !onDelete}
+                title={
+                  !isPro
+                    ? "Delete is blocked in Beginner mode. Switch to Pro to delete tokens."
+                    : onDelete
+                      ? undefined
+                      : "Type and spacing tokens are part of the scale and cannot be deleted."
+                }
                 data-testid="brand-token-action-delete"
               >
                 Delete token…
@@ -557,6 +569,18 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           </IconButton>
         </HintTooltip>
       </div>
+
+      <TokenRenameDialog
+        open={renameOpen}
+        currentId={token.id}
+        takenIds={(allTokens ?? []).map((t) => t.id).filter((id) => id !== token.id)}
+        usage={usageCount}
+        onCancel={() => setRenameOpen(false)}
+        onRename={(newId) => {
+          setRenameOpen(false);
+          onRename?.(token.id, newId);
+        }}
+      />
 
       <TokenReplaceModal
         open={replaceOpen}

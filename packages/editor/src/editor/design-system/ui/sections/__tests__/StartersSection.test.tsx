@@ -42,12 +42,13 @@ describe("StartersSection", () => {
     expect(group.querySelectorAll('[role="radio"]').length).toBe(STARTER_DS_REGISTRY.length);
   });
 
-  it("each row names the starter over its description", () => {
+  it("each row names the starter over '<fonts> · <colour>' (7316:85139); the description is its title", () => {
     const { getByTestId } = render(wrap(<StartersSection projectId="p1" />));
     const first = STARTER_DS_REGISTRY[0];
     const row = getByTestId(`starter-row-${first.id}`);
     expect(row.textContent).toContain(first.name);
-    expect(row.textContent).toContain(first.description);
+    expect(getByTestId(`starter-line-${first.id}`).textContent).toMatch(/^[A-Z][\w ]+( \+ [\w ]+)? · #[0-9A-F]{6} on #[0-9A-F]{6}$/);
+    expect(row.getAttribute("title")).toBe(first.description);
   });
 
   it("stages the starter rather than declaring it saved", () => {

@@ -7,8 +7,8 @@
  *                                (spacing / type tokens)
  *
  * Empty states:
- *   - Zero tokens in list  → "No [X] tokens yet" + "Add in Design tab" hint
- *   - Search yields nothing → "No tokens found"  (no Design tab hint)
+ *   - Zero tokens in list  → "No [X] tokens yet" + "Add tokens in Brand" hint
+ *   - Search yields nothing → "No tokens found"  (no Brand hint)
  *
  * Binding model: onSelect passes token.cssVar (e.g. var(--buildrick-design-color-primary)),
  * NOT the raw hex/px value.
@@ -233,7 +233,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               <div className="tw:mb-1 tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                 No {tokenLabel} tokens yet
               </div>
-              <div className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">Add tokens in the Design tab</div>
+              <div className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">Add tokens in Brand</div>
             </div>
           )}
 

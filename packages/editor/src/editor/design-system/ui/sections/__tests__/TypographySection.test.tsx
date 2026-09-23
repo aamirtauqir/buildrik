@@ -178,10 +178,11 @@ describe("Brand · Fonts & type styles — the board's card (7316:81551)", () =>
     ]);
   });
 
-  it("a type style names its role's family and its size", () => {
+  it("a type style reads '<family> <weight> <size>/<line>' as 7316:81551 draws it", () => {
     render(<TypographySection composer={makeComposer([])} tokens={WITH_SIZES} />);
-    expect(screen.getByTestId("brand-type-row-font-size-4xl").textContent).toMatch(/Heading 1General Sans · 36px/);
-    expect(screen.getByTestId("brand-type-row-font-size-base").textContent).toMatch(/Body textInter · 16px/);
+    // h1 on the canvas: 700, line 1.1 → 36/40; body: 400, 1.6 → 16/26.
+    expect(screen.getByTestId("brand-type-row-font-size-4xl").textContent).toMatch(/Heading 1General Sans Bold 36\/40/);
+    expect(screen.getByTestId("brand-type-row-font-size-base").textContent).toMatch(/Body textInter Regular 16\/26/);
   });
 
   it("a row click selects the token — the card opens in the right column", () => {

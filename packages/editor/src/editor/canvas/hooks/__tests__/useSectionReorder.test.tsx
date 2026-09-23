@@ -105,12 +105,13 @@ describe("useSectionReorder", () => {
     vi.clearAllMocks();
   });
 
-  function mountHook(enabled = true) {
+  function mountHook(enabled = true, addToast?: (t: { description: string }) => void) {
     return renderHook(() =>
       useSectionReorder({
         composer: composer as unknown as Composer,
         canvasRef,
         enabled,
+        addToast,
       })
     );
   }
@@ -202,6 +203,18 @@ describe("useSectionReorder", () => {
       expect(composer.elements.moveElement).toHaveBeenCalledWith("sec-a", "root-1", 2);
       expect(composer.endTransaction).toHaveBeenCalled();
       expect(result.current.dragState).toBeNull();
+    });
+
+    /* G2-031 / board 5940:148012: a completed move says "Moved down" + Undo. */
+    it("completeDrag toasts 'Moved down' with an Undo after a downward move", () => {
+      const addToast = vi.fn();
+      const { result } = mountHook(true, addToast);
+      act(() => result.current.startDrag("sec-a", 0));
+      act(() => result.current.updateDrag(250));
+      act(() => result.current.completeDrag());
+      expect(addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "Moved down", action: expect.objectContaining({ label: "Undo" }) }),
+      );
     });
 
     it("completeDrag does not move when target equals origin (same slot or slot+1)", () => {

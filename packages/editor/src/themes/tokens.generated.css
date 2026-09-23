@@ -72,11 +72,11 @@
   --bk-bg-elevated: #FFFFFF;
   --bk-border: #E5E7EB;
   --bk-border-medium: #D1D5DB;
-  --bk-border-strong: #9CA3AF;
-  --bk-border-input: #9CA3AF;
+  --bk-border-strong: #868C97;
+  --bk-border-input: #868C97;
   --bk-ink: #111827;
   --bk-ink-soft: #4B5563;
-  --bk-ink-muted: #6B7280;
+  --bk-ink-muted: #6C7079;
   --bk-ink-disabled: #D1D5DB;
   --bk-accent: #1A56DB;
   --bk-accent-hover: #1E429F;
@@ -113,9 +113,12 @@
 
   /* ── Radius ───────────────────────────────────────────────────── */
 
+  --bk-radius-xs: 2px;
   --bk-radius-sm: 4px;
   --bk-radius-md: 6px;
   --bk-radius-lg: 8px;
+  --bk-radius-xl: 12px;
+  --bk-radius-2xl: 16px;
   --bk-radius-full: 9999px;
 
   /* ── Size · the shell's committed numbers ─────────────────────── */
@@ -127,10 +130,25 @@
   --bk-size-row-tall: 64px;
   --bk-size-rail: 60px;
   --bk-size-drawer: 280px;
-  --bk-size-panel-right: 360px;
+  --bk-size-panel-right: 300px;
   --bk-size-inspector: 300px;
   --bk-size-nav: 240px;
   --bk-size-footer: 32px;
+  --bk-size-sidebar: 256px;
+  --bk-size-control-xs: 28px;
+  --bk-size-control-sm: 32px;
+  --bk-size-control-md: 36px;
+  --bk-size-control-lg: 40px;
+  --bk-size-control-xl: 44px;
+  --bk-size-icon-xs: 12px;
+  --bk-size-icon-sm: 16px;
+  --bk-size-icon-md: 20px;
+  --bk-size-icon-lg: 24px;
+  --bk-size-row-nav: 36px;
+  --bk-size-row-table: 40px;
+  --bk-size-row-2line: 52px;
+  --bk-size-menu-item: 30px;
+  --bk-size-panel-footer: 44px;
 
   /* ── Z-index ──────────────────────────────────────────────────── */
 

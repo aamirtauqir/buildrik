@@ -747,6 +747,9 @@
  * how it will behave at that breakpoint on the published site.
  * Inline serialization is `--hide-<bp>: true` (see buildAttributeString). */
 [data-buildrick-canvas][data-device="desktop"] [style*="--hide-desktop: true"],
+/* Wide previews the Desktop styles (it stores as Desktop), so a
+   desktop-hidden element stays hidden there too (G2-008). */
+[data-buildrick-canvas][data-device="wide"] [style*="--hide-desktop: true"],
 [data-buildrick-canvas][data-device="tablet"] [style*="--hide-tablet: true"],
 [data-buildrick-canvas][data-device="mobile"] [style*="--hide-mobile: true"] {
   display: none !important;
