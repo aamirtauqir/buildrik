@@ -47,7 +47,7 @@
 
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
-import { Button, useToast } from "@/editor/chrome-ui";
+import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
@@ -698,6 +698,33 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             + Add token
           </Button>
         );
+      case "component-styles": {
+        /* 7316:82755's page action. Gated on the SAME flag that decides
+           whether an AIClient is built at all (useComposerInit.ts:132): with
+           it off the modal would open over a service with no client and answer
+           with AIAssistService's developer string. Blocked, never hidden, and
+           aria-disabled so the reason stays reachable by keyboard. */
+        const aiOn = isFeatureEnabled("dsAi");
+        const cta = (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className={PAGE_ACTION}
+            onClick={aiOn ? () => setAiOpen(true) : undefined}
+            aria-disabled={aiOn ? undefined : "true"}
+            data-open-ai-assist
+            data-testid="brand-page-action"
+          >
+            ✦ Generate with AI
+          </Button>
+        );
+        return aiOn ? cta : (
+          <Tooltip content="AI generation isn't switched on for this workspace yet" placement="bottom" arrow={false}>
+            {cta}
+          </Tooltip>
+        );
+      }
       case "fonts":
         /* The fonts a site can pick from are its Site fonts — the same door
            the font picker's "Manage site fonts" opens. */
@@ -736,18 +763,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           />
         );
       case "component-styles":
-        return (
-          <ComponentsSection
-            composer={composer}
-            /* Gated on the SAME flag that decides whether an AIClient is
-               built at all (useComposerInit.ts:132). The flag guarded the
-               client and nothing guarded this entry, so the modal opened over
-               a service with no client and Generate answered every user with
-               AIAssistService's developer string. Absent callback → the
-               section blocks the CTA and says why. */
-            onOpenAIAssist={isFeatureEnabled("dsAi") ? () => setAiOpen(true) : undefined}
-          />
-        );
+        return <ComponentsSection composer={composer} />;
       case "classes":
         return <ClassesSection composer={composer} />;
       case "presets":

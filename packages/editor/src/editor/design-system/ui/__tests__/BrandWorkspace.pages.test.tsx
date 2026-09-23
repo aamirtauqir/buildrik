@@ -150,11 +150,13 @@ describe("BrandWorkspace › Component styles — AI assist entry", () => {
     return utils.container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
   }
 
-  it("the page offers the AI entry", () => {
+  it("the page offers the AI entry as its header action (7316:82755)", () => {
     const utils = renderWorkspace(makeAiComposer());
     const btn = openComponents(utils);
     expect(btn).toBeTruthy();
     expect(btn.textContent).toContain("Generate with AI");
+    expect(btn.getAttribute("data-testid")).toBe("brand-page-action");
+    expect(utils.getByTestId("brand-page-body").contains(btn)).toBe(false);
   });
 
   it("clicking the button opens AIPromptModal with the composer's service", () => {
