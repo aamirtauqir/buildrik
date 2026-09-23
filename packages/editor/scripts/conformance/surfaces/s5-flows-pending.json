@@ -9,7 +9,7 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "review-bar"
+      "testId": "topbar-review-pill"
     }
   ],
   "contrastScope": "[data-probe]",
@@ -39,36 +39,6 @@
       "nodeId": "I682:4576;680:22;9:19"
     },
     {
-      "name": "review-bar",
-      "testId": "review-bar",
-      "spec": "s5-flows-pending",
-      "nodeId": "136:14"
-    },
-    {
-      "name": "review-count",
-      "testId": "review-bar-count",
-      "spec": "s5-flows-pending",
-      "nodeId": "136:15"
-    },
-    {
-      "name": "review-next",
-      "testId": "review-bar-next",
-      "spec": "s5-flows-pending",
-      "nodeId": "136:16"
-    },
-    {
-      "name": "review-compare",
-      "testId": "review-bar-compare",
-      "spec": "s5-flows-pending",
-      "nodeId": "136:17"
-    },
-    {
-      "name": "review-resend",
-      "testId": "review-bar-resend",
-      "spec": "s5-flows-pending",
-      "nodeId": "136:19"
-    },
-    {
       "name": "review-pill",
       "testId": "topbar-review-pill"
     },
@@ -78,6 +48,13 @@
     }
   ],
   "_note": [
+    "RETIRED TARGETS 2026-09-22 (code-gap C2, owner decision D3): the Review bar",
+    "(136:14 · 136:15 · 136:16 · 136:17 · 136:19) is gone from the product — the",
+    "v3 IA carries the round on the topbar chip (B3-01 7569:190283: status verb",
+    "+ count) and the Review panel's banner. The five review-bar targets left this",
+    "recipe with the component; the topbar targets stay. The chip's copy on this",
+    "frame is now 'Waiting · <name>' (was 'In review').",
+    "",
     "Board 130:201 — the shell with a PENDING round, which is the one S5.2",
     "frame that adds a control rather than a colour: the Review bar (136:14)",
     "under the topbar, with the open count, Next ›, Compare and Re-send.",

@@ -15,9 +15,11 @@ vi.mock("../useEditorRole", () => ({ useEditorRole: () => null }));
 
 const fetchReviewStatus = vi.fn();
 const fetchReviewStatusOrNull = vi.fn();
+const fetchCurrentRound = vi.fn();
 vi.mock("@/services/ReviewService", () => ({
   fetchReviewStatus: (...a: unknown[]) => fetchReviewStatus(...a),
   fetchReviewStatusOrNull: (...a: unknown[]) => fetchReviewStatusOrNull(...a),
+  fetchCurrentRound: (...a: unknown[]) => fetchCurrentRound(...a),
   UNKNOWN_REVIEW_STATUS: {
     state: "none",
     reviewerName: null,
@@ -73,8 +75,10 @@ const settle = async () => {
 beforeEach(() => {
   fetchReviewStatus.mockReset();
   fetchReviewStatusOrNull.mockReset();
+  fetchCurrentRound.mockReset();
   fetchReviewStatus.mockResolvedValue(status());
   fetchReviewStatusOrNull.mockResolvedValue(null);
+  fetchCurrentRound.mockResolvedValue(null);
 });
 afterEach(cleanup);
 
@@ -125,6 +129,35 @@ describe("useLifecycle — the reads", () => {
     });
     await settle();
     expect(result.current.reviewStatus.state).toBe("approved");
+  });
+});
+
+describe("useLifecycle — the chip's count (C2, board B3-01)", () => {
+  it("reads the round's open count beside the status, and re-reads on comments:refresh", async () => {
+    const composer = makeComposer();
+    fetchCurrentRound.mockResolvedValue({ revoked: false, openCommentCount: 2 });
+    const { result } = renderHook((p: UseLifecycleInput) => useLifecycle(p), {
+      initialProps: input({ composer: composer as never }),
+    });
+    await settle();
+    expect(result.current.openCommentCount).toBe(2);
+    fetchCurrentRound.mockResolvedValue({ revoked: false, openCommentCount: 1 });
+    await act(async () => {
+      composer.emit("comments:refresh", {});
+    });
+    await settle();
+    expect(result.current.openCommentCount).toBe(1);
+  });
+
+  it("no round, a revoked one, or a failed read → null, never a zero", async () => {
+    fetchCurrentRound.mockRejectedValue(new Error("offline"));
+    const { result, rerender } = renderHook((p: UseLifecycleInput) => useLifecycle(p), { initialProps: input() });
+    await settle();
+    expect(result.current.openCommentCount).toBeNull();
+    fetchCurrentRound.mockResolvedValue({ revoked: true, openCommentCount: 4 });
+    rerender(input({ serverBlock: "review-pending" }));
+    await settle();
+    expect(result.current.openCommentCount).toBeNull();
   });
 });
 

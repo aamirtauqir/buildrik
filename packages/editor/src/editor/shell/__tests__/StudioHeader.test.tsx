@@ -428,13 +428,15 @@ describe("StudioHeader", () => {
     });
   });
 
-  describe("review status pill", () => {
-    it("shows the pending pill from the status it is handed", () => {
-      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "pending" }) })} />);
-      expect(screen.getByText("In review")).toBeTruthy();
+  /* Board B3-01 7569:190283 (C2): the chip is the status VERB plus the one
+     number that matters; the sentence rides in `title`. */
+  describe("review status chip", () => {
+    it("a pending round reads 'Waiting · <name>'", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "pending", reviewerName: "Sara" }) })} />);
+      expect(screen.getByText("Waiting · Sara")).toBeTruthy();
     });
 
-    it("names the reviewer on an approval", () => {
+    it("an approval reads 'Approved' with who and when in the title", () => {
       render(
         <StudioHeader
           {...makeProps({
@@ -442,7 +444,36 @@ describe("StudioHeader", () => {
           })}
         />,
       );
-      expect(screen.getByText(/Approved by Sara/)).toBeTruthy();
+      expect(screen.getByText("Approved")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-pill").getAttribute("title")).toMatch(/^Approved by Sara · /);
+    });
+
+    it("changes requested carries the open count", () => {
+      render(
+        <StudioHeader
+          {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 2 })}
+        />,
+      );
+      expect(screen.getByText("Changes requested · 2")).toBeTruthy();
+    });
+
+    it("no count is a verb alone, never '· 0'", () => {
+      render(
+        <StudioHeader
+          {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 0 })}
+        />,
+      );
+      expect(screen.getByText("Changes requested")).toBeTruthy();
+    });
+
+    it("edited since approval says so", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "approved-edited-since" }) })} />);
+      expect(screen.getByText("Approved · edited since")).toBeTruthy();
+    });
+
+    it("'Not sent' only where a send is the site's next act (an approval workspace)", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "none", editsRequireApproval: true }) })} />);
+      expect(screen.getByText("Not sent")).toBeTruthy();
     });
 
     it("no review in flight, no pill", async () => {
@@ -900,19 +931,19 @@ describe("F3 review pill", () => {
         {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "pending", at: new Date().toISOString() }) })}
       />,
     );
-    const pill = await screen.findByRole("button", { name: "In review" });
+    const pill = await screen.findByRole("button", { name: "Waiting" });
     fireEvent.click(pill);
     expect(onOpenReview).toHaveBeenCalled();
   });
 
-  it("59-minute-old approval reads in minutes, not 'just now' (U1)", async () => {
+  it("59-minute-old approval reads in minutes, not 'just now' (U1) — in the chip's title", async () => {
     const at = new Date(Date.now() - 59 * 60_000).toISOString();
     render(
       <StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "approved", reviewerName: "Sara", at }) })} />,
     );
-    const pill = await screen.findByText(/Approved by Sara/);
-    expect(pill.textContent).toMatch(/59m ago/);
-    expect(pill.textContent).not.toMatch(/just now/);
+    const title = (await screen.findByTestId("topbar-review-pill")).getAttribute("title") ?? "";
+    expect(title).toMatch(/59m ago/);
+    expect(title).not.toMatch(/just now/);
   });
 });
 
@@ -927,7 +958,8 @@ describe("T8 status grammar", () => {
    * result always could.
    */
   const toneOf = (labelEl: HTMLElement) => labelEl.parentElement!.className;
-  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-yellow-50");
+  /* #26: the warning tone is the status token, not a Tailwind literal. */
+  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-[var(--bk-warning-tint)]");
 
   const changesRequested = () =>
     reviewStatus({ state: "changes-requested", reviewerName: "Sara", at: new Date().toISOString() });

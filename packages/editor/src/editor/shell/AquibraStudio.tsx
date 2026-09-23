@@ -24,7 +24,6 @@ import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal
 import { gateFromBlockReason, type PublishGate } from "./lifecycle";
 import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
-import { ReviewBar } from "./ReviewBar";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -409,7 +408,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     () => state.issues.filter((i) => i.type === "error").length,
     [state.issues],
   );
-  const { reviewStatus, nextMove, gateAfterErrors } = useLifecycle({
+  const { reviewStatus, openCommentCount, nextMove, gateAfterErrors } = useLifecycle({
     composer,
     addToast,
     isDirty: state.isDirty,
@@ -594,18 +593,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
           reviewStatus={reviewStatus}
+          openCommentCount={openCommentCount}
           nextMove={nextMove}
           addToast={addToast}
         />
       </header>
-      {/* Board 200:213 gives an open round its own row under the topbar: the
-          count, a way through the comments, Compare and Re-send. It renders
-          nothing when no round is in flight. */}
-      <ReviewBar
-        composer={composer}
-        onCompare={() => state.openLeftPanelToTab("review", "compare")}
-        onResend={resendReview}
-      />
       <StudioPanels
         composer={composer}
         selectedElement={selectedElement}

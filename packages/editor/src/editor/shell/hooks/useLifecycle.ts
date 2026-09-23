@@ -15,7 +15,11 @@
  *     which keeps the last-known status on transport failure;
  *   · a refresh on `REVIEW_SENT`, so a send from any door moves the CTA and
  *     the panel in the same render;
- *   · the "Review closed" toast on the transition away from a live round.
+ *   · the "Review closed" toast on the transition away from a live round;
+ *   · the round's open-comment count for the topbar chip ("Changes
+ *     requested · 2", board B3-01 7569:190283), re-read when the panel
+ *     mutates comments (`comments:refresh`) — the read the retired ReviewBar
+ *     used to make for itself.
  *
  * @license BSD-3-Clause
  */
@@ -24,6 +28,7 @@ import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
 import type { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import {
+  fetchCurrentRound,
   fetchReviewStatus,
   fetchReviewStatusOrNull,
   UNKNOWN_REVIEW_STATUS,
@@ -59,6 +64,9 @@ export interface UseLifecycleInput {
 
 export interface Lifecycle {
   reviewStatus: ReviewStatus;
+  /** The current round's open comments, for the chip's count. `null` = no
+   *  round, or the read failed — the chip then carries the verb alone. */
+  openCommentCount: number | null;
   /** `null` = the site has no next act (live, nothing waiting). */
   nextMove: NextMove | null;
   /**
@@ -102,6 +110,18 @@ export function useLifecycle({
     };
   }, []);
 
+  /* The count rides beside the status. A failed read is `null`, never a
+     zero — "Changes requested" with no number is true; "· 0" would not be. */
+  const [openCommentCount, setOpenCommentCount] = React.useState<number | null>(null);
+  const refreshCount = React.useCallback(() => {
+    void fetchCurrentRound()
+      .then((r) => setOpenCommentCount(r && !r.revoked ? r.openCommentCount : null))
+      .catch(() => setOpenCommentCount(null));
+  }, []);
+  React.useEffect(() => {
+    refreshCount();
+  }, [refreshCount]);
+
   /* F3/6A: approval usually lands while the editor is backgrounded — refresh
      on return. The OrNull variant keeps the last-known status on transport
      failure instead of erasing it (fail-closed is for the mount only). */
@@ -109,7 +129,8 @@ export function useLifecycle({
     void fetchReviewStatusOrNull().then((s) => {
       if (s) setReviewStatus(s);
     });
-  }, []);
+    refreshCount();
+  }, [refreshCount]);
   useRefetchOnFocus(refresh);
 
   /* A send from any door (topbar SendForReview, the Review panel, the stale
@@ -118,10 +139,16 @@ export function useLifecycle({
   React.useEffect(() => {
     if (!composer) return;
     composer.on(EVENTS.REVIEW_SENT, refresh);
+    /* The panel's resolve/reopen/reattach change the count without moving
+       the status; the panel announces them on these two events already. */
+    composer.on("comments:refresh", refreshCount);
+    composer.on("comments:reattached", refreshCount);
     return () => {
       composer.off(EVENTS.REVIEW_SENT, refresh);
+      composer.off("comments:refresh", refreshCount);
+      composer.off("comments:reattached", refreshCount);
     };
-  }, [composer, refresh]);
+  }, [composer, refresh, refreshCount]);
 
   /* The server refused a publish this derivation had allowed: the round moved
      under us. Re-read, so the CTA and the panel say what the server says. */
@@ -184,5 +211,5 @@ export function useLifecycle({
     [input, nextMove?.gate],
   );
 
-  return { reviewStatus, nextMove, gateAfterErrors };
+  return { reviewStatus, openCommentCount, nextMove, gateAfterErrors };
 }

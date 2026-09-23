@@ -123,7 +123,6 @@ import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageCont
 import { PageCommandPalette } from "@/editor/sidebar/tabs/pages/components/PageCommandPalette";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar } from "@/editor/chrome-ui";
-import { ReviewBar } from "@/editor/shell/ReviewBar";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -3101,16 +3100,15 @@ const CASES: Record<string, () => React.ReactElement> = {
 
   /* Boards 130:798 (S5.2 approved) and 130:201 (S5.2 pending). Both are the
      whole 1440 shell; what is THEIRS rather than the shell family's is the
-     review state — the topbar's review pill, and on the pending frame the
-     Review bar under it. The shell around them is measured on its own boards
-     (shell-default 681:26, the Layers / Inspector / Rail families), so this
-     case mounts the two real components that carry the state instead of a
-     shell whose every other pixel belongs to someone else's recipe.
+     review state — the topbar's review chip. (The pending frame also drew a
+     Review bar under the topbar; that component is retired — C2, owner
+     decision D3 — and the v3 IA's chip B3-01 carries the round.) The shell
+     around them is measured on its own boards, so this case mounts the real
+     component that carries the state.
 
-     The pill is the REAL chrome-ui ReviewBadge with the props StudioHeader
-     builds for each state (`REVIEW_PILL` + the "Approved by <name> · <ago>"
-     interpolation at StudioHeader.tsx:718-724), so nothing about it is a
-     fixture's opinion. */
+     The chip is the REAL chrome-ui ReviewBadge with the props StudioHeader's
+     `reviewChip` builds for each state, so nothing about it is a fixture's
+     opinion. */
   ...Object.fromEntries(
     (
       [
@@ -3140,17 +3138,14 @@ const CASES: Record<string, () => React.ReactElement> = {
               onExit={() => {}}
               save="saved"
               savedAt={Date.now() - 2 * 60_000}
-              onSave={() => {}}
+              onSaveClick={() => {}}
               review={
                 state === "approved"
-                  ? { label: "Approved by Sara Whitfield · 2h ago", tone: "success", onClick: () => {} }
-                  : { label: "In review", tone: "info", onClick: () => {} }
+                  ? { label: "Approved", tone: "success", title: "Approved by Sara Whitfield · 2h ago", onClick: () => {} }
+                  : { label: "Waiting · Sara Whitfield", tone: "info", title: "Sent to Sara Whitfield — waiting on approval", onClick: () => {} }
               }
               onPublish={() => {}}
             />
-            {state === "pending" ? (
-              <ReviewBar composer={reviewComposerStub()} onCompare={() => {}} onResend={async () => {}} />
-            ) : null}
           </div>
         );
       },

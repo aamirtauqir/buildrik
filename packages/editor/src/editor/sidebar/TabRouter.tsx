@@ -251,8 +251,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           {...commonTabProps}
           composer={composer}
           onResend={onResendReview}
-          /* Board 200:213's ReviewBar links straight to Compare, the same way
-             the history tab deep-links to "published" two cases above. */
+          /* A deep link into Compare (`openLeftPanelToTab("review",
+             "compare")`), the same way the history tab deep-links to
+             "published" two cases above. */
           initialCompare={activeSubTab === "compare"}
           onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />

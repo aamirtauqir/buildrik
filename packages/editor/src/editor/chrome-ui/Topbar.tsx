@@ -359,16 +359,15 @@ const REVIEW_BASE_CLASS =
   "tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
   "tw:text-xs tw:font-medium tw:whitespace-nowrap";
 
-/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
-   information, not instructions: they sit on gray so the bar's colour budget
-   stays with the two signals that gate a publish (Issues chip, save trouble).
-   Only "Changes requested" — the one review state that blocks — keeps amber.
-   `info` and `success` are visually identical by design (same neutral
-   surface); only `warning` gets its own look. */
+/* Board B3-01 7569:190283, decision #26 (C2): tones via the status tokens —
+   warning-tint for Changes requested, success-tint for Approved, neutral
+   otherwise. (T8/D7 rule 3 had `success` on the neutral surface; the chip
+   set's tone variants were drawn since, and the container still demotes a
+   warning chip to neutral when two louder ambers are on the bar.) */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
   info: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  success: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  warning: "tw:bg-yellow-50 tw:text-yellow-800",
+  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
+  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
 };
 
 /* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */

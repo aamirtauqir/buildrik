@@ -125,8 +125,10 @@ export interface StudioHeaderProps {
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
    *  region. Toasts stay with useExportHandlers (eng D10), never here. */
   publishOutcome?: "published" | "failed" | null;
-  /** The review round, from `useLifecycle` — drives the pill. */
+  /** The review round, from `useLifecycle` — drives the chip. */
   reviewStatus: ReviewStatus;
+  /** The round's open comments, from `useLifecycle` — the chip's count. */
+  openCommentCount?: number | null;
   /** The site's ONE next move, from `useLifecycle`. `null` = live with nothing
    *  waiting: the CTA is withheld. The Publish panel reads the same object. */
   nextMove: NextMove | null;
@@ -135,15 +137,44 @@ export interface StudioHeaderProps {
   addToast: (input: ToastInput) => string;
 }
 
-/** Persistent review status → the topbar's one review pill. */
-const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | null> = {
-  none: null,
-  pending: { label: "In review", tone: "info" },
-  "opened-not-acted": { label: "Opened · no reply", tone: "info" },
-  "changes-requested": { label: "Changes requested", tone: "warning" },
-  approved: { label: "Approved", tone: "success" },
-  "approved-edited-since": { label: "Approved · edited since", tone: "warning" },
-};
+/**
+ * The topbar's one review chip — board B3-01 `7569:190283` (C2, owner
+ * decision D3): the status VERB plus the one number that matters, in five
+ * states: Not sent · Waiting · Sara · Changes requested · 2 · Approved ·
+ * Approved · edited since. The sentence (who, when, opened-but-no-reply)
+ * rides in `title`. Tones by status token (#26): warning-tint for Changes
+ * requested, success-tint for Approved, neutral otherwise.
+ *
+ * "Not sent" is drawn only where a send is the site's next act — an
+ * approval workspace. Elsewhere a round that was never opened is not a
+ * status, and the chip stays away as it always did.
+ */
+function reviewChip(
+  status: ReviewStatus,
+  openCount: number | null,
+): Omit<ReviewPill, "onClick"> | null {
+  const who = status.reviewerName;
+  switch (status.state) {
+    case "none":
+      return status.reviewsEnabled && status.editsRequireApproval
+        ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
+        : null;
+    case "pending":
+      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
+    case "opened-not-acted":
+      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
+    case "changes-requested":
+      return {
+        label: openCount ? `Changes requested · ${openCount}` : "Changes requested",
+        tone: "warning",
+        title: `${who ?? "Your client"} asked for changes${openCount ? ` — ${openCount} open` : ""}`,
+      };
+    case "approved":
+      return { label: "Approved", tone: "success", title: `Approved by ${who ?? "your client"}${pillAgo(status.at)}` };
+    case "approved-edited-since":
+      return { label: "Approved · edited since", tone: "warning", title: `${who ?? "Your client"} approved an earlier version — edited since` };
+  }
+}
 
 /**
  * Save transitions worth announcing (T5/eng D5). `conflict` is listed even
@@ -208,6 +239,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   publishedUrl,
   publishOutcome = null,
   reviewStatus,
+  openCommentCount = null,
   nextMove,
   addToast,
 }) => {
@@ -651,23 +683,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         },
       };
 
-  const pill = REVIEW_PILL[reviewStatus.state];
+  const pill = reviewChip(reviewStatus, openCommentCount);
   // T8/D7 rule 6 — at most two amber signals at once. Offline-or-unsaved save
   // and an amber Issues chip are both about *this* publish; a warning review
-  // pill is about the last one, so it is the signal that steps back. Demoted to
-  // `info`, which D7 rule 3 already renders neutral — the copy still says
-  // "Changes requested", it just stops shouting alongside two louder ambers.
+  // chip is about the last one, so it is the signal that steps back. Demoted
+  // to `info` (neutral) — the copy still says "Changes requested", it just
+  // stops shouting alongside two louder ambers.
   const amberElsewhere = (save === "offline" || save === "unsaved") && warnCount > 0;
   const tone: ReviewTone = pill?.tone === "warning" && amberElsewhere ? "info" : (pill?.tone ?? "info");
   const review: ReviewPill | null = pill
     ? {
         ...pill,
         tone,
-        label:
-          reviewStatus.state === "approved" && reviewStatus.reviewerName
-            ? `Approved by ${reviewStatus.reviewerName}${pillAgo(reviewStatus.at)}`
-            : pill.label,
-        title: reviewStatus.reviewerName ? `${pill.label} — ${reviewStatus.reviewerName}` : undefined,
         // F3: every review state opens the same door — the Review panel.
         onClick: onOpenReview,
       }

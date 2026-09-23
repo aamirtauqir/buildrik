@@ -49,6 +49,7 @@ import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
+import { locateComment } from "./locate";
 import {
   fetchCurrentRound,
   fetchRounds,
@@ -79,8 +80,8 @@ export interface ReviewTabProps {
   /** Composer for the orphan-comment events (Detached group + reattach) and
    *  for page names — the boards label groups "OPEN · HOME", not by page id. */
   composer?: import("@/engine").Composer | null;
-  /** Open Compare on mount — board 200:213's ReviewBar links straight to it,
-   *  the way the history tab deep-links to its Published view. */
+  /** Open Compare on mount — a deep link (`openLeftPanelToTab("review",
+   *  "compare")`), the way the history tab deep-links to its Published view. */
   initialCompare?: boolean;
 }
 
@@ -162,6 +163,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [compareOpen, setCompareOpen] = React.useState(false);
+  /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
+     comments in server order, switching page and selecting each anchor via
+     `locateComment` (C2, #39). */
+  const [walkCursor, setWalkCursor] = React.useState(0);
   /* Compare's mode is lifted here because it decides WHERE the view renders:
      list in the 280 drawer, split and overlay at 1080 in an OverlayMount
      (B1, founder call 2026-09-08). Defaults to "split", matching what
@@ -336,9 +341,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   }, [onExportCurrentPages]);
 
-  /* Board 200:213's bar links here directly. Fires once — reopening Compare
-     after the user closes it would trap them in it while the deep-link prop
-     is still true. */
+  /* The Compare deep link. Fires once — reopening Compare after the user
+     closes it would trap them in it while the deep-link prop is still true. */
   const compareRequested = React.useRef(false);
   React.useEffect(() => {
     if (!initialCompare || compareRequested.current || !onExportCurrentPages) return;
@@ -714,22 +718,67 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     </div>
   );
 
-  /* The client closed this round by asking for changes. Without this the body
-     was chosen from comment counts alone, so a CHANGES_REQUESTED round with no
-     note rendered `emptyBody` — "has not commented yet. You will be notified." —
-     directly beside a topbar pill reading "Changes requested". */
-  const changesRequestedBody = (
-    <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
-      <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">
-        {round.reviewerName ?? "Your reviewer"} asked for changes.
+  /* ── The round banner (C2 · board B3-05 7571:191619) ─────────────────────
+     Board 200:213's ReviewBar — a strip under the topbar with the open count,
+     a walk through the comments, Compare and Re-send — is retired (owner
+     decision D3): the topbar chip says WHERE the round stands and this
+     panel is where it is worked. What the bar owned that the panel did not
+     was the walk; it lives here now, in a band at the top of the drawer:
+     warning-tinted when the client asked for changes (B3-05), neutral while
+     the round is merely out. The re-send is the panel's own (confirm when
+     comments are open). Absent for a finished or revoked round. */
+  const changesRequested = round.status?.toLowerCase() === "changes_requested";
+  const roundLive = !round.revoked && (round.status?.toLowerCase() === "pending" || changesRequested);
+  const walk = () => {
+    if (!composer || openComments.length === 0) return;
+    const i = walkCursor % openComments.length;
+    setWalkCursor(i + 1);
+    locateComment(composer, openComments[i]);
+  };
+  const walkable = Boolean(composer) && openComments.length > 0;
+  /* A zero here was a count where a sentence belongs: `0 open` meant "your
+     client has not replied yet" and printed a number that says none of that.
+     The count earns its place the moment there IS one. */
+  const bannerLine =
+    openComments.length > 0
+      ? changesRequested
+        ? `${round.reviewerName ?? "Your reviewer"} asked for changes · ${openComments.length} open`
+        : `${openComments.length} open`
+      : changesRequested
+        ? "Changes requested — nothing left open"
+        : "Sent — waiting on your client";
+  const roundBanner = roundLive ? (
+    <div
+      className={`tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-border)] ${
+        changesRequested ? "tw:bg-[var(--bk-warning-tint)]" : "tw:bg-[var(--bk-bg-subtle)]"
+      }`}
+      role="region"
+      aria-label={changesRequested ? "Changes requested" : "Review in progress"}
+      data-testid="review-banner"
+      data-tone={changesRequested ? "warning" : "neutral"}
+    >
+      <span
+        className={`tw:min-w-0 tw:flex-1 tw:text-[12px] tw:leading-4 tw:font-medium ${
+          changesRequested ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-ink-soft)]"
+        }`}
+        data-testid="review-banner-line"
+      >
+        {bannerLine}
       </span>
-      <span className={META}>
-        {total === 0
-          ? "They left no notes — the round is closed and it is your move."
-          : `${openComments.length} of ${total} still open.`}
-      </span>
+      <Button
+        color="light"
+        size="xs"
+        className={`${GHOST} tw:h-6 tw:px-1.5 tw:text-[12px]`}
+        onClick={walk}
+        disabled={!walkable}
+        /* Disabled without a reason is a bug, not a state (wireframes §5.8). */
+        title={walkable ? undefined : "No open comments to step through"}
+        data-testid="review-banner-next"
+      >
+        Next ›
+      </Button>
     </div>
-  );
+  ) : null;
 
   /* Board 157:221 — sent, nothing back yet. */
   const emptyBody = (
@@ -752,6 +801,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   return (
     <div className={BODY} data-review-state={round.revoked ? "revoked" : "open"}>
       {header}
+      {roundBanner}
 
       {/* Board 158:105: revoke asks at the top of the panel, in the panel. */}
       {confirmRevoke && (
@@ -784,15 +834,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       {progress}
 
       <div className={SCROLL}>
+        {/* A CHANGES_REQUESTED round's own sentence is the banner above; its
+            thread renders like any other (or the all-resolved close). */}
         {round.revoked
           ? revokedBody
-          : round.status?.toLowerCase() === "changes_requested"
-            ? changesRequestedBody
-            : total === 0
-              ? emptyBody
-              : openComments.length === 0
-                ? allResolvedBody
-                : null}
+          : total === 0
+            ? changesRequested
+              ? null
+              : emptyBody
+            : openComments.length === 0
+              ? allResolvedBody
+              : null}
 
         {detached.length > 0 && (
           <div data-detached-group>
