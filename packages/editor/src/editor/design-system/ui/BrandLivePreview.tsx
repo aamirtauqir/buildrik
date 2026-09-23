@@ -64,7 +64,7 @@ const ZOOMS = [
 ] as const;
 
 /** Every `--buildrick-design-*` the draft carries, resolved for the mode. */
-export function stagedTokensCSS(tokens: readonly DesignToken[], mode: "light" | "dark"): string {
+function stagedTokensCSS(tokens: readonly DesignToken[], mode: "light" | "dark"): string {
   return siteTokensCSS(
     tokens.map((t) => ({
       cssVar: t.cssVar,
@@ -172,7 +172,7 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           </Select>
           <span
             aria-hidden="true"
-            className="tw:pointer-events-none tw:absolute tw:right-0 tw:text-[9px] tw:leading-none tw:text-[var(--bk-ink-muted)]"
+            className="tw:pointer-events-none tw:absolute tw:right-0 tw:text-[length:var(--bk-text-11)] tw:leading-none tw:text-[var(--bk-ink-muted)]"
           >
             ▾
           </span>

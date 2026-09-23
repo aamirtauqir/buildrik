@@ -39,8 +39,8 @@ export interface BrandRowProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 }
 
 const ROW = "tw:flex tw:h-12 tw:w-full tw:items-center tw:gap-3 tw:pl-4 tw:pr-3 tw:text-left tw:outline-none";
-export const BRAND_ROW_NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
-export const BRAND_ROW_SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const BRAND_ROW_NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const BRAND_ROW_SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** The muted › a drill-in row ends in. */
 export const BrandChevron: React.FC = () => (

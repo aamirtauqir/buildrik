@@ -277,7 +277,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     onDeleted?.();
   };
 
-  const subtitle = isPro ? token.id : (token.description ?? "");
+  const subtitle = token.description ?? "";
   const issue = lintIssues[0];
 
   return (
@@ -292,19 +292,26 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         {previewTile(token)}
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
           <span
-            className="tw:truncate tw:text-[15px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+            className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
             data-testid="brand-token-detail-name"
           >
             {token.friendlyName ?? token.name}
           </span>
-          {subtitle && (
+          {/* Pro prints the id (the anchor the conformance spec measures),
+              Beginner the description — two literal elements, so the anchor
+              check can see the testid rather than a ternary. */}
+          {isPro ? (
             <span
-              className={`tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${isPro ? MONO : ""}`}
-              data-testid={isPro ? "brand-token-detail-id" : undefined}
+              className={`tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${MONO}`}
+              data-testid="brand-token-detail-id"
             >
+              {token.id}
+            </span>
+          ) : subtitle ? (
+            <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
               {subtitle}
             </span>
-          )}
+          ) : null}
         </div>
         <div data-testid="brand-token-actions">
           <Popover
