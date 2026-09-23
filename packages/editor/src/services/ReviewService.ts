@@ -37,6 +37,10 @@ export interface ReviewStatus {
   reviewsEnabled: boolean | null;
   /** Same three-valued contract: `null` means unknown, not "not required". */
   editsRequireApproval: boolean | null;
+  /** `true` = we asked and the dashboard did not answer. The flags are null
+   *  either way; this is what tells "not answered YET" (a beat) from "the
+   *  read failed" (a state that needs Retry, never a permanent spinner). */
+  readFailed?: boolean;
 }
 
 /**
@@ -55,8 +59,9 @@ export const UNKNOWN_REVIEW_STATUS: ReviewStatus = {
 /**
  * The current review status for the pill (S5.2). Returns `none` when there is no
  * site, the agency layer is off, or the site was never sent for review — the
- * editor then shows no pill. Never throws; a failed fetch is treated as `none`
- * with **unknown** flags, so a caller can tell "no review" from "no answer".
+ * editor then shows no pill. Never throws; a failed fetch is `none` with
+ * **unknown** flags and `readFailed: true`, so a caller can tell "no review"
+ * from "no answer yet" from "the read failed".
  */
 export async function fetchReviewStatus(): Promise<ReviewStatus> {
   const siteId = currentSiteId();
@@ -64,7 +69,7 @@ export async function fetchReviewStatus(): Promise<ReviewStatus> {
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
   } catch {
-    return UNKNOWN_REVIEW_STATUS;
+    return { ...UNKNOWN_REVIEW_STATUS, readFailed: true };
   }
 }
 

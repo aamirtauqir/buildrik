@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 /**
- * AdvancedTab — visibility radios, password box, indexing switches, head code.
- * Pure form renderer.
+ * AdvancedTab — visibility radios (Live · Hidden), indexing switches, head
+ * code. Pure form renderer. Decision #21: Password is gone until the
+ * published-site middleware exists; indexing / follow and head code stay.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -32,10 +33,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setOgImageUrl: vi.fn(),
     visibility: "live",
     setVisibility: vi.fn(),
-    password: "",
-    setPassword: vi.fn(),
-    showPassword: false,
-    setShowPassword: vi.fn(),
     allowIndex: true,
     setAllowIndex: vi.fn(),
     allowFollow: true,
@@ -43,7 +40,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     customHead: "",
     setCustomHead: vi.fn(),
     headCodeError: null,
-    copyPassword: vi.fn(),
     domain: null,
     saveState: "clean",
     isDirty: false,
@@ -51,9 +47,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     discard: vi.fn(),
     showDiscardConfirm: false,
     setShowDiscardConfirm: vi.fn(),
-    pendingTabChange: null,
-    confirmTabChange: vi.fn(),
-    cancelTabChange: vi.fn(),
     ...over,
   };
 }
@@ -72,11 +65,18 @@ describe("AdvancedTab visibility", () => {
     expect(live.getAttribute("aria-checked")).toBe("false");
   });
 
+  it("offers Live and Hidden only — no Password (decision #21)", () => {
+    render(<AdvancedTab s={makeSettings()} />);
+    expect(screen.getAllByRole("radio").map((r) => r.textContent)).toEqual(["Live", "Hidden"]);
+    expect(screen.queryByLabelText("Page access password")).toBeNull();
+    expect(screen.queryByText(/password/i)).toBeNull();
+  });
+
   it("calls setVisibility with the clicked value", () => {
     const s = makeSettings({ visibility: "live" });
     render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getAllByRole("radio").find((r) => r.textContent === "Password")!);
-    expect(s.setVisibility).toHaveBeenCalledWith("password");
+    fireEvent.click(screen.getAllByRole("radio").find((r) => r.textContent === "Hidden")!);
+    expect(s.setVisibility).toHaveBeenCalledWith("hidden");
   });
 
   it("shows the visibility helper text matching the current mode", () => {
@@ -87,64 +87,7 @@ describe("AdvancedTab visibility", () => {
   });
 });
 
-// ── Password box ─────────────────────────────────────────────────────────────
-
-describe("AdvancedTab password box", () => {
-  it("is hidden unless visibility is password", () => {
-    render(<AdvancedTab s={makeSettings({ visibility: "live" })} />);
-    expect(screen.queryByLabelText("Page access password")).toBeNull();
-  });
-
-  it("renders the password input when visibility is password", () => {
-    render(<AdvancedTab s={makeSettings({ visibility: "password", password: "secret" })} />);
-    const input = screen.getByLabelText("Page access password") as HTMLInputElement;
-    expect(input.value).toBe("secret");
-  });
-
-  it("masks the password (type=password) until Show is toggled", () => {
-    render(<AdvancedTab s={makeSettings({ visibility: "password", showPassword: false })} />);
-    const input = screen.getByLabelText("Page access password") as HTMLInputElement;
-    expect(input.getAttribute("type")).toBe("password");
-  });
-
-  it("reveals the password (type=text) when showPassword is true", () => {
-    render(<AdvancedTab s={makeSettings({ visibility: "password", showPassword: true })} />);
-    const input = screen.getByLabelText("Page access password") as HTMLInputElement;
-    expect(input.getAttribute("type")).toBe("text");
-  });
-
-  it("Show button toggles showPassword", () => {
-    const s = makeSettings({ visibility: "password", showPassword: false });
-    render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getByRole("button", { name: "Show password" }));
-    expect(s.setShowPassword).toHaveBeenCalledWith(true);
-  });
-
-  it("Copy button is disabled with an empty password and calls copyPassword when enabled", () => {
-    const empty = makeSettings({ visibility: "password", password: "" });
-    const { rerender } = render(<AdvancedTab s={empty} />);
-    const copyEmpty = screen.getByRole("button", { name: "Copy password" }) as HTMLButtonElement;
-    expect(copyEmpty.disabled).toBe(true);
-
-    const filled = makeSettings({ visibility: "password", password: "pw" });
-    rerender(<AdvancedTab s={filled} />);
-    const copyFilled = screen.getByRole("button", { name: "Copy password" }) as HTMLButtonElement;
-    expect(copyFilled.disabled).toBe(false);
-    fireEvent.click(copyFilled);
-    expect(filled.copyPassword).toHaveBeenCalledTimes(1);
-  });
-
-  it("forwards password input to setPassword", () => {
-    const s = makeSettings({ visibility: "password" });
-    render(<AdvancedTab s={s} />);
-    fireEvent.change(screen.getByLabelText("Page access password"), {
-      target: { value: "hunter2" },
-    });
-    expect(s.setPassword).toHaveBeenCalledWith("hunter2");
-  });
-});
-
-// ── Indexing switches ────────────────────────────────────────────────────────
+// ── Indexing ─────────────────────────────────────────────────────────────────
 
 describe("AdvancedTab indexing switches", () => {
   it("reflects allowIndex / allowFollow as switch checked state", () => {

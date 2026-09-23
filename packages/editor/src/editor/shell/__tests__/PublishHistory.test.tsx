@@ -16,12 +16,10 @@ const rollbackToVersion = vi.fn();
    not carry — the panel reads it separately. */
 const fetchSitePublishState = vi.fn();
 
-const fetchPublishDiff = vi.fn();
 vi.mock("../../../services/PublishService", () => ({
   fetchPublishHistory: (...a: unknown[]) => fetchPublishHistory(...a),
   fetchSitePublishState: (...a: unknown[]) => fetchSitePublishState(...a),
   rollbackToVersion: (...a: unknown[]) => rollbackToVersion(...a),
-  fetchPublishDiff: (...a: unknown[]) => fetchPublishDiff(...a),
 }));
 
 // P6 role gating — controllable; null = unknown (rollback stays enabled).
@@ -76,15 +74,23 @@ describe("P6 republish role gating", () => {
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
     const entry = screen.getByTestId("publish-republish-2");
-    expect(entry).toBeDisabled();
-    expect(entry).toHaveAttribute("title", "Ask an admin to republish");
+    /* Decision #19: aria-disabled + tooltip, never `disabled` — the control
+       stays focusable so the reason is reachable by keyboard (QA 2026-09-24). */
+    expect(entry).toHaveAttribute("aria-disabled", "true");
+    expect(entry).not.toBeDisabled();
+    expect(entry).not.toHaveAttribute("title");
+    expect(screen.getAllByText("Ask an admin to republish").length).toBeGreaterThan(0);
+    fireEvent.click(entry);
+    expect(screen.queryByText(/^Republish v2 as/)).toBeNull();
   });
 
   it("ADMIN keeps republish enabled on rollbackable versions", async () => {
     roleState.role = "ADMIN";
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
-    expect(screen.getByTestId("publish-republish-2")).toBeEnabled();
+    const entry = screen.getByTestId("publish-republish-2");
+    expect(entry).toBeEnabled();
+    expect(entry).not.toHaveAttribute("aria-disabled");
   });
 });
 
@@ -127,8 +133,11 @@ describe("republish", () => {
   it("a version whose snapshot is gone is disabled with the reason", async () => {
     renderIt();
     const pruned = await screen.findByTestId("publish-republish-1");
-    expect(pruned).toBeDisabled();
-    expect(pruned).toHaveAttribute("title", "This version's snapshot is no longer stored");
+    expect(pruned).toHaveAttribute("aria-disabled", "true");
+    expect(pruned).not.toBeDisabled();
+    expect(screen.getByText("This version's snapshot is no longer stored")).toBeInTheDocument();
+    fireEvent.click(pruned);
+    expect(screen.queryByText(/^Republish v1 as/)).toBeNull();
   });
 
   it("republishing an older version confirms then re-publishes it", async () => {
@@ -400,55 +409,28 @@ describe("the row is the entry — no picker under the list", () => {
   });
 });
 
-describe("Compare — what changed between two published versions", () => {
-  /* "Compare v3 → v4" only switched tabs; no diff existed. Now every row but
-     the oldest can compare itself with the version before it, page by page. */
-  beforeEach(() => {
-    fetchPublishDiff.mockReset().mockResolvedValue({
-      retained: true,
-      pages: [
-        { path: "about.html", change: "changed", fromBytes: 1024, toBytes: 2048 },
-        { path: "index.html", change: "same", fromBytes: 512, toBytes: 512 },
-        { path: "new.html", change: "added", fromBytes: null, toBytes: 300 },
-      ],
-      added: 1, removed: 0, changed: 1,
-    });
-  });
-
+describe("Compare — a door of the one Compare (B8)", () => {
+  /* The diff itself renders in CompareHost now (PublishDiffView.test.tsx);
+     each row but the oldest hands the host the version before it and itself. */
   it("offers Compare on every row except the oldest, which has nothing before it", async () => {
-    renderIt();
+    renderIt({ onCompare: vi.fn() });
     await screen.findByText(/Version 3/i);
     expect(screen.getByRole("button", { name: "Compare v2 to v3" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Compare v1 to v2" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Compare v0/ })).toBeNull();
   });
 
-  it("asks the server for exactly those two jobs and names what changed", async () => {
-    renderIt();
+  it("hands the host exactly those two versions", async () => {
+    const onCompare = vi.fn();
+    renderIt({ onCompare });
     await screen.findByText(/Version 3/i);
     fireEvent.click(screen.getByRole("button", { name: "Compare v2 to v3" }));
-    await waitFor(() => expect(fetchPublishDiff).toHaveBeenCalledWith("s1", "j2", "j3"));
-    expect(await screen.findByTestId("publish-diff-summary")).toHaveTextContent("1 changed · 1 added · 0 removed · 1 unchanged");
-    expect(screen.getByText("about.html").closest("li")).toHaveAttribute("data-change", "changed");
-    expect(screen.getByText("new.html").closest("li")).toHaveAttribute("data-change", "added");
-    expect(screen.getByText("1.0 KB → 2.0 KB")).toBeInTheDocument();
+    expect(onCompare).toHaveBeenCalledWith({ id: "j2", version: 2 }, { id: "j3", version: 3 });
   });
 
-  it("says a pruned version cannot be compared, rather than showing an empty diff", async () => {
-    fetchPublishDiff.mockResolvedValue({ retained: false, pages: [], added: 0, removed: 0, changed: 0 });
+  it("offers no Compare where no host is wired", async () => {
     renderIt();
     await screen.findByText(/Version 3/i);
-    fireEvent.click(screen.getByRole("button", { name: "Compare v1 to v2" }));
-    expect(await screen.findByText(/no longer stored/)).toBeInTheDocument();
-    expect(screen.queryByTestId("publish-diff-summary")).toBeNull();
-  });
-
-  it("goes back to the list", async () => {
-    renderIt();
-    await screen.findByText(/Version 3/i);
-    fireEvent.click(screen.getByRole("button", { name: "Compare v2 to v3" }));
-    await screen.findByTestId("publish-diff");
-    fireEvent.click(screen.getByRole("button", { name: "‹ Versions" }));
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Compare v/ })).toBeNull();
   });
 });

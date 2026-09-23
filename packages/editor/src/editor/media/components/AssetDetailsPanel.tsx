@@ -33,8 +33,13 @@ import {
   ModalTitle,
   TextInput,
   Textarea,
+  Tooltip,
   VersionRow,
 } from "@/editor/chrome-ui";
+import {
+  useMediaWriteAccess,
+  type MediaWriteAction,
+} from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
@@ -212,6 +217,21 @@ export function AssetDetailsPanel({
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
+  /* Audit G3-064: a viewer keeps Rename and Delete on show, aria-disabled with
+     the reason (board 6289:148485 pattern) — same gate as the grid and menu. */
+  const write = useMediaWriteAccess();
+  const gated = (action: MediaWriteAction, label: string, className: string, run: () => void) =>
+    write.canWrite ? (
+      <Button className={className} onClick={run}>
+        {label}
+      </Button>
+    ) : (
+      <Tooltip content={write.reason(action)} placement="left">
+        <Button className={`${className} tw:opacity-55`} aria-disabled="true" data-testid={`mgr-det-${action}`}>
+          {label}
+        </Button>
+      </Tooltip>
+    );
   const [regenerating, setRegenerating] = React.useState(false);
   /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
      the drop is the only thing the pointer is doing. */
@@ -440,14 +460,10 @@ export function AssetDetailsPanel({
               <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
                 Edit image
               </Button>
-              <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
-                Rename
-              </Button>
+              {gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))}
             </div>
           ) : (
-            <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
-              Rename
-            </Button>
+            gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
           )}
           {!isFont && (
             <Button
@@ -468,9 +484,7 @@ export function AssetDetailsPanel({
               Optimize
             </Button>
           )}
-          <Button className="mgr-btn danger" onClick={() => onRequestDelete(selectedItem.key)}>
-            Delete
-          </Button>
+          {gated("delete", "Delete", "mgr-btn danger", () => onRequestDelete(selectedItem.key))}
         </div>
       </div>
 

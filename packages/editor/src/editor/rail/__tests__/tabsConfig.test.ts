@@ -15,8 +15,8 @@ describe("tabsConfig helpers", () => {
       expect(getTabMode("add")).toBe("panel");
     });
 
-    it("returns 'panel' for Templates tab", () => {
-      expect(getTabMode("templates")).toBe("panel");
+    it("returns 'fullpage' for Templates tab (decision #24)", () => {
+      expect(getTabMode("templates")).toBe("fullpage");
     });
 
     it("returns 'fullpage' for Settings tab (P5 — graduated from the 320px drawer)", () => {

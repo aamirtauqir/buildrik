@@ -65,6 +65,14 @@ export interface ApprovedCompareViewProps {
    */
   mode?: Mode;
   onModeChange?: (mode: Mode) => void;
+  /** The one Compare (B8): the two sides' names, in the pane heads, the
+   *  overlay slider and the no-differences state. Omitted = this view's
+   *  original approved-vs-current wording. */
+  leftLabel?: string;
+  rightLabel?: string;
+  /** The one Compare's source pickers ("Opened from …" · [left ▾] → [right ▾],
+   *  board 4418:115486), placed right after the bar's title. */
+  sources?: React.ReactNode;
 }
 
 const KIND: Record<CompareChangeKind, { icon: LucideIcon; className: string; label: string }> = {
@@ -169,6 +177,9 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
   onBack,
   mode: controlledMode,
   onModeChange,
+  leftLabel,
+  rightLabel,
+  sources,
 }) => {
   /* Controlled when the host passes both; otherwise self-managed, unchanged. */
   const [uncontrolledMode, setUncontrolledMode] = React.useState<Mode>("split");
@@ -230,7 +241,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           underneath — the same 1080-vs-280 placement question BLOCKERS B1 holds
           for the founder, showing up as a layout bug. */}
       <Toolbar className="tw:min-h-12 tw:bg-[var(--bk-bg-card)] tw:border-[var(--bk-gray-100)] tw:px-4" data-testid="compare-bar">
-        <span className={BAR_TITLE} data-testid="compare-title">Compare</span>
+        <span className={BAR_TITLE} data-testid="compare-title" id="compare-title">Compare</span>
+        {sources}
         <div className={MODE_STRIP} role="group" aria-label="Compare mode" data-testid="compare-mode-strip">
           {(["split", "overlay", "list"] as Mode[]).map((m) => (
             <Button
@@ -292,8 +304,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           className="tw:flex-1"
           data-testid="compare-no-changes"
           icon={<CheckCircle2 size={24} aria-hidden="true" />}
-          title="Nothing changed since the approved version."
-          body="Every page matches what the client approved."
+          title={leftLabel ? "No differences" : "Nothing changed since the approved version."}
+          body={leftLabel ? `${leftLabel} and ${rightLabel ?? "Current draft"} match on every page.` : "Every page matches what the client approved."}
         />
       ) : mode === "list" ? (
         <>
@@ -347,7 +359,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
             </div>
           </div>
           <Toolbar edge="top">
-            <span className={LIST_DETAIL}>Approved</span>
+            <span className={LIST_DETAIL}>{leftLabel ?? "Approved"}</span>
             <div className="tw:flex-1">
               <Slider
                 value={Math.round(overlayOpacity * 100)}
@@ -359,14 +371,21 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                 withField={false}
               />
             </div>
-            <span className={LIST_DETAIL}>Current</span>
+            <span className={LIST_DETAIL}>{rightLabel ?? "Current"}</span>
           </Toolbar>
         </>
       ) : (
         <div className={STAGE}>
           <div className={PANE} data-testid="compare-pane-approved">
             <div className={PANE_HEAD}>
-              <span className={PANE_LABEL_APPROVED} data-testid="compare-pane-approved-label">Approved</span>
+              {/* Success-text marks the signed-off side (168:16); any other
+                  left side is just a version, in ink. */}
+              <span
+                className={!leftLabel || leftLabel === "Approved" ? PANE_LABEL_APPROVED : PANE_LABEL}
+                data-testid="compare-pane-approved-label"
+              >
+                {leftLabel ?? "Approved"}
+              </span>
               {!currentReady && (
                 <span className={PANE_HINT} data-testid="compare-pane-approved-hint">
                   instant — stored snapshot
@@ -377,7 +396,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </div>
           <div className={PANE} data-testid="compare-pane-current">
             <div className={PANE_HEAD}>
-              <span className={PANE_LABEL} data-testid="compare-pane-current-label">Current</span>
+              <span className={PANE_LABEL} data-testid="compare-pane-current-label">{rightLabel ?? "Current"}</span>
               {!currentReady && (
                 <span className={PANE_HINT} data-testid="compare-pane-current-hint">
                   rendering…

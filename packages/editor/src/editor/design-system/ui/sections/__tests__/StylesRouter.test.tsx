@@ -83,14 +83,8 @@ describe("StylesRouter", () => {
     const { container } = render(wrap(<StylesRouter />));
     const rows = container.querySelectorAll("[data-category-row]");
     rows.forEach((row) => {
-      const btn = row as HTMLButtonElement;
-      const label = btn.textContent ?? "";
-      const isZero = / · 0 variants$/.test(label);
-      if (isZero) {
-        expect(btn.disabled).toBe(true);
-      } else {
-        expect(btn.disabled).toBe(false);
-      }
+      const isZero = /0 variants$/.test(row.textContent?.replace("›", "").trim() ?? "");
+      expect(row.getAttribute("aria-disabled")).toBe(isZero ? "true" : null);
     });
   });
 });

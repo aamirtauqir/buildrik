@@ -37,3 +37,11 @@ describe("the template confirm says what applying one actually does", () => {
     expect(data).toMatch(/#[0-9a-fA-F]{3,6}/);
   });
 });
+
+/* G2-098 / Q2b: templates never touch Brand — the replace confirm has no
+   "Reset global styles" option (it cleared the project's styles outright). */
+describe("ReplaceModal — no global-styles reset", () => {
+  it("offers no Reset global styles option", () => {
+    expect(modals).not.toMatch(/Reset global styles/);
+  });
+});

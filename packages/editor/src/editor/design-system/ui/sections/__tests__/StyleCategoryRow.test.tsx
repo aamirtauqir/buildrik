@@ -1,84 +1,39 @@
+/**
+ * StyleCategoryRow — a Presets row, board 7316:83953 (C1 (ii)).
+ */
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { StyleCategoryRow } from "../StyleCategoryRow";
 
 describe("StyleCategoryRow", () => {
-  it("renders category label + variant count (plural)", () => {
-    const { getByText } = render(
-      <StyleCategoryRow
-        category="button"
-        variantCount={3}
-        isActive={false}
-        onClick={() => {}}
-      />,
-    );
-    /* Board 152:112 puts the name at the left and the count at the right,
-       so they are two nodes now rather than one run of text. */
-    expect(getByText("Button")).toBeTruthy();
-    expect(getByText("3 variants")).toBeTruthy();
+  it("names the category the way the board does, over its variant count", () => {
+    const { getByTestId } = render(<StyleCategoryRow category="button" variantCount={3} onClick={() => {}} />);
+    expect(getByTestId("brand-preset-label-button").textContent).toBe("Buttons");
+    expect(getByTestId("brand-preset-count-button").textContent).toBe("3 variants");
   });
 
-  it("renders singular 'variant' when variantCount === 1", () => {
-    const { getByText } = render(
-      <StyleCategoryRow
-        category="form"
-        variantCount={1}
-        isActive={false}
-        onClick={() => {}}
-      />,
-    );
-    expect(getByText("Form input")).toBeTruthy();
-    expect(getByText("1 variant")).toBeTruthy();
+  it("says 'variant', singular, for one", () => {
+    const { getByTestId } = render(<StyleCategoryRow category="form" variantCount={1} onClick={() => {}} />);
+    expect(getByTestId("brand-preset-label-form").textContent).toBe("Forms");
+    expect(getByTestId("brand-preset-count-form").textContent).toBe("1 variant");
   });
 
-  it("active state exposes data-active='true' and accent fg", () => {
-    const { container } = render(
-      <StyleCategoryRow
-        category="card"
-        variantCount={2}
-        isActive
-        onClick={() => {}}
-      />,
-    );
-    const btn = container.querySelector('[data-category-row="card"]') as
-      | HTMLButtonElement
-      | null;
-    expect(btn).toBeTruthy();
-    expect(btn?.getAttribute("data-active")).toBe("true");
-    expect(btn?.style.borderLeftColor || btn?.style.borderLeft).toBeTruthy();
-  });
-
-  it("click invokes onClick exactly once", () => {
+  it("click and Enter invoke onClick", () => {
     const onClick = vi.fn();
-    const { container } = render(
-      <StyleCategoryRow
-        category="badge"
-        variantCount={2}
-        isActive={false}
-        onClick={onClick}
-      />,
-    );
-    const btn = container.querySelector(
-      '[data-category-row="badge"]',
-    ) as HTMLButtonElement;
-    fireEvent.click(btn);
-    expect(onClick).toHaveBeenCalledTimes(1);
+    const { container } = render(<StyleCategoryRow category="badge" variantCount={2} onClick={onClick} />);
+    const row = container.querySelector('[data-category-row="badge"]') as HTMLElement;
+    fireEvent.click(row);
+    fireEvent.keyDown(row, { key: "Enter" });
+    expect(onClick).toHaveBeenCalledTimes(2);
   });
 
-  it("variantCount=0 → disabled + opacity 0.4", () => {
-    const { container } = render(
-      <StyleCategoryRow
-        category="tooltip"
-        variantCount={0}
-        isActive={false}
-        onClick={() => {}}
-      />,
-    );
-    const btn = container.querySelector(
-      '[data-category-row="tooltip"]',
-    ) as HTMLButtonElement;
-    expect(btn.disabled).toBe(true);
-    expect(btn.style.opacity).toBe("0.4");
+  it("a category with no presets is disabled and does not drill in", () => {
+    const onClick = vi.fn();
+    const { container } = render(<StyleCategoryRow category="tooltip" variantCount={0} onClick={onClick} />);
+    const row = container.querySelector('[data-category-row="tooltip"]') as HTMLElement;
+    expect(row.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(row);
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

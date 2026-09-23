@@ -30,15 +30,11 @@ import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
-import { exportPublishPages } from "../shell/exportPublishPages";
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
-const TemplatesTab = React.lazy(() =>
-  import("./tabs/templates/TemplatesTab").then((m) => ({ default: m.TemplatesTab }))
-);
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
@@ -65,11 +61,6 @@ export interface TabRouterProps {
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
-  /** Pages › "From template" navigated here — Templates opens in new-page
-   *  mode. A prop, deliberately: the old event-based handoff ALWAYS missed,
-   *  because TabRouter mounts one tab at a time, so the listener did not
-   *  exist yet when the emit fired from the Pages tab. */
-  templatesNewPageMode?: boolean;
   /** Site menu › Unpublish asked for the confirm before PublishTab existed.
    *  Same one-tab-at-a-time race as above; same answer — a prop the always-
    *  mounted sidebar owns, consumed once by the tab it was meant for. */
@@ -81,7 +72,6 @@ export interface TabRouterProps {
   /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
   nextMove?: NextMove | null;
   onRequestPublish?: () => void;
-  onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
@@ -121,7 +111,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   canvasHoveredId,
   onSwitchToAdd,
   onSwitchToTemplates,
-  templatesNewPageMode,
   unpublishIntent,
   onUnpublishIntentConsumed,
   onCreateComponent,
@@ -129,7 +118,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   publishJob,
   nextMove,
   onRequestPublish,
-  onTemplatesSwitchTab,
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -141,19 +129,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   switch (activeTab) {
     case "add":
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
-
-    case "templates":
-      return (
-        <TemplatesTab
-          isExpanded={commonTabProps.isExpanded}
-          onExpandToggle={commonTabProps.onExpandToggle}
-          composer={composer}
-          newPageMode={templatesNewPageMode}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          onClose={commonTabProps.onClose}
-        />
-      );
 
     case "ai":
       return <AITab composer={composer} {...commonTabProps} />;
@@ -222,7 +197,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          initialView={activeSubTab === "published" ? "published" : undefined}
+          initialView={activeSubTab === "published" || activeSubTab === "activity" ? activeSubTab : undefined}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={
@@ -250,11 +225,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           {...commonTabProps}
           composer={composer}
           onResend={onResendReview}
-          /* A deep link into Compare (`openLeftPanelToTab("review",
-             "compare")`), the same way the history tab deep-links to
-             "published" two cases above. */
-          initialCompare={activeSubTab === "compare"}
-          onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />
       );
 

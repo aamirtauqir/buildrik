@@ -35,7 +35,8 @@ import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
-import { useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "../../shared/types/media";
@@ -108,6 +109,16 @@ type MoveDoor = "selection" | "menu";
 
 export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
   const state = useMediaState(composer);
+  /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
+     aria-disabled, with the reason on a tooltip. The rest of the media gate
+     lives in the grid, folder rail, details and menu components. */
+  const mediaWrite = useMediaWriteAccess();
+  const viewOnlyTip = (control: React.ReactElement) =>
+    mediaWrite.canWrite ? control : (
+      <Tooltip content={mediaWrite.reason("upload")} placement="bottom">
+        {control}
+      </Tooltip>
+    );
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
@@ -379,6 +390,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
+  /* A1 / QA 2026-09-24: the folder-delete confirm's "Move files…" hands the
+     folder's files to the same Move modal (board B1-13 7564:185465). */
+  const [folderMoveItems, setFolderMoveItems] = React.useState<LibraryItem[] | null>(null);
   /* Clone 3721:45960 — a menu move's receipt is the count line (`Products ·
      team-photo.jpg moved`), not the rail, which keeps whatever it showed. It
      clears on the next scope or filter change. */
@@ -400,7 +414,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     async (keys: string[], folderId: string | null, from: MoveDoor = "selection") => {
       setAssetDrag(null);
       const items = keys
-        .map((k) => state.libraryItems.find((i) => i.key === k))
+        .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
       try {
@@ -821,21 +835,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         {/* Upload is the primary — it is the action the library exists for.
             Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
-          <Button
-            className="mgr-btn"
-            data-testid="mgr-btn-import"
-            onClick={() => {
-              setImportDraft("");
-              setImportUrlOpen(true);
-            }}
-          >
-            <Download size={14} />
-            Import URL
-          </Button>
-          <Button className="mgr-btn-primary" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
-            <Upload size={14} />
-            Upload
-          </Button>
+          {viewOnlyTip(
+            <Button
+              className={mediaWrite.canWrite ? "mgr-btn" : "mgr-btn tw:opacity-55"}
+              data-testid="mgr-btn-import"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              onClick={() => {
+                if (!mediaWrite.canWrite) return;
+                setImportDraft("");
+                setImportUrlOpen(true);
+              }}
+            >
+              <Download size={14} />
+              Import URL
+            </Button>,
+          )}
+          {viewOnlyTip(
+            <Button
+              className={mediaWrite.canWrite ? "mgr-btn-primary" : "mgr-btn-primary tw:opacity-55"}
+              data-testid="mgr-btn-upload"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              onClick={() => mediaWrite.canWrite && handleUploadClick()}
+            >
+              <Upload size={14} />
+              Upload
+            </Button>,
+          )}
           <Button className="mgr-btn" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from stock
@@ -1087,12 +1112,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             }
           }}
           onMoveFiles={() => {
-            /* Drop into the existing move picker by surfacing the empty
-               "Move to…" picker on the asset grid's bulk action. The board
-               intended this entry to be discoverable; routing through
-               setCurrentFolderId scopes the picker to this folder. */
+            /* The folder's files go straight into the Move modal; the folder
+               itself stays until the user deletes it (now empty). */
+            const inFolder = state.allLibraryItems.filter((i) => (i.folderId ?? null) === folderConfirm.folderId);
             setFolderConfirm(null);
-            addToast({ description: "Pick a destination folder for the files, then come back.", tone: "info" });
+            setFolderMoveItems(inFolder);
           }}
         />
       )}
@@ -1207,18 +1231,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       {/* One Move modal for both doors: the checked set (3683:19950) or the
           card menu's one file (3721:45952). */}
       <MoveAssetsModal
-        open={moveModalOpen || menuMoveTarget !== null}
-        items={menuMoveTarget ? [menuMoveTarget] : checkedItems}
+        open={moveModalOpen || menuMoveTarget !== null || folderMoveItems !== null}
+        items={menuMoveTarget ? [menuMoveTarget] : (folderMoveItems ?? checkedItems)}
         folders={state.allFolders}
         onClose={() => {
           setMoveModalOpen(false);
           setMenuMoveTarget(null);
+          setFolderMoveItems(null);
         }}
-        onMove={(folderId) =>
-          void (menuMoveTarget
-            ? runMove([menuMoveTarget.key], folderId, "menu")
-            : runMove(checkedItems.map((i) => i.key), folderId))
-        }
+        onMove={(folderId) => {
+          if (menuMoveTarget) void runMove([menuMoveTarget.key], folderId, "menu");
+          else if (folderMoveItems) {
+            setFolderMoveItems(null);
+            void runMove(folderMoveItems.map((i) => i.key), folderId);
+          } else void runMove(checkedItems.map((i) => i.key), folderId);
+        }}
       />
       <MoveFailedModal
         open={moveFailure !== null}

@@ -50,6 +50,8 @@ export interface FullPageRouterProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
+  /** New-page modal → From template: the name Create page uses (#19). */
+  templatesNewPageName?: string;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -63,16 +65,28 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
+  templatesNewPageName,
 }) => {
   switch (activeTab) {
+    /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
+       view's own sidebar carries `‹ Back to canvas`. Same portal, same reason
+       (the view owns its Escape and its dialogs). */
     case "templates":
       return (
-        <TemplatesTab
-          composer={composer}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          {...commonTabProps}
-        />
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="tpl-host"
+          >
+            <TemplatesTab
+              composer={composer}
+              onTemplateUsed={onSwitchToAdd}
+              onSwitchTab={onTemplatesSwitchTab}
+              newPageName={templatesNewPageName}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
       );
 
     /* Clone 3695:45155 — the Asset library is edge-to-edge: no rail, no

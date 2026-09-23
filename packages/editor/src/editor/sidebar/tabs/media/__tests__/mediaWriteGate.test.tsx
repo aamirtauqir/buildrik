@@ -17,7 +17,8 @@ import { UploadZone } from "../components/UploadZone";
 import { MediaContextMenu } from "../components/MediaContextMenu";
 import { FolderTree } from "@/editor/media/components/FolderTree";
 import { AssetGrid } from "@/editor/media/components/AssetGrid";
-import { makeMediaState } from "@/editor/media/__tests__/libraryFixture";
+import { makeMediaState, TEN } from "@/editor/media/__tests__/libraryFixture";
+import { AssetDetailsPanel, type AssetDetailsPanelProps } from "@/editor/media/components/AssetDetailsPanel";
 import { VIEW_ONLY_REASON } from "../hooks/useMediaWriteAccess";
 
 let role: WorkspaceRole | null = "VIEWER";
@@ -187,5 +188,42 @@ describe("AssetGrid — view only", () => {
     const { state } = mount({ libraryItems: items, selMode: true, selectedKeys: new Set(["a1"]) });
     fireEvent.click(screen.getByTestId("mgr-bulk-delete"));
     expect(state.requestBulkDelete).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("AssetDetailsPanel — view only", () => {
+  const mount = () => {
+    const onOpenRename = vi.fn();
+    const onRequestDelete = vi.fn();
+    const img = TEN.find((i) => i.type === "img") as LibraryItem;
+    render(
+      <AssetDetailsPanel
+        selectedItem={img} versions={[]} usageCount={0} usedIn={[]} libraryItems={TEN}
+        onOpenVersions={vi.fn()} onInsert={vi.fn()} onEditImage={vi.fn()}
+        onOpenRename={onOpenRename} onRequestDelete={onRequestDelete}
+        composer={{ mediaOps: { replaceAcross: vi.fn() } } as unknown as AssetDetailsPanelProps["composer"]}
+        addToast={vi.fn()}
+      />,
+    );
+    return { onOpenRename, onRequestDelete };
+  };
+
+  it("Rename and Delete stay on show, aria-disabled, and run nothing", () => {
+    const { onOpenRename, onRequestDelete } = mount();
+    const rename = screen.getByTestId("mgr-det-rename");
+    const del = screen.getByTestId("mgr-det-delete");
+    expect(rename).toHaveAttribute("aria-disabled", "true");
+    expect(del).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(rename);
+    fireEvent.click(del);
+    expect(onOpenRename).not.toHaveBeenCalled();
+    expect(onRequestDelete).not.toHaveBeenCalled();
+  });
+
+  it("an EDITOR's Rename opens the rename overlay", () => {
+    role = "EDITOR";
+    const { onOpenRename } = mount();
+    fireEvent.click(screen.getByRole("button", { name: "Rename" }));
+    expect(onOpenRename).toHaveBeenCalledTimes(1);
   });
 });

@@ -38,10 +38,6 @@ export interface TemplateItem {
   industry?: TemplateIndustry;
   /** CSS gradient for card preview thumbnail */
   gradient?: string;
-  /** Number of pages in this template */
-  pageCount?: number;
-  /** Sub-category tag for filtering (hero | features | pricing | testimonials | cta | footer | contact) */
-  subCategory?: string;
   /**
    * P9: semver tag for the template definition. When a page applies a
    * template, the version is captured into PageMeta.appliedTemplates;
@@ -142,35 +138,9 @@ export function addRecentTemplate(template: { id: string; name: string; icon: st
 // SITE TEMPLATES — full-site templates shown in card grid (Templates tab v2)
 // ============================================================================
 
-export type SiteCategory = "all" | "site-pages" | "sections" | "my-templates";
-
 /** Optional industry tag — kept on TemplateItem for analytics + secondary filters,
  * not part of the top-level IA. */
 export type TemplateIndustry = "landing" | "portfolio" | "saas" | "blog" | "ecommerce";
-
-export const SITE_CATEGORY_PILLS: { id: SiteCategory; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "site-pages", label: "Site Pages" },
-  { id: "sections", label: "Sections" },
-  { id: "my-templates", label: "My Templates" },
-];
-
-export type TemplateType = "page" | "section";
-
-export const TEMPLATE_TYPE_PILLS: { id: TemplateType; label: string }[] = [
-  { id: "page", label: "Page Templates" },
-  { id: "section", label: "Section Templates" },
-];
-
-export const SUB_CATEGORY_TAGS: { id: string; label: string }[] = [
-  { id: "hero", label: "Hero" },
-  { id: "features", label: "Features" },
-  { id: "pricing", label: "Pricing" },
-  { id: "testimonials", label: "Testimonials" },
-  { id: "cta", label: "CTA" },
-  { id: "footer", label: "Footer" },
-  { id: "contact", label: "Contact" },
-];
 
 export const SITE_TEMPLATES: TemplateItem[] = [
   {
@@ -182,9 +152,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     status: "free",
     category: "site-pages",
     industry: "landing",
-    gradient: "linear-gradient(145deg, #0a081e, #180f3a)",
-    pageCount: 4,
-    subCategory: "features", // SaaS landing: has feature sections
+    gradient: "linear-gradient(145deg, #0a081e, #180f3a)", // SaaS landing: has feature sections
   },
   {
     id: "site-portfolio",
@@ -195,9 +163,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     status: "free",
     category: "site-pages",
     industry: "portfolio",
-    gradient: "linear-gradient(145deg, #0e1220, #061624)",
-    pageCount: 3,
-    subCategory: "hero", // Portfolio: hero-focused layout
+    gradient: "linear-gradient(145deg, #0e1220, #061624)", // Portfolio: hero-focused layout
   },
   {
     id: "site-agency",
@@ -208,9 +174,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     status: "free",
     category: "site-pages",
     industry: "landing",
-    gradient: "linear-gradient(145deg, #0d1a12, #061a0a)",
-    pageCount: 5,
-    subCategory: "cta", // Agency: CTA-focused hero with strong call-to-action
+    gradient: "linear-gradient(145deg, #0d1a12, #061a0a)", // Agency: CTA-focused hero with strong call-to-action
   },
   {
     id: "site-ecommerce",
@@ -221,9 +185,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     status: "premium",
     category: "site-pages",
     industry: "ecommerce",
-    gradient: "linear-gradient(145deg, #1a0a00, #2d1200)",
-    pageCount: 6,
-    subCategory: "pricing", // E-Commerce: product/pricing grid prominent
+    gradient: "linear-gradient(145deg, #1a0a00, #2d1200)", // E-Commerce: product/pricing grid prominent
   },
   {
     id: "site-blog",
@@ -235,7 +197,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "blog",
     gradient: "linear-gradient(145deg, #0a0e1a, #0a1428)",
-    pageCount: 3,
   },
   {
     id: "site-startup",
@@ -247,7 +208,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "saas",
     gradient: "linear-gradient(145deg, #180a2e, #240a3e)",
-    pageCount: 4,
   },
   {
     id: "site-restaurant",
@@ -259,7 +219,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "landing",
     gradient: "linear-gradient(145deg, #1a0a06, #2d0a00)",
-    pageCount: 4,
   },
   {
     id: "site-minimal",
@@ -271,7 +230,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "portfolio",
     gradient: "linear-gradient(145deg, #0d0d14, #181820)",
-    pageCount: 2,
   },
   {
     id: "site-saas-pro",
@@ -283,7 +241,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "saas",
     gradient: "linear-gradient(145deg, #0a1028, #061830)",
-    pageCount: 7,
   },
   {
     id: "site-coming-soon",
@@ -295,7 +252,6 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "site-pages",
     industry: "landing",
     gradient: "linear-gradient(145deg, #0a0a1e, #14082e)",
-    pageCount: 1,
   },
 ];
 

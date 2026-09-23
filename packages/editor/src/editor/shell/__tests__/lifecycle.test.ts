@@ -118,6 +118,24 @@ describe("deriveLifecycleState — off the happy path", () => {
     }
   });
 
+  /* QA 2026-09-24: `reviews.status` erroring left Publish on "Checking…"
+     forever — a failure read as "not answered yet". A failed read is its own
+     gate: shut, with the reason, and the panel's Retry. */
+  it("a FAILED status read is the unchecked gate, not an endless check", () => {
+    const move = deriveLifecycleState(at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true }));
+    expect(move?.gate).toBe("unchecked");
+    expect(move?.blockedReason).toBe("Couldn't check this site's review settings.");
+    expect(move?.gateReason).toBe("Couldn't check this site's review settings.");
+    expect(move?.blockedReason).not.toMatch(/Checking/);
+  });
+
+  it("a known blocker still outranks the failed read", () => {
+    const move = deriveLifecycleState(
+      at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true, offline: true }),
+    );
+    expect(move?.blockedReason).toBe("Can't publish while offline");
+  });
+
   it("a server too old to send the flags does not block publishing forever", () => {
     // `undefined` is a standing condition (deploy skew), not a beat. Holding the
     // in-flight control through it makes publishing impossible for as long as

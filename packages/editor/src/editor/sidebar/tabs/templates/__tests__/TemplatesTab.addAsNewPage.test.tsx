@@ -62,18 +62,18 @@ afterEach(cleanup);
 describe("Templates — add as new page", () => {
   it("switches to the page it created BEFORE importing into it", async () => {
     const { calls, composer } = makeComposer();
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
 
-    // Open a template's detail, then choose the new-page route.
+    // Open a template's preview, then choose the new-page route.
     const first = SITE_TEMPLATES[0];
-    fireEvent.click(await screen.findByText(first.name));
-    /* Two buttons carry that name: the detail pane's action and the "Add as
-       new page instead?" nudge under the replace warning. The action is the
-       first. */
-    const [addAsNewPage] = await screen.findAllByRole("button", { name: /^add as new page$/i });
-    fireEvent.click(addAsNewPage);
+    /* The sidebar row opens the same preview as the grid card (decision #24).
+       Test ids, not role queries: role + accessible-name resolution over the
+       whole catalogue took ~8 s and timed this test out under load. */
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
+    /* The card opens the preview (decision #24); Create page is the new-page route. */
+    fireEvent.click(await screen.findByText("Create page"));
 
-    await waitFor(() => expect(calls).toContain("import"));
+    await waitFor(() => expect(calls).toContain("import"), { timeout: 5000 });
 
     expect(calls).toEqual(["createPage", "setActivePage:page-new", "import"]);
     // The import must never run while the old page is still the active one.

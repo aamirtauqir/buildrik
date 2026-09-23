@@ -45,6 +45,19 @@ async function importViaPaste(utils: ReturnType<typeof renderWorkspace>, payload
 }
 
 describe("BrandWorkspace › Import / export", () => {
+  it("4418:168885: Dark strategy, EXPORT and IMPORT share one panel, above the preview", async () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    openPage(utils, "export");
+    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
+    expect(card.contains(utils.getByTestId("brand-export-dark-row"))).toBe(true);
+    expect(card.contains(utils.getByTestId("brand-export-head"))).toBe(true);
+    expect(card.contains(utils.getByTestId("brand-import-head"))).toBe(true);
+    const preview = utils.getByTestId("export-preview");
+    expect(card.contains(preview)).toBe(false);
+    // IMPORT comes before the preview in reading order.
+    expect(utils.getByTestId("brand-import-head").compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("shows the import card + export preview", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
@@ -150,11 +163,13 @@ describe("BrandWorkspace › Component styles — AI assist entry", () => {
     return utils.container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
   }
 
-  it("the page offers the AI entry", () => {
+  it("the page offers the AI entry as its header action (7316:82755)", () => {
     const utils = renderWorkspace(makeAiComposer());
     const btn = openComponents(utils);
     expect(btn).toBeTruthy();
     expect(btn.textContent).toContain("Generate with AI");
+    expect(btn.getAttribute("data-testid")).toBe("brand-page-action");
+    expect(utils.getByTestId("brand-page-body").contains(btn)).toBe(false);
   });
 
   it("clicking the button opens AIPromptModal with the composer's service", () => {
@@ -218,6 +233,21 @@ describe("BrandWorkspace › dark preview chrome (T10)", () => {
       colorMode.set("dark");
     });
 
+    expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
+  });
+
+  it("Colour mode (7316:80949): the Light / Dark switch sits in the preview card, and flips it", () => {
+    const { composer } = makeModeComposer("light");
+    const utils = renderWorkspace(composer);
+    // Only on Colour mode.
+    expect(utils.queryByTestId("brand-colour-mode-seg")).toBeNull();
+    openPage(utils, "colour-mode");
+    const seg = utils.getByTestId("brand-colour-mode-seg");
+    expect(utils.getByTestId("brand-live-preview").contains(seg)).toBe(true);
+    expect(utils.getByTestId("brand-page-body").contains(seg)).toBe(false);
+    act(() => {
+      fireEvent.click(utils.getByTestId("brand-colour-mode-seg-dark"));
+    });
     expect(utils.getByTestId("brand-panel").getAttribute("data-ds-preview")).toBe("dark");
   });
 

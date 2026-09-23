@@ -158,11 +158,19 @@
   pointer-events: none;
 }
 
+.buildrick-design-picker__alpha-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.buildrick-design-picker__alpha-row > .buildrick-design-picker__slider-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
 .buildrick-design-picker__alpha-label {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%) translateX(calc(100% + 6px));
+  flex: none;
   font-size: 12px;
   color: var(--bk-ink-muted);
   white-space: nowrap;

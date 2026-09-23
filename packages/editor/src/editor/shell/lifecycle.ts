@@ -46,6 +46,10 @@
  *                      approval acknowledgement (B1-10)
  *   confirm            the plain path — the door opens the four-facts confirm
  *                      (B3-10) and nothing else
+ *   unchecked          `reviews.status` FAILED — the flags are unknown and
+ *                      will stay unknown until asked again. Shut, with the
+ *                      reason and a Retry (QA 2026-09-24: this used to read
+ *                      as "not answered yet" and spun forever)
  *   none               there is no publish door: a permission/network block
  *                      (the CTA carries its own `blockedReason`), or a server
  *                      refusal this module does not recognise
@@ -91,6 +95,9 @@ export interface LifecycleInput {
    * `null` = unknown, treated the same as `reviewsEnabled: null`.
    */
   editsRequireApproval: boolean | null;
+  /** The `reviews.status` read failed (not merely pending). Unknown flags
+   *  with this set are the `unchecked` gate, not an in-flight beat. */
+  reviewStatusFailed?: boolean;
   /** Has this site ever gone live? */
   isPublished: boolean;
   /** Changed since it last went live. `null` = unknown (never published, or no
@@ -118,6 +125,7 @@ export type PublishGate =
   | "waiting"
   | "stale-approval"
   | "confirm"
+  | "unchecked"
   | "none";
 
 export interface NextMove {
@@ -180,7 +188,7 @@ function openErrorsLine(n: number): string {
 /** What the review round says about the publish door, before the blocks and
  *  the error count are weighed against it. */
 interface ReviewGate {
-  gate: "waiting" | "stale-approval" | null;
+  gate: "waiting" | "stale-approval" | "unchecked" | null;
   reason: string | null;
 }
 
@@ -199,6 +207,7 @@ function resolveGate(
   review: ReviewGate,
 ): Pick<NextMove, "gate" | "gateReason"> {
   if (review.gate === "waiting") return { gate: "waiting", gateReason: review.reason ?? blockedReason };
+  if (review.gate === "unchecked") return { gate: "unchecked", gateReason: review.reason };
   if (blockedReason) return { gate: "none", gateReason: null };
   if (i.errorCount > 0) return { gate: "open-errors", gateReason: openErrorsLine(i.errorCount) };
   if (review.gate === "stale-approval") return { gate: "stale-approval", gateReason: review.reason };
@@ -291,6 +300,18 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
   const answered = (v: boolean | null | undefined): v is boolean => typeof v === "boolean";
   const bothAnswered = answered(i.reviewsEnabled) && answered(i.editsRequireApproval);
   const anyPending = i.reviewsEnabled === null || i.editsRequireApproval === null;
+
+  if (!bothAnswered && anyPending && i.reviewStatusFailed) {
+    /* The read FAILED. Asking again is the only way forward, so the door is
+       shut with the reason and the panel offers Retry — a spinner here never
+       ends (QA 2026-09-24, reviews.status erroring). A blocker we already
+       know still outranks it, as below. */
+    const reason = "Couldn't check this site's review settings.";
+    return publishMove(i, "Couldn't check where this site stands.", publishBlocker(i) ?? reason, {
+      gate: "unchecked",
+      reason,
+    });
+  }
 
   if (!bothAnswered && anyPending) {
     /* First paint, before `reviews.status` answers. Not `null`: withholding the

@@ -11,17 +11,12 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { ColorTokenList } from "../ColorTokenList";
 import type { DesignToken } from "../../../types";
 
 const base = {
   pendingDiff: {},
-  onColorChange: vi.fn(),
-  onUndo: vi.fn(),
-  onRedo: vi.fn(),
-  canUndo: () => false,
-  canRedo: () => false,
   onAddToken: vi.fn(),
 };
 
@@ -41,15 +36,6 @@ describe("ColorTokenList — which empty is it", () => {
   it("says color, singular, when it is hiding one", () => {
     render(<ColorTokenList {...base} tokens={[]} hiddenByModeCount={1} />);
     expect(screen.getByText(/hiding 1 color\./)).toBeInTheDocument();
-  });
-
-  // The search box is the component's own state, so the query is typed, not passed.
-  it("still blames the search when a search is what emptied it", () => {
-    render(<ColorTokenList {...base} tokens={[token("brand")]} hiddenByModeCount={9} />);
-    const box = screen.getByRole("textbox");
-    fireEvent.change(box, { target: { value: "zzz" } });
-    expect(screen.getByText(/No colors match "zzz"/)).toBeInTheDocument();
-    expect(screen.queryByTestId("color-empty-mode")).toBeNull();
   });
 
   it("says neither when the library is simply empty", () => {

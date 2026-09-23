@@ -18,11 +18,11 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import { makeComposer, makeItem, makeMediaState } from "./libraryFixture";
+import { makeComposer, makeFolder, makeItem, makeMediaState } from "./libraryFixture";
 
 // ─── Hoisted mock state ──────────────────────────────────────────────────────
 
@@ -135,5 +135,27 @@ describe("LibraryManager — D5 baseline", () => {
     // Clone 3695:45155 — "2 files · All assets"; the grid foot that used to
     // read "Showing N of M" is gone (LibraryManager.clone.test.tsx).
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
+  });
+
+  /* QA 2026-09-24 (A1, board B1-13 7564:185465): "Move files…" in the
+     folder-delete confirm used to close with an info toast. It hands the
+     folder's files to the Move modal. */
+  it("Move files… opens the Move modal with the folder's files", async () => {
+    const folder = makeFolder({ id: "f1", name: "Products" });
+    const inFolder = makeItem({ key: "a", name: "shoe.png", folderId: "f1" });
+    const atRoot = makeItem({ key: "b", name: "logo.png" });
+    await mount(
+      makeMediaState({
+        folders: [folder],
+        allFolders: [folder],
+        libraryItems: [inFolder, atRoot],
+        allLibraryItems: [inFolder, atRoot],
+        inspectFolder: vi.fn(() => ({ assetCount: 1, subFolderCount: 0 })),
+      }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Delete folder" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move files…" }));
+    expect(screen.getByTestId("mgr-move-title")).toHaveTextContent("Move 1 asset");
+    expect(screen.getByTestId("mgr-move-body")).toHaveTextContent("Products");
   });
 });

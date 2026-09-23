@@ -1,6 +1,12 @@
 /**
- * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
- * Light theme, 4-column grid, pagination, inline detail panel, two-stage filtering.
+ * TemplatesTab — the full-canvas Templates view (decision #24; boards
+ * 4418:54134 catalogue, 4418:53202 preview). Mounted edge-to-edge by
+ * FullPageRouter, it replaces the 280/700 drawer and the preview modal.
+ *
+ * Left: the view's own sidebar — ‹ Back to canvas · Templates · PAGE
+ * TEMPLATES · All page templates · N · one row per page template. Right: the
+ * catalogue (search + one flat grid of built-in and saved templates) or, when a
+ * template is picked, its preview in place with Create page · Replace page….
  * @license BSD-3-Clause
  */
 
@@ -9,28 +15,25 @@ import { PanelFrame, useToast, Button, TextField, openUpgrade } from "@/editor/c
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { DrillInHeader } from "../../shared/DrillInHeader";
-import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
+import { type TemplateItem, SITE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
-import { TemplatePreviewModal } from "./TemplatePreviewModal";
+import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
+import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
 import { TemplateCard } from "./components/TemplateCard";
-import { TemplateDetail } from "./components/TemplateDetail";
-import { TemplatePagination } from "./components/TemplatePagination";
-import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
-import { DrawerGallery } from "./components/DrawerGallery";
-import { TemplateApplyModal } from "./components/TemplateApplyModal";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
+
+/** The sidebar lists the built-in page templates (board 4418:54134). */
+const PAGE_TEMPLATES = SITE_TEMPLATES.filter((t) => t.type === "page");
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
@@ -41,9 +44,8 @@ export interface TemplatesTabProps {
   onTemplateUsed?: () => void;
   onSwitchTab?: (tab: string) => void;
   onClose?: () => void;
-  newPageMode?: boolean;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
+  /** The New-page modal's name (#19): Create page makes the page under it. */
+  newPageName?: string;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
@@ -51,22 +53,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onTemplateUsed,
   onSwitchTab,
   onClose,
-  newPageMode: newPageModeProp = false,
-  isExpanded,
-  onExpandToggle,
+  newPageName,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
-  const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
-  // §6 — newPageMode is a PROP from the caller that navigated here (Pages ›
-  // "From template" via LeftSidebar). It used to be an event, and the event
-  // could never be heard: TabRouter mounts one tab at a time, so this panel's
-  // listener did not exist yet when the emit fired — the gallery mode, whose
-  // apply REPLACES the current page, showed every time. LeftSidebar owns the
-  // reset (mode ends when the visit leaves Templates).
-  const newPageMode = newPageModeProp;
 
   // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();
@@ -93,7 +85,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     showProgress, setShowProgress,
     applyError, setApplyError,
     canRetry, setCanRetry,
-    resetStyles, setResetStyles,
     hasExistingContent,
     pendingId,
     startApply,
@@ -114,48 +105,17 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const [backupCurrentPage, setBackupCurrentPage] = React.useState(true);
 
   // ── Derived ──
-  const detailTemplate = sel.detailId
-    ? SITE_TEMPLATES.find((t) => t.id === sel.detailId) ?? null
-    : null;
+  /* G2-103: saved templates are first-class — listed, previewed, applied —
+     beside the built-ins. Read once per visit; a save happens outside the view. */
+  const catalogue = React.useMemo<TemplateItem[]>(() => [...PAGE_TEMPLATES, ...getMyTemplates()], []);
+  const findTemplate = (id: string | null) => (id ? catalogue.find((t) => t.id === id) ?? null : null);
+  const visible = sel.searchQ.trim()
+    ? catalogue.filter((t) => t.name.toLowerCase().includes(sel.searchQ.trim().toLowerCase()))
+    : catalogue;
 
-  // S9: aggregate usage across pages from page.meta.appliedTemplates.
+  // S9: which pages each template was applied to (page.meta.appliedTemplates).
   const usageMap = useTemplateUsageMap(composer);
-  const [usageDrawerOpen, setUsageDrawerOpen] = React.useState(false);
-  const detailUsage = detailTemplate ? usageMap.get(detailTemplate.id) : [];
-
-  // prototype-v3 §2: surface current page name + applied-here state to TemplateDetail.
   const activePageInfo = composer?.elements?.getActivePage?.();
-  const detailAppliedToCurrent =
-    !!activePageInfo && !!detailUsage?.some((u) => u.pageId === activePageInfo.id);
-
-  // prototype-v3 §2 — emit panel width override based on detail mode.
-  // null (fall back to --bk-size-drawer) when no card is selected, 700
-  // (grid + 380 detail) when one is. Emitting the default as a literal pinned
-  // this panel to that number and made the token non-authoritative here.
-  React.useEffect(() => {
-    if (!composer) return;
-    composer.emit("ui:templates-panel-width", {
-      width: sel.detailId ? 700 : null,
-      expanded: !!sel.detailId,
-    });
-    return () => {
-      composer.emit("ui:templates-panel-width", {
-        width: null,
-        expanded: false,
-      });
-    };
-  }, [composer, sel.detailId]);
-
-  const handleJumpToPage = React.useCallback(
-    (pageId: string) => {
-      composer?.elements.setActivePage?.(pageId);
-      setUsageDrawerOpen(false);
-    },
-    [composer]
-  );
-
-  /** The drawer's preview modal (board 642:2556). */
-  const [applyPreviewId, setApplyPreviewId] = React.useState<string | null>(null);
 
   // Track whether apply is "add as new page" mode
   const addAsNewPageRef = React.useRef(false);
@@ -172,28 +132,22 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // ── Handlers ──
   function handleApplyToCurrent(id: string) {
     if (denyApply()) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = false;
     pendingId.current = id;
-    sel.setDetailId(null);
     hasExistingContent ? sel.setShowReplace(true) : startApply();
   }
 
   function handleAddAsNewPage(id: string) {
     if (denyApply()) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = true;
     pendingId.current = id;
-    sel.setDetailId(null);
-    if (newPageMode) {
-      setShowCreateConfirm(true);
-    } else {
-      startApply();
-    }
+    startApply();
   }
 
   /* The stages the apply actually runs, in the order it runs them. The
@@ -248,7 +202,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   async function runApply() {
     const id = pendingId.current;
     if (!id) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     // P2 fix (codex A6): capture newPageMode flag BEFORE null reset; needed for
     // success/error modal routing below.
@@ -290,10 +244,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            page replaced the page they were on, and left the new one empty.
            Walked live — Page 1 held "SaaS Landing", "Add as new page" with
            Portfolio, and Page 1 came back as Portfolio. */
-        const created = composer.elements.createPage(t.name);
+        const created = composer.elements.createPage(newPageName ?? t.name);
         composer.elements.setActivePage?.(created.id);
       }
-      if (resetStyles) composer.styles.clear();
       setApplyCancellable(false);
       setImportedSections([]);
       composer.elements.importHTMLToActivePage(resolvedHtml, (label, done, total) => {
@@ -334,8 +287,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     setAppliedId(null);
     requestAnimationFrame(() => {
       setAppliedId(id);
-      setResetStyles(false);
-      addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
+      /* Board 4428:150147 — a replace says what it replaced and offers Undo
+         (the apply is one history step); the backup line names where the
+         auto-version went (#25). The board's second action, View backup,
+         needs a two-action toast chrome-ui does not have. */
+      const replacedName = composer?.elements.getActivePage()?.name;
+      if (!wasNewPageMode && replacedName) {
+        addToast({
+          tone: "success",
+          title: `${replacedName} replaced`,
+          description: backupCurrentPage ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
+          action: { label: "Undo", onClick: () => composer?.history.undo() },
+        });
+      } else {
+        addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
+      }
       recordTemplateApplied(t);
       saveAppliedId(id);
       // Phase -1: persist applied-template state on Page.meta so it survives reload
@@ -375,229 +341,140 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showProgress]);
 
+  /* QA 2026-09-24: Escape leaves the full-canvas view. The preview owns
+     Escape first (back to the catalogue, capture phase); the replace confirm,
+     an apply and its outcome dialogs keep theirs. `defaultPrevented` is not
+     a guard: the canvas's own Escape (clear selection) prevents default under
+     the view, and that swallowed this one live. */
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (sel.previewId || sel.showReplace || showProgress || createResult) return;
+      onClose?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [sel.previewId, sel.showReplace, showProgress, createResult, onClose]);
+
   // ── Render ──
-  // Compact drawer (board 641:2487) vs the full grid: detail, new-page and
-  // the expanded 700 view keep the pre-existing layout.
-  const showFull = Boolean(detailTemplate) || newPageMode || Boolean(isExpanded);
-  const tName = pendingId.current
-    ? (SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Template")
-    : "Template";
+  const tName = findTemplate(pendingId.current)?.name ?? "Template";
+  const previewTemplate = findTemplate(sel.previewId);
 
   return (
-    <PanelFrame className="tpl-shell">
-      {/* Header — 3 modes via TabFrame.Header / DrillInHeader. Breadcrumb
-          mode uses the canonical drill-in pattern (back button + path);
-          newpage + default modes use the standard panel header. */}
-      {detailTemplate ? (
-        <DrillInHeader
-          title={detailTemplate.name}
-          parentName="Templates"
-          breadcrumb={[
-            (detailTemplate.category || "Templates").replace(/-/g, " "),
-            detailTemplate.name,
-          ]}
-          onBack={() => sel.setDetailId(null)}
-          onClose={onClose}
-        />
-      ) : newPageMode ? (
-        /* PanelFrame.Header renders `actions`, never children — the chip and
-           the close button sat here as children and were dropped on the floor,
-           so the new-page header (board 807:7252) shipped without its "New
-           Page" chip and, alone among the three headers, without a way out. */
-        <PanelFrame.Header
-          title="Choose a template for your new page"
-          onClose={onClose}
-          actions={<span className="tpl-newpage-chip">New Page</span>}
+    <div className="tpl-ws" data-testid="tpl-workspace">
+      {/* Board 4418:54134 "Full-screen Templates sidebar": one door out (to the
+          canvas, or back to the catalogue from a preview), then the page
+          templates by name. */}
+      <aside className="tpl-ws-side" data-testid="tpl-ws-side" aria-label="Page templates">
+        <Button
+          color="light"
+          size="xs"
+          variant="link"
+          className="tpl-ws-back"
+          data-testid="tpl-ws-back"
+          onClick={previewTemplate ? () => sel.setPreviewId(null) : onClose}
+        >
+          {previewTemplate ? "‹ Back to templates" : "‹ Back to canvas"}
+        </Button>
+        <div className="tpl-ws-title">Templates</div>
+        <div className="tpl-ws-label">PAGE TEMPLATES</div>
+        <Button
+          className="tpl-ws-row"
+          data-testid="tpl-ws-all"
+          aria-current={previewTemplate ? undefined : "true"}
+          onClick={() => sel.setPreviewId(null)}
+        >
+          All page templates · {catalogue.length}
+        </Button>
+        {catalogue.map((t) => (
+          <Button
+            key={t.id}
+            className="tpl-ws-row tpl-ws-row--item"
+            data-testid={`tpl-ws-item-${t.id}`}
+            aria-current={previewTemplate?.id === t.id ? "true" : undefined}
+            onClick={() => sel.setPreviewId(t.id)}
+          >
+            {t.name}
+          </Button>
+        ))}
+      </aside>
+      <PanelFrame className="tpl-shell tpl-ws-main">
+      {previewTemplate ? (
+        /* Board 4418:53202 — the preview lives in the view, not in a modal. */
+        <TemplatePreview
+          template={previewTemplate}
+          pageName={activePageInfo?.name}
+          onCreatePage={(t) => handleAddAsNewPage(t.id)}
+          onReplacePage={(t) => handleApplyToCurrent(t.id)}
+          onBack={() => sel.setPreviewId(null)}
+          usedOn={(usageMap.get(previewTemplate.id) ?? []).map((u) => ({ id: u.pageId, name: u.pageName }))}
+          onOpenPage={(pageId) => {
+            composer?.elements.setActivePage?.(pageId);
+            onClose?.();
+          }}
         />
       ) : (
+      <>
         <PanelFrame.Header
           title="Templates"
-          subtitle={showFull ? `${SITE_TEMPLATES.length} templates` : undefined}
-          isExpanded={isExpanded}
-          onExpandToggle={onExpandToggle}
+          subtitle="Preview a template, then create a page or replace this one."
           onClose={onClose}
         >
-          {showFull && (
-            <Button
-              className="tpl-header-btn"
-              onClick={() => setShowSearch(!showSearch)}
-              aria-label={showSearch ? "Close search" : "Search templates"}
-            >
-              <Search size={16} />
-            </Button>
-          )}
+          <Button
+            className="tpl-header-btn"
+            onClick={() => setShowSearch(!showSearch)}
+            aria-label={showSearch ? "Close search" : "Search templates"}
+          >
+            <Search size={16} />
+          </Button>
         </PanelFrame.Header>
-      )}
-      {/* Board 641:2487: at 320 the drawer shows the compact gallery — page
-          cards + section rows + Browse-all (which expands to this full view).
-          The full grid/pills/pagination survive as the EXPANDED (700) and
-          detail/new-page layouts. */}
-      {/* Board 642:2556: a card in the drawer opens the preview modal. It used
-          to set detailId, which widened the panel to 700 and swapped in the
-          expanded gallery's detail pane — a different surface, with three
-          apply buttons and no statement of what applying replaces. */}
-      {!showFull ? (
-        <DrawerGallery
-          searchQ={sel.searchQ}
-          onSearchChange={sel.setSearchQ}
-          onOpenTemplate={setApplyPreviewId}
-          onBrowseAll={onExpandToggle}
-        />
-      ) : (
-      <>
-      {/* Search input — board 807:7252 draws it visible by default in the
-          new-page picker (no toggle icon to find first); the plain Templates
-          tab keeps the header's search-icon toggle. */}
-      {(showSearch || newPageMode) && (
-        <div className="tpl-search-wrap">
-          <div className="tpl-search-input-box">
-            <Search size={16} className="tpl-search-icon" />
-            <TextField
-              className="tpl-search-input"
-              placeholder="Search templates..."
-              value={sel.searchQ}
-              onChange={(e) => sel.setSearchQ(e.target.value)}
-              aria-label="Search templates"
-              autoFocus
-            />
-            {sel.searchQ.length > 0 && (
-              <Button
-                className="tpl-search-clear"
-                onClick={() => sel.setSearchQ("")}
-                aria-label="Clear search"
-              >
-                <X size={14} />
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-      <>
-
-      {/* Filter pills — two-stage */}
-      {sel.templateType === null ? (
-        <div className="tpl-pills" role="tablist" aria-label="Template categories">
-          {SITE_CATEGORY_PILLS.map((pill) => (
-            <Button
-              key={pill.id}
-              className={`tpl-pill${sel.activeFilter === pill.id ? " tpl-pill--active" : ""}`}
-              onClick={() => sel.setActiveFilter(pill.id)}
-              role="tab"
-              aria-selected={sel.activeFilter === pill.id}
-            >
-              {pill.label}
-            </Button>
-          ))}
-        </div>
-      ) : (
-        <>
-          {/* Type toggle — Page Templates / Section Templates */}
-          <div className="tpl-pills" role="tablist" aria-label="Template type">
-            {TEMPLATE_TYPE_PILLS.map((pill) => (
-              <Button
-                key={pill.id}
-                className={`tpl-pill${sel.templateType === pill.id ? " tpl-pill--active" : ""}`}
-                onClick={() => sel.setTemplateType(pill.id)}
-                role="tab"
-                aria-selected={sel.templateType === pill.id}
-              >
-                {pill.label}
-              </Button>
-            ))}
-          </div>
-          {/* Sub-category tags */}
-          <div className="tpl-tags">
-            {SUB_CATEGORY_TAGS.map((tag) => (
-              <Button
-                key={tag.id}
-                className={`tpl-tag${sel.subCategory === tag.id ? " tpl-tag--active" : ""}`}
-                onClick={() => sel.setSubCategory(sel.subCategory === tag.id ? null : tag.id)}
-              >
-                {tag.label}
-              </Button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Content area */}
-      <div className="tpl-content">
-        {sel.paginatedTemplates.length === 0 ? (
-          <div className="tpl-empty">
-            <Search size={32} className="tpl-empty-icon" />
-            <p className="tpl-empty-text">
-              {sel.searchQ.trim()
-                ? `No templates found for "${sel.searchQ}"`
-                : "No templates in this category"}
-            </p>
-            <Button className="tpl-empty-btn" onClick={sel.clearAll}>
-              {sel.searchQ.trim() ? "Clear search" : "Show all templates"}
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className={`tpl-detail-layout${detailTemplate ? " tpl-detail-layout--split" : ""}`}>
-              <div className="tpl-grid-area">
-                {sel.searchQ.trim() && (
-                  <div className="tpl-search-results-count" aria-live="polite">
-                    {sel.filteredTemplates.length} result{sel.filteredTemplates.length === 1 ? "" : "s"} for &ldquo;{sel.searchQ.trim()}&rdquo;
-                  </div>
-                )}
-                <div className="tpl-grid" role="listbox" aria-label="Available templates">
-                  {sel.paginatedTemplates.map((tpl) => (
-                    <TemplateCard
-                      key={tpl.id}
-                      template={tpl}
-                      isSelected={sel.detailId === tpl.id}
-                      isApplied={appliedId === tpl.id}
-                      onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
-                      highlightQuery={sel.searchQ.trim() || undefined}
-                    />
-                  ))}
-                </div>
-              </div>
-              {detailTemplate && (
-                <TemplateDetail
-                  template={detailTemplate}
-                  onApplyToCurrent={handleApplyToCurrent}
-                  onAddAsNewPage={handleAddAsNewPage}
-                  onPreview={(id) => sel.setPreviewId(id)}
-                  usageCount={detailUsage.length}
-                  onShowUsage={() => setUsageDrawerOpen(true)}
-                  currentPageName={activePageInfo?.name}
-                  appliedToCurrentPage={detailAppliedToCurrent}
-                />
+        {showSearch && (
+          <div className="tpl-search-wrap">
+            <div className="tpl-search-input-box">
+              <Search size={16} className="tpl-search-icon" />
+              <TextField
+                className="tpl-search-input"
+                placeholder="Search templates..."
+                value={sel.searchQ}
+                onChange={(e) => sel.setSearchQ(e.target.value)}
+                aria-label="Search templates"
+                autoFocus
+              />
+              {sel.searchQ.length > 0 && (
+                <Button className="tpl-search-clear" onClick={() => sel.setSearchQ("")} aria-label="Clear search">
+                  <X size={14} />
+                </Button>
               )}
             </div>
-            {detailTemplate && (
-              <TemplateUsageDrawer
-                open={usageDrawerOpen}
-                onOpenChange={setUsageDrawerOpen}
-                templateId={detailTemplate.id}
-                templateName={detailTemplate.name}
-                usage={detailUsage}
-                onJumpToPage={handleJumpToPage}
-                currentVersion={detailTemplate.version ?? DEFAULT_TEMPLATE_VERSION}
-                onOpenPreview={() => {
-                  setUsageDrawerOpen(false);
-                  sel.setPreviewId(detailTemplate.id);
-                }}
-              />
-            )}
-          </>
+          </div>
         )}
-      </div>
-
-      {/* Pagination */}
-      <TemplatePagination
-        currentPage={sel.currentPage}
-        totalPages={sel.totalPages}
-        onChange={sel.setCurrentPage}
-      />
-
-      </>
+        {/* G2-095: board 4418:54134 is one flat list — no pills, tags or pages. */}
+        <div className="tpl-content">
+          {visible.length === 0 ? (
+            <div className="tpl-empty">
+              <Search size={32} className="tpl-empty-icon" />
+              <p className="tpl-empty-text">No templates found for &ldquo;{sel.searchQ.trim()}&rdquo;</p>
+              <Button className="tpl-empty-btn" onClick={() => sel.setSearchQ("")}>
+                Clear search
+              </Button>
+            </div>
+          ) : (
+            <div className="tpl-grid" role="listbox" aria-label="Available templates">
+              {visible.map((tpl) => (
+                <TemplateCard
+                  key={tpl.id}
+                  template={tpl}
+                  isApplied={appliedId === tpl.id}
+                  onClick={(id) => sel.setPreviewId(id)}
+                  highlightQuery={sel.searchQ.trim() || undefined}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </>
       )}
+      </PanelFrame>
       {/* Error banner */}
       {applyError && (
         <div className="tpl-error-banner">
@@ -625,57 +502,29 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         const elementCount = activePageElement?.getDescendants?.()?.length ?? 0;
         return (
         <ReplaceModal
-          template={SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0]}
+          template={findTemplate(pendingId.current) ?? SITE_TEMPLATES[0]}
           currentPageName={activePage?.name}
           currentPageCount={elementCount}
-          resetGlobalStyles={resetStyles}
-          onResetChange={setResetStyles}
           backupCurrentPage={backupCurrentPage}
           onBackupChange={setBackupCurrentPage}
           onCancel={() => sel.setShowReplace(false)}
-          onApply={() => {
+          onApply={async () => {
             sel.setShowReplace(false);
-            // P2 fix (codex A4): if user opted in, duplicate current page first.
-            if (backupCurrentPage && composer) {
-              const active = composer.elements.getActivePage();
-              if (active) {
-                const backup = composer.elements.duplicatePage(active.id);
-                /* Name it what the checkbox PROMISED. `duplicatePage` names its
-                   output "<name> Copy", which is also exactly what the Pages
-                   menu's Duplicate produces — so the backup was
-                   indistinguishable from an ordinary duplicate, while the hint
-                   above it said `Keeps your work as "Home (backup)"`. The
-                   suffix is numbered on collision so a second backup does not
-                   overwrite the first in the reader's eye. */
-                if (backup) {
-                  const taken = new Set(
-                    composer.elements.getAllPages().map((p) => p.name),
-                  );
-                  let name = `${active.name} (backup)`;
-                  for (let n = 2; taken.has(name); n++) name = `${active.name} (backup ${n})`;
-                  composer.elements.updatePage(backup.id, { name });
-                }
-              }
+            /* Owner decision #25 (C4): the backup is a History auto-version,
+               not a "<page> (backup)" page — it restores the whole site from
+               History › Saves instead of leaving a stray page in the
+               sitemap. Taken BEFORE the apply, so it holds the page the user
+               is about to lose. A failed snapshot must not cost the apply
+               the user asked for; the version list simply lacks the row. */
+            if (backupCurrentPage && composer?.versions) {
+              const t = findTemplate(pendingId.current) ?? SITE_TEMPLATES[0];
+              await composer.versions.autoCheckpoint(`Before template “${t.name}”`).catch(() => null);
             }
             startApply();
           }}
         />
         );
       })()}
-      {showCreateConfirm && (
-        <CreatePageConfirmModal
-          templateName={tName}
-          /* The new page takes the template's name — createPage(t.name). */
-          newPageName={tName}
-          onCancel={() => { setShowCreateConfirm(false); addAsNewPageRef.current = false; }}
-          onConfirm={() => {
-            // P2 fix (codex A6): startApply only — success/error result is set
-            // inside handleProgressComplete after the actual page creation.
-            setShowCreateConfirm(false);
-            startApply();
-          }}
-        />
-      )}
       {createResult === "success" && (
         <CreatePageSuccessModal
           pageName={tName}
@@ -714,32 +563,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           }
         />
       )}
-      {/* Board 642:2556 — what a drawer card opens. Applying goes through the
-          same gate as every other entry point (premium check, then the replace
-          confirm when the page already has content). */}
-      <TemplateApplyModal
-        open={!!applyPreviewId}
-        template={SITE_TEMPLATES.find((t) => t.id === applyPreviewId) ?? null}
-        pageName={activePageInfo?.name}
-        onClose={() => setApplyPreviewId(null)}
-        onApply={(t) => {
-          setApplyPreviewId(null);
-          handleApplyToCurrent(t.id);
-        }}
-      />
-      {sel.previewId && (() => {
-        const previewTemplate = SITE_TEMPLATES.find((t) => t.id === sel.previewId);
-        if (!previewTemplate) return null;
-        return (
-          <TemplatePreviewModal
-            template={previewTemplate}
-            onBack={() => sel.setPreviewId(null)}
-            onUseTemplate={(t) => { sel.setPreviewId(null); handleApplyToCurrent(t.id); }}
-            hasExistingContent={hasExistingContent}
-          />
-        );
-      })()}
-    </PanelFrame>
+    </div>
   );
 };
 

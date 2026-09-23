@@ -133,22 +133,31 @@ export function useLifecycle({
   }, [refreshCount]);
   useRefetchOnFocus(refresh);
 
+  /* Retry after a failed read (the unchecked gate's "Retry ›"). The mount
+     fetcher, not the OrNull one: a second failure must stay a failure the
+     panel can say, not keep a stale answer. */
+  const retryStatus = React.useCallback(() => {
+    void fetchReviewStatus().then(setReviewStatus);
+  }, []);
+
   /* A send from any door (topbar SendForReview, the Review panel, the stale
      modal's "Request fresh review") moves the round; the CTA and the panel
      read the new position together instead of waiting for a focus change. */
   React.useEffect(() => {
     if (!composer) return;
+    composer.on(EVENTS.REVIEW_STATUS_RETRY, retryStatus);
     composer.on(EVENTS.REVIEW_SENT, refresh);
     /* The panel's resolve/reopen/reattach change the count without moving
        the status; the panel announces them on these two events already. */
     composer.on("comments:refresh", refreshCount);
     composer.on("comments:reattached", refreshCount);
     return () => {
+      composer.off(EVENTS.REVIEW_STATUS_RETRY, retryStatus);
       composer.off(EVENTS.REVIEW_SENT, refresh);
       composer.off("comments:refresh", refreshCount);
       composer.off("comments:reattached", refreshCount);
     };
-  }, [composer, refresh, refreshCount]);
+  }, [composer, refresh, refreshCount, retryStatus]);
 
   /* The server refused a publish this derivation had allowed: the round moved
      under us. Re-read, so the CTA and the panel say what the server says. */
@@ -192,6 +201,7 @@ export function useLifecycle({
       reviewerName: reviewStatus.reviewerName,
       reviewsEnabled: reviewStatus.reviewsEnabled,
       editsRequireApproval: reviewStatus.editsRequireApproval,
+      reviewStatusFailed: reviewStatus.readFailed === true,
       isPublished: Boolean(publishedUrl),
       hasUnpublishedChanges,
       isViewer,

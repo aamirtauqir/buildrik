@@ -32,10 +32,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setOgImageUrl: vi.fn(),
     visibility: "live",
     setVisibility: vi.fn(),
-    password: "",
-    setPassword: vi.fn(),
-    showPassword: false,
-    setShowPassword: vi.fn(),
     allowIndex: true,
     setAllowIndex: vi.fn(),
     allowFollow: true,
@@ -43,7 +39,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     customHead: "",
     setCustomHead: vi.fn(),
     headCodeError: null,
-    copyPassword: vi.fn(),
     domain: null,
     saveState: "clean",
     isDirty: false,
@@ -51,9 +46,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     discard: vi.fn(),
     showDiscardConfirm: false,
     setShowDiscardConfirm: vi.fn(),
-    pendingTabChange: null,
-    confirmTabChange: vi.fn(),
-    cancelTabChange: vi.fn(),
     ...over,
   };
 }

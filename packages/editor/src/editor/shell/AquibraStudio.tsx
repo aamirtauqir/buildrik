@@ -24,6 +24,7 @@ import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal
 import { gateFromBlockReason, type PublishGate } from "./lifecycle";
 import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
+import { CompareHost } from "./CompareHost";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -488,7 +489,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      "Publish to production" still has to answer with the gate modal. */
   const requestPublish = React.useCallback(() => {
     const gate = nextMove?.gate ?? "none";
-    if (gate === "waiting" || gate === "none") return;
+    if (gate === "waiting" || gate === "unchecked" || gate === "none") return;
     setPublishDoor(gate);
   }, [nextMove]);
   const confirmPublish = React.useCallback(async () => {
@@ -579,6 +580,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPublishHistory={() => state.openLeftPanelToTab("history", "published")}
+          onOpenActivity={() => state.openLeftPanelToTab("history", "activity")}
           onOpenTemplates={() => state.openLeftPanelToTab("templates")}
           onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
@@ -808,6 +810,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onDone={() => setPreviewHtml(null)}
         siteId={getSiteIdFromUrl()}
       />
+      {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
+      <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />
 
       <UpgradeModal />
 

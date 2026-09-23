@@ -103,8 +103,6 @@ import type { UploadProgress } from "@/shared/types/media";
 import { PageList } from "@/editor/sidebar/tabs/pages/components/PageList";
 import { ConfirmDeleteModal } from "@/editor/sidebar/tabs/media/components/ConfirmDeleteModal";
 import { ImportUrlModal } from "@/editor/media/components/ImportUrlModal";
-import { DrawerGallery } from "@/editor/sidebar/tabs/templates/components/DrawerGallery";
-import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
 import { ApplyProgressOverlay } from "@/editor/sidebar/tabs/templates/ApplyProgressOverlay";
 import { PublishTab } from "@/editor/sidebar/tabs/publish/PublishTab";
 import {
@@ -116,7 +114,6 @@ import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageTabBar } from "@/editor/shell/PageTabBar";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
-import { TemplateUsageDrawer } from "@/editor/sidebar/tabs/templates/components/TemplateUsageDrawer";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
@@ -2950,29 +2947,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   // ── Templates states (boards 1138:13413 / 642:2832 / 1169:4725) ──────────
-  /* The built-in catalog is a static module array, so DrawerGallery's empty
-     branch cannot be reached by any prop — the catalog itself has to be empty,
-     which is exactly what the board draws and what a site whose only templates
-     are server-side sees when that pull returns nothing. Emptied here rather
-     than faked, so the branch under test is the shipped one. */
-  "templates-empty": () => {
-    SITE_TEMPLATES.length = 0;
-    return (
-      <div data-probe="templates-empty">
-        <PanelFrame>
-          <PanelFrame.Header title="Templates" onClose={() => {}} />
-          <PanelFrame.Body noScroll>
-            <DrawerGallery
-              searchQ=""
-              onSearchChange={() => {}}
-              onOpenTemplate={() => {}}
-              onBrowseAll={() => {}}
-            />
-          </PanelFrame.Body>
-        </PanelFrame>
-      </div>
-    );
-  },
   "templates-applying": () => (
     <div data-probe="templates-applying">
       <ApplyProgressOverlay
@@ -3254,7 +3228,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
@@ -3270,29 +3243,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub()}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
-  /* Board 1169:4764 — the "Where 'X' is used" drawer, on its Used-in tab.
-     The drawer is a controlled component over a plain usage array (the real
-     one comes from templateUsage over a Composer), so it is mounted as the
-     product mounts it and the tab is clicked, not preset. */
-  "templates-usage-drawer": () => (
-    <div data-probe="templates-usage-drawer">
-      <TemplateUsageDrawer
-        open
-        onOpenChange={() => {}}
-        templateId="tpl-bistro"
-        templateName="Bistro Menu"
-        usage={[
-          { pageId: "menu", pageName: "Menu", appliedAt: "2026-08-02T09:00:00.000Z" },
-          { pageId: "menu-2", pageName: "Menu 2", appliedAt: "2026-09-07T09:00:00.000Z" },
-        ]}
-        onJumpToPage={() => {}}
-      />
-    </div>
-  ),
   /* Board B3-10 7574:193972 — the ONE facts confirm both publish doors open
      (the stepped wizard it replaced is gone, code-gap B4). The facts are the
      real PublishConfirmFacts over the real services; with no composer and no

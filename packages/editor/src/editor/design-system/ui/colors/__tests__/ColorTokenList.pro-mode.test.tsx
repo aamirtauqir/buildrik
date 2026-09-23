@@ -26,11 +26,6 @@ const aliasedToken: DesignToken = {
 
 const baseProps = {
   pendingDiff: {},
-  onColorChange: () => {},
-  onUndo: () => {},
-  onRedo: () => {},
-  canUndo: () => false,
-  canRedo: () => false,
   onAddToken: () => {},
 };
 
@@ -50,9 +45,12 @@ describe("ColorTokenList Pro mode", () => {
     expect(getByText("color.brand.primary")).toBeTruthy();
   });
 
-  test("isPro=true + aliasOf: alias arrow visible", () => {
-    const { getByText } = render(<ColorTokenList tokens={[aliasedToken]} {...baseProps} isPro={true} />);
-    expect(getByText("→ color.brand.primary")).toBeTruthy();
+  /* 7315:80955's TOKEN cell is the id alone; the alias shows on the selected
+     token's card ("Aliased by"), not as a row arrow. */
+  test("isPro=true + aliasOf: the row prints the id, no alias arrow", () => {
+    const { getByText, queryByText } = render(<ColorTokenList tokens={[aliasedToken]} {...baseProps} isPro={true} />);
+    expect(getByText("color.action.default")).toBeTruthy();
+    expect(queryByText(/→/)).toBeNull();
   });
 
   test("isPro=false + aliasOf: alias arrow NOT visible", () => {

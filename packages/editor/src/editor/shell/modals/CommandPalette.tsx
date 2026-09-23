@@ -63,7 +63,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     if (!tab.shortcut) continue;
     commands.push({
       id: `nav-${tab.id}`,
-      label: `Open ${tab.label} panel`,
+      /* A fullpage tab (Templates, Brand, Settings) is a view, not a panel. */
+      label: tab.mode === "fullpage" ? `Open ${tab.label}` : `Open ${tab.label} panel`,
       group: "Navigation",
       shortcut: tab.shortcut,
       handler: () => {
@@ -125,6 +126,15 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       group: "View",
       shortcut: "Ctrl+P",
       handler: () => { composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {}); onClose(); },
+    },
+    {
+      /* C3: the topbar Issues chip is gone; ⌘K and the site menu are the
+         Issues panel's doors. */
+      id: "view-issues",
+      label: "Show issues",
+      group: "View",
+      keywords: ["problems", "errors", "warnings", "checks"],
+      handler: () => { composer.emit(EVENTS.UI_OPEN_ISSUES, undefined); onClose(); },
     },
     {
       id: "view-zoom-in",
