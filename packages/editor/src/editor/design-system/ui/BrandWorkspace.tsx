@@ -106,6 +106,7 @@ import { ClassesSection } from "./sections/ClassesSection";
 import { TypographySection } from "./sections/TypographySection";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
+import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
@@ -710,7 +711,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "colours":
         return <TokensSection {...tokenPageProps} openKind="color" />;
       case "colour-mode":
-        return <ColourModeSection composer={composer} />;
+        return <ColourModeSection />;
       case "fonts":
         /* The board's one page is the drawer's two: the active fonts, then the
            type styles (the type tokens). */
@@ -793,6 +794,10 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     if (id === "brand-checks" && lintIssues.length > 0) return lintIssues.length;
     return undefined;
   };
+
+  /* 7316:80949 draws the Light / Dark switch inside the preview card. */
+  const previewControls =
+    page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
 
   const isTokenPage = page === "colours" || page === "fonts" || page === "spacing" || page.startsWith("kind-");
 
@@ -993,7 +998,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (
-            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} />
+            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} controls={previewControls} />
           ) : (
             /* No document to render (no composer, or one without an export —
                the load-error and test harnesses): the palette and type slots
@@ -1002,8 +1007,9 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               className="tw:flex tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]"
               data-testid="brand-live-preview"
             >
-              <div className="tw:flex tw:h-10 tw:items-center tw:px-4 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-                Live preview
+              <div className="tw:flex tw:h-10 tw:items-center tw:gap-3 tw:px-4 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+                <span className="tw:flex-1">Live preview</span>
+                {previewControls}
               </div>
               <BrandPreview colors={visibleColors} />
             </section>

@@ -1,5 +1,12 @@
 /**
- * ColourModeSection — Brand › Colour mode, board 153:92.
+ * ColourModeSection — Brand › Colour mode, board 7316:80949 (C1 (ii); was
+ * the drawer's 153:92).
+ *
+ * One bordered card, a 48px row per colour token: the id, then either "No dark
+ * value" with a Set action, or "#LIGHT → #DARK" with a check. The tokens that
+ * still need a value come first — that is what the page is for. The Light /
+ * Dark switch is not on this page any more: the board draws it inside the
+ * live preview card, so the workspace passes it there.
  *
  * Deferred at M5 with the reason "its board lists tokens with NO DARK VALUE
  * plus a Set action each, and that query is not known to exist on the
@@ -22,26 +29,36 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Check } from "lucide-react";
 import { Button, TextInput } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine/Composer";
 import { useColorRegistry } from "../../state/TokenRegistryContext";
-import { ColorModeToggle } from "../ColorModeToggle";
+import { useDSModeOptional } from "../../state/DSModeContext";
+import { filterTokensByMode } from "../../utils/semanticKind";
+import { displayValue } from "../colors/ColorTokenList";
 
-export interface ColourModeSectionProps {
-  composer?: Composer | null;
-}
+/* 7316:80949: 48 tall, 16 in on the left, 12 on the right; 14px ink name over
+   a 13px muted line; the action in accent. */
+const ROW = "tw:flex tw:h-12 tw:items-center tw:gap-3 tw:pl-4 tw:pr-3";
+const NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
-export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }) => {
+export const ColourModeSection: React.FC = () => {
   const color = useColorRegistry();
+  const mode = useDSModeOptional()?.mode ?? "beginner";
   const [editing, setEditing] = React.useState<string | null>(null);
   const [draft, setDraft] = React.useState("");
 
   /* The unconditional question — which colour tokens have no dark value — not
-     the lint rule, which stays silent until the project has at least one. */
-  const missing = React.useMemo(
-    () => (color?.tokens ?? []).filter((t) => !t.darkValue),
-    [color?.tokens],
-  );
+     the lint rule, which stays silent until the project has at least one.
+     The same mode filter as the Colours page, so the two pages count the same
+     palette. */
+  const { missing, paired } = React.useMemo(() => {
+    const visible = filterTokensByMode(color?.tokens ?? [], mode);
+    return {
+      missing: visible.filter((t) => !t.darkValue),
+      paired: visible.filter((t) => t.darkValue),
+    };
+  }, [color?.tokens, mode]);
 
   const commit = (id: string, lightValue: string) => {
     const next = draft.trim();
@@ -50,101 +67,78 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
     color.updateToken(id, lightValue, next);
   };
 
-  return (
-    <div className="tw:flex tw:flex-col">
-      {composer && composer.colorMode ? (
-        /* 44 tall — 153:99. `py-2` around a 34px group measured 50, which is
-           six pixels of unboarded band above the first section header. */
-        <div className="tw:flex tw:h-11 tw:flex-none tw:items-center tw:px-3" data-testid="brand-colour-mode-preview">
-          <ColorModeToggle composer={composer} />
-        </div>
-      ) : null}
-
-      <div
-        /* `--bk-ink-soft`, not the board's `--color/ink-muted`: this header's
-           own fill is `--bk-gray-100`, where ink-muted measures 4.39:1 and
-           fails AA at 11px. Same substitution as DesignTabFooter's status line.
-           28 tall on a 16 inset with an 8px gap — 220:835, the shared Section
-           header. It shipped 12-in on a `py-1.5` hug, so the one band that
-           groups this list sat 4px inside every row it grouped. */
-        className="tw:flex tw:h-7 tw:items-center tw:justify-between tw:gap-2 tw:px-4 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-gray-100)]"
-        data-no-dark-header
-        data-testid="brand-nodark-header"
-      >
-        <span>No dark value</span>
-        <span className="tw:font-mono tw:tabular-nums tw:font-medium" data-no-dark-count>{missing.length}</span>
+  if (missing.length + paired.length === 0) {
+    return (
+      <div className="tw:py-6 tw:text-center tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]">
+        No colour tokens yet.
       </div>
+    );
+  }
 
-      {missing.length === 0 ? (
-        <div className="tw:px-3 tw:py-6 tw:text-center tw:text-xs tw:text-[var(--bk-ink-muted)]">
-          Every colour token has a dark value.
-        </div>
-      ) : (
-        <ul className="tw:flex tw:flex-col tw:list-none tw:m-0 tw:p-0">
-          {missing.map((t) => (
-            <li
-              key={t.id}
-              data-no-dark-row={t.id}
-              data-testid={`brand-nodark-row-${t.id}`}
-              className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4 tw:py-0"
+  return (
+    <ul
+      className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0"
+      aria-label="Colour mode"
+      data-testid="brand-colour-mode-list"
+    >
+      {/*
+        The id, not the display name — the board draws ids, and the live
+        palette holds both `Text` and `Text Primary`, so a name cannot say
+        which token you are about to give a dark value to. The name stays in
+        the title so it is still reachable.
+      */}
+      {missing.map((t) => (
+        <li key={t.id} data-no-dark-row={t.id} data-testid={`brand-nodark-row-${t.id}`} className={ROW}>
+          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+            <span data-testid={`brand-nodark-name-${t.id}`} className={NAME} title={t.name}>
+              {t.id}
+            </span>
+            <span className={SUB}>No dark value</span>
+          </div>
+          {editing === t.id ? (
+            <TextInput
+              autoFocus
+              value={draft}
+              aria-label={`Dark value for ${t.name}`}
+              className="tw:w-28 tw:[font-family:var(--bk-font-mono)]"
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={() => commit(t.id, t.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commit(t.id, t.value);
+                if (e.key === "Escape") setEditing(null);
+              }}
+            />
+          ) : (
+            <Button
+              size="xs"
+              variant="link"
+              data-set-dark={t.id}
+              data-testid={`brand-nodark-set-${t.id}`}
+              onClick={() => {
+                setDraft(t.value);
+                setEditing(t.id);
+              }}
+              className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent-text)]"
             >
-              {/*
-                The id, not the display name. Board 153:92 draws these rows as
-                mono ids (`brand/accent-soft`, `surface/raised`) and the mono
-                was already here — only the value was wrong. It matters on this
-                screen more than on any other: the live list holds both `Text`
-                and `Text Primary`, so a name cannot say which token you are
-                about to give a dark value to, and this row's whole job is to
-                let you set one without leaving to check.
-
-                The board's own ids are sample data in a different convention;
-                ours are `color-text` / `color-primary`, which serve the same
-                purpose. The name stays in the accessible label so a screen
-                reader still reads something human.
-              */}
-              <span
-                data-testid={`brand-nodark-name-${t.id}`}
-                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
-                title={t.name}
-              >
-                {t.id}
-              </span>
-              {editing === t.id ? (
-                <TextInput
-                  autoFocus
-                  value={draft}
-                  aria-label={`Dark value for ${t.name}`}
-                  className="tw:w-24 tw:[font-family:var(--bk-font-mono)]"
-                  onChange={(e) => setDraft(e.target.value)}
-                  onBlur={() => commit(t.id, t.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") commit(t.id, t.value);
-                    if (e.key === "Escape") setEditing(null);
-                  }}
-                />
-              ) : (
-                <Button
-                  color="light"
-                  size="xs"
-                  data-set-dark={t.id}
-                  data-testid={`brand-nodark-set-${t.id}`}
-                  onClick={() => {
-                    setDraft(t.value);
-                    setEditing(t.id);
-                  }}
-                  /* 12/18 in `--color/accent-text` — 153:110 and its three
-                     siblings. flowbite's `size="xs"` link is 12/16, so the one
-                     action on each row sat two pixels short of its own row. */
-                  variant="link" className="tw:font-normal tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
-                >
-                  Set
-                </Button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+              Set
+            </Button>
+          )}
+        </li>
+      ))}
+      {paired.map((t) => (
+        <li key={t.id} data-dark-row={t.id} data-testid={`brand-dark-row-${t.id}`} className={ROW}>
+          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+            <span className={NAME} title={t.name}>
+              {t.id}
+            </span>
+            <span className={SUB} data-testid={`brand-dark-pair-${t.id}`}>
+              {displayValue(t.value)} → {displayValue(t.darkValue ?? "")}
+            </span>
+          </div>
+          <Check size={12} aria-label="Has a dark value" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
+        </li>
+      ))}
+    </ul>
   );
 };
 

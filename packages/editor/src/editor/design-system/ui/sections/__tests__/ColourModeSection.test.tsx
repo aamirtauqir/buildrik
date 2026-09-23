@@ -1,5 +1,5 @@
 /**
- * ColourModeSection — Brand › Colour mode, board 153:92.
+ * ColourModeSection — Brand › Colour mode, board 7316:80949 (C1 (ii)).
  *
  * The load-bearing test is the last one. The dark value used to be typed into a
  * field whose onBlur was empty, so it was discarded silently; this screen exists
@@ -36,11 +36,35 @@ function Probe({ onReady }: { onReady: (r: ReturnType<typeof useColorRegistry>) 
 }
 
 describe("ColourModeSection", () => {
-  it("counts the colour tokens with no dark value", () => {
-    const { container } = render(wrap(<ColourModeSection />));
-    const count = Number(container.querySelector("[data-no-dark-count]")?.textContent);
-    expect(Number.isNaN(count)).toBe(false);
-    expect(container.querySelectorAll("[data-no-dark-row]").length).toBe(count);
+  it("lists every colour token in one card: the missing ones first, then the paired ones", () => {
+    let reg: ReturnType<typeof useColorRegistry> | null = null;
+    const { container, getByTestId } = render(
+      wrap(
+        <>
+          <Probe onReady={(r) => (reg = r)} />
+          <ColourModeSection />
+        </>,
+      ),
+    );
+    const card = getByTestId("brand-colour-mode-list");
+    const rows = [...card.children];
+    expect(rows.length).toBe(reg!.tokens.length);
+    const firstPaired = rows.findIndex((r) => r.hasAttribute("data-dark-row"));
+    const lastMissing = rows.map((r) => r.hasAttribute("data-no-dark-row")).lastIndexOf(true);
+    if (firstPaired !== -1 && lastMissing !== -1) expect(lastMissing).toBeLessThan(firstPaired);
+    // The drawer's "NO DARK VALUE" band is not on the board.
+    expect(container.querySelector("[data-no-dark-header]")).toBeNull();
+  });
+
+  it("a paired row prints LIGHT → DARK, upper-case, with no Set", () => {
+    const { container, getByTestId } = render(wrap(<ColourModeSection />));
+    const id = container.querySelector("[data-no-dark-row]")!.getAttribute("data-no-dark-row")!;
+    fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-set-dark="${id}"]`)!);
+    const input = container.querySelector("input") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "#abcdef" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(getByTestId(`brand-dark-pair-${id}`).textContent).toMatch(/→ #ABCDEF$/);
+    expect(container.querySelector(`[data-set-dark="${id}"]`)).toBeNull();
   });
 
   it("offers Set on every listed token", () => {
@@ -72,7 +96,7 @@ describe("ColourModeSection", () => {
     expect(token?.darkValue).toBe("#123456");
   });
 
-  it("drops the row once its dark value is set", () => {
+  it("moves the row out of the missing list once its dark value is set", () => {
     const { container } = render(wrap(<ColourModeSection />));
     const before = container.querySelectorAll("[data-no-dark-row]").length;
     if (before === 0) return;
@@ -87,7 +111,7 @@ describe("ColourModeSection", () => {
 
 describe("ColourModeSection — the row names the token unambiguously", () => {
   /*
-    Board 153:92 draws these rows as mono IDs. The row rendered `t.name`
+    Boards 153:92 and 7316:80949 draw these rows as IDs. The row rendered `t.name`
     instead, and the live list holds both `Text` and `Text Primary` — so the
     row could not say which token you were about to give a dark value to, on
     the one screen whose entire job is to set that value in place.
@@ -98,14 +122,14 @@ describe("ColourModeSection — the row names the token unambiguously", () => {
     expect(rows.length).toBeGreaterThan(0);
     for (const row of rows) {
       const id = row.getAttribute("data-no-dark-row")!;
-      const label = row.querySelector("span")?.textContent?.trim();
+      const label = row.querySelector(`[data-testid="brand-nodark-name-${id}"]`)?.textContent?.trim();
       expect(label).toBe(id);
     }
   });
 
   it("keeps the human name reachable, so the id is not the only thing said", () => {
     const { container } = render(wrap(<ColourModeSection />));
-    const first = container.querySelector("[data-no-dark-row] span");
+    const first = container.querySelector('[data-testid^="brand-nodark-name-"]');
     expect(first?.getAttribute("title")).toBeTruthy();
     expect(first?.getAttribute("title")).not.toBe(first?.textContent?.trim());
   });
