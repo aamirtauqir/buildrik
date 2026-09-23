@@ -73,12 +73,6 @@
       "nodeId": "200:105"
     },
     {
-      "name": "breakpoint-pill",
-      "testId": "inspector-breakpoint-pill",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:107"
-    },
-    {
       "name": "state-pill",
       "testId": "inspector-state-pill",
       "spec": "shell-state-6-comment-mode",

@@ -75,12 +75,6 @@
       "nodeId": "189:8"
     },
     {
-      "name": "breakpoint-pill",
-      "testId": "inspector-breakpoint-pill",
-      "spec": "inspector-reach-whole-site",
-      "nodeId": "189:10"
-    },
-    {
       "name": "state-pill",
       "testId": "inspector-state-pill",
       "spec": "inspector-reach-whole-site",
