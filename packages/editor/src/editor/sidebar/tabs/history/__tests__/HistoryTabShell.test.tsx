@@ -1,8 +1,8 @@
 /**
  * HistoryTab shell tests — verifies the chrome after M1 + M2:
- *   - View switcher is Saves / Published (Changes is a filter, not a tab)
+ *   - View switcher: Session / Saves / Published / Activity
  *   - Helper text under each tab
- *   - Saves filter switches milestones ↔ all changes
+ *   - Session · Saves · Published · Activity tabs (board 4418:73791, B8)
  *   - Search bar is Saves-only (Published takes no query)
  *   - `initialView` deep link lands on Published
  *   - Time-Travel scrubber toggles via Ctrl+Shift+T
@@ -122,8 +122,8 @@ const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {})
     />
   );
 
-/** Saves is the default view; the changes list sits behind a filter chip. */
-const showChanges = () => fireEvent.click(screen.getByRole("button", { name: "This session" }));
+/** Saves is the default view; this session's changes are the Session tab. */
+const showChanges = () => fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
 
 describe("HistoryTab shell", () => {
   beforeEach(() => {
@@ -131,25 +131,31 @@ describe("HistoryTab shell", () => {
   });
   afterEach(cleanup);
 
-  it("renders Saves by default, with Published and Activity as sibling tabs", () => {
+  /* Board 4418:73791 draws Session · Saves · Published (Backups has no
+     service); Activity is B6's. "This session" was a filter chip inside Saves
+     and is the Session tab now — the chip is gone. */
+  it("renders Session · Saves · Published · Activity, Saves selected by default", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(3);
-    expect(tabs[0]).toHaveTextContent(/Saves/);
-    expect(tabs[1]).toHaveTextContent(/Published/);
-    expect(tabs[2]).toHaveTextContent(/Activity/);
-    expect(tabs[0].getAttribute("aria-selected")).toBe("true");
-    // Changes is a filter now — it must not be reachable as a tab.
-    expect(screen.queryByRole("tab", { name: /Changes/ })).toBeNull();
+    expect(tabs).toHaveLength(4);
+    expect(tabs[0]).toHaveTextContent(/Session/);
+    expect(tabs[1]).toHaveTextContent(/Saves/);
+    expect(tabs[2]).toHaveTextContent(/Published/);
+    expect(tabs[3]).toHaveTextContent(/Activity/);
+    expect(tabs[1].getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByRole("button", { name: "This session" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Saved versions" })).toBeNull();
   });
 
-  it("shows helper text under each tab", () => {
+  /* 4418:73791 draws plain labels; the helper line under each was the
+     two-tab design and pushed a fourth tab off the 280 drawer. */
+  it("tabs are plain labels — no helper line", () => {
     renderTab();
-    expect(screen.getByText("Named milestones")).toBeInTheDocument();
-    expect(screen.getByText("What's live")).toBeInTheDocument();
+    expect(screen.queryByText("Named milestones")).toBeNull();
+    expect(screen.queryByText("What's live")).toBeNull();
   });
 
-  it("defaults the Saves filter to milestones and switches to all changes", () => {
+  it("Saves lists saved versions; the Session tab lists this session's changes", () => {
     renderTab();
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("activity-view")).toBeNull();
@@ -189,7 +195,7 @@ describe("HistoryTab shell", () => {
     expect(screen.getByText(/Open this site from the dashboard/)).toBeInTheDocument();
   });
 
-  it("migrates a stored 'changes' preference to Saves + the changes filter", () => {
+  it("migrates a stored 'changes' preference to the Session tab", () => {
     window.localStorage.setItem("buildrick-history-view", "changes");
     renderTab();
     expect(screen.getAllByRole("tab")[0].getAttribute("aria-selected")).toBe("true");
@@ -217,7 +223,7 @@ describe("HistoryTab shell", () => {
      only door in used to live inside ActivityView's header — reachable only
      after switching to "All changes". Milestones (the default view) had no
      button at all, just the undiscoverable Ctrl+Shift+T chord. */
-  it("opens the Time-Travel scrubber from the Milestones filter, not just Changes", () => {
+  it("opens the Time-Travel scrubber from Saves, not just Session", () => {
     renderTab();
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
@@ -344,7 +350,7 @@ describe("HistoryTab — board 163:113 preview band", () => {
   beforeEach(() => window.localStorage.clear());
 
   const openScrubber = () => {
-    fireEvent.click(screen.getByRole("button", { name: "This session" }));
+    fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
     fireEvent.click(screen.getByTestId("tt-trigger"));
   };
 

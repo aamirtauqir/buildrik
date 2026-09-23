@@ -24,6 +24,7 @@ import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal
 import { gateFromBlockReason, type PublishGate } from "./lifecycle";
 import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
+import { CompareHost } from "./CompareHost";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -806,6 +807,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       />
 
       <PreviewOverlay html={previewHtml} onDone={() => setPreviewHtml(null)} />
+      {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
+      <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />
 
       <UpgradeModal />
 

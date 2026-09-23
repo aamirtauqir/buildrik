@@ -29,7 +29,6 @@ import {
   rollbackToVersion,
   type PublishHistoryRow,
 } from "../../services/PublishService";
-import { PublishDiffView } from "./PublishDiffView";
 
 export interface PublishHistoryProps {
   siteId: string;
@@ -44,7 +43,11 @@ export interface PublishHistoryProps {
    * rollback that had not reached the server. Observed live 2026-08-17: the
    * success modal at T+0s, and no new row in publish_build_jobs.
    */
-  onRollbackStarted?: (jobId: string) => void;  /**
+  onRollbackStarted?: (jobId: string) => void;
+  /** A row's "Compare" — opens the one Compare (B8) on the version before it
+   *  and this one. Omitted = no Compare on the rows. */
+  onCompare?: (from: { id: string; version: number }, to: { id: string; version: number }) => void;
+  /**
    * The shell's publish job, as far as this panel needs it. Three boards run
    * off one state: 184:37 "Rolling back…" (a bar while it publishes), 184:45
    * "Rolled back" (the green confirmation naming the new live version), and
@@ -120,7 +123,7 @@ const OUTCOME_REASON =
   "tw:mt-2 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 
-export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, rollbackJob = null }) => {
+export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, onCompare, rollbackJob = null }) => {
   // P6 permissions boards: republish is admin-scoped (owner decision 8) —
   // non-admins see the row action disabled with "Ask an admin", never hidden.
   const canRollback = roleAtLeast(useEditorRole(), "ADMIN") !== false;
@@ -144,8 +147,6 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
      costs the banner one clause, and must not turn the whole list into the
      load-error board. */
   const [liveDomain, setLiveDomain] = React.useState<string | null>(null);
-  /* Two versions to compare, page by page. Null = show the list. */
-  const [compare, setCompare] = React.useState<{ from: { id: string; version: number }; to: { id: string; version: number } } | null>(null);
   /* null = the site state has not answered yet. Distinct from false, so
      nothing renders a liveness claim in either direction while loading. */
   const [isPublished, setIsPublished] = React.useState<boolean | null>(null);
@@ -302,9 +303,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         </div>
       )}
       {notice && <div className={NOTICE}>{notice}</div>}
-      {compare ? (
-        <PublishDiffView siteId={siteId} from={compare.from} to={compare.to} onBack={() => setCompare(null)} />
-      ) : rows.map((r, i) => {
+      {rows.map((r, i) => {
         const isLive = i === 0 && Boolean(isPublished);
         // rolledBackFrom is a job id — map it to that version's number for the label.
         const fromVersion = r.rolledBackFrom
@@ -325,11 +324,11 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
             actions={
               <>
-                {i < rows.length - 1 ? (
+                {onCompare && i < rows.length - 1 ? (
                   <Button
                     color="light"
                     size="xs"
-                    onClick={() => setCompare({ from: { id: rows[i + 1].id, version: rows[i + 1].version }, to: { id: r.id, version: r.version } })}
+                    onClick={() => onCompare({ id: rows[i + 1].id, version: rows[i + 1].version }, { id: r.id, version: r.version })}
                     className={ROW_LINK}
                     aria-label={`Compare v${rows[i + 1].version} to v${r.version}`}
                   >

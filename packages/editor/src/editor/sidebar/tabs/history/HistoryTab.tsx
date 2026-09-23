@@ -2,9 +2,11 @@
  * HistoryTab — Version history sidebar panel
  *
  * Layout:
- *   PanelHeader → view-switcher (Saves / Published) → search-bar → list-container
- * Inside Saves, a filter row switches between named milestones and raw recent
- * edits — the old top-level "Changes" tab (M1).
+ *   PanelHeader → view-switcher (Session / Saves / Published / Activity)
+ *   → search-bar → list-container
+ * Session is this editing session's undo stack; it was the "This session"
+ * filter chip inside Saves until board 4418:73791 gave it its own tab (B8,
+ * G1-068).
  * Time-Travel scrubber drawer renders at body level when active.
  *
  * @license BSD-3-Clause
@@ -21,42 +23,22 @@ import { ActivityLogView } from "./components/ActivityLogView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import { TimeTravelIcon } from "./icons";
-import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
+import type { HistoryView, HistoryTabProps } from "./types";
+import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
 import { useVersionHistory } from "@/shared/hooks/useVersionHistory";
 
 const VIEW_LABEL: Record<HistoryView, string> = {
+  session: "Session",
   saves: "Saves",
   published: "Published",
   activity: "Activity",
 };
 
-/* Activity has no helper — the filter chips below the tab are the affordance
-   (B6 plan). Saves/Published keep the helper sentence because the panel
-   context alone is not enough. */
-const HELPER_TEXT: Record<HistoryView, string> = {
-  saves: "Named milestones",
-  published: "What's live",
-  activity: "Site activity",
-};
-
-/* Boards 163:64 / 163:269 / 163:220 (nodes 1657:7158 / 1657:7160, redrawn
-   2026-09-05) settle a conflict two earlier boards had left open. 163:2 and
-   163:113 drew this filter as two BARE TEXT LABELS reading "Changes" / "Saves",
-   which the code refused because "Saves" is already the name of the view TAB
-   one row above — adopting it would have put two different "Saves" controls a
-   row apart. The redrawn boards keep the code's chips and rename them: the
-   filter says which SET of saves is listed, and neither word collides with the
-   tab. So the words come from the board and the control stays a chip. */
-const FILTER_LABEL: Record<SavesFilter, string> = {
-  milestones: "Saved versions",
-  changes: "This session",
-};
-
-const SEARCH_PLACEHOLDER: Record<SavesFilter, string> = {
-  milestones: "Search saves...",
-  changes: "Search changes...",
+const SEARCH_PLACEHOLDER: Record<"session" | "saves", string> = {
+  session: "Search changes...",
+  saves: "Search saves...",
 };
 
 const SearchIconSvg = () => (
@@ -73,13 +55,6 @@ const ClearXSvg = () => (
   </svg>
 );
 
-/*
-  Saves filter (M1) — the old top-level "Changes" tab, demoted to a filter over
-  the same list. Chips, not tabs, so it cannot read as a third destination next
-  to Saves / Published. `tw:` rather than a rule in history.css: the panel-CSS
-  lane is what the styling ratchet drains, and a caller's utilities win over
-  flowbite's Button theme (chrome-ui/__tests__/className-precedence.test.tsx).
-*/
 /* Board 163:113's preview band — accent tint, actions inline with the title. */
 const PREVIEW_BAND =
   "tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-3 tw:bg-[var(--bk-accent-tint)] tw:px-4";
@@ -97,22 +72,6 @@ const PREVIEW_NOTE =
 const PREVIEW_ACTION = "tw:h-7 tw:px-3 tw:py-1.5 tw:border-[var(--bk-border)]";
 
 const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
-/* `shrink-0` and the explicit 12 radius are both measured, not tidying.
-   Without shrink-0 the Time-Travel button on the right squeezed both chips —
-   "This session" rendered 63px against the board's 82 — because a flex item's
-   default is to shrink before its neighbour does. `rounded-full` computes to
-   calc(infinity)px, which is visually the same pill on a 24-tall chip and is
-   not a number any spec can be compared against; 1657:7159 says 12.
-   `leading-normal`, not `leading-4`: 1657:7158/7160 carry no line-height. */
-const FILTER_CHIP =
-  "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
-  "tw:h-6 tw:shrink-0 tw:leading-normal tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
-  "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-[12px] " +
-  "tw:cursor-pointer tw:[transition:color_150ms_ease-out,background-color_150ms_ease-out,border-color_150ms_ease-out] " +
-  "tw:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
-  "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
-const FILTER_CHIP_ACTIVE =
-  "tw:font-medium tw:text-[var(--bk-accent-on)] tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]";
 const HISTORY_EMPTY =
   "tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)] tw:text-[12px] " +
   "tw:text-[var(--bk-ink-muted)] tw:text-center";
@@ -157,8 +116,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
   /* Stored preference, read once. The key predates M1 and every returning user
      has either "saves" or "changes" in it — "changes" is no longer a view, so
-     it migrates to Saves-with-the-changes-filter rather than being discarded.
-     Dropping it would silently move those users to a list they did not pick. */
+     it migrates to the Session tab, which is that list. Dropping it would
+     silently move those users to a list they did not pick. */
   const stored = React.useMemo<string | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -172,12 +131,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     if (initialView) return initialView; // deep link wins for this mount
     if (stored === "published") return "published";
     if (stored === "activity") return "activity";
+    if (stored === "changes") return "session";
     return "saves";
   });
-
-  const [savesFilter, setSavesFilter] = React.useState<SavesFilter>(() =>
-    stored === "changes" ? "changes" : "milestones",
-  );
 
   const [searchQuery, setSearchQuery] = React.useState("");
   const [showScrubber, setShowScrubber] = React.useState(false);
@@ -197,20 +153,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
      a new enum. */
   React.useEffect(() => {
     if (typeof window === "undefined") return;
-    const persisted =
-      activeView === "published"
-        ? "published"
-        : activeView === "activity"
-          ? "activity"
-          : savesFilter === "changes"
-            ? "changes"
-            : "saves";
+    const persisted = activeView === "session" ? "changes" : activeView;
     try {
       window.localStorage.setItem(storageKey, persisted);
     } catch {
       // Ignore storage errors
     }
-  }, [activeView, savesFilter, storageKey]);
+  }, [activeView, storageKey]);
 
   // Ctrl+Shift+T toggles Time-Travel scrubber
   React.useEffect(() => {
@@ -253,7 +202,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
-        {(["saves", "published", "activity"] as const).map((view) => (
+        {(["session", "saves", "published", "activity"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -264,33 +213,18 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             onClick={() => setActiveView(view)}
           >
             {VIEW_LABEL[view]}
-            <span className="tab-helper" data-testid={`history-view-helper-${view}`}>{HELPER_TEXT[view]}</span>
           </Button>
         ))}
       </div>
-      {/* Saves-only chrome. Published renders its own list and takes no search
-          query, so showing a dead search field over it would be a lie. */}
-      {activeView === "saves" && (
+      {/* Session/Saves chrome. Published renders its own list and takes no
+          search query, so showing a dead search field over it would be a lie. */}
+      {(activeView === "session" || activeView === "saves") && (
         <>
-          <div className={FILTER_ROW} role="group" aria-label="Saves filter" data-testid="history-filter-row">
-            {(["milestones", "changes"] as const).map((f) => (
-              <Button
-                key={f}
-                type="button"
-                aria-pressed={savesFilter === f}
-                className={`${FILTER_CHIP}${savesFilter === f ? ` ${FILTER_CHIP_ACTIVE}` : ""}`}
-                data-testid={`history-filter-${f}`}
-                onClick={() => setSavesFilter(f)}
-              >
-                {FILTER_LABEL[f]}
-              </Button>
-            ))}
-            {/* Board 163:113 is the Milestones list WITH time-travel active —
-                but the only door into it lived inside ActivityView's header,
-                reachable only from the "All changes" filter (plus the
-                Ctrl+Shift+T chord nobody is told about). Milestones had no
-                way in at all. */}
-            {savesFilter === "milestones" && (
+          {activeView === "saves" && (
+            <div className={FILTER_ROW} data-testid="history-filter-row">
+              {/* Board 163:113 is the Saves list WITH time-travel active; this
+                  is its door (plus Ctrl+Shift+T). Session has its own, in
+                  ActivityView's header. */}
               <Button
                 type="button"
                 /* `tw:h-6` is load-bearing: flowbite's Button ships h-10 and
@@ -308,8 +242,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 <TimeTravelIcon />
                 Time-Travel
               </Button>
-            )}
-          </div>
+            </div>
+          )}
           <div className="search-bar" data-testid="history-search-bar">
             <span className="search-icon" aria-hidden="true">
               <SearchIconSvg />
@@ -319,8 +253,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={SEARCH_PLACEHOLDER[savesFilter]}
-              aria-label={SEARCH_PLACEHOLDER[savesFilter]}
+              placeholder={SEARCH_PLACEHOLDER[activeView]}
+              aria-label={SEARCH_PLACEHOLDER[activeView]}
               data-testid="history-search-input"
             />
             {searchQuery && (
@@ -381,7 +315,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </>
         )}
 
-        {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
+        {(activeView === "session" || activeView === "saves") && savesSettled && (
+          <SavesApproval composer={composer} />
+        )}
 
 
         {/* The lists scroll; the approval band above and the prune note below
@@ -394,7 +330,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             min-content floor, so without it this grows past the panel and
             overflows instead of scrolling. */}
         <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col" data-testid="history-list-scroll">
-        {activeView === "saves" && savesFilter === "changes" && (
+        {activeView === "session" && (
           <ActivityView
             composer={composer}
             searchQuery={searchQuery}
@@ -404,7 +340,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           />
         )}
 
-        {activeView === "saves" && savesFilter === "milestones" && (
+        {activeView === "saves" && (
           <>
             {milestoneAvailable && milestoneSuggestion && (
               <MilestoneSuggestionBanner
@@ -427,6 +363,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               siteId={siteId}
               rollbackJob={rollbackJob}
               onRollbackStarted={onRollbackStarted}
+              /* A door of the one Compare (B8). */
+              onCompare={(from, to) =>
+                composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                  left: { kind: "published", jobId: from.id, version: from.version },
+                  right: { kind: "published", jobId: to.id, version: to.version },
+                  from: "History",
+                })
+              }
             />
           ) : (
             /* No SITE, which is a different fact from no versions —
@@ -443,8 +387,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         )}
         </div>
 
-        {activeView === "saves" && savesSettled && (
-          <SavesPruneNote composer={composer} filter={savesFilter} />
+        {(activeView === "session" || activeView === "saves") && savesSettled && (
+          <SavesPruneNote composer={composer} view={activeView} />
         )}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}

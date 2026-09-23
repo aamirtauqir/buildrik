@@ -46,20 +46,17 @@ import {
   Spinner,
   Textarea,
   Toolbar,
-  OverlayMount,
   useToast,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
-import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
-import type { PublishPage } from "@/editor/shell/exportPublishPages";
+import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
 import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
 import {
   fetchCurrentRound,
   fetchRounds,
   fetchReviewComments,
-  fetchApprovedSnapshot,
   postReply,
   resolveReviewComment,
   revokeReview,
@@ -79,15 +76,9 @@ export interface ReviewTabProps {
    *  round's `invitedEmail`; without it `submitReview` mints no token and the
    *  new round is invisible to the client — measured 2026-08-25. */
   onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
-  /** Live-render the current site to pages for the §3 Compare — same decoupling
-   *  as onResend (the shell owns the composer/export path). Absent → no Compare. */
-  onExportCurrentPages?: () => Promise<PublishPage[]>;
   /** Composer for the orphan-comment events (Detached group + reattach) and
    *  for page names — the boards label groups "OPEN · HOME", not by page id. */
   composer?: import("@/engine").Composer | null;
-  /** Open Compare on mount — a deep link (`openLeftPanelToTab("review",
-   *  "compare")`), the way the history tab deep-links to its Published view. */
-  initialCompare?: boolean;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -148,9 +139,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   onHelpClick,
   onClose,
   onResend,
-  onExportCurrentPages,
   composer,
-  initialCompare,
 }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [round, setRound] = React.useState<CurrentRound | null>(null);
@@ -168,19 +157,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [menuForId, setMenuForId] = React.useState<string | null>(null);
-  const [compareOpen, setCompareOpen] = React.useState(false);
   /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
      comments in server order, switching page and selecting each anchor via
      `locateComment` (C2, #39). */
   const [walkCursor, setWalkCursor] = React.useState(0);
-  /* Compare's mode is lifted here because it decides WHERE the view renders:
-     list in the 280 drawer, split and overlay at 1080 in an OverlayMount
-     (B1, founder call 2026-09-08). Defaults to "split", matching what
-     ApprovedCompareView opened with before the mode moved out. */
-  const [compareMode, setCompareMode] = React.useState<"split" | "overlay" | "list">("split");
-  const [compareState, setCompareState] = React.useState<LoadState>("loading");
-  const [approvedSnap, setApprovedSnap] = React.useState<PublishPage[] | null>(null);
-  const [currentPages, setCurrentPages] = React.useState<PublishPage[] | null>(null);
 
   /* Previous rounds — board 157:169's buildable half. Lazy: fetched the first
      time the strip is opened, because most sessions never look back. `null`
@@ -328,33 +308,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       setResending(false);
     }
   };
-
-  const openCompare = React.useCallback(async () => {
-    if (!onExportCurrentPages) return;
-    setCompareOpen(true);
-    setCompareState("loading");
-    setCurrentPages(null);
-    // Export the current side in parallel — it can resolve after the approved
-    // side (the per-side loading asymmetry the view is built for).
-    void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([]));
-    try {
-      // The approved read throws on transport failure (DF5) → error state,
-      // never a fake "nothing changed". A real null = no stored snapshot.
-      setApprovedSnap(await fetchApprovedSnapshot());
-      setCompareState("ready");
-    } catch {
-      setCompareState("error");
-    }
-  }, [onExportCurrentPages]);
-
-  /* The Compare deep link. Fires once — reopening Compare after the user
-     closes it would trap them in it while the deep-link prop is still true. */
-  const compareRequested = React.useRef(false);
-  React.useEffect(() => {
-    if (!initialCompare || compareRequested.current || !onExportCurrentPages) return;
-    compareRequested.current = true;
-    void openCompare();
-  }, [initialCompare, onExportCurrentPages, openCompare]);
 
   const header = (
     <PanelHeader
@@ -531,9 +484,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     <Button
       color="light"
       size="xs"
-      onClick={() => void openCompare()}
-      disabled={!onExportCurrentPages}
-      title={!onExportCurrentPages ? "Compare isn't available here" : undefined}
+      /* A door of the one Compare (B8) — the shell's CompareHost renders it
+         full-canvas; this panel no longer hosts a second copy. */
+      onClick={() =>
+        composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+          left: { kind: "approved" },
+          right: { kind: "current" },
+          from: "Review",
+        })
+      }
+      disabled={!composer}
+      title={!composer ? "Compare isn't available here" : undefined}
       /* Board 229:1090: `--size/row-dense` (28) with 12/6 padding and an 8
          radius — the dense secondary, not the 40-tall default a bare
          `<Button>` renders. `tw:h-7` and not `tw:min-h-7`: on a flowbite
@@ -623,87 +584,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 }}
           />
         </div>
-      </div>
-    );
-  }
-
-  if (compareOpen) {
-    const compareView = (
-      <ApprovedCompareView
-        approvedPages={approvedSnap}
-        currentPages={currentPages}
-        mode={compareMode}
-        onModeChange={setCompareMode}
-        onBack={() => setCompareOpen(false)}
-        onRefreshCurrent={
-          onExportCurrentPages
-            ? () => {
-                setCurrentPages(null);
-                void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([]));
-              }
-            : undefined
-        }
-      />
-    );
-    return (
-      <div className={BODY} data-review-state="compare">
-        {/* No strip of our own: every Compare board draws ONE 48-tall bar, and
-            the way back is a hotspot at its left end. ApprovedCompareView owns
-            that bar and takes `onBack`; this used to stack a second Toolbar
-            above it, so the panel showed two rules and two titles. The loading
-            and error states keep a bar because there is no compare view yet to
-            carry one. */}
-        {compareState === "loading" ? (
-          <>
-          <Toolbar>
-            <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
-              <ChevronLeft size={14} aria-hidden="true" /> Back
-            </Button>
-            <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
-          </Toolbar>
-          <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading approved snapshot…" />
-          </>
-        ) : compareState === "error" ? (
-          <>
-          <Toolbar>
-            <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
-              <ChevronLeft size={14} aria-hidden="true" /> Back
-            </Button>
-            <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
-          </Toolbar>
-          <EmptyState
-            className="tw:flex-1"
-            icon={<AlertCircle size={24} aria-hidden="true" />}
-            title="Couldn't load the approved snapshot"
-            body="The dashboard didn't answer. Try again."
-            action={<Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>}
-          />
-          </>
-        ) : compareMode === "list" ? (
-          /* LIST stays in the drawer: one column reads fine at 280, and the
-             board draws it that way. */
-          compareView
-        ) : (
-          /* SPLIT and OVERLAY open at 1080 (boards 168:2 / 168:26 / 168:48,
-             founder call 2026-09-08 closing BLOCKERS.md B1). In the 280 drawer
-             each pane was ~140px, so "Side by side" was only side-by-side on
-             the board's own surface. `OverlayMount` is chrome-ui's overlay-root
-             primitive, which is what Gate 22 requires — no bare createPortal.
-             Closing the overlay drops back to list rather than leaving Compare
-             entirely: the user asked for a comparison, not to leave one. */
-          <>
-            {compareView === null ? null : (
-              <OverlayMount open onClose={() => setCompareMode("list")} labelledBy="compare-title">
-                <div
-                  className="tw:flex tw:h-[760px] tw:w-[1080px] tw:max-w-[95vw] tw:flex-col tw:overflow-hidden tw:rounded-lg tw:bg-[var(--bk-bg-panel)]"
-                  data-testid="compare-overlay"
-                >
-                  {compareView}
-                </div>
-              </OverlayMount>
-            )}
-          </>
-        )}
       </div>
     );
   }

@@ -3263,7 +3263,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
@@ -3279,7 +3278,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub()}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
