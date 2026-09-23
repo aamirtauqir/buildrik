@@ -700,9 +700,12 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "presets":          return "Section and element presets";
       case "brand-checks":     return brandChecksCaption(lintIssues);
       case "starters":         return "Pick a starter, then apply it to the draft";
-      case "spacing":          return `${spacing.tokens.length} tokens`;
+      case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
-      default:                 return "Tokens";
+      default: {
+        const n = moreKindRegistry[page.slice("kind-".length) as MoreKind]?.tokens.length ?? 0;
+        return `${n} token${n === 1 ? "" : "s"}`;
+      }
     }
   })();
 
