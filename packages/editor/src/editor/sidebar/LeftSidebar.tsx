@@ -570,7 +570,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {/* Rail */}
       <nav
         ref={navRef}
-        className="ls-rail"
+        className={`ls-rail${railMode === "figma" ? " ls-rail--figma" : ""}`}
         // Conformance anchor — see themes/fonts.css era note in Topbar.tsx.
         // `.ls-rail` happens to be stable today, but recipes select on testids
         // uniformly so a class rename can never silently unhook measurement.
@@ -580,11 +580,16 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         aria-orientation="vertical"
         onKeyDown={handleKeyDown}
       >
-        <div className="ls-logo">
-          <Layers size={28} />
-        </div>
-
-        <div className="ls-divider" />
+        {/* Board 4418:123573: the rail starts with its first item — no logo
+            mark, no divider (the dev rails keep theirs). */}
+        {railMode !== "figma" && (
+          <>
+            <div className="ls-logo">
+              <Layers size={28} />
+            </div>
+            <div className="ls-divider" />
+          </>
+        )}
 
         {railMode === "e3" ? (
           <FourToolRail

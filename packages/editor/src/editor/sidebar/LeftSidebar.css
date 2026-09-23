@@ -54,6 +54,19 @@
   gap: 2px;
 }
 
+/* Board 4418:123573 (parity V1 #4): 10 top padding, 4 between items — the
+   first item lands at y66 (56 + 10), pitch 48 (44 + 4). */
+.ls-rail--figma {
+  padding-top: 10px;
+}
+.ls-rail--figma .ls-zone {
+  gap: 4px;
+}
+.ls-rail--figma .ls-btn__label {
+  font-weight: 400;
+  color: var(--bk-ink-muted);
+}
+
 /* ─────────────────────────────────────────────
    LOGO — 40px centered icon
    ───────────────────────────────────────────── */
