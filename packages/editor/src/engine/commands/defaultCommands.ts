@@ -87,7 +87,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "delete",
       shortcuts: ["delete", "backspace"],
       requiresSelection: true,
-      run: (c) => {
+      run: (c, options) => {
         /* Was `getSelected()` — one element out of a multi-selection, and no
            transaction, so undoing a three-element delete took three presses.
            Same defect cut carried; measured live at 49 -> 48 on a
@@ -97,6 +97,13 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            label would still count it. */
         const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
+        /* Decision #17: one element deletes at once (Undo follows); more than
+           one asks first. Every door — Delete/Backspace, ⌘K — lands here, so
+           the confirm is decided here and drawn by whoever listens. */
+        if (selected.length > 1 && options?.confirmed !== true) {
+          c.emit(EVENTS.UI_REQUEST_DELETE_SELECTION, { count: selected.length });
+          return;
+        }
         c.beginTransaction("delete");
         for (const el of selected) c.elements.removeElement(el.getId());
         c.endTransaction();

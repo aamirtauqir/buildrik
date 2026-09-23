@@ -9,6 +9,7 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
 import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
@@ -745,6 +746,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               }}
             />
           )}
+
+          {!readOnly && <DeleteSelectionConfirm composer={composer} />}
 
           {/* All overlays delegated to CanvasOverlayGroup */}
           <CanvasOverlayGroup
