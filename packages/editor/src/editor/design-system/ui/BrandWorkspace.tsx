@@ -4,15 +4,20 @@
  * `7315:80955` and its pages are the single Brand design; the 280/700 drawer
  * this replaces is `ARCHIVE · STATES · Brand … superseded 21 Sep 2026`).
  *
- *   ┌ nav 256 ────────────┬ pane ───────────────────────────┬ preview 320 ─┐
- *   │ ‹ Back to canvas    │ Colours              [Draft] [B|P]│ Live preview │
- *   │ Colours             │ 18 tokens · light / dark          │              │
- *   │ Colour mode         ├───────────────────────────────────┤ swatches +   │
- *   │ Fonts & type styles │ the page's section, re-parented   │ type sample  │
- *   │ Component styles    │ from the drawer without restyle   │              │
- *   │ …                   ├───────────────────────────────────┤              │
- *   │ Import / export     │ Unsaved brand changes  Discard·Save│              │
- *   └─────────────────────┴───────────────────────────────────┴──────────────┘
+ *   ┌ nav 256 ──────────┬ 32 ┬ pane 620 ─────────────────┬ 32 ┬ preview 468 ─┬ 32 ┐
+ *   │  ‹ Back to canvas │    │ Colours  18 tokens · light │    │ Live preview ·│    │
+ *   │ Brand             │    │              [+ Add token] │    │ Home     50% ▾│    │
+ *   │ site name         │    ├────────────────────────────┤    │  page at zoom │    │
+ *   │                   │    │ TOKEN  LIGHT  DARK  USED   │    ├───────────────┤    │
+ *   │ Colours        18 │    │ ● color-primary #1A56DB …  │    │ ▇ token card  │    │
+ *   │ Colour mode       │    │ …                          │    │ Light value … │    │
+ *   │ …                 │    ├────────────────────────────┤    │ Used by …     │    │
+ *   │ Beginner | Pro    │    │ Unsaved brand changes  Save│    │ ✓ Brand checks│    │
+ *   └───────────────────┴────┴────────────────────────────┴────┴───────────────┴────┘
+ *
+ * Measured off 7315:80955 at 1440×900 (C1 (ii)): nav 256 with the Brand head,
+ * main gutters 40 top / 32 sides, pane content 620, preview column 468, the
+ * page action at the header's right, the page's table in a bordered card.
  *
  * Nav order is the board's (decision #15), Colours landing (#28): Colours ·
  * Colour mode · Fonts & type styles · Component styles · Classes · Presets ·
@@ -75,6 +80,7 @@ import {
 import type { DesignToken, StylePreset, TokenKind } from "../types";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import { CURRENT_SCHEMA_VERSION } from "../migrations";
+import type { TokensForKindRegistry } from "../state/useTokensForKind";
 import { mergeProjectTokens } from "../state/projectTokens";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
@@ -86,6 +92,8 @@ import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
 import { BrandDiscardDialog } from "./BrandDiscardDialog";
 import { BrandPreview } from "./BrandPreview";
+import { BrandLivePreview } from "./BrandLivePreview";
+import { TokenDetailView } from "./sections/TokenDetailView";
 import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
@@ -150,16 +158,23 @@ function pageLabel(id: BrandPageId): string {
     ?? id;
 }
 
-// ─── Row chrome (the Settings shell's nav row, same tokens) ──────────────────
+// ─── Row chrome (7315:80955: 32-tall rows on a 2px rhythm, 14px, accent tint when on) ──
 
 const NAV_ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
-  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
+/* The count at the row's right — "18" on Colours, "2" on Brand checks — stays
+   muted on the active row too (measured: rgb(107,114,128) on the tint). */
+const NAV_COUNT =
+  "tw:flex-none tw:tabular-nums tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
+const PAGE_ACTION =
+  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -175,16 +190,19 @@ interface KindRegistryLike {
   discardAll: () => void;
 }
 
+/** A token is dirty when its value OR its dark value differs from the saved one. */
+function tokenDirty(t: DesignToken, saved: DesignToken | undefined): boolean {
+  return saved === undefined || t.value !== saved.value || (t.darkValue ?? "") !== (saved.darkValue ?? "");
+}
+
 function dirtyCount(reg: KindRegistryLike): number {
   // Counts both modifications (id present in saved with different value) AND
   // additions (id not in saved at all). Pre-fix this only counted modifications,
   // so import-via-add and AddTokenModal both shipped tokens silently — no
   // section-tab dot, no DraftChip count increment. Removals are not counted
-  // here; deleteToken UX is a separate concern.
-  return reg.tokens.filter((t) => {
-    const saved = reg.savedTokens.find((s) => s.id === t.id);
-    return saved === undefined || t.value !== saved.value;
-  }).length;
+  // here; deleteToken UX is a separate concern. A dark value set on the card
+  // counts too — it used to stage without ever lighting the footer (C1 (ii)).
+  return reg.tokens.filter((t) => tokenDirty(t, reg.savedTokens.find((s) => s.id === t.id))).length;
 }
 
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
@@ -458,6 +476,11 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
         category: t.category,
         type: t.type,
         group: t.group,
+        /* The dark variant. It was dropped here, so a dark value set in the
+           drawer's detail view — and the card's "Dark value · Set" now —
+           reached the registry and never the project: measured live
+           2026-09-22, Apply persisted `#C81E1E` and lost `#76A9FA`. */
+        ...(t.darkValue ? { darkValue: t.darkValue } : {}),
       }));
 
     // S2: pull all 11 preset categories into a flat record array for persistence.
@@ -500,9 +523,9 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       r.tokens
         .filter((t) => {
           const saved = r.savedTokens.find((s) => s.id === t.id);
-          return saved !== undefined && t.value !== saved.value;
+          return saved !== undefined && tokenDirty(t, saved);
         })
-        .map((t) => ({ id: t.id, value: t.value, registry: r }))
+        .map((t) => ({ id: t.id, value: t.value, darkValue: t.darkValue, registry: r }))
     );
     const count = totalDirty;
 
@@ -515,7 +538,8 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       action: {
         label: "Undo",
         onClick: () => {
-          flat.forEach(({ id, value, registry }) => registry.updateToken(id, value));
+          flat.forEach(({ id, value, darkValue, registry }) =>
+            registry === color ? color.updateToken(id, value, darkValue) : registry.updateToken(id, value));
         },
       },
     });
@@ -576,6 +600,73 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
 
+  /* The site name under "Brand" (7315:80955 draws the site's own name there;
+     "Bella Cucina" is the board's sample). Same read the topbar makes. */
+  const [siteName, setSiteName] = React.useState("");
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const read = () => setSiteName(composer.getProjectMetadata?.()?.name ?? "");
+    read();
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    composer.on(EVENTS.PROJECT_METADATA_CHANGED, read);
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, read);
+      composer.off(EVENTS.PROJECT_METADATA_CHANGED, read);
+    };
+  }, [composer]);
+
+  /* The selected token — the right column's card (7315:80955). One per
+     workspace, cleared on a page change; a row click on any token page sets
+     it. The card is a sibling of the table, not a drill-in. */
+  const [selectedTokenId, setSelectedTokenId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setSelectedTokenId(null);
+  }, [page]);
+  const allTokens = React.useMemo(
+    () => allRegistries.flatMap((r) => r.tokens),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    allRegistries.map((r) => r.tokens),
+  );
+  const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
+  const moreKindRegistry: Record<MoreKind, TokensForKindRegistry> = {
+    radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery,
+  };
+
+  /* Dispatch to whichever registry owns the token. Only the colour registry
+     stores a dark variant; type and spacing expose no delete or rename, so
+     those two calls reach only colour and the eleven generic kinds. */
+  const kindOf = (tok: DesignToken): TokenKind | undefined =>
+    tok.kind ?? (tok.category === "colors" ? "color"
+      : tok.category === "typography" ? "type"
+      : tok.category === "spacing" ? "spacing"
+      : undefined);
+  const isMoreKind = (k: TokenKind | undefined): k is MoreKind =>
+    MORE_KINDS.some((m) => m.kind === k);
+  const tokenById = (id: string) => allTokens.find((t) => t.id === id);
+  const changeToken = (id: string, value: string, darkValue?: string) => {
+    const tok = tokenById(id);
+    if (!tok) return;
+    const k = kindOf(tok);
+    if (k === "color") color.updateToken(id, value, darkValue);
+    else if (k === "type") type.updateToken(id, value);
+    else if (k === "spacing") spacing.updateToken(id, value);
+    else if (isMoreKind(k)) moreKindRegistry[k].updateToken(id, value);
+  };
+  const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
+    const tok = tokenById(id);
+    if (!tok) return;
+    const k = kindOf(tok);
+    if (k === "color") color.deleteToken(id, opts);
+    else if (isMoreKind(k)) moreKindRegistry[k].deleteToken(id, opts);
+  };
+  const renameToken = (id: string, newId: string) => {
+    const tok = tokenById(id);
+    if (!tok) return;
+    const k = kindOf(tok);
+    if (k === "color") color.renameToken(id, newId);
+    else if (isMoreKind(k)) moreKindRegistry[k].renameToken(id, newId);
+  };
+
   const caption = (() => {
     switch (page) {
       case "colours":          return `${visibleColors.length} tokens · light / dark`;
@@ -592,10 +683,26 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     }
   })();
 
+  /* The header's page action — each board draws one at the top right. */
+  const pageAction = (() => {
+    switch (page) {
+      case "colours":
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+            + Add token
+          </Button>
+        );
+      default:
+        return null;
+    }
+  })();
+
   const tokenPageProps = {
     onAddTokenClick: () => setShowAddToken(true),
     onResetSpacingToDefaults: handleResetSpacingToDefaults,
     composer,
+    selectedTokenId,
+    onSelectToken: setSelectedTokenId,
   };
 
   const renderPage = (): React.ReactNode => {
@@ -645,7 +752,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     }
   };
 
-  const navRow = (id: BrandPageId, label: string, dirtyHere: boolean) => {
+  const navRow = (id: BrandPageId, label: string, dirtyHere: boolean, count?: number) => {
     const active = page === id;
     return (
       <Button
@@ -668,14 +775,26 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             aria-label="unsaved changes"
           />
         )}
+        {count !== undefined && (
+          <span className={NAV_COUNT} data-testid={`brand-row-count-${id}`}>
+            {count}
+          </span>
+        )}
       </Button>
     );
   };
 
   const kindDirty = (reg: KindRegistryLike) => dirtyCount(reg) > 0;
-  const moreKindRegistry: Record<MoreKind, KindRegistryLike> = {
-    radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery,
+
+  /* The count the board draws beside two rows: the palette size on Colours,
+     the open findings on Brand checks (only while there are any). */
+  const navCount = (id: NavId): number | undefined => {
+    if (id === "colours") return visibleColors.length;
+    if (id === "brand-checks" && lintIssues.length > 0) return lintIssues.length;
+    return undefined;
   };
+
+  const isTokenPage = page === "colours" || page === "fonts" || page === "spacing" || page.startsWith("kind-");
 
   return (
     <div
@@ -685,11 +804,12 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     >
       {/* ── Nav ─────────────────────────────────────────────────────────── */}
       <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        <div className="tw:flex tw:flex-col tw:px-5 tw:pt-4" data-testid="brand-back-row">
+        {/* 7315:80955: the back link sits centred on the nav's first line. */}
+        <div className="tw:flex tw:justify-center tw:pt-5" data-testid="brand-back-row">
           <Button
             type="button"
             variant="link"
-            className="tw:h-auto tw:min-h-0 tw:self-start tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:no-underline"
+            className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
             onClick={requestLeave}
             data-testid="brand-back-link"
           >
@@ -697,7 +817,22 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             Back to canvas
           </Button>
         </div>
-        <nav className="tw:flex tw:flex-col tw:px-3 tw:pb-4 tw:pt-8" aria-label="Brand pages">
+        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-4" data-testid="brand-nav-head">
+          <h1 className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]">
+            Brand
+          </h1>
+          {siteName && (
+            <span
+              className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+              data-testid="brand-nav-site"
+            >
+              {siteName}
+            </span>
+          )}
+        </div>
+        {/* 72 down to the first row — 7315:80955 leaves the band under the
+            site name empty. */}
+        <nav className="tw:flex tw:flex-col tw:gap-0.5 tw:px-2 tw:pb-4 tw:pt-18" aria-label="Brand pages">
           {NAV.map((n) => {
             const dirtyHere =
               (n.id === "colours" && kindDirty(color)) ||
@@ -706,14 +841,14 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               (n.id === "presets" && stylesDirty > 0);
             return (
               <React.Fragment key={n.id}>
-                {navRow(n.id, n.label, dirtyHere)}
+                {navRow(n.id, n.label, dirtyHere, navCount(n.id))}
                 {n.id === "spacing" && (
                   <>
                     <Button
                       type="button"
                       variant="ghost"
                       size="xs"
-                      className={`${NAV_ROW} tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-accent)] tw:enabled:hover:text-[var(--bk-accent)]`}
+                      className={`${NAV_ROW} tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent)] tw:enabled:hover:text-[var(--bk-accent)]`}
                       aria-expanded={showMoreKinds}
                       onClick={() => setShowMoreKinds((v) => !v)}
                       data-testid="brand-more-kinds"
@@ -752,110 +887,142 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
         </div>
       </aside>
 
-      {/* ── Pane ────────────────────────────────────────────────────────── */}
-      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        <header className="tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-6 tw:border-b tw:border-[var(--bk-border)] tw:px-8 tw:pb-4 tw:pt-6">
-          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-            <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
-              data-testid="brand-page-title"
-            >
-              {pageLabel(page)}
-            </h2>
-            <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
-              {caption}
-            </p>
-          </div>
-          <div aria-live="polite" aria-atomic="true" className="tw:shrink-0">
-            <DraftChip state={isDirty ? "dirty" : "saved"} count={totalDirty} />
-          </div>
-        </header>
-
-        {error ? (
-          /* Board 781:4311's copy: what failed, and — the half that matters —
-             that nothing was lost. The raw exception text said neither. */
-          <PanelErrorState
-            title="Couldn't load your brand system."
-            message="Your tokens are safe — only this list failed to load."
-            onRetry={() => { setError(null); loadFromComposer(); }}
-          />
-        ) : (
-          <div id={`design-section-${page}`} className="tw:flex-1 tw:overflow-auto" data-testid="brand-page-body">
-            {/* Board 306:2161 draws a status badge in the band under the back
-                row. Its two siblings (bound / unbound) specify a state nothing
-                can answer — elements carry no preset reference — so only this
-                one ships. See SectionStatusBadge's note. */}
-            {page === "presets" && presetsStatus(stylesDirty > 0) && (
-              <SectionStatusBadge status="draft" />
-            )}
-            {/* Board 306:2232 — "Exported CSS" after a download. The Copy
-                button carries its own feedback; Download had none at all. */}
-            {page === "export" && lastExport && (
-              <SectionStatusBadge status="exported" detail={lastExport} />
-            )}
-            {/* Boards 306:2265 / 4418:168885 — the import outcome, "⚠ Import
-                failed" being the row the workspace board draws. The card shows
-                its own error DETAIL inline; this says what state the page is in. */}
-            {page === "export" && !lastExport && importOutcome && (
-              <SectionStatusBadge status={importOutcome} />
-            )}
-            {page === "brand-checks" && suppressedCount > 0 ? (
-              <SectionStatusBadge status="warnings-suppressed" role="status" />
-            ) : null}
-
-            {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
-                with Browse starters · Import — the workspace's first-run state,
-                on the landing page, until the first Save. The sentence is the
-                design doc's own (§5.7, conformance copy.json). */}
-            {isFirstLoad && page === "colours" && (
-              <div
-                data-testid="brand-tokens-first-load-banner"
-                className="tw:mx-4 tw:mt-4 tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3"
+      {/* ── Main: pane + preview column, 40 top / 32 sides, 32 between ──── */}
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:gap-8 tw:px-8 tw:pt-10">
+        {/* ── Pane ──────────────────────────────────────────────────────── */}
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
+          {/* 36 tall: the title and the 28px action share the centre line at
+              y=58, and the card starts 16 under it at y=92 (7315:80955). */}
+          <header className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-between tw:gap-6">
+            <div className="tw:flex tw:min-w-0 tw:items-baseline tw:gap-2.5">
+              <h2
+                className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+                data-testid="brand-page-title"
               >
-                <span
-                  data-testid="brand-tokens-first-load-text"
-                  className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
-                >
-                  <strong>No brand set.</strong> Start from a theme or import your client's tokens. These
-                  are the site's default design tokens — customize them and click{" "}
-                  <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
-                </span>
-                <span className="tw:flex tw:gap-2">
-                  <Button size="xs" variant="secondary" onClick={() => setPage("starters")} data-testid="brand-empty-starters">
-                    Browse starters
-                  </Button>
-                  <Button size="xs" variant="secondary" onClick={() => setPage("export")} data-testid="brand-empty-import">
-                    Import
-                  </Button>
-                </span>
+                {pageLabel(page)}
+              </h2>
+              <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-caption">
+                {caption}
+              </p>
+            </div>
+            <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
+              {/* The auto-draft pill (#28). The board's clean state draws no
+                  chip, so it appears only while something is staged. */}
+              <div aria-live="polite" aria-atomic="true">
+                {isDirty && <DraftChip state="dirty" count={totalDirty} />}
               </div>
-            )}
+              {pageAction}
+            </div>
+          </header>
 
-            {renderPage()}
-          </div>
-        )}
+          {error ? (
+            /* Board 781:4311's copy: what failed, and — the half that matters —
+               that nothing was lost. The raw exception text said neither. */
+            <PanelErrorState
+              title="Couldn't load your brand system."
+              message="Your tokens are safe — only this list failed to load."
+              onRetry={() => { setError(null); loadFromComposer(); }}
+            />
+          ) : (
+            <div id={`design-section-${page}`} className="tw:mt-4 tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4" data-testid="brand-page-body">
+              {/* Board 306:2161 draws a status badge in the band under the back
+                  row. Its two siblings (bound / unbound) specify a state nothing
+                  can answer — elements carry no preset reference — so only this
+                  one ships. See SectionStatusBadge's note. */}
+              {page === "presets" && presetsStatus(stylesDirty > 0) && (
+                <SectionStatusBadge status="draft" />
+              )}
+              {/* Board 306:2232 — "Exported CSS" after a download. The Copy
+                  button carries its own feedback; Download had none at all. */}
+              {page === "export" && lastExport && (
+                <SectionStatusBadge status="exported" detail={lastExport} />
+              )}
+              {/* Boards 306:2265 / 4418:168885 — the import outcome, "⚠ Import
+                  failed" being the row the workspace board draws. The card shows
+                  its own error DETAIL inline; this says what state the page is in. */}
+              {page === "export" && !lastExport && importOutcome && (
+                <SectionStatusBadge status={importOutcome} />
+              )}
+              {page === "brand-checks" && suppressedCount > 0 ? (
+                <SectionStatusBadge status="warnings-suppressed" role="status" />
+              ) : null}
 
-        <DesignTabFooter
-          isDirty={isDirty}
-          dirtyCount={totalDirty}
-          onDiscard={handleDiscard}
-          onReview={() => setShowReview(true)}
-        />
-      </div>
+              {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
+                  with Browse starters · Import — the workspace's first-run state,
+                  on the landing page, until the first Save. The sentence is the
+                  design doc's own (§5.7, conformance copy.json). */}
+              {isFirstLoad && page === "colours" && (
+                <div
+                  data-testid="brand-tokens-first-load-banner"
+                  className="tw:mb-4 tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3"
+                >
+                  <span
+                    data-testid="brand-tokens-first-load-text"
+                    className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  >
+                    <strong>No brand set.</strong> Start from a theme or import your client's tokens. These
+                    are the site's default design tokens — customize them and click{" "}
+                    <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
+                  </span>
+                  <span className="tw:flex tw:gap-2">
+                    <Button size="xs" variant="secondary" onClick={() => setPage("starters")} data-testid="brand-empty-starters">
+                      Browse starters
+                    </Button>
+                    <Button size="xs" variant="secondary" onClick={() => setPage("export")} data-testid="brand-empty-import">
+                      Import
+                    </Button>
+                  </span>
+                </div>
+              )}
 
-      {/* ── Preview ─────────────────────────────────────────────────────── */}
-      {/* Every workspace board carries a "Live preview" pane at the right. The
-          page-at-50 % preview is not built in C1 (i); the drawer's brand band
-          (swatches + type sample, live off the staged registries) stands in. */}
-      <aside
-        className="tw:flex tw:w-80 tw:shrink-0 tw:flex-col tw:border-l tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]"
-        data-testid="brand-live-preview"
-      >
-        <div className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:border-b tw:border-[var(--bk-border)] tw:px-4 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink-muted)]">
-          Live preview
+              {renderPage()}
+            </div>
+          )}
+
+          <DesignTabFooter
+            isDirty={isDirty}
+            dirtyCount={totalDirty}
+            onDiscard={handleDiscard}
+            onReview={() => setShowReview(true)}
+          />
         </div>
-        <BrandPreview colors={visibleColors} />
-      </aside>
+
+        {/* ── Preview column ────────────────────────────────────────────── */}
+        <aside
+          className="tw:flex tw:w-[468px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4"
+          data-testid="brand-preview-column"
+        >
+          {composer?.exportHTML ? (
+            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} />
+          ) : (
+            /* No document to render (no composer, or one without an export —
+               the load-error and test harnesses): the palette and type slots
+               stand in for the page. */
+            <section
+              className="tw:flex tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]"
+              data-testid="brand-live-preview"
+            >
+              <div className="tw:flex tw:h-10 tw:items-center tw:px-4 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+                Live preview
+              </div>
+              <BrandPreview colors={visibleColors} />
+            </section>
+          )}
+          {isTokenPage && selectedToken && (
+            <TokenDetailView
+              key={selectedToken.id}
+              token={selectedToken}
+              composer={composer}
+              allTokens={allTokens}
+              mode={resolvedMode}
+              onValueChange={changeToken}
+              onDelete={deleteToken}
+              onRename={renameToken}
+              onDeleted={() => setSelectedTokenId(null)}
+            />
+          )}
+        </aside>
+      </div>
 
       <BrandDiscardDialog
         open={guardOpen}
