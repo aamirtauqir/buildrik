@@ -16,6 +16,7 @@ function makeComposer(updateCollection: ReturnType<typeof vi.fn>) {
     emit: vi.fn(),
     cms: {
       collections: {
+        getAllCollections: vi.fn(() => []),
         createCollection: vi.fn().mockResolvedValue({ id: "col-1" }),
         addField: vi.fn().mockResolvedValue(undefined),
         updateCollection,

@@ -5,10 +5,8 @@
  * other field on a record was invisible until you opened it. The board draws a
  * table whose columns are the collection's own leading fields plus Updated.
  *
- * The load-bearing test here is the negative one: the board also draws an
- * `Import JSON` button, and the engine has no bulk or JSON import path —
- * `createContentItem` takes one record at a time. A button with nothing to call
- * must not ship, and a test is what keeps it from drifting back in.
+ * `Import JSON` sits beside Add record, as the board draws it (B13); its
+ * behaviour lives in CMSRecordsModal.importJson.test.tsx.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
@@ -110,10 +108,11 @@ describe("CMSRecordsModal — records table", () => {
     expect(screen.getByRole("button", { name: /delete record/i })).toBeTruthy();
   });
 
-  it("offers no Import JSON, because no bulk import path exists", async () => {
+  it("offers Import JSON beside Add record, as the board draws it", async () => {
     open();
     await screen.findByText("Menu items — 1 record");
-    expect(screen.queryByRole("button", { name: /import/i })).toBeNull();
+    const foot = screen.getByTestId("cms-records-foot");
+    expect(within(foot).getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Import JSON", "Add record"]);
   });
 
   it("explains an empty collection inside the table rather than dropping it", async () => {
