@@ -1,7 +1,8 @@
 /**
  * BuildTab — Add tab shell.
  *
- * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
+ * Layout: PanelHeader / panel-scroll. Search is the topbar field, which this
+ * panel claims while it is open (board 4418:100087 "Search elements…").
  * The first-use tip (7054:78348) opens beside the panel; there is no tips
  * strip (G2-113).
  *
@@ -13,10 +14,9 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { SearchBar } from "../../shared/SearchBar";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
@@ -127,21 +127,42 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     });
   };
 
-  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F (board 137:10 —
-  // hijacks browser find while the Insert panel is mounted, same as Figma).
+  /* The topbar field searches this panel while it is open (4418:100087). */
+  /* Held in a ref: setSearchQuery changes identity with every query, and
+     re-running this effect would release and re-claim the field mid-typing. */
+  const setSearchQueryRef = React.useRef(tab.setSearchQuery);
+  setSearchQueryRef.current = tab.setSearchQuery;
+  React.useEffect(() => {
+    if (!composer) return;
+    const onQuery = ({ query }: { query: string }) => setSearchQueryRef.current(query);
+    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
+    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search elements…" });
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
+      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
+    };
+  }, [composer]);
+
+  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F. G2-105: ⌘F is
+  // taken only while focus is in this panel or its search field — anywhere
+  // else it stays the browser's find.
+  const panelRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const isCmdF = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f";
       if (e.key !== "/" && !isCmdF) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      if (!isCmdF) {
+      if (isCmdF) {
+        const inPanel = panelRef.current?.contains(target) || target.id === TOPBAR_CONTEXT_SEARCH_ID;
+        if (!inPanel) return;
+      } else {
         const tag = target.tagName;
         const inTypingContext =
           tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
         if (inTypingContext) return;
       }
-      const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
+      const input = document.getElementById(TOPBAR_CONTEXT_SEARCH_ID) as HTMLInputElement | null;
       if (!input) return;
       e.preventDefault();
       input.focus();
@@ -196,49 +217,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         }
       />
 
-      <div className="bld-content">
-        <div
-          className="bld-search-wrap"
-          data-testid="insert-search-wrap"
-          onKeyDown={(e) => {
-            if (e.key === "Escape" && tab.searchQuery.length > 0) {
-              e.stopPropagation();
-              tab.setSearchQuery("");
-            }
-          }}
-        >
-          <SearchBar
-            id="bld-search-input"
-            value={tab.searchQuery}
-            onChange={tab.setSearchQuery}
-            placeholder="Search elements"
-            debounceMs={150}
-            kbdHint="⌘F"
-            testId="insert-search-box"
-          />
-        </div>
-
-        {/* What this panel is for. Insert opened straight onto a wall of 53
-            element tiles with nothing saying what a click does.
-
-            Every clause here is scoped to what the code actually does:
-            - "Click a row" covers all four groups — clicking inserts everywhere.
-            - "Drag elements" is deliberately narrow. Only the ELEMENTS group
-              passes `draggable` (GroupSection.tsx:189); blocks, components and
-              mine rows do not, so a blanket "drag onto the canvas" would have
-              been false for most of the panel — the same defect IA-13 fixed.
-            - "inside or next to … where it fits" is the smart-placement walk in
-              useBlockInsertion.ts:67-80, which climbs to the nearest ancestor
-              that accepts the block; "where it fits" carries the case where
-              none does and it lands at the page root. */}
-        {!isSearching && (
-          <p data-testid="insert-purpose" className="tw:m-0 tw:w-full tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-            {tab.insertionContext
-              ? `Click a row to add it inside or next to ${tab.insertionContext.label} where it fits. Drag elements onto the canvas instead.`
-              : "Click a row to add it at the end of the page. Drag elements onto the canvas instead."}
-          </p>
-        )}
-
+      <div className="bld-content" ref={panelRef}>
         {isSearching ? (
           <div className="bld-scroll">
             <SearchResults

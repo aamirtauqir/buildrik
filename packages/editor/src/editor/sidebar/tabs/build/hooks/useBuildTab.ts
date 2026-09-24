@@ -96,8 +96,6 @@ export interface UseBuildTabReturn {
   /** Board 4428:140817's `grip/⠿ drag to place` — a block card is a drag source too. */
   handleBlockDragStart: BlockDragStartFn;
   handleElClick: ElClickFn;
-  /** Describes where the next clicked element will be inserted */
-  insertionContext: { type: string; label: string } | null;
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
@@ -220,42 +218,6 @@ export function useBuildTab(
     [searchQuery]
   );
 
-  /* Selection ticker. insertionContext read composer.selection but listed only
-     [composer] as its dependency, so it was computed once and never again — it
-     would have named whatever was selected when the panel mounted. It had no
-     reader at all until the purpose line below started showing it, so the
-     staleness never surfaced. Same five events useLayerSelection listens to. */
-  const [selectionTick, setSelectionTick] = React.useState(0);
-  React.useEffect(() => {
-    if (!composer) return;
-    const bump = () => setSelectionTick((n) => n + 1);
-    const events = [
-      EVENTS.ELEMENT_SELECTED,
-      EVENTS.SELECTION_MULTIPLE,
-      EVENTS.SELECTION_CLEARED,
-      EVENTS.SELECTION_ADDED,
-      EVENTS.SELECTION_REMOVED,
-    ];
-    events.forEach((e) => composer.on(e, bump));
-    /* Block body, not a concise arrow: composer.off is chainable and returns the
-       Composer, which React would take for a destructor. */
-    return () => {
-      events.forEach((e) => composer.off(e, bump));
-    };
-  }, [composer]);
-
-  const insertionContext = React.useMemo((): { type: string; label: string } | null => {
-    if (!composer) return null;
-    const selectedIds = composer.selection.getSelectedIds();
-    if (selectedIds.length !== 1) return null;
-    const el = composer.elements.getElement(selectedIds[0]);
-    if (!el) return null;
-    const type = el.getType();
-    // Capitalize first letter for display
-    const label = type.charAt(0).toUpperCase() + type.slice(1);
-    return { type, label };
-  }, [composer, selectionTick]);
-
   return {
     favs,
     openCats,
@@ -275,6 +237,5 @@ export function useBuildTab(
     handleDragStart,
     handleBlockDragStart,
     handleElClick,
-    insertionContext,
   };
 }
