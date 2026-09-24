@@ -19,6 +19,7 @@ export function makeEngine(opts?: {
   let collections = opts?.collections ?? [];
   let items = opts?.items ?? [];
   const listeners = new Map<string, Set<Handler>>();
+  let settings: Record<string, unknown> = {};
   const sources = new Map<string, { id: string; name: string; type: string; data?: unknown }>();
   const elements: Array<{
     getId: () => string;
@@ -38,6 +39,10 @@ export function makeEngine(opts?: {
     off: (ev: string, fn: Handler) => listeners.get(ev)?.delete(fn),
     emit: (ev: string, p?: unknown) => listeners.get(ev)?.forEach((fn) => fn(p)),
     getProjectMetadata: () => ({ name: "test-proj" }),
+    getProjectSettings: () => settings,
+    setProjectSettings: vi.fn((next: Record<string, unknown>) => {
+      settings = next;
+    }),
     elements: {
       getAllElements: () => elements,
       getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,

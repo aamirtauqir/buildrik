@@ -96,7 +96,7 @@ describe("BuildTab — element row description on hover (G2-108)", () => {
     const tip = screen.getByTestId("insert-el-tip");
     expect(tip.getAttribute("role")).toBe("tooltip");
     expect(tip.textContent).toBe("Generic wrapper box for grouping elements");
-    expect(tip.className).toContain("tw:bg-gray-900");
+    expect(tip.className).toContain("tw:bg-[var(--bk-gray-900)]");
     fireEvent.mouseLeave(row);
     expect(screen.queryByTestId("insert-el-tip")).toBeNull();
   });
@@ -120,6 +120,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
       composer: {
         on: vi.fn(), off: vi.fn(), emit,
         components: { getAllComponents: () => saved },
+        elements: { getActivePage: () => ({ id: "page-home" }) },
       } as unknown as NonNullable<BuildTabProps["composer"]>,
     };
   };
@@ -202,6 +203,17 @@ describe("BuildTab — ✦ Generate a block with AI… (G2-117)", () => {
     requestGenerateBlock(c);
     renderTab({ composer: c });
     expect(screen.getByTestId("generate-block")).toBeTruthy();
+  });
+});
+
+/* G3-079 — board 4428:151488: "Collection list" is an ELEMENTS row that
+   inserts L2's collection-list block. */
+describe("BuildTab — Collection list row (G3-079)", () => {
+  it("inserts the collection-list block", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-el-Collection list"));
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "collection-list", label: "Collection list" });
   });
 });
 

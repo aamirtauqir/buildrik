@@ -227,6 +227,7 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "container",
       "flex",
       "grid",
+      "collection-list",
       "input",
       "textarea",
       "select",
@@ -294,6 +295,7 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "container",
       "flex",
       "grid",
+      "collection-list",
       "columns",
       "card",
     ],
@@ -481,6 +483,13 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     allowedChildren: ["product-card", "container"],
     description: "Responsive grid for displaying product cards from CMS collection",
   },
+  /* G3-079: repeats its children once per CMS record (a `repeat: "children"`
+     collection binding); the children are the item template. */
+  "collection-list": {
+    categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.FLOW],
+    allowChildren: true,
+    description: "Repeats its children once per record of a CMS collection",
+  },
   "product-detail": {
     categories: [ElementCategory.CONTAINER, ElementCategory.BLOCK, ElementCategory.SECTION],
     allowChildren: true,
@@ -536,6 +545,7 @@ export const STRICT_HTML5_RULES: Record<string, { forbidden: string[]; allowed?:
       "container",
       "flex",
       "grid",
+      "collection-list",
       "columns",
     ],
   },
@@ -553,6 +563,7 @@ export const STRICT_HTML5_RULES: Record<string, { forbidden: string[]; allowed?:
       "container",
       "flex",
       "grid",
+      "collection-list",
       "columns",
     ],
   },

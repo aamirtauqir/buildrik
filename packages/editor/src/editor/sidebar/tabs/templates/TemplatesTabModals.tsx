@@ -1,8 +1,8 @@
 /**
- * TemplatesTabModals — Replace confirm, Pro intercept, and the three
- * create-page outcome dialogs.
+ * TemplatesTabModals — Replace confirm, Pro intercept, the three
+ * create-page outcome dialogs, and Backup failed (G2-100).
  *
- * All five compose `chrome-ui/Modal`, which brings the focus trap, Escape and
+ * All six compose `chrome-ui/Modal`, which brings the focus trap, Escape and
  * scrim dismissal these hand-rolled overlays never had. Each is mounted
  * conditionally by TemplatesTab, so `open` is always true — the prop exists
  * because Modal owns the mount/unmount transition, not the caller.
@@ -244,6 +244,47 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
   >
     <p className="tw:m-0">
       {reason ?? "The template failed to load."} Your pages are unchanged.
+    </p>
+  </Modal>
+);
+
+// ============================================================================
+// Backup Failed Modal — G2-100, board 4428:151964
+// ============================================================================
+
+export interface BackupFailedModalProps {
+  pageName: string;
+  onCancel: () => void;
+  onReplaceWithout: () => void;
+  onRetry: () => void;
+}
+
+export const BackupFailedModal: React.FC<BackupFailedModalProps> = ({
+  pageName,
+  onCancel,
+  onReplaceWithout,
+  onRetry,
+}) => (
+  <Modal
+    open
+    onClose={onCancel}
+    title={`${pageName} backup could not be saved`}
+    width="sm"
+    testId="tpl-backup-failed"
+    footer={
+      <>
+        <Button color="light" className="tw:mr-auto tw:!px-0 tw:border-0 tw:bg-transparent tw:hover:bg-transparent tw:hover:underline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button color="red" onClick={onReplaceWithout}>
+          Replace without a backup
+        </Button>
+        <Button onClick={onRetry}>Try the backup again</Button>
+      </>
+    }
+  >
+    <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-18)] tw:text-[var(--bk-ink-soft)]">
+      {pageName} has not been replaced. Retry creating the backup, or go back and pick another layout.
     </p>
   </Modal>
 );

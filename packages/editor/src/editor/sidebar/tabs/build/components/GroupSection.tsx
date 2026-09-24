@@ -28,6 +28,10 @@ interface GroupSectionProps {
   components?: BlockDefinition[];
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
+  /** FROM LIBRARY (board 4418:99857): the workspace's shared masters, listed
+   *  under SAVED COMPONENTS before "Manage components ›". */
+  library?: ReadonlyArray<{ componentId: string; name: string }>;
+  onLibraryInsert?: (componentId: string) => void;
   onDragStart: DragStartFn;
   /** Board 4428:140817's grip — a block card drags onto the canvas too. */
   onBlockDragStart?: BlockDragStartFn;
@@ -286,7 +290,7 @@ const ElementRows: React.FC<{
           role="tooltip"
           data-testid={`insert-${group === "elements" ? "el" : group === "favourites" ? "fav" : "recent"}-tip`}
           style={{ top: tip.top }}
-          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-gray-900 tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
+          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-[var(--bk-gray-900)] tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
         >
           {tip.text}
         </div>
@@ -303,7 +307,7 @@ const elRowTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `in
 const elFavTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-fav-${n}` : g === "recent" ? `insert-recent-fav-${n}` : `insert-el-fav-${n}`);
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
+  group, isOpen, onToggle, elements, blocks, components, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -355,13 +359,31 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
             onClick={() => onMineInsert?.(c)}
           />
         ))}
-        {mine.length === 0 && (
+        {mine.length === 0 && !library?.length && (
           <p
             data-testid="insert-mine-empty"
             className="tw:m-0 tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:py-[var(--bk-space-4)] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
           >
             No saved components yet. Select an element and choose Save as component.
           </p>
+        )}
+        {library && library.length > 0 && (
+          <>
+            <div
+              data-testid="insert-library-label"
+              className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:text-[11px] tw:leading-[16px] tw:font-semibold tw:tracking-[.5px] tw:text-[var(--bk-ink-muted)]"
+            >
+              FROM LIBRARY
+            </div>
+            {library.map((c) => (
+              <Row
+                key={c.componentId}
+                label={c.name}
+                testId={`insert-library-${c.componentId}`}
+                onClick={() => onLibraryInsert?.(c.componentId)}
+              />
+            ))}
+          </>
         )}
         {onManageComponents && (
           <div

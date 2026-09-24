@@ -24,7 +24,7 @@ describe("defineSection — style slicing via pickKeys", () => {
       return null;
     };
     const entry = defineSection({
-      tab: "style",
+      tab: "style", title: "Test",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: ["width", "height"],
@@ -42,7 +42,7 @@ describe("defineSection — style slicing via pickKeys", () => {
       return null;
     };
     const entry = defineSection({
-      tab: "style",
+      tab: "style", title: "Test",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: ["width", "margin-top"],
@@ -59,7 +59,7 @@ describe("defineSection — style slicing via pickKeys", () => {
     };
     const full = { width: "10px", color: "red" };
     const entry = defineSection({
-      tab: "style",
+      tab: "style", title: "Test",
       Component: Probe,
       adaptProps: (ctx) => ({ styles: ctx.styles }),
       styleKeys: [],
@@ -72,7 +72,7 @@ describe("defineSection — style slicing via pickKeys", () => {
     const Probe = () => null;
     const shouldRender = () => true;
     const entry = defineSection({
-      tab: "style",
+      tab: "style", title: "Test",
       Component: Probe,
       adaptProps: () => ({}),
       styleKeys: ["opacity"],

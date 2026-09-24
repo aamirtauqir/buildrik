@@ -1,12 +1,10 @@
 /**
  * The Submissions inbox and the editor's Forms screen agree.
  *
- * The empty state said "Submissions from your published site will appear here",
- * while the editor's Settings → Forms screen says the opposite in its own copy:
- * a Form block exports with no action and no submit script, so a published page
- * posts nowhere and `/api/public/forms/[siteId]/[formBlockId]` is never called.
- * Two screens in one product, opposite claims — the dashboard one was the
- * hopeful half.
+ * Both once said capture wasn't wired: a Form block exported with no action,
+ * so a published page posted nowhere. Since a10f19233 the publish worker points
+ * every action-less form at `/api/public/forms/[siteId]/[formBlockId]`, so both
+ * screens now say submissions arrive here — the same sentence, in both places.
  *
  * @license BSD-3-Clause
  */
@@ -28,13 +26,10 @@ describe("submissions empty state", () => {
     expect(rendered).not.toMatch(/: "Submissions from your published site will appear here"/);
   });
 
-  it("says capture isn't wired yet — in BOTH empty states", () => {
-    // The table's empty state (forms exist, no rows) …
-    expect(panel).toMatch(/wired up yet\. Rows here come from/);
-    // … and the no-forms-at-all state, which used to send people to the editor
-    // to "start collecting submissions".
-    expect(panel).toMatch(/renders on a published page, but capturing/);
-    expect(panel).not.toMatch(/> *Add a form block in the editor to start collecting submissions\./);
+  it("says published Form blocks feed this inbox — in BOTH empty states", () => {
+    // The no-forms-at-all state and the table's empty state (forms exist, no rows).
+    expect(panel.match(/Publish a page with a Form block and its submissions arrive here\./g)).toHaveLength(2);
+    expect(panel).not.toMatch(/wired up yet/);
   });
 
   it("the page header does not claim published pages feed it", () => {
@@ -47,6 +42,6 @@ describe("submissions empty state", () => {
   });
 
   it("still matches what the editor's Forms screen tells the same user", () => {
-    expect(formsScreen).toMatch(/not captured yet/i);
+    expect(formsScreen).toMatch(/Publish a page with a Form block and its submissions arrive here\./);
   });
 });

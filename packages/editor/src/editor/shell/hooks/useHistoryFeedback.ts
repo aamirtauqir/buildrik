@@ -94,6 +94,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "link-change": "Changed link",
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",
+  "bind-collection-list": "Bound the collection list",
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",

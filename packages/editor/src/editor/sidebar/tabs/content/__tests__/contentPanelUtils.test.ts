@@ -6,8 +6,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import {
-  loadSiteVariables,
-  saveSiteVariables,
+  loadLegacySiteVariables,
   variablesToSourceData,
   isValidVariableKey,
   conditionSummary,
@@ -18,18 +17,18 @@ import type { ConditionBinding } from "@/shared/types/data";
 
 beforeEach(() => localStorage.clear());
 
-describe("site variables persistence", () => {
-  it("round-trips per project id", () => {
-    saveSiteVariables("proj-a", [{ key: "name", value: "Bella Cucina" }]);
-    expect(loadSiteVariables("proj-a")).toEqual([{ key: "name", value: "Bella Cucina" }]);
-    expect(loadSiteVariables("proj-b")).toEqual([]);
+describe("legacy site variables (localStorage, read once to migrate into the project)", () => {
+  it("reads per project id", () => {
+    localStorage.setItem("buildrick-site-variables-proj-a", JSON.stringify([{ key: "name", value: "Bella Cucina" }]));
+    expect(loadLegacySiteVariables("proj-a")).toEqual([{ key: "name", value: "Bella Cucina" }]);
+    expect(loadLegacySiteVariables("proj-b")).toEqual([]);
   });
 
   it("survives corrupt storage (returns [])", () => {
     localStorage.setItem("buildrick-site-variables-x", "{not json");
-    expect(loadSiteVariables("x")).toEqual([]);
+    expect(loadLegacySiteVariables("x")).toEqual([]);
     localStorage.setItem("buildrick-site-variables-x", JSON.stringify({ nope: 1 }));
-    expect(loadSiteVariables("x")).toEqual([]);
+    expect(loadLegacySiteVariables("x")).toEqual([]);
   });
 
   it("filters malformed entries", () => {
@@ -37,7 +36,7 @@ describe("site variables persistence", () => {
       "buildrick-site-variables-x",
       JSON.stringify([{ key: "ok", value: "1" }, { key: 2 }, null]),
     );
-    expect(loadSiteVariables("x")).toEqual([{ key: "ok", value: "1" }]);
+    expect(loadLegacySiteVariables("x")).toEqual([{ key: "ok", value: "1" }]);
   });
 
   it("variablesToSourceData maps to a flat object", () => {

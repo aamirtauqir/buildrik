@@ -2,9 +2,9 @@
  * Threading regression for the Create Collection prop path.
  *
  * Guards: ProInspector forwards its `onOpenCreateCollection` prop into the
- * tab content, which hands it to Settings › CONTENT's BindingPopover (the
- * binding door moved there from the header — G2-144). The BindingPopover unit test covers the downstream hop
- * (its own click handler invokes the prop). This test covers the hop
+ * tab content, which hands it to Settings › CONTENT (the binding door moved
+ * there from the header — G2-144). ContentSection's own test covers the
+ * downstream hop (its Create collection button invokes the prop). This test covers the hop
  * above — a rename on either side, or accidentally dropping the prop
  * spread, would make the spy observed here fire with the wrong shape or
  * not at all.
@@ -17,18 +17,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 
-// Mock BindingPopover as a probe that records every prop it received on
-// mount. Hoisted above the import so vitest's module registry intercepts.
-const bindingPopoverProps: Array<Record<string, unknown>> = [];
-vi.mock("../BindingPopover", () => ({
-  BindingPopover: (props: Record<string, unknown>) => {
-    bindingPopoverProps.push(props);
-    return null;
-  },
-}));
-
 // Keep the rest of ProInspector's heavy subtree out of the render — we
-// only care about whether the prop reaches BindingPopover. Most of these
+// only care about whether the prop reaches the tab content. Most of these
 // deps come from hooks/composer, which would require a real composer to
 // boot. Stub the components/hooks ProInspector imports that don't touch
 // the threading under test.
@@ -119,7 +109,7 @@ describe("ProInspector threads onOpenCreateCollection to the Settings tab conten
     expect(received, "InspectorTabContent must mount").toBeTruthy();
     expect(received.onOpenCreateCollection).toBe(spy);
 
-    // Simulate BindingPopover's footer click firing the received callback —
+    // Simulate CONTENT's Create collection click firing the received callback —
     // the same contract the real component uses. If the prop was dropped
     // or renamed upstream, `received.onOpenCreateCollection` would be
     // undefined and this call would throw.
@@ -137,7 +127,5 @@ describe("ProInspector threads onOpenCreateCollection to the Settings tab conten
       />
     );
     expect(tabContentProps[0]?.onOpenCreateCollection).toBeUndefined();
-    // The header no longer mounts the popover (board 4428:141170).
-    expect(bindingPopoverProps).toHaveLength(0);
   });
 });

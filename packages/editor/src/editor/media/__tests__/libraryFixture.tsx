@@ -237,6 +237,7 @@ export function makeComposer(
      another (3720:43316 → 3697:20341) and the rail follows. */
   replaceAcross?: (oldSrc: string, newSrc: string) => unknown,
 ) {
+  const replace = replaceAcross ?? (() => ({ replaced: [], failed: [], clean: true }));
   return {
     emit: media.emit ?? vi.fn(),
     elements,
@@ -247,7 +248,19 @@ export function makeComposer(
       // failed: { elementId, error }[]; clean }`. The result dialog maps both
       // lists to ids (`resultIds`); returning a number here would crash the
       // first test that exercises the picker click path.
-      replaceAcross: vi.fn(replaceAcross ?? (() => ({ replaced: [], failed: [], clean: true }))),
+      replaceAcross: vi.fn(replace),
+      /* Replace across site (G3-027) is scoped per page: the dialog lists
+         `getUsagesByPage` and runs `replaceAcrossSelective` on the ticked
+         pages. Placements group by the page whose root they hang off. */
+      getUsagesByPage: vi.fn((src: string) => {
+        const out = new Map<string, SiteElement[]>();
+        for (const page of elements.getAllPages()) {
+          const onPage = elements.findByMediaSrc(src).filter((el) => el.getParent()?.getId() === page.root.id);
+          if (onPage.length) out.set(page.id, onPage);
+        }
+        return out;
+      }),
+      replaceAcrossSelective: vi.fn((oldSrc: string, newSrc: string, _pageIds: readonly string[]) => replace(oldSrc, newSrc)),
     },
     media: {
       /* The engine's replace events (the manager re-reads placements on

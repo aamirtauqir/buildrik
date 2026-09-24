@@ -7,3 +7,4 @@ export { sectionBlockConfig } from "./Section";
 export { columns2BlockConfig, columns3BlockConfig } from "./Columns";
 export { gridBlockConfig } from "./Grid";
 export { flexBlockConfig } from "./Flex";
+export { collectionListBlockConfig } from "./CollectionList";

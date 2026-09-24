@@ -33,7 +33,7 @@ describe("UI_PANEL_OPEN allowlist", () => {
   it("covers every palette-reachable tab", () => {
     const paletteTabs = GROUPED_TABS_CONFIG.filter((t) => t.shortcut).map((t) => t.id);
     // The previously dropped four, named so a future trim is deliberate.
-    for (const id of ["publish", "review", "content", "ai"]) {
+    for (const id of ["publish", "review", "content"]) {
       expect(paletteTabs, `${id} should be palette-reachable`).toContain(id);
     }
   });

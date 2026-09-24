@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AgentPlan } from "../AgentPlan";
@@ -27,9 +27,9 @@ function renderPlan(over: Partial<React.ComponentProps<typeof AgentPlan>> = {}) 
       steps={[step("Rewrite the headline", "applied"), step("Warm the background tint", "running"), step("Swap the hero photo", "pending")]}
       currentIndex={1}
       error={null}
-      autoApply={false}
-      onAutoApplyChange={vi.fn()}
       onApprove={vi.fn()}
+      onEditStep={vi.fn()}
+      onRunPlan={vi.fn()}
       onSkip={vi.fn()}
       onStop={vi.fn()}
       {...over}
@@ -48,13 +48,15 @@ describe("agent run", () => {
 
   it("numbers every step and never leans on colour alone", () => {
     renderPlan({
+      phase: "done",
+      stoppedByUser: true,
       steps: [step("Rewrite the headline", "applied"), step("Warm the tint", "skipped")],
-      currentIndex: 1,
+      currentIndex: -1,
     });
-    expect(screen.getByText("1")).toBeInTheDocument();
-    expect(screen.getByText("2")).toBeInTheDocument();
-    // A status that is not simply "waiting" is written out as a word.
-    expect(screen.getByText("skipped")).toBeInTheDocument();
+    expect(screen.getByTestId("ai-run-index-1").textContent).toBe("1");
+    expect(screen.getByTestId("ai-run-index-2").textContent).toBe("2");
+    // A finished run writes each row's state out as a word (board 4418:105261).
+    expect(screen.getByTestId("ai-run-step-2").textContent).toContain("Skipped");
   });
 
   /* Board 170:97 — the run stops and says what it is about to do, with both
@@ -79,130 +81,134 @@ describe("agent run", () => {
      approved step applies in its own transaction, so a run of three is three
      undo entries. A finished run offers no Undo all — that button belongs to
      the two states where the run did not finish cleanly. */
-  it("tells the truth about undo at the end of a multi-step run", () => {
+  /* Board 4418:105401 — what changed, Undo all · Done, and the note. */
+  it("a finished run lists what changed, with Undo all and Done", () => {
+    const onUndoAll = vi.fn();
+    const onDismiss = vi.fn();
+    const withRows = (t: string, field: string, to: string): RunStep => ({
+      ...step(t, "applied"),
+      edit: { target: "x", summary: "", rows: [{ field, from: "", to }], applyOps: { preview: {}, commit: {} } },
+    });
     renderPlan({
       phase: "done",
       currentIndex: 2,
-      steps: [
-        step("Rewrite the headline", "applied"),
-        step("Warm the tint", "applied"),
-        step("Swap the hero photo", "skipped"),
-      ],
+      steps: [withRows("Rewrite the headline", "Headline", "Wood-fired"), withRows("Warm the tint", "Background", "warmer tint"), step("Swap the photo", "skipped")],
+      onUndoAll,
+      onDismiss,
     });
     expect(screen.getByText("Done · 2 of 3")).toBeInTheDocument();
-    expect(screen.getByText("2 changes applied, 1 skipped.")).toBeInTheDocument();
-    expect(screen.getByText(/Each step is its own undo step/)).toBeInTheDocument();
-    expect(screen.queryByText(/ONE undo step/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Undo all" })).toBeNull();
+    const card = screen.getByTestId("ai-run-applied");
+    expect(card.textContent).toContain("2 changes applied");
+    expect(card.textContent).toContain("Headline → Wood-fired");
+    expect(screen.getByText(/Each approved step was applied/)).toBeInTheDocument();
+    expect(screen.getByTestId("ai-run-step-1").textContent).not.toContain("Done");
+    fireEvent.click(screen.getByTestId("ai-run-undo-all"));
+    fireEvent.click(screen.getByTestId("ai-run-done"));
+    expect(onUndoAll).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  /* A clean finish offers no Undo all even when the handler is wired — the
-     note block that reads "Undo all takes back every step" is an annotation,
-     and the two states that DO offer it are stopped and failed. */
-  it("keeps Undo all out of a cleanly finished run", () => {
-    renderPlan({
-      phase: "done",
-      currentIndex: 2,
-      steps: [
-        step("Rewrite the headline", "applied"),
-        step("Warm the tint", "applied"),
-        step("Swap the hero photo", "skipped"),
-      ],
-      onUndoAll: vi.fn(),
-    });
-    expect(screen.queryByRole("button", { name: "Undo all" })).toBeNull();
-  });
-
-  it("a single applied step says the simple thing instead", () => {
-    renderPlan({
-      phase: "done",
-      currentIndex: 0,
-      steps: [step("Rewrite the headline", "applied")],
-    });
-    expect(screen.getByText("1 change applied.")).toBeInTheDocument();
-    expect(screen.getByText("⌘Z takes it back.")).toBeInTheDocument();
-  });
-
-  /* Board 171:2 — a failed step says which one, what survived, and offers the
-     two ways on. The old panel printed the error and nothing else. */
-  it("names the failed step, what was kept, and offers Undo all + Retry", () => {
-    const onRetry = vi.fn();
+  /* Board 4418:105118 — which step failed, what is applied, and the three
+     ways on: Undo all · Keep N changes · Edit prompt. */
+  it("a failed step: Step N failed, Step 1 is applied, Undo all · Keep 1 change · Edit prompt", () => {
     const onUndoAll = vi.fn();
+    const onDismiss = vi.fn();
+    const onEditPrompt = vi.fn();
     renderPlan({
-      phase: "running",
-      currentIndex: 1,
-      error: "the token is locked",
-      steps: [
-        step("Rewrite the headline", "applied"),
-        step("Warm the background tint", "failed"),
-        step("Swap the hero photo", "pending"),
-      ],
-      onRetry,
+      phase: "done",
+      currentIndex: -1,
+      error: "the token is locked.",
+      steps: [step("Rewrite the headline", "applied"), step("Warm the background tint", "failed"), step("Increase the hero height", "pending")],
       onUndoAll,
+      onDismiss,
+      onEditPrompt,
     });
-
     expect(screen.getByText("Stopped at step 2")).toBeInTheDocument();
-    expect(screen.getByText("Step 2 failed — the token is locked")).toBeInTheDocument();
-    expect(screen.getByText(/1 step kept\. Nothing after step 2 ran\./)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Undo all" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(screen.getByText("Step 2 failed — the token is locked.")).toBeInTheDocument();
+    expect(screen.getByText("Step 1 is applied. Edit your request before starting another run.")).toBeInTheDocument();
+    expect(screen.getByTestId("ai-run-step-2").textContent).toContain("Failed");
+    expect(screen.getByTestId("ai-run-step-3").textContent).toContain("Pending");
+    expect(screen.getByTestId("ai-run-keep").textContent).toBe("Keep 1 change");
+    fireEvent.click(screen.getByTestId("ai-run-edit-prompt"));
+    expect(onEditPrompt).toHaveBeenCalled();
   });
 
-  it("cannot offer to undo a run that applied nothing", () => {
+  it("a failed run that applied nothing offers no Undo all and no Keep", () => {
     renderPlan({
-      phase: "running",
-      currentIndex: 0,
-      error: "the token is locked",
+      phase: "done",
+      currentIndex: -1,
+      error: "the token is locked.",
       steps: [step("Rewrite the headline", "failed"), step("Warm the tint", "pending")],
-      onRetry: vi.fn(),
       onUndoAll: vi.fn(),
+      onDismiss: vi.fn(),
+      onEditPrompt: vi.fn(),
     });
-    expect(screen.getByText(/Nothing was applied\. Nothing after step 1 ran\./)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Undo all" })).toBeDisabled();
+    expect(screen.getByText(/Nothing was applied\./)).toBeInTheDocument();
+    expect(screen.queryByTestId("ai-run-undo-all")).toBeNull();
+    expect(screen.queryByTestId("ai-run-keep")).toBeNull();
   });
 
-  /* Board 171:36 — stopping is not finishing, and stop() sets the same phase
-     as a completed run, so the panel needs telling. */
-  it("a run the user stopped says so, and offers to take back what applied", () => {
-    const onUndoAll = vi.fn();
+  /* Board 4418:105261 — stopped by you: what ran is kept, what did not run
+     is named, and Undo all · Keep N changes are links. */
+  it("a run the user stopped names what applied and what did not run", () => {
     renderPlan({
       phase: "done",
       currentIndex: -1,
       stoppedByUser: true,
-      steps: [
-        step("Rewrite the headline", "applied"),
-        step("Warm the tint", "pending"),
-        step("Swap the hero photo", "pending"),
-      ],
-      onUndoAll,
+      steps: [step("Rewrite the headline", "applied"), step("Warm the tint", "skipped"), step("Swap the photo", "skipped")],
+      onUndoAll: vi.fn(),
+      onDismiss: vi.fn(),
     });
-
     expect(screen.getByText("Stopped by you")).toBeInTheDocument();
     expect(screen.getByText("Stopped after step 1.")).toBeInTheDocument();
-    expect(screen.getByText(/Undo all takes back the 1 step that applied/)).toBeInTheDocument();
-    // Not the finished-run wording.
-    expect(screen.queryByText(/changes applied/)).not.toBeInTheDocument();
+    expect(screen.getByTestId("ai-run-stopped").textContent).toContain(
+      "Step 1 is applied. Steps 2 and 3 did not run. Undo all restores the page as it was before this run.",
+    );
+    expect(screen.getByTestId("ai-run-keep").textContent).toBe("Keep 1 change");
   });
 });
+
+/* G2-132 — board 4418:104698: the plan waits for review. */
+describe("agent run — plan review (board 4418:104698)", () => {
+  it("lists the plan under PLANNING with Edit plan · Run N steps; editing rewrites a step", () => {
+    const onEditStep = vi.fn();
+    const onRunPlan = vi.fn();
+    renderPlan({
+      phase: "review",
+      currentIndex: -1,
+      steps: [step("Rewrite the headline", "pending", "Rewrite the headline"), step("Warm the tint", "pending", "Warm the tint")],
+      onEditStep,
+      onRunPlan,
+    });
+    expect(screen.getByTestId("ai-run-band").textContent).toBe("Planning");
+    expect(screen.queryByTestId("ai-run-glyph-1")).toBeNull();
+    expect(screen.getByTestId("ai-plan-run").textContent).toBe("Run 2 steps");
+    fireEvent.click(screen.getByTestId("ai-plan-edit"));
+    fireEvent.change(screen.getByTestId("ai-plan-edit-2"), { target: { value: "Warm it a lot" } });
+    expect(onEditStep).toHaveBeenCalledWith(1, "Warm it a lot");
+    fireEvent.click(screen.getByTestId("ai-plan-run"));
+    expect(onRunPlan).toHaveBeenCalled();
+  });
+});
+
 /* Decision #23: the chat bubble that carried "Thinking…" (board 170:29) is
    gone; the plan call is where every prompt now waits. */
 describe("agent run — Thinking (board 4418:104577)", () => {
   const props = {
     currentIndex: 0,
     error: null,
-    autoApply: false,
-    onAutoApplyChange: vi.fn(),
     onApprove: vi.fn(),
+    onEditStep: vi.fn(),
+    onRunPlan: vi.fn(),
     onSkip: vi.fn(),
     onStop: vi.fn(),
   };
 
-  it("while planning: the Thinking… band and a Stop button — no run band, no steps, no auto-apply", () => {
+  it("while planning: the Thinking… band and a Stop button — no run band, no steps", () => {
     renderPlan({ phase: "planning", steps: [] });
     expect(screen.getByTestId("ai-thinking")).toHaveTextContent("Thinking…");
     expect(screen.getByRole("button", { name: "Stop run" })).toBeInTheDocument();
     expect(screen.queryByTestId("ai-run-band")).toBeNull();
-    expect(screen.queryByText(/Auto-apply/)).toBeNull();
   });
 
   it("a one-step (element) run still waiting on its answer is thinking, not a RUNNING list", () => {

@@ -71,7 +71,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, usages: Record
   const { LibraryManager } = await import("../LibraryManager");
   const onClose = vi.fn();
   const utils = render(
-    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} />,
   );
   return { ...utils, onClose };
 }
@@ -80,7 +80,7 @@ async function rerenderWith(utils: { rerender: (ui: React.ReactElement) => void 
   mocks.state.mediaState = { ...mocks.state.mediaState, ...over };
   const { LibraryManager } = await import("../LibraryManager");
   utils.rerender(
-    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />,
   );
 }
 
@@ -116,6 +116,16 @@ describe("Clone 3721:43552 · Assets · Unused · browse — the card menu", () 
     expect(screen.getByTestId("mgr-scope-note")).toHaveTextContent("8 unused assets · No current site references.");
     fireEvent.click(screen.getByTestId("mgr-row-in-use"));
     expect(screen.queryByTestId("mgr-scope-note")).toBeNull();
+  });
+});
+
+/* G3-057: the card menu's "Replace across pages…" had no caller wiring it;
+   it opens the same replace picker the rail's ⋯ does, on that file. */
+describe("card menu · Replace across pages…", () => {
+  it("opens the replace picker for that file", async () => {
+    await mountLibrary(menuOpenOn());
+    fireEvent.click(within(screen.getByTestId("media-ctx-menu")).getByRole("menuitem", { name: "Replace across pages…" }));
+    expect(await screen.findByText(/Replace "team-photo.jpg" across/)).toBeInTheDocument();
   });
 });
 

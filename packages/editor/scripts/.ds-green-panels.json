@@ -5,7 +5,6 @@
   "files": [
     "packages/editor/src/editor/canvas/Canvas.tsx",
     "packages/editor/src/editor/canvas/CanvasEmptyCTA.tsx",
-    "packages/editor/src/editor/canvas/controls/DeviceSelector.tsx",
     "packages/editor/src/editor/canvas/controls/UnifiedSelectionToolbar.tsx",
     "packages/editor/src/editor/canvas/hooks/drag/dropOperations.tsx",
     "packages/editor/src/editor/canvas/menus/ElementContextMenu.tsx",
@@ -72,12 +71,10 @@
     "packages/editor/src/editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/icons.tsx",
     "packages/editor/src/editor/sidebar/tabs/layers/LayersTab.tsx",
-    "packages/editor/src/editor/sidebar/tabs/layers/components/LayerContextMenu.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/AssetDetailOverlay.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/ConfirmDeleteModal.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/MediaContextMenu.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/ReplaceAcrossDialog.tsx",
-    "packages/editor/src/editor/sidebar/tabs/media/components/TypePills.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/components/UploadZone.tsx",
     "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/pages/components/AddPageButton.tsx",
@@ -112,7 +109,7 @@
   ],
   "lastDriftAudit": "2026-05-18",
   "driftedRemoved": {
-    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23). +1 stale 2026-09-25: inspector/renderer/featureFlags.ts deleted with the unused schema/renderer pipeline (L2 ef385a55a, G2-154).",
+    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23). +1 stale 2026-09-25: inspector/renderer/featureFlags.ts deleted with the unused schema/renderer pipeline (L2 ef385a55a, G2-154). +2 stale 2026-09-25: sidebar layers LayerContextMenu (afc3efc3f, G3-006 dead branch) and media TypePills (0626b078c, Filter \u25be replaces the pills).",
     "stale": [
       "packages/editor/src/shared/ui/SemanticBadge.tsx",
       "packages/editor/src/shared/ui/HelpTooltip.tsx",
@@ -136,7 +133,9 @@
       "packages/editor/src/editor/sidebar/tabs/templates/TemplatePreviewModal.tsx",
       "packages/editor/src/editor/sidebar/tabs/templates/components/TemplateDetail.tsx",
       "packages/editor/src/editor/sidebar/tabs/templates/components/TemplatePagination.tsx",
-      "packages/editor/src/editor/inspector/renderer/featureFlags.ts"
+      "packages/editor/src/editor/inspector/renderer/featureFlags.ts",
+      "packages/editor/src/editor/sidebar/tabs/layers/components/LayerContextMenu.tsx",
+      "packages/editor/src/editor/sidebar/tabs/media/components/TypePills.tsx"
     ],
     "drifted": [
       "packages/editor/src/editor/sidebar/tabs/component-library/CreateComponentModal.tsx",

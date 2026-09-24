@@ -13,7 +13,6 @@ import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 
-vi.mock("../BindingPopover", () => ({ BindingPopover: () => null }));
 vi.mock("../InspectorEmptyState", () => ({ InspectorEmptyState: () => null }));
 vi.mock("../MultiSelectToolbar", () => ({ MultiSelectToolbar: () => null }));
 vi.mock("../InspectorErrorBoundary", () => ({

@@ -2,7 +2,7 @@
  * useContentModals — D4b Stage 1 extraction (audit-remediation 2026-05-08).
  *
  * Lifted out of useStudioModals.ts. Holds the 8 modals that act on
- * project content (templates, AI assistance, media + icon pickers,
+ * project content (templates, AI assistance, icon picker,
  * image editor, exporter). Each "with-context" modal pairs a boolean
  * visibility flag with a payload that names what the modal acts on
  * — e.g. `imageEditorContext` carries the `imageSrc` + `onSave`
@@ -16,12 +16,11 @@
  */
 
 import * as React from "react";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/types/media";
+import type { IconConfig } from "../../../shared/types/media";
 import type {
   IconPickerContext,
   ImageEditorContext,
   ImageEditorOptions,
-  MediaLibraryContext,
 } from "./useStudioModals";
 
 export interface UseContentModalsReturn {
@@ -37,15 +36,6 @@ export interface UseContentModalsReturn {
   openExporter: () => void;
   closeExporter: () => void;
 
-  // Media Library
-  showMediaLibrary: boolean;
-  mediaLibraryContext: MediaLibraryContext | null;
-  openMediaLibrary: (
-    allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void,
-    forLabel?: string,
-  ) => void;
-  closeMediaLibrary: () => void;
 
   // Image Editor
   showImageEditor: boolean;
@@ -73,9 +63,6 @@ export interface UseContentModalsReturn {
 export function useContentModals(): UseContentModalsReturn {
   const [showSaveTemplate, setShowSaveTemplate] = React.useState(false);
   const [showExporter, setShowExporter] = React.useState(false);
-  const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
-  const [mediaLibraryContext, setMediaLibraryContext] =
-    React.useState<MediaLibraryContext | null>(null);
   const [showImageEditor, setShowImageEditor] = React.useState(false);
   const [imageEditorContext, setImageEditorContext] =
     React.useState<ImageEditorContext | null>(null);
@@ -87,18 +74,6 @@ export function useContentModals(): UseContentModalsReturn {
 
   const openExporter = React.useCallback(() => setShowExporter(true), []);
   const closeExporter = React.useCallback(() => setShowExporter(false), []);
-
-  const openMediaLibrary = React.useCallback(
-    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, forLabel?: string) => {
-      setMediaLibraryContext({ allowedTypes, onSelect, forLabel });
-      setShowMediaLibrary(true);
-    },
-    [],
-  );
-  const closeMediaLibrary = React.useCallback(() => {
-    setShowMediaLibrary(false);
-    setMediaLibraryContext(null);
-  }, []);
 
   const openImageEditor = React.useCallback(
     (imageSrc: string, onSave: ImageEditorContext["onSave"], options?: ImageEditorOptions) => {
@@ -127,8 +102,6 @@ export function useContentModals(): UseContentModalsReturn {
   const resetContentModals = React.useCallback(() => {
     setShowSaveTemplate(false);
     setShowExporter(false);
-    setShowMediaLibrary(false);
-    setMediaLibraryContext(null);
     setShowImageEditor(false);
     setImageEditorContext(null);
     setShowIconPicker(false);
@@ -144,10 +117,6 @@ export function useContentModals(): UseContentModalsReturn {
     setShowExporter,
     openExporter,
     closeExporter,
-    showMediaLibrary,
-    mediaLibraryContext,
-    openMediaLibrary,
-    closeMediaLibrary,
     showImageEditor,
     imageEditorContext,
     openImageEditor,

@@ -19,7 +19,7 @@
  * @license BSD-3-Clause
  */
 
-import type { CMSContentItem } from "../../shared/types/cms";
+import type { CMSContentItem, CMSFieldType } from "../../shared/types/cms";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
@@ -57,7 +57,17 @@ export interface CMSCollectionBinding {
   limit?: number;
   /** Filter by status */
   status?: "published" | "draft" | "all";
+  /** What repeats per record: the bound element itself (the original
+   *  repeater, default) or its children (the Collection list element,
+   *  G3-079 — the list stays one container, its children are the template). */
+  repeat?: "self" | "children";
 }
+
+/** An element whose whole content is one `{{item.<field>}}` placeholder. */
+const ITEM_PLACEHOLDER = /^\s*\{\{\s*item\.([\w-]+)\s*\}\}\s*$/;
+
+/** Field types whose value reads as text in a placeholder. */
+const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "date", "datetime", "url", "email"]);
 
 /**
  * CMS Binding Manager
@@ -86,7 +96,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     itemId: string | undefined,
     fieldSlug: string,
     property: string,
-    fallback?: string
+    fallback?: string,
+    /** Makes the bind one undo step (the inspector passes it; loads don't). */
+    historyLabel?: string
   ): void {
     const binding: CMSElementBinding = {
       binding: {
@@ -101,7 +113,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       fallback,
     };
 
-    this.bind(elementId, binding);
+    this.bind(elementId, binding, historyLabel);
   }
 
   /**
@@ -111,9 +123,14 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     try {
       const { collectionId, itemId, fieldSlug, fallback } = binding;
 
-      // If no itemId, we can't resolve (would need context)
+      /* No record: the binding follows "the record on this page" (4428:149540).
+         On a dynamic page the publish worker fills it per record from the
+         template's {fieldSlug} token (CMSExportResolver); everywhere else —
+         the canvas, a plain page — it previews the first published record. */
       if (!itemId || itemId === "context") {
-        return fallback || "";
+        const first = (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
+        const v = first?.data[fieldSlug];
+        return v === undefined || v === null ? fallback || "" : String(v);
       }
 
       // Get the content item. Only published records may resolve: static
@@ -240,10 +257,44 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       indexVar: options.indexVar || "index",
       limit: options.limit,
       status: options.status || "published",
+      ...(options.repeat ? { repeat: options.repeat } : {}),
     });
 
     this.composer.markDirty();
     this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId, collectionId });
+  }
+
+  /**
+   * Bind a Collection list (G3-079): its children repeat once per record.
+   * The starter `{{item.<field>}}` placeholders in the template that name no
+   * field of this collection are pointed at fields it has — the display
+   * field first, then its other text-like fields — so a fresh list shows the
+   * records instead of blanks. Placeholders the author already aimed stay.
+   */
+  bindCollectionList(elementId: string, collectionId: string, options: { limit?: number } = {}): void {
+    this.bindCollection(elementId, collectionId, { repeat: "children", limit: options.limit });
+    const collection = this.cmsManager.getCollection(collectionId);
+    const list = this.composer.elements.getElement(elementId);
+    if (!collection || !list) return;
+    const slugs = new Set(collection.fields.map((f) => f.slug));
+    const placeholders = list.getDescendants().flatMap((el) => {
+      const slug = ITEM_PLACEHOLDER.exec(el.getContent())?.[1];
+      return slug ? [{ el, slug }] : [];
+    });
+    const used = new Set(placeholders.map((p) => p.slug).filter((slug) => slugs.has(slug)));
+    const candidates = [
+      collection.displayField,
+      ...collection.fields.filter((f) => TEXT_LIKE_FIELDS.has(f.type)).map((f) => f.slug),
+    ];
+    const free = candidates.filter(
+      (slug, i): slug is string => !!slug && slugs.has(slug) && !used.has(slug) && candidates.indexOf(slug) === i,
+    );
+    for (const { el, slug } of placeholders) {
+      if (slugs.has(slug)) continue;
+      const next = free.shift();
+      if (!next) break;
+      el.setContent(`{{item.${next}}}`);
+    }
   }
 
   /**

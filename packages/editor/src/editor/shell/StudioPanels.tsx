@@ -87,7 +87,6 @@ export interface StudioPanelsProps {
   showRulers?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
-  devMode?: boolean;
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -188,7 +187,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showGrid = false,
   showRulers = false,
   showXRay = false,
-  devMode = false,
   onOverlayChange,
   onAIRequest,
   onOpenMediaLibrary,
@@ -627,7 +625,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
-              devMode={devMode}
               onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}

@@ -17,6 +17,8 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 
 import "./component-library/ComponentsTab.css";
+import { EVENTS } from "@/shared/constants";
+import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 export type { ComponentsTabProps };
 
 
@@ -40,6 +42,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
+
+  // Which of this site's masters are shared from the workspace library.
+  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
+  React.useEffect(() => {
+    if (!composer) return;
+    const load = () => void fetchComponentLibrary().then(setLibrary);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
 
   const { pendingToast, setPendingToast } = state;
   React.useEffect(() => {
@@ -205,6 +219,47 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
+  /* Board 4418:142419: YOUR COMPONENTS, then LINKED FROM LIBRARY — masters this
+     site shares with other sites of the workspace ("24 on this site · linked"). */
+  const linkedIds = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
+  const own = state.components.filter((c) => !linkedIds.has(c.id));
+  const linked = state.components.filter((c) => linkedIds.has(c.id));
+  const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
+    const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+    return (
+              <div
+                key={component.id}
+                role="button"
+                tabIndex={0}
+                draggable
+                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+                data-testid={`comp-row-${component.id}`}
+                onClick={() => state.handleViewDetail(component)}
+                onDragStart={(e) => state.handleDragStart(e, component)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
+                }}
+              >
+                <span
+                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  data-testid={`comp-row-name-${component.id}`}
+                >
+                  {component.name}
+                </span>
+                {/* Board 641:2564 writes the count as "6 on this site", not
+                    "6 instances". The number is sample data; the words are the
+                    label, and copy on screen is decided by the board. */}
+                <span
+                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  data-testid={`comp-row-count-${component.id}`}
+                >
+                  {n} on this site{isLinked ? " · linked" : ""}
+                </span>
+                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
+              </div>
+    );
+  };
+
   return (
     <PanelFrame data-testid="comp-panel">
       {state.isStandaloneMode && (
@@ -240,41 +295,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           >
             YOUR COMPONENTS
           </div>
-          {state.components.map((component) => {
-            const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
-            return (
+          {own.map((component) => renderRow(component, false))}
+          {linked.length > 0 && (
+            <>
               <div
-                key={component.id}
-                role="button"
-                tabIndex={0}
-                draggable
-                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
-                data-testid={`comp-row-${component.id}`}
-                onClick={() => state.handleViewDetail(component)}
-                onDragStart={(e) => state.handleDragStart(e, component)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
-                }}
+                className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+                data-testid="comp-section-linked"
               >
-                <span
-                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
-                  data-testid={`comp-row-name-${component.id}`}
-                >
-                  {component.name}
-                </span>
-                {/* Board 641:2564 writes the count as "6 on this site", not
-                    "6 instances". The number is sample data; the words are the
-                    label, and copy on screen is decided by the board. */}
-                <span
-                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                  data-testid={`comp-row-count-${component.id}`}
-                >
-                  {n} on this site
-                </span>
-                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
+                LINKED FROM LIBRARY
               </div>
-            );
-          })}
+              {linked.map((component) => renderRow(component, true))}
+            </>
+          )}
         </div>
       </div>
       {/* Board 641:2596 panel footer — the screen's ONE primary button. */}

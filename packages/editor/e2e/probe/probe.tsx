@@ -56,12 +56,11 @@ import { getAllIcons } from "@/shared/constants/icons";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
 import { ReplaceAcrossDialog } from "@/editor/sidebar/tabs/media/components/ReplaceAcrossDialog";
-import { MediaLibraryPanel } from "@/editor/media/MediaLibraryPanel";
+import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
-import { saveSiteVariables } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { Composer } from "@/engine/Composer";
@@ -199,7 +198,7 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
       onUpload={async () => []}
       onRetryUpload={() => {}}
       onOpenDetail={() => {}}
-      onOpenIconPicker={() => {}}
+     
       onOpenStock={() => {}}
       onOpenLibrary={() => {}}
       onToggleSelection={() => {}}
@@ -257,28 +256,6 @@ const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
  * derives each row's label by differencing with its successor, so the fixture
  * supplies sizes rather than the labels themselves.
  */
-/* The optimise drill-in needs a source that actually SHRINKS. The shared
-   fixture is a 1x1 GIF, which WebP-encodes ten times larger, so the panel drew
-   its "+1069%" warning branch — the one state board 1124:4584 does not draw.
-   A 2400x1600 SVG carrying a padded comment gives a real byte count to start
-   from and a flat image that compresses to almost nothing, so the success
-   branch (green, a negative percentage) is what gets measured. */
-const OPTIMISE_ITEM: LibraryItem = MEDIA_ITEM({
-  key: "hero",
-  name: "hero-dark.jpg",
-  size: 840 * 1024,
-  width: 2400,
-  height: 1600,
-  src:
-    "data:image/svg+xml," +
-    encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='2400' height='1600'>" +
-        "<rect width='2400' height='1600' fill='#334155'/><!--" +
-        "padding".repeat(9000) +
-        "--></svg>",
-    ),
-});
-
 const VERSIONED_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
   name: "hero-dark.jpg",
@@ -498,7 +475,7 @@ function mgrHost(children: React.ReactNode) {
 /**
  * Media picker fixture (board 1164:4713).
  *
- * MediaLibraryPanel reads through `useMediaManager`, which is three
+ * UploadAssetModal reads through `useMediaManager`, which is three
  * `composer.media` calls and an event subscription — so the fixture answers
  * those and the panel mounts as it ships. The live picker cannot be measured
  * instead: it opens from an element that needs an asset, and a fresh demo
@@ -527,7 +504,7 @@ const PICKER_COMPOSER = {
     getAssets: () => PICKER_ASSETS,
     getAsset: (id: string) => PICKER_ASSETS.find((a) => a.id === id),
   },
-} as unknown as React.ComponentProps<typeof MediaLibraryPanel>["composer"];
+} as unknown as React.ComponentProps<typeof UploadAssetModal>["composer"];
 
 /**
  * Replace-across fixture (board 1164:4738 — the picker half).
@@ -1502,9 +1479,9 @@ const agentPlan = (over: Partial<React.ComponentProps<typeof AgentPlan>>) => (
     steps={[]}
     currentIndex={-1}
     error={null}
-    autoApply={false}
-    onAutoApplyChange={() => {}}
     onApprove={() => {}}
+    onEditStep={() => {}}
+    onRunPlan={() => {}}
     onSkip={() => {}}
     onStop={() => {}}
     {...over}
@@ -1911,6 +1888,9 @@ function contentComposer({
   const noop = () => {};
   return {
     getProjectMetadata: () => ({ name: CONTENT_PROJECT }),
+    /* Variables live in the project settings (board 151:62's list). */
+    getProjectSettings: () => ({ siteVariables: CONTENT_VARIABLES }),
+    setProjectSettings: noop,
     cms: {
       collections: {
         initialize: async () => {},
@@ -1950,13 +1930,6 @@ function contentComposer({
  *  frame. Without a real height `CONTENT_BODY`'s `h-full` collapses and every
  *  `flex-1` region measures its content instead of its column. */
 function ContentPanelHost({ probe, composer }: { probe: string; composer: Composer }) {
-  /* Variables persist in localStorage keyed by the project NAME
-     (contentPanelUtils.storageKey). Seeded through the shipped writer so the
-     read path is identical to production's — and during THIS render rather
-     than in an effect: child effects run before parent effects, so an effect
-     here would write them after `useContentPanel` had already read, and board
-     151:62 would mount on an empty list. */
-  React.useMemo(() => saveSiteVariables(CONTENT_PROJECT, CONTENT_VARIABLES), []);
   return (
     <div data-probe={probe} className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
       <ContentTab composer={composer} hydrationStatus="ready" onCreateCollection={() => {}} onClose={() => {}} />
@@ -2109,21 +2082,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   // ── Media drawer states (T6) — the 320 drawer the board specifies ─────────
   "media-drawer-grid": () => <div data-probe="media-drawer-grid" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">{mediaDrawer()}</div>,
-  /* Boards 303:1997 / 303:2032 — the drawer with a running media job naming
-     itself over the grid. Neither state is reachable here: the editing pill is
-     set when `onOpenImageEditor` fires (the modal lives in AquibraStudio), and
-     the optimizing pill is set inside an await around a real blob upload. The
-     pill is a prop, so the real panel is mounted with it. */
-  "media-status-editing": () => (
-    <div data-probe="media-status-editing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Image editor — crop · rotate · adjust" })}
-    </div>
-  ),
-  "media-status-optimizing": () => (
-    <div data-probe="media-status-optimizing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Optimizing → WebP…" })}
-    </div>
-  ),
   // One card, so a conformance target for `Card / media` resolves to exactly
   // one element — measure.mjs refuses ambiguity, and rightly: whichever card
   // happened to be first would be measured silently.
@@ -2635,7 +2593,6 @@ const CASES: Record<string, () => React.ReactElement> = {
           composer={USAGE_COMPOSER}
           onClose={() => {}}
           onEditImage={() => {}}
-          onOptimized={() => {}}
           onReplaceAcross={() => {}}
         />,
       )}
@@ -2650,25 +2607,6 @@ const CASES: Record<string, () => React.ReactElement> = {
             composer={USAGE_COMPOSER}
             onClose={() => {}}
             onEditImage={() => {}}
-          />
-        </AutoOpen>,
-      )}
-    </div>
-  ),
-  /* Board 1124:4562 — the OPTIMISE drill-in, at the board's own 280x812. The
-     panel is `OptimizationPanel` inside `AssetDetailOverlay`'s fourth view, so
-     the probe mounts the real overlay and AutoOpen presses the hub's Optimise
-     row, which is how a person reaches it. */
-  "media-detail-optimize": () => (
-    <div data-probe="media-detail-optimize">
-      {drillHost(
-        <AutoOpen testid="media-detail-optimize">
-          <AssetDetailOverlay
-            item={OPTIMISE_ITEM}
-            composer={USAGE_COMPOSER}
-            onClose={() => {}}
-            onEditImage={() => {}}
-            onOptimized={() => {}}
           />
         </AutoOpen>,
       )}
@@ -2693,14 +2631,14 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   "media-fullpage-library": () => (
     <div data-probe="media-fullpage-library">
-      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />)}
+      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />)}
     </div>
   ),
   "media-fullpage-drag-over": () => (
     <div data-probe="media-fullpage-drag-over">
       {mgrHost(
         <AutoDragOver>
-          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />
+          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />
         </AutoDragOver>,
       )}
     </div>
@@ -2740,12 +2678,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-picker-modal": () => (
     <div data-probe="media-picker-modal">
       <ToastProvider>
-        <MediaLibraryPanel
-          isOpen
+        <UploadAssetModal
+          open
           onClose={() => {}}
-          onSelect={() => {}}
+          onUse={() => {}}
           composer={PICKER_COMPOSER}
-          forLabel="Hero · Image"
+          forLabel="Hero"
         />
       </ToastProvider>
     </div>

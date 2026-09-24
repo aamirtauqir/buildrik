@@ -319,6 +319,7 @@ The `/edit/:id` walk (Task 7) starts 24 Sep on the integration worktree: the das
 
 ## Ship checklist additions (collected during the run)
 - **Prisma migration `20260924120000_page_folders`** (per-user page folders, L7): run `prisma migrate deploy` on production BEFORE deploying this build, over the SSH tunnel per the deploy memory. `pages.folders.*` 500s without it. The migration was trimmed to only create the new table; do not regenerate it against a DB that has drifted.
+- **Prisma migration `20260924140000_site_component_page_scope`** (G2-118 component scope, L7): adds nullable `site_components.pageId`. Run `prisma migrate deploy` on production before this build, same way as the one above. Without it `siteComponents.upsert/list/library` 500. Existing rows stay site-wide (NULL).
 - **Integration worktree after any schema merge:** run `npx prisma generate`, or tsc shows false errors.
 - Server authz changes (L7): media writes need EDITOR+, `upload.presign` is scoped (site images need ADMIN), `pages.update/delete` check the page's site, and `domains.check` needs EDITOR. Watch dashboard error logs for new 403s after deploy.
 - Exports now include the reset stylesheet and link Inter and Geist Mono (L7). Published pages change font from the serif fallback to Inter; this is intended.

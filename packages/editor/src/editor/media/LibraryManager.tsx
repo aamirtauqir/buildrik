@@ -18,6 +18,7 @@ import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { ConfirmFolderDeleteModal } from "../sidebar/tabs/media/components/ConfirmFolderDeleteModal";
+import { ReplaceAcrossDialog } from "../sidebar/tabs/media/components/ReplaceAcrossDialog";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { ImportResultModal, type ImportResult } from "./components/ImportResultModal";
@@ -27,7 +28,7 @@ import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
 import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
-import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "./components/ReplaceResultModal";
+import { ReplaceResultModal, type ReplaceOutcome } from "./components/ReplaceResultModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { VersionsModal } from "./components/VersionsModal";
@@ -45,9 +46,8 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { generateAltTextRemote } from "../../services/AltTextService";
+import { regenerateAltText } from "../../services/AltTextService";
 import { createAssetVersion } from "../../services/MediaVersionService";
-import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
 /* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
@@ -74,10 +74,6 @@ interface LibraryManagerProps {
     imageSrc: string,
     onSave: (editedSrc: string, edits?: EditsSnapshot) => void | Promise<void>,
     door?: ImageEditorOptions,
-  ) => void;
-  onOpenIconPicker?: (
-    currentIcon: IconConfig | undefined,
-    onSelect: (icon: IconConfig) => void
   ) => void;
 }
 
@@ -107,7 +103,7 @@ const SORT_OPTIONS = [
    count line (3721:45960). */
 type MoveDoor = "selection" | "menu";
 
-export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
+export function LibraryManager({ composer, onClose, onOpenImageEditor }: LibraryManagerProps) {
   const state = useMediaState(composer);
   /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
      aria-disabled, with the reason on a tooltip. The rest of the media gate
@@ -327,54 +323,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
-  /* Clone 3695:43897 → 3695:43900 / 3695:43903 — the run the picker started:
-     the srcs it replaces, the new src, the placements it is about to update
-     (the busy line names their pages) and, once the engine has answered,
-     the ids either way. The srcs are the FAMILY's (`familyOf`): the picker's
-     "across 1 use" counts a placement sitting on an applied version, so the
-     run must reach that version's src too, not only the original's — walked
-     live 2026-09-14, a family whose one placement was on v2 reported
-     "0 of 0 uses updated" and the canvas kept v2. */
-  const [replaceRun, setReplaceRun] = React.useState<{
+  /* Audit G3-027 / board 6940:79709 — the picked replacement opens Replace
+     across site: before → after, the PAGES it is used on (each can be
+     unticked), then "Replace N uses on M pages". The srcs are the FAMILY's
+     (`familyOf`): the picker's "across 1 use" counts a placement sitting on
+     an applied version, so the run must reach that version's src too — walked
+     live 2026-09-14, a family whose one placement was on v2 reported "0 of 0
+     uses updated" and the canvas kept v2. The dialog reports the run
+     (Clone 3695:43897 → 3695:43900 / 3695:43903). */
+  const [replacePair, setReplacePair] = React.useState<{
     sources: string[];
     newSrc: string;
-    targets: string[];
-    result: ReplaceOutcome | null;
+    oldLabel: string;
+    newLabel: string;
   } | null>(null);
-
-  /* One `replaceAcross` per src, each its own undo step, merged into one
-     outcome. A throw is the engine's rollback of that src's run — nothing
-     changed, so its placements are failed ones the card can offer to retry. */
-  const replaceSources = React.useCallback(
-    (sources: string[], newSrc: string): ReplaceOutcome => {
-      const outcome: ReplaceOutcome = { replaced: [], failed: [] };
-      for (const src of sources) {
-        try {
-          const result = resultIds(composer.mediaOps.replaceAcross(src, newSrc));
-          outcome.replaced.push(...result.replaced);
-          outcome.failed.push(...result.failed);
-        } catch {
-          outcome.failed.push(...composer.elements.findByMediaSrc(src).map((el) => el.getId()));
-        }
-      }
-      return outcome;
-    },
-    [composer],
-  );
-
-  const runReplaceAcross = React.useCallback(
-    (sources: string[], newSrc: string) => {
-      const targets = sources.flatMap((src) => composer.elements.findByMediaSrc(src).map((el) => el.getId()));
-      setReplaceRun({ sources, newSrc, targets, result: null });
-      /* A microtask later, so the busy card paints before the synchronous run. */
-      Promise.resolve()
-        .then(() => replaceSources(sources, newSrc))
-        .then((result) => {
-          setReplaceRun((prev) => (prev && prev.sources === sources && prev.newSrc === newSrc ? { ...prev, result } : prev));
-        });
-    },
-    [composer, replaceSources],
-  );
 
   /* ─── P2-B Move & drag ─────────────────────────────────────────────── */
   /* Clone 3683:19950 — the Move modal, from the bulk bar or the rail. */
@@ -608,18 +570,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setSelectedAssetId(uploadDone.landed[0].id);
     setUploadDone(null);
   }, [uploadDone]);
-
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        composer.mediaOps.insertMedia(icon.name, "icon");
-        addToast({ description: `${icon.name} icon added`, tone: "success" });
-      } catch {
-        addToast({ description: "Could not add icon", tone: "error" });
-      }
-    });
-  }, [onOpenIconPicker, composer, addToast]);
 
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
@@ -1003,7 +953,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onReplaceAcross={(candidate) => {
             if (!selectedItem) return;
             const sources = versions.length > 0 ? versions.map((v) => v.item.src) : [selectedItem.src];
-            runReplaceAcross(sources, candidate.src);
+            setReplacePair({
+              sources,
+              newSrc: candidate.src,
+              oldLabel: selectedItem.displayName ?? selectedItem.name,
+              newLabel: candidate.displayName ?? candidate.name,
+            });
           }}
           composer={composer}
           addToast={addToast}
@@ -1019,22 +974,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               generatedMetadata: undefined,
             });
           }}
-          onRegenerateAltText={async (key) => {
-            // Regenerate is an explicit ask to REPLACE the current text.
-            const result = await generateAltTextRemote(key, { force: true });
-            if (!result) return null;
-            if (result.skipped) return result;
-            await composer.media.updateAsset(key, {
-              altText: result.altText,
-              generatedMetadata: {
-                altText: {
-                  generatedAt: new Date().toISOString(),
-                  model: result.model ?? DEFAULT_MODEL,
-                },
-              },
-            });
-            return result;
-          }}
+          // Regenerate is an explicit ask to REPLACE the current text.
+          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
@@ -1090,7 +1031,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onClose={() => setStockModalOpen(false)}
         photos={state.stockPhotos}
         videos={state.stockVideos}
-        icons={state.discIcons}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
@@ -1103,7 +1043,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             setStockSaved(saved);
           }
         }}
-        onOpenIconPicker={handleOpenIconPicker}
       />
       <StockSavedModal
         saved={stockSaved}
@@ -1159,6 +1098,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
+          /* G3-057 — the menu's "Replace across pages…" was a branch no
+             caller wired; it opens the same picker as the rail's ⋯. */
+          onReplaceAcross={(item) => {
+            setSelectedAssetId(item.key);
+            setReplacePickerOpen(true);
+          }}
         />
       )}
       {/* ─── P6-V Versions ──────────────────────────────────────────────── */}
@@ -1280,22 +1225,17 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);
         }}
       />
-      {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
-          ./components/AssetDetailsPanel.tsx (D5 Stage 2). Its run reports
-          here: Replacing image → Replacement complete / Some uses could not
-          update → Retrying failed use (Clone 3695:43897 … 3695:43906). */}
-      {replaceRun && (
-        <ReplaceResultModal
-          open
+      {/* The replace-all picker lives inside <AssetDetailsPanel>; the pick
+          it hands over is scoped per page here before anything runs. */}
+      {replacePair && (
+        <ReplaceAcrossDialog
           composer={composer}
-          title="Replacement complete"
-          replaced={replaceRun.result?.replaced ?? []}
-          failed={replaceRun.result?.failed ?? []}
-          busy={replaceRun.result ? undefined : { label: replacingLabel(composer, replaceRun.targets) }}
-          /* The updated placements no longer match their old src, so the
-             same sources run again reach only the ones that failed. */
-          onRetry={async () => replaceSources(replaceRun.sources, replaceRun.newSrc)}
-          onDone={() => setReplaceRun(null)}
+          oldSrc={replacePair.sources[0]}
+          sources={replacePair.sources}
+          newSrc={replacePair.newSrc}
+          oldLabel={replacePair.oldLabel}
+          newLabel={replacePair.newLabel}
+          onClose={() => setReplacePair(null)}
         />
       )}
     </div>

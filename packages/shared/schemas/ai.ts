@@ -32,3 +32,17 @@ export function isOpenAIModel(model: AIModel): boolean {
 export function isOllamaModel(model: AIModel): boolean {
   return model === "ollama";
 }
+
+/**
+ * `ai.quota` — the AI panel counter ("N of M today · resets …", G2-129). The
+ * SAME numbers the daily-limit check enforces (quota.service reserveQuota /
+ * checkQuota over AIUsage, per user per UTC day); there is no second counter.
+ * `limit` is -1 on an unlimited plan (then `used` is informational only).
+ * `resetsAt` is the next UTC midnight.
+ */
+export const aiQuotaSchema = z.object({
+  used: z.number().int().nonnegative(),
+  limit: z.number().int().min(-1),
+  resetsAt: z.date(),
+});
+export type AiQuota = z.infer<typeof aiQuotaSchema>;

@@ -68,7 +68,6 @@ export interface OverlayState {
   showGuides: boolean;
   showGrid: boolean;
   showRulers: boolean;
-  devMode: boolean;
   showSuggestions: boolean;
 }
 
@@ -143,10 +142,8 @@ export interface UseStudioStateReturn {
   setShowGuides: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGrid: React.Dispatch<React.SetStateAction<boolean>>;
   setShowRulers: React.Dispatch<React.SetStateAction<boolean>>;
-  setDevMode: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuggestions: React.Dispatch<React.SetStateAction<boolean>>;
   toggleOverlay: (overlay: keyof OverlayState) => void;
-  toggleDevMode: () => void;
 
   // Sync status
   syncStatus: SyncStatus;
@@ -244,7 +241,6 @@ export function useStudioState(): UseStudioStateReturn {
   const [showGuides, setShowGuides] = React.useState(savedState?.overlays?.showGuides ?? true);
   const [showGrid, setShowGrid] = React.useState(savedState?.overlays?.showGrid ?? false);
   const [showRulers, setShowRulers] = React.useState(savedState?.overlays?.showRulers ?? false);
-  const [devMode, setDevMode] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
 
   // Sync status for collaboration
@@ -348,7 +344,6 @@ export function useStudioState(): UseStudioStateReturn {
       showGuides,
       showGrid,
       showRulers,
-      devMode,
       showSuggestions,
     }),
     [
@@ -358,7 +353,6 @@ export function useStudioState(): UseStudioStateReturn {
       showGuides,
       showGrid,
       showRulers,
-      devMode,
       showSuggestions,
     ]
   );
@@ -384,27 +378,10 @@ export function useStudioState(): UseStudioStateReturn {
       case "showRulers":
         setShowRulers((prev) => !prev);
         break;
-      case "devMode":
-        setDevMode((prev) => !prev);
-        break;
       case "showSuggestions":
         setShowSuggestions((prev) => !prev);
         break;
     }
-  }, []);
-
-  // Dev Mode master toggle - enables/disables multiple features at once
-  const toggleDevMode = React.useCallback(() => {
-    setDevMode((prev) => {
-      const newState = !prev;
-      // When enabling dev mode, turn on all dev features
-      // When disabling, turn them off
-      setShowGrid(newState);
-      setShowGuides(newState);
-      setShowSpacingIndicators(newState);
-      setShowBadges(newState);
-      return newState;
-    });
   }, []);
 
   // Issue management helpers
@@ -470,10 +447,8 @@ export function useStudioState(): UseStudioStateReturn {
     setShowGuides,
     setShowGrid,
     setShowRulers,
-    setDevMode,
     setShowSuggestions,
     toggleOverlay,
-    toggleDevMode,
 
     // Sync status
     syncStatus,

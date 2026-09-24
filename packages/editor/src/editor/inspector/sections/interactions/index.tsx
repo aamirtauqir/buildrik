@@ -10,6 +10,7 @@ import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
 import { ElementAnimationRow } from "./ElementAnimationRow";
 import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
+import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
@@ -46,20 +47,26 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   tier = "tertiary",
   composer,
   elementId,
-  animation,
+  animation: animationProp,
   onAnimationChange,
   onAnimationPreview,
 }) => {
   const [showAddPanel, setShowAddPanel] = React.useState(false);
   const [live, setLive] = React.useState<Interaction[] | null>(null);
+  const [liveAnimation, setLiveAnimation] = React.useState<AnimationConfig | null | undefined>(undefined);
+  const [animationJustAdded, setAnimationJustAdded] = React.useState(false);
   React.useEffect(() => {
     setLive(null);
+    setLiveAnimation(undefined);
+    setAnimationJustAdded(false);
     if (!composer || !elementId) return;
     /* Re-read on any element update: cheap, and the payload is an Element
        (getId(), no id field), so it is not filtered on. */
     const sync = () => {
-      const next = composer.elements.getElement(elementId)?.getInteractions?.();
+      const el = composer.elements.getElement(elementId);
+      const next = el?.getInteractions?.();
       setLive(Array.isArray(next) ? (next as Interaction[]) : []);
+      if (el?.getAnimation) setLiveAnimation(el.getAnimation() ?? null);
     };
     composer.on(EVENTS.ELEMENT_UPDATED, sync);
     return () => {
@@ -67,6 +74,13 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     };
   }, [composer, elementId]);
   const interactions = live ?? interactionsProp;
+  const animation = liveAnimation === undefined ? animationProp : liveAnimation;
+
+  const addAnimation = () => {
+    onAnimationChange?.({ ...DEFAULT_ANIMATION });
+    setShowAddPanel(false);
+    setAnimationJustAdded(true);
+  };
   const [editingId, setEditingId] = React.useState<string | null>(null);
 
   // Add new interaction
@@ -118,7 +132,12 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     >
       <div style={styles.container}>
         {animation && onAnimationChange ? (
-          <ElementAnimationRow animation={animation} onChange={onAnimationChange} onPreview={onAnimationPreview} />
+          <ElementAnimationRow
+            animation={animation}
+            onChange={onAnimationChange}
+            onPreview={onAnimationPreview}
+            defaultOpen={animationJustAdded}
+          />
         ) : null}
         {/* Existing Interactions */}
         {interactions.map((interaction) => (
@@ -144,7 +163,11 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             + Add interaction
           </Button>
         ) : (
-          <AddInteractionPanel onAdd={addInteraction} onClose={() => setShowAddPanel(false)} />
+          <AddInteractionPanel
+            onAdd={addInteraction}
+            onClose={() => setShowAddPanel(false)}
+            onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
+          />
         )}
       </div>
     </Section>

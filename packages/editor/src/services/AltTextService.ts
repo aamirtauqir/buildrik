@@ -14,6 +14,7 @@
  */
 import { createBuildrikApiClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
+import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -51,6 +52,32 @@ export async function generateAltTextRemote(
   } catch {
     return null;
   }
+}
+
+/**
+ * An explicit Regenerate: ask the server to REPLACE the alt text, then write
+ * it to the engine asset with its AI provenance. One path for the library's
+ * details rail and the drawer's asset hub. `null` = the model could not be
+ * reached (or the asset has no server row); `skipped` = the server kept text
+ * the user wrote.
+ */
+export async function regenerateAltText(
+  media: {
+    updateAsset(
+      id: string,
+      updates: { altText: string; generatedMetadata: { altText: { generatedAt: string; model: string } } },
+    ): Promise<unknown>;
+  },
+  id: string,
+  assetId: string,
+): Promise<AltTextRemoteResult | null> {
+  const result = await generateAltTextRemote(assetId, { force: true });
+  if (!result || result.skipped) return result;
+  await media.updateAsset(id, {
+    altText: result.altText,
+    generatedMetadata: { altText: { generatedAt: new Date().toISOString(), model: result.model ?? DEFAULT_MODEL } },
+  });
+  return result;
 }
 
 /** Test-only: reset the cached tRPC client so vi.mock() takes effect per-test. */

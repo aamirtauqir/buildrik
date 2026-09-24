@@ -130,4 +130,27 @@ describe("CMSCollectionSetupModal — the board's single modal", () => {
     fireEvent.click(screen.getByTestId("cms-setup-remove-1"));
     expect(screen.getAllByPlaceholderText("field_name")).toHaveLength(1);
   });
+
+  /* 4418:84646 / 6887:72969 with L4's ui:cms-open: a created collection
+     opens in the CMS workspace — from Create, and from the clash's "Use". */
+  it("Create closes the modal and opens the new collection in the workspace", async () => {
+    const { composer } = makeComposer();
+    const onClose = vi.fn();
+    render(<CMSCollectionSetupModal isOpen onClose={onClose} composer={composer} />);
+    typeName("Menu items");
+    create();
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect((composer as unknown as { emit: ReturnType<typeof vi.fn> }).emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-new" });
+  });
+
+  it("the clash's Use <name> 2 also opens the collection it created", async () => {
+    const { composer } = makeComposer(["Menu items"]);
+    render(<CMSCollectionSetupModal isOpen onClose={vi.fn()} composer={composer} />);
+    typeName("Menu items");
+    create();
+    fireEvent.click(screen.getByTestId("cms-setup-clash-use"));
+    await waitFor(() =>
+      expect((composer as unknown as { emit: ReturnType<typeof vi.fn> }).emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-new" }),
+    );
+  });
 });

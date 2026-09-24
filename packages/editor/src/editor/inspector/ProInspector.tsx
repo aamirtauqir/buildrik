@@ -11,11 +11,12 @@ import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { ScopeDropdown } from "./components/ScopeDropdown";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { EVENTS } from "../../shared/constants/events";
-import type { SectionId, TabId } from "./sections/registry";
+import type { TabId } from "./sections/registry";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -32,6 +33,7 @@ import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
 import { useInspectorState, useStyleHandlers, useInspectorSections, useInspectorTier } from "./hooks";
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
+import { usePropertyJump } from "./hooks/usePropertyJump";
 import { VariantSection } from "./sections/VariantSection";
 import { MediaSourceRow } from "./sections/MediaSourceRow";
 import { TextContentRow } from "./sections/TextContentRow";
@@ -293,33 +295,27 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
 
-  /* v3 IA Q8 — the canvas context menu's "Add interaction" lands here. A
-     collapsed section stays collapsed on selection, so the door has to open
-     it AND bring it on screen; `toggleSection` is keyed by element type, the
-     same key InspectorTabContent reads. The scroll waits one frame so the
-     expanded body has a height to scroll to. */
+  /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them and behind
+     the canvas menu's "Add interaction" (UI_INSPECTOR_FOCUS_SECTION). */
   const selectedType = selectedElement?.type ?? null;
-  React.useEffect(() => {
-    if (!composer || !selectedType) return;
-    const focus = ({ section }: { section: SectionId }) => {
-      if (!expandedSections.has(`${selectedType}:${section}`)) toggleSection(selectedType, section);
-      requestAnimationFrame(() => {
-        contentRef.current
-          ?.querySelector<HTMLElement>(`#inspector-section-${section}`)
-          ?.scrollIntoView({ block: "start", behavior: "smooth" });
-      });
-    };
-    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
-    return () => {
-      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
-    };
-  }, [composer, selectedType, expandedSections, toggleSection]);
+  usePropertyJump({
+    composer,
+    selectedType,
+    contentRef,
+    setActiveTab,
+    tier,
+    setShowAll,
+    expandedSections,
+    toggleSection,
+    advancedState,
+  });
 
   const ElementIcon = selectedElement
     ? getElementIcon(selectedElement.type)
     : getElementIcon("default");
   const elementLabel = selectedElement?.type
-    ? selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)
+    ? (ELEMENT_TYPE_LABELS[selectedElement.type] ??
+      selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1))
     : "Element";
 
   // Multi-select short-circuit

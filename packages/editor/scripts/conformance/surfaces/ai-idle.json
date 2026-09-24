@@ -59,8 +59,8 @@
       "testId": "ai-prompt-input"
     },
     {
-      "name": "draft-brief",
-      "testId": "ai-draft-brief"
+      "name": "create-block",
+      "testId": "ai-create-block"
     }
   ],
   "_note": [

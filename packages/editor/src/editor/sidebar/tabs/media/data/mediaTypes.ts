@@ -13,6 +13,7 @@ import type {
 import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
 import type { StockFailureReason } from "../../../../../services/stock/StockService";
+import type { AssetPickRequest } from "./assetPick";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };
 export type { StockFailureReason };
@@ -450,12 +451,11 @@ export interface MediaStateResult {
   closeDetail(): void;
 
   // Selection context (canvas → media replace flow)
-  selectionContext: { elementId: string; label?: string } | null;
-  setSelectionContext(ctx: { elementId: string; label?: string } | null): void;
-
-  // §12 expanded-panel mode (320 ↔ 560)
-  panelExpanded: boolean;
-  setPanelExpanded(v: boolean): void;
+  selectionContext: AssetPickRequest | null;
+  setSelectionContext(ctx: AssetPickRequest | null): void;
+  /** Pick mode's "Use selected image": hands the asset to the field that
+   *  asked (`onSelect`) or replaces the element's media. */
+  applyPick(key: string): void;
 
   // §21 replace-across pair (old + new srcs flow into ReplaceAcrossDialog)
   replaceAcrossPair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null;
@@ -469,13 +469,6 @@ export interface MediaStateResult {
 }
 
 // --- Prop slices ---
-
-export interface TypePillsProps {
-  activeType: MediaTypeFilter;
-  counts: TypeCounts;
-  discMode: boolean;
-  onTypeChange(t: MediaTypeFilter): void;
-}
 
 export interface LibraryViewProps {
   items: LibraryItem[];

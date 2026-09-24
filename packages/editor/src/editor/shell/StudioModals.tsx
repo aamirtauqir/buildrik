@@ -7,12 +7,12 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { IconConfig } from "../../shared/types/media";
 import type { ImageEditorContext } from "./hooks/useStudioModals";
 import { SaveTemplate } from "../../templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
-import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
+import { ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
 import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
@@ -45,14 +45,6 @@ export interface StudioModalsProps {
   onCloseShortcuts: () => void;
 
   // Media modals
-  showMediaLibrary: boolean;
-  onCloseMediaLibrary: () => void;
-  onSelectMedia: (asset: MediaAsset) => void;
-  mediaLibraryContext: {
-    onSelect: (asset: MediaAsset) => void;
-    allowedTypes?: MediaAssetType[];
-    forLabel?: string;
-  } | null;
   showImageEditor: boolean;
   onCloseImageEditor: () => void;
   imageEditorContext: ImageEditorContext | null;
@@ -108,10 +100,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseExporter,
   showShortcuts,
   onCloseShortcuts,
-  showMediaLibrary,
-  onCloseMediaLibrary,
-  onSelectMedia,
-  mediaLibraryContext,
   showImageEditor,
   onCloseImageEditor,
   imageEditorContext,
@@ -181,16 +169,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} />
       {/* Rail Help's legend card (4418:126882); its "All shortcuts ›" opens the sheet above. */}
       <KeyboardLegend composer={composer} />
-
-      {/* Media Library */}
-      <MediaLibraryPanel
-        isOpen={showMediaLibrary}
-        onClose={onCloseMediaLibrary}
-        onSelect={onSelectMedia}
-        allowedTypes={mediaLibraryContext?.allowedTypes}
-        forLabel={mediaLibraryContext?.forLabel}
-        composer={composer}
-      />
 
       {/* Image Editor — Clone 3397:39917. The promise is forwarded: a
           rejection is the dialog's own failure state (3695:45542, with

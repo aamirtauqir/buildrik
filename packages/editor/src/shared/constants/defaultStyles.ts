@@ -189,6 +189,13 @@ export const DEFAULT_ELEMENT_STYLES: Record<string, Record<string, string>> = {
     "grid-template-columns": "repeat(3, 1fr)",
   },
 
+  /* G3-079 — the board draws the list as a 3-up row of record cards. */
+  "collection-list": {
+    display: "grid",
+    gap: "16px",
+    "grid-template-columns": "repeat(3, 1fr)",
+  },
+
   row: {
     display: "flex",
     "flex-direction": "row",

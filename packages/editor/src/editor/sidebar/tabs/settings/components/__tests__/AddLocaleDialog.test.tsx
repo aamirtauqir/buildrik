@@ -33,7 +33,7 @@ const toggle = () => screen.getByTestId("set-loc-set-default");
 describe("Clone 3737:44855 · Add locale", () => {
   it("carries the frame's title, the site-scoped line, the draft note and the two buttons, at 640", () => {
     mount();
-    expect(screen.getByTestId("set-loc-dialog")).toHaveClass("tw:w-[640px]");
+    expect(screen.getByTestId("set-loc-dialog")).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
     expect(screen.getByTestId("set-loc-dialog-title")).toHaveTextContent("Add locale");
     expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Localization");
     expect(screen.getByTestId("set-loc-draft-note")).toHaveTextContent(

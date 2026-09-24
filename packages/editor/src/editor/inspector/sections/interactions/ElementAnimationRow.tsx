@@ -35,10 +35,12 @@ export interface ElementAnimationRowProps {
   animation: AnimationConfig;
   onChange: (animation: AnimationConfig | null) => void;
   onPreview?: () => void;
+  /** Open on mount — a just-created animation lands in its editor. */
+  defaultOpen?: boolean;
 }
 
-export function ElementAnimationRow({ animation, onChange, onPreview }: ElementAnimationRowProps) {
-  const [open, setOpen] = React.useState(false);
+export function ElementAnimationRow({ animation, onChange, onPreview, defaultOpen = false }: ElementAnimationRowProps) {
+  const [open, setOpen] = React.useState(defaultOpen);
   const toggle = () => setOpen((v) => !v);
   return (
     <div data-testid="element-animation-row">

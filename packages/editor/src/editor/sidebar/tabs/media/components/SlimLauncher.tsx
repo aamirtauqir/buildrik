@@ -5,26 +5,21 @@
  * screens describe, which is why the redesign lands here rather than in the
  * fullpage manager.
  *
- * ORDER IS THE DESIGN. Header, search, folder row, type chips, grid, spacer,
- * footer. It used to be header, chips + "+ Stock" button, search, grid, a
- * drop-zone footer — so the first thing under the title was a filter for
- * assets the user had not found yet. Search leads now, and Stock moved to the
- * footer beside Upload, where the two ways of getting media in sit together.
+ * ORDER IS THE DESIGN (v3 board 4418:59771). Header ("Assets · N", ⋯,
+ * close), Manage assets ›, Filter ▾, grid, spacer, Upload + caret. Search is
+ * the topbar field while this drawer is open (MediaTab claims it).
  *
- * WHAT THE FOOTER KEPT. The board draws text links, the accept list and a
- * pointer to the full library — 182px of it. `UploadZone` is still mounted
- * above them because it owns the file input, the drag-and-drop target, the
- * quota bar and the persistent failed-upload list with retry — none of which
- * the board's mock shows and all of which are real behaviour. Deleting the
- * component to match a static frame would have removed working surfaces; the
- * links drive it instead.
+ * WHAT THE FOOTER KEPT. `UploadZone` is still mounted above Upload because
+ * it owns the file input, the drag-and-drop target, the quota bar and the
+ * persistent failed-upload list with retry — none of which the board's mock
+ * shows and all of which are real behaviour. Upload drives its input.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField, Tooltip } from "@/editor/chrome-ui";
-import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare, ArrowUpRight } from "lucide-react";
+import { PanelFrame, Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, SkeletonBlock, Tooltip } from "@/editor/chrome-ui";
+import { Upload, Cloud, Shapes, Folder, ChevronDown, ChevronRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
 import { MEDIA_SIZE_LIMITS_LABEL, fileExtensionLabel } from "@shared/constants/media";
@@ -32,8 +27,6 @@ import { displayNameFor } from "../data/mediaUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { FailedUpload, LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
-import { TypePills } from "./TypePills";
-import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import { ReplacementUploadModal } from "./ReplacementUploadModal";
@@ -49,19 +42,9 @@ interface SlimLauncherProps {
   storage: { used: number; total: number };
   uploadQueue: UploadProgress[];
   usageMap: Map<string, number>;
-  appliedAssetKey?: string;
   onInsert(key: string): void;
   onToggleType(type: MediaBucket): void;
   onSearchChange(query: string): void;
-  /** Header expand brackets — 320 ↔ 700, same as every other drawer. */
-  onExpand?(): void;
-  /**
-   * Boards 303:1997 / 303:2032 — a pill over the grid naming the media job
-   * currently running ("Image editor — …", "Optimizing → WebP…").
-   */
-  statusPill?: string | null;
-  /** Any interaction with the drawer clears a pill left by a closed modal. */
-  onDismissStatusPill?(): void;
   /** Resolves the engine's result per file — the replacement banner
    *  (Clone 3585:23337) names the asset that landed. */
   onUpload(files: File[]): Promise<UploadResult[]>;
@@ -79,14 +62,9 @@ interface SlimLauncherProps {
 
   // ── Bulk select (board `145:300`) ─────────────────────────────────────────
   /**
-   * Two ways in. `☑ Select` in the folder row is the board's own (144:12, and
-   * the hotspot on it names `bulk-select` as the destination); right-click on
-   * a card is the gesture the fullpage manager already uses for its per-asset
-   * menu and pre-selects the card it landed on. The way out — Done — is
-   * visible the whole time selection is on.
-   *
-   * This comment used to read "the board draws the SELECTED state but no way
-   * into it". True of the 2026-09-02 capture, not of the board.
+   * Two ways in: the header ⋯ "Select assets…" (board 7077:79223) and
+   * right-click on a card, which pre-selects the card it landed on. The way
+   * out — Done — is visible the whole time selection is on.
    */
   /**
    * Open the asset drill-in (board `146:2`, and its Versions / Used-in tabs at
@@ -105,7 +83,7 @@ interface SlimLauncherProps {
   onFolderChange?(folderId: string | null): void;
 
   selectionMode?: boolean;
-  /** Board 144:12's `☑ Select` — enter (or leave) bulk-select from the folder row. */
+  /** Header ⋯ "Select assets…" — enter bulk-select. */
   onToggleSelection?(): void;
   selectedKeys?: Set<string>;
   onEnterSelection?(key: string): void;
@@ -134,8 +112,27 @@ interface SlimLauncherProps {
   onOpenStock(): void;
   onOpenLibrary?(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
-  selectionContext?: { elementId: string; label?: string } | null;
-  onCancelSelection?(): void;
+}
+
+/* Board 7077:79171's TYPE rows. SVG is the `ico` bucket, Icons the `fnt`
+   bucket (icon sets and fonts) — the labels the chips carried as "svg" /
+   "icon". */
+const TYPE_ROWS: Array<{ key: MediaBucket; label: string }> = [
+  { key: "img", label: "Images" },
+  { key: "vid", label: "Video" },
+  { key: "ico", label: "SVG" },
+  { key: "fnt", label: "Icons" },
+];
+
+function FilterRowLabel({ label, count }: { label: string; count?: number }) {
+  return (
+    <span className="tw:flex tw:w-full tw:items-center tw:justify-between">
+      {label}
+      {count === undefined ? null : (
+        <span className="tw:text-[11px] tw:tabular-nums tw:text-[var(--bk-ink-muted)]">{count}</span>
+      )}
+    </span>
+  );
 }
 
 export function SlimLauncher(props: SlimLauncherProps) {
@@ -148,8 +145,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
     onSearchChange,
     onOpenStock,
     onClose,
-    selectionContext,
-    onCancelSelection,
   } = props;
 
   // The footer's Upload link drives UploadZone's file input rather than
@@ -159,6 +154,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
      (board 6289:148485), never hidden. */
   const write = useMediaWriteAccess();
   const [folderMenuOpen, setFolderMenuOpen] = React.useState(false);
+  const [panelMenuOpen, setPanelMenuOpen] = React.useState(false);
+  const [filterOpen, setFilterOpen] = React.useState(false);
+  const [addFromOpen, setAddFromOpen] = React.useState(false);
 
   /* Clone 3584:45522 → 3585:23326 → 3585:23337. The rejected row's `Choose a
      smaller file…` picked a file: it waits in the confirm; Upload file drops
@@ -212,34 +210,62 @@ export function SlimLauncher(props: SlimLauncherProps) {
          must not redefine a chrome-ui-wide primitive (CLAUDE.md). */
       className="sl-launcher tw:border tw:border-[var(--bk-gray-100)]"
       data-testid="media-panel"
-      onPointerDownCapture={props.statusPill ? props.onDismissStatusPill : undefined}
     >
-      {selectionContext ? (
-        <SelectionContextBar
-          label={selectionContext.label}
-          onCancel={onCancelSelection ?? (() => {})}
-        />
-      ) : null}
-      <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={props.onExpand} />
+      {/* Board 4418:59771 — "Assets · N", the ⋯ panel menu (7077:79223) and
+          close. The expand brackets are gone (G3-002): they opened the same
+          full-page library as "Manage assets ›" below while reading as
+          "widen this drawer". The ⋯ carries "Select assets…" (G3-011) — the
+          visible door to bulk select; right-click on a card still enters it. */}
+      <PanelFrame.Header
+        title={`Assets · ${props.serverPage?.total ?? props.libraryItems.length}`}
+        onClose={onClose}
+        actions={
+          <Popover
+            open={panelMenuOpen}
+            onClose={() => setPanelMenuOpen(false)}
+            placement="bottom-end"
+            label="Assets options"
+            trigger={
+              <IconButton
+                label="Assets options"
+                aria-haspopup="menu"
+                aria-expanded={panelMenuOpen}
+                data-testid="media-panel-menu"
+                onClick={() => setPanelMenuOpen((v) => !v)}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label="Assets options">
+              <MenuItem
+                data-testid="media-select-mode"
+                onClick={() => {
+                  setPanelMenuOpen(false);
+                  if (!props.selectionMode) props.onToggleSelection?.();
+                }}
+              >
+                Select assets…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
+      />
 
-      {/* Clone 3584:45522 / 3584:45876 / 3585:23337 — `Manage assets ↗`, a
-          full-width quiet button under the header, is the drawer's named
-          door to the fullpage library. The only door before this was the
-          header's expand brackets, which say nothing about where they go.
-          3437:36027 draws the same button above the footer instead; the
-          later frames win. */}
+      {/* Board 4418:59771 — `Manage assets ›`, a full-width quiet button under
+          the header: the drawer's one door to the full-page library. */}
       {props.onOpenLibrary ? (
         <div className="tw:px-4 tw:pb-2" data-testid="media-manage-assets-row">
           <Button
             type="button"
             size="xs"
             variant="secondary"
-            className="tw:w-full tw:gap-1 tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]"
+            className="tw:h-10 tw:w-full tw:gap-1 tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]"
             data-testid="media-manage-assets"
             onClick={() => props.onOpenLibrary?.()}
           >
             Manage assets
-            <ArrowUpRight size={12} aria-hidden="true" />
+            <ChevronRight size={12} aria-hidden="true" />
           </Button>
         </div>
       ) : null}
@@ -281,51 +307,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
         </div>
       ) : null}
 
-      {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
-      {/* Boards 303:1997 / 303:2032 — the running job names itself over the
-          grid; it is status, not a control, so it never takes a click. */}
-      {props.statusPill ? (
-        <div
-          className="tw:relative tw:h-0"
-          role="status"
-          aria-live="polite"
-          data-testid="media-status-pill"
-        >
-          {/* Boards 333:2340 / 333:2342 — the chrome-ui Badge treatment, not a
-              bare tint: gray-200 fill, a gray-400 rule, 10/2 padding, and the
-              label 12/16 Medium gray-700. It shipped as bg-subtle with no
-              border and ink text, which read as part of the grid rather than
-              as something laid over it. The raised shadow stays: it is what
-              makes a floating status legible over cards, and no board can draw
-              a shadow this small. */}
-          <span
-            data-testid="media-status-pill-badge"
-            className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-gray-400)] tw:bg-[var(--bk-gray-200)] tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-700)] tw:[box-shadow:var(--bk-shadow-raised)]"
-          >
-            {props.statusPill}
-          </span>
-        </div>
-      ) : null}
-
-      {/* Board 144:7/144:8 — bare 28h box, no magnifier, no inline clear. */}
-      {/* Board 144:7 draws ONE box: 36 high, border --color/border (`var(--bk-gray-200)`),
-          radius 6. The code had the 36 on this wrapper and the border+radius on
-          the input inside it, so the measured wrapper reported no border and
-          radius 0 while the height passed — three failures for one structural
-          mismatch. The edge belongs on the box the board describes. */}
-      <div
-        className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4 tw:rounded-md tw:border tw:border-[var(--bk-border)]"
-        data-testid="media-search"
-      >
-        <TextField
-          type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:border-0 tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-          aria-label="Search library"
-        />
-      </div>
 
       {/* Search scope — board `145:2` → `Search scope` (1313:11), 22h under the
           field. Shown only while a query is running against a library that is
@@ -360,93 +341,109 @@ export function SlimLauncher(props: SlimLauncherProps) {
         </div>
       ) : null}
 
-      {/*
-        Folder row — board `144:10`. Scope on the left, Select on the right.
-      */}
-      <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid="media-folder-row">
+      {/* Board 4418:59771 / 7077:79171 — one "Filter ▾" button. Its popover
+          holds TYPE (All · Images · Video · SVG · Icons, with counts) and
+          FOLDER (scope + change…). It replaces the four type chips and the
+          folder row (G3-005). TYPE is one-of, as drawn (a leading ✓ on the
+          current row): picking a type replaces the filter, All clears it. */}
+      <div className="tw:flex tw:h-10 tw:items-center tw:px-4" data-testid="media-filter-row">
         <Popover
-          open={folderMenuOpen}
-          onClose={() => setFolderMenuOpen(false)}
+          open={filterOpen}
+          onClose={() => { setFilterOpen(false); setFolderMenuOpen(false); }}
           placement="bottom"
-          label="Folder"
+          label="Filter"
           trigger={
             <Button
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
-              aria-expanded={folderMenuOpen}
-              data-testid="media-folder-scope"
-              onClick={() => setFolderMenuOpen((v) => !v)}
-              disabled={(props.allFolders?.length ?? 0) === 0}
+              className="tw:h-7 tw:gap-1 tw:px-2 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]"
+              aria-haspopup="menu"
+              aria-expanded={filterOpen}
+              aria-label={activeTypes.size || props.currentFolderId ? "Filter (active)" : "Filter"}
+              data-testid="media-filter"
+              onClick={() => setFilterOpen((v) => !v)}
             >
-              {/* flowbite's Button renders its children inside its own span,
-                  so the gap has to live on that span, not on the button. */}
-              <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
-                <Folder size={14} className="tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
-                <span className="tw:truncate">{currentFolderName}</span>
-                <ChevronDown size={12} className="tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
+              <span className="tw:flex tw:items-center tw:gap-1">
+                Filter
+                <ChevronDown size={12} aria-hidden="true" />
               </span>
             </Button>
           }
         >
-          <Menu label="Folder">
+          <Menu label="Filter" className="tw:w-[228px]">
+            <MenuLabel>Type</MenuLabel>
             <MenuItem
-              onClick={() => {
-                setFolderMenuOpen(false);
-                props.onFolderChange?.(null);
-              }}
+              radio
+              selected={activeTypes.size === 0}
+              data-testid="media-type-all"
+              onClick={() => activeTypes.forEach((t) => onToggleType(t))}
             >
-              All
+              <FilterRowLabel label="All" count={props.loadError ? undefined : counts.all} />
             </MenuItem>
-            {(props.allFolders ?? []).map((f) => (
-              <MenuItem
-                key={f.id}
-                onClick={() => {
-                  setFolderMenuOpen(false);
-                  props.onFolderChange?.(f.id);
-                }}
-              >
-                {f.name}
-              </MenuItem>
-            ))}
+            {TYPE_ROWS.map((row) => {
+              const isActive = activeTypes.has(row.key);
+              const count = counts[row.key];
+              /* A type at zero leads to "No assets matching this filter" —
+                 disabled with the reason rather than hidden. An ACTIVE type
+                 stays enabled even at zero, so it can always be cleared. */
+              const isDead = !props.loadError && count === 0 && !isActive;
+              return (
+                <MenuItem
+                  key={row.key}
+                  radio
+                  selected={isActive}
+                  disabled={isDead}
+                  title={isDead ? `No ${row.label} in this library yet` : undefined}
+                  data-testid={`media-type-chip-${row.key}`}
+                  onClick={() => {
+                    activeTypes.forEach((t) => { if (t !== row.key) onToggleType(t); });
+                    if (!isActive) onToggleType(row.key);
+                  }}
+                >
+                  <FilterRowLabel label={row.label} count={props.loadError ? undefined : count} />
+                </MenuItem>
+              );
+            })}
+            <MenuSeparator />
+            <MenuLabel>Folder</MenuLabel>
+            <MenuItem
+              data-testid="media-folder-scope"
+              aria-expanded={folderMenuOpen}
+              disabled={(props.allFolders?.length ?? 0) === 0}
+              onClick={() => setFolderMenuOpen((v) => !v)}
+            >
+              <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
+                <Folder size={13} className="tw:flex-none tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
+                <span className="tw:truncate">{currentFolderName}</span>
+                <ChevronDown size={12} className="tw:flex-none tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
+                <span className="tw:ml-auto tw:text-[11px] tw:text-[var(--bk-ink-muted)]">change…</span>
+              </span>
+            </MenuItem>
+            {folderMenuOpen ? (
+              <>
+                <MenuItem
+                  radio
+                  selected={!props.currentFolderId}
+                  onClick={() => { setFolderMenuOpen(false); props.onFolderChange?.(null); }}
+                >
+                  All
+                </MenuItem>
+                {flattenFolderTree(props.allFolders ?? []).map(({ folder, depth }) => (
+                  <MenuItem
+                    key={folder.id}
+                    radio
+                    selected={props.currentFolderId === folder.id}
+                    onClick={() => { setFolderMenuOpen(false); props.onFolderChange?.(folder.id); }}
+                  >
+                    {" ".repeat(depth * 2)}{folder.name}
+                  </MenuItem>
+                ))}
+              </>
+            ) : null}
           </Menu>
         </Popover>
-        <span className="tw:flex-1" />
-        {/*
-          Board 144:12, redrawn. This slot held three DISABLED glyphs — grid,
-          list, sort — on the reading that a present-but-disabled control says
-          "not here yet". The board now spends the slot on `☑ Select` (11/18
-          ink-soft, with a 76×30 hotspot wired to the bulk-select state) and
-          says where the other three live in the footer instead. That is one
-          edit, not two: keeping the greyed glyphs beside a footer line that
-          sends you elsewhere for them states the opposite of what it means.
-
-          It also closes the hole this file used to record — "the board draws
-          the SELECTED state but no way into it". Right-click still enters
-          selection on a card; this is the entry a first-time user can see.
-        */}
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          variant="link"
-          className="tw:min-h-6 tw:gap-1 tw:font-normal tw:text-[11px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]"
-          data-testid="media-select-mode"
-          aria-pressed={Boolean(props.selectionMode)}
-          onClick={props.onToggleSelection}
-        >
-          <CheckSquare size={13} aria-hidden="true" />
-          Select
-        </Button>
       </div>
-
-      <TypePills
-        selectedTypes={activeTypes}
-        counts={counts}
-        discMode={Boolean(props.loadError)}
-        onToggle={onToggleType}
-      />
 
       <div className="sl-grid-wrap tw:min-h-0 tw:flex-1 tw:overflow-y-auto" data-testid="media-grid-wrap">
         {props.loadError ? (
@@ -611,7 +608,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 key={item.key}
                 item={item}
                 usageCount={props.usageMap.get(item.key) ?? 0}
-                isApplied={props.appliedAssetKey === item.key}
                 isSelected={props.selectedKeys?.has(item.key) ?? false}
                 selectable={props.selectionMode}
                 // While selecting, a click selects — inserting an asset the
@@ -785,114 +781,78 @@ export function SlimLauncher(props: SlimLauncherProps) {
           disabled={props.storage.used >= props.storage.total}
           viewOnlyReason={write.reason("upload")}
         />
-        {/*
-          Clone 3437:36027 / 3585:23337 (re-draws board `144:46`): the links
-          row, then ONE line — `Images, videos and fonts · up to 50 MB per
-          file` on the board, the code's own per-type limits here. V1's second
-          line ("Sort and list view live in the full library", 2838:12023) is
-          not drawn by the Clone and is gone.
-
-          The line takes ink-soft: the one board that colours this text as
-          text rather than as a link — 145:250, quota-full — uses ink-muted on
-          a bg-subtle foot, where it computes 4.39:1 and fails AA; ink-soft is
-          7.4 on the panel, 7.0 on the tint.
-        */}
-        {/* Board 145:294 — when storage is full the whole foot goes to
-            --color/bg-subtle: Upload cannot run, and a footer that still looks
-            live is the part of a disabled control users argue with. */}
+        {/* Board 4418:59771 — one dark Upload button and its caret. The caret
+            opens ADD FROM · Stock photos · Icons · Fonts (7077:79204); those
+            three were a row of links under Upload (G3-020). The accepted
+            kinds and the engine's limits (`MEDIA_SIZE_LIMITS_LABEL`) moved
+            from a caption line onto Upload's tooltip. When storage is full
+            the foot goes to bg-subtle (board 145:294). */}
         <div
-          className={`tw:pb-7.5 tw:text-[13px] tw:leading-5 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
+          className={`tw:flex tw:items-center tw:gap-1 tw:px-4 tw:pt-2 tw:pb-10 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
         >
-        {/* Four doors in 248px. Board 3437:36027 draws them spanning the row's
-            full width at ~14px gaps; at the code's 13px type a fixed 16 gap
-            overflows the drawer by ~20px (the same trap that wrapped "Browse
-            stock" here), so the gap is distributed instead — the board's
-            spread, and it cannot overflow while the labels fit. */}
-        <div
-          className="tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-2 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
-          data-testid="media-footer-links"
-        >
-          {write.canWrite ? (
             <Button
               type="button"
-              color="light"
               size="xs"
-              variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
+              className={`tw:h-7 tw:min-w-0 tw:flex-1 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
               data-testid="media-upload-action"
-              onClick={() => uploadInputRef.current?.click()}
-              disabled={props.storage.used >= props.storage.total}
+              title={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
+              aria-disabled={write.canWrite ? undefined : "true"}
+              disabled={write.canWrite && props.storage.used >= props.storage.total}
+              onClick={write.canWrite ? () => uploadInputRef.current?.click() : undefined}
             >
-              <Upload size={14} aria-hidden="true" />
-              Upload
-            </Button>
-          ) : (
-            <Tooltip content={write.reason("upload")} placement="top">
-              <Button
-                type="button"
-                color="light"
-                size="xs"
-                variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal tw:opacity-55"
-                data-testid="media-upload-action"
-                aria-disabled="true"
-              >
+              <span className="tw:flex tw:items-center tw:gap-1.5">
                 <Upload size={14} aria-hidden="true" />
                 Upload
-              </Button>
-            </Tooltip>
-          )}
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
-            data-testid="media-stock-action"
-            onClick={onOpenStock}
-          >
-            <Cloud size={14} aria-hidden="true" />
-            {/* Clone 3437:36027 — the footer row is `↑ Upload · Stock · Icons`
-                on ONE line; "Browse stock" wrapped the row at 280 (measured
-                live 2026-09-13). The empty and load-error CTAs keep the
-                longer phrase: a CTA says what pressing it does, the footer
-                names the door. */}
-            Stock
-          </Button>
-          {props.onOpenIconPicker ? (
-            <Button
-              type="button"
-              color="light"
-              size="xs"
-              variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
-              data-testid="media-icons-action"
-              onClick={props.onOpenIconPicker}
-            >
-              <Shapes size={14} aria-hidden="true" />
-              Icons
+              </span>
             </Button>
-          ) : null}
-          {/* Clone 3437:36027's fourth door, `Aa Fonts` — the Site fonts
-              dialog (3686:42317), mounted once in the shell and opened by
-              the composer event every door emits. No file to highlight
-              from here. The glyph is the board's own "Aa", the same mark
-              the rail's font preview uses. */}
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
-            data-testid="media-fonts-action"
-            onClick={() => props.composer.emit("ui:site-fonts", {})}
+          <Popover
+            open={addFromOpen}
+            onClose={() => setAddFromOpen(false)}
+            placement="top-end"
+            label="Add from"
+            trigger={
+              <IconButton
+                label="Add from"
+                aria-haspopup="menu"
+                aria-expanded={addFromOpen}
+                data-testid="media-add-from"
+                className="tw:h-7 tw:w-7 tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] tw:enabled:hover:text-white"
+                onClick={() => setAddFromOpen((v) => !v)}
+              >
+                <ChevronDown size={14} aria-hidden="true" />
+              </IconButton>
+            }
           >
-            <span aria-hidden="true" className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>{" "}
-            Fonts
-          </Button>
-        </div>
-          {/* The limits are the engine's (`MEDIA_SIZE_LIMITS`), written once
-              in `MEDIA_SIZE_LIMITS_LABEL`. This line used to carry its own
-              "50 MB per file" — a number the engine never had. */}
-          <p className="tw:m-0 tw:px-4 tw:text-[var(--bk-ink-soft)]" data-testid="media-footer-accepts">
-            Images, videos and fonts · {MEDIA_SIZE_LIMITS_LABEL}
-          </p>
+            <Menu label="Add from" className="tw:w-[228px]">
+              <MenuLabel>Add from</MenuLabel>
+              <MenuItem
+                icon={<Cloud size={13} aria-hidden="true" />}
+                data-testid="media-stock-action"
+                onClick={() => { setAddFromOpen(false); onOpenStock(); }}
+              >
+                Stock photos
+              </MenuItem>
+              {props.onOpenIconPicker ? (
+                <MenuItem
+                  icon={<Shapes size={13} aria-hidden="true" />}
+                  data-testid="media-icons-action"
+                  onClick={() => { setAddFromOpen(false); props.onOpenIconPicker?.(); }}
+                >
+                  Icons
+                </MenuItem>
+              ) : null}
+              {/* The Site fonts dialog (3686:42317), mounted once in the shell
+                  and opened by the composer event every door emits. */}
+              <MenuItem
+                icon={<span className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>}
+                data-testid="media-fonts-action"
+                onClick={() => { setAddFromOpen(false); props.composer.emit("ui:site-fonts", {}); }}
+              >
+                Fonts
+              </MenuItem>
+            </Menu>
+          </Popover>
         </div>
       </div>
       {replacement ? (

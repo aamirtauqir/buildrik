@@ -35,29 +35,31 @@ interface AssetCellProps {
   item: LibraryItem;
   onClick: (key: string) => void;
   usageCount?: number;
-  isApplied?: boolean;
   isLocked?: boolean;
   isSelected?: boolean;
   /** Selection mode is on — the card shows its check state (board 145:300). */
   selectable?: boolean;
+  /** Pick mode (board 6764:59051): true on the chosen card — accent edge on the thumb and a
+   *  filled check in its top-right corner. */
+  picked?: boolean;
   onDoubleClick?: (key: string) => void;
   onContextMenu?: (e: MouseEvent, key: string) => void;
 }
 
-/** Board `I218:686;218:6` — only these two ever paint. */
+/** Board `I218:686;218:6`. Only stock ever paints: nothing writes an
+ *  `assetSource: "ai"` (audit G3-006), so its AI badge was a stub. */
 const BADGE: Partial<Record<NonNullable<LibraryItem["assetSource"]>, string>> = {
   stock: "STOCK",
-  ai: "AI",
 };
 
 export function AssetCell({
   item,
   onClick,
   usageCount = 0,
-  isApplied = false,
   isLocked = false,
   isSelected = false,
   selectable = false,
+  picked,
   onDoubleClick,
   onContextMenu,
 }: AssetCellProps) {
@@ -116,7 +118,6 @@ export function AssetCell({
       color="light"
       className={[
         `med-asset-cell med-asset-cell--${item.type}`,
-        isApplied && "med-asset-cell--applied",
         isLocked && "med-asset-cell--locked",
         isSelected && "med-asset-cell--selected",
         "tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-full tw:h-26 tw:p-0",
@@ -133,7 +134,7 @@ export function AssetCell({
       onDoubleClick={onDoubleClick ? handleDoubleClick : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}
       aria-label={`${item.name} asset`}
-      aria-pressed={selectable ? isSelected : undefined}
+      aria-pressed={selectable ? isSelected : picked}
       data-testid="media-card"
     >
       <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-full tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-muted)]">
@@ -175,6 +176,17 @@ export function AssetCell({
             {badge}
           </span>
         ) : null}
+        {picked ? (
+          <span
+            className="tw:pointer-events-none tw:absolute tw:inset-0 tw:rounded tw:border-2 tw:border-[var(--bk-accent)]"
+            aria-hidden="true"
+            data-testid="media-card-picked"
+          >
+            <span className="tw:absolute tw:right-1 tw:top-1 tw:flex tw:size-4 tw:items-center tw:justify-center tw:rounded tw:bg-[var(--bk-accent)] tw:text-[length:var(--bk-text-11)] tw:text-white">
+              ✓
+            </span>
+          </span>
+        ) : null}
         {isLocked ? (
           <span className="tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:bg-white/60" aria-hidden="true">
             <Lock size={18} />
@@ -201,14 +213,6 @@ export function AssetCell({
         {usageCount > 0 ? <UsagePips count={usageCount} /> : null}
       </span>
 
-      {isApplied ? (
-        <span
-          className="med-asset-cell__applied-badge tw:absolute tw:right-1.5 tw:top-1.5 tw:rounded tw:bg-[var(--bk-accent)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-white"
-          data-testid="media-card-applied"
-        >
-          APPLIED
-        </span>
-      ) : null}
     </Button>
   );
 }

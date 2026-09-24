@@ -43,22 +43,6 @@
 }
 
 
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--bk-alpha-accent-30);
-  outline-offset: -1px;
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].container,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].section,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].row,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].col {
-  outline: 1px dashed var(--bk-accent);
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id][data-selected="true"] {
-  outline: none;
-}
-
 /* CHROME TOKENS ON CUSTOMER CONTENT — REMOVED 2026-08-27.
    What stood here painted the user's own page in the EDITOR'S colours, fonts
    and spacing, using `--bk-*` tokens. `--bk-*` is the chrome namespace; the
@@ -828,3 +812,31 @@ button:hover > .bd-canvas-empty-cta__thumb {
   justify-content: safe center;
   overflow: auto;
 }
+
+/* View › Grid lines (GridOverlay sets background-size from the grid size).
+   Accent at 10% — the value the retired Emotion GridPattern drew. */
+.bd-canvas-grid {
+  --grid-line: color-mix(in srgb, var(--bk-accent) 10%, transparent);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+}
+
+/* G3-079 Collection list: records 2..N on the canvas are copies of the
+   template (record 1 renders into the real, editable children). Clicks and
+   hover pass through a copy to the list itself. */
+.buildrick-canvas [data-cms-repeater-clone] {
+  pointer-events: none;
+}
+
+/* An empty box inside a Collection list is the card's media slot, drawn as a
+   plain grey block on 4428:151488 — not the dashed "Drop a block here" strip,
+   which would repeat once per record. */
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty {
+  border: 0;
+}
+
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty::after {
+  content: none;
+}
+

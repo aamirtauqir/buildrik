@@ -53,7 +53,7 @@ describe("Clone 3737:44869 · Translation checklist", () => {
     expect(screen.getByTestId("set-loc-check-line")).toHaveTextContent(
       "Right-to-left locale. Begin with Home, then Menu, Contact, About, Reservations and Privacy.",
     );
-    expect(screen.getByTestId("set-loc-check")).toHaveClass("tw:w-[640px]");
+    expect(screen.getByTestId("set-loc-check")).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
   });
 
   it("a LIVE locale reads Live, and a left-to-right one has no RTL note", () => {

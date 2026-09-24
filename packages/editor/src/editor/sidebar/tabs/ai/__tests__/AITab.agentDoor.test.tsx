@@ -55,20 +55,16 @@ const mount = () =>
     <AITab composer={makeComposer()} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
   );
 
-describe("AITab — the way into the agent surface", () => {
-  it("opens the agent surface when DRAFT is clicked", () => {
-    mount();
-    fireEvent.click(screen.getByText(/Draft a new section from a brief/));
-
-    // AgentPlan's idle frame — the brief-entry state the DRAFT row leads to.
-    expect(screen.getByText(/Describe what to build/)).toBeInTheDocument();
-  });
-
-  it("leaves the chat empty state behind", () => {
-    mount();
-    fireEvent.click(screen.getByText(/Draft a new section from a brief/));
-
-    expect(screen.queryByText(/Draft a new section from a brief/)).not.toBeInTheDocument();
+describe("AITab — CREATE opens Add › Generate a block (board 4418:104313)", () => {
+  it("the idle panel's CREATE row asks Add for its Generate screen", () => {
+    const composer = makeComposer() as unknown as { emit: ReturnType<typeof vi.fn> };
+    render(
+      <AITab composer={composer as never} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    expect(screen.queryByText(/Draft a new section from a brief/)).toBeNull();
+    fireEvent.click(screen.getByTestId("ai-create-block"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
+    expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-generate", {});
   });
 });
 
@@ -85,15 +81,15 @@ describe("AgentPlan — an ended run hands the panel back", () => {
         steps={[{ plan: { title: "Add a hero", instruction: "", scope: { kind: "page" as const } }, status: "applied" as const }]}
         currentIndex={-1}
         error={null}
-        autoApply={false}
-        onAutoApplyChange={vi.fn()}
         onApprove={vi.fn()}
+        onEditStep={vi.fn()}
+        onRunPlan={vi.fn()}
         onSkip={vi.fn()}
         onStop={vi.fn()}
         onDismiss={onDismiss}
       />,
     );
-    fireEvent.click(screen.getByText("Ask something else"));
+    fireEvent.click(screen.getByTestId("ai-run-done"));
     expect(onDismiss).toHaveBeenCalled();
   });
 
@@ -105,16 +101,16 @@ describe("AgentPlan — an ended run hands the panel back", () => {
         steps={[{ plan: { title: "Add a hero", instruction: "", scope: { kind: "page" as const } }, status: "applied" as const }]}
         currentIndex={-1}
         error={null}
-        autoApply={false}
-        onAutoApplyChange={vi.fn()}
         onApprove={vi.fn()}
+        onEditStep={vi.fn()}
+        onRunPlan={vi.fn()}
         onSkip={vi.fn()}
         onStop={vi.fn()}
         stoppedByUser
         onDismiss={onDismiss}
       />,
     );
-    fireEvent.click(screen.getByText("Ask something else"));
+    fireEvent.click(screen.getByTestId("ai-run-keep"));
     expect(onDismiss).toHaveBeenCalled();
   });
 });

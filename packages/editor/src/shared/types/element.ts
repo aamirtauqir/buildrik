@@ -125,6 +125,7 @@ export type ElementType =
   | "accordion"
   | "product-card"
   | "product-grid"
+  | "collection-list"
   | "product-detail"
   | "video-embed"
   | "map-embed"
