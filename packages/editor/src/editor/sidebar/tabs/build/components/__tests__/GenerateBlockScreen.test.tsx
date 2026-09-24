@@ -6,11 +6,16 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act, within } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { GenerateBlockScreen, generateTarget, type GenerateFn } from "../GenerateBlockScreen";
 import { AiRunError, type ServerEdit } from "../../../ai/hooks/runPromptOnce";
+
+vi.mock("../../../ai/hooks/useAiQuota", () => ({ useAiQuota: () => null, quotaLeftLabel: () => null }));
+
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 
 const el = (id: string, type: string, parent: unknown, children: unknown[] = [], layerName?: string) => {
   const e = {
@@ -28,15 +33,23 @@ function makeComposer(selected: string[] = []) {
   const hero = el("hero", "section", root, [], "Hero");
   const footer = el("footer", "section", root, [], "Footer");
   const heading = el("h1", "heading", hero);
-  root.getChildren = () => [hero, footer];
+  const kids: unknown[] = [hero, footer];
+  root.getChildren = () => kids;
   const byId: Record<string, unknown> = { root, hero, footer, h1: heading };
   const undo = vi.fn();
+  const select = vi.fn();
+  /** What a real insert does: a new top-level section lands after Hero. */
+  const insertFeatures = () => {
+    const features = el("features", "section", root, [], "Features");
+    byId.features = features;
+    kids.splice(1, 0, features);
+  };
   const composer = {
     elements: { getActivePage: () => ({ name: "Home", root: { id: "root" } }), getElement: (id: string) => byId[id] ?? null },
-    selection: { getSelectedIds: () => selected },
+    selection: { getSelectedIds: () => selected, select },
     history: { undo },
   } as unknown as Composer;
-  return { composer, undo };
+  return { composer, undo, select, insertFeatures };
 }
 
 const edit: ServerEdit = {
@@ -99,11 +112,65 @@ describe("GenerateBlockScreen", () => {
     expect(screen.getByTestId("generate-run")).toBeTruthy();
   });
 
-  it("names a missing provider and a spent quota", async () => {
-    const generate: GenerateFn = () => Promise.reject(new AiRunError("no key", "not-configured"));
-    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={vi.fn()} generate={generate} />);
-    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "x" } });
+  /* Board 6881:74045: the new section is selected, and Done leaves on
+     "Block added · Undo". */
+  it("selects the inserted section, and Done toasts 'Block added · Undo'", async () => {
+    const { composer, select, insertFeatures, undo } = makeComposer(["h1"]);
+    const onBack = vi.fn();
+    const generate: GenerateFn = async () => {
+      insertFeatures();
+      return edit;
+    };
+    render(<GenerateBlockScreen composer={composer} onBack={onBack} generate={generate} />);
+    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "A features grid" } });
     await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
-    expect(screen.getByTestId("generate-error").textContent).toContain("AI drafting isn't configured yet");
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
+    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("features");
+    fireEvent.click(screen.getByTestId("generate-done"));
+    expect(onBack).toHaveBeenCalled();
+    const toast = (await screen.findByText("Block added")).closest("[data-testid^=toast-item-]") as HTMLElement;
+    fireEvent.click(within(toast).getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
+  });
+
+  const fail = async (kind: "not-configured" | "quota" | "other") => {
+    const generate = vi.fn(() => Promise.reject(new AiRunError("x", kind)));
+    const onBack = vi.fn();
+    render(<GenerateBlockScreen composer={makeComposer().composer} onBack={onBack} generate={generate} />);
+    fireEvent.change(screen.getByTestId("generate-input"), { target: { value: "Make the Hero warmer" } });
+    await act(async () => fireEvent.click(screen.getByTestId("generate-run")));
+    return { generate, onBack, card: screen.getByTestId("generate-error") };
+  };
+
+  /* 6881:76122: the composer goes, the prompt is echoed, the owner is the way on. */
+  it("no provider: prompt echoed, owner link, hand-off to Add", async () => {
+    const { card, onBack } = await fail("not-configured");
+    expect(screen.queryByTestId("generate-input")).toBeNull();
+    expect(card.textContent).toContain("Your prompt: Make the Hero warmer");
+    expect(card.textContent).toContain("AI isn't available on this workspace.");
+    expect(card.textContent).toContain("No AI provider is configured for this deployment.");
+    expect(screen.getByRole("link", { name: /View workspace owner/ }).getAttribute("href")).toContain("/dashboard/settings/team");
+    fireEvent.click(screen.getByRole("button", { name: "Continue by hand in Add" }));
+    expect(onBack).toHaveBeenCalled();
+  });
+
+  /* 6881:75906: out of credit — billing link, field kept. */
+  it("quota: out of credit, billing link, field kept", async () => {
+    const { card } = await fail("quota");
+    expect(card.textContent).toContain("AI is out of credit.");
+    expect(card.textContent).toContain("Nothing was changed.");
+    expect(card.textContent).toContain("Resets at midnight UTC.");
+    expect(screen.getByRole("link", { name: /Workspace billing/ }).getAttribute("href")).toContain("/dashboard/settings/billing");
+    expect(screen.getByTestId("generate-input")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Continue by hand in Add" })).toBeTruthy();
+  });
+
+  /* 6881:76336: the service did not answer — retry runs it again. */
+  it("service error: says so, Try again re-runs the prompt", async () => {
+    const { card, generate } = await fail("other");
+    expect(card.textContent).toContain("The AI service didn't respond.");
+    expect(card.textContent).toContain("Your prompt is still here");
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
+    expect(generate).toHaveBeenCalledTimes(2);
   });
 });
