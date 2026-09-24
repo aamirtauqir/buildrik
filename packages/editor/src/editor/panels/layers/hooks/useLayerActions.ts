@@ -44,6 +44,9 @@ export interface UseLayerActionsReturn {
   moveToTop: (id: string, layers: LayerItem[]) => void;
   moveToBottom: (id: string, layers: LayerItem[]) => void;
   groupLayers: (ids: string[], layers: LayerItem[]) => void;
+  /** Move to the END of another page's root (board 4418:82847), one
+   *  transaction; nested picks travel with their ancestor. False = nothing moved. */
+  moveToPage: (ids: string[], pageId: string) => boolean;
 }
 
 export function useLayerActions(
@@ -277,6 +280,22 @@ export function useLayerActions(
     [composer]
   );
 
+  const moveToPage = React.useCallback(
+    (ids: string[], pageId: string) => {
+      if (!composer) return false;
+      const rootId = composer.elements.getPage(pageId)?.root?.id;
+      if (!rootId || !composer.elements.getElement(rootId)) return false;
+      const els = ids.map((id) => composer.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
+      const topMost = els.filter((el) => !els.some((other) => other !== el && el.isDescendantOf(other)));
+      if (topMost.length === 0) return false;
+      composer.beginTransaction("move-to-page");
+      topMost.forEach((el) => composer.elements.moveElement(el.getId(), rootId));
+      composer.endTransaction();
+      return true;
+    },
+    [composer]
+  );
+
   return {
     hiddenIds,
     lockedIds,
@@ -296,5 +315,6 @@ export function useLayerActions(
     moveToTop,
     moveToBottom,
     groupLayers,
+    moveToPage,
   };
 }

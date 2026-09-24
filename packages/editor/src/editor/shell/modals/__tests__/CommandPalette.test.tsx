@@ -186,6 +186,14 @@ describe("CommandPalette — search", () => {
     expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
   });
 
+  it("C4 #19: \"New page\" answers from anywhere (no Pages rows registered) and asks for the New-page modal", () => {
+    const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY }));
+    expect(labels()).not.toContain("New page");
+    type("new page");
+    fireEvent.click(screen.getByTestId("cmdk-row-add-new-page"));
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+  });
+
   it("runs a registry command through the CommandCenter — Delete element takes the selection", () => {
     const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY, selected: ["a"] }));
     type("delete");

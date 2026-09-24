@@ -51,6 +51,15 @@ describe("§14 — useSelectionState entry paths", () => {
     expect(Array.from(result.current.selectedKeys)).toEqual(["b"]);
   });
 
+  it("shiftSelect with no anchor ranges from the fallback (the file open in the rail)", () => {
+    const items = ["a", "b", "c", "d"].map(makeItem);
+    const { result } = renderHook(() =>
+      useSelectionState(FAKE_COMPOSER, items, () => {}),
+    );
+    act(() => result.current.shiftSelect("d", "b"));
+    expect(Array.from(result.current.selectedKeys)).toEqual(["b", "c", "d"]);
+  });
+
   it("shiftSelect with prior anchor selects range inclusive", () => {
     const items = ["a", "b", "c", "d", "e"].map(makeItem);
     const { result } = renderHook(() =>

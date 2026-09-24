@@ -37,7 +37,7 @@ const createButton = () => screen.getByTestId("mgr-create-folder-go");
 describe("Clone 3700:20347 · Assets · Create folder", () => {
   it("reads the board's copy: title, 'Folder name:' label, Cancel, Create folder — and no OS prompt", () => {
     mount();
-    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "New folder" })).toBeInTheDocument();
     expect(screen.getByTestId("mgr-create-folder-label")).toHaveTextContent("Folder name:");
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
     expect(createButton()).toHaveTextContent("Create folder");
@@ -97,10 +97,10 @@ describe("Clone 3700:20347 · Assets · Create folder", () => {
     const { rerender, props } = mount({ existingNames: ["Products"] });
     fireEvent.change(nameField(), { target: { value: "Products" } });
     fireEvent.click(createButton());
-    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Folder name already exists" })).toBeInTheDocument();
     rerender(<CreateFolderModal {...props} open={false} />);
     rerender(<CreateFolderModal {...props} open />);
-    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "New folder" })).toBeInTheDocument();
     expect(nameField()).toHaveValue("");
   });
 });
@@ -111,7 +111,7 @@ describe("Clone 3700:20350 · Assets · Folder name already exists", () => {
     fireEvent.change(nameField(), { target: { value: "  products " } });
     fireEvent.click(createButton());
     expect(props.onCreate).not.toHaveBeenCalled();
-    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Folder name already exists" })).toBeInTheDocument();
     expect(screen.getByTestId("mgr-create-folder-taken")).toHaveTextContent(
       "Products already exists. Choose a different name. Your assets have not changed.",
     );

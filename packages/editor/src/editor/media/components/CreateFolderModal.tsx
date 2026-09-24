@@ -14,21 +14,15 @@
  * reads "Use Campaign images"; the shape is "the first `<Name> N` nobody
  * holds yet".
  *
- * Phase-2 modal spec (founder, 2026-09-13): title 16/600, body 13 ink-soft,
- * buttons 32 on an 8 gap, ~560 wide. The Clone draws a 24 inset with the
- * buttons LEFT-aligned under the body and no rule above them, so the frame
- * is ModalContent with one padded column inside it (ReviewSentModal's shape)
- * and the heading is its own element at 16, the way the family's delete
- * confirm sets its own — the shared ModalTitle/ModalBody carry 14 / px-4 as
- * `tw:` classes, and a second same-property utility would be resolved by
- * stylesheet order, not by intent. Field: chrome-ui's 32 TextInput; buttons:
- * flowbite's `xs`, which IS h-8.
+ * Frame: the shared chrome-ui Modal (4418:155920) — 560 wide, 20/600 title,
+ * the action row right-aligned with a plain Cancel, as every dialog board
+ * since the 2026-09-20 DS pass draws it.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ModalContent, ModalRoot, TextInput } from "@/editor/chrome-ui";
+import { Button, Modal, TextInput } from "@/editor/chrome-ui";
 
 interface CreateFolderModalProps {
   open: boolean;
@@ -39,9 +33,9 @@ interface CreateFolderModalProps {
   onCreate(name: string): void;
 }
 
-const TITLE_CLASS =
-  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]";
-const FOOT_CLASS = "tw:mt-1 tw:flex tw:items-center tw:gap-2";
+/* ConfirmDialog's quiet Cancel — no fill, no edge (4418:155920). */
+const CANCEL_CLASS =
+  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]";
 
 const fold = (name: string) => name.trim().toLowerCase();
 
@@ -90,66 +84,63 @@ export function CreateFolderModal({ open, existingNames, onClose, onCreate }: Cr
     onClose();
   };
 
+  const cancel = (
+    <Button type="button" color="light" size="xs" className={CANCEL_CLASS} onClick={onClose} data-testid="mgr-create-folder-cancel">
+      Cancel
+    </Button>
+  );
+
   return (
-    <ModalRoot open={open} onClose={onClose}>
-      <ModalContent
-        size="form"
-        srTitle={taken === null ? "New folder" : "Folder name already exists"}
-        data-testid="mgr-create-folder"
-      >
-        {taken === null ? (
-          <div className="tw:flex tw:flex-col tw:gap-3 tw:p-6">
-            <h2 className={TITLE_CLASS} data-testid="mgr-create-folder-title">
-              New folder
-            </h2>
-            <p
-              className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]"
-              data-testid="mgr-create-folder-label"
-            >
-              Folder name:
-            </p>
-            <TextInput
-              autoFocus
-              value={name}
-              placeholder="Folder name"
-              aria-label="Folder name"
-              data-testid="mgr-create-folder-input"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter") submit();
-              }}
-            />
-            <div className={FOOT_CLASS} data-testid="mgr-create-folder-foot">
-              <Button type="button" color="light" size="xs" onClick={onClose} data-testid="mgr-create-folder-cancel">
-                Cancel
-              </Button>
-              <Button type="button" size="xs" onClick={submit} disabled={!canCreate} data-testid="mgr-create-folder-go">
-                Create folder
-              </Button>
-            </div>
-          </div>
+    <Modal
+      open={open}
+      onClose={onClose}
+      kind="form"
+      title={taken === null ? "New folder" : "Folder name already exists"}
+      testId="mgr-create-folder"
+      footer={
+        taken === null ? (
+          <>
+            {cancel}
+            <Button type="button" size="xs" onClick={submit} disabled={!canCreate} data-testid="mgr-create-folder-go">
+              Create folder
+            </Button>
+          </>
         ) : (
-          <div className="tw:flex tw:flex-col tw:gap-3 tw:p-6">
-            <h2 className={TITLE_CLASS} data-testid="mgr-create-folder-title">
-              Folder name already exists
-            </h2>
-            <p
-              className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
-              data-testid="mgr-create-folder-taken"
-            >
-              {taken} already exists. Choose a different name. Your assets have not changed.
-            </p>
-            <div className={FOOT_CLASS} data-testid="mgr-create-folder-foot">
-              <Button type="button" color="light" size="xs" onClick={onClose} data-testid="mgr-create-folder-cancel">
-                Cancel
-              </Button>
-              <Button type="button" size="xs" autoFocus onClick={useNextFree} data-testid="mgr-create-folder-use">
-                Use {nextFreeName(taken, existingNames)}
-              </Button>
-            </div>
-          </div>
-        )}
-      </ModalContent>
-    </ModalRoot>
+          <>
+            {cancel}
+            <Button type="button" size="xs" autoFocus onClick={useNextFree} data-testid="mgr-create-folder-use">
+              Use {nextFreeName(taken, existingNames)}
+            </Button>
+          </>
+        )
+      }
+    >
+      {taken === null ? (
+        <div className="tw:flex tw:flex-col tw:gap-3">
+          <label
+            htmlFor="mgr-create-folder-input"
+            className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+            data-testid="mgr-create-folder-label"
+          >
+            Folder name:
+          </label>
+          <TextInput
+            id="mgr-create-folder-input"
+            autoFocus
+            value={name}
+            placeholder="Folder name"
+            data-testid="mgr-create-folder-input"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") submit();
+            }}
+          />
+        </div>
+      ) : (
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid="mgr-create-folder-taken">
+          {taken} already exists. Choose a different name. Your assets have not changed.
+        </p>
+      )}
+    </Modal>
   );
 }

@@ -46,6 +46,8 @@ export interface TemplatesTabProps {
   onClose?: () => void;
   /** The New-page modal's name (#19): Create page makes the page under it. */
   newPageName?: string;
+  /** New page's "Add to site navigation" — applied once the page exists. */
+  addToNavigation?: boolean;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
@@ -54,6 +56,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onSwitchTab,
   onClose,
   newPageName,
+  addToNavigation,
 }) => {
   const { addToast } = useToast();
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
@@ -282,6 +285,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            Walked live — Page 1 held "SaaS Landing", "Add as new page" with
            Portfolio, and Page 1 came back as Portfolio. */
         const created = composer.elements.createPage(newPageName ?? t.name);
+        if (addToNavigation) composer.elements.addPageToNavigation(created.id);
         composer.elements.setActivePage?.(created.id);
       }
       setApplyCancellable(false);

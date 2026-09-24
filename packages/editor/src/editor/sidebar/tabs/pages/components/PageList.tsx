@@ -92,6 +92,22 @@ export const PageList: React.FC<Props> = ({
   onMovePageToFolder,
   onRemovePageFromFolder,
 }) => {
+  /* A drop lands BEFORE or AFTER the row it is on. The engine only knows
+     "after <id>", so before-X is after X's predecessor in site order (or
+     first, when X is the first page). */
+  const onReorder = React.useCallback(
+    (draggedId: string, targetId: string, position: "before" | "after") => {
+      if (!composer) return;
+      if (position === "after") {
+        composer.elements.reorderPage(draggedId, targetId);
+        return;
+      }
+      const order = composer.elements.getAllPages().map((p) => p.id).filter((id) => id !== draggedId);
+      const at = order.indexOf(targetId);
+      composer.elements.reorderPage(draggedId, at > 0 ? order[at - 1] : null);
+    },
+    [composer]
+  );
   const [search, setSearch] = React.useState("");
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -300,9 +316,7 @@ export const PageList: React.FC<Props> = ({
                   nameError={renamingPageId === page.id ? nameError : null}
                   isContextMenuOpen={openContextMenuPageId === page.id}
                   draggable
-                  onReorderDrop={(draggedId) =>
-                    composer?.elements.reorderPage(draggedId, page.id)
-                  }
+                  onReorderDrop={(draggedId, position) => onReorder(draggedId, page.id, position)}
                   isSelected={selectedIds.has(page.id)}
                   isDirty={dirtyPages?.has(page.id) ?? false}
                   onSelect={() => onSelectPage(page.id)}

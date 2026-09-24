@@ -51,6 +51,7 @@ export interface TabRouterProps {
   activeTab: GroupedTabId;
   composer: Composer | null;
   commonTabProps: {
+    isOpen?: boolean;
     isExpanded: boolean;
     /** Absent for panels hosted in the inspector column — no 700 expand there. */
     onExpandToggle?: () => void;

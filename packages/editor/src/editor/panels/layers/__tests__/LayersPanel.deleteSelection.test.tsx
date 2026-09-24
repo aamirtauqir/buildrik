@@ -131,7 +131,7 @@ describe("LayersPanel — delete a multi-selection", () => {
   it("one selected row deletes at once — no dialog (decision 17)", () => {
     const composer = mount(["lx-footer"]);
     fireEvent.contextMenu(screen.getByTestId("layer-row-lx-footer"));
-    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete$/);
+    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete · [^0-9]/);
     act(() => {
       fireEvent.click(screen.getByTestId("layer-menu-delete"));
     });
@@ -142,6 +142,6 @@ describe("LayersPanel — delete a multi-selection", () => {
   it("a row outside the selection gets its own single-row menu", () => {
     mount(["lx-heading", "lx-subtitle"]);
     fireEvent.contextMenu(screen.getByTestId("layer-row-lx-footer"));
-    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete$/);
+    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete · [^0-9]/);
   });
 });

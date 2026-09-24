@@ -579,6 +579,9 @@ export class MediaManager extends MediaEventEmitter {
        *  `siteFont` beside it (3686:42317), `versionOf` / `edits` too
        *  (3695:45529). */
       userMetadata?: unknown;
+      /** Pixel size, when the server measured it (`media_assets.width/height`). */
+      width?: number | null;
+      height?: number | null;
     }>,
     serverFolders: ReadonlyArray<{
       id: string;
@@ -631,6 +634,7 @@ export class MediaManager extends MediaEventEmitter {
         ...(siteFontFromUserMetadata(sa.userMetadata) ? { siteFont: true } : {}),
         ...(versionOf !== undefined ? { versionOf } : {}),
         ...(edits !== undefined ? { edits } : {}),
+        ...(sa.width && sa.height ? { width: sa.width, height: sa.height } : {}),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
@@ -678,6 +682,14 @@ export class MediaManager extends MediaEventEmitter {
       this.blobUrlMap.set(newId, blobUrl);
     }
     this.emit(MEDIA_EVENTS.MEDIA_UPDATED, updated);
+    /* A file placed while it was device-only carries this session's Object
+       URL; now that the server has it, those placements must point at the
+       server copy, or the page saves a `blob:` that is dead on the next open
+       (walk 2026-09-24). Same "old URL → new URL" remap the reload repair
+       uses, so the Composer re-points every element that holds it. */
+    if (old.src.startsWith("blob:") && old.src !== remoteUrl) {
+      this.emit(MEDIA_EVENTS.LOCAL_URLS_REBUILT, { remapped: { [old.src]: remoteUrl } });
+    }
   }
 
   /**

@@ -169,6 +169,18 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     handler: run(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })),
   });
 
+  /* C4 #19: ⌘K is one of the New-page doors, from anywhere — not only while
+     the Pages panel has its rows registered. Same event every door emits.
+     MORE, so it answers a query without adding a row the board's resting
+     list does not draw. */
+  commands.push({
+    id: "add-new-page",
+    label: "New page",
+    group: "More",
+    keywords: ["page", "create", "add page"],
+    handler: run(() => composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {})),
+  });
+
   // TOOLS
   fromRegistry("cms-records", "Tools");
   fromRegistry("save-template", "Tools");

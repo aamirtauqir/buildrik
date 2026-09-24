@@ -279,7 +279,7 @@ export interface SelectionStateResult {
   executeDelete(): Promise<void>;
   cancelDelete(): void;
   /** §14 — shift-click range select. Anchored on last toggleSelect. */
-  shiftSelect(key: string): void;
+  shiftSelect(key: string, fallbackAnchor?: string | null): void;
   /** §14 — right-click "Select" entry: enter mode + pre-select one item. */
   enterSelectModeWith(key: string): void;
   /** Which of these assets are on a page, and which pages. The delete confirm
@@ -372,7 +372,7 @@ export interface MediaStateResult {
   toggleSelMode(): void;
   toggleSelect(key: string): void;
   selectAll(): void;
-  shiftSelect(key: string): void;
+  shiftSelect(key: string, fallbackAnchor?: string | null): void;
   enterSelectModeWith(key: string): void;
   checkInUse(keys: string[]): AssetUsage[];
   /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */

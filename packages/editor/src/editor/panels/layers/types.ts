@@ -102,4 +102,5 @@ export type LayerAction =
   | "group"
   | "selectChildren"
   | "moveToTop"
-  | "moveToBottom";
+  | "moveToBottom"
+  | "moveToPage";

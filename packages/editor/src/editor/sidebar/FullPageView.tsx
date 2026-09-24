@@ -31,6 +31,7 @@ export interface FullPageViewProps {
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
   templatesNewPageName?: string;
+  templatesAddToNavigation?: boolean;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
@@ -54,6 +55,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   settingsOpen,
   onTemplatesSwitchTab,
   templatesNewPageName,
+  templatesAddToNavigation,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -86,6 +88,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
             templatesNewPageName={templatesNewPageName}
+            templatesAddToNavigation={templatesAddToNavigation}
           />
         </React.Suspense>
       </InspectorErrorBoundary>

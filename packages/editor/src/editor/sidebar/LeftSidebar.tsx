@@ -574,6 +574,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     : null;
 
   const commonTabProps = {
+    /* A closed drawer keeps its tab mounted (width 0); a tab that acts on
+       the shell while visible (Layers' topbar filter, its Escape) reads this. */
+    isOpen: drawerOpen,
     isExpanded,
     onExpandToggle: onExpandToggle ?? (() => {}),
     onClose: onDrawerToggle,

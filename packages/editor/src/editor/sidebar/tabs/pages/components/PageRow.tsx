@@ -32,7 +32,8 @@ interface Props {
   draggable?: boolean;
   /** When provided, the row is a reorder drop target: dropping another page
    *  here moves the dragged page to just after this one. */
-  onReorderDrop?: (draggedPageId: string) => void;
+  /** A page dropped on this row: before it (upper half) or after it. */
+  onReorderDrop?: (draggedPageId: string, position: "before" | "after") => void;
   /** Renders with `.nested` class — left-padded for folder children. */
   nested?: boolean;
   /** Whether this row is part of a multi-select. */
@@ -50,6 +51,13 @@ interface Props {
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
   isDirty?: boolean;
 }
+
+/* The drop line, as Layers draws it: a 2px accent edge on the side the page
+   will land. Inset shadow, so it takes no layout. */
+const DROP_LINE = {
+  before: "tw:shadow-[inset_0_2px_0_var(--bk-accent)]",
+  after: "tw:shadow-[inset_0_-2px_0_var(--bk-accent)]",
+} as const;
 
 export const PageRow = React.memo<Props>(
   ({
@@ -129,23 +137,43 @@ export const PageRow = React.memo<Props>(
          keyboard problem rather than this. */
     };
 
+    const [dropAt, setDropAt] = React.useState<"before" | "after" | null>(null);
+
     const handleDragStart = (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", page.id);
       e.dataTransfer.effectAllowed = "move";
+    };
+
+    /* Which half of the row the pointer is on. The drop used to ignore it
+       and always put the page AFTER this row, so dragging a page onto the
+       top edge of the row above it changed nothing (walk 2026-09-24: drop
+       fired, "Saved" showed, order unchanged). */
+    const halfOf = (e: React.DragEvent): "before" | "after" => {
+      const r = e.currentTarget.getBoundingClientRect();
+      return e.clientY < r.top + r.height / 2 ? "before" : "after";
     };
 
     const handleReorderDragOver = (e: React.DragEvent) => {
       if (!onReorderDrop) return;
       e.preventDefault(); // allow drop
       e.dataTransfer.dropEffect = "move";
+      const next = halfOf(e);
+      setDropAt((prev) => (prev === next ? prev : next));
+    };
+
+    const handleReorderDragLeave = (e: React.DragEvent) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top && e.clientY < r.bottom;
+      if (!inside) setDropAt(null);
     };
 
     const handleReorderDrop = (e: React.DragEvent) => {
       if (!onReorderDrop) return;
       e.preventDefault();
       e.stopPropagation();
+      setDropAt(null);
       const draggedId = e.dataTransfer.getData("text/plain");
-      if (draggedId && draggedId !== page.id) onReorderDrop(draggedId);
+      if (draggedId && draggedId !== page.id) onReorderDrop(draggedId, halfOf(e));
     };
 
     const handleContextMenuClick = (e: React.MouseEvent) => {
@@ -188,11 +216,13 @@ export const PageRow = React.memo<Props>(
          missing group/tree parent. Presentation is the honest role for a drag
          wrapper: it carries no semantics of its own. */
       <div
-        className="bd-pg-row-wrap"
+        className={`bd-pg-row-wrap${dropAt ? ` ${DROP_LINE[dropAt]}` : ""}`}
         role="presentation"
         draggable={isDraggable}
+        data-drop={dropAt ?? undefined}
         onDragStart={isDraggable ? handleDragStart : undefined}
         onDragOver={onReorderDrop ? handleReorderDragOver : undefined}
+        onDragLeave={onReorderDrop ? handleReorderDragLeave : undefined}
         onDrop={onReorderDrop ? handleReorderDrop : undefined}
       >
         <div

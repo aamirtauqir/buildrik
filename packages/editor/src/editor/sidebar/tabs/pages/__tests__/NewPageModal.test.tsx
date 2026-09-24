@@ -40,6 +40,7 @@ function makeComposer() {
         return page;
       }),
       setActivePage: vi.fn(),
+      addPageToNavigation: vi.fn(() => 1),
     },
   };
   const request = () => act(() => handlers.get(EVENTS.UI_NEW_PAGE_REQUESTED)?.forEach((fn) => fn({})));
@@ -59,7 +60,30 @@ describe("NewPageModal", () => {
     expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankEmpty canvas");
     expect(screen.getByTestId("new-page-source-template")).toHaveTextContent(/From templatePick from \d+ layouts/);
     expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
-    expect(screen.queryByText("Add to site navigation")).toBeNull();
+    // 6752:59256: ✕ in the head, and the navigation toggle ON by default.
+    expect(screen.getByTestId("modal-close-new-page-modal")).toBeInTheDocument();
+    expect(screen.getByText("Add to site navigation")).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Add to site navigation" })).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("the ✕ closes without creating", () => {
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    fireEvent.click(screen.getByTestId("modal-close-new-page-modal"));
+    expect(screen.queryByTestId("new-page-modal")).toBeNull();
+    expect(composer.elements.createPage).not.toHaveBeenCalled();
+  });
+
+  it("Blank with the toggle OFF adds the page to no nav", () => {
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    fireEvent.click(screen.getByTestId("new-page-source-blank"));
+    fireEvent.click(screen.getByRole("switch", { name: "Add to site navigation" }));
+    fireEvent.click(screen.getByTestId("new-page-create"));
+    expect(composer.elements.createPage).toHaveBeenCalled();
+    expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
   });
 
   it("Blank → creates the named page, makes it active, toasts Page created", () => {
@@ -71,6 +95,7 @@ describe("NewPageModal", () => {
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).toHaveBeenCalledWith("Reservations");
     expect(composer.elements.setActivePage).toHaveBeenCalledWith("p2");
+    expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("p2");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, expect.anything());
     expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Page created" }));
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
@@ -88,7 +113,7 @@ describe("NewPageModal", () => {
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).not.toHaveBeenCalled();
     expect(composer.elements.setActivePage).not.toHaveBeenCalled();
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: "Our menu" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: "Our menu", addToNavigation: true });
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
   });
 
