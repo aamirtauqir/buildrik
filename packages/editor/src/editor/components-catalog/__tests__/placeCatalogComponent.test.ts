@@ -10,6 +10,8 @@ interface FakeElement {
   type: string;
   children: FakeElement[];
   getId: () => string;
+  getType?: () => string;
+  getParent?: () => null;
   addChild: (child: FakeElement, index?: number) => void;
 }
 
@@ -25,6 +27,8 @@ function makeComposer(opts: { hasParent: boolean; throwOnAddChild?: boolean }) {
         type: "container",
         children: [],
         getId: () => "parent-1",
+        getType: () => "container",
+        getParent: () => null,
         addChild: (child, _index) => {
           if (opts.throwOnAddChild) throw new Error("addChild fail");
           parent!.children.push(child);
@@ -44,6 +48,8 @@ function makeComposer(opts: { hasParent: boolean; throwOnAddChild?: boolean }) {
           type,
           children: [],
           getId: () => id,
+          getType: () => type,
+          getParent: () => null,
           addChild: () => {},
         } as FakeElement;
       }),
