@@ -51,6 +51,8 @@ describe("getCurrentRound", () => {
       resolvedAt: null,
       createdAt: created,
       updatedAt: updated,
+      token: "tok_live",
+      expiresAt: new Date(Date.now() + 86_400_000),
     });
     rrCount.mockResolvedValue(2);
     commentCount.mockResolvedValue(3);
@@ -68,6 +70,7 @@ describe("getCurrentRound", () => {
       roundNumber: 2,
       totalRounds: 2,
       openCommentCount: 3,
+      token: "tok_live",
     });
     // open-comment count is scoped to the site + OPEN
     expect(commentCount).toHaveBeenCalledWith({ where: { siteId: "s1", status: "OPEN" } });
@@ -78,12 +81,46 @@ describe("getCurrentRound", () => {
       id: "r1", status: "PENDING", invitedEmail: null, reviewer: null,
       revokedAt: new Date(), resolvedAt: null,
       createdAt: new Date(), updatedAt: new Date(),
+      token: "tok_dead", expiresAt: null,
     });
     rrCount.mockResolvedValue(1);
     commentCount.mockResolvedValue(0);
     const round = await getCurrentRound("s1");
     expect(round?.revoked).toBe(true);
     expect(round?.reviewerName).toBeNull();
+    // A revoked link must not be handed back for copying.
+    expect(round?.token).toBeNull();
+  });
+
+  /* B3 "Copy link" (post-Oct-1 R4): the token rides the round only while the
+     link still opens. */
+  const liveRound = (over: Record<string, unknown>) => ({
+    id: "r1", status: "PENDING", invitedEmail: "sara@client.com", reviewer: null,
+    revokedAt: null, resolvedAt: null, createdAt: new Date(), updatedAt: new Date(),
+    token: "tok_1", expiresAt: new Date(Date.now() + 60_000),
+    ...over,
+  });
+
+  it("returns the token of a live client link and selects it", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({}));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1"))?.token).toBe("tok_1");
+    expect(rrFindFirst.mock.calls[0][0].select).toMatchObject({ token: true, expiresAt: true });
+  });
+
+  it("withholds an expired link's token", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({ expiresAt: new Date(Date.now() - 1) }));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1"))?.token).toBeNull();
+  });
+
+  it("is null for an internal round that never invited a client", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({ token: null, invitedEmail: null, expiresAt: null }));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1"))?.token).toBeNull();
   });
 });
 

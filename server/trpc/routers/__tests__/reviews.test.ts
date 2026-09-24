@@ -12,6 +12,7 @@ const submitMock = vi.fn();
 const listMock = vi.fn();
 const resolveMock = vi.fn();
 const isFeatureEnabledMock = vi.fn();
+const getCurrentRoundMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -42,6 +43,7 @@ vi.mock("@/server/services/review.service", () => ({
   submitReview: (...a: unknown[]) => submitMock(...a),
   listReviews: (...a: unknown[]) => listMock(...a),
   resolveReview: (...a: unknown[]) => resolveMock(...a),
+  getCurrentRound: (...a: unknown[]) => getCurrentRoundMock(...a),
   ReviewError: class ReviewError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -60,7 +62,7 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock].forEach((m) =>
     m.mockReset(),
   );
   // Default: agency layer ON, so the existing role-gate assertions still hold.
@@ -100,6 +102,23 @@ describe("reviews router", () => {
     expect(resolveMock).toHaveBeenCalledWith("ws_1", "r1", "APPROVED", "u_1");
   });
 
+  /* currentRound carries the live client-link token (post-Oct-1 R4) — the
+     same people who get it back from submit: EDITORs of the site. */
+  it("currentRound returns the round, token included, to an EDITOR", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    getCurrentRoundMock.mockResolvedValueOnce({ id: "r1", token: "tok_1" });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).resolves.toMatchObject({ token: "tok_1" });
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u_1", "s1", "EDITOR");
+  });
+
+  it("currentRound is FORBIDDEN below EDITOR and never reads the round", async () => {
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs EDITOR"));
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(getCurrentRoundMock).not.toHaveBeenCalled();
+  });
+
   // IRON RULE (IA v2 E1): with agency_layer off, mutations deny and the list
   // collapses to empty — no procedure reaches the service.
   describe("agency_layer gate", () => {
@@ -117,6 +136,12 @@ describe("reviews router", () => {
       await expect(caller.list()).resolves.toEqual({ items: [], nextCursor: null });
       expect(checkWorkspaceRoleMock).not.toHaveBeenCalled();
       expect(listMock).not.toHaveBeenCalled();
+    });
+
+    it("currentRound is null and never reads the round (so no token leaks)", async () => {
+      const caller = reviewsRouter.createCaller(makeCtx() as never);
+      await expect(caller.currentRound({ siteId: "s1" })).resolves.toBeNull();
+      expect(getCurrentRoundMock).not.toHaveBeenCalled();
     });
 
     it("resolve is denied and never resolves", async () => {

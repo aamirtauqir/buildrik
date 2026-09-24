@@ -260,6 +260,11 @@ export interface CurrentRound {
   roundNumber: number;
   totalRounds: number;
   openCommentCount: number;
+  /** The client link's token (`/review/<token>`) while that link still opens —
+   *  null when no client was invited, or the link is revoked or expired. The
+   *  sender already receives it from `submitReview`; this lets the Review panel
+   *  copy the live link later without a re-send (B3). */
+  token: string | null;
 }
 
 /**
@@ -320,9 +325,12 @@ export async function getCurrentRound(siteId: string): Promise<CurrentRound | nu
       resolvedAt: true,
       createdAt: true,
       updatedAt: true,
+      token: true,
+      expiresAt: true,
     },
   });
   if (!r) return null;
+  const linkLive = r.token !== null && r.revokedAt === null && (r.expiresAt === null || r.expiresAt > new Date());
   const [totalRounds, openCommentCount] = await Promise.all([
     prisma.reviewRequest.count({ where: { siteId } }),
     prisma.comment.count({ where: { siteId, status: "OPEN" } }),
@@ -339,6 +347,7 @@ export async function getCurrentRound(siteId: string): Promise<CurrentRound | nu
     roundNumber: totalRounds,
     totalRounds,
     openCommentCount,
+    token: linkLive ? r.token : null,
   };
 }
 
