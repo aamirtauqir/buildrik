@@ -225,6 +225,10 @@ describe("AITab — scope + composer wiring", () => {
     expect(screen.getByRole("button", { name: "View workspace owner ↗" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Continue by hand in the inspector" })).toBeInTheDocument();
     expect(screen.getByTestId("ai-state-prompt")).toHaveTextContent("Your prompt: make the hero warmer");
+    // Board 4418:106796: no composer, and the prompt echo leads the notice.
+    expect(container.querySelector("textarea")).toBeNull();
+    const block = screen.getByTestId("ai-state-not-configured");
+    expect(block.firstElementChild).toBe(screen.getByTestId("ai-state-prompt"));
   });
 
   it("keeps an ordinary failure as a message, not as the not-configured state", async () => {
@@ -282,6 +286,9 @@ describe("AITab — scope + composer wiring", () => {
     expect(screen.getByText("AI is out of credit.")).toBeInTheDocument();
     // The server's own numbers, not a re-worded guess at them.
     expect(screen.getByText(/Nothing was changed\. Daily limit reached \(10\)/)).toBeInTheDocument();
+    // Board 4418:106671: the title in error red; the reset time read, not ISO.
+    expect(screen.getByText("AI is out of credit.").className).toContain("tw:text-[var(--bk-error)]");
+    expect(screen.getByText(/Resets at midnight UTC\./)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Workspace billing ↗" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Continue by hand in the inspector" })).toBeInTheDocument();
   });

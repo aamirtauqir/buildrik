@@ -1,178 +1,78 @@
 /**
- * Selection Label Component
- * Shows the element name and a "select parent" button at the top-left of the
- * selection. Its ancestor dropdown is gone (G2-026): the path lives in Layers,
- * and ← selects the parent.
+ * Selection tag — library "Canvas selection tag" (board 5940:148012,
+ * "Section · Hero"): accent fill, white 11/16, 20 high, pad 0/6, hugging its
+ * text, placed at (−2, −24) above the selected element's top-left.
+ *
+ * It lives in canvas units, so it scales with the page exactly as the
+ * library's Zoom=50/33 variants draw it (10 h at 50%).
+ *
+ * It used to be a chrome pill with a select-parent button and an ancestor
+ * dropdown. Selecting a parent or an ancestor lives in the inspector ⋯
+ * (Select parent), the ← key and Layers.
+ *
  * @license BSD-3-Clause
  */
 
-import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
-import { canvasTokens } from "../../../styles/tokens";
-import { getElementNameFromType, getTypeIcon } from "../utils/elementInfo";
-import { Button } from "@/editor/chrome-ui";
+import { canvasScale } from "../utils/canvasScale";
+import { getElementNameFromType } from "../utils/elementInfo";
 
 export interface SelectionLabelProps {
   composer: Composer;
   elementId: string;
   canvasRef: React.RefObject<HTMLDivElement | null>;
-  onSelectParent: () => void;
 }
 
-interface ElementPosition {
-  left: number;
-  top: number;
-  width: number;
-}
+const TAG_CLASS =
+  "tw:flex tw:items-center tw:h-5 tw:px-1.5 tw:whitespace-nowrap tw:bg-[var(--bk-accent)] " +
+  "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-on)] tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 
-/* NOTE: Local getElementName and getTypeIcon functions REMOVED
-   Now using shared utilities from ../utils/elementInfo.ts
-   This ensures a single source of truth for element naming across the app */
+export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elementId, canvasRef }) => {
+  const [pos, setPos] = React.useState<{ left: number; top: number } | null>(null);
 
-export const SelectionLabel: React.FC<SelectionLabelProps> = ({
-  composer,
-  elementId,
-  canvasRef,
-  onSelectParent,
-}) => {
-  const [position, setPosition] = React.useState<ElementPosition | null>(null);
-
-  // Get element info
-  const element = composer.elements.getElement(elementId);
-  const elementType = element?.getType?.() || "element";
-  const elementTagName = element?.getTagName?.()?.toLowerCase();
-  const elementName = getElementNameFromType(elementType, elementTagName);
-
-  // Track element position
   React.useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const updatePosition = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
-      if (!el) return;
-
-      const canvasRect = canvas.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const update = () => {
+      const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`);
+      if (!el) return setPos(null);
+      const c = canvas.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
       const zs = canvasScale(canvas);
-      const elRect = el.getBoundingClientRect();
-      const scrollLeft = canvas.scrollLeft || 0;
-      const scrollTop = canvas.scrollTop || 0;
-
-      setPosition({
-        left: (elRect.left - canvasRect.left) / zs + scrollLeft,
-        top: (elRect.top - canvasRect.top) / zs + scrollTop,
-        width: elRect.width / zs,
+      setPos({
+        left: (r.left - c.left) / zs + (canvas.scrollLeft || 0),
+        top: (r.top - c.top) / zs + (canvas.scrollTop || 0),
       });
     };
-
-    updatePosition();
-
-    const observer = new ResizeObserver(updatePosition);
-    const el = canvasRef.current.querySelector(`[data-buildrick-id="${elementId}"]`);
-    if (el) observer.observe(el);
-
-    window.addEventListener("scroll", updatePosition, { capture: true, passive: true });
+    update();
+    const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`);
+    const ro = new ResizeObserver(update);
+    if (el) ro.observe(el);
+    const mo = new MutationObserver(update);
+    mo.observe(canvas, { childList: true, subtree: true });
+    window.addEventListener("scroll", update, { capture: true, passive: true });
     return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", updatePosition, {
-        capture: true,
-      } as EventListenerOptions);
+      ro.disconnect();
+      mo.disconnect();
+      window.removeEventListener("scroll", update, { capture: true } as EventListenerOptions);
     };
   }, [elementId, canvasRef]);
 
-  if (!position || !element) return null;
-
-  // Parent info
-  const parent = element.getParent();
-  const parentType = parent?.getType?.() || "";
-  const parentName = parent
-    ? getElementNameFromType(parentType, parent.getTagName?.()?.toLowerCase())
-    : null;
-
-  // Position label above element, constrained to canvas
-  const labelTop = Math.max(4, position.top - 32);
-  const labelLeft = Math.max(4, position.left);
+  const element = composer.elements.getElement(elementId);
+  if (!pos || !element) return null;
+  const name = getElementNameFromType(element.getType?.() || "element", element.getTagName?.()?.toLowerCase());
 
   return (
     <div
-     
-      style={{
-        position: "absolute",
-        left: labelLeft,
-        top: labelTop,
-        zIndex: Z_INDEX.floatingToolbar,
-        pointerEvents: "auto",
-      }}
+      data-testid="canvas-selection-tag"
+      className={TAG_CLASS}
+      style={{ position: "absolute", left: pos.left - 2, top: pos.top - 24, zIndex: Z_INDEX.floatingToolbar }}
     >
-      {/* Main label bar */}
-      <div style={labelBarStyles}>
-        {/* Parent button */}
-        {parent && (
-          <Button
-            onClick={onSelectParent}
-            style={parentBtnStyles}
-            /* px-0: 24 wide against flowbite's 40 of horizontal padding, which
-               clamps the content box to zero and hides the svg below. */
-            className="tw:px-0"
-            title={`Go to parent: ${parentName} (←)`}
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path d="M12 19V5M5 12l7-7 7 7" />
-            </svg>
-          </Button>
-        )}
-
-        <span style={nameStyles}>
-          <span style={{ opacity: 0.7, marginRight: 4 }}>{getTypeIcon(elementType)}</span>
-          {elementName}
-        </span>
-      </div>
+      {name}
     </div>
   );
 };
 
-// Styles - using canvasTokens for consistency
-const labelBarStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 2,
-  background: canvasTokens.colors.surface.background,
-  borderRadius: canvasTokens.radius.md,
-  padding: "2px 4px",
-  boxShadow: canvasTokens.shadows.panel,
-};
-
-const parentBtnStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 24,
-  height: 24,
-  background: canvasTokens.colors.primary.alpha20,
-  border: "none",
-  borderRadius: 4,
-  color: canvasTokens.colors.primary.light,
-  cursor: "pointer",
-  transition: "background 0.15s",
-};
-
-const nameStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  padding: "4px 8px",
-  color: canvasTokens.colors.text.primary,
-  fontSize: 12,
-  fontWeight: 500,
-  whiteSpace: "nowrap",
-};
+export default SelectionLabel;

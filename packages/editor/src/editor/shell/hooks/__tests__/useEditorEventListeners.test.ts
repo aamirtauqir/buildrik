@@ -76,7 +76,6 @@ interface MockOpts {
     setShowGuides: ReturnType<typeof vi.fn>;
     setShowGrid: ReturnType<typeof vi.fn>;
   };
-  hasManuallyToggledSpacingRef: { current: boolean };
 }
 
 function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
@@ -95,8 +94,6 @@ function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
       setShowGuides: vi.fn(),
       setShowGrid: vi.fn(),
     },
-    hasManuallyToggledSpacingRef:
-      overrides.hasManuallyToggledSpacingRef ?? { current: false },
   };
 }
 
@@ -107,7 +104,6 @@ function mount(opts: MockOpts) {
         composer: opts.composer,
         modals: opts.modals,
         state: opts.state,
-        hasManuallyToggledSpacingRef: opts.hasManuallyToggledSpacingRef,
       } as unknown) as UseEditorEventListenersOptions,
     ),
   );
@@ -209,23 +205,11 @@ describe("useEditorEventListeners", () => {
       composer.canvas!.indicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
       const o = makeOpts({ composer });
       mount(o);
-      // hasManuallyToggledSpacingRef.current is false → spacing default = true
-      expect(o.state.setShowSpacingIndicators).toHaveBeenCalledWith(true);
+      // Spacing defaults OFF (board 5936:44788 draws no padding overlay).
+      expect(o.state.setShowSpacingIndicators).toHaveBeenCalledWith(false);
       expect(o.state.setShowBadges).toHaveBeenCalledWith(false);
       expect(o.state.setShowGuides).toHaveBeenCalledWith(true);
       expect(o.state.setShowGrid).toHaveBeenCalledWith(false);
-    });
-
-    it("respects manual-toggle ref when overlay.showSpacing is undefined", () => {
-      const composer = makeComposer();
-      composer.canvas!.indicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
-      const o = makeOpts({
-        composer,
-        hasManuallyToggledSpacingRef: { current: true },
-      });
-      mount(o);
-      // hasManuallyToggledSpacingRef.current === true → !true === false
-      expect(o.state.setShowSpacingIndicators).toHaveBeenCalledWith(false);
     });
 
     it("does not touch overlay setters when canvas.indicators is missing", () => {
@@ -247,7 +231,6 @@ describe("useEditorEventListeners", () => {
             composer: null,
             modals: opts.modals,
             state: opts.state,
-            hasManuallyToggledSpacingRef: opts.hasManuallyToggledSpacingRef,
           } as unknown) as UseEditorEventListenersOptions,
         ),
       );

@@ -35,6 +35,9 @@ interface PreviewOverlayProps {
   onDone: () => void;
   /** The site whose share link the Share button mints; no site, no button. */
   siteId?: string | null;
+  /** Named in the share dialog (board 4418:165739). */
+  siteName?: string | null;
+  pageName?: string | null;
 }
 
 /* Board 4418:165611 (C5 G1-086): the preview is full-screen with its own
@@ -75,7 +78,7 @@ const PAGE_FRAME_CLASS =
 /** Inside a bezel the frame draws them, so the page fills the screen flat. */
 const SCREEN_FRAME_CLASS = "tw:w-full tw:h-full tw:border-0 tw:bg-[var(--bk-bg-elevated)]";
 
-export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, siteId }) => {
+export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, siteId, siteName, pageName }) => {
   const [device, setDevice] = React.useState<Breakpoint>("desktop");
   const [shareOpen, setShareOpen] = React.useState(false);
 
@@ -129,7 +132,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
         </DeviceFramePreview>
       </div>
       {siteId && shareOpen && (
-        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} />
+        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} />
       )}
     </div>
   );

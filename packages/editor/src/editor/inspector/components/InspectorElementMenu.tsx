@@ -18,11 +18,11 @@
  * @license BSD-3-Clause
  */
 
-import { Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Trash2 } from "lucide-react";
+import { Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, RotateCcw, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -132,6 +132,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   onHideInspector,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { addToast } = useToast();
   const [isTriggerHovered, setIsTriggerHovered] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState<string | null>(null);
   const menuRef = React.useRef<HTMLDivElement | null>(null);
@@ -186,6 +187,22 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  /* "Reset all styles" left the canvas menu with G2-054; it lives here so the
+     capability is not lost (owner rule 2026-09-24). One transaction, so the
+     toast's Undo takes it back in one step. */
+  const handleResetStyles = () => {
+    const el = composer?.elements.getElement(selectedElementId);
+    if (!composer || !el) return;
+    composer.beginTransaction?.("reset-styles");
+    try {
+      el.setStyles?.({});
+    } finally {
+      composer.endTransaction?.();
+    }
+    setIsOpen(false);
+    addToast({ description: "Styles reset", action: { label: "Undo", onClick: () => composer.history.undo() } });
+  };
+
   const handleDelete = () => {
     onRequestDelete();
     setIsOpen(false);
@@ -228,6 +245,12 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       icon: <ClipboardPaste size={14} aria-hidden="true" />,
       onClick: handlePasteStyles,
       disabled: !composer?.styleClipboard,
+    },
+    {
+      id: "reset-styles",
+      label: "Reset all styles",
+      icon: <RotateCcw size={14} aria-hidden="true" />,
+      onClick: handleResetStyles,
     },
     {
       id: "delete",
