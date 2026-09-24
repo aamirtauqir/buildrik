@@ -535,14 +535,6 @@
     "skipped": 1,
     "compared": 35
   },
-  "layers-filtered": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 2,
-    "compared": 16
-  },
   "layers-renaming": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
@@ -685,22 +677,6 @@
   "s1-1-coach-dismissed": {
     "skipped": 2,
     "compared": 25,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
-  "brand-tokens-add": {
-    "skipped": 0,
-    "compared": 72,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
-  "brand-tokens-replace": {
-    "skipped": 0,
-    "compared": 72,
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
@@ -1198,18 +1174,6 @@
     },
     "nonTextPairs": {}
   },
-  "insert-searching": {
-    "skipped": 4,
-    "compared": 31
-  },
-  "insert-no-results": {
-    "skipped": 4,
-    "compared": 21
-  },
-  "insert-tip-dismissed": {
-    "skipped": 4,
-    "compared": 25
-  },
   "media-modal-replace-across": {
     "skipped": 0,
     "compared": 46,
@@ -1522,22 +1486,6 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 5,
-    "compared": 23
-  },
-  "brand-tokens": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 5,
-    "compared": 72
-  },
-  "canvas-breadcrumb": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
     "compared": 23
   },
   "canvas-zoom-levels": {
