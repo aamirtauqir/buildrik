@@ -10,7 +10,7 @@ import type { Composer } from "../../../engine";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { getDisplayName } from "./data/layerUtils";
 import { getElementIcon } from "@/editor/shared/elementIcons";
-import { Button, TextField } from "@/editor/chrome-ui";
+import { Button, Checkbox, TextField } from "@/editor/chrome-ui";
 
 export interface LayerTreeItemProps {
   layer: LayerItem;
@@ -130,14 +130,11 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     !!composer &&
     (composer.cms.bindings.getBindings(layer.id).length > 0 || composer.cms.bindings.hasCollectionBinding(layer.id));
 
-  /* Board 1082:4640's indent ladder, read off the frame: chevrons sit at
-     12 / 28 / 44 / 60 / 76 and labels at 40 / 56 / 72 — base 12, step 16.
-     This was `16 + depth * 14`, so every row started 4px too far in and each
-     level closed the gap by 2 until they crossed. At depth 3 the live ladder
-     was 58 against the board's 60, and the deeper the tree the wider the drift
-     ran in the other direction. */
+  /* v3 board 4418:81300's indent ladder: 16px chevron boxes at 16 / 32 / 48
+     from the drawer edge — base 16, step 16. The first 16 is the selection
+     checkbox's gutter (see LayerTreeItem.indent.test.tsx). */
   const rowStyle: React.CSSProperties = {
-    paddingLeft: `${12 + layer.depth * 16}px`, // board 1082:4640 — see LayerTreeItem.indent.test.tsx
+    paddingLeft: `${16 + layer.depth * 16}px`,
   };
 
   const rowClassNames = [
@@ -215,6 +212,20 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         }}
         onKeyDown={handleKeyDown}
       >
+        {/* v3 boards 4418:79139 / 4418:81300: a 16px checkbox in the row's left
+            gutter — the ⇧/⌘-click multi-select, made visible. Ticking adds or
+            removes this row from the selection without touching the others.
+            A lone selection is the tinted row, not a tick (4418:81300 draws
+            Hero selected with its box empty). */}
+        <span className="tw:absolute tw:left-1 tw:top-1/2 tw:flex tw:-translate-y-1/2" onClick={(e) => e.stopPropagation()}>
+          <Checkbox
+            aria-label={`Select ${displayName}`}
+            data-testid={`layer-check-${layer.id}`}
+            checked={isSelected && selectedIds.size >= 2}
+            onChange={() => onSelect(layer.id, { meta: true })}
+            className="tw:size-4 tw:cursor-pointer tw:rounded tw:border-[1.5px] tw:border-[var(--bk-gray-300)] tw:bg-[var(--bk-bg-panel)]"
+          />
+        </span>
         <Button
           type="button"
           className="bdc-lr-chev"
@@ -226,9 +237,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             if (hasChildren) onToggleExpand(layer.id);
           }}
         >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
+          {"\u25BE"}
         </Button>
 
         {/* Was a 12px solid ink-muted square (board 244:1580, the same call as
@@ -242,7 +251,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
              that file and a real glyph needs no CSS of its own. The square
              background is dropped here rather than overridden there. */
           className={`bdc-lr-ic tw:inline-flex tw:items-center tw:justify-center tw:bg-transparent ${
-            isHidden ? "tw:text-[var(--bk-gray-300)]" : "tw:text-[var(--bk-ink-muted)]"
+            isHidden ? "tw:text-[var(--bk-gray-300)]" : ""
           }`}
           aria-hidden
         >

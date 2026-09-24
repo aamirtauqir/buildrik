@@ -18,7 +18,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--bk-space-8);
+  gap: var(--bk-space-4);
   height: 28px;
   /* Rows are flex items in an overflowing column, so flex-shrink was
      compressing them below the 28px above — their apparent height was an
@@ -73,12 +73,12 @@
 .bdc-lr.bdc-cms-bound { background: var(--bk-accent-tint); }
 
 .bdc-lr-chev {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--bk-ink-muted);
+  color: var(--bk-gray-500); font: 400 12px/16px var(--bk-font-ui);
   transition: transform 120ms;
   background: transparent;
   border: none;
@@ -97,7 +97,7 @@
      the svg inside is stroked in currentColor, which inherits the same token,
      so every row drew a grey square and the per-type icon was invisible. */
   background: transparent;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink); /* v3 4418:81300: the glyph is ink, like the name */
   flex-shrink: 0;
 }
 
@@ -234,8 +234,8 @@
 .bdc-lr .bdc-lr-lock:not(.bdc-on) { visibility: hidden; }
 .bdc-lr:hover .bdc-lr-eye,
 .bdc-lr:hover .bdc-lr-lock,
-.bdc-lr:focus-within .bdc-lr-eye,
-.bdc-lr:focus-within .bdc-lr-lock { visibility: visible; }
+.bdc-lr:has(:focus-visible) .bdc-lr-eye, .bdc-lr:focus-visible .bdc-lr-eye,
+.bdc-lr:has(:focus-visible) .bdc-lr-lock, .bdc-lr:focus-visible .bdc-lr-lock { visibility: visible; }
 
 /* Board 143:179 dims a hidden row ONCE — 245:1837 carries `opacity-45` and
    none of its five children carries an opacity of its own. This rule stacked
@@ -517,15 +517,9 @@
   height: var(--bk-size-row);
   display: flex;
   align-items: center;
-  /* 12, not 16: board 1082:4638 is the only Layers board that states the
-     footer's own insets and it says 12 — which is also the toolbar's inset
-     above it, so the panel now has one left edge instead of two. py-5 is that
-     board's box and 28 - 5 - 5 is the 18px line box exactly. */
-  padding: 5px var(--bk-space-12);
-  /* 18px line box — board 142:59, and 143:59 / 143:352 / 1171:4845 all repeat
-     it. The shorthand carried no line-height at all, so the count sat on
-     Inter's own ~15px normal. */
-  font: 400 var(--bk-text-12)/18px var(--bk-font-ui);
+  /* v3 4418:81300: count text at x16, 11/16 ink-muted; ⓘ ends 16 in. */
+  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 /* panel body container — holds the scrollable tree region */
