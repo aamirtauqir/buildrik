@@ -662,7 +662,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 activeSubTab={leftPanelSubTab}
                 composer={composer}
                 commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
-                onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
                 onCreateComponent={() => {}}
                 unpublishIntent={unpublishIntent}
                 onUnpublishIntentConsumed={() => setUnpublishIntent(false)}

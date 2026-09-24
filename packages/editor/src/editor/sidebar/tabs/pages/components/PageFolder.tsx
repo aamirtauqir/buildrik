@@ -13,13 +13,20 @@
  */
 
 import * as React from "react";
-import { IconButton, TextInput } from "@/editor/chrome-ui";
+import { IconButton, TextInput, Tooltip } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
 
+/* v3 7069:78978 "folders tooltip (ⓘ)". The board says "This browser only";
+   folders now live on the server per user (useFolders), so the copy says who
+   sees them instead of where they are kept. */
+const FOLDERS_TIP = "Personal folders · Only you see these; URLs stay unchanged.";
+
 interface Props {
   folder: FolderItem;
+  /** v3 4418:90494 draws the ⓘ on the first folder only — one explainer. */
+  explainFolders?: boolean;
   pages: PageItem[];
   allPages: PageItem[];
   composer: Composer | null;
@@ -38,11 +45,11 @@ interface Props {
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onDrop: (pageId: string) => void;
-  onPageRemove: (pageId: string) => void;
 }
 
 export const PageFolder: React.FC<Props> = ({
   folder,
+  explainFolders = false,
   pages,
   allPages,
   composer,
@@ -61,7 +68,6 @@ export const PageFolder: React.FC<Props> = ({
   onRenameCommit,
   onRenameCancel,
   onDrop,
-  onPageRemove,
 }) => {
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [isRenamingFolder, setIsRenamingFolder] = React.useState(false);
@@ -172,14 +178,17 @@ export const PageFolder: React.FC<Props> = ({
               e.stopPropagation();
               onToggle();
             }}
-            style={{ width: 12, height: 12, display: "grid", placeItems: "center", color: "var(--bk-ink-muted)", flexShrink: 0 }}
+            className="bd-pg-row-chev"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 10, height: 10, transition: "transform 120ms", transform: isExpanded ? "rotate(90deg)" : undefined }}>
-              <polyline points="9 6 15 12 9 18" />
+            {/* v3 4418:90494: the disclosure is Inter's small ▾ / ▸ in a 12×16
+                slot — drawn, because the glyph falls back to a much larger
+                one in other fonts. */}
+            <svg width="5" height="5" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true" className={isExpanded ? "" : "tw:-rotate-90"}>
+              <path d="M0 1.5h6L3 5z" />
             </svg>
           </IconButton>
 
-          <span style={{ flexShrink: 0, color: "var(--bk-ink-muted)", display: "grid", placeItems: "center" }} aria-hidden="true">
+          <span className="bd-pg-row-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
@@ -206,7 +215,7 @@ export const PageFolder: React.FC<Props> = ({
             />
           ) : (
             <span
-              style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", font: "400 13px var(--bk-font-ui)" }}
+              className="bd-pg-row-name bd-pg-folder-name"
               title={folder.name}
               onDoubleClick={(e) => {
                 e.stopPropagation();
@@ -217,14 +226,21 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
-          {/* `.bd-pg-folder-count` pushes itself right with `margin-left: auto`
-              (PagesTab.css:328). A second `flex: 1` spacer used to follow it,
-              so the free space was split between the NAME's flex:1 and that
-              spacer and the count parked mid-row — measured at x187 against
-              board 141:2's x290. One flex child, one auto margin. */}
+          {explainFolders && (
+            <Tooltip content={FOLDERS_TIP} placement="bottom" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
+              <span className="bd-pg-folder-info" data-testid="pages-folders-info" tabIndex={0} aria-label={FOLDERS_TIP}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </span>
+            </Tooltip>
+          )}
+          {/* v3 4418:90494: "3 pages", 11px muted, straight after the name. */}
           <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
-            {pages.length}
+            {pages.length} page{pages.length === 1 ? "" : "s"}
           </span>
+          <span className="tw:flex-1" aria-hidden="true" />
 
           <div className="bd-pg-folder-actions">
             <IconButton
@@ -265,18 +281,6 @@ export const PageFolder: React.FC<Props> = ({
         <div>
           {pages.map((page) => (
             <div key={page.id} className="bd-pg-page-wrap">
-              <IconButton
-                className="bd-pg-page-eject"
-                size="sm"
-                title="Remove from folder"
-                label={`Remove ${page.name} from folder`}
-                onClick={() => onPageRemove(page.id)}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 8, height: 8 }}>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </IconButton>
               <PageRow
                 page={page}
                 pages={allPages}

@@ -28,6 +28,11 @@ interface Props {
   onReplaceLayout: (id: string) => void;
   onCopyLink: (id: string) => void;
   onSettings: (id: string) => void;
+  /** The folder this page sits in, if any — offers "Remove from <folder>".
+   *  It was a hover × on the row's left edge; v3 7069:79370 gives that spot
+   *  to the ⠿ handle. */
+  folderName?: string;
+  onRemoveFromFolder: (id: string) => void;
 }
 
 export const PageContextMenu: React.FC<Props> = ({
@@ -43,6 +48,8 @@ export const PageContextMenu: React.FC<Props> = ({
   onReplaceLayout,
   onCopyLink,
   onSettings,
+  folderName,
+  onRemoveFromFolder,
 }) => {
   const page = pages.find((p) => p.id === pageId);
   const menuRef = React.useRef<HTMLDivElement>(null);
@@ -121,6 +128,11 @@ export const PageContextMenu: React.FC<Props> = ({
         <MenuItem data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
           Page settings…
         </MenuItem>
+        {folderName && (
+          <MenuItem data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
+            Remove from {folderName}
+          </MenuItem>
+        )}
         <MenuSeparator />
         <MenuItem
           danger
