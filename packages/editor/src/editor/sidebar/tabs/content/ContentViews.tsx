@@ -180,6 +180,7 @@ export function RootView({
   sourcesCount,
   variablesCount,
   conditionsCount,
+  selectedCollectionId,
   onOpenCollection,
   onCreateCollection,
   onOpenSources,
@@ -191,6 +192,7 @@ export function RootView({
   sourcesCount: number;
   variablesCount: number;
   conditionsCount: number;
+  selectedCollectionId?: string | null;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
   onOpenSources: () => void;
@@ -254,6 +256,8 @@ export function RootView({
           label={c.name}
           count={recordCounts[c.id] ?? "—"}
           chevron
+          selected={c.id === selectedCollectionId}
+          aria-current={c.id === selectedCollectionId ? "true" : undefined}
           data-testid={`content-collection-${c.id}`}
           onClick={() => onOpenCollection(c.id)}
         />
@@ -276,70 +280,6 @@ export function RootView({
       <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
       <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
       <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
-    </div>
-  );
-}
-
-/* ── Collection (149:50) ─────────────────────────────────────────────────── */
-
-export function CollectionView({
-  collection,
-  records,
-  onBack,
-  onOpenRecord,
-  onAddRecord,
-  onOpenFields,
-  onOpenDynamicPages,
-}: {
-  collection: CMSCollection;
-  records: CMSContentItem[];
-  onBack: () => void;
-  onOpenRecord: (id: string) => void;
-  onAddRecord: () => void;
-  onOpenFields: () => void;
-  onOpenDynamicPages?: () => void;
-}) {
-  const display = collection.displayField ?? collection.fields[0]?.slug;
-  const recordName = (r: CMSContentItem): string => {
-    const v = display ? r.data[display] : undefined;
-    return typeof v === "string" && v.trim() ? v : `Record ${r.id.slice(-4)}`;
-  };
-  return (
-    <div className={CONTENT_BODY}>
-      <Crumb label={collection.name} onClick={onBack} />
-      {/* 149:57 — a 32-tall meta strip on the panel's own 16px gutters, both
-          lines 12/18. It was 12px gutters, a 11px left word and a 13px right
-          one, so nothing in the row shared a baseline with the rows below.
-          The board states the 12/18 on the STRIP, not only on its two words,
-          and the strip itself was inheriting the document's 16 — invisible
-          while both children override it, and wrong the moment anything else
-          lands in the row. */}
-      <div className="tw:flex tw:h-8 tw:justify-between tw:items-center tw:px-4 tw:text-[12px] tw:leading-[18px]" data-testid="content-collection-meta">
-        <span className={META_TEXT} data-testid="content-collection-count">
-          {records.length} record{records.length === 1 ? "" : "s"}
-        </span>
-        <Button className={`${LINK_BTN} ${META_ADD}`} data-testid="content-collection-add" onClick={onAddRecord}>
-          + Add
-        </Button>
-      </div>
-      <div className={SCROLL}>
-        {records.map((r) => (
-          <RecordRow
-            key={r.id}
-            data-record-row
-            data-testid={`content-record-${r.id}`}
-            label={recordName(r)}
-            published={r.status === "published"}
-            chevron
-            onClick={() => onOpenRecord(r.id)}
-          />
-        ))}
-        {records.length === 0 && <div className={`${SUB} tw:p-3`}>No records yet — add the first one.</div>}
-      </div>
-      <div className="tw:border-t tw:border-[var(--bk-gray-200)]">
-        <ListRow label="Fields" count={collection.fields.length} chevron data-testid="content-open-fields" onClick={onOpenFields} />
-        {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron data-testid="content-open-dynamic" onClick={onOpenDynamicPages} />}
-      </div>
     </div>
   );
 }
@@ -559,7 +499,7 @@ export function FieldsView({
   onDeleteField,
 }: {
   collection: CMSCollection;
-  onBack: () => void;
+  onBack?: () => void;
   onAddField: (name: string, type: string, required: boolean) => Promise<void>;
   onDeleteField: (fieldId: string) => Promise<void>;
 }) {
@@ -572,7 +512,7 @@ export function FieldsView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={`${collection.name} · fields`} onClick={onBack} />
+      {onBack ? <Crumb label={`${collection.name} · fields`} onClick={onBack} /> : null}
       <div className={SCROLL}>
         {collection.fields.map((f) => (
           <Row key={f.id} size="stack" data-field-row data-testid={`content-fieldrow-${f.id}`}>
@@ -705,7 +645,7 @@ export function DynamicPagesView({
 }: {
   collection: CMSCollection;
   records: CMSContentItem[];
-  onBack: () => void;
+  onBack?: () => void;
   onSave: (pattern: string) => Promise<void>;
 }) {
   const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
@@ -719,7 +659,7 @@ export function DynamicPagesView({
      records are not in the undo stack — measured: the row was gone at once and
      ⌘Z did not bring it back. */
   const [confirmDelete, setConfirmDelete] = React.useState(false);
-  const leave = () => (dirty ? setConfirmLeave(true) : onBack());
+  const leave = () => (dirty ? setConfirmLeave(true) : onBack?.());
   const publishedCount = records.filter((r) => r.status === "published").length;
   /* Two more conditions decide whether a page actually appears, and neither is
      the record count. Both were checked against the service, not guessed:
@@ -736,7 +676,7 @@ export function DynamicPagesView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} />
+      {onBack ? <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} /> : null}
       <div className={SCROLL}>
         <div className={FIELD_LABEL}>URL pattern</div>
         <div className={FIELD_WRAP}>
@@ -788,7 +728,7 @@ export function DynamicPagesView({
       <ConfirmDialog
         open={confirmLeave}
         onClose={() => setConfirmLeave(false)}
-        onConfirm={() => { setConfirmLeave(false); onBack(); }}
+        onConfirm={() => { setConfirmLeave(false); onBack?.(); }}
         title="Discard changes?"
         message="The page pattern has unsaved changes. Going back throws them away."
         confirmLabel="Discard"

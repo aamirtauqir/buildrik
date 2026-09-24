@@ -10,6 +10,7 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
@@ -22,10 +23,6 @@ import {
 
 export type ContentView =
   | { kind: "root" }
-  | { kind: "collection"; id: string }
-  | { kind: "record"; collectionId: string; recordId: string | null }
-  | { kind: "fields"; collectionId: string }
-  | { kind: "dynamic-pages"; collectionId: string }
   | { kind: "sources" }
   | { kind: "variables" }
   | { kind: "conditions" };
@@ -145,13 +142,58 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     reload();
   }, [projectId, registerSiteSource, reload]);
 
+  /* The collection whose records `records` holds, so an engine event can
+     re-read the same list (the CMS workspace table and the drawer both read
+     through this hook). */
+  const recordsFor = React.useRef<string | null>(null);
   const loadRecords = React.useCallback(
     async (collectionId: string) => {
       if (!composer) return;
-      setRecords(await composer.cms.collections.getContentItems(collectionId));
+      recordsFor.current = collectionId;
+      const rows = await composer.cms.collections.getContentItems(collectionId);
+      if (recordsFor.current === collectionId) setRecords(rows);
     },
     [composer],
   );
+
+  // Reload on engine CMS events (collection created via the shell modal, etc.).
+  // NB: CollectionManager is its own emitter — subscribe there, not on composer.
+  React.useEffect(() => {
+    if (!composer) return;
+    const cms = composer.cms.collections;
+    const onChange = () => {
+      reload();
+      if (recordsFor.current) void loadRecords(recordsFor.current);
+    };
+    const cmsEvents = [
+      EVENTS.CMS_COLLECTION_CREATED,
+      EVENTS.CMS_COLLECTION_UPDATED,
+      EVENTS.CMS_COLLECTION_DELETED,
+      EVENTS.CMS_CONTENT_CREATED,
+      EVENTS.CMS_CONTENT_UPDATED,
+      EVENTS.CMS_CONTENT_DELETED,
+      /* The server hydration lands after this panel's first read. */
+      EVENTS.CMS_STORE_REFRESHED,
+    ] as const;
+    cmsEvents.forEach((ev) => cms.on(ev, onChange));
+
+    /* Sources live on DataManager, which is a DIFFERENT emitter. A source
+       registered or updated from anywhere else left the Sources view showing
+       stale rows, and board 303:2083's "Watching for changes" is only true
+       because the panel really is watching. */
+    const dataEvents = [
+      EVENTS.DATA_SOURCE_REGISTERED,
+      EVENTS.DATA_SOURCE_UPDATED,
+      EVENTS.DATA_SOURCE_UNREGISTERED,
+      EVENTS.DATA_SAMPLE_IMPORTED,
+    ] as const;
+    dataEvents.forEach((ev) => composer.data.on(ev, onChange));
+
+    return () => {
+      cmsEvents.forEach((ev) => cms.off(ev, onChange));
+      dataEvents.forEach((ev) => composer.data.off(ev, onChange));
+    };
+  }, [composer, reload, loadRecords]);
 
   const saveRecord = React.useCallback(
     async (

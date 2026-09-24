@@ -41,7 +41,7 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { CollectionView, FieldsView, RecordView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { FieldsView, RecordView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
@@ -2004,29 +2004,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   // to nothing while every gate stayed green — the probe silently measured
   // an empty page. e2e/ is typechecked now, and the coverage `S` used to give
   // is replaced by rendering the real converted views below.
-  "content-collection-rows": () => (
-    <div data-probe="content-collection-rows">
-      <CollectionView
-        collection={
-          {
-            id: "c1",
-            name: "Posts",
-            displayField: "title",
-            fields: [{ id: "f1", name: "Title", slug: "title", type: "text" }],
-          } as never
-        }
-        records={[
-          { id: "r0001", status: "published", data: { title: "Margherita" } } as never,
-          { id: "r0002", status: "draft", data: { title: "Marinara" } } as never,
-        ]}
-        onBack={() => {}}
-        onOpenRecord={() => {}}
-        onAddRecord={() => {}}
-        onOpenFields={() => {}}
-        onOpenDynamicPages={() => {}}
-      />
-    </div>
-  ),
   // The strike-through on a completed step used to be an inline
   // `textDecoration`, asserted in jsdom. It is a class now, and jsdom computes
   // "" for classes, so that assertion could no longer prove anything. This
