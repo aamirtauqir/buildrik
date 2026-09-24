@@ -162,7 +162,6 @@ const SECTIONS: SectionDef[] = [
       ["Pixel ID", "Meta Pixel", "pixel-id"],
       ["Enable Microsoft Clarity", "Microsoft Clarity", "enable-microsoft-clarity"],
       ["Clarity Project ID", "Microsoft Clarity", "clarity-project-id"],
-      ["Cookie Consent", "Consent", "cookie-consent"],
     ],
   },
   {
