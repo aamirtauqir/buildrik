@@ -97,7 +97,7 @@ export async function instantiateComponent(
 
   // The index only means something inside the parent the caller asked for.
   const index = parent === requested ? _index : undefined;
-  const element = composer.elements.pasteElement(clonedData, parent, index);
+  const element = composer.elements.pasteElement(clonedData, parent, index, false);
   if (!element) return null;
 
   const instance: ComponentInstance = {
@@ -285,7 +285,7 @@ export async function syncInstance(
     const { applied, dropped, kept } = applyOverridesToTree(clonedData, instance.overrides);
     overridesDropped = dropped;
 
-    const newElement = composer.elements.pasteElement(clonedData, parent, index);
+    const newElement = composer.elements.pasteElement(clonedData, parent, index, false);
     if (!newElement) throw new Error("Failed to re-instantiate during sync");
 
     const newInstance: ComponentInstance = {

@@ -257,9 +257,11 @@ export class ElementCRUD {
   }
 
   /**
-   * Paste element from clipboard data
+   * Paste element from clipboard data. `announce: false` mounts the tree
+   * without CLIPBOARD_PASTE — component instances are placed through here,
+   * and their toast is the component's, not "Element pasted".
    */
-  pasteElement(data: ElementData, target: Element, index?: number): Element | null {
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
     if (!data) return null;
 
     // Clone with new IDs
@@ -273,7 +275,9 @@ export class ElementCRUD {
     const place = resolvePlacement(newElement, target, index) ?? { parent: target, index };
     place.parent.addChild(newElement, place.index);
 
-    this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target: place.parent, index: place.index });
+    if (announce) {
+      this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target: place.parent, index: place.index });
+    }
     this.ctx.composer.markDirty();
 
     return newElement;

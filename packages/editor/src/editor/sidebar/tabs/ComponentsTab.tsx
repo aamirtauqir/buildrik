@@ -330,9 +330,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
-          const name = state.confirmDelete?.name;
-          state.confirmDeleteAction();
-          addToast({ description: `"${name}" deleted`, tone: "warning", duration: 4000 });
+          void state.confirmDeleteAction().then((toast) => toast && addToast(toast));
         }}
         {...componentDeleteCopy(
           state.confirmDelete?.name ?? "",

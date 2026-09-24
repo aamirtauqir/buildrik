@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, IconButton, TextInput, type ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
@@ -60,6 +60,25 @@ export function componentDeleteCopy(name: string, instances: number): { title: s
   return {
     title: `Delete “${name}”?`,
     message: `${fate} The saved ${name} component will be permanently deleted.`,
+  };
+}
+
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/**
+ * Delete a master — board 4418:142651: "Menu card deleted · 18 instances
+ * detached · Undo". Snapshots first, so Undo can re-register the master and
+ * relink the instances it detached. Both delete doors (this screen and the
+ * list's row menu) use it. Throws when the engine does.
+ */
+export async function deleteComponentWithUndo(composer: Composer, id: string): Promise<ToastInput> {
+  const snapshot = composer.components.snapshotComponent(id);
+  const detached = composer.components.getInstancesOfComponent(id).length;
+  await composer.components.deleteComponent(id);
+  const name = snapshot?.component.name ?? "Component";
+  return {
+    description: detached > 0 ? `${name} deleted · ${count(detached, "instance", "instances")} detached` : `${name} deleted`,
+    ...(snapshot && { action: { label: "Undo", onClick: () => void composer.components.restoreDeletedComponent(snapshot) } }),
   };
 }
 
@@ -149,6 +168,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     setShowUpdateConfirm(false);
     if (!composer || !selectedElementId) return;
 
+    const before = composer.components.snapshotComponent(component.id);
     const { updated, instancesSynced, overridesDropped } =
       await composer.components.updateComponentMaster(component.id, selectedElementId);
 
@@ -163,30 +183,32 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
     void captureComponentThumbnail(composer, component.id, selectedElementId);
 
-    const followed =
+    // Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo".
+    const headline =
       instancesSynced > 0
-        ? `${instancesSynced} instance${instancesSynced === 1 ? "" : "s"} followed`
-        : "no instances placed yet";
+        ? `${component.name} updated · ${count(instancesSynced, "linked instance", "linked instances")} updated`
+        : `${component.name} updated`;
+    const action = before && {
+      label: "Undo",
+      onClick: () => void composer.components.revertComponentMaster(component.id, before.component.masterTree),
+    };
 
     // Overrides whose target the new master no longer has cannot be re-applied.
     // They are gone; the engine used to report that only to devError, which is
     // a no-op in production, so the user watched their edits revert in silence.
     if (overridesDropped > 0) {
       addToast({
-        description: `"${component.name}" updated — ${followed}. ${overridesDropped} override${
+        description: `${headline}. ${overridesDropped} override${
           overridesDropped === 1 ? "" : "s"
         } couldn't be re-applied and ${overridesDropped === 1 ? "was" : "were"} lost.`,
         tone: "warning",
         duration: 8000,
+        ...(action && { action }),
       });
       return;
     }
 
-    addToast({
-      description: `"${component.name}" updated — ${followed}.`,
-      tone: "success",
-      duration: 4000,
-    });
+    addToast({ description: headline, ...(action && { action }) });
   };
 
   // Handle delete action — opens ConfirmDialog
@@ -197,10 +219,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Actual delete after confirmation
   const confirmDeleteAction = async () => {
     if (!composer) return;
-    await composer.components.deleteComponent(component.id);
     setShowDeleteConfirm(false);
-    // TODO: Add soft-delete + undo when backend supports it
-    addToast({ description: `"${component.name}" deleted`, tone: "warning", duration: 4000 });
+    try {
+      addToast(await deleteComponentWithUndo(composer, component.id));
+    } catch {
+      addToast({ description: "Couldn't delete component.", tone: "error" });
+      return;
+    }
     onDelete?.();
     onBack();
   };

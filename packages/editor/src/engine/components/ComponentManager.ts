@@ -43,6 +43,16 @@ export interface UpdateMasterOutcome {
   overridesDropped: number;
 }
 
+/**
+ * A component and its live instance records, deep-copied — what the toast
+ * Undo after an update or delete restores from. Element history holds pages,
+ * not component definitions, so ⌘Z cannot bring either back on its own.
+ */
+export interface ComponentSnapshot {
+  component: ComponentDefinition;
+  instances: ComponentInstance[];
+}
+
 const FAILED_UPDATE: UpdateMasterOutcome = {
   updated: false,
   instancesSynced: 0,
@@ -318,7 +328,22 @@ export class ComponentManager {
     // instance's edits up is a legitimate way to reach here — and its subtree
     // still carries instance bookkeeping that toJSON copies verbatim.
     this.instanceUtils.clearInstanceMarkers(promoted);
-    component.masterTree = promoted;
+    return this.applyMaster(component, promoted);
+  }
+
+  /** Undo of an update: put a snapshot's master back and fan it out again. */
+  async revertComponentMaster(id: string, masterTree: ComponentDefinition["masterTree"]): Promise<UpdateMasterOutcome> {
+    const component = this.components.get(id);
+    if (!component) return FAILED_UPDATE;
+    return this.applyMaster(component, deepClone(masterTree));
+  }
+
+  private async applyMaster(
+    component: ComponentDefinition,
+    masterTree: ComponentDefinition["masterTree"],
+  ): Promise<UpdateMasterOutcome> {
+    const id = component.id;
+    component.masterTree = masterTree;
     component.version++;
     component.updatedAt = Date.now();
 
@@ -436,6 +461,38 @@ export class ComponentManager {
     this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
 
     return duplicate;
+  }
+
+  snapshotComponent(id: string): ComponentSnapshot | null {
+    const component = this.components.get(id);
+    if (!component) return null;
+    return {
+      component: deepClone(component),
+      instances: getInstancesOfComponent(this.maps, id).map((i) => deepClone(i)),
+    };
+  }
+
+  /**
+   * Undo of a delete: re-register the snapshot's master and relink every
+   * instance whose element is still on the site. Returns how many relinked.
+   */
+  async restoreDeletedComponent(snapshot: ComponentSnapshot): Promise<number> {
+    const component = deepClone(snapshot.component);
+    await saveComponent(component, this.projectId);
+    this.components.set(component.id, component);
+
+    let relinked = 0;
+    for (const record of snapshot.instances) {
+      const element = this.composer.elements.getElement(record.elementId);
+      if (!element) continue;
+      const instance: ComponentInstance = { ...deepClone(record), isDetached: false };
+      this.instances.set(record.elementId, instance);
+      element.setData("componentInstance", instance);
+      relinked++;
+    }
+    if (relinked > 0) this.composer.markDirty();
+    this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+    return relinked;
   }
 
   async deleteComponent(id: string): Promise<boolean> {

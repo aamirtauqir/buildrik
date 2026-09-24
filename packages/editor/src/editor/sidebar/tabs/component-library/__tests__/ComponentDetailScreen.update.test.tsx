@@ -48,6 +48,8 @@ function makeComposer(
       endTransaction: vi.fn(),
       components: {
         updateComponentMaster,
+        snapshotComponent: () => ({ component: { masterTree: { id: "old" } }, instances: [] }),
+        revertComponentMaster: vi.fn().mockResolvedValue({ updated: true, instancesSynced: 2, overridesDropped: 0 }),
         instantiateComponent: vi.fn(),
         getInstancesOfComponent: () => instances,
         isInstance: () => false,
@@ -117,14 +119,19 @@ describe("ComponentDetailScreen — Update component", () => {
     await waitFor(() => expect(toastText()).toContain("3 overrides couldn't be re-applied"));
   });
 
-  it("confirms the fan-out on a clean update", async () => {
+  /* Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo". */
+  it("confirms the fan-out on a clean update, with an Undo that reverts the master", async () => {
     const { composer } = makeComposer();
     renderScreen(composer, "el-9");
 
     fireEvent.click(updateButton());
     fireEvent.click(confirmButton());
 
-    await waitFor(() => expect(toastText()).toContain("2 instances followed"));
+    await waitFor(() => expect(toastText()).toContain("CTA updated · 2 linked instances updated"));
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    const revert = (composer as unknown as { components: { revertComponentMaster: ReturnType<typeof vi.fn> } }).components
+      .revertComponentMaster;
+    await waitFor(() => expect(revert).toHaveBeenCalledWith("c1", { id: "old" }));
   });
 
   it("says so when the engine refuses", async () => {
