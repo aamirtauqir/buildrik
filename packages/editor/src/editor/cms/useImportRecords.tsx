@@ -122,7 +122,7 @@ export function ImportRecordsButton({ importer }: { importer: RecordsImporter })
     <Button
       size="xs"
       variant="secondary"
-      className="tw:h-7 tw:px-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]"
+      className="tw:h-8 tw:px-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]"
       disabled={importer.busy}
       data-testid="cms-ws-empty-import"
       onClick={importer.pick}

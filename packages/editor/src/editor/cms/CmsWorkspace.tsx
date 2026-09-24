@@ -181,12 +181,12 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   if (ws.tab === "records") {
     body = isEmpty ? (
       /* 4428:148905 — an empty collection offers both ways in. */
-      <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-24 tw:text-center" data-testid="cms-ws-no-records">
+      <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
         <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
-        <p className="tw:m-0 tw:mt-2 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
-        <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
+        <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
         <div className="tw:mt-3 tw:flex tw:gap-2">
-          <Button size="xs" className={PRIMARY} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
+          <Button size="xs" className={`${PRIMARY} tw:h-8`} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
             Add record
           </Button>
           <ImportRecordsButton importer={importer} />
