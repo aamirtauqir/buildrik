@@ -36,7 +36,9 @@
 /* ── Notifications ───────────────────────────────────────────────────────── */
 
 .bk-notifications {
-  width: var(--bk-size-panel-right);
+  /* Board 4418:140492: 358 wide. It sat at the 300 right-panel token, which
+     squeezed the fixed 268 text column until the age had no room at all. */
+  width: 358px;
   max-height: 60vh;
   overflow-y: auto;
   background: var(--bk-bg-panel);
@@ -82,19 +84,14 @@
   background: var(--bk-accent);
 }
 
-/* 165:10 — an 8px accent disc at x=16, on unread rows only. A read row keeps
-   the same 8px of column and puts nothing in it, which is what makes both
-   boards' text columns start at 32. */
-.bk-notif-row__spacer,
-.bk-notif-row__dot {
+/* Board 4418:140492 — a 12px type glyph at x=16, top-aligned with the first
+   line of text. */
+.bk-notif-row__icon {
   flex: none;
-  width: var(--bk-space-8);
-  height: var(--bk-space-8);
-  align-self: center;
-}
-.bk-notif-row__dot {
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-accent);
+  display: inline-flex;
+  width: var(--bk-space-12);
+  height: 18px;
+  align-items: center;
 }
 
 /* 268 is the board's own text column: 165:11 sits at x=32 and runs to 300 in a
