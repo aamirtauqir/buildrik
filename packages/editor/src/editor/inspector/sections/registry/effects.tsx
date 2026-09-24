@@ -14,7 +14,9 @@ import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   /* Board 4428:142686 draws OPACITY, SHADOW, BLUR, INTERACTIONS — one
-     control each. The rest of what paints is "More effects" (advanced). */
+     control each, and MORE EFFECTS as its own collapsed row between BLUR and
+     INTERACTIONS — so it is not tier-"advanced" (that would put it behind
+     "Show all" instead of drawing the row). */
   opacity: defineSection({
     tab: "effects",
     Component: OpacitySection,
@@ -38,7 +40,6 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   effects: defineSection({
     tab: "effects",
-    tier: "advanced",
     Component: EffectsSection,
     styleKeys: ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
