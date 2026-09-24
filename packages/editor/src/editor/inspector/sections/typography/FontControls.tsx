@@ -121,9 +121,12 @@ interface FontControlsProps {
   isMultiSelect?: boolean;
   /** Threaded so the colour chip can jump to the Design panel. */
   composer?: Composer | null;
+  /** Only the Size · line-height row — a container's inherited type
+   *  (board 7056:78382); the rest waits behind More settings. */
+  sizeOnly?: boolean;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys, composer }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys, composer, sizeOnly = false }) => {
   return (
     <>
       {/* Board 807:8342 pairs the two type numbers on one row — "Size 14 | 1.5"
@@ -163,7 +166,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
                 ariaLabel="Line height"
                 value={styles["line-height"] || ""}
                 onChange={(v) => onChange("line-height", v)}
-                units={["px", "em", "%", "normal"]}
+                /* Unitless first: "1.5 ×" is the board's line (7079:79176). */
+                units={["", "px", "em", "%", "normal"]}
                 placeholder="1.5"
               />
             </div>
@@ -178,6 +182,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         </div>
       </div>
 
+      {!sizeOnly && (
+      <>
       {/* Font Weight */}
       <div className="tw:relative">
         <MixedValueIndicator prop="font-weight" mixedKeys={mixedKeys} />
@@ -264,6 +270,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         />
       </div>
 
+      </>
+      )}
     </>
   );
 };
