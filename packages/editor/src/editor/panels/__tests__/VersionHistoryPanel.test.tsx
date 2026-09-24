@@ -225,15 +225,11 @@ describe("VersionHistoryPanel — restore flow", () => {
     const restoreBtn = screen.getByLabelText('Restore "Save A"');
     fireEvent.click(restoreBtn);
 
-    // Confirmation appears outside the row (pinned section).
-    const confirmRestore = await screen.findByText(/Restore “Save A”\?/);
+    // Confirmation appears as a modal (board 4418:74511).
+    const confirmRestore = await screen.findByText("Restore “Save A” to the draft?");
     expect(confirmRestore).toBeTruthy();
 
-    // Click "Restore" in the confirmation strip — there are now two
-    // possible matches; the inline section's button is the one with
-    // textContent "Restore" not gated by aria-label.
-    const allRestores = screen.getAllByRole("button", { name: /^Restore$/i });
-    fireEvent.click(allRestores[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     await waitFor(() => {
       expect(mocks.restoreVersion).toHaveBeenCalledWith("v1");

@@ -327,7 +327,7 @@ function ToastItem({
           {dot ? <span className="tw:pt-1.5">{dot}</span> : null}
           <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:min-w-0">
             <span className="tw:text-sm tw:font-semibold">{title}</span>
-            <span data-testid={`toast-body-${index}`}>{description}</span>
+            <span data-testid={`toast-body-${index}`} className="tw:whitespace-pre-line">{description}</span>
             {actionButton ? <div className="tw:flex tw:gap-2 tw:-ml-2">{actionButton}</div> : null}
           </div>
           {closeButton}

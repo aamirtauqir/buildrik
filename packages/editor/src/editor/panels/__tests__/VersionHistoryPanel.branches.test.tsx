@@ -229,7 +229,9 @@ describe("VersionHistoryPanel — save form branches", () => {
     fireEvent.change(input, { target: { value: "Milestone 2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save version" }));
 
-    expect(await screen.findByText("Saved 'Milestone 2'")).toBeTruthy();
+    // Board 4418:165677 — a titled "Version saved" card naming the version.
+    expect(await screen.findByText("Version saved")).toBeTruthy();
+    expect(screen.getByText(/^Milestone 2\s+Your current draft is saved as a named milestone/)).toBeTruthy();
     expect(mocks.createVersion).toHaveBeenCalledWith("Milestone 2", "");
     expect(screen.queryByLabelText("Version name")).toBeNull();
   });
@@ -244,10 +246,10 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
+    await screen.findByText("Restore “Save A” to the draft?");
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(screen.queryByText(/Restore “Save A”\?/)).toBeNull();
+    expect(screen.queryByText("Restore “Save A” to the draft?")).toBeNull();
     expect(mocks.restoreVersion).not.toHaveBeenCalled();
   });
 
@@ -258,8 +260,8 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     expect(await screen.findByText("Restore failed")).toBeTruthy();
   });
@@ -271,8 +273,8 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     expect(await screen.findByText(/^Restored to /)).toBeTruthy();
     expect(mocks.restoreVersion).toHaveBeenCalledWith("v1");
@@ -295,8 +297,8 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={composer} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     fireEvent.click(await screen.findByRole("button", { name: "Undo restore" }));
     await waitFor(() => expect(mocks.restoreVersion).toHaveBeenLastCalledWith("safety-1"));
@@ -485,28 +487,27 @@ describe("VersionHistoryPanel — compare branches", () => {
   that makes the action safe to take: restoring does not discard the current
   work, it saves it first.
 */
-describe("VersionHistoryPanel — board 163:167 restore confirm", () => {
+describe("VersionHistoryPanel — board 4418:74511 restore confirm", () => {
   it("says the current work survives", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    expect(await screen.findByText(/Restore “Save A”\?/)).toBeInTheDocument();
+    expect(await screen.findByText("Restore “Save A” to the draft?")).toBeInTheDocument();
     expect(
       screen.getByText("Your current work is saved first — nothing is lost."),
     ).toBeInTheDocument();
   });
 
-  it("sits above the list, not under it", async () => {
+  it("board 4418:74511 — is a modal naming what a restore leaves alone", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
     const Panel = await loadPanel();
-    const { container } = render(<Panel composer={makeComposer()} />);
+    render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    const confirm = await screen.findByRole("alertdialog");
-    const list = container.querySelector(".version-list, [class*=version-list]") ?? container.lastElementChild;
-    expect(confirm.compareDocumentPosition(list!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(await screen.findByTestId("history-restore-confirm")).toBeInTheDocument();
+    expect(screen.getByText(/stay unchanged\.$/)).toBeInTheDocument();
   });
 
   it("puts Cancel before Restore, per the board", async () => {
@@ -516,8 +517,8 @@ describe("VersionHistoryPanel — board 163:167 restore confirm", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    const dialog = await screen.findByRole("alertdialog");
-    const labels = [...dialog.querySelectorAll("button")].map((b) => b.textContent?.trim());
-    expect(labels).toEqual(["Cancel", "Restore"]);
+    const foot = await screen.findByTestId("modal-foot-history-restore-confirm");
+    const labels = [...foot.querySelectorAll("button")].map((b) => b.textContent?.trim());
+    expect(labels).toEqual(["Cancel", "Restore draft"]);
   });
 });

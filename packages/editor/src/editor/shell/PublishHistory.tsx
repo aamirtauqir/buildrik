@@ -17,8 +17,8 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { ConfirmDialog, EmptyState, Modal, Progress, Spinner, Button, Tooltip, VersionRow } from "@/editor/chrome-ui";
+import { AlertCircle, Check, CheckCircle2, Info, MoreHorizontal } from "lucide-react";
+import { ConfirmDialog, EmptyState, Menu, MenuItem, Modal, Popover, Progress, Spinner, Button, Tooltip, VersionRow } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { domainOf } from "@/editor/sidebar/tabs/publish/usePublishSnapshot";
@@ -80,18 +80,25 @@ function relTime(iso: string | Date | null): string {
 
 /* The version line is chrome-ui's VersionRow — Figma 240:6, whose own header
    names "Publish history" as a surface it was drawn for. */
-const WRAP = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:min-w-0";
+/* 4418:74024: the LIVE banner runs full-bleed, the rows follow at a 56 pitch
+   with no gap between them. */
+const WRAP = "tw:flex tw:flex-col tw:min-w-0";
 /* Board 949:4474's live banner — green tint block above the list. */
 const LIVE_BANNER =
-  "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1";
+  "tw:rounded-none tw:bg-[var(--bk-success-tint)] tw:px-4 tw:py-2.5 tw:mb-2 tw:flex tw:flex-col tw:gap-1";
 const LIVE_TITLE =
   "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-success-text)]";
 const LIVE_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-success)]";
 const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
 /* Board 949:4474 closes the list with the rule that makes a republish safe to
    try. It sits under the rows, not in a tooltip on each one. */
-const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
-const ROW_LINK = "tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:text-[var(--bk-accent)]";
+const FOOTER_NOTE = "tw:mt-2 tw:px-4 tw:text-xs tw:text-[var(--bk-ink-muted)]";
+/* 4418:74024 — the time sits at the row's right, 11/16 muted. */
+const ROW_TIME = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* The ⋯ shows on hover or focus, as 4418:74024 draws the rows bare. */
+const ROW_MORE =
+  "tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 tw:aria-expanded:opacity-100 tw:size-6 tw:p-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+const MENU_REASON = "tw:px-3 tw:pb-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* THE 24 GUTTER. Every modal in this family insets its content 24 from the
    frame: 184:29 and 184:30 are 392 in a 440, 184:52/184:53 are 392, 453:4071/
    453:4072 are 392, 184:42's progress track is 392, and 184:7's picker rows are
@@ -110,9 +117,9 @@ const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw
 const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
 const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
-const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
+const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-3.5";
 const STATUS_DISC =
-  "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
+  "tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
 const NOTICE = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
 /* Board 184:44 — the caption under the rollback progress bar. */
 const PROGRESS_CAPTION = "tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
@@ -120,7 +127,7 @@ const PROGRESS_CAPTION = "tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(
    ink (success) or error-text (failure), REGULAR weight in both. 184:53 /
    453:4072 are its footnote at 11/16, ink-muted and ink-soft respectively. */
 const OUTCOME_LEAD = "tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-const OUTCOME_SUB = "tw:mt-1 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const OUTCOME_SUB = "tw:mt-4 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const OUTCOME_LEAD_ERROR =
   "tw:text-center tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-error-text)]";
 const OUTCOME_REASON =
@@ -143,6 +150,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
   const [confirm, setConfirm] = React.useState<PublishHistoryRow | null>(null);
   /* Board 6881:70883 — the deploy a row click is inspecting. */
   const [details, setDetails] = React.useState<PublishHistoryRow | null>(null);
+  const [rowMenu, setRowMenu] = React.useState<string | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
   /* Board 453:4064 answers a failed rollback with a MODAL, not a line of grey
      text under the header — and its copy carries the one fact the user needs
@@ -322,66 +330,117 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
         const fromVersion = r.rolledBackFrom
           ? rows.find((x) => x.id === r.rolledBackFrom)?.version
           : undefined;
+        /* Decision #19: disabled-with-reason, never hidden — aria-disabled
+           (not `disabled`), and the menu says why beneath the item. */
+        const why = !canRollback
+          ? "Ask an admin to republish"
+          : r.rollbackable
+            ? null
+            : "This version's snapshot is no longer stored";
+        const prev = rows[i + 1];
         return (
           <VersionRow
             key={r.id}
             data-version-row
             data-version={r.version}
+            className="tw:group"
             /* Board 4418:74024: a deploy row opens its details overlay
-               (6881:70883). The row's own buttons stay theirs. */
+               (6881:70883). The row's own ⋯ stays its own. */
             interactive
             onClick={(e: React.MouseEvent) => {
               if ((e.target as HTMLElement).closest("button")) return;
               setDetails(r);
             }}
-            title={`Version ${r.version}`}
-            current={isLive}
-            currentLabel="Live"
-            meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
+            /* 4418:74024 writes the row "v6 · live" behind a green dot, the
+               time at the right, and no chip. */
+            title={isLive ? `v${r.version} · live` : `v${r.version}`}
+            state={isLive ? "live" : undefined}
+            /* Titles sit in one column past the live dot's slot (4418:74024). */
+            leading={isLive ? undefined : <span className="tw:size-2 tw:flex-none" aria-hidden="true" />}
+            meta={fromVersion !== undefined ? `↩ from v${fromVersion}` : ""}
             actions={
               <>
-                {onCompare && i < rows.length - 1 ? (
-                  <Button
-                    color="light"
-                    size="xs"
-                    onClick={() => onCompare({ id: rows[i + 1].id, version: rows[i + 1].version }, { id: r.id, version: r.version })}
-                    className={ROW_LINK}
-                    aria-label={`Compare v${rows[i + 1].version} to v${r.version}`}
-                  >
-                    Compare
-                  </Button>
-                ) : null}
-                {/* G1-052 — "Republish vN…" ON the row (Figma 6881:70883 /
-                    6881:71292), replacing the picker under the list. The live
-                    version carries none: republishing what is serving is a
-                    deploy that changes nothing, and its chip already says why.
-                    Disabled-with-reason, never hidden, for a pruned snapshot
-                    and for a role below ADMIN (P6; owner decision 8). */}
-                {!isLive ? (
-                  (() => {
-                    /* Decision #19: disabled-with-reason is aria-disabled + a
-                       tooltip, never `disabled` — the control stays focusable
-                       so the reason is reachable by keyboard. */
-                    const why = !canRollback
-                      ? "Ask an admin to republish"
-                      : r.rollbackable
-                        ? null
-                        : "This version's snapshot is no longer stored";
-                    const button = (
-                      <Button
-                        color="light"
-                        size="xs"
+                <span className={ROW_TIME}>{relTime(r.completedAt)}</span>
+                {/* Board 6881:71292 — every action lives in the row's ⋯:
+                    View details · Compare with current · Republish vN…
+                    "Compare with vN-1" stays as a fourth item: it is the
+                    row's older Compare, and parity never drops a capability. */}
+                <Popover
+                  open={rowMenu === r.id}
+                  onClose={() => setRowMenu(null)}
+                  placement="bottom-end"
+                  label={`v${r.version} actions`}
+                  trigger={
+                    <Button
+                      color="light"
+                      size="xs"
+                      className={ROW_MORE}
+                      aria-label={`v${r.version} actions`}
+                      aria-haspopup="menu"
+                      aria-expanded={rowMenu === r.id}
+                      onClick={() => setRowMenu((v) => (v === r.id ? null : r.id))}
+                      data-testid={`publish-row-menu-${r.version}`}
+                    >
+                      <MoreHorizontal size={14} aria-hidden="true" />
+                    </Button>
+                  }
+                >
+                  <Menu label={`v${r.version} actions`}>
+                    <MenuItem
+                      onClick={() => {
+                        setRowMenu(null);
+                        setDetails(r);
+                      }}
+                    >
+                      View details
+                    </MenuItem>
+                    {onCompareWithCurrent ? (
+                      <MenuItem
+                        onClick={() => {
+                          setRowMenu(null);
+                          onCompareWithCurrent({ id: r.id, version: r.version });
+                        }}
+                      >
+                        Compare with current
+                      </MenuItem>
+                    ) : null}
+                    {onCompare && prev ? (
+                      <MenuItem
+                        aria-label={`Compare v${prev.version} to v${r.version}`}
+                        onClick={() => {
+                          setRowMenu(null);
+                          onCompare({ id: prev.id, version: prev.version }, { id: r.id, version: r.version });
+                        }}
+                      >
+                        Compare with v{prev.version}
+                      </MenuItem>
+                    ) : null}
+                    {/* The live version carries no republish: republishing
+                        what is serving changes nothing. */}
+                    {!isLive ? (
+                      <MenuItem
                         aria-disabled={why ? "true" : undefined}
-                        onClick={why ? undefined : () => setConfirm(r)}
-                        className={`${ROW_LINK}${why ? " tw:opacity-50 tw:cursor-not-allowed" : ""}`}
+                        className={why ? "tw:cursor-not-allowed tw:text-[var(--bk-ink-disabled)] tw:hover:bg-transparent" : undefined}
+                        onClick={
+                          why
+                            ? undefined
+                            : () => {
+                                setRowMenu(null);
+                                setConfirm(r);
+                              }
+                        }
                         data-testid={`publish-republish-${r.version}`}
                       >
                         Republish v{r.version}…
-                      </Button>
-                    );
-                    return why ? <Tooltip content={why}>{button}</Tooltip> : button;
-                  })()
-                ) : null}
+                      </MenuItem>
+                    ) : null}
+                    {!isLive && why ? (
+                      <p className={MENU_REASON} data-testid={`publish-republish-why-${r.version}`}>
+                        {why}
+                      </p>
+                    ) : null}
+                  </Menu>
+                </Popover>
               </>
             }
           />
@@ -469,8 +528,13 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
         open={rollingBack !== null && rollbackJob?.state === "publishing"}
         onClose={() => setRollingBack(null)}
         kind="question"
+        width="sm"
         testId="publish-rollback-progress"
-        title="Republishing…"
+        title={
+          rollingBack?.live !== undefined
+            ? `Republishing v${rollingBack.target} as v${rollingBack.live + 1}…`
+            : "Republishing…"
+        }
       >
         <div className={MODAL_INSET}>
           {/* 184:42 draws the track bg-subtle with a 4 radius and 184:43 fills it
@@ -505,10 +569,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
         open={rolledBack !== null}
         onClose={() => setRolledBack(null)}
         kind="question"
+        width="sm"
+        closeButton
         testId="publish-rolledback"
-        title="Republished"
+        title="Version republished"
         footer={
-          <div className="tw:flex tw:justify-end">
+          <div className="tw:flex tw:w-full tw:justify-center">
             <Button onClick={() => setRolledBack(null)}>Close</Button>
           </div>
         }
@@ -518,7 +584,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
             and the modal had no such mark at all. */}
         <div className={STATUS_DISC_WRAP}>
           <span className={`${STATUS_DISC} tw:bg-[var(--bk-success)]`} aria-hidden="true">
-            <CheckCircle2 size={16} />
+            <Check size={16} strokeWidth={2.5} />
           </span>
         </div>
         <div className={MODAL_INSET}>
@@ -530,7 +596,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
         </p>
         {rolledBack?.previous !== undefined && (
           <p className={OUTCOME_SUB} data-testid="publish-rolledback-sub">
-            v{rolledBack.previous} is still in your history and can be republished the same way.
+            v{rolledBack.previous} remains in History. Live v{rolledBack.newLive} names v{rolledBack.target} as its source.
           </p>
         )}
         </div>
@@ -589,6 +655,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
       <ConfirmDialog
         open={confirm !== null}
         testId="publish-rollback-confirm"
+        width="sm"
+        closeButton
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
         title={confirm ? `Republish v${confirm.version} as v${nextVersion}?` : "Republish?"}
@@ -602,13 +670,11 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                 : " Your current version stays in history"}{" "}
               — nothing is deleted or rewritten.
             </p>
-            {/* The board's info block. It is not a repeat of the sentence
-                above: that one says what happens to the live version, this
-                one says what happens to the LIST — it only ever grows, and
-                the new entry carries its source. That is the fact that makes
-                a rollback safe to try. */}
+            {/* Board 4418:73440's info block, in its words: the live version
+                stays in history, and the new entry carries its source. That
+                is the fact that makes a rollback safe to try. */}
             <div className={INFO_BOX} data-testid="publish-rollback-info">
-              <p className={INFO_TITLE} data-testid="publish-rollback-info-title">The publish list only ever grows.</p>
+              <p className={INFO_TITLE} data-testid="publish-rollback-info-title">Your current published version remains in history.</p>
               <p className={INFO_META} data-testid="publish-rollback-info-meta">
                 v{nextVersion} will name v{confirm?.version} as its source.
               </p>

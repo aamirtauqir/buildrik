@@ -41,11 +41,13 @@ export const MODAL_FOOT_CLASS =
   "tw:[&_button]:h-8 tw:[&_button]:min-h-0 tw:[&_button]:px-4 tw:[&_button]:py-1.5 " +
   "tw:[&_button]:rounded-lg tw:[&_button]:text-[13px] tw:[&_button]:font-medium";
 
-/** width/dialog-md 560 is the default; New page draws width/dialog-lg 640;
+/** width/dialog-md 560 is the default; the republish confirm family
+ *  (4418:73440 / 73452 / 73462) draws width/dialog-sm 480; New page draws width/dialog-lg 640;
  *  "wide" is the board token width/dialog-xl 960 (Permissions, 4418:133026) —
  *  named apart because "xl" here was already 720. */
-export type ModalWidth = "md" | "lg" | "xl" | "wide";
+export type ModalWidth = "sm" | "md" | "lg" | "xl" | "wide";
 const WIDTH_CLASS: Record<ModalWidth, string> = {
+  sm: "tw:w-[var(--bk-size-dialog-sm)]",
   md: "tw:w-[var(--bk-size-dialog-md)]",
   lg: "tw:w-[var(--bk-size-dialog-lg)]",
   xl: "tw:w-[720px]",
