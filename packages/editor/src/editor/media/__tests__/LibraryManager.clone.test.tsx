@@ -79,6 +79,9 @@ async function mountLibrary(
   return { ...utils, onClose, composer };
 }
 
+/** The header's ▾ — Import from URL and Add from stock live in its menu (4418:58292). */
+const openAddMenu = () => fireEvent.click(screen.getByTestId("mgr-btn-upload-menu"));
+
 describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", () => {
   it("titles the overlay 'Asset library' with no MANAGE tag and no breadcrumb", async () => {
     await mountLibrary();
@@ -87,14 +90,19 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(screen.queryByText("All Media")).toBeNull();
   });
 
-  it("orders the header Import URL · Upload (primary) · Add from stock · Close, and Close is a labelled text button", async () => {
+  /* Board 4418:58292 "mgr-top" (v3): Upload | ▾ is one dark split control —
+     the ▾ holds Import from URL and Add from stock — then ‹ Back to canvas.
+     This pinned the Clone's four loose buttons (Import URL · Upload · Add
+     from stock · Close). */
+  it("draws Upload | ▾ then ‹ Back to canvas; the ▾ holds Import from URL and Add from stock", async () => {
     const { onClose } = await mountLibrary();
     const top = screen.getByTestId("mgr-top");
-    const names = within(top).getAllByRole("button").map((b) => b.textContent?.trim());
-    expect(names).toEqual(["Import URL", "Upload", "Add from stock", "Close"]);
-    expect(screen.getByTestId("mgr-btn-upload").className).toContain("mgr-btn-primary");
-    expect(screen.getByTestId("mgr-btn-stock").className).not.toContain("mgr-btn-primary");
-    fireEvent.click(within(top).getByRole("button", { name: "Close" }));
+    const names = within(top).getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim());
+    expect(names).toEqual(["Upload", "More ways to add", "‹ Back to canvas"]);
+    openAddMenu();
+    expect(screen.getByTestId("mgr-btn-import")).toHaveTextContent("Import from URL…");
+    expect(screen.getByTestId("mgr-btn-stock")).toHaveTextContent("Add from stock…");
+    fireEvent.click(within(top).getByRole("button", { name: "‹ Back to canvas" }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -155,7 +163,7 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
     const setLibraryQuery = vi.fn();
     const setLibrarySearch = vi.fn();
     await mountLibrary({ setLibraryQuery, setLibrarySearch });
-    fireEvent.change(screen.getByPlaceholderText("Search across all folders…"), { target: { value: "menu" } });
+    fireEvent.change(screen.getByPlaceholderText("Search all assets…"), { target: { value: "menu" } });
     expect(setLibraryQuery).toHaveBeenCalledWith("menu");
     expect(setLibrarySearch).not.toHaveBeenCalled();
   });
@@ -847,6 +855,7 @@ const landsAs = (id: string) =>
   }));
 
 const importUrl = (url: string) => {
+  openAddMenu();
   fireEvent.click(screen.getByTestId("mgr-btn-import"));
   fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: url } });
   fireEvent.click(screen.getByTestId("import-url-go"));
@@ -860,6 +869,7 @@ describe("Clone 3397:18835 → 3695:43873 / 3695:43876 · Import image from URL,
     const uploadFile = landsAs("imported");
     await mountWithUpload({ libraryItems: [...TEN, IMPORTED], currentFolderId: "f1", allFolders: [makeFolder()] }, uploadFile);
 
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-import"));
     expect(screen.getByRole("heading", { name: "Import image from URL" })).toBeInTheDocument();
     fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: "https://cdn.example.com/hero-imported.jpg" } });
@@ -911,6 +921,7 @@ describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", ()
   it("Add from stock opens the dialog with no Insert door; Save to library resolves into `Stock image saved`, and View asset selects it in the rail", async () => {
     const saveToLibrary = vi.fn(() => Promise.resolve({ key: "stock1", name: "restaurant-interior.jpg" }));
     await mountLibrary({ libraryItems: [...TEN, STOCK], saveToLibrary });
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-stock"));
     expect(stockStub.props?.open).toBe(true);
     expect(stockStub.props).not.toHaveProperty("onInsert");
@@ -927,6 +938,7 @@ describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", ()
   it("a save the engine refused keeps the stock dialog open and shows no result", async () => {
     const saveToLibrary = vi.fn(() => Promise.resolve(null));
     await mountLibrary({ saveToLibrary });
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-stock"));
     fireEvent.click(screen.getByTestId("stub-stock-save"));
     await vi.waitFor(() => expect(saveToLibrary).toHaveBeenCalledTimes(1));

@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, Search, Download, AlertCircle, X,
+  Upload, Search, AlertCircle, X, ChevronDown,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -35,7 +35,7 @@ import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
-import { useToast, Button, IconButton, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
@@ -113,6 +113,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      aria-disabled, with the reason on a tooltip. The rest of the media gate
      lives in the grid, folder rail, details and menu components. */
   const mediaWrite = useMediaWriteAccess();
+  const [uploadMenuOpen, setUploadMenuOpen] = React.useState(false);
   const viewOnlyTip = (control: React.ReactElement) =>
     mediaWrite.canWrite ? control : (
       <Tooltip content={mediaWrite.reason("upload")} placement="bottom">
@@ -799,74 +800,98 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       <div className="mgr-top" data-testid="mgr-top">
         <h2 className="mgr-title">Asset library</h2>
 
-        <div className="mgr-middle">
-          <div className="mgr-search">
-            <Search size={14} />
-            {/* Clone 3721:43697 — while a tag is the filter the field leads
-                with its token, `Tag: menu · Clear filter ×`, where the
-                placeholder was; typing after it searches within the tag. */}
-            {state.tagFilter && (
-              <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
-                Tag: {state.tagFilter} · Clear filter
-                <IconButton
-                  size="sm"
-                  label="Clear the tag filter"
-                  className={SEARCH_TAG_CLEAR}
-                  data-testid="mgr-search-tag-clear"
-                  onClick={() => state.setTagFilter(null)}
-                >
-                  <X size={12} />
-                </IconButton>
-              </span>
-            )}
-            <TextInput
-              ref={searchRef}
-              type="text"
-              placeholder={state.tagFilter ? "" : "Search across all folders…"}
-              aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : undefined}
-              data-testid="mgr-search-input"
-              value={state.librarySearch}
-              onChange={(e) => state.setLibraryQuery(e.target.value)}
-            />
-            <span className="mgr-kbd">⌘K</span>
-          </div>
+        {/* Board 4418:58292 "mgr-top": title · a full-width search · the dark
+            Upload split button (▾ holds Import from URL and Add from stock) ·
+            ‹ Back to canvas. */}
+        <div className="mgr-search">
+          <Search size={16} />
+          {/* Clone 3721:43697 — while a tag is the filter the field leads
+              with its token, `Tag: menu · Clear filter ×`, where the
+              placeholder was; typing after it searches within the tag. */}
+          {state.tagFilter && (
+            <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
+              Tag: {state.tagFilter} · Clear filter
+              <IconButton
+                size="sm"
+                label="Clear the tag filter"
+                className={SEARCH_TAG_CLEAR}
+                data-testid="mgr-search-tag-clear"
+                onClick={() => state.setTagFilter(null)}
+              >
+                <X size={12} />
+              </IconButton>
+            </span>
+          )}
+          <TextInput
+            ref={searchRef}
+            type="text"
+            placeholder={state.tagFilter ? "" : "Search all assets…"}
+            aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : "Search all assets"}
+            data-testid="mgr-search-input"
+            value={state.librarySearch}
+            onChange={(e) => state.setLibraryQuery(e.target.value)}
+          />
         </div>
 
-        {/* Upload is the primary — it is the action the library exists for.
-            Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
-          {viewOnlyTip(
-            <Button
-              className={mediaWrite.canWrite ? "mgr-btn" : "mgr-btn tw:opacity-55"}
-              data-testid="mgr-btn-import"
-              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
-              onClick={() => {
-                if (!mediaWrite.canWrite) return;
-                setImportDraft("");
-                setImportUrlOpen(true);
-              }}
+          <div className={`mgr-upload-split${mediaWrite.canWrite ? "" : " mgr-upload-split--view-only"}`}>
+            {viewOnlyTip(
+              <Button
+                className="mgr-btn-primary"
+                data-testid="mgr-btn-upload"
+                aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+                onClick={() => mediaWrite.canWrite && handleUploadClick()}
+              >
+                <Upload size={16} />
+                Upload
+              </Button>,
+            )}
+            <span className="mgr-upload-divider" aria-hidden="true" />
+            <Popover
+              open={uploadMenuOpen}
+              onClose={() => setUploadMenuOpen(false)}
+              placement="bottom-end"
+              label="More ways to add"
+              trigger={
+                <Button
+                  className="mgr-btn-primary mgr-upload-caret"
+                  data-testid="mgr-btn-upload-menu"
+                  aria-label="More ways to add"
+                  aria-haspopup="menu"
+                  aria-expanded={uploadMenuOpen}
+                  onClick={() => setUploadMenuOpen((v) => !v)}
+                >
+                  <ChevronDown size={16} />
+                </Button>
+              }
             >
-              <Download size={14} />
-              Import URL
-            </Button>,
-          )}
-          {viewOnlyTip(
-            <Button
-              className={mediaWrite.canWrite ? "mgr-btn-primary" : "mgr-btn-primary tw:opacity-55"}
-              data-testid="mgr-btn-upload"
-              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
-              onClick={() => mediaWrite.canWrite && handleUploadClick()}
-            >
-              <Upload size={14} />
-              Upload
-            </Button>,
-          )}
-          <Button className="mgr-btn" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
-            <Plus size={14} />
-            Add from stock
-          </Button>
+              <Menu label="More ways to add">
+                <MenuItem
+                  data-testid="mgr-btn-import"
+                  aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+                  onClick={() => {
+                    setUploadMenuOpen(false);
+                    if (!mediaWrite.canWrite) return;
+                    setImportDraft("");
+                    setImportUrlOpen(true);
+                  }}
+                >
+                  Import from URL…
+                </MenuItem>
+                <MenuItem
+                  data-testid="mgr-btn-stock"
+                  onClick={() => {
+                    setUploadMenuOpen(false);
+                    setStockModalOpen(true);
+                  }}
+                >
+                  Add from stock…
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </div>
           <Button className="mgr-close" data-testid="mgr-btn-close" onClick={onClose}>
-            Close
+            ‹ Back to canvas
           </Button>
         </div>
       </div>

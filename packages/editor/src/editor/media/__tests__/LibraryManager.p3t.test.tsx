@@ -267,7 +267,7 @@ describe("Clone 3721:43697 / 43902 / 44107 · Tag menu · team · food — the t
   it("no tag active: no token, the placeholder is the library's, and no TAGS group without tags", async () => {
     await mountLibrary({ libraryItems: TEN, allLibraryItems: TEN });
     expect(screen.queryByTestId("mgr-search-tag-token")).toBeNull();
-    expect(screen.getByPlaceholderText("Search across all folders…")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search all assets…")).toBeInTheDocument();
     expect(screen.queryByTestId("mgr-tags")).toBeNull();
   });
 });
