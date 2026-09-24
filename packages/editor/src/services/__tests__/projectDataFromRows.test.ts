@@ -47,6 +47,12 @@ describe("projectDataFromRows → renderProjectPages", () => {
     expect(project.settings?.seo?.metaTitle).toBe("Bella Cucina");
 
     const pages = await renderProjectPages(project);
+    // Each rendered page names its source page — the /share menu shows NAMES
+    // and links pages by SLUG.
+    expect(pages.map((p) => [p.path, p.name, p.slug])).toEqual([
+      ["index.html", "Home", "home"],
+      ["menu.html", "Menu", "menu"],
+    ]);
     const byPath = Object.fromEntries(pages.map((p) => [p.path, p.html]));
     expect(byPath["index.html"]).toContain("Welcome to Bella");
     expect(Object.values(byPath).join("\n")).toContain("Our menu");

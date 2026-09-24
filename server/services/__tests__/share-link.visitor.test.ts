@@ -45,13 +45,14 @@ describe("resolveShareLink", () => {
   });
 
   it.each([
-    ["missing", null],
-    ["revoked", link({ isActive: false })],
-    ["expired", link({ expiresAt: new Date(Date.now() - 1000) })],
-    ["deleted site", link({ site: { id: "s1", name: "Bella", deletedAt: new Date() } })],
-  ])("%s → unavailable", async (_label, row) => {
+    ["missing", null, "unknown"],
+    ["revoked", link({ isActive: false }), "revoked"],
+    ["expired", link({ expiresAt: new Date(Date.now() - 1000) }), "expired"],
+    ["deleted site", link({ site: { id: "s1", name: "Bella", deletedAt: new Date() } }), "revoked"],
+    ["expired AND password", link({ expiresAt: new Date(Date.now() - 1000), passwordHash: "$2a$h" }), "expired"],
+  ])("%s → unavailable (%s)", async (_label, row, reason) => {
     vi.mocked(prisma.shareLink.findUnique).mockResolvedValue(row as never);
-    await expect(resolveShareLink("t", undefined)).resolves.toEqual({ state: "unavailable" });
+    await expect(resolveShareLink("t", undefined)).resolves.toEqual({ state: "unavailable", reason });
   });
 
   it("an unexpired link with a future expiry is still open", async () => {
