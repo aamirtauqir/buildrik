@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { getBoxModel, getElementInfo } from "../utils/elementInfo";
@@ -117,13 +118,14 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
     }
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
+    const zs = canvasScale(canvasRef.current);
     const elementRect = element.getBoundingClientRect();
 
     const relativeRect = new DOMRect(
-      elementRect.left - canvasRect.left,
-      elementRect.top - canvasRect.top,
-      elementRect.width,
-      elementRect.height
+      (elementRect.left - canvasRect.left) / zs,
+      (elementRect.top - canvasRect.top) / zs,
+      elementRect.width / zs,
+      elementRect.height / zs
     );
 
     setOverlayData({

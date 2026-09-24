@@ -48,6 +48,9 @@ interface MediaTabProps {
   ) => void;
   /** When provided, MediaTab renders as the slim 280px launcher (panel mode). */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
+  /** ⌘K "Search stock photos" (and its no-results fallback) opens the drawer
+   *  straight on the stock browser, with that query when one was typed. */
+  initialStockQuery?: string;
 }
 
 export function MediaTab(props: MediaTabProps) {
@@ -69,6 +72,7 @@ function MediaTabWithComposer({
   onClose,
   onOpenImageEditor,
   onOpenLibrary,
+  initialStockQuery,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
   const { addToast } = useToast();
@@ -99,7 +103,11 @@ function MediaTabWithComposer({
     state.setPanelExpanded(false);
     onOpenLibrary();
   }, [state.panelExpanded, state, onOpenLibrary]);
-  const [stockBrowserOpen, setStockBrowserOpen] = React.useState(false);
+  const [stockBrowserOpen, setStockBrowserOpen] = React.useState(initialStockQuery !== undefined);
+  const { discSearchAll } = state;
+  React.useEffect(() => {
+    if (initialStockQuery) void discSearchAll(initialStockQuery);
+  }, [initialStockQuery, discSearchAll]);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
     addToast({ description: msg, tone: type });

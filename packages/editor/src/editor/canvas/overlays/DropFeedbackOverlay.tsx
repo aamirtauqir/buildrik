@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
@@ -121,12 +122,13 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
   const message = invalidReason ? INVALID_DROP_MESSAGES[invalidReason] : null;
 
   // Calculate relative position only when visual is shown
+  const zs = canvasScale(canvasRef.current);
   const relativeRect = showVisual
     ? {
-        left: targetRect.left - canvasRect.left,
-        top: targetRect.top - canvasRect.top,
-        width: targetRect.width,
-        height: targetRect.height,
+        left: (targetRect.left - canvasRect.left) / zs,
+        top: (targetRect.top - canvasRect.top) / zs,
+        width: targetRect.width / zs,
+        height: targetRect.height / zs,
       }
     : null;
 

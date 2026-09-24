@@ -3,7 +3,8 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { EVENTS } from "@/shared/constants/events";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionsSection } from "../index";
 import type { Interaction } from "../types";
@@ -28,27 +29,35 @@ describe("InteractionsSection", () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it("shows empty-state hint when no interactions", () => {
+  it("draws no empty-state paragraph — the board shows only + Add interaction", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
-    expect(screen.getByText(/No interactions yet/i)).toBeInTheDocument();
+    expect(screen.queryByText(/No interactions yet/i)).toBeNull();
+  });
+
+  it("a row reads trigger · animation · chevron (board 4428:142686: On hover  Scale up ›)", () => {
+    const interaction = { ...makeInteraction("hover"), animation: { ...DEFAULT_ANIMATION_CONFIG, preset: "scaleUp" } } as Interaction;
+    renderOpen({ interactions: [interaction], onInteractionsChange: vi.fn() });
+    const row = screen.getByRole("button", { name: /On hover/ });
+    expect(row).toHaveTextContent("Scale Up");
+    expect(row).toHaveTextContent("›");
   });
 
   it("renders Add Interaction button", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
     // Multiple matches possible (section title includes "Interactions") — use getAllByText
-    const matches = screen.getAllByText(/Add Interaction/i);
+    const matches = screen.getAllByText(/Add interaction/);
     expect(matches.length).toBeGreaterThan(0);
   });
 
   it("shows the trigger picker panel when Add Interaction is clicked", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
-    fireEvent.click(screen.getByText(/\+ Add Interaction/i));
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
     expect(screen.getByText("Choose Trigger")).toBeInTheDocument();
   });
 
   it("hides the picker panel when close button is clicked", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
-    fireEvent.click(screen.getByText(/\+ Add Interaction/i));
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
     // The × close button rendered via &#215;
     const closeBtn = screen.getByText("×");
     fireEvent.click(closeBtn);
@@ -58,8 +67,8 @@ describe("InteractionsSection", () => {
   it("calls onInteractionsChange when a trigger is selected", () => {
     const onChange = vi.fn();
     renderOpen({ interactions: [], onInteractionsChange: onChange });
-    fireEvent.click(screen.getByText(/\+ Add Interaction/i));
-    fireEvent.click(screen.getByText("On Click"));
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("On click"));
     expect(onChange).toHaveBeenCalledOnce();
     const [newList] = onChange.mock.calls[0] as [Interaction[]];
     expect(newList).toHaveLength(1);
@@ -73,7 +82,7 @@ describe("InteractionsSection", () => {
       interactions: [interaction],
       onInteractionsChange: vi.fn(),
     });
-    expect(screen.getByText("On Hover")).toBeInTheDocument();
+    expect(screen.getByText("On hover")).toBeInTheDocument();
   });
 
   it("calls onInteractionsChange with empty array when interaction is deleted", () => {
@@ -84,7 +93,7 @@ describe("InteractionsSection", () => {
       onInteractionsChange: onChange,
     });
     // Expand the item to reveal the Delete button
-    fireEvent.click(screen.getByText("On Hover"));
+    fireEvent.click(screen.getByText("On hover"));
     fireEvent.click(screen.getByText("Delete"));
     expect(onChange).toHaveBeenCalledWith([]);
   });
@@ -96,10 +105,35 @@ describe("InteractionsSection", () => {
       interactions: [interaction],
       onInteractionsChange: onChange,
     });
-    fireEvent.click(screen.getByText("On Click"));
+    fireEvent.click(screen.getByText("On click"));
     fireEvent.click(screen.getByText("Disable"));
     expect(onChange).toHaveBeenCalledOnce();
     const [updated] = onChange.mock.calls[0] as [Interaction[]];
     expect(updated[0].enabled).toBe(false);
+  });
+
+  it("shows an interaction the moment the element takes it (live defect: it appeared only after a re-mount)", () => {
+    const handlers = new Map<string, (el: unknown) => void>();
+    let stored: Interaction[] = [];
+    const element = { id: "el-1", getInteractions: () => stored };
+    const composer = {
+      on: (e: string, h: (el: unknown) => void) => handlers.set(e, h),
+      off: (e: string) => handlers.delete(e),
+      elements: { getElement: () => element },
+    };
+    renderOpen({
+      interactions: [],
+      onInteractionsChange: (next) => {
+        stored = next;
+        handlers.get(EVENTS.ELEMENT_UPDATED)?.(element);
+      },
+      composer: composer as never,
+      elementId: "el-1",
+    });
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    act(() => {
+      fireEvent.click(screen.getByText("On hover"));
+    });
+    expect(screen.getByRole("button", { name: /On hover/ })).toBeInTheDocument();
   });
 });

@@ -34,6 +34,9 @@ export interface BindingPopoverProps {
   composer: Composer | null;
   /** Called when user wants to create a new collection (opens CMSCollectionSetupModal) */
   onOpenCreateCollection?: () => void;
+  /** A host-drawn trigger (Settings › CONTENT's Static / From CMS row).
+   *  Absent → the chain-link icon button. */
+  renderTrigger?: (t: { open: boolean; isBound: boolean; toggle: () => void }) => React.ReactNode;
 }
 
 // =============================================================================
@@ -59,6 +62,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   elementId,
   composer,
   onOpenCreateCollection,
+  renderTrigger,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [collections, setCollections] = React.useState<CMSCollection[]>([]);
@@ -191,15 +195,19 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
       label="Bind to collection field"
       className="tw:w-60"
       trigger={
-        <IconButton
-          size="sm"
-          label="Bind to collection field"
-          pressed={isActive}
-          aria-expanded={open}
-          onClick={() => (open ? handleClose() : setOpen(true))}
-        >
-          <Link size={12} aria-hidden />
-        </IconButton>
+        renderTrigger ? (
+          renderTrigger({ open, isBound, toggle: () => (open ? handleClose() : setOpen(true)) })
+        ) : (
+          <IconButton
+            size="sm"
+            label="Bind to collection field"
+            pressed={isActive}
+            aria-expanded={open}
+            onClick={() => (open ? handleClose() : setOpen(true))}
+          >
+            <Link size={12} aria-hidden />
+          </IconButton>
+        )
       }
     >
       {/* Current binding status */}

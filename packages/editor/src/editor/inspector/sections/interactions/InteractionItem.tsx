@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { InteractionEditor } from "./InteractionEditor";
-import { type Interaction, getTriggerInfo } from "./types";
+import { ANIMATION_PRESETS, type Interaction, getTriggerInfo } from "./types";
 
 // ============================================================================
 // TYPES
@@ -26,39 +26,12 @@ export interface InteractionItemProps {
 // STYLES
 // ============================================================================
 
-const styles = {
-  container: (enabled: boolean): React.CSSProperties => ({
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 8,
-    overflow: "hidden",
-    opacity: enabled ? 1 : 0.5,
-  }),
-  header: (isEditing: boolean): React.CSSProperties => ({
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "10px 12px",
-    cursor: "pointer",
-    background: isEditing ? "var(--bk-bg-card)" : "transparent",
-  }),
-  icon: {
-    fontSize: 14,
-  },
-  label: {
-    flex: 1,
-    fontSize: 13,
-    color: "var(--bk-ink)",
-  },
-  type: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-  },
-  arrow: (isEditing: boolean): React.CSSProperties => ({
-    transform: isEditing ? "rotate(90deg)" : "none",
-    color: "var(--bk-ink-muted)",
-    fontSize: 12,
-  }),
-};
+/* Board 4428:142686 draws each interaction as a flat 32px row:
+   trigger on the left, the animation it plays and a chevron on the right. */
+const ROW =
+  "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:cursor-pointer tw:select-none " +
+  "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)] tw:rounded-[var(--bk-radius-sm)] " +
+  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 // ============================================================================
 // COMPONENT
@@ -74,15 +47,33 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({
   onPreview,
 }) => {
   const triggerInfo = getTriggerInfo(interaction.trigger);
+  const presetLabel =
+    ANIMATION_PRESETS.find((p) => p.value === interaction.animation.preset)?.label ?? interaction.animation.preset;
 
   return (
-    <div style={styles.container(interaction.enabled)}>
-      {/* Header */}
-      <div onClick={onToggleEdit} style={styles.header(isEditing)}>
-        <span style={styles.icon}>{triggerInfo.icon}</span>
-        <span style={styles.label}>{triggerInfo.label}</span>
-        <span style={styles.type}>{interaction.animation.preset}</span>
-        <span style={styles.arrow(isEditing)}>&#9654;</span>
+    <div style={{ opacity: interaction.enabled ? 1 : 0.5 }}>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isEditing}
+        className={ROW}
+        onClick={onToggleEdit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggleEdit();
+          }
+        }}
+      >
+        <span className="tw:flex-1 tw:min-w-0 tw:truncate">{triggerInfo.label}</span>
+        <span className="tw:text-[var(--bk-ink-muted)] tw:truncate">{presetLabel}</span>
+        <span
+          aria-hidden="true"
+          className="tw:text-[var(--bk-ink-muted)] tw:inline-block tw:transition-transform"
+          style={{ transform: isEditing ? "rotate(90deg)" : "none" }}
+        >
+          ›
+        </span>
       </div>
 
       {/* Expanded Editor */}

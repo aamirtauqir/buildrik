@@ -167,10 +167,6 @@
     {
       "name": "sechead-size",
       "testId": "inspector-sechead-size"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [

@@ -9,9 +9,9 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   getStorageKey,
   loadSetFromStorage,
-  loadMapFromStorage,
+  takeLegacyLayerState,
+  getLayerName,
   saveSetToStorage,
-  saveMapToStorage,
   applyStoredStatesToDOM,
 } from "../layersPersistence";
 
@@ -62,22 +62,28 @@ describe("Set persistence round-trip", () => {
   });
 });
 
-describe("Map persistence round-trip", () => {
-  it("saves and loads a Map as a JSON object", () => {
-    saveMapToStorage("p1", new Map([["id1", "Hero"], ["id2", "Footer"]]));
-    const loaded = loadMapFromStorage("p1");
-    expect(loaded).toBeInstanceOf(Map);
-    expect(loaded.get("id1")).toBe("Hero");
-    expect(loaded.get("id2")).toBe("Footer");
+describe("legacy names / locked keys (pre G2-061)", () => {
+  it("are read once and removed", () => {
+    localStorage.setItem(getStorageKey("p1", "names"), JSON.stringify({ id1: "Hero" }));
+    localStorage.setItem(getStorageKey("p1", "locked"), JSON.stringify(["id2"]));
+    const { names, locked } = takeLegacyLayerState("p1");
+    expect(names.get("id1")).toBe("Hero");
+    expect([...locked]).toEqual(["id2"]);
+    expect(localStorage.getItem(getStorageKey("p1", "names"))).toBeNull();
+    expect(localStorage.getItem(getStorageKey("p1", "locked"))).toBeNull();
   });
 
-  it("returns an empty Map when the key is missing", () => {
-    expect(loadMapFromStorage("nope").size).toBe(0);
-  });
-
-  it("returns an empty Map when the stored value is invalid JSON", () => {
+  it("an invalid stored value migrates nothing", () => {
     localStorage.setItem(getStorageKey("p1", "names"), "###");
-    expect(loadMapFromStorage("p1").size).toBe(0);
+    expect(takeLegacyLayerState("p1").names.size).toBe(0);
+  });
+});
+
+describe("getLayerName", () => {
+  it("reads data.layerName, and nothing else", () => {
+    expect(getLayerName({ getCustomData: (k) => (k === "layerName" ? "Hero" : undefined) })).toBe("Hero");
+    expect(getLayerName({ getCustomData: () => "" })).toBeUndefined();
+    expect(getLayerName(undefined)).toBeUndefined();
   });
 });
 

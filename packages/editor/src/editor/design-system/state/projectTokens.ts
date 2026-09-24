@@ -31,7 +31,7 @@ export function mergeProjectTokens(
     storedVersion < CURRENT_SCHEMA_VERSION
       ? migrateDesignTokens(incoming as DesignToken[], storedVersion, CURRENT_SCHEMA_VERSION)
       : (incoming as DesignToken[]);
-  return DEFAULT_TOKENS.map((def) => {
+  const seeded = DEFAULT_TOKENS.map((def) => {
     const hit = saved.find((t) => (t.id ? t.id === def.id : t.name === def.name));
     /* The dark variant rides along. Only `value` was copied, so a dark value
        saved through Brand's Apply reached projectSettings and was dropped
@@ -40,4 +40,9 @@ export function mergeProjectTokens(
     if (!hit) return def;
     return hit.darkValue ? { ...def, value: hit.value, darkValue: hit.darkValue } : { ...def, value: hit.value };
   });
+  /* Tokens the site ADDED (Brand's "+ Add token") are not in the seed, and
+     mapping over the seed dropped them: measured live 2026-09-24, a token
+     added, saved and reloaded was gone. They follow the seed, as saved. */
+  const added = saved.filter((t) => t.id && !DEFAULT_TOKENS.some((def) => def.id === t.id));
+  return [...seeded, ...added];
 }

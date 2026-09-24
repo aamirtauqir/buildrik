@@ -40,7 +40,6 @@ import { getProfileFor } from "../config/elementProfiles";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 import {
   SECTION_REGISTRY,
-  sectionApplies,
   type SectionContext,
   type SectionId,
   type ShouldRenderContext,
@@ -79,6 +78,7 @@ export interface InspectorTabContentProps {
     c: IconConfig | undefined,
     s: (i: IconConfig) => void
   ) => void;
+  onOpenCreateCollection?: () => void;
   devMode: boolean;
   /** Beginner hides the registry's ADVANCED-tagged sections behind "Show all
    *  (N more)" (board 4428:141170); Pro shows everything (4428:141406). */
@@ -108,6 +108,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     advancedState,
     onOpenMediaLibrary,
     onOpenIconPicker,
+    onOpenCreateCollection,
     devMode,
     tier,
     showAll,
@@ -218,6 +219,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
               },
           onOpenMediaLibrary,
           onOpenIconPicker,
+          onOpenCreateCollection,
           devMode,
           tabId,
           tier: sectionTier,
@@ -228,16 +230,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         };
         return <React.Fragment key={id}>{entry.render(ctx)}</React.Fragment>;
       })}
-
-      {/* Every profile board closes with this line — "2 of 12 sections apply",
-          "4 of 13" on the flex board. It says why most of the column is shut:
-          the sections below carry nothing for this element yet. */}
-      {renderIds.length > 0 && (
-        <p className="tw:m-0 tw:px-4 tw:py-3 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]" data-testid="inspector-sections-apply">
-          {renderIds.filter((id) => sectionApplies(id, styles)).length} of{" "}
-          {renderIds.length} sections apply
-        </p>
-      )}
 
       {/* Board 4428:141170's `row/show-all` — "Show all (3 more)" — and its
           expanded twin 6887:74333, "8 of 8 groups · Show less ▴". A preference,

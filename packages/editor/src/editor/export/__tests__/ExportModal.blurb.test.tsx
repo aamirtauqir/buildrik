@@ -1,3 +1,4 @@
+import * as React from "react";
 /**
  * Board 1172:4825 titles the export modal "Export site as HTML" and puts a
  * sentence under it saying what you actually get.
@@ -14,6 +15,10 @@
  * @license BSD-3-Clause
  */
 import { render, screen, cleanup } from "@testing-library/react";
+
+import { ToastProvider } from "@/editor/chrome-ui";
+/* ExportModal reports ready / failed through the toast (C5 G3-113). */
+const renderT = (ui: React.ReactElement) => render(ui, { wrapper: ToastProvider });
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ExportModal } from "../ExportModal";
 
@@ -28,7 +33,7 @@ vi.mock("../../../engine/export/ExportEngine", () => ({
 afterEach(cleanup);
 
 const open = () =>
-  render(<ExportModal isOpen onClose={vi.fn()} composer={null as never} />);
+  renderT(<ExportModal isOpen onClose={vi.fn()} composer={null as never} />);
 
 describe("ExportModal — board 1172:4825's title and blurb", () => {
   it("names the format in the title, not just 'Export'", () => {

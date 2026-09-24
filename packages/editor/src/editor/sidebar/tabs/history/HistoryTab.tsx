@@ -194,7 +194,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   return (
     <PanelFrame className="bd-history-container" data-testid="history-panel">
       <PanelFrame.Header
-        title="Version History"
+        title="History"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}

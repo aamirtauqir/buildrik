@@ -63,6 +63,33 @@ const SHAPES: Record<string, React.ReactElement> = {
       <rect x="92" y="33" width="26" height="12" rx="3" fill={ACCENT} />
     </>
   ),
+  "menu-grid": (
+    <>
+      <rect x="40" y="10" width="56" height="6" rx="2" fill={INK} />
+      <rect x="12" y="24" width="34" height="44" rx="3" fill={FILL} stroke={INK} />
+      <rect x="51" y="24" width="34" height="44" rx="3" fill={FILL} stroke={INK} />
+      <rect x="90" y="24" width="34" height="44" rx="3" fill={FILL} stroke={INK} />
+    </>
+  ),
+  "testimonials-section": (
+    <>
+      <rect x="12" y="16" width="54" height="48" rx="3" fill={FILL} stroke={INK} />
+      <rect x="70" y="16" width="54" height="48" rx="3" fill={FILL} stroke={INK} />
+      <rect x="20" y="26" width="38" height="4" rx="2" fill={INK} />
+      <rect x="78" y="26" width="38" height="4" rx="2" fill={INK} />
+      <rect x="20" y="50" width="12" height="6" rx="3" fill={ACCENT} />
+      <rect x="78" y="50" width="12" height="6" rx="3" fill={ACCENT} />
+    </>
+  ),
+  contact: (
+    <>
+      <rect x="12" y="20" width="44" height="6" rx="2" fill={INK} />
+      <rect x="12" y="32" width="34" height="4" rx="2" fill={INK} opacity="0.6" />
+      <rect x="12" y="40" width="30" height="4" rx="2" fill={INK} opacity="0.6" />
+      <rect x="70" y="14" width="54" height="52" rx="3" fill={FILL} stroke={INK} />
+      <circle cx="97" cy="40" r="5" fill={ACCENT} />
+    </>
+  ),
 };
 
 const GENERIC = (

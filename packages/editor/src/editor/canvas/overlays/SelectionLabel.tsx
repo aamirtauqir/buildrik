@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
@@ -56,14 +57,15 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
       if (!el) return;
 
       const canvasRect = canvas.getBoundingClientRect();
+      const zs = canvasScale(canvas);
       const elRect = el.getBoundingClientRect();
       const scrollLeft = canvas.scrollLeft || 0;
       const scrollTop = canvas.scrollTop || 0;
 
       setPosition({
-        left: elRect.left - canvasRect.left + scrollLeft,
-        top: elRect.top - canvasRect.top + scrollTop,
-        width: elRect.width,
+        left: (elRect.left - canvasRect.left) / zs + scrollLeft,
+        top: (elRect.top - canvasRect.top) / zs + scrollTop,
+        width: elRect.width / zs,
       });
     };
 

@@ -1,14 +1,18 @@
 /**
  * CommandPalette — the editor's ONE command palette.
  * Triggered by Ctrl+K / ⌘+K; ⌘⇧P is an alias (audit G1-093, decision #38).
- * PRD §17.1
  *
- * The canvas used to carry a second palette behind ⌘⇧P
- * (`canvas/controls/CommandPalette.tsx` + `useCanvasCommandPalette`), and the
- * Pages panel a third behind its own ⌘K (`PageCommandPalette`). Both are
- * gone: their rows live in the engine registry (`defaultCommands.ts`, and the
- * page rows the Pages panel registers while it is mounted), which this
- * palette reads on every open.
+ * Board 4418:141220 (v3 · "Commands · navigation and page actions (⌘K)"):
+ * a 640-wide card 48px from the top with a "Search pages, layers, assets and
+ * actions…" field and a "Scope: everything" chip, then five bands — NAVIGATE ·
+ * EDIT · VIEW · ADD · TOOLS — in the board's order, 32px rows at 11px, and a
+ * legend foot ("Click a command · Esc Close … Current editor"). The opening
+ * list IS that curated set; typing searches it plus every other command the
+ * editor has (the engine registry, and the page rows the Pages panel registers
+ * while it is open — those band under PAGES).
+ *
+ * The canvas used to carry a second palette behind ⌘⇧P, and the Pages panel a
+ * third behind its own ⌘K (`PageCommandPalette`). Both are gone.
  *
  * @module editor/shell/modals/CommandPalette
  * @license BSD-3-Clause
@@ -19,29 +23,23 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
-import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
-import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
+
 // =============================================================================
 // TYPES
 // =============================================================================
-
-/** How many commands the opening list offers before the rest fall under their
- *  own bands — board 166:2 shows a short "Suggested" head, not the catalogue. */
-const SUGGESTED_COUNT = 5;
 
 interface PaletteCommand {
   id: string;
   label: string;
   group: string;
   shortcut?: string;
-  icon?: string;
   /** Registry `keywords` — matched by the filter beside the label. */
   keywords?: string[];
   handler: () => void;
-  /** Board 166:58 — a command you cannot run is still worth seeing. Disabled
-   *  rows render muted with the reason and don't close the palette. */
+  /** A command you cannot run is still worth seeing: disabled rows render
+   *  muted as "Label · reason" and don't close the palette. */
   disabled?: boolean;
   disabledReason?: string;
 }
@@ -49,224 +47,203 @@ interface PaletteCommand {
 export interface CommandPaletteProps {
   onClose: () => void;
   composer: Composer | null;
+  /** A panel's "Search everywhere for …" hand-off (G2-059) opens on its query. */
+  initialQuery?: string;
 }
 
+/** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
+ *  leads; MORE holds everything searchable that the opening list leaves out. */
+const BAND_ORDER = ["Pages", "Navigate", "Edit", "View", "Add", "Tools", "More"];
+/** Bands the opening (empty-query) list shows — the board's curated set. */
+const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
+
 // =============================================================================
-// HELPERS
+// COMMANDS
 // =============================================================================
 
 function buildCommands(composer: Composer | null, onClose: () => void): PaletteCommand[] {
   const commands: PaletteCommand[] = [];
+  const run = (fn: () => void) => () => {
+    fn();
+    onClose();
+  };
+  const openPanel = (panel: string, screen?: string) =>
+    composer?.emit(EVENTS.UI_PANEL_OPEN, screen ? { panel, screen } : { panel });
 
-  // 1. Navigation — from GROUPED_TABS_CONFIG
-  for (const tab of GROUPED_TABS_CONFIG) {
-    if (!tab.shortcut) continue;
-    commands.push({
-      id: `nav-${tab.id}`,
-      /* A fullpage tab (Templates, Brand, Settings) is a view, not a panel. */
-      label: tab.mode === "fullpage" ? `Open ${tab.label}` : `Open ${tab.label} panel`,
-      group: "Navigation",
-      shortcut: tab.shortcut,
-      handler: () => {
-        if (composer) {
-          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: tab.id });
-        }
-        onClose();
-      },
-    });
+  // NAVIGATE — board order. Each is a door, so none prints a chord.
+  const nav: Array<[string, string, () => void, string[]?]> = [
+    ["pages", "Open Pages", () => openPanel("pages")],
+    ["add", "Open Add", () => openPanel("add")],
+    ["layers", "Open Layers", () => openPanel("layers")],
+    ["assets", "Open Assets", () => openPanel("assets")],
+    ["asset-library", "Open Asset library", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }), ["media", "files"]],
+    ["content", "Open CMS", () => openPanel("content"), ["collections", "records"]],
+    ["design", "Open Brand", () => openPanel("design"), ["tokens", "colours", "fonts"]],
+    ["publish", "Open Publish", () => openPanel("publish")],
+    ["ai", "Open AI assistant", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })],
+    ["templates", "Browse Templates", () => openPanel("templates")],
+    ["review", "Open Review", () => openPanel("review")],
+    ["activity", "Open Activity", () => openPanel("history", "activity")],
+    ["issues", "Open Issues", () => composer?.emit(EVENTS.UI_OPEN_ISSUES, undefined), ["problems", "errors", "warnings", "checks"]],
+    ["settings", "Open Site settings", () => openPanel("settings")],
+    ["components", "Open Components", () => openPanel("components")],
+    ["shortcuts", "Keyboard shortcuts", () => composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {})],
+  ];
+  for (const [id, label, fn, keywords] of nav) {
+    commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
 
   if (!composer) return commands;
 
-  // 2. Edit
-  commands.push(
-    {
-      id: "edit-undo",
-      label: "Undo",
-      group: "Edit",
-      shortcut: "Ctrl+Z",
-      disabled: !composer.history.canUndo(),
-      disabledReason: "nothing to undo",
-      handler: () => { composer.history.undo(); onClose(); },
-    },
-    {
-      id: "edit-redo",
-      label: "Redo",
-      group: "Edit",
-      shortcut: "Ctrl+Y",
-      disabled: !composer.history.canRedo(),
-      disabledReason: "nothing to redo",
-      handler: () => { composer.history.redo(); onClose(); },
-    },
-    /* Copy and Paste are NOT hardcoded here. They used to be, as
-       `document.execCommand("copy"|"paste")`, and both were dead: the editor's
-       clipboard is `composer.clipboard` holding a serialised element, while
-       execCommand("copy") copies a DOM text selection the palette does not
-       have, and execCommand("paste") is refused outright by every modern
-       browser. Worse, the registry loop below dedups by LABEL — so the real
-       `copy` and `paste` commands were skipped as duplicates of these two, and
-       the only Copy and Paste a user could reach were the broken ones. They
-       come from the registry now, guarded like the rest. */
-    /* Delete is not hardcoded either, and for a sharper reason than Copy and
-       Paste: this row AND the registry's `delete` both appeared in the palette
-       — two rows a reader cannot tell apart — and both removed exactly one
-       element. This one checked getSelectedIds() for its guard and then
-       deleted ids[0]. The registry's is multi-aware and transactional now, and
-       carries this row's clearer label. Board 166:58 still governs the
-       disabled treatment ("A command you cannot run is still worth seeing —
-       hiding it means the shortcut someone memorised silently vanishes");
-       registryGuard supplies the reason. */
-  );
-
-  // 3. View
-  commands.push(
-    {
-      id: "view-preview",
-      label: "Preview",
-      group: "View",
-      shortcut: "Ctrl+P",
-      handler: () => { composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {}); onClose(); },
-    },
-    {
-      /* C3: the topbar Issues chip is gone; ⌘K and the site menu are the
-         Issues panel's doors. */
-      id: "view-issues",
-      label: "Show issues",
-      group: "View",
-      keywords: ["problems", "errors", "warnings", "checks"],
-      handler: () => { composer.emit(EVENTS.UI_OPEN_ISSUES, undefined); onClose(); },
-    },
-    {
-      id: "view-zoom-in",
-      label: "Zoom in",
-      group: "View",
-      shortcut: "Ctrl++",
-      handler: () => { composer.emit(EVENTS.ZOOM_IN, {}); onClose(); },
-    },
-    {
-      id: "view-zoom-out",
-      label: "Zoom out",
-      group: "View",
-      shortcut: "Ctrl+-",
-      handler: () => { composer.emit(EVENTS.ZOOM_OUT, {}); onClose(); },
-    },
-    {
-      id: "view-fit",
-      /* "Zoom to fit" on Ctrl+1 — the flyout's own row and chord
-         (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). This printed
-         "Fit to view · Ctrl+0" — the one chord the audit flagged as wrong
-         (G1-093 / SH-90), and the last surface still calling it that. */
-      label: "Zoom to fit",
-      group: "View",
-      shortcut: "Ctrl+1",
-      handler: () => { composer.emit(EVENTS.ZOOM_FIT, {}); onClose(); },
-    }
-  );
-
-  // 4. History
-  commands.push(
-    {
-      id: "history-undo",
-      label: "Undo last action",
-      group: "History",
-      shortcut: "Ctrl+Z",
-      disabled: !composer.history.canUndo(),
-      disabledReason: "nothing to undo",
-      handler: () => { composer.history.undo(); onClose(); },
-    },
-    {
-      id: "history-clear",
-      label: "Clear history",
-      group: "History",
-      handler: () => { composer.emit(EVENTS.HISTORY_CLEARED, undefined); onClose(); },
-    }
-  );
-
-  // 4b. v3 IA doors (docs/plans/2026-09-14-editor-v3-ia.md Q8) — the two
-  // features that had no non-keystroke entry once the rail's ⋯ More went:
-  // the page-replace flow lives inside Templates, the cheat sheet behind `?`.
-  commands.push(
-    {
-      id: "templates-replace-layout",
-      label: "Replace page layout with template…",
-      /* "Templates", not "Pages": the PAGES band is the Pages panel's context
-         section and exists only while that panel is open. */
-      group: "Templates",
-      handler: () => { composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {}); onClose(); },
-    },
-    {
-      id: "help-keyboard-shortcuts",
-      label: "Keyboard shortcuts",
-      group: "Help",
-      shortcut: "?",
-      handler: () => { composer.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); onClose(); },
-    },
-  );
-
-  /* Carried over from the canvas palette, flag-gated the same way
-     StudioHeader gates the Collaborate CTA (G2-038: "collab row stays
-     flag-gated"). Not a registry command: it needs the site id from the URL,
-     which lives in services/ and engine/ may not import. */
-  if (isFeatureEnabled("collab")) {
-    commands.push({
-      id: "start-collab",
-      label: "Start collaboration session",
-      group: "Tools",
-      keywords: ["collaborate", "team", "real-time", "multiplayer", "share"],
-      handler: () => {
-        const siteId = getSiteIdFromUrl();
-        if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
-        onClose();
-      },
-    });
-  }
-
-  // 5. Registry-backed commands (S3.14 B8 fix). The CommandCenter holds ~39
-  // commands the hardcoded list never surfaced — Export HTML/JSON, Open
-  // Exporter, device switches — so ⌘K couldn't reach them. Append the ones not
-  // already covered (dedup by label), run through the registry. Additive: the
-  // hardcoded commands above keep their exact behavior.
-  const registry = composer.commands?.getAll?.() ?? [];
-  const seenLabels = new Set(commands.map((c) => c.label.toLowerCase()));
   const selectedCount = composer.selection?.getSelectedIds?.().length ?? 0;
   const selectedType = composer.selection?.getSelected?.()?.getType?.();
-  /* Registry commands that quietly return when the selection is wrong. Walked
-     the palette command by command: Group with one element selected, Ungroup
-     with a non-container, and every nudge/reorder with nothing selected all
-     looked perfectly available, ran, and did nothing. The engine cannot carry
-     this — its command list is built once at startup, while the selection
-     changes under it — so the reason is computed here, where the list is built
-     each time the palette opens. Same treatment Undo and Delete already got. */
-  const registryGuard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
+  const registry = composer.commands?.getAll?.() ?? [];
+  const reg = (id: string) => registry.find((c) => c.id === id);
+  /* Registry commands that quietly return when the selection is wrong. The
+     engine cannot carry this — its list is built once at startup while the
+     selection changes under it — so the reason is computed here, each open. */
+  const guard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
     if (cmd.id === "group") return selectedCount < 2 ? "select two or more" : undefined;
     if (cmd.id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
-    /* `paste` reads composer.clipboard and returns silently when it is empty —
-       the same shape as the selection-bound rows, and the same reason it is
-       guarded. */
     if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
-    /* The registry says which rows need a selection (`requiresSelection`);
-       this used to be a hand-kept id list here that the registry could
-       silently outgrow. */
-    if (cmd.requiresSelection) return selectedCount === 0 ? "nothing selected" : undefined;
+    if (cmd.requiresSelection) return selectedCount === 0 ? "Select an element first" : undefined;
     return undefined;
   };
-  for (const cmd of registry) {
-    const label = cmd.label ?? cmd.id;
-    if (seenLabels.has(label.toLowerCase())) continue;
-    seenLabels.add(label.toLowerCase());
-    const reason = registryGuard(cmd);
+  const used = new Set<string>();
+  /** A registry command placed in one of the board's bands. */
+  const fromRegistry = (id: string, group: string, label?: string) => {
+    const cmd = reg(id);
+    if (!cmd) return;
+    used.add(id);
+    const reason = guard(cmd);
     commands.push({
-      id: `cmd-${cmd.id}`,
-      label,
-      /* The registry's own group decides the band: "Navigation" lands under
-         GO TO with the panel rows, "Pages" (registered by the Pages panel
-         while it is open) under PAGES, everything else under ACTIONS. */
-      group: cmd.group ?? "Commands",
+      id: `cmd-${id}`,
+      label: label ?? cmd.label ?? id,
+      group,
       shortcut: cmd.shortcut,
       keywords: cmd.keywords,
       disabled: reason !== undefined,
       disabledReason: reason,
-      handler: () => { composer.commands.run(cmd.id); onClose(); },
+      handler: run(() => composer.commands.run(id)),
+    });
+  };
+
+  // EDIT
+  commands.push({
+    id: "edit-undo",
+    label: "Undo",
+    group: "Edit",
+    shortcut: "Ctrl+Z",
+    disabled: !composer.history.canUndo(),
+    disabledReason: "No changes to undo",
+    handler: run(() => composer.history.undo()),
+  });
+  used.add("undo");
+  fromRegistry("duplicate", "Edit");
+  fromRegistry("replace-media", "Edit");
+
+  // VIEW
+  const pageName = composer.elements?.getActivePage?.()?.name;
+  commands.push(
+    { id: "view-zoom-50", label: "Zoom to 50%", group: "View", handler: run(() => composer.setZoom(50)) },
+    {
+      id: "view-preview",
+      label: pageName ? `Preview ${pageName} page` : "Preview",
+      group: "View",
+      shortcut: "Ctrl+P",
+      keywords: ["preview"],
+      handler: run(() => composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {})),
+    },
+  );
+
+  // ADD
+  fromRegistry("add-text", "Add");
+  fromRegistry("add-container", "Add");
+  commands.push({
+    id: "add-ai-block",
+    label: "Generate a block with AI…",
+    group: "Add",
+    keywords: ["ai", "generate", "section", "block"],
+    /* The AI assistant plans and runs changes (decision #23); it is where a
+       generated block comes from. */
+    handler: run(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })),
+  });
+
+  // TOOLS
+  fromRegistry("cms-records", "Tools");
+  fromRegistry("save-template", "Tools");
+  commands.push(
+    {
+      id: "templates-replace-layout",
+      label: "Replace layout with template…",
+      group: "Tools",
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})),
+    },
+    { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
+    {
+      id: "tools-stock",
+      label: "Search stock photos",
+      group: "Tools",
+      keywords: ["unsplash", "pexels", "image", "photo"],
+      handler: run(() => openPanel("assets", "stock")),
+    },
+  );
+
+  // MORE — searchable, not in the opening list.
+  commands.push(
+    {
+      id: "edit-redo",
+      label: "Redo",
+      group: "More",
+      shortcut: "Ctrl+Y",
+      disabled: !composer.history.canRedo(),
+      disabledReason: "nothing to redo",
+      handler: run(() => composer.history.redo()),
+    },
+    { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.emit(EVENTS.ZOOM_IN, {})) },
+    { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
+    /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
+    { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
+    { id: "history-clear", label: "Clear history", group: "More", handler: run(() => composer.emit(EVENTS.HISTORY_CLEARED, undefined)) },
+  );
+  used.add("redo");
+
+  /* Carried over from the canvas palette, flag-gated the same way StudioHeader
+     gates the Collaborate CTA. Not a registry command: it needs the site id
+     from the URL, which lives in services/ and engine/ may not import. */
+  if (isFeatureEnabled("collab")) {
+    commands.push({
+      id: "start-collab",
+      label: "Start collaboration session",
+      group: "More",
+      keywords: ["collaborate", "team", "real-time", "multiplayer", "share"],
+      handler: run(() => {
+        const siteId = getSiteIdFromUrl();
+        if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
+      }),
+    });
+  }
+
+  /* Everything else the registry holds (Export HTML/JSON, devices, nudges…) —
+     searchable under MORE. The Pages panel's rows keep their PAGES band. Dedup
+     by id AND label: a registry row the board list already carries is not
+     printed twice. */
+  const seenLabels = new Set(commands.map((c) => c.label.toLowerCase()));
+  for (const cmd of registry) {
+    if (used.has(cmd.id)) continue;
+    const label = cmd.label ?? cmd.id;
+    if (seenLabels.has(label.toLowerCase())) continue;
+    seenLabels.add(label.toLowerCase());
+    const reason = guard(cmd);
+    commands.push({
+      id: `cmd-${cmd.id}`,
+      label,
+      group: cmd.group === "Pages" ? "Pages" : "More",
+      shortcut: cmd.shortcut,
+      keywords: cmd.keywords,
+      disabled: reason !== undefined,
+      disabledReason: reason,
+      handler: run(() => composer.commands.run(cmd.id)),
     });
   }
 
@@ -274,167 +251,100 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
 }
 
 // =============================================================================
-// SHORTCUT BADGE
+// PARTS
 // =============================================================================
 
-const ShortcutBadge: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
-  const isMac =
-    typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-  const display = formatChord(shortcut, isMac);
-
+/** 4418:141220 kbd chip — gray-100 on a gray-200 edge, 20 tall, 11/16 medium. */
+const Kbd: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
+  const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   return (
-    /* Boards 166:9 / 166:14 / 166:17 / 303:1984 draw the chord as bare mono
-       text in --color/ink-muted at 11/16, not as a chip. The gray-200 chip it
-       shipped as needed gray-700 to clear AA against its own fill (3.9:1 with
-       gray-500, per axe); dropped onto the panel's white it is ink-muted at
-       4.83 and the note that justified the darker grey no longer applies. */
     <span
       data-testid={testId}
-      className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-mono)] tw:font-medium"
+      className="tw:flex tw:h-5 tw:flex-none tw:items-center tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:whitespace-nowrap tw:text-[var(--bk-gray-500)]"
     >
-      {display}
+      {/* The board prints "⌘Z", not "⌘+Z": symbols join their key directly. */}
+      {formatChord(shortcut, isMac).replace(/([⌘⇧⌥⌃])\+/g, "$1")}
     </span>
   );
 };
+
+/** One id for the listbox, so the input can point at it and at its rows. */
+const LIST_ID = "bk-cmdk-list";
+
+/** Band name -> test-id suffix. */
+const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
 
 // =============================================================================
 // COMPONENT
 // =============================================================================
 
-/** One id for the listbox, so the input can point at it and at its rows. */
-const LIST_ID = "bk-cmdk-list";
-
-/** Fixed strip order — see `bands` below for why it cannot be emission order.
- *  PAGES is the context band: it exists only while the Pages panel is open
- *  (it registers those rows on mount) and sits under RECENT so a jump is one
- *  arrow away, ahead of the generic SUGGESTED head. */
-const BAND_ORDER = ["Recent", "Pages", "Suggested", "Actions", "Go to"];
-
-/** Band name -> test-id suffix ("Go to" -> "go-to"). */
-const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
-
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer }) => {
-  const [query, setQuery] = React.useState("");
+export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer, initialQuery = "" }) => {
+  const [query, setQuery] = React.useState(initialQuery);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  /* The palette unmounts on close (StudioHeader renders it conditionally), so
+     this list — and every "cannot run" reason in it — is rebuilt on each open
+     against the selection of that moment. */
   const commands = React.useMemo(
     () => buildCommands(composer, onClose),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // The palette unmounts on close (StudioHeader renders it conditionally), so
-    // this list — and every "cannot run" reason in it — is rebuilt on each open
-    // against the selection of that moment.
-    [composer]
+    [composer],
   );
 
-  // Run a command AND record it as recent (S3.14), so the next ⌘K surfaces it.
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
-    if (cmd.disabled) return; // board 166:58 — visible, not runnable
-    recordCommandRun(cmd.id);
+    if (cmd.disabled) return;
     cmd.handler();
   }, []);
 
-  // Opens the AI panel when the query matches no command (ai-offer). Read once
-  // per open — recents don't change mid-session in a way the palette must track.
-  const recentIds = React.useMemo(() => getRecentCommandIds(), []);
-
-  // Focus input on open
   React.useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
     return () => clearTimeout(timer);
   }, []);
 
-  // Filtered commands
-  const filteredCommands = React.useMemo(() => {
+  const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return commands;
+    if (!q) return commands.filter((c) => OPENING_BANDS.has(c.group));
     return commands.filter((cmd) =>
-      [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q)
+      [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
   }, [commands, query]);
 
-  // What actually renders: on an empty query, a "Recent" group of the last-run
-  // commands is prepended (S3.14). Recents are clones (distinct object identity)
-  // so list indexing stays correct even though they repeat a real command.
-  //
-  // A promoted command is MOVED, not copied. Board 166:2 draws "Open Insert
-  // panel" under RECENT and opens SUGGESTED at the NEXT command, and the two
-  // rows it would otherwise draw are indistinguishable: same label, same
-  // shortcut, same handler, one above the other. They were also literally the
-  // same anchor — `data-testid={`cmdk-row-${cmd.id}`}` resolved to two elements
-  // for every recent, which no measurement can address.
-  const displayCommands = React.useMemo(() => {
-    if (query.trim()) return filteredCommands;
-    if (recentIds.length === 0) return commands;
-    const recents = recentIds
-      .map((id) => commands.find((c) => c.id === id))
-      .filter((c): c is PaletteCommand => Boolean(c))
-      .map((c) => ({ ...c, group: "Recent" }));
-    const promoted = new Set(recents.map((c) => c.id));
-    return [...recents, ...commands.filter((c) => !promoted.has(c.id))];
-  }, [query, filteredCommands, commands, recentIds]);
-
-  // ai-offer: a query that matches nothing → offer the AI panel instead of a
-  // dead end (contracts §2, no-results never a nothing-state).
+  // A query that matches nothing is never a dead end: AI, or stock photos.
   const askAI = React.useCallback(() => {
-    /* UI_PANEL_OPEN is allow-listed to real LEFT tabs and "ai" is not one —
-       this offer has been a no-op since it shipped. AI opens over the
-       inspector (boards 170:*), which is what ui:switch-tab now routes. */
-    composer?.emit("ui:switch-tab", { tab: "ai" });
+    composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
     onClose();
   }, [composer, onClose]);
+  const searchStock = React.useCallback(() => {
+    composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: `stock:${query.trim()}` });
+    onClose();
+  }, [composer, onClose, query]);
 
-  // Reset selection when query changes
   React.useEffect(() => {
     setSelectedIndex(0);
   }, [query]);
 
-  // Scroll selected item into view
   React.useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const item = list.querySelector(`[data-idx="${selectedIndex}"]`) as HTMLElement | null;
+    const item = listRef.current?.querySelector(`[data-idx="${selectedIndex}"]`) as HTMLElement | null;
     item?.scrollIntoView({ block: "nearest" });
   }, [selectedIndex]);
 
-  /* Boards 166:2 and 166:27 group by what a row DOES, not by which part of the
-     editor owns it: RECENT · SUGGESTED before you type, ACTIONS · GO TO once
-     you do. The internal groups (Navigation · Edit · View · History ·
-     Commands) are the palette's own taxonomy and mean nothing to the person
-     reading the list. */
-  const bandFor = React.useCallback((cmd: PaletteCommand, index: number): string => {
-    if (cmd.group === "Recent") return "Recent";
-    if (cmd.group === "Pages") return "Pages";
-    if (!query.trim()) return index < SUGGESTED_COUNT ? "Suggested" : cmd.group === "Navigation" ? "Go to" : "Actions";
-    return cmd.group === "Navigation" ? "Go to" : "Actions";
-  }, [query]);
-
-  /* The strips render in a FIXED sequence, not in whatever order buildCommands
-     happens to emit. Board 303:1978 draws ACTIONS above GO TO for exactly the
-     query 166:27 draws (166:27's own two strips are both labelled GO TO, so
-     that frame cannot settle its own order); live drew GO TO first only
-     because the navigation commands are pushed first. */
   const bands = React.useMemo(() => {
     const groups = new Map<string, PaletteCommand[]>();
-    let nonRecent = 0;
-    for (const cmd of displayCommands) {
-      /* Pages rows do not consume a SUGGESTED slot — they have their own band. */
-      const band = bandFor(cmd, cmd.group === "Recent" || cmd.group === "Pages" ? -1 : nonRecent++);
-      const list = groups.get(band);
+    for (const cmd of visibleCommands) {
+      const list = groups.get(cmd.group);
       if (list) list.push(cmd);
-      else groups.set(band, [cmd]);
+      else groups.set(cmd.group, [cmd]);
     }
     const rank = (b: string) => {
       const i = BAND_ORDER.indexOf(b);
       return i === -1 ? BAND_ORDER.length : i;
     };
     return [...groups].sort(([a], [b]) => rank(a) - rank(b));
-  }, [displayCommands, bandFor]);
+  }, [visibleCommands]);
 
-  /* What the arrow keys walk. It has to be the BANDED order, not
-     displayCommands' — reordering only the render would leave ArrowDown
-     stepping between strips instead of down the list you can see. */
+  /* What the arrow keys walk: the BANDED order, the list you can see. */
   const orderedCommands = React.useMemo(() => bands.flatMap(([, cmds]) => cmds), [bands]);
 
   const handleKeyDown = React.useCallback(
@@ -462,253 +372,146 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           break;
       }
     },
-    [orderedCommands, selectedIndex, onClose, query, askAI, runCommand]
+    [orderedCommands, selectedIndex, onClose, query, askAI, runCommand],
   );
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className="tw:fixed tw:inset-0 tw:bg-black/60 tw:[z-index:calc(var(--bk-z-modal)-1)]"
-      />
-      {/* Panel */}
-      {/* The key handling lived on the search input alone, so it only worked
-          while focus sat there: one Tab moved focus to a result button and
-          Escape stopped closing the palette — measured, twice in a row, with
-          the dialog still open. Arrow keys and Enter had the same reach. On
-          the panel it covers everything inside, and the input still receives
-          it by bubbling. */}
-      {/* Boards 166:2 / 166:18 / 166:27 / 166:45 / 303:1978: the palette is a
-          bg-panel card on a --color/border edge at radius 12, not the
-          bg-subtle sheet it shipped as — the subtle fill made the band strips
-          invisible, since those are bg-subtle too. */}
+      {/* 4418:141220 "dismiss · click outside": a click catcher, not a dim —
+          the board leaves the editor at full strength behind the card. */}
+      <div onClick={onClose} className="tw:fixed tw:inset-0 tw:bg-transparent tw:[z-index:calc(var(--bk-z-modal)-1)]" />
       <div
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
         data-testid="cmdk-palette"
         onKeyDown={handleKeyDown}
-        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
+        className="tw:fixed tw:top-12 tw:left-1/2 tw:flex tw:max-h-[800px] tw:w-160 tw:max-w-[calc(100vw-32px)] tw:-translate-x-1/2 tw:flex-col tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
-        {/* Search row — 56 tall on a gray-100 rule, 20px gutter (166:3/166:4) */}
-        <div
-          data-testid="cmdk-query"
-          className="tw:flex tw:items-center tw:h-14 tw:px-5 tw:gap-2.5 tw:border-b tw:border-[var(--bk-gray-100)]"
-        >
-          {/* Search icon */}
-          <svg
-            width={18}
-            height={18}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--bk-ink-muted)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="tw:flex-none"
-          >
-            <circle cx={11} cy={11} r={8} />
-            <line x1={21} y1={21} x2={16.65} y2={16.65} />
-          </svg>
-
+        {/* Input row — 16/12 inset, ⌕ at 15px, the field at 12px, the scope chip. */}
+        <div data-testid="cmdk-query" className="tw:flex tw:flex-none tw:items-center tw:gap-2 tw:px-4 tw:py-3">
+          {/* The input row is the card's focus: the caret is the indicator, and
+              the board draws no ring around the field. */}
+          <span aria-hidden="true" className="tw:flex-none tw:text-[15px] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
+            ⌕
+          </span>
           <TextInput
             ref={inputRef}
             type="text"
-            /* Board 166:2's own words — the palette does both. */
-            placeholder="Type a command or search…"
+            placeholder="Search pages, layers, assets and actions…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            /* The arrow keys move a highlight that assistive tech could not
-               see: this was an input and a list of plain buttons, with no
-               combobox, no listbox and no activedescendant, so a screen-reader
-               user typing here heard the results change not at all. The list
-               below carries role=listbox and each row role=option. */
+            /* A combobox over the listbox below, so the highlight the arrow
+               keys move is announced (aria-activedescendant). */
             role="combobox"
             aria-expanded
             aria-controls={LIST_ID}
             aria-autocomplete="list"
-            aria-activedescendant={
-              orderedCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined
-            }
-            aria-label="Type a command or search"
+            aria-activedescendant={orderedCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined}
+            aria-label="Search pages, layers, assets and actions"
             data-testid="cmdk-input"
-            /* 16/24 in --color/ink (166:4). `text-base` already carries both;
-               the colour was flowbite's gray-900, one step off --bk-ink.
-               SEMIBOLD on -0.01em: all five palette boards draw the query row
-               in `Inter:Semi_Bold` at `tracking-[-0.16px]` (166:4, 166:20,
-               166:29, 166:47, 303:1980) — the `ui/16 · heading` style, which
-               is what --bk-tracking-tight resolves to at 16px. It shipped
-               regular, so the one line a reader types read lighter than the
-               13px rows under it. */
-            className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base tw:[&_input]:font-semibold tw:[&_input]:[letter-spacing:var(--bk-tracking-tight)] tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:placeholder:text-[var(--bk-ink-disabled)]"
+            /* a11y.css's unlayered `*:focus-visible` ring beats any layered
+               utility; `style` reaches the real <input> on this wrapper. */
+            style={{ outline: "none" }}
+            className="tw:flex-1 tw:[&_input]:h-[18px] tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:p-0 tw:[&_input]:text-[12px] tw:[&_input]:leading-[18px] tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:shadow-none tw:[&_input]:ring-0 tw:[&_input]:focus:ring-0 tw:[&_input]:placeholder:text-[var(--bk-ink-muted)]"
           />
+          <span
+            data-testid="cmdk-scope"
+            className="tw:flex-none tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:py-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+          >
+            Scope: everything
+          </span>
         </div>
+        <div className="tw:h-px tw:flex-none tw:bg-[var(--bk-border)]" />
 
-        {/* Results list */}
         <div
           ref={listRef}
           id={LIST_ID}
           role="listbox"
           aria-label="Commands"
-          className="tw:max-h-90 tw:overflow-y-auto tw:[scrollbar-width:thin] tw:[scrollbar-color:var(--bk-gray-200)_transparent]"
+          className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:py-1 tw:[scrollbar-width:thin] tw:[scrollbar-color:var(--bk-gray-200)_transparent]"
         >
           {orderedCommands.length === 0 ? (
             query.trim() ? (
-              // Boards 166:45 / 166:51 — a garbage query gets "nothing
-              // matches"; a natural-language one gets the AI hand-off with the
-              // diff-not-direct-writes explainer. Both route to the AI panel.
-              query.trim().split(/\s+/).length > 1 ? (
-                /* 166:51 (ai-offer) — not this agent's board; left as it ships. */
-                <div className="tw:px-4 tw:py-3.5" data-testid="cmdk-no-results">
-                  <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                    That isn&rsquo;t a command — send it to AI?
-                  </div>
-                  <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-[var(--bk-ink-muted)]">
-                    AI proposes a diff and never writes directly. Apply lands as one undo step.
-                  </div>
-                  <Button
-                    onClick={askAI}
-                    data-idx={0}
-                    className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent-text)]"
-                  >
-                    <span aria-hidden="true">✨</span>
-                    Ask AI ›
-                  </Button>
+              <div
+                className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:px-4 tw:py-6 tw:text-center tw:text-[12px] tw:leading-[18px]"
+                data-testid="cmdk-no-results"
+              >
+                <div data-testid="cmdk-no-results-line" className="tw:text-[var(--bk-ink-muted)]">
+                  Nothing matches &lsquo;{query.trim()}&rsquo;.
                 </div>
-              ) : (
-                /* 166:48 — a 120-tall centred block: the miss in ink-muted,
-                   the offer under it as an accent text link. It shipped as a
-                   left-aligned ink line above a tinted ✨ chip; the board
-                   draws neither the fill nor the emoji, and DESIGN.md's
-                   anti-slop list bans the decorative glyph independently. */
-                <div
-                  className="tw:flex tw:h-30 tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-5 tw:text-center tw:text-[13px] tw:leading-5"
-                  data-testid="cmdk-no-results"
-                >
-                  <div
-                    data-testid="cmdk-no-results-line"
-                    className="tw:text-[var(--bk-ink-muted)]"
-                  >
-                    Nothing matches &lsquo;{query.trim()}&rsquo;.
-                  </div>
-                  <Button
-                    onClick={askAI}
-                    data-idx={0}
-                    variant="link"
-                    data-testid="cmdk-no-results-ai"
-                  >
-                    Ask AI instead ›
-                  </Button>
-                </div>
-              )
-            ) : (
-              <div className="tw:px-4 tw:py-6 tw:text-center tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
-                No commands found
+                <Button onClick={searchStock} data-idx={0} variant="link" data-testid="cmdk-no-results-stock">
+                  Search stock photos for &lsquo;{query.trim()}&rsquo;
+                </Button>
+                <Button onClick={askAI} variant="link" data-testid="cmdk-no-results-ai">
+                  Ask AI instead ›
+                </Button>
               </div>
-            )
+            ) : null
           ) : (
-            bands.map(([group, cmds]) => {
-              return (
-                <div key={group}>
-                  {/* Section header */}
-                  <div
-                    /* A listbox may only own options and groups, so the band
-                       label is the group's own name rather than a loose div. */
-                    role="presentation"
-                    data-testid={`cmdk-band-${bandSlug(group)}`}
-                    /* 220:927 — 28 tall, 16px gutters, 8px gap, on a
-                       --color/bg-subtle strip. The COLOUR stays ink-soft
-                       against the board's ink-muted: 11px ink-muted on
-                       bg-subtle is 4.39:1 (axe flagged 6 nodes here), which is
-                       open decision #1 in FIGMA-TO-CODE/OPEN-DECISIONS.md and
-                       a Figma-side fix, not a call-site one. */
-                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:gap-2 tw:text-[11px] tw:leading-4 tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]"
-                  >
-                    {group}
-                  </div>
-                  {/* Items */}
-                  {cmds.map((cmd) => {
-                    const globalIdx = orderedCommands.indexOf(cmd);
-                    const isSelected = globalIdx === selectedIndex;
-
-                    return (
-                      <Button
-                        key={`${group}-${cmd.id}`}
-                        id={`${LIST_ID}-${globalIdx}`}
-                        data-idx={globalIdx}
-                        role="option"
-                        aria-selected={isSelected}
-                        onClick={() => runCommand(cmd)}
-                        onMouseEnter={() => setSelectedIndex(globalIdx)}
-                        aria-disabled={cmd.disabled || undefined}
-                        data-testid={`cmdk-row-${cmd.id}`}
-                        /* A row is a quiet action on a transparent fill, which
-                           is what `ghost` means — and the reason it has to say
-                           so is measured, not stylistic. Without a variant this
-                           is flowbite's PRIMARY button: the `tw:bg-*` above
-                           overrides its resting fill through twMerge, but
-                           nothing overrode `enabled:hover:bg-primary-800`, so
-                           hovering any command row painted it `var(--bk-blue-800)` under a
-                           13px --bk-ink label — 1.97:1, well under AA, on the
-                           row the pointer is actually on. Boards 166:2/166:18/
-                           166:27/303:1978 draw no hover state at all, so the
-                           fix is free of them. The selected row keeps the
-                           accent tint ON hover as well, because mouseEnter is
-                           what selects it. */
-                        variant="ghost"
-                        /* 40 tall on a 20px gutter (166:7 / 166:8). `h-11` put
-                           44px rows under 28px band strips and pushed the
-                           third row off the board's own list height. */
-                        className={`tw:flex tw:items-center tw:justify-between tw:w-full tw:h-10 tw:px-5 tw:gap-2.5 tw:rounded-none tw:border-0 tw:text-left ${
-                          isSelected
-                            ? "tw:bg-[var(--bk-accent-tint)] tw:enabled:hover:bg-[var(--bk-accent-tint)]"
-                            : "tw:bg-transparent"
-                        } ${cmd.disabled ? "tw:opacity-55 tw:cursor-default" : ""}`}
-                      >
-                        <div className="tw:flex tw:items-center tw:gap-2.5 tw:min-w-0">
-                          {cmd.icon && (
-                            <span
-                              aria-hidden="true"
-                              className="tw:flex tw:flex-none tw:items-center tw:justify-center tw:size-4 tw:text-sm tw:text-[var(--bk-ink-muted)]"
-                            >
-                              {cmd.icon}
-                            </span>
-                          )}
-                          {/* 13/20 in --color/ink (166:8). `text-sm` is 14 —
-                              a step above every other list row in the shell. */}
-                          <span
-                            data-testid={`cmdk-label-${cmd.id}`}
-                            className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
-                          >
-                            {cmd.label}
-                          </span>
-                          {cmd.disabled && cmd.disabledReason && (
-                            <span className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-                              {cmd.disabledReason}
-                            </span>
-                          )}
-                        </div>
-                        {cmd.shortcut && (
-                          <ShortcutBadge shortcut={cmd.shortcut} testId={`cmdk-kbd-${cmd.id}`} />
-                        )}
-                      </Button>
-                    );
-                  })}
+            bands.map(([group, cmds]) => (
+              <div key={group}>
+                <div
+                  role="presentation"
+                  data-testid={`cmdk-band-${bandSlug(group)}`}
+                  className="tw:pt-2 tw:pb-1 tw:pl-4 tw:text-[11px] tw:font-medium tw:leading-4 tw:tracking-[0.88px] tw:uppercase tw:text-[var(--bk-ink-muted)]"
+                >
+                  {group}
                 </div>
-              );
-            })
+                {cmds.map((cmd) => {
+                  const globalIdx = orderedCommands.indexOf(cmd);
+                  const isSelected = globalIdx === selectedIndex;
+                  /* A door prints no chord (NAVIGATE on the board); an action does. */
+                  const showChord = cmd.shortcut && cmd.group !== "Navigate" && cmd.group !== "Pages";
+                  return (
+                    <Button
+                      key={`${group}-${cmd.id}`}
+                      id={`${LIST_ID}-${globalIdx}`}
+                      data-idx={globalIdx}
+                      role="option"
+                      aria-selected={isSelected}
+                      onClick={() => runCommand(cmd)}
+                      onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      aria-disabled={cmd.disabled || undefined}
+                      data-testid={`cmdk-row-${cmd.id}`}
+                      variant="ghost"
+                      className={`tw:flex tw:h-8 tw:min-h-0 tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:rounded-none tw:border-0 tw:px-4 tw:py-0 tw:text-left ${
+                        isSelected
+                          ? "tw:bg-[var(--bk-bg-subtle)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
+                          : "tw:bg-transparent tw:enabled:hover:bg-transparent"
+                      } ${cmd.disabled ? "tw:opacity-50 tw:cursor-default" : ""}`}
+                    >
+                      <span
+                        data-testid={`cmdk-label-${cmd.id}`}
+                        className="tw:min-w-0 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+                      >
+                        {cmd.disabled && cmd.disabledReason ? `${cmd.label} · ${cmd.disabledReason}` : cmd.label}
+                      </span>
+                      {showChord && cmd.shortcut ? <Kbd shortcut={cmd.shortcut} testId={`cmdk-kbd-${cmd.id}`} /> : null}
+                    </Button>
+                  );
+                })}
+              </div>
+            ))
           )}
         </div>
 
-        {/* Footer */}
+        {/* Legend — "Click a command · Esc Close … Current editor". */}
+        <div className="tw:h-px tw:flex-none tw:bg-[var(--bk-border)]" />
         <div
-          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-[var(--bk-gray-200)] tw:text-[11px] tw:text-[var(--bk-ink-soft)]"
+          data-testid="cmdk-legend"
+          className="tw:flex tw:flex-none tw:items-center tw:gap-3 tw:px-4 tw:py-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
         >
-          <span>↑↓ navigate</span>
-          <span>↵ run</span>
-          <span>Esc close</span>
+          <span>Click a command</span>
+          <Button
+            variant="link"
+            onClick={onClose}
+            className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          >
+            Esc Close
+          </Button>
+          <span className="tw:flex-1" />
+          <span>Current editor</span>
         </div>
       </div>
     </>

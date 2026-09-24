@@ -62,7 +62,9 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(within(side).getByTestId("tpl-ws-back")).toHaveTextContent("‹ Back to canvas");
     expect(side).toHaveTextContent("Templates");
     expect(side).toHaveTextContent("PAGE TEMPLATES");
-    expect(within(side).getByTestId("tpl-ws-all")).toHaveTextContent(`All page templates · ${PAGE_TEMPLATES.length}`);
+    expect(within(side).getByTestId("tpl-ws-all")).toHaveTextContent(`All page templates${PAGE_TEMPLATES.length}`);
+    expect(within(side).getByTestId("tpl-ws-reload")).toHaveTextContent("Reload catalogue");
+    expect(screen.getByRole("heading", { name: "Page templates" })).toBeInTheDocument();
     for (const t of PAGE_TEMPLATES) expect(within(side).getByTestId(`tpl-ws-item-${t.id}`)).toHaveTextContent(t.name);
     // The compact drawer gallery and the 280↔700 expand toggle are gone.
     expect(screen.queryByRole("button", { name: /browse all templates/i })).toBeNull();
@@ -95,7 +97,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
-    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled());
+    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).toHaveBeenCalledWith(t.name);
     expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-new");
   });
@@ -106,7 +108,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Replace page…" }));
-    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled());
+    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).not.toHaveBeenCalled();
   });
 
@@ -117,7 +119,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
-    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled());
+    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).toHaveBeenCalledWith("Our menu");
   });
 

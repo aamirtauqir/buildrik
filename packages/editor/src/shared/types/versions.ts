@@ -45,21 +45,6 @@ export interface NamedVersion {
   userId?: string | null;
 }
 
-/**
- * Version history export format
- * Used for import/export of version history
- */
-export interface VersionHistoryExport {
-  /** Export format version */
-  version: "1.0.0";
-  /** Project ID */
-  projectId: string;
-  /** Export timestamp (ISO string) */
-  exportedAt: string;
-  /** All exported versions */
-  versions: NamedVersion[];
-}
-
 // ============================================
 // Configuration Types
 // ============================================
@@ -140,15 +125,6 @@ export interface VersionRestoredPayload {
 export interface VersionDeletedPayload {
   versionId: string;
   versionName: string;
-}
-
-/**
- * Version export/import payload
- */
-export interface VersionExportPayload {
-  projectId: string;
-  count: number;
-  filename?: string;
 }
 
 // ============================================

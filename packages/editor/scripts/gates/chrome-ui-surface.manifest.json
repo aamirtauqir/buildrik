@@ -109,6 +109,7 @@
     "PanelFrameProps": "local",
     "PanelHeader": "local",
     "PanelHeaderActions": "local",
+    "PanelHeaderSize": "local",
     "PanelHeaderActionsProps": "local",
     "PanelHeaderProps": "local",
     "PanelWidth": "local",

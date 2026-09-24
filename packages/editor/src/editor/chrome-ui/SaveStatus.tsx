@@ -112,7 +112,10 @@ const DOT_CLASS: Record<SaveState, string> = {
 };
 
 export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }: SaveStatusProps) {
-  const label = state === "saved" ? "Saved" : COPY[state];
+  /* Board 4418:123573 (v3 IA): the settled pill IS the History door —
+     "● History ›" — when it has one; the saved time moves to its title.
+     Without a door (view mode) it stays "Saved". */
+  const label = state === "saved" ? (onClick ? "History ›" : "Saved") : COPY[state];
   const actionable = Boolean(onClick);
   const classes = [BASE_CLASS, STATE_CLASS[state], className].filter(Boolean).join(" ");
   const dot = (
@@ -131,7 +134,7 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
    * into it.
    */
   const stamp =
-    state === "saved" && savedAt ? (
+    state === "saved" && savedAt && !onClick ? (
       <span className="tw:@max-[1200px]:hidden">{ago(savedAt)}</span>
     ) : null;
 
@@ -151,7 +154,14 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
      for exactly the two states that are actionable. */
   if (actionable) {
     return (
-      <button type="button" className={classes} onClick={onClick} data-testid={`save-status-${state}`} {...rest}>
+      <button
+        type="button"
+        className={classes}
+        onClick={onClick}
+        title={state === "saved" && savedAt ? `Saved ${ago(savedAt)}` : undefined}
+        data-testid={`save-status-${state}`}
+        {...rest}
+      >
         {dot}
         {label}
         {stamp}

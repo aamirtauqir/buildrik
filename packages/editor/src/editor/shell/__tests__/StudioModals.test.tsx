@@ -32,6 +32,9 @@ vi.mock("../../media", () => ({
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-icon-picker" /> : null,
 }));
+vi.mock("../../canvas/controls/KeyboardLegend", () => ({
+  KeyboardLegend: () => null,
+}));
 vi.mock("../../canvas/controls/KeyboardCheatSheet", () => ({
   KeyboardCheatSheet: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-shortcuts" /> : null,

@@ -94,7 +94,7 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
         <div className="tw:flex tw:flex-col tw:gap-1">
           {title ? (
             <h3
-              className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]"
               data-testid={cardTitleId}
             >
               {title}
@@ -145,7 +145,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
       data-testid={`set-field-${stem}`}
     >
       <label
-        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]"
         htmlFor={htmlFor}
         data-testid={`set-field-label-${stem}`}
       >
@@ -167,8 +167,23 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
 // can't deliver. chrome-ui's default theme already draws the 32-tall,
 // radius-md, --bk-border-input box the Clone wants.
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
+/* 4418:127313 fills Settings fields `--bk-gray-50` inside a `--bk-border`
+   hairline (the chrome-ui default is a white box on --bk-border-input). The
+   wrapper merges this over BK_TEXT_INPUT_THEME per leaf; the invalid and
+   focus states are restated because `colors.gray` is replaced whole. */
+const SETTINGS_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
+  field: {
+    input: {
+      colors: {
+        gray:
+          "tw:bg-[var(--bk-gray-50)] tw:rounded-md! tw:border-[var(--bk-border)] tw:focus:border-primary-700 tw:focus:ring-primary-700 " +
+          "tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)] tw:aria-invalid:focus:ring-[var(--bk-error)]",
+      },
+    },
+  },
+};
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (props, ref) => <ChromeTextInput ref={ref} {...props} />
+  (props, ref) => <ChromeTextInput ref={ref} theme={SETTINGS_INPUT_THEME} {...props} />
 );
 Input.displayName = "Input";
 
@@ -184,7 +199,7 @@ const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
     select: {
       colors: {
         gray:
-          "tw:bg-white tw:border-[var(--bk-border-input)] tw:text-[var(--bk-ink)] " +
+          "tw:bg-[var(--bk-gray-50)] tw:border-[var(--bk-border)] tw:text-[var(--bk-ink)] " +
           "tw:focus:border-primary-700 tw:focus:ring-primary-700",
       },
       sizes: {

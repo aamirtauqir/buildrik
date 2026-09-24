@@ -333,6 +333,7 @@ const FALLBACK_SPACING: SpacingRegistry = {
   stageTokens: noop,
   applyPreset: noop,
   stageDefaults: noop,
+  addToken: noop,
 } as SpacingRegistry;
 
 const FALLBACK_TYPE: TypeRegistry = {

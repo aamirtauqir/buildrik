@@ -13,7 +13,11 @@
     },
     {
       "action": "click",
-      "testId": "inspector-empty-ask-ai"
+      "testId": "insert-el-Heading"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-ai-chip"
     },
     {
       "action": "waitFor",

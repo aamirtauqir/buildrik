@@ -5,7 +5,7 @@
 
 export const heroBlockConfig = {
   id: "hero",
-  label: "Hero Section",
+  label: "Hero",
   category: "Sections",
   elementType: "hero" as const,
   icon: "🦸",

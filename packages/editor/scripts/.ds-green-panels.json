@@ -14,7 +14,6 @@
     "packages/editor/src/editor/canvas/menus/MenuIcon.tsx",
     "packages/editor/src/editor/canvas/menus/SubmenuItem.tsx",
     "packages/editor/src/editor/canvas/menus/SubmenuPanel.tsx",
-    "packages/editor/src/editor/canvas/overlays/CanvasBreadcrumb.tsx",
     "packages/editor/src/editor/canvas/overlays/CanvasOverlayGroup.tsx",
     "packages/editor/src/editor/canvas/overlays/GridOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/RemoteCursorsOverlay.tsx",

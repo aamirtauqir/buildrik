@@ -46,7 +46,7 @@ describe("help chords", () => {
   });
 
   it("the ⌘K palette's fit row prints the chord that fits (G1-093 / SH-90)", () => {
-    expect(palette).toMatch(/label: "Zoom to fit",\s*group: "View",\s*shortcut: "Ctrl\+1"/);
+    expect(palette).toMatch(/label: "Zoom to fit", group: "More", shortcut: "Ctrl\+1"/);
     expect(palette).not.toMatch(/label: "Fit to view"/);
   });
 

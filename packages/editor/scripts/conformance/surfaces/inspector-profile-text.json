@@ -243,10 +243,6 @@
       "nodeId": "2069:20317"
     },
     {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
-    },
-    {
       "name": "header",
       "testId": "inspector-header"
     },

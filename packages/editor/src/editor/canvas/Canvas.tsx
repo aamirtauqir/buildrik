@@ -9,6 +9,9 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+
+/** Grey left each side of the page card when the canvas fits on load. */
+const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
 import { stepZoom } from "../../shared/constants/canvas";
 import { getBreakpointForWidth } from "../../shared/constants/breakpoints";
@@ -541,6 +544,25 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
     const isCanvasEmpty = pageIsEmpty && !projectLoading && !projectUnavailable;
+    /* Boards 5936:44788 / 4428:44164 draw the page as a card inside the
+       canvas — the 1024 desktop frame scaled to leave grey around it — not
+       edge to edge under the drawer and inspector. Once the project has
+       loaded, if the desktop frame is wider than its viewport, zoom to fit
+       its WIDTH with a 60px gutter each side. Only on load: after that the
+       zoom is the user's. */
+    const didInitialFitRef = React.useRef(false);
+    React.useEffect(() => {
+      if (didInitialFitRef.current || projectLoading || !composer || device !== "desktop") return;
+      const frame = frameRef.current;
+      const viewport = scrollRef.current;
+      if (!frame || !viewport) return;
+      didInitialFitRef.current = true;
+      const fw = frame.offsetWidth;
+      const vw = viewport.clientWidth;
+      if (!fw || fw <= vw) return;
+      composer.setZoom(Math.max(10, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100)));
+    }, [projectLoading, composer, device]);
+
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
@@ -549,11 +571,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       handleSelectAncestor,
       handleToolbarDuplicate,
       handleToolbarDelete,
-      handleToolbarCopy,
-      handleToolbarWrap,
-      handleToolbarMoveUp,
-      handleToolbarMoveDown,
-      handleToolbarUndo,
     } = useCanvasToolbarActions({ composer, selectedId, addToast, select });
 
     // Expose ref methods
@@ -648,7 +665,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const size = activeCustomWidth
       ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
       : DEVICE_SIZES[device];
-    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly);
+    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
        edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
@@ -713,6 +730,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
+            data-empty-cta={isCanvasEmpty && !readOnly && !startedBlank ? "true" : undefined}
             style={contentStyles}
             dangerouslySetInnerHTML={canvasInnerHtml}
           />
@@ -725,16 +743,17 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              door as well as a wrong one. The container placeholder next to it
              was already suppressed; this larger one was missed.
 
-             Start blank goes to board 807:6558: the Insert drawer opens, and
-             the sentence becomes the next instruction. It used to only set a
+             Start blank: the Insert drawer opens and the prompt goes — the
+             v3 flow lands on the editor page (the 807:6558 sentence it used to
+             leave behind is on the archived page). It used to only set a
              flag that hid the whole CTA, so the one button a first-time user
              pressed left them on an empty canvas with no drawer and nothing to
              do. `ui:switch-tab` is the seam StudioPanels already listens on,
              and it opens the panel when it is closed. */}
-          {isCanvasEmpty && !readOnly && (
+          {isCanvasEmpty && !readOnly && !startedBlank && (
             <CanvasEmptyCTA
-              started={startedBlank}
               span={emptyCtaSpan}
+              scale={scale}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
               /* Board 4428:44164's two new doors reuse the seams that already
                  exist: the Add drawer opened on BLOCKS (the canvas menu's
@@ -781,11 +800,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             onSelectAncestor={handleSelectAncestor}
             onDuplicate={handleToolbarDuplicate}
             onDelete={handleToolbarDelete}
-            onCopy={handleToolbarCopy}
-            onWrap={handleToolbarWrap}
-            onMoveUp={handleToolbarMoveUp}
-            onMoveDown={handleToolbarMoveDown}
-            onUndo={handleToolbarUndo}
+            onOpenElementMenu={(elementId, point) => setContextMenu({ x: point.x, y: point.y, elementId })}
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}

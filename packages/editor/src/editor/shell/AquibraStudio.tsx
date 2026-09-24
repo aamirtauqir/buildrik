@@ -572,18 +572,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
-          onShowAI={() => composer.emit("ui:switch-tab", { tab: "ai" })}
           onShowExporter={modals.openExporter}
           onOpenProjectSettings={modals.openProjectSettings}
-          onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
-          onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPages={() => state.openLeftPanelToTab("pages")}
-          onOpenPublishHistory={() => state.openLeftPanelToTab("history", "published")}
+          onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
           onOpenActivity={() => state.openLeftPanelToTab("history", "activity")}
-          onOpenTemplates={() => state.openLeftPanelToTab("templates")}
-          onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
@@ -657,15 +652,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onRequestPublish={requestPublish}
       />
 
-      {/* P3: Issues panel — opened by the topbar issue pill */}
+      {/* P3: Issues panel. Board 4418:147641 puts it in the inspector column —
+          300 wide, ending where the column ends, not over the status footer. */}
       {issuesOpen && (
         <div
+          data-testid="issues-column"
           style={{
             position: "absolute",
-            top: 56,
+            top: "var(--bk-size-topbar)",
             right: 0,
-            bottom: 0,
-            width: 360,
+            bottom: "var(--bk-size-footer)",
+            width: "var(--bk-size-inspector)",
             zIndex: 45,
             background: "var(--bk-bg-panel)",
             borderLeft: "1px solid var(--bk-border)",

@@ -251,8 +251,8 @@ export const PageRow = React.memo<Props>(
           </span>
 
           {/* Board 140:2: plain page rows carry NO icon — only Home draws
-              the roof glyph (140:19) and external pages keep the link glyph. */}
-          {(page.isHome || page.status === "external") && (
+              the roof glyph (140:19). */}
+          {page.isHome && (
           <span className="bd-pg-row-icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
@@ -263,17 +263,8 @@ export const PageRow = React.memo<Props>(
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              {page.status === "external" ? (
-                <>
-                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-                </>
-              ) : (
-                <>
-                  <path d="M3 11l9-8 9 8" />
-                  <path d="M5 9.5V21h14V9.5" />
-                </>
-              )}
+              <path d="M3 11l9-8 9 8" />
+              <path d="M5 9.5V21h14V9.5" />
             </svg>
           </span>
           )}
@@ -324,8 +315,19 @@ export const PageRow = React.memo<Props>(
             </span>
           )}
 
+          {/* Board 4418:93381 — "● Unpublished" for unsaved edits, then the
+              page's status chip ("Draft", "Hidden from publish"); a live page
+              with nothing pending draws neither (C5 G2-071). */}
           {isDirty && (
-            <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" aria-hidden="true" />
+            <span className="bd-pg-row-unpublished" aria-hidden="true">
+              <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" />
+              <span data-testid={`page-dirty-label-${page.id}`}>Unpublished</span>
+            </span>
+          )}
+          {!isRenaming && label && page.status && page.status !== "live" && (
+            <span className={`bd-pg-chip ${page.status}`} data-testid={`page-status-chip-${page.id}`} aria-hidden="true">
+              {label}
+            </span>
           )}
 
           <Button

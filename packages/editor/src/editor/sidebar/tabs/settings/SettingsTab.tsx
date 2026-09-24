@@ -27,7 +27,7 @@
 
 import * as React from "react";
 import { ArrowUpRight, ChevronLeft, Search as SearchIcon } from "lucide-react";
-import { Button } from "@/editor/chrome-ui";
+import { Button, IconButton } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -101,16 +101,25 @@ function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
    `size="xs"` gives the Button its 32; everything else is replaced per
    property through twMerge (padding, alignment, type). The <a> rows for
    Members / Billing wear the same string — nothing in it needs a button. */
+/* 4418:127313: 36-tall rows (--bk-size-row-nav), 14px. */
 const NAV_ROW =
-  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
-  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:flex tw:h-[var(--bk-size-row-nav)] tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
+  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+  "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
 
 const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
+  /* 4418:127313 marks Overview with a dot, not a glyph. */
+  if (id === "overview") {
+    return (
+      <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+        <span className="tw:size-1.5 tw:rounded-full tw:bg-current" />
+      </span>
+    );
+  }
   const Icon = NAV_ICONS[id];
   return (
     <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
@@ -396,7 +405,9 @@ export const SettingsTab: React.FC<
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
 
-  const handleSave = React.useCallback(() => {
+  /* `then` runs after a save succeeds: the Saved dialog after the footer's
+     Save, the pending nav / exit after the guard's Save and continue. */
+  const handleSave = React.useCallback((then?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
       console.error("[settings] save failed", err);
@@ -407,7 +418,9 @@ export const SettingsTab: React.FC<
       if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
       setScreenIsDirty(false);
-      setSavedOpen(true);
+      screenIsDirtyRef.current = false;
+      if (then) then();
+      else setSavedOpen(true);
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -451,6 +464,19 @@ export const SettingsTab: React.FC<
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
   }, [composer, current, currentScreen, saving, projectId]);
+
+  /* The guard's Save and continue (4418:165478): save, then finish whatever
+     raised the guard. A failed save leaves the dialog down and the screen's
+     save-error banner up, with the edits still there. */
+  const handleSaveAndContinue = React.useCallback(() => {
+    const pending = pendingRef.current;
+    handleSave(() => {
+      pendingRef.current = null;
+      setGuardOpen(false);
+      if (!pending || pending.kind === "leave") leave();
+      else performNav(pending.id);
+    });
+  }, [handleSave, leave, performNav]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -545,7 +571,8 @@ export const SettingsTab: React.FC<
           data-testid={`set-nav-${n.id}`}
         >
           <NavRowIcon id={n.id} />
-          <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
+          {/* "Members ↗" — the arrow rides the label, as on the board. */}
+          <span className="tw:min-w-0 tw:truncate">{n.title}</span>
           <ArrowUpRight size={12} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
         </a>
       );
@@ -563,12 +590,9 @@ export const SettingsTab: React.FC<
         data-testid={`set-nav-${n.id}`}
       >
         <NavRowIcon id={n.id} />
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
-        {rowLocked ? (
-          <span className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]">
-            Pro
-          </span>
-        ) : null}
+        {/* No "Pro" pill on the row (not drawn): a locked screen says so
+            itself, with its header's Upgrade. */}
+        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-locked={rowLocked || undefined}>{n.title}</span>
       </Button>
     );
   };
@@ -577,28 +601,38 @@ export const SettingsTab: React.FC<
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        <div className="tw:flex tw:flex-col tw:px-5 tw:pt-4">
+        {/* 4418:127313 — the Brand workspace's head: back link centred on the
+            first line, 24px title (with the search door at its right), the
+            site name under it. */}
+        <div className="tw:flex tw:justify-center tw:pt-5">
           <Button
             type="button"
             variant="link"
-            className="tw:h-auto tw:min-h-0 tw:self-start tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:no-underline"
+            className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
             onClick={requestLeave}
             data-testid="set-back"
           >
             <ChevronLeft size={12} aria-hidden />
             Back to canvas
           </Button>
-          <h2
-            className="tw:m-0 tw:mt-4 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
-            data-testid="set-title"
-          >
-            Settings
-          </h2>
-          <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
+        </div>
+        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-4">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+            <h2
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
+              data-testid="set-title"
+            >
+              Settings
+            </h2>
+            <IconButton label="Search settings" onClick={() => setSearchOpen(true)} data-testid="set-search-icon" className="tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
+              <SearchIcon size={14} aria-hidden />
+            </IconButton>
+          </div>
+          <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
             {siteName}
           </div>
         </div>
-        <nav className="tw:flex tw:flex-col tw:px-3 tw:pb-4 tw:pt-20" aria-label="Settings sections">
+        <nav className="tw:flex tw:flex-col tw:gap-px tw:px-4 tw:pb-4 tw:pt-4" aria-label="Settings sections">
           <Button
             type="button"
             variant="ghost"
@@ -613,7 +647,7 @@ export const SettingsTab: React.FC<
           </Button>
           {GROUP_ORDER.map((group) => (
             <React.Fragment key={group}>
-              <div className={`${SET_EYEBROW} tw:px-3 tw:pb-1 tw:pt-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
+              <div className={`${SET_EYEBROW} tw:flex tw:h-7 tw:items-center tw:px-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
               {SETTINGS_NAV.filter((n) => n.group === group).map(renderRow)}
             </React.Fragment>
           ))}
@@ -629,7 +663,7 @@ export const SettingsTab: React.FC<
         >
           <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
             <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
               data-testid="set-head-title"
             >
               {headTitle}
@@ -672,7 +706,10 @@ export const SettingsTab: React.FC<
 
         {/* A locked screen has nothing to save and the frame (3397:32859)
             draws no footer under it — its only action is the header's Upgrade. */}
-        {locked ? null : (
+        {/* 4418:127313 draws no footer on a clean screen: the bar appears
+            while there is something to save, a save failed, or loading did —
+            and on the Overview, whose Done is its way out. */}
+        {locked || (!isOverview && !immediate && footStatus.text === "All changes saved") ? null : (
         <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:gap-4 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
           <span
             className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
@@ -695,7 +732,7 @@ export const SettingsTab: React.FC<
                 size="xs"
                 className={SET_BTN}
                 disabled={loadState !== "ready" || saving}
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 data-testid="set-foot-save"
               >
                 {saveError ? "Retry save" : "Save changes"}
@@ -706,7 +743,14 @@ export const SettingsTab: React.FC<
         )}
       </div>
 
-      <UnsavedSettingsDialog open={guardOpen} siteName={siteName} onKeepEditing={handleKeepEditing} onDiscard={handleDiscard} />
+      <UnsavedSettingsDialog
+        open={guardOpen}
+        siteName={siteName}
+        onKeepEditing={handleKeepEditing}
+        onDiscard={handleDiscard}
+        onSaveAndContinue={handleSaveAndContinue}
+        saving={saving}
+      />
       <SettingsSavedDialog open={savedOpen} siteName={siteName} onReturn={() => setSavedOpen(false)} />
       <SearchSettingsModal
         open={searchOpen}

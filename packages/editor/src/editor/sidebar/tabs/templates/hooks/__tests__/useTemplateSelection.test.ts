@@ -1,5 +1,5 @@
 /**
- * useTemplateSelection — preview id, replace confirm, search. The drawer-era
+ * useTemplateSelection — preview id and replace confirm. The drawer-era
  * pills, tags, pagination and detail id are gone with the drawer (#24).
  *
  * @license BSD-3-Clause
@@ -9,11 +9,10 @@ import { renderHook, act } from "@testing-library/react";
 import { useTemplateSelection } from "../useTemplateSelection";
 
 describe("useTemplateSelection", () => {
-  it("starts with nothing previewed, no confirm and an empty search", () => {
+  it("starts with nothing previewed and no confirm", () => {
     const { result } = renderHook(() => useTemplateSelection(false));
     expect(result.current.previewId).toBeNull();
     expect(result.current.showReplace).toBe(false);
-    expect(result.current.searchQ).toBe("");
   });
 
   it("Escape closes the replace confirm", () => {

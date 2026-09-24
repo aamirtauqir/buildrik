@@ -84,7 +84,12 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
 
     const dialog = await screen.findByTestId("brand-discard");
     expect(dialog.textContent).toContain("Discard brand changes?");
-    expect(screen.getByTestId("brand-discard-body").textContent).toContain("1 brand edit has not been saved");
+    expect(screen.getByTestId("brand-discard-body").textContent).toBe(
+      "Your brand edit has not been saved. Discard it and leave Brand, or keep editing.",
+    );
+    // 7317:80979: Discard (danger) first, Keep editing (primary, focused) last.
+    const buttons = [...dialog.querySelectorAll("button")].map((b) => b.getAttribute("data-testid")).filter((t) => t?.startsWith("brand-discard-"));
+    expect(buttons).toEqual(["brand-discard-confirm", "brand-discard-keep"]);
     expect(onClose).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByTestId("brand-discard-keep"));

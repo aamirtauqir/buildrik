@@ -147,8 +147,6 @@ export const EVENTS = {
   VERSION_LOAD_FAILED: "version:load-failed",
   VERSION_PRUNED: "version:pruned",
   VERSION_DELETED: "version:deleted",
-  VERSION_EXPORTED: "version:exported",
-  VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
   /* Removed 2026-08-14, all five dead on arrival:
        VERSION_LOAD_ERROR   — a second name for VERSION_LOAD_FAILED (6 uses);
@@ -196,23 +194,9 @@ export const EVENTS = {
   // ============================================
   // Template Events
   // ============================================
-  TEMPLATE_LOADED: "template:loaded",
-  TEMPLATE_SAVED: "template:saved",
   TEMPLATE_SAVE_REQUESTED: "template:save-requested",
   TEMPLATE_APPLIED: "template:applied",
   TEMPLATE_REMOVED: "template:removed",
-  /** Template begins loading from a source */
-  TEMPLATE_LOADING: "template:loading",
-  /** Template load failed */
-  TEMPLATE_ERROR: "template:error",
-  /** Template deleted via TemplateManager */
-  TEMPLATE_DELETED: "template:deleted",
-  /** Template source registered with TemplateManager */
-  TEMPLATE_SOURCE_REGISTERED: "template:source:registered",
-  /** TemplateManager cache cleared */
-  TEMPLATE_CACHE_CLEARED: "template:cache:cleared",
-  /** Bulk template import completed */
-  TEMPLATES_IMPORTED: "templates:imported",
 
   // ============================================
   // CMS Events
@@ -361,6 +345,9 @@ export const EVENTS = {
    *  state directly; this is the door for rows that are not a keystroke —
    *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
   UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
+  /** Rail Help (board 4418:126882): the compact "Keyboard" legend card; its
+   *  "All shortcuts ›" opens the full sheet (UI_TOGGLE_CHEAT_SHEET). */
+  UI_TOGGLE_KEYBOARD_LEGEND: "ui:toggle:keyboard-legend",
   /** Toggle the one ⌘K command palette (StudioHeader owns its state). ⌘⇧P —
    *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
    *  come in through here. */
@@ -888,8 +875,6 @@ export interface EventPayloads {
   [EVENTS.VERSION_LOAD_FAILED]: Record<string, never>;
   [EVENTS.VERSION_PRUNED]: { removed: number; kept: number };
   [EVENTS.VERSION_DELETED]: import("../types/versions").VersionDeletedPayload;
-  [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
-  [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_LIST_UPDATED]: { versions: import("../types/versions").NamedVersion[] };
 
   // Component Events (AQUI-027)

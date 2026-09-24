@@ -26,8 +26,8 @@
  */
 
 import * as React from "react";
-import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuItem, MenuSeparator, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
-import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { stepZoom } from "@/shared/constants/canvas";
 import { CustomWidthModal } from "./controls/CustomWidthModal";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
@@ -161,70 +161,15 @@ const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: s
   { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
 ];
 
-/* Breakpoint ▸ rows — board 5930:44781. Wide stays on the W/D/T/M switcher. */
-const BREAKPOINT_ROWS = ["desktop", "tablet", "mobile"] as const;
-/* Zoom ▸ / "100% ▾" rows — boards 7048:78046 / 7048:78112. */
-const ZOOM_ROWS = [50, 75, 100, 150, 200] as const;
-
-/** A menu row that opens a sub-menu to its right: label, current value, ▸. */
-function SubmenuRow({
-  label,
-  value,
-  open,
-  onOpen,
-  onClose,
-  testId,
-  children,
-}: {
-  label: string;
-  value: string;
-  open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  testId: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Popover
-      block
-      open={open}
-      onClose={onClose}
-      placement="right-end"
-      label={label}
-      trigger={
-        <MenuItem
-          kbd={`${value} ▸`}
-          aria-haspopup="menu"
-          aria-expanded={open}
-          className="tw:bg-[var(--bk-bg-subtle)]"
-          data-testid={testId}
-          onClick={onOpen}
-        >
-          <span className="tw:font-medium">{label}</span>
-        </MenuItem>
-      }
-    >
-      {children}
-    </Popover>
-  );
-}
-
-function ZoomMenu({ zoom, onPick, onFit }: { zoom: number; onPick: (z: number) => void; onFit?: () => void }) {
-  return (
-    <Menu label="Zoom" data-testid="canvas-zoom-menu" className="tw:min-w-[152px]">
-      {onFit && (
-        <MenuItem selected={false} data-testid="canvas-zoom-fit" onClick={onFit}>
-          Fit to screen
-        </MenuItem>
-      )}
-      {ZOOM_ROWS.map((z) => (
-        <MenuItem key={z} selected={Math.round(zoom) === z} data-testid={`canvas-zoom-${z}`} onClick={() => onPick(z)}>
-          {z}%
-        </MenuItem>
-      ))}
-    </Menu>
-  );
-}
+/** Board 5930:44781 — the Breakpoint list (+ Custom width…, G2-014). */
+const BREAKPOINT_ROWS: { id: Breakpoint; label: string; width?: string }[] = [
+  { id: "desktop", label: "Desktop" },
+  { id: "tablet", label: "Tablet", width: "768px" },
+  { id: "mobile", label: "Mobile", width: "375px" },
+];
+const DEVICE_LABEL: Partial<Record<string, string>> = { wide: "Wide", desktop: "Desktop", tablet: "Tablet", mobile: "Mobile" };
+/** Board 7048:78112's presets. */
+const VIEW_ZOOM_LEVELS = [50, 75, 100, 150, 200];
 
 /* The trigger reads like the words it replaces: a grey pill while any overlay
    is on, plain otherwise, so the bar still says at a glance that something is
@@ -321,27 +266,49 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
-  const [viewOpen, setViewOpen] = React.useState(false);
-  const [viewSub, setViewSub] = React.useState<"breakpoint" | "zoom" | null>(null);
+  const [viewOpen, setViewOpenState] = React.useState(false);
+  /* Board 5930:44801's last two rows open their own lists in place —
+     5930:44781 (Breakpoint) and 7048:78112 (Zoom). */
+  const [viewPane, setViewPane] = React.useState<"main" | "breakpoint" | "zoom">("main");
+  const setViewOpen = (next: boolean | ((v: boolean) => boolean)) => {
+    setViewOpenState(next);
+    setViewPane("main");
+  };
+  const activeOverlays = VIEW_ROWS.filter((row) => overlays[row.key]).length;
   const [zoomOpen, setZoomOpen] = React.useState(false);
   const [customOpen, setCustomOpen] = React.useState(false);
-  const closeView = () => {
-    setViewOpen(false);
-    setViewSub(null);
-  };
-  const zoomTo = (z: number) => {
-    onZoomChange(z);
-    closeView();
-    setZoomOpen(false);
-  };
-  const fit = onFitToScreen
-    ? () => {
-        onFitToScreen();
-        closeView();
-        setZoomOpen(false);
-      }
-    : undefined;
-  const activeOverlays = VIEW_ROWS.filter((row) => overlays[row.key]).length;
+  /* Zoom rows — shared by View ▸ Zoom and the bar's "100% ▾" (7048:78046). */
+  const zoomRows = (close: () => void) => (
+    <>
+      {onFitToScreen && (
+        <MenuItem
+          radio
+          selected={false}
+          data-testid="canvas-zoom-fit"
+          onClick={() => {
+            onFitToScreen();
+            close();
+          }}
+        >
+          Fit to screen
+        </MenuItem>
+      )}
+      {VIEW_ZOOM_LEVELS.map((z) => (
+        <MenuItem
+          key={z}
+          radio
+          selected={Math.round(zoom) === z}
+          data-testid={`canvas-zoom-${z}`}
+          onClick={() => {
+            onZoomChange(z);
+            close();
+          }}
+        >
+          {`${z}%`}
+        </MenuItem>
+      ))}
+    </>
+  );
 
   return (
     <div className={BAR}>
@@ -402,7 +369,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       <div className={GROUP}>
         <Popover
           open={viewOpen}
-          onClose={closeView}
+          onClose={() => setViewOpen(false)}
           placement="top"
           label="View"
           trigger={
@@ -425,77 +392,71 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           }
         >
           <Menu label="View" data-testid="canvas-view-menu">
-            {VIEW_ROWS.map((row) => (
-              <MenuItem
-                key={row.key}
-                selected={overlays[row.key]}
-                kbd={row.kbd}
-                data-testid={`canvas-view-${row.key}`}
-                onClick={() => {
-                  onOverlayChange(row.key, !overlays[row.key]);
-                  setViewOpen(false);
-                }}
-              >
-                {row.label}
-              </MenuItem>
-            ))}
-            <MenuSeparator />
-            {device && onDeviceChange && (
-              <SubmenuRow
-                label="Breakpoint"
-                value={customWidth ? `${customWidth}px` : DEVICE_PREVIEW_SIZES[device].label}
-                open={viewSub === "breakpoint"}
-                onOpen={() => setViewSub((s) => (s === "breakpoint" ? null : "breakpoint"))}
-                onClose={() => setViewSub(null)}
-                testId="canvas-view-breakpoint"
-              >
-                <Menu label="Breakpoint" data-testid="canvas-breakpoint-menu" className="tw:min-w-[152px]">
-                  {BREAKPOINT_ROWS.map((id) => {
-                    const size = DEVICE_PREVIEW_SIZES[id];
-                    const current = device === id && !customWidth;
-                    return (
-                      <MenuItem
-                        key={id}
-                        kbd={current ? "✓" : typeof size.width === "number" ? `${size.width}px` : undefined}
-                        className={current ? "tw:bg-[var(--bk-bg-subtle)]" : undefined}
-                        aria-current={current || undefined}
-                        data-testid={`canvas-breakpoint-${id}`}
-                        onClick={() => {
-                          onDeviceChange(id);
-                          closeView();
-                        }}
-                      >
-                        {size.label}
-                      </MenuItem>
-                    );
-                  })}
-                  {onCustomWidth && (
-                    <>
-                      <MenuSeparator />
-                      <MenuItem
-                        data-testid="canvas-breakpoint-custom"
-                        onClick={() => {
-                          closeView();
-                          setCustomOpen(true);
-                        }}
-                      >
-                        Custom width…
-                      </MenuItem>
-                    </>
+            {viewPane === "main" && (
+              <>
+                {VIEW_ROWS.map((row) => (
+                  <MenuItem
+                    key={row.key}
+                    selected={overlays[row.key]}
+                    kbd={row.kbd}
+                    data-testid={`canvas-view-${row.key}`}
+                    onClick={() => {
+                      onOverlayChange(row.key, !overlays[row.key]);
+                      setViewOpen(false);
+                    }}
+                  >
+                    {row.label}
+                  </MenuItem>
+                ))}
+                <MenuGroup>
+                  {device && onDeviceChange && (
+                    <MenuItem
+                      data-testid="canvas-view-breakpoint"
+                      kbd={`${customWidth ? `${customWidth}px` : (DEVICE_LABEL[device] ?? device)} ▸`}
+                      onClick={() => setViewPane("breakpoint")}
+                    >
+                      Breakpoint
+                    </MenuItem>
                   )}
-                </Menu>
-              </SubmenuRow>
+                  <MenuItem data-testid="canvas-view-zoom" kbd={`${Math.round(zoom)}% ▸`} onClick={() => setViewPane("zoom")}>
+                    Zoom
+                  </MenuItem>
+                </MenuGroup>
+              </>
             )}
-            <SubmenuRow
-              label="Zoom"
-              value={`${Math.round(zoom)}%`}
-              open={viewSub === "zoom"}
-              onOpen={() => setViewSub((s) => (s === "zoom" ? null : "zoom"))}
-              onClose={() => setViewSub(null)}
-              testId="canvas-view-zoom"
-            >
-              <ZoomMenu zoom={zoom} onPick={zoomTo} onFit={fit} />
-            </SubmenuRow>
+            {viewPane === "breakpoint" && device && onDeviceChange && (
+              <>
+                {BREAKPOINT_ROWS.map((row) => (
+                  <MenuItem
+                    key={row.id}
+                    radio
+                    selected={device === row.id && !customWidth}
+                    kbd={row.width}
+                    data-testid={`canvas-breakpoint-${row.id}`}
+                    onClick={() => {
+                      onDeviceChange(row.id);
+                      setViewOpen(false);
+                    }}
+                  >
+                    {row.label}
+                  </MenuItem>
+                ))}
+                {onCustomWidth && (
+                  <MenuGroup>
+                    <MenuItem
+                      data-testid="canvas-breakpoint-custom"
+                      onClick={() => {
+                        setViewOpen(false);
+                        setCustomOpen(true);
+                      }}
+                    >
+                      Custom width…
+                    </MenuItem>
+                  </MenuGroup>
+                )}
+              </>
+            )}
+            {viewPane === "zoom" && zoomRows(() => setViewOpen(false))}
           </Menu>
         </Popover>
         {/* "100% ▾" — board 5936:44788's bar; opens 7048:78046. */}
@@ -519,7 +480,9 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             </Button>
           }
         >
-          <ZoomMenu zoom={zoom} onPick={zoomTo} onFit={fit} />
+          <Menu label="Zoom" data-testid="canvas-zoom-menu">
+            {zoomRows(() => setZoomOpen(false))}
+          </Menu>
         </Popover>
       </div>
       {onCustomWidth && (

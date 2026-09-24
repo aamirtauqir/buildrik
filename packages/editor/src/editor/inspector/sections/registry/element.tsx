@@ -10,6 +10,7 @@ import { AllCSSSection } from "../AllCSSSection";
 import { CSSClassesSection } from "../CSSClassesSection";
 import { ElementPropertiesSection } from "../elementProperties";
 import { LinkSection } from "../LinkSection";
+import { ContentSection } from "../ContentSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
@@ -28,6 +29,21 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
     // element tab clean for everything else.
     shouldRender: (ctx) =>
       ["link", "button", "cta"].includes(ctx.selectedElement.type),
+  }),
+
+  /* Board 4428:141642 — CONTENT (Static / From CMS). G2-144. */
+  content: defineSection({
+    tab: "element",
+    Component: ContentSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
+      onOpenCreateCollection: ctx.onOpenCreateCollection,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
   }),
 
   "element-properties": defineSection({

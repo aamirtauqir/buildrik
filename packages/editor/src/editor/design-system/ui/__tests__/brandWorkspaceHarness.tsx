@@ -86,10 +86,15 @@ export function renderWorkspace(
   return render(wrap(<BrandWorkspace composer={composer} {...props} />));
 }
 
-/** Click a nav row. The ten undesigned kinds sit behind "More token kinds". */
+/** Click a nav row. The eleven other kinds are one "Other tokens" row plus
+ *  the page header's kind switch. */
 export function openPage(utils: ReturnType<typeof render>, id: BrandPageId) {
-  if (id.startsWith("kind-") && !utils.container.querySelector(`[data-section-id="${id}"]`)) {
-    fireEvent.click(utils.getByTestId("brand-more-kinds"));
+  if (id.startsWith("kind-")) {
+    const row = utils.container.querySelector<HTMLButtonElement>('[data-section-id="tokens"]');
+    if (!row) throw new Error("Other tokens row not found");
+    fireEvent.click(row);
+    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: id } });
+    return;
   }
   const row = utils.container.querySelector<HTMLButtonElement>(`[data-section-id="${id}"]`);
   if (!row) throw new Error(`Brand nav row ${id} not found`);

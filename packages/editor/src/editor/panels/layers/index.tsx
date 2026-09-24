@@ -9,7 +9,6 @@ import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";
 import { LayersEmptyState } from "./components/LayersEmptyState";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
-import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
 import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
 import { LayersScrollThumb } from "./components/LayersScrollThumb";
@@ -21,6 +20,7 @@ import { getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
 /** "Heading, Subtitle and Menu previews" — board 6887:78291's sentence. */
@@ -386,27 +386,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onClose={() => onDisplaySettingsToggle?.()}
         />
       )}
-      {/* Always mounted, empty when nothing is selected. Mounting it ON selection
-          inserted a block above the tree and pushed every row below it down —
-          between the two halves of a double-click, which broke rename on any row
-          that was not already selected. */}
-      <LayerBreadcrumb
-        selectedId={state.selectionHook.selectedIds.size === 1 ? [...state.selectionHook.selectedIds][0] : null}
-        layers={state.treeHook.layers}
-        customNames={state.actionsHook.customNames}
-        onSelect={state.selectionHook.selectLayer}
-      />
-      {/* What this panel is for. The empty state explains itself ("This page is
-          empty…"), but the moment one element existed the panel became a bare
-          tree — the reason to be here, and the fact that a row can be dragged
-          to reorder or nest, were nowhere on screen. Hidden while searching so
-          it does not sit above a result count. Drop positions verified against
-          types.ts:56 — "before" | "after" | "inside". */}
-      {state.layers.length > 0 && !state.searchHook.isSearching && (
-        <p data-testid="layers-purpose" className="tw:m-0 tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-          Every element on this page. Drag a row to reorder or nest it.
-        </p>
-      )}
+      {/* No breadcrumb band and no purpose line: v3 board 4418:81300 starts the
+          tree directly under the search band (first row y136). The selected
+          element's path lives in the canvas breadcrumb / status bar (G2-062). */}
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && matchCount > 0
@@ -451,6 +433,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <LayersNoResults
             search={state.search}
             onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
+            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
           />
         )}
 

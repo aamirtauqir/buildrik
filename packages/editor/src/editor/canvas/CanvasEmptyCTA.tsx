@@ -13,9 +13,8 @@
  * board's Restaurant · Bistro Menu · Autumn are sample data; the SHAPE is the
  * contract. A card opens the Templates panel the way Browse all does: the
  * panel owns apply, backup and confirm (G2-098), and this surface does not
- * grow a second copy of that flow. Its swatch is the template's own
- * `gradient` — a swatch whose fill IS the value is the one inline style
- * DESIGN.md allows.
+ * grow a second copy of that flow. Its thumbnail is the board's light
+ * wireframe, drawn in CSS.
  *
  * Board 807:6558 is what Start blank leads to — the Insert drawer open, and
  * this sentence replaced by the next instruction rather than removed. Pressing
@@ -38,16 +37,28 @@ interface CanvasEmptyCTAProps {
   onAddBlock: () => void;
   onDescribe: () => void;
   onStartBlank: () => void;
-  /**
-   * Board 807:6558 — after Start blank. The page is still empty, so the
-   * invitation stays; it becomes the next instruction and drops its cards and
-   * buttons, because the Insert drawer it just opened is where the next act is.
-   */
-  started?: boolean;
   /** The part of the frame on screen (useVisibleFrameSpan). The frame can be
    *  wider than its viewport, and a CTA centred on the frame hid "Start blank"
    *  under the inspector. Absent → the whole frame. */
   span?: FrameSpan | null;
+  /** The canvas zoom as a fraction. The CTA lives inside the scaled frame so
+   *  drops over it reach the frame, but it is chrome: it counter-scales so its
+   *  type and buttons stay at 1:1 when the page is fitted (board 4428:44164
+   *  draws a readable CTA inside a scaled page card). */
+  scale?: number;
+}
+
+function ctaBoxStyle(span: FrameSpan | null | undefined, scale: number): React.CSSProperties | undefined {
+  if (!span && scale === 1) return undefined;
+  const left = span?.left ?? 0;
+  const style: React.CSSProperties = { left, right: "auto", bottom: "auto", top: 0 };
+  style.width = span ? span.width * scale : `${100 * scale}%`;
+  style.height = `${100 * scale}%`;
+  if (scale !== 1) {
+    style.transform = `scale(${1 / scale})`;
+    style.transformOrigin = "0 0";
+  }
+  return style;
 }
 
 /** The board's three cards. */
@@ -58,8 +69,8 @@ export function CanvasEmptyCTA({
   onAddBlock,
   onDescribe,
   onStartBlank,
-  started,
   span,
+  scale = 1,
 }: CanvasEmptyCTAProps): React.ReactElement {
   const cards = SITE_TEMPLATES.slice(0, CARD_COUNT);
   return (
@@ -68,14 +79,9 @@ export function CanvasEmptyCTA({
       role="status"
       aria-label="Canvas is empty"
       data-testid="canvas-empty-cta"
-      style={span ? { left: span.left, width: span.width, right: "auto" } : undefined}
+      style={ctaBoxStyle(span, scale)}
     >
-      {started ? (
-        <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
-          Drop an element from the Insert panel, or drag a section.
-        </p>
-      ) : (
-        <>
+      <>
           <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
             This page is empty
           </p>
@@ -92,28 +98,39 @@ export function CanvasEmptyCTA({
                   aria-label={`Start from the ${t.name} template`}
                   onClick={onBrowseTemplates}
                 >
-                  <span className="bd-canvas-empty-cta__swatch" aria-hidden="true" style={{ background: t.gradient }} />
+                  {/* Board 4428:44164: a light wireframe thumbnail with the
+                      name under it, left-aligned — not a dark colour swatch. */}
+                  <span className="bd-canvas-empty-cta__thumb" aria-hidden="true">
+                    <span className="bd-canvas-empty-cta__thumb-bar" />
+                    <span className="bd-canvas-empty-cta__thumb-row">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                  </span>
                   <span className="bd-canvas-empty-cta__card-name">{t.name}</span>
                 </Button>
               </li>
             ))}
           </ul>
           <div className="bd-canvas-empty-cta__actions" data-testid="canvas-empty-cta-actions">
-            <Button color="light" onClick={onBrowseTemplates} className={SECONDARY} data-testid="canvas-empty-browse">
+            {/* Board 4428:44164: Browse all templates is the primary; Add a
+                block and Describe are bordered secondaries; Start blank is a
+                plain text action. */}
+            <Button onClick={onBrowseTemplates} className={PRIMARY} data-testid="canvas-empty-browse">
               Browse all templates
             </Button>
-            <Button onClick={onAddBlock} className={PRIMARY} data-testid="canvas-empty-add-block">
+            <Button color="light" onClick={onAddBlock} className={SECONDARY} data-testid="canvas-empty-add-block">
               Add a block
             </Button>
             <Button color="light" onClick={onDescribe} className={SECONDARY} data-testid="canvas-empty-describe">
               ✦ Describe your site
             </Button>
-            <Button color="light" onClick={onStartBlank} className={SECONDARY} data-testid="canvas-empty-start-blank">
+            <Button color="light" onClick={onStartBlank} className={TEXT_ACTION} data-testid="canvas-empty-start-blank">
               Start blank
             </Button>
           </div>
-        </>
-      )}
+      </>
     </div>
   );
 }
@@ -122,11 +139,13 @@ export function CanvasEmptyCTA({
    32 tall, 16 across, 10 top/bottom, radius 8. flowbite's size-md defaults are
    h-10/px-5, and only a SAME-property utility unseats them — `tw:h-8` does,
    a `min-h` would not (CLAUDE.md §Chrome Routing). The one primary on the
-   row is Add a block — the board's other three are quiet. */
+   row is Browse all templates (board 4428:44164). */
 const PRIMARY = "tw:h-8 tw:px-4 tw:py-2.5 tw:rounded-lg";
 const SECONDARY = "tw:h-8 tw:px-[14px] tw:rounded-lg tw:text-[13px] tw:leading-5";
-/* A card is a column: swatch over name, on a hairline, the whole thing a
-   button. `h-auto` unseats flowbite's h-10 so the swatch can set the height. */
+const TEXT_ACTION =
+  "tw:h-8 tw:px-[14px] tw:rounded-lg tw:text-[13px] tw:leading-5 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
+/* A card is a column: thumbnail over name, the whole thing a button.
+   `h-auto` unseats flowbite's h-10 so the thumbnail sets the height. */
 const CARD =
-  "tw:h-auto tw:min-h-0 tw:w-[132px] tw:flex-col tw:items-stretch tw:gap-2 tw:p-2 tw:rounded-lg " +
-  "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:hover:border-[var(--bk-accent)]";
+  "tw:h-auto tw:min-h-0 tw:w-[148px] tw:flex-col tw:items-start tw:gap-1.5 tw:p-0 tw:rounded-md " +
+  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)]";

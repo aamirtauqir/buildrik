@@ -112,40 +112,46 @@
   padding: 12px;
 }
 
-/* ── Template card ── */
+/* ── Template card — board 4418:54134 (catalogue card): white, gray-200
+   edge, radius 12, 16 inset, 16 gap; actual-page thumbnail 155 tall on
+   gray-50; name 16/24 semibold; "N sections" 13 gray-500 + a Built-in / Saved
+   chip; a full-width 44-tall blue "Preview template →". Radius 12 is the
+   board's own card radius (no token carries it). ── */
 .tpl-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: var(--bk-radius-lg);
-  overflow: hidden;
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  cursor: pointer;
-  transition: border-color 0.14s, box-shadow 0.14s;
-  outline: none;
-}
-.tpl-card:hover {
-  border-color: var(--bk-accent);
+  gap: var(--bk-space-16);
+  padding: var(--bk-space-16);
+  border: 1px solid var(--bk-border);
+  border-radius: 12px;
+  background: var(--bk-bg-panel);
   box-shadow: var(--bk-shadow-raised);
+  cursor: pointer;
+  min-width: 0;
+  outline: none;
 }
 .tpl-card:focus-visible {
   outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
 }
-.tpl-card--selected {
-  border-color: var(--bk-accent);
-  box-shadow: 0 0 0 2px var(--bk-accent-tint);
-}
-.tpl-card--applied {
-  border-color: var(--bk-accent);
-  border-width: 2px;
-}
+.tpl-card--selected,
+.tpl-card--applied { border-color: var(--bk-accent); }
 
 .tpl-card-thumb {
   position: relative;
-  aspect-ratio: 4 / 3;
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
+  height: 155px;
+  border-radius: var(--bk-radius-md);
+  overflow: hidden;
+  background: var(--bk-gray-50);
   flex-shrink: 0;
+}
+.tpl-card-thumb-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
 }
 
 /* APPLIED badge — top-right of thumb (prototype-v3 §1) */
@@ -155,7 +161,7 @@
   right: 6px;
   padding: 2px 6px;
   background: var(--bk-accent);
-  color: var(--bk-bg-card, var(--bk-bg-card));
+  color: var(--bk-bg-card);
   font-size: var(--bk-text-11);
   font-weight: var(--bk-weight-semibold);
   letter-spacing: 0.04em;
@@ -166,34 +172,50 @@
 .tpl-card-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 10px var(--bk-space-12);
+  gap: var(--bk-space-4);
+  min-width: 0;
 }
 .tpl-card-name {
-  font-size: 13px;
-  font-weight: 600;
+  font: 600 16px/24px var(--bk-font-ui);
+  letter-spacing: -0.16px;
   color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tpl-card-name-mark {
-  background: var(--bk-accent-tint);
-  color: inherit;
-  padding: 0 2px;
-  border-radius: 2px;
+.tpl-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bk-space-8);
 }
-
 .tpl-card-category {
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  margin-top: 1px;
+  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-gray-500);
 }
+.tpl-card-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 1px 6px;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+  font: 500 11px/16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  white-space: nowrap;
+}
+.tpl-card-tag--saved { background: var(--bk-accent-tint); color: var(--bk-accent-text); }
 .tpl-card-cta {
-  margin-top: var(--bk-space-4);
-  font-size: var(--bk-text-11);
-  color: var(--bk-accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-accent);
+  font: 500 14px/20px var(--bk-font-ui);
+  color: var(--bk-accent-on);
 }
+.tpl-card:hover .tpl-card-cta { background: var(--bk-accent-hover); }
 
 /* Breadcrumb row rules deleted 2026-05-24 in header-pattern migration
    (commit 54f16df4). Detail mode now uses DrillInHeader (canonical
@@ -283,54 +305,111 @@
 }
 
 /* ── Full-canvas view (decision #24; board 4418:54134) ─────────────────────
-   FullPageRouter mounts the view edge-to-edge; the 256 sidebar is the view's
-   own, the catalogue fills the rest. The drawer's two-column grid becomes as
-   many columns as the pane holds. */
+   Sidebar 256 on white: ‹ Back to canvas (13 medium), "Templates" 28/36
+   semibold, the site name, PAGE TEMPLATES, 36-tall nav rows at 14px (the
+   current one on bg-selected, accent 600, count on the right), a help line
+   and "⟳ Reload catalogue". Main on gray-50, 40 inset: "Page templates"
+   24/32, one 14px line, then the cards four across at a 24 gap. */
 .tpl-ws {
   display: flex;
   height: 100%;
-  background: var(--bk-bg-panel);
+  background: var(--bk-gray-50);
   font-family: var(--bk-font-ui);
 }
 .tpl-ws-side {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--bk-space-4);
   width: 256px;
   flex-shrink: 0;
-  padding: var(--bk-space-16) var(--bk-space-12);
+  padding: 11px 16px 24px 15px;
+  background: var(--bk-bg-panel);
   border-right: 1px solid var(--bk-border);
   overflow-y: auto;
 }
 .tpl-ws-side .tpl-ws-back {
   justify-content: flex-start;
-  margin-bottom: var(--bk-space-12);
-  padding: 0 var(--bk-space-8);
-}
-.tpl-ws-title {
-  padding: 0 var(--bk-space-8);
-  font: 600 14px var(--bk-font-ui);
+  height: 40px;
+  min-height: 0;
+  padding: 4px var(--bk-space-12);
+  border: 0;
+  background: transparent;
+  font: 500 13px/20px var(--bk-font-ui);
   color: var(--bk-ink);
 }
+.tpl-ws-title {
+  margin-top: 8px;
+  font: 600 28px/36px var(--bk-font-ui);
+  letter-spacing: -0.42px;
+  color: var(--bk-ink);
+}
+.tpl-ws-site {
+  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-gray-500);
+}
 .tpl-ws-label {
-  padding: var(--bk-space-16) var(--bk-space-8) var(--bk-space-4);
-  font: 600 11px var(--bk-font-ui);
-  letter-spacing: 0.04em;
-  color: var(--bk-ink-muted);
+  margin: 30px 0 12px;
+  font: 500 11px/16px var(--bk-font-ui);
+  letter-spacing: 0.88px;
+  color: var(--bk-gray-500);
 }
 .tpl-ws-side .tpl-ws-row {
-  justify-content: flex-start;
-  height: 32px;
+  justify-content: space-between;
+  gap: var(--bk-space-12);
+  height: 36px;
   min-height: 0;
-  padding: 0 var(--bk-space-8);
+  padding: 0 var(--bk-space-12);
   border: 0;
-  border-radius: var(--bk-radius-md);
+  border-radius: var(--bk-radius-lg);
   background: transparent;
-  font: 400 13px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  font: 400 14px/20px var(--bk-font-ui);
+  color: var(--bk-ink);
   text-align: left;
 }
-.tpl-ws-side .tpl-ws-row:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-.tpl-ws-side .tpl-ws-row[aria-current="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); font-weight: 500; }
-.tpl-ws .tpl-ws-main { flex: 1; min-width: 0; }
-.tpl-ws .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.tpl-ws-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tpl-ws-row-count { font: 400 13px/20px var(--bk-font-ui); color: var(--bk-gray-500); }
+.tpl-ws-side .tpl-ws-row:hover { background: var(--bk-bg-subtle); }
+.tpl-ws-side .tpl-ws-row[aria-current="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); font-weight: 600; }
+.tpl-ws-help {
+  margin: 96px 0 0;
+  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-gray-500);
+}
+.tpl-ws-side .tpl-ws-reload {
+  justify-content: flex-start;
+  height: 20px;
+  min-height: 0;
+  margin-top: 16px;
+  padding: 0;
+  font: 500 11px/16px var(--bk-font-ui);
+  color: var(--bk-accent-text);
+}
+.tpl-ws .tpl-ws-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--bk-gray-50);
+  overflow-y: auto;
+}
+.tpl-ws-catalogue {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px 40px 32px;
+}
+.tpl-ws-heading {
+  margin: 0;
+  font: 600 24px/32px var(--bk-font-ui);
+  letter-spacing: -0.36px;
+  color: var(--bk-ink);
+}
+.tpl-ws-desc {
+  margin: 0;
+  font: 400 14px/20px var(--bk-font-ui);
+  color: var(--bk-gray-500);
+}
+.tpl-ws .tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  padding: 0;
+}

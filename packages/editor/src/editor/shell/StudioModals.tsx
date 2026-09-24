@@ -14,6 +14,7 @@ import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
+import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
@@ -183,6 +184,8 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       {/* Keyboard shortcuts — mounted here, not on the canvas, so the sheet
           answers from every view the shell renders. */}
       <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} />
+      {/* Rail Help's legend card (4418:126882); its "All shortcuts ›" opens the sheet above. */}
+      <KeyboardLegend composer={composer} />
 
       {/* Media Library */}
       <MediaLibraryPanel

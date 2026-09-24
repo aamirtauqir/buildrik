@@ -27,21 +27,21 @@ describe("TemplateCard", () => {
     expect(screen.getByText("Hero Landing")).toBeInTheDocument();
   });
 
-  /* Board 4418:54134 card meta: "N sections · Built-in" / "Saved", then
-     "Preview template →". The old category line ("Landing page · Free") and
-     the catalogue's "with N pages" claim are gone (G2-093). */
-  it("reads N sections · Built-in, and Preview template →", () => {
+  /* Board 4418:54134 card: "N sections" with a Built-in / Saved chip, then a
+     full-width "Preview template →". The old category line ("Landing page ·
+     Free") and the catalogue's "with N pages" claim are gone (G2-093). */
+  it("reads N sections with a Built-in chip, and Preview template →", () => {
     render(<TemplateCard template={makeTemplate({ html: "<section></section><section></section>" })} onClick={() => {}} />);
-    expect(screen.getByTestId("tpl-card-meta-tmpl-hero")).toHaveTextContent("2 sections · Built-in");
+    expect(screen.getByTestId("tpl-card-meta-tmpl-hero")).toHaveTextContent(/^2 sectionsBuilt-in$/);
     expect(screen.getByText("Preview template →")).toBeInTheDocument();
     expect(screen.queryByText(/Landing page|pages\b/)).toBeNull();
   });
 
   it("marks a saved template Saved, and a premium one Pro", () => {
     render(<TemplateCard template={makeTemplate({ id: "mine", category: "my-templates" as never })} onClick={() => {}} />);
-    expect(screen.getByTestId("tpl-card-meta-mine")).toHaveTextContent("1 section · Saved");
+    expect(screen.getByTestId("tpl-card-meta-mine")).toHaveTextContent(/^1 sectionSaved$/);
     render(<TemplateCard template={makeTemplate({ id: "pro", status: "premium" })} onClick={() => {}} />);
-    expect(screen.getByTestId("tpl-card-meta-pro")).toHaveTextContent("1 section · Built-in · Pro");
+    expect(screen.getByTestId("tpl-card-meta-pro")).toHaveTextContent(/^1 sectionBuilt-in · Pro$/);
   });
 
   it("applies tpl-card class to the card element", () => {

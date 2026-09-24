@@ -23,8 +23,17 @@ import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { slugify } from "@shared/utils/helpers/string";
-import type { PageItem } from "./types";
+import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+
+/** A page's stored visibility → its panel status. Unset is "live" (what the
+ *  deploy does with it). C4 #26: a "password" stored before Password pages
+ *  were removed reads as "hidden" — it is unpublished, like a hidden page. */
+const PAGE_STATUSES: ReadonlyArray<PageStatus> = ["live", "draft", "hidden", "scheduled", "error"];
+function pageStatus(visibility: string | undefined): PageStatus {
+  if (visibility === "password") return "hidden";
+  return PAGE_STATUSES.find((s) => s === visibility) ?? "live";
+}
 
 interface ContextMenuState {
   pageId: string;
@@ -122,7 +131,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
                Every other reader already agrees: PageRow falls back to
                "live", and the settings drawer persists only live/hidden/
                password and reads anything else as "live". */
-            status: (p.settings?.visibility as PageItem["status"]) ?? "live",
+            status: pageStatus(p.settings?.visibility),
             seo: p.settings?.seo,
             head: p.settings?.head,
             updatedAt: p.updatedAt,
@@ -278,14 +287,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     (pageId: string) => {
       const page = pages.find((p) => p.id === pageId);
       setContextMenu(null);
-      if (page?.status === "external") {
-        addToast({
-          description: "External link pages can't be set as the homepage.",
-          tone: "warning",
-          duration: 4000,
-        });
-        return;
-      }
       if (!composer) return;
       try {
         composer.elements.setHomePage?.(pageId);

@@ -136,64 +136,76 @@ describe("CanvasFooterToolbar — help button", () => {
   });
 });
 
-/* G2-013 / G2-014 / G2-016: the View menu's last two rows open the breakpoint
-   menu (5930:44781) and the zoom menu (7048:78112); the bar's own "100% ▾"
-   opens the zoom popover (7048:78046); Custom width… opens 5930:44824. */
-describe("CanvasFooterToolbar — Breakpoint ▸ / Zoom ▸ / Custom width", () => {
-  const openMenu = () => fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
-
-  it("View menu ends with Breakpoint (current device) and Zoom (current %)", () => {
-    renderToolbar({ device: "tablet", onDeviceChange: vi.fn(), zoom: 75 });
-    openMenu();
-    expect(screen.getByTestId("canvas-view-breakpoint").textContent).toMatch(/Breakpoint.*Tablet/);
-    expect(screen.getByTestId("canvas-view-zoom").textContent).toMatch(/Zoom.*75%/);
+/* Board 5930:44801 ends the View menu with "Breakpoint · Desktop ▸" and
+   "Zoom · 100% ▸"; they open 5930:44781 (Desktop · Tablet 768px · Mobile
+   375px) and 7048:78112 (Fit to screen · 50% · 75% · 100% · 150% · 200%). */
+describe("CanvasFooterToolbar — View › Breakpoint / Zoom (5930:44801)", () => {
+  it("shows the current breakpoint and zoom as submenu rows", () => {
+    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), zoom: 75 });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    expect(screen.getByTestId("canvas-view-breakpoint")).toHaveTextContent(/Breakpoint.*Desktop ▸/);
+    expect(screen.getByTestId("canvas-view-zoom")).toHaveTextContent(/Zoom.*75% ▸/);
   });
 
-  it("Breakpoint ▸ lists Desktop · Tablet 768px · Mobile 375px · Custom width…, and picks one", () => {
+  it("Breakpoint ▸ lists the devices and picking one switches and closes", () => {
     const onDeviceChange = vi.fn();
-    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth: vi.fn() });
-    openMenu();
+    renderToolbar({ device: "desktop", onDeviceChange });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
     fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
-    const menu = screen.getByTestId("canvas-breakpoint-menu");
-    expect(menu.textContent).toMatch(/Desktop.*Tablet.*768px.*Mobile.*375px.*Custom width…/);
-    fireEvent.click(screen.getByTestId("canvas-breakpoint-mobile"));
+    expect(screen.getByRole("menuitemradio", { name: /Tablet/ })).toHaveTextContent("768px");
+    fireEvent.click(screen.getByRole("menuitemradio", { name: /Mobile/ }));
     expect(onDeviceChange).toHaveBeenCalledWith("mobile");
     expect(screen.queryByTestId("canvas-view-menu")).toBeNull();
   });
 
-  it("Zoom ▸ lists Fit to screen · 50 · 75 · 100 · 150 · 200 with the current one checked", () => {
+  it("Zoom ▸ offers Fit and the presets", () => {
     const onFitToScreen = vi.fn();
-    const { onZoomChange } = renderToolbar({ zoom: 100, onFitToScreen });
-    openMenu();
+    const { onZoomChange } = renderToolbar({ onFitToScreen });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
     fireEvent.click(screen.getByTestId("canvas-view-zoom"));
-    const rows = screen.getAllByTestId(/^canvas-zoom-(fit|\d+)$/).map((r) => r.textContent?.replace("✓", "").trim());
-    expect(rows).toEqual(["Fit to screen", "50%", "75%", "100%", "150%", "200%"]);
-    expect(screen.getByTestId("canvas-zoom-100").getAttribute("aria-checked")).toBe("true");
-    fireEvent.click(screen.getByTestId("canvas-zoom-150"));
+    const labels = screen.getAllByRole("menuitemradio").map((e) => (e.textContent ?? "").replace("✓", ""));
+    expect(labels).toEqual(["Fit to screen", "50%", "75%", "100%", "150%", "200%"]);
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "150%" }));
     expect(onZoomChange).toHaveBeenCalledWith(150);
   });
+});
 
-  it("the bar's 100% ▾ opens the same zoom rows", () => {
-    const onFitToScreen = vi.fn();
-    renderToolbar({ zoom: 100, onFitToScreen });
-    const trigger = screen.getByTestId("canvas-zoom-trigger");
-    expect(trigger.textContent).toContain("100%");
-    fireEvent.click(trigger);
-    fireEvent.click(screen.getByTestId("canvas-zoom-fit"));
-    expect(onFitToScreen).toHaveBeenCalledTimes(1);
-  });
+/* G2-014 / G2-016: Custom width… (5930:44824) and the bar's own "100% ▾"
+   (7048:78046, board 5936:44788). */
+describe("CanvasFooterToolbar — Custom width and the 100% ▾ zoom", () => {
+  const openBreakpoints = () => {
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
+  };
 
   it("Custom width… opens the modal; Apply hands the width over", () => {
     const onCustomWidth = vi.fn();
     renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), onCustomWidth });
-    openMenu();
-    fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
+    openBreakpoints();
     fireEvent.click(screen.getByTestId("canvas-breakpoint-custom"));
-    expect(screen.getByText("Custom width")).toBeTruthy();
     expect(screen.getByText("Changes the preview width only, not page content.")).toBeTruthy();
-    const input = screen.getByLabelText("Preview width") as HTMLInputElement;
-    fireEvent.change(input, { target: { value: "600" } });
+    fireEvent.change(screen.getByLabelText("Preview width"), { target: { value: "600" } });
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(onCustomWidth).toHaveBeenCalledWith(600);
+  });
+
+  it("an active custom width is what the Breakpoint row shows", () => {
+    renderToolbar({ device: "mobile", onDeviceChange: vi.fn(), onCustomWidth: vi.fn(), customWidth: 600 });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    expect(screen.getByTestId("canvas-view-breakpoint").textContent).toContain("600px");
+  });
+
+  it("the bar's 100% ▾ opens the zoom rows with the current one checked", () => {
+    const onFitToScreen = vi.fn();
+    const { onZoomChange } = renderToolbar({ zoom: 100, onFitToScreen });
+    const trigger = screen.getByTestId("canvas-zoom-trigger");
+    expect(trigger.textContent).toContain("100%");
+    fireEvent.click(trigger);
+    expect(screen.getByTestId("canvas-zoom-100").getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(screen.getByTestId("canvas-zoom-150"));
+    expect(onZoomChange).toHaveBeenCalledWith(150);
+    fireEvent.click(screen.getByTestId("canvas-zoom-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-zoom-fit"));
+    expect(onFitToScreen).toHaveBeenCalledTimes(1);
   });
 });

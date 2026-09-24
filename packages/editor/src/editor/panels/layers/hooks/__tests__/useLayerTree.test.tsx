@@ -112,14 +112,19 @@ describe("useLayerTree — tree build", () => {
     expect(result.current.totalCount).toBe(0);
   });
 
-  // Nothing auto-expands now, and that IS the old behaviour: expanding the root
-  // only ever made the top-level elements visible, and with the root excluded
-  // they are visible already. Expanding layers[0] would open a level deeper
-  // than the panel ever did.
-  it("expands nothing on arrival — the top level is already visible", () => {
+  /* Parity with board 4418:81300: on a page's first visit (nothing stored) the
+     first section opens down to depth 3 — "Hero › Content › Heading…" — and
+     the rest stay closed ("Footer" collapsed). A stored state still wins. */
+  it("opens the first top-level layer on a first visit; the rest stay closed", () => {
+    const { result } = mount();
+    expect([...result.current.expandedIds]).toEqual(["a"]);
+    expect(result.current.getVisibleLayerIds()).toEqual(["a", "a1", "b"]);
+  });
+
+  it("a stored expansion wins over the first-visit default", () => {
+    localStorage.setItem("buildrick-layers-page-1-expanded", "[]");
     const { result } = mount();
     expect(result.current.expandedIds.size).toBe(0);
-    expect(result.current.getVisibleLayerIds().sort()).toEqual(["a", "b"]);
   });
 });
 
@@ -143,6 +148,7 @@ describe("useLayerTree — expansion controls", () => {
 
   it("toggleExpand flips a single node's expansion", () => {
     const { result } = mount();
+    act(() => result.current.collapseAll());
     expect(result.current.expandedIds.has("a")).toBe(false);
     act(() => result.current.toggleExpand("a"));
     expect(result.current.expandedIds.has("a")).toBe(true);
@@ -163,7 +169,7 @@ describe("useLayerTree — expansion controls", () => {
 
   it("getVisibleLayerIds hides children of collapsed nodes", () => {
     const { result } = mount();
-    // Only root expanded initially → a1 is under a (collapsed) so hidden
+    act(() => result.current.collapseAll());
     expect(result.current.getVisibleLayerIds()).not.toContain("a1");
   });
 });

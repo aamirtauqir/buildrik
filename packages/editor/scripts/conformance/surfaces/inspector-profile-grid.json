@@ -175,10 +175,6 @@
     {
       "name": "sechead-spacing",
       "testId": "inspector-sechead-spacing"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [

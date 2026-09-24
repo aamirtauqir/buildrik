@@ -93,10 +93,8 @@ interface PersistedState {
 
 function getPersistedState(page: PageItem): PersistedState {
   const seoFlags = page.seo as { noIndex?: boolean; noFollow?: boolean } | undefined;
-  /* A legacy password page reads as Hidden: both are left out of the deploy,
-     so saving one here can never publish it unprotected. */
-  const visibility: PersistedState["visibility"] =
-    page.status === "hidden" || page.status === "password" ? "hidden" : "live";
+  /* A legacy password page already arrives as "hidden" (usePages, #26). */
+  const visibility: PersistedState["visibility"] = page.status === "hidden" ? "hidden" : "live";
   return {
     seoTitle: page.seo?.metaTitle ?? page.name,
     seoDesc: page.seo?.metaDescription ?? "",
