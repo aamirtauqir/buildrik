@@ -218,7 +218,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       : ws.tab === "dynamic-pages"
         ? { title: "Select a page", hint: "Generated pages open here and under Pages." }
         : ws.tab === "fields"
-          ? { title: "Select a field", hint: "Click a row to open its settings — type, key and validation." }
+          ? { title: "Select a field", hint: "Click a row to open its settings — type, key, required and validation." }
         : ws.tab === "settings"
           ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
           : null;
