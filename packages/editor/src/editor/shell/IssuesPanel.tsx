@@ -18,8 +18,8 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { PanelHeader, Button, EmptyState, Progress, Row, Toolbar } from "@/editor/chrome-ui";
+import { CheckCircle2 } from "lucide-react";
+import { PanelHeader, Button, EmptyState, Progress, Row } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -54,11 +54,23 @@ function isFixable(i: Issue): boolean {
   return Boolean(i.tokenId && i.autoFixHint);
 }
 
-const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> = {
-  error: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-error)]" },
-  warning: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-warning-text)]" },
-  info: { icon: <Info size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-ink-muted)]" },
+/* Board 4418:147641: an 8px dot per row, and a severity pill under Fix ›. */
+const DOT: Record<Issue["type"], string> = {
+  error: "tw:bg-[var(--bk-error)]",
+  warning: "tw:bg-[var(--bk-yellow-400)]",
+  info: "tw:bg-[var(--bk-gray-400)]",
 };
+const SEVERITY: Record<Issue["type"], { label: string; className: string } | null> = {
+  error: { label: "Error", className: "tw:bg-[rgba(155,28,28,0.12)] tw:text-[var(--bk-red-800)]" },
+  warning: { label: "Warning · should fix", className: "tw:bg-[rgba(114,59,19,0.12)] tw:text-[var(--bk-yellow-800)]" },
+  info: null,
+};
+const PILL = "tw:inline-flex tw:h-[22px] tw:items-center tw:rounded-full tw:px-2 tw:text-[11px] tw:leading-4 tw:font-medium tw:whitespace-nowrap";
+/* The scope segmented control: 24 high, 2px inset, selected on bg-subtle. */
+const SEG_WRAP = "tw:flex tw:h-6 tw:items-center tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0.5";
+const segClass = (on: boolean) =>
+  "tw:h-5 tw:min-h-0 tw:rounded tw:border-0 tw:px-2 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-medium tw:focus:ring-0 " +
+  (on ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)]" : "tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-bg-subtle)]");
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 /* ONE line, and one colour. Boards 164:2 / 164:22 head the list with a single
@@ -69,22 +81,22 @@ const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
    punctuation. The rest is 164:22's own row: it shipped 12px on the font's
    own line box, in a shorter row, with the count in ink-muted. */
 const SUMMARY =
-  "tw:flex tw:h-9 tw:items-center tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
+  "tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]";
 /* flowbite's Button is 40 tall and pads itself; only same-property utilities
    beat that through twMerge (CLAUDE.md §Chrome), and left alone it pushed the
    36 row to 40. */
 const FILTER_BTN =
-  "tw:h-[18px] tw:min-h-0 tw:p-0 tw:text-[12px] tw:leading-[18px] tw:font-normal " +
+  "tw:h-4 tw:min-h-0 tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal " +
   "tw:text-[var(--bk-accent-text)] tw:no-underline";
 /* Board 164:32 draws Fix as accent text on the row, not a bordered control. */
 const FIX_BTN =
   "tw:h-[18px] tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 " +
-  "tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-accent-text)]";
+  "tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-accent-text)]";
 /* Board 164:33/164:34 — the filter's own consequence, a 36-tall 11/16 line. */
 const FILTER_NOTE =
   "tw:m-0 tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 " +
   "tw:text-[var(--bk-ink-muted)]";
-const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
+const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
 /** The fixing / fix-failed bands differ only by tint. */
 const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-[var(--bk-gray-200)]";
 /** The quiet button look, previously copy-pasted onto six separate Buttons. */
@@ -117,9 +129,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const [scope, setScope] = React.useState<"page" | "site">("page");
   const [fixing, setFixing] = React.useState<Issue | null>(null);
   const [failed, setFailed] = React.useState<Issue | null>(null);
-  const anyPageBound = issues.some((i) => i.pageId != null);
-  const scoped =
-    anyPageBound && scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
+  const scoped = scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
 
   const runFix = async (issue: Issue) => {
     if (!onFix) return;
@@ -141,12 +151,6 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const currentFilter = FILTERS[filterIndex];
   const nextFilter = FILTERS[(filterIndex + 1) % FILTERS.length];
 
-  /** Selected reads as the primary action, unselected as a quiet one. */
-  const segment = (selected: boolean) => ({
-    color: selected ? undefined : ("light" as const),
-    className: selected ? undefined : GHOST,
-  });
-
   return (
     <div className={BODY}>
       <PanelHeader title="Issues" onClose={onClose} size="panel" />
@@ -166,17 +170,22 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         </div>
       ) : (
         <>
-          {anyPageBound && (
-            <Toolbar role="group" aria-label="Issue scope">
-              <Button size="xs" onClick={() => setScope("page")} {...segment(scope === "page")}>
+          {/* Board 4418:147641: This page / Whole site, always drawn. Site-wide
+              issues pass the page scope too, so both can list the same rows. */}
+          <div className="tw:flex tw:px-4 tw:py-2">
+            <div className={SEG_WRAP} role="group" aria-label="Issue scope">
+              <Button color="alternative" aria-pressed={scope === "page"} className={segClass(scope === "page")} onClick={() => setScope("page")}>
                 This page
               </Button>
-              <Button size="xs" onClick={() => setScope("site")} {...segment(scope === "site")}>
-                All pages
+              <Button color="alternative" aria-pressed={scope === "site"} className={segClass(scope === "site")} onClick={() => setScope("site")}>
+                Whole site
               </Button>
-            </Toolbar>
-          )}
+            </div>
+          </div>
           <div className={SUMMARY} data-testid="issues-filter-row">
+            <span className="tw:flex-1">Open issues: {visible.length}</span>
+            {/* The severity filter — no board draws it; kept as a quiet
+                trailing control (designer-notes.md). Clicking cycles. */}
             <Button
               color="light"
               size="xs"
@@ -188,7 +197,6 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             >
               {currentFilter.label}
             </Button>
-            <span className="tw:ml-1">· {visible.length}</span>
           </div>
 
           {fixing && (
@@ -252,46 +260,45 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             ) : (
               visible.map((i, idx) => (
                 // Fix sits BESIDE the navigate target, never inside it — a
-                // button nested in a role="button" is invalid, and it also
-                // swallows the outer element's accessible name.
-                <div
-                  key={i.id}
-                  className="tw:flex tw:items-start tw:gap-1.5 tw:mb-1.5"
-                  data-testid={`issue-row-${idx}`}
-                >
-                  {/* `tall` (56) not `comment` (min 64) — board 164:28 draws a
-                      56 row, and Row's own comment records 56 as board 8:29's
-                      height. The issue line is a message over a location, not
-                      a wrapping comment body. */}
+                // button nested in a role="button" is invalid.
+                <div key={i.id} className="tw:relative tw:h-14" data-testid={`issue-row-${idx}`}>
                   <Row
                     size="tall"
                     interactive
-                    className="tw:flex-1 tw:min-w-0"
+                    className="tw:h-14 tw:w-full tw:items-start tw:pl-4 tw:pr-4 tw:pt-2"
                     onClick={() => onSelectElement?.(i)}
                   >
-                    <span className={`tw:flex-none tw:mt-px ${TONE[i.type].className}`}>{TONE[i.type].icon}</span>
+                    <span aria-hidden="true" data-testid={`issue-dot-${idx}`} className={`tw:mt-1.5 tw:size-2 tw:flex-none tw:rounded-full ${DOT[i.type]}`} />
                     <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
-                      {/* One line each: the row is a fixed 56 (board 164:28), and
-                          a lint message wrapped to three lines pushed the
-                          location into the next row. Full text: title + DOM. */}
-                      <span className="tw:leading-5 tw:truncate" title={i.message} data-testid={`issue-message-${idx}`}>
+                      {/* One line each: the row is a fixed 56. Full text: title + DOM.
+                          The first line leaves room for Fix ›, the second for the pill. */}
+                      <span
+                        className={`tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:truncate ${isFixable(i) && onFix ? "tw:pr-10" : ""}`}
+                        title={i.message}
+                        data-testid={`issue-message-${idx}`}
+                      >
                         {i.message}
                       </span>
-                      {i.location && (
+                      <span className="tw:mt-0.5 tw:flex tw:items-center tw:gap-2 tw:min-w-0">
                         <span
-                          className="tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5 tw:truncate"
+                          className="tw:flex-1 tw:min-w-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate"
                           data-testid={`issue-location-${idx}`}
                         >
                           {i.location}
                         </span>
-                      )}
+                        {SEVERITY[i.type] && (
+                          <span className={`${PILL} tw:flex-none ${SEVERITY[i.type]!.className}`} data-testid={`issue-severity-${idx}`}>
+                            {SEVERITY[i.type]!.label}
+                          </span>
+                        )}
+                      </span>
                     </span>
                   </Row>
                   {isFixable(i) && onFix && (
                     <Button
                       color="light"
                       size="xs"
-                      className={FIX_BTN}
+                      className={`tw:absolute tw:right-4 tw:top-2 ${FIX_BTN}`}
                       data-testid={`issue-fix-${idx}`}
                       disabled={fixing !== null}
                       onClick={() => void runFix(i)}
@@ -316,6 +323,9 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
             </p>
           )}
+          <p className="tw:m-0 tw:flex-none tw:px-4 tw:py-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-gray-500)]">
+            ● red = error · ● amber = warning
+          </p>
         </>
       )}
     </div>

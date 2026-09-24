@@ -24,12 +24,20 @@ describe("IssuesPanel", () => {
   /* Boards 164:2 / 164:22 head the list with one line: what you are looking
      at, and how many. The error/warning split it replaces needed its own row
      plus a segmented filter above it to say the same thing. */
-  it("lists every issue under an 'All · N' head", () => {
+  /* Board 4418:147641: "Open issues: 3" heads the list; each row is a dot,
+     the message over its location, Fix › and a severity pill; a legend
+     closes the panel. The severity filter (no board draws it) stays as a
+     quiet trailing control on the head row. */
+  it("lists every issue under an 'Open issues: N' head, with the board's row parts", () => {
     renderPanel();
     expect(screen.getByText(/Broken link/)).toBeInTheDocument();
     expect(screen.getByText(/missing alt/)).toBeInTheDocument();
+    expect(screen.getByText("Open issues: 3")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "All" })).toBeInTheDocument();
-    expect(screen.getByText("· 3")).toBeInTheDocument();
+    expect(screen.getByTestId("issue-severity-0")).toHaveTextContent("Error");
+    expect(screen.getByTestId("issue-severity-1")).toHaveTextContent("Warning · should fix");
+    expect(screen.getByTestId("issue-dot-0").className).toContain("tw:bg-[var(--bk-error)]");
+    expect(screen.getByText("● red = error · ● amber = warning")).toBeInTheDocument();
   });
 
   it("cycles to errors only, and says what it is hiding", () => {
@@ -66,9 +74,11 @@ describe("IssuesPanel", () => {
       { id: "s1", type: "warning" as const, message: "Off-token color everywhere" },
     ];
 
-    it("hides the scope filter when every issue is site-wide", () => {
-      renderPanel(); // ISSUES carry no pageId
-      expect(screen.queryByRole("group", { name: /issue scope/i })).not.toBeInTheDocument();
+    it("always offers This page / Whole site, as the board draws it", () => {
+      renderPanel(); // ISSUES carry no pageId — both scopes show the same list
+      const group = screen.getByRole("group", { name: /issue scope/i });
+      expect(group).toHaveTextContent("This page");
+      expect(group).toHaveTextContent("Whole site");
     });
 
     it("defaults to This page: current page's issues + site-wide, other pages hidden", () => {
@@ -78,14 +88,14 @@ describe("IssuesPanel", () => {
       expect(screen.getByText(/Off-token color everywhere/)).toBeInTheDocument();
       expect(screen.queryByText(/Missing alt on About/)).not.toBeInTheDocument();
       // the head's count follows the scope
-      expect(screen.getByText("· 2")).toBeInTheDocument();
+      expect(screen.getByText("Open issues: 2")).toBeInTheDocument();
     });
 
-    it("All pages shows everything", () => {
+    it("Whole site shows everything", () => {
       renderPanel({ issues: PAGED, activePageId: "home" });
-      fireEvent.click(screen.getByRole("button", { name: /all pages/i }));
+      fireEvent.click(screen.getByRole("button", { name: /whole site/i }));
       expect(screen.getByText(/Missing alt on About/)).toBeInTheDocument();
-      expect(screen.getByText("· 3")).toBeInTheDocument();
+      expect(screen.getByText("Open issues: 3")).toBeInTheDocument();
     });
   });
 });

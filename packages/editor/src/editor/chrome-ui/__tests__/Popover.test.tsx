@@ -141,6 +141,26 @@ describe("Menu", () => {
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Delete" }));
   });
 
+  /* Board 5930:44801: a checkable row ends in a 14px check slot (r3,
+     gray-300 hairline) holding the ✓ — not a leading bare tick. */
+  it("draws a trailing 14px check slot, ticked when selected", () => {
+    render(
+      <Menu label="View">
+        <MenuItem selected>Snap guides</MenuItem>
+        <MenuItem selected={false}>Grid</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemcheckbox", { name: "Snap guides" });
+    const slot = on.querySelector("[data-check-slot]") as HTMLElement;
+    expect(slot).not.toBeNull();
+    expect(slot.className).toContain("tw:size-3.5");
+    expect(slot.className).toContain("tw:rounded-[3px]");
+    expect(slot.textContent).toBe("✓");
+    expect(on.lastElementChild).toBe(slot);
+    const off = screen.getByRole("menuitemcheckbox", { name: "Grid" }).querySelector("[data-check-slot]") as HTMLElement;
+    expect(off.textContent).toBe("");
+  });
+
   it("a checkable item is a menuitemcheckbox, not a menuitem", () => {
     render(
       <Menu>

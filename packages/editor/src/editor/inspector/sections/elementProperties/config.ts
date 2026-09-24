@@ -21,8 +21,9 @@ export interface PropertyConfig {
 // ============================================================================
 
 export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
+  /* G2-156: no href rows here — LinkSection (Settings › LINK) owns href for
+     link and button; two editors for one attribute disagreed. */
   link: [
-    { id: "href", label: "URL", type: "text", placeholder: "https://..." },
     {
       id: "target",
       label: "Open In",
@@ -40,7 +41,6 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
 
   button: [
     { id: "content", label: "Button Label", type: "textarea", placeholder: "Button text" },
-    { id: "href", label: "Link URL", type: "text", placeholder: "https://..." },
     {
       id: "target",
       label: "Open In",

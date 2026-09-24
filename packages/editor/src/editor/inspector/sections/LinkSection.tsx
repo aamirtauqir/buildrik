@@ -41,7 +41,7 @@ const ErrorText: React.FC<{ message: string }> = ({ message }) => (
 );
 
 const LINK_TYPE_OPTIONS = [
-  { value: "none", label: "No Link" },
+  { value: "none", label: "None" },
   { value: "page", label: "Page" },
   { value: "url", label: "External URL" },
   { value: "email", label: "Email" },
@@ -242,8 +242,9 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
 
   return (
     <Section title="Link" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
+      {/* Board 4428:141642: "Link  [None ▾]". */}
       <SelectRow
-        label="Link Type"
+        label="Link"
         value={linkType}
         onChange={handleLinkTypeChange}
         options={LINK_TYPE_OPTIONS}
