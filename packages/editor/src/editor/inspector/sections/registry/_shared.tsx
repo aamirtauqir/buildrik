@@ -79,6 +79,9 @@ export type SectionId =
   | "css-classes"
   | "all-css"
   // Effects tab
+  | "opacity"
+  | "shadow"
+  | "blur"
   | "effects"
   | "animation"
   | "interactions"

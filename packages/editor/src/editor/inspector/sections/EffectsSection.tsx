@@ -1,18 +1,19 @@
 /**
- * Effects Section - Shadow, Opacity, Transform, Transition, Cursor
+ * "More effects" — the advanced Effects-tab section (board 4428:142686 draws
+ * OPACITY, SHADOW and BLUR on their own; those are EffectsBasicSections.tsx).
+ * Inner shadow, custom shadow, transform, transition, cursor, the other
+ * filters, blend, text shadow and will-change live here.
  */
 
 import * as React from "react";
 import {
   Section,
   SelectRow,
-  SliderInput,
   SectionLabel,
   RangeSlider,
   TextInputRow,
   PresetButtonGrid,
   type SectionTier,
-  MixedValueIndicator,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
@@ -29,17 +30,6 @@ export interface EffectsSectionProps {
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
-
-// Shadow presets
-const SHADOW_PRESETS = [
-  { label: "None", value: "none" },
-  { label: "SM", value: "0 1px 2px rgba(0,0,0,0.1)" },
-  { label: "MD", value: "0 4px 6px rgba(0,0,0,0.1)" },
-  { label: "LG", value: "0 10px 15px rgba(0,0,0,0.1)" },
-  { label: "XL", value: "0 20px 25px rgba(0,0,0,0.15)" },
-  { label: "2XL", value: "0 25px 50px rgba(0,0,0,0.25)" },
-  { label: "Glow", value: "0 0 20px rgba(0,115,230,0.5)" },
-];
 
 // Inner Shadow presets (L1 → L2 upgrade per plan Part 10, Feature #160)
 const INNER_SHADOW_PRESETS = [
@@ -64,7 +54,7 @@ const parseTransform = (
 };
 
 // Extract inner shadow (inset) from combined box-shadow value
-const extractInnerShadow = (boxShadow: string | undefined): string => {
+export const extractInnerShadow = (boxShadow: string | undefined): string => {
   if (!boxShadow || boxShadow === "none") return "";
   const shadows = boxShadow.split(/,(?![^(]*\))/); // Split on commas not inside parens
   const insetShadow = shadows.find((s) => s.trim().startsWith("inset"));
@@ -72,7 +62,7 @@ const extractInnerShadow = (boxShadow: string | undefined): string => {
 };
 
 // Extract outer shadow (non-inset) from combined box-shadow value
-const extractOuterShadow = (boxShadow: string | undefined): string => {
+export const extractOuterShadow = (boxShadow: string | undefined): string => {
   if (!boxShadow || boxShadow === "none") return "";
   const shadows = boxShadow.split(/,(?![^(]*\))/); // Split on commas not inside parens
   const outerShadows = shadows.filter((s) => !s.trim().startsWith("inset"));
@@ -80,7 +70,7 @@ const extractOuterShadow = (boxShadow: string | undefined): string => {
 };
 
 // Parse filter values
-const parseFilter = (filter: string | undefined, type: string, defaultValue: string): string => {
+export const parseFilter = (filter: string | undefined, type: string, defaultValue: string): string => {
   if (!filter) return defaultValue;
   const match = filter.match(new RegExp(`${type}\\(([^)]+)\\)`));
   return match?.[1] || defaultValue;
@@ -137,10 +127,10 @@ const FILTER_IDENTITY: Record<string, string> = {
 export const composeFilter = (current: string | undefined, fn: string, arg: string) =>
   composeFunctional(current, FILTER_ORDER, FILTER_IDENTITY, fn, arg);
 
-export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary", mixedKeys, isMultiSelect }) => {
-  // Parse opacity
-  const opacity = styles.opacity ? parseFloat(styles.opacity) * 100 : 100;
+/** Keys "More effects" edits — its collapsed preview counts the ones set. */
+const MORE_EFFECT_KEYS = ["transform", "transition", "transition-property", "cursor", "mix-blend-mode", "text-shadow", "will-change"];
 
+export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary", mixedKeys, isMultiSelect }) => {
   // Parse transform values
   const scaleValue = parseFloat(parseTransform(styles.transform, "scale", "1")) * 100;
   const rotateValue = parseFloat(
@@ -150,42 +140,21 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
   const translateX = parseTransform(styles.transform, "translateX", "");
   const translateY = parseTransform(styles.transform, "translateY", "");
 
-  // Parse filter values
-  const blurValue = parseFloat(parseFilter(styles.filter, "blur", "0px").replace("px", ""));
+  // Parse filter values (blur has its own section)
   const brightnessValue = parseFloat(
     parseFilter(styles.filter, "brightness", "100%").replace("%", "")
   );
   const contrastValue = parseFloat(parseFilter(styles.filter, "contrast", "100%").replace("%", ""));
   const grayscaleValue = parseFloat(parseFilter(styles.filter, "grayscale", "0%").replace("%", ""));
 
-  // Build the collapsed preview — prioritize the most visually impactful effect.
-  // Shows shadow count OR "blur 4px" OR opacity % OR "scaled/rotated" — whichever
-  // is the dominant signal for this element. Only one badge, not all four, so it
-  // stays scannable.
-  const shadows = styles["box-shadow"] ? styles["box-shadow"].split("),").length : 0;
-  const hasTransform = styles.transform && styles.transform !== "none";
-  const previewParts: string[] = [];
-  if (shadows > 0) previewParts.push(`${shadows} shadow${shadows !== 1 ? "s" : ""}`);
-  if (blurValue > 0) previewParts.push(`blur ${blurValue}`);
-  if (opacity < 100) previewParts.push(`${Math.round(opacity)}%`);
-  if (hasTransform && !previewParts.length) previewParts.push("transform");
-  const effectsPreview =
-    previewParts.length > 0 ? (
-      <span
-        style={{
-          fontSize: 11,
-          color: "var(--bk-ink-muted)",
-          fontFamily: "var(--bk-font-mono)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {previewParts.slice(0, 2).join(" · ")}
-      </span>
-    ) : undefined;
+  const setCount =
+    MORE_EFFECT_KEYS.filter((k) => styles[k] && styles[k] !== "none" && styles[k] !== "normal").length +
+    (extractInnerShadow(styles["box-shadow"]) ? 1 : 0);
+  const effectsPreview = setCount > 0 ? `${setCount} set` : undefined;
 
   return (
     <Section
-      title="Effects"
+      title="More effects"
       icon="Sparkles"
       preview={effectsPreview}
       isOpen={isOpen}
@@ -193,41 +162,17 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
       tier={tier}
       id="inspector-section-effects"
     >
-      {/* Opacity */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="opacity" mixedKeys={mixedKeys} />
-        <SliderInput
-          label="Opacity"
-          value={opacity}
-          onChange={(v) => onChange("opacity", String(v / 100))}
-          min={0}
-          max={100}
-          unit="%"
-        />
-      </div>
-
-      {/* Box Shadow */}
+      {/* Custom Shadow — the SHADOW section's select covers the presets. */}
       <div style={{ marginBottom: 16 }}>
         <SectionLabel>
-          Box Shadow{mixedKeys?.has("box-shadow") && <MixedValueBadge compact />}
+          Custom shadow{mixedKeys?.has("box-shadow") && <MixedValueBadge compact />}
         </SectionLabel>
-
-        <PresetButtonGrid
-          presets={SHADOW_PRESETS}
-          currentValue={styles["box-shadow"] || ""}
-          onChange={(v) => onChange("box-shadow", v)}
-        />
-
-        {/* Custom Shadow */}
-        {/* The presets above carry their own names; this field had none, so
-            its only accessible name was the placeholder — it announced itself
-            as "0 4px 6px rgba(0,0,0,0.1)". */}
         <InputField
           type="text"
           aria-label="Custom box shadow"
           value={styles["box-shadow"] || ""}
           onChange={(e) => onChange("box-shadow", e.target.value)}
-          placeholder="0 4px 6px rgba(0,0,0,0.1)"
+          placeholder="0 4px 12px rgba(0,0,0,0.08)"
         />
       </div>
 
@@ -406,15 +351,6 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <SectionLabel style={{ marginBottom: 12 }}>
           Filters{mixedKeys?.has("filter") && <MixedValueBadge compact />}
         </SectionLabel>
-
-        <RangeSlider
-          label="Blur"
-          value={blurValue}
-          onChange={(v) => onChange("filter", composeFilter(styles.filter, "blur", `${v}px`))}
-          min={0}
-          max={20}
-          unit="px"
-        />
 
         <RangeSlider
           label="Brightness"
