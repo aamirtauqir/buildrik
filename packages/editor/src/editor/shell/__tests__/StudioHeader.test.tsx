@@ -230,6 +230,23 @@ describe("StudioHeader", () => {
       expect(onCloseDrawer).toHaveBeenCalled();
     });
 
+    /* 4428:140486 — a full-canvas view names the page crumb ("<site> › CMS")
+       through ui:crumb-context; null gives it back to the page. */
+    it("the page crumb follows ui:crumb-context", () => {
+      const handlers = new Map<string, (p: unknown) => void>();
+      const composer = {
+        on: vi.fn((ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn)),
+        off: vi.fn(),
+        emit: vi.fn(),
+        elements: { getActivePage: () => ({ name: "Menu" }) },
+      };
+      render(<StudioHeader {...makeProps({ composer: composer as never })} />);
+      act(() => handlers.get("ui:crumb-context")?.({ label: "CMS" }));
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("CMS");
+      act(() => handlers.get("ui:crumb-context")?.(null));
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
+    });
+
     /* B6 / G1-019: the activity log opens in the editor (History ·
        Activity), not a dashboard tab. */
     it("the site menu's Activity log opens History · Activity in the editor", () => {
