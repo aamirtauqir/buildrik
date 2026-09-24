@@ -10,7 +10,12 @@ import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 type Handler = (p: unknown) => void;
 
-export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentItem[] }) {
+export function makeEngine(opts?: {
+  collections?: CMSCollection[];
+  items?: CMSContentItem[];
+  /** cms.bindings.export(): element id → its CMS field bindings. */
+  bindings?: Record<string, Array<{ collectionId: string; fieldSlug: string; property: string }>>;
+}) {
   let collections = opts?.collections ?? [];
   let items = opts?.items ?? [];
   const listeners = new Map<string, Set<Handler>>();
@@ -19,6 +24,7 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
     getId: () => string;
     getType: () => string;
     getContent: () => string;
+    getCustomData?: (key: string) => unknown;
     getDataBindings: () => Record<string, unknown>;
     removeDataBinding: (p: string) => void;
   }> = [];
@@ -72,6 +78,7 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
       bindCondition: vi.fn(),
     },
     cms: {
+      bindings: { export: () => opts?.bindings ?? {} },
       collections: {
         on: vi.fn(),
         off: vi.fn(),

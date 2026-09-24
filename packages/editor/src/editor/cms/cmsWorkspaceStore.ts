@@ -22,6 +22,13 @@ export interface CmsWorkspaceState {
   recordId: string | null;
 }
 
+/** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
+ *  `recordId` its side sheet on that record (⌘K jumps here). */
+export interface CmsOpenRequest {
+  collectionId: string;
+  recordId?: string;
+}
+
 const INITIAL: CmsWorkspaceState = { collectionId: null, tab: "records", recordId: null };
 
 let state: CmsWorkspaceState = INITIAL;
@@ -38,6 +45,9 @@ export const cmsWorkspace = {
     set({ collectionId, tab, recordId: null }),
   setTab: (tab: CmsTab): void => set({ ...state, tab, recordId: null }),
   openRecord: (recordId: string | null): void => set({ ...state, tab: "records", recordId }),
+  /** One write for both, so the table never renders a frame without its sheet. */
+  openRequest: ({ collectionId, recordId }: CmsOpenRequest): void =>
+    set({ collectionId, tab: "records", recordId: recordId ?? null }),
   reset: (): void => set(INITIAL),
   subscribe: (l: () => void): (() => void) => {
     listeners.add(l);
