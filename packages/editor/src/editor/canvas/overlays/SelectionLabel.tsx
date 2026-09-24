@@ -8,7 +8,8 @@
  *
  * It used to be a chrome pill with a select-parent button and an ancestor
  * dropdown. Selecting a parent or an ancestor lives in the inspector ⋯
- * (Select parent), the ← key and Layers.
+ * (Select parent), the ← key and Layers. It reads "Type · layer name" when
+ * the element carries one (G2-139), the same name Layers and the header show.
  *
  * @license BSD-3-Clause
  */
@@ -18,6 +19,7 @@ import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
 import { canvasScale } from "../utils/canvasScale";
 import { getElementNameFromType } from "../utils/elementInfo";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 
 export interface SelectionLabelProps {
   composer: Composer;
@@ -62,7 +64,9 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elemen
 
   const element = composer.elements.getElement(elementId);
   if (!pos || !element) return null;
-  const name = getElementNameFromType(element.getType?.() || "element", element.getTagName?.()?.toLowerCase());
+  const type = getElementNameFromType(element.getType?.() || "element", element.getTagName?.()?.toLowerCase());
+  const layerName = getLayerName(element);
+  const name = layerName ? `${type} · ${layerName}` : type;
 
   return (
     <div

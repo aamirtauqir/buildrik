@@ -40,6 +40,7 @@ function makeComposer() {
       getElement: () => ({
         getStyles: () => ({}),
         getClasses: () => [],
+        getCustomData: () => undefined,
         getId: () => "el-1",
         getParent: () => null,
         getTagName: () => "div",

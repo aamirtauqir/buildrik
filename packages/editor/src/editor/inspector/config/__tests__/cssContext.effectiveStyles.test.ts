@@ -14,7 +14,6 @@ describe("deriveCssContext respects effective styles", () => {
     const ctx = deriveCssContext(
       { id: "e1", type: "box" },
       composer,
-      false,
       { display: "flex" }
     );
     expect(ctx.isFlexContainer).toBe(true);
@@ -30,7 +29,7 @@ describe("deriveCssContext respects effective styles", () => {
         }),
       },
     } as any;
-    const ctx = deriveCssContext({ id: "e1", type: "box" }, composer, false);
+    const ctx = deriveCssContext({ id: "e1", type: "box" }, composer);
     expect(ctx.isGridContainer).toBe(true);
     expect(ctx.display).toBe("grid");
   });
@@ -56,7 +55,6 @@ describe("deriveCssContext respects effective styles", () => {
     const ctx = deriveCssContext(
       { id: "e1", type: "box" },
       composer,
-      false,
       undefined,
       "mobile",
       "normal",
@@ -89,7 +87,6 @@ describe("deriveCssContext respects effective styles", () => {
     const ctx = deriveCssContext(
       { id: "e1", type: "box" },
       composer,
-      false,
       undefined,
       "desktop",
       "hover",

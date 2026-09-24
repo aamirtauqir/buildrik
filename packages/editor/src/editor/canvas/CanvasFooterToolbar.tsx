@@ -358,7 +358,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             </Button>
           }
         >
-          <Menu label="View" data-testid="canvas-view-menu">
+          {/* Board 5930:44801 draws the View menu 220 wide. */}
+          <Menu label="View" data-testid="canvas-view-menu" className="tw:min-w-[220px]">
             {viewPane === "main" && (
               <>
                 {VIEW_ROWS.map((row) => {

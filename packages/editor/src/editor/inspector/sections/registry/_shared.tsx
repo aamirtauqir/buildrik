@@ -71,13 +71,11 @@ export type SectionId =
   | "typography"
   | "background"
   | "border"
-  | "corner-radius"
   // Element tab
   | "link"
   | "content"
   | "element-properties"
   | "css-classes"
-  | "all-css"
   // Effects tab
   | "opacity"
   | "shadow"
@@ -128,7 +126,6 @@ export interface SectionContext {
   ) => void;
   /** Settings › CONTENT's "new collection" door (BindingPopover footer). */
   onOpenCreateCollection?: () => void;
-  devMode: boolean;
   tabId: TabId;
   /**
    * Visual weight tier computed over VISIBLE sections (post shouldRender

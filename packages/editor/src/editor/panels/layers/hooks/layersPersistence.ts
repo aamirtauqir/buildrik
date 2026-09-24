@@ -3,7 +3,7 @@
  *
  * A layer's custom NAME and its LOCK belong to the element and are saved with
  * the project (C5 G2-061 / G2-065): the name in `data.layerName`, the lock in
- * `locked`. `getLayerName` is the one reader.
+ * `locked`. `getLayerName` is the one reader, `renameElement` the one writer.
  *
  * Per-browser view state stays in localStorage, per page:
  * - `buildrick-layers-{pageId}-hidden`: string[] (dimmed-in-editor ids)
@@ -13,6 +13,8 @@
  *
  * @license BSD-3-Clause
  */
+
+import { EVENTS } from "@/shared/constants/events";
 
 const STORAGE_PREFIX = "buildrick-layers";
 
@@ -59,6 +61,28 @@ export const LAYER_NAME_KEY = "layerName";
 export function getLayerName(el: { getCustomData(key: string): unknown } | null | undefined): string | undefined {
   const v = el?.getCustomData(LAYER_NAME_KEY);
   return typeof v === "string" && v ? v : undefined;
+}
+
+/** The one writer of a layer's custom name (Layers' rename and the inspector
+ *  header's, G2-139): trimmed, empty clears it back to the type label, saved
+ *  with the project, and announced so every surface showing the name follows. */
+export function renameElement(
+  composer: {
+    elements: { getElement(id: string): { setData(key: string, value: unknown): void } | null | undefined };
+    markDirty(): void;
+    emit(event: string, payload: unknown): void;
+  } | null | undefined,
+  id: string,
+  name: string,
+): void {
+  if (!composer) return;
+  const trimmed = name.trim();
+  const el = composer.elements.getElement(id);
+  if (el) {
+    el.setData(LAYER_NAME_KEY, trimmed || undefined);
+    composer.markDirty();
+  }
+  composer.emit(EVENTS.ELEMENT_RENAMED, { id, name: trimmed || null });
 }
 
 /** Read and REMOVE the pre-G2-061 per-browser names / locked keys. */
