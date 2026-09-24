@@ -37,6 +37,7 @@ import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
+import { resolveUrl } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 
 export type OpenMediaLibrary = (
@@ -451,7 +452,7 @@ export function RecordSheet({
             addToast({ tone: "success", title: `${title} deleted`, description: `${collection.name} · The record and its generated page are gone.` });
           }}
           name={title}
-          consequence="Deleting removes this record and its generated page."
+          consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
         />

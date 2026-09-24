@@ -31,7 +31,7 @@ export interface DynamicPagesPaneProps {
 function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
-function resolveUrl(pattern: string, data: Record<string, unknown>): string {
+export function resolveUrl(pattern: string, data: Record<string, unknown>): string {
   return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => slugify(data[key] == null ? "" : String(data[key])));
 }
 
