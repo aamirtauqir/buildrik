@@ -34,9 +34,6 @@ export interface GlobalStyle {
 
   /** Tags for search */
   tags?: string[];
-
-  /** Is this a system style (non-deletable)? */
-  system?: boolean;
 }
 
 /**
@@ -50,149 +47,19 @@ export class GlobalStyleManager extends EventEmitter {
   constructor(composer: Composer) {
     super();
     this.composer = composer;
-
-    // Register default global styles
-    this.registerDefaults();
   }
 
   /**
-   * Register default global styles
+   * Define a global style (a user edit — marks the project dirty)
    */
-  /** Built-ins, not user edits: every `define` here passes `silent`. */
-  private registerDefaults(): void {
-    // Primary Button
-    this.define({
-      id: "btn-primary",
-      name: "Primary Button",
-      category: "Buttons",
-      system: true,
-      styles: {
-        padding: "12px 24px",
-        background: "#667eea",
-        color: "#ffffff",
-        border: "none",
-        "border-radius": "8px",
-        "font-weight": "600",
-        cursor: "pointer",
-        transition: "all 0.2s",
-      },
-      tags: ["button", "primary", "cta"],
-    }, { silent: true });
-
-    // Secondary Button
-    this.define({
-      id: "btn-secondary",
-      name: "Secondary Button",
-      category: "Buttons",
-      system: true,
-      styles: {
-        padding: "12px 24px",
-        background: "transparent",
-        color: "#667eea",
-        border: "2px solid #667eea",
-        "border-radius": "8px",
-        "font-weight": "600",
-        cursor: "pointer",
-        transition: "all 0.2s",
-      },
-      tags: ["button", "secondary"],
-    }, { silent: true });
-
-    // Heading 1
-    this.define({
-      id: "heading-1",
-      name: "Heading 1",
-      category: "Typography",
-      system: true,
-      styles: {
-        "font-size": "48px",
-        "font-weight": "700",
-        "line-height": "1.2",
-        margin: "0 0 24px 0",
-        color: "#1a1a2e",
-      },
-      tags: ["heading", "h1", "typography"],
-    }, { silent: true });
-
-    // Heading 2
-    this.define({
-      id: "heading-2",
-      name: "Heading 2",
-      category: "Typography",
-      system: true,
-      styles: {
-        "font-size": "36px",
-        "font-weight": "600",
-        "line-height": "1.3",
-        margin: "0 0 20px 0",
-        color: "#1a1a2e",
-      },
-      tags: ["heading", "h2", "typography"],
-    }, { silent: true });
-
-    // Body Text
-    this.define({
-      id: "body-text",
-      name: "Body Text",
-      category: "Typography",
-      system: true,
-      styles: {
-        "font-size": "16px",
-        "line-height": "1.6",
-        color: "#333333",
-      },
-      tags: ["text", "body", "typography"],
-    }, { silent: true });
-
-    // Container
-    this.define({
-      id: "container",
-      name: "Container",
-      category: "Layout",
-      system: true,
-      styles: {
-        "max-width": "1200px",
-        margin: "0 auto",
-        padding: "0 20px",
-      },
-      tags: ["container", "layout", "wrapper"],
-    }, { silent: true });
-
-    // Card
-    this.define({
-      id: "card",
-      name: "Card",
-      category: "Layout",
-      system: true,
-      styles: {
-        background: "#ffffff",
-        "border-radius": "12px",
-        padding: "24px",
-        "box-shadow": "0 4px 12px rgba(0,0,0,0.1)",
-      },
-      tags: ["card", "layout", "container"],
-    }, { silent: true });
-  }
-
-  /**
-   * Define a global style
-   */
-  define(style: GlobalStyle, options?: { silent?: boolean }): void {
+  define(style: GlobalStyle): void {
     if (this.styles.has(style.id)) {
       throw new Error(`Global style "${style.id}" already exists`);
     }
 
     this.styles.set(style.id, style);
     this.emit(EVENTS.STYLE_DEFINED, style);
-
-    /* `silent` is the load path. Registering the built-in styles is not a user
-       edit, and marking the project dirty for it made a freshly opened,
-       untouched project save itself: measured on 4 of 4 clean loads, the first
-       and only dirty transition came from registerDefaults. With a full
-       snapshot save that drops omitted pages, an unrequested write is the
-       data-loss precondition — `Composer.setProjectSettingsRaw` exists for
-       exactly this reason on the settings path. */
-    if (!options?.silent) this.composer.markDirty();
+    this.composer.markDirty();
   }
 
   /**
@@ -202,11 +69,6 @@ export class GlobalStyleManager extends EventEmitter {
     const style = this.styles.get(id);
     if (!style) {
       throw new Error(`Global style "${id}" not found`);
-    }
-
-    // Prevent updating system styles
-    if (style.system && updates.styles) {
-      throw new Error(`Cannot modify system style "${id}"`);
     }
 
     // Apply updates
@@ -229,11 +91,6 @@ export class GlobalStyleManager extends EventEmitter {
     const style = this.styles.get(id);
     if (!style) {
       throw new Error(`Global style "${id}" not found`);
-    }
-
-    // Prevent deleting system styles
-    if (style.system) {
-      throw new Error(`Cannot delete system style "${id}"`);
     }
 
     this.styles.delete(id);
@@ -370,8 +227,7 @@ export class GlobalStyleManager extends EventEmitter {
    * Export global styles for project save
    */
   export(): GlobalStyle[] {
-    // Only export non-system styles
-    return this.getAll().filter((s) => !s.system);
+    return this.getAll();
   }
 
   /**
@@ -379,7 +235,6 @@ export class GlobalStyleManager extends EventEmitter {
    */
   import(styles: GlobalStyle[]): void {
     styles.forEach((style) => {
-      // Don't override system styles
       if (!this.styles.has(style.id)) {
         this.styles.set(style.id, style);
       }
@@ -389,11 +244,10 @@ export class GlobalStyleManager extends EventEmitter {
   }
 
   /**
-   * Clear all non-system styles
+   * Clear all styles
    */
   clear(): void {
-    const toDelete = this.getAll().filter((s) => !s.system);
-    toDelete.forEach((s) => this.styles.delete(s.id));
+    this.styles.clear();
 
     this.emit(EVENTS.STYLES_CLEARED);
   }
