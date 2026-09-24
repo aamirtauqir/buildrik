@@ -12,11 +12,17 @@ describe("getPropertiesForType", () => {
   it("returns type-specific fields followed by the default fields", () => {
     const props = getPropertiesForType("link");
     const ids = props.map((p) => p.id);
-    // link-specific fields come first…
-    expect(ids.slice(0, 4)).toEqual(["href", "target", "rel", "title"]);
+    // link-specific fields come first — no href: LinkSection owns it (G2-156)…
+    expect(ids.slice(0, 3)).toEqual(["target", "rel", "title"]);
     // …and the shared default fields are appended.
     expect(ids).toContain("id");
     expect(ids).toContain("tabindex");
+  });
+
+  it("no type offers an href field — LinkSection owns href (G2-156)", () => {
+    for (const type of ["link", "button"]) {
+      expect(getPropertiesForType(type).some((p) => p.id === "href")).toBe(false);
+    }
   });
 
   it("falls back to just the default fields for an unknown type", () => {

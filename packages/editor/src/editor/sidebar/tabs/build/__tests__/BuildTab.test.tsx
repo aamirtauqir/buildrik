@@ -85,9 +85,68 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 });
 
-/* Paste HTML… moved into the panel ⋯ (board 7063:78846). */
-describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
-  it("reads the clipboard and sends content through onBlockClick", async () => {
+/* G2-108 — board 4418:103591: an element row's one-line description is its
+   hover tooltip (it used to live only in search matching). */
+describe("BuildTab — element row description on hover (G2-108)", () => {
+  it("an enabled ELEMENTS row carries its catalog description as a tooltip", () => {
+    renderTab();
+    const row = screen.getByTestId("insert-el-Container");
+    // flowbite Tooltip: <div target>{row}</div><div role="tooltip">…</div>
+    const tip = row.parentElement?.nextElementSibling;
+    expect(tip?.getAttribute("role")).toBe("tooltip");
+    expect(tip?.textContent).toBe("Generic wrapper box for grouping elements");
+    // The target wrapper spans the row, so the hover fill still fills the panel.
+    expect(row.parentElement?.className).toContain("tw:w-full");
+  });
+});
+
+/* G2-111 — board 4418:99857: SAVED COMPONENTS rows carry a ⠿ grip and drag
+   onto the canvas; the group ends in "Manage components ›"; an empty group
+   says how to make one. */
+describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
+  const composerWith = (saved: Array<{ id: string; name: string }>) => {
+    const emit = vi.fn();
+    return {
+      emit,
+      composer: {
+        on: vi.fn(), off: vi.fn(), emit,
+        components: { getAllComponents: () => saved },
+      } as unknown as NonNullable<BuildTabProps["composer"]>,
+    };
+  };
+
+  it("rows drag as a component id and draw a grip", () => {
+    const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    const row = screen.getByTestId("insert-mine-c1");
+    expect(row).toHaveAttribute("draggable", "true");
+    expect(screen.getByTestId("insert-row-grip-insert-mine-c1").textContent).toBe("⠿");
+    const setData = vi.fn();
+    fireEvent.dragStart(row, { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith("application/x-aquibra-component", "c1");
+  });
+
+  it("Manage components › opens the Components panel", () => {
+    const { composer, emit } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByTestId("insert-mine-manage"));
+    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
+  });
+
+  it("an empty group says how to save one", () => {
+    const { composer } = composerWith([]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    expect(screen.getByTestId("insert-mine-empty").textContent).toMatch(/No saved components yet/);
+  });
+});
+
+/* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
+   modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
+describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
+  it("opens the modal prefilled from the clipboard; Insert sends it through onBlockClick", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
       clipboard: { readText: vi.fn().mockResolvedValue("<div><p>hi</p></div>") },
@@ -95,22 +154,31 @@ describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(onBlockClick).toHaveBeenCalledTimes(1));
+    /* Board 6887:78320: a modal, prefilled from the clipboard; Insert inserts. */
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    await waitFor(() => expect(field.value).toBe("<div><p>hi</p></div>"));
+    expect(onBlockClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({
       id: "pasted-html",
       content: "<div><p>hi</p></div>",
     });
   });
 
-  it("empty clipboard → warns, never inserts", async () => {
+  it("says what sanitising will strip, and Insert waits for some HTML", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
-      clipboard: { readText: vi.fn().mockResolvedValue("   ") },
+      clipboard: { readText: vi.fn().mockRejectedValue(new Error("denied")) },
     });
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(screen.getByText(/Clipboard is empty/)).toBeTruthy());
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    expect(screen.getByRole("button", { name: "Insert" })).toBeDisabled();
+    fireEvent.change(field, { target: { value: '<p onclick="x()">a</p><script>1</script><script>2</script>' } });
+    expect(screen.getByText("2 <script> tags and 1 event handler will be removed")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onBlockClick).not.toHaveBeenCalled();
   });
 });

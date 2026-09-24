@@ -249,6 +249,10 @@ const MENU_ITEM_BASE =
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-left " +
   "tw:focus-visible:outline-none tw:focus-visible:bg-blue-50";
 
+const CHECK_SLOT =
+  "tw:flex tw:size-3.5 tw:flex-none tw:items-center tw:justify-center tw:rounded-[3px] tw:border tw:border-[var(--bk-gray-300)] " +
+  "tw:text-[11px] tw:leading-none tw:text-[var(--bk-ink-soft)]";
+
 export function MenuItem({ icon, kbd, selected, danger, radio, disabled, className, children, ...rest }: MenuItemProps) {
   const stateClass = disabled
     ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-[var(--bk-gray-300)]"
@@ -267,7 +271,8 @@ export function MenuItem({ icon, kbd, selected, danger, radio, disabled, classNa
       tabIndex={-1}
       {...rest}
     >
-      {selected !== undefined ? (
+      {/* A radio keeps the leading tick (one-of-many). */}
+      {radio && selected !== undefined ? (
         <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-[var(--bk-accent-text)]">
           {selected ? "✓" : ""}
         </span>
@@ -275,6 +280,13 @@ export function MenuItem({ icon, kbd, selected, danger, radio, disabled, classNa
       {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
       <span className="tw:flex-1 tw:text-left">{children}</span>
       {kbd ? <span className="tw:ml-auto tw:text-[var(--bk-ink-muted)] tw:text-[11px]">{kbd}</span> : null}
+      {/* Board 5930:44801: a checkable row ENDS in a 14px check slot (r3,
+          gray-300 hairline) that holds the ✓ — not a leading bare tick. */}
+      {!radio && selected !== undefined ? (
+        <span aria-hidden="true" data-check-slot="" className={CHECK_SLOT}>
+          {selected ? "✓" : ""}
+        </span>
+      ) : null}
     </button>
   );
 }

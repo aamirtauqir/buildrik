@@ -10,6 +10,7 @@ import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { CATALOG, flatCatalog } from "../catalog/catalog";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
+import type { ComponentDefinition } from "@/shared/types/components";
 import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
@@ -66,6 +67,8 @@ export type BlockDragStartFn = (e: React.DragEvent, block: BlockDefinition) => v
 
 /** The one payload the canvas drop reads (`dropOperations.handleBlockDrop`
  *  → `getBlockById(id)`); an element row and a block card write the same. */
+const NO_SAVED: ComponentDefinition[] = [];
+
 function setBlockPayload(e: React.DragEvent, payload: { id: string; label: string; category?: string }) {
   e.dataTransfer.setData("block", JSON.stringify(payload));
   e.dataTransfer.setData("text/plain", payload.id);
@@ -102,7 +105,8 @@ export interface UseBuildTabReturn {
 
 export function useBuildTab(
   composer: Composer | null,
-  onBlockClick?: (data: BlockData) => void
+  onBlockClick?: (data: BlockData) => void,
+  saved: ComponentDefinition[] = NO_SAVED
 ): UseBuildTabReturn {
   const [favs, setFavs] = React.useState<Set<string>>(() =>
     ls.getSet(STORAGE_KEYS.BUILD_FAVORITES)
@@ -214,8 +218,8 @@ export function useBuildTab(
   // Board 138:53: search is flat and cross-source — elements, blocks AND
   // components (the board's third tag).
   const searchResults = React.useMemo(
-    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows),
-    [searchQuery]
+    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows, saved),
+    [searchQuery, saved]
   );
 
   return {

@@ -103,6 +103,22 @@ describe("PreviewShareModal", () => {
     expect(open).toHaveBeenCalledWith(expect.stringMatching(/\/share\/tok-open$/), "_blank", "noopener,noreferrer");
   });
 
+  /* Real-site walk: one open minted TWO links (StrictMode runs the effect
+     twice, and both saw an empty list). Reuse-or-create happens once. */
+  it("mints exactly one link per open, even under StrictMode", async () => {
+    list.mockResolvedValue([]);
+    create.mockResolvedValue(link("tok-one"));
+    render(
+      <React.StrictMode>
+        <ToastProvider>
+          <PreviewShareModal open onOpenChange={vi.fn()} siteId="site-strict" />
+        </ToastProvider>
+      </React.StrictMode>,
+    );
+    expect((await screen.findByTestId("preview-share-link")).textContent).toMatch(/tok-one$/);
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
   /* Board 4418:165739. */
   it("names the page, says what it shares, and closes with Done — no ✕", async () => {
     const onOpenChange = vi.fn();

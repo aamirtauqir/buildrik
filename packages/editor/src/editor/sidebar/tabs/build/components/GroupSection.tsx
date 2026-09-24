@@ -34,6 +34,8 @@ interface GroupSectionProps {
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
   onMineInsert?: (component: ComponentDefinition) => void;
+  /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
+  onManageComponents?: () => void;
 }
 
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
@@ -106,11 +108,16 @@ export const Row: React.FC<{
    *  "Disabled without a reason is a bug" — the Button component doc. */
   disabled?: boolean;
   disabledReason?: string;
+  /** Enabled rows: the catalog's one-line description, shown on hover
+   *  (G2-108, board 4418:103591). */
+  description?: string;
   testId: string;
+  /** Board 4418:99857's trailing ⠿ — a drag hint; the row is the handle. */
+  grip?: boolean;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, description, testId, grip, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
@@ -181,14 +188,26 @@ export const Row: React.FC<{
           <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
         )}
       </span>
+      {grip ? (
+        <span
+          aria-hidden="true"
+          data-testid={`insert-row-grip-${testId}`}
+          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+        >
+          ⠿
+        </span>
+      ) : null}
     </div>
   );
 
   // Board 138:198: the disabled row's tooltip IS the reason ("Video blocks
   // need a media provider connected" is that board's sample). Ink bg, white
   // 12px — the Tooltip primitive's dark style.
-  return disabled && disabledReason ? (
-    <Tooltip content={disabledReason} placement="bottom" arrow={false}>
+  // An enabled row's tooltip is its description (G2-108). The target wrapper
+  // is widened so the row keeps its full-width hover fill.
+  const tip = disabled ? disabledReason : description;
+  return tip ? (
+    <Tooltip content={tip} placement="bottom" arrow={false} theme={{ target: "tw:w-full" }}>
       {row}
     </Tooltip>
   ) : (
@@ -197,7 +216,7 @@ export const Row: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert,
+  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -208,6 +227,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         iconHtml={el.iconHtml}
         disabled={el.disabled}
         disabledReason={el.disabled ? el.description : undefined}
+        description={el.disabled ? undefined : el.description}
         testId={`insert-el-${el.name}`}
         draggable
         onDragStart={(e) => onDragStart(e, el)}
@@ -234,17 +254,48 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         onClick={() => onBlockInsert?.(c)}
       />
     ))}
-    {/* Board 1069:4970 (mine-expanded): the user's own components as plain
-        dense rows — same Row treatment as ELEMENTS. Empty registry = no rows;
-        the group header's live count already says 0. */}
-    {isOpen && group.id === "mine" && mine?.map((c) => (
-      <Row
-        key={c.id}
-        label={c.name}
-        testId={`insert-mine-${c.id}`}
-        onClick={() => onMineInsert?.(c)}
-      />
-    ))}
+    {isOpen && group.id === "mine" && mine && (
+      <>
+        {/* Board 4418:99857: dense rows with a ⠿ grip; each drags onto the
+            canvas as a component id (the drop instantiates it). */}
+        {mine.map((c) => (
+          <Row
+            key={c.id}
+            label={c.name}
+            testId={`insert-mine-${c.id}`}
+            grip
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("application/x-aquibra-component", c.id);
+              e.dataTransfer.effectAllowed = "copy";
+            }}
+            onClick={() => onMineInsert?.(c)}
+          />
+        ))}
+        {mine.length === 0 && (
+          <p
+            data-testid="insert-mine-empty"
+            className="tw:m-0 tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:py-[var(--bk-space-4)] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+          >
+            No saved components yet. Select an element and choose Save as component.
+          </p>
+        )}
+        {onManageComponents && (
+          <div
+            role="button"
+            tabIndex={0}
+            data-testid="insert-mine-manage"
+            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+            onClick={onManageComponents}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onManageComponents(); }
+            }}
+          >
+            Manage components ›
+          </div>
+        )}
+      </>
+    )}
     {/* A GRID, because the flex-wrap version missed two columns by ONE pixel
         and nobody could see why. Board 138:2 draws two cards side by side and
         the arithmetic under it reads 16 + 136 + 16 + 136 + 16 = 320 — right

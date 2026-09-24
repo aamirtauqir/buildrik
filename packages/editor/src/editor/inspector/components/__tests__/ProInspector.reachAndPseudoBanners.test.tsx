@@ -25,9 +25,6 @@ vi.mock("../../tabs/InspectorTabContent", () => ({
 vi.mock("../../sections/VariantSection", () => ({ VariantSection: () => null }));
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
-vi.mock("@/editor/components-catalog/ui/DetachInstanceButton", () => ({
-  DetachInstanceButton: () => null,
-}));
 
 import { ProInspector } from "../../ProInspector";
 

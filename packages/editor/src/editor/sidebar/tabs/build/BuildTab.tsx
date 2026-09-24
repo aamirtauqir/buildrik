@@ -13,6 +13,7 @@
  * remains.
  */
 
+import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
 import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
@@ -40,7 +41,20 @@ export interface BuildTabProps {
 export const BuildTab: React.FC<BuildTabProps> = ({
   composer, onBlockClick, onHelpClick, onClose,
 }) => {
-  const tab = useBuildTab(composer, onBlockClick);
+  // MINE (board 1069:4970): the user's own components, inline, and
+  // searched with the rest (G2-111). Same load +
+  // subscribe shape useComponentsState uses.
+  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const load = () => setMine(composer.components?.getAllComponents() ?? []);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
+  const tab = useBuildTab(composer, onBlockClick, mine);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
@@ -65,18 +79,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, [composer]);
   const { addToast } = useToast();
 
-  // MINE (board 1069:4970): the user's own components, inline. Same load +
-  // subscribe shape useComponentsState uses.
-  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
-  React.useEffect(() => {
-    if (!composer?.components) return;
-    const load = () => setMine(composer.components?.getAllComponents() ?? []);
-    load();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
-    };
-  }, [composer]);
 
   const groups = React.useMemo(
     () => buildInsertGroups(composer?.components ? mine.length : null),
@@ -101,23 +103,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     }
   }, [composer, addToast]);
 
-  // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
-  // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
-  // XSS boundary) and gives the transaction/smart-placement/select/flash.
-  const pasteHtml = React.useCallback(async () => {
-    let text = "";
-    try {
-      text = await navigator.clipboard.readText();
-    } catch {
-      addToast({ description: "Clipboard is not readable — allow clipboard access and try again.", tone: "warning" });
-      return;
-    }
-    if (!text.trim()) {
-      addToast({ description: "Clipboard is empty — copy some HTML first.", tone: "warning" });
-      return;
-    }
-    onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: text });
-  }, [addToast, onBlockClick]);
+  // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
+  // clipboard) and Insert sends the text down the SAME BlockData insert path
+  // everything else uses — insertBlock owns the XSS boundary.
+  const [pasteOpen, setPasteOpen] = React.useState(false);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -207,7 +196,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 data-testid="insert-paste-html"
                 onClick={() => {
                   setMenuOpen(false);
-                  void pasteHtml();
+                  setPasteOpen(true);
                 }}
               >
                 Paste HTML…
@@ -224,8 +213,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               query={tab.searchQuery}
               hits={tab.searchResults}
               onDragStart={tab.handleDragStart}
+              onBlockDragStart={tab.handleBlockDragStart}
               onElClick={tab.handleElClick}
               onBlockInsert={(b) => onBlockClick?.(b)}
+              onSavedInsert={(c) => void insertMine(c)}
               onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>
@@ -250,6 +241,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
+                onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
             ))}
           </div>
@@ -258,6 +250,11 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         <div ref={panelBottomRef} className="bld-panel-bottom" />
         <FirstUseTip anchorRef={panelBottomRef} />
       </div>
+      <PasteHtmlModal
+        open={pasteOpen}
+        onClose={() => setPasteOpen(false)}
+        onInsert={(content) => onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content })}
+      />
     </PanelFrame>
   );
 };
