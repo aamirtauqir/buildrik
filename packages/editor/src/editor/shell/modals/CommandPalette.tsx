@@ -26,6 +26,9 @@ import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
+import { LAYER_NAME_KEY } from "@/editor/panels/layers/hooks/layersPersistence";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 // =============================================================================
@@ -55,7 +58,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Templates", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -235,6 +238,43 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       group: "Templates",
       keywords: ["template"],
       handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { previewId: t.id })),
+    });
+  }
+
+  /* LAYERS / ASSETS — the placeholder promises "pages, layers, assets":
+     a layer on this page answers by its Layers name (custom name, else its
+     first words, else its type) and the row selects it; an asset answers by
+     name and opens the Asset library on it. Searchable only. */
+  const page = composer.elements.getActivePage?.();
+  const root = page ? composer.elements.getElement?.(page.root.id) : null;
+  for (const el of root?.getDescendants?.() ?? []) {
+    const custom = el.getCustomData?.(LAYER_NAME_KEY);
+    const name =
+      (typeof custom === "string" && custom) ||
+      getLayerPreview(el) ||
+      ELEMENT_TYPE_LABELS[el.getType()] ||
+      el.getType();
+    commands.push({
+      id: `layer-${el.getId()}`,
+      label: name,
+      group: "Layers",
+      keywords: ["layer", el.getType()],
+      handler: run(() => {
+        composer.selection.select(el);
+        openPanel("layers");
+      }),
+    });
+  }
+  for (const asset of composer.media?.getAssets?.() ?? []) {
+    commands.push({
+      id: `asset-${asset.id}`,
+      label: asset.name,
+      group: "Assets",
+      keywords: ["asset", "image", "file"],
+      handler: run(() => {
+        composer.media.selectAssets([asset.id]);
+        composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true });
+      }),
     });
   }
 
@@ -444,6 +484,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             style={{ outline: "none" }}
             className="tw:flex-1 tw:[&_input]:h-[18px] tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:p-0 tw:[&_input]:text-[12px] tw:[&_input]:leading-[18px] tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:shadow-none tw:[&_input]:ring-0 tw:[&_input]:focus:ring-0 tw:[&_input]:placeholder:text-[var(--bk-ink-muted)]"
           />
+          {query && (
+            <Button
+              variant="ghost"
+              aria-label="Clear search"
+              data-testid="cmdk-clear"
+              className="tw:h-5 tw:min-h-0 tw:w-5 tw:flex-none tw:rounded tw:border-0 tw:p-0 tw:text-[12px] tw:leading-none tw:text-[var(--bk-ink-muted)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+            >
+              ✕
+            </Button>
+          )}
           <span
             data-testid="cmdk-scope"
             className="tw:flex-none tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:py-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
