@@ -195,6 +195,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      comments in server order, switching page and selecting each anchor via
      `locateComment` (C2, #39). */
   const [walkCursor, setWalkCursor] = React.useState(0);
+  /* Boards 4418:172804 / 173065 / 173326 — after Locate ›, a "Comment
+     located" block tops the column: the comment, an edit door for the
+     element it is on, and the way back to the list. */
+  const [located, setLocated] = React.useState<{ comment: ReviewComment; name: string } | null>(null);
 
   /* Round history — board 4418:172775's modal. Lazy: fetched the first time
      it is opened, because most sessions never look back. `null` means not
@@ -463,7 +467,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const locate = React.useCallback(
     (c: ReviewComment) => {
       if (!composer) return;
-      if (locateComment(composer, c) !== "gone") return;
+      const outcome = locateComment(composer, c);
+      if (outcome === "located" && c.targetSelector) {
+        const el = composer.elements.getElement(anchorId(c.targetSelector));
+        const layer = el?.getCustomData?.("layerName");
+        const type = el?.getType?.() ?? "element";
+        setLocated({ comment: c, name: typeof layer === "string" && layer ? layer : type });
+        return;
+      }
+      setLocated(null);
+      if (outcome !== "gone") return;
       setDetachedIds((prev) => new Set(prev).add(c.id));
       addToast({
         tone: "warning",
@@ -837,6 +850,29 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   return (
     <div className={BODY} data-review-state={round.revoked ? "revoked" : "open"}>
+      {located ? (
+        <div
+          className="tw:flex tw:flex-none tw:flex-col tw:items-start tw:gap-2 tw:border-b tw:border-[var(--bk-border)] tw:px-4 tw:py-3"
+          data-testid="review-located"
+        >
+          <span className="tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            {pageName(located.comment.pageId)} · Comment located
+          </span>
+          <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+            {located.comment.authorKind === "client" ? (located.comment.authorName ?? "Client") : "You"}: {"“"}
+            {located.comment.body}
+            {"”"}
+          </span>
+          {/* The edit happens in the inspector, which shares this column:
+              closing Review hands it the element Locate selected. */}
+          <Button onClick={() => onClose?.()} disabled={!onClose} data-testid="review-located-edit">
+            Edit {located.name.toLowerCase()}
+          </Button>
+          <Button color="light" size="xs" className={GHOST} onClick={() => setLocated(null)}>
+            Back to all comments
+          </Button>
+        </div>
+      ) : null}
       {header}
       {roundBanner}
 

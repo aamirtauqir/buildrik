@@ -487,6 +487,22 @@ describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as
     expect(within(row).queryByRole("button", { name: "More actions" })).toBeNull();
   });
 
+  it("boards 4418:172804–173326 — Locate › tops the column with a Comment located block", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const onClose = vi.fn();
+    renderTab({ composer: makeComposer(), onClose });
+    fireEvent.click(await screen.findByRole("button", { name: "Locate ›" }));
+    const block = await screen.findByTestId("review-located");
+    expect(block).toHaveTextContent("Home · Comment located");
+    expect(block).toHaveTextContent("Sara Khan: “hero photo is too dark”");
+    fireEvent.click(within(block).getByTestId("review-located-edit"));
+    expect(onClose).toHaveBeenCalled();
+    fireEvent.click(within(block).getByRole("button", { name: "Back to all comments" }));
+    expect(screen.queryByTestId("review-located")).not.toBeInTheDocument();
+  });
+
   it("Locate › switches page when the comment lives on another one, then selects its element", async () => {
     fetchReviewComments.mockResolvedValue([
       { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-menu" },
@@ -571,7 +587,10 @@ describe("ReviewTab — opened from the Activity panel", () => {
   it("draws ‹ Activity, which goes back to the Activity panel", async () => {
     const emit = vi.fn();
     renderTab({ fromActivity: true, composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
-    fireEvent.click(await screen.findByRole("button", { name: "‹ Activity" }));
+    /* Past the loading state: its header is replaced once the round lands, and
+       a click on the replaced node reaches nothing. */
+    await screen.findByTestId("review-status-line");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
     expect(emit).toHaveBeenCalledWith("panel:open", { panel: "activity" });
   });
 
