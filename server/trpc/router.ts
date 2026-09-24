@@ -32,6 +32,7 @@ import { siteVersionsRouter } from "./routers/site-version";
 import { siteComponentsRouter } from "./routers/site-component";
 import { userTemplatesRouter } from "./routers/user-template";
 import { marketplaceRouter } from "./routers/marketplace";
+import { activityRouter } from "./routers/activity";
 
 export const appRouter = router({
   auth: authRouter,
@@ -45,6 +46,7 @@ export const appRouter = router({
   help: helpRouter,
   learn: learnRouter,
   notifications: notificationsRouter,
+  activity: activityRouter,
   onboarding: onboardingRouter,
   pages: pagesRouter,
   forms: formsRouter,
