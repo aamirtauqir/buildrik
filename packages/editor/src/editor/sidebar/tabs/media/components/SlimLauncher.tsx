@@ -23,8 +23,8 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField, Tooltip } from "@/editor/chrome-ui";
-import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare, ArrowUpRight } from "lucide-react";
+import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField, Tooltip } from "@/editor/chrome-ui";
+import { Upload, Cloud, Shapes, Folder, ChevronDown, ChevronRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
 import { MEDIA_SIZE_LIMITS_LABEL, fileExtensionLabel } from "@shared/constants/media";
@@ -52,8 +52,6 @@ interface SlimLauncherProps {
   onInsert(key: string): void;
   onToggleType(type: MediaBucket): void;
   onSearchChange(query: string): void;
-  /** Header expand brackets — 320 ↔ 700, same as every other drawer. */
-  onExpand?(): void;
   /**
    * Boards 303:1997 / 303:2032 — a pill over the grid naming the media job
    * currently running ("Image editor — …", "Optimizing → WebP…").
@@ -78,14 +76,9 @@ interface SlimLauncherProps {
 
   // ── Bulk select (board `145:300`) ─────────────────────────────────────────
   /**
-   * Two ways in. `☑ Select` in the folder row is the board's own (144:12, and
-   * the hotspot on it names `bulk-select` as the destination); right-click on
-   * a card is the gesture the fullpage manager already uses for its per-asset
-   * menu and pre-selects the card it landed on. The way out — Done — is
-   * visible the whole time selection is on.
-   *
-   * This comment used to read "the board draws the SELECTED state but no way
-   * into it". True of the 2026-09-02 capture, not of the board.
+   * Two ways in: the header ⋯ "Select assets…" (board 7077:79223) and
+   * right-click on a card, which pre-selects the card it landed on. The way
+   * out — Done — is visible the whole time selection is on.
    */
   /**
    * Open the asset drill-in (board `146:2`, and its Versions / Used-in tabs at
@@ -104,7 +97,7 @@ interface SlimLauncherProps {
   onFolderChange?(folderId: string | null): void;
 
   selectionMode?: boolean;
-  /** Board 144:12's `☑ Select` — enter (or leave) bulk-select from the folder row. */
+  /** Header ⋯ "Select assets…" — enter bulk-select. */
   onToggleSelection?(): void;
   selectedKeys?: Set<string>;
   onEnterSelection?(key: string): void;
@@ -158,6 +151,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
      (board 6289:148485), never hidden. */
   const write = useMediaWriteAccess();
   const [folderMenuOpen, setFolderMenuOpen] = React.useState(false);
+  const [panelMenuOpen, setPanelMenuOpen] = React.useState(false);
 
   /* Clone 3584:45522 → 3585:23326 → 3585:23337. The rejected row's `Choose a
      smaller file…` picked a file: it waits in the confirm; Upload file drops
@@ -219,14 +213,49 @@ export function SlimLauncher(props: SlimLauncherProps) {
           onCancel={onCancelSelection ?? (() => {})}
         />
       ) : null}
-      <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={props.onExpand} />
+      {/* Board 4418:59771 — "Assets · N", the ⋯ panel menu (7077:79223) and
+          close. The expand brackets are gone (G3-002): they opened the same
+          full-page library as "Manage assets ›" below while reading as
+          "widen this drawer". The ⋯ carries "Select assets…" (G3-011) — the
+          visible door to bulk select; right-click on a card still enters it. */}
+      <PanelFrame.Header
+        title={`Assets · ${props.serverPage?.total ?? props.libraryItems.length}`}
+        onClose={onClose}
+        actions={
+          <Popover
+            open={panelMenuOpen}
+            onClose={() => setPanelMenuOpen(false)}
+            placement="bottom-end"
+            label="Assets options"
+            trigger={
+              <IconButton
+                label="Assets options"
+                aria-haspopup="menu"
+                aria-expanded={panelMenuOpen}
+                data-testid="media-panel-menu"
+                onClick={() => setPanelMenuOpen((v) => !v)}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label="Assets options">
+              <MenuItem
+                data-testid="media-select-mode"
+                onClick={() => {
+                  setPanelMenuOpen(false);
+                  if (!props.selectionMode) props.onToggleSelection?.();
+                }}
+              >
+                Select assets…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
+      />
 
-      {/* Clone 3584:45522 / 3584:45876 / 3585:23337 — `Manage assets ↗`, a
-          full-width quiet button under the header, is the drawer's named
-          door to the fullpage library. The only door before this was the
-          header's expand brackets, which say nothing about where they go.
-          3437:36027 draws the same button above the footer instead; the
-          later frames win. */}
+      {/* Board 4418:59771 — `Manage assets ›`, a full-width quiet button under
+          the header: the drawer's one door to the full-page library. */}
       {props.onOpenLibrary ? (
         <div className="tw:px-4 tw:pb-2" data-testid="media-manage-assets-row">
           <Button
@@ -238,7 +267,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             onClick={() => props.onOpenLibrary?.()}
           >
             Manage assets
-            <ArrowUpRight size={12} aria-hidden="true" />
+            <ChevronRight size={12} aria-hidden="true" />
           </Button>
         </div>
       ) : null}
@@ -411,33 +440,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
             ))}
           </Menu>
         </Popover>
-        <span className="tw:flex-1" />
-        {/*
-          Board 144:12, redrawn. This slot held three DISABLED glyphs — grid,
-          list, sort — on the reading that a present-but-disabled control says
-          "not here yet". The board now spends the slot on `☑ Select` (11/18
-          ink-soft, with a 76×30 hotspot wired to the bulk-select state) and
-          says where the other three live in the footer instead. That is one
-          edit, not two: keeping the greyed glyphs beside a footer line that
-          sends you elsewhere for them states the opposite of what it means.
-
-          It also closes the hole this file used to record — "the board draws
-          the SELECTED state but no way into it". Right-click still enters
-          selection on a card; this is the entry a first-time user can see.
-        */}
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          variant="link"
-          className="tw:min-h-6 tw:gap-1 tw:font-normal tw:text-[11px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]"
-          data-testid="media-select-mode"
-          aria-pressed={Boolean(props.selectionMode)}
-          onClick={props.onToggleSelection}
-        >
-          <CheckSquare size={13} aria-hidden="true" />
-          Select
-        </Button>
       </div>
 
       <TypePills
