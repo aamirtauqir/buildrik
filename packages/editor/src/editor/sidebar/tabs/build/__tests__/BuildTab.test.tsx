@@ -100,6 +100,49 @@ describe("BuildTab — element row description on hover (G2-108)", () => {
   });
 });
 
+/* G2-111 — board 4418:99857: SAVED COMPONENTS rows carry a ⠿ grip and drag
+   onto the canvas; the group ends in "Manage components ›"; an empty group
+   says how to make one. */
+describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
+  const composerWith = (saved: Array<{ id: string; name: string }>) => {
+    const emit = vi.fn();
+    return {
+      emit,
+      composer: {
+        on: vi.fn(), off: vi.fn(), emit,
+        components: { getAllComponents: () => saved },
+      } as unknown as NonNullable<BuildTabProps["composer"]>,
+    };
+  };
+
+  it("rows drag as a component id and draw a grip", () => {
+    const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    const row = screen.getByTestId("insert-mine-c1");
+    expect(row).toHaveAttribute("draggable", "true");
+    expect(screen.getByTestId("insert-row-grip-insert-mine-c1").textContent).toBe("⠿");
+    const setData = vi.fn();
+    fireEvent.dragStart(row, { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith("application/x-aquibra-component", "c1");
+  });
+
+  it("Manage components › opens the Components panel", () => {
+    const { composer, emit } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByTestId("insert-mine-manage"));
+    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
+  });
+
+  it("an empty group says how to save one", () => {
+    const { composer } = composerWith([]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    expect(screen.getByTestId("insert-mine-empty").textContent).toMatch(/No saved components yet/);
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {

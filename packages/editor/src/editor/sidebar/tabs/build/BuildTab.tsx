@@ -251,6 +251,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
+                onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
             ))}
           </div>
