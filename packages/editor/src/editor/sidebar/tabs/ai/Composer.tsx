@@ -4,12 +4,13 @@ import { Button, Textarea } from "@/editor/chrome-ui";
 
 export interface ComposerProps {
   onSubmit: (text: string) => void;
-  onStop: () => void;
+  /** A run is live: the field shows only the prompt — Stop is under the
+   *  Thinking band / run band (board 4418:104577). */
   streaming: boolean;
 }
 
 export const Composer: React.FC<ComposerProps> = ({
-  onSubmit, onStop, streaming,
+  onSubmit, streaming,
 }) => {
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
@@ -18,7 +19,7 @@ export const Composer: React.FC<ComposerProps> = ({
      prompt is still here"). A run that finishes cleanly remounts this
      component from AITab, which is what empties it. */
   const submit = () => {
-    if (!trimmed) return;
+    if (!trimmed || streaming) return;
     onSubmit(trimmed);
   };
 
@@ -46,14 +47,7 @@ export const Composer: React.FC<ComposerProps> = ({
           }}
           rows={2}
         />
-        {streaming ? (
-          <Button
-            type="button"
-            className="bd-ai-composer-stop"
-            aria-label="Stop"
-            onClick={onStop}
-          >■</Button>
-        ) : (
+        {streaming ? null : (
           <Button
             type="button"
             className="bd-ai-composer-send"

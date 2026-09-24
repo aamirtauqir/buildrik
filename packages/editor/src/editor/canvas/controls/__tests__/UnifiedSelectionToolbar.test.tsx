@@ -71,4 +71,9 @@ describe("UnifiedSelectionToolbar", () => {
     }
     expect(screen.getByTestId("selection-toolbar-more").className).toContain("tw:bg-[var(--bk-accent)]");
   });
+
+  it("carries the board's caption row under the pill", () => {
+    setup();
+    expect(screen.getByTestId("selection-toolbar-caption")).toHaveTextContent("⧉ Duplicate ⌘D · 🗑 Delete ⌫ · ⋯ More");
+  });
 });

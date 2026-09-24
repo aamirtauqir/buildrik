@@ -145,7 +145,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 }) => {
   const canvasRef = React.useRef<CanvasRef>(null);
   const composerContainerRef = React.useRef<HTMLDivElement | null>(null);
-  const hasManuallyToggledSpacing = React.useRef(false);
   const { addToast } = useToast();
 
   // Use extracted hooks
@@ -255,7 +254,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       setShowGuides: state.setShowGuides,
       setShowGrid: state.setShowGrid,
     },
-    hasManuallyToggledSpacingRef: hasManuallyToggledSpacing,
   });
 
   // Single source of truth for selection - derived from Composer
@@ -511,15 +509,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     });
   }, [publishJob.uiState, publishJob.jobId, publishJob.publishedUrl, composer]);
 
-  // Auto-enable spacing on first selection. Deps are the specific values read
-  // (not the whole `state` object, which is a fresh literal every render and
-  // made this effect run on every render).
-  const showSpacingIndicators = state.overlays.showSpacingIndicators;
-  const setShowSpacingIndicators = state.setShowSpacingIndicators;
-  React.useEffect(() => {
-    if (!selectedElement || showSpacingIndicators || hasManuallyToggledSpacing.current) return;
-    setShowSpacingIndicators(true);
-  }, [selectedElement, showSpacingIndicators, setShowSpacingIndicators]);
 
   if (!composer) {
     return <StudioSkeleton />;
@@ -619,12 +608,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         devMode={state.overlays.devMode}
         onOverlayChange={(overlay, enabled) => {
           if (overlay === "guides") state.setShowGuides(enabled);
-          else if (overlay === "spacing") {
-            // Mark spacing as user-controlled so the auto-enable-on-selection
-            // effect stops re-enabling it after the user turns it off.
-            hasManuallyToggledSpacing.current = true;
-            state.setShowSpacingIndicators(enabled);
-          } else if (overlay === "grid") state.setShowGrid(enabled);
+          else if (overlay === "spacing") state.setShowSpacingIndicators(enabled);
+          else if (overlay === "grid") state.setShowGrid(enabled);
           else if (overlay === "rulers") state.setShowRulers(enabled);
           else if (overlay === "badges") state.setShowBadges(enabled);
           else if (overlay === "xray") state.setShowXRay(enabled);
@@ -765,6 +750,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         html={previewHtml}
         onDone={() => setPreviewHtml(null)}
         siteId={getSiteIdFromUrl()}
+        siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
+        pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
       />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
       <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />

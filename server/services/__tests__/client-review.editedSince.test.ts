@@ -17,7 +17,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const findUnique = vi.fn();
 vi.mock("@/lib/prisma", () => ({
-  prisma: { reviewRequest: { findUnique: (...a: unknown[]) => findUnique(...a) }, reviewer: { findUnique: vi.fn(() => null) } },
+  prisma: {
+    reviewRequest: { findUnique: (...a: unknown[]) => findUnique(...a), count: vi.fn(() => Promise.resolve(1)) },
+    reviewer: { findUnique: vi.fn(() => null) },
+  },
 }));
 
 import { getReviewByToken } from "../client-review.service";

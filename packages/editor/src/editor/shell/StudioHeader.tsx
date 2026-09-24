@@ -872,6 +872,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
             }
             siteId={siteIdForMenu}
+            siteName={siteName}
+            pageName={pageName}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={toggleReadOnlyView}
           />

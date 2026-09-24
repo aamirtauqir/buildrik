@@ -61,6 +61,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "clone-element": "Duplicated element",
   paste: "Pasted element",
   "paste-styles": "Pasted styles",
+  "reset-styles": "Reset styles",
   // Move / order
   "move-element": "Moved element",
   "multi-element-move": "Moved elements",
