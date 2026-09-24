@@ -638,6 +638,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [handleSelectionClick, pickMode, composer]
     );
 
+    /* The grey around the page is canvas too. The column's 24px padding and
+       the scroll area below the frame sit outside the frame's click handler,
+       so a click there used to change nothing — the walk at /edit/:id clicked
+       exactly there. Only a click that lands on those surfaces themselves
+       counts; the bar, overlays and the frame handle their own. */
+    const handleBackgroundClick = React.useCallback(
+      (e: React.MouseEvent) => {
+        if (!composer || (e.target !== wrapperRef.current && e.target !== scrollRef.current)) return;
+        composer.selection.clear();
+        composer.emit(EVENTS.UI_CANVAS_BACKGROUND_CLICK, {});
+      },
+      [composer]
+    );
+
     // Context menu handler
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent) => {
@@ -680,7 +694,14 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
          left and 16px above the footer toolbar (board 5940:148012) —
          chrome-ui/Toast measures both. */
-      <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles} data-bk-toast-anchor="">
+      <div
+        ref={wrapperRef}
+        tabIndex={0}
+        onKeyDown={readOnly ? undefined : handleKeyDown}
+        onClick={handleBackgroundClick}
+        style={wrapperStyles}
+        data-bk-toast-anchor=""
+      >
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div

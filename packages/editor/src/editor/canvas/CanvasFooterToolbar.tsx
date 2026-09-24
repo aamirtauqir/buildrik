@@ -109,10 +109,12 @@ const RedoIcon = () => (
   </svg>
 );
 
-/** Square icon control in the bar — undo/redo/help all share this box. */
+/** Square icon control in the bar — undo/redo/help all share this box. The
+ *  board draws a disabled ↶ ↷ as a muted glyph with no fill, so the Button's
+ *  disabled fill is cleared. */
 const EDIT_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
-  "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
+  "tw:border tw:border-transparent tw:bg-transparent tw:disabled:bg-transparent tw:text-[var(--bk-ink-soft)] " +
   "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
 
 /**
@@ -153,11 +155,11 @@ const GRID_SIZES: readonly number[] = [4, 8, 16];
 /** Board 7048:78112's presets. */
 const VIEW_ZOOM_LEVELS = [50, 75, 100, 150, 200];
 
-/* The trigger reads like the words it replaces: a grey pill while any overlay
-   is on, plain otherwise, so the bar still says at a glance that something is
-   drawn over the canvas. */
+/* The trigger is plain text on the bar, as the board draws it, overlays on or
+   off. The " · N" count is the one hint that something is drawn over the
+   canvas (designer-notes: View trigger count). */
 const VIEW_TRIGGER =
-  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap";
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]";
 
 // ============================================
 // Main Component
@@ -345,11 +347,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             <Button
               type="button"
               color="light"
-              className={`${VIEW_TRIGGER} ${
-                activeOverlays > 0
-                  ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:font-semibold"
-                  : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]"
-              }`}
+              className={VIEW_TRIGGER}
               aria-haspopup="menu"
               aria-expanded={viewOpen}
               aria-label="View"

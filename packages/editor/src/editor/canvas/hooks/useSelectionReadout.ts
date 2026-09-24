@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";
 
 /** `section` -> `Section`, matching the board's `Section · Hero` casing. */
@@ -59,7 +60,9 @@ export function useSelectionReadout(
   const customName = React.useMemo(() => {
     if (!selectedElement || !pageId) return null;
     if (renamed && renamed.id === selectedElement.id) return renamed.name;
-    return getLayerName(composer?.elements.getElement(selectedElement.id)) ?? null;
+    // The name Layers shows: a custom layer name, else a text layer's copy.
+    const el = composer?.elements.getElement(selectedElement.id);
+    return getLayerName(el) ?? getLayerPreview(el) ?? null;
   }, [selectedElement, pageId, renamed, composer]);
 
   const [selectionCount, setSelectionCount] = React.useState(0);

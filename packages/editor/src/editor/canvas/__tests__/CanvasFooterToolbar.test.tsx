@@ -72,7 +72,11 @@ describe("CanvasFooterToolbar — the View menu (board 5930:44801)", () => {
 
   it("reflects active overlay state as a checked row, and counts it on the trigger", () => {
     renderToolbar({ overlays: { ...ALL_OFF, grid: true } });
-    expect(screen.getByTestId("canvas-view-menu-trigger").textContent).toContain("View · 1");
+    const trigger = screen.getByTestId("canvas-view-menu-trigger");
+    expect(trigger.textContent).toContain("View · 1");
+    // The board draws the trigger plain whether overlays are on or off.
+    expect(trigger.className).not.toContain("--bk-bg-subtle");
+    expect(trigger.className).not.toContain("font-semibold");
     openMenu();
     expect(screen.getByTestId("canvas-view-grid").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("canvas-view-spacing").getAttribute("aria-checked")).toBe("false");
@@ -238,5 +242,16 @@ describe("CanvasFooterToolbar — View ▸ Grid", () => {
     fireEvent.change(input, { target: { value: "12" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(onGridSizeChange).toHaveBeenCalledWith(12);
+  });
+});
+
+describe("CanvasFooterToolbar — disabled undo/redo (board 4418:103591)", () => {
+  it("a disabled undo draws no fill", () => {
+    renderToolbar({ onUndo: vi.fn(), canUndo: false, onRedo: vi.fn(), canRedo: false });
+    for (const name of ["Undo", "Redo"]) {
+      const cls = screen.getByRole("button", { name }).className;
+      expect(cls).toContain("tw:disabled:bg-transparent");
+      expect(cls).not.toContain("tw:disabled:bg-[var(--bk-bg-subtle)]");
+    }
   });
 });

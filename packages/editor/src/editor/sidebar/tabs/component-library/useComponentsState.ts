@@ -9,6 +9,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { type ComponentFilter, FAVORITES_STORAGE_KEY } from "../componentsData";
+import { takePendingMaster } from "./openMasterRequest";
 
 const MAX_COMPONENTS = 100;
 
@@ -404,6 +405,26 @@ export function useComponentsState({
     },
     [setSelectedId]
   );
+
+  // "Edit master ›" from an instance (openMasterRequest.ts): a request made
+  // before this panel mounted is taken here; a mounted panel hears the event.
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const open = (componentId: string | undefined) => {
+      takePendingMaster(composer);
+      const c = componentId ? composer.components?.getComponent(componentId) : undefined;
+      if (c) {
+        setDetailComponent(c);
+        setSelectedId(c.id);
+      }
+    };
+    open(takePendingMaster(composer));
+    const onEvent = ({ componentId }: { componentId: string }) => open(componentId);
+    composer.on(EVENTS.UI_COMPONENTS_OPEN_MASTER, onEvent);
+    return () => {
+      composer.off(EVENTS.UI_COMPONENTS_OPEN_MASTER, onEvent);
+    };
+  }, [composer, setSelectedId]);
 
   const handleBackFromDetail = React.useCallback(() => {
     setDetailComponent(null);
