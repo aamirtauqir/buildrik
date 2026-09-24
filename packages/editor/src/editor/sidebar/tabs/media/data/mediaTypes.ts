@@ -457,10 +457,6 @@ export interface MediaStateResult {
    *  asked (`onSelect`) or replaces the element's media. */
   applyPick(key: string): void;
 
-  // §12 expanded-panel mode (320 ↔ 560)
-  panelExpanded: boolean;
-  setPanelExpanded(v: boolean): void;
-
   // §21 replace-across pair (old + new srcs flow into ReplaceAcrossDialog)
   replaceAcrossPair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null;
   setReplaceAcrossPair(

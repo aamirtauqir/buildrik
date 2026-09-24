@@ -41,7 +41,6 @@ function mount(over: Record<string, unknown> = {}) {
     storage: { used: 0, total: 1000 },
     uploadQueue: [],
     usageMap: new Map(),
-    appliedAssetKey: undefined,
     onInsert: vi.fn(),
     onToggleType: vi.fn(),
     onSearchChange: vi.fn(),

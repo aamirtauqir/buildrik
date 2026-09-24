@@ -209,11 +209,30 @@ export class CollectionManager extends EventEmitter {
     const fieldIndex = collection.fields.findIndex((f) => f.id === fieldId);
     if (fieldIndex === -1) return null;
 
-    const updatedField = { ...collection.fields[fieldIndex], ...updates };
+    const previous = collection.fields[fieldIndex];
+    const updatedField = { ...previous, ...updates };
     const updatedFields = [...collection.fields];
     updatedFields[fieldIndex] = updatedField;
 
-    await this.updateCollection(collectionId, { fields: updatedFields });
+    /* A new key moves every record's value to it — records store data by
+       key, so an unmigrated rename would orphan them all — and follows into
+       the two places the collection names a field by key. */
+    const renamed = updates.slug !== undefined && updates.slug !== previous.slug;
+    const keyed: Partial<CMSCollection> = {};
+    if (renamed) {
+      const from = previous.slug;
+      const to = updatedField.slug;
+      for (const item of await Storage.loadContentItems(collectionId)) {
+        if (!(from in item.data)) continue;
+        const { [from]: value, ...rest } = item.data;
+        await Storage.saveContentItem({ ...item, data: { ...rest, [to]: value } });
+      }
+      this.invalidateContentCache(collectionId);
+      if (collection.pageSlugPattern) keyed.pageSlugPattern = collection.pageSlugPattern.split(`{${from}}`).join(`{${to}}`);
+      if (collection.displayField === from) keyed.displayField = to;
+    }
+
+    await this.updateCollection(collectionId, { fields: updatedFields, ...keyed });
 
     return updatedField;
   }

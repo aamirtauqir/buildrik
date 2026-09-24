@@ -36,8 +36,6 @@ export interface ComposerConfig {
   project?: ProjectConfig;
   /** Canvas configuration */
   canvas?: CanvasConfig;
-  /** Theme configuration */
-  theme?: ThemeConfig;
   /** Plugin configuration */
   plugins?: import("./plugins").PluginConfig[];
   /** Internationalization */
@@ -101,17 +99,6 @@ export interface CanvasConfig {
   gridSize?: number;
   /** Snap to grid */
   snapToGrid?: boolean;
-}
-
-export interface ThemeConfig {
-  /** Theme mode */
-  mode?: "light" | "dark" | "auto";
-  /** Primary color */
-  primaryColor?: string;
-  /** Accent color */
-  accentColor?: string;
-  /** Custom CSS variables */
-  variables?: Record<string, string>;
 }
 
 export interface PluginConfig {

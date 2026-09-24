@@ -8,7 +8,7 @@ export { LayoutShell } from "./LayoutShell";
 export type { LayoutShellProps } from "./LayoutShell";
 
 // Rail + tab configuration
-export { GROUPED_TABS_CONFIG, getTabsByZone } from "./tabsConfig";
+export { GROUPED_TABS_CONFIG } from "./tabsConfig";
 export type {
   TabZone,
   GroupedTabId,

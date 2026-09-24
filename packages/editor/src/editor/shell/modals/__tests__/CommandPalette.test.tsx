@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, within, waitFor } from "@testing-library/react";
 import { CommandPalette } from "../CommandPalette";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { Composer } from "../../../../engine";
@@ -422,5 +422,42 @@ describe("CommandPalette — jump rows (layers, assets) + clear search", () => {
     fireEvent.click(screen.getByTestId("cmdk-clear"));
     expect(input()).toHaveValue("");
     expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
+  });
+});
+
+describe("CommandPalette — CMS record jump rows (ui:cms-open)", () => {
+  function cmsComposer() {
+    const base = makeComposer({ registry: BOARD_REGISTRY });
+    return Object.assign(base, {
+      cms: {
+        collections: {
+          getAllCollections: () => [
+            { id: "col1", name: "Menu items", displayField: "dish", fields: [{ slug: "dish", type: "text" }] },
+          ],
+          getContentItems: vi.fn(async () => [
+            { id: "r1", collectionId: "col1", data: { dish: "Margherita" }, status: "published" },
+            { id: "r2", collectionId: "col1", data: { dish: "Diavola" }, status: "draft" },
+          ]),
+        },
+      },
+    });
+  }
+
+  it("a record answers a query by its display field under RECORDS; the row opens it in the workspace", async () => {
+    const composer = cmsComposer();
+    renderPalette(composer);
+    type("diavola");
+    const row = await screen.findByTestId("cmdk-row-record-r2");
+    expect(screen.getByTestId("cmdk-label-record-r2")).toHaveTextContent("Diavola · Menu items");
+    expect(bands()).toContain("Records");
+    fireEvent.click(row);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_CMS_OPEN, { collectionId: "col1", recordId: "r2" });
+  });
+
+  it("records are not in the opening list", async () => {
+    const composer = cmsComposer();
+    renderPalette(composer);
+    await waitFor(() => expect(composer.cms.collections.getContentItems).toHaveBeenCalled());
+    expect(bands()).not.toContain("Records");
   });
 });

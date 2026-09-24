@@ -23,7 +23,6 @@ import {
   Popover,
   Menu,
   MenuItem,
-  MenuSeparator,
   ListRow,
   Row,
   SectionHeader,
@@ -239,6 +238,10 @@ export function RootView({
   );
 }
 
+/* 6930:80567 — the Sources / Variables row ⋯ is 222 wide on the 1440 board
+   (the shared Menu's own width is 200). */
+const DATA_ROW_MENU = "tw:w-[222px]";
+
 /* ── Sources (151:46) ────────────────────────────────────────────────────── */
 
 /** Board 151:46 draws a status LINE under the source name — a dot, then a
@@ -332,15 +335,14 @@ export function SourcesView({
                       </IconButton>
                     }
                   >
-                    <Menu label={`Actions for ${s.name}`}>
+                    <Menu label={`Actions for ${s.name}`} className={DATA_ROW_MENU}>
                       <MenuItem data-testid={`content-source-rename-${s.id}`} onClick={() => { setMenuFor(null); setRenaming(s); }}>
                         Rename
                       </MenuItem>
                       <MenuItem data-testid={`content-source-resync-${s.id}`} onClick={() => { setMenuFor(null); void resync(s); }}>
                         Re-sync
                       </MenuItem>
-                      <MenuSeparator />
-                      <MenuItem data-testid={`content-source-delete-${s.id}`} onClick={() => { setMenuFor(null); setDeleting(s); }}>
+                      <MenuItem danger data-testid={`content-source-delete-${s.id}`} onClick={() => { setMenuFor(null); setDeleting(s); }}>
                         Delete…
                       </MenuItem>
                     </Menu>
@@ -554,15 +556,14 @@ export function VariablesView({
                     </IconButton>
                   }
                 >
-                  <Menu label={`Actions for ${v.key}`}>
+                  <Menu label={`Actions for ${v.key}`} className={DATA_ROW_MENU}>
                     <MenuItem data-testid={`content-var-edit-${v.key}`} onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
                       Edit value
                     </MenuItem>
                     <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
                       Rename
                     </MenuItem>
-                    <MenuSeparator />
-                    <MenuItem data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
+                    <MenuItem danger data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
                       Delete…
                     </MenuItem>
                   </Menu>

@@ -131,11 +131,6 @@ export const THRESHOLDS = {
   CANVAS_MAX_WIDTH: 20000,
   CANVAS_MAX_HEIGHT: 20000,
 
-  // Panels
-  PANEL_MIN_WIDTH: 200,
-  PANEL_MAX_WIDTH: 600,
-  PANEL_DEFAULT_WIDTH: 280,
-
   // Tree depth
   MAX_NESTING_DEPTH: 50,
 
@@ -215,31 +210,3 @@ export const API = {
   PLACEHOLDER_IMAGE: "https://picsum.photos",
   FONT_API: "https://fonts.googleapis.com",
 } as const;
-
-// ============================================
-// Feature Flags
-// ============================================
-
-/**
- * Feature flags for enabling/disabling functionality
- */
-export const FEATURES = {
-  AI_ASSISTANT: true,
-  TEMPLATES: true,
-  CUSTOM_COMPONENTS: true,
-  DATA_BINDING: true,
-  RESPONSIVE_PREVIEW: true,
-  CODE_EXPORT: true,
-  COLLABORATION: false, // Not yet implemented
-  PLUGINS: false, // Implemented but disabled - enable when ready
-  VERSION_HISTORY: false, // Not yet implemented
-} as const;
-
-export type FeatureFlag = keyof typeof FEATURES;
-
-/**
- * Check if a feature is enabled
- */
-export function isFeatureEnabled(feature: FeatureFlag): boolean {
-  return FEATURES[feature] ?? false;
-}

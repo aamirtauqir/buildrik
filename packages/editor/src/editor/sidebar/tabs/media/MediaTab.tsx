@@ -15,7 +15,6 @@ import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { MediaContextMenu } from "./components/MediaContextMenu";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
@@ -56,7 +55,7 @@ export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
       <PanelFrame className="med-tab">
-        <PanelFrame.Header title="Assets" {...props} />
+        <PanelFrame.Header title="Assets" onClose={props.onClose} />
         <PanelFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
         </PanelFrame.Body>
@@ -90,18 +89,6 @@ function MediaTabWithComposer({
   */
   const [statusPill, setStatusPill] = React.useState<string | null>(null);
 
-  /*
-    Board 1159:4593 draws ONE manager. The 560 "expanded" panel was a second
-    one with its own grid, folder rail and toolbar; it is gone, so every
-    expand signal (the header brackets, the upload auto-expand) opens the
-    fullpage manager instead. Drag-to-folder lived only in that panel and was
-    ported into FolderTree first — see FolderTree.drop.test.tsx.
-  */
-  React.useEffect(() => {
-    if (!state.panelExpanded || !onOpenLibrary) return;
-    state.setPanelExpanded(false);
-    onOpenLibrary();
-  }, [state.panelExpanded, state, onOpenLibrary]);
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(initialStockQuery !== undefined);
   const { discSearchAll } = state;
   React.useEffect(() => {
@@ -301,11 +288,9 @@ function MediaTabWithComposer({
         storage={state.storage}
         uploadQueue={state.uploadQueue}
         usageMap={state.usageMap}
-        appliedAssetKey={undefined}
         onInsert={state.insertToCanvas}
         onToggleType={state.toggleType}
         onSearchChange={(q) => state.setLibrarySearch(q)}
-        onExpand={() => state.setPanelExpanded(true)}
         statusPill={statusPill}
         onDismissStatusPill={() => setStatusPill(null)}
         onUpload={state.upload}

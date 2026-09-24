@@ -92,7 +92,7 @@ export function parseDragData(dataTransfer: DataTransfer | null): DragData {
     }
   }
 
-  // Check for external content (files, text, etc.)
+  // External files (image elements on drop)
   if (dataTransfer.files && dataTransfer.files.length > 0) {
     return {
       type: "external",
@@ -103,22 +103,9 @@ export function parseDragData(dataTransfer: DataTransfer | null): DragData {
     };
   }
 
-  const text = dataTransfer.getData("text/plain");
-  const html = dataTransfer.getData("text/html");
-  const url = dataTransfer.getData("text/uri-list");
-
-  if (text || html || url) {
-    return {
-      type: "external",
-      sessionId: generateDragSessionId(),
-      startTime: Date.now(),
-      startPosition: { x: 0, y: 0 },
-      text: text || undefined,
-      html: html || undefined,
-      url: url || undefined,
-    };
-  }
-
+  /* Dragged text / HTML / links (text/plain, text/html, text/uri-list) were
+     parsed here with no canvas handler to receive them — only files land
+     (C5 G1-107, owner: consume or delete). They read as "unknown" now. */
   return { type: "unknown" };
 }
 

@@ -15,7 +15,6 @@ import * as dropTarget from "./dropTarget";
 import * as dropZones from "./dropZones";
 import * as geometry from "./geometry";
 import * as indicators from "./indicators";
-import * as keyboardSupport from "./keyboardSupport";
 import * as positioning from "./positioning";
 import * as session from "./session";
 import * as sortable from "./sortable";
@@ -85,9 +84,6 @@ export const dragDropHelpers = {
   // Auto-scroll
   startAutoScroll: autoScroll.startAutoScroll,
   stopAutoScroll: autoScroll.stopAutoScroll,
-
-  // Keyboard support
-  handleKeyboardDrag: keyboardSupport.handleKeyboardDrag,
 
   // Drop zones
   createDropZoneRegistry: dropZones.createDropZoneRegistry,

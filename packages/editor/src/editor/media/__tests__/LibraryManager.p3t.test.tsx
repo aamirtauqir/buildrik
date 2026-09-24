@@ -119,6 +119,16 @@ describe("Clone 3721:43552 · Assets · Unused · browse — the card menu", () 
   });
 });
 
+/* G3-057: the card menu's "Replace across pages…" had no caller wiring it;
+   it opens the same replace picker the rail's ⋯ does, on that file. */
+describe("card menu · Replace across pages…", () => {
+  it("opens the replace picker for that file", async () => {
+    await mountLibrary(menuOpenOn());
+    fireEvent.click(within(screen.getByTestId("media-ctx-menu")).getByRole("menuitem", { name: "Replace across pages…" }));
+    expect(await screen.findByText(/Replace "team-photo.jpg" across/)).toBeInTheDocument();
+  });
+});
+
 describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu", () => {
   it("Move to folder… opens the Move modal for that one file, and choosing a folder moves just it", async () => {
     const bulkMoveAssets = vi.fn(() => Promise.resolve());

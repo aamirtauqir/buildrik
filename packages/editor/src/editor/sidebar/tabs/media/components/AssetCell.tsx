@@ -35,7 +35,6 @@ interface AssetCellProps {
   item: LibraryItem;
   onClick: (key: string) => void;
   usageCount?: number;
-  isApplied?: boolean;
   isLocked?: boolean;
   isSelected?: boolean;
   /** Selection mode is on — the card shows its check state (board 145:300). */
@@ -47,17 +46,16 @@ interface AssetCellProps {
   onContextMenu?: (e: MouseEvent, key: string) => void;
 }
 
-/** Board `I218:686;218:6` — only these two ever paint. */
+/** Board `I218:686;218:6`. Only stock ever paints: nothing writes an
+ *  `assetSource: "ai"` (audit G3-006), so its AI badge was a stub. */
 const BADGE: Partial<Record<NonNullable<LibraryItem["assetSource"]>, string>> = {
   stock: "STOCK",
-  ai: "AI",
 };
 
 export function AssetCell({
   item,
   onClick,
   usageCount = 0,
-  isApplied = false,
   isLocked = false,
   isSelected = false,
   selectable = false,
@@ -120,7 +118,6 @@ export function AssetCell({
       color="light"
       className={[
         `med-asset-cell med-asset-cell--${item.type}`,
-        isApplied && "med-asset-cell--applied",
         isLocked && "med-asset-cell--locked",
         isSelected && "med-asset-cell--selected",
         "tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-full tw:h-26 tw:p-0",
@@ -216,14 +213,6 @@ export function AssetCell({
         {usageCount > 0 ? <UsagePips count={usageCount} /> : null}
       </span>
 
-      {isApplied ? (
-        <span
-          className="med-asset-cell__applied-badge tw:absolute tw:right-1.5 tw:top-1.5 tw:rounded tw:bg-[var(--bk-accent)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-white"
-          data-testid="media-card-applied"
-        >
-          APPLIED
-        </span>
-      ) : null}
     </Button>
   );
 }

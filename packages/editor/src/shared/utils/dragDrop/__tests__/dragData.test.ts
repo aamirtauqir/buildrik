@@ -128,16 +128,12 @@ describe("parseDragData", () => {
     expect(parsed.files).toHaveLength(1);
   });
 
-  it("detects external text/html/url drags", () => {
+  it("text / HTML / link drags are not parsed (no canvas handler receives them)", () => {
     const t = dt();
     t.setData("text/plain", "hello");
     t.setData("text/html", "<b>hi</b>");
     t.setData("text/uri-list", "https://x.test");
-    const parsed = parseDragData(t) as Extract<DragData, { type: "external" }>;
-    expect(parsed.type).toBe("external");
-    expect(parsed.text).toBe("hello");
-    expect(parsed.html).toBe("<b>hi</b>");
-    expect(parsed.url).toBe("https://x.test");
+    expect(parseDragData(t)).toEqual({ type: "unknown" });
   });
 });
 

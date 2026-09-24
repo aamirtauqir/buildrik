@@ -84,9 +84,6 @@ export interface DragDataMulti extends DragDataBase {
 export interface DragDataExternal extends DragDataBase {
   type: "external";
   files?: File[];
-  text?: string;
-  html?: string;
-  url?: string;
 }
 
 /** Unknown drag data */
@@ -225,7 +222,6 @@ export type {
   DragEventHandler,
   DropZone,
   DropZoneRegistry,
-  KeyboardDragConfig,
   DragGhostOptions,
   AutoScrollConfig,
 } from "./configTypes";
