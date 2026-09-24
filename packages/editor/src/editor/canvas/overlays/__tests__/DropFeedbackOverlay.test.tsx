@@ -176,3 +176,41 @@ describe("DropFeedbackOverlay — aria-live invalid drop announcements (A9 / WCA
     expect(liveDiv?.textContent).toBe("");
   });
 });
+
+/* Board 4428:139921: an insert between elements is the 2px accent line with
+   a centred "Drop here" pill — the element it lands next to is NOT filled,
+   and no "Insert after …" label or breadcrumb is drawn. */
+describe("DropFeedbackOverlay — before/after reads 'Drop here' (4428:139921)", () => {
+  const renderAt = (dropPosition: "before" | "after" | "inside") =>
+    render(
+      <DropFeedbackOverlay
+        isDragOver
+        dropTargetId="el-1"
+        dropPosition={dropPosition}
+        isValidDrop
+        invalidReason={null}
+        canvasRef={makeCanvasRef("el-1")}
+        dropTargetPath={[{ id: "a", name: "Section" }, { id: "el-1", name: "Container" }] as never}
+        dropSlotRect={{ x: 0, y: 0, width: 10, height: 10, isHorizontal: false } as never}
+      />,
+    );
+
+  it("after: line + centred pill, no fill, no label or breadcrumb", () => {
+    const { getByTestId, queryByText, container } = renderAt("after");
+    const pill = getByTestId("drop-here-pill");
+    expect(pill.textContent).toBe("Drop here");
+    expect(pill.getAttribute("title")).toBe("Insert after Container");
+    expect(pill.style.top).toBe("180px"); // on the line: 100 + 80
+    expect(queryByText(/Insert after/)).toBeNull();
+    expect(queryByText(/Drop inside/)).toBeNull();
+    expect(container.querySelector(".bd-drop-feedback-target")).toBeNull();
+    expect(container.querySelector(".bd-drop-slot-preview")).toBeNull();
+    expect(getByTestId("drop-insertion-line")).toBeTruthy();
+  });
+
+  it("inside keeps the target highlight and the breadcrumb", () => {
+    const { queryByTestId, container } = renderAt("inside");
+    expect(queryByTestId("drop-here-pill")).toBeNull();
+    expect(container.querySelector(".bd-drop-feedback-target")).toBeTruthy();
+  });
+});
