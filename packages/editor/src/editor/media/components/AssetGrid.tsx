@@ -41,6 +41,7 @@
 
 import {
   Check,
+  CheckSquare,
   ChevronDown,
   FolderOpen,
   MoreHorizontal,
@@ -95,13 +96,16 @@ const SEGMENT =
 const SEGMENT_ON = "tw:bg-[var(--bk-bg-subtle)] tw:font-semibold tw:text-[var(--bk-ink)]";
 const SEGMENT_OFF = "tw:bg-transparent tw:font-normal tw:text-[var(--bk-ink-soft)]";
 
-/* Board 1163:4641 draws the bulk bar's actions as 11/500 text on the accent
-   tint — accent for Move/Download, error ink for Delete, muted for Clear —
-   not as the outlined 27-tall .mgr-btn the toolbar above it uses. `link`
-   carries the recipe; min-h-6 keeps the 24px target under the smaller text. */
-const BULK_LINK = "tw:min-h-6 tw:text-[11px] tw:font-medium";
+/* 4418:58608 — the bulk bar's actions are 13 regular text on the tint: ink
+   for Move / Download / ✕ Clear, error ink for Delete. `link` carries the
+   recipe; min-h-6 keeps the 24px target. */
+const BULK_LINK = "tw:min-h-6 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink)]";
 const BULK_LINK_DANGER = `${BULK_LINK} tw:text-[var(--bk-error-text)]`;
-const BULK_LINK_MUTED = "tw:min-h-6 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+const BULK_LINK_MUTED = "tw:min-h-6 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink-muted)]";
+/* 4418:58608 — in select mode the toolbar carries a "☑ Select" word before
+   Grid · List; pressing it leaves select mode. */
+const SELECT_CHIP =
+  "tw:h-6 tw:min-h-0 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-1.5 tw:py-0 tw:shadow-none tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink)]";
 
 /* 6930:80054 — Date added · Name A→Z · Name Z→A · File size; each option
    carries its direction. Type is not drawn and stays (a sort the library had);
@@ -153,6 +157,9 @@ const GHOST_BADGE =
 const CARD_MENU_BTN =
   "tw:absolute tw:top-0.5 tw:right-0.5 tw:z-[1] tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] " +
   "tw:bg-[color-mix(in_srgb,var(--bk-bg-card)_92%,transparent)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-card)]";
+
+const LIST_MENU_BTN =
+  "tw:size-6 tw:min-h-0 tw:p-0 tw:justify-self-end tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A→Z" : "Name Z→A";
@@ -469,6 +476,22 @@ export function AssetGrid({
 
         <div className="mgr-spacer" />
 
+        {state.selMode ? (
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className={SELECT_CHIP}
+            aria-pressed="true"
+            aria-label="Exit select mode"
+            data-testid="mgr-select-chip"
+            onClick={() => state.toggleSelMode()}
+          >
+            <CheckSquare size={12} aria-hidden="true" />
+            Select
+          </Button>
+        ) : null}
+
         {/* 4418:58292 — Grid · List as a 24-high segmented pair. */}
         <div className={SEGMENTED} role="group" aria-label="View" data-testid="mgr-view">
           {(["grid", "list"] as const).map((mode) => (
@@ -660,7 +683,7 @@ export function AssetGrid({
               </Button>
             </Tooltip>
           )}
-          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.clearSelection}>
+          <Button variant="link" className={BULK_LINK} onClick={state.clearSelection}>
             ✕ Clear
           </Button>
         </div>
@@ -732,6 +755,7 @@ export function AssetGrid({
           <span>Type</span>
           <span>Size</span>
           <span>Usage</span>
+          <span aria-hidden="true" />
         </div>
       )}
       {visibleItems.length > 0 ? (
@@ -853,6 +877,23 @@ export function AssetGrid({
                       ? `used ×${usageMap.get(item.key)}`
                       : "unused"}
                   </div>
+                  {/* 4418:58608 — every row ends in the card's own ⋯ (same menu as right-click). */}
+                  <IconButton
+                    size="sm"
+                    label={`More actions for ${item.displayName ?? item.name}`}
+                    className={LIST_MENU_BTN}
+                    data-testid={`mgr-list-menu-${item.key}`}
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    onDoubleClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const box = e.currentTarget.getBoundingClientRect();
+                      state.openCtxMenu(e, item, { x: box.left, y: box.bottom + 4 });
+                    }}
+                  >
+                    <MoreHorizontal size={16} />
+                  </IconButton>
                 </div>
               );
             }

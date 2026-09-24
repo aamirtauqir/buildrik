@@ -513,13 +513,21 @@ describe("AssetGrid — the card ··· menu (Clone 3721:43552)", () => {
     expect(props.onSelectAsset).not.toHaveBeenCalled();
   });
 
-  it("the list rows keep the right-click door and draw no ··· button", () => {
+  it("4418:58608 — every list row ends in a ⋯ that opens the same menu; right-click still does", () => {
     const state = makeState({ libraryItems: [makeItem({ key: "team", name: "team-photo.jpg" })] });
     mount(state);
     fireEvent.click(screen.getByRole("button", { name: "List" }));
-    expect(screen.queryByRole("button", { name: "More actions for team-photo.jpg" })).toBeNull();
-    fireEvent.contextMenu(screen.getByTestId("mgr-list-row-team"));
+    fireEvent.click(screen.getByTestId("mgr-list-menu-team"));
     expect(state.openCtxMenu).toHaveBeenCalledTimes(1);
+    fireEvent.contextMenu(screen.getByTestId("mgr-list-row-team"));
+    expect(state.openCtxMenu).toHaveBeenCalledTimes(2);
+  });
+
+  it("4418:58608 — in select mode the toolbar carries '☑ Select', which leaves select mode", () => {
+    const state = makeState({ selMode: true, libraryItems: [makeItem({ key: "team" })] });
+    mount(state);
+    fireEvent.click(screen.getByTestId("mgr-select-chip"));
+    expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
   });
 });
 

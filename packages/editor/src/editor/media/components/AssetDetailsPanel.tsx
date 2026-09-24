@@ -69,8 +69,8 @@ const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
 /* 4418:58292 row/Details — a 32 row, no fill: "Details ▸" left, the summary right. */
 const DETAILS_ROW =
   "tw:h-8 tw:min-h-0 tw:w-full tw:shrink-0 tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:shadow-none tw:enabled:hover:bg-transparent";
-/* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
-const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
+/* 4418:58608 — the checked files, one 13/20 line each, 12 apart. */
+const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 

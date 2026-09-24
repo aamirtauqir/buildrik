@@ -457,11 +457,13 @@
   color: var(--bk-error, var(--bk-error));
 }
 
+/* 4418:58608 — a 44 tint band, 13 ink count, 14 between the actions. */
 .mgr-bulk-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: var(--bk-space-8) var(--bk-space-12);
+  gap: 14px;
+  min-height: var(--bk-size-control-xl);
+  padding: 0 var(--bk-space-12);
   border-radius: var(--bk-radius-md);
   background: var(--bk-accent-tint);
   animation: mgr-slide-down 0.15s ease-out;
@@ -473,17 +475,20 @@
 }
 
 .mgr-bulk-count {
-  font-size: var(--bk-text-11);
-  font-weight: 500;
-  color: var(--bk-accent-text);
+  font-size: var(--bk-text-13);
+  font-weight: 400;
+  color: var(--bk-ink);
   margin-right: var(--bk-space-8);
 }
 
+/* 4418:58608 — every row is its own white 40 band, 20 apart: the list keeps
+   the column's own 20 rhythm. */
 .mgr-list {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .mgr-list-row {
@@ -492,8 +497,10 @@
   align-items: center;
   border-radius: var(--bk-radius-md);
   cursor: pointer;
-  font-size: 12px;
-  color: var(--bk-ink-soft);
+  font-size: var(--bk-text-13);
+  color: var(--bk-ink);
+  background: var(--bk-bg-card);
+  min-height: 40px;
   transition: background 0.1s;
 }
 
@@ -523,7 +530,7 @@
 }
 
 .mgr-list-name {
-  font-size: var(--bk-text-11);
+  font-size: var(--bk-text-13);
   font-weight: 400;
   color: var(--bk-ink);
   overflow: hidden;
@@ -623,17 +630,20 @@
   color: var(--bk-gray-600);
 }
 
+/* 4418:58608 — "2 assets selected" 20/600 over a 13/20 gray-500 hint. */
 .mgr-det-heading {
   margin: 0;
-  font-size: var(--bk-text-16);
+  font-size: var(--bk-text-20);
+  line-height: 28px;
   font-weight: 600;
   color: var(--bk-ink);
 }
 
 .mgr-det-hint {
   margin: 0;
-  font-size: var(--bk-text-12);
-  color: var(--bk-ink-soft);
+  font-size: var(--bk-text-13);
+  line-height: 20px;
+  color: var(--bk-gray-500);
 }
 
 .mgr-det-used-line {
@@ -906,19 +916,18 @@
 .mgr-list-head,
 .mgr-list-row {
   display: grid;
-  /* 1163:4883-4887 — 24 / name / 60 / 80 / 90. The name column is the
-     board's 300 inside an 820 body, i.e. whatever is left. */
-  grid-template-columns: 24px 1fr 60px 80px 90px;
+  /* 4418:58608 — check 24 · name 300 · type 60 · size 80 · usage · ⋯ 24. */
+  grid-template-columns: 24px 300px 60px 80px 1fr 24px;
   align-items: center;
   gap: var(--bk-space-12);
-  padding: var(--bk-space-8) var(--bk-space-12);
+  padding: 0 var(--bk-space-12);
 }
 .mgr-list-head {
-  padding: 6px var(--bk-space-12);
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  border: 0 solid var(--bk-border);
-  border-bottom-width: 1px;
+  min-height: var(--bk-size-control-xl);
+  font: 400 var(--bk-text-13) var(--bk-font-ui);
+  color: var(--bk-ink);
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-md);
 }
 .mgr-list-check {
   display: grid;
@@ -939,10 +948,10 @@
 .mgr-list-type,
 .mgr-list-size,
 .mgr-list-use {
-  font: 400 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
+  font: 400 var(--bk-text-13) var(--bk-font-ui);
+  color: var(--bk-ink);
+  text-align: left;
 }
-.mgr-list-use.unused { color: var(--bk-ink-muted); }
 
 /* ─── Board 1163:13695 smart-scope note ──────────────────────────────── */
 .mgr-scope-note {
