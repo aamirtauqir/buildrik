@@ -131,3 +131,21 @@ describe("InputWithUnit — unit select compact font (fix round 1)", () => {
     expect(unitSelect.className).not.toMatch(/\btext-sm\b/);
   });
 });
+
+/* G2-161: ↑/↓ nudge by 1, Shift by 10, keeping the unit. */
+describe("InputWithUnit — arrow nudge", () => {
+  it("↑ adds 1, Shift+↓ takes 10, and the unit stays", () => {
+    const { onChange } = renderInput({ value: "24px" });
+    const input = screen.getAllByRole("textbox")[0];
+    fireEvent.keyDown(input, { key: "ArrowUp" });
+    expect(onChange).toHaveBeenLastCalledWith("25px");
+    fireEvent.keyDown(input, { key: "ArrowDown", shiftKey: true });
+    expect(onChange).toHaveBeenLastCalledWith("15px");
+  });
+
+  it("an empty field nudges from 0; a keyword does not nudge", () => {
+    const { onChange } = renderInput({ value: "" });
+    fireEvent.keyDown(screen.getAllByRole("textbox")[0], { key: "ArrowUp" });
+    expect(onChange).toHaveBeenLastCalledWith("1px");
+  });
+});

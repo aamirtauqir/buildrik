@@ -161,6 +161,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const { num, unit } = parseValue(value);
+  const isKeywordUnit = unit === "auto" || unit === "none" || unit === "inherit";
 
   const [inputValue, setInputValue] = React.useState(num);
   const [isInvalid, setIsInvalid] = React.useState(false);
@@ -202,6 +203,19 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    /* G2-161: ↑/↓ nudge by 1 (Shift: 10), keeping the unit. An empty field
+       nudges from 0; a token or a keyword is left alone. */
+    if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !isTokenVar(inputValue) && !isKeywordUnit) {
+      const base = inputValue === "" ? 0 : Number(inputValue);
+      if (!Number.isFinite(base)) return;
+      e.preventDefault();
+      const step = (e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1);
+      const next = String(Math.round((base + step) * 100) / 100);
+      setInputValue(next);
+      setIsInvalid(false);
+      commitValue(next);
+      return;
+    }
     if (e.key === "Escape") {
       setInputValue(num);
       setIsInvalid(false);
@@ -222,7 +236,6 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const hasValue = !disabled && value !== "" && value !== undefined;
   const showReset = hasValue && isRowHovered && !isTokenVar(inputValue);
 
-  const isKeywordUnit = unit === "auto" || unit === "none" || unit === "inherit";
 
   return (
     /* An unlabelled field takes the whole row: the 88px label column is for a
