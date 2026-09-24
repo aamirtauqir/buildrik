@@ -88,6 +88,8 @@ const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-4 t
 /* 151:70 — the {{site.*}} key is 12/16, and `text-xs` carries Tailwind's own
    16… which is right here, but only by accident: state it. */
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-accent-text)]";
+/* 4418:88015 — a variable row's key is ink; accent is for the inline hint. */
+const VAR_KEY = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-ink)]";
 /* Boards 303:2067 and 303:2083 both draw the Sources status as the file's own
    Badge (12:16): a bordered pill, 10/2 padding, 12/16 medium. The two states
    differ only in ramp — grey for "nothing connected", green for "watching".
@@ -112,7 +114,8 @@ const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
  *  151:54 a source name, 151:95 a condition's element). `Row` supplies the 13
  *  and nothing supplied the 20. */
 const ROW_TITLE = "tw:leading-5";
-const ROW_ACTIONS = "tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:flex-none";
+/* 4418:87780 / :88015 put a row's ⋯ 14px from the drawer edge, not 28. */
+const ROW_ACTIONS = "tw:ml-auto tw:-mr-[14px] tw:inline-flex tw:items-center tw:gap-1 tw:flex-none";
 const ERROR_TEXT = "tw:text-xs tw:text-[var(--bk-error)]";
 
 function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
@@ -465,7 +468,7 @@ export function VariablesView({
         {variables.map((v) => (
           <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`}>
             <span className={ROW_STACK}>
-              <span className={MONO} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
+              <span className={VAR_KEY} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
                 <TextInput
                   className="tw:mt-1"
