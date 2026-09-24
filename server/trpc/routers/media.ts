@@ -307,7 +307,7 @@ export const mediaRouter = router({
     .input(generateAltTextSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        return await applyAltTextToAsset(ctx.session.user.id, input.assetId);
+        return await applyAltTextToAsset(ctx.session.user.id, input.assetId, { force: input.force });
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ASSET_NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
