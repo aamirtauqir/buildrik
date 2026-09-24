@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { PageCrumb, type SnapshotPage } from "@/components/reviews/signoff-snapshot";
 
-type Rows = { site: unknown; pages: unknown; siteColumns: unknown };
+type Rows = {
+  site: unknown;
+  pages: unknown;
+  siteColumns: unknown;
+  siteFonts: ReadonlyArray<{ filename: string; url: string }>;
+};
 type RenderState = { status: "rendering" } | { status: "ready"; pages: SnapshotPage[] } | { status: "failed" };
 
 /**
@@ -27,7 +32,7 @@ export function DraftPreview({ siteName, rows }: { siteName: string; rows: Rows 
     let cancelled = false;
     import("@buildrik/editor")
       .then(({ projectDataFromRows, renderProjectPages }) =>
-        renderProjectPages(projectDataFromRows(rows.site, rows.pages, rows.siteColumns)),
+        renderProjectPages(projectDataFromRows(rows.site, rows.pages, rows.siteColumns), rows.siteFonts),
       )
       .then((pages) => {
         if (!cancelled) setState({ status: "ready", pages });

@@ -63,13 +63,21 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
  * and export without it). Its late outcome is swallowed — the instance is
  * already destroyed by then.
  */
-export async function renderProjectPages(snapshot: ProjectData): Promise<PublishPage[]> {
+export async function renderProjectPages(
+  snapshot: ProjectData,
+  /** The site's ADDED fonts (library files) — what the live composer registers
+   *  from its media library, which a scratch instance does not load. Without
+   *  them the export cannot write their @font-face. A file that fails to load
+   *  is left out, and the export drops its family from the stacks. */
+  siteFonts: ReadonlyArray<{ filename: string; url: string }> = [],
+): Promise<PublishPage[]> {
   const scratch = createComposer({
     container: document.createElement("div"),
     storage: { type: "none", autoSave: false },
   });
   scratch.whenReady().catch(() => {});
   try {
+    await Promise.all(siteFonts.map((f) => scratch.fonts.registerLibraryFont(f).catch(() => undefined)));
     scratch.importProject(snapshot);
     return await exportPublishPages(scratch);
   } finally {

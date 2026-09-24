@@ -8,6 +8,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     shareLink: { findUnique: vi.fn(), update: vi.fn() },
     site: { findUnique: vi.fn() },
+    mediaAsset: { findMany: vi.fn().mockResolvedValue([]) },
   },
 }));
 
@@ -93,5 +94,18 @@ describe("getShareDraftRows", () => {
     expect(rows.siteColumns).toMatchObject({ name: "Bella", metaTitle: "Bella" });
     const select = vi.mocked(prisma.site.findUnique).mock.calls[0][0].select as Record<string, unknown>;
     expect(select.publishedPassword).toBeUndefined();
+  });
+
+  it("carries the site's ADDED fonts, and only those", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", sitePages: [] } as never);
+    vi.mocked(prisma.mediaAsset.findMany).mockResolvedValue([
+      { filename: "Inter-Var.woff2", url: "https://x.public.blob.vercel-storage.com/Inter-Var.woff2" },
+    ] as never);
+    const rows = await getShareDraftRows("s1");
+    expect(rows.siteFonts).toEqual([
+      { filename: "Inter-Var.woff2", url: "https://x.public.blob.vercel-storage.com/Inter-Var.woff2" },
+    ]);
+    const where = vi.mocked(prisma.mediaAsset.findMany).mock.calls.at(-1)![0]!.where;
+    expect(where).toEqual({ siteId: "s1", type: "font", userMetadata: { path: ["siteFont"], equals: true } });
   });
 });
