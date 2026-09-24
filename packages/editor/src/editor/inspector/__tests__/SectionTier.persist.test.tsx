@@ -142,7 +142,7 @@ describe("ProInspector — strip, tier footer, no breakpoint pill", () => {
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Size section/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("tab", { name: "Effects" }));
-    expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Opacity section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
   });
 

@@ -52,9 +52,11 @@ describe("insertActions", () => {
 
 
 
-  it("wrap-section calls element.wrap('section')", () => {
-    action("wrap-section").handler!(ctx);
-    expect(element.wrap).toHaveBeenCalledWith("section");
+  /* G2-052: one wrap — "Wrap in container" (board 7052:78347), a div. */
+  it("wrap-container wraps in a div", () => {
+    Object.assign(element, { isRoot: () => false, isLocked: () => false, isComponentInstance: () => false });
+    action("wrap-container").handler!(ctx);
+    expect(element.wrap).toHaveBeenCalledWith("div");
   });
 
   it("unwrap calls element.unwrap()", () => {

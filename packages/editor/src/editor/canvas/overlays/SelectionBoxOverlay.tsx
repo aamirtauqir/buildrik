@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { ROTATION_HANDLE_OFFSET } from "../../../engine/canvas/constants";
@@ -154,6 +155,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
       if (!canvas) return;
 
       const canvasRect = canvas.getBoundingClientRect();
+      const zs = canvasScale(canvas);
 
       // Account for canvas scroll position
       const scrollLeft = canvas.scrollLeft || 0;
@@ -174,19 +176,19 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           if (element) {
             const elRect = element.getBoundingClientRect();
             // Add scroll offset to convert viewport coords to canvas coords
-            const elLeft = elRect.left - canvasRect.left + scrollLeft;
-            const elTop = elRect.top - canvasRect.top + scrollTop;
+            const elLeft = (elRect.left - canvasRect.left) / zs + scrollLeft;
+            const elTop = (elRect.top - canvasRect.top) / zs + scrollTop;
             minX = Math.min(minX, elLeft);
             minY = Math.min(minY, elTop);
-            maxX = Math.max(maxX, elRect.right - canvasRect.left + scrollLeft);
-            maxY = Math.max(maxY, elRect.bottom - canvasRect.top + scrollTop);
+            maxX = Math.max(maxX, (elRect.right - canvasRect.left) / zs + scrollLeft);
+            maxY = Math.max(maxY, (elRect.bottom - canvasRect.top) / zs + scrollTop);
 
             // Store individual element rect for render
             newElementRects.set(id, {
               left: elLeft,
               top: elTop,
-              width: elRect.width,
-              height: elRect.height,
+              width: elRect.width / zs,
+              height: elRect.height / zs,
             });
           }
         });
@@ -210,10 +212,10 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           const elementRect = element.getBoundingClientRect();
           // Add scroll offset to convert viewport coords to canvas coords
           setRect({
-            left: elementRect.left - canvasRect.left + scrollLeft,
-            top: elementRect.top - canvasRect.top + scrollTop,
-            width: elementRect.width,
-            height: elementRect.height,
+            left: (elementRect.left - canvasRect.left) / zs + scrollLeft,
+            top: (elementRect.top - canvasRect.top) / zs + scrollTop,
+            width: elementRect.width / zs,
+            height: elementRect.height / zs,
           });
         }
       }
@@ -240,6 +242,15 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
     if (canvas) {
       resizeObserver.observe(canvas);
     }
+
+    /* The selection can land before its element is in the DOM — an insert
+       selects the new element in the same tick the canvas re-renders its
+       HTML. The canvas box does not always change size when that happens
+       (it has a min-height, and a fitted/zoomed page keeps its footprint), so
+       the ResizeObserver above never fired and the outline never appeared.
+       Re-measure when the canvas subtree is re-rendered. */
+    const contentObserver = new MutationObserver(updateRectThrottled);
+    if (canvas) contentObserver.observe(canvas, { childList: true, subtree: true });
 
     // Observe all selected elements for size changes
     effectiveIds.forEach((id) => {
@@ -284,6 +295,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
     return () => {
       resizeObserver.disconnect();
       mutationObserver.disconnect();
+      contentObserver.disconnect();
       window.removeEventListener("scroll", updateRectThrottled, scrollListenerOptions);
       window.removeEventListener("resize", updateRectThrottled, resizeListenerOptions);
       // Cancel any pending RAF on cleanup

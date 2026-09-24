@@ -6,6 +6,7 @@
 import { GSAPEngine } from "../../../../engine/animations";
 import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
 import type { SectionTier } from "../../shared/controls/Section";
+import type { Composer } from "@/engine";
 
 // ============================================================================
 // TYPES
@@ -54,6 +55,11 @@ export interface InteractionsSectionProps {
   onInteractionsChange: (interactions: Interaction[]) => void;
   /** Preview an interaction */
   onPreview?: (interaction: Interaction) => void;
+  /** With these the section follows the element live: writing interactions
+   *  changes no style, so nothing re-renders the inspector — an added
+   *  interaction stayed invisible until the section re-mounted. */
+  composer?: Composer | null;
+  elementId?: string;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */
@@ -69,26 +75,26 @@ export interface InteractionsSectionProps {
 
 export const TRIGGER_GROUPS = {
   element: [
-    { value: "hover", label: "On Hover", icon: "👆" },
-    { value: "click", label: "On Click", icon: "🖱" },
-    { value: "active", label: "While Pressed", icon: "👇" },
-    { value: "focus", label: "On Focus", icon: "🎯" },
-    { value: "blur", label: "On Blur", icon: "💨" },
+    { value: "hover", label: "On hover", icon: "👆" },
+    { value: "click", label: "On click", icon: "🖱" },
+    { value: "active", label: "While pressed", icon: "👇" },
+    { value: "focus", label: "On focus", icon: "🎯" },
+    { value: "blur", label: "On blur", icon: "💨" },
   ],
   page: [
-    { value: "page-load", label: "Page Load", icon: "📄" },
-    { value: "page-scroll", label: "Page Scroll", icon: "📜" },
-    { value: "page-leave", label: "Page Leave", icon: "👋" },
+    { value: "page-load", label: "On page load", icon: "📄" },
+    { value: "page-scroll", label: "On page scroll", icon: "📜" },
+    { value: "page-leave", label: "On page leave", icon: "👋" },
   ],
   scroll: [
-    { value: "scroll-into-view", label: "Scroll Into View", icon: "👁" },
-    { value: "while-scrolling", label: "While Scrolling", icon: "🔄" },
-    { value: "scroll-out", label: "Scroll Out", icon: "👁‍🗨" },
+    { value: "scroll-into-view", label: "On scroll into view", icon: "👁" },
+    { value: "while-scrolling", label: "While scrolling", icon: "🔄" },
+    { value: "scroll-out", label: "On scroll out", icon: "👁‍🗨" },
   ],
   mouse: [
-    { value: "mouse-over", label: "Mouse Over", icon: "🐭" },
-    { value: "mouse-move", label: "Mouse Move", icon: "➡️" },
-    { value: "mouse-out", label: "Mouse Out", icon: "🚪" },
+    { value: "mouse-over", label: "On mouse over", icon: "🐭" },
+    { value: "mouse-move", label: "On mouse move", icon: "➡️" },
+    { value: "mouse-out", label: "On mouse out", icon: "🚪" },
   ],
 };
 

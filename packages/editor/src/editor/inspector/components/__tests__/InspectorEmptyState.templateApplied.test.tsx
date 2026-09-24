@@ -58,14 +58,14 @@ describe("InspectorEmptyState — template applied", () => {
     seed("Bistro Landing", Date.now() - 31 * 60 * 1000);
     render(<InspectorEmptyState composer={makeComposer()} />);
     expect(screen.queryByText("Template applied!")).toBeNull();
-    expect(screen.getByText("Select something on the canvas to edit it.")).toBeTruthy();
+    expect(screen.getByText("Nothing selected")).toBeTruthy();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 
   it("ignores a malformed stored value instead of throwing", () => {
     localStorage.setItem(KEY, "{not json");
     render(<InspectorEmptyState composer={makeComposer()} />);
-    expect(screen.getByText("Select something on the canvas to edit it.")).toBeTruthy();
+    expect(screen.getByText("Nothing selected")).toBeTruthy();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

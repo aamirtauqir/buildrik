@@ -652,15 +652,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onRequestPublish={requestPublish}
       />
 
-      {/* P3: Issues panel — opened by the topbar issue pill */}
+      {/* P3: Issues panel. Board 4418:147641 puts it in the inspector column —
+          300 wide, ending where the column ends, not over the status footer. */}
       {issuesOpen && (
         <div
+          data-testid="issues-column"
           style={{
             position: "absolute",
-            top: 56,
+            top: "var(--bk-size-topbar)",
             right: 0,
-            bottom: 0,
-            width: 360,
+            bottom: "var(--bk-size-footer)",
+            width: "var(--bk-size-inspector)",
             zIndex: 45,
             background: "var(--bk-bg-panel)",
             borderLeft: "1px solid var(--bk-border)",

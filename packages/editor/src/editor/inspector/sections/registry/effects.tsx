@@ -7,16 +7,41 @@
 
 import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
 import { EffectsSection } from "../EffectsSection";
+import { BlurSection, OpacitySection, ShadowSection } from "../EffectsBasicSections";
 import { AnimationSection } from "../AnimationSection";
 import { InteractionsSection, type Interaction } from "../interactions";
 import { VisibilitySection } from "../VisibilitySection";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
+  /* Board 4428:142686 draws OPACITY, SHADOW, BLUR, INTERACTIONS — one
+     control each. The rest of what paints is "More effects" (advanced). */
+  opacity: defineSection({
+    tab: "effects",
+    Component: OpacitySection,
+    styleKeys: ["opacity"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  shadow: defineSection({
+    tab: "effects",
+    Component: ShadowSection,
+    styleKeys: ["box-shadow"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  blur: defineSection({
+    tab: "effects",
+    Component: BlurSection,
+    styleKeys: ["filter"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
   effects: defineSection({
     tab: "effects",
+    tier: "advanced",
     Component: EffectsSection,
-    styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
+    styleKeys: ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
   }),
 
@@ -121,6 +146,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
       return {
         interactions: getInteractions(),
         onInteractionsChange: handleInteractionsChange,
+        composer: ctx.composer,
+        elementId: ctx.selectedElement.id,
         onPreview: handleInteractionPreview,
         isOpen: ctx.isOpen,
         onToggle: ctx.onToggle,

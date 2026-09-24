@@ -18,6 +18,14 @@
   /* Spacing indicators */
 }
 
+/* The page is a white card on the grey canvas (boards 5936:44788 /
+   4428:44164). legacy-components.css paints .buildrick-canvas with the app
+   grey, which filled the white frame edge to edge; the page content surface
+   is the card's own white. */
+.buildrick-canvas[data-buildrick-canvas] {
+  background: var(--bk-bg-card);
+}
+
 .buildrick-canvas {
   /* Override theme centering - web pages flow top-to-bottom */
   display: block !important;
@@ -141,6 +149,19 @@
   font-weight: 500;
   text-align: center;
   padding: var(--bk-space-8) var(--bk-space-16);
+}
+
+/* While the empty-page CTA is up (board 4428:44164) it is the one
+   invitation on the page; an empty starter container's dashed "Drop a block
+   here" strip under it was a second, competing one the board does not draw. */
+[data-empty-cta="true"] [data-buildrick-type="container"]:empty,
+[data-empty-cta="true"] [data-buildrick-type="columns"]:empty {
+  border-color: transparent;
+  background: transparent;
+}
+[data-empty-cta="true"] [data-buildrick-type="container"]:empty::after,
+[data-empty-cta="true"] [data-buildrick-type="columns"]:empty::after {
+  content: none;
 }
 
 /* View mode is a VIEW. An empty container's dashed box and its "Drop a block
@@ -375,7 +396,7 @@
   justify-content: center;
   z-index: 5;
   text-align: center;
-  padding: var(--bk-space-40);
+  padding: var(--bk-space-24);
   background: transparent;
   animation: bd-fade-in 0.4s ease-out;
   /* Board 297:2008 expresses the 12 between the sentence and the buttons as a
@@ -415,11 +436,36 @@
   padding: 0;
   list-style: none;
 }
-.bd-canvas-empty-cta__swatch {
-  display: block;
-  height: 72px;
+.bd-canvas-empty-cta__thumb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  width: 148px;
+  height: 75px;
+  padding: var(--bk-space-8);
+  box-sizing: border-box;
   border-radius: var(--bk-radius-md);
   border: 1px solid var(--bk-border);
+  background: var(--bk-bg-card);
+}
+.bd-canvas-empty-cta__card:hover .bd-canvas-empty-cta__thumb,
+button:hover > .bd-canvas-empty-cta__thumb {
+  border-color: var(--bk-accent);
+}
+.bd-canvas-empty-cta__thumb-bar {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bk-gray-200);
+}
+.bd-canvas-empty-cta__thumb-row {
+  display: flex;
+  gap: var(--bk-space-4);
+  height: 14px;
+}
+.bd-canvas-empty-cta__thumb-row > span {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bk-gray-200);
 }
 .bd-canvas-empty-cta__card-name {
   font-size: 12px;
@@ -434,6 +480,12 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-12);
+}
+/* Four actions on one line inside a fitted page card (board 4428:44164);
+   a button label never breaks across two lines. */
+.bd-canvas-empty-cta__actions > button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 @keyframes bd-fade-in {

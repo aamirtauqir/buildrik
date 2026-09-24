@@ -25,14 +25,14 @@ import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
 
 afterEach(cleanup);
 
-const renderCTA = (started?: boolean) => {
+const renderCTA = () => {
   const handlers = {
     onBrowseTemplates: vi.fn(),
     onAddBlock: vi.fn(),
     onDescribe: vi.fn(),
     onStartBlank: vi.fn(),
   };
-  render(<CanvasEmptyCTA started={started} {...handlers} />);
+  render(<CanvasEmptyCTA {...handlers} />);
   return handlers;
 };
 
@@ -68,19 +68,15 @@ describe("CanvasEmptyCTA — board 4428:44164", () => {
     fireEvent.click(screen.getByTestId("canvas-empty-start-blank"));
     expect(h.onStartBlank).toHaveBeenCalledTimes(1);
   });
+});
 
-  it("after Start blank it points at the drawer instead of vanishing", () => {
-    renderCTA(true);
-    expect(
-      screen.getByText("Drop an element from the Insert panel, or drag a section."),
-    ).toBeInTheDocument();
-  });
-
-  it("…and drops the cards and buttons there, because the next act is in the drawer", () => {
-    renderCTA(true);
-    expect(screen.queryByRole("button", { name: "Start blank" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Browse all templates" })).not.toBeInTheDocument();
-    expect(screen.queryByTestId("canvas-empty-cta-cards")).not.toBeInTheDocument();
+/* Parity flow note 2026-09-24: v3 lands Start blank on the editor page — the
+   prompt goes (it used to stay with a changed sentence, board 807:6558,
+   archived). Asserted on the source: mounting Canvas needs a Composer. */
+describe("Start blank clears the empty-page prompt", () => {
+  it("the CTA mount is gated on !startedBlank", () => {
+    const canvas = readFileSync(join(__dirname, "../Canvas.tsx"), "utf8");
+    expect(canvas).toMatch(/isCanvasEmpty && !readOnly && !startedBlank && \(\s*<CanvasEmptyCTA/);
   });
 });
 

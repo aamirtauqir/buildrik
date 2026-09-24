@@ -11,7 +11,7 @@ export interface CTABlockConfig extends BlockData {
 
 export const ctaBlockConfig: CTABlockConfig = {
   id: "cta",
-  label: "Call to Action",
+  label: "CTA",
   category: "Sections",
   elementType: "cta",
   content:

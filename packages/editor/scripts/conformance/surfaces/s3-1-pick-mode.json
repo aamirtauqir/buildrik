@@ -1,6 +1,6 @@
 {
   "surface": "s3-1-pick-mode",
-  "board": "S3.1 \u00b7 pick-mode (Figma 301:2186)",
+  "board": "S3.1 · pick-mode (Figma 301:2186)",
   "url": "http://localhost:5050/",
   "viewport": {
     "width": 1440,
@@ -21,12 +21,16 @@
     },
     {
       "action": "click",
-      "testId": "inspector-pick"
+      "testId": "inspector-element-menu"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-menu-pick"
     },
     {
       "action": "waitForState",
       "selector": "[data-bk-pick=\"true\"]",
-      "because": "pick mode has no element of its own \u2014 Canvas.tsx:690 flips a data attribute on the canvas frame and Canvas.css:256 hangs the crosshair off it. The attribute IS the state."
+      "because": "pick mode has no element of its own — Canvas.tsx:690 flips a data attribute on the canvas frame and Canvas.css:256 hangs the crosshair off it. The attribute IS the state."
     }
   ],
   "contrastScope": "body",
@@ -57,35 +61,31 @@
     {
       "name": "rail",
       "testId": "rail"
-    },
-    {
-      "name": "pick-button",
-      "testId": "inspector-pick"
     }
   ],
   "_note": [
-    "DRIVEN LIVE at :5050 \u2014 Insert's Container row creates and selects a",
+    "DRIVEN LIVE at :5050 — Insert's Container row creates and selects a",
     "container (the CONTAINER profile the board draws), then the inspector's",
     "crosshair button is CLICKED. The last step waits on `[data-bk-pick=\"true\"]`,",
     "which is the state: Canvas.tsx:690 puts that attribute on the canvas frame",
     "and Canvas.css hangs the crosshair off it. Nothing is faked.",
     "",
     "THE BOARD DOES NOT DRAW PICK MODE. 301:2186 is byte-for-byte the same shell",
-    "as 301:1979 (S3.1 \u00b7 dragging) \u2014 same topbar, same drawer, same canvas, same",
+    "as 301:1979 (S3.1 · dragging) — same topbar, same drawer, same canvas, same",
     "inspector, same footer. Diffed with node ids and asset URLs stripped: the",
     "ONLY differences are the frame name, one `cursor-pointer` on a panel header,",
     "the status badge at the bottom ('Pick an element' vs 'Dragging element') and",
     "a back-hotspot. That badge is a gray-200 documentation chip of the same kind",
-    "807:7301 uses for 'Drop target shown' \u2014 it is not product UI, and Figma has",
+    "807:7301 uses for 'Drop target shown' — it is not product UI, and Figma has",
     "no way to draw a cursor. So this recipe conforms the SHELL the board draws,",
     "in the state the board names, and the state's own artefact is verified",
     "outside the property diff (below).",
     "",
-    "FIXED \u2014 the drift boards.json already recorded, `partial-trigger-exists-",
+    "FIXED — the drift boards.json already recorded, `partial-trigger-exists-",
     "cursor-not-on-body`. Measured with CDP while pick mode was live: the frame",
     "read `crosshair` and every `[data-buildrick-id]` read `crosshair`, but",
-    "`.buildrick-canvas` \u2014 the page surface BETWEEN elements, i.e. most of what",
-    "the pointer crosses \u2014 read `default`. Cause: canvasStyles sets an INLINE",
+    "`.buildrick-canvas` — the page surface BETWEEN elements, i.e. most of what",
+    "the pointer crosses — read `default`. Cause: canvasStyles sets an INLINE",
     "`cursor: default` on that element, and an own declaration always beats an",
     "inherited one, so the frame's `!important` could never reach it. Canvas.css",
     "now names `.buildrick-canvas` in the pick selector; a stylesheet",
@@ -95,7 +95,7 @@
     "BOARD WON, twice, and both are shell-wide:",
     "  301:2287  the inspector is 300. It measured 299 because",
     "            `.layout-shell__inspector` drew a `border-left` of its own",
-    "            INSIDE the 300 border-box column \u2014 a SECOND hairline, one step",
+    "            INSIDE the 300 border-box column — a SECOND hairline, one step",
     "            darker than the `1px solid var(--bk-gray-100)` `.bdi-panel`",
     "            already draws off boards 32:2/642:3249. Removing it gives back",
     "            the pixel and leaves one edge instead of two.",
@@ -105,27 +105,27 @@
     "            inspector already took off 32:2.",
     "",
     "NOT JOINED, and why:",
-    "  drawer (301:2226) \u2014 the board puts its edge on `border-r`; measure.mjs",
+    "  drawer (301:2226) — the board puts its edge on `border-r`; measure.mjs",
     "  reads `borderTopColor` only, so the comparison would be against an edge",
     "  neither side draws (the live value is `currentColor`, i.e. ink). The",
     "  colour was conformed anyway; the join would measure the wrong pixel.",
-    "  site page (301:2267) \u2014 680 x 520 is the board's SAMPLE DOCUMENT, not a",
+    "  site page (301:2267) — 680 x 520 is the board's SAMPLE DOCUMENT, not a",
     "  spec. The live canvas is the viewport's own width at the desktop preset",
     "  (1024 here). Founder rule: board sample data is never conformed to.",
     "",
     "HARNESS BUG FIXED IN PASSING: `waitForState` was in lib.mjs's STEP_ACTIONS",
     "and had a validateRecipe rule of its own demanding a `because`, but",
-    "measure.mjs's step switch never handled it \u2014 so the ONE action the schema",
+    "measure.mjs's step switch never handled it — so the ONE action the schema",
     "allows a CSS selector for died on 'unknown step action'. One branch added.",
     "",
-    "CONTRAST, REPORTED NOT HIDDEN \u2014 four failures at 1.34:1, and they are bad.",
+    "CONTRAST, REPORTED NOT HIDDEN — four failures at 1.34:1, and they are bad.",
     "CanvasBreadcrumb (`src/editor/canvas/overlays/CanvasBreadcrumb.tsx`) paints",
-    "its separator `\u203a` and its two hint labels ('\u2190 Parent', '\u2192 Child') in",
+    "its separator `›` and its two hint labels ('← Parent', '→ Child') in",
     "--bk-gray-400 #9CA3AF on a bar of `rgba(17,24,39,0.5)`; over the light",
     "canvas that composites to rgb(136,140,147), giving 1.34:1 against a 4.5",
     "floor. That is text that is very nearly invisible. It is NOT drawn on this",
     "board and no board of this surface set covers CanvasBreadcrumb, so it is",
-    "reported rather than restyled on my own authority \u2014 the fix is either an",
+    "reported rather than restyled on my own authority — the fix is either an",
     "opaque bar or white text, and that is a design call."
   ]
 }

@@ -88,6 +88,9 @@ import {
   footerBlockConfig,
   navbarBlockConfig,
   ctaBlockConfig,
+  menuGridBlockConfig,
+  testimonialsSectionBlockConfig,
+  contactBlockConfig,
 } from "./Sections";
 import type { BlockBuildConfig } from "./types";
 
@@ -147,12 +150,15 @@ export const blockDefinitions: BlockDefinition[] = [
   labelBlockConfig,
   submitButtonBlockConfig,
 
-  // Section blocks
+  // Section blocks — board 4428:140817's order
   heroBlockConfig,
   featuresBlockConfig,
+  menuGridBlockConfig,
+  testimonialsSectionBlockConfig,
+  ctaBlockConfig,
+  contactBlockConfig,
   footerBlockConfig,
   navbarBlockConfig,
-  ctaBlockConfig,
 
   // Component blocks
   cardBlockConfig,

@@ -19,6 +19,9 @@ export interface SliderInputProps {
   max?: number;
   step?: number;
   unit?: string;
+  /** Renders an editable number field instead of the printed value, named
+   *  by this label (Effects OPACITY, board 4428:142686, draws [100]). */
+  fieldLabel?: string;
 }
 
 const sliderStyle: React.CSSProperties = {
@@ -38,6 +41,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   max = 100,
   step = 1,
   unit = "",
+  fieldLabel,
 }) => {
   /* The row printed its label and never tied it to the control, so every
      slider in the inspector announced itself as an unnamed "slider" — 8 of
@@ -58,18 +62,35 @@ export const SliderInput: React.FC<SliderInputProps> = ({
           step={step}
           style={sliderStyle}
         />
-        <span
-          style={{
-            font: "500 11px var(--bk-font-ui)",
-            color: "var(--bk-ink-muted)",
-            minWidth: 32,
-            textAlign: "right",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {value}
-          {unit}
-        </span>
+        {fieldLabel ? (
+          <TextInput
+            type="number"
+            aria-label={fieldLabel}
+            className="tw:w-14 tw:flex-none"
+            sizing="sm"
+            value={value}
+            min={min}
+            max={max}
+            step={step}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              if (e.target.value !== "" && Number.isFinite(n)) onChange(Math.min(max, Math.max(min, n)));
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              font: "500 11px var(--bk-font-ui)",
+              color: "var(--bk-ink-muted)",
+              minWidth: 32,
+              textAlign: "right",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {value}
+            {unit}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -67,10 +67,6 @@
     {
       "name": "sechead-layout",
       "testId": "inspector-sechead-layout"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [

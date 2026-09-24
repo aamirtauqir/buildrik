@@ -1,330 +1,136 @@
 /**
- * UnifiedSelectionToolbar — orchestrator
- * Compact toolbar at top of selected element.
- * State + action handlers live here; JSX sections are delegated to sub-components.
+ * UnifiedSelectionToolbar — board 5936:44788 ("Canvas · selected · Hero").
+ *
+ * Three buttons pinned inside the selected element's top-right corner:
+ * Duplicate (⌘D) · Delete (⌫) · More (⋯). More opens the same element menu a
+ * right-click opens (G2-024: one menu, not a second dropdown of its own), at
+ * the button.
+ *
+ * What the old bottom-left pill carried and where it went:
+ *   - Select parent / ancestor dropdown → Layers and the ← key.
+ *   - + Add child → the Add panel (it opened a legacy picker modal).
+ *   - Copy · Wrap · Move up/down → the element menu (More).
+ *   - ✦ Edit with AI → the inspector header's ✦ AI.
+ *
+ * Surface: the board draws a near-black pill; DESIGN.md's NO BLACK RULE
+ * (decision #25) bans near-black chrome, and that conflict is with the owner.
+ * Until it is ruled on the pill keeps the light chrome surface.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Sparkles } from "lucide-react";
+import { Copy, MoreHorizontal, Trash2 } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { IconButton, useToast } from "@/editor/chrome-ui";
-import { getElementNameFromType } from "../utils/elementInfo";
-import { BlockPickerModal } from "./BlockPickerModal";
-import { AiPromptPopover } from "./AiPromptPopover";
-import { ToolbarActionsSection } from "./toolbar/ToolbarActionsSection";
-import { ToolbarNavSection } from "./toolbar/ToolbarNavSection";
-import { toolbarStyles, formatElementName } from "./toolbar/toolbarStyles";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Props
-// ─────────────────────────────────────────────────────────────────────────────
+import { IconButton } from "@/editor/chrome-ui";
+import { canvasScale } from "../utils/canvasScale";
 
 export interface UnifiedSelectionToolbarProps {
-  /** Composer instance — used for element data and fallback actions */
   composer: Composer;
   /** ID of the selected element */
   elementId: string;
   /** Reference to canvas container */
   canvasRef: React.RefObject<HTMLDivElement | null>;
-
-  // Action callbacks (Clean Layer Architecture).
-  // When provided, these override direct composer access.
-  onSelectParent?: () => void;
-  onSelectAncestor?: (id: string) => void;
-  onDuplicate?: () => void;
-  onDelete?: () => void;
-  onCopy?: () => void;
-  onWrap?: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  onUndo?: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+  /** Opens the element menu (the right-click menu) at a viewport point. */
+  onOpenMenu: (elementId: string, point: { x: number; y: number }) => void;
 }
 
-interface ToolbarPosition {
-  left: number;
-  top: number;
-}
+/** Inset from the element's top-right corner (board 5936:44788). */
+const INSET = 8;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
+const PILL =
+  "tw:flex tw:items-center tw:gap-0.5 tw:p-0.5 tw:rounded-lg tw:border tw:border-[var(--bk-border)] " +
+  "tw:bg-[var(--bk-bg-card)] tw:[box-shadow:var(--bk-shadow-raised)]";
 
 export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = ({
   composer,
   elementId,
   canvasRef,
-  onSelectParent,
-  onSelectAncestor,
   onDuplicate,
   onDelete,
-  onCopy,
-  onWrap,
-  onMoveUp,
-  onMoveDown,
-  onUndo,
+  onOpenMenu,
 }) => {
-  const [position, setPosition] = React.useState<ToolbarPosition | null>(null);
-  const [showAncestorMenu, setShowAncestorMenu] = React.useState(false);
-  const [showMoreMenu, setShowMoreMenu] = React.useState(false);
-  const [pickerOpen, setPickerOpen] = React.useState(false);
-  const [aiOpen, setAiOpen] = React.useState(false);
-  const ancestorMenuRef = React.useRef<HTMLDivElement>(null);
-  const moreMenuRef = React.useRef<HTMLDivElement>(null);
-  const toolbarRef = React.useRef<HTMLDivElement>(null);
-  const { addToast } = useToast();
+  const [anchor, setAnchor] = React.useState<{ right: number; top: number; scale: number } | null>(null);
+  const moreRef = React.useRef<HTMLButtonElement>(null);
 
-  // ── Element info ────────────────────────────────────────────────────────────
-  const element = composer.elements.getElement(elementId);
-  const elementType = element?.getType?.() || "element";
-  const elementName = formatElementName(elementType);
-  const parent = element?.getParent?.();
-  const hasParent = !!parent;
-
-  const ancestors = React.useMemo(() => {
-    const chain: Array<{ id: string; name: string }> = [];
-    let current = element?.getParent?.();
-    while (current) {
-      chain.push({
-        id: current.getId(),
-        name: formatElementName(current.getType?.() || "element"),
-      });
-      current = current.getParent?.();
-    }
-    return chain;
-  }, [element]);
-
-  // ── Track element position ──────────────────────────────────────────────────
   React.useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const updatePosition = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
-      if (!el) return;
-
-      const canvasRect = canvas.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const scrollLeft = canvas.scrollLeft || 0;
-      const scrollTop = canvas.scrollTop || 0;
-
-      let top = elRect.top - canvasRect.top + scrollTop - 36;
-      let left = elRect.left - canvasRect.left + scrollLeft;
-
-      // Keep in viewport
-      if (top < 8) top = elRect.bottom - canvasRect.top + scrollTop + 8;
-      if (left < 8) left = 8;
-
-      setPosition({ left, top });
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
+    const update = () => {
+      const target = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
+      if (!target) return setAnchor(null);
+      const c = canvas.getBoundingClientRect();
+      const r = target.getBoundingClientRect();
+      /* The overlay layer is scaled with the canvas; positions are in canvas
+         (unscaled) units, so undo the zoom the rects carry. */
+      const scale = canvasScale(canvas);
+      setAnchor({
+        right: (r.right - c.left) / scale + (canvas.scrollLeft || 0) - INSET / scale,
+        top: (r.top - c.top) / scale + (canvas.scrollTop || 0) + INSET / scale,
+        scale,
+      });
     };
-
-    updatePosition();
-
-    const observer = new ResizeObserver(updatePosition);
-    const el = canvasRef.current.querySelector(`[data-buildrick-id="${elementId}"]`);
+    update();
+    const observer = new ResizeObserver(update);
     if (el) observer.observe(el);
-
-    window.addEventListener("scroll", updatePosition, { capture: true, passive: true });
-    window.addEventListener("resize", updatePosition, { passive: true });
-
+    /* Same late-DOM case as SelectionBoxOverlay: re-anchor when the canvas
+       HTML re-renders (an insert selects before its element exists). */
+    const content = new MutationObserver(update);
+    content.observe(canvas, { childList: true, subtree: true });
+    window.addEventListener("scroll", update, { capture: true, passive: true });
+    window.addEventListener("resize", update, { passive: true });
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", updatePosition, {
-        capture: true,
-      } as EventListenerOptions);
-      window.removeEventListener("resize", updatePosition);
+      content.disconnect();
+      window.removeEventListener("scroll", update, { capture: true } as EventListenerOptions);
+      window.removeEventListener("resize", update);
     };
   }, [elementId, canvasRef]);
 
-  // ── Close menus on click outside ───────────────────────────────────────────
-  React.useEffect(() => {
-    if (!showAncestorMenu && !showMoreMenu) return;
+  if (!anchor || !composer.elements.getElement(elementId)) return null;
 
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        showAncestorMenu &&
-        ancestorMenuRef.current &&
-        !ancestorMenuRef.current.contains(target)
-      ) {
-        setShowAncestorMenu(false);
-      }
-      if (showMoreMenu && moreMenuRef.current && !moreMenuRef.current.contains(target)) {
-        setShowMoreMenu(false);
-      }
-    };
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showAncestorMenu, showMoreMenu]);
-
-  if (!position || !element) return null;
-
-  // ── Action handlers ─────────────────────────────────────────────────────────
-
-  const handleSelectParent = () => {
-    if (onSelectParent) {
-      onSelectParent();
-    } else if (parent) {
-      composer.selection.select(parent);
-    }
-  };
-
-  const handleSelectAncestor = (id: string) => {
-    if (onSelectAncestor) {
-      onSelectAncestor(id);
-    } else {
-      const el = composer.elements.getElement(id);
-      if (el) composer.selection.select(el);
-    }
-    setShowAncestorMenu(false);
-  };
-
-  const handleAdd = () => setPickerOpen(true);
-
-  const handleDuplicate = () => {
-    if (onDuplicate) {
-      onDuplicate();
-    } else {
-      composer.elements.duplicateElement?.(elementId);
-    }
-  };
-
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete();
-    } else {
-      const elType = element?.getType?.() || "element";
-      const elName = getElementNameFromType(elType);
-      const childCount = element?.getChildren?.()?.length || 0;
-
-      composer.beginTransaction("delete-element");
-      composer.elements.removeElement(elementId);
-      composer.endTransaction();
-
-      const message =
-        childCount > 0
-          ? `${elName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
-          : `${elName} deleted`;
-
-      addToast({
-        description: message,
-        tone: "info",
-        duration: 5000,
-        action: {
-          label: "Undo",
-          onClick: () => (onUndo ? onUndo() : composer.history.undo()),
-        },
-      });
-    }
-  };
-
-  const handleCopy = () => {
-    if (onCopy) {
-      onCopy();
-    } else if (element) {
-      const data = element.toJSON?.();
-      composer.clipboard = data ? [data] : null;
-    }
-    setShowMoreMenu(false);
-  };
-
-  const handleWrap = () => {
-    if (onWrap) {
-      onWrap();
-    } else {
-      element?.wrap?.("container");
-    }
-    setShowMoreMenu(false);
-  };
-
-  const handleMoveUp = () => {
-    if (onMoveUp) {
-      onMoveUp();
-    } else {
-      composer.commands.run("bring-forward");
-    }
-    setShowMoreMenu(false);
-  };
-
-  const handleMoveDown = () => {
-    if (onMoveDown) {
-      onMoveDown();
-    } else {
-      composer.commands.run("send-backward");
-    }
-    setShowMoreMenu(false);
-  };
-
-  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
-
-  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div
-      ref={toolbarRef}
-     
-      onMouseDown={stopPropagation}
-      onClick={stopPropagation}
+      data-testid="selection-toolbar"
+      className={`bd-canvas-toolbar ${PILL}`}
+      onMouseDown={stop}
+      onClick={stop}
       style={{
         position: "absolute",
-        left: position.left,
-        top: position.top,
+        left: anchor.right,
+        top: anchor.top,
+        /* Chrome, not page: it stays 1:1 however far the page is zoomed. */
+        transform: `translateX(-100%) scale(${1 / anchor.scale})`,
+        transformOrigin: "100% 0",
         zIndex: Z_LAYERS.floatingToolbar,
         pointerEvents: "auto",
       }}
     >
-      <div className="bd-canvas-toolbar" style={toolbarStyles}>
-        <ToolbarNavSection
-          hasParent={hasParent}
-          elementName={elementName}
-          ancestors={ancestors}
-          showAncestorMenu={showAncestorMenu}
-          ancestorMenuRef={ancestorMenuRef}
-          onSelectParent={handleSelectParent}
-          onAncestorMenuToggle={() => setShowAncestorMenu((v) => !v)}
-          onSelectAncestor={handleSelectAncestor}
-        />
-        <ToolbarActionsSection
-          showMoreMenu={showMoreMenu}
-          moreMenuRef={moreMenuRef}
-          onAdd={handleAdd}
-          onDuplicate={handleDuplicate}
-          onDelete={handleDelete}
-          onCopy={handleCopy}
-          onWrap={handleWrap}
-          onMoveUp={handleMoveUp}
-          onMoveDown={handleMoveDown}
-          onMoreMenuToggle={() => setShowMoreMenu((v) => !v)}
-        />
-        <IconButton
-          size="sm"
-          label="Edit with AI"
-          pressed={aiOpen}
-          onClick={() => setAiOpen((v) => !v)}
-        >
-          <Sparkles size={14} />
-        </IconButton>
-      </div>
-
-      {aiOpen && (
-        <AiPromptPopover
-          composer={composer}
-          elementId={elementId}
-          top={position.top + 36}
-          left={position.left}
-          onClose={() => setAiOpen(false)}
-        />
-      )}
-
-      <BlockPickerModal
-        composer={composer}
-        isOpen={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        insertionContext={{ targetElementId: elementId, position: "child" }}
-      />
+      <IconButton size="sm" label="Duplicate (⌘D)" data-testid="selection-toolbar-duplicate" onClick={onDuplicate}>
+        <Copy size={14} aria-hidden="true" />
+      </IconButton>
+      <IconButton size="sm" label="Delete (⌫)" data-testid="selection-toolbar-delete" onClick={onDelete}>
+        <Trash2 size={14} aria-hidden="true" />
+      </IconButton>
+      <IconButton
+        ref={moreRef}
+        size="sm"
+        label="More"
+        aria-haspopup="menu"
+        data-testid="selection-toolbar-more"
+        onClick={() => {
+          const b = moreRef.current?.getBoundingClientRect();
+          onOpenMenu(elementId, b ? { x: b.left, y: b.bottom + 4 } : { x: 0, y: 0 });
+        }}
+      >
+        <MoreHorizontal size={14} aria-hidden="true" />
+      </IconButton>
     </div>
   );
 };

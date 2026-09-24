@@ -159,10 +159,6 @@
     {
       "name": "context-row",
       "testId": "inspector-context-row"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [
