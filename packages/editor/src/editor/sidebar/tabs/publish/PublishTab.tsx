@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "../../../../engine";
@@ -98,6 +98,19 @@ const FIX_TARGETS: Record<string, FixTarget> = {
 
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
+
+/** "Home, Menu and Contact". */
+function listNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** Board 7045:77984 — the primary's tooltip: what it replaces and what ships. */
+export function publishTooltip(lastLiveVersion: number | null, pageNames: string[]): string {
+  const lead = lastLiveVersion !== null ? `Replaces LIVE · v${lastLiveVersion}.` : "First publish.";
+  if (pageNames.length === 0) return lead;
+  return `${lead} ${listNames(pageNames)} ${pageNames.length === 1 ? "is" : "are"} included.`;
+}
 
 /** Board 4418:97118's RELEASE TO row: label left, the value muted on the
     right with a ›. The whole row opens Settings › Domains, where the
@@ -871,16 +884,35 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   chip sized to its label, 28 tall. The remaining 50% dim is
                   `themes/ux-fixes.css`'s global `button:disabled { opacity:
                   .5 }`, left global deliberately. */}
-              <Button
-                onClick={onRequestPublish}
-                disabled={ctaDisabled}
-                className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
-                data-testid="publish-cta"
-              >
-                {/* One label, in every state. The board names the destination
-                    and never draws an "Update" variant. */}
-                {isPublishing ? "Publishing…" : "Publish to production"}
-              </Button>
+              {(() => {
+                const cta = (
+                  <Button
+                    onClick={onRequestPublish}
+                    disabled={ctaDisabled}
+                    className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                    data-testid="publish-cta"
+                  >
+                    {/* One label, in every state. The board names the destination
+                        and never draws an "Update" variant. */}
+                    {isPublishing ? "Publishing…" : "Publish to production"}
+                  </Button>
+                );
+                /* Board 7045:77984: hovering the live primary says what it
+                   replaces and which pages ship. A disabled primary has its
+                   reason printed under it instead. */
+                return ctaDisabled || snapshot.loading ? (
+                  cta
+                ) : (
+                  <Tooltip
+                    content={publishTooltip(
+                      snapshot.lastDeploy?.isLive ? snapshot.lastDeploy.version : null,
+                      snapshot.pageNames,
+                    )}
+                  >
+                    {cta}
+                  </Tooltip>
+                );
+              })()}
               {/* Board 893:4518 swaps the primary's neighbour for Connect
                   Vercel when the connection is the blocker. */}
               {blockedOnVercel && !isPublishing ? (

@@ -386,6 +386,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                   from: "History",
                 })
               }
+              onCompareWithCurrent={(row) =>
+                composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                  left: { kind: "published", jobId: row.id, version: row.version },
+                  right: { kind: "current" },
+                  from: "History",
+                })
+              }
+              siteName={composer?.getProjectMetadata?.()?.name}
             />
           ) : (
             /* No SITE, which is a different fact from no versions —

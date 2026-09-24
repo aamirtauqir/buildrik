@@ -37,6 +37,8 @@ export interface PublishSnapshot {
   changes: PublishChange[];
   changeCount: number;
   pageCount: number;
+  /** Names of the pages that ship, in order — the primary's tooltip lists them. */
+  pageNames: string[];
   /** `rawAt` is the timestamp itself — board 784:4326 prints it relatively
       ("just now"), board 641:2652 absolutely ("2 Jul, 14:22"). */
   lastDeploy: { version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
@@ -169,7 +171,9 @@ export function usePublishSnapshot(
      pages ("what ships is what the exporter produces"); this counted the page
      list, so a site with one live page and one hidden read "2 pages" while the
      deploy carried one. */
-  const pageCount = (composer?.elements?.getAllPages?.() ?? []).filter(isPageLive).length;
+  const livePages = (composer?.elements?.getAllPages?.() ?? []).filter(isPageLive);
+  const pageCount = livePages.length;
+  const pageNames = livePages.map((p) => p.name);
 
   return {
     production: { label: "Production", value: domainOf(publishedUrl) },
@@ -180,6 +184,7 @@ export function usePublishSnapshot(
     changes,
     changeCount: changes.length,
     pageCount,
+    pageNames,
     /* `isLive` was hardcoded true whenever any COMPLETED job existed, which
        is a different question from whether the site is serving. On a site
        whose truth is DRAFT with no published URL, the panel said "never
