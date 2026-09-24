@@ -19,7 +19,7 @@ export function fmtSize(bytes: number): string {
 }
 
 /** Map MediaAsset.type to LibraryItem short code */
-function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
+export function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
   switch (type) {
     case "image":
       return "img";

@@ -24,7 +24,7 @@ import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
-import { SelectionContextBar } from "./components/SelectionContextBar";
+import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
@@ -279,6 +279,26 @@ function MediaTabWithComposer({
      Same shape as the publish opener that spent itself on
      `onVercelPublish ?? onOpenPublish`. The live manager is `editor/media/
      LibraryManager`, which the Media family walk verified against its boards. */
+  /* Boards 6764:59051 / 6881:91481 — while something is choosing a file,
+     the drawer IS the picker (audit G3-008 / G3-061). */
+  if (state.selectionContext) {
+    return (
+      <>
+        <PickModePanel
+          composer={composer}
+          request={state.selectionContext}
+          items={state.libraryItems}
+          usageMap={state.usageMap}
+          searchQuery={state.librarySearch}
+          onSearchChange={(q) => state.setLibrarySearch(q)}
+          onUse={state.applyPick}
+          onCancel={() => state.setSelectionContext(null)}
+        />
+        {sharedOverlays}
+      </>
+    );
+  }
+
   return (
     <>
       <SlimLauncher
@@ -343,8 +363,6 @@ function MediaTabWithComposer({
         onClose={onClose}
         onOpenDetail={state.openDetail}
         onOpenIconPicker={() => setIconBrowserOpen(true)}
-        selectionContext={state.selectionContext}
-        onCancelSelection={() => state.setSelectionContext(null)}
       />
       {stockBrowserOpen && (
         <StockBrowserOverlay

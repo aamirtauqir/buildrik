@@ -6,7 +6,7 @@
  * three domain sub-hooks:
  *
  *   ./useGlobalModals.ts  — shortcuts, projectSettings, commandPalette
- *   ./useContentModals.ts — templates, exporter, ai, copilot, mediaLibrary,
+ *   ./useContentModals.ts — templates, exporter, ai, copilot,
  *                           imageEditor, iconPicker (8 with payloads)
  *   ./useDomainModals.ts  — collectionSetup, createComponent,
  *                           cmsCollectionSetup
@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/types/media";
+import type { IconConfig } from "../../../shared/types/media";
 import type { EditsSnapshot, ImageEditorTab } from "../../media/ImageEditorModal";
 import { useGlobalModals } from "./useGlobalModals";
 import { useContentModals } from "./useContentModals";
@@ -31,14 +31,6 @@ import { useDomainModals } from "./useDomainModals";
 // ============================================
 // Context Types
 // ============================================
-
-/** Media library context for asset selection */
-export interface MediaLibraryContext {
-  onSelect: (asset: MediaAsset) => void;
-  allowedTypes?: MediaAssetType[];
-  /** What the picker is being opened FOR, e.g. "Hero · Image" (board 1164:4713). */
-  forLabel?: string;
-}
 
 /** Image editor context for editing images */
 export interface ImageEditorContext {
@@ -114,12 +106,6 @@ export interface UseStudioModalsReturn {
   setShowShortcuts: React.Dispatch<React.SetStateAction<boolean>>;
   toggleShortcuts: () => void;
   closeShortcuts: () => void;
-
-  // Media Library modal
-  showMediaLibrary: boolean;
-  mediaLibraryContext: MediaLibraryContext | null;
-  openMediaLibrary: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => void;
-  closeMediaLibrary: () => void;
 
   // Image Editor modal
   showImageEditor: boolean;

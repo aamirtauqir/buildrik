@@ -16,6 +16,7 @@ import { useSelectionState } from "./useSelectionState";
 import { useUploadState } from "./useUploadState";
 import { useDiscoveryState } from "./useDiscoveryState";
 import { useServerStorageQuota } from "./useServerStorageQuota";
+import { endAssetPick, requestAssetPick, useAssetPick, type AssetPickRequest } from "../data/assetPick";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
@@ -34,7 +35,11 @@ export function useMediaState(composer: Composer): MediaStateResult {
   // Navigation
   const [detailItem, setDetailItem] = useState<LibraryItem | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
-  const [selectionContext, setSelectionContext] = useState<{ elementId: string; label?: string } | null>(null);
+  const selectionContext = useAssetPick();
+  const setSelectionContext = useCallback(
+    (ctx: AssetPickRequest | null) => (ctx ? requestAssetPick(composer, ctx) : endAssetPick()),
+    [composer],
+  );
 
   // §21 — replace-across pair. Once set (after user uploads replacement),
   // ExpandedMediaPanel / MediaTab mounts <ReplaceAcrossDialog>.
@@ -108,31 +113,24 @@ export function useMediaState(composer: Composer): MediaStateResult {
     });
   }, [library.libraryItems, library.versionsOf, selection.checkInUse]);
 
-  // Listen for selection mode requests from other parts of the UI
+  /* A pick opened by ⌘K "Replace selected media" carries the element's name
+     as a starting search (the shell bridge sets `query`). */
+  const pickQuery = selectionContext?.query;
+  const { setLibrarySearch } = library;
   useEffect(() => {
-    const handler = (data: { elementId: string; label?: string }) => {
-      setSelectionContext(data);
-      
-      // Semantic Search: Use label/context to pre-fill library search
-      if (data.label && data.label.length > 2) {
-        library.setLibrarySearch(data.label);
-      }
-      
-      // Open Media Tab in Sidebar
-      composer.emit("ui:switch-tab", { tab: "assets" });
-    };
-    composer.on("ui:media-selection-request", handler);
+    if (pickQuery && pickQuery.length > 2) setLibrarySearch(pickQuery);
+  }, [pickQuery, setLibrarySearch]);
 
+  useEffect(() => {
     // Build tab contract: empty media element dropped → open Media picker
     const needsAssetHandler = (data: { elementId: string; type: string }) => {
-      setSelectionContext({ elementId: data.elementId, label: data.type });
+      requestAssetPick(composer, { elementId: data.elementId, label: data.type });
       library.setActiveType(
         data.type === "image" ? "img"
           : data.type === "video" ? "vid"
           : data.type === "icon" ? "ico"
           : "all"
       );
-      composer.emit("ui:switch-tab", { tab: "assets" });
     };
     composer.on("element:needs-asset", needsAssetHandler);
 
@@ -150,7 +148,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     composer.on("element:selected", selectionHandler);
 
     return () => {
-      composer.off("ui:media-selection-request", handler);
       composer.off("element:needs-asset", needsAssetHandler);
       composer.off("element:selected", selectionHandler);
     };
@@ -253,7 +250,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
               showToast(`${asset.name} applied ✓`, "success");
             }
             composer.emit("ui:switch-tab", { tab: "add" });
-            setSelectionContext(null);
+            endAssetPick();
           }
         } else {
           // STANDARD MODE: Insert new element via command layer (type-aware).
@@ -307,6 +304,22 @@ export function useMediaState(composer: Composer): MediaStateResult {
       setDetailItem(null);
     },
     [composer, showToast, discovery.discIcons, discovery.discFonts, discovery.stockPhotos, selectionContext, autoSaveStockToLibrary]
+  );
+
+  const applyPick = useCallback(
+    (key: string) => {
+      const onSelect = selectionContext?.onSelect;
+      if (!onSelect) {
+        insertToCanvas(key);
+        return;
+      }
+      const asset = composer.media.getAsset(key);
+      if (!asset) return;
+      onSelect(asset);
+      endAssetPick();
+      showToast(`${asset.name} applied ✓`, "success");
+    },
+    [composer, selectionContext, insertToCanvas, showToast],
   );
 
   const copyUrl = useCallback(
@@ -456,6 +469,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     closeDetail,
     selectionContext,
     setSelectionContext,
+    applyPick,
 
     // §12 expanded panel
     panelExpanded,

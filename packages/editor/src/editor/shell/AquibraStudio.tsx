@@ -55,6 +55,8 @@ import { useStudioState } from "./hooks/useStudioState";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
+import { requestAssetPick, useAssetPickBridge } from "../sidebar/tabs/media/data/assetPick";
+import type { MediaAsset, MediaAssetType } from "@shared/types/media";
 import { ConflictModal } from "./modals/ConflictModal";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
@@ -188,6 +190,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     onLoadError: setLoadError,
     onAuthExpired,
   });
+
+  /* Audit G3-061: every "choose an image" door opens the Assets drawer's pick
+     mode — the one picker (board 6764:59051). */
+  useAssetPickBridge(composer);
+  const openAssetPick = React.useCallback(
+    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, forLabel?: string) => {
+      if (composer) requestAssetPick(composer, { allowedTypes, onSelect, label: forLabel });
+    },
+    [composer],
+  );
 
   /* The Issues panel's one door (owner decision 11 removed the topbar chip). */
   React.useEffect(() => {
@@ -615,7 +627,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           else if (overlay === "badges") state.setShowBadges(enabled);
           else if (overlay === "xray") state.setShowXRay(enabled);
         }}
-        onOpenMediaLibrary={modals.openMediaLibrary}
+        onOpenMediaLibrary={openAssetPick}
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
@@ -695,13 +707,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseExporter={modals.closeExporter}
         showShortcuts={modals.showShortcuts}
         onCloseShortcuts={modals.closeShortcuts}
-        showMediaLibrary={modals.showMediaLibrary}
-        onCloseMediaLibrary={modals.closeMediaLibrary}
-        onSelectMedia={(asset) => {
-          modals.mediaLibraryContext?.onSelect(asset);
-          modals.closeMediaLibrary();
-        }}
-        mediaLibraryContext={modals.mediaLibraryContext}
         showImageEditor={modals.showImageEditor}
         onCloseImageEditor={modals.closeImageEditor}
         imageEditorContext={modals.imageEditorContext}

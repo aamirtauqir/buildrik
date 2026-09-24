@@ -88,7 +88,7 @@
       },
       {
         "path": "src/editor/sidebar/tabs/media/__tests__/test-utils/mockMediaState.ts",
-        "line": 35,
+        "line": 36,
         "severity": "minor",
         "message": "Dead export \"mockMediaState\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."

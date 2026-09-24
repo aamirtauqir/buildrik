@@ -33,7 +33,6 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import type { FailedUpload, LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
 import { TypePills } from "./TypePills";
-import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import { ReplacementUploadModal } from "./ReplacementUploadModal";
@@ -134,8 +133,6 @@ interface SlimLauncherProps {
   onOpenStock(): void;
   onOpenLibrary?(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
-  selectionContext?: { elementId: string; label?: string } | null;
-  onCancelSelection?(): void;
 }
 
 export function SlimLauncher(props: SlimLauncherProps) {
@@ -148,8 +145,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
     onSearchChange,
     onOpenStock,
     onClose,
-    selectionContext,
-    onCancelSelection,
   } = props;
 
   // The footer's Upload link drives UploadZone's file input rather than
@@ -214,12 +209,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
       data-testid="media-panel"
       onPointerDownCapture={props.statusPill ? props.onDismissStatusPill : undefined}
     >
-      {selectionContext ? (
-        <SelectionContextBar
-          label={selectionContext.label}
-          onCancel={onCancelSelection ?? (() => {})}
-        />
-      ) : null}
       <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={props.onExpand} />
 
       {/* Clone 3584:45522 / 3584:45876 / 3585:23337 — `Manage assets ↗`, a

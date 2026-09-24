@@ -523,47 +523,6 @@
   color: var(--bk-ink-muted);
 }
 
-/* §11 — selection-context bar (extract from inline) */
-.med-selection-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  font-size: 12px;
-  font-weight: 500;
-}
-.med-selection-bar__inner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.med-selection-bar__pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-card);
-  animation: bd-status-pulse 2s infinite;
-}
-.med-selection-bar__title {
-  font-size: 12px;
-}
-.med-selection-bar__label {
-  font-size: 11px;
-  opacity: 0.85;
-}
-.med-selection-bar__cancel.bd-btn {
-  background: var(--bk-alpha-on-dark-15);
-  border: 1px solid var(--bk-alpha-on-dark-40);
-  color: var(--bk-bg-card);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  height: auto;
-  min-height: 0;
-}
-
 /* Usage pips (cobalt dots = N pages used) — prototype-v3 §10/§12/§15 */
 .med-usage-pips {
   position: absolute;
