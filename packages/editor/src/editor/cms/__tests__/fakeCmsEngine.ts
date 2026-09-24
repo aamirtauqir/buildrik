@@ -10,7 +10,12 @@ import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 type Handler = (p: unknown) => void;
 
-export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentItem[] }) {
+export function makeEngine(opts?: {
+  collections?: CMSCollection[];
+  items?: CMSContentItem[];
+  /** cms.bindings.export(): element id → its CMS field bindings. */
+  bindings?: Record<string, Array<{ collectionId: string; fieldSlug: string; property: string }>>;
+}) {
   let collections = opts?.collections ?? [];
   let items = opts?.items ?? [];
   const listeners = new Map<string, Set<Handler>>();
@@ -19,6 +24,7 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
     getId: () => string;
     getType: () => string;
     getContent: () => string;
+    getCustomData?: (key: string) => unknown;
     getDataBindings: () => Record<string, unknown>;
     removeDataBinding: (p: string) => void;
   }> = [];
@@ -35,6 +41,10 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
     elements: {
       getAllElements: () => elements,
       getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,
+      getAllPages: () => [
+        { id: "p-home", name: "Home", slug: "home", isHome: true },
+        { id: "p-item", name: "Menu item", slug: "menu-item" },
+      ],
     },
     selection: { select: vi.fn() },
     data: {
@@ -68,6 +78,7 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
       bindCondition: vi.fn(),
     },
     cms: {
+      bindings: { export: () => opts?.bindings ?? {} },
       collections: {
         on: vi.fn(),
         off: vi.fn(),
@@ -98,6 +109,11 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
            way it is in the engine — a spy that only records the call would pass
            even if the panel never re-read the collection. */
         updateCollection,
+        deleteCollection: vi.fn((id: string) => {
+          collections = collections.filter((c) => c.id !== id);
+          items = items.filter((i) => i.collectionId !== id);
+          return Promise.resolve(true);
+        }),
       },
     },
   };

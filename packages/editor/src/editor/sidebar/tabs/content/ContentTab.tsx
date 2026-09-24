@@ -33,13 +33,12 @@ import {
   CONTENT_BODY,
   SECTION_H,
   SourcesView,
+  type SourceRowActions,
   VariablesView,
 } from "./ContentViews";
 
 export interface ContentTabProps {
   composer: Composer | null;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Opens the CMS collection setup (shell-owned modal) — the data-first create
@@ -74,8 +73,6 @@ function SkeletonRow({ width, testId }: { width: string; testId: string }) {
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
   hydrationStatus,
-  isExpanded,
-  onExpandToggle,
   onHelpClick,
   onClose,
   onCreateCollection,
@@ -117,11 +114,27 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   /* Board 151:46 puts a `⋯` on each source row. DataManager.unregisterSource
      has existed since the manager shipped and no UI ever called it, so a source
      could be added and never removed. */
-  const removeSource = (id: string) => {
-    if (!composer) return;
-    composer.data.unregisterSource(id);
-    reload();
-  };
+  const sourceActions: SourceRowActions | undefined = composer
+    ? {
+        rename: (id, name) => {
+          composer.data.renameSource(id, name);
+          reload();
+        },
+        refresh: async (id) => {
+          const pulled = await composer.data.refreshSource(id);
+          if (pulled) reload();
+          return pulled;
+        },
+        replaceData: (id, data) => {
+          composer.data.updateSourceData(id, data);
+          reload();
+        },
+        remove: (id) => {
+          composer.data.unregisterSource(id);
+          reload();
+        },
+      }
+    : undefined;
 
   const selectElement = (id: string) => {
     const el = composer?.elements.getElement(id);
@@ -211,7 +224,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           sources={panel.sources}
           onBack={() => setView({ kind: "root" })}
           onImportJson={importJson}
-          onRemoveSource={removeSource}
+          actions={sourceActions}
         />
       );
       break;
@@ -253,8 +266,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       <PanelHeader
         // v3 IA Q4 — the panel is the CMS; the rail says so, the header agrees.
         title="CMS"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
+        /* No expand toggle (4428:140486 draws none): the records live in the
+           full-canvas workspace now, so a wider drawer only squeezed it. */
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

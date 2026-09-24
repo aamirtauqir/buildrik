@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { PageContextMenu } from "../components/PageContextMenu";
 import type { PageItem } from "../types";
 
@@ -155,5 +155,21 @@ describe("PageContextMenu — Replace layout with template…", () => {
     fireEvent.click(screen.getByTestId("pages-menu-replace-layout"));
     expect(onReplaceLayout).toHaveBeenCalledWith("p2");
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PageContextMenu — 6883:69130", () => {
+  it("the homepage's menu says why Delete is off; another page's does not", () => {
+    render(<PageContextMenu {...baseProps} pageId="p1" />);
+    expect(screen.getByTestId("pages-menu-delete")).toBeDisabled();
+    expect(screen.getByTestId("pages-menu-delete-reason")).toHaveTextContent("Homepage can’t be deleted");
+    cleanup();
+    render(<PageContextMenu {...baseProps} pageId="p2" />);
+    expect(screen.queryByTestId("pages-menu-delete-reason")).toBeNull();
+  });
+
+  it("is 224 wide", () => {
+    render(<PageContextMenu {...baseProps} pageId="p2" />);
+    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-56");
   });
 });

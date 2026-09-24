@@ -32,29 +32,18 @@ const ModalContent =
 
 interface Props {
   isOpen: boolean;
-  /** The tab being left — names the edits at risk in the title. */
-  pendingTab: string;
   onDiscard: () => void;
   onCancel: () => void;
 }
-
-/** What each tab's unsaved edits actually are, for the body line. */
-const TAB_COPY: Record<string, { label: string; fields: string }> = {
-  seo: { label: "SEO", fields: "the page title and description" },
-  social: { label: "Social", fields: "the social title, description and image" },
-  advanced: { label: "Advanced", fields: "the page's advanced settings" },
-};
 
 const BTN = "tw:min-h-0 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium";
 
 export const UnsavedWarningModal: React.FC<Props> = ({
   isOpen,
-  pendingTab,
   onDiscard,
   onCancel,
 }) => {
   const keepRef = React.useRef<HTMLButtonElement>(null);
-  const copy = TAB_COPY[pendingTab] ?? TAB_COPY.seo;
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onCancel()}>
@@ -87,14 +76,14 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                   `tw:text-[13px]` this file passed never applied and the
                   heading measured 14. Same defect found on ReviewModal today. */}
               <span data-testid="pages-unsaved-title" className="tw:text-[13px] tw:leading-[normal]">
-                Discard unsaved {copy.label} changes?
+                Discard unsaved changes?
               </span>
             </ModalTitle>
 
             {/* `leading-[normal]` — 1171:4822. */}
             <p data-testid="pages-unsaved-body" className="tw:m-0 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink-soft)]">
-              You edited {copy.fields} but didn&apos;t save. Leaving this tab throws those edits
-              away.
+              You changed this page&apos;s settings but didn&apos;t save. Closing throws those
+              edits away.
             </p>
 
             <div className="tw:flex tw:justify-end tw:gap-2" data-testid="pages-unsaved-foot">
@@ -103,7 +92,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                 className={`${BTN} tw:border-0 tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]`}
                 onClick={onCancel}
                 data-testid="pages-unsaved-keep"
-                aria-label="Keep editing and stay on this tab"
+                aria-label="Keep editing"
               >
                 Keep editing
               </Button>
@@ -111,7 +100,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                 className={`${BTN} tw:border tw:border-[var(--bk-error)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-error-text,var(--bk-error))] tw:enabled:hover:bg-[var(--bk-error-tint)]`}
                 onClick={onDiscard}
                 data-testid="pages-unsaved-discard"
-                aria-label="Discard the unsaved changes and switch tab"
+                aria-label="Discard the unsaved changes and close"
               >
                 Discard changes
               </Button>

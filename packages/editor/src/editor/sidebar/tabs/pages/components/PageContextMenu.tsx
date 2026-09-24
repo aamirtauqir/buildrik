@@ -66,7 +66,7 @@ export const PageContextMenu: React.FC<Props> = ({
   const style: React.CSSProperties = {
     position: "fixed",
     top: Math.min(y, window.innerHeight - 260),
-    left: Math.min(x, window.innerWidth - 220),
+    left: Math.min(x, window.innerWidth - 232),
     zIndex: 9999,
   };
 
@@ -88,7 +88,8 @@ export const PageContextMenu: React.FC<Props> = ({
        computed from the click, not from an anchor. */
     <div
       ref={menuRef}
-      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed`}
+      /* 6883:69130 — the menu is 224 wide. */
+      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-56`}
       style={style}
       data-testid="pages-context-menu"
     >
@@ -131,6 +132,16 @@ export const PageContextMenu: React.FC<Props> = ({
         >
           Delete page
         </MenuItem>
+        {/* 6883:69130 — why Delete is off, said in the menu (a disabled row
+            shows no tooltip). */}
+        {deleteDisabled && (
+          <p
+            className="tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="pages-menu-delete-reason"
+          >
+            {isHome ? "Homepage can’t be deleted" : "A site needs at least one page"}
+          </p>
+        )}
       </Menu>
     </div>
   );

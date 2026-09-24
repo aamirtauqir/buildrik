@@ -20,6 +20,8 @@ function makeComposer(opts: { hasParent: boolean; failOnAddChild?: boolean }) {
 
   const makeElement = (type: string, options: { content?: string; attributes?: Record<string, string> }): Created & {
     getId: () => string;
+    getType: () => string;
+    getParent: () => null;
     addChild: (c: Created & { getId: () => string }, i?: number) => void;
   } => {
     counter += 1;
@@ -35,6 +37,8 @@ function makeComposer(opts: { hasParent: boolean; failOnAddChild?: boolean }) {
     return {
       ...el,
       getId: () => id,
+      getType: () => type,
+      getParent: () => null,
       addChild: (child) => {
         if (opts.failOnAddChild) throw new Error("addChild fail");
         el.children.push(createdElements.get(child.getId())!);
@@ -50,6 +54,8 @@ function makeComposer(opts: { hasParent: boolean; failOnAddChild?: boolean }) {
             return {
               ...parent,
               getId: () => parent.id,
+              getType: () => parent.type,
+              getParent: () => null,
               addChild: (child: { getId: () => string }, _i?: number) => {
                 if (opts.failOnAddChild) throw new Error("addChild fail");
                 parent.children.push(createdElements.get(child.getId())!);
@@ -63,6 +69,8 @@ function makeComposer(opts: { hasParent: boolean; failOnAddChild?: boolean }) {
           return {
             ...stored,
             getId: () => stored.id,
+            getType: () => stored.type,
+            getParent: () => null,
             addChild: (child: { getId: () => string }, _i?: number) => {
               if (opts.failOnAddChild) throw new Error("addChild fail");
               stored.children.push(createdElements.get(child.getId())!);
@@ -137,5 +145,27 @@ describe("applyInterpretedTree", () => {
     const result = applyInterpretedTree(composer, "parent-1", tree);
     expect(result.rootElementId).toBeUndefined();
     expect(composer.rollbackTransaction).toHaveBeenCalled();
+  });
+});
+
+/* Walk 2026-09-24: the engine refuses illegal nesting on every structural
+   write; an interpreted tree is one of them. A heading the tree nests in a
+   heading lands after it, as the browser would render it. */
+import { makeEngine } from "@/engine/elements/__tests__/harness";
+
+describe("applyInterpretedTree — nesting rule", () => {
+  it("an interpreted heading inside a heading lands after it", () => {
+    const { manager, composer } = makeEngine();
+    const page = manager.createPage("Home");
+    const tree: InterpretedNode = {
+      kind: "element",
+      tag: "div",
+      attrs: {},
+      children: [{ kind: "element", tag: "h2", attrs: {}, content: "A", children: [{ kind: "element", tag: "h3", attrs: {}, content: "B", children: [] }] }],
+    } as InterpretedNode;
+    const { rootElementId } = applyInterpretedTree(composer as unknown as Composer, page.root.id, tree);
+    const box = manager.getElement(rootElementId!)!;
+    expect(box.getChildren().map((c) => c.getType())).toEqual(["heading", "heading"]);
+    expect(box.getChildren()[0].getChildren()).toHaveLength(0);
   });
 });

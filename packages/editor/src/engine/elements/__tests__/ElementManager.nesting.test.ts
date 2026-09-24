@@ -63,3 +63,40 @@ describe("engine writes refuse illegal nesting by placing after the parent", () 
     expect(section.getChildren()[0].getId()).toBe(box.getId());
   });
 });
+
+describe("wrap / unwrap / replaceWith obey the same rule", () => {
+  it("wrap: a div wrapper that a <p> may not hold lands after the <p>", () => {
+    const { manager, section, ids } = setup();
+    const p = manager.createElement("paragraph");
+    manager.addElement(p, section.getId(), 0);
+    const link = manager.createElement("link");
+    manager.addElement(link, p.getId());
+    const wrapper = link.wrap("div");
+    expect(p.getChildren()).toHaveLength(0);
+    expect(ids().slice(0, 2)).toEqual([p.getId(), wrapper.getId()]);
+    expect(wrapper.getChildren()[0].getId()).toBe(link.getId());
+  });
+
+  it("unwrap: children a parent may not hold land after it, in order", () => {
+    const { manager, h, after, ids } = setup();
+    const span = manager.createElement("text");
+    manager.addElement(span, h.getId());
+    const inner1 = manager.createElement("heading");
+    const inner2 = manager.createElement("heading");
+    span.addChild(inner1);
+    span.addChild(inner2);
+    span.unwrap();
+    expect(h.getChildren()).toHaveLength(0);
+    expect(ids()).toEqual([h.getId(), inner1.getId(), inner2.getId(), after.getId()]);
+  });
+
+  it("replaceWith: a replacement the parent may not hold lands after it", () => {
+    const { manager, h, after, ids } = setup();
+    const span = manager.createElement("text");
+    manager.addElement(span, h.getId());
+    const heading = manager.createElement("heading");
+    span.replaceWith(heading);
+    expect(h.getChildren()).toHaveLength(0);
+    expect(ids()).toEqual([h.getId(), heading.getId(), after.getId()]);
+  });
+});

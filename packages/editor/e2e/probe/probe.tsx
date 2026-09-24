@@ -41,7 +41,7 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
@@ -2053,27 +2053,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
-  // Covers the non-interactive Row variant plus the required-badge and the
-  // row-action button, none of which the collection case reaches.
-  "content-field-rows": () => (
-    <div data-probe="content-field-rows">
-      <FieldsView
-        collection={
-          {
-            id: "c1",
-            name: "Posts",
-            fields: [
-              { id: "f1", name: "Title", slug: "title", type: "text", validation: { required: true } },
-              { id: "f2", name: "Body", slug: "body", type: "richtext" },
-            ],
-          } as never
-        }
-        onBack={() => {}}
-        onAddField={async () => {}}
-        onDeleteField={async () => {}}
-      />
-    </div>
-  ),
   // The empty-state render path, so the baseline also covers styles that only
   // appear through real JSX rather than through the S map alone.
   // POPULATED. An all-zero RootView early-returns its empty state
@@ -2324,14 +2303,12 @@ const CASES: Record<string, () => React.ReactElement> = {
     <div data-probe="components-detach-confirm">
       {drillHost(
         <DSModeProvider initialMode="pro">
-          <AutoOpen testid="component-detach">
+          <AutoOpen testid="component-detach-all">
             <ComponentDetailScreen
               component={DETACH_COMPONENT}
               composer={DETACH_COMPOSER}
               onBack={() => {}}
-              isInstanceSelected
               selectedElementId="el-1"
-              onDetachInstance={() => {}}
             />
           </AutoOpen>
         </DSModeProvider>,

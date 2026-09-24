@@ -53,10 +53,6 @@ import {
   loadComponents,
   deleteComponent as deleteFromStorage,
   isStorageAvailable,
-  exportComponents as exportFromStorage,
-  importComponents as importToStorage,
-  downloadComponentsFile,
-  type ComponentExport,
 } from "./ComponentStorage";
 import {
   findInstanceContainingElement,
@@ -241,7 +237,7 @@ export class ComponentManager {
 
   async updateComponentMetadata(
     id: string,
-    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags">>
+    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags" | "thumbnail">>
   ): Promise<boolean> {
     const component = this.components.get(id);
     if (!component) return false;
@@ -518,24 +514,6 @@ export class ComponentManager {
       this.maps.instances,
       elementId
     );
-  }
-
-  // ─── Export / Import ─────────────────────────────────────────────────────────
-
-  async exportComponents(download: boolean = true): Promise<ComponentExport> {
-    const data = await exportFromStorage(this.projectId);
-    if (download) {
-      downloadComponentsFile(data);
-    }
-    return data;
-  }
-
-  async importComponents(file: File, clearExisting: boolean = false): Promise<number> {
-    const text = await file.text();
-    const data = JSON.parse(text) as ComponentExport;
-    const count = await importToStorage(data, clearExisting);
-    await this.loadComponentsFromStorage();
-    return count;
   }
 
   // ─── Configuration ───────────────────────────────────────────────────────────

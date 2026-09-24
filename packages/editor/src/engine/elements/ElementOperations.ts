@@ -12,6 +12,7 @@ import type { DataBinding } from "../../shared/types/data";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
+import { resolvePlacement } from "./manager/placement";
 
 /**
  * Delegate that manages structural operations (wrap, unwrap, duplicate,
@@ -82,9 +83,11 @@ export class ElementOperations {
     // Add this element as child of wrapper
     wrapper.addChild(self);
 
-    // Insert wrapper at old position in old parent
+    // Insert wrapper at old position in old parent — or after it when the
+    // old parent may not hold the wrapper (nesting/placement.ts)
     if (oldParent && oldIndex !== -1) {
-      oldParent.addChild(wrapper, oldIndex);
+      const place = resolvePlacement(wrapper, oldParent, oldIndex) ?? { parent: oldParent, index: oldIndex };
+      place.parent.addChild(wrapper, place.index);
     }
 
     this.getComposer().emit(EVENTS.ELEMENT_WRAPPED, { element: self, wrapper });
@@ -112,12 +115,18 @@ export class ElementOperations {
     // Clear children from this element
     this.setChildrenRef([]);
 
-    // Insert children at the position where this element was
-    // Insert in reverse order at same index to maintain order
-    for (let i = children.length - 1; i >= 0; i--) {
-      const child = children[i];
-      parent.addChild(child, index);
-    }
+    // Insert children, in order, where this element was. A child the parent
+    // may not hold lands after it (nesting/placement.ts), after any child
+    // already lifted there.
+    let lastLifted: Element | null = null;
+    children.forEach((child, i) => {
+      const place = resolvePlacement(child, parent, index + i) ?? { parent, index: index + i };
+      if (place.parent !== parent && lastLifted?.getParent() === place.parent) {
+        place.index = place.parent.getChildIndex(lastLifted) + 1;
+      }
+      place.parent.addChild(child, place.index);
+      if (place.parent !== parent) lastLifted = child;
+    });
 
     this.getComposer().emit(EVENTS.ELEMENT_UNWRAPPED, { element: self, children });
     this.getComposer().markDirty();
@@ -137,7 +146,8 @@ export class ElementOperations {
     const index = parentChildren.indexOf(self);
 
     parent.removeChild(self);
-    parent.addChild(element, index);
+    const place = resolvePlacement(element, parent, index) ?? { parent, index };
+    place.parent.addChild(element, place.index);
 
     // NOTE: We do NOT maintain data.children here.
     // The toJSON() method reconstructs children from live this.children array.

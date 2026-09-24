@@ -30,6 +30,7 @@ import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
+import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -391,7 +392,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
 
+    /* ⌘K → a collection or record. The workspace reads its store, which
+       outlives it, so the request is written there and the tab switched. */
+    const openCms = (data: CmsOpenRequest) => {
+      cmsWorkspace.openRequest(data);
+      onLeftPanelTabChange?.("content");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+
     composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
+    composer.on(EVENTS.UI_CMS_OPEN, openCms);
     composer.on(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
     composer.on(EVENTS.UI_SETTINGS_OPEN, openSettings);
     composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
@@ -400,6 +410,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
       composer.off(EVENTS.UI_SETTINGS_OPEN, openSettings);
       composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
+      composer.off(EVENTS.UI_CMS_OPEN, openCms);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
 

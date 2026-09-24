@@ -16,7 +16,6 @@ import { Braces, Database, GitBranch, Table2 } from "lucide-react";
 import {
   ConfirmDialog,
   Button,
-  Checkbox,
   EmptyState,
   EmptyStateActions,
   EmptyStateDesc,
@@ -24,6 +23,7 @@ import {
   Popover,
   Menu,
   MenuItem,
+  MenuSeparator,
   ListRow,
   Row,
   SectionHeader,
@@ -37,6 +37,7 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
+import { RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
@@ -78,28 +79,6 @@ const LINK_BTN =
   "tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
-/* 149:116/120/124 — 12/18, not `text-xs`'s own 16. */
-const FIELD_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)] tw:mx-4 tw:mt-2.5 tw:mb-1";
-/** Inputs sit in a padded wrapper rather than carrying their own margin, so
- *  the field keeps the TextInput/Select wrapper theme untouched. */
-const FIELD_WRAP = "tw:px-4";
-/* Board 149:108 tints the save bar with the warning wash, not neutral grey —
-   the bar exists to say something is unsaved, and grey says nothing. */
-const SAVEBAR =
-  "tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4 tw:py-0 " +
-  "tw:text-[12px] tw:leading-[18px] tw:bg-[var(--bk-warning-tint)]";
-/* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
-   same Figma page is explicit that the one filled accent button belongs to the
-   screen's primary action; a drawer's save bar is not where that is spent. */
-/* The recipe moved into Button's `link` variant (2026-08-29); what stays
-   here is the one class this row adds on top. */
-/* Board 149:133/134/135 — all three of the bar's words are 12/18, and they
-   differ only in colour: the status is warning-text, Discard is ink-MUTED
-   (it was ink-soft, borrowed from the row-action GHOST which this row is not),
-   Save is accent-text. `leading-[18px]` because `text-xs` carries Tailwind's
-   own 16, and 2px per line across a 44 bar is the difference between the
-   words sitting on the board's baseline and 1px above it. */
-const SAVE_LINK = "tw:min-h-6 tw:text-[12px] tw:leading-[18px] tw:font-normal";
 /** A note that belongs to the row above it, not to the panel's foot.
  *  151:61 — 11/16 on the panel's 16px gutters with 8 above and 8 below
  *  (151:60's frame is the text's own box plus those two insets). It was
@@ -110,16 +89,6 @@ const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-4 t
 /* 151:70 — the {{site.*}} key is 12/16, and `text-xs` carries Tailwind's own
    16… which is right here, but only by accident: state it. */
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-accent-text)]";
-/* 151:12 / 151:17 / 151:38 draw this 11/16 in `--color/ink-disabled`, and the
-   code followed them — so board and code AGREED on `var(--bk-gray-300)`, which is 1.47:1 on
-   white. Nothing failed, because agreement is what the diff checks; that is the
-   one case where agreement is not evidence.
-   A tag stating a field is MANDATORY is not decoration, and `ink-disabled` is
-   the token for a control you cannot use — WCAG exempts inactive controls
-   precisely so they can be dim. Wrong token for the job (founder call
-   2026-09-08): ink-soft, 7.56:1. Size and line box are unchanged, so the boards
-   still win everything they are right about. */
-const REQUIRED_TAG = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 /* Boards 303:2067 and 303:2083 both draw the Sources status as the file's own
    Badge (12:16): a bordered pill, 10/2 padding, 12/16 medium. The two states
    differ only in ramp — grey for "nothing connected", green for "watching".
@@ -270,298 +239,6 @@ export function RootView({
   );
 }
 
-/* ── Fields (151:2) ──────────────────────────────────────────────────────── */
-
-const FIELD_TYPES = ["text", "textarea", "richtext", "number", "boolean", "image", "date", "slug", "reference"] as const;
-
-/** Board 151:2 writes the type as prose — "Rich text", not the `richtext` slug
- *  the model stores. The slug is an identifier; a field list is read, not
- *  parsed. */
-const FIELD_TYPE_LABEL: Record<string, string> = {
-  text: "Text",
-  textarea: "Long text",
-  richtext: "Rich text",
-  number: "Number",
-  boolean: "Boolean",
-  image: "Image",
-  date: "Date",
-  slug: "Slug",
-  reference: "Reference",
-};
-
-export function FieldsView({
-  collection,
-  onBack,
-  onAddField,
-  onDeleteField,
-}: {
-  collection: CMSCollection;
-  onBack?: () => void;
-  onAddField: (name: string, type: string, required: boolean) => Promise<void>;
-  onDeleteField: (fieldId: string) => Promise<void>;
-}) {
-  const [adding, setAdding] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [type, setType] = React.useState<string>("text");
-  const [required, setRequired] = React.useState(false);
-  const [confirmDelete, setConfirmDelete] = React.useState<CMSField | null>(null);
-  const [menuFor, setMenuFor] = React.useState<string | null>(null);
-
-  return (
-    <div className={CONTENT_BODY}>
-      {onBack ? <Crumb label={`${collection.name} · fields`} onClick={onBack} /> : null}
-      <div className={SCROLL}>
-        {collection.fields.map((f) => (
-          <Row key={f.id} size="stack" data-field-row data-testid={`content-fieldrow-${f.id}`}>
-            <span className={ROW_STACK}>
-              <span className={ROW_TITLE} data-testid={`content-fieldrow-name-${f.id}`}>{f.name}</span>
-              <span className={SUB} data-testid={`content-fieldrow-type-${f.id}`}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
-            </span>
-            <span className={ROW_ACTIONS}>
-              {/* 151:12 — the `required` tag is ink-DISABLED, a step quieter
-                  than the type line beside it. It was ink-muted, which read as
-                  a second piece of content rather than a tag. */}
-              {f.validation?.required && <span className={REQUIRED_TAG} data-testid={`content-fieldrow-req-${f.id}`}>required</span>}
-              {/* Board 151:2 draws `⋯`, not a bare ✕: delete is not the only
-                  thing a field row will ever offer, and a destructive glyph
-                  sitting permanently on every row invites the mis-click.
-                  IconButton (32x32) rather than a text Button carrying a glyph —
-                  that sizes to the glyph and measured 21.92x18, under WCAG
-                  2.5.8's 24x24 minimum. */}
-              <Popover
-                open={menuFor === f.id}
-                onClose={() => setMenuFor(null)}
-                placement="bottom-end"
-                label={`Actions for ${f.name}`}
-                trigger={
-                  <IconButton
-                    label={`Actions for field ${f.name}`}
-                    onClick={() => setMenuFor((p) => (p === f.id ? null : f.id))}
-                  >
-                    ⋯
-                  </IconButton>
-                }
-              >
-                <Menu>
-                  <MenuItem
-                    onClick={() => {
-                      setMenuFor(null);
-                      setConfirmDelete(f);
-                    }}
-                  >
-                    Delete field
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </span>
-          </Row>
-        ))}
-        {adding ? (
-          <div className={INLINE_FORM}>
-            <TextInput
-              placeholder="Field name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              aria-label="Field name"
-              autoFocus
-            />
-            <div className={FORM_ROW}>
-              <Select value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
-                {FIELD_TYPES.map((t) => (
-                  <option key={t} value={t}>{FIELD_TYPE_LABEL[t] ?? t}</option>
-                ))}
-              </Select>
-              <label className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:cursor-pointer">
-                <Checkbox
-                  color="blue"
-                  className="tw:bg-white"
-                  checked={required}
-                  onChange={(e) => setRequired(e.target.checked)}
-                />
-                <span>required</span>
-              </label>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!name.trim()}
-                onClick={() => {
-                  void onAddField(name, type, required).then(() => {
-                    setAdding(false);
-                    setName("");
-                    setRequired(false);
-                  });
-                }}
-              >
-                Add
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-field" onClick={() => setAdding(true)}>
-            + Add field
-          </Button>
-        )}
-      </div>
-      <ConfirmDialog
-        open={confirmDelete != null}
-        onClose={() => setConfirmDelete(null)}
-        onConfirm={() => {
-          if (confirmDelete) void onDeleteField(confirmDelete.id);
-          setConfirmDelete(null);
-        }}
-        title="Delete field?"
-        message={`"${confirmDelete?.name}" and its values on every record will be removed.`}
-        confirmLabel="Delete field"
-        tone="destructive"
-      />
-    </div>
-  );
-}
-
-/* ── Dynamic pages ───────────────────────────────────────────────────────────
- *
- * Board 149:50 draws a `Dynamic pages ›` row in the collection footer and stops
- * there — it names the destination without drawing it. `CollectionView` had the
- * row behind an optional `onOpenDynamicPages`, ContentTab never passed it, and
- * the row is conditional, so it has never once rendered. The prop was dead from
- * the day it was added.
- *
- * The destination below is therefore designed, not transcribed, and it is
- * grounded in what the field actually does: `pageSlugPattern` generates one page
- * per record (`cms.ts:60`), so this screen is where you set it, see how many
- * pages it will produce, and learn why nothing appears until records publish —
- * which is the question `CMSRecordsModal` already answers in a warning banner.
- */
-
-export function DynamicPagesView({
-  collection,
-  records,
-  onBack,
-  onSave,
-}: {
-  collection: CMSCollection;
-  records: CMSContentItem[];
-  onBack?: () => void;
-  onSave: (pattern: string) => Promise<void>;
-}) {
-  const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
-  const [saving, setSaving] = React.useState(false);
-  React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
-
-  const trimmed = pattern.trim();
-  const dirty = trimmed !== (collection.pageSlugPattern ?? "");
-  const [confirmLeave, setConfirmLeave] = React.useState(false);
-  /* Deleting one FIELD asks first; deleting the whole record did not, and CMS
-     records are not in the undo stack — measured: the row was gone at once and
-     ⌘Z did not bring it back. */
-  const [confirmDelete, setConfirmDelete] = React.useState(false);
-  const leave = () => (dirty ? setConfirmLeave(true) : onBack?.());
-  const publishedCount = records.filter((r) => r.status === "published").length;
-  /* Two more conditions decide whether a page actually appears, and neither is
-     the record count. Both were checked against the service, not guessed:
-     - `applyPattern` (cms.service.ts:121) substitutes "" for a {key} that names
-       no field, so "/{slug}" on a collection whose only field is `title`
-       resolves every record to "/" — they collide instead of generating.
-     - `appendDynamicPagesToPublish` (:234) selects collections where
-       `pageTemplatePath` is NOT NULL. Nothing in this panel sets it, so a
-       collection created here contributes ZERO pages at publish while this
-       screen said "Generates 1 page". */
-  const patternKeys = [...trimmed.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
-  const unknownKeys = patternKeys.filter((k) => !collection.fields.some((f) => f.slug === k));
-  const hasTemplate = Boolean(collection.pageTemplatePath);
-
-  return (
-    <div className={CONTENT_BODY}>
-      {onBack ? <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} /> : null}
-      <div className={SCROLL}>
-        <div className={FIELD_LABEL}>URL pattern</div>
-        <div className={FIELD_WRAP}>
-          <TextInput
-            value={pattern}
-            placeholder="/menu/{slug}"
-            onChange={(e) => setPattern(e.target.value)}
-            aria-label="URL pattern"
-            className="tw:[font-family:var(--bk-font-mono)]"
-          />
-        </div>
-        <div className={`${SUB} tw:px-3 tw:pt-1.5 tw:leading-normal`}>
-          One page per record. Use a field slug in braces — {"{slug}"} — to build the URL.
-        </div>
-
-        {trimmed ? (
-          <div className={`${SUB} tw:px-3 tw:pt-3 tw:leading-normal`}>
-            {publishedCount === 0 ? (
-              /* The count that matters is PUBLISHED, not total: generation
-                 filters on published, so "4 records" would be a comforting
-                 number that produces nothing. */
-              <span style={{ color: "var(--bk-warning)" }}>
-                {records.length === 0
-                  ? "No records yet — nothing to generate."
-                  : `${records.length} record${records.length === 1 ? "" : "s"}, none published. Dynamic pages only generate from published records.`}
-              </span>
-            ) : (
-              `Generates ${publishedCount} page${publishedCount === 1 ? "" : "s"} from published records.`
-            )}
-          </div>
-        ) : (
-          <div className={`${SUB} tw:px-3 tw:pt-3 tw:leading-normal`}>
-            No pattern set — this collection generates no pages.
-          </div>
-        )}
-        {trimmed && unknownKeys.length > 0 && (
-          <div className={`${SUB} tw:px-3 tw:pt-2 tw:leading-normal`} style={{ color: "var(--bk-warning)" }}>
-            {unknownKeys.length === 1
-              ? `This collection has no field called "${unknownKeys[0]}", so every record resolves to the same URL.`
-              : `This collection has no fields called ${unknownKeys.map((k) => `"${k}"`).join(", ")}, so every record resolves to the same URL.`}
-          </div>
-        )}
-        {trimmed && !hasTemplate && (
-          <div className={`${SUB} tw:px-3 tw:pt-2 tw:leading-normal`} style={{ color: "var(--bk-warning)" }}>
-            No template page is bound, so publishing emits none of these yet.
-          </div>
-        )}
-      </div>
-      <ConfirmDialog
-        open={confirmLeave}
-        onClose={() => setConfirmLeave(false)}
-        onConfirm={() => { setConfirmLeave(false); onBack?.(); }}
-        title="Discard changes?"
-        message="The page pattern has unsaved changes. Going back throws them away."
-        confirmLabel="Discard"
-        tone="destructive"
-      />
-      {dirty && (
-        <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
-          <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>
-          <span className={SPACER} />
-          <Button
-            color="light"
-            size="xs"
-            className={GHOST}
-            onClick={() => setPattern(collection.pageSlugPattern ?? "")}
-          >
-            Discard
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className={SAVE_LINK}
-            disabled={saving}
-            aria-busy={saving || undefined}
-            onClick={() => {
-              setSaving(true);
-              void onSave(trimmed).finally(() => setSaving(false));
-            }}
-          >
-            {saving ? "Saving…" : "Save"}
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ── Sources (151:46) ────────────────────────────────────────────────────── */
 
 /** Board 151:46 draws a status LINE under the source name — a dot, then a
@@ -590,20 +267,29 @@ export function SourcesView({
   sources,
   onBack,
   onImportJson,
-  onRemoveSource,
+  actions,
 }: {
   sources: DataSource[];
   onBack: () => void;
   onImportJson: (json: string) => string | null;
-  /** Board 151:46 draws a `⋯` on every source row. `DataManager` has had
-   *  `unregisterSource` all along and no UI ever called it, so a source could
-   *  be added and never removed. */
-  onRemoveSource?: (id: string) => void;
+  /** The row ⋯ (6930:80567: Rename · Re-sync · Delete…). Board 151:46 drew
+   *  the ⋯; `unregisterSource` had no UI caller, so a source could be added
+   *  and never removed. */
+  actions?: SourceRowActions;
 }) {
   const [adding, setAdding] = React.useState(false);
   const [json, setJson] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
+  const [renaming, setRenaming] = React.useState<DataSource | null>(null);
+  const [resyncing, setResyncing] = React.useState<DataSource | null>(null);
+  const [deleting, setDeleting] = React.useState<DataSource | null>(null);
+  /* A source with a provider pulls from it; imported JSON has none, so
+     Re-sync asks for the current data instead. */
+  const resync = async (s: DataSource) => {
+    if (!actions) return;
+    if (!(await actions.refresh(s.id))) setResyncing(s);
+  };
   return (
     <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
@@ -633,7 +319,7 @@ export function SourcesView({
                   {status.label}
                 </span>
               </span>
-              {onRemoveSource && (
+              {actions && (
                 <span className={ROW_ACTIONS}>
                   <Popover
                     open={menuFor === s.id}
@@ -646,14 +332,16 @@ export function SourcesView({
                       </IconButton>
                     }
                   >
-                    <Menu>
-                      <MenuItem
-                        onClick={() => {
-                          setMenuFor(null);
-                          onRemoveSource(s.id);
-                        }}
-                      >
-                        Remove source
+                    <Menu label={`Actions for ${s.name}`}>
+                      <MenuItem data-testid={`content-source-rename-${s.id}`} onClick={() => { setMenuFor(null); setRenaming(s); }}>
+                        Rename
+                      </MenuItem>
+                      <MenuItem data-testid={`content-source-resync-${s.id}`} onClick={() => { setMenuFor(null); void resync(s); }}>
+                        Re-sync
+                      </MenuItem>
+                      <MenuSeparator />
+                      <MenuItem data-testid={`content-source-delete-${s.id}`} onClick={() => { setMenuFor(null); setDeleting(s); }}>
+                        Delete…
                       </MenuItem>
                     </Menu>
                   </Popover>
@@ -716,8 +404,55 @@ export function SourcesView({
           </>
         )}
       </div>
+      {actions ? (
+        <>
+          {renaming ? (
+            <RenameDialog
+              key={renaming.id}
+              open
+              onClose={() => setRenaming(null)}
+              title="Rename source"
+              label="Source name"
+              initial={renaming.name}
+              validate={(next) => (next ? null : "A source needs a name.")}
+              onSave={(next) => actions.rename(renaming.id, next)}
+              testId="content-source-rename"
+            />
+          ) : null}
+          {resyncing ? (
+            <ResyncJsonDialog
+              key={resyncing.id}
+              open
+              onClose={() => setResyncing(null)}
+              name={resyncing.name}
+              current={resyncing.data}
+              onResync={(data) => actions.replaceData(resyncing.id, data)}
+            />
+          ) : null}
+          <ConfirmDialog
+            open={deleting != null}
+            onClose={() => setDeleting(null)}
+            onConfirm={() => {
+              if (deleting) actions.remove(deleting.id);
+              setDeleting(null);
+            }}
+            title={`Delete “${deleting?.name ?? ""}”?`}
+            message="The source and its data leave this site. Elements bound to it stop receiving its data."
+            confirmLabel="Delete source"
+            tone="destructive"
+          />
+        </>
+      ) : null}
     </div>
   );
+}
+
+export interface SourceRowActions {
+  rename: (id: string, name: string) => void;
+  /** Pulls from the source's own provider; false when it has none. */
+  refresh: (id: string) => Promise<boolean>;
+  replaceData: (id: string, data: unknown) => void;
+  remove: (id: string) => void;
 }
 
 /* ── Variables (151:62) ──────────────────────────────────────────────────── */
@@ -737,6 +472,8 @@ export function VariablesView({
   const [editKey, setEditKey] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
+  const [renaming, setRenaming] = React.useState<string | null>(null);
+  const [deleting, setDeleting] = React.useState<string | null>(null);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
 
@@ -817,12 +554,16 @@ export function VariablesView({
                     </IconButton>
                   }
                 >
-                  <Menu>
-                    <MenuItem onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
+                  <Menu label={`Actions for ${v.key}`}>
+                    <MenuItem data-testid={`content-var-edit-${v.key}`} onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
                       Edit value
                     </MenuItem>
-                    <MenuItem onClick={() => { setMenuFor(null); onChange(variables.filter((x) => x.key !== v.key)); }}>
-                      Delete variable
+                    <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
+                      Rename
+                    </MenuItem>
+                    <MenuSeparator />
+                    <MenuItem data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
+                      Delete…
                     </MenuItem>
                   </Menu>
                 </Popover>
@@ -873,6 +614,37 @@ export function VariablesView({
           </Button>
         )}
       </div>
+      {renaming != null ? (
+      <RenameDialog
+        key={renaming}
+        open
+        onClose={() => setRenaming(null)}
+        title="Rename variable"
+        label="Key"
+        initial={renaming}
+        validate={(next) =>
+          !isValidVariableKey(next)
+            ? "Keys are letters/digits/dashes, starting with a letter."
+            : variables.some((x) => x.key === next)
+              ? "A variable with this key already exists."
+              : null
+        }
+        onSave={(next) => onChange(variables.map((x) => (x.key === renaming ? { ...x, key: next } : x)))}
+        testId="content-var-rename"
+      />
+      ) : null}
+      <ConfirmDialog
+        open={deleting != null}
+        onClose={() => setDeleting(null)}
+        onConfirm={() => {
+          onChange(variables.filter((x) => x.key !== deleting));
+          setDeleting(null);
+        }}
+        title={`Delete {{site.${deleting ?? ""}}}?`}
+        message="The variable and its value are removed."
+        confirmLabel="Delete variable"
+        tone="destructive"
+      />
     </div>
   );
 }

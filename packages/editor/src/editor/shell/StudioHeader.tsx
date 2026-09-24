@@ -258,6 +258,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       composer.off(EVENTS.UI_SEARCH_CONTEXT, onCtx);
     };
   }, [composer]);
+  /* 4428:140486 — a full-canvas view (the CMS workspace) takes the page
+     crumb's place: "<site> › CMS", not the page the canvas behind it shows. */
+  const [crumbCtx, setCrumbCtx] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onCrumb = (ctx: { label: string } | null) => setCrumbCtx(ctx?.label ?? null);
+    composer.on(EVENTS.UI_CRUMB_CONTEXT, onCrumb);
+    return () => {
+      composer.off(EVENTS.UI_CRUMB_CONTEXT, onCrumb);
+    };
+  }, [composer]);
 
   React.useEffect(() => {
     if (!composer) return;
@@ -776,7 +787,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       </div>
       <Topbar
         siteName={siteName}
-        pageName={pageName}
+        pageName={crumbCtx ?? pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
         /* Board 4418:123573's shell search is the ⌘K door. */
@@ -886,7 +897,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             siteId={siteIdForMenu}
             siteName={siteName}
-            pageName={pageName}
+            pageName={crumbCtx ?? pageName}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={canLeaveView ? toggleReadOnlyView : undefined}
           />

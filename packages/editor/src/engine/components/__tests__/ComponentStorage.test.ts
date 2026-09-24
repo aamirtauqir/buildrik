@@ -94,7 +94,7 @@ describe("saveComponent / loadComponents / loadComponent", () => {
   });
 });
 
-describe("deleteComponent / deleteAllComponents", () => {
+describe("deleteComponent", () => {
   it("deleteComponent removes exactly that record", async () => {
     await storage.saveComponent(makeComponent({ id: "a" }), "p");
     await storage.saveComponent(makeComponent({ id: "b" }), "p");
@@ -104,64 +104,6 @@ describe("deleteComponent / deleteAllComponents", () => {
     expect((await storage.loadComponents("p")).map((c) => c.id)).toEqual(["b"]);
   });
 
-  it("deleteAllComponents wipes ONLY the given project and returns the count", async () => {
-    await storage.saveComponent(makeComponent({ id: "a1" }), "p1");
-    await storage.saveComponent(makeComponent({ id: "a2" }), "p1");
-    await storage.saveComponent(makeComponent({ id: "b1" }), "p2");
-
-    expect(await storage.deleteAllComponents("p1")).toBe(2);
-    expect(await storage.loadComponents("p1")).toEqual([]);
-    expect((await storage.loadComponents("p2")).map((c) => c.id)).toEqual(["b1"]);
-  });
-
-  it("deleteAllComponents returns 0 for an empty project", async () => {
-    await storage.saveComponent(makeComponent(), "p");
-    expect(await storage.deleteAllComponents("empty")).toBe(0);
-  });
-});
-
-describe("exportComponents / importComponents", () => {
-  it("export bundles project components with version + timestamp", async () => {
-    await storage.saveComponent(makeComponent({ id: "a" }), "p");
-
-    const data = await storage.exportComponents("p");
-
-    expect(data.version).toBe("1.0.0");
-    expect(data.projectId).toBe("p");
-    expect(data.exportedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
-    expect(data.components.map((c) => c.id)).toEqual(["a"]);
-  });
-
-  it("import adds components and returns the count (existing kept by default)", async () => {
-    await storage.saveComponent(makeComponent({ id: "old" }), "p");
-
-    const count = await storage.importComponents({
-      version: "1.0.0",
-      projectId: "p",
-      exportedAt: "x",
-      components: [makeComponent({ id: "new-1" }), makeComponent({ id: "new-2" })],
-    });
-
-    expect(count).toBe(2);
-    const ids = (await storage.loadComponents("p")).map((c) => c.id).sort();
-    expect(ids).toEqual(["new-1", "new-2", "old"]);
-  });
-
-  it("clearExisting=true wipes the target project before importing", async () => {
-    await storage.saveComponent(makeComponent({ id: "old" }), "p");
-
-    await storage.importComponents(
-      {
-        version: "1.0.0",
-        projectId: "p",
-        exportedAt: "x",
-        components: [makeComponent({ id: "new-1" })],
-      },
-      true
-    );
-
-    expect((await storage.loadComponents("p")).map((c) => c.id)).toEqual(["new-1"]);
-  });
 });
 
 describe("getStorageStats", () => {
@@ -181,30 +123,6 @@ describe("getStorageStats", () => {
     expect(stats.count).toBe(2);
     expect(stats.oldestDate).toEqual(new Date(1_000));
     expect(stats.newestDate).toEqual(new Date(9_000));
-  });
-});
-
-describe("downloadComponentsFile", () => {
-  it("creates + revokes a blob URL and clicks a temp anchor", async () => {
-    const createObjectURL = vi.fn(() => "blob:fake");
-    const revokeObjectURL = vi.fn();
-    vi.stubGlobal("URL", Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }));
-    const click = vi
-      .spyOn(HTMLAnchorElement.prototype, "click")
-      .mockImplementation(() => undefined);
-
-    storage.downloadComponentsFile({
-      version: "1.0.0",
-      projectId: "p",
-      exportedAt: "x",
-      components: [],
-    });
-
-    expect(createObjectURL).toHaveBeenCalledTimes(1);
-    expect(click).toHaveBeenCalledTimes(1);
-    expect(revokeObjectURL).toHaveBeenCalledWith("blob:fake");
-    // The temp anchor is removed again.
-    expect(document.querySelector("a[download]")).toBeNull();
   });
 });
 

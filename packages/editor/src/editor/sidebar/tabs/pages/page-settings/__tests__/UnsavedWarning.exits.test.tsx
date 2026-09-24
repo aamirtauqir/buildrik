@@ -17,30 +17,25 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { UnsavedWarningModal } from "../UnsavedWarningModal";
 
 describe("UnsavedWarningModal (board 1171:4820)", () => {
-  it("names the tab's edits and offers exactly the board's two actions", () => {
-    render(
-      <UnsavedWarningModal isOpen pendingTab="seo" onDiscard={vi.fn()} onCancel={vi.fn()} />,
+  /* #20 made the three tabs one form, so the prompt only guards CLOSING
+     now — it says so instead of naming one tab's fields ("Leaving this tab"
+     was about the retired tab-switch guard). */
+  it("asks about the page's unsaved changes on close, with the board's two actions", () => {
+    render(<UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} />);
+    expect(screen.getByText("Discard unsaved changes?")).toBeInTheDocument();
+    expect(screen.getByTestId("pages-unsaved-body")).toHaveTextContent(
+      "You changed this page's settings but didn't save. Closing throws those edits away.",
     );
-    expect(screen.getByText("Discard unsaved SEO changes?")).toBeInTheDocument();
-    expect(screen.getByText(/page title and description/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /keep editing/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /discard the unsaved changes/i })).toBeInTheDocument();
     expect(screen.queryByText(/Save & Switch/i)).toBeNull();
-  });
-
-  it("titles itself per tab — Social names the social fields", () => {
-    render(
-      <UnsavedWarningModal isOpen pendingTab="social" onDiscard={vi.fn()} onCancel={vi.fn()} />,
-    );
-    expect(screen.getByText("Discard unsaved Social changes?")).toBeInTheDocument();
-    expect(screen.getByText(/social title, description and image/)).toBeInTheDocument();
   });
 
   it("Keep editing cancels, Discard discards", () => {
     const onDiscard = vi.fn();
     const onCancel = vi.fn();
     render(
-      <UnsavedWarningModal isOpen pendingTab="seo" onDiscard={onDiscard} onCancel={onCancel} />,
+      <UnsavedWarningModal isOpen onDiscard={onDiscard} onCancel={onCancel} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /keep editing/i }));
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -52,7 +47,7 @@ describe("UnsavedWarningModal (board 1171:4820)", () => {
   // Enter away from a modal that just appeared.
   it("focus lands on Keep editing, not on Discard", () => {
     render(
-      <UnsavedWarningModal isOpen pendingTab="seo" onDiscard={vi.fn()} onCancel={vi.fn()} />,
+      <UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} />,
     );
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: /keep editing/i }),

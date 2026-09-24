@@ -48,6 +48,17 @@ afterEach(() => {
 });
 
 describe("CmsWorkspace · root (4428:140486)", () => {
+  it("names itself in the topbar crumb while open, and gives it back on close (4428:140486)", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    const crumbs: unknown[] = [];
+    composer.on(EVENTS.UI_CRUMB_CONTEXT, (c) => crumbs.push(c));
+    const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    await screen.findByTestId("cms-workspace");
+    expect(crumbs).toEqual([{ label: "CMS" }]);
+    unmount();
+    expect(crumbs).toEqual([{ label: "CMS" }, null]);
+  });
+
   it("names the site, counts collections and records, and offers + New collection", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     const onCreate = vi.fn();
@@ -185,9 +196,10 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByRole("tab", { name: "Fields" }));
     expect(await screen.findByText("Published?")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
-    fireEvent.change(screen.getByLabelText("Field name"), { target: { value: "Photo URL" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent(`· ${MENU.fields.length} field`);
+    fireEvent.click(screen.getByTestId("cms-ws-add-field"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Photo URL" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() =>
       expect(composer.cms.collections.addField).toHaveBeenCalledWith(
         "col-1",
