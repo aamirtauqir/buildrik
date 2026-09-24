@@ -36,6 +36,9 @@ interface GroupSectionProps {
   onMineInsert?: (component: ComponentDefinition) => void;
   /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
   onManageComponents?: () => void;
+  /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
+  favs?: Set<string>;
+  onToggleFav?: (name: string) => void;
 }
 
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
@@ -114,17 +117,19 @@ export const Row: React.FC<{
   testId: string;
   /** Board 4418:99857's trailing ⠿ — a drag hint; the row is the handle. */
   grip?: boolean;
+  /** ★ favourite toggle (G2-115): shown on hover. */
+  fav?: { on: boolean; onToggle: () => void; testId: string };
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, description, testId, grip, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, description, testId, grip, fav, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
         pinned
           ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
           : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
@@ -188,6 +193,28 @@ export const Row: React.FC<{
           <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
         )}
       </span>
+      {fav ? (
+        <span
+          role="button"
+          tabIndex={0}
+          aria-pressed={fav.on}
+          aria-label={fav.on ? `Remove ${label} from favourites` : `Add ${label} to favourites`}
+          data-testid={fav.testId}
+          /* Hover-only either way: the boards draw element rows without it. */
+          className={`tw:w-[20px] tw:shrink-0 tw:text-center tw:text-[12px] tw:cursor-pointer tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 ${
+            fav.on ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-gray-400)]"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            fav.onToggle();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); fav.onToggle(); }
+          }}
+        >
+          {fav.on ? "★" : "☆"}
+        </span>
+      ) : null}
       {grip ? (
         <span
           aria-hidden="true"
@@ -215,12 +242,19 @@ export const Row: React.FC<{
   );
 };
 
+/** Groups that list element rows, and their row test-id prefix. */
+const ELEMENT_ROW_PREFIX: Partial<Record<InsertGroup["id"], string>> = {
+  favourites: "insert-fav",
+  recent: "insert-recent",
+  elements: "insert-el",
+};
+
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents,
+  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
-    {isOpen && group.id === "elements" && elements?.map((el) => (
+    {isOpen && ELEMENT_ROW_PREFIX[group.id] && elements?.map((el) => (
       <Row
         key={`${el.catId}-${el.name}`}
         label={el.name}
@@ -228,7 +262,12 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         disabled={el.disabled}
         disabledReason={el.disabled ? el.description : undefined}
         description={el.disabled ? undefined : el.description}
-        testId={`insert-el-${el.name}`}
+        testId={`${ELEMENT_ROW_PREFIX[group.id]}-${el.name}`}
+        fav={
+          onToggleFav && !el.disabled
+            ? { on: favs?.has(el.name) ?? false, onToggle: () => onToggleFav(el.name), testId: `${ELEMENT_ROW_PREFIX[group.id]}-fav-${el.name}` }
+            : undefined
+        }
         draggable
         onDragStart={(e) => onDragStart(e, el)}
         onClick={() => onElClick(el)}

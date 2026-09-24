@@ -9,6 +9,11 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+const checkSiteRoleMock = vi.fn();
+vi.mock("@/server/services/permission.service", () => ({
+  checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
+}));
+
 const mockCompletionsCreate = vi.fn();
 vi.mock("openai", () => ({
   default: class MockOpenAI {
@@ -184,6 +189,57 @@ describe("alt-text.service", () => {
 
       await expect(applyAltTextToAsset("u1", "a1")).rejects.toThrow("ASSET_NOT_FOUND");
       expect(prisma.mediaAsset.update).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── Regenerate (force) ─────────────────────────────────────────────────
+  /* The library's "Regenerate" could never work: the skip-guard kept any
+     existing alt text, so the button only ever said "Kept your alt text". */
+  describe("applyAltTextToAsset — force (Regenerate)", () => {
+    it("replaces existing alt text when forced", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue({ ...SAMPLE_ASSET, altText: "Old text" } as any);
+      mockCompletionsCreate.mockResolvedValue(SAMPLE_RESPONSE);
+
+      const result = await applyAltTextToAsset("u1", "a1", { force: true });
+
+      expect(result).toMatchObject({ altText: "A sunset over mountains.", skipped: false });
+      expect(prisma.mediaAsset.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ altText: "A sunset over mountains." }) }),
+      );
+    });
+
+    it("without force, existing alt text is still kept and the model is not called", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue({ ...SAMPLE_ASSET, altText: "Old text" } as any);
+
+      await expect(applyAltTextToAsset("u1", "a1")).resolves.toMatchObject({ altText: "Old text", skipped: true });
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
+      expect(prisma.mediaAsset.update).not.toHaveBeenCalled();
+    });
+
+    it("forced, but the user typed something NEW while generating → theirs wins", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique)
+        .mockResolvedValueOnce({ ...SAMPLE_ASSET, altText: "Old text" } as any)
+        .mockResolvedValueOnce({ userId: "u1", altText: "Typed meanwhile" } as any);
+      mockCompletionsCreate.mockResolvedValue(SAMPLE_RESPONSE);
+
+      await expect(applyAltTextToAsset("u1", "a1", { force: true })).resolves.toEqual({
+        altText: "Typed meanwhile",
+        skipped: true,
+      });
+      expect(prisma.mediaAsset.update).not.toHaveBeenCalled();
+    });
+
+    it("force does not bypass the role gate: a VIEWER on the asset's site is refused", async () => {
+      const { applyAltTextToAsset } = await import("@/server/services/alt-text.service");
+      vi.mocked(prisma.mediaAsset.findUnique).mockResolvedValue({ ...SAMPLE_ASSET, siteId: "s1", altText: "Old" } as any);
+      checkSiteRoleMock.mockRejectedValueOnce(Object.assign(new Error("Insufficient permissions"), { code: "FORBIDDEN" }));
+
+      await expect(applyAltTextToAsset("u1", "a1", { force: true })).rejects.toMatchObject({ code: "FORBIDDEN" });
+      expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u1", "s1", "EDITOR");
+      expect(mockCompletionsCreate).not.toHaveBeenCalled();
     });
   });
 });

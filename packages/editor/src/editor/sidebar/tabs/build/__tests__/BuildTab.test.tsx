@@ -143,6 +143,35 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   });
 });
 
+/* G2-115 — board 4418:103353: ★ FAVOURITES sits in the drawer (it lived only
+   in the Element Picker modal). Recently inserted elements get a RECENT group
+   (the modal's other list, kept; designer-notes). */
+describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
+  it("starring an element row adds a ★ FAVOURITES group above ELEMENTS, opened", () => {
+    renderTab();
+    expect(screen.queryByTestId("insert-group-favourites")).toBeNull();
+    fireEvent.click(screen.getByTestId("insert-el-fav-Heading"));
+    const groups = [...document.querySelectorAll('[data-testid^="insert-group-"]')].map((g) => g.getAttribute("data-testid"));
+    expect(groups[0]).toBe("insert-group-favourites");
+    expect(screen.getByTestId("insert-group-favourites").textContent).toContain("★ FAVOURITES");
+    expect(screen.getByTestId("insert-group-favourites")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("insert-fav-Heading")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("insert-el-fav-Heading"));
+    expect(screen.queryByTestId("insert-group-favourites")).toBeNull();
+  });
+
+  it("an inserted element shows up under RECENT", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-el-Heading"));
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("insert-group-recent")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("insert-group-recent"));
+    fireEvent.click(screen.getByTestId("insert-recent-Heading"));
+    expect(onBlockClick).toHaveBeenCalledTimes(2);
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
@@ -288,6 +317,25 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
     );
     expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
+  });
+
+  /* Brand › Component styles and "Replace with block…" land here asking for
+     BLOCKS; with ELEMENTS' 53 rows still open above it, the asked-for group
+     sat off-screen. The asked group opens alone and scrolls into view. */
+  it("a request opens that group alone and scrolls it into view", () => {
+    const scrolled: string[] = [];
+    const orig = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function () { scrolled.push((this as HTMLElement).dataset.testid ?? ""); };
+    const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
+    requestInsertGroup(composer as never, "blocks");
+    render(
+      <ToastProvider>
+        <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
+      </ToastProvider>,
+    );
+    Element.prototype.scrollIntoView = orig;
+    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "false");
+    expect(scrolled).toContain("insert-section-blocks");
   });
 
   it("the request is consumed once — the next mount is back to ELEMENTS only", () => {

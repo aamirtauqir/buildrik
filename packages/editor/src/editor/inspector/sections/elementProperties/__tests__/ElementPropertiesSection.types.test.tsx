@@ -60,13 +60,11 @@ describe("ElementPropertiesSection — input element", () => {
 });
 
 describe("ElementPropertiesSection — video element", () => {
-  it("routes the Video URL through the video-src transaction and keeps <source> in sync", () => {
-    const sourceChild = makeMockElement({ id: "src-1", tagName: "source" });
-    const { el, composer } = setup("video", { children: [sourceChild] });
-    fireEvent.change(rowInput("Video URL"), { target: { value: "https://v.example/clip.mp4" } });
-    expect(composer.beginTransaction).toHaveBeenCalledWith("video-src-change");
-    expect(el.setAttribute).toHaveBeenCalledWith("src", "https://v.example/clip.mp4");
-    expect(sourceChild.setAttribute).toHaveBeenCalledWith("src", "https://v.example/clip.mp4");
+  /* The Video URL row is gone (G2-145): "Manage video" in MediaSourceRow
+     picks the video and keeps <source> in sync — see MediaSourceRow.test. */
+  it("offers no Video URL row", () => {
+    setup("video");
+    expect(screen.queryByText("Video URL")).toBeNull();
   });
 
   it("toggling the Autoplay checkbox writes autoplay=true", () => {

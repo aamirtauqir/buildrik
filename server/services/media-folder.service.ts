@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { assertMediaWrite } from "@/server/services/media.service";
 import type {
   CreateFolderInput,
   DeleteFolderInput,
@@ -37,6 +38,7 @@ export async function listFolders(userId: string, input: ListFoldersInput) {
 }
 
 export async function createFolder(userId: string, input: CreateFolderInput) {
+  await assertMediaWrite(userId, input.siteId);
   // Validate parent ownership when set.
   if (input.parentId) {
     const parent = await prisma.mediaFolder.findUnique({
@@ -60,11 +62,12 @@ export async function createFolder(userId: string, input: CreateFolderInput) {
 export async function renameFolder(userId: string, input: RenameFolderInput) {
   const folder = await prisma.mediaFolder.findUnique({
     where: { id: input.folderId },
-    select: { userId: true },
+    select: { userId: true, siteId: true },
   });
   if (!folder || folder.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, folder.siteId);
   return prisma.mediaFolder.update({
     where: { id: input.folderId },
     data: { name: input.name },
@@ -75,7 +78,7 @@ export async function moveFolder(userId: string, input: MoveFolderInput) {
   const [folder, newParent] = await Promise.all([
     prisma.mediaFolder.findUnique({
       where: { id: input.folderId },
-      select: { userId: true, parentId: true },
+      select: { userId: true, parentId: true, siteId: true },
     }),
     input.newParentId
       ? prisma.mediaFolder.findUnique({
@@ -88,6 +91,7 @@ export async function moveFolder(userId: string, input: MoveFolderInput) {
   if (!folder || folder.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, folder.siteId);
   if (input.newParentId && (!newParent || newParent.userId !== userId)) {
     throw new Error("PARENT_NOT_FOUND");
   }
@@ -124,11 +128,12 @@ export async function moveFolder(userId: string, input: MoveFolderInput) {
 export async function deleteFolder(userId: string, input: DeleteFolderInput) {
   const folder = await prisma.mediaFolder.findUnique({
     where: { id: input.folderId },
-    select: { userId: true },
+    select: { userId: true, siteId: true },
   });
   if (!folder || folder.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, folder.siteId);
 
   return prisma.$transaction(async (tx) => {
     // Move direct child folders to root.

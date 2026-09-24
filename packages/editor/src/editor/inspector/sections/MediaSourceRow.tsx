@@ -23,11 +23,13 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
-import { handleGenericAttributeChange, runTxn } from "./elementProperties/handlers";
+import { handleGenericAttributeChange, handleVideoSrcChange, runTxn } from "./elementProperties/handlers";
 
 const KINDS: Record<string, { label: string; door: string; picker: MediaAssetType | null }> = {
   image: { label: "Image source", door: "Choose image", picker: "image" },
-  video: { label: "Video source", door: "Manage video", picker: null },
+  /* Owner decision (G2-145): "Manage video" picks a video, as "Choose image"
+     picks an image — the Element properties Video URL row is gone. */
+  video: { label: "Video source", door: "Manage video", picker: "video" },
   svg: { label: "SVG image source", door: "Manage SVG", picker: null },
 };
 
@@ -71,7 +73,9 @@ export function MediaSourceRow({ composer, selectedElement, onOpenMediaLibrary }
       onOpenMediaLibrary([kind.picker], (chosen) => {
         const target = composer.elements.getElement(selectedElement.id);
         if (!target) return;
-        runTxn(composer, "media-source-change", () => handleGenericAttributeChange(target, "src", chosen.src));
+        /* A video keeps its <source> child in step, as the URL row did. */
+        if (selectedElement.type === "video") runTxn(composer, "video-src-change", () => handleVideoSrcChange(target, chosen.src));
+        else runTxn(composer, "media-source-change", () => handleGenericAttributeChange(target, "src", chosen.src));
         bump();
       });
       return;

@@ -7,6 +7,7 @@ import { GSAPEngine } from "../../../../engine/animations";
 import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
 import type { SectionTier } from "../../shared/controls/Section";
 import type { Composer } from "@/engine";
+import type { AnimationConfig } from "@/shared/types/animations";
 
 // ============================================================================
 // TYPES
@@ -60,6 +61,12 @@ export interface InteractionsSectionProps {
    *  interaction stayed invisible until the section re-mounted. */
   composer?: Composer | null;
   elementId?: string;
+  /** G2-157 (option A): the element's CSS animation, shown as its own row in
+   *  this list. Data and export are untouched — the row edits the same
+   *  AnimationConfig the old Animation section did. */
+  animation?: AnimationConfig | null;
+  onAnimationChange?: (animation: AnimationConfig | null) => void;
+  onAnimationPreview?: () => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */

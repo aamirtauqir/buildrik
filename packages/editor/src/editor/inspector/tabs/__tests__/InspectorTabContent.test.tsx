@@ -73,7 +73,6 @@ function makeCssContext(overrides: Partial<CssContext> = {}): CssContext {
       isMedia: false,
       isFlexContainer: false,
       isGridContainer: false,
-      devMode: false,
     } as unknown as CssContext["inspectorContext"],
     selectedElements: [],
     mixedKeys: new Set<string>(),
@@ -95,7 +94,6 @@ function renderTab(opts: {
   tabId: "style" | "element" | "effects";
   elementType: string;
   cssContext?: Partial<CssContext>;
-  devMode?: boolean;
   expanded?: Set<string>;
 }) {
   const composer = makeComposer();
@@ -121,7 +119,6 @@ function renderTab(opts: {
       expandedSections={opts.expanded ?? new Set()}
       onToggleSection={vi.fn()}
       advancedState={NO_OP_ADVANCED}
-      devMode={opts.devMode ?? false}
       tier="pro"
       showAll={false}
       onShowAllChange={vi.fn()}
@@ -147,7 +144,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: false,
           isFlexContainer: false,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -173,7 +169,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: true,
           isFlexContainer: false,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -199,7 +194,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: false,
           isFlexContainer: true,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -226,19 +220,19 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("container's Effects tab shows Effects + Animation + Interactions; Visibility lives on Settings", () => {
+  it("container's Effects tab shows Opacity · Shadow · Blur · Interactions (animation folded in, G2-157); Visibility lives on Settings", () => {
     /* Board 4428:142686 (Effects) draws OPACITY · SHADOW · BLUR ·
        INTERACTIONS; board 4428:141642 (Settings) opens with VISIBILITY. */
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Opacity section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Animation section/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Interactions section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
     unmount();
     renderTab({ tabId: "element", elementType: "container" });
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Effects section/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Opacity section/i })).not.toBeInTheDocument();
   });
 
   it("button shows Link (linkable)", () => {
@@ -248,41 +242,27 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).toBeInTheDocument();
   });
 
-  it("container does NOT show Link (not linkable)", () => {
+  /* Board 4428:141642 draws LINK on a Section; export wraps a linked
+     container in a box-less <a> (ExportEngine.blockLink.test). */
+  it("container shows Link, between Visibility and Content", () => {
     renderTab({ tabId: "element", elementType: "container" });
-    expect(
-      screen.queryByRole("button", { name: /Link section/i })
-    ).not.toBeInTheDocument();
+    const names = screen
+      .getAllByRole("button", { name: /(Visibility|Link|Content) section/i })
+      .map((b) => b.getAttribute("aria-label") ?? b.textContent ?? "");
+    const at = (re: RegExp) => names.findIndex((n) => re.test(n));
+    expect(at(/Link/i)).toBeGreaterThan(at(/Visibility/i));
+    expect(at(/Content/i)).toBeGreaterThan(at(/Link/i));
   });
 
-  it("all-css is only rendered in dev mode", () => {
-    const { rerender } = renderTab({
-      tabId: "element",
-      elementType: "container",
-      devMode: false,
-    });
-    expect(screen.queryByRole("button", { name: /All CSS section/i })).not.toBeInTheDocument();
+  it("an image still does NOT show Link", () => {
+    renderTab({ tabId: "element", elementType: "image" });
+    expect(screen.queryByRole("button", { name: /Link section/i })).not.toBeInTheDocument();
+  });
 
-    rerender(
-      <InspectorTabContent
-        tabId="element"
-        composer={makeComposer() as never}
-        selectedElement={{ id: "el-1", type: "container" }}
-        styles={{}}
-        onChange={vi.fn()}
-        onBatchChange={vi.fn()}
-        cssContext={makeCssContext({ elementType: "container" })}
-        propertyStates={{}}
-          expandedSections={new Set()}
-        onToggleSection={vi.fn()}
-        advancedState={NO_OP_ADVANCED}
-        devMode={true}
-        tier="pro"
-        showAll={false}
-        onShowAllChange={vi.fn()}
-      />
-    );
-    expect(screen.getByRole("button", { name: /All CSS section/i })).toBeInTheDocument();
+  /* G2-160: the dev-flag "All CSS" section is gone. */
+  it("renders no All CSS section", () => {
+    renderTab({ tabId: "element", elementType: "container" });
+    expect(screen.queryByRole("button", { name: /All CSS section/i })).not.toBeInTheDocument();
   });
 
   it("css-classes is universal — every element type has it", () => {

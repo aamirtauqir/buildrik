@@ -122,11 +122,21 @@ const crumbOf = (...parts: React.ReactNode[]) => (
   </>
 );
 
+/** The in-page error UI is the whole handling; see the hooks below. */
+const HANDLED_IN_PAGE = (): void => undefined;
+
 export function ReviewClient({ token }: { token: string }) {
   const review = trpc.clientReview.get.useQuery({ token }, { retry: false });
   const identify = trpc.clientReview.identify.useMutation();
-  const comment = trpc.clientReview.comment.useMutation();
-  const resolve = trpc.clientReview.resolve.useMutation();
+  /* Every failure of these two is shown IN the page — the red "not sent" box
+     (board 4418:122170) for a change request, `comment.error` under the notes,
+     `resolve.error` under the approval. The provider's default mutation
+     onError (lib/trpc/client.tsx) also raised a global "Something went wrong"
+     toast on top, which the board does not draw. A hook-level onError replaces
+     that default for these two mutations only; every other mutation, and any
+     error outside them, still gets the global toast. */
+  const comment = trpc.clientReview.comment.useMutation({ onError: HANDLED_IN_PAGE });
+  const resolve = trpc.clientReview.resolve.useMutation({ onError: HANDLED_IN_PAGE });
   // The client's own notes, so the page isn't write-only — they see what they
   // already said. Only fetched once identified (the router requires it).
   const comments = trpc.clientReview.comments.useQuery(

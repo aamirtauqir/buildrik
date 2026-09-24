@@ -11,8 +11,9 @@
  * with the dashboard modal's default name. The URL is `/share/<token>`, the
  * route the dashboard serves; a site id is not a token.
  *
- * Copy is the board's: "current saved design". Owner decision 2026-09-24:
- * `/share/<token>` renders the saved draft (a server lane makes it so).
+ * Copy is the board's (visual precedence): "current saved design" — which is
+ * what `/share/<token>` renders since 2026-09-24 (the saved draft through the
+ * publish exporter; it used to redirect to the published site).
  *
  * Password and expiry stay in the dashboard's modal — the board carries
  * neither.
@@ -52,22 +53,7 @@ function isOpenToAnyone(row: ShareLinkRow, now: number): boolean {
   return row.expiresAt == null || new Date(row.expiresAt).getTime() > now;
 }
 
-/* One reuse-or-create per site at a time. StrictMode runs the open effect
-   twice, and both runs saw an empty list and each minted a link — the
-   real-site walk found two ShareLinks per open. Concurrent callers now
-   share the in-flight promise; it is dropped once settled, so a later
-   open (or Try again) asks the server afresh. */
-const inflight = new Map<string, Promise<string>>();
-
-function resolveShareToken(siteId: string): Promise<string> {
-  const pending = inflight.get(siteId);
-  if (pending) return pending;
-  const run = findOrCreateShareToken(siteId).finally(() => inflight.delete(siteId));
-  inflight.set(siteId, run);
-  return run;
-}
-
-async function findOrCreateShareToken(siteId: string): Promise<string> {
+async function resolveShareToken(siteId: string): Promise<string> {
   const sharing = getBuildrikClient(DASHBOARD_URL).siteDetail.sharing;
   const rows: ShareLinkRow[] = await sharing.list.query({ siteId });
   const reusable = rows.find((row) => isOpenToAnyone(row, Date.now()));

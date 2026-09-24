@@ -13,7 +13,7 @@ vi.mock("../shared/controls", async () => {
 describe("BorderSection", () => {
   it("renders without crashing", () => {
     const { container } = render(
-      <BorderSection styles={{}} onChange={vi.fn()} onBatchChange={vi.fn()} />
+      <BorderSection styles={{}} onChange={vi.fn()} />
     );
     expect(container.firstChild).toBeTruthy();
   });

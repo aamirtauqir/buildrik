@@ -231,13 +231,6 @@
 }
 
 /* ─────────────────────────────────────────────
-   HELP BUTTON — static footer link
-   ───────────────────────────────────────────── */
-.ls-btn--help {
-  flex-shrink: 0;
-}
-
-/* ─────────────────────────────────────────────
    PANEL — variable width drawer
    ───────────────────────────────────────────── */
 .ls-panel {
@@ -269,109 +262,6 @@
   width: 0 !important;
   opacity: 0;
   overflow: hidden;
-}
-
-/* Explicit close affordance — floats top-right of the open drawer.
-   Sits above tab headers via z-index; 24x24 so it reads as a control
-   without crowding the header action row. */
-.ls-panel-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  width: 24px;
-  height: 24px;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 5px;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.ls-panel-close:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-.ls-panel-close:focus-visible {
-  outline: 2px solid var(--bk-accent);
-  outline-offset: -2px;
-}
-.ls-panel-close:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* ─────────────────────────────────────────────
-   PANEL HEADER — title + optional subtitle + actions
-   ───────────────────────────────────────────── */
-.ls-panel-header {
-  display: flex;
-  align-items: center;
-  padding: 11px var(--bk-space-12) 10px;
-  border-bottom: 1px solid var(--bk-border);
-  flex-shrink: 0;
-  gap: var(--bk-space-8);
-}
-
-.ls-panel-title {
-  font-family: var(--bk-font-ui, "Inter Tight", system-ui, sans-serif);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bk-ink);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  margin: 0;
-  line-height: 1.2;
-}
-
-/* Optional subtitle under title (e.g. "30 blocks · 4 categories") */
-.ls-panel-subtitle {
-  font-family: var(--bk-font-mono);
-  font-size: var(--bk-text-11);
-  font-weight: 500;
-  color: var(--bk-ink-muted);
-  letter-spacing: -0.01em;
-  margin-top: 1px;
-  line-height: 1.2;
-}
-
-.ls-panel-header-spacer {
-  flex: 1;
-}
-
-.ls-panel-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: var(--bk-ink-muted);
-  padding: 0;
-  border-radius: 5px;
-  transition: background 0.12s ease, color 0.12s ease;
-  flex-shrink: 0;
-}
-
-.ls-panel-icon-btn:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-
-.ls-panel-icon-btn:focus-visible {
-  outline: 2px solid var(--bk-accent);
-  outline-offset: -2px;
-}
-
-.ls-panel-icon-btn > svg {
-  width: 16px;
-  height: 16px;
 }
 
 /* ─────────────────────────────────────────────

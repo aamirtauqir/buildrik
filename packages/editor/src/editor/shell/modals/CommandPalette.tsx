@@ -25,6 +25,8 @@ import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 // =============================================================================
 // TYPES
@@ -53,7 +55,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Pages", "Navigate", "Edit", "View", "Add", "Tools", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -189,7 +191,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       id: "templates-replace-layout",
       label: "Replace layout with template…",
       group: "Tools",
-      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})),
+      /* 4428:149355: the catalogue opens in replace mode for the active page. */
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })),
     },
     { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
     {
@@ -233,6 +236,19 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
         const siteId = getSiteIdFromUrl();
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
       }),
+    });
+  }
+
+  /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws
+     none); the owner kept the capability, so a template answers a query here
+     and opens on its preview. Searchable only, never in the opening list. */
+  for (const t of [...PAGE_TEMPLATES, ...getMyTemplates()]) {
+    commands.push({
+      id: `template-${t.id}`,
+      label: t.name,
+      group: "Templates",
+      keywords: ["template"],
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { previewId: t.id })),
     });
   }
 
@@ -307,8 +323,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
     if (cmd.disabled) return;
+    recordCommandRun(cmd.id.replace(/^recent-/, ""));
     cmd.handler();
   }, []);
+
+  /* RECENT (S3.14, restored off-board — the owner's "never silently remove a
+     capability"; 4418:141220 draws no strip, logged in the designer notes):
+     the last five rows you ran, above the board's bands, on the empty query
+     only. A copy of the live row, so its guard reflects this open. */
+  const recentCommands = React.useMemo(() => {
+    const byId = new Map(commands.map((c) => [c.id, c]));
+    return getRecentCommandIds().flatMap((id) => {
+      const cmd = byId.get(id);
+      if (!cmd) return [];
+      const isDoor = cmd.group === "Navigate" || cmd.group === "Pages";
+      return [{ ...cmd, id: `recent-${cmd.id}`, group: "Recent", shortcut: isDoor ? undefined : cmd.shortcut }];
+    });
+  }, [commands]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
@@ -317,11 +348,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return commands.filter((c) => OPENING_BANDS.has(c.group));
+    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
     return commands.filter((cmd) =>
       [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
-  }, [commands, query]);
+  }, [commands, recentCommands, query]);
 
   // A query that matches nothing is never a dead end: AI, or stock photos.
   const askAI = React.useCallback(() => {
@@ -400,11 +431,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         onKeyDown={handleKeyDown}
         className="tw:fixed tw:top-12 tw:left-1/2 tw:flex tw:max-h-[800px] tw:w-160 tw:max-w-[calc(100vw-32px)] tw:-translate-x-1/2 tw:flex-col tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
-        {/* Input row — 16/12 inset, ⌕ at 15px, the field at 12px, the scope chip. */}
+        {/* Input row — 16/12 inset, ⌕ at 16 (the board's 15 snapped to --bk-text-16), the field at 12px, the scope chip. */}
         <div data-testid="cmdk-query" className="tw:flex tw:flex-none tw:items-center tw:gap-2 tw:px-4 tw:py-3">
           {/* The input row is the card's focus: the caret is the indicator, and
               the board draws no ring around the field. */}
-          <span aria-hidden="true" className="tw:flex-none tw:text-[15px] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
+          <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-16)] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
             ⌕
           </span>
           <TextInput

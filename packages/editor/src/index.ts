@@ -37,6 +37,10 @@ export {
 // Editor Shell
 // ============================================
 export { AquibraStudio } from "./editor/shell/AquibraStudio";
+// The `/share/<token>` draft preview: dashboard rows → ProjectData → the
+// publish pages, with no editor mounted.
+export { projectDataFromRows } from "./services/BuildrikSyncProvider";
+export { renderProjectPages, type PublishPage, type RenderedPage } from "./editor/shell/exportPublishPages";
 
 // ============================================
 // Types

@@ -51,6 +51,9 @@ export interface ActivityLogViewProps {
    *  or the URL fallback. Null = opened without a project; the view renders
    *  a banner and not a query. */
   siteId: string | null;
+  /** Flow DRIFT: a row opens its subject in the editor — comments in Review,
+   *  publishes in History › Published, edits in History › Session. */
+  onOpenRow?: (kind: "edit" | "comment" | "publish") => void;
 }
 
 export interface ActivityViewProps {

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
+import type { IconConfig } from "../../../../shared/types/media";
 import { Section, type SectionTier } from "../../shared/controls";
 import { escapeHTML } from "../../../../shared/utils/html/encoding";
 import { getPropertiesForType } from "./config";
@@ -17,7 +17,6 @@ import {
   handleColumnsGapChange,
   handleContentChange,
   handleTextareaDefaultChange,
-  handleVideoSrcChange,
   handleVideoPosterChange,
   handleGenericAttributeChange,
   handleIconSelectAction,
@@ -79,11 +78,6 @@ export interface ElementPropertiesSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
-  /** Opens media library for asset selection */
-  onOpenMediaLibrary?: (
-    allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void
-  ) => void;
   /** Opens icon picker for icon selection */
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -134,7 +128,6 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   isOpen,
   onToggle,
   tier = "secondary",
-  onOpenMediaLibrary,
   onOpenIconPicker,
 }) => {
   const [attrs, setAttrs] = React.useState<Record<string, string>>({});
@@ -261,15 +254,6 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
       return;
     }
 
-    // Video src
-    if (selectedElement.type === "video" && id === "src") {
-      runTxn(composer, "video-src-change", () => {
-        handleVideoSrcChange(el, value);
-      });
-      setAttrs((prev) => ({ ...prev, [id]: value }));
-      return;
-    }
-
     // Video poster
     if (selectedElement.type === "video" && id === "poster") {
       runTxn(composer, "video-poster-change", () => {
@@ -331,7 +315,6 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
           value={attrs[prop.id] || ""}
           onChange={handleChange}
           selectedElement={selectedElement}
-          onOpenMediaLibrary={onOpenMediaLibrary}
         />
       ))}
 

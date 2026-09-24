@@ -46,6 +46,7 @@ function makeElement(id: string) {
   return {
     getStyles: () => ({}),
     getClasses: () => [],
+    getCustomData: () => undefined,
     getId: () => id,
     getParent: () => null,
     getTagName: () => "div",

@@ -74,6 +74,17 @@ const ROW_KIND_LABEL: Record<ActivityEntry["kind"], string> = {
   publish: "Publish",
 };
 
+/** Where a row opens, said to screen readers (the row itself is the button). */
+const OPEN_IN: Record<ActivityEntry["kind"], string> = {
+  edit: "open in Session",
+  comment: "open in Review",
+  publish: "open in Published",
+};
+/* The row's clickable body: ghost, left-aligned, the row's own two lines. */
+const ROW_OPEN =
+  "tw:h-auto tw:w-full tw:flex-col tw:items-stretch tw:gap-[var(--bk-space-2)] tw:border-transparent tw:bg-transparent " +
+  "tw:p-0 tw:text-left tw:font-normal tw:hover:bg-transparent tw:disabled:opacity-100";
+
 const LIST_CLASS = "tw:flex tw:flex-col tw:gap-[var(--bk-space-4)] tw:px-[var(--bk-space-12)]";
 const ROW_CLASS =
   "tw:flex tw:flex-col tw:gap-[var(--bk-space-2)] tw:rounded-md tw:border tw:border-[var(--bk-border)] " +
@@ -91,7 +102,7 @@ function dashboardHref(actionUrl: string, siteId: string): string {
   return new URL(actionUrl, `${DASHBOARD_URL}/dashboard/sites/${siteId}`).toString();
 }
 
-export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
+export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpenRow }) => {
   const [filter, setFilter] = React.useState<ActivityFilter>("all");
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<ActivityEntry[]>([]);
@@ -244,6 +255,15 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
           <ul className={LIST_CLASS} data-testid="activity-rows">
             {rows.map((r) => (
               <li key={r.id} className={ROW_CLASS} data-kind={r.kind}>
+                <Button
+                  color="light"
+                  size="xs"
+                  disabled={!onOpenRow}
+                  onClick={() => onOpenRow?.(r.kind)}
+                  aria-label={`${ROW_KIND_LABEL[r.kind]}: ${r.summary} — ${OPEN_IN[r.kind]}`}
+                  className={ROW_OPEN}
+                  data-testid="activity-row-open"
+                >
                 <div className={ROW_META}>
                   <span data-testid="activity-kind">{ROW_KIND_LABEL[r.kind]}</span>
                   <span aria-hidden="true">·</span>
@@ -254,6 +274,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
                   </time>
                 </div>
                 <p className={ROW_SUMMARY}>{r.summary}</p>
+                </Button>
                 {r.actionUrl && (
                   <a
                     href={dashboardHref(r.actionUrl, siteId)}

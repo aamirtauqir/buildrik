@@ -105,6 +105,13 @@ describe("SiteMenu — board 4418:126034", () => {
     expect(screen.getAllByRole("menuitem").map((i) => i.textContent)).toEqual(["Exit view mode"]);
   });
 
+  it("a VIEWER held in view mode (no toggle) is told why, not shown an empty menu", () => {
+    render(<SiteMenu {...all} readOnlyView onToggleReadOnlyView={undefined} />);
+    openMenu();
+    expect(screen.queryAllByRole("menuitem")).toHaveLength(0);
+    expect(screen.getByText("View only — ask an editor to make changes")).toBeTruthy();
+  });
+
   it("Share preview link opens the in-editor share modal, not the dashboard", async () => {
     const open = vi.fn();
     vi.stubGlobal("open", open);

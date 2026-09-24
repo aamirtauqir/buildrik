@@ -17,7 +17,7 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { ConfirmDialog, EmptyState, Modal, Progress, Spinner, Button, Tooltip, VersionRow } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
@@ -47,6 +47,10 @@ export interface PublishHistoryProps {
   /** A row's "Compare" — opens the one Compare (B8) on the version before it
    *  and this one. Omitted = no Compare on the rows. */
   onCompare?: (from: { id: string; version: number }, to: { id: string; version: number }) => void;
+  /** The details overlay's "Compare with current" (board 6881:70883). */
+  onCompareWithCurrent?: (row: { id: string; version: number }) => void;
+  /** The site name the details overlay leads with. */
+  siteName?: string;
   /**
    * The shell's publish job, as far as this panel needs it. Three boards run
    * off one state: 184:37 "Rolling back…" (a bar while it publishes), 184:45
@@ -123,13 +127,22 @@ const OUTCOME_REASON =
   "tw:mt-2 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 
-export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, onCompare, rollbackJob = null }) => {
+export const PublishHistory: React.FC<PublishHistoryProps> = ({
+  siteId,
+  onRollbackStarted,
+  onCompare,
+  onCompareWithCurrent,
+  siteName,
+  rollbackJob = null,
+}) => {
   // P6 permissions boards: republish is admin-scoped (owner decision 8) —
   // non-admins see the row action disabled with "Ask an admin", never hidden.
   const canRollback = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<PublishHistoryRow[]>([]);
   const [confirm, setConfirm] = React.useState<PublishHistoryRow | null>(null);
+  /* Board 6881:70883 — the deploy a row click is inspecting. */
+  const [details, setDetails] = React.useState<PublishHistoryRow | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
   /* Board 453:4064 answers a failed rollback with a MODAL, not a line of grey
      text under the header — and its copy carries the one fact the user needs
@@ -314,10 +327,13 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             key={r.id}
             data-version-row
             data-version={r.version}
-            /* No row-level click target here — the only action is the button
-               inside it, and a focusable role=button that does nothing is a
-               keyboard trap with no payoff. */
-            interactive={false}
+            /* Board 4418:74024: a deploy row opens its details overlay
+               (6881:70883). The row's own buttons stay theirs. */
+            interactive
+            onClick={(e: React.MouseEvent) => {
+              if ((e.target as HTMLElement).closest("button")) return;
+              setDetails(r);
+            }}
             title={`Version ${r.version}`}
             current={isLive}
             currentLabel="Live"
@@ -375,9 +391,74 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       {/* Board 949:4474 states the rule that makes a republish safe to try,
           once, under the list. Both halves matter: nothing is lost, AND a
           republish is itself a deploy. */}
-      <p className={FOOTER_NOTE}>
+      <p className={`${FOOTER_NOTE} tw:flex tw:items-center tw:gap-1`}>
         Every publish is restorable. Republishing a version redeploys it as a new one.
+        {/* Board 7293:80948 — the notes ⓘ. */}
+        <Tooltip
+          content={
+            <>
+              Republish an available version to create a new deployment.
+              <br />
+              The last 20 published versions are retained.
+            </>
+          }
+        >
+          <span tabIndex={0} role="img" aria-label="About published versions" data-testid="publish-history-notes-info">
+            <Info size={12} aria-hidden="true" />
+          </span>
+        </Tooltip>
       </p>
+
+      <Modal
+        open={details !== null}
+        onClose={() => setDetails(null)}
+        kind="form"
+        testId="publish-version-details"
+        title="Published version"
+        footer={
+          <div className="tw:flex tw:justify-end tw:gap-2">
+            <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" onClick={() => setDetails(null)}>
+              Close
+            </Button>
+            {onCompareWithCurrent && details ? (
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => {
+                  onCompareWithCurrent({ id: details.id, version: details.version });
+                  setDetails(null);
+                }}
+              >
+                Compare with current
+              </Button>
+            ) : null}
+            {details && !(rows[0]?.id === details.id && isPublished) && canRollback && details.rollbackable ? (
+              <Button
+                size="xs"
+                onClick={() => {
+                  setConfirm(details);
+                  setDetails(null);
+                }}
+              >
+                Republish v{details.version}…
+              </Button>
+            ) : null}
+          </div>
+        }
+      >
+        <div className={MODAL_INSET}>
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            {[siteName, liveDomain].filter(Boolean).join(" · ")}
+          </p>
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            Inspect this deploy before republishing it. Your current draft stays unchanged.
+          </p>
+          <p className="tw:m-0 tw:mt-4 tw:text-[13px] tw:text-[var(--bk-ink)]">Selected deploy</p>
+          <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:text-[var(--bk-ink)]" data-testid="publish-version-details-line">
+            {details ? `v${details.version} · published ${relTime(details.completedAt)}` : ""}
+          </p>
+        </div>
+      </Modal>
 
       {/* Board 184:37 — "Rolling back…", a determinate bar, and the caption
           naming both versions. Rendered only while the shell reports a job in

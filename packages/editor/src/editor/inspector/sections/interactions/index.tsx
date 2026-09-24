@@ -8,6 +8,7 @@ import * as React from "react";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
+import { ElementAnimationRow } from "./ElementAnimationRow";
 import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
@@ -45,6 +46,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   tier = "tertiary",
   composer,
   elementId,
+  animation,
+  onAnimationChange,
+  onAnimationPreview,
 }) => {
   const [showAddPanel, setShowAddPanel] = React.useState(false);
   const [live, setLive] = React.useState<Interaction[] | null>(null);
@@ -106,13 +110,16 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     <Section
       title="Interactions"
       icon="MousePointer"
-      defaultOpen={interactions.length > 0}
+      defaultOpen={interactions.length > 0 || Boolean(animation)}
       isOpen={isOpen}
       onToggle={onToggle}
       tier={tier}
       id="inspector-section-interactions"
     >
       <div style={styles.container}>
+        {animation && onAnimationChange ? (
+          <ElementAnimationRow animation={animation} onChange={onAnimationChange} onPreview={onAnimationPreview} />
+        ) : null}
         {/* Existing Interactions */}
         {interactions.map((interaction) => (
           <InteractionItem

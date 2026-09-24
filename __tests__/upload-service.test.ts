@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    site: { findUnique: vi.fn() },
+    workspaceMember: { findFirst: vi.fn() },
+    sitePermission: { findUnique: vi.fn() },
     pendingUpload: {
       create: vi.fn(),
       findFirst: vi.fn(),
@@ -112,5 +115,51 @@ describe("Upload Service", () => {
       expect(limits.favicon.maxSizeMB).toBe(0.5);
       expect(limits.site_media.maxSizeMB).toBe(50);
     });
+  });
+});
+
+/* Presign is the write authorisation for a PUT that overwrites a fixed path
+   (sites/<id>/favicon…, workspaces/<id>/icon). It used to check nothing. */
+describe("createPresignedUrl — role gate", () => {
+  function asRole(role: string) {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ workspaceId: "ws" } as never);
+    vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+      id: "m", role, _count: { sitePermissions: 0 },
+    } as never);
+    vi.mocked(prisma.sitePermission.findUnique).mockResolvedValue(null as never);
+    p.pendingUpload.create.mockResolvedValue({});
+  }
+  const favicon = { fileName: "f.png", fileType: "image/png", context: "favicon" as const, siteId: "s1" };
+
+  it("VIEWER cannot presign a site favicon", async () => {
+    asRole("VIEWER");
+    await expect(createPresignedUrl(favicon, "u", "ws")).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(p.pendingUpload.create).not.toHaveBeenCalled();
+  });
+
+  it("EDITOR cannot either — site assets are settings, which are ADMIN", async () => {
+    asRole("EDITOR");
+    await expect(createPresignedUrl(favicon, "u", "ws")).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("ADMIN can", async () => {
+    asRole("ADMIN");
+    await expect(createPresignedUrl(favicon, "u", "ws")).resolves.toMatchObject({ uploadUrl: expect.any(String) });
+  });
+
+  it("a site asset without a siteId is refused (it used to land on sites/global/)", async () => {
+    asRole("OWNER");
+    await expect(createPresignedUrl({ ...favicon, siteId: undefined }, "u", "ws")).rejects.toThrow("SITE_REQUIRED");
+  });
+
+  it("VIEWER cannot presign workspace media or the workspace icon; EDITOR can do media", async () => {
+    asRole("VIEWER");
+    const media = { fileName: "a.png", fileType: "image/png", context: "site_media" as const };
+    await expect(createPresignedUrl(media, "u", "ws")).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(
+      createPresignedUrl({ fileName: "i.png", fileType: "image/png", context: "workspace_icon" }, "u", "ws"),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    asRole("EDITOR");
+    await expect(createPresignedUrl(media, "u", "ws")).resolves.toMatchObject({ uploadUrl: expect.any(String) });
   });
 });

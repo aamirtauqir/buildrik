@@ -111,7 +111,7 @@ describe("element profiles — board order", () => {
   it("button leads with typography, background and keeps link low", () => {
     const order = getProfileFor("button").order;
     expect(order.slice(0, 2)).toEqual(["typography", "background"]);
-    expect(order.indexOf("link")).toBeGreaterThan(order.indexOf("animation"));
+    expect(order.indexOf("link")).toBeGreaterThan(order.indexOf("interactions"));
   });
 
   /* Board 807:8521 — Size, Spacing, and no Link anywhere: LinkSection gates

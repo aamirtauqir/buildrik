@@ -59,18 +59,6 @@
       "nodeId": "66:199"
     },
     {
-      "name": "footer-dims",
-      "testId": "footer-selection-dims",
-      "spec": "shell-state-4-multi-select",
-      "nodeId": "66:200"
-    },
-    {
-      "name": "footer-zoom",
-      "testId": "footer-device-zoom",
-      "spec": "shell-state-4-multi-select",
-      "nodeId": "66:202"
-    },
-    {
       "name": "ai-chip",
       "testId": "multiselect-ai-chip"
     },
@@ -185,6 +173,7 @@
     "  MultiSelectToolbar's count badge 14 -> 14/20 (66:203) and its band labels",
     "  11 -> 11/16 (66:204's line box, which is not the property in dispute).",
     "  Both declarations carried the size without a line-height, so they sat on",
-    "  Inter's own normal."
+    "  Inter's own normal.",
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
   ]
 }

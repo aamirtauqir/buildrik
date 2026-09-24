@@ -34,46 +34,10 @@
   {
    "action": "waitFor",
    "testId": "create-component-modal"
-  },
-  {
-   "action": "click",
-   "testId": "create-component-variant-toggle"
-  },
-  {
-   "action": "waitFor",
-   "testId": "create-component-variant-panel"
   }
  ],
  "contrastScope": "body",
  "targets": [
-  {
-   "name": "name-label",
-   "testId": "create-component-name-label",
-   "spec": "components-create-modal-canvas-save-as",
-   "nodeId": "1712:8394"
-  },
-  {
-   "name": "variant-label",
-   "testId": "create-component-variant-label",
-   "spec": "components-create-modal-canvas-save-as",
-   "nodeId": "1712:8409"
-  },
-  {
-   "name": "variant-check-label",
-   "testId": "create-component-variant-check-label",
-   "spec": "components-create-modal-canvas-save-as",
-   "nodeId": "1712:8411"
-  },
-  {
-   "name": "variant-hint",
-   "testId": "create-component-variant-hint"
-  },
-  {
-   "name": "prefill-label",
-   "testId": "create-component-prefill-label",
-   "spec": "components-create-modal-canvas-save-as",
-   "nodeId": "1712:8427"
-  },
   {
    "name": "modal",
    "testId": "create-component-modal"
@@ -81,22 +45,6 @@
   {
    "name": "name-input",
    "testId": "create-component-name"
-  },
-  {
-   "name": "description",
-   "testId": "create-component-description"
-  },
-  {
-   "name": "variant-panel",
-   "testId": "create-component-variant-panel"
-  },
-  {
-   "name": "variant-chip",
-   "testId": "create-component-variant-chip-Size"
-  },
-  {
-   "name": "prefill-checkbox",
-   "testId": "create-component-prefill-toggle"
   },
   {
    "name": "submit",
@@ -164,6 +112,7 @@
   "only verdict that node can produce is UNKNOWN. A spec bug on one text",
   "node, not a product one; 1712:8423 has the same shape.",
   "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"create-component-modal\\\"]\", which resolved to a subtree holding none of the text under test — ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero.",
-  "COACH DISMISSAL ADDED 2026-09-08. This recipe passed until the S1 arc FIXED the onboarding credit bug: useComposerInit's bootstrap emitted page:created for a page the user never made, so the checklist started at 1/7 and `showCoach` — which requires completedCount === 0 — was false for every user who ever existed. With the credit corrected the coach finally renders, and it is a fixed 240x154 bubble at x72-312 / y152-306 that covers the Insert drawer's first six rows. `waitFor` on an Insert row still passes; the CLICK times out on an intercepted pointer. Dismissing it first is what a person does. That the coach covers the drawer at all is the live half of authority=open:first-run-drawer and is NOT fixed by this step."
+  "COACH DISMISSAL ADDED 2026-09-08. This recipe passed until the S1 arc FIXED the onboarding credit bug: useComposerInit's bootstrap emitted page:created for a page the user never made, so the checklist started at 1/7 and `showCoach` — which requires completedCount === 0 — was false for every user who ever existed. With the credit corrected the coach finally renders, and it is a fixed 240x154 bubble at x72-312 / y152-306 that covers the Insert drawer's first six rows. `waitFor` on an Insert row still passes; the CLICK times out on an intercepted pointer. Dismissing it first is what a person does. That the coach covers the drawer at all is the live half of authority=open:first-run-drawer and is NOT fixed by this step.",
+  "2026-09-24 (gates): 457ff728e trimmed the modal to board 4418:142143 — description, variant presets and the pre-fill toggle are deleted, so the variant-panel steps and every variant/prefill/description target (and the label anchors nothing renders) are dropped. The recipe measures the open modal only."
  ]
 }

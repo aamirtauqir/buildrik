@@ -18,7 +18,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { PanelHeaderSize, useToast } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -28,6 +28,7 @@ import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { TabRouter } from "../sidebar/TabRouter";
 import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
+import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
@@ -37,6 +38,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { RightColumnPanel } from "./RightColumnPanel";
 import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
@@ -281,11 +283,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   const [settingsDirty, setSettingsDirty] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
   const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
-  /* New-page modal → From template (#19): the name rides to the Templates
-     view's Create page; a plain visit carries none. */
-  const [templatesNewPageName, setTemplatesNewPageName] = React.useState<string | undefined>(undefined);
-  /* New page's "Add to site navigation", carried with the name (6752:59256). */
-  const [templatesAddToNav, setTemplatesAddToNav] = React.useState(false);
+  /* `ui:browse-templates` — the New-page modal's name + "Add to site
+     navigation" (#19, 6752:59256), a ⌘K template row's preview, or the
+     Pages row's replace mode (4428:149355). A plain visit carries none. */
+  const [templatesOpen, setTemplatesOpen] = React.useState<TemplatesOpenRequest | null>(null);
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
@@ -348,9 +349,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
 
-    const openTemplates = (data?: { newPageName?: string; addToNavigation?: boolean }) => {
-      setTemplatesNewPageName(data?.newPageName);
-      setTemplatesAddToNav(Boolean(data?.addToNavigation));
+    const openTemplates = (data?: TemplatesOpenRequest) => {
+      /* A fresh object per request → the view re-reads it each time. */
+      setTemplatesOpen({ ...data });
       onLeftPanelTabChange?.("templates");
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
@@ -394,7 +395,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (activeTabId !== "settings") setSettingsOpen(null);
     if (activeTabId !== "pages") setPagesOpen(null);
-    if (activeTabId !== "templates") setTemplatesNewPageName(undefined);
+    if (activeTabId !== "templates") setTemplatesOpen(null);
   }, [activeTabId]);
 
   // Listen for tab switch events
@@ -613,7 +614,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         {readOnlyView ? null : (
         <LayoutShell.Inspector>
           {rightColumnTab ? (
-            <PanelHeaderSize.Provider value="column">
+            <RightColumnPanel>
               <TabRouter
                 activeTab={activeTabId}
                 activeSubTab={leftPanelSubTab}
@@ -629,7 +630,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 onRequestPublish={onRequestPublish}
                 onResendReview={onResendReview}
               />
-            </PanelHeaderSize.Provider>
+            </RightColumnPanel>
           ) : aiInInspector ? (
             <AITab
               composer={composer}
@@ -668,8 +669,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
             /* Templates' "Open page settings" after Create page. */
             onTemplatesSwitchTab={(tab) => onLeftPanelTabChange?.(tab)}
-            templatesNewPageName={templatesNewPageName}
-            templatesAddToNavigation={templatesAddToNav}
+            templatesOpen={templatesOpen}
             /* The deep-link sub-tab reached the DRAWER and stopped there. Every
                fullpage tab — Settings above all — got nothing, so the site
                menu's "Plugins" landed on the Settings root and looked like a

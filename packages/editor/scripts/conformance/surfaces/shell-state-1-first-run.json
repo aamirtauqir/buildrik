@@ -49,12 +49,6 @@
       "nodeId": "65:197"
     },
     {
-      "name": "footer-zoom",
-      "testId": "footer-device-zoom",
-      "spec": "shell-state-1-first-run",
-      "nodeId": "65:200"
-    },
-    {
       "name": "empty-cta-actions",
       "testId": "canvas-empty-cta-actions"
     },
@@ -139,7 +133,8 @@
     "",
     "`ignore` drops the dev-only Agentation overlay from the contrast sweep, the",
     "same one shell-default excludes: it is `demo/main.tsx`'s DEV widget, not",
-    "editor chrome, and its 'v3.0.2' at white/40% is its own design."
+    "editor chrome, and its 'v3.0.2' at white/40% is its own design.",
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
   ],
   "ignore": [
     "[class*=\"styles-module__\"]"

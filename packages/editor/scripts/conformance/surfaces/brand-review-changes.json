@@ -29,11 +29,11 @@
     },
     {
       "action": "waitFor",
-      "testId": "starter-grid"
+      "testId": "starter-list"
     },
     {
       "action": "click",
-      "testId": "starter-card-stripe-blue"
+      "testId": "starter-row-stripe-blue"
     },
     {
       "action": "waitFor",
@@ -213,6 +213,7 @@
     "`COLOR CHANGES` / `TYPOGRAPHY CHANGES` / `SPACING CHANGES` caps rows between",
     "the groups. With nine colour rows staged they are the only thing telling the",
     "three groups apart, so deleting them on a board that only ever shows three",
-    "rows would cost more than it conforms."
+    "rows would cost more than it conforms.",
+    "2026-09-24 re-pointed (05ee928dc, Starters is one card of rows; the row stages it): starter-grid -> starter-list, starter-card-<id> -> starter-row-<id>; thumbnails and the warning callout were removed (targets dropped)."
   ]
 }

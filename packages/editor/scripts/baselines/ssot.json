@@ -16,9 +16,9 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
-        "line": 581,
+        "line": 604,
         "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:581, src/themes/design-system/a11y.css:60",
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:604, src/themes/design-system/a11y.css:60",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]
@@ -63,13 +63,6 @@
         "line": 27,
         "severity": "minor",
         "message": "Dead export \"TestDataTransfer\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/design-system/ui/ExportDropdown.tsx",
-        "line": 29,
-        "severity": "minor",
-        "message": "Dead export \"ExportDropdown\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {

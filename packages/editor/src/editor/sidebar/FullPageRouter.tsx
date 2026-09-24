@@ -13,6 +13,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "../../shared/types/media";
 import { Portal } from "@/editor/chrome-ui";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
+import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
@@ -50,9 +51,9 @@ export interface FullPageRouterProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
-  /** New-page modal → From template: the name Create page uses (#19). */
-  templatesNewPageName?: string;
-  templatesAddToNavigation?: boolean;
+  /** `ui:browse-templates` — New-page name (#19), a template to preview, or
+   *  replace mode (4428:149355). */
+  templatesOpen?: TemplatesOpenRequest | null;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -66,8 +67,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
-  templatesNewPageName,
-  templatesAddToNavigation,
+  templatesOpen,
 }) => {
   switch (activeTab) {
     /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
@@ -84,8 +84,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               composer={composer}
               onTemplateUsed={onSwitchToAdd}
               onSwitchTab={onTemplatesSwitchTab}
-              newPageName={templatesNewPageName}
-              addToNavigation={templatesAddToNavigation}
+              request={templatesOpen}
               onClose={commonTabProps.onClose}
             />
           </div>

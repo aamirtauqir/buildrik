@@ -28,6 +28,7 @@ import type { Prisma } from "@prisma/client";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import { getOpenAI } from "./openai.client";
 import { assertProviderConfigured } from "./ai.service";
+import { assertMediaWrite } from "./media.service";
 
 const ALT_TEXT_PROMPT = [
   "Generate concise alt text for this image suitable for screen readers.",
@@ -124,20 +125,25 @@ function isPopulatedAltText(value: string | null | undefined): boolean {
 export async function applyAltTextToAsset(
   userId: string,
   assetId: string,
+  /** Regenerate: replace existing alt text (the asset library's "Regenerate").
+   *  Without it an existing alt text is kept, as before. */
+  opts: { force?: boolean } = {},
 ): Promise<ApplyAltTextResult> {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: assetId },
-    select: { userId: true, url: true, type: true, altText: true },
+    select: { userId: true, url: true, type: true, altText: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("ASSET_NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
   if (asset.type !== "image") {
     throw new Error("NOT_IMAGE");
   }
 
-  // Pre-call skip-guard: user already typed something — return existing.
-  if (isPopulatedAltText(asset.altText)) {
+  // Pre-call skip-guard: user already typed something — return existing,
+  // unless this is an explicit Regenerate.
+  if (!opts.force && isPopulatedAltText(asset.altText)) {
     return { altText: asset.altText as string, skipped: true };
   }
 
@@ -152,7 +158,13 @@ export async function applyAltTextToAsset(
   if (!fresh || fresh.userId !== userId) {
     throw new Error("ASSET_NOT_FOUND");
   }
-  if (isPopulatedAltText(fresh.altText)) {
+  /* Without force: anything typed now wins. With force: the text being
+     replaced is the one the user asked to regenerate — but if it CHANGED while
+     we waited, they typed something new, and that still wins. */
+  const typedMeanwhile = opts.force
+    ? (fresh.altText ?? "") !== (asset.altText ?? "") && isPopulatedAltText(fresh.altText)
+    : isPopulatedAltText(fresh.altText);
+  if (typedMeanwhile) {
     return { altText: fresh.altText as string, skipped: true };
   }
 

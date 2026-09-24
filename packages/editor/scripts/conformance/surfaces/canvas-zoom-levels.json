@@ -17,102 +17,46 @@
     },
     {
       "action": "waitFor",
-      "testId": "footer-device-zoom"
+      "testId": "canvas-zoom-trigger"
     },
     {
       "action": "click",
-      "testId": "footer-device-zoom"
+      "testId": "canvas-zoom-trigger"
     },
     {
       "action": "waitFor",
-      "testId": "footer-zoom-flyout"
+      "testId": "canvas-zoom-menu"
     }
   ],
-  "contrastScope": "[data-testid=\"footer-zoom-flyout\"]",
+  "contrastScope": "[data-testid=\"canvas-zoom-menu\"]",
   "targets": [
     {
       "name": "flyout",
-      "testId": "footer-zoom-flyout"
+      "testId": "canvas-zoom-menu"
     },
     {
       "name": "row-fit",
-      "testId": "zoom-label-fit",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4727"
-    },
-    {
-      "name": "row-selection",
-      "testId": "zoom-label-selection",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4729"
-    },
-    {
-      "name": "row-100",
-      "testId": "zoom-label-100",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4732"
-    },
-    {
-      "name": "row-in",
-      "testId": "zoom-label-in",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4743"
-    },
-    {
-      "name": "row-out",
-      "testId": "zoom-label-out",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4745"
-    },
-    {
-      "name": "preset-25",
-      "testId": "zoom-preset-25",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4734"
+      "testId": "canvas-zoom-fit"
     },
     {
       "name": "preset-50",
-      "testId": "zoom-preset-50",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4735"
+      "testId": "canvas-zoom-50"
     },
     {
       "name": "preset-75",
-      "testId": "zoom-preset-75",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4736"
+      "testId": "canvas-zoom-75"
     },
     {
       "name": "preset-100",
-      "testId": "zoom-preset-100",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4738"
+      "testId": "canvas-zoom-100"
     },
     {
       "name": "preset-150",
-      "testId": "zoom-preset-150",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4739"
+      "testId": "canvas-zoom-150"
     },
     {
       "name": "preset-200",
-      "testId": "zoom-preset-200",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4740"
-    },
-    {
-      "name": "preset-400",
-      "testId": "zoom-preset-400",
-      "spec": "canvas-zoom-levels",
-      "nodeId": "817:4742"
-    },
-    {
-      "name": "sep-top",
-      "testId": "zoom-sep-top"
-    },
-    {
-      "name": "sep-bottom",
-      "testId": "zoom-sep-bottom"
+      "testId": "canvas-zoom-200"
     }
   ],
   "_note": [
@@ -167,6 +111,7 @@
     "SAMPLE DATA: the board draws seven presets (25..400); the code ships eight —",
     "10% as well, which the board's own description (\"Range: 10%-400%\") and its",
     "`10% · Min zoom` explainer card both require. The seven the board draws are",
-    "joined; 10% is left uncovered rather than called drift."
+    "joined; 10% is left uncovered rather than called drift.",
+    "2026-09-24 (gates): RE-POINTED. The footer readout and its flyout were removed in 83854c5e3; ef6492be0 moved zoom to the canvas bar's \"100% ▾\" (canvas-zoom-trigger -> canvas-zoom-menu, 7048:78046): Fit to screen + 50/75/100/150/200. The 817:4723 rows (selection, 100 label, in/out chords, separators, 25/400 presets) no longer render and their spec joins are dropped — the new menu is a different board, so targets here are presence-only until it is joined against 7048:78046."
   ]
 }

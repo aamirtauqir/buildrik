@@ -16,6 +16,7 @@ import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBo
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { FullPageRouter } from "./FullPageRouter";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
+import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
 
 export interface FullPageViewProps {
   activeTab: GroupedTabId;
@@ -30,8 +31,8 @@ export interface FullPageViewProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
-  templatesNewPageName?: string;
-  templatesAddToNavigation?: boolean;
+  /** `ui:browse-templates` — what the door that opened Templates asked for. */
+  templatesOpen?: TemplatesOpenRequest | null;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
@@ -54,8 +55,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
-  templatesNewPageName,
-  templatesAddToNavigation,
+  templatesOpen,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -87,8 +87,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             onSettingsDirtyChange={onSettingsDirtyChange}
             settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
-            templatesNewPageName={templatesNewPageName}
-            templatesAddToNavigation={templatesAddToNavigation}
+            templatesOpen={templatesOpen}
           />
         </React.Suspense>
       </InspectorErrorBoundary>

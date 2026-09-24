@@ -180,30 +180,45 @@ describe("Clone 3397:39917 · Edit image — head, tabs, preview, foot", () => {
   });
 });
 
-describe("Clone 3695:43236 · Crop", () => {
-  it("aspect chips Free · 1:1 · 4:3 · 3:2 · 16:9; choosing one drives the cropper and the status (3707:20431)", () => {
+describe("4418:149321 · Crop", () => {
+  const sel = (id: string) => screen.getByTestId(id) as HTMLSelectElement;
+
+  it("the active tab is a solid accent pill (4418:149321)", () => {
     mount();
-    const chips = ["free", "1-1", "4-3", "3-2", "16-9"].map((id) => screen.getByTestId(`image-editor-aspect-${id}`));
-    expect(chips.map((c) => c.textContent)).toEqual(["Free", "1:1", "4:3", "3:2", "16:9"]);
-    expect(chips[0]).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(chips[4]);
-    expect(chips[4]).toHaveAttribute("aria-pressed", "true");
-    expect(chips[0]).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(16 / 9));
-    expect(status()).toHaveTextContent("· 16:9 ·");
+    expect(tab("crop").className).toMatch(/aria-selected:bg-\[var\(--bk-accent\)\]/);
   });
 
-  it("Rotation reads 0°, ↻ 90° and ↺ 90° step it, the slider reaches any angle (3707:20501)", () => {
+  it("titles the panel 'Crop image' and offers Aspect ratio / Rotation / Zoom as dropdowns", () => {
     mount();
-    expect(screen.getByTestId("image-editor-rotate-value")).toHaveTextContent("0°");
-    fireEvent.click(screen.getByTestId("image-editor-rotate-cw"));
-    expect(screen.getByTestId("image-editor-rotate-value")).toHaveTextContent("90°");
+    expect(screen.getByTestId("image-editor-crop-heading")).toHaveTextContent("Crop image");
+    expect([...sel("image-editor-aspect-select").options].map((o) => o.text)).toEqual(["Free", "1:1", "4:3", "3:2", "16:9"]);
+    expect(sel("image-editor-rotate-select").value).toBe("0");
+    expect(sel("image-editor-zoom-select").value).toBe("1");
+    expect([...sel("image-editor-zoom-select").options].map((o) => o.text)).toEqual(["100%", "125%", "150%", "175%", "200%"]);
+  });
+
+  it("Crop ratio chips Free · 1:1 · 4:3 · 16:9 and the dropdown drive one aspect, the cropper and the status (3707:20431)", () => {
+    mount();
+    const chips = ["free", "1-1", "4-3", "16-9"].map((id) => screen.getByTestId(`image-editor-aspect-${id}`));
+    expect(chips.map((c) => c.textContent)).toEqual(["Free", "1:1", "4:3", "16:9"]);
+    expect(chips[0]).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(chips[3]);
+    expect(chips[3]).toHaveAttribute("aria-pressed", "true");
+    expect(chips[0]).toHaveAttribute("aria-pressed", "false");
+    expect(sel("image-editor-aspect-select").value).toBe("16:9");
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(16 / 9));
+    expect(status()).toHaveTextContent("· 16:9 ·");
+    fireEvent.change(sel("image-editor-aspect-select"), { target: { value: "3:2" } });
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(3 / 2));
+    expect(chips.every((c) => c.getAttribute("aria-pressed") === "false")).toBe(true);
+  });
+
+  it("Rotation turns by quarter and by 15° steps from the dropdown (3707:20501)", () => {
+    mount();
+    fireEvent.change(sel("image-editor-rotate-select"), { target: { value: "90" } });
     expect(screen.getByTestId("cropper")).toHaveAttribute("data-rotation", "90");
-    fireEvent.click(screen.getByTestId("image-editor-rotate-ccw"));
-    fireEvent.click(screen.getByTestId("image-editor-rotate-ccw"));
-    expect(screen.getByTestId("image-editor-rotate-value")).toHaveTextContent("-90°");
-    fireEvent.change(slider("image-editor-rotate"), { target: { value: "45" } });
-    expect(screen.getByTestId("image-editor-rotate-value")).toHaveTextContent("45°");
+    fireEvent.change(sel("image-editor-rotate-select"), { target: { value: "-15" } });
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-rotation", "-15");
   });
 
   /* Walked live 2026-09-14: a 1800 × 1200 file opened on Free read
@@ -212,18 +227,18 @@ describe("Clone 3695:43236 · Crop", () => {
     mount();
     await waitFor(() => expect(screen.getByTestId("image-editor-subtitle")).toHaveTextContent("2400 × 1600"));
     expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(2400 / 1600));
-    fireEvent.click(screen.getByTestId("image-editor-rotate-cw"));
+    fireEvent.change(sel("image-editor-rotate-select"), { target: { value: "90" } });
     expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(1600 / 2400));
     fireEvent.click(screen.getByTestId("image-editor-aspect-16-9"));
     expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(16 / 9));
   });
 
-  it("Flip Horizontal / Vertical are pressed toggles that mirror the media (3695:43705)", () => {
+  it("Flip H / Flip V are pressed toggles that mirror the media (3695:43705)", () => {
     mount();
     const h = screen.getByTestId("image-editor-flip-h");
     const v = screen.getByTestId("image-editor-flip-v");
-    expect(h).toHaveTextContent("Horizontal");
-    expect(v).toHaveTextContent("Vertical");
+    expect(h).toHaveTextContent("Flip H");
+    expect(v).toHaveTextContent("Flip V");
     expect(h).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(h);
     expect(h).toHaveAttribute("aria-pressed", "true");
@@ -234,15 +249,17 @@ describe("Clone 3695:43236 · Crop", () => {
     expect(h).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("Zoom reads 100% with the reposition hint; 150% is on the slider (3707:20536)", () => {
+  it("Zoom 150% from the dropdown reaches the cropper; a finer zoom still shows in the list", () => {
     mount();
-    expect(screen.getByTestId("image-editor-zoom-value")).toHaveTextContent("100%");
-    expect(screen.getByTestId("image-editor-zoom-hint")).toHaveTextContent(
-      "Drag the image in the preview to reposition.",
-    );
-    fireEvent.change(slider("image-editor-zoom"), { target: { value: "1.5" } });
-    expect(screen.getByTestId("image-editor-zoom-value")).toHaveTextContent("150%");
+    fireEvent.change(sel("image-editor-zoom-select"), { target: { value: "1.5" } });
     expect(screen.getByTestId("cropper")).toHaveAttribute("data-zoom", "1.5");
+  });
+
+  it("the info block under the preview reads Crop / Preset / Format and the tone lines", () => {
+    mount();
+    expect(screen.getByTestId("image-editor-info")).toHaveTextContent(
+      "Crop: FreePreset: NoneFormat: WebPBrightness: 0 · Contrast: 0Saturation: 0 · Blur: 0",
+    );
   });
 });
 
@@ -551,7 +568,7 @@ describe("Clone 3695:45542 · Failure", () => {
       if (attempts === 1) throw new Error("upload boom");
     });
     mount({ onSave });
-    fireEvent.click(screen.getByTestId("image-editor-rotate-cw"));
+    fireEvent.change(screen.getByTestId("image-editor-rotate-select"), { target: { value: "90" } });
     fireEvent.click(screen.getByTestId("image-editor-save"));
     await waitFor(() => screen.getByTestId("image-editor-failed-retry"));
     await act(async () => {
