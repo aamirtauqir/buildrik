@@ -213,16 +213,12 @@ describe("Toast policy — anchor and surface", () => {
     expect(dot?.className).toContain("tw:bg-[var(--bk-error)]");
   });
 
-  it("actions are on-dark link buttons (blue-300), and only a persistent toast carries ✕", () => {
+  it("actions are on-dark link buttons (blue-300); every toast keeps its ✕", () => {
     mount();
     act(() => {
       api.addToast({ description: "Moved down", action: { label: "Undo", onClick: () => {} } });
     });
     expect(screen.getByRole("button", { name: "Undo" }).className).toContain("tw:text-[var(--bk-blue-300)]");
-    expect(screen.queryByRole("button", { name: "Dismiss notification" })).toBeNull();
-    act(() => {
-      api.addToast({ description: "2 changes are not on the server", tone: "error" });
-    });
     expect(screen.getByRole("button", { name: "Dismiss notification" })).toBeTruthy();
   });
 

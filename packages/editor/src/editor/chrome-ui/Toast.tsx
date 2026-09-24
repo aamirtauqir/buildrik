@@ -31,8 +31,8 @@
  * text, r8, actions as on-dark link buttons (blue-300), an 8px tone dot for
  * success / warning / error. The owner retired decision #25's NO BLACK RULE
  * for toasts on 2026-09-24. Lines=1 is a 36px bar that hugs its text; a toast
- * with a title is the 420px two-line card. Only a persistent toast carries ✕
- * — the catalogue draws none on transients, which dismiss themselves.
+ * with a title is the 420px two-line card. Every toast keeps its ✕ (the
+ * library's Close:B), though the catalogue draws it off on transients.
  *
  * The viewport is aria-live="polite": announced when the user is idle rather
  * than interrupting mid-sentence. Errors use assertive, because "publish
@@ -292,7 +292,11 @@ function ToastItem({
       {action.label}
     </Button>
   ) : null;
-  const closeButton = persistent ? (
+  /* Library Toast `Close:B` (IconButton 24, icon/x). The catalogue shows it
+     off on transients, but dismissing early is something users can do today,
+     so it stays on every toast (owner rule 2026-09-24: parity never silently
+     removes a capability — designer-notes.md). */
+  const closeButton = (
     <Button
       color="alternative"
       size="xs"
@@ -302,7 +306,7 @@ function ToastItem({
     >
       <X size={16} aria-hidden="true" />
     </Button>
-  ) : null;
+  );
 
   return (
     <div
