@@ -302,9 +302,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      result to whatever toast deletePage happened to raise, which is a report
      from a different surface about a different unit of work. */
   const confirmBulkDelete = React.useCallback(() => {
-    (bulkDeleteIds ?? []).forEach((id) => p.deletePage(id));
+    p.deletePages(bulkDeleteIds ?? []);
     bulk.clearSelection();
-  }, [bulkDeleteIds, p.deletePage, bulk.clearSelection]);
+  }, [bulkDeleteIds, p.deletePages, bulk.clearSelection]);
 
   const handleBulkMoveToFolder = React.useCallback(
     (folderId: string) => {
