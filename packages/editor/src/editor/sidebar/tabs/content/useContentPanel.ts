@@ -11,7 +11,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
   SITE_VARS_SOURCE_ID,
@@ -51,7 +51,7 @@ export interface UseContentPanelReturn {
     published: boolean,
   ) => Promise<CMSContentItem | null>;
   deleteRecord: (recordId: string) => Promise<void>;
-  addField: (collectionId: string, name: string, type: string, required: boolean) => Promise<void>;
+  addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
   setVariables: (vars: SiteVariable[]) => void;
   removeCondition: (elementId: string) => void;
@@ -230,17 +230,10 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
   );
 
   const addField = React.useCallback(
-    async (collectionId: string, name: string, type: string, required: boolean) => {
+    async (collectionId: string, field: Omit<CMSField, "id" | "order">) => {
       if (!composer) return;
-      const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       const order = composer.cms.collections.getCollection(collectionId)?.fields.length ?? 0;
-      await composer.cms.collections.addField(collectionId, {
-        name: name.trim(),
-        slug,
-        type: type as CMSCollection["fields"][number]["type"],
-        order,
-        ...(required ? { validation: { required: true } } : {}),
-      });
+      await composer.cms.collections.addField(collectionId, { ...field, order });
       reload();
     },
     [composer, reload],

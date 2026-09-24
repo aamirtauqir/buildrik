@@ -284,7 +284,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
         <AddFieldDialog
           collection={collection}
           onClose={() => setAddingField(false)}
-          onAdd={(name, type, required) => panel.addField(collection.id, name, type, required)}
+          collections={panel.collections}
+          onAdd={(field) => panel.addField(collection.id, field)}
         />
       ) : null}
       {selectedField ? (
