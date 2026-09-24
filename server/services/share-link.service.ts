@@ -85,8 +85,10 @@ export async function revokeShareLink(id: string) {
 
 // ─── Visitor side: /share/<token> ──────────────────────────────────────────
 
+export type ShareUnavailableReason = "expired" | "revoked" | "unknown";
+
 export type ShareResolution =
-  | { state: "unavailable" }
+  | { state: "unavailable"; reason: ShareUnavailableReason }
   | { state: "locked" }
   | { state: "open"; linkId: string; siteId: string; siteName: string };
 
@@ -115,10 +117,11 @@ function isValidProof(token: string, cookie: string | undefined): boolean {
 }
 
 /**
- * What a share-link visitor may see. Missing, revoked, expired links and links
- * to a deleted site are all "unavailable" — one answer, so the page cannot be
- * used to probe which. A password link without a valid unlock cookie is
- * "locked".
+ * What a share-link visitor may see. "unavailable" carries why — expired,
+ * revoked (or its site deleted), or unknown — because those are different
+ * things for the person holding the link, the same split the review link's
+ * dead-link card makes. A password link without a valid unlock cookie is
+ * "locked"; nothing of the site is revealed before that.
  */
 export async function resolveShareLink(
   token: string,
@@ -134,8 +137,9 @@ export async function resolveShareLink(
       site: { select: { id: true, name: true, deletedAt: true } },
     },
   });
-  if (!link || !link.isActive || link.site.deletedAt) return { state: "unavailable" };
-  if (link.expiresAt && link.expiresAt < new Date()) return { state: "unavailable" };
+  if (!link) return { state: "unavailable", reason: "unknown" };
+  if (!link.isActive || link.site.deletedAt) return { state: "unavailable", reason: "revoked" };
+  if (link.expiresAt && link.expiresAt < new Date()) return { state: "unavailable", reason: "expired" };
   if (link.passwordHash && !isValidProof(token, unlockCookie)) return { state: "locked" };
   return { state: "open", linkId: link.id, siteId: link.site.id, siteName: link.site.name };
 }
@@ -195,6 +199,15 @@ export async function getShareDraftRows(siteId: string) {
     },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
+  /* The site's ADDED fonts (Site fonts dialog — `userMetadata.siteFont`), the
+     same set the editor's Composer registers from the media library. Without
+     them the scratch render cannot write their @font-face, and the preview
+     named e.g. 'Inter Var' while loading nothing (2026-09-24). */
+  const fontAssets = await prisma.mediaAsset.findMany({
+    where: { siteId, type: "font", userMetadata: { path: ["siteFont"], equals: true } },
+    select: { filename: true, url: true },
+    orderBy: { createdAt: "asc" },
+  });
   const { sitePages, name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
@@ -204,5 +217,6 @@ export async function getShareDraftRows(siteId: string) {
     site: { name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
+    siteFonts: fontAssets,
   };
 }

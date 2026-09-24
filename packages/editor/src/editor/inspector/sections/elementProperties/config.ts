@@ -63,8 +63,11 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
     { id: "disabled", label: "Disabled", type: "checkbox" },
   ],
 
+  /* G2-145: no Image URL row — MediaSourceRow ("Choose image") owns an
+     image's source, and the library's From URL covers a pasted link. Video
+     keeps its URL row until its source row can assign a video (today
+     "Manage video" only opens Assets). */
   image: [
-    { id: "src", label: "Image URL", type: "text", placeholder: "https://..." },
     { id: "alt", label: "Alt Text", type: "text", placeholder: "Image description" },
     { id: "title", label: "Title", type: "text", placeholder: "Image title" },
     {

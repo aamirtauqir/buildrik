@@ -39,42 +39,10 @@
    "nodeId": "1657:7152"
   },
   {
-   "name": "view-helper-saves",
-   "testId": "history-view-helper-saves",
-   "spec": "history-saves-empty",
-   "nodeId": "1657:7153",
-   "skipProps": {
-    "color": "Board names --color/ink-placeholder #9CA3AF, which is 2.54:1 on white at 11px — barely half the 4.5 floor. The code ships --bk-ink-muted (4.83:1). THIS EXACT REFUSAL WAS ALREADY MADE on boards 1657:7153/7156: an agent adopted #9CA3AF for the tab helper, the contrast gate lit immediately, and it was backed out with 'the board is wrong'. Same colour, same surface family, same answer. The size and line box are joined and match; only the colour is refused. The fix belongs in Figma."
-   }
-  },
-  {
    "name": "view-tab-published",
    "testId": "history-view-tab-published",
    "spec": "history-saves-empty",
    "nodeId": "1657:7155"
-  },
-  {
-   "name": "view-helper-published",
-   "testId": "history-view-helper-published",
-   "spec": "history-saves-empty",
-   "nodeId": "1657:7156",
-   "skipProps": {
-    "color": "Board names --color/ink-placeholder #9CA3AF, which is 2.54:1 on white at 11px — barely half the 4.5 floor. The code ships --bk-ink-muted (4.83:1). THIS EXACT REFUSAL WAS ALREADY MADE on boards 1657:7153/7156: an agent adopted #9CA3AF for the tab helper, the contrast gate lit immediately, and it was backed out with 'the board is wrong'. Same colour, same surface family, same answer. The size and line box are joined and match; only the colour is refused. The fix belongs in Figma."
-   }
-  },
-  {
-   "name": "filter-row",
-   "testId": "history-filter-row",
-   "spec": "history-saves-empty",
-   "nodeId": "1657:7157"
-  },
-  {
-   "name": "filter-chip-on",
-   "testId": "history-filter-milestones"
-  },
-  {
-   "name": "filter-chip-off",
-   "testId": "history-filter-changes"
   },
   {
    "name": "search-bar",
@@ -188,6 +156,7 @@
   "reported as drawn-but-not-rendered. It IS rendered — as the search field's",
   "`placeholder`, which is an attribute and not a text node, so the sweep cannot",
   "see it. The board draws it inside the box for the same reason. Instrument",
-  "limit, not drift; the field's `aria-label` carries the same string."
+  "limit, not drift; the field's `aria-label` carries the same string.",
+  "2026-09-24 (gates): view-tab helper lines and the Milestones/Changes chips dropped — removed by bd26b73ae (Session tab) / 410fee584 (History pills, 4418:73791)."
  ]
 }

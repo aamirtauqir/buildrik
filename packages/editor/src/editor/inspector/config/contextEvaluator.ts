@@ -7,7 +7,6 @@
  * - "ctx.display == 'flex'" - Check display property
  * - "ctx.isTextLike == true" - Check boolean trait
  * - "ctx.elementType == 'modal'" - Check element type
- * - "ctx.devMode == true" - Check dev mode state
  *
  * @license BSD-3-Clause
  */
@@ -32,8 +31,6 @@ export interface InspectorContext {
   hasContent: boolean;
   /** Current display value (flex, grid, block, etc.) */
   display: string;
-  /** Whether Dev mode is enabled */
-  devMode: boolean;
 }
 
 // ============================================================================
@@ -82,7 +79,6 @@ const CONTENT_ELEMENTS = new Set([
 export interface ContextBuilderInput {
   elementType: string;
   display?: string;
-  devMode?: boolean;
 }
 
 /**
@@ -98,7 +94,6 @@ export function buildInspectorContext(input: ContextBuilderInput): InspectorCont
     isLinkLike: LINK_LIKE_ELEMENTS.has(elementType),
     hasContent: CONTENT_ELEMENTS.has(elementType),
     display: input.display ?? "",
-    devMode: input.devMode ?? false,
   };
 }
 

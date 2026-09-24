@@ -237,6 +237,28 @@ export function siteFontFaceCSS(
   return { css: rules.join("\n"), skipped };
 }
 
+/**
+ * Remove families from every `font-family` stack in `css` — for site fonts that
+ * have no file on the server (`siteFontFaceCSS`'s `skipped`). Naming a family
+ * the page never loads is a lie the browser papers over; dropping it lets the
+ * stack say what the visitor actually gets. A stack left empty falls back to
+ * the generic `sans-serif`. Entity-escaped quotes (inline style attributes)
+ * are handled like real ones.
+ */
+export function dropFontFamilies(css: string, families: readonly string[]): string {
+  if (!families.length) return css;
+  const drop = new Set(families.map((f) => f.toLowerCase()));
+  const unquote = (f: string) =>
+    f.trim().replace(/^(?:&quot;|&#34;|&#39;|["'])|(?:&quot;|&#34;|&#39;|["'])$/g, "").toLowerCase();
+  return css.replace(/(font-family\s*:\s*)((?:&quot;|&#34;|&#39;|[^;}])+)/g, (whole, prop: string, stack: string) => {
+    const important = /\s*!important\s*$/.exec(stack)?.[0] ?? "";
+    const parts = stack.slice(0, stack.length - important.length).split(",");
+    const kept = parts.filter((f) => !drop.has(unquote(f)));
+    if (kept.length === parts.length) return whole;
+    return `${prop}${kept.length ? kept.join(",").trim() : "sans-serif"}${important}`;
+  });
+}
+
 export const RESET_CSS = `
 *,*::before,*::after{box-sizing:border-box}
 *{margin:0;padding:0}

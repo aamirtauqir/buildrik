@@ -19,7 +19,7 @@ globalThis.ResizeObserver = class {
 } as unknown as typeof ResizeObserver;
 
 function setup() {
-  const el = { getType: () => "heading", getTagName: () => "h1", getParent: () => null, getId: () => "h" };
+  const el = { getType: () => "heading", getTagName: () => "h1", getParent: () => null, getId: () => "h", getCustomData: () => undefined };
   const composer = { elements: { getElement: vi.fn(() => el) } } as unknown as Composer;
   const canvas = document.createElement("div");
   const node = document.createElement("h1");

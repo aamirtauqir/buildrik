@@ -1,10 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageCrumb, type SnapshotPage } from "@/components/reviews/signoff-snapshot";
+import { PageCrumb } from "@/components/reviews/signoff-snapshot";
+import type { RenderedPage } from "@buildrik/editor";
 
-type Rows = { site: unknown; pages: unknown; siteColumns: unknown };
-type RenderState = { status: "rendering" } | { status: "ready"; pages: SnapshotPage[] } | { status: "failed" };
+type Rows = {
+  site: unknown;
+  pages: unknown;
+  siteColumns: unknown;
+  siteFonts: ReadonlyArray<{ filename: string; url: string }>;
+};
+type RenderState = { status: "rendering" } | { status: "ready"; pages: RenderedPage[] } | { status: "failed" };
+
+/** `?page=<slug>` → that page's index; missing or unknown → the first page. */
+export function pageIndexForSlug(pages: readonly RenderedPage[], slug: string | null): number {
+  if (!slug) return 0;
+  const i = pages.findIndex((p) => p.slug === slug);
+  return i === -1 ? 0 : i;
+}
 
 /**
  * The saved draft, rendered by the publish exporter itself: the rows are mapped
@@ -19,18 +32,40 @@ type RenderState = { status: "rendering" } | { status: "ready"; pages: SnapshotP
  * this page or its cookies. The page switch lives in the header because a
  * script-less frame cannot follow its own nav links.
  */
-export function DraftPreview({ siteName, rows }: { siteName: string; rows: Rows }) {
+export function DraftPreview({
+  siteName,
+  rows,
+  initialPage = null,
+}: {
+  siteName: string;
+  rows: Rows;
+  /** The `?page=<slug>` the link was opened with. */
+  initialPage?: string | null;
+}) {
   const [state, setState] = useState<RenderState>({ status: "rendering" });
   const [active, setActive] = useState(0);
+
+  /* The chosen page lives in the URL, so the link in the address bar opens
+     the page being looked at. replaceState: switching pages is not history. */
+  const pick = (index: number, pages: readonly RenderedPage[]) => {
+    setActive(index);
+    const slug = pages[index]?.slug;
+    const url = new URL(window.location.href);
+    if (index === 0 || !slug) url.searchParams.delete("page");
+    else url.searchParams.set("page", slug);
+    window.history.replaceState(null, "", url.toString());
+  };
 
   useEffect(() => {
     let cancelled = false;
     import("@buildrik/editor")
       .then(({ projectDataFromRows, renderProjectPages }) =>
-        renderProjectPages(projectDataFromRows(rows.site, rows.pages, rows.siteColumns)),
+        renderProjectPages(projectDataFromRows(rows.site, rows.pages, rows.siteColumns), rows.siteFonts),
       )
       .then((pages) => {
-        if (!cancelled) setState({ status: "ready", pages });
+        if (cancelled) return;
+        setActive(pageIndexForSlug(pages, initialPage));
+        setState({ status: "ready", pages });
       })
       .catch((e: unknown) => {
         console.error("[share] draft render failed", e);
@@ -39,7 +74,7 @@ export function DraftPreview({ siteName, rows }: { siteName: string; rows: Rows 
     return () => {
       cancelled = true;
     };
-  }, [rows]);
+  }, [rows, initialPage]);
 
   const pages = state.status === "ready" ? state.pages : [];
   const page = pages[Math.min(active, Math.max(pages.length - 1, 0))] ?? null;
@@ -58,7 +93,7 @@ export function DraftPreview({ siteName, rows }: { siteName: string; rows: Rows 
             <span aria-hidden="true" style={{ color: "var(--color-text-secondary)" }}>
               ·
             </span>
-            <PageCrumb pages={pages} active={active} onPick={setActive} />
+            <PageCrumb pages={pages} active={active} onPick={(i) => pick(i, pages)} />
           </>
         ) : null}
         <span className="ml-auto" style={{ color: "var(--color-text-secondary)" }}>

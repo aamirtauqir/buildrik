@@ -33,10 +33,6 @@
       "nodeId": "807:8332"
     },
     {
-      "name": "switcher",
-      "testId": "breakpoint-switcher"
-    },
-    {
       "name": "cell-wide",
       "testId": "bp-cell-wide"
     }
@@ -96,6 +92,7 @@
     "      `check-design-debt-ratchet`'s offscale-font-size rule is locked at",
     "      zero \u2014 the same wall the pages-command-palette and smart-guides",
     "      recipes hit.",
-    "Founder call. If the bar is wanted, the breakpoint SET moves first."
+    "Founder call. If the bar is wanted, the breakpoint SET moves first.",
+    "2026-09-24 (gates): breakpoint-switcher target dropped \u2014 the canvas bar was rebuilt to 5936:44788 in ef6492be0 (no breakpoint switcher)."
   ]
 }

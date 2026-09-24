@@ -21,17 +21,11 @@
     },
     {
       "action": "hover",
-      "testId": "insert-search-wrap"
+      "testId": "panel-header-title"
     }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    {
-      "name": "search-band",
-      "testId": "insert-search-wrap",
-      "spec": "insert-mine-expanded",
-      "nodeId": "1069:4974"
-    },
     {
       "name": "group-header-elements",
       "testId": "insert-group-elements",
@@ -97,12 +91,6 @@
       "testId": "insert-row-label-insert-paste-html",
       "spec": "insert-mine-expanded",
       "nodeId": "1069:5012"
-    },
-    {
-      "name": "tips",
-      "testId": "insert-tips",
-      "spec": "insert-mine-expanded",
-      "nodeId": "1069:5013"
     },
     {
       "name": "first-row",
@@ -177,6 +165,7 @@
     "hover state no board draws — flowbite's `color=\\\"light\\\"` fill.",
     "That hover is also where a real contrast failure lives: 11px",
     "--bk-ink-muted on gray-100 is 4.39:1. Fixed in this pass (BuildTab.css,",
-    "`.bld-group-header:hover span`), not baselined."
+    "`.bld-group-header:hover span`), not baselined.",
+    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover. The neutral hover that parked the pointer off the rows now targets panel-header-title, as insert-dragging does."
   ]
 }

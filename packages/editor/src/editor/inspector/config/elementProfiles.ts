@@ -63,7 +63,6 @@ const CONTAINER_PROFILE: ElementProfile = {
     "typography",
     "background",
     "border",
-    "corner-radius",
     "opacity",
     "shadow",
     "blur",
@@ -77,7 +76,6 @@ const CONTAINER_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -102,7 +100,6 @@ const TEXT_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -115,7 +112,6 @@ const FLEX_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
     "opacity",
     "shadow",
     "blur",
@@ -126,7 +122,6 @@ const FLEX_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -141,7 +136,6 @@ const GRID_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
     "opacity",
     "shadow",
     "blur",
@@ -152,7 +146,6 @@ const GRID_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -167,7 +160,6 @@ const MEDIA_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
     "opacity",
     "shadow",
     "blur",
@@ -178,7 +170,6 @@ const MEDIA_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -189,7 +180,6 @@ const BUTTON_PROFILE: ElementProfile = {
     "typography",
     "background",
     "border",
-    "corner-radius",
     "spacing",
     "size",
     "opacity",
@@ -203,7 +193,6 @@ const BUTTON_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -217,7 +206,6 @@ const INPUT_PROFILE: ElementProfile = {
     "spacing",
     "size",
     "background",
-    "corner-radius",
     "opacity",
     "shadow",
     "blur",
@@ -228,7 +216,6 @@ const INPUT_PROFILE: ElementProfile = {
     "visibility",
     "content",
     "css-classes",
-    "all-css",
   ],
 };
 

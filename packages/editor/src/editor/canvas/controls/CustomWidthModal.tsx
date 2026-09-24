@@ -10,7 +10,7 @@ import * as React from "react";
 import { Button, FormField, Modal, TextField } from "@/editor/chrome-ui";
 
 /** Narrowest phone to a wide desktop — outside it the preview is meaningless. */
-export const CUSTOM_WIDTH_RANGE = { min: 240, max: 2560 } as const;
+const CUSTOM_WIDTH_RANGE = { min: 240, max: 2560 } as const;
 
 export interface CustomWidthModalProps {
   open: boolean;

@@ -12,7 +12,6 @@ import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { ScopeDropdown } from "./components/ScopeDropdown";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
-import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { EVENTS } from "../../shared/constants/events";
@@ -23,6 +22,7 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { ElementNameField } from "./components/ElementNameField";
 import { LockedBanner } from "./components/LockedBanner";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
@@ -103,7 +103,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     currentPseudoState,
     setCurrentPseudoState,
   } = useInspectorState(selectedElement);
-  const devMode = USE_DEV_MODE;
 
   // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
   // per-element controls (site styles live in the Brand panel).
@@ -179,7 +178,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
 
-  const { expandedSections, toggleSection } = useInspectorSections({
+  const { expandedSections, toggleSection, expandAll, collapseAll } = useInspectorSections({
     selectedElement,
     composer,
     styles: styles_state,
@@ -218,7 +217,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const boundLabel = useElementBinding(composer, selectedElement?.id ?? "");
 
   const [contextState, setContextState] = React.useState(() =>
-    deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState)
+    deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState)
   );
   const propertyStates = getPropertyStates(contextState);
 
@@ -230,8 +229,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   }
 
   React.useEffect(() => {
-    setContextState(deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState));
-  }, [selectedElement, composer, styles_state, devMode, currentBreakpoint, currentPseudoState]);
+    setContextState(deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState));
+  }, [selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState]);
 
   const selectedElements = React.useMemo<readonly Element[]>(() => {
     if (!composer || selectedIds.length === 0) return [];
@@ -365,7 +364,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <ElementIcon size="sm" />
         </div>
         <div className="bdi-ename">
-          <div className="bdi-n" data-testid="inspector-element-name">{elementLabel}</div>
+          {/* G2-139: the layer name (else the type), renamed in place. */}
+          <ElementNameField composer={composer} elementId={selectedElement.id} typeLabel={elementLabel} />
         </div>
         <div className="bdi-eact">
           {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`
@@ -409,6 +409,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               }}
               onSelectParent={() => composer?.selection.selectParent()}
               onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
+              onExpandAll={expandAll}
+              onCollapseAll={collapseAll}
             />
           )}
         </div>
@@ -604,7 +606,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
               onOpenCreateCollection={onOpenCreateCollection}
-              devMode={devMode}
               tier={tier}
               showAll={showAll}
               onShowAllChange={setShowAll}

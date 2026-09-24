@@ -36,6 +36,8 @@ function fakeElement(id: string, init: { layerName?: string; locked?: boolean } 
 function makeComposer(els: ReturnType<typeof fakeElement>[]) {
   return {
     emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     markDirty: vi.fn(),
     elements: {
       getAllElements: () => els,

@@ -71,6 +71,7 @@ export function makeMockElement(opts: MockElementOptions = {}) {
     getParent: vi.fn(() => opts.parent ?? null),
     getChildren: vi.fn(() => opts.children ?? []),
     addChild: vi.fn(),
+    getCustomData: vi.fn(() => undefined),
     getAnimation: vi.fn(() => null),
     getInteractions: vi.fn(() => []),
   };

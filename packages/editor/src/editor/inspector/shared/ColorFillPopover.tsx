@@ -4,8 +4,8 @@
  *
  * Three rows, in the board's order: BRAND (the colour tokens, a 3-column
  * grid of swatch + name, each with a ✎), RECENT (the last custom colours
- * applied here), CUSTOM (a hex field, a swatch that opens the one picker —
- * G3-140's ColorPicker — and Detach while the value is bound). Pro adds the
+ * applied here, always drawn), CUSTOM (a hex field, a swatch that opens the
+ * one picker — G3-140's ColorPicker — and Detach, live while bound). Pro adds the
  * search field and its "N of M match" line, and the ✎ footnote.
  *
  * ✎ opens Edit <token>: the same picker without its foot, and the board's two
@@ -193,15 +193,19 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           <div className="tw:grid tw:max-h-32 tw:grid-cols-3 tw:gap-y-3 tw:overflow-y-auto tw:pt-1.5" role="listbox" aria-label="Brand colours">
             {brand.map((t) => {
               const selected = t.id === boundTokenId;
+              /* Board 4428:142922: a 32px tile in the token's own colour, the
+                 selected one ringed 2px in the accent with a white ✎ on it
+                 (the other tiles show their ✎ on hover). The ✎ is a sibling
+                 over the tile, not inside it — a button in a button is invalid. */
               return (
-                <div key={t.id} className="tw:flex tw:flex-col tw:items-center tw:gap-1">
+                <div key={t.id} className="tw:group tw:flex tw:flex-col tw:items-center tw:gap-1">
                   <div className="tw:relative">
                     <Button
                       type="button"
                       role="option"
                       aria-selected={selected}
                       aria-label={t.name}
-                      className={`${SWATCH} tw:size-7 ${selected ? "tw:ring-2 tw:ring-[var(--bk-accent)] tw:ring-offset-1" : ""}`}
+                      className={`${SWATCH} tw:size-8 ${selected ? "tw:border-2 tw:border-[var(--bk-accent)]" : ""}`}
                       style={{ background: t.value }}
                       onClick={() => onSelectToken(`var(${t.cssVar})`)}
                       data-testid={`fill-brand-${t.id}`}
@@ -209,10 +213,10 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
                     <IconButton
                       label={`Edit ${t.name}`}
                       onClick={() => setView({ kind: "edit", token: t })}
-                      className="tw:absolute tw:-right-1.5 tw:-top-1.5 tw:size-4 tw:min-h-0 tw:min-w-0 tw:rounded-full tw:border tw:border-[var(--bk-border)] tw:bg-white tw:p-0 tw:text-[var(--bk-ink-muted)]"
+                      className={`tw:absolute tw:left-1/2 tw:top-1/2 tw:size-5 tw:min-h-0 tw:min-w-0 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:bg-transparent tw:p-0 tw:text-white tw:[filter:drop-shadow(0_0_1px_rgba(0,0,0,0.6))] tw:hover:bg-transparent ${selected ? "" : "tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100"}`}
                       data-testid={`fill-edit-${t.id}`}
                     >
-                      <Pencil size={8} aria-hidden />
+                      <Pencil size={12} aria-hidden />
                     </IconButton>
                   </div>
                   <span className="tw:max-w-full tw:truncate tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{t.name}</span>
@@ -223,23 +227,26 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
         )}
       </div>
 
-      {recent.length > 0 ? (
-        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="fill-recent">
-          <span className={EYEBROW}>Recent</span>
+      {/* Board 4428:142922 always draws RECENT. */}
+      <div className="tw:flex tw:flex-col tw:gap-2" data-testid="fill-recent">
+        <span className={EYEBROW}>Recent</span>
+        {recent.length > 0 ? (
           <div className="tw:flex tw:gap-2">
             {recent.map((hex) => (
               <Button
                 key={hex}
                 type="button"
                 aria-label={`Use ${hex}`}
-                className={`${SWATCH} tw:size-6`}
+                className={`${SWATCH} tw:size-8`}
                 style={{ background: hex }}
                 onClick={() => applyCustom(hex)}
               />
             ))}
           </div>
-        </div>
-      ) : null}
+        ) : (
+          <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">Colours you apply show here.</span>
+        )}
+      </div>
 
       <div className="tw:flex tw:flex-col tw:gap-2">
         <span className={EYEBROW}>Custom</span>
@@ -266,11 +273,19 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
             className="tw:w-34 tw:[font-family:var(--bk-font-mono)]"
             data-testid="fill-custom-hex"
           />
-          {boundTokenId ? (
-            <Button type="button" variant="link" className={`${LINK} tw:ml-auto`} onClick={() => onCustomValue(currentHex)} data-testid="fill-detach">
-              Detach
-            </Button>
-          ) : null}
+          {/* Beside the field as the board draws it; live only while the fill
+              is bound to a brand colour. */}
+          <Button
+            type="button"
+            variant="link"
+            className={`${LINK} tw:ml-auto tw:bg-transparent tw:disabled:bg-transparent tw:disabled:text-[var(--bk-ink-disabled)] tw:disabled:opacity-100`}
+            disabled={!boundTokenId}
+            title={boundTokenId ? "Keep this colour, unlinked from the brand colour" : "Not linked to a brand colour"}
+            onClick={() => onCustomValue(currentHex)}
+            data-testid="fill-detach"
+          >
+            Detach
+          </Button>
         </div>
       </div>
 

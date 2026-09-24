@@ -33,6 +33,7 @@ import {
   minifyCSS,
   downloadFile,
   localeRedirectSnippet,
+  dropFontFamilies,
   blockLinkPlan,
   BLOCK_LINK_STYLE,
   type LinkNodeView,
@@ -79,6 +80,8 @@ export interface MultiPageExportFile {
   content: string;
   /** File type */
   type: "html" | "css" | "js" | "xml" | "tsx" | "json";
+  /** For a page's HTML: the page it was written from. */
+  pageId?: string;
 }
 
 /**
@@ -282,7 +285,13 @@ export class ExportEngine {
     return (this.composer.fonts?.getAllFonts({ source: "custom" }) ?? []).map((f) => f.family);
   }
 
-  private siteFontFaces(css: string): string {
+  /**
+   * `css` with the faces the site's ADDED fonts provide put ahead of every rule
+   * that names them, and with any added font that has no file on the server
+   * taken OUT of the stacks that name it — a page must not name a font it
+   * never loads (its only url is a session blob:, which dies with the tab).
+   */
+  private withSiteFontFaces(css: string, minify: boolean): string {
     const { css: faces, skipped } = siteFontFaceCSS(
       css,
       this.siteFontFamilies(),
@@ -292,10 +301,11 @@ export class ExportEngine {
       devWarn(
         "ExportEngine",
         `Site font "${family}" is not on the server yet (its only url is a session blob:) — ` +
-          "no @font-face was written for it; the exported page falls back to the next family in the stack"
+          "no @font-face was written for it and it was dropped from the font stacks that named it"
       );
     }
-    return faces;
+    const named = dropFontFamilies(css, skipped);
+    return faces ? faces + (minify ? "" : "\n\n") + named : named;
   }
 
   /**
@@ -345,8 +355,7 @@ export class ExportEngine {
     // The faces the site's ADDED fonts provide, ahead of every rule that
     // names them. Decided from the finished CSS — a family reaches it from an
     // element's style or from a site font token, and both count as a use.
-    const faces = this.siteFontFaces(css);
-    if (faces) css = `${faces}\n${css}`;
+    css = this.withSiteFontFaces(css, false);
 
     return cfg.minify ? minifyCSS(css) : css;
   }
@@ -768,7 +777,14 @@ export class ExportEngine {
     const siteCss =
       siteTokensCSS(projectTokens) + siteFontCSS(siteFontsFromTokens(projectTokens));
 
-    let css = [baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
+    /* The reset leads, as in `generateCSS`: it carries the base body font
+       (THEME.fontFamily — what the canvas renders unstyled text in) and the
+       box-sizing/margin rules the canvas was designed under. This path never
+       emitted it, so every published page with no Brand body font rendered in
+       the browser's default SERIF, and the font links below had no base family
+       to fetch. The site's own font rules come after it, so they still win. */
+    const reset = options.minify ? RESET_CSS.replace(/\s+/g, " ") : RESET_CSS;
+    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 
     /* …and the @keyframes those styles reference. `generateCSS` has emitted
        them since the single-file export was found shipping `animation:
@@ -782,8 +798,7 @@ export class ExportEngine {
        stylesheet every page links — once, before any rule on any page that
        names them. Same reader as the single file; `generateCSS` above is a
        different assembly, so it has its own call. */
-    const faces = this.siteFontFaces(css);
-    if (faces) css = faces + (options.minify ? "" : "\n\n") + css;
+    css = this.withSiteFontFaces(css, !!options.minify);
 
     /* CMS export options. The default was "none", and nothing set it: publish
        calls exportAllPages({format,minify}) and the ZIP path does the same, so
@@ -813,6 +828,7 @@ export class ExportEngine {
         name: fileName,
         content: html,
         type: "html",
+        pageId: page.id,
       });
     }
 

@@ -75,7 +75,8 @@
     "  text nodes inside it are joined, which is where the 11/16 contract lives.",
     "",
     "Board sample data not conformed to: 'Bella Cucina' (a site name) and",
-    "'Saved 2m ago' (a live clock)."
+    "'Saved 2m ago' (a live clock).",
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
   ],
   "url": "http://localhost:5050/",
   "viewport": {
@@ -154,12 +155,6 @@
       "testId": "footer-selection-label",
       "spec": "s1-1-coach-dismissed",
       "nodeId": "297:2019"
-    },
-    {
-      "name": "footer-device-zoom",
-      "testId": "footer-device-zoom",
-      "spec": "s1-1-coach-dismissed",
-      "nodeId": "297:2022"
     }
   ]
 }

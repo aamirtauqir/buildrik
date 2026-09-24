@@ -1,22 +1,23 @@
 /**
- * CornerRadiusSection — shorthand parsing, linked vs per-corner writes.
+ * Border › corner radius (G2-154: the Corner radius section folded into
+ * Border) — shorthand parsing, linked vs per-corner writes.
  *
  * @license BSD-3-Clause
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { CornerRadiusSection } from "../CornerRadiusSection";
+import { BorderSection } from "../BorderSection";
 
 function renderRadius(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
   const utils = render(
-    <CornerRadiusSection styles={styles} onChange={onChange} isOpen={isOpen} />
+    <BorderSection styles={styles} onChange={onChange} isOpen={isOpen} />
   );
   return { onChange, ...utils };
 }
 
-describe("CornerRadiusSection — value rendering", () => {
+describe("Border › corner radius — value rendering", () => {
   it("populates all four corner inputs from the border-radius shorthand", () => {
     renderRadius({ "border-radius": "8px" });
     for (const corner of ["tl", "tr", "br", "bl"]) {
@@ -29,14 +30,9 @@ describe("CornerRadiusSection — value rendering", () => {
     expect(screen.getByRole("textbox", { name: "tl corner" })).toHaveValue("12");
     expect(screen.getByRole("textbox", { name: "br corner" })).toHaveValue("");
   });
-
-  it("shows the shorthand as the collapsed preview pill", () => {
-    renderRadius({ "border-radius": "6px" }, false);
-    expect(screen.getByText("6px")).toBeInTheDocument();
-  });
 });
 
-describe("CornerRadiusSection — writes", () => {
+describe("Border › corner radius — writes", () => {
   it("linked (default): editing any corner writes the border-radius shorthand", () => {
     const { onChange } = renderRadius();
     fireEvent.change(screen.getByRole("textbox", { name: "tr corner" }), {

@@ -115,12 +115,6 @@
       "nodeId": "2069:20334"
     },
     {
-      "name": "sechead-corner-radius",
-      "testId": "inspector-sechead-corner-radius",
-      "spec": "inspector-profile-flex",
-      "nodeId": "2069:20335"
-    },
-    {
       "name": "sechead-effects",
       "testId": "inspector-sechead-effects",
       "spec": "inspector-profile-flex",

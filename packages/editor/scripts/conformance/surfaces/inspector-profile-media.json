@@ -117,10 +117,6 @@
     {
       "name": "sechead-spacing",
       "testId": "inspector-sechead-spacing"
-    },
-    {
-      "name": "sechead-corner-radius",
-      "testId": "inspector-sechead-corner-radius"
     }
   ],
   "_note": [

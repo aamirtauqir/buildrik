@@ -1,6 +1,6 @@
 /**
  * SECTION_REGISTRY shouldRender predicates — the per-family visibility gates
- * (flex/grid container-or-item, link element types, dev-only all-css,
+ * (flex/grid container-or-item, link element types,
  * text-like typography).
  *
  * @license BSD-3-Clause
@@ -32,12 +32,6 @@ describe("SECTION_REGISTRY — shouldRender gates", () => {
     expect(gate(ctx({ selectedElement: { type: "button" } }))).toBe(true);
     expect(gate(ctx({ selectedElement: { type: "section" } }))).toBe(true); // board 4428:141642
     expect(gate(ctx({ selectedElement: { type: "image" } }))).toBe(false);
-  });
-
-  it("all-css renders only in dev mode", () => {
-    const gate = SECTION_REGISTRY["all-css"].shouldRender!;
-    expect(gate(ctx({ devMode: true }))).toBe(true);
-    expect(gate(ctx({ devMode: false }))).toBe(false);
   });
 
   it("typography renders only for text-like elements", () => {

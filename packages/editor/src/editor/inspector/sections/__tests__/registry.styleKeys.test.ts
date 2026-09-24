@@ -50,7 +50,6 @@ const sectionCoverage: Record<string, SectionCoverage> = {
     // Template-literal read: `border-${side}` for side in top/right/bottom/left.
     dynamicKeys: ["border-top", "border-right", "border-bottom", "border-left"],
   },
-  "corner-radius": { files: ["../CornerRadiusSection.tsx"] },
   effects: { files: ["../EffectsSection.tsx"] },
 };
 

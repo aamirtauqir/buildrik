@@ -1,12 +1,11 @@
 /**
- * Element-tab section registry: link, element-properties, css-classes,
- * all-css. Edits the element's identity / addressing rather than its style.
+ * Element-tab section registry: link, content, element-properties,
+ * css-classes. Edits the element's identity / addressing rather than its style.
  *
  * @license BSD-3-Clause
  */
 
 import { defineSection, type AnySectionEntry } from "./_shared";
-import { AllCSSSection } from "../AllCSSSection";
 import { CSSClassesSection } from "../CSSClassesSection";
 import { ElementPropertiesSection } from "../elementProperties";
 import { LINKABLE_TYPES, LinkSection } from "../LinkSection";
@@ -77,21 +76,5 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
       tier: ctx.tier,
     }),
     // Universal — every element can have classes.
-  }),
-
-  "all-css": defineSection({
-    tab: "element",
-    tier: "advanced",
-    Component: AllCSSSection,
-    styleKeys: [],
-    adaptProps: (ctx) => ({
-      selectedElement: ctx.selectedElement,
-      composer: ctx.composer ?? null,
-      isOpen: ctx.isOpen,
-      onToggle: ctx.onToggle,
-      tier: ctx.tier,
-    }),
-    // Dev mode only — gated at the registry level.
-    shouldRender: (ctx) => ctx.devMode === true,
   }),
 };
