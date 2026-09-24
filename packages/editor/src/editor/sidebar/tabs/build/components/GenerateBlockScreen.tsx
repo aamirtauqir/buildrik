@@ -17,7 +17,7 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button, Textarea } from "@/editor/chrome-ui";
+import { Button, PanelBackRow, Textarea } from "@/editor/chrome-ui";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { applyAiEdit } from "../../ai/applySetStyle";
@@ -126,14 +126,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="generate-block">
-      <Button
-        color="light"
-        onClick={onBack}
-        data-testid="generate-back"
-        className="tw:h-9 tw:w-full tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
-      >
-        ‹&nbsp;&nbsp;Add
-      </Button>
+      <PanelBackRow label="Add" onClick={onBack} data-testid="generate-back" />
       <div className="tw:flex tw:items-center tw:h-11 tw:px-4 tw:shrink-0 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
         Generate a block
       </div>

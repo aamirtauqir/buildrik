@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { Button } from "flowbite-react";
 import { IconButton } from "./Icon";
 
 export interface PanelHeaderActionsProps {
@@ -179,5 +180,32 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
         {actions}
       </PanelHeaderActions>
     </div>
+  );
+}
+
+export interface PanelBackRowProps extends Omit<React.ComponentProps<typeof Button>, "children" | "color"> {
+  /** Where the row goes back to — drawn as "‹  {label}". */
+  label: string;
+}
+
+/**
+ * The 36px back row above a drilled-in panel's header — "‹ Add" (4418:142419,
+ * 5946:51667), "‹ Saved components" (4418:142876). 14/500 ink, rule below.
+ */
+export function PanelBackRow({ label, className, ...rest }: PanelBackRowProps) {
+  return (
+    <Button
+      color="light"
+      className={[
+        "tw:h-9 tw:w-full tw:shrink-0 tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] " +
+          "tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...rest}
+    >
+      ‹&nbsp;&nbsp;{label}
+    </Button>
   );
 }

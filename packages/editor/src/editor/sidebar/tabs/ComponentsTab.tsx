@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelBackRow, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -21,6 +21,9 @@ import { EVENTS } from "@/shared/constants";
 import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 export type { ComponentsTabProps };
 
+
+const SECTION_HEADER =
+  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
@@ -42,6 +45,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
+
+  /* Board 4418:142419: Components is reached from Add ("Manage components ›"),
+     and the drawer says so with a back row above its header. */
+  const backRow = composer && (
+    <PanelBackRow
+      label="Add"
+      data-testid="comp-back-row"
+      onClick={() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" })}
+    />
+  );
 
   // Which of this site's masters are shared from the workspace library.
   const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
@@ -68,6 +81,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (!composer?.components?.isAvailable()) {
     return (
       <PanelFrame>
+        {backRow}
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
@@ -92,6 +106,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (state.error) {
     return (
       <PanelFrame>
+        {backRow}
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
@@ -158,7 +173,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       );
     }
     return (
-      <PanelFrame>
+      <PanelFrame className="tw:h-full">
+        {backRow}
         {state.isStandaloneMode && (
           <>
             <PanelFrame.Header
@@ -255,13 +271,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 >
                   {n} on this site{isLinked ? " · linked" : ""}
                 </span>
-                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
               </div>
     );
   };
 
   return (
-    <PanelFrame data-testid="comp-panel">
+    <PanelFrame className="tw:h-full" data-testid="comp-panel">
+      {backRow}
       {state.isStandaloneMode && (
         <>
           <PanelFrame.Header
@@ -289,20 +305,19 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
         <div aria-live="polite">
           <span className="bd-sr-only">{state.components.length} components found</span>
-          <div
-            className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
-            data-testid="comp-section-header"
-          >
-            YOUR COMPONENTS
+          <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink)]" data-testid="comp-intro">
+            Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.
+          </p>
+          <div className={SECTION_HEADER} data-testid="comp-section-header">
+            <span className="tw:flex-1 tw:tracking-[0.88px]">YOUR COMPONENTS</span>
+            <span className="tw:[font-family:var(--bk-font-mono)]">{own.length}</span>
           </div>
           {own.map((component) => renderRow(component, false))}
           {linked.length > 0 && (
             <>
-              <div
-                className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
-                data-testid="comp-section-linked"
-              >
-                LINKED FROM LIBRARY
+              <div className={SECTION_HEADER} data-testid="comp-section-linked">
+                <span className="tw:flex-1 tw:tracking-[0.88px]">LINKED FROM LIBRARY</span>
+                <span className="tw:[font-family:var(--bk-font-mono)]">{linked.length}</span>
               </div>
               {linked.map((component) => renderRow(component, true))}
             </>

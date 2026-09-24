@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast, Button, IconButton, TextInput, type ToastInput } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, IconButton, PanelBackRow, TextInput, type ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
@@ -269,14 +269,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="component-master">
-      <Button
-        color="light"
-        onClick={onBack}
-        data-testid="component-back-row"
-        className="tw:h-9 tw:w-full tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
-      >
-        ‹&nbsp;&nbsp;Saved components
-      </Button>
+      <PanelBackRow label="Saved components" onClick={onBack} data-testid="component-back-row" />
       <div className="tw:flex tw:items-center tw:gap-2 tw:h-11 tw:px-4 tw:shrink-0">
         <span className="tw:flex-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Components</span>
         {onClose && (
