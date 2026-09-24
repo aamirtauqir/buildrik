@@ -17,7 +17,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
+import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
@@ -71,6 +71,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const replaceMode = Boolean(request?.replace);
   const { addToast } = useToast();
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
+  /** G2-100: the page whose backup could not be written — the Backup failed dialog is open. */
+  const [backupFailedPage, setBackupFailedPage] = React.useState<string | null>(null);
 
 
   // ── Hooks ──
@@ -176,20 +178,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
      titled, so Saves lists it by name and it is never deduped away. If the
      backup was asked for and could not be written, nothing is replaced: a
      toast that promises a backup that does not exist is the worst outcome
-     (QA 2026-09-24). `backupTakenRef` is what the success toast reads. */
-  async function replaceCurrentPage() {
+     (QA 2026-09-24). `backupTakenRef` is what the success toast reads.
+     G2-100 (board 4428:151964): the failure opens the Backup failed dialog —
+     retry the backup, or replace without one (`skipBackup`). */
+  async function replaceCurrentPage(skipBackup = false) {
     const t = findTemplate(pendingId.current) ?? SITE_TEMPLATES[0];
     backupTakenRef.current = false;
-    if (backupCurrentPage && composer?.versions) {
+    if (backupCurrentPage && !skipBackup && composer?.versions) {
       const version = await composer.versions
         .autoCheckpoint(`Before template “${t.name}”`, { title: `Before template “${t.name}”` })
         .catch(() => null);
       if (!version) {
-        addToast({
-          tone: "error",
-          title: "Couldn't save a backup",
-          description: "Nothing was replaced. Try again, or untick the backup to replace without one.",
-        });
+        setBackupFailedPage(composer.elements.getActivePage()?.name ?? "Page");
         return;
       }
       backupTakenRef.current = true;
@@ -558,6 +558,14 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
         );
       })()}
+      {backupFailedPage !== null && (
+        <BackupFailedModal
+          pageName={backupFailedPage}
+          onCancel={() => { setBackupFailedPage(null); pendingId.current = null; }}
+          onReplaceWithout={() => { setBackupFailedPage(null); void replaceCurrentPage(true); }}
+          onRetry={() => { setBackupFailedPage(null); void replaceCurrentPage(); }}
+        />
+      )}
       {createResult === "success" && (
         <CreatePageSuccessModal
           pageName={tName}
