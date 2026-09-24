@@ -1239,6 +1239,16 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           typeSavedTokens={type.savedTokens}
           spacingTokens={spacing.tokens}
           spacingSavedTokens={spacing.savedTokens}
+          otherSections={MORE_KINDS.map(({ kind, label }) => {
+            const reg = moreKindRegistry[kind];
+            return {
+              title: `${label} Changes`,
+              rows: reg.tokens
+                .map((t) => ({ t, saved: reg.savedTokens.find((x) => x.id === t.id) }))
+                .filter(({ t, saved }) => tokenDirty(t, saved))
+                .map(({ t, saved }) => ({ id: t.id, name: t.name, was: saved?.value ?? "new", now: t.value })),
+            };
+          })}
           onConfirm={handleApply}
           onClose={() => setShowReview(false)}
           /* Board 1172:4840's third door. The same discard the footer runs,
