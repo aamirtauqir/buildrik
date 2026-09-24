@@ -281,10 +281,18 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
   const handleDragLeave = React.useCallback(
     (e: React.DragEvent) => {
-      const relatedTarget = e.relatedTarget as HTMLElement;
-      if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
-        state.setDragState((prev) => ({ ...prev, targetId: null, position: null }));
-      }
+      /* Chromium hands drag events a NULL relatedTarget, and a row's own
+         label/glyph children fire dragleave on it as the pointer crosses
+         them — so "no relatedTarget" cleared the drop line while the pointer
+         was still on the row, and with no further dragover the line never
+         came back (walk 2026-09-24: "no drop indicator"). Leaving means the
+         pointer is outside the row's box. */
+      const r = e.currentTarget.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top && e.clientY < r.bottom;
+      if (inside) return;
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      if (relatedTarget && e.currentTarget.contains(relatedTarget)) return;
+      state.setDragState((prev) => ({ ...prev, targetId: null, position: null }));
     },
     [state]
   );
