@@ -3280,6 +3280,15 @@ const CASES: Record<string, () => React.ReactElement> = {
         enabledLocales: ["en-US", "ur-PK"],
         autoRedirectLocale: false,
       },
+      /* The screen also loads the per-locale summary (867305c5c); without it
+         the load rejects and only the load-error card renders. */
+      "siteDetail.locales": {
+        locales: [
+          { code: "en-US", path: "/", translated: 4, total: 4, status: "LIVE", pending: [] },
+          { code: "ur-PK", path: "/ur-PK", translated: 1, total: 4, status: "PENDING", pending: ["Menu", "About", "Contact"] },
+        ],
+        total: 4,
+      },
     });
     return (
       <SettingsPane case_="settings-localization">
@@ -3290,10 +3299,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* Board 640:2440 — the board's own pair of redirects. */
   "settings-redirects": () => {
     stubTrpc({
+      /* The row shape is the shared schema's (6249f342e): toUrl + type. The
+         screen also loads the 404 suggester alongside the list. */
       "siteDetail.redirects.list": [
-        { id: "r1", fromPath: "/pizza-menu", toPath: "/menu", statusCode: 301 },
-        { id: "r2", fromPath: "/contact-us", toPath: "/contact", statusCode: 301 },
+        { id: "r1", fromPath: "/pizza-menu", toUrl: "/menu", type: "301" },
+        { id: "r2", fromPath: "/contact-us", toUrl: "/contact", type: "301" },
       ],
+      "siteDetail.redirects.suggestions": [],
     });
     return (
       <SettingsPane case_="settings-redirects">

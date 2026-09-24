@@ -76,7 +76,10 @@
     "",
     "Board sample data not conformed to: 'Bella Cucina' (a site name) and",
     "'Saved 2m ago' (a live clock).",
-    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger).",
+    "",
+    "2026-09-25 (conformance-recipes): target footer-selection dropped — the status footer",
+    "was removed on purpose in 83854c5e3 (\"remove the status footer — the columns run to 900\")."
   ],
   "url": "http://localhost:5050/",
   "viewport": {
@@ -149,12 +152,6 @@
       "testId": "save-status-saved",
       "spec": "s1-1-coach-dismissed",
       "nodeId": "692:421"
-    },
-    {
-      "name": "footer-selection",
-      "testId": "footer-selection-label",
-      "spec": "s1-1-coach-dismissed",
-      "nodeId": "297:2019"
     }
   ]
 }

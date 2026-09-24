@@ -34,19 +34,19 @@
       "name": "rail-coach",
       "testId": "rail-coach",
       "spec": "shell-state-1-first-run",
-      "nodeId": "65:208"
+      "nodeId": "65:208",
+      "skipProps": {
+        "background-color": "Owner decision #25 (NO BLACK RULE, DESIGN.md) overrides this board: the coach mark takes the white tooltip surface the founder chose on 2026-08-27, not --bk-ink (e77014a15)."
+      }
     },
     {
       "name": "rail-coach-got-it",
       "testId": "rail-coach-got-it",
       "spec": "shell-state-1-first-run",
-      "nodeId": "65:210"
-    },
-    {
-      "name": "footer-selection",
-      "testId": "footer-selection-label",
-      "spec": "shell-state-1-first-run",
-      "nodeId": "65:197"
+      "nodeId": "65:210",
+      "skipProps": {
+        "color": "Owner decision #25 (NO BLACK RULE, DESIGN.md) overrides this board: the coach mark takes the white tooltip surface the founder chose on 2026-08-27, not --bk-ink (e77014a15). 'Got it' is accent text on white."
+      }
     },
     {
       "name": "empty-cta-actions",
@@ -134,7 +134,10 @@
     "`ignore` drops the dev-only Agentation overlay from the contrast sweep, the",
     "same one shell-default excludes: it is `demo/main.tsx`'s DEV widget, not",
     "editor chrome, and its 'v3.0.2' at white/40% is its own design.",
-    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger).",
+    "",
+    "2026-09-25 (conformance-recipes): target footer-selection dropped — the status footer",
+    "was removed on purpose in 83854c5e3 (\"remove the status footer — the columns run to 900\")."
   ],
   "ignore": [
     "[class*=\"styles-module__\"]"

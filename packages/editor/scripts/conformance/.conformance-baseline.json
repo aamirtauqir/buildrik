@@ -676,7 +676,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 3,
-    "compared": 17
+    "compared": 9
   },
   "s1-1-coach-dismissed": {
     "skipped": 2,
@@ -750,7 +750,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 3,
-    "compared": 12
+    "compared": 3
   },
   "s3-4-responsive-viewport-breakpoint-bar": {
     "contrastFailures": 0,
