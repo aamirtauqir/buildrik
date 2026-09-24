@@ -268,6 +268,8 @@ export function FieldInspector({ composer, collection, collections, field, recor
             void onDeleteField(field.id);
           }}
           onOpenUse={onOpenUse}
+          siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}
+          recordCount={records.length}
         />
       ) : null}
     </aside>
