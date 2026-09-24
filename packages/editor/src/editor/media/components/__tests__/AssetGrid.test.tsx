@@ -325,6 +325,29 @@ describe("AssetGrid — badges + footer", () => {
     }
   });
 
+  it("⌘-click after a plain click carries the open file into select mode — two checked, not one", () => {
+    const state = makeState({
+      selMode: false,
+      libraryItems: [makeItem({ key: "a" }), makeItem({ key: "b", name: "b.png" })],
+      enterSelectModeWith: vi.fn(),
+    });
+    mount(state, { selectedAssetId: "a" });
+    fireEvent.click(screen.getByTestId("mgr-asset-b"), { metaKey: true });
+    expect(state.enterSelectModeWith).toHaveBeenCalledWith("a");
+    expect(state.toggleSelect).toHaveBeenCalledWith("b");
+  });
+
+  it("Shift-click after a plain click ranges from the open file", () => {
+    const state = makeState({
+      selMode: false,
+      libraryItems: [makeItem({ key: "a" }), makeItem({ key: "b", name: "b.png" })],
+      shiftSelect: vi.fn(),
+    });
+    mount(state, { selectedAssetId: "a" });
+    fireEvent.click(screen.getByTestId("mgr-asset-b"), { shiftKey: true });
+    expect(state.shiftSelect).toHaveBeenCalledWith("b", "a");
+  });
+
   it("only the file KIND badges (▶ / ◆ / Aa) remain — provenance left the card", () => {
     const state = makeState({
       libraryItems: [
