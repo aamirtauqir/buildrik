@@ -579,6 +579,9 @@ export class MediaManager extends MediaEventEmitter {
        *  `siteFont` beside it (3686:42317), `versionOf` / `edits` too
        *  (3695:45529). */
       userMetadata?: unknown;
+      /** Pixel size, when the server measured it (`media_assets.width/height`). */
+      width?: number | null;
+      height?: number | null;
     }>,
     serverFolders: ReadonlyArray<{
       id: string;
@@ -631,6 +634,7 @@ export class MediaManager extends MediaEventEmitter {
         ...(siteFontFromUserMetadata(sa.userMetadata) ? { siteFont: true } : {}),
         ...(versionOf !== undefined ? { versionOf } : {}),
         ...(edits !== undefined ? { edits } : {}),
+        ...(sa.width && sa.height ? { width: sa.width, height: sa.height } : {}),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",

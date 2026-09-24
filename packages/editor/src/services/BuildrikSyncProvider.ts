@@ -561,6 +561,8 @@ export async function loadServerMedia(
       createdAt: string | Date;
       updatedAt: string | Date;
       userMetadata?: unknown;
+      width?: number | null;
+      height?: number | null;
     }>;
     const folders = foldersResult as unknown as ReadonlyArray<{
       id: string;
