@@ -45,14 +45,12 @@ describe("useStudioState", () => {
     it("overlay defaults: guides + suggestions on, everything else off", () => {
       const { result } = renderHook(() => useStudioState());
       expect(result.current.overlays).toEqual({
-        showComponentView: false,
         showXRay: false,
         showSpacingIndicators: false,
         showBadges: false,
         showGuides: true,
         showGrid: false,
         showRulers: false,
-        devMode: false,
         showSuggestions: true,
       });
     });
@@ -201,14 +199,12 @@ describe("useStudioState", () => {
   // Overlays -------------------------------------------------------------------
   describe("overlay toggles", () => {
     const ALL_OVERLAYS: (keyof OverlayState)[] = [
-      "showComponentView",
       "showXRay",
       "showSpacingIndicators",
       "showBadges",
       "showGuides",
       "showGrid",
       "showRulers",
-      "devMode",
       "showSuggestions",
     ];
 
@@ -224,33 +220,6 @@ describe("useStudioState", () => {
       }
       act(() => result.current.toggleOverlay(key));
       expect(result.current.overlays[key]).toBe(before[key]);
-    });
-
-    it("toggleDevMode ON enables grid/guides/spacing/badges/componentView", () => {
-      const { result } = renderHook(() => useStudioState());
-      act(() => result.current.toggleDevMode());
-      expect(result.current.overlays).toMatchObject({
-        devMode: true,
-        showGrid: true,
-        showGuides: true,
-        showSpacingIndicators: true,
-        showBadges: true,
-        showComponentView: true,
-      });
-    });
-
-    it("toggleDevMode OFF disables the dev feature set again", () => {
-      const { result } = renderHook(() => useStudioState());
-      act(() => result.current.toggleDevMode());
-      act(() => result.current.toggleDevMode());
-      expect(result.current.overlays).toMatchObject({
-        devMode: false,
-        showGrid: false,
-        showGuides: false,
-        showSpacingIndicators: false,
-        showBadges: false,
-        showComponentView: false,
-      });
     });
   });
 

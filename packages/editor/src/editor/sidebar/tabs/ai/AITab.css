@@ -117,20 +117,31 @@
 .bd-ai-model-item:hover { background: var(--bk-bg-subtle); }
 .bd-ai-model-item[aria-current="true"] { color: var(--bk-accent); }
 
-/* Two classes deep on purpose: flowbite's `px-3` is a `tw:` utility, and a
-   single-class rule ties it on specificity and then loses on source order —
-   which is how a 26px send button rendered 40 wide, its own width overrun by
-   padding it never asked for. */
-.bd-ai-composer-field .bd-ai-composer-send,
-.bd-ai-composer-field .bd-ai-composer-stop {
-  padding: 0;
+/* The labelled primary (board 4418:104454): its own width, 8 across. Two
+   classes deep on purpose — flowbite's `px-3` is a `tw:` utility, and a
+   single-class rule ties it on specificity and loses on source order. */
+.bd-ai-composer-field .bd-ai-composer-send {
+  width: auto;
+  padding: 0 var(--bk-space-8);
 }
 
-.bd-ai-composer-send,
-.bd-ai-composer-stop {
+/* The field's bottom-right corner: the quota counter (G2-129) then the send
+   button, side by side. */
+.bd-ai-composer-foot {
   position: absolute;
   right: var(--bk-space-4);
   bottom: var(--bk-space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+}
+
+.bd-ai-composer-quota {
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+
+.bd-ai-composer-send {
   width: 26px;
   height: 22px;
   border-radius: var(--bk-radius-sm);
@@ -143,72 +154,6 @@
 .bd-ai-composer-send { background: var(--bk-accent); }
 .bd-ai-composer-send:hover { background: var(--bk-accent-hover); }
 .bd-ai-composer-send:disabled { background: var(--bk-border-medium); cursor: not-allowed; }
-
-.bd-ai-composer-stop { background: var(--bk-error); }
-.bd-ai-composer-stop:hover { filter: brightness(0.9); }
-
-.bd-ai-msg {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-4);
-  margin-bottom: var(--bk-space-8);
-}
-
-.bd-ai-msg-role {
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bk-ink-muted);
-}
-
-.bd-ai-msg-user .bd-ai-msg-role { color: var(--bk-accent); }
-
-.bd-ai-msg-body {
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
-  color: var(--bk-ink);
-  line-height: 1.5;
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border-radius: var(--bk-radius-lg);
-  background: var(--bk-bg-subtle);
-}
-
-.bd-ai-msg-user .bd-ai-msg-body { background: var(--bk-accent-tint); color: var(--bk-ink); }
-.bd-ai-msg-assistant .bd-ai-msg-body { background: var(--bk-bg-card); border: 1px solid var(--bk-border); }
-
-.bd-ai-msg-body p { margin: 0; }
-
-.bd-ai-msg-streaming::after {
-  content: "▍";
-  color: var(--bk-accent);
-  animation: bd-ai-blink 0.8s step-end infinite;
-  margin-left: 1px;
-}
-
-@keyframes bd-ai-blink { 50% { opacity: 0; } }
-
-.bd-ai-msg-stopped {
-  display: inline-block;
-  margin-left: var(--bk-space-4);
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-}
-
-.bd-ai-msg-error {
-  margin: 0;
-  color: var(--bk-error);
-}
-
-.bd-ai-msg-regenerate {
-  align-self: flex-start;
-  background: transparent;
-  border: none;
-  color: var(--bk-ink-muted);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  cursor: pointer;
-  padding: 0;
-}
-
-.bd-ai-msg-regenerate:hover { color: var(--bk-accent); }
 
 /* P4 agent build loop */
 .bd-ai-mode {
@@ -261,16 +206,6 @@
   padding: var(--bk-space-8) var(--bk-space-16);
   color: var(--bk-error);
 }
-.bd-ai-agent-autoapply {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  padding: var(--bk-space-8) var(--bk-space-16);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-}
-
 /* Board 171:136 (AI · not-configured): the panel says why nothing will run,
    in the panel, instead of printing the server's error under a live-looking
    composer. */

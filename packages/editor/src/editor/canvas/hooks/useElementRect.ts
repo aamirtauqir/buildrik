@@ -11,6 +11,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 
 export interface ElementRect {
@@ -76,6 +77,7 @@ export function useElementRect(
     }
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
+    const zs = canvasScale(canvasRef.current);
     const elementRect = element.getBoundingClientRect();
 
     // Account for canvas scroll position
@@ -83,10 +85,10 @@ export function useElementRect(
     const scrollTop = canvasRef.current.scrollTop || 0;
 
     const newRect: ElementRect = {
-      left: elementRect.left - canvasRect.left + scrollLeft,
-      top: elementRect.top - canvasRect.top + scrollTop,
-      width: elementRect.width,
-      height: elementRect.height,
+      left: (elementRect.left - canvasRect.left) / zs + scrollLeft,
+      top: (elementRect.top - canvasRect.top) / zs + scrollTop,
+      width: elementRect.width / zs,
+      height: elementRect.height / zs,
       raw: elementRect,
     };
 
@@ -197,6 +199,7 @@ export function useMultipleElementRects(
 
     const canvas = canvasRef.current;
     const canvasRect = canvas.getBoundingClientRect();
+    const zs = canvasScale(canvas);
     const scrollLeft = canvas.scrollLeft || 0;
     const scrollTop = canvas.scrollTop || 0;
 
@@ -208,10 +211,10 @@ export function useMultipleElementRects(
       if (element) {
         const elementRect = element.getBoundingClientRect();
         newRects.set(id, {
-          left: elementRect.left - canvasRect.left + scrollLeft,
-          top: elementRect.top - canvasRect.top + scrollTop,
-          width: elementRect.width,
-          height: elementRect.height,
+          left: (elementRect.left - canvasRect.left) / zs + scrollLeft,
+          top: (elementRect.top - canvasRect.top) / zs + scrollTop,
+          width: elementRect.width / zs,
+          height: elementRect.height / zs,
           raw: elementRect,
         });
       }

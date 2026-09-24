@@ -10,6 +10,7 @@
 
 import { createBuildrikApiClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
+import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 
@@ -295,6 +296,95 @@ export function getEditorPlanTier(): EditorPlanTier {
   return _editorPlanTier;
 }
 
+/** Duplicate a site (`sites.duplicate`, EDITOR). Throws the server's message
+ *  on refusal — e.g. the plan's site limit — so the caller can say it. */
+export async function duplicateSite(siteId: string): Promise<{ id: string; name: string }> {
+  const copy = await getClient().sites.duplicate.mutate({ id: siteId });
+  return { id: copy.id, name: copy.name };
+}
+
+/**
+ * The dashboard's rows → the editor's ProjectData. Pure: no client, no module
+ * state. `loadProject` feeds it the three tRPC reads; the `/share/<token>`
+ * draft preview feeds it the same rows from the server, so a shared draft is
+ * built by exactly the mapping the editor opens.
+ */
+export function projectDataFromRows(
+  site: unknown,
+  pages: unknown,
+  siteColumns: unknown,
+): ProjectData {
+  const siteRow = site as {
+    name: string;
+    domain?: string;
+    publishedUrl?: string | null;
+    projectStyles?: unknown;
+    projectSettings?: unknown;
+    dsSchemaVersion?: number;
+  };
+  // tRPC `pages.list` returns Prisma rows with Json columns typed as
+  // JsonValue. Runtime shape matches DashboardPageRow (blocks/settings/meta
+  // are persisted typed at write time + validated via shared schemas).
+  const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
+    .slice()
+    .sort((a, b) => a.position - b.position);
+
+  // sites.get returns the full Site row including the projectSettings Json
+  // column (Prisma findFirst defaults to selecting all scalars). Pull that
+  // as the base so non-mirrored settings (e.g. things only persisted in the
+  // JSON blob) survive editor reload from dashboard.
+  const baseSettings = siteRow.projectSettings as ProjectData["settings"] | undefined;
+  const mergedSettings = siteColumns
+    ? mergeSiteColumnsIntoSettings(baseSettings, siteColumns as SiteColumnSettings)
+    : baseSettings;
+
+  return {
+    version: "1.0",
+    pagesOrder: sortedPages.map((p) => p.id),
+    pages: sortedPages.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      isHome: p.isHomePage,
+      root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
+        ? p.blocks
+        : DEFAULT_ROOT,
+      settings: p.settings,
+      meta: p.meta ?? undefined,
+      updatedAt: p.updatedAt,
+      slugManuallySet: p.slugManuallySet ?? false,
+      slugHistory: p.slugHistory ?? [],
+    })),
+    // projectStyles holds StyleEngine CSS rules ({id, selector, properties}).
+    // Legacy data also contains design-token entries ({id, kind, cssVar, ...})
+    // from before tokens migrated to TokenRegistry — those fail StyleEngine
+    // validation and warn "dropped N malformed rule(s)" on every site open.
+    // Filter at load so only real CSS rules reach the engine; tokens are
+    // hydrated separately by the DS layer.
+    styles: (Array.isArray(siteRow.projectStyles)
+      ? (siteRow.projectStyles as unknown[]).filter(
+          (s): s is { selector: string } =>
+            s != null &&
+            typeof s === "object" &&
+            typeof (s as { selector?: unknown }).selector === "string" &&
+            (s as { selector: string }).selector.length > 0
+        )
+      : []) as ProjectData["styles"],
+    assets: [],
+    settings: mergedSettings,
+    dsSchemaVersion: siteRow.dsSchemaVersion ?? 0,
+    metadata: {
+      name: siteRow.name,
+      domain: siteRow.domain,
+      /* Carried so the slug-change warning can ask whether this site is
+         reachable at all, instead of reading a per-page field that defaults
+         to off. Same loose read as `domain` above — this is the tRPC row,
+         not a typed domain object. */
+      publishedUrl: siteRow.publishedUrl ?? null,
+    },
+  };
+}
+
 export async function loadProject(siteId: string): Promise<ProjectData> {
   try {
     const client = getClient();
@@ -305,26 +395,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
       client.pages.list.query({ siteId }),
       client.siteDetail.settings.get.query({ siteId }).catch(() => null),
     ]);
-
-    // tRPC `pages.list` returns Prisma rows with Json columns typed as
-    // JsonValue. Runtime shape matches DashboardPageRow (blocks/settings/meta
-    // are persisted typed at write time + validated via shared schemas).
-    // Two-step `unknown as` cast satisfies TS — JsonValue → typed shape
-    // doesn't structurally overlap without the bridge.
-    const sortedPages: DashboardPageRow[] = (pages as unknown as DashboardPageRow[])
-      .slice()
-      .sort((a, b) => a.position - b.position);
-
-    // sites.get returns the full Site row including the projectSettings Json
-    // column (Prisma findFirst defaults to selecting all scalars). Pull that
-    // as the base so non-mirrored settings (e.g. things only persisted in the
-    // JSON blob) survive editor reload from dashboard.
-    const baseSettings = (site as { projectSettings?: unknown }).projectSettings as
-      | ProjectData["settings"]
-      | undefined;
-    const mergedSettings = settingsResult
-      ? mergeSiteColumnsIntoSettings(baseSettings, settingsResult as SiteColumnSettings)
-      : baseSettings;
+    const data = projectDataFromRows(site, pages, settingsResult);
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
@@ -336,56 +407,31 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
 
-    return {
-      version: "1.0",
-      pagesOrder: sortedPages.map((p) => p.id),
-      pages: sortedPages.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        isHome: p.isHomePage,
-        root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
-          ? p.blocks
-          : DEFAULT_ROOT,
-        settings: p.settings,
-        meta: p.meta ?? undefined,
-        updatedAt: p.updatedAt,
-        slugManuallySet: p.slugManuallySet ?? false,
-        slugHistory: p.slugHistory ?? [],
-      })),
-      // projectStyles holds StyleEngine CSS rules ({id, selector, properties}).
-      // Legacy data also contains design-token entries ({id, kind, cssVar, ...})
-      // from before tokens migrated to TokenRegistry — those fail StyleEngine
-      // validation and warn "dropped N malformed rule(s)" on every site open.
-      // Filter at load so only real CSS rules reach the engine; tokens are
-      // hydrated separately by the DS layer.
-      styles: (Array.isArray((site as { projectStyles?: unknown }).projectStyles)
-        ? ((site as { projectStyles: unknown[] }).projectStyles as unknown[]).filter(
-            (s): s is { selector: string } =>
-              s != null &&
-              typeof s === "object" &&
-              typeof (s as { selector?: unknown }).selector === "string" &&
-              (s as { selector: string }).selector.length > 0
-          )
-        : []) as ProjectData["styles"],
-      assets: [],
-      settings: mergedSettings,
-      dsSchemaVersion: (site as { dsSchemaVersion?: number }).dsSchemaVersion ?? 0,
-      metadata: {
-        name: site.name,
-        domain: (site as { domain?: string }).domain,
-        /* Carried so the slug-change warning can ask whether this site is
-           reachable at all, instead of reading a per-page field that defaults
-           to off. Same loose read as `domain` above — this is the tRPC row,
-           not a typed domain object. */
-        publishedUrl: (site as { publishedUrl?: string | null }).publishedUrl ?? null,
-      },
-    };
+    return data;
   } catch (cause) {
     const error = cause instanceof Error ? cause : new Error(String(cause));
     if (/not_found/i.test(error.message)) _missingSites.add(siteId);
     throw new Error(`BuildrikSyncProvider.loadProject failed for site ${siteId}: ${error.message}`, { cause: error });
   }
+}
+
+/* Saves run one at a time. Two in flight at once (autosave + ⌘S, 180 ms
+   apart on the walk) both carried the same `expectedLastEditedAt`; the first
+   advanced the server's row, so the second read as another writer's change —
+   a false "Conflict — reload" with nobody else on the site. Chained, each save
+   leaves with the baseline the previous one returned. */
+let _saveChain: Promise<unknown> = Promise.resolve();
+
+export function saveProject(
+  siteId: string,
+  projectData: ProjectData
+): Promise<{ success: boolean; savedAt: Date }> {
+  const run = _saveChain.then(
+    () => saveProjectNow(siteId, projectData),
+    () => saveProjectNow(siteId, projectData),
+  );
+  _saveChain = run.catch(() => undefined);
+  return run;
 }
 
 /**
@@ -395,7 +441,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
  *
  * Both calls run in parallel. If only one half changes, the other is skipped.
  */
-export async function saveProject(
+async function saveProjectNow(
   siteId: string,
   projectData: ProjectData
 ): Promise<{ success: boolean; savedAt: Date }> {
@@ -403,14 +449,27 @@ export async function saveProject(
     throw new ProjectNotLoadedError(siteId, _missingSites.has(siteId));
   }
   const client = getClient();
-  const siteColumnPatch = extractSiteColumnPatch(projectData);
+  /* Never persist a session Object URL: it is a broken image on every later
+     open. The live element keeps its preview; once its upload reaches the
+     server the element is re-pointed (MediaManager.replaceAssetId) and the
+     next save stores the server URL. */
+  const persisted: ProjectData = {
+    ...projectData,
+    pages: projectData.pages.map((page) => {
+      if (!page.root || !JSON.stringify(page.root).includes("blob:")) return page;
+      const root = structuredClone(page.root);
+      dropSessionMediaUrls(root);
+      return { ...page, root };
+    }),
+  };
+  const siteColumnPatch = extractSiteColumnPatch(persisted);
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
 
   // Both mutations start in the same tick so the httpBatchLink still batches
   // them; they are AWAITED separately so one cannot speak for the other.
   const primaryCall = client.sites.saveProject.mutate({
     siteId,
-    projectData,
+    projectData: persisted,
     // 61-conflict: opt into behind-copy detection.
     expectedLastEditedAt: _baselineLastEditedAt,
   });
@@ -554,6 +613,8 @@ export async function loadServerMedia(
       createdAt: string | Date;
       updatedAt: string | Date;
       userMetadata?: unknown;
+      width?: number | null;
+      height?: number | null;
     }>;
     const folders = foldersResult as unknown as ReadonlyArray<{
       id: string;

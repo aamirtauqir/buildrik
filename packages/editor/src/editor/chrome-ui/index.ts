@@ -17,7 +17,7 @@
  *      `forwardRef` that applies its `BK_*_THEME` default and deep-merges
  *      (`mergeTheme.ts`) a caller-supplied `theme` on top. A third wrapper
  *      fails the gate until this list is deliberately amended.
- *  (c) The 45 editor-specific components already here (Topbar, IssueChip,
+ *  (c) The 45 editor-specific components already here (Topbar,
  *      Modal, Toast, etc.) — unchanged.
  *  (d) Non-component symbols: `CustomFlowbiteTheme` (type-only) and every
  *      `BK_*` theme/class constant, so deep `chrome-ui/<name>Theme` imports
@@ -36,12 +36,12 @@ export { TextField, type TextFieldProps } from "./TextField";
 export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./Skeleton";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
-export { IssueChip, formatIssueSummary, plural, type IssueChipProps } from "./IssueChip";
+export { formatIssueSummary, plural } from "./issueCopy";
 export { Chip, type ChipProps } from "./Chip";
 export { SkeletonBlock, type SkeletonBlockProps } from "./Skeleton";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
-export { Topbar, SiteMenuIcon } from "./Topbar";
+export { Topbar, SiteMenuIcon, TOPBAR_CONTEXT_SEARCH_ID } from "./Topbar";
 export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } from "./Topbar";
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
@@ -84,6 +84,7 @@ export { UpgradeModal, openUpgrade, type UpgradeModalProps } from "./UpgradeModa
 export {
   PanelHeader,
   PanelHeaderActions,
+  PanelHeaderSize,
   type PanelHeaderProps,
   type PanelHeaderActionsProps,
 } from "./PanelHeader";
@@ -163,12 +164,11 @@ export { Avatar, AvatarGroup } from "flowbite-react";
 export { Checkbox } from "flowbite-react";
 export { Radio } from "flowbite-react";
 export { ToggleSwitch } from "flowbite-react";
-/* Wrapper, not a re-export: flowbite's Tooltip defaults to `style="dark"`
-   (`bg-gray-900`, the same value as `--bk-ink`), which DESIGN.md's NO BLACK RULE bans by name for
-   this control. The third member of the closed wrapper set — the gate manifest
+/* Wrapper, not a re-export: it gives flowbite's dark Tooltip the board's
+   bubble size (4433:46540). The third member of the closed wrapper set — the gate manifest
    is amended in the same commit, per CLAUDE.md's rule for adding one. */
 export { Tooltip, type TooltipProps } from "./Tooltip";
-export { BK_TOOLTIP_TEXT_CLASS } from "./tooltipTheme";
+export { BK_TOOLTIP_CLASS } from "./tooltipTheme";
 export { Textarea } from "flowbite-react";
 export { Label } from "flowbite-react";
 export { HelperText } from "flowbite-react";

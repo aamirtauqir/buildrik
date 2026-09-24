@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 
 /** Selection rectangle in canvas coordinates */
@@ -46,6 +47,7 @@ export function useSelectionRect({
       if (!canvas) return;
 
       const canvasRect = canvas.getBoundingClientRect();
+      const zs = canvasScale(canvas);
       const scrollLeft = canvas.scrollLeft || 0;
       const scrollTop = canvas.scrollTop || 0;
 
@@ -60,10 +62,10 @@ export function useSelectionRect({
           const element = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
           if (element) {
             const elRect = element.getBoundingClientRect();
-            minX = Math.min(minX, elRect.left - canvasRect.left + scrollLeft);
-            minY = Math.min(minY, elRect.top - canvasRect.top + scrollTop);
-            maxX = Math.max(maxX, elRect.right - canvasRect.left + scrollLeft);
-            maxY = Math.max(maxY, elRect.bottom - canvasRect.top + scrollTop);
+            minX = Math.min(minX, (elRect.left - canvasRect.left) / zs + scrollLeft);
+            minY = Math.min(minY, (elRect.top - canvasRect.top) / zs + scrollTop);
+            maxX = Math.max(maxX, (elRect.right - canvasRect.left) / zs + scrollLeft);
+            maxY = Math.max(maxY, (elRect.bottom - canvasRect.top) / zs + scrollTop);
           }
         });
 
@@ -82,10 +84,10 @@ export function useSelectionRect({
         if (element) {
           const elementRect = element.getBoundingClientRect();
           setRect({
-            left: elementRect.left - canvasRect.left + scrollLeft,
-            top: elementRect.top - canvasRect.top + scrollTop,
-            width: elementRect.width,
-            height: elementRect.height,
+            left: (elementRect.left - canvasRect.left) / zs + scrollLeft,
+            top: (elementRect.top - canvasRect.top) / zs + scrollTop,
+            width: elementRect.width / zs,
+            height: elementRect.height / zs,
           });
         }
       }

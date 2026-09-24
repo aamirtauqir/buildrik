@@ -12,20 +12,13 @@
 // =============================================================================
 
 export {
-  MAX_NESTING_DEPTH,
-  RECOMMENDED_MAX_DEPTH,
-  MAX_CHILDREN_COUNT,
   ElementCategory,
   LandmarkRole,
   type HeadingLevel,
   type ElementRule,
-  type ValidationIssue,
-  type TreeStatistics,
-  type TreeValidationResult,
   type ValidationOptions,
   type MoveValidationResult,
   type AutoFixSuggestion,
-  type TreeAnalysis,
 } from "./types";
 
 // =============================================================================
@@ -100,7 +93,6 @@ export {
   filterTree,
   flattenTree,
   countElements,
-  analyzeTree,
 } from "./treeOps";
 
 // =============================================================================
@@ -119,9 +111,16 @@ export {
   getValidDropTargets,
   getValidChildren,
   clearNestingCaches,
-  validateElementTree,
   isValidNesting,
 } from "./validator";
+
+export {
+  TEXT_ELEMENT_TYPES,
+  insideRefusal,
+  engineMayPlaceInside,
+  parserHoists,
+  type InsideRefusal,
+} from "./placement";
 
 // =============================================================================
 // OPERATIONS EXPORTS
@@ -170,7 +169,6 @@ import {
   filterTree,
   flattenTree,
   countElements,
-  analyzeTree,
 } from "./treeOps";
 import {
   canHaveChildren,
@@ -196,7 +194,6 @@ import {
   getValidDropTargets,
   getValidChildren,
   clearNestingCaches,
-  validateElementTree,
   isValidNesting,
 } from "./validator";
 
@@ -210,7 +207,6 @@ const nestingRules = {
   getValidDropTargets,
   getValidChildren,
   clearNestingCaches,
-  validateElementTree,
   isValidNesting,
   canMoveElement,
   validateBulkMove,
@@ -250,7 +246,6 @@ const nestingRules = {
   getImplicitRole,
   getLandmarkRole,
   getHeadingLevel,
-  analyzeTree,
 };
 
 export default nestingRules;

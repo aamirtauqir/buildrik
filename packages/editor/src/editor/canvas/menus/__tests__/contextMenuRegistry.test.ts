@@ -56,6 +56,23 @@ describe("getContextMenuActions — structure", () => {
   });
 });
 
+/* C5 G2-052/053/054/056: the placeholder inserts, layout and style presets,
+   "Reset all styles", Reveal in layers and Select parent are gone from the
+   canvas menu. */
+describe("getContextMenuActions — removed rows (C5 G2-052…056)", () => {
+  it("offers none of the deleted rows", () => {
+    const all = getContextMenuActions(makeCtx({}));
+    const ids = all.flatMap((a) => [a.id, ...(a.submenu ?? []).map((b) => b.id)]);
+    for (const gone of [
+      "insert-before", "insert-after", "insert-inside-first", "insert-inside-last",
+      "layout-flex-row", "layout-flex-column", "layout-grid", "layout-center", "layout-space-between",
+      "style-padding", "style-margin", "style-border", "style-background", "style-shadow", "style-reset",
+      "reveal-in-layers", "select-parent", "wrap-section",
+    ]) expect(ids).not.toContain(gone);
+    expect(ids).toEqual(expect.arrayContaining(["wrap-container", "bring-to-front", "copy-styles", "paste-styles", "delete"]));
+  });
+});
+
 describe("getContextMenuActions — isVisible filtering", () => {
   it("hides the layout group entirely for a non-container element (empty submenu collapses parent)", () => {
     // Layout submenu items are all isContainer-gated except the layer-ordering
@@ -101,9 +118,4 @@ describe("getContextMenuActions — isVisible filtering", () => {
     expect(multi.map((a) => a.id)).toContain("group-elements");
   });
 
-  it("hides select-parent when the element has no parent", () => {
-    const orphan = makeElementStub({ id: "o-1", type: "container", parent: null });
-    const actions = getContextMenuActions(makeCtx({ element: orphan }));
-    expect(actions.map((a) => a.id)).not.toContain("select-parent");
-  });
 });

@@ -191,10 +191,11 @@ describe("PageRow active indicator", () => {
     expect(onContextMenu).toHaveBeenCalled();
   });
 
-  it("scheduled status is announced, not chipped (board 140:2 rows carry no chips)", () => {
+  /* v3 board 4418:93381 chips non-live pages (C5 G2-071); V1's 140:2 drew none. */
+  it("scheduled status is chipped and announced", () => {
     const page = makePage({ status: "scheduled" });
     const { container } = render(<PageRow page={page} {...baseProps} />);
-    expect(container.querySelector(".bd-pg-chip")).toBeNull();
+    expect(container.querySelector(".bd-pg-chip.scheduled")?.textContent).toBe("Scheduled");
     const row = container.querySelector(".bd-pg-row");
     expect(row?.getAttribute("aria-label") ?? "").toContain("Scheduled");
   });

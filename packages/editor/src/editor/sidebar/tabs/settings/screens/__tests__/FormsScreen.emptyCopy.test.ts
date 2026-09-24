@@ -1,16 +1,11 @@
 /**
- * The Forms inbox told users to drop a Form block "to start collecting
- * submissions". Nothing collects them.
- *
- * Walked the whole chain: inserting a Form on the canvas exports
- * `<form class=… data-buildrick-id=…>` with no `action` and no submit script,
- * so a published page posts nowhere. The public endpoint
- * (app/api/public/forms/[siteId]/[formBlockId]) is never called by anything we
- * ship, and no code path creates a FormBlock row except site duplication —
- * so `forms.listBlocks` can only ever return the empty list this screen is
- * rendering. The export DOES wire a form when a Formspree/custom webhook URL
- * is set, but the settings section that would set one (shared/forms/
- * FormSettingsSection) has no consumer, so a user cannot reach it either.
+ * The Forms inbox empty state. It once promised that dropping a Form block
+ * "starts collecting submissions" (false: nothing listed until publish), then
+ * said submissions were "not captured yet" (false since a10f19233: publish
+ * points every action-less form at /api/public/forms/<siteId>/<elementId> and
+ * creates the FormBlock row this screen lists — root lib/publish-forms.ts).
+ * The editor's own exporter still sets an action only for Formspree / a
+ * custom URL; the publish step supplies the default.
  *
  * @license BSD-3-Clause
  */
@@ -31,8 +26,9 @@ describe("Forms inbox — empty state", () => {
     expect(rendered).not.toMatch(/start collecting submissions/i);
   });
 
-  it("says submissions are not captured yet", () => {
-    expect(rendered).toMatch(/not captured yet/i);
+  it("says a published Form block is what fills the inbox", () => {
+    expect(rendered).toMatch(/Publish a page with a Form block/);
+    expect(rendered).not.toMatch(/not captured yet/i);
   });
 
   it("matches the exporter: an action only exists for formspree or a custom URL", () => {

@@ -173,12 +173,13 @@ describe("useEditorShortcuts", () => {
     expect(modals.setShowShortcuts).toHaveBeenCalledWith(true);
   });
 
-  it("'?' does NOT open the shortcuts modal — the canvas cheat sheet owns it", () => {
+  it("'?' opens the one keyboard sheet — bare only, never with a modifier", () => {
     mount();
-    dispatchKey({ key: "?" });
     dispatchKey({ key: "?", metaKey: true });
     dispatchKey({ key: "?", ctrlKey: true });
     expect(modals.setShowShortcuts).not.toHaveBeenCalled();
+    dispatchKey({ key: "?" });
+    expect(modals.setShowShortcuts).toHaveBeenCalledWith(true);
   });
 
   it("Cmd+K is NOT handled here (Topbar owns it — avoids double palette)", () => {

@@ -1,12 +1,11 @@
 /**
- * InspectorEmptyState — no selection, board 159:99.
+ * InspectorEmptyState — no selection, board 4428:44164 (v3).
  *
- * The board draws two lines: a muted sentence and one accent link to the AI.
- * What it replaced was six blocks of chrome — icon circle, h3, description, two
- * CTA buttons and a keyboard tip — for "nothing is selected". Nothing here
- * covered any of that, which is why the rewrite ran green before these existed.
+ * A centred "Nothing selected" over a two-line hint, and nothing else — no
+ * AI link (the header's ✦ AI is the door once something is selected), no
+ * CTA buttons.
  */
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { InspectorEmptyState } from "../InspectorEmptyState";
@@ -15,31 +14,19 @@ import { InspectorEmptyState } from "../InspectorEmptyState";
 const makeComposer = () => ({ emit: vi.fn() }) as any;
 
 describe("InspectorEmptyState — no selection", () => {
-  it("says what to do in one sentence", () => {
+  it("says Nothing selected, then what to do", () => {
     render(<InspectorEmptyState composer={makeComposer()} />);
-    expect(screen.getByText("Select something on the canvas to edit it.")).toBeTruthy();
+    expect(screen.getByTestId("inspector-empty-title")).toHaveTextContent("Nothing selected");
+    expect(screen.getByTestId("inspector-empty-text")).toHaveTextContent(
+      "Click an element on the canvas to edit its style, settings and effects.",
+    );
   });
 
-  it("offers the AI entry and nothing else", () => {
+  it("is centred and carries no link or CTA", () => {
     render(<InspectorEmptyState composer={makeComposer()} />);
-    expect(screen.getByTestId("inspector-empty-ask-ai")).toBeTruthy();
-    // The two CTAs the board dropped. Their destinations live on the rail and
-    // in the command palette; an empty panel no longer advertises them.
-    expect(screen.queryByText(/Open Build Panel/i)).toBeNull();
-    expect(screen.queryByText(/Browse Templates/i)).toBeNull();
-    expect(screen.queryByText(/Nothing Selected/i)).toBeNull();
-  });
-
-  it("routes Ask AI to the AI panel", () => {
-    const composer = makeComposer();
-    render(<InspectorEmptyState composer={composer} />);
-    fireEvent.click(screen.getByTestId("inspector-empty-ask-ai"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
-  });
-
-  it("renders the sentence without a composer, and no dead link", () => {
-    render(<InspectorEmptyState composer={null} />);
-    expect(screen.getByText("Select something on the canvas to edit it.")).toBeTruthy();
-    expect(screen.queryByTestId("inspector-empty-ask-ai")).toBeNull();
+    const box = screen.getByTestId("inspector-empty");
+    expect(box.className).toMatch(/tw:justify-center/);
+    expect(box.className).toMatch(/tw:items-center/);
+    expect(box.querySelectorAll("button")).toHaveLength(0);
   });
 });

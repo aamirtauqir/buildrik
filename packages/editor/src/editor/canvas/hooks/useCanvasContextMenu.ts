@@ -18,8 +18,6 @@ export interface ContextMenuState {
   x: number;
   y: number;
   elementId: string;
-  /** Stack of element IDs at click position (for "Select from stack" feature) */
-  elementStack?: string[];
 }
 
 export interface ContextMenuContext {
@@ -27,8 +25,6 @@ export interface ContextMenuContext {
   element: Element;
   isRoot: boolean;
   openAI?: () => void;
-  /** Stack of element IDs at click position (for "Select from stack" feature) */
-  elementStack?: string[];
   /** Toast function for showing undo notifications */
   addToast?: AddToastFn;
 }
@@ -113,7 +109,6 @@ export function useCanvasContextMenu({
               elementType: el.getType(),
             })
         : undefined,
-      elementStack: contextMenu.elementStack,
       addToast,
     };
 

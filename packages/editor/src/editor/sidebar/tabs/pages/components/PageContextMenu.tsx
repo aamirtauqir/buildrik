@@ -24,6 +24,8 @@ interface Props {
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
   onSetHomepage: (id: string) => void;
+  /** Board 6883:69504 — "Replace layout with template…" (audit G2-078). */
+  onReplaceLayout: (id: string) => void;
   onCopyLink: (id: string) => void;
   onSettings: (id: string) => void;
 }
@@ -38,6 +40,7 @@ export const PageContextMenu: React.FC<Props> = ({
   onDuplicate,
   onDelete,
   onSetHomepage,
+  onReplaceLayout,
   onCopyLink,
   onSettings,
 }) => {
@@ -63,7 +66,7 @@ export const PageContextMenu: React.FC<Props> = ({
   const style: React.CSSProperties = {
     position: "fixed",
     top: Math.min(y, window.innerHeight - 260),
-    left: Math.min(x, window.innerWidth - 220),
+    left: Math.min(x, window.innerWidth - 232),
     zIndex: 9999,
   };
 
@@ -85,7 +88,8 @@ export const PageContextMenu: React.FC<Props> = ({
        computed from the click, not from an anchor. */
     <div
       ref={menuRef}
-      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed`}
+      /* 6883:69130 — the menu is 224 wide. */
+      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-56`}
       style={style}
       data-testid="pages-context-menu"
     >
@@ -108,6 +112,9 @@ export const PageContextMenu: React.FC<Props> = ({
             Set as homepage
           </MenuItem>
         )}
+        <MenuItem data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
+          Replace layout with template…
+        </MenuItem>
         <MenuItem data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
           Copy link
         </MenuItem>
@@ -125,6 +132,16 @@ export const PageContextMenu: React.FC<Props> = ({
         >
           Delete page
         </MenuItem>
+        {/* 6883:69130 — why Delete is off, said in the menu (a disabled row
+            shows no tooltip). */}
+        {deleteDisabled && (
+          <p
+            className="tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="pages-menu-delete-reason"
+          >
+            {isHome ? "Homepage can’t be deleted" : "A site needs at least one page"}
+          </p>
+        )}
       </Menu>
     </div>
   );

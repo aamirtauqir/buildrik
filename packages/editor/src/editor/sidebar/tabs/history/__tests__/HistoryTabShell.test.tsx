@@ -1,8 +1,8 @@
 /**
  * HistoryTab shell tests — verifies the chrome after M1 + M2:
- *   - View switcher is Saves / Published (Changes is a filter, not a tab)
+ *   - View switcher: Session / Saves / Published (Activity is its own panel)
  *   - Helper text under each tab
- *   - Saves filter switches milestones ↔ all changes
+ *   - Session · Saves · Published tabs (board 4418:73791, B8)
  *   - Search bar is Saves-only (Published takes no query)
  *   - `initialView` deep link lands on Published
  *   - Time-Travel scrubber toggles via Ctrl+Shift+T
@@ -22,14 +22,14 @@ vi.mock("../../../../panels/VersionHistoryPanel", () => ({
 }));
 
 vi.mock("../components/ActivityView", () => ({
-  ActivityView: ({ onOpenTimeTravel }: { onOpenTimeTravel?: () => void }) => (
-    <div data-testid="activity-view">
-      <button data-testid="tt-trigger" onClick={() => onOpenTimeTravel?.()}>
-        open-tt
-      </button>
-    </div>
-  ),
+  ActivityView: () => <div data-testid="activity-view" />,
 }));
+
+/** Board 4418:73791: Time-Travel and search live behind the panel ⋯. */
+const openMenuItem = (name: RegExp | string) => {
+  fireEvent.click(screen.getByTestId("history-menu"));
+  fireEvent.click(screen.getByRole("menuitem", { name }));
+};
 
 vi.mock("../components/TimeTravelScrubber", () => ({
   TimeTravelScrubber: ({
@@ -103,6 +103,8 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
 }));
 
 import { HistoryTab } from "../HistoryTab";
+import { EVENTS } from "@/shared/constants/events";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 vi.mock("../../../../shell/PublishHistory", () => ({
   PublishHistory: ({ siteId }: { siteId: string }) => (
@@ -112,6 +114,7 @@ vi.mock("../../../../shell/PublishHistory", () => ({
 
 const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {}) =>
   render(
+    <ToastProvider>
     <HistoryTab
       composer={null}
       isExpanded={false}
@@ -120,10 +123,11 @@ const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {})
       onClose={() => {}}
       {...props}
     />
+    </ToastProvider>
   );
 
-/** Saves is the default view; the changes list sits behind a filter chip. */
-const showChanges = () => fireEvent.click(screen.getByRole("button", { name: "This session" }));
+/** Saves is the default view; this session's changes are the Session tab. */
+const showChanges = () => fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
 
 describe("HistoryTab shell", () => {
   beforeEach(() => {
@@ -131,25 +135,31 @@ describe("HistoryTab shell", () => {
   });
   afterEach(cleanup);
 
-  it("renders Saves by default, with Published as the only sibling tab", () => {
+  /* Board 4418:73791 draws Session · Saves · Published (Backups has no
+     service); Activity is its own panel (owner, 2026-09-25). "This session" was a filter chip inside Saves
+     and is the Session tab now — the chip is gone. */
+  it("renders Session · Saves · Published, Session selected by default (4418:73791)", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(2);
-    expect(tabs[0]).toHaveTextContent(/Saves/);
-    expect(tabs[1]).toHaveTextContent(/Published/);
+    expect(tabs).toHaveLength(3);
+    expect(tabs[0]).toHaveTextContent(/Session/);
+    expect(tabs[1]).toHaveTextContent(/Saves/);
+    expect(tabs[2]).toHaveTextContent(/Published/);
     expect(tabs[0].getAttribute("aria-selected")).toBe("true");
-    // Changes is a filter now — it must not be reachable as a tab.
-    expect(screen.queryByRole("tab", { name: /Changes/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "This session" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Saved versions" })).toBeNull();
   });
 
-  it("shows helper text under each tab", () => {
+  /* 4418:73791 draws plain labels; the helper line under each was the
+     two-tab design and pushed a fourth tab off the 280 drawer. */
+  it("tabs are plain labels — no helper line", () => {
     renderTab();
-    expect(screen.getByText("Named milestones")).toBeInTheDocument();
-    expect(screen.getByText("What's live")).toBeInTheDocument();
+    expect(screen.queryByText("Named milestones")).toBeNull();
+    expect(screen.queryByText("What's live")).toBeNull();
   });
 
-  it("defaults the Saves filter to milestones and switches to all changes", () => {
-    renderTab();
+  it("Saves lists saved versions; the Session tab lists this session's changes", () => {
+    renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("activity-view")).toBeNull();
     showChanges();
@@ -157,8 +167,19 @@ describe("HistoryTab shell", () => {
     expect(screen.queryByTestId("saves-panel")).toBeNull();
   });
 
-  it("renders prototype search-bar markup with a search-icon", () => {
+  /* 4418:73791 ends the Session tab with the same "+ Save a version" footer
+     Saves carries — it was only on Saves. */
+  it("Session carries the + Save a version footer", () => {
+    renderTab();
+    expect(screen.getByTestId("saves-save-version")).toHaveTextContent("+ Save a version");
+    fireEvent.click(screen.getByTestId("saves-save-version"));
+    expect(screen.getByRole("dialog")).toHaveTextContent("Save a version");
+  });
+
+  it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {
     const { container } = renderTab();
+    expect(container.querySelector(".search-bar")).toBeNull();
+    openMenuItem(/^Search /);
     expect(container.querySelector(".search-bar")).toBeTruthy();
     expect(container.querySelector(".search-input")).toBeTruthy();
     expect(container.querySelector(".search-icon")).toBeTruthy();
@@ -188,18 +209,18 @@ describe("HistoryTab shell", () => {
     expect(screen.getByText(/Open this site from the dashboard/)).toBeInTheDocument();
   });
 
-  it("migrates a stored 'changes' preference to Saves + the changes filter", () => {
+  it("migrates a stored 'changes' preference to the Session tab", () => {
     window.localStorage.setItem("buildrick-history-view", "changes");
     renderTab();
     expect(screen.getAllByRole("tab")[0].getAttribute("aria-selected")).toBe("true");
     expect(screen.getByTestId("activity-view")).toBeInTheDocument();
   });
 
-  it("toggles the Time-Travel scrubber when the activity view requests it", () => {
+  it("opens the Time-Travel scrubber from the panel ⋯", () => {
     renderTab();
     showChanges();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
   });
 
@@ -216,12 +237,19 @@ describe("HistoryTab shell", () => {
      only door in used to live inside ActivityView's header — reachable only
      after switching to "All changes". Milestones (the default view) had no
      button at all, just the undiscoverable Ctrl+Shift+T chord. */
-  it("opens the Time-Travel scrubber from the Milestones filter, not just Changes", () => {
-    renderTab();
+  it("opens the Time-Travel scrubber from Saves, not just Session", () => {
+    renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/ }));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
+  });
+
+  it("⋯ › Clear undo history… is there, and inert with nothing to undo", () => {
+    renderTab();
+    fireEvent.click(screen.getByTestId("history-menu"));
+    const item = screen.getByRole("menuitem", { name: /Clear undo history/ });
+    expect(item.hasAttribute("disabled") || item.getAttribute("aria-disabled") === "true").toBe(true);
   });
 });
 
@@ -307,7 +335,7 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
   const note = () => screen.queryByText(/versions kept\. Auto-saves prune oldest first/);
 
   it("frames the list once it has settled", () => {
-    renderTab({ composer: withCap });
+    renderTab({ composer: withCap, initialView: "saves" });
     expect(note()).toBeInTheDocument();
   });
 
@@ -343,8 +371,8 @@ describe("HistoryTab — board 163:113 preview band", () => {
   beforeEach(() => window.localStorage.clear());
 
   const openScrubber = () => {
-    fireEvent.click(screen.getByRole("button", { name: "This session" }));
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
+    openMenuItem(/^Time-Travel/);
   };
 
   it("says nothing until the scrubber reports what it is previewing", () => {
@@ -372,5 +400,23 @@ describe("HistoryTab — board 163:113 preview band", () => {
     fireEvent.click(screen.getByTestId("tt-preview"));
     fireEvent.click(screen.getByRole("button", { name: "Exit (Esc)" }));
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+  });
+});
+
+describe("HistoryTab — opened by an Activity row, with the way back", () => {
+  it("draws ‹ Activity, which reopens the Activity panel", () => {
+    const emit = vi.fn();
+    renderTab({ initialView: "published", fromActivity: true, composer: { emit, on: () => {}, off: () => {} } as never });
+    expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "activity" });
+  });
+
+  it("draws no back row when opened any other way, and a stored 'activity' view lands on Session", () => {
+    window.localStorage.setItem("buildrick-history-view", "activity");
+    renderTab();
+    expect(screen.queryByTestId("back-to-activity")).toBeNull();
+    expect(screen.getByTestId("history-view-tab-session").getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByTestId("history-view-tab-activity")).toBeNull();
   });
 });

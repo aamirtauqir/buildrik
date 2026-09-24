@@ -1,5 +1,5 @@
 /**
- * Effects-tab section registry: effects, animation, interactions,
+ * Effects-tab section registry: opacity, shadow, blur, effects, interactions
  * visibility. Edits motion + dynamic behavior + final paint effects.
  *
  * @license BSD-3-Clause
@@ -7,25 +7,90 @@
 
 import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
 import { EffectsSection } from "../EffectsSection";
-import { AnimationSection } from "../AnimationSection";
+import { BlurSection, OpacitySection, ShadowSection } from "../EffectsBasicSections";
 import { InteractionsSection, type Interaction } from "../interactions";
 import { VisibilitySection } from "../VisibilitySection";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
-  effects: defineSection({
-    Component: EffectsSection,
-    styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
+  /* Board 4428:142686 draws OPACITY, SHADOW, BLUR, INTERACTIONS — one
+     control each, and MORE EFFECTS as its own collapsed row between BLUR and
+     INTERACTIONS — so it is not tier-"advanced" (that would put it behind
+     "Show all" instead of drawing the row). */
+  opacity: defineSection({
+    tab: "effects",
+    title: "Opacity",
+    Component: OpacitySection,
+    styleKeys: ["opacity"],
     adaptProps: adaptBaseStyleProps,
   }),
 
-  animation: defineSection({
-    Component: AnimationSection,
+  shadow: defineSection({
+    tab: "effects",
+    title: "Shadow",
+    Component: ShadowSection,
+    styleKeys: ["box-shadow"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  blur: defineSection({
+    tab: "effects",
+    title: "Blur",
+    Component: BlurSection,
+    styleKeys: ["filter"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  effects: defineSection({
+    tab: "effects",
+    title: "More effects",
+    Component: EffectsSection,
+    styleKeys: ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  interactions: defineSection({
+    tab: "effects",
+    title: "Interactions",
+    Component: InteractionsSection,
     styleKeys: [],
     adaptProps: (ctx) => {
-      // Pull the live animation config from the element each render. This
-      // is the same pattern the old EffectsTab used — reads via composer
-      // directly because animations aren't in the styles map.
+      const getInteractions = (): Interaction[] => {
+        if (!ctx.composer || !ctx.selectedElement) return [];
+        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
+        if (!el) return [];
+        if (!el.getInteractions) {
+          if (IS_DEV_BUILD) console.warn(`[Inspector] getInteractions not implemented on element ${ctx.selectedElement.id}`);
+          return [];
+        }
+        return (el.getInteractions() as Interaction[]) ?? [];
+      };
+      const handleInteractionsChange = (interactions: Interaction[]) => {
+        if (!ctx.composer) return;
+        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
+        if (!el) return;
+        ctx.composer.beginTransaction?.("interactions-change");
+        try {
+          if (!el.setInteractions && IS_DEV_BUILD) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
+          el.setInteractions?.(interactions);
+        } finally {
+          ctx.composer.endTransaction?.();
+        }
+      };
+      const handleInteractionPreview = (interaction: Interaction) => {
+        const domEl = document.querySelector(
+          `[data-buildrick-id="${ctx.selectedElement.id}"]`
+        ) as HTMLElement | null;
+        if (!domEl) return;
+        const anim = interaction.animation;
+        if (anim) {
+          domEl.style.animation = "";
+          void domEl.offsetHeight;
+          domEl.style.animation = `bd-anim-${anim.preset} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
+        }
+      };
+      /* G2-157 (option A): the element's CSS animation is a row of this list
+         — the adapters the Animation section used move here unchanged. */
       const getAnimation = () => {
         if (!ctx.composer) return null;
         const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
@@ -66,57 +131,13 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         domEl.style.animation = animation;
       };
       return {
-        animation: getAnimation(),
-        onAnimationChange: handleAnimationChange,
-        onPreview: handleAnimationPreview,
-        isOpen: ctx.isOpen,
-        onToggle: ctx.onToggle,
-        tier: ctx.tier,
-      };
-    },
-  }),
-
-  interactions: defineSection({
-    Component: InteractionsSection,
-    styleKeys: [],
-    adaptProps: (ctx) => {
-      const getInteractions = (): Interaction[] => {
-        if (!ctx.composer || !ctx.selectedElement) return [];
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el) return [];
-        if (!el.getInteractions) {
-          if (IS_DEV_BUILD) console.warn(`[Inspector] getInteractions not implemented on element ${ctx.selectedElement.id}`);
-          return [];
-        }
-        return (el.getInteractions() as Interaction[]) ?? [];
-      };
-      const handleInteractionsChange = (interactions: Interaction[]) => {
-        if (!ctx.composer) return;
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el) return;
-        ctx.composer.beginTransaction?.("interactions-change");
-        try {
-          if (!el.setInteractions && IS_DEV_BUILD) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
-          el.setInteractions?.(interactions);
-        } finally {
-          ctx.composer.endTransaction?.();
-        }
-      };
-      const handleInteractionPreview = (interaction: Interaction) => {
-        const domEl = document.querySelector(
-          `[data-buildrick-id="${ctx.selectedElement.id}"]`
-        ) as HTMLElement | null;
-        if (!domEl) return;
-        const anim = interaction.animation;
-        if (anim) {
-          domEl.style.animation = "";
-          void domEl.offsetHeight;
-          domEl.style.animation = `bd-anim-${anim.preset} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
-        }
-      };
-      return {
         interactions: getInteractions(),
         onInteractionsChange: handleInteractionsChange,
+        animation: getAnimation(),
+        onAnimationChange: handleAnimationChange,
+        onAnimationPreview: handleAnimationPreview,
+        composer: ctx.composer,
+        elementId: ctx.selectedElement.id,
         onPreview: handleInteractionPreview,
         isOpen: ctx.isOpen,
         onToggle: ctx.onToggle,
@@ -126,6 +147,8 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   visibility: defineSection({
+    tab: "element",
+    title: "Visibility",
     /* The THREE keys this section reads, and only those. It declared
        `display`, `visibility`, `opacity` and `pointer-events` — none of which
        VisibilitySection touches — and omitted the `--hide-<breakpoint>` custom

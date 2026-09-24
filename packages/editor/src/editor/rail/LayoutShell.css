@@ -26,8 +26,6 @@
   --layout-drawer-width: var(--bk-size-drawer);
   --layout-inspector-width: var(--bk-size-inspector);
   --layout-topbar-height: var(--bk-size-topbar);
-  /* footer, not row: the track and the element it reserves must read one token (cbd15eeb) */
-  --layout-footer-height: var(--bk-size-footer);
   --layout-gap: var(--bk-space-12);
   --layout-touch-min: var(--bk-size-header, 44px);
 }
@@ -44,7 +42,11 @@
   grid-template-rows:
     var(--layout-topbar-height, 56px)
     1fr
-    var(--layout-footer-height, 32px);
+    /* auto, not a fixed 32: the app never fills the Footer slot (its status
+       bar sits outside the grid), and a fixed track left a 32px dead band
+       under the rail, drawer and inspector (parity V1 #2, board 4418:123573).
+       An empty track is 0; a filled one sizes to .layout-shell__footer. */
+    auto;
   grid-template-areas:
     "topbar topbar topbar topbar"
     "rail drawer canvas inspector"
@@ -59,7 +61,7 @@
 
 /* No topbar slot provided — collapse the empty topbar row */
 .layout-shell--no-topbar {
-  grid-template-rows: 1fr var(--layout-footer-height, 32px);
+  grid-template-rows: 1fr auto;
   grid-template-areas:
     "rail drawer canvas inspector"
     "footer footer footer footer";
@@ -68,6 +70,8 @@
 /* View mode: collapse the rail column. Columns 2 and 4 are already 0px here —
    StudioPanels passes drawerOpen/inspectorOpen false — so one property does it. */
 html.bk-read-only-view { --layout-rail-width: 0px; }
+/* A workspace VIEWER keeps the rail (board 4418:126059). */
+html.bk-read-only-view.bk-viewer-chrome { --layout-rail-width: var(--bk-size-rail); }
 
 /* Drawer open state - expand drawer column */
 .layout-shell--drawer-open {
@@ -174,7 +178,7 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
 .layout-shell--has-sidebar.layout-shell--no-topbar {
   grid-template-rows:
     1fr
-    var(--layout-footer-height, 32px);
+    auto;
   grid-template-areas:
     "rail rail canvas inspector"
     "footer footer footer footer";
@@ -351,13 +355,6 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
     border-radius: var(--bk-radius-lg);
     box-shadow: var(--bk-shadow-overlay);
     z-index: calc(var(--bk-z-drawer) + 6);
-  }
-}
-
-/* Minimum supported width warning */
-@media (max-width: 1024px) {
-  .layout-shell {
-    /* Show warning overlay - handled by component */
   }
 }
 

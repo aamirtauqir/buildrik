@@ -3,22 +3,41 @@
   "board": "Media · empty (Figma 145:359)",
   "_note": "Probe, not the live app: an empty library is a fact about the user's account and no click produces one. The waitFor is on `media-empty` rather than the panel, because `SlimLauncher` has three different zero states (empty library / no search match / no filter match) and a fixture that lands on the wrong one would be measured as if it were this board — the failure mode that left the drill-in used-in case rendering its EMPTY state for as long as it existed. Chassis nodes are joined against this board's own copies of them, not media-drawer's. NOT joined: 145:365 the inner 28h search field (chrome-ui TextInput, boards.json authority=open:input-fill); 145:369 the folder row's `☑ Select`, whose only geometric prop is the auto-width of a text frame whose ☑ stands in for an icon; 145:407 / 145:409, text-frame widths for the same reason.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-empty",
-  "viewport": { "width": 280, "height": 812 },
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
   "steps": [
-    { "action": "waitFor", "testId": "media-empty" }
+    {
+      "action": "waitFor",
+      "testId": "media-empty"
+    }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "panel",        "testId": "media-panel",         "spec": "media-empty", "nodeId": "145:359" },
-    { "name": "panel-header", "testId": "panel-header",        "spec": "media-empty", "nodeId": "208:351" },
-    { "name": "search",       "testId": "media-search",        "spec": "media-empty", "nodeId": "145:364" },
-    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-empty", "nodeId": "145:367" },
-    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-empty", "nodeId": "145:370" },
-    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-empty", "nodeId": "145:371" },
-    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-empty", "nodeId": "145:374" },
-    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-empty", "nodeId": "145:377" },
-    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-empty", "nodeId": "145:380" },
-    { "name": "empty-state",  "testId": "media-empty",         "spec": "media-empty", "nodeId": "145:406" },
-    { "name": "footer",       "testId": "media-footer",        "spec": "media-empty", "nodeId": "145:403" }
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-empty",
+      "nodeId": "145:359"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-empty",
+      "nodeId": "208:351"
+    },
+    {
+      "name": "empty-state",
+      "testId": "media-empty",
+      "spec": "media-empty",
+      "nodeId": "145:406"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-empty",
+      "nodeId": "145:403"
+    }
   ]
 }

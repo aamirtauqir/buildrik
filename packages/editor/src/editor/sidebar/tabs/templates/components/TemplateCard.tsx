@@ -1,79 +1,61 @@
 /**
- * TemplateCard — single template tile in the Templates grid.
- *
- * Spec lives in __tests__/TemplateCard.test.tsx. Renders thumbnail (gradient
- * background + icon glyph), name, formatted category label, and reacts to
- * click + Enter for keyboard-driven selection.
+ * TemplateCard — one card of the full-canvas catalogue (board 4418:54134):
+ * the template's actual page as a thumbnail, its name, "N sections" with a
+ * Built-in / Saved chip, and a full-width "Preview template →" button. The
+ * whole card opens the preview.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { TemplateItem } from "../templatesData";
+import { Button } from "@/editor/chrome-ui";
+import { getSectionCount, type TemplateItem } from "../templatesData";
 
 export interface TemplateCardProps {
   template: TemplateItem;
   onClick: (id: string) => void;
   isSelected?: boolean;
-  /** True when this template is the most-recently applied one for current page.
-   *  Drives the cobalt APPLIED badge (prototype-v3 §1). */
+  /** Most-recently applied to the current page — the APPLIED badge. */
   isApplied?: boolean;
-  /** Active search query — wraps matching substring in <mark> for highlight. */
-  highlightQuery?: string;
+  /** Replace mode (4428:149355): the card's button acts instead of previewing
+   *  — "Use for <page>" → the replace confirm. The card body still previews. */
+  useLabel?: string;
+  onUse?: (id: string) => void;
 }
 
-/** "landing-page" → "Landing page". */
-function formatCategory(category: string | undefined): string {
-  if (!category) return "";
-  const spaced = category.replace(/[-_]+/g, " ");
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function renderHighlighted(name: string, query: string): React.ReactNode {
-  const trimmed = query.trim();
-  if (!trimmed) return name;
-  const tokens = trimmed.split(/\s+/).filter(Boolean).map(escapeRegex);
-  if (tokens.length === 0) return name;
-  const re = new RegExp(`(${tokens.join("|")})`, "gi");
-  const parts = name.split(re);
-  return parts.map((part, i) =>
-    re.test(part) ? <mark key={i} className="tpl-card-name-mark">{part}</mark> : <React.Fragment key={i}>{part}</React.Fragment>
-  );
-}
+/** The thumbnail frame is 226 wide on the board; the page renders at 1200. */
+const THUMB_SCALE = 226 / 1200;
 
 export const TemplateCard: React.FC<TemplateCardProps> = ({
   template,
   onClick,
   isSelected = false,
   isApplied = false,
-  highlightQuery,
+  useLabel,
+  onUse,
 }) => {
-  const handleActivate = React.useCallback(() => {
-    onClick(template.id);
-  }, [onClick, template.id]);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick(template.id);
+    }
+  };
 
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleActivate();
-      }
-    },
-    [handleActivate]
+  const isPremium = template.status === "premium";
+  const isSaved = template.category === "my-templates";
+  const sections = getSectionCount(template.html);
+  /* The page itself, scaled — "Actual template thumbnail" on the board. */
+  const srcDoc = React.useMemo(
+    () =>
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;overflow:hidden}` +
+      `.r{width:1200px;transform:scale(${THUMB_SCALE});transform-origin:top left}</style></head>` +
+      `<body><div class="r">${template.html}</div></body></html>`,
+    [template.html],
   );
 
-  const className = [
-    "tpl-card",
-    isSelected && "tpl-card--selected",
-    isApplied && "tpl-card--applied",
-  ].filter(Boolean).join(" ");
-  const categoryLabel = formatCategory(template.category);
-  const isPremium = template.status === "premium";
-  const statusLabel = isPremium ? "Pro" : "Free";
+  const className = ["tpl-card", isSelected && "tpl-card--selected", isApplied && "tpl-card--applied"]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
@@ -82,32 +64,41 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       aria-selected={isSelected}
       aria-label={`${template.name} template`}
       tabIndex={0}
-      onClick={handleActivate}
+      onClick={() => onClick(template.id)}
       onKeyDown={handleKeyDown}
     >
-      <div
-        className="tpl-card-thumb"
-        style={template.gradient ? { background: template.gradient } : undefined}
-        aria-hidden="true"
-      >
-        <span className="tpl-card-thumb-icon">{template.icon}</span>
-        {isApplied && (
-          <span className="tpl-card-applied-badge" aria-label="Applied to current page">APPLIED</span>
-        )}
-        {!isApplied && isPremium && (
-          <span className="tpl-card-badge">Pro</span>
-        )}
+      <div className="tpl-card-thumb" aria-hidden="true">
+        <iframe className="tpl-card-thumb-frame" title="" tabIndex={-1} sandbox="" srcDoc={srcDoc} />
+        {isApplied && <span className="tpl-card-applied-badge">APPLIED</span>}
       </div>
       <div className="tpl-card-info">
-        <div className="tpl-card-name">{highlightQuery ? renderHighlighted(template.name, highlightQuery) : template.name}</div>
-        {categoryLabel && (
-          <div className="tpl-card-category">
-            {categoryLabel}
-            <span className="tpl-card-meta-sep"> · </span>
-            <span className={`tpl-card-status${isPremium ? " tpl-card-status--pro" : ""}`}>{statusLabel}</span>
-          </div>
-        )}
+        <div className="tpl-card-name">{template.name}</div>
+        <div className="tpl-card-meta" data-testid={`tpl-card-meta-${template.id}`}>
+          <span className="tpl-card-category">
+            {sections} {sections === 1 ? "section" : "sections"}
+          </span>
+          <span className={`tpl-card-tag${isSaved ? " tpl-card-tag--saved" : ""}`}>
+            {isSaved ? "Saved" : "Built-in"}
+            {isPremium ? " · Pro" : ""}
+          </span>
+        </div>
       </div>
+      {onUse && useLabel ? (
+        <Button
+          className="tpl-card-cta tpl-card-cta--use"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            onUse(template.id);
+          }}
+          onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+        >
+          {useLabel}
+        </Button>
+      ) : (
+        <span className="tpl-card-cta" aria-hidden="true">
+          Preview template →
+        </span>
+      )}
     </div>
   );
 };

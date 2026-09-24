@@ -15,7 +15,7 @@
 import React from "react";
 import { ROW_ICON_CLASS } from "./Row";
 
-export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right";
+export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right" | "right-end";
 
 /* inline/block and each placement supply their own full set — same-property
    values (display; top/bottom/left/right) can't be additive across variants
@@ -30,6 +30,8 @@ const PLACEMENT_CLASS: Record<PopoverPlacement, string> = {
   top: "tw:bottom-[calc(100%+4px)] tw:left-0",
   "top-end": "tw:bottom-[calc(100%+4px)] tw:right-0",
   right: "tw:left-[calc(100%+4px)] tw:top-0",
+  /* Bottom-aligned: a sub-menu opened from a row low on screen grows up. */
+  "right-end": "tw:left-[calc(100%+4px)] tw:bottom-0",
 };
 /** Exported for the rare cross-file borrower that wraps its own positioned
  *  box in the popover "look" without using the Popover component itself
@@ -52,6 +54,8 @@ export interface PopoverProps {
 
 /** Keep this much clear of every viewport edge when nudging back into view. */
 const VIEWPORT_MARGIN = 8;
+
+const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block }: PopoverProps) {
   const wrap = React.useRef<HTMLSpanElement | null>(null);
@@ -91,8 +95,24 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
     const onDown = (e: PointerEvent) => {
       if (wrap.current && !wrap.current.contains(e.target as Node)) onClose();
     };
+    /* Escape from inside the panel returns focus to the trigger (WAI-ARIA
+       menu button). Without it the panel unmounted under the focused item
+       and focus fell to <body> — QA, integration 5e0d47902, Layers ⋯. Focus
+       that is somewhere else entirely is left where it is. */
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      /* This Escape is spent closing the panel: a host that closes on Escape
+         (the Asset library) checks defaultPrevented and stays open. */
+      e.preventDefault();
+      const focusInside = !!panel.current?.contains(document.activeElement);
+      onClose();
+      if (!focusInside) return;
+      const trigger = wrap.current?.firstElementChild;
+      const target =
+        trigger instanceof HTMLElement && trigger.matches(FOCUSABLE)
+          ? trigger
+          : trigger?.querySelector<HTMLElement>(FOCUSABLE);
+      target?.focus();
     };
     document.addEventListener("pointerdown", onDown, true);
     document.addEventListener("keydown", onKey, true);
@@ -222,6 +242,9 @@ export interface MenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButto
   selected?: boolean;
   /** Destructive action — red, and never the resting tab stop by accident. */
   danger?: boolean;
+  /** One-of-many choice (a device, a zoom level): role menuitemradio, and
+   *  `selected` marks the current one. */
+  radio?: boolean;
 }
 
 const MENU_ITEM_BASE =
@@ -229,7 +252,11 @@ const MENU_ITEM_BASE =
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-left " +
   "tw:focus-visible:outline-none tw:focus-visible:bg-blue-50";
 
-export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
+const CHECK_SLOT =
+  "tw:flex tw:size-3.5 tw:flex-none tw:items-center tw:justify-center tw:rounded-[3px] tw:border tw:border-[var(--bk-gray-300)] " +
+  "tw:text-[11px] tw:leading-none tw:text-[var(--bk-ink-soft)]";
+
+export function MenuItem({ icon, kbd, selected, danger, radio, disabled, className, children, ...rest }: MenuItemProps) {
   const stateClass = disabled
     ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-[var(--bk-gray-300)]"
     : danger
@@ -239,7 +266,7 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
   return (
     <button
       type="button"
-      role={selected === undefined ? "menuitem" : "menuitemcheckbox"}
+      role={radio ? "menuitemradio" : selected === undefined ? "menuitem" : "menuitemcheckbox"}
       aria-checked={selected === undefined ? undefined : selected}
       className={[MENU_ITEM_BASE, stateClass, className].filter(Boolean).join(" ")}
       disabled={disabled}
@@ -247,7 +274,8 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
       tabIndex={-1}
       {...rest}
     >
-      {selected !== undefined ? (
+      {/* A radio keeps the leading tick (one-of-many). */}
+      {radio && selected !== undefined ? (
         <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-[var(--bk-accent-text)]">
           {selected ? "✓" : ""}
         </span>
@@ -255,6 +283,13 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
       {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
       <span className="tw:flex-1 tw:text-left">{children}</span>
       {kbd ? <span className="tw:ml-auto tw:text-[var(--bk-ink-muted)] tw:text-[11px]">{kbd}</span> : null}
+      {/* Board 5930:44801: a checkable row ENDS in a 14px check slot (r3,
+          gray-300 hairline) that holds the ✓ — not a leading bare tick. */}
+      {!radio && selected !== undefined ? (
+        <span aria-hidden="true" data-check-slot="" className={CHECK_SLOT}>
+          {selected ? "✓" : ""}
+        </span>
+      ) : null}
     </button>
   );
 }

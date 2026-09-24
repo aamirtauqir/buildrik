@@ -31,6 +31,10 @@ export interface NamedVersion {
   tags?: string[];
   /** Whether this was auto-created or manually saved */
   isAutoCheckpoint: boolean;
+  /** What an auto-version marks, shown in place of "Auto-save" — the
+   *  template backup's `Before template "<name>"` (C4 #25). Plain auto-saves
+   *  carry none. */
+  title?: string;
   /** Project ID this version belongs to */
   projectId?: string;
   /** Base64 JPEG visual snapshot of the canvas at save time */
@@ -39,21 +43,9 @@ export interface NamedVersion {
   aiSummary?: string | null;
   /** User ID of who created this version */
   userId?: string | null;
-}
-
-/**
- * Version history export format
- * Used for import/export of version history
- */
-export interface VersionHistoryExport {
-  /** Export format version */
-  version: "1.0.0";
-  /** Project ID */
-  projectId: string;
-  /** Export timestamp (ISO string) */
-  exportedAt: string;
-  /** All exported versions */
-  versions: NamedVersion[];
+  /** The author's display name, from the server's version list (G1-075).
+   *  Absent for a version made here and not yet listed — "You" covers it. */
+  authorName?: string | null;
 }
 
 // ============================================
@@ -83,9 +75,12 @@ export const DEFAULT_VERSION_HISTORY_CONFIG: VersionHistoryConfig = {
   /* `project:loaded` was in here, so merely OPENING a site minted a version —
      one nobody made, first in the list, and the reason Saves·empty (163:64)
      was unreachable on every healthy site. Founder call G7 (2026-09-02): the
-     first checkpoint waits for a real edit. `template:applied` is one; an
-     ordinary edit is covered by the user's own save. */
-  autoCheckpointEvents: ["template:applied"],
+     first checkpoint waits for a real edit.
+     `template:applied` was here too, and fired AFTER the apply — a version of
+     the page the user already has, listed beside the real backup as a second
+     "Auto-save" at the same minute (QA 2026-09-24). The template backup is
+     the version the Templates panel takes BEFORE it replaces (#25). */
+  autoCheckpointEvents: [],
   enabled: true,
 };
 
@@ -125,6 +120,9 @@ export interface VersionCreatedPayload {
 export interface VersionRestoredPayload {
   version: NamedVersion;
   previousVersionId?: string;
+  /** The version the work on screen was saved as before the restore — what
+   *  "Undo restore" restores (G1-071). */
+  safetyVersionId?: string;
 }
 
 /**
@@ -133,15 +131,6 @@ export interface VersionRestoredPayload {
 export interface VersionDeletedPayload {
   versionId: string;
   versionName: string;
-}
-
-/**
- * Version export/import payload
- */
-export interface VersionExportPayload {
-  projectId: string;
-  count: number;
-  filename?: string;
 }
 
 // ============================================

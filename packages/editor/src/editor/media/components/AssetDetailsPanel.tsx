@@ -26,15 +26,24 @@ import { versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
   IconButton,
+  Menu,
+  MenuItem,
+  MenuSeparator,
   ModalBody,
   ModalClose,
   ModalContent,
   ModalRoot,
   ModalTitle,
+  Popover,
   TextInput,
   Textarea,
+  Tooltip,
   VersionRow,
 } from "@/editor/chrome-ui";
+import {
+  useMediaWriteAccess,
+  type MediaWriteAction,
+} from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
@@ -53,6 +62,9 @@ const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
    flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
    quiet grey Clear selection is the same fill as the dialogs' Cancel. */
 const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
+/* 4418:58292 act/Insert to canvas — the rail's one filled action is INK, not
+   accent: 40 tall, radius 8, 13 regular white. */
+const RAIL_INSERT = "mgr-btn-ink tw:w-full tw:shrink-0 tw:justify-center";
 const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
 /* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
 const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
@@ -212,7 +224,39 @@ export function AssetDetailsPanel({
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
+  /* Audit G3-064: a viewer keeps Rename and Delete on show, aria-disabled with
+     the reason (board 6289:148485 pattern) — same gate as the grid and menu. */
+  const write = useMediaWriteAccess();
+  const gated = (action: MediaWriteAction, label: string, className: string, run: () => void) =>
+    write.canWrite ? (
+      <Button className={className} onClick={run}>
+        {label}
+      </Button>
+    ) : (
+      <Tooltip content={write.reason(action)} placement="left">
+        <Button className={`${className} tw:opacity-55`} aria-disabled="true" data-testid={`mgr-det-${action}`}>
+          {label}
+        </Button>
+      </Tooltip>
+    );
   const [regenerating, setRegenerating] = React.useState(false);
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const runMore = (fn: () => void) => () => {
+    setMoreOpen(false);
+    fn();
+  };
+  /* The ⋯ twin of `gated`: a viewer sees the row disabled, with the reason. */
+  const menuGated = (action: MediaWriteAction, label: string, run: () => void, danger = false) => (
+    <MenuItem
+      danger={danger}
+      disabled={!write.canWrite}
+      title={write.canWrite ? undefined : write.reason(action)}
+      data-testid={`mgr-det-${action}`}
+      onClick={runMore(run)}
+    >
+      {write.canWrite ? label : `${label} · View only`}
+    </MenuItem>
+  );
   /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
      the drop is the only thing the pointer is doing. */
   const railClass = `mgr-details${dimmed ? " tw:pointer-events-none tw:opacity-50" : ""}`;
@@ -420,7 +464,7 @@ export function AssetDetailsPanel({
             3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
-            <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
+            <Button size="xs" className={RAIL_INSERT} onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
             </Button>
           )}
@@ -435,42 +479,55 @@ export function AssetDetailsPanel({
               Manage font
             </Button>
           )}
-          {isImage ? (
-            <div className="mgr-det-actions-row">
+          {/* 4418:58292 — one quiet button and a ⋯: "Edit image" for an
+              image, else Rename. The rest of the old stack (Rename · Replace
+              across site… · Optimize · Delete) lives in the ⋯, unchanged —
+              same gates, same reasons, same doors. */}
+          <div className="mgr-det-actions-row">
+            {isImage ? (
               <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
                 Edit image
               </Button>
-              <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
-                Rename
-              </Button>
-            </div>
-          ) : (
-            <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
-              Rename
-            </Button>
-          )}
-          {!isFont && (
-            <Button
-              className="mgr-btn"
-              disabled={usageCount === 0}
-              title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
-              onClick={() => setReplaceAllPickerOpen(true)}
+            ) : (
+              gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
+            )}
+            <Popover
+              open={moreOpen}
+              onClose={() => setMoreOpen(false)}
+              placement="top-end"
+              label="More actions"
+              trigger={
+                <Button
+                  className="mgr-btn mgr-btn-more"
+                  aria-label="More actions"
+                  aria-haspopup="menu"
+                  aria-expanded={moreOpen}
+                  data-testid="mgr-det-more"
+                  onClick={() => setMoreOpen((v) => !v)}
+                >
+                  ⋯
+                </Button>
+              }
             >
-              Replace across site…
-            </Button>
-          )}
-          {/* Not on the Clone. The optimiser's only other door is the picker
-              modal, which is reachable only mid-way through choosing an image
-              for an element; Phase 6 folds Optimise into the editor dialog and
-              this row goes with it. */}
-          {selectedItem.type === "img" && onOptimizeImage && (
-            <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
-              Optimize
-            </Button>
-          )}
-          <Button className="mgr-btn danger" onClick={() => onRequestDelete(selectedItem.key)}>
-            Delete
-          </Button>
+              <Menu label="More actions">
+                {isImage && menuGated("rename", "Rename", () => onOpenRename(selectedItem))}
+                {!isFont && (
+                  <MenuItem
+                    disabled={usageCount === 0}
+                    title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
+                    onClick={runMore(() => setReplaceAllPickerOpen(true))}
+                  >
+                    Replace across site…
+                  </MenuItem>
+                )}
+                {selectedItem.type === "img" && onOptimizeImage && (
+                  <MenuItem onClick={runMore(() => onOptimizeImage(selectedItem))}>Optimize</MenuItem>
+                )}
+                <MenuSeparator />
+                {menuGated("delete", "Delete", () => onRequestDelete(selectedItem.key), true)}
+              </Menu>
+            </Popover>
+          </div>
         </div>
       </div>
 
@@ -586,42 +643,69 @@ function AltTextSection({
     }
   };
 
+  const altText = item.altText ?? "";
+  const field = (filled: boolean) => (
+    <Textarea
+      className={
+        filled
+          ? "tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:shadow-none tw:focus:ring-0"
+          : "tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
+      }
+      id={`alt-text-${item.key}`}
+      value={altText}
+      maxLength={ALT_TEXT_MAX}
+      rows={2}
+      placeholder="Add a description for this image"
+      onChange={(e) => onUpdateAltText(item.key, e.target.value)}
+    />
+  );
+  const regenerate = (label: string, className: string) =>
+    onRegenerateAltText ? (
+      <Button data-testid="alt-text-regenerate" className={className} onClick={handleRegenerate} disabled={regenerating}>
+        {label === "Generate" && <Sparkles size={10} />}
+        {regenerating ? "Generating…" : label}
+      </Button>
+    ) : null;
+
   return (
     <div data-testid="alt-text-section" className="mgr-det-section">
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Alt text
       </label>
-      <Textarea
-        className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
-        id={`alt-text-${item.key}`}
-        value={item.altText ?? ""}
-        maxLength={ALT_TEXT_MAX}
-        rows={2}
-        placeholder="Add a description for this image"
-        onChange={(e) => onUpdateAltText(item.key, e.target.value)}
-      />
-      <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
-        {provenance ? (
-          <span data-testid="alt-text-provenance" className="tw:flex tw:items-center tw:gap-1">
-            <Sparkles size={10} />
-            AI-generated by {provenance.model} on{" "}
-            {new Date(provenance.generatedAt).toLocaleDateString()}
-          </span>
-        ) : (
-          <span>{(item.altText ?? "").length} / {ALT_TEXT_MAX}</span>
-        )}
-        {onRegenerateAltText && (
-          <Button
-            data-testid="alt-text-regenerate"
-            className={`mgr-btn ${MINI_BTN}`}
-            onClick={handleRegenerate}
-            disabled={regenerating}
-          >
-            <Sparkles size={10} />
-            {regenerating ? "Generating…" : provenance ? "Regenerate" : "Generate"}
-          </Button>
-        )}
-      </div>
+      {altText ? (
+        /* 4418:58292 — written alt text reads as a grey box: the text, then
+           "✨ AI" (when the model wrote it) and Regenerate. The field stays
+           editable in place. */
+        <div className="mgr-alt-box tw:flex tw:flex-col tw:gap-1.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2" data-testid="alt-text-box">
+          {field(true)}
+          <div className="tw:flex tw:items-center tw:gap-2">
+            {provenance && (
+              <span
+                data-testid="alt-text-provenance"
+                className="tw:inline-flex tw:h-[18px] tw:items-center tw:gap-[3px] tw:rounded-full tw:bg-[var(--bk-accent-subtle)] tw:px-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+                title={`AI-generated by ${provenance.model} on ${new Date(provenance.generatedAt).toLocaleDateString()}`}
+              >
+                <Sparkles size={10} aria-hidden="true" />
+                AI
+              </span>
+            )}
+            {regenerate("Regenerate", "mgr-alt-regenerate")}
+            {!provenance && (
+              <span className="tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
+                {altText.length} / {ALT_TEXT_MAX}
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {field(false)}
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
+            <span>0 / {ALT_TEXT_MAX}</span>
+            {regenerate("Generate", `mgr-btn ${MINI_BTN}`)}
+          </div>
+        </>
+      )}
     </div>
   );
 }

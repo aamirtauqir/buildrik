@@ -7,6 +7,7 @@
  */
 
 import type { AssetData } from "./asset";
+import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
 import type { StyleData } from "./style";
 
@@ -223,10 +224,10 @@ export interface PageSettings {
   head?: string;
   /** SEO metadata */
   seo?: PageSEO;
-  /** Page visibility / publication status */
-  visibility?: "live" | "hidden" | "password";
-  /** Access password (used when visibility = "password") */
-  password?: string;
+  /** Page visibility. Live · Hidden (C4 #26 removed Password pages; a stored
+   *  "password" from before decision #21 is read as Hidden by the Pages panel
+   *  and stays unpublished — `isPageLive` ships only unset / "live"). */
+  visibility?: "live" | "hidden";
 }
 
 /**
@@ -268,7 +269,17 @@ export interface PageSEO {
 /**
  * Project-wide settings for analytics and integrations
  */
+/** A site variable — written once in CMS › Variables, used as {{site.<key>}}
+ *  in any text; the export writes the value in its place. */
+export interface SiteVariable {
+  key: string;
+  value: string;
+}
+
 export interface ProjectSettings {
+  /** CMS › Variables. Saved with the project so export and publish see them
+   *  (they lived in one browser's localStorage, where publish could not). */
+  siteVariables?: SiteVariable[];
   /** Analytics tracking configuration */
   analytics?: AnalyticsConfig;
   /** Third-party service integrations */
@@ -310,6 +321,8 @@ export interface ProjectSettings {
   redirects?: {
     suggestFrom404s: boolean;
   };
+  /** Ruler guides placed on the canvas (G2-033) — saved with the site. */
+  canvasGuides?: CanvasGuide[];
 }
 
 /**

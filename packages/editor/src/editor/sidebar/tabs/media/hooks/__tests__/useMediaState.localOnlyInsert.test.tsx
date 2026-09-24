@@ -215,3 +215,34 @@ describe("insertToCanvas — a local-only asset", () => {
     expect(last.description).toContain("added to page");
   });
 });
+
+/* Audit G3-008 / G3-061 — the pick store. A field that stores the pick
+   itself (background, CMS, share image) gets the asset through `onSelect`;
+   nothing is inserted or replaced on the canvas. */
+describe("applyPick — pick mode's Use selected image", () => {
+  it("hands the asset to the field's onSelect, leaves pick mode, and touches no element", async () => {
+    const { endAssetPick } = await import("../../data/assetPick");
+    const composer = composerWith({ id: "a1", src: "https://cdn/share.jpg", type: "image", name: "share.jpg" });
+    (composer as unknown as { mediaOps: Record<string, unknown> }).mediaOps.replaceMedia = vi.fn();
+    const { result } = renderHook(() => useMediaState(composer as never));
+    const onSelect = vi.fn();
+    act(() => result.current.setSelectionContext({ allowedTypes: ["image"], onSelect, label: "Share image" }));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "assets" });
+    expect(result.current.selectionContext?.label).toBe("Share image");
+    act(() => result.current.applyPick("a1"));
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ src: "https://cdn/share.jpg" }));
+    expect(result.current.selectionContext).toBeNull();
+    expect(composer.mediaOps.insertMediaAt).not.toHaveBeenCalled();
+    endAssetPick();
+  });
+
+  it("a request made before the drawer mounts is waiting for it (the drawer is lazy)", async () => {
+    const { requestAssetPick, endAssetPick } = await import("../../data/assetPick");
+    const composer = composerWith({});
+    requestAssetPick(composer as never, { elementId: "el-9", label: "Hero" });
+    const { result } = renderHook(() => useMediaState(composer as never));
+    expect(result.current.selectionContext).toEqual({ elementId: "el-9", label: "Hero" });
+    act(() => endAssetPick());
+    expect(result.current.selectionContext).toBeNull();
+  });
+});

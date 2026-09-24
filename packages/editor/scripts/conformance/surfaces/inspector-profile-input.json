@@ -45,12 +45,6 @@
       "nodeId": "956:6876"
     },
     {
-      "name": "breakpoint-pill",
-      "testId": "inspector-breakpoint-pill",
-      "spec": "inspector-profile-input",
-      "nodeId": "956:6878"
-    },
-    {
       "name": "state-pill",
       "testId": "inspector-state-pill",
       "spec": "inspector-profile-input",
@@ -141,12 +135,6 @@
       "nodeId": "2069:20393"
     },
     {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-input",
-      "nodeId": "2069:20394"
-    },
-    {
       "name": "sechead-visibility",
       "testId": "inspector-sechead-visibility",
       "spec": "inspector-profile-input",
@@ -165,10 +153,6 @@
     {
       "name": "context-row",
       "testId": "inspector-context-row"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [

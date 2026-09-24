@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const src = readFileSync(join(__dirname, "../PublishTab.tsx"), "utf8");
-const footer = src.slice(src.indexOf("Privacy & Terms footer"), src.indexOf("<PublishWizard"));
+const footer = src.slice(src.indexOf("Privacy & Terms footer"), src.indexOf("<UnpublishConfirmModal"));
 
 describe("publish footer links", () => {
   it("underlines both links", () => {

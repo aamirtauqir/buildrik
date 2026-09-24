@@ -77,40 +77,8 @@ export interface DropZoneRegistry {
 }
 
 // =============================================================================
-// TOUCH SUPPORT
-// =============================================================================
-
-/** Touch drag state */
-export interface TouchDragState {
-  /** Touch identifier */
-  touchId: number;
-  /** Starting position */
-  startPosition: Point;
-  /** Current position */
-  currentPosition: Point;
-  /** Long press timer */
-  longPressTimer: number | null;
-  /** Is long press triggered */
-  isLongPress: boolean;
-  /** Touch start time */
-  startTime: number;
-  /** Target element */
-  targetElement: HTMLElement | null;
-}
-
-// =============================================================================
 // KEYBOARD SUPPORT
 // =============================================================================
-
-/** Keyboard drag step sizes */
-export interface KeyboardDragConfig {
-  /** Small step (arrow keys) */
-  smallStep: number;
-  /** Large step (arrow + shift) */
-  largeStep: number;
-  /** Index step (for list reordering) */
-  indexStep: number;
-}
 
 // =============================================================================
 // DRAG GHOST OPTIONS

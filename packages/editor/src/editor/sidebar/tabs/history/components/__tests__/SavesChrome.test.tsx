@@ -95,7 +95,7 @@ describe("SavesApproval — the band", () => {
 
 describe("SavesPruneNote — the retention rule", () => {
   it("reads the cap off the manager instead of hardcoding it", () => {
-    render(<SavesPruneNote composer={composerWith(20)} filter="milestones" />);
+    render(<SavesPruneNote composer={composerWith(20)} view="saves" />);
     expect(
       screen.getByText("20 versions kept. Auto-saves prune oldest first; named ones never prune."),
     ).toBeInTheDocument();
@@ -103,12 +103,12 @@ describe("SavesPruneNote — the retention rule", () => {
 
   it("says nothing when the manager cannot report a cap", () => {
     // A number invented here is a claim about retention that nothing backs.
-    render(<SavesPruneNote composer={composerWith(undefined)} filter="milestones" />);
+    render(<SavesPruneNote composer={composerWith(undefined)} view="saves" />);
     expect(screen.queryByText(/versions kept/)).toBeNull();
   });
 
   it("survives a composer that has no versions manager", () => {
-    render(<SavesPruneNote composer={{} as Composer} filter="milestones" />);
+    render(<SavesPruneNote composer={{} as Composer} view="saves" />);
     expect(screen.queryByText(/versions kept/)).toBeNull();
   });
 
@@ -116,7 +116,7 @@ describe("SavesPruneNote — the retention rule", () => {
      not about saved versions. The panel printed the versions sentence under
      both filters, which promises a durability the undo stack does not have. */
   it("states the session-only rule under the changes filter", () => {
-    render(<SavesPruneNote composer={composerWith(20, 100)} filter="changes" />);
+    render(<SavesPruneNote composer={composerWith(20, 100)} view="session" />);
     expect(
       screen.getByText(
         "This session only — the last 100 steps, cleared when you reload. Save a version to keep a point.",
@@ -126,7 +126,7 @@ describe("SavesPruneNote — the retention rule", () => {
   });
 
   it("says nothing under the changes filter when no undo cap can be read", () => {
-    render(<SavesPruneNote composer={composerWith(20)} filter="changes" />);
+    render(<SavesPruneNote composer={composerWith(20)} view="session" />);
     expect(screen.queryByText(/This session only/)).toBeNull();
   });
 });
@@ -189,10 +189,14 @@ describe("SavesApproval — what changed, and the way to look at it", () => {
     expect(screen.queryByText("old")).toBeNull();
   });
 
-  it("opens Review straight into Compare, rather than rebuilding it here", async () => {
+  it("opens the one Compare on approved → current draft (B8)", async () => {
     reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
     render(<SavesApproval composer={labelledComposer()} />);
     (await screen.findByRole("button", { name: "Compare with current" })).click();
-    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "review", screen: "compare" });
+    expect(emit).toHaveBeenCalledWith("ui:compare-open", {
+      left: { kind: "approved" },
+      right: { kind: "current" },
+      from: "History",
+    });
   });
 });

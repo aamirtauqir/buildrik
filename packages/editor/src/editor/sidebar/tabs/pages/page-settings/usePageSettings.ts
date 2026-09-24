@@ -11,6 +11,7 @@
 
 import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
@@ -39,12 +40,10 @@ export interface UsePageSettingsReturn {
   ogImageUrl: string | null;
   setOgImageUrl: (url: string | null) => void;
 
-  visibility: "live" | "hidden" | "password";
-  setVisibility: (v: "live" | "hidden" | "password") => void;
-  password: string;
-  setPassword: (v: string) => void;
-  showPassword: boolean;
-  setShowPassword: (v: boolean) => void;
+  /** Decision #21: Live · Hidden. Password is gone until the published-site
+   *  middleware exists to enforce it. */
+  visibility: "live" | "hidden";
+  setVisibility: (v: "live" | "hidden") => void;
   allowIndex: boolean;
   setAllowIndex: (v: boolean) => void;
   allowFollow: boolean;
@@ -52,7 +51,6 @@ export interface UsePageSettingsReturn {
   customHead: string;
   setCustomHead: (v: string) => void;
   headCodeError: string | null;
-  copyPassword: () => void;
 
   domain: string | null;
   /** The site's live URL, or null when it has never been published. Gates the
@@ -62,14 +60,12 @@ export interface UsePageSettingsReturn {
 
   saveState: SaveState;
   isDirty: boolean;
-  save: () => Promise<void>;
+  /** Resolves true once the page is written; false when blocked or failed. */
+  save: () => Promise<boolean>;
   discard: () => void;
 
   showDiscardConfirm: boolean;
   setShowDiscardConfirm: (v: boolean) => void;
-  pendingTabChange: DrawerTab | null;
-  confirmTabChange: () => void;
-  cancelTabChange: () => void;
 }
 
 function validateHeadCode(code: string): string | null {
@@ -90,18 +86,16 @@ interface PersistedState {
   ogTitle: string;
   ogDesc: string;
   ogImageUrl: string | null;
-  visibility: "live" | "hidden" | "password";
-  password: string;
+  visibility: "live" | "hidden";
   allowIndex: boolean;
   allowFollow: boolean;
   customHead: string;
 }
 
 function getPersistedState(page: PageItem): PersistedState {
-  const settings = (page as { settings?: { password?: string } }).settings;
   const seoFlags = page.seo as { noIndex?: boolean; noFollow?: boolean } | undefined;
-  const visibility: PersistedState["visibility"] =
-    page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
+  /* A legacy password page already arrives as "hidden" (usePages, #26). */
+  const visibility: PersistedState["visibility"] = page.status === "hidden" ? "hidden" : "live";
   return {
     seoTitle: page.seo?.metaTitle ?? page.name,
     seoDesc: page.seo?.metaDescription ?? "",
@@ -110,7 +104,6 @@ function getPersistedState(page: PageItem): PersistedState {
     ogDesc: page.seo?.ogDescription ?? "",
     ogImageUrl: page.seo?.ogImage ?? null,
     visibility,
-    password: settings?.password ?? "",
     allowIndex: !seoFlags?.noIndex,
     allowFollow: !seoFlags?.noFollow,
     customHead: page.head ?? "",
@@ -123,8 +116,9 @@ export function usePageSettings(
   allPages: PageItem[]
 ): UsePageSettingsReturn {
   const { addToast } = useToast();
-  const [activeTab, _setActiveTab] = React.useState<DrawerTab>("seo");
-  const [pendingTabChange, setPendingTabChange] = React.useState<DrawerTab | null>(null);
+  /* Decision #20: the three tabs are one form saved on Done, so a tab switch
+     keeps every edit — it is no longer guarded. */
+  const [activeTab, setActiveTab] = React.useState<DrawerTab>("seo");
   const [showDiscardConfirm, setShowDiscardConfirm] = React.useState(false);
 
   const [seoTitle, setSeoTitle] = React.useState("");
@@ -134,9 +128,7 @@ export function usePageSettings(
   const [ogTitle, setOgTitle] = React.useState("");
   const [ogDesc, setOgDesc] = React.useState("");
   const [ogImageUrl, setOgImageUrl] = React.useState<string | null>(null);
-  const [visibility, setVisibility] = React.useState<"live" | "hidden" | "password">("live");
-  const [password, setPassword] = React.useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [visibility, setVisibility] = React.useState<"live" | "hidden">("live");
   const [allowIndex, setAllowIndex] = React.useState(true);
   const [allowFollow, setAllowFollow] = React.useState(true);
   const [customHead, setCustomHead] = React.useState("");
@@ -155,8 +147,6 @@ export function usePageSettings(
     setOgDesc(state.ogDesc);
     setOgImageUrl(state.ogImageUrl);
     setVisibility(state.visibility);
-    setPassword(state.password);
-    setShowPassword(false);
     setAllowIndex(state.allowIndex);
     setAllowFollow(state.allowFollow);
     setCustomHead(state.customHead);
@@ -181,7 +171,6 @@ export function usePageSettings(
       ogDesc,
       ogImageUrl,
       visibility,
-      password,
       allowIndex,
       allowFollow,
       customHead,
@@ -196,7 +185,6 @@ export function usePageSettings(
     ogDesc,
     ogImageUrl,
     visibility,
-    password,
     allowIndex,
     allowFollow,
     customHead,
@@ -219,45 +207,17 @@ export function usePageSettings(
     [page?.id, allPages]
   );
 
-  const setActiveTab = React.useCallback(
-    (tab: DrawerTab) => {
-      if (isDirty || saveState === "error") {
-        setPendingTabChange(tab);
-        setShowDiscardConfirm(true);
-        return;
-      }
-      _setActiveTab(tab);
-    },
-    [isDirty, saveState]
-  );
-
-  const confirmTabChange = React.useCallback(() => {
-    if (pendingTabChange) _setActiveTab(pendingTabChange);
-    setPendingTabChange(null);
-    setShowDiscardConfirm(false);
-    setSaveState("clean");
-  }, [pendingTabChange]);
-
-  const cancelTabChange = React.useCallback(() => {
-    setPendingTabChange(null);
-    setShowDiscardConfirm(false);
-  }, []);
-
-  const save = React.useCallback(async () => {
-    if (!composer || !page) return;
+  const save = React.useCallback(async (): Promise<boolean> => {
+    if (!composer || !page) return false;
     if (slugError) {
       addToast({ description: "Fix slug error before saving", tone: "warning" });
-      return;
+      return false;
     }
     const codeErr = validateHeadCode(customHead);
     if (codeErr) {
       setHeadCodeError(codeErr);
       addToast({ description: codeErr, tone: "warning" });
-      return;
-    }
-    if (visibility === "password" && !password.trim()) {
-      addToast({ description: "Set an access password before saving", tone: "warning" });
-      return;
+      return false;
     }
     setSaveState("saving");
     try {
@@ -269,7 +229,6 @@ export function usePageSettings(
         slugManuallySet: slug !== (page.slug ?? "") ? true : undefined,
         settings: {
           visibility,
-          password: visibility === "password" ? password : undefined,
           head: customHead || undefined,
           seo: {
             metaTitle: seoTitle || undefined,
@@ -291,20 +250,22 @@ export function usePageSettings(
         ogDesc,
         ogImageUrl,
         visibility,
-        password,
         allowIndex,
         allowFollow,
         customHead,
       });
-      addToast({ description: "Page settings saved", tone: "success" });
-    } catch {
-      setSaveState("error");
+      /* 6887:73801 — the saved toast carries its way on: Manage pages. */
       addToast({
-        description: "Save failed — your changes are still here.",
-        tone: "error",
-        duration: 0,
-        action: { label: "Retry", onClick: () => save() },
+        description: "Page settings saved",
+        tone: "success",
+        action: { label: "Manage pages", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" }) },
       });
+      return true;
+    } catch {
+      /* The dialog stays open with the edits; Done is the retry (#20). */
+      setSaveState("error");
+      addToast({ description: "Save failed — your changes are still here.", tone: "error" });
+      return false;
     }
   }, [
     composer,
@@ -316,7 +277,6 @@ export function usePageSettings(
     ogDesc,
     ogImageUrl,
     visibility,
-    password,
     allowIndex,
     allowFollow,
     customHead,
@@ -342,13 +302,6 @@ export function usePageSettings(
     indexingOn: allowIndex,
     descSet: seoDesc.length >= 50,
   };
-
-  const copyPassword = React.useCallback(() => {
-    if (!password) return;
-    navigator.clipboard?.writeText?.(password).catch(() => {
-      addToast({ description: "Could not copy password", tone: "error" });
-    });
-  }, [password, addToast]);
 
   // A4 parity with usePages.copyPageLink: domain lives in ProjectData metadata,
   // NOT on `composer.project.domain` (that property doesn't exist on Composer
@@ -380,10 +333,6 @@ export function usePageSettings(
     setOgImageUrl,
     visibility,
     setVisibility,
-    password,
-    setPassword,
-    showPassword,
-    setShowPassword,
     allowIndex,
     setAllowIndex,
     allowFollow,
@@ -391,7 +340,6 @@ export function usePageSettings(
     customHead,
     setCustomHead,
     headCodeError,
-    copyPassword,
     domain,
     publishedUrl,
     saveState,
@@ -400,8 +348,5 @@ export function usePageSettings(
     discard,
     showDiscardConfirm,
     setShowDiscardConfirm,
-    pendingTabChange,
-    confirmTabChange,
-    cancelTabChange,
   };
 }

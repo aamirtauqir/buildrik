@@ -6,46 +6,58 @@
  * @license BSD-3-Clause
  */
 
-import { Crosshair, CornerLeftUp, Link } from "lucide-react";
+import { Link } from "lucide-react";
 import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
-import { BindingPopover } from "./components/BindingPopover";
-import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";
-import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
-import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { EVENTS } from "../../shared/constants/events";
-import type { SectionId } from "./sections/registry";
-import { getEditorViewMode } from "../../shared/utils/editorViewMode";
+import type { TabId } from "./sections/registry";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
-import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { ElementNameField } from "./components/ElementNameField";
+import { LockedBanner } from "./components/LockedBanner";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
-import { BreakpointOverrides, useBreakpointOverrides } from "./components/BreakpointOverrides";
+import { BreakpointOverrides } from "./components/BreakpointOverrides";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
-import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
+import { useInspectorState, useStyleHandlers, useInspectorSections, useInspectorTier } from "./hooks";
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
+import { usePropertyJump } from "./hooks/usePropertyJump";
 import { VariantSection } from "./sections/VariantSection";
 import { MediaSourceRow } from "./sections/MediaSourceRow";
-import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
+import { TextContentRow } from "./sections/TextContentRow";
+import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Tabs } from "@/editor/chrome-ui";
+
+/** Footer switch, board 4428:141170 / 141406 — the two tiers by name. */
+/** Equal-width underline tabs (board 4428:141170), merged over chrome-ui's
+ *  pill tab via twMerge. */
+const INSPECTOR_TAB_CLASS =
+  "tw:flex-1 tw:h-9 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-medium tw:bg-transparent " +
+  "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
+  "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
+
+const TIER_TABS = [
+  { id: "beginner", label: "Beginner" },
+  { id: "pro", label: "Pro" },
+] as const;
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -58,7 +70,6 @@ export interface ProInspectorProps {
   } | null;
   composer?: Composer | null;
   currentBreakpoint?: DeviceType;
-  onBreakpointChange?: (bp: BreakpointId) => void;
   onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -81,7 +92,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   selectedElement,
   composer,
   currentBreakpoint: currentBreakpointProp = "desktop",
-  onBreakpointChange,
   onDelete,
   onOpenMediaLibrary,
   onOpenIconPicker,
@@ -95,7 +105,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     currentPseudoState,
     setCurrentPseudoState,
   } = useInspectorState(selectedElement);
-  const devMode = USE_DEV_MODE;
 
   // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
   // per-element controls (site styles live in the Brand panel).
@@ -162,16 +171,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     reachPeerIds
   );
 
-  // Breakpoint override indicator — same reading the strip below the scope row
-  // shows, from the same subscription, so the dot and the list can never
-  // disagree about whether this breakpoint changes anything.
-  const breakpointOverrides = useBreakpointOverrides(
-    composer,
-    selectedElement?.id,
-    currentBreakpoint
-  );
-  const breakpointHasOverride = breakpointOverrides.length > 0;
-
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
   // pseudo rules light up the indicator pills at the active zoom level.
   // Logic extracted for testability; see config/pseudoOverrides.ts.
@@ -181,14 +180,21 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
 
-  const { expandedSections, toggleSection } = useInspectorSections({
+  const { expandedSections, toggleSection, expandAll, collapseAll } = useInspectorSections({
     selectedElement,
     composer,
     styles: styles_state,
   });
 
-  // E3 per-user density (acceptance #4) — from the shared editor view-mode SSOT.
-  const inspectorDensity = React.useMemo(() => getEditorViewMode().density, []);
+  /* Boards 4428:141170 / 141642 / 142686 — the strip. The tab survives a
+     selection change (the board's SET_VARIABLE is file-wide); Beginner's
+     "Show all" does not, it is a look, not a setting. */
+  const [activeTab, setActiveTab] = React.useState<TabId>("style");
+  const [tier, setTier] = useInspectorTier();
+  const [showAll, setShowAll] = React.useState(false);
+  React.useEffect(() => {
+    setShowAll(false);
+  }, [selectedElement?.id, activeTab]);
 
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
@@ -202,7 +208,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousElementIdRef = React.useRef<string | null>(null);
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [pickActive, setPickActive] = React.useState(false);
 
   // Canvas signals pick completion/cancellation — clear pickActive so the
@@ -214,7 +219,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const boundLabel = useElementBinding(composer, selectedElement?.id ?? "");
 
   const [contextState, setContextState] = React.useState(() =>
-    deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState)
+    deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState)
   );
   const propertyStates = getPropertyStates(contextState);
 
@@ -226,8 +231,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   }
 
   React.useEffect(() => {
-    setContextState(deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState));
-  }, [selectedElement, composer, styles_state, devMode, currentBreakpoint, currentPseudoState]);
+    setContextState(deriveCssContext(selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState));
+  }, [selectedElement, composer, styles_state, currentBreakpoint, currentPseudoState]);
 
   const selectedElements = React.useMemo<readonly Element[]>(() => {
     if (!composer || selectedIds.length === 0) return [];
@@ -290,33 +295,27 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
 
-  /* v3 IA Q8 — the canvas context menu's "Add interaction" lands here. A
-     collapsed section stays collapsed on selection, so the door has to open
-     it AND bring it on screen; `toggleSection` is keyed by element type, the
-     same key InspectorTabContent reads. The scroll waits one frame so the
-     expanded body has a height to scroll to. */
+  /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them and behind
+     the canvas menu's "Add interaction" (UI_INSPECTOR_FOCUS_SECTION). */
   const selectedType = selectedElement?.type ?? null;
-  React.useEffect(() => {
-    if (!composer || !selectedType) return;
-    const focus = ({ section }: { section: SectionId }) => {
-      if (!expandedSections.has(`${selectedType}:${section}`)) toggleSection(selectedType, section);
-      requestAnimationFrame(() => {
-        contentRef.current
-          ?.querySelector<HTMLElement>(`#inspector-section-${section}`)
-          ?.scrollIntoView({ block: "start", behavior: "smooth" });
-      });
-    };
-    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
-    return () => {
-      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
-    };
-  }, [composer, selectedType, expandedSections, toggleSection]);
+  usePropertyJump({
+    composer,
+    selectedType,
+    contentRef,
+    setActiveTab,
+    tier,
+    setShowAll,
+    expandedSections,
+    toggleSection,
+    advancedState,
+  });
 
   const ElementIcon = selectedElement
     ? getElementIcon(selectedElement.type)
     : getElementIcon("default");
   const elementLabel = selectedElement?.type
-    ? selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)
+    ? (ELEMENT_TYPE_LABELS[selectedElement.type] ??
+      selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1))
     : "Element";
 
   // Multi-select short-circuit
@@ -345,8 +344,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return <InspectorEmptyState composer={composer} />;
   }
 
-  // Parent lookup drives the header's "select parent" affordance.
-  const selectedInstance = composer?.elements?.getElement(selectedElement.id) ?? null;
 
   return (
     <div className="bdi-panel" data-testid="inspector-panel">
@@ -363,34 +360,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <ElementIcon size="sm" />
         </div>
         <div className="bdi-ename">
-          <div className="bdi-n" data-testid="inspector-element-name">{elementLabel}</div>
+          {/* G2-139: the layer name (else the type), renamed in place. */}
+          <ElementNameField composer={composer} elementId={selectedElement.id} typeLabel={elementLabel} />
         </div>
         <div className="bdi-eact">
-          <Button
-            type="button"
-            className={`bdi-icon-btn${pickActive ? " on" : ""}`}
-            title="Pick element on canvas"
-            aria-label="Pick element on canvas"
-            data-testid="inspector-pick"
-            aria-pressed={pickActive}
-            onClick={() => {
-              const next = !pickActive;
-              setPickActive(next);
-              composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
-            }}
-          >
-            <Crosshair size={12} aria-hidden="true" />
-          </Button>
-          <Button
-            type="button"
-            className="bdi-icon-btn"
-            title="Select parent"
-            aria-label="Select parent element"
-            disabled={!selectedInstance?.getParent()}
-            onClick={() => composer?.selection.selectParent()}
-          >
-            <CornerLeftUp size={12} aria-hidden="true" />
-          </Button>
           {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`
               deliberately (tabsConfig RAIL_FIGMA); the 2026-08-05 Figma arc put
               this chip on every inspector header instead, and it never shipped:
@@ -405,11 +378,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           >
             ✦ AI
           </Button>
-          <BindingPopover
-            elementId={selectedElement?.id ?? null}
-            composer={composer ?? null}
-            onOpenCreateCollection={onOpenCreateCollection}
-          />
           {/* Board 160:105 — the header carries the fact, not just the way in.
               A bound element used to be indistinguishable from a loose one
               until someone opened the link popover. */}
@@ -422,28 +390,48 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               <Link size={10} aria-hidden="true" /> Bound
             </span>
           )}
+          {/* Decision #17: one element deletes at once, with the Undo toast the
+              shell's handler raises — a confirm is for N > 1 (the multi-select
+              header) and for component masters (the Components panel). */}
           {onDelete && (
             <InspectorElementMenu
               composer={composer}
               selectedElementId={selectedElement.id}
-              onRequestDelete={() => setShowDeleteConfirm(true)}
+              onRequestDelete={() => onDelete(selectedElement.id)}
+              onPick={() => {
+                const next = !pickActive;
+                setPickActive(next);
+                composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
+              }}
+              onSelectParent={() => composer?.selection.selectParent()}
+              onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
+              onExpandAll={expandAll}
+              onCollapseAll={collapseAll}
             />
           )}
         </div>
-        <DeleteConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={() => {
-            onDelete?.(selectedElement.id);
-            setShowDeleteConfirm(false);
-          }}
-          elementLabel={elementLabel}
-        />
       </div>
-      {/* Figma 32-2 pill row: `This ▾ · Desktop ▾ · Base ▾` (scope · breakpoint ·
-          state), three compact dropdowns on one line. S3.9: no tab strip — the
-          body below is one flat scrolling column ordered per element profile. */}
+      {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
+          The sections each tab holds are the registry's `tab` tags; the strip
+          only picks which set the body renders. */}
+      {!wholeSite && !agentRun.running && (
+        <Tabs
+          tabs={INSPECTOR_TABS}
+          value={activeTab}
+          onChange={(id) => setActiveTab(id as TabId)}
+          label="Inspector tabs"
+          data-testid="inspector-tab-strip"
+          /* Board 4428:141170: three equal tabs, 36 tall, the active one
+             underlined in the accent — not left-packed tinted pills. */
+          className="tw:h-9 tw:p-0 tw:gap-0 tw:border-b tw:border-[var(--bk-border)]"
+          tabClassName={INSPECTOR_TAB_CLASS}
+        />
+      )}
+      {/* Board 4428:141170: "Applies to [This element ▾]" sits UNDER the tab
+          strip (it was a pill row above it). The state pill stays on the row
+          — pseudo-state editing has no other door. */}
       <div className="bdi-bpr" data-testid="inspector-context-row">
+        <span className="bdi-bpr-label">Applies to</span>
         <ScopeDropdown
           composer={composer}
           selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
@@ -451,23 +439,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           onReachAllChange={setReachAll}
           onWholeSite={() => setWholeSite(true)}
         />
-        <BreakpointPill
-          current={currentBreakpoint}
-          onChange={onBreakpointChange}
-          hasOverride={breakpointHasOverride}
-        />
         <StateDropdown
           current={currentPseudoState}
           onChange={setCurrentPseudoState}
           withOverrides={statesWithOverrides}
         />
-        {/* S6: detach catalog/user-saved instance — pro-mode only, hides
-            itself when selectedElement is not an instance. Self-gated. */}
-        <DetachInstanceButton
-          composer={composer ?? null}
-          selectedElementId={selectedElement?.id}
-        />
       </div>
+      <LockedBanner composer={composer} elementId={selectedElement.id} />
+
       {/* Every banner below annotates THE CONTROLS BELOW IT — which scope a
           write lands on, which breakpoint it overrides, which instance it
           follows. The two takeovers (whole-site, and an AI run) replace those
@@ -603,10 +582,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div className="bdi-body">
           {/* Clone 3721:45178 / 3724:43815 / 3724:44339 — a media element's
               source is the first thing in its inspector, above SIZE. */}
-          <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
+          {activeTab === "style" && (
+            <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
+          )}
+          {activeTab === "style" && <TextContentRow composer={composer} selectedElement={selectedElement} />}
           <InspectorErrorBoundary>
             <InspectorTabContent
-              tabId="style"
+              tabId={activeTab}
               composer={composer}
               selectedElement={selectedElement}
               styles={styles_state}
@@ -619,13 +601,35 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               advancedState={advancedState}
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
-              devMode={devMode}
-              density={inspectorDensity}
+              onOpenCreateCollection={onOpenCreateCollection}
+              tier={tier}
+              showAll={showAll}
+              onShowAllChange={setShowAll}
             />
-
           </InspectorErrorBoundary>
         </div>
       </div>
+      )}
+      {/* Board 4428:141170's footer — Beginner / Pro, remembered per user
+          (decision #29). Below the scroll so it is reachable on every
+          profile, however long the column above it runs. */}
+      {!wholeSite && !agentRun.running && (
+        <footer
+          /* Board 4428:141170: a 44-tall footer with the Beginner / Pro
+             segmented control at its left edge. */
+          className="tw:flex tw:items-center tw:h-[var(--bk-size-panel-footer)] tw:shrink-0 tw:border-t tw:border-[var(--bk-border)] tw:px-4"
+          data-testid="inspector-footer"
+        >
+          <Tabs
+            tabs={TIER_TABS}
+            value={tier}
+            onChange={(id) => setTier(id === "pro" ? "pro" : "beginner")}
+            label="Inspector tier"
+            data-testid="inspector-tier-toggle"
+            className="tw:p-0.5 tw:gap-0 tw:rounded-md tw:bg-[var(--bk-gray-100)]"
+            tabClassName="tw:h-6 tw:px-3 tw:text-[12px] tw:rounded tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)]"
+          />
+        </footer>
       )}
     </div>
   );

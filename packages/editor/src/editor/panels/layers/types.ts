@@ -56,14 +56,23 @@ export interface DragState {
   position: "before" | "after" | "inside" | null;
 }
 
-/** Display preferences for the Layers panel (persisted to localStorage) */
+/**
+ * Display preferences for the Layers panel (persisted to localStorage).
+ * The set is Figma's (board 4418:84113: Show dimmed layers · Show lock badges
+ * · Compact rows · Highlight CMS-bound) plus HTML tags — owner decision 18,
+ * 2026-09-21. "Show element IDs" went with it.
+ */
 export interface LayerDisplayPrefs {
-  /** Show raw HTML tag badges (div, section, h1). Default: false */
-  showHtmlBadges: boolean;
-  /** Show element IDs (#w83sqctx format). Default: false */
-  showElementIds: boolean;
+  /** Keep editor-dimmed rows (the eye) in the tree. Off → they are hidden from the list. Default: true */
+  showDimmed: boolean;
+  /** Show the lock control on every row. Off → only rows that ARE locked show it (so they can be unlocked). Default: true */
+  showLockBadges: boolean;
   /** Compact row density. Default: "compact" (founder call 2026-08-28; DESIGN.md compact density + board 1082:4527). */
   treeDensity: "comfortable" | "compact";
+  /** Tint rows whose element carries a CMS field or collection binding. Default: false */
+  highlightCmsBound: boolean;
+  /** Show raw HTML tag badges (div, section, h1). Default: false */
+  showHtmlBadges: boolean;
 }
 
 /** State for the right-click context menu */
@@ -93,4 +102,5 @@ export type LayerAction =
   | "group"
   | "selectChildren"
   | "moveToTop"
-  | "moveToBottom";
+  | "moveToBottom"
+  | "moveToPage";

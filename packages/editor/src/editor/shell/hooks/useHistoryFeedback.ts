@@ -61,6 +61,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "clone-element": "Duplicated element",
   paste: "Pasted element",
   "paste-styles": "Pasted styles",
+  "reset-styles": "Reset styles",
   // Move / order
   "move-element": "Moved element",
   "multi-element-move": "Moved elements",
@@ -68,6 +69,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "touch-move-element": "Moved element",
   nudge: "Moved element",
   "move-layer": "Reordered layer",
+  "move-to-page": "Moved to another page",
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
@@ -92,6 +94,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "link-change": "Changed link",
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",
+  "bind-collection-list": "Bound the collection list",
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",
@@ -154,11 +157,11 @@ export function useHistoryFeedback(
            link beside it. A separate "↩ Undo" title above the sentence made
            the bar two lines and said "Undo" twice. */
         description: `Undo: ${action}`,
-        /* Board 814:7027 draws every undo/redo toast on --color/ink with the
-           message in gray-200 — a transient bar, not one of the five semantic
-           tints. It shipped as `info`, i.e. the same pale blue card a
+        /* Board 814:7027 draws every undo/redo toast on --color/ink. DESIGN.md's
+           NO BLACK RULE wins over the board (plan 2026-09-21 decision #25), so
+           the bar is the neutral grey one — not the pale blue `info` card a
            "publish queued" notice uses. */
-        tone: "dark",
+        tone: "neutral",
         duration: isDestructive ? 4000 : 2500,
         action: { label: "Redo", onClick: () => composer.history.redo() },
       });
@@ -169,7 +172,7 @@ export function useHistoryFeedback(
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
         description: `Redo: ${action}`,
-        tone: "dark",
+        tone: "neutral",
         duration: isDestructive ? 4000 : 2500,
         action: { label: "Undo", onClick: () => composer.history.undo() },
       });
@@ -190,12 +193,12 @@ export function useHistoryFeedback(
             ? "Nothing to undo"
             : "Nothing to redo",
         /* 814:7060's caption reads "Grey toast, no action", but the frame it
-           captions (814:7062) is filled --color/ink like the other five. The
-           DRAWING is the design and the caption describes it, so the
-           empty-stack toast is dark too; what actually distinguishes it is
-           what the caption's second half says — no reverse action, because
-           there is nothing to reverse. */
-        tone: "dark",
+           captions (814:7062) is filled --color/ink like the other five —
+           and ink loses to DESIGN.md's NO BLACK RULE (decision #25), so the
+           empty-stack toast is the same neutral bar; what actually
+           distinguishes it is what the caption's second half says — no
+           reverse action, because there is nothing to reverse. */
+        tone: "neutral",
         duration: data.reason ? 4000 : 2000,
       });
     };

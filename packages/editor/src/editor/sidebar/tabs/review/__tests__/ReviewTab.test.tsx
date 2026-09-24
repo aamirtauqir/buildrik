@@ -6,9 +6,9 @@
  * was the pre-board panel, and a test protecting removed design is how
  * "No pages yet" survived for months (PageList.test.tsx:55).
  *
- * What it protects now: the frame every board shares (progress "N of M", the
- * sent line, the round line, Compare, one primary button whose label is the
- * state), the bodies that differ per board, and the behaviours the boards
+ * What it protects now: the frame every board shares (the status line, the
+ * ⋯ menu's Compare rounds / Round history, one primary button whose label is
+ * the state), the bodies that differ per board, and the behaviours the boards
  * imply — the re-send confirm REPLACING the primary, the revoke confirm being
  * inline and race-safe, resolve reaching the canvas.
  */
@@ -38,6 +38,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
 
 import { fetchRounds } from "../../../../../services/ReviewService";
 import { ReviewTab } from "../ReviewTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const ROUND = {
   id: "r1",
@@ -59,10 +60,19 @@ const COMMENTS = [
 ];
 
 function renderTab(props = {}) {
-  return render(<ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />);
+  return render(
+    <ToastProvider>
+      <ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />
+    </ToastProvider>,
+  );
 }
 
+/* Locate › polls for the anchor for up to 5s (review/locate.ts). Real
+   timers let that poll outlive the file and throw `document is not defined`
+   after jsdom is torn down, which failed CI with every test green. Fake
+   timers that still advance keep waitFor working; afterEach drops the rest. */
 beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
   [fetchCurrentRound, fetchReviewComments, postReply, resolveReviewComment, revokeReview].forEach((m) => m.mockReset());
   fetchCurrentRound.mockResolvedValue(ROUND);
   fetchReviewComments.mockResolvedValue(COMMENTS);
@@ -70,25 +80,36 @@ beforeEach(() => {
   resolveReviewComment.mockResolvedValue(undefined);
   revokeReview.mockResolvedValue({ revoked: true });
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.clearAllTimers();
+  vi.useRealTimers();
+});
 
-describe("the frame every board shares", () => {
-  it("counts resolved of total, and says who it went to and when", async () => {
+describe("the frame every board shares (board 4418:115784)", () => {
+  it("is one status line — counts and who it waits on; no progress bar, no round strip, no Compare button", async () => {
     renderTab();
-    expect(await screen.findByText("1 of 3")).toBeInTheDocument();
-    expect(screen.getByText("Sent 2d ago · Sara Khan")).toBeInTheDocument();
-    expect(screen.getByText(/Round 2 of 3/)).toBeInTheDocument();
+    expect(await screen.findByTestId("review-status-line")).toHaveTextContent("2 open · 1 resolved · Awaiting Sara Khan");
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.queryByText(/Round 2 of 3/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Compare with approved" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
   });
 
-  /* The strip is a HISTORY toggle now (reviews.rounds, 2026-08-28), but still
-     no ‹ › pager: comments carry no round id by design (contracts §6.4), so an
-     older round's comments cannot be paged to, and a chevron that cannot move
-     is a dead control. */
-  it("has no round pager — the strip toggles a header-line history instead", async () => {
+  it("the panel ⋯ holds Compare rounds and Round history ›, as board 7071:79114 draws", async () => {
+    const emit = vi.fn();
+    renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Compare rounds" }));
+    expect(emit).toHaveBeenCalledWith("ui:compare-open", expect.objectContaining({ left: { kind: "approved" }, right: { kind: "current" } }));
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    expect(await screen.findByRole("menuitem", { name: "Round history ›" })).toBeInTheDocument();
+  });
+
+  it("Send is the blue primary even while disabled", async () => {
     renderTab();
-    await screen.findByText(/Round 2 of 3/);
-    expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId("review-rounds-toggle")).toBeInTheDocument();
+    const send = await screen.findByRole("button", { name: "Send" });
+    expect(send.className).toContain("tw:disabled:bg-[var(--bk-accent)]");
   });
 });
 
@@ -189,8 +210,9 @@ describe("load states", () => {
   it("asks to withdraw, not to revoke a link, when there is no client link", async () => {
     fetchCurrentRound.mockResolvedValue({ ...ROUND, invitedEmail: null, reviewerName: null });
     renderTab();
-    fireEvent.click(await screen.findByRole("button", { name: "Withdraw request" }));
-    expect(await screen.findByRole("alertdialog", { name: "Withdraw this review request?" })).toBeInTheDocument();
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Withdraw request" }));
+    expect(await screen.findByText("Withdraw this review request?")).toBeInTheDocument();
     expect(screen.queryByText(/lose access/i)).not.toBeInTheDocument();
   });
 
@@ -210,10 +232,10 @@ describe("load states", () => {
 });
 
 describe("actions", () => {
-  it("posts an internal reply then reloads the thread", async () => {
+  it("posts a team-only page comment then reloads the thread", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    fireEvent.change(screen.getByPlaceholderText(/reply/i), { target: { value: "fixed the contrast" } });
+    fireEvent.change(screen.getByPlaceholderText(/^Comment on /), { target: { value: "fixed the contrast" } });
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
     await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "page-home"));
     await waitFor(() => expect(fetchReviewComments.mock.calls.length).toBeGreaterThan(1));
@@ -239,19 +261,18 @@ describe("actions", () => {
     await waitFor(() => expect(composer.emit).toHaveBeenCalledWith("comments:refresh", {}));
   });
 
-  /* Board 158:2. Two live re-send affordances at once is how a client's link
-     gets invalidated by the wrong click, so the confirm REPLACES the button. */
-  it("re-sending with open comments asks first, and the confirm replaces the primary", async () => {
+  /* Board 4418:120052 (G1-058): the re-send asks in a modal, which names
+     who gets the new link and what round it starts. */
+  it("re-sending asks in a modal first, then sends", async () => {
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
     await screen.findByText(/hero photo is too dark/);
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
-
-    expect(screen.getByText(/2 comments are still open\. Re-send anyway\?/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Re-send for review" })).not.toBeInTheDocument();
+    expect(await screen.findByText(/^Send a new review to /)).toBeInTheDocument();
+    expect(screen.getByText(/the previous link stops working/)).toBeInTheDocument();
+    expect(screen.getByText(/2 comments are still open/)).toBeInTheDocument();
     expect(onResend).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Re-send" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalled());
   });
 
@@ -264,6 +285,7 @@ describe("actions", () => {
     renderTab({ onResend });
     await screen.findByText("Everything is resolved.");
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
 
     const btn = await screen.findByRole("button", { name: "Sending round 3…" });
     expect(btn).toBeDisabled();
@@ -273,26 +295,44 @@ describe("actions", () => {
     );
   });
 
-  it("a clean round re-sends without a confirm", async () => {
+  it("a clean round asks too — the re-send still kills the current link", async () => {
     fetchReviewComments.mockResolvedValue([COMMENTS[2]]);
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
     await screen.findByText("Everything is resolved.");
     fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalled());
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
+    expect(onResend).not.toHaveBeenCalled();
   });
 
-  /* Board 158:105 — the revoke confirm is an inline panel at the top of the
-     panel, not a modal, and it carries the revision so a re-send that landed
+  /* Board 7071:79114 + 6879:67202 (G1-059): revoke lives in the panel's ⋯
+     menu and asks in a modal, carrying the revision so a re-send that landed
      first cannot be revoked by a stale click. */
-  it("revoke asks inline and passes the revision", async () => {
+  it("revoke is a ⋯ menu row with a modal, and passes the revision", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    expect(screen.queryByText("Revoke this review link?")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Revoke link" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke link" }));
+    expect(await screen.findByText("Revoke this review link?")).toBeInTheDocument();
+    expect(screen.getByText("Revoking does not change the approval lock or any comment.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Revoke link" }));
-    expect(screen.getByText("Revoke this review link?")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Revoke" }));
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
+  });
+
+  it("the ⋯ menu's Re-send opens the same modal", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Re-send review link" }));
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
+  });
+
+  it("the composer is the board's page comment, and still says it is team-only (G1-056)", async () => {
+    renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] } } });
+    await screen.findByText(/hero photo is too dark/);
+    expect(screen.getByPlaceholderText("Comment on Home…")).toBeInTheDocument();
+    expect(screen.getByTestId("review-composer-meta").textContent).toBe("Page comment · Home · team only");
   });
 
   /* The harness supplies onResend by default, which is exactly why nothing
@@ -354,13 +394,14 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
 });
 
 describe("the previous-rounds history (board 157:169, the buildable half)", () => {
-  it("opens on the strip and prints each earlier round as a header line", async () => {
+  it("opens from the ⋯ menu and prints each earlier round as a header line", async () => {
     vi.mocked(fetchRounds).mockResolvedValueOnce([
       { id: "rr-old", roundNumber: 1, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-20T10:00:00Z", createdAt: "2026-08-18T10:00:00Z" },
       { id: "r1", roundNumber: 2, status: "PENDING", reviewerName: null, revoked: false, resolvedAt: null, createdAt: "2026-08-25T10:00:00Z" },
     ]);
     renderTab();
-    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByTestId("review-menu-round-history"));
     /* The current round is not its own history. The line is the board's
        (1753:8423-8429): outcome then a RELATIVE age, not "Approved by <name>"
        and a locale date — the name is already on the sent line above, and the
@@ -372,9 +413,146 @@ describe("the previous-rounds history (board 157:169, the buildable half)", () =
   it("a failed history read says so and offers a retry — it does not impersonate 'no history'", async () => {
     vi.mocked(fetchRounds).mockRejectedValueOnce(new Error("net"));
     renderTab();
-    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByTestId("review-menu-round-history"));
     expect(await screen.findByText(/Couldn't load the history/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
   });
 });
 
+describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as board 4418:115784", () => {
+  /* Locate › goes through `locateComment` (page first, then select); Copy
+     link writes window.location.href to the clipboard. */
+
+  function makeComposer() {
+    const handlers: Record<string, ((p: unknown) => void)[]> = {};
+    const activePage = { id: "page-home", name: "Home" };
+    const target = { id: "el-hero", type: "image", name: "Hero" };
+    return {
+      on: (evt: string, fn: (p: unknown) => void) => {
+        (handlers[evt] ||= []).push(fn);
+      },
+      off: () => {},
+      emit: vi.fn(),
+      selection: { select: vi.fn() },
+      elements: {
+        getAllPages: () => [{ id: "page-home", name: "Home" }, { id: "page-menu", name: "Menu" }],
+        getActivePage: () => activePage,
+        setActivePage: vi.fn((id: string) => {
+          activePage.id = id;
+        }),
+        getElement: vi.fn((sel: string) => (sel === "el-hero" ? target : null)),
+      },
+    };
+  }
+
+  beforeEach(() => {
+    Object.assign(window, { location: { ...window.location, href: "http://localhost:5051/?siteId=abc" } });
+  });
+
+  it("an anchored row: Locate › trailing, Resolve and Copy link under it, no per-row ⋯", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    expect(within(row).getByRole("button", { name: "Locate ›" })).toBeInTheDocument();
+    expect(within(row).getByRole("button", { name: "Copy link" })).toBeInTheDocument();
+    expect(within(row).getByRole("button", { name: "Resolve" })).toBeInTheDocument();
+    expect(within(row).queryByRole("button", { name: "More actions" })).toBeNull();
+  });
+
+  it("Locate › switches page when the comment lives on another one, then selects its element", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-menu" },
+    ]);
+    const composer = makeComposer();
+    const order: string[] = [];
+    composer.elements.setActivePage.mockImplementation(() => order.push("page"));
+    composer.selection.select.mockImplementation(() => order.push("select"));
+    renderTab({ composer });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Locate ›" }));
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-menu");
+    expect(composer.selection.select).toHaveBeenCalledWith({ id: "el-hero", type: "image", name: "Hero" });
+    expect(order).toEqual(["page", "select"]);
+  });
+
+  it("Locate › on an anchor deleted since load moves the row to Detached and says why (#27)", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-gone"]`, pageId: "page-home" },
+    ]);
+    const composer = makeComposer();
+    renderTab({ composer });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Locate ›" }));
+    expect(composer.selection.select).not.toHaveBeenCalled();
+    expect(await screen.findByText(/lost its anchor/i)).toBeInTheDocument();
+    const moved = (await screen.findByTestId("review-detached-band")).parentElement as HTMLElement;
+    expect(within(moved).getByText(/hero photo is too dark/)).toBeInTheDocument();
+    expect(within(moved).queryByRole("button", { name: "Locate ›" })).toBeNull();
+  });
+
+  it("clicking the comment body locates it too; its buttons stay its buttons", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const composer = makeComposer();
+    renderTab({ composer });
+    const body = await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(body);
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+    const row = body.closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Resolve" }));
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+  });
+
+  it("an unanchored comment has no Locate ›", async () => {
+    fetchReviewComments.mockResolvedValue([COMMENTS[0]]); // targetSelector: null
+    renderTab({ composer: makeComposer() });
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    expect(within(row).queryByRole("button", { name: "Locate ›" })).toBeNull();
+  });
+
+  it("Copy link writes the comment's ?el=&page= deep link to the clipboard", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const writeText = vi.fn((_text: string) => Promise.resolve());
+    Object.assign(navigator, { clipboard: { writeText } });
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Copy link" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const url = new URL(writeText.mock.calls[0][0]);
+    expect(url.searchParams.get("el")).toBe("el-hero");
+    expect(url.searchParams.get("page")).toBe("page-home");
+    expect(await screen.findByText("Link copied")).toBeInTheDocument();
+  });
+
+  it("Copy link falls back to the address-bar notice when the clipboard throws", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(() => Promise.reject(new Error("denied"))) } });
+    renderTab();
+    const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Copy link" }));
+    expect(await screen.findByText(/Couldn't copy the link/i)).toBeInTheDocument();
+  });
+});
+
+describe("ReviewTab — opened from the Activity panel", () => {
+  it("draws ‹ Activity, which goes back to the Activity panel", async () => {
+    const emit = vi.fn();
+    renderTab({ fromActivity: true, composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
+    fireEvent.click(await screen.findByRole("button", { name: "‹ Activity" }));
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "activity" });
+  });
+
+  it("no back row when opened any other way", async () => {
+    renderTab();
+    await screen.findByTestId("review-status-line");
+    expect(screen.queryByTestId("back-to-activity")).toBeNull();
+  });
+});

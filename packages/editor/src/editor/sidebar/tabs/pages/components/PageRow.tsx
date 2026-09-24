@@ -18,6 +18,8 @@ import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 import { Button, TextField } from "@/editor/chrome-ui";
+import { slugify } from "@shared/utils/helpers/string";
+import { RenameUrlDecision } from "./RenameUrlDecision";
 
 interface Props {
   page: PageItem;
@@ -30,7 +32,8 @@ interface Props {
   draggable?: boolean;
   /** When provided, the row is a reorder drop target: dropping another page
    *  here moves the dragged page to just after this one. */
-  onReorderDrop?: (draggedPageId: string) => void;
+  /** A page dropped on this row: before it (upper half) or after it. */
+  onReorderDrop?: (draggedPageId: string, position: "before" | "after") => void;
   /** Renders with `.nested` class — left-padded for folder children. */
   nested?: boolean;
   /** Whether this row is part of a multi-select. */
@@ -38,7 +41,8 @@ interface Props {
   /** Toggle multi-select for this page. */
   onToggleSelect?: (e: React.MouseEvent | React.KeyboardEvent) => void;
   onSelect: () => void;
-  onRenameCommit: (name: string) => void;
+  /** `updateUrl` answers the URL decision (G2-076); absent = the URL was not at stake. */
+  onRenameCommit: (name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
@@ -47,6 +51,13 @@ interface Props {
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
   isDirty?: boolean;
 }
+
+/* The drop line, as Layers draws it: a 2px accent edge on the side the page
+   will land. Inset shadow, so it takes no layout. */
+const DROP_LINE = {
+  before: "tw:shadow-[inset_0_2px_0_var(--bk-accent)]",
+  after: "tw:shadow-[inset_0_-2px_0_var(--bk-accent)]",
+} as const;
 
 export const PageRow = React.memo<Props>(
   ({
@@ -84,10 +95,29 @@ export const PageRow = React.memo<Props>(
       }
     }, [isRenaming, page.name]);
 
-    const commitOnce = (value: string) => {
+    /* G2-076: a new name whose slug differs from the page's URL waits for
+       Keep URL / Update URL. The home page answers on "/" whatever it is
+       called, so its rename never asks. */
+    const [pendingName, setPendingName] = React.useState<string | null>(null);
+    React.useEffect(() => {
+      if (!isRenaming) setPendingName(null);
+    }, [isRenaming]);
+
+    const finish = (value: string, updateUrl?: boolean) => {
       if (committedRef.current) return;
       committedRef.current = true;
-      onRenameCommit(value);
+      setPendingName(null);
+      onRenameCommit(value, updateUrl);
+    };
+
+    const commitOnce = (value: string) => {
+      if (committedRef.current) return;
+      const nextSlug = slugify(value);
+      if (!page.isHome && value !== page.name && nextSlug && nextSlug !== page.slug) {
+        setPendingName(value);
+        return;
+      }
+      finish(value);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -107,23 +137,43 @@ export const PageRow = React.memo<Props>(
          keyboard problem rather than this. */
     };
 
+    const [dropAt, setDropAt] = React.useState<"before" | "after" | null>(null);
+
     const handleDragStart = (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", page.id);
       e.dataTransfer.effectAllowed = "move";
+    };
+
+    /* Which half of the row the pointer is on. The drop used to ignore it
+       and always put the page AFTER this row, so dragging a page onto the
+       top edge of the row above it changed nothing (walk 2026-09-24: drop
+       fired, "Saved" showed, order unchanged). */
+    const halfOf = (e: React.DragEvent): "before" | "after" => {
+      const r = e.currentTarget.getBoundingClientRect();
+      return e.clientY < r.top + r.height / 2 ? "before" : "after";
     };
 
     const handleReorderDragOver = (e: React.DragEvent) => {
       if (!onReorderDrop) return;
       e.preventDefault(); // allow drop
       e.dataTransfer.dropEffect = "move";
+      const next = halfOf(e);
+      setDropAt((prev) => (prev === next ? prev : next));
+    };
+
+    const handleReorderDragLeave = (e: React.DragEvent) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top && e.clientY < r.bottom;
+      if (!inside) setDropAt(null);
     };
 
     const handleReorderDrop = (e: React.DragEvent) => {
       if (!onReorderDrop) return;
       e.preventDefault();
       e.stopPropagation();
+      setDropAt(null);
       const draggedId = e.dataTransfer.getData("text/plain");
-      if (draggedId && draggedId !== page.id) onReorderDrop(draggedId);
+      if (draggedId && draggedId !== page.id) onReorderDrop(draggedId, halfOf(e));
     };
 
     const handleContextMenuClick = (e: React.MouseEvent) => {
@@ -166,11 +216,13 @@ export const PageRow = React.memo<Props>(
          missing group/tree parent. Presentation is the honest role for a drag
          wrapper: it carries no semantics of its own. */
       <div
-        className="bd-pg-row-wrap"
+        className={`bd-pg-row-wrap${dropAt ? ` ${DROP_LINE[dropAt]}` : ""}`}
         role="presentation"
         draggable={isDraggable}
+        data-drop={dropAt ?? undefined}
         onDragStart={isDraggable ? handleDragStart : undefined}
         onDragOver={onReorderDrop ? handleReorderDragOver : undefined}
+        onDragLeave={onReorderDrop ? handleReorderDragLeave : undefined}
         onDrop={onReorderDrop ? handleReorderDrop : undefined}
       >
         <div
@@ -229,8 +281,8 @@ export const PageRow = React.memo<Props>(
           </span>
 
           {/* Board 140:2: plain page rows carry NO icon — only Home draws
-              the roof glyph (140:19) and external pages keep the link glyph. */}
-          {(page.isHome || page.status === "external") && (
+              the roof glyph (140:19). */}
+          {page.isHome && (
           <span className="bd-pg-row-icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
@@ -241,17 +293,8 @@ export const PageRow = React.memo<Props>(
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              {page.status === "external" ? (
-                <>
-                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-                </>
-              ) : (
-                <>
-                  <path d="M3 11l9-8 9 8" />
-                  <path d="M5 9.5V21h14V9.5" />
-                </>
-              )}
+              <path d="M3 11l9-8 9 8" />
+              <path d="M5 9.5V21h14V9.5" />
             </svg>
           </span>
           )}
@@ -302,8 +345,19 @@ export const PageRow = React.memo<Props>(
             </span>
           )}
 
+          {/* Board 4418:93381 — "● Unpublished" for unsaved edits, then the
+              page's status chip ("Draft", "Hidden from publish"); a live page
+              with nothing pending draws neither (C5 G2-071). */}
           {isDirty && (
-            <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" aria-hidden="true" />
+            <span className="bd-pg-row-unpublished" aria-hidden="true">
+              <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" />
+              <span data-testid={`page-dirty-label-${page.id}`}>Unpublished</span>
+            </span>
+          )}
+          {!isRenaming && label && page.status && page.status !== "live" && (
+            <span className={`bd-pg-chip ${page.status}`} data-testid={`page-status-chip-${page.id}`} aria-hidden="true">
+              {label}
+            </span>
           )}
 
           <Button
@@ -321,6 +375,20 @@ export const PageRow = React.memo<Props>(
             </svg>
           </Button>
         </div>
+        {isRenaming && pendingName !== null && (
+          <RenameUrlDecision
+            pageId={page.id}
+            fromSlug={page.slug}
+            toSlug={slugify(pendingName)}
+            onKeep={() => finish(pendingName, false)}
+            onUpdate={() => finish(pendingName, true)}
+            onCancel={() => {
+              committedRef.current = true;
+              setPendingName(null);
+              onRenameCancel();
+            }}
+          />
+        )}
       </div>
     );
   },

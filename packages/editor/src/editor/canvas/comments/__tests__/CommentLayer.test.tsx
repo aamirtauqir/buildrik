@@ -143,9 +143,74 @@ describe("CommentLayer", () => {
     );
     expect(await screen.findByText("A comment lost its element")).toBeInTheDocument();
     // Board 184:56: 560-wide (`form`), not the 720 (`lg`) it shipped with.
-    expect(document.querySelector(".tw\\:w-\\[560px\\]")).toBeInTheDocument();
+    expect(document.querySelector(".tw\\:w-\\[var\\(--bk-size-dialog-md\\)\\]")).toBeInTheDocument();
     // No captured label for this session — the generic fallback, not a lie.
     expect(screen.getByText("was pinned to a deleted element")).toBeInTheDocument();
+  });
+
+  /* 2026-09-25 (L5 + L1, scratch-ver): two comments whose elements really
+     were deleted opened "2 comments lost their element" on EVERY load. The
+     modal is an announcement — once per orphan, remembered per site across
+     reloads. The Detached group (comments:orphans) still hears every scan. */
+  it("announces an orphan once — a reload does not reopen the modal", async () => {
+    window.localStorage.clear();
+    comments.push(
+      openComment({ id: "dead", targetSelector: anchorSelector("deleted-el") }),
+      openComment({ id: "ok", targetSelector: anchorSelector("el-1") }),
+    );
+    const first = makeComposer();
+    const view = mount(first);
+    expect(await screen.findByText("A comment lost its element")).toBeInTheDocument();
+    view.unmount();
+
+    const second = makeComposer();
+    mount(second);
+    await waitFor(() =>
+      expect(second.emit).toHaveBeenCalledWith("comments:orphans", { ids: ["dead"] }),
+    );
+    expect(screen.queryByTestId("orphan-modal")).toBeNull();
+  });
+
+  it("a comment that re-anchors and is orphaned again is announced again", async () => {
+    window.localStorage.clear();
+    window.localStorage.setItem("buildrick-orphans-announced-site-1", JSON.stringify(["dead", "gone-now"]));
+    comments.push(openComment({ id: "dead", targetSelector: anchorSelector("el-1") }));
+    const composer = makeComposer();
+    mount(composer);
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: [] }),
+    );
+    // "dead" is anchored now, so it is forgotten; so is an id no longer listed.
+    expect(JSON.parse(window.localStorage.getItem("buildrick-orphans-announced-site-1") ?? "[]")).toEqual([]);
+  });
+
+  /* QA 2026-09-24 (HIGH): switching to a page raced the orphan scan — the
+     PREVIOUS page was still rendered, the new page's anchors read as deleted,
+     and live comments moved to Detached. The scan waits for the active
+     page's own root. */
+  it("does not judge a page that has not rendered yet", async () => {
+    comments.push(
+      openComment({ id: "a", targetSelector: anchorSelector("about-heading") }),
+      openComment({ id: "b", targetSelector: anchorSelector("about-text") }),
+    );
+    const composer = makeComposer();
+    composer.elements.getActivePage = () => ({ id: "p1", root: { id: "root-about" } }) as never;
+    const { container } = mount(composer);
+    // The canvas still shows the previous page (root-home + el-1) well past the old 150 ms.
+    const host = container.querySelector('[data-buildrick-id="el-1"]')!.parentElement!;
+    const oldRoot = document.createElement("div");
+    oldRoot.setAttribute("data-buildrick-id", "root-home");
+    host.appendChild(oldRoot);
+    await new Promise((r) => setTimeout(r, 600));
+    expect(composer.emit).not.toHaveBeenCalledWith("comments:orphans", expect.anything());
+    // The About page lands, anchors and all: nothing is an orphan.
+    oldRoot.remove();
+    const newRoot = document.createElement("div");
+    newRoot.setAttribute("data-buildrick-id", "root-about");
+    newRoot.innerHTML = '<h1 data-buildrick-id="about-heading">About</h1><p data-buildrick-id="about-text">x</p>';
+    host.appendChild(newRoot);
+    await waitFor(() => expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: [] }));
+    expect(screen.queryByText(/lost (its|their) element/)).toBeNull();
   });
 
   it("names the deleted element when ELEMENT_DELETED captured it this session (board 184:56 'was on:')", async () => {

@@ -9,27 +9,33 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "component-detach-confirm"
+      "testId": "component-detach-all-confirm"
     }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
     {
       "name": "confirm-foot",
-      "testId": "modal-foot-component-detach-confirm",
+      "testId": "modal-foot-component-detach-all-confirm",
       "spec": "components-variant-picker-detach-confirm",
       "nodeId": "1170:4809"
     },
     {
       "name": "confirm",
-      "testId": "component-detach-confirm"
+      "testId": "component-detach-all-confirm"
     },
     {
       "name": "detach-action",
-      "testId": "component-detach"
+      "testId": "component-detach-all"
     }
   ],
   "_note": [
+    "2026-09-24 (L5, G2-122/G2-125): the master screen no longer carries a per-instance",
+    "Detach (it moved to the inspector's instance doors, board 6918:74827 / confirm 6887:78306).",
+    "The probe now opens the master screen's 'Detach all' confirm; targets re-pointed to",
+    "component-detach-all / component-detach-all-confirm. The copy measured is the Detach-all",
+    "confirm, not board 1170:4792's per-instance copy.",
+    "",
     "HALF THIS BOARD HAS NO CODE TO CONFORM, and the board says so itself. Its",
     "own title reads '[not-implemented] the variant-picker half:",
     "component.variants is always empty and addVariant/updateVariant/",

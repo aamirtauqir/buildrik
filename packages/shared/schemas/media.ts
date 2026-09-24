@@ -121,6 +121,8 @@ export type RestoreAssetVersionInput = z.infer<typeof restoreAssetVersionSchema>
 
 export const generateAltTextSchema = z.object({
   assetId: z.string(),
+  /** Replace existing alt text ("Regenerate"). Omitted → existing text is kept. */
+  force: z.boolean().optional(),
 });
 
 export const generateAltTextResultSchema = z.object({

@@ -7,6 +7,7 @@
  */
 
 import { EVENTS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
 import type { CommandData, ElementType } from "../../shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
@@ -59,16 +60,19 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "undo",
       label: "Undo",
+      group: "Edit",
       run: (c) => c.history.undo(),
     },
     {
       id: "redo",
       label: "Redo",
+      group: "Edit",
       run: (c) => c.history.redo(),
     },
     {
       id: "save",
       label: "Save",
+      group: "Edit",
       shortcut: "ctrl+s",
       run: (c) => c.saveProject(),
     },
@@ -80,9 +84,11 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
          duplicate. A bare "Delete" beside page and site actions says nothing
          about what it deletes. */
       label: "Delete element",
+      group: "Edit",
       shortcut: "delete",
       shortcuts: ["delete", "backspace"],
-      run: (c) => {
+      requiresSelection: true,
+      run: (c, options) => {
         /* Was `getSelected()` — one element out of a multi-selection, and no
            transaction, so undoing a three-element delete took three presses.
            Same defect cut carried; measured live at 49 -> 48 on a
@@ -92,6 +98,13 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            label would still count it. */
         const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
+        /* Decision #17: one element deletes at once (Undo follows); more than
+           one asks first. Every door — Delete/Backspace, ⌘K — lands here, so
+           the confirm is decided here and drawn by whoever listens. */
+        if (selected.length > 1 && options?.confirmed !== true) {
+          c.emit(EVENTS.UI_REQUEST_DELETE_SELECTION, { count: selected.length });
+          return;
+        }
         c.beginTransaction("delete");
         for (const el of selected) c.elements.removeElement(el.getId());
         c.endTransaction();
@@ -100,6 +113,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "group",
       label: "Group",
+      group: "Edit",
       shortcut: "ctrl+g",
       run: (c) => {
         const ids = c.selection.getSelectedIds();
@@ -113,6 +127,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "ungroup",
       label: "Ungroup",
+      group: "Edit",
       shortcut: "ctrl+shift+g",
       run: (c) => {
         const selected = c.selection.getSelected();
@@ -126,7 +141,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "duplicate",
       label: "Duplicate",
+      group: "Edit",
       shortcut: "ctrl+d",
+      requiresSelection: true,
       run: (c) => {
         /* Pruned like copy/cut/delete. duplicateElement clones a whole subtree,
            so an ancestor AND its selected descendant produced the descendant
@@ -159,7 +176,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "copy",
       label: "Copy",
+      group: "Edit",
       shortcut: "ctrl+c",
+      requiresSelection: true,
       run: (c) => {
         const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
@@ -174,7 +193,9 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "cut",
       label: "Cut",
+      group: "Edit",
       shortcut: "ctrl+x",
+      requiresSelection: true,
       run: (c) => {
         const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
@@ -193,6 +214,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "paste",
       label: "Paste",
+      group: "Edit",
       shortcut: "ctrl+v",
       run: (c) => {
         const items = c.clipboard;
@@ -281,41 +303,57 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "nudge-up",
       label: "Nudge up",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, 0, -nudgeAmount),
     },
     {
       id: "nudge-down",
       label: "Nudge down",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, 0, nudgeAmount),
     },
     {
       id: "nudge-left",
       label: "Nudge left",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, -nudgeAmount, 0),
     },
     {
       id: "nudge-right",
       label: "Nudge right",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, nudgeAmount, 0),
     },
     {
       id: "nudge-up-large",
       label: "Nudge up (10px)",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, 0, -nudgeAmountLarge),
     },
     {
       id: "nudge-down-large",
       label: "Nudge down (10px)",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, 0, nudgeAmountLarge),
     },
     {
       id: "nudge-left-large",
       label: "Nudge left (10px)",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, -nudgeAmountLarge, 0),
     },
     {
       id: "nudge-right-large",
       label: "Nudge right (10px)",
+      group: "Edit",
+      requiresSelection: true,
       run: (c) => nudgeSelected(c, nudgeAmountLarge, 0),
     },
 
@@ -325,43 +363,34 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "bring-forward",
       label: "Bring forward",
+      group: "Edit",
       shortcut: "ctrl+]",
+      requiresSelection: true,
       run: (c) => reorderElement(c, "forward"),
     },
     {
       id: "send-backward",
       label: "Send backward",
+      group: "Edit",
       shortcut: "ctrl+[",
+      requiresSelection: true,
       run: (c) => reorderElement(c, "backward"),
     },
     {
       id: "bring-to-front",
       label: "Bring to front",
+      group: "Edit",
       shortcut: "ctrl+shift+]",
+      requiresSelection: true,
       run: (c) => reorderElement(c, "front"),
     },
     {
       id: "send-to-back",
       label: "Send to back",
+      group: "Edit",
       shortcut: "ctrl+shift+[",
+      requiresSelection: true,
       run: (c) => reorderElement(c, "back"),
-    },
-
-    // ============================================
-    // Snap to Grid
-    // ============================================
-    /* No chord. ⌘' is printed on the canvas overlay bar for the Grid overlay
-       and bound there; both listeners sit on window and both used to run, so
-       one press toggled the overlay AND flipped this setting — which resize
-       reads, and which nothing on screen shows changing. Same tie-break as
-       ⌘1–⌘4 below: the printed chord wins, the command keeps its palette row. */
-    {
-      id: "toggle-snap-to-grid",
-      label: "Toggle snap to grid",
-      run: (c) => {
-        const current = c.getState().snapToGrid;
-        c.setSnapToGrid(!current);
-      },
     },
 
     // ============================================
@@ -370,6 +399,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "select-all",
       label: "Select all",
+      group: "Selection",
       shortcut: "ctrl+a",
       /* Selected the page ROOT — one container — which is not what Select All
          means in any editor, and is not what the OTHER Select All in this app
@@ -389,6 +419,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "deselect",
       label: "Deselect",
+      group: "Selection",
       shortcut: "escape",
       run: (c) => c.selection.clear(),
     },
@@ -399,6 +430,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "preview",
       label: "Preview",
+      group: "View",
       run: (c) => {
         const html = c.exportHTML();
         const previewWindow = window.open("", "_blank");
@@ -412,11 +444,13 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "export-html",
       label: "Export HTML",
+      group: "Tools",
       run: (c) => c.exportHTML(),
     },
     {
       id: "export-json",
       label: "Export JSON",
+      group: "Tools",
       run: (c) => c.exportJSON(),
     },
 
@@ -424,62 +458,50 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // UI Toggles (emit events, UI listens)
     // ============================================
     {
-      /* No shortcut. `ctrl+shift+t` used to live here, and it won — the
-         KeybindingManager listens on window in the CAPTURE phase, so it beat
-         HistoryTab's own bubble-phase listener for the same chord and the
-         History panel was replaced by Templates. That chord is printed on the
-         Time-Travel button's label AND title, so it is a contract; Templates
-         already has its own working door (`T`) and needed no second one. */
-      id: "ui-open-templates",
-      label: "Open templates",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_TEMPLATES),
-    },
-    {
       id: "ui-open-exporter",
       label: "Open exporter",
+      group: "Panels",
       shortcut: "ctrl+shift+e",
       run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
-      id: "ui-open-ai",
-      label: "Open AI assistant",
-      shortcut: "ctrl+shift+a",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
+      /* The footer word bar's Inspector toggle lives here now (B12, G2-037),
+         beside the ✕ in the inspector header; both emit the one event the
+         shell acts on. No chord — nothing on the board prints one. */
+      id: "toggle-inspector",
+      label: "Toggle inspector",
+      group: "Panels",
+      run: () => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR),
     },
     {
-      id: "ui-toggle-component-view",
-      label: "Toggle component view",
-      shortcut: "ctrl+shift+c",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_COMPONENT_VIEW),
+      id: "ui-open-ai",
+      label: "Open AI assistant",
+      group: "Panels",
+      shortcut: "ctrl+shift+a",
+      run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
     },
 
     // ============================================
     // Zoom
     // ============================================
-    /* Also chordless, for the same reason and with a visible symptom: ⌘= and
-       ⌘- are printed beside the zoom flyout's + and − buttons, which step
-       through ZOOM_PRESETS, while these step by 10. Measured at 100%: the
-       button gave 150, the chord gave 110. CanvasFooterToolbar owns all five
-       of the flyout's printed rows (fit, selection, 100%, in, out). */
+    /* Chordless: CanvasFooterToolbar owns all five of the flyout's printed
+       rows (fit, selection, 100%, in, out). Same preset step (stepZoom). */
     {
       id: "zoom-in",
       label: "Zoom in",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current + 10);
-      },
+      group: "View",
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, 1)),
     },
     {
       id: "zoom-out",
       label: "Zoom out",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current - 10);
-      },
+      group: "View",
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, -1)),
     },
     {
       id: "zoom-reset",
       label: "Reset zoom",
+      group: "View",
       run: (c) => c.setZoom(100),
     },
 
@@ -496,22 +518,118 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "device-desktop",
       label: "Desktop view",
+      group: "View",
       run: (c) => c.setDevice("desktop"),
     },
     {
       id: "device-tablet",
       label: "Tablet view",
+      group: "View",
       run: (c) => c.setDevice("tablet"),
     },
     {
       id: "device-mobile",
       label: "Mobile view",
+      group: "View",
       run: (c) => c.setDevice("mobile"),
     },
+    /* The canvas bar dropped its W/D/T/M buttons for View ▸ Breakpoint
+       (board 5936:44788), whose list is Desktop · Tablet · Mobile; Wide stays
+       reachable here. */
     {
-      id: "device-watch",
-      label: "Watch view",
-      run: (c) => c.setDevice("watch"),
+      id: "device-wide",
+      label: "Wide view",
+      group: "View",
+      run: (c) => c.setDevice("wide"),
+    },
+
+    // ============================================
+    // Insert & Tools — merged from the canvas ⌘⇧P palette (2026-09-22)
+    // ============================================
+    /* `useCanvasCommandPalette` carried these as a second command list behind
+       a second chord. One registry now: the shell ⌘K palette reads every row
+       here, and ⌘⇧P is an alias of ⌘K (audit G1-093 / G2-038, decision #38).
+       Rows the canvas list duplicated from this registry (undo, redo,
+       duplicate, delete, select-all, deselect) or from the palette's own
+       navigation rows (open media, toggle layers, preview, browse templates,
+       open page settings) were not carried over — one door each. */
+    {
+      id: "add-text",
+      label: "Add text",
+      group: "Insert",
+      keywords: ["paragraph", "heading"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "text" }),
+    },
+    {
+      id: "add-image",
+      label: "Add image",
+      group: "Insert",
+      keywords: ["picture", "photo"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "image" }),
+    },
+    {
+      id: "add-button",
+      label: "Add button",
+      group: "Insert",
+      keywords: ["cta", "link"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "button" }),
+    },
+    {
+      id: "add-container",
+      label: "Add container",
+      group: "Insert",
+      keywords: ["div", "section", "box"],
+      run: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "container" }),
+    },
+    {
+      id: "cms-records",
+      label: "Manage CMS records",
+      group: "Tools",
+      keywords: ["cms", "content", "collection", "records", "data"],
+      run: () => composer.emit(EVENTS.CMS_MANAGE_RECORDS, {}),
+    },
+    {
+      id: "save-template",
+      label: "Save page as template",
+      group: "Tools",
+      keywords: ["template", "save", "reuse", "my templates"],
+      run: () => composer.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {}),
+    },
+    {
+      id: "replace-media",
+      label: "Replace selected media",
+      group: "Tools",
+      keywords: ["change", "swap", "image", "replace"],
+      requiresSelection: true,
+      run: (c) => {
+        const selected = c.selection.getSelected();
+        if (!selected) return;
+        c.emit("ui:media-selection-request", {
+          elementId: selected.getId(),
+          label: selected.getType() === "image" ? "Image" : "Element",
+        });
+      },
+    },
+    {
+      id: "open-analytics",
+      label: "Open analytics settings",
+      group: "Navigation",
+      keywords: ["analytics", "google", "tracking", "pixel"],
+      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }),
+    },
+    {
+      id: "open-export-settings",
+      label: "Open export settings",
+      group: "Navigation",
+      keywords: ["export", "code", "download"],
+      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }),
+    },
+    {
+      id: "open-integrations",
+      label: "Open integrations",
+      group: "Navigation",
+      keywords: ["integrations", "api", "connect", "third-party"],
+      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }),
     },
   ];
 }

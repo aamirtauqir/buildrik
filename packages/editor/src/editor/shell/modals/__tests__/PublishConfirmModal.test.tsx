@@ -92,7 +92,9 @@ describe("PublishConfirmModal — it states the real consequence", () => {
     /* Board 914:4507 names the environment with the domain: "Production ·
        bellacucina.com", not the bare host. */
     expect(screen.getByText("Production · bellacucina.com")).toBeTruthy();
-    expect(screen.getByText("Update now")).toBeTruthy();
+    // Board B3-10: one question and one verb in every state.
+    expect(screen.getByText("Publish to production?")).toBeTruthy();
+    expect(screen.getByText("Publish now")).toBeTruthy();
   });
 
   it("does not claim a live site is being replaced on a first publish", async () => {

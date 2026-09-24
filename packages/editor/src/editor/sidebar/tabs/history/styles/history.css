@@ -30,37 +30,35 @@
    and resolves off Inter's own metrics. */
 .view-switcher {
   display: flex;
+  align-items: center;
+  gap: var(--bk-space-4);
   height: var(--bk-space-40);
-  /* `border: 0 solid <colour>` then a bottom WIDTH, rather than the shorthand
-     `border-bottom: 1px solid <colour>`. Same paint, but the element's
-     border-COLOR is now the board's on all four edges — and border-top-color
-     is what a computed-style read reports, so the shorthand made this rule
-     unmeasurable (it read `var(--bk-gray-900)`, the inherited `color`). */
   border: 0 solid var(--bk-border);
-  border-bottom-width: 1px;
-  /* The board fills it bg-panel. It had no fill of its own and showed whatever
-     the host painted behind the panel. */
   background: var(--bk-bg-panel);
   padding: 0 var(--bk-space-12);
 }
 
+/* Board 4418:73791 — pill tabs: 28 tall, the active one a gray-100 pill in
+   ink, the rest muted text. No underline. Session · Saves · Published ·
+   Activity (Saves holds the board's Backups slot, owner decision). */
 .view-tab {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 11px var(--bk-space-16) 0;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  height: var(--bk-space-28);
+  padding: 0 var(--bk-space-8);
   font-size: 13px;
   line-height: normal;
   font-weight: 400;
-  /* 1657:7155 — the inactive tab is ink-MUTED (`var(--bk-gray-500)`); it was ink-soft. */
   color: var(--bk-ink-muted);
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  border-radius: var(--bk-radius-md);
   cursor: pointer;
   font-family: inherit;
-  transition: color 150ms ease-out, border-color 150ms ease-out;
+  transition: color 150ms ease-out, background-color 150ms ease-out;
 }
 
 .view-tab:hover {
@@ -68,24 +66,9 @@
 }
 
 .view-tab.active {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--bk-ink);
-  border-bottom-color: var(--bk-accent);
-}
-
-.tab-helper {
-  display: block;
-  font-size: 11px;
-  line-height: normal;
-  font-weight: 400;
-  /* NOT the board's colour, deliberately. 1657:7153/7156 paint this `var(--bk-gray-400)`
-     (gray-400), which is 2.54:1 on the panel's white — a WCAG AA failure at
-     11px, measured by the conformance run the moment it was adopted. Board
-     wins on visuals, but not into an accessibility regression: ink-muted is
-     the nearest token that clears 4.5 (4.83). Flagged for the founder in the
-     2026-09-08 conformance report; the fix is in Figma, not here. */
-  color: var(--bk-ink-muted);
-  margin-top: 0;
+  background: var(--bk-gray-100);
 }
 
 /* 1657:7162 — 53 tall, which is 8 + the 36 box + 8 + the rule. It was 46,
@@ -247,6 +230,8 @@
   background: var(--bk-gray-200);
 }
 
+/* Saves (VersionList) still bands its rows by date and badges Auto /
+   named versions; the Session list no longer uses either. */
 .date-group-header {
   padding: 10px var(--bk-space-12) var(--bk-space-4);
   font-size: 11px;
@@ -267,76 +252,6 @@
   margin-top: 0;
 }
 
-/* Board 163:48 — a 44-tall, full-bleed change row: label at x16 y6 (12/18),
-   meta under it at y25 (11/16), 3 below. It shipped as an inset 8px card with
-   8px padding and a wrapping meta line, which measured 75.6 at the 280 drawer
-   width — the board's four rows took the height of seven. The arithmetic is
-   the board's own: 2 border + 3 top + 18 label + 2 gap + 16 meta + 3 bottom. */
-.entry-row {
-  padding: 3px var(--bk-space-16);
-  border-radius: var(--bk-radius-sm);
-  cursor: pointer;
-  transition: background 150ms ease-out;
-  border: 1px solid transparent;
-  outline: none;
-}
-
-.entry-row:hover {
-  background: var(--bk-bg-subtle);
-}
-
-.entry-row.focused {
-  background: var(--bk-bg-subtle);
-  border-color: var(--bk-accent);
-  outline: 2px solid var(--bk-accent);
-  outline-offset: 1px;
-}
-
-.entry-row.current {
-  background: var(--bk-accent-tint);
-  border-color: var(--bk-alpha-accent-30);
-}
-
-.entry-row.expanded {
-  background: var(--bk-bg-subtle);
-}
-
-.entry-row-main {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--bk-space-8);
-  align-items: center;
-}
-
-.entry-label {
-  font-size: var(--bk-text-12); /* board 163:49 draws the change label 12/400 */
-  font-weight: 400;
-  color: var(--bk-ink);
-  line-height: 18px; /* 163:49 — 18, not 1.3 (15.6) */
-}
-
-/* nowrap: at the 280 drawer the meta line wrapped to a second and third row,
-   which is where 31 of the 44-vs-75 overshoot came from. Board 163:50/163:51
-   draw ONE line — who, then when. */
-.entry-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 2px;
-  flex-wrap: nowrap;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.entry-time {
-  font-family: var(--bk-font-mono);
-  font-size: 11px;
-  line-height: 16px; /* board 163:51 */
-  color: var(--bk-ink-muted);
-}
-
-/* 16 tall like every other item on the meta line — the 2px block padding made
-   the badge 19.4 and the whole row inherited it. */
 .entry-badge {
   display: inline-flex;
   align-items: center;
@@ -348,36 +263,59 @@
   font-weight: 500;
 }
 
-.entry-badge.checkpoint {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-muted);
-}
-
-.entry-badge.current-badge {
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-}
-
 .entry-badge.auto-save {
   background: var(--bk-accent-subtle);
   color: var(--bk-accent);
 }
 
-.entry-badge.grouped {
+/* Board 4418:73791 — a 44-tall, full-bleed Session row: "label · author"
+   12/18 ink at x16 y6, the time 11/16 mono muted at x(W-60) y7, one line,
+   nothing under it. (It carried a second meta line — relative time, author
+   chip, Current / Checkpoint / N-changes badges — and date bands above.) */
+.entry-row {
+  position: relative;
+  padding: 6px var(--bk-space-16) 0;
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 150ms ease-out;
+  outline: none;
+}
+
+.entry-row:hover,
+.entry-row.focused,
+.entry-row.expanded {
   background: var(--bk-bg-subtle);
-  color: var(--bk-ink-muted);
 }
 
-.expand-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  color: var(--bk-ink-muted);
-  transition: transform 150ms ease-out;
+.entry-row:focus-visible {
+  box-shadow: var(--bk-shadow-focus);
 }
 
-.expand-icon.open {
-  transform: rotate(90deg);
+.entry-label {
+  font-size: var(--bk-text-12);
+  font-weight: 400;
+  color: var(--bk-ink);
+  line-height: 18px;
+  /* stops 8 short of the time, which starts 60 from the row's right edge */
+  max-width: calc(100% - 52px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entry-row .entry-time-btn {
+  position: absolute;
+  left: calc(100% - 60px);
+  top: 7px;
+}
+
+.entry-time {
+  font-family: var(--bk-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--bk-ink-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .diff-preview {
@@ -650,121 +588,6 @@
 .fab svg {
   width: 20px;
   height: 20px;
-}
-
-.save-form {
-  margin: 0 var(--bk-space-8) var(--bk-space-8);
-  padding: var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  display: none;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  animation: slideUp 200ms ease-out;
-}
-
-.save-form.open {
-  display: flex;
-}
-
-@keyframes slideUp{
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }}
-
-.form-row {
-  display: flex;
-  gap: var(--bk-space-8);
-  align-items: flex-start;
-}
-
-.form-field {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-4);
-}
-
-.form-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--bk-ink-soft);
-}
-
-.form-input {
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-sm);
-  padding: 7px 10px;
-  font-size: 13px;
-  color: var(--bk-ink);
-  font-family: inherit;
-  transition: border-color 150ms ease-out;
-  outline: none;
-}
-
-.form-input::placeholder {
-  color: var(--bk-ink-muted);
-}
-
-.form-input:focus {
-  border-color: var(--bk-accent);
-}
-
-.form-input.error {
-  border-color: var(--bk-error);
-}
-
-.form-hint {
-  font-size: 11px;
-  color: var(--bk-ink-muted);
-  align-self: flex-end;
-}
-
-.save-btn {
-  padding: 7px var(--bk-space-16);
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  border: none;
-  border-radius: var(--bk-radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 150ms ease-out;
-  white-space: nowrap;
-}
-
-.save-btn:hover {
-  background: var(--bk-accent-hover);
-}
-
-.save-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  padding: 7px var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-soft);
-  border: none;
-  border-radius: var(--bk-radius-sm);
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 150ms ease-out;
-}
-
-.cancel-btn:hover {
-  background: var(--bk-gray-200);
-  color: var(--bk-ink);
 }
 
 /* Board 168:82: an empty diff view reads as broken, so the empty case says
@@ -1138,24 +961,6 @@
     opacity: 1;
     transform: translateX(0);
   }}
-
-.keyboard-hints {
-  display: flex;
-  gap: var(--bk-space-12);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  border-top: 1px solid var(--bk-border);
-  font-size: 11px;
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.kbd-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-}
 
 .bd-history-container kbd {
   display: inline-block;

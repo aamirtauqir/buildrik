@@ -109,14 +109,11 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
       <div className="rounded-lg border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
         <Inbox className="mx-auto h-6 w-6" style={{ color: "var(--color-text-muted)" }} />
         <p className="mt-2 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No forms on this site yet</p>
-        {/* "Add a form block in the editor to start collecting submissions"
-            sent people to do something that collects nothing: a Form block
-            exports with no action and no submit script, so a published page
-            posts nowhere. The editor's Settings → Forms screen says so; this
-            one was sending the same user the other way. */}
+        {/* Since a10f19233 the publish worker points every action-less form
+            at this site's form endpoint, so a published Form block does feed
+            this inbox. Same sentence as the editor's Settings → Forms screen. */}
         <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
-          A Form block renders on a published page, but capturing what visitors
-          send isn&rsquo;t wired up yet.
+          Publish a page with a Form block and its submissions arrive here.
         </p>
       </div>
     );
@@ -210,16 +207,12 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             empty={
               <div className="rounded-lg border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
                 <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No submissions found</p>
-                {/* "Submissions from your published site will appear here" is a
-                    promise the product does not keep: a Form block exports with
-                    no action and no submit script, so a published page posts
-                    nowhere and this endpoint is never called. The editor's own
-                    Settings → Forms screen says exactly that; these two screens
-                    were telling the user opposite things. */}
+                {/* Same sentence as the editor's Settings → Forms screen — a
+                    published Form block posts to this site's form endpoint. */}
                 <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
                   {filterFormBlockId
                     ? "Try clearing the form filter."
-                    : "Capturing submissions from a published Form block isn\u2019t wired up yet. Rows here come from anything you point at this site\u2019s form endpoint yourself."}
+                    : "Publish a page with a Form block and its submissions arrive here."}
                 </p>
               </div>
             }

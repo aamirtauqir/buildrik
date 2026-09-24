@@ -82,7 +82,6 @@ function params(): UseComposerInitParams {
     setDevice: vi.fn(),
     setZoom: vi.fn(),
     setShowExporter: vi.fn(),
-    setShowComponentView: vi.fn(),
     setIsDirty: vi.fn(),
     setSaveState: vi.fn(),
   };

@@ -2,7 +2,7 @@
 /**
  * CanvasFooterToolbar — edit + viewport group.
  *
- * Guards the Figma-contract §2 move: Undo/Redo + the device/breakpoint switcher
+ * Guards the Figma-contract §2 move: Undo/Redo (breakpoints now in View ▸ Breakpoint)
  * left the topbar and now live on this canvas toolbar. Also the anti-orphan
  * guard for the toolbar itself — before F1, StudioPanels swallowed onZoomChange/
  * onOverlayChange, so the toolbar never rendered in the studio. These specs pin
@@ -60,8 +60,8 @@ describe("CanvasFooterToolbar — edit + viewport group", () => {
     );
     expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Redo" })).toBeTruthy();
-    // BreakpointSwitcher renders a role="group" labelled "Device breakpoint"
-    expect(screen.getByRole("group", { name: "Device breakpoint" })).toBeTruthy();
+    // Board 5936:44788: breakpoints moved into View ▸ Breakpoint — no W/D/T/M here.
+    expect(screen.queryByRole("group", { name: "Device breakpoint" })).toBeNull();
   });
 
   it("Undo/Redo fire their callbacks; disabled state respects canUndo/canRedo", () => {
@@ -99,7 +99,7 @@ describe("CanvasFooterToolbar — edit + viewport group", () => {
     expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Redo" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Device breakpoint" })).toBeNull();
-    // overlay controls still render — the toolbar itself is intact
-    expect(screen.getByRole("button", { name: "Snap Guides" })).toBeTruthy();
+    // the View menu still renders — the toolbar itself is intact
+    expect(screen.getByRole("button", { name: "View" })).toBeTruthy();
   });
 });

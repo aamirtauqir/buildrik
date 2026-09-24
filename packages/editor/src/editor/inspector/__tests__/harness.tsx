@@ -71,6 +71,7 @@ export function makeMockElement(opts: MockElementOptions = {}) {
     getParent: vi.fn(() => opts.parent ?? null),
     getChildren: vi.fn(() => opts.children ?? []),
     addChild: vi.fn(),
+    getCustomData: vi.fn(() => undefined),
     getAnimation: vi.fn(() => null),
     getInteractions: vi.fn(() => []),
   };
@@ -122,6 +123,8 @@ export function makeMockComposer(opts: MockComposerOptions = {}) {
       getGlobalClasses: vi.fn(() => opts.globalClasses ?? []),
     },
     history: { push: vi.fn() },
+    commands: { run: vi.fn() },
+    isProjectLoading: vi.fn(() => false),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     on: vi.fn(),

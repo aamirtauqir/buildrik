@@ -41,7 +41,7 @@ const ErrorText: React.FC<{ message: string }> = ({ message }) => (
 );
 
 const LINK_TYPE_OPTIONS = [
-  { value: "none", label: "No Link" },
+  { value: "none", label: "None" },
   { value: "page", label: "Page" },
   { value: "url", label: "External URL" },
   { value: "email", label: "Email" },
@@ -53,6 +53,17 @@ const TARGET_OPTIONS = [
   { value: "_self", label: "Same Window" },
   { value: "_blank", label: "New Tab" },
 ];
+
+/**
+ * Element types the Link section edits. Containers joined 2026-09-24 (board
+ * 4428:141642 draws LINK on a Section): export wraps a linked container in a
+ * box-less <a> and drops the link when the container holds its own
+ * interactive content (ExportHelpers.blockLinkPlan).
+ */
+export const LINKABLE_TYPES: ReadonlySet<string> = new Set([
+  "link", "button", "a", "cta",
+  "container", "section", "card",
+]);
 
 export const LinkSection: React.FC<LinkSectionProps> = ({
   selectedElement,
@@ -74,8 +85,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [phoneError, setPhoneError] = React.useState(false);
   const [anchorError, setAnchorError] = React.useState(false);
 
-  // Only show for link/button elements
-  const isLinkable = ["link", "button", "a", "cta"].includes(selectedElement.type);
+  const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
 
   // Load pages from composer
   React.useEffect(() => {
@@ -242,8 +252,9 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
 
   return (
     <Section title="Link" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
+      {/* Board 4428:141642: "Link  [None ▾]". */}
       <SelectRow
-        label="Link Type"
+        label="Link"
         value={linkType}
         onChange={handleLinkTypeChange}
         options={LINK_TYPE_OPTIONS}

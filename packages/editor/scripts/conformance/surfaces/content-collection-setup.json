@@ -16,10 +16,6 @@
       "key": "M"
     },
     {
-      "action": "click",
-      "testId": "cms-setup-next"
-    },
-    {
       "action": "waitFor",
       "testId": "cms-add-field"
     },
@@ -47,40 +43,6 @@
       "testId": "cms-setup-steps",
       "spec": "content-collection-setup",
       "nodeId": "1173:4815"
-    },
-    {
-      "name": "step1",
-      "testId": "cms-setup-step1",
-      "spec": "content-collection-setup",
-      "nodeId": "1173:4816"
-    },
-    {
-      "name": "step1-dot",
-      "testId": "cms-setup-step1-dot"
-    },
-    {
-      "name": "step1-label",
-      "testId": "cms-setup-step1-label",
-      "spec": "content-collection-setup",
-      "nodeId": "1173:4819"
-    },
-    {
-      "name": "step2",
-      "testId": "cms-setup-step2",
-      "spec": "content-collection-setup",
-      "nodeId": "1173:4821"
-    },
-    {
-      "name": "step2-dot",
-      "testId": "cms-setup-step2-dot",
-      "spec": "content-collection-setup",
-      "nodeId": "1173:4822"
-    },
-    {
-      "name": "step2-label",
-      "testId": "cms-setup-step2-label",
-      "spec": "content-collection-setup",
-      "nodeId": "1173:4824"
     },
     {
       "name": "caption",
@@ -221,6 +183,7 @@
     "row's bg-subtle fill = 4.39 — the 39-instance token defect in",
     "docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md, specified by the board",
     "and fixable only by moving the token value in Figma. Pre-existing; the sweep",
-    "could not see it until the scope above was corrected."
+    "could not see it until the scope above was corrected.",
+    "2026-09-24 (gates): 8a031dc68 made Create Collection one modal (4418:84646) — no Next step, the step chips are a single label (cms-setup-steps, kept). The cms-setup-next step and the step1/step2 targets are dropped; the field rows are on the first screen."
   ]
 }

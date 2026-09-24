@@ -13,7 +13,11 @@
     },
     {
       "action": "click",
-      "testId": "inspector-empty-ask-ai"
+      "testId": "insert-el-Heading"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-ai-chip"
     },
     {
       "action": "waitFor",
@@ -55,8 +59,8 @@
       "testId": "ai-prompt-input"
     },
     {
-      "name": "draft-brief",
-      "testId": "ai-draft-brief"
+      "name": "create-block",
+      "testId": "ai-create-block"
     }
   ],
   "_note": [

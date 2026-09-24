@@ -8,7 +8,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={onSubmit}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
@@ -23,7 +22,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={onSubmit}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
@@ -33,42 +31,41 @@ describe("Composer", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("send button disabled when text is empty", () => {
+  it("Plan changes is disabled when text is empty", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
-    const sendBtn = screen.getByLabelText(/send/i) as HTMLButtonElement;
+    const sendBtn = screen.getByRole("button", { name: "Plan changes" }) as HTMLButtonElement;
     expect(sendBtn.disabled).toBe(true);
   });
 
-  it("send button flips to stop while streaming and calls onStop", () => {
-    const onStop = vi.fn();
-    render(
-      <Composer
-        onSubmit={vi.fn()}
-        onStop={onStop}
-        streaming={true}
-      />,
-    );
-    fireEvent.click(screen.getByLabelText(/stop/i));
-    expect(onStop).toHaveBeenCalled();
+  it("the primary reads 'Plan changes' (board 4418:104454)", () => {
+    render(<Composer onSubmit={vi.fn()} streaming={false} />);
+    expect(screen.getByRole("button", { name: "Plan changes" })).toHaveTextContent("Plan changes");
   });
 
-  it("clears textarea after submit", () => {
+  /* Board 4418:104577: while a run is live the field shows only the prompt;
+     Stop is the button under the Thinking band (AgentPlan). */
+  it("shows no button in the field while streaming", () => {
+    render(<Composer onSubmit={vi.fn()} streaming={true} />);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  /* Board 4418:106919: "Your prompt is still here". AITab remounts the
+     composer after a clean run, which is what empties it. */
+  it("keeps the prompt in the textarea after submit", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
     const ta = screen.getByPlaceholderText(/Ask AI/i) as HTMLTextAreaElement;
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
-    expect(ta.value).toBe("");
+    expect(ta.value).toBe("Hello");
   });
 });

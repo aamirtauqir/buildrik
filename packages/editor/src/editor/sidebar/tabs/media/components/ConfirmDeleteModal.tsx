@@ -6,8 +6,10 @@
  * placements and offers Replace instead when there are any. A checked set:
  * every file with its use count in one sentence, then the total. The V1
  * board 1175:4827's "Delete file?" title, 📄 name list and amber in-use alert
- * are displaced by that copy; its type-DELETE gate past 20 files stays — a
- * data-safety door the Clone never draws, code wins.
+ * are displaced by that copy. Its type-DELETE gate past 20 files is gone:
+ * decision #29 keeps typed DELETE for irreversible AND wide actions (site ·
+ * collection · record with page · token in use) — a large asset delete is a
+ * plain confirm, whose file list and placement count are the warning.
  *
  * The Clone draws no unused variant of the single confirm; "This file is not
  * used on the site." stands in for the absent placement sentence.
@@ -22,7 +24,7 @@
  * @license BSD-3-Clause
  */
 
-import { ModalBody, ModalContent, ModalRoot, Button, TextField } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_DANGER,
@@ -30,7 +32,6 @@ import {
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
-import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
 
 interface ConfirmDeleteModalProps {
@@ -42,7 +43,6 @@ interface ConfirmDeleteModalProps {
   onReplaceInstead?(key: string): void;
 }
 
-const LARGE_BULK_THRESHOLD = 20;
 /* A checked set past this is named as "a, b, c, d, e and N more": the Clone's
    one-sentence shape holds, and a 34-name paragraph does not. */
 const NAMED_FILES = 5;
@@ -56,10 +56,7 @@ function joinAnd(parts: string[]): string {
 }
 
 export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInstead }: ConfirmDeleteModalProps) {
-  const [confirmInput, setConfirmInput] = useState("");
   const { keys, names, inUse, isBulk } = payload;
-  const isLargeBulk = isBulk && keys.length > LARGE_BULK_THRESHOLD;
-  const canConfirm = !isLargeBulk || confirmInput === "DELETE";
   const countFor = (key: string) => inUse.find((u) => u.key === key)?.count ?? 0;
 
   const n = keys.length;
@@ -93,22 +90,6 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInst
             {body}
           </p>
 
-          {/* Large bulk: require typing DELETE */}
-          {isLargeBulk && (
-            <div className="tw:mt-4">
-              <p className="tw:mb-1.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-                Type <strong>DELETE</strong> to confirm:
-              </p>
-              <TextField
-                className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px]"
-                value={confirmInput}
-                onChange={(e) => setConfirmInput(e.target.value)}
-                placeholder="DELETE"
-                autoFocus
-                aria-label="Type DELETE to confirm"
-              />
-            </div>
-          )}
         </ModalBody>
 
         <div className={LIBRARY_MODAL_FOOT} data-testid="media-delete-foot">
@@ -131,24 +112,11 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInst
             className={LIBRARY_MODAL_BTN_DANGER}
             data-testid="media-delete-confirm"
             onClick={onConfirm}
-            disabled={!canConfirm}
-            aria-disabled={!canConfirm}
           >
             {confirmLabel}
           </Button>
         </div>
 
-        {/*
-          Board 1175:4827 puts the reason under the dead button. The Button
-          component's own doc makes this a rule, not a nicety: "every disabled
-          variant ships a tooltip naming the role needed — disabled without a
-          reason is a bug." Here the reason is the typing gate.
-        */}
-        {isLargeBulk && !canConfirm && (
-          <p className="tw:m-0 tw:px-4 tw:pb-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="media-delete-gate-reason">
-            Delete stays disabled until the word matches exactly.
-          </p>
-        )}
       </ModalContent>
     </ModalRoot>
   );

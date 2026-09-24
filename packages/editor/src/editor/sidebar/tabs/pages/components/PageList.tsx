@@ -26,10 +26,6 @@ interface Props {
   pages: PageItem[];
   renamingPageId: string | null;
   nameError: string | null;
-  /** Opens the whole-site listings view — board 140:10's toolbar link. */
-  onOpenListings?: () => void;
-  /** The site as a tree of routes — the only site-wide view was a flat SEO table. */
-  onOpenStructure?: () => void;
   openContextMenuPageId?: string | null;
   composer: Composer | null;
   folders: FolderItem[];
@@ -53,7 +49,7 @@ interface Props {
   onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
   onRenameStart: (id: string) => void;
-  onRenameCommit: (id: string, name: string) => void;
+  onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onRequestTemplates?: () => void;
   onFolderToggle: (folderId: string) => void;
@@ -67,8 +63,6 @@ export const PageList: React.FC<Props> = ({
   pages,
   renamingPageId,
   nameError,
-  onOpenListings,
-  onOpenStructure,
   openContextMenuPageId = null,
   composer,
   folders,
@@ -98,6 +92,22 @@ export const PageList: React.FC<Props> = ({
   onMovePageToFolder,
   onRemovePageFromFolder,
 }) => {
+  /* A drop lands BEFORE or AFTER the row it is on. The engine only knows
+     "after <id>", so before-X is after X's predecessor in site order (or
+     first, when X is the first page). */
+  const onReorder = React.useCallback(
+    (draggedId: string, targetId: string, position: "before" | "after") => {
+      if (!composer) return;
+      if (position === "after") {
+        composer.elements.reorderPage(draggedId, targetId);
+        return;
+      }
+      const order = composer.elements.getAllPages().map((p) => p.id).filter((id) => id !== draggedId);
+      const at = order.indexOf(targetId);
+      composer.elements.reorderPage(draggedId, at > 0 ? order[at - 1] : null);
+    },
+    [composer]
+  );
   const [search, setSearch] = React.useState("");
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -164,8 +174,9 @@ export const PageList: React.FC<Props> = ({
   return (
     <div className="bd-pg-list-shell">
       {/* Board 140:7: 36h band with a bare 28h search box (no magnifier,
-          no inline clear) plus the Listings text link on the right. Always
-          visible - the old 5-page gate is gone. */}
+          no inline clear). Always visible - the old 5-page gate is gone. The
+          Listings / Structure links that sat on its right moved under the
+          header ⋯ menu (board 7069:79383, audit G2-070). */}
       <div className="bd-pg-search-wrap" data-testid="pages-search-band">
         <div className="bd-pg-search" data-testid="pages-search-box">
           <TextInput
@@ -180,28 +191,6 @@ export const PageList: React.FC<Props> = ({
             aria-label="Search pages"
           />
         </div>
-        {onOpenListings && (
-          <Button
-            color="light"
-            size="xs"
-            className="bd-pg-listings-link"
-            data-testid="pages-open-listings"
-            onClick={onOpenListings}
-          >
-            {"\u229E"} Listings
-          </Button>
-        )}
-        {onOpenStructure && (
-          <Button
-            color="light"
-            size="xs"
-            className="bd-pg-listings-link"
-            data-testid="pages-open-structure"
-            onClick={onOpenStructure}
-          >
-            {"\u2442"} Structure
-          </Button>
-        )}
       </div>
       {showSelectAll && (
         <div
@@ -327,15 +316,13 @@ export const PageList: React.FC<Props> = ({
                   nameError={renamingPageId === page.id ? nameError : null}
                   isContextMenuOpen={openContextMenuPageId === page.id}
                   draggable
-                  onReorderDrop={(draggedId) =>
-                    composer?.elements.reorderPage(draggedId, page.id)
-                  }
+                  onReorderDrop={(draggedId, position) => onReorder(draggedId, page.id, position)}
                   isSelected={selectedIds.has(page.id)}
                   isDirty={dirtyPages?.has(page.id) ?? false}
                   onSelect={() => onSelectPage(page.id)}
                   onToggleSelect={(e) => onToggleSelect(page.id, e)}
                   onRenameStart={() => onRenameStart(page.id)}
-                  onRenameCommit={(name) => onRenameCommit(page.id, name)}
+                  onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
                   searchContext={

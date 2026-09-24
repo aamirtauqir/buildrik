@@ -1,7 +1,8 @@
 /**
- * PageTabBar.test.tsx — rename flow with validation (F2 / Enter / Escape),
- * delete guards (home page + last page), set-home action, and the 8-second
- * post-delete undo window carried by the toast.
+ * PageTabBar.test.tsx — tabs only switch (owner decision 14, 2026-09-21):
+ * click / Enter / Space switch the page; right-click, ⇧F10 and F2 do
+ * nothing here — rename, duplicate, homepage and delete live in the Pages
+ * panel's row menu. Plus the + button and pages that arrive after mount.
  *
  * @license BSD-3-Clause
  */
@@ -49,29 +50,11 @@ function makeComposer(initialPages: PageData[]) {
       pages = [...pages, makePage({ id: `p-${pages.length + 1}-new`, name })];
       emit(EVENTS.PROJECT_CHANGED, { type: "page:created" });
     }),
-    /* The engine's duplicate deep-clones the source and names the copy itself.
-       The tab bar must call THIS, not createPage — createPage produces an empty
-       page wearing the copy's name. */
-    duplicatePage: vi.fn((id: string) => {
-      const source = pages.find((p) => p.id === id);
-      if (!source) return null;
-      const copy = makePage({
-        id: `p-${pages.length + 1}-copy`,
-        name: `${source.name} Copy`,
-        root: source.root,
-      });
-      pages = [...pages, copy];
-      emit(EVENTS.PROJECT_CHANGED, { type: "page:created" });
-      return copy;
-    }),
-    updatePage: vi.fn((id: string, patch: Partial<PageData>) => {
-      pages = pages.map((p) => (p.id === id ? { ...p, ...patch } : p));
-      emit(EVENTS.PROJECT_CHANGED, { type: "page:updated" });
-    }),
-    deletePage: vi.fn((id: string) => {
-      pages = pages.filter((p) => p.id !== id);
-      emit(EVENTS.PROJECT_CHANGED, { type: "page:deleted" });
-    }),
+    /* None of these belong to the bar any more (decision 14); a call to
+       any of them is the regression this file guards against. */
+    duplicatePage: vi.fn(),
+    updatePage: vi.fn(),
+    deletePage: vi.fn(),
     setHomePage: vi.fn(),
   };
   const composer = {
@@ -82,6 +65,7 @@ function makeComposer(initialPages: PageData[]) {
     off: (ev: string, fn: EventHandler) => {
       handlers.get(ev)?.delete(fn);
     },
+    emit: vi.fn(emit),
     history: { undo: vi.fn() },
     elements,
   };
@@ -120,16 +104,15 @@ describe("PageTabBar", () => {
     expect(screen.getByRole("tab", { name: "About" })).toBeInTheDocument();
   });
 
-  /* Board 435:2348: the active tab's white surface reaches the bar's own
-     bottom edge — the row wraps its bottom padding into a per-tab margin
-     instead, so only the (invisible) resting tabs carry the 4px gap. */
-  it("keeps the active tab flush with the bar bottom (board 435:2348)", () => {
+  /* Board 4418:123573 (parity V1 #5): the active page is a gray-100 chip,
+     resting pages are plain text — no browser-tab surface, no ⌂ glyph. */
+  it("marks the active page as a chip, with no home glyph", () => {
     const { composer } = makeComposer(TWO_PAGES);
     renderBar(composer);
-    const row = screen.getByRole("tablist").parentElement;
-    expect(row?.className).not.toMatch(/tw:pb-1\b/);
-    expect(screen.getByRole("tab", { name: "Home, Homepage" }).className).not.toMatch(/tw:mb-1\b/);
-    expect(screen.getByRole("tab", { name: "About" }).className).toMatch(/tw:mb-1\b/);
+    const active = screen.getByRole("tab", { name: /^Home/ });
+    expect(active.className).toContain("tw:bg-[var(--bk-gray-100)]");
+    expect(screen.getByRole("tab", { name: /^About/ }).className).toContain("tw:bg-transparent");
+    expect(screen.queryByTestId("page-tab-home-p-1")).toBeNull();
   });
 
   it("renders nothing without a composer", () => {
@@ -141,209 +124,66 @@ describe("PageTabBar", () => {
     expect(container.querySelectorAll('[role="tab"]')).toHaveLength(0);
   });
 
-  // ── rename flow ────────────────────────────────────────────────────────────
-  describe("rename flow", () => {
-    it("F2 on a tab starts rename with the current name prefilled", () => {
+  // ── tabs only switch (decision 14) ─────────────────────────────────────────
+  describe("tabs only switch", () => {
+    it("click, Enter and Space switch the active page", () => {
+      const { composer, elements } = makeComposer(TWO_PAGES);
+      renderBar(composer);
+      /* Names carry ", unsaved changes" once the mock's PROJECT_CHANGED has
+         marked the pages dirty — match the head. */
+      fireEvent.click(screen.getByRole("tab", { name: /^About/ }));
+      expect(elements.setActivePage).toHaveBeenLastCalledWith("p-2");
+      fireEvent.keyDown(screen.getByRole("tab", { name: /^Home/ }), { key: "Enter" });
+      expect(elements.setActivePage).toHaveBeenLastCalledWith("p-1");
+      fireEvent.keyDown(screen.getByRole("tab", { name: /^About/ }), { key: " " });
+      expect(elements.setActivePage).toHaveBeenLastCalledWith("p-2");
+    });
+
+    it("right-click and ⇧F10 open no menu — the row menu lives in the Pages panel", () => {
       const { composer } = makeComposer(TWO_PAGES);
       renderBar(composer);
-      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      expect(screen.getByDisplayValue("About")).toBeInTheDocument();
+      fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
+      expect(screen.queryByRole("menu")).toBeNull();
+      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F10", shiftKey: true });
+      expect(screen.queryByRole("menu")).toBeNull();
+      expect(screen.queryByRole("menuitem")).toBeNull();
     });
 
-    it("Enter commits a valid rename", () => {
+    it("F2 starts no inline rename; the name stays a label", () => {
       const { composer, elements } = makeComposer(TWO_PAGES);
       renderBar(composer);
       fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      const input = screen.getByDisplayValue("About");
-      fireEvent.change(input, { target: { value: "Landing Page" } });
-      fireEvent.keyDown(input, { key: "Enter" });
-      expect(elements.updatePage).toHaveBeenCalledWith("p-2", { name: "Landing Page" });
-      expect(screen.queryByDisplayValue("Landing Page")).toBeNull(); // edit mode exited
-    });
-
-    it("empty name shows the validation error and Enter does NOT commit", () => {
-      const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      const input = screen.getByDisplayValue("About");
-      fireEvent.change(input, { target: { value: "   " } });
-      expect(screen.getByRole("alert")).toHaveTextContent("Page name is required");
-      expect(input).toHaveAttribute("aria-invalid", "true");
-      fireEvent.keyDown(input, { key: "Enter" });
+      expect(screen.queryByRole("textbox")).toBeNull();
+      expect(screen.getByTestId("page-tab-name-p-2")).toHaveTextContent("About");
       expect(elements.updatePage).not.toHaveBeenCalled();
-      expect(screen.getByRole("alert")).toBeInTheDocument(); // still editing
     });
 
-    it("short names warn but still commit on Enter", () => {
+    it("never duplicates, deletes or re-homes a page from here", () => {
       const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      const input = screen.getByDisplayValue("About");
-      fireEvent.change(input, { target: { value: "Hi" } });
-      expect(screen.getByText("Short name — consider 3+ characters")).toBeInTheDocument();
-      fireEvent.keyDown(input, { key: "Enter" });
-      expect(elements.updatePage).toHaveBeenCalledWith("p-2", { name: "Hi" });
-    });
-
-    it("shows the slug preview derived from the name", () => {
-      const { composer } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      fireEvent.change(screen.getByDisplayValue("About"), {
-        target: { value: "Our Team!" },
-      });
-      expect(screen.getByText("/our-team")).toBeInTheDocument();
-    });
-
-    it("Escape cancels the rename without committing", () => {
-      const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "F2" });
-      const input = screen.getByDisplayValue("About");
-      fireEvent.change(input, { target: { value: "Something else" } });
-      fireEvent.keyDown(input, { key: "Escape" });
-      expect(elements.updatePage).not.toHaveBeenCalled();
-      expect(screen.queryByDisplayValue("Something else")).toBeNull();
-      expect(screen.getByRole("tab", { name: "About" })).toBeInTheDocument();
-    });
-
-    it("rename is also reachable from the context menu", () => {
-      const { composer } = makeComposer(TWO_PAGES);
       renderBar(composer);
       fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Rename/ }));
-      expect(screen.getByDisplayValue("About")).toBeInTheDocument();
-    });
-  });
-
-  // ── delete guards ──────────────────────────────────────────────────────────
-  describe("delete guards", () => {
-    it("home page cannot be deleted — warns via toast instead of confirming", () => {
-      const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.contextMenu(screen.getByRole("tab", { name: "Home, Homepage" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
-      expect(
-        screen.getByText("Set another page as Homepage before deleting this one.")
-      ).toBeInTheDocument();
+      fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "Delete" });
+      expect(elements.duplicatePage).not.toHaveBeenCalled();
       expect(elements.deletePage).not.toHaveBeenCalled();
-      // No confirm dialog opened.
-      expect(screen.queryByText(/All content on this page will be permanently removed/)).toBeNull();
-    });
-
-    it("last page cannot be deleted — the Delete item is absent from the menu", () => {
-      const { composer } = makeComposer([makePage({ id: "p-1", name: "Only", isHome: false })]);
-      renderBar(composer);
-      fireEvent.contextMenu(screen.getByRole("tab", { name: "Only" }));
-      expect(screen.getByRole("menu")).toBeInTheDocument();
-      expect(screen.queryByRole("menuitem", { name: /Delete/ })).toBeNull();
-    });
-
-    it("non-home page delete goes through the confirm dialog", () => {
-      const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
-      expect(elements.deletePage).not.toHaveBeenCalled(); // not before confirm
-      expect(screen.getByText('Delete "About"?')).toBeInTheDocument();
-      fireEvent.click(screen.getByRole("button", { name: "Delete page" }));
-      expect(elements.deletePage).toHaveBeenCalledWith("p-2");
-      expect(screen.queryByRole("tab", { name: "About" })).toBeNull();
-    });
-
-    it("cancelling the confirm dialog keeps the page", () => {
-      const { composer, elements } = makeComposer(TWO_PAGES);
-      renderBar(composer);
-      fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
-      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-      expect(elements.deletePage).not.toHaveBeenCalled();
-      expect(screen.getByRole("tab", { name: "About" })).toBeInTheDocument();
+      expect(elements.setHomePage).not.toHaveBeenCalled();
     });
   });
 
-  // ── set-home ───────────────────────────────────────────────────────────────
-  it("'Set as home' calls composer.elements.setHomePage", () => {
-    const { composer, elements } = makeComposer(TWO_PAGES);
+  /* Board 4418:123573 draws no "+" on the strip; Add page is the Pages
+     panel's door (decision #19). */
+  it("draws no add button", () => {
+    const { composer } = makeComposer(TWO_PAGES);
     renderBar(composer);
-    fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Set as home/ }));
-    expect(elements.setHomePage).toHaveBeenCalledWith("p-2");
+    expect(screen.queryByRole("button", { name: "Add new page" })).toBeNull();
   });
 
-  // ── other actions ──────────────────────────────────────────────────────────
-  /* This test used to assert `createPage("About Copy")` — it pinned the bug.
-     createPage makes an EMPTY page with that name; measured live, a Home page
-     with four blocks duplicated to a canvas holding one node. Duplicate has to
-     go through the engine's deep clone. */
-  it("'Duplicate' deep-clones the source page, it does not create an empty one", () => {
-    const { composer, elements } = makeComposer(TWO_PAGES);
-    renderBar(composer);
-    fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
-    expect(elements.duplicatePage).toHaveBeenCalledWith("p-2");
-    expect(elements.createPage).not.toHaveBeenCalled();
-  });
-
-  it("warns instead of failing silently when the source page is gone", () => {
-    const { composer, elements } = makeComposer(TWO_PAGES);
-    elements.duplicatePage.mockReturnValueOnce(null);
-    renderBar(composer);
-    fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
-    expect(elements.duplicatePage).toHaveBeenCalledWith("p-2");
-  });
-
-  it("'+' adds a page with the smart default name", () => {
-    const { composer, elements } = makeComposer(TWO_PAGES);
-    renderBar(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Add new page" }));
-    expect(elements.createPage).toHaveBeenCalledWith("Page 3");
-  });
-
-  // ── 8-second undo window ───────────────────────────────────────────────────
-  describe("8-second undo window after delete", () => {
-    function deleteAboutPage(composer: Composer) {
-      renderBar(composer);
-      fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
-      fireEvent.click(screen.getByRole("button", { name: "Delete page" }));
-    }
-
-    it("the delete toast exposes an Undo action that restores via history.undo", () => {
-      const { composer, history } = makeComposer(TWO_PAGES);
-      deleteAboutPage(composer);
-      expect(screen.getByText('"About" deleted')).toBeInTheDocument();
-      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
-      expect(history.undo).toHaveBeenCalledTimes(1);
-    });
-
-    it("after 8 seconds the toast (and its Undo) expires — delete is final", () => {
-      vi.useFakeTimers();
-      const { composer, history } = makeComposer(TWO_PAGES);
-      deleteAboutPage(composer);
-      expect(screen.getByText('"About" deleted')).toBeInTheDocument();
-      // Just before the window closes, Undo is still available.
-      act(() => {
-        vi.advanceTimersByTime(7900);
-      });
-      expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
-      // Past the 8000ms duration the toast auto-dismisses.
-      act(() => {
-        vi.advanceTimersByTime(300);
-      });
-      expect(screen.queryByText('"About" deleted')).toBeNull();
-      expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
-      expect(history.undo).not.toHaveBeenCalled();
-    });
-  });
 });
 
 /* The bar mounts against an empty project and the pages arrive after: the
    project load emits PROJECT_LOADED, which this component did not listen for,
    so a plain page load produced NO tab bar at all — it appeared only once some
-   unrelated edit happened to fire PROJECT_CHANGED. Board 435:2348 draws the
-   bar at the canvas foot on every load. */
+   unrelated edit happened to fire PROJECT_CHANGED. The board draws the bar
+   on every load. */
 describe("PageTabBar — pages that arrive after mount", () => {
   it("renders once the project finishes loading", async () => {
     const { composer, loadPages } = makeComposer([]);

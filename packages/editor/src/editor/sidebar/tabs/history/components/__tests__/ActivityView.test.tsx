@@ -83,66 +83,14 @@ describe("ActivityView — non-happy states", () => {
   });
 });
 
-describe("ActivityView — clear-history confirm FSM", () => {
-  it("hides the Clear control entirely when no handler is supplied", () => {
-    setHistory([entry()], false);
+describe("ActivityView — board 4418:73791 draws no header band", () => {
+  it("has no Undo History / Clear / Time-Travel controls (they live in the History ⋯)", () => {
     renderView();
-    expect(screen.queryByRole("button", { name: /clear/i })).toBeNull();
-  });
-
-  it("disables Clear when there is nothing to clear", () => {
-    setHistory([entry()], false);
-    renderView({ onClearHistory: vi.fn(), canClear: false } as never);
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeDisabled();
-  });
-
-  it("Clear → confirm reveals Clear-all + Cancel; Clear-all fires the handler", () => {
-    const onClearHistory = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onClearHistory, canClear: true } as never);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear undo history" }));
-    expect(screen.getByRole("button", { name: "Confirm clear history" })).toBeInTheDocument();
-    expect(onClearHistory).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Confirm clear history" }));
-    expect(onClearHistory).toHaveBeenCalledTimes(1);
-    // Returns to the idle Clear button.
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeInTheDocument();
-  });
-
-  it("Cancel backs out of the confirm state without clearing", () => {
-    const onClearHistory = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onClearHistory, canClear: true } as never);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear undo history" }));
-    fireEvent.click(screen.getByRole("button", { name: "Cancel clear" }));
-    expect(onClearHistory).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeInTheDocument();
+    expect(screen.queryByText("Undo History")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Clear undo history|Time-Travel/ })).toBeNull();
   });
 });
 
-describe("ActivityView — time-travel trigger", () => {
-  it("renders and fires the Time-Travel button when a handler is provided", () => {
-    const onOpenTimeTravel = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onOpenTimeTravel } as never);
-    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/i }));
-    expect(onOpenTimeTravel).toHaveBeenCalledTimes(1);
-  });
-});
-
-/* The header comment above says the react-window body "needs a measured height
-   (always 0 under jsdom)" — and that gap hid a real defect for the whole life
-   of this panel. The height was measured in a mount-time `useLayoutEffect`
-   with `[]` deps, which ran while the component was still rendering its
-   loading skeleton: the ref'd scroll host does not exist in that branch, the
-   effect returned early, and it never ran again. `measuredHeight` stayed 0, so
-   `{measuredHeight > 0 && <VariableSizeList/>}` rendered nothing at all.
-   Measured live with three real undo entries: History → All changes drew its
-   header over an empty 430px box — no rows, and not the empty state either.
-   These tests stub the two things jsdom lacks, so the branch is covered. */
 /* jsdom reports 0 for every clientHeight, and the virtualized body only renders
    when it measures a non-zero host — so any test that needs real rows has to
    stub it. Shared by the mount test below and the restore-confirm tests. */
@@ -158,6 +106,7 @@ const withHeight = (px: number) => {
     if (original) Object.defineProperty(HTMLElement.prototype, "clientHeight", original);
   };
 };
+
 
 describe("ActivityView — the list body actually mounts", () => {
   it("renders rows after loading finishes, not an empty box", () => {
@@ -247,6 +196,53 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       const label = container.querySelector(".entry-time-btn")?.getAttribute("aria-label") ?? "";
       expect(label).not.toMatch(/jump/i);
       expect(label).toMatch(/restore/i);
+    } finally {
+      restore();
+    }
+  });
+});
+
+/* Board 4418:73791 — the Session list is plain 44-tall rows: "label · author"
+   at the left, the time in mono at the right. No date bands, no badges, no
+   relative time, no keyboard-hint footer. The row still expands to its diff
+   and the time is still the (confirmed) restore. */
+describe("ActivityView — Session rows are board 4418:73791", () => {
+  it("draws label · author and the time, with none of the old row furniture", () => {
+    const restore = withHeight(400);
+    try {
+      setHistory([
+        entry({ id: "h2", label: "Hero copy edited", userId: "cmpa9ohx10000wrjux4ecumzo", timestamp: 1_700_000_100_000 }),
+        entry({ id: "h1", label: "Move heading" }),
+      ]);
+      const view = renderView();
+      expect(screen.getByTestId("history-change-label-0").textContent).toBe("Hero copy edited · You");
+      // the first row is not drawn highlighted before anything picks it
+      expect(screen.getByTestId("history-change-0").className).not.toMatch(/focused/);
+      expect(screen.getByTestId("history-change-label-1").textContent).toBe("Move heading");
+      expect(screen.getByTestId("history-change-time-0").textContent).toMatch(/\d{1,2}:\d{2}/);
+      expect(view.container.querySelector(".date-group-header")).toBeNull();
+      expect(view.container.querySelector(".keyboard-hints")).toBeNull();
+      expect(view.container.querySelector(".entry-badge")).toBeNull();
+      expect(screen.queryByText("Current")).toBeNull();
+      expect(screen.queryByText(/ago$|Just now/)).toBeNull();
+    } finally {
+      restore();
+    }
+  });
+
+  it("still expands a row to its changes", () => {
+    const restore = withHeight(400);
+    try {
+      setHistory([
+        entry({
+          id: "h1",
+          label: "Restyle",
+          changes: [{ property: "color", operation: "replace", type: "style", description: "color" }] as never,
+        }),
+      ]);
+      renderView();
+      fireEvent.click(screen.getByTestId("history-change-0"));
+      expect(screen.getByRole("region", { name: "Changes detail" })).toBeInTheDocument();
     } finally {
       restore();
     }

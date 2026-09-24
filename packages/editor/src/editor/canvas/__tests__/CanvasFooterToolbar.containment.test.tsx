@@ -52,13 +52,13 @@ beforeAll(() => {
   }
 });
 
-const CONTAINMENT = ["tw:max-w-full", "tw:min-w-0", "tw:flex-wrap"];
+const CONTAINMENT = ["tw:max-w-full", "tw:min-w-0"];
 
 function pill(): HTMLElement {
   render();
   // the bar is the toggle's nearest ancestor carrying the containment
   // utilities — the toggle itself has radius+padding but never these
-  let n: HTMLElement | null = screen.getByRole("button", { name: "Snap Guides" });
+  let n: HTMLElement | null = screen.getByTestId("canvas-view-menu-trigger");
   while (n && !CONTAINMENT.every((c) => n!.classList.contains(c))) n = n.parentElement;
   if (!n) throw new Error("toolbar container not found");
   return n;
@@ -91,10 +91,12 @@ describe("canvas toolbar containment", () => {
     expect([...bar.classList].some((c) => /^tw:overflow-x?-(auto|hidden|scroll)$/.test(c))).toBe(false);
   });
 
-  it("keeps one row when the controls fit — the height boards draw is 40px", () => {
+  /* Board 5936:44788: one 44-tall row. The controls are four; the readout
+     at the right truncates (full text on hover) rather than wrap or hide. */
+  it("is one 44px row — the height the board draws", () => {
     const bar = pill();
-    expect(bar.classList.contains("tw:min-h-10")).toBe(true);
-    expect(bar.classList.contains("tw:h-10")).toBe(false);
+    expect(bar.classList.contains("tw:h-[var(--bk-size-header)]")).toBe(true);
+    expect(bar.classList.contains("tw:flex-wrap")).toBe(false);
   });
 
   /* Overflow that cannot be scrolled to is the same as deleted. A centred

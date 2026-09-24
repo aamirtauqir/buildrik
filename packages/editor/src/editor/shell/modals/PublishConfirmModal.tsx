@@ -1,5 +1,9 @@
 /**
- * PublishConfirmModal — step 3 of the publish flow (Figma "Publish · Confirm").
+ * PublishConfirmModal — board B3-10 `7574:193972` ("Publish to production?"):
+ * the ONE facts confirm both publish doors open (code-gap B4, decision #34 —
+ * the topbar CTA and the Publish panel's CTA route here through the shell's
+ * `requestPublish`). The panel's own two-step wizard, whose second step
+ * duplicated this dialog, is gone.
  *
  * Publishing replaces the live site for every visitor and there was no confirm
  * on the normal path: clicking Publish exported and deployed immediately. The
@@ -15,7 +19,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { PublishConfirmFacts, warningsLine } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
 
@@ -56,8 +60,16 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <ModalContent size="question" srTitle="Confirm publish">
-        <ModalTitle>{isPublished ? "Update the live site?" : "Publish this site?"}</ModalTitle>
+      {/* Board 7574:193972 (parity V1 #6): 480 wide, a ✕, the title at 16. */}
+      <ModalContent size="confirm" srTitle="Confirm publish" data-testid="publish-confirm">
+        {/* Board B3-10 asks one question in every state — the Target row is
+            what says "replaces live v6". */}
+        <ModalTitle className="tw:text-[length:var(--bk-text-16)]">Publish to production?</ModalTitle>
+        <ModalClose label="Close" data-testid="publish-confirm-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
 
         {/* The four rows live in PublishConfirmFacts — the wizard's Confirm
             step renders the same component, so the two entry points into board
@@ -114,7 +126,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
               void Promise.resolve(onConfirm()).finally(() => setSubmitting(false));
             }}
           >
-            {submitting ? "Publishing…" : isPublished ? "Update now" : "Publish now"}
+            {submitting ? "Publishing…" : "Publish now"}
           </Button>
         </ModalFooter>
       </ModalContent>

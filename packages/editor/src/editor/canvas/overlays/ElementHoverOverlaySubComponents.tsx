@@ -211,11 +211,6 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
           🔗
         </span>
       )}
-      {info.hasCMSBinding && (
-        <span className="tw:text-xs" title="CMS bound">
-          📊
-        </span>
-      )}
       {info.isFlexContainer && (
         <span className={BADGE_TAG}>flex{info.flexDirection === "column" ? "↓" : "→"}</span>
       )}

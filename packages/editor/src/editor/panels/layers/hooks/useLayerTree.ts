@@ -15,7 +15,8 @@ import type { Composer } from "../../../../engine";
 import type { Element } from "../../../../engine/elements/Element";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
-import { loadSetFromStorage, saveSetToStorage } from "./layersPersistence";
+import { getLayerPreview } from "../data/layerUtils";
+import { hasStoredSet, loadSetFromStorage, saveSetToStorage } from "./layersPersistence";
 
 export interface UseLayerTreeReturn {
   layers: LayerItem[];
@@ -38,6 +39,10 @@ export function useLayerTree(
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
   const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
   const isHydrated = React.useRef(false);
+  /* A page's first visit (nothing stored) opens like board 4418:81300: the
+     first top-level layer down to depth 3, everything else closed. Seeded
+     once the tree for that page exists. */
+  const seedDefaultRef = React.useRef(false);
   const treeContainerRef = React.useRef<HTMLDivElement>(null);
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousPageIdRef = React.useRef<string | null>(null);
@@ -49,6 +54,7 @@ export function useLayerTree(
      look like it had state. The `rootId` argument went with it. */
   const hydrateExpandedFromStorage = React.useCallback((pageId: string) => {
     setExpandedIds(loadSetFromStorage(pageId, "expanded"));
+    seedDefaultRef.current = !hasStoredSet(pageId, "expanded");
   }, []);
 
   const buildLayersFromEngine = React.useCallback(() => {
@@ -67,26 +73,12 @@ export function useLayerTree(
       return;
     }
 
-    /* Text-ish layers carry the first words of their own copy — see
-       LayerItem.preview. Only these types: a container's "content" is its
-       children's text concatenated, which would make every wrapper row read
-       like the page. Tags stripped, because content can hold inline HTML. */
-    const PREVIEWABLE = new Set([
-      "text", "heading", "paragraph", "button", "link", "label", "quote", "list-item",
-    ]);
-    const previewOf = (element: Element): string | undefined => {
-      if (!PREVIEWABLE.has(element.getType())) return undefined;
-      const raw = (element.getContent?.() ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-      if (!raw) return undefined;
-      return raw.length > 32 ? `${raw.slice(0, 32)}…` : raw;
-    };
-
     const buildTree = (element: Element, depth = 0): LayerItem => ({
       id: element.getId(),
       type: element.getType() || "element",
       tagName: (element.getTagName() || "div").toLowerCase(),
       depth,
-      preview: previewOf(element),
+      preview: getLayerPreview(element),
       children: element.getChildren().map((child: Element) => buildTree(child, depth + 1)),
     });
 
@@ -152,6 +144,19 @@ export function useLayerTree(
       events.forEach((e) => composer.off(e, handler));
     };
   }, [composer, buildLayersFromEngine]);
+
+  React.useEffect(() => {
+    if (!seedDefaultRef.current || layers.length === 0) return;
+    seedDefaultRef.current = false;
+    const open = new Set<string>();
+    const walk = (item: LayerItem) => {
+      if (item.children.length === 0 || item.depth > 2) return;
+      open.add(item.id);
+      item.children.forEach(walk);
+    };
+    walk(layers[0]);
+    setExpandedIds(open);
+  }, [layers]);
 
   // Persist expanded state to localStorage
   React.useEffect(() => {

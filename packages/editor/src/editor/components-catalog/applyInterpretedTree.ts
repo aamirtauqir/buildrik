@@ -15,6 +15,7 @@
  */
 
 import type { Composer } from "@/engine";
+import { resolvePlacement } from "@/engine/elements/manager/placement";
 import type { ElementType } from "@/shared/types/element";
 import type { InterpretedElement, InterpretedNode } from "./schemaInterpreter";
 
@@ -89,7 +90,10 @@ function applyElementShape(
     attributes: node.attrs,
   } as Parameters<typeof composer.elements.createElement>[1]);
 
-  parent.addChild(element, index);
+  // Same nesting rule as every other structural write: a child the parent
+  // may not hold lands after it, where the browser would render it.
+  const place = resolvePlacement(element, parent, index) ?? { parent, index };
+  place.parent.addChild(element, place.index);
 
   for (const child of node.children) {
     applyNode(composer, element.getId(), child);

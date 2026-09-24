@@ -1,6 +1,14 @@
 /**
  * useLayerContextActions - Handles actions dispatched from the right-click context menu.
  * Bridges LayerContextMenu → useLayerActions / useLayerSelection / useLayerTree.
+ *
+ * With the clicked row inside a multi-selection (board 6881:71323), cut / copy
+ * / duplicate / delete act on the WHOLE selection through the engine's own
+ * commands — `composer.selection` is the single source of truth the tree
+ * mirrors, and the registry commands prune to top-most elements and wrap one
+ * transaction (defaultCommands.ts). Delete of N > 1 asks first (board
+ * 6887:78291), which is the panel's dialog: `requestDeleteSelection`.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -9,20 +17,36 @@ import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
 import { useToast } from "@/editor/chrome-ui";
 
-export function useLayerContextActions(state: UseLayersStateReturn) {
+export interface LayerContextActionOptions {
+  /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
+  requestDeleteSelection: () => void;
+  /** "Move to page…" — open the page picker (board 4418:82847) for these ids. */
+  requestMoveToPage: (ids: string[]) => void;
+}
+
+export function useLayerContextActions(
+  state: UseLayersStateReturn,
+  { requestDeleteSelection, requestMoveToPage }: LayerContextActionOptions,
+) {
   const { composer, actionsHook, treeHook, selectionHook } = state;
   const { addToast } = useToast();
   return React.useCallback(
     (action: LayerAction, nodeId: string) => {
       const syntheticEvent = { stopPropagation: () => {} } as unknown as React.MouseEvent;
+      /* The clicked row is one of two or more selected rows: the menu was the
+         selection's, so the action is too. */
+      const multi = selectionHook.selectedIds.size >= 2 && selectionHook.selectedIds.has(nodeId);
       switch (action) {
         // Board 1082:4527 Cut/Copy/Paste — the same composer.clipboard
         // contract the canvas ⌘X/⌘C/⌘V path uses (useCanvasKeyboard).
         case "copy": {
-          if (composer) {
-            const data = composer.elements.serializeElement(nodeId);
-            composer.clipboard = data ? [data] : null;
+          if (!composer) break;
+          if (multi) {
+            composer.commands.run("copy");
+            break;
           }
+          const data = composer.elements.serializeElement(nodeId);
+          composer.clipboard = data ? [data] : null;
           break;
         }
         case "copyLink": {
@@ -43,6 +67,10 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         }
         case "cut": {
           if (!composer) break;
+          if (multi) {
+            composer.commands.run("cut");
+            break;
+          }
           const cutData = composer.elements.serializeElement(nodeId);
           composer.clipboard = cutData ? [cutData] : null;
           actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
@@ -73,7 +101,8 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           break;
         }
         case "duplicate":
-          actionsHook.duplicateLayer(nodeId);
+          if (multi) composer?.commands.run("duplicate");
+          else actionsHook.duplicateLayer(nodeId);
           break;
         case "hide":
         case "show":
@@ -83,9 +112,25 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         case "unlock":
           actionsHook.toggleLock(nodeId, syntheticEvent);
           break;
-        case "delete":
+        case "delete": {
+          /* Decision #17: a Layers delete is instant, with the same Undo toast
+             the canvas gives — never a confirm for one row. Two or more ask
+             first. */
+          if (multi) {
+            requestDeleteSelection();
+            break;
+          }
+          const node = findById(treeHook.layers, nodeId);
+          const type = actionsHook.customNames.get(nodeId) ?? node?.type ?? "Element";
+          const label = type.charAt(0).toUpperCase() + type.slice(1);
           actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
+          addToast({
+            description: `${label} deleted`,
+            tone: "info",
+            action: { label: "Undo", onClick: () => composer?.history.undo() },
+          });
           break;
+        }
         case "group":
           actionsHook.groupLayers([...selectionHook.selectedIds], treeHook.layers);
           break;
@@ -104,8 +149,11 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         case "moveToBottom":
           actionsHook.moveToBottom(nodeId, treeHook.layers);
           break;
+        case "moveToPage":
+          requestMoveToPage(multi ? [...selectionHook.selectedIds] : [nodeId]);
+          break;
       }
     },
-    [composer, actionsHook, treeHook, selectionHook, addToast]
+    [composer, actionsHook, treeHook, selectionHook, addToast, requestDeleteSelection, requestMoveToPage]
   );
 }

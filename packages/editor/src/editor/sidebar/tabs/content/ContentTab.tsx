@@ -1,26 +1,22 @@
 /**
  * ContentTab — the Content panel (Figma boards 148:2…151:87, P3 build-out).
  *
- * Drill-in views over the live engine:
- *   root        collections (+ counts) · Data: Sources / Variables / Conditions
- *   collection  records list · + Add · Fields ›
- *   record      field form + Published toggle + unsaved savebar
- *   fields      field list · + Add field
+ * The CMS drawer (v3 IA, 4428:140486). Its root lists the collections and
+ * the Data rows; a collection opens in the CMS workspace beside it
+ * (`editor/cms/CmsWorkspace`, which replaces the canvas + inspector), so the
+ * drawer only drills into the Data views:
  *   sources     DataManager sources · + Add a source (JSON → importSampleData)
  *   variables   {{site.*}} key/values (persisted, registered as a live source)
  *   conditions  element condition bindings · + New condition (pick → expr)
  *
- * Deliberate divergences from the boards (documented in the audit doc):
- * "Dynamic pages ›" row omitted (no edit path for an existing collection's
- * page settings yet); "Connect a source" is "+ Add a source (JSON)" — external
- * connectors (Sheets) aren't built.
+ * "Connect a source" is "+ Add a source (JSON)" — external connectors
+ * (Sheets) aren't built.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
-import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
 import type { ConditionExpression } from "@/shared/types/data";
 import {
@@ -30,23 +26,19 @@ import {
   type CmsHydrationStatus,
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
+import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import {
-  CollectionView,
-  DynamicPagesView,
   ConditionsView,
-  FieldsView,
-  RecordView,
   RootView,
   CONTENT_BODY,
   SECTION_H,
   SourcesView,
+  type SourceRowActions,
   VariablesView,
 } from "./ContentViews";
 
 export interface ContentTabProps {
   composer: Composer | null;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Opens the CMS collection setup (shell-owned modal) — the data-first create
@@ -81,55 +73,14 @@ function SkeletonRow({ width, testId }: { width: string; testId: string }) {
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
   hydrationStatus,
-  isExpanded,
-  onExpandToggle,
   onHelpClick,
   onClose,
   onCreateCollection,
 }) => {
   const panel = useContentPanel(composer);
+  const workspace = useCmsWorkspace();
   const { view, setView, reload } = panel;
   const [pickedElementId, setPickedElementId] = React.useState<string | null>(null);
-
-  // Reload on engine CMS events (collection created via the shell modal, etc.).
-  // NB: CollectionManager is its own emitter — subscribe there, not on composer.
-  React.useEffect(() => {
-    if (!composer) return;
-    const cms = composer.cms.collections;
-    const onChange = () => reload();
-    const cmsEvents = [
-      EVENTS.CMS_COLLECTION_CREATED,
-      EVENTS.CMS_COLLECTION_UPDATED,
-      EVENTS.CMS_COLLECTION_DELETED,
-      EVENTS.CMS_CONTENT_CREATED,
-      EVENTS.CMS_CONTENT_UPDATED,
-      EVENTS.CMS_CONTENT_DELETED,
-      /* The server hydration lands after this panel's first read. */
-      EVENTS.CMS_STORE_REFRESHED,
-    ] as const;
-    cmsEvents.forEach((ev) => cms.on(ev, onChange));
-
-    /* Sources live on DataManager, which is a DIFFERENT emitter, and nothing
-       here was subscribed to it — the Sources view only ever refreshed because
-       importJson and removeSource call reload() by hand. A source registered or
-       updated from anywhere else left this panel showing stale rows with no
-       sign anything had happened.
-
-       Subscribing is also what makes board 303:2083's "Watching for changes"
-       true rather than decorative: the panel really is watching now. */
-    const dataEvents = [
-      EVENTS.DATA_SOURCE_REGISTERED,
-      EVENTS.DATA_SOURCE_UPDATED,
-      EVENTS.DATA_SOURCE_UNREGISTERED,
-      EVENTS.DATA_SAMPLE_IMPORTED,
-    ] as const;
-    dataEvents.forEach((ev) => composer.data.on(ev, onChange));
-
-    return () => {
-      cmsEvents.forEach((ev) => cms.off(ev, onChange));
-      dataEvents.forEach((ev) => composer.data.off(ev, onChange));
-    };
-  }, [composer, reload]);
 
   // "+ New condition" pick flow — reuses the inspector's canvas pick mode.
   React.useEffect(() => {
@@ -163,18 +114,33 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   /* Board 151:46 puts a `⋯` on each source row. DataManager.unregisterSource
      has existed since the manager shipped and no UI ever called it, so a source
      could be added and never removed. */
-  const removeSource = (id: string) => {
-    if (!composer) return;
-    composer.data.unregisterSource(id);
-    reload();
-  };
+  const sourceActions: SourceRowActions | undefined = composer
+    ? {
+        rename: (id, name) => {
+          composer.data.renameSource(id, name);
+          reload();
+        },
+        refresh: async (id) => {
+          const pulled = await composer.data.refreshSource(id);
+          if (pulled) reload();
+          return pulled;
+        },
+        replaceData: (id, data) => {
+          composer.data.updateSourceData(id, data);
+          reload();
+        },
+        remove: (id) => {
+          composer.data.unregisterSource(id);
+          reload();
+        },
+      }
+    : undefined;
 
   const selectElement = (id: string) => {
     const el = composer?.elements.getElement(id);
     if (el && composer) composer.selection.select(el);
   };
 
-  const collectionFor = (id: string) => panel.collections.find((c) => c.id === id) ?? null;
 
   const [liveHydration, setLiveHydration] = React.useState<CmsHydrationStatus>(() =>
     getCmsHydrationStatus(),
@@ -241,10 +207,10 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           sourcesCount={panel.sources.length}
           variablesCount={panel.variables.length}
           conditionsCount={panel.conditions.length}
-          onOpenCollection={(id) => {
-            void panel.loadRecords(id);
-            setView({ kind: "collection", id });
-          }}
+          selectedCollectionId={workspace.collectionId}
+          /* v3 IA (4428:143182) — a collection opens in the workspace beside
+             the drawer; the drawer stays on its list. */
+          onOpenCollection={(id) => cmsWorkspace.openCollection(id)}
           onCreateCollection={onCreateCollection}
           onOpenSources={() => setView({ kind: "sources" })}
           onOpenVariables={() => setView({ kind: "variables" })}
@@ -252,87 +218,13 @@ export const ContentTab: React.FC<ContentTabProps> = ({
         />
       );
       break;
-    case "collection": {
-      const collection = collectionFor(view.id);
-      body = collection ? (
-        <CollectionView
-          collection={collection}
-          records={panel.records}
-          onBack={() => setView({ kind: "root" })}
-          onOpenRecord={(recordId) => setView({ kind: "record", collectionId: view.id, recordId })}
-          onAddRecord={() => setView({ kind: "record", collectionId: view.id, recordId: null })}
-          onOpenFields={() => setView({ kind: "fields", collectionId: view.id })}
-          onOpenDynamicPages={() => setView({ kind: "dynamic-pages", collectionId: view.id })}
-        />
-      ) : null;
-      break;
-    }
-    case "record": {
-      const collection = collectionFor(view.collectionId);
-      const record = view.recordId ? panel.records.find((r) => r.id === view.recordId) ?? null : null;
-      body = collection ? (
-        <RecordView
-          collection={collection}
-          record={record}
-          onBack={() => setView({ kind: "collection", id: view.collectionId })}
-          onSave={async (data, published) => {
-            await panel.saveRecord(view.collectionId, view.recordId, data, published);
-            setView({ kind: "collection", id: view.collectionId });
-          }}
-          onDelete={
-            view.recordId
-              ? () => {
-                  void panel.deleteRecord(view.recordId as string).then(() => {
-                    void panel.loadRecords(view.collectionId);
-                    setView({ kind: "collection", id: view.collectionId });
-                  });
-                }
-              : undefined
-          }
-        />
-      ) : null;
-      break;
-    }
-    case "fields": {
-      const collection = collectionFor(view.collectionId);
-      body = collection ? (
-        <FieldsView
-          collection={collection}
-          onBack={() => setView({ kind: "collection", id: view.collectionId })}
-          onAddField={(name, type, required) => panel.addField(view.collectionId, name, type, required)}
-          onDeleteField={(fieldId) => panel.deleteField(view.collectionId, fieldId)}
-        />
-      ) : null;
-      break;
-    }
-    case "dynamic-pages": {
-      const collection = collectionFor(view.collectionId);
-      body = collection ? (
-        <DynamicPagesView
-          collection={collection}
-          records={panel.records}
-          onBack={() => setView({ kind: "collection", id: view.collectionId })}
-          onSave={async (pattern) => {
-            if (!composer) return;
-            /* Empty clears the binding rather than storing "" — a collection
-               with an empty pattern is one that generates nothing, and the
-               field is optional in the model. */
-            await composer.cms.collections.updateCollection(view.collectionId, {
-              pageSlugPattern: pattern || undefined,
-            });
-            reload();
-          }}
-        />
-      ) : null;
-      break;
-    }
     case "sources":
       body = (
         <SourcesView
           sources={panel.sources}
           onBack={() => setView({ kind: "root" })}
           onImportJson={importJson}
-          onRemoveSource={removeSource}
+          actions={sourceActions}
         />
       );
       break;
@@ -374,8 +266,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       <PanelHeader
         // v3 IA Q4 — the panel is the CMS; the rail says so, the header agrees.
         title="CMS"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
+        /* No expand toggle (4428:140486 draws none): the records live in the
+           full-canvas workspace now, so a wider drawer only squeezed it. */
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

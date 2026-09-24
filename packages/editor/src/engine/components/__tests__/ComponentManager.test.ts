@@ -22,17 +22,11 @@ import type { Composer } from "../../Composer";
 const saveComponent = vi.fn().mockResolvedValue(undefined);
 const loadComponents = vi.fn().mockResolvedValue([]);
 const deleteComponent = vi.fn().mockResolvedValue(undefined);
-const exportComponents = vi.fn();
-const importComponents = vi.fn();
-const downloadComponentsFile = vi.fn();
 
 vi.mock("../ComponentStorage", () => ({
   saveComponent: (...a: unknown[]) => saveComponent(...a),
   loadComponents: (...a: unknown[]) => loadComponents(...a),
   deleteComponent: (...a: unknown[]) => deleteComponent(...a),
-  exportComponents: (...a: unknown[]) => exportComponents(...a),
-  importComponents: (...a: unknown[]) => importComponents(...a),
-  downloadComponentsFile: (...a: unknown[]) => downloadComponentsFile(...a),
   isStorageAvailable: () => false, // constructor skips auto-init
 }));
 
@@ -58,9 +52,6 @@ beforeEach(() => {
   saveComponent.mockClear();
   loadComponents.mockClear();
   deleteComponent.mockClear();
-  exportComponents.mockReset();
-  importComponents.mockReset();
-  downloadComponentsFile.mockClear();
 });
 
 describe("ComponentManager.createComponent", () => {
@@ -355,37 +346,7 @@ describe("ComponentManager.rehydrateInstances", () => {
   });
 });
 
-describe("ComponentManager export / import / config", () => {
-  it("exportComponents(false) returns storage data without downloading", async () => {
-    const { mgr } = makeStack();
-    const data = { version: "1.0.0", projectId: "default", exportedAt: "x", components: [] };
-    exportComponents.mockResolvedValue(data);
-
-    expect(await mgr.exportComponents(false)).toBe(data);
-    expect(downloadComponentsFile).not.toHaveBeenCalled();
-  });
-
-  it("exportComponents() downloads by default", async () => {
-    const { mgr } = makeStack();
-    const data = { version: "1.0.0", projectId: "default", exportedAt: "x", components: [] };
-    exportComponents.mockResolvedValue(data);
-
-    await mgr.exportComponents();
-    expect(downloadComponentsFile).toHaveBeenCalledWith(data);
-  });
-
-  it("importComponents parses the file, stores, and reloads the registry", async () => {
-    const { mgr } = makeStack();
-    const payload = { version: "1.0.0", projectId: "p", exportedAt: "x", components: [] };
-    const file = { text: async () => JSON.stringify(payload) } as unknown as File;
-    importComponents.mockResolvedValue(7);
-    loadComponents.mockClear();
-
-    expect(await mgr.importComponents(file, true)).toBe(7);
-    expect(importComponents).toHaveBeenCalledWith(payload, true);
-    expect(loadComponents).toHaveBeenCalledTimes(1);
-  });
-
+describe("ComponentManager config", () => {
   it("setProjectId reloads and scopes future persists to the new project", async () => {
     const { manager, mgr, page } = makeStack();
     await mgr.setProjectId("proj-2");

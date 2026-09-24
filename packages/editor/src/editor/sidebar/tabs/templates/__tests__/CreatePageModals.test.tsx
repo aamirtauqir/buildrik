@@ -19,7 +19,7 @@ import {
 
 afterEach(cleanup);
 
-describe("create page from template (board 1169:4725)", () => {
+describe("create page from template (boards 1169:4725, 4418:54243)", () => {
   it("the question names the template, the answer names the page", () => {
     render(
       <CreatePageConfirmModal
@@ -31,7 +31,7 @@ describe("create page from template (board 1169:4725)", () => {
     );
     expect(screen.getByText(/Create a page from ‘Bistro Menu’\?/)).toBeInTheDocument();
     expect(
-      screen.getByText(/A new page ‘Menu 2’ will be added after your current pages\./),
+      screen.getByText(/A new page named ‘Menu 2’ will be added\. Your current pages stay unchanged\./),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create page" })).toBeInTheDocument();
   });

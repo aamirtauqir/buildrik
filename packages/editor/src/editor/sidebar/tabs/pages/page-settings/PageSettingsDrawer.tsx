@@ -4,9 +4,12 @@
  * Architecture:
  * - Called by PagesTab when settingsPageId is set.
  * - usePageSettings owns ALL form state (same hook, new container).
- * - Tab switching is guarded by unsaved changes (UnsavedWarningModal).
- * - ⌘S saves immediately. ESC, the scrim and the header ✕ all close through
- *   the same guard. The ✕ is board 2838:12107, inside header frame 302:1980
+ * - Decision #20 (boards 6887:73809/73848/73882, toast 6887:73801): Cancel ·
+ *   Done in the foot, no autosave. The three tabs are one form — switching
+ *   keeps the edits; Done saves once and closes with "Page settings saved";
+ *   Cancel discards and closes. A failed Done keeps the dialog open.
+ * - ⌘S saves without closing. ESC, the scrim and the header ✕ close through
+ *   the unsaved guard (UnsavedWarningModal). The ✕ is board 2838:12107, inside header frame 302:1980
  *   on all three S3.7 boards (SEO / Social / Advanced) as of the 2026-09-07
  *   capture. This docblock previously said "There is no ✕", which was true of
  *   an older board and left a modal dialog whose only exits were ESC and a
@@ -16,6 +19,7 @@
  */
 
 import * as React from "react";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { usePageSettings } from "./usePageSettings";
@@ -37,29 +41,19 @@ interface Props {
   onClose: () => void;
   /** The tab a door asked for (`ui:pages-open-settings`); SEO otherwise. */
   initialTab?: DrawerTab;
+  /** The slug a rename's "Update URL" just moved the page off (G2-076). */
+  previousSlug?: string;
 }
 
-export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab }) => {
+export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
   const s = usePageSettings(composer, page, allPages);
 
-  /* A door's tab lands through the same guarded switch a tab click uses, once
-     the form has settled: on the first render the saved snapshot is still
-     empty and `isDirty` reads true, so switching then would raise the discard
-     modal over a drawer nobody has typed in. */
-  const [askedTab, setAskedTab] = React.useState(initialTab);
-  React.useEffect(() => { setAskedTab(initialTab); }, [initialTab]);
+  /* A door's tab (`ui:pages-open-settings`) lands on open and whenever a new
+     request arrives. Tab switches are unguarded now (#20), so it applies at once. */
+  const { setActiveTab } = s;
   React.useEffect(() => {
-    if (!askedTab || s.isDirty) return;
-    s.setActiveTab(askedTab);
-    setAskedTab(undefined);
-  }, [askedTab, s.isDirty, s.setActiveTab]);
-
-  // Auto-save: 500ms after any change
-  React.useEffect(() => {
-    if (!s.isDirty) return;
-    const timer = setTimeout(() => { s.save(); }, 500);
-    return () => clearTimeout(timer);
-  }, [s.isDirty, s]);
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab, setActiveTab]);
 
   // ⌘S / Ctrl+S — immediate save
   React.useEffect(() => {
@@ -73,8 +67,26 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     return () => document.removeEventListener("keydown", onKey);
   }, [s.isDirty, s.saveState, s]);
 
-  const handleTabClick = (tab: DrawerTab) => {
-    s.setActiveTab(tab);
+  const handleDone = async () => {
+    if (!s.isDirty && s.saveState !== "error") {
+      onClose();
+      return;
+    }
+    if (await s.save()) onClose();
+  };
+
+  const handleCancel = () => {
+    s.discard();
+    onClose();
+  };
+
+  /* What to do once the dialog has closed — set by a door that leaves it
+     (Site SEO defaults), run after the close or the discard. */
+  const afterCloseRef = React.useRef<(() => void) | null>(null);
+  const close = () => {
+    onClose();
+    afterCloseRef.current?.();
+    afterCloseRef.current = null;
   };
 
   const handleClose = () => {
@@ -82,7 +94,14 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
       s.setShowDiscardConfirm(true);
       return;
     }
-    onClose();
+    close();
+  };
+
+  /* 6887:73809 "Site SEO defaults ›" → full-screen Settings › SEO defaults,
+     through the same unsaved guard as ✕. */
+  const openSiteDefaults = () => {
+    afterCloseRef.current = () => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "seo" });
+    handleClose();
   };
 
   // ESC — the same guarded close as the scrim. Skipped while the discard modal
@@ -122,7 +141,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
                 aria-controls={`pg-drawer-tab-${tab.id}`}
                 data-testid={`pg-drawer-tabbtn-${tab.id}`}
                 className={["bd-pg-drawer-tab", s.activeTab === tab.id ? "bd-pg-drawer-tab--active" : ""].filter(Boolean).join(" ")}
-                onClick={() => handleTabClick(tab.id)}
+                onClick={() => s.setActiveTab(tab.id)}
               >
                 {tab.label}
                 {tab.id === "seo" && s.seoScore < 80 && s.allowIndex && (
@@ -150,7 +169,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         <div className="bd-pg-drawer-body" data-testid="pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} composer={composer} />
+              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} onOpenSiteDefaults={openSiteDefaults} />
             </div>
           )}
           {s.activeTab === "social" && (
@@ -164,35 +183,33 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             </div>
           )}
         </div>
-        {/* Autosave owns persistence (the board draws no save chrome); a save
-            FAILURE still needs a real affordance, shown only then. */}
-        {s.saveState === "error" && (
-          <div className="bd-pg-drawer-errrow" role="alert">
-            <span>Couldn&apos;t save your changes.</span>
-            <Button className="bd-pg-drawer-errrow-retry" onClick={() => s.save()}>
-              Retry
-            </Button>
-          </div>
-        )}
+        <div className="bd-pg-drawer-foot" data-testid="pg-drawer-foot">
+          <Button color="light" size="xs" data-testid="pg-drawer-cancel" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button
+            size="xs"
+            data-testid="pg-drawer-done"
+            disabled={s.saveState === "saving"}
+            aria-busy={s.saveState === "saving" || undefined}
+            onClick={() => void handleDone()}
+          >
+            Done
+          </Button>
+        </div>
       </div>
-      {/* One modal, two exits: a guarded TAB switch confirms the pending tab,
-          a guarded CLOSE (no pending tab) discards and closes. Before this the
-          close path opened the modal and Discard only ever confirmed a tab
-          change, so discarding on close left the drawer open. */}
+      {/* The guarded close (✕ / ESC / scrim on a dirty form): Discard throws
+          the edits away and closes, Keep editing returns to the form. */}
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
-        pendingTab={s.pendingTabChange ?? s.activeTab}
         onDiscard={() => {
           s.discard();
-          if (s.pendingTabChange) s.confirmTabChange();
-          else {
-            s.setShowDiscardConfirm(false);
-            onClose();
-          }
+          s.setShowDiscardConfirm(false);
+          close();
         }}
         onCancel={() => {
-          if (s.pendingTabChange) s.cancelTabChange();
-          else s.setShowDiscardConfirm(false);
+          afterCloseRef.current = null;
+          s.setShowDiscardConfirm(false);
         }}
       />
     </>

@@ -61,3 +61,28 @@ describe("LayoutSection — advanced disclosure", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+/* Board 4428:141170: LAYOUT carries Display and a "Size  Fill · Hug" row —
+   width and height sizing modes. Exact numbers stay in the Size section. */
+describe("LayoutSection — Size row", () => {
+  it("reads width/height as Fill · Hug and writes the chosen mode", () => {
+    const { onChange } = renderLayout({ styles: { width: "100%", height: "fit-content" } });
+    const w = screen.getByRole("combobox", { name: "Width sizing" }) as HTMLSelectElement;
+    const h = screen.getByRole("combobox", { name: "Height sizing" }) as HTMLSelectElement;
+    expect(w.value).toBe("fill");
+    expect(h.value).toBe("hug");
+    fireEvent.change(w, { target: { value: "hug" } });
+    expect(onChange).toHaveBeenCalledWith("width", "fit-content");
+    fireEvent.change(h, { target: { value: "fill" } });
+    expect(onChange).toHaveBeenCalledWith("height", "100%");
+  });
+
+  it("a fixed size reads as its value and Fixed keeps it", () => {
+    const { onChange } = renderLayout({ styles: { width: "320px" } });
+    const w = screen.getByRole("combobox", { name: "Width sizing" }) as HTMLSelectElement;
+    expect(w.value).toBe("fixed");
+    expect(w.selectedOptions[0].textContent).toBe("320px");
+    fireEvent.change(w, { target: { value: "fixed" } });
+    expect(onChange).not.toHaveBeenCalledWith("width", "200px");
+  });
+});

@@ -45,12 +45,6 @@
       "nodeId": "956:6844"
     },
     {
-      "name": "breakpoint-pill",
-      "testId": "inspector-breakpoint-pill",
-      "spec": "inspector-profile-flex",
-      "nodeId": "956:6846"
-    },
-    {
       "name": "state-pill",
       "testId": "inspector-state-pill",
       "spec": "inspector-profile-flex",
@@ -121,12 +115,6 @@
       "nodeId": "2069:20334"
     },
     {
-      "name": "sechead-corner-radius",
-      "testId": "inspector-sechead-corner-radius",
-      "spec": "inspector-profile-flex",
-      "nodeId": "2069:20335"
-    },
-    {
       "name": "sechead-effects",
       "testId": "inspector-sechead-effects",
       "spec": "inspector-profile-flex",
@@ -137,12 +125,6 @@
       "testId": "inspector-sechead-interactions",
       "spec": "inspector-profile-flex",
       "nodeId": "2069:20337"
-    },
-    {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-flex",
-      "nodeId": "2069:20338"
     },
     {
       "name": "sechead-visibility",
@@ -173,10 +155,6 @@
     {
       "name": "sechead-size",
       "testId": "inspector-sechead-size"
-    },
-    {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
     }
   ],
   "_note": [

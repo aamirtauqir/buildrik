@@ -3,9 +3,11 @@
  *
  * Replaces the three per-tab components (LayoutTab / AppearanceTab /
  * EffectsTab) with a single declarative renderer. Reads the active element
- * profile, filters sections via `shouldRender`, computes visible tier by
- * position, builds stable `SectionContext` per section, and delegates
- * rendering to each registry entry's `render(ctx)` closure.
+ * profile, keeps the sections the registry places on the active tab, filters
+ * them via `shouldRender`, hides the ADVANCED-tagged ones on the Beginner
+ * tier (decision #29), computes visible tier by position, builds stable
+ * `SectionContext` per section, and delegates rendering to each registry
+ * entry's `render(ctx)` closure.
  *
  * Two phases per render:
  *   1. Filter by shouldRender — before position/tier are known.
@@ -34,18 +36,18 @@ import type {
   MediaAssetType,
 } from "../../../shared/types/media";
 import type { CssContext, PropertyState } from "../config/cssContext";
-import { getProfileFor } from "../config/elementProfiles";
+import { getProfileFor, isAdvancedIn } from "../config/elementProfiles";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 import {
   SECTION_REGISTRY,
-  sectionApplies,
   type SectionContext,
   type SectionId,
   type ShouldRenderContext,
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { BK_HELPER_CLASS, Button, HelperText } from "@/editor/chrome-ui";
+import type { InspectorTier } from "../hooks/useInspectorTier";
+import { Button } from "@/editor/chrome-ui";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 // ============================================================================
 // TYPES
@@ -76,11 +78,14 @@ export interface InspectorTabContentProps {
     c: IconConfig | undefined,
     s: (i: IconConfig) => void
   ) => void;
-  devMode: boolean;
-  /** E3 per-user density. "fewer" (?view=readonly) trims the
-   *  inspector to its primary + secondary sections, hiding tertiary (advanced)
-   *  ones; "full" shows everything. Row heights are unaffected (density learning). */
-  density?: "full" | "fewer";
+  onOpenCreateCollection?: () => void;
+  /** Beginner hides the registry's ADVANCED-tagged sections behind "Show all
+   *  (N more)" (board 4428:141170); Pro shows everything (4428:141406). */
+  tier: InspectorTier;
+  /** Beginner's "Show all" — a temporary reveal, owned by the panel so it
+   *  resets with the selection (board 6887:74333 "8 of 8 groups · Show less"). */
+  showAll: boolean;
+  onShowAllChange: (next: boolean) => void;
 }
 
 // ============================================================================
@@ -102,12 +107,18 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     advancedState,
     onOpenMediaLibrary,
     onOpenIconPicker,
-    devMode,
-    density = "full",
+    onOpenCreateCollection,
+    tier,
+    showAll,
+    onShowAllChange,
   } = props;
 
-  // One scroll, one order — the profile's, read off its board.
-  const orderedIds: SectionId[] = getProfileFor(selectedElement.type).order;
+  // One order — the profile's, read off its board — narrowed to the sections
+  // the registry places on THIS tab (boards 4428:141170 / 141642 / 142686).
+  const orderedIds = React.useMemo<SectionId[]>(
+    () => getProfileFor(selectedElement.type).order.filter((id) => SECTION_REGISTRY[id]?.tab === tabId),
+    [selectedElement.type, tabId]
+  );
 
   // Stable per-section toggle factories. Without `useCallback`, each render
   // produces new closures, which defeats downstream React.memo on section
@@ -138,7 +149,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
       propertyStates,
       onOpenMediaLibrary,
       onOpenIconPicker,
-      devMode,
       tabId,
     };
     return orderedIds.filter((id) => {
@@ -166,13 +176,17 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     propertyStates,
     onOpenMediaLibrary,
     onOpenIconPicker,
-    devMode,
     tabId,
   ]);
 
-  // E3 density: "fewer" keeps only primary + secondary sections (visible index
-  // < 3 = the two non-tertiary tiers below), hiding the advanced/tertiary ones.
-  const renderIds = density === "fewer" ? visibleIds.slice(0, 3) : visibleIds;
+  // Beginner hides the ADVANCED-tagged sections until "Show all" — by tag,
+  // not by position: a section is advanced because the registry says so, not
+  // because it happens to sit fourth in this profile.
+  const hidden = tier === "beginner" && !showAll;
+  const profile = getProfileFor(selectedElement.type);
+  const isAdvanced = (id: SectionId) => isAdvancedIn(profile, id, SECTION_REGISTRY[id].tier);
+  const renderIds = hidden ? visibleIds.filter((id) => !isAdvanced(id)) : visibleIds;
+  const hiddenCount = visibleIds.length - renderIds.length;
 
   // ── Phase 2: render visible sections with tier derived from visible index ──
   return (
@@ -180,8 +194,8 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
       {renderIds.map((id, visibleIdx) => {
         const entry = SECTION_REGISTRY[id];
         const stateKey = `${selectedElement.type}:${id}`;
-        const tier: SectionTier =
-          visibleIdx === 0 ? "primary" : visibleIdx <= 2 ? "secondary" : "tertiary";
+        const sectionTier: SectionTier =
+          entry.tier ?? (visibleIdx === 0 ? "primary" : visibleIdx <= 2 ? "secondary" : "tertiary");
         const advancedKey = entry.advancedKey ?? id;
         const ctx: SectionContext = {
           composer,
@@ -203,9 +217,9 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
               },
           onOpenMediaLibrary,
           onOpenIconPicker,
-          devMode,
+          onOpenCreateCollection,
           tabId,
-          tier,
+          tier: sectionTier,
           // Wave 2: multi-select — optional, default to empty/false so test
           // fixtures that don't wire cssContext.selectedElements still work.
           mixedKeys: cssContext.mixedKeys,
@@ -214,37 +228,31 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         return <React.Fragment key={id}>{entry.render(ctx)}</React.Fragment>;
       })}
 
-      {/* Every profile board closes with this line — "2 of 12 sections apply",
-          "4 of 13" on the flex board. It says why most of the column is shut:
-          the sections below carry nothing for this element yet. */}
-      {renderIds.length > 0 && (
-        <p className="tw:m-0 tw:px-4 tw:py-3 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]" data-testid="inspector-sections-apply">
-          {renderIds.filter((id) => sectionApplies(id, styles)).length} of{" "}
-          {renderIds.length} sections apply
-        </p>
+      {/* Board 4428:141170's `row/show-all` — "Show all (3 more)" — and its
+          expanded twin 6887:74333, "8 of 8 groups · Show less ▴". A preference,
+          never a permission: the hidden sections are one click away, and the
+          Beginner / Pro footer switch makes the reveal permanent. */}
+      {tier === "beginner" && hiddenCount > 0 && (
+        <Button
+          color="light"
+          size="xs"
+          data-testid="inspector-show-all"
+          onClick={() => onShowAllChange(true)}
+          className="tw:mx-4 tw:my-2 tw:h-7 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)]"
+        >
+          Show all ({hiddenCount} more)
+        </Button>
       )}
-
-      {/* E3 density: when "fewer" hides advanced sections, say so and offer a
-          reversible way back to full controls — density is a preference, never
-          a permission (so this is a "hidden", not a "locked", affordance). */}
-      {density === "fewer" && visibleIds.length > renderIds.length && (
-        <div className="tw:flex tw:flex-col tw:gap-2 tw:divide-y tw:divide-[var(--bk-gray-200)] tw:[&>*+*]:pt-3">
-          <HelperText className={BK_HELPER_CLASS}>
-            Simplified view — {visibleIds.length - renderIds.length} more control
-            {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
-          </HelperText>
-          <Button
-            color="light"
-            size="xs"
-            onClick={() => {
-              const url = new URL(window.location.href);
-              url.searchParams.set("density", "full");
-              window.location.assign(url.toString());
-            }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-          >
-            Show all controls
-          </Button>
-        </div>
+      {tier === "beginner" && showAll && visibleIds.some(isAdvanced) && (
+        <Button
+          color="light"
+          size="xs"
+          data-testid="inspector-show-less"
+          onClick={() => onShowAllChange(false)}
+          className="tw:mx-4 tw:my-2 tw:h-7 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+        >
+          {renderIds.length} of {renderIds.length} groups · Show less ▴
+        </Button>
       )}
     </>
   );

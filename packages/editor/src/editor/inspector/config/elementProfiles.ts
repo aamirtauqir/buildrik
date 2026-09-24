@@ -34,6 +34,15 @@ import type { SectionId } from "../sections/registry";
 export interface ElementProfile {
   /** Ordered section ids, board order. */
   order: SectionId[];
+  /** Sections this profile hides on Beginner (behind "Show all") on top of
+   *  the registry's ADVANCED tag — e.g. a container's numeric SIZE, whose
+   *  Fill/Hug modes LAYOUT already carries (board 4428:141170). */
+  advanced?: readonly SectionId[];
+}
+
+/** Hidden on Beginner for this profile: registry-ADVANCED or listed here. */
+export function isAdvancedIn(profile: ElementProfile, id: SectionId, registryTier: string | undefined): boolean {
+  return registryTier === "advanced" || Boolean(profile.advanced?.includes(id));
 }
 
 // ============================================================================
@@ -54,15 +63,20 @@ const CONTAINER_PROFILE: ElementProfile = {
     "typography",
     "background",
     "border",
-    "corner-radius",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "interactions",
-    "animation",
     "visibility",
+    // Board 4428:141642: LINK sits between VISIBILITY and CONTENT. Rendered
+    // only for LINKABLE_TYPES (section registry gate).
+    "link",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Text-like elements — board 807:8342. Typography leads; the board draws no
@@ -74,14 +88,16 @@ const TEXT_PROFILE: ElementProfile = {
     "size",
     "background",
     "border",
-    "effects",
+    "opacity",
+    "shadow",
+    "blur",
     "link",
+    "effects",
     "interactions",
-    "animation",
     "visibility",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -94,15 +110,17 @@ const FLEX_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "interactions",
-    "animation",
     "visibility",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Explicit grid container — board 807:8475. Columns is a grid underneath, so
@@ -115,15 +133,17 @@ const GRID_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "interactions",
-    "animation",
     "visibility",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Image / video / icon / lottie / svg / audio / embeds — board 807:8521.
@@ -136,14 +156,15 @@ const MEDIA_PROFILE: ElementProfile = {
     "spacing",
     "background",
     "border",
-    "corner-radius",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "interactions",
-    "animation",
     "visibility",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -154,17 +175,18 @@ const BUTTON_PROFILE: ElementProfile = {
     "typography",
     "background",
     "border",
-    "corner-radius",
     "spacing",
     "size",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "interactions",
-    "animation",
     "link",
     "visibility",
+    "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -178,14 +200,15 @@ const INPUT_PROFILE: ElementProfile = {
     "spacing",
     "size",
     "background",
-    "corner-radius",
+    "opacity",
+    "shadow",
+    "blur",
     "effects",
     "element-properties",
     "interactions",
-    "animation",
     "visibility",
+    "content",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -259,6 +282,12 @@ const PROFILES: Record<string, ElementProfile> = {
   countdown: CONTAINER_PROFILE,
   "product-card": CONTAINER_PROFILE,
   "product-grid": CONTAINER_PROFILE,
+  /* G3-079: a container whose CONTENT is its collection — COLLECTION takes
+     the Static / From CMS row's place. */
+  "collection-list": {
+    ...CONTAINER_PROFILE,
+    order: CONTAINER_PROFILE.order.map((id) => (id === "content" ? "collection" : id)),
+  },
   "product-detail": CONTAINER_PROFILE,
 };
 

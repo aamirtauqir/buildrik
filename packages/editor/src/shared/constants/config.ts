@@ -85,9 +85,8 @@ export { STORAGE_KEYS, type StorageKey } from "./storageKeys";
 export const THRESHOLDS = {
   // Zoom limits
   ZOOM_MIN: 10,
-  ZOOM_MAX: 500,
+  ZOOM_MAX: 400, // = ZOOM_LIMITS.max, board 817:4723 (10–400 %)
   ZOOM_DEFAULT: 100,
-  ZOOM_STEP: 10,
 
   // Drag thresholds
   DRAG_THRESHOLD: 5, // pixels before drag starts
@@ -131,11 +130,6 @@ export const THRESHOLDS = {
   CANVAS_PADDING: 100,
   CANVAS_MAX_WIDTH: 20000,
   CANVAS_MAX_HEIGHT: 20000,
-
-  // Panels
-  PANEL_MIN_WIDTH: 200,
-  PANEL_MAX_WIDTH: 600,
-  PANEL_DEFAULT_WIDTH: 280,
 
   // Tree depth
   MAX_NESTING_DEPTH: 50,
@@ -216,31 +210,3 @@ export const API = {
   PLACEHOLDER_IMAGE: "https://picsum.photos",
   FONT_API: "https://fonts.googleapis.com",
 } as const;
-
-// ============================================
-// Feature Flags
-// ============================================
-
-/**
- * Feature flags for enabling/disabling functionality
- */
-export const FEATURES = {
-  AI_ASSISTANT: true,
-  TEMPLATES: true,
-  CUSTOM_COMPONENTS: true,
-  DATA_BINDING: true,
-  RESPONSIVE_PREVIEW: true,
-  CODE_EXPORT: true,
-  COLLABORATION: false, // Not yet implemented
-  PLUGINS: false, // Implemented but disabled - enable when ready
-  VERSION_HISTORY: false, // Not yet implemented
-} as const;
-
-export type FeatureFlag = keyof typeof FEATURES;
-
-/**
- * Check if a feature is enabled
- */
-export function isFeatureEnabled(feature: FeatureFlag): boolean {
-  return FEATURES[feature] ?? false;
-}

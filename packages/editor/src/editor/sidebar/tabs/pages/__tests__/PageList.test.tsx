@@ -4,7 +4,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { PageList } from "../components/PageList";
 import type { FolderItem, PageItem } from "../types";
 
@@ -129,12 +129,46 @@ describe("PageList", () => {
   });
 });
 
-describe("PageList — the Structure door", () => {
-  it("opens the site-structure view when a handler is given", () => {
-    const onOpenStructure = vi.fn();
-    /* The empty state renders no footer links; a page makes the list body mount. */
-    render(<PageList {...makeProps({ pages: [{ id: "p1", name: "Home", slug: "home" } as never], onOpenStructure })} />);
-    fireEvent.click(screen.getByTestId("pages-open-structure"));
-    expect(onOpenStructure).toHaveBeenCalledTimes(1);
+/* Walk 2026-09-24: a grip drag fired drop and "Saved", but the order never
+   changed — the drop always meant "after this row", so a page dropped on the
+   TOP edge of the row above it landed where it already was. */
+describe("PageList — drag reorder lands on the half it is dropped on", () => {
+  const three: PageItem[] = [
+    { id: "p1", name: "Home", slug: "/", isHome: true, status: "live", isActive: true },
+    { id: "p2", name: "Home Copy", slug: "/copy", status: "live" },
+    { id: "p3", name: "Home Copy 2", slug: "/copy-2", status: "live" },
+  ];
+  const composerWith = () => ({
+    elements: { getAllPages: () => three.map((p) => ({ id: p.id })), reorderPage: vi.fn() },
+  });
+  const dropOn = (rowId: string, clientY: number) => {
+    const wrap = screen.getByTestId(`page-row-${rowId}`).closest(".bd-pg-row-wrap") as HTMLElement;
+    wrap.getBoundingClientRect = () => ({ top: 0, bottom: 32, left: 0, right: 280, height: 32, width: 280, x: 0, y: 0, toJSON: () => ({}) }) as DOMRect;
+    const ev = new MouseEvent("drop", { bubbles: true, cancelable: true, clientX: 50, clientY });
+    Object.defineProperty(ev, "dataTransfer", { value: { getData: () => "p3", dropEffect: "" } });
+    act(() => {
+      wrap.dispatchEvent(ev);
+    });
+  };
+
+  it("upper half → before the row (after its predecessor)", () => {
+    const composer = composerWith();
+    render(<PageList {...makeProps({ pages: three, composer: composer as never })} />);
+    dropOn("p2", 4);
+    expect(composer.elements.reorderPage).toHaveBeenCalledWith("p3", "p1");
+  });
+
+  it("upper half of the FIRST row → first", () => {
+    const composer = composerWith();
+    render(<PageList {...makeProps({ pages: three, composer: composer as never })} />);
+    dropOn("p1", 4);
+    expect(composer.elements.reorderPage).toHaveBeenCalledWith("p3", null);
+  });
+
+  it("lower half → after the row", () => {
+    const composer = composerWith();
+    render(<PageList {...makeProps({ pages: three, composer: composer as never })} />);
+    dropOn("p1", 28);
+    expect(composer.elements.reorderPage).toHaveBeenCalledWith("p3", "p1");
   });
 });

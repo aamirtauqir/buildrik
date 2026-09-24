@@ -240,8 +240,6 @@ export {
   // Accessibility
   getLuminance,
   getContrastRatio,
-  // Color blindness simulation
-  simulateColorBlindness,
   // Gradient parsing
   parseGradient,
   serializeGradient,
@@ -310,8 +308,6 @@ export {
   clearQueue,
   isAIError,
   getErrorMessage,
-  CONTENT_TYPES,
-  TONES,
   PROMPT_TEMPLATES,
   type AIRequestOptions,
   type ContentRequest,

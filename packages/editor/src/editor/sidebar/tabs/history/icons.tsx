@@ -121,7 +121,7 @@ export function SaveIcon() {
   );
 }
 
-export function TimeTravelIcon() {
+export function CompareIcon() {
   return (
     <svg
       width="14"
@@ -131,9 +131,10 @@ export function TimeTravelIcon() {
       stroke="currentColor"
       strokeWidth="1.5"
     >
-      <circle cx="7" cy="7" r="5" />
-      <path d="M7 4v3l2 1" />
-      <path d="M5 9.5l-1.5 1.5L5 12.5" />
+      <rect x="2" y="2" width="4" height="10" rx="1" />
+      <rect x="8" y="2" width="4" height="10" rx="1" />
+      <path d="M6 5h2" />
+      <path d="M6 9h2" />
     </svg>
   );
 }

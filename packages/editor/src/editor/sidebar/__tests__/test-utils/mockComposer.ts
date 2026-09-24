@@ -16,6 +16,7 @@
 
 import { vi } from "vitest";
 import type { Composer } from "@/engine";
+import type { CommandData } from "@/shared/types";
 import { EVENTS } from "@/shared/constants/events";
 
 export interface MockPage {
@@ -145,6 +146,20 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
 
   let projectSettings: Record<string, unknown> = opts.projectSettings ?? {};
 
+  /* The command registry the Pages panel registers its ⌘K rows into while it
+     is mounted (usePageCommands). A Map, so a test can read back what a panel
+     registered and run it. */
+  const registry = new Map<string, CommandData>();
+  const commands = {
+    register: vi.fn((cmd: CommandData) => {
+      registry.set(cmd.id, cmd);
+    }),
+    unregister: vi.fn((id: string) => registry.delete(id)),
+    get: vi.fn((id: string) => registry.get(id)),
+    getAll: vi.fn(() => [...registry.values()]),
+    run: vi.fn((id: string) => registry.get(id)?.run(composer as unknown as Composer)),
+  };
+
   const composer = {
     on,
     off,
@@ -152,6 +167,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     elements,
     components: componentsNs,
     selection,
+    commands,
     history: { undo: vi.fn(), redo: vi.fn() },
     getProjectSettings: vi.fn(() => projectSettings),
     setProjectSettings: vi.fn((patch: Record<string, unknown>) => {

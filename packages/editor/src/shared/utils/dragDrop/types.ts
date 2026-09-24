@@ -84,9 +84,6 @@ export interface DragDataMulti extends DragDataBase {
 export interface DragDataExternal extends DragDataBase {
   type: "external";
   files?: File[];
-  text?: string;
-  html?: string;
-  url?: string;
 }
 
 /** Unknown drag data */
@@ -210,8 +207,6 @@ export interface DragSession {
   autoScrollTimer: number | null;
   /** Keyboard mode active */
   isKeyboardDrag: boolean;
-  /** Touch mode active */
-  isTouchDrag: boolean;
   /** Constraints */
   constraints: DragConstraints;
   /** Start time */
@@ -227,8 +222,6 @@ export type {
   DragEventHandler,
   DropZone,
   DropZoneRegistry,
-  TouchDragState,
-  KeyboardDragConfig,
   DragGhostOptions,
   AutoScrollConfig,
 } from "./configTypes";

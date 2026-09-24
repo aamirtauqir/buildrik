@@ -4,20 +4,26 @@ import { Button, Textarea } from "@/editor/chrome-ui";
 
 export interface ComposerProps {
   onSubmit: (text: string) => void;
-  onStop: () => void;
+  /** A run is live: the field shows only the prompt — Stop is under the
+   *  Thinking band / run band (board 4418:104577). */
   streaming: boolean;
+  /** "7 left today" (board 4418:104313, G2-129) — only when the quota read
+   *  answered; absent otherwise. */
+  quotaLabel?: string;
 }
 
 export const Composer: React.FC<ComposerProps> = ({
-  onSubmit, onStop, streaming,
+  onSubmit, streaming, quotaLabel,
 }) => {
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
 
+  /* The prompt stays in the field after sending (board 4418:106919: "Your
+     prompt is still here"). A run that finishes cleanly remounts this
+     component from AITab, which is what empties it. */
   const submit = () => {
-    if (!trimmed) return;
+    if (!trimmed || streaming) return;
     onSubmit(trimmed);
-    setText("");
   };
 
   /* Boards 170:7 / 170:36 / 170:48 / 171:74 draw the prompt block as 72 tall:
@@ -44,22 +50,27 @@ export const Composer: React.FC<ComposerProps> = ({
           }}
           rows={2}
         />
-        {streaming ? (
-          <Button
-            type="button"
-            className="bd-ai-composer-stop"
-            aria-label="Stop"
-            onClick={onStop}
-          >■</Button>
-        ) : (
-          <Button
-            type="button"
-            className="bd-ai-composer-send"
-            aria-label="Send"
-            disabled={!trimmed}
-            onClick={submit}
-          >↑</Button>
-        )}
+        {quotaLabel || !streaming ? (
+          <div className="bd-ai-composer-foot">
+            {quotaLabel ? (
+              <span className="bd-ai-composer-quota" data-testid="ai-quota">
+                {quotaLabel}
+              </span>
+            ) : null}
+            {streaming ? null : (
+              <Button
+                type="button"
+                className="bd-ai-composer-send"
+                disabled={!trimmed}
+                onClick={submit}
+              >
+                {/* Board 4418:104454's primary is a labelled "Plan changes" — the
+                    panel only plans and runs (decision #23). It was a bare ↑. */}
+                Plan changes
+              </Button>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );

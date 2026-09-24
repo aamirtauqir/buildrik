@@ -1,244 +1,115 @@
 // @vitest-environment jsdom
 /**
- * CreateComponentModal.test.tsx — the save-as-component form machine: name
- * validation gate, payload shaping (trim, comma-split tags, variant presets,
- * prefill flag), success/failure/throw toasts, and reset-on-close.
+ * CreateComponentModal — board 4418:142143 (C5 G1-098): Name · Scope ·
+ * "Also convert N matching groups", and the master converts the selection
+ * into its first instance.
+ *
+ * @license BSD-3-Clause
  */
+import * as React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import { CreateComponentModal } from "../CreateComponentModal";
 
-const { addToastMock } = vi.hoisted(() => ({ addToastMock: vi.fn() }));
+const { addToastMock, findMatching } = vi.hoisted(() => ({ addToastMock: vi.fn(), findMatching: vi.fn(() => [] as string[]) }));
 
 vi.mock("@/editor/chrome-ui", async (importActual) => {
   const actual = await importActual<typeof import("@/editor/chrome-ui")>();
   return { ...actual, useToast: () => ({ addToast: addToastMock }) };
 });
+vi.mock("../../../../engine/components/matchingGroups", () => ({
+  findMatchingElements: (...a: unknown[]) => findMatching(...(a as [])),
+}));
 
-function makeComposer(createComponent = vi.fn().mockResolvedValue({ id: "c1" })) {
-  return { components: { createComponent } } as never;
+import { CreateComponentModal } from "../CreateComponentModal";
+
+function makeComposer(createComponent = vi.fn().mockResolvedValue({ id: "c1", name: "Hero" }), adoptInstances = vi.fn((_: string, ids: string[]) => ids.length)) {
+  const el = { getType: () => "section", getCustomData: (k: string) => (k === "layerName" || k === "name" ? "Hero" : undefined) };
+  return {
+    composer: {
+      components: { createComponent, adoptInstances },
+      elements: { getElement: () => el, getActivePage: () => ({ id: "page-home", name: "Home" }) },
+    } as never,
+    createComponent,
+    adoptInstances,
+  };
 }
 
-function renderModal(over: Partial<Parameters<typeof CreateComponentModal>[0]> = {}) {
+function renderModal(composer: never) {
   const onClose = vi.fn();
-  const composer = over.composer ?? makeComposer();
-  const utils = render(
-    <CreateComponentModal
-      isOpen
-      onClose={onClose}
-      composer={composer}
-      elementId="el-1"
-      {...over}
-    />,
-  );
-  return { onClose, composer, ...utils };
+  render(<CreateComponentModal isOpen onClose={onClose} composer={composer} elementId="el-1" />);
+  return { onClose };
 }
-
-const nameInput = () => screen.getByPlaceholderText("e.g., Hero Section");
-const createBtn = () => screen.getByRole("button", { name: /Create Component/i });
 
 beforeEach(() => {
   cleanup();
   addToastMock.mockClear();
+  findMatching.mockReset().mockReturnValue([]);
 });
 
-describe("CreateComponentModal — name gate", () => {
-  it("disables Create until a non-blank name is entered", () => {
-    renderModal();
-    expect(createBtn()).toBeDisabled();
-    fireEvent.change(nameInput(), { target: { value: "Hero" } });
-    expect(createBtn()).toBeEnabled();
-    // Whitespace-only stays disabled.
-    fireEvent.change(nameInput(), { target: { value: "   " } });
-    expect(createBtn()).toBeDisabled();
-  });
-});
-
-describe("CreateComponentModal — submit payload", () => {
-  it("creates with trimmed name, comma-split tags, and prefill on by default", async () => {
-    const createComponent = vi.fn().mockResolvedValue({ id: "c1" });
-    const { onClose } = renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "  Hero  " } });
-    fireEvent.change(screen.getByPlaceholderText(/Optional description/i), {
-      target: { value: " a card " },
-    });
-    fireEvent.change(screen.getByPlaceholderText(/Headers, Footers, Cards/i), {
-      target: { value: "Headers" },
-    });
-    fireEvent.change(screen.getByPlaceholderText(/comma-separated/i), {
-      target: { value: "responsive, dark-mode ,hero" },
-    });
-
-    fireEvent.click(createBtn());
-
-    await waitFor(() =>
-      expect(createComponent).toHaveBeenCalledWith("Hero", "el-1", {
-        description: "a card",
-        category: "Headers",
-        tags: ["responsive", "dark-mode", "hero"],
-        variantProperties: undefined,
-        prefillFromDs: true,
-      }),
+describe("CreateComponentModal — board 4418:142143", () => {
+  it("draws exactly the board's form: lead, Name, Scope (This site), Cancel · Create component", () => {
+    const { composer } = makeComposer();
+    renderModal(composer);
+    expect(screen.getByTestId("create-component-title")).toHaveTextContent("Create component");
+    expect(screen.getByTestId("create-component-lead")).toHaveTextContent(
+      /^Selected: Home › .+ \(section\)\. Creating a master converts this .+ into its first instance\. Nothing else changes unless you opt in below\.$/,
     );
-    await waitFor(() =>
-      expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ tone: "success" })),
-    );
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Name")).toBeInTheDocument();
+    expect((screen.getByLabelText("Scope") as HTMLSelectElement).selectedOptions[0].textContent).toBe("This site");
+    for (const gone of ["Description", "Category", "Tags", "variant", "Pre-fill"]) {
+      expect(screen.queryByText(new RegExp(gone, "i"))).toBeNull();
+    }
+    expect(screen.getByRole("button", { name: "Create component" })).toBeInTheDocument();
   });
 
-  it("omits empty optional fields (description/category/tags → undefined)", async () => {
-    const createComponent = vi.fn().mockResolvedValue({ id: "c1" });
-    renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "Bare" } });
-    fireEvent.click(createBtn());
-
-    await waitFor(() =>
-      expect(createComponent).toHaveBeenCalledWith(
-        "Bare",
-        "el-1",
-        expect.objectContaining({
-          description: undefined,
-          category: undefined,
-          tags: undefined,
-        }),
-      ),
-    );
+  it("offers the convert box only when identical groups exist, with their count", () => {
+    const { composer } = makeComposer();
+    findMatching.mockReturnValue(["el-2", "el-3"]);
+    renderModal(composer);
+    expect(screen.getByTestId("create-component-convert")).toHaveTextContent(/Also convert 2 other matching .+ groups on this page/);
   });
 
-  it("passes prefillFromDs=false when the toggle is unchecked", async () => {
-    const createComponent = vi.fn().mockResolvedValue({ id: "c1" });
-    renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "NoPrefill" } });
-    // Checkbox [1] is the "Pre-fill from DS styles" toggle (default checked).
-    const prefill = screen.getAllByRole("checkbox")[1];
-    fireEvent.click(prefill);
-    fireEvent.click(createBtn());
-
-    await waitFor(() =>
-      expect(createComponent).toHaveBeenCalledWith(
-        "NoPrefill",
-        "el-1",
-        expect.objectContaining({ prefillFromDs: false }),
-      ),
-    );
+  it("creates, converts the selection into the first instance, and only the opted-in matches", async () => {
+    const { composer, createComponent, adoptInstances } = makeComposer();
+    findMatching.mockReturnValue(["el-2", "el-3"]);
+    const { onClose } = renderModal(composer);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "  Hero card " } });
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true, pageId: null });
+    expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1"]);
   });
-});
 
-describe("CreateComponentModal — variant set", () => {
-  it("reveals preset chips and includes the selected variant properties", async () => {
-    const createComponent = vi.fn().mockResolvedValue({ id: "c1" });
-    renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "VariantCard" } });
-    // Chips hidden until the variant-set checkbox is on.
-    expect(screen.queryByRole("button", { name: /Size/ })).toBeNull();
-    fireEvent.click(screen.getAllByRole("checkbox")[0]);
-
-    fireEvent.click(screen.getByRole("button", { name: /Size/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Theme/ }));
-    fireEvent.click(createBtn());
-
-    await waitFor(() => expect(createComponent).toHaveBeenCalled());
-    const opts = createComponent.mock.calls[0][2];
-    expect(opts.variantProperties).toEqual([
-      { name: "Size", values: ["S", "M", "L"], defaultValue: "M" },
-      { name: "Theme", values: ["Light", "Dark"], defaultValue: "Light" },
-    ]);
+  it("with the box ticked, the matches are converted too", async () => {
+    const { composer, adoptInstances } = makeComposer();
+    findMatching.mockReturnValue(["el-2"]);
+    const { onClose } = renderModal(composer);
+    fireEvent.click(screen.getByTestId("create-component-convert").querySelector("input")!);
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1", "el-2"]);
   });
-});
 
-describe("CreateComponentModal — failure paths", () => {
-  it("toasts an error and stays open when createComponent returns null", async () => {
-    const createComponent = vi.fn().mockResolvedValue(null);
-    const { onClose } = renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "Fails" } });
-    fireEvent.click(createBtn());
-
-    await waitFor(() =>
-      expect(addToastMock).toHaveBeenCalledWith(
-        expect.objectContaining({ description: "Failed to create component", tone: "error" }),
-      ),
-    );
+  it("a blank name cannot be submitted; a failed create says so and stays open", async () => {
+    const { composer } = makeComposer(vi.fn().mockResolvedValue(null));
+    const { onClose } = renderModal(composer);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "   " } });
+    expect(screen.getByRole("button", { name: "Create component" })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Hero" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })));
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("toasts the error message when createComponent throws", async () => {
-    const createComponent = vi.fn().mockRejectedValue(new Error("boom"));
-    renderModal({ composer: makeComposer(createComponent) });
-
-    fireEvent.change(nameInput(), { target: { value: "Throws" } });
-    fireEvent.click(createBtn());
-
-    await waitFor(() =>
-      expect(addToastMock).toHaveBeenCalledWith(
-        expect.objectContaining({ description: "Error: boom", tone: "error" }),
-      ),
-    );
-  });
-});
-
-describe("CreateComponentModal — reset on close", () => {
-  it("clears the form when the modal is closed and reopened", () => {
-    const composer = makeComposer();
-    const { rerender } = render(
-      <CreateComponentModal isOpen onClose={vi.fn()} composer={composer} elementId="el-1" />,
-    );
-    fireEvent.change(nameInput(), { target: { value: "Draft name" } });
-    expect((nameInput() as HTMLInputElement).value).toBe("Draft name");
-
-    rerender(
-      <CreateComponentModal isOpen={false} onClose={vi.fn()} composer={composer} elementId="el-1" />,
-    );
-    rerender(
-      <CreateComponentModal isOpen onClose={vi.fn()} composer={composer} elementId="el-1" />,
-    );
-    expect((nameInput() as HTMLInputElement).value).toBe("");
-  });
-});
-
-describe("CreateComponentModal — the prefill hint names the number when it knows it", () => {
-  /*
-    This contract came from the deleted component-library modal, which existed
-    almost entirely to say how many styles would bind. That was one sentence,
-    not a second dialog, so it moved onto the checkbox that was already here
-    rather than the file being deleted with its behaviour.
-  */
-  const ctx = (n: number) => ({
-    selectionIds: ["el-1"] as readonly string[],
-    extractedBindings: new Map(Array.from({ length: n }, (_, i) => [`el-1:p${i}`, `t${i}`])),
-  });
-
-  it("says nothing about a count when the caller extracted no bindings", () => {
-    renderModal();
-    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
-      /Lift matching values/,
-    );
-  });
-
-  it("names the count when the caller has one", () => {
-    renderModal({ selectionContext: ctx(3) });
-    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
-      /3 styles will bind to your DS tokens/,
-    );
-  });
-
-  it("says style, singular, for one", () => {
-    renderModal({ selectionContext: ctx(1) });
-    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
-      /^1 style will bind/,
-    );
-  });
-
-  // A selection whose styles bind to nothing is still a selection: the honest
-  // answer is zero, not the generic promise.
-  it("says zero rather than falling back to the generic line", () => {
-    renderModal({ selectionContext: ctx(0) });
-    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
-      /0 styles will bind/,
-    );
+  /* Popover 6971:77663: This site / This page. */
+  it("Scope offers This site and This page; This page scopes the master to the open page", async () => {
+    const { composer, createComponent } = makeComposer();
+    const { onClose } = renderModal(composer);
+    const scope = screen.getByLabelText("Scope") as HTMLSelectElement;
+    expect([...scope.options].map((o) => o.textContent)).toEqual(["This site", "This page"]);
+    fireEvent.change(scope, { target: { value: "page" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createComponent).toHaveBeenCalledWith("Hero", "el-1", { prefillFromDs: true, pageId: "page-home" });
   });
 });

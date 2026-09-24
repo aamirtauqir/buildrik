@@ -30,12 +30,15 @@ export function dnsVerificationToken(domainId: string): string {
  * with the deploy pipeline — status VERIFIED + sslStatus PENDING is the
  * "issuing certificate" board state.
  */
-export async function checkDomainDns(domainId: string) {
+export async function checkDomainDns(domainId: string, siteId: string) {
   const domain = await prisma.domain.findUnique({
     where: { id: domainId },
     include: { dnsRecords: true },
   });
-  if (!domain) return null;
+  // Site-bound BEFORE any write: the caller's role was checked on `siteId`,
+  // and a domain id from another site used to get its records rewritten
+  // before the router noticed the mismatch (audit 2026-09-24).
+  if (!domain || domain.siteId !== siteId) return null;
 
   let anyVerified = false;
   let allVerified = domain.dnsRecords.length > 0;

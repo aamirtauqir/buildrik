@@ -9,6 +9,7 @@ import { Agentation } from "agentation";
 import { AquibraStudio } from "../src/editor/shell/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
 import { initErrorTracking } from "../src/shared/utils/errorTracking";
+import { PROJECT_MIGRATIONS } from "../src/engine/designSystem/migrations/projectMigrations";
 // Global styles.
 // fonts.css is imported HERE rather than from default.css: default.css is also
 // bundled into the dashboard for the unified editor route, where layout.tsx
@@ -43,6 +44,17 @@ const App: React.FC = () => {
         licenseKey="DEMO"
         onEditor={(composer) => {
           composerRef.current = composer;
+          // Dev-only probe: live verification reads engine state through the
+          // composer (never by eye) and forces a migration step to throw by
+          // patching the registry, which nothing in the shell exposes.
+          if (import.meta.env.DEV) {
+            const w = window as unknown as {
+              __bkComposer?: Composer;
+              __bkProjectMigrations?: typeof PROJECT_MIGRATIONS;
+            };
+            w.__bkComposer = composer;
+            w.__bkProjectMigrations = PROJECT_MIGRATIONS;
+          }
         }}
         onReady={(_composer) => {
           // editor ready

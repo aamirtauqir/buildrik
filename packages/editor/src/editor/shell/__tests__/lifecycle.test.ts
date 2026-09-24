@@ -3,8 +3,8 @@
  * one control meaning six different things, and a table is the only shape where
  * "these two rows render the same button" is visible.
  */
-import { describe, it, expect } from "vitest";
-import { deriveLifecycleState, type LifecycleInput } from "../lifecycle";
+import { describe, it, expect, vi } from "vitest";
+import { deriveLifecycleState, gateFromBlockReason, type LifecycleInput, type PublishGate } from "../lifecycle";
 
 /** A workspace that requires client approval, actor is an editor, online,
  *  nothing wrong with the site, never published. */
@@ -116,6 +116,24 @@ describe("deriveLifecycleState — off the happy path", () => {
       expect(move?.kind).toBe("publish");
       expect(move?.blockedReason).toBe("Checking this site's review settings…");
     }
+  });
+
+  /* QA 2026-09-24: `reviews.status` erroring left Publish on "Checking…"
+     forever — a failure read as "not answered yet". A failed read is its own
+     gate: shut, with the reason, and the panel's Retry. */
+  it("a FAILED status read is the unchecked gate, not an endless check", () => {
+    const move = deriveLifecycleState(at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true }));
+    expect(move?.gate).toBe("unchecked");
+    expect(move?.blockedReason).toBe("Couldn't check this site's review settings.");
+    expect(move?.gateReason).toBe("Couldn't check this site's review settings.");
+    expect(move?.blockedReason).not.toMatch(/Checking/);
+  });
+
+  it("a known blocker still outranks the failed read", () => {
+    const move = deriveLifecycleState(
+      at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true, offline: true }),
+    );
+    expect(move?.blockedReason).toBe("Can't publish while offline");
   });
 
   it("a server too old to send the flags does not block publishing forever", () => {
@@ -235,5 +253,115 @@ describe("deriveLifecycleState — the reviewer has a name", () => {
       "Your client asked for changes.",
     );
     expect(deriveLifecycleState(at({ reviewState: "pending" }))?.hint).toMatch(/to your client/);
+  });
+});
+
+/* B4 (decisions #20/#34): the publish DOOR is one derivation. The topbar CTA,
+   the Publish panel's footer, its gate banner and whichever dialog opens all
+   read `gate` + `gateReason` — three surfaces used to hold three truths. */
+describe("deriveLifecycleState — the publish gate", () => {
+  const gateOf = (over: Partial<LifecycleInput>) => deriveLifecycleState(at(over))?.gate;
+
+  it.each<[LifecycleInput["reviewState"], PublishGate]>([
+    ["none", "waiting"],
+    ["pending", "waiting"],
+    ["opened-not-acted", "waiting"],
+    ["changes-requested", "changes-requested"],
+    ["approved", "confirm"],
+    ["approved-edited-since", "stale-approval"],
+  ])("%s → %s", (reviewState, gate) => {
+    expect(gateOf({ reviewState })).toBe(gate);
+  });
+
+  it("a shut door carries the same sentence the CTA tooltip carries", () => {
+    const move = deriveLifecycleState(at({ reviewState: "pending", reviewerName: "Sara" }));
+    expect(move?.gate).toBe("waiting");
+    expect(move?.gateReason).toBe("Waiting on Sara's approval");
+    expect(move?.gateReason).toBe(move?.blockedReason);
+  });
+
+  it("never-sent on an approval workspace: the SEND is open, the publish door is shut", () => {
+    const move = deriveLifecycleState(at({ reviewState: "none" }));
+    expect(move?.kind).toBe("send-for-review");
+    expect(move?.blockedReason).toBeNull();
+    expect(move?.gate).toBe("waiting");
+    expect(move?.gateReason).toMatch(/Send for review first/);
+  });
+
+  it("changes requested names the reviewer on the door as on the hint", () => {
+    const move = deriveLifecycleState(at({ reviewState: "changes-requested", reviewerName: "Sara" }));
+    expect(move?.gateReason).toMatch(/^Sara asked for changes/);
+  });
+
+  /* Priority pairs. Each row is two states that both apply; the gate is the
+     one that wins. */
+  describe("priority — each pair ordered", () => {
+    it("waiting beats open errors — no invitation on a door the server refuses", () => {
+      const move = deriveLifecycleState(at({ reviewState: "pending", errorCount: 2 }));
+      expect(move?.gate).toBe("waiting");
+      expect(move?.label).toBe("Publish");
+    });
+
+    it("changes requested beats open errors", () => {
+      expect(gateOf({ reviewState: "changes-requested", errorCount: 2 })).toBe("changes-requested");
+    });
+
+    it("open errors beat a stale approval — the errors confirm opens first", () => {
+      const move = deriveLifecycleState(at({ reviewState: "approved-edited-since", errorCount: 1 }));
+      expect(move?.gate).toBe("open-errors");
+      expect(move?.gateReason).toBe("1 open error will go live exactly as it is.");
+    });
+
+    it("open errors beat the plain confirm", () => {
+      expect(gateOf({ reviewState: "approved", errorCount: 3 })).toBe("open-errors");
+      expect(deriveLifecycleState(at({ reviewState: "approved", errorCount: 3 }))?.gateReason).toBe(
+        "3 open errors will go live exactly as they are.",
+      );
+    });
+
+    it("stale approval beats the plain confirm", () => {
+      expect(gateOf({ reviewState: "approved-edited-since" })).toBe("stale-approval");
+      expect(gateOf({ reviewState: "approved" })).toBe("confirm");
+    });
+
+    it("a permission or network block leaves NO door — the CTA's own reason is the message", () => {
+      for (const over of [{ publishEnabled: false }, { isViewer: true }, { offline: true }] as const) {
+        const move = deriveLifecycleState(at({ reviewState: "approved", errorCount: 2, ...over }));
+        expect(move?.gate).toBe("none");
+        expect(move?.gateReason).toBeNull();
+        expect(move?.blockedReason).not.toBeNull();
+      }
+    });
+
+    it("the in-flight control has no door either", () => {
+      expect(gateOf({ reviewsEnabled: null })).toBe("none");
+    });
+  });
+
+  it("no review in the path: errors confirm, else the plain confirm", () => {
+    const noReview = { reviewsEnabled: false, editsRequireApproval: false } as const;
+    expect(gateOf({ ...noReview })).toBe("confirm");
+    expect(gateOf({ ...noReview, errorCount: 1 })).toBe("open-errors");
+  });
+});
+
+/* The server's post-click refusal lands on the same enum, so the dialog a
+   refusal opens is the dialog the pre-click gate would have opened. */
+describe("gateFromBlockReason — the server's refusal on the same enum", () => {
+  it.each<[string | null | undefined, PublishGate]>([
+    ["review-pending", "waiting"],
+    ["no-review", "waiting"],
+    ["changes-requested", "changes-requested"],
+    ["stale-approval", "stale-approval"],
+    [null, "none"],
+    [undefined, "none"],
+  ])("%s → %s", (reason, gate) => {
+    expect(gateFromBlockReason(reason)).toBe(gate);
+  });
+
+  it("an unknown string maps to none — the server still blocks, nothing is invented", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(gateFromBlockReason("quota-exceeded")).toBe("none");
+    warn.mockRestore();
   });
 });

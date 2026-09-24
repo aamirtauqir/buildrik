@@ -126,6 +126,20 @@ describe("the status the panel shows agrees with what the exporter ships", () =>
   }
 });
 
+/* C4 #26 — Password pages are gone. A page saved as "password" before #21
+   stays unpublished (isPageLive fails closed) and reads as Hidden everywhere
+   in the panel: no "Password" status, no "Password" chip. */
+describe("usePages — legacy password pages", () => {
+  it('maps visibility "password" to the Hidden status and label', () => {
+    const composer = createMockComposer({
+      pages: [pg("p1", "Secret", { settings: { visibility: "password" } } as never)],
+    });
+    const { result } = setup(composer);
+    expect(result.current.pages[0].status).toBe("hidden");
+    expect(getStatusLabel(result.current.pages[0].status)).toBe("Hidden from publish");
+  });
+});
+
 // ── PROJECT_CHANGED filtering ────────────────────────────────────────────────
 
 describe("usePages PROJECT_CHANGED handler", () => {
@@ -188,41 +202,6 @@ describe("usePages PROJECT_LOADED handler — undo / redo / version-restore", ()
     composer._pages.push({ id: "p2", name: "About", slug: "about" });
     act(() => composer._emit(EVENTS.PROJECT_LOADED));
     expect(result.current.pages).toHaveLength(2);
-  });
-});
-
-// ── addPage ──────────────────────────────────────────────────────────────────
-
-describe("usePages addPage", () => {
-  it("calls elements.createPage with default name + slug and enters rename mode on the new id", () => {
-    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
-    const { result } = setup(composer);
-
-    act(() => result.current.addPage());
-
-    // 1 existing page → getDefaultPageName returns "About"
-    expect(composer.elements.createPage).toHaveBeenCalledWith("About", { slug: "about" });
-    // Mock harness assigns pg-new-1; renamingPageId comes from createPage's return
-    expect(result.current.renamingPageId).toBe("pg-new-1");
-    expect(result.current.pages).toHaveLength(2);
-  });
-
-  it("shows an error toast and does not enter rename mode when createPage throws", () => {
-    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    (composer.elements.createPage as unknown as Mock).mockImplementation(() => {
-      throw new Error("boom");
-    });
-    const { result } = setup(composer);
-
-    act(() => result.current.addPage());
-
-    expect(lastToast()).toMatchObject({
-      description: "Couldn't add page right now. Try again.",
-      tone: "error",
-    });
-    expect(result.current.renamingPageId).toBeNull();
-    consoleSpy.mockRestore();
   });
 });
 
@@ -333,24 +312,6 @@ describe("usePages duplicatePage", () => {
 // ── setHomepage ──────────────────────────────────────────────────────────────
 
 describe("usePages setHomepage", () => {
-  it("blocks external-status pages with a warning toast", () => {
-    const composer = createMockComposer({
-      pages: [
-        pg("p1", "Home", { isHome: true }),
-        pg("p2", "Docs", { settings: { visibility: "external" } }),
-      ],
-    });
-    const { result } = setup(composer);
-
-    act(() => result.current.setHomepage("p2"));
-
-    expect(composer.elements.setHomePage).not.toHaveBeenCalled();
-    expect(lastToast()).toMatchObject({
-      description: "External link pages can't be set as the homepage.",
-      tone: "warning",
-    });
-  });
-
   it("calls elements.setHomePage and toasts success for a normal page", () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "About")],

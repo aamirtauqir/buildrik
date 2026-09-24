@@ -15,7 +15,7 @@ import { EVENTS } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
-import type { DesignToken } from "@/editor/design-system";
+import { importMigratedProject } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
   loadCurrentUserId,
@@ -52,7 +52,6 @@ export interface UseComposerInitParams {
   setDevice: (d: DeviceType) => void;
   setZoom: (z: number) => void;
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDirty: (dirty: boolean) => void;
   /* Was this shape spelled out inline — a fourth copy of SaveState, and an
      anonymous one, so no duplicate-name scan could see it. Widening the union
@@ -82,7 +81,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setDevice,
     setZoom,
     setShowExporter,
-    setShowComponentView,
     setIsDirty,
     setSaveState,
     openCollectionSetup,
@@ -190,24 +188,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // writes a localStorage snapshot/marker for crash-resume. Failure
             // surfaces a toast and falls through with un-migrated data so the
             // editor still loads — DS migrations are forward-fix, not load-gating.
-            const fromVersion = data.dsSchemaVersion ?? 0;
-            let toImport: ProjectData = data;
+            // The run-then-import step is shared with the migration modal's
+            // Restore / Retry (A2), so a re-run lands tokens the way this does.
+            let migrated = false;
             try {
-              const result = instance.migration.run({
-                project: { tokens: (data.styles ?? []) as unknown as DesignToken[] },
-                currentVersion: fromVersion,
-                siteId,
-              });
-              if (result.newVersion !== fromVersion) {
-                toImport = {
-                  ...data,
-                  styles: result.project.tokens as unknown as ProjectData["styles"],
-                  dsSchemaVersion: result.newVersion,
-                };
-              }
-              instance.aliasResolver.validate(
-                (toImport.styles ?? []) as unknown as DesignToken[]
-              );
+              migrated = importMigratedProject(instance, data, siteId);
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -215,8 +200,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 description: "Could not update design system schema. Loaded as-is.",
                 tone: "warning",
               });
+              instance.importProject(data);
             }
-            instance.importProject(toImport);
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
             // instead of "Not saved" on fresh load. The just-loaded state IS
             // the persisted state; without this seed lastSavedAt stays null
@@ -255,6 +240,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }
             setIsDirty(false);
+            /* A migration that moved the version is an unsaved change: left
+               clean, its dsSchemaVersion never reached the server and the
+               "Updating your project" modal returned on every open (walk A2,
+               2026-09-24). A project:changed schedules the autosave that
+               persists it — once; the next load is at the target and skips. */
+            if (migrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.
@@ -441,7 +432,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
     // for ui:switch-tab) instead of the removed AIAssistant modal.
     const toggleAIHandler = () => instance.emit("ui:switch-tab", { tab: "ai" });
-    const toggleComponentViewHandler = () => setShowComponentView((v) => !v);
     const deviceChangedHandler = (d: DeviceType) => setDevice(d);
     const zoomChangedHandler = (z: number) => setZoom(z);
 
@@ -452,7 +442,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("ui:toggle:templates", toggleTemplatesHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
     instance.on("ui:toggle:ai", toggleAIHandler);
-    instance.on("ui:toggle:component-view", toggleComponentViewHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
        :70,:87). Listening for "device:changed" / "zoom:changed" meant nothing
        the engine did to zoom ever reached React — and the canvas transform is
@@ -477,7 +466,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("ui:toggle:templates", toggleTemplatesHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
       instance.off("ui:toggle:ai", toggleAIHandler);
-      instance.off("ui:toggle:component-view", toggleComponentViewHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
       instance.destroy();

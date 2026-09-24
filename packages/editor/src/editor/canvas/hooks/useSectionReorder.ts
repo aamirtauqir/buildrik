@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
@@ -34,6 +35,8 @@ export interface UseSectionReorderOptions {
   composer: Composer | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   enabled?: boolean;
+  /** Board 5940:148012: a finished move says so — "Moved down" + Undo. */
+  addToast?: (toast: { description: string; action?: { label: string; onClick: () => void } }) => void;
 }
 
 export interface UseSectionReorderResult {
@@ -55,13 +58,29 @@ export interface UseSectionReorderResult {
   setHoveredBoundary: (id: string | null) => void;
 }
 
+const sameBoundaries = (a: SectionBoundary[], b: SectionBoundary[]) =>
+  a.length === b.length &&
+  a.every(
+    (x, i) =>
+      x.sectionId === b[i].sectionId &&
+      x.index === b[i].index &&
+      x.rect.top === b[i].rect.top &&
+      x.rect.left === b[i].rect.left &&
+      x.rect.width === b[i].rect.width
+  );
+
 // ─── Hook ───────────────────────────────────────────────────────────────────
 
 export function useSectionReorder({
   composer,
   canvasRef,
   enabled = true,
+  addToast,
 }: UseSectionReorderOptions): UseSectionReorderResult {
+  /* Held in a ref: the toast function is not a reason to rebuild the drag
+     callbacks (their identity feeds the canvas overlay's effects). */
+  const addToastRef = React.useRef(addToast);
+  addToastRef.current = addToast;
   const [boundaries, setBoundaries] = React.useState<SectionBoundary[]>([]);
   const [dragState, setDragState] = React.useState<SectionDragState | null>(null);
   const [hoveredBoundary, setHoveredBoundary] = React.useState<string | null>(null);
@@ -86,6 +105,7 @@ export function useSectionReorder({
     }
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
+    const zs = canvasScale(canvasRef.current);
     const newBoundaries: SectionBoundary[] = [];
 
     children.forEach((child, index) => {
@@ -98,14 +118,14 @@ export function useSectionReorder({
         sectionId: id,
         index,
         rect: {
-          top: elRect.top - canvasRect.top,
-          left: elRect.left - canvasRect.left,
-          width: elRect.width,
+          top: (elRect.top - canvasRect.top) / zs,
+          left: (elRect.left - canvasRect.left) / zs,
+          width: elRect.width / zs,
         },
       });
     });
 
-    setBoundaries(newBoundaries);
+    setBoundaries((prev) => (sameBoundaries(prev, newBoundaries) ? prev : newBoundaries));
   }, [composer, canvasRef, enabled]);
 
   // Recompute on content changes
@@ -136,6 +156,49 @@ export function useSectionReorder({
     };
   }, [composer, enabled, computeBoundaries]);
 
+  /* A loaded project or a page switch renders its sections with no element
+     event (the import fires before this hook subscribes, and the markup lands
+     after), which left a freshly opened page with no handles at all. Watching
+     the canvas markup covers every way sections appear. */
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!enabled || !canvas || typeof MutationObserver === "undefined") return;
+    let frame = 0;
+    const observer = new MutationObserver(() => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        computeBoundaries();
+      });
+    });
+    observer.observe(canvas, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [canvasRef, enabled, computeBoundaries]);
+
+  /* Size changes without markup changes (images loading, the zoom-fit
+     settling) move sections too. */
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!enabled || !canvas || typeof ResizeObserver === "undefined") return;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        computeBoundaries();
+      });
+    });
+    observer.observe(canvas);
+    for (const child of Array.from(canvas.children)) observer.observe(child);
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [canvasRef, enabled, computeBoundaries]);
+
   // Also recompute on window resize / scroll
   React.useEffect(() => {
     if (!enabled) return;
@@ -147,11 +210,15 @@ export function useSectionReorder({
 
   // ── Drag operations ─────────────────────────────────────────────────────
 
+  /* A drag measures again: layout can move with no element event — zoom-fit
+     on load, images and fonts arriving — and the walk at /edit/:id found the
+     handles 100px off their sections, resolving drops against stale tops. */
   const startDrag = React.useCallback(
     (sectionId: string, fromIndex: number) => {
+      computeBoundaries();
       setDragState({ sectionId, fromIndex, toIndex: fromIndex });
     },
-    []
+    [computeBoundaries]
   );
 
   const updateDrag = React.useCallback(
@@ -159,7 +226,8 @@ export function useSectionReorder({
       if (!dragState || boundaries.length === 0 || !canvasRef.current) return;
 
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const relativeY = clientY - canvasRect.top;
+      const zs = canvasScale(canvasRef.current);
+      const relativeY = (clientY - canvasRect.top) / zs;
 
       // Find the closest boundary position to determine target index
       let targetIndex = 0;
@@ -196,13 +264,26 @@ export function useSectionReorder({
         return;
       }
 
-      // Adjust index: if moving down, account for removal of the element
-      const adjustedIndex = toIndex > fromIndex ? toIndex - 1 : toIndex;
-
+      // toIndex is a slot in the pre-move list; moveElement itself shifts a
+      // same-parent downward move by one, so it takes the slot unadjusted.
       composer.beginTransaction("reorder-section");
       try {
-        composer.elements.moveElement(sectionId, page.root.id, adjustedIndex);
+        const moved = composer.elements.moveElement(sectionId, page.root.id, toIndex);
         composer.endTransaction();
+        if (moved) {
+          /* Board 5940:148012: the moved section stays selected. The pointer
+             is released over a different section, and the click that follows
+             would select that one instead — swallow it. */
+          const swallowClick = (e: MouseEvent) => e.stopPropagation();
+          window.addEventListener("click", swallowClick, { capture: true, once: true });
+          setTimeout(() => window.removeEventListener("click", swallowClick, true), 0);
+          const movedEl = composer.elements.getElement(sectionId);
+          if (movedEl) composer.selection.select(movedEl);
+        }
+        if (moved) addToastRef.current?.({
+          description: toIndex > fromIndex ? "Moved down" : "Moved up",
+          action: { label: "Undo", onClick: () => composer.history.undo() },
+        });
       } catch {
         composer.rollbackTransaction();
       }

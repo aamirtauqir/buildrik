@@ -44,6 +44,10 @@ export const GOOGLE_FONT_CATALOGUE: GoogleFontEntry[] = [
   { family: "JetBrains Mono", variants: ["400", "500", "600", "700"], category: "monospace" },
   { family: "Source Code Pro", variants: ["400", "500", "600", "700"], category: "monospace" },
   { family: "Roboto Mono", variants: ["400", "500", "700"], category: "monospace" },
+  /* The design system's default mono token (editor/design-system/constants.ts
+     font-mono = "Geist Mono"). Listed so a site that keeps the default loads
+     it: absent here, the export named it and linked nothing (2026-09-24). */
+  { family: "Geist Mono", variants: ["400", "500", "600", "700"], category: "monospace" },
   { family: "Dancing Script", variants: ["400", "500", "600", "700"], category: "handwriting" },
   { family: "Pacifico", variants: ["400"], category: "handwriting" },
   { family: "Caveat", variants: ["400", "500", "600", "700"], category: "handwriting" },

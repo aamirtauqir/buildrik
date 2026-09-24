@@ -211,6 +211,11 @@ export const editorSaveProjectSchema = z.object({
     assets: z.array(z.unknown()),
     metadata: z.unknown().optional(),
     settings: z.unknown().optional(),
+    /* The DS project-migration version. saveProjectFromEditor has always
+       forwarded it, but this schema stripped it, so the editor's save never
+       reached Site.dsSchemaVersion and the migration re-ran on every open
+       (walk A2, 2026-09-24). */
+    dsSchemaVersion: z.number().int().min(0).optional(),
   }),
 });
 

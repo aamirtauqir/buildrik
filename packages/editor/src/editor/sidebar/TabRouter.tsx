@@ -27,36 +27,43 @@ import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
-import { exportPublishPages } from "../shell/exportPublishPages";
+import { FROM_ACTIVITY } from "./tabs/activity/BackToActivityRow";
+
+/** History's deep-link sub-screen: "published", or an Activity row's
+ *  "from-activity:published" / "from-activity:session". */
+function historyView(sub: string | undefined): "published" | "session" | undefined {
+  const view = sub?.startsWith(`${FROM_ACTIVITY}:`) ? sub.slice(FROM_ACTIVITY.length + 1) : sub;
+  return view === "published" || view === "session" ? view : undefined;
+}
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
-const TemplatesTab = React.lazy(() =>
-  import("./tabs/templates/TemplatesTab").then((m) => ({ default: m.TemplatesTab }))
-);
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
+const ActivityTab = React.lazy(() => import("./tabs/activity/ActivityTab").then((m) => ({ default: m.ActivityTab })));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
 );
-const DesignSystemTab = React.lazy(() => import("@/editor/design-system/ui/DesignSystemTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
   composer: Composer | null;
   commonTabProps: {
+    isOpen?: boolean;
     isExpanded: boolean;
-    onExpandToggle: () => void;
+    /** Absent for panels hosted in the inspector column — no 700 expand there. */
+    onExpandToggle?: () => void;
     onHelpClick?: () => void;
     onClose: () => void;
   };
@@ -65,11 +72,6 @@ export interface TabRouterProps {
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
-  /** Pages › "From template" navigated here — Templates opens in new-page
-   *  mode. A prop, deliberately: the old event-based handoff ALWAYS missed,
-   *  because TabRouter mounts one tab at a time, so the listener did not
-   *  exist yet when the emit fired from the Pages tab. */
-  templatesNewPageMode?: boolean;
   /** Site menu › Unpublish asked for the confirm before PublishTab existed.
    *  Same one-tab-at-a-time race as above; same answer — a prop the always-
    *  mounted sidebar owns, consumed once by the tab it was meant for. */
@@ -78,8 +80,9 @@ export interface TabRouterProps {
   onCreateComponent: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
-  onTemplatesSwitchTab?: (tab: string) => void;
+  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
+  nextMove?: NextMove | null;
+  onRequestPublish?: () => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
@@ -119,14 +122,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   canvasHoveredId,
   onSwitchToAdd,
   onSwitchToTemplates,
-  templatesNewPageMode,
   unpublishIntent,
   onUnpublishIntentConsumed,
   onCreateComponent,
   projectId,
   publishJob,
-  onVercelPublish,
-  onTemplatesSwitchTab,
+  nextMove,
+  onRequestPublish,
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -138,22 +140,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   switch (activeTab) {
     case "add":
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
-
-    case "templates":
-      return (
-        <TemplatesTab
-          isExpanded={commonTabProps.isExpanded}
-          onExpandToggle={commonTabProps.onExpandToggle}
-          composer={composer}
-          newPageMode={templatesNewPageMode}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          onClose={commonTabProps.onClose}
-        />
-      );
-
-    case "ai":
-      return <AITab composer={composer} {...commonTabProps} />;
 
     case "layers":
       return (
@@ -194,31 +180,37 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onOpenLibrary={onOpenLibrary}
           onOpenImageEditor={onOpenImageEditor}
           onOpenIconPicker={onOpenIconPicker}
+          initialStockQuery={activeSubTab?.startsWith("stock") ? activeSubTab.slice(6) : undefined}
           {...commonTabProps}
         />
       );
 
     case "publish":
-      // onVercelPublish gated on the same flag as the Topbar Publish dropdown
-      // so the sidebar action only lights up when publishing is enabled.
+      // The publish door is gated on the same flag as the topbar CTA, so the
+      // sidebar action only lights up when publishing is enabled.
       return (
         <PublishTab
           composer={composer}
           {...commonTabProps}
           projectId={projectId}
           publishJob={publishJob}
-          onVercelPublish={isFeatureEnabled("publish") ? onVercelPublish : undefined}
+          nextMove={nextMove ?? null}
+          onRequestPublish={isFeatureEnabled("publish") ? onRequestPublish : undefined}
           initialUnpublish={unpublishIntent}
           onUnpublishIntentConsumed={onUnpublishIntentConsumed}
         />
       );
+
+    case "activity":
+      return <ActivityTab composer={composer} projectId={projectId} onClose={commonTabProps.onClose} />;
 
     case "history":
       return (
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          initialView={activeSubTab === "published" ? "published" : undefined}
+          initialView={historyView(activeSubTab)}
+          fromActivity={activeSubTab?.startsWith(`${FROM_ACTIVITY}:`) ?? false}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={
@@ -245,11 +237,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <ReviewTab
           {...commonTabProps}
           composer={composer}
+          fromActivity={activeSubTab === FROM_ACTIVITY}
           onResend={onResendReview}
-          /* Board 200:213's ReviewBar links straight to Compare, the same way
-             the history tab deep-links to "published" two cases above. */
-          initialCompare={activeSubTab === "compare"}
-          onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />
       );
 
@@ -257,9 +246,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return (
         <ContentTab composer={composer} onCreateCollection={onCreateCollection} {...commonTabProps} />
       );
-
-    case "design":
-      return <DesignSystemTab composer={composer} projectId={projectId} {...commonTabProps} />;
 
     default:
       return null;

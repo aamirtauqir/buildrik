@@ -83,48 +83,35 @@ export function getAllNavigableElements(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Move element position by delta pixels.
- * Adjusts top/left for absolute/fixed; transform for static/relative.
+ * Move a POSITIONED element by delta pixels (its top/left). Returns false and
+ * changes nothing for an in-flow (static) element: nudging one used to write
+ * a transform, which moved the pixels while the layout box — and the page
+ * around it — stayed put, and nothing in the inspector showed it (G2-047,
+ * CI-62). The caller says why nothing moved.
  */
 export function moveElementPosition(
   composer: Composer,
   elementId: string,
   deltaX: number,
   deltaY: number
-): void {
+): boolean {
   const element = composer.elements.getElement(elementId);
-  if (!element) return;
+  if (!element) return false;
 
   const currentStyles = element.getStyles?.() || {};
   const position = currentStyles.position || "static";
+  if (position === "static") return false;
 
   composer.beginTransaction("keyboard-move");
   try {
-    if (position === "absolute" || position === "fixed") {
-      const currentTop = parseFloat(currentStyles.top || "0") || 0;
-      const currentLeft = parseFloat(currentStyles.left || "0") || 0;
-      element.setStyle?.("top", `${currentTop + deltaY}px`);
-      element.setStyle?.("left", `${currentLeft + deltaX}px`);
-    } else {
-      // Static/relative: use transform to preserve document flow
-      const currentTransform = currentStyles.transform || "";
-      const translateMatch = currentTransform.match(/translate\(([^,]+),\s*([^)]+)\)/);
-
-      let newX = deltaX;
-      let newY = deltaY;
-
-      if (translateMatch) {
-        newX += parseFloat(translateMatch[1]) || 0;
-        newY += parseFloat(translateMatch[2]) || 0;
-      }
-
-      const otherTransforms = currentTransform.replace(/translate\([^)]+\)/, "").trim();
-      const newTransform = `translate(${newX}px, ${newY}px)${otherTransforms ? " " + otherTransforms : ""}`;
-      element.setStyle?.("transform", newTransform);
-    }
+    const currentTop = parseFloat(currentStyles.top || "0") || 0;
+    const currentLeft = parseFloat(currentStyles.left || "0") || 0;
+    element.setStyle?.("top", `${currentTop + deltaY}px`);
+    element.setStyle?.("left", `${currentLeft + deltaX}px`);
   } finally {
     composer.endTransaction();
   }
+  return true;
 }
 
 /** Reorder element within its parent (keyboard-driven) */

@@ -5,13 +5,15 @@
  */
 
 import * as React from "react";
-import {  } from "../../../../shared/types/animations";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
+import { ElementAnimationRow } from "./ElementAnimationRow";
 import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
+import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 
@@ -28,13 +30,7 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: 12,
-  },
-  emptyState: {
-    textAlign: "center" as const,
-    padding: "16px 12px",
-    color: "var(--bk-ink-muted)",
-    fontSize: 12,
+    gap: 4,
   },
 };
 
@@ -43,14 +39,48 @@ const styles = {
 // ============================================================================
 
 export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
-  interactions,
+  interactions: interactionsProp,
   onInteractionsChange,
   onPreview,
   isOpen,
   onToggle,
   tier = "tertiary",
+  composer,
+  elementId,
+  animation: animationProp,
+  onAnimationChange,
+  onAnimationPreview,
 }) => {
   const [showAddPanel, setShowAddPanel] = React.useState(false);
+  const [live, setLive] = React.useState<Interaction[] | null>(null);
+  const [liveAnimation, setLiveAnimation] = React.useState<AnimationConfig | null | undefined>(undefined);
+  const [animationJustAdded, setAnimationJustAdded] = React.useState(false);
+  React.useEffect(() => {
+    setLive(null);
+    setLiveAnimation(undefined);
+    setAnimationJustAdded(false);
+    if (!composer || !elementId) return;
+    /* Re-read on any element update: cheap, and the payload is an Element
+       (getId(), no id field), so it is not filtered on. */
+    const sync = () => {
+      const el = composer.elements.getElement(elementId);
+      const next = el?.getInteractions?.();
+      setLive(Array.isArray(next) ? (next as Interaction[]) : []);
+      if (el?.getAnimation) setLiveAnimation(el.getAnimation() ?? null);
+    };
+    composer.on(EVENTS.ELEMENT_UPDATED, sync);
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, sync);
+    };
+  }, [composer, elementId]);
+  const interactions = live ?? interactionsProp;
+  const animation = liveAnimation === undefined ? animationProp : liveAnimation;
+
+  const addAnimation = () => {
+    onAnimationChange?.({ ...DEFAULT_ANIMATION });
+    setShowAddPanel(false);
+    setAnimationJustAdded(true);
+  };
   const [editingId, setEditingId] = React.useState<string | null>(null);
 
   // Add new interaction
@@ -94,13 +124,21 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     <Section
       title="Interactions"
       icon="MousePointer"
-      defaultOpen={interactions.length > 0}
+      defaultOpen={interactions.length > 0 || Boolean(animation)}
       isOpen={isOpen}
       onToggle={onToggle}
       tier={tier}
       id="inspector-section-interactions"
     >
       <div style={styles.container}>
+        {animation && onAnimationChange ? (
+          <ElementAnimationRow
+            animation={animation}
+            onChange={onAnimationChange}
+            onPreview={onAnimationPreview}
+            defaultOpen={animationJustAdded}
+          />
+        ) : null}
         {/* Existing Interactions */}
         {interactions.map((interaction) => (
           <InteractionItem
@@ -115,22 +153,21 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
           />
         ))}
 
-        {/* Add Interaction Button / Panel */}
         {!showAddPanel ? (
-          <Button onClick={() => setShowAddPanel(true)} color="light" size="xs" style={{
-            width: "100%"
-          }}>
-            + Add Interaction
+          <Button
+            onClick={() => setShowAddPanel(true)}
+            color="alternative"
+            size="xs"
+            className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
+          >
+            + Add interaction
           </Button>
         ) : (
-          <AddInteractionPanel onAdd={addInteraction} onClose={() => setShowAddPanel(false)} />
-        )}
-
-        {/* Empty State */}
-        {interactions.length === 0 && !showAddPanel && (
-          <div style={styles.emptyState}>
-            No interactions yet — click Add Interaction to trigger animations on hover, click, or scroll.
-          </div>
+          <AddInteractionPanel
+            onAdd={addInteraction}
+            onClose={() => setShowAddPanel(false)}
+            onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
+          />
         )}
       </div>
     </Section>

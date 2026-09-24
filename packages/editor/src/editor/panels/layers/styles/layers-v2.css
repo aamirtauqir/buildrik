@@ -69,6 +69,8 @@
 /* Board 143:179: a hidden layer is the WHOLE row at .45 — not five parts recoloured
    (the icon used to get a grey square painted behind its glyph). */
 .bdc-lr.bdc-hidden { opacity: 0.45; }
+/* "Highlight CMS-bound" (board 4418:84113): a tint on the row. */
+.bdc-lr.bdc-cms-bound { background: var(--bk-accent-tint); }
 
 .bdc-lr-chev {
   width: 12px;
@@ -154,9 +156,8 @@
   color: var(--bk-ink);
 }
 
-/* Inline tag/id/class/component/bp badges (display-settings controlled) */
-.bdc-lr-tag,
-.bdc-lr-id {
+/* Inline tag/CMS/component/bp badges (display-settings controlled) */
+.bdc-lr-tag {
   font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-muted);
   padding: 0 3px;
@@ -179,8 +180,9 @@
   flex-shrink: 0;
 }
 
-/* Eye + lock — board 244:1580 draws them ALWAYS, at gray-300; hover/state
-   darkens. (Was hover-reveal, which the board contradicts.) */
+/* Eye + lock — v3 board 4418:81300 draws NONE at rest; row hover (7059:78941)
+   reveals them. A row whose layer IS dimmed or locked keeps its control, or
+   the state could not be seen or undone. (V1 board 244:1580 drew them always.) */
 .bdc-lr-comp {
   font-size: var(--bk-text-11);
   line-height: 16px;
@@ -228,6 +230,12 @@
 
 .bdc-lr:hover .bdc-lr-eye,
 .bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink); }
+.bdc-lr .bdc-lr-eye:not(.bdc-off),
+.bdc-lr .bdc-lr-lock:not(.bdc-on) { visibility: hidden; }
+.bdc-lr:hover .bdc-lr-eye,
+.bdc-lr:hover .bdc-lr-lock,
+.bdc-lr:focus-within .bdc-lr-eye,
+.bdc-lr:focus-within .bdc-lr-lock { visibility: visible; }
 
 /* Board 143:179 dims a hidden row ONCE — 245:1837 carries `opacity-45` and
    none of its five children carries an opacity of its own. This rule stacked
@@ -294,15 +302,22 @@
    to 6. The left value never applied: LayerTreeItem writes padding-left inline
    for the depth ladder. */
 .bdc-layers-tree.bdc-layers-tree-compact .bdc-lr {
+  height: var(--bk-size-row-dense);
   padding: 2px var(--bk-space-8);
+}
+/* "Compact rows" off (C4 #18): the standard 32. Both heights were 28, so the
+   display option toggled a class that changed nothing (QA 2026-09-24). */
+.bdc-layers-tree:not(.bdc-layers-tree-compact) .bdc-lr {
+  height: var(--bk-size-row);
 }
 
 /* ==========================================================================
-   Selection banner (multi-select action bar)
+   Icon button (display-settings popover close)
    ========================================================================== */
 
-/* Shared icon button primitive used by the selection banner + panel-h acts.
-   Promoted to chrome.css in a later cross-tab cleanup. */
+/* Shared icon button primitive. Its other two owners — the selection banner
+   (deleted 2026-09-22, audit G2-068) and the toolbar's ⊞ ⊟ ⚙ (now the header
+   ⋯ menu, G2-058) — are gone. */
 .bdc-icon-btn {
   display: inline-flex;
   width: var(--bk-size-row-dense); height: var(--bk-size-row-dense); min-height: 0;
@@ -321,92 +336,13 @@
   color: var(--bk-ink);
 }
 
-.bdc-layers-banner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--bk-bg-subtle);
-  border-bottom: 1px solid var(--bk-border);
-}
-
-.bdc-layers-banner-count {
-  font: 500 12px/16px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-  flex: 1;
-}
-
-.bdc-layers-banner .bdc-icon-btn {
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 5px;
-  color: var(--bk-ink-soft);
-  cursor: pointer;
-}
-.bdc-layers-banner .bdc-icon-btn:hover {
-  background: var(--bk-bg-card);
-  color: var(--bk-ink);
-}
-.bdc-layers-banner .bdc-icon-btn svg {
-  width: 13px;
-  height: 13px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* ==========================================================================
-   Breadcrumb (single-select ancestor chain)
-   ========================================================================== */
-
-.bdc-layers-crumb {
-  display: flex;
-  height: var(--bk-size-row); align-items: center;
-  gap: var(--bk-space-4);
-  padding: 6px 10px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--bk-border);
-  /* Navigation labels are Inter — Geist Mono is data-only (DESIGN.md). */
-  font: 400 11px/16px var(--bk-font-ui);
-}
-
-.bdc-layers-crumb button {
-  height: 20px; min-height: 0; background: transparent;
-  border: none;
-  padding: 1px var(--bk-space-4);
-  border-radius: 3px;
-  color: var(--bk-ink-muted);
-  font: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.bdc-layers-crumb button:hover {
-  color: var(--bk-ink);
-  background: var(--bk-bg-subtle);
-}
-.bdc-layers-crumb button.bdc-on {
-  color: var(--bk-accent);
-  font-weight: 600;
-}
-
-.bdc-layers-crumb-sep {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
 
 /* ==========================================================================
    Context menu
    ========================================================================== */
 
 .bdc-menu {
-  /* Board 1082:4564: 140w card, radius 8, 4px vertical padding only — items
+  /* Board 1082:4564: card, radius 8, 4px vertical padding only — items
      run full-bleed. The 180 here (and the comment claiming the board said so)
      was stale: re-extracted 2026-09-08 the frame is w-[140px], and the widest
      label, "Group selection", is ~103px at 13px + 24 of inset. `13px/normal`,
@@ -417,7 +353,9 @@
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
   padding: var(--bk-space-4) 0;
-  width: 140px;
+  /* v3 4418:79546: 224 wide — every row now names its target ("Move to
+     page… · Heading"), which the V1 140 frame wrapped onto two lines. */
+  width: 224px;
   font: 400 13px/normal var(--bk-font-ui);
 }
 
@@ -429,7 +367,7 @@
   height: 28px;
   /* 5/12 — 1082:4565. A 0 vertical pad let the 28px height do all the work,
      which is the same thing right up until a label wraps. */
-  padding: 5px var(--bk-space-12);
+  padding: 7px var(--bk-space-12);
   border-radius: 0;
   background: transparent;
   border: none;
@@ -438,6 +376,9 @@
   cursor: pointer;
   width: 100%;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bdc-menu-item:hover { background: var(--bk-bg-subtle); }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
@@ -554,51 +495,6 @@
 }
 
 /* ==========================================================================
-   Inline delete-confirm
-   ========================================================================== */
-
-.bdc-layers-confirm {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  padding: 6px var(--bk-space-12);
-  margin: 6px 10px 0;
-  background: rgba(217, 119, 6, 0.08);
-  border-left: 2px solid var(--bk-warning);
-  border-radius: 4px;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-}
-.bdc-layers-confirm span { flex: 1; }
-
-.bdc-layers-confirm .bdc-btn {
-  padding: var(--bk-space-4) 10px;
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  border-radius: 5px;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
-
-.bdc-layers-confirm .bdc-btn-danger {
-  background: var(--bk-error);
-  color: var(--bk-bg-card);
-  border-color: var(--bk-error);
-}
-.bdc-layers-confirm .bdc-btn-danger:hover {
-  filter: brightness(1.05);
-}
-
-.bdc-layers-confirm .bdc-btn-ghost {
-  background: transparent;
-  color: var(--bk-ink-soft);
-  border-color: transparent;
-}
-.bdc-layers-confirm .bdc-btn-ghost:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-
-/* ==========================================================================
    LayersTab outer section — override chrome.css .bdc-panel which assumes
    grid-area: panel inside .bdc-shell. When rendered inside .ls-panel-animate
    (legacy sidebar), we need explicit height fill.
@@ -614,51 +510,11 @@
    now ride as children of TabFrame.Header; layout sourced from
    PanelHeader's HeaderActions. */
 
-/* Board 142:7 Toolbar — 36h band: search box + ⊞ ⊟ ⚙ cluster.
-   Measured 2026-09-08 against 142:7, which all five Layers state boards repeat:
-   the band is inset 12 on BOTH sides (it was 16 on the left, so the search box
-   started 4px inside where every board puts it) and the cluster is spaced 8,
-   not 4. `py-4` is the board's own box and 36 - 4 - 4 = 28 is the field's
-   height exactly, so it renders identically to the centring it replaces. */
-.bdc-ltoolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: var(--bk-space-36);
-  padding: var(--bk-space-4) var(--bk-space-12);
-  flex-shrink: 0;
-}
-
-/* Board 143:10 / 143:303 / 1082:4597 / 1171:4834 put the ⊞ ⊟ ⚙ run on an 18px
-   line box in --color/ink-muted; `.bdc-icon-btn`'s shared 16/ink-soft is the
-   selection banner's and the popover header's, not the toolbar's. Two classes
-   deep so it outranks nothing it should not — the base rule is one class. */
-.bdc-ltoolbar .bdc-icon-btn {
-  line-height: 18px;
-  color: var(--bk-ink-muted);
-}
-
-/* Search field (board 142:8 — 28h subtle box inside the toolbar) */
-.bdc-psearch {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-  gap: 6px;
-  height: var(--bk-size-row-dense);
-  /* Board 142:8: px-8 py-4 on a 28 box — 28 - 4 - 4 is the input's own 20px
-     line box, so the padded box and the centred one render the same. */
-  padding: var(--bk-space-4) var(--bk-space-8);
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  font: 500 11px var(--bk-font-ui);
-}
-
-/* Board 142:58 Count footer — 28h, 12px muted, 16px inset. */
+/* Count footer — v3 board 4418:81300 "Count footer" (7420:128318) is 32 tall
+   (was 28 off V1 142:58). */
 .bdc-lcount {
   flex-shrink: 0;
-  height: var(--bk-size-row-dense);
+  height: var(--bk-size-row);
   display: flex;
   align-items: center;
   /* 12, not 16: board 1082:4638 is the only Layers board that states the
@@ -672,23 +528,6 @@
   font: 400 var(--bk-text-12)/18px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-.bdc-psearch svg {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
-.bdc-psearch input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-}
-.bdc-psearch input::placeholder {
-  color: var(--bk-ink-muted);
-}
-
 /* panel body container — holds the scrollable tree region */
 .bdc-pbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .bdc-pbody-scroll { overflow-y: auto; }

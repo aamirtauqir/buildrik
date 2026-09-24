@@ -1,11 +1,12 @@
 /**
- * The empty-canvas CTA, and where its two buttons lead.
+ * The empty-canvas CTA — board 4428:44164 (Canvas · empty page): a title, one
+ * sentence, three template cards, and four routes — Browse all templates ·
+ * Add a block · ✦ Describe your site · Start blank (G2-018).
  *
- * Board 65:2 draws the first-run state: one sentence, two equal routes.
  * Board 807:6558 draws what Start blank LEADS TO — the Insert drawer open, and
- * the same sentence replaced by "Drop an element from the Insert panel, or drag
- * a section." The buttons are gone there, because the next act is in the
- * drawer that just opened.
+ * the sentence replaced by "Drop an element from the Insert panel, or drag a
+ * section." The cards and buttons are gone there, because the next act is in
+ * the drawer that just opened.
  *
  * Start blank used to hide the CTA and do nothing else, so the one button a
  * first-time user pressed left them on an empty canvas with no drawer, no
@@ -17,36 +18,65 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import * as React from "react";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CanvasEmptyCTA } from "../CanvasEmptyCTA";
+import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
 
 afterEach(cleanup);
 
-const renderCTA = (started?: boolean) =>
-  render(
-    <CanvasEmptyCTA started={started} onBrowseTemplates={vi.fn()} onStartBlank={vi.fn()} />,
-  );
+const renderCTA = () => {
+  const handlers = {
+    onBrowseTemplates: vi.fn(),
+    onAddBlock: vi.fn(),
+    onDescribe: vi.fn(),
+    onStartBlank: vi.fn(),
+  };
+  render(<CanvasEmptyCTA {...handlers} />);
+  return handlers;
+};
 
-describe("CanvasEmptyCTA", () => {
-  it("offers the two routes as equal-weight siblings on first run", () => {
+describe("CanvasEmptyCTA — board 4428:44164", () => {
+  it("names the page's state and the three ways forward", () => {
     renderCTA();
-    expect(screen.getByText("Start with a template, or drop your first section.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Browse templates" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start blank" })).toBeInTheDocument();
+    expect(screen.getByText("This page is empty")).toBeInTheDocument();
+    expect(screen.getByText("Start with a template, drop a block, or describe your site.")).toBeInTheDocument();
   });
 
-  it("after Start blank it points at the drawer instead of vanishing", () => {
-    renderCTA(true);
-    expect(
-      screen.getByText("Drop an element from the Insert panel, or drag a section."),
-    ).toBeInTheDocument();
+  it("draws three template cards from the catalogue, each opening Templates", () => {
+    const h = renderCTA();
+    const cards = screen.getAllByTestId(/^canvas-empty-template-/);
+    expect(cards).toHaveLength(3);
+    expect(cards.map((c) => c.textContent)).toEqual(SITE_TEMPLATES.slice(0, 3).map((t) => t.name));
+    fireEvent.click(cards[1]);
+    expect(h.onBrowseTemplates).toHaveBeenCalledTimes(1);
   });
 
-  it("…and drops both buttons there, because the next act is in the drawer", () => {
-    renderCTA(true);
-    expect(screen.queryByRole("button", { name: "Start blank" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Browse templates" })).not.toBeInTheDocument();
+  it("offers the four routes in the board's order and wires each", () => {
+    const h = renderCTA();
+    const actions = screen.getByTestId("canvas-empty-cta-actions");
+    expect(Array.from(actions.querySelectorAll("button")).map((b) => b.textContent)).toEqual([
+      "Browse all templates",
+      "Add a block",
+      "✦ Describe your site",
+      "Start blank",
+    ]);
+    fireEvent.click(screen.getByTestId("canvas-empty-add-block"));
+    expect(h.onAddBlock).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("canvas-empty-describe"));
+    expect(h.onDescribe).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("canvas-empty-start-blank"));
+    expect(h.onStartBlank).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* Parity flow note 2026-09-24: v3 lands Start blank on the editor page — the
+   prompt goes (it used to stay with a changed sentence, board 807:6558,
+   archived). Asserted on the source: mounting Canvas needs a Composer. */
+describe("Start blank clears the empty-page prompt", () => {
+  it("the CTA mount is gated on !startedBlank", () => {
+    const canvas = readFileSync(join(__dirname, "../Canvas.tsx"), "utf8");
+    expect(canvas).toMatch(/isCanvasEmpty && !readOnly && !startedBlank && \(\s*<CanvasEmptyCTA/);
   });
 });
 
@@ -66,8 +96,11 @@ describe("Start blank opens the Insert drawer", () => {
     expect(read("../../shell/StudioPanels.tsx")).toMatch(/composer\.on\("ui:switch-tab"/);
   });
 
-  it("and 'add' is still the Insert tab", () => {
+  /* The tab is labelled "Add" since the v3 IA (Q4); this assert said
+     "Insert" and was red on main from 2026-09-14 (learning: a green push
+     proves nothing about vitest). The seam it guards is the ID. */
+  it("and 'add' is still the Add tab", () => {
     const tabs = read("../../rail/tabsConfig.ts");
-    expect(tabs).toMatch(/id: "add",[\s\S]{0,200}label: "Insert"/);
+    expect(tabs).toMatch(/id: "add",[\s\S]{0,300}label: "Add"/);
   });
 });

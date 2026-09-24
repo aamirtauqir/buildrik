@@ -7,18 +7,19 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { IconConfig } from "../../shared/types/media";
 import type { ImageEditorContext } from "./hooks/useStudioModals";
 import { SaveTemplate } from "../../templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
-import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
-import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
+import { ImageEditorModal, IconPickerModal } from "../media";
+import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
+import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
-import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
+import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 
 // ============================================================================
 // TYPES
@@ -37,19 +38,13 @@ export interface StudioModalsProps {
   showExporter: boolean;
   onCloseExporter: () => void;
 
-  // Keyboard shortcuts
+  /** The one keyboard sheet (board 7575:195538). State is
+   *  `useGlobalModals.showShortcuts`; `?`, ⌘/, the ⌘K row, the site-menu row
+   *  and the footer help button all flip it. */
   showShortcuts: boolean;
   onCloseShortcuts: () => void;
 
   // Media modals
-  showMediaLibrary: boolean;
-  onCloseMediaLibrary: () => void;
-  onSelectMedia: (asset: MediaAsset) => void;
-  mediaLibraryContext: {
-    onSelect: (asset: MediaAsset) => void;
-    allowedTypes?: MediaAssetType[];
-    forLabel?: string;
-  } | null;
   showImageEditor: boolean;
   onCloseImageEditor: () => void;
   imageEditorContext: ImageEditorContext | null;
@@ -88,8 +83,6 @@ export interface StudioModalsProps {
   // CMS Collection Setup modal (WS-14a)
   showCMSCollectionSetup: boolean;
   onCloseCMSCollectionSetup: () => void;
-  showCMSRecords: boolean;
-  onCloseCMSRecords: () => void;
 
   // Command Palette
 }
@@ -107,10 +100,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseExporter,
   showShortcuts,
   onCloseShortcuts,
-  showMediaLibrary,
-  onCloseMediaLibrary,
-  onSelectMedia,
-  mediaLibraryContext,
   showImageEditor,
   onCloseImageEditor,
   imageEditorContext,
@@ -130,8 +119,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseProjectSettings,
   showCMSCollectionSetup,
   onCloseCMSCollectionSetup,
-  showCMSRecords,
-  onCloseCMSRecords,
 }) => {
   /* Board 1172:4867's Project settings modal (General · Canvas · SEO) is
      superseded by the Clone's full-screen Settings (3397:32915 — its General
@@ -171,21 +158,17 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         onSave={onSaveTemplate}
       />
 
+      {/* New page (decision #19) — opens on UI_NEW_PAGE_REQUESTED from any Add-page door. */}
+      <NewPageModal composer={composer} />
+
       {/* Export Modal */}
       <ExportModal isOpen={showExporter} onClose={onCloseExporter} composer={composer} />
 
-      {/* Keyboard Shortcuts */}
-      <KeyboardShortcutsPanel isOpen={showShortcuts} onClose={onCloseShortcuts} />
-
-      {/* Media Library */}
-      <MediaLibraryPanel
-        isOpen={showMediaLibrary}
-        onClose={onCloseMediaLibrary}
-        onSelect={onSelectMedia}
-        allowedTypes={mediaLibraryContext?.allowedTypes}
-        forLabel={mediaLibraryContext?.forLabel}
-        composer={composer}
-      />
+      {/* Keyboard shortcuts — mounted here, not on the canvas, so the sheet
+          answers from every view the shell renders. */}
+      <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} />
+      {/* Rail Help's legend card (4418:126882); its "All shortcuts ›" opens the sheet above. */}
+      <KeyboardLegend composer={composer} />
 
       {/* Image Editor — Clone 3397:39917. The promise is forwarded: a
           rejection is the dialog's own failure state (3695:45542, with
@@ -252,27 +235,12 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           saveAsComponentContext?.selectionIds[0] ??
           null
         }
-        selectionContext={
-          saveAsComponentContext
-            ? {
-                selectionIds: saveAsComponentContext.selectionIds,
-                extractedBindings: saveAsComponentContext.extractedBindings,
-              }
-            : undefined
-        }
       />
 
       {/* CMS Collection Setup Modal (WS-14a) */}
       <CMSCollectionSetupModal
         isOpen={showCMSCollectionSetup}
         onClose={onCloseCMSCollectionSetup}
-        composer={composer}
-      />
-
-      {/* CMS Records management */}
-      <CMSRecordsModal
-        isOpen={showCMSRecords}
-        onClose={onCloseCMSRecords}
         composer={composer}
       />
     </>

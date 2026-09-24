@@ -10,22 +10,18 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import { EVENTS } from "@/shared/constants";
+import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
+import type { SiteVariable } from "@/shared/types/project";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
   SITE_VARS_SOURCE_ID,
-  loadSiteVariables,
-  saveSiteVariables,
+  loadLegacySiteVariables,
   variablesToSourceData,
-  type SiteVariable,
 } from "./contentPanelUtils";
 
 export type ContentView =
   | { kind: "root" }
-  | { kind: "collection"; id: string }
-  | { kind: "record"; collectionId: string; recordId: string | null }
-  | { kind: "fields"; collectionId: string }
-  | { kind: "dynamic-pages"; collectionId: string }
   | { kind: "sources" }
   | { kind: "variables" }
   | { kind: "conditions" };
@@ -54,7 +50,7 @@ export interface UseContentPanelReturn {
     published: boolean,
   ) => Promise<CMSContentItem | null>;
   deleteRecord: (recordId: string) => Promise<void>;
-  addField: (collectionId: string, name: string, type: string, required: boolean) => Promise<void>;
+  addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
   setVariables: (vars: SiteVariable[]) => void;
   removeCondition: (elementId: string) => void;
@@ -139,19 +135,73 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
 
   // Mount: load persisted variables, register the live source, load the rest.
   React.useEffect(() => {
-    const vars = loadSiteVariables(projectId);
+    /* Variables live in the project (saved with it, so export and publish
+       see them). A site that still has them only in this browser's
+       localStorage moves them into the project once. */
+    let vars = composer?.getProjectSettings()?.siteVariables;
+    if (!vars && composer) {
+      const legacy = loadLegacySiteVariables(projectId);
+      if (legacy.length) composer.setProjectSettings({ ...composer.getProjectSettings(), siteVariables: legacy });
+      vars = legacy;
+    }
+    vars = vars ?? [];
     setVariablesState(vars);
     registerSiteSource(vars);
     reload();
-  }, [projectId, registerSiteSource, reload]);
+  }, [composer, projectId, registerSiteSource, reload]);
 
+  /* The collection whose records `records` holds, so an engine event can
+     re-read the same list (the CMS workspace table and the drawer both read
+     through this hook). */
+  const recordsFor = React.useRef<string | null>(null);
   const loadRecords = React.useCallback(
     async (collectionId: string) => {
       if (!composer) return;
-      setRecords(await composer.cms.collections.getContentItems(collectionId));
+      recordsFor.current = collectionId;
+      const rows = await composer.cms.collections.getContentItems(collectionId);
+      if (recordsFor.current === collectionId) setRecords(rows);
     },
     [composer],
   );
+
+  // Reload on engine CMS events (collection created via the shell modal, etc.).
+  // NB: CollectionManager is its own emitter — subscribe there, not on composer.
+  React.useEffect(() => {
+    if (!composer) return;
+    const cms = composer.cms.collections;
+    const onChange = () => {
+      reload();
+      if (recordsFor.current) void loadRecords(recordsFor.current);
+    };
+    const cmsEvents = [
+      EVENTS.CMS_COLLECTION_CREATED,
+      EVENTS.CMS_COLLECTION_UPDATED,
+      EVENTS.CMS_COLLECTION_DELETED,
+      EVENTS.CMS_CONTENT_CREATED,
+      EVENTS.CMS_CONTENT_UPDATED,
+      EVENTS.CMS_CONTENT_DELETED,
+      /* The server hydration lands after this panel's first read. */
+      EVENTS.CMS_STORE_REFRESHED,
+    ] as const;
+    cmsEvents.forEach((ev) => cms.on(ev, onChange));
+
+    /* Sources live on DataManager, which is a DIFFERENT emitter. A source
+       registered or updated from anywhere else left the Sources view showing
+       stale rows, and board 303:2083's "Watching for changes" is only true
+       because the panel really is watching. */
+    const dataEvents = [
+      EVENTS.DATA_SOURCE_REGISTERED,
+      EVENTS.DATA_SOURCE_UPDATED,
+      EVENTS.DATA_SOURCE_UNREGISTERED,
+      EVENTS.DATA_SAMPLE_IMPORTED,
+    ] as const;
+    dataEvents.forEach((ev) => composer.data.on(ev, onChange));
+
+    return () => {
+      cmsEvents.forEach((ev) => cms.off(ev, onChange));
+      dataEvents.forEach((ev) => composer.data.off(ev, onChange));
+    };
+  }, [composer, reload, loadRecords]);
 
   const saveRecord = React.useCallback(
     async (
@@ -188,17 +238,10 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
   );
 
   const addField = React.useCallback(
-    async (collectionId: string, name: string, type: string, required: boolean) => {
+    async (collectionId: string, field: Omit<CMSField, "id" | "order">) => {
       if (!composer) return;
-      const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       const order = composer.cms.collections.getCollection(collectionId)?.fields.length ?? 0;
-      await composer.cms.collections.addField(collectionId, {
-        name: name.trim(),
-        slug,
-        type: type as CMSCollection["fields"][number]["type"],
-        order,
-        ...(required ? { validation: { required: true } } : {}),
-      });
+      await composer.cms.collections.addField(collectionId, { ...field, order });
       reload();
     },
     [composer, reload],
@@ -216,10 +259,11 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
   const setVariables = React.useCallback(
     (vars: SiteVariable[]) => {
       setVariablesState(vars);
-      saveSiteVariables(projectId, vars);
-      if (composer) registerSiteSource(vars);
+      if (!composer) return;
+      composer.setProjectSettings({ ...composer.getProjectSettings(), siteVariables: vars });
+      registerSiteSource(vars);
     },
-    [composer, projectId, registerSiteSource],
+    [composer, registerSiteSource],
   );
 
   const removeCondition = React.useCallback(

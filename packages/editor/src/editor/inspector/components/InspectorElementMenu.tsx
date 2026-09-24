@@ -18,11 +18,11 @@
  * @license BSD-3-Clause
  */
 
-import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, RotateCcw, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -32,6 +32,14 @@ export interface InspectorElementMenuProps {
   selectedElementId: string;
   /** Called after the user confirms delete (triggers existing delete flow). */
   onRequestDelete: () => void;
+  /* Board 4428:141170's header is `[icon] Name · ✦ AI · ⋯` — the pick,
+     select-parent and hide-inspector icons it carried moved in here (G2-139). */
+  onPick?: () => void;
+  onSelectParent?: () => void;
+  onHideInspector?: () => void;
+  /** G2-146: open / close every section of this tab. */
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
 }
 
 interface MenuItem {
@@ -122,8 +130,14 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   composer,
   selectedElementId,
   onRequestDelete,
+  onPick,
+  onSelectParent,
+  onHideInspector,
+  onExpandAll,
+  onCollapseAll,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { addToast } = useToast();
   const [isTriggerHovered, setIsTriggerHovered] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState<string | null>(null);
   const menuRef = React.useRef<HTMLDivElement | null>(null);
@@ -178,12 +192,52 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  /* "Reset all styles" left the canvas menu with G2-054; it lives here so the
+     capability is not lost (owner rule 2026-09-24). One transaction, so the
+     toast's Undo takes it back in one step. */
+  const handleResetStyles = () => {
+    const el = composer?.elements.getElement(selectedElementId);
+    if (!composer || !el) return;
+    composer.beginTransaction?.("reset-styles");
+    try {
+      el.setStyles?.({});
+    } finally {
+      composer.endTransaction?.();
+    }
+    setIsOpen(false);
+    addToast({ description: "Styles reset", action: { label: "Undo", onClick: () => composer.history.undo() } });
+  };
+
   const handleDelete = () => {
     onRequestDelete();
     setIsOpen(false);
   };
 
+  const run = (fn: () => void) => () => {
+    fn();
+    setIsOpen(false);
+  };
+  const hasParent = Boolean(composer?.elements.getElement(selectedElementId)?.getParent?.());
+  const navItems: MenuItem[] = [
+    ...(onPick
+      ? [{ id: "pick", label: "Pick on canvas", icon: <Crosshair size={14} aria-hidden="true" />, onClick: run(onPick) }]
+      : []),
+    ...(onSelectParent
+      ? [{ id: "select-parent", label: "Select parent", icon: <CornerLeftUp size={14} aria-hidden="true" />, onClick: run(onSelectParent), disabled: !hasParent }]
+      : []),
+    ...(onHideInspector
+      ? [{ id: "hide-inspector", label: "Hide inspector", icon: <PanelRightClose size={14} aria-hidden="true" />, onClick: run(onHideInspector) }]
+      : []),
+    ...(onExpandAll
+      ? [{ id: "expand-all", label: "Expand all sections", icon: <ChevronsUpDown size={14} aria-hidden="true" />, onClick: run(onExpandAll) }]
+      : []),
+    ...(onCollapseAll
+      ? [{ id: "collapse-all", label: "Collapse all sections", icon: <ChevronsDownUp size={14} aria-hidden="true" />, onClick: run(onCollapseAll) }]
+      : []),
+  ];
+
   const items: MenuItem[] = [
+    ...navItems,
     {
       id: "duplicate",
       label: "Duplicate",
@@ -204,6 +258,12 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       disabled: !composer?.styleClipboard,
     },
     {
+      id: "reset-styles",
+      label: "Reset all styles",
+      icon: <RotateCcw size={14} aria-hidden="true" />,
+      onClick: handleResetStyles,
+    },
+    {
       id: "delete",
       label: "Delete",
       icon: <Trash2 size={14} aria-hidden="true" />,
@@ -221,6 +281,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
         onMouseEnter={() => setIsTriggerHovered(true)}
         onMouseLeave={() => setIsTriggerHovered(false)}
         aria-label="Element actions"
+        data-testid="inspector-element-menu"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         title="Element actions"
@@ -235,10 +296,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
         <div ref={menuRef} role="menu" style={styles.menu}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
-              {index === items.length - 1 && <div style={styles.divider} />}
+              {(index === items.length - 1 || (navItems.length > 0 && index === navItems.length)) && <div style={styles.divider} />}
               <Button
                 type="button"
                 role="menuitem"
+                data-testid={`inspector-menu-${item.id}`}
                 onClick={item.onClick}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}

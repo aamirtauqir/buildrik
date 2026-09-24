@@ -110,9 +110,8 @@
   background: rgba(17, 24, 39, 0.6);
 }
 
-/* Board 1164:4738 — 12 radius on --color/bg-elevated with a --color/border
-   edge, 16/14 inset, and a 12 gap between blocks. It shipped on 8 radius, a
-   flat 24 pad, no edge, and per-child margins doing the gap's job. */
+/* Board 6940:79709 (v3, supersedes 1164:4738) — dialog-md 560, 24 inset,
+   16 gap, 12 radius on --color/bg-elevated with a --color/border edge. */
 .med-rx-dialog {
   position: fixed;
   top: 50%;
@@ -121,12 +120,12 @@
   z-index: 301;
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-12);
-  width: 520px;
+  gap: var(--bk-space-16);
+  width: var(--bk-size-dialog-md);
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 96px);
   overflow-y: auto;
-  padding: 14px var(--bk-space-16);
+  padding: var(--bk-space-24);
   background: var(--bk-bg-elevated);
   border: 1px solid var(--bk-border);
   border-radius: 12px;
@@ -135,17 +134,22 @@
   color: var(--bk-ink);
 }
 
+/* 6940:79712 — ui/20 heading lg. */
 .med-rx-title {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--bk-text-20);
+  line-height: 30px;
+  letter-spacing: -0.24px;
   font-weight: 600;
   color: var(--bk-ink);
 }
 
+/* 6940:79713 — ui/11 caption. */
 .med-rx-body {
   margin: 0;
+  font-size: var(--bk-text-11);
+  line-height: 16px;
   color: var(--bk-ink-soft);
-  line-height: 20px;
 }
 
 /* Before → After. Board 1164:4741 draws two 96x64 plates with the arrow
@@ -160,30 +164,35 @@
 .med-rx-preview__before,
 .med-rx-preview__after {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--bk-space-4);
-  font-size: 11px;
-  color: var(--bk-ink-soft);
+  flex-shrink: 0;
 }
+/* 6940:79715 / 6940:79717 — 96x64 plates on an 8 radius, no labels; the
+   incoming one is ringed 2px accent on the accent tint. */
 .med-rx-preview__before img,
 .med-rx-preview__after img {
   width: 96px;
   height: 64px;
   object-fit: cover;
   border-radius: var(--bk-radius-lg);
-  border: 1px solid var(--bk-border);
   background: var(--bk-gray-200);
 }
-/* 1164:4744 — the board rings the incoming asset in accent AND tints its
-   plate: it is the thing being chosen. */
 .med-rx-preview__after img {
-  border: 1px solid var(--bk-accent);
+  border: 2px solid var(--bk-accent);
   background: var(--bk-accent-tint);
 }
 .med-rx-preview__arrow {
   font-size: 16px;
+  font-weight: 500;
   color: var(--bk-ink-muted);
+}
+/* 6940:79718 — the incoming file's name beside its plate. */
+.med-rx-preview__name {
+  font-size: var(--bk-text-11);
+  line-height: 16px;
+  color: var(--bk-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 1164:4746 — 8 gap, 11px, and no margin of its own (the dialog column owns
@@ -210,10 +219,14 @@
   max-height: 200px;
   overflow-y: auto;
 }
+/* 6940:79720 — ui/11 section header. */
 .med-rx-pages-label {
   margin: 0;
-  font-size: 11px;
-  color: var(--bk-ink-soft);
+  font-size: var(--bk-text-11);
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.88px;
+  color: var(--bk-ink-muted);
 }
 .med-rx-page-label {
   display: flex;
@@ -222,6 +235,7 @@
   padding: 4px 0 4px 8px;
   cursor: pointer;
   font-size: 11px;
+  line-height: 16px;
 }
 /* A single-class rule ties a `tw:` utility on specificity and loses on source
    order — this one competes with nothing, but the hover fill was
@@ -521,47 +535,6 @@
   font-size: 11px;
   font-weight: 600;
   color: var(--bk-ink-muted);
-}
-
-/* §11 — selection-context bar (extract from inline) */
-.med-selection-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  font-size: 12px;
-  font-weight: 500;
-}
-.med-selection-bar__inner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.med-selection-bar__pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-card);
-  animation: bd-status-pulse 2s infinite;
-}
-.med-selection-bar__title {
-  font-size: 12px;
-}
-.med-selection-bar__label {
-  font-size: 11px;
-  opacity: 0.85;
-}
-.med-selection-bar__cancel.bd-btn {
-  background: var(--bk-alpha-on-dark-15);
-  border: 1px solid var(--bk-alpha-on-dark-40);
-  color: var(--bk-bg-card);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  height: auto;
-  min-height: 0;
 }
 
 /* Usage pips (cobalt dots = N pages used) — prototype-v3 §10/§12/§15 */

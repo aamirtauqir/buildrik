@@ -3,31 +3,27 @@
  * Displays, creates, and manages saved components.
  *
  * Sub-components live in ./component-library/:
- *   ComponentRow, ComponentIcon, ComponentDetailScreen, useComponentsState, styles
+ *   ComponentIcon, ComponentDetailScreen, useComponentsState
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
+import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
-import {
-  containerStyles,
-  dialogInputStyles,
-  dialogCancelBtnStyles,
-  dialogPrimaryBtnStyles,
-} from "./component-library/styles";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 
 import "./component-library/ComponentsTab.css";
+import { EVENTS } from "@/shared/constants";
+import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 export type { ComponentsTabProps };
+
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
-  searchQuery: externalSearchQuery,
   compactMode = false,
   onCreateNew,
   onComponentSelect,
@@ -39,7 +35,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 }) => {
   const state = useComponentsState({
     composer,
-    externalSearchQuery,
     selectedComponentId,
     onComponentSelect,
     onClose,
@@ -47,11 +42,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
-  const [renameInput, setRenameInput] = React.useState("");
 
+  // Which of this site's masters are shared from the workspace library.
+  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
   React.useEffect(() => {
-    if (state.renameTarget) setRenameInput(state.renameTarget.currentName);
-  }, [state.renameTarget]);
+    if (!composer) return;
+    const load = () => void fetchComponentLibrary().then(setLibrary);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
 
   const { pendingToast, setPendingToast } = state;
   React.useEffect(() => {
@@ -121,11 +123,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         component={state.detailComponent}
         composer={composer}
         onBack={state.handleBackFromDetail}
+        onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
-        isInstanceSelected={state.isDetailInstanceSelected}
         selectedElementId={state.canvasSelection[0] ?? null}
-        onDetachInstance={state.handleDetachInstance}
       />
     );
   }
@@ -218,6 +219,47 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
+  /* Board 4418:142419: YOUR COMPONENTS, then LINKED FROM LIBRARY — masters this
+     site shares with other sites of the workspace ("24 on this site · linked"). */
+  const linkedIds = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
+  const own = state.components.filter((c) => !linkedIds.has(c.id));
+  const linked = state.components.filter((c) => linkedIds.has(c.id));
+  const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
+    const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+    return (
+              <div
+                key={component.id}
+                role="button"
+                tabIndex={0}
+                draggable
+                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+                data-testid={`comp-row-${component.id}`}
+                onClick={() => state.handleViewDetail(component)}
+                onDragStart={(e) => state.handleDragStart(e, component)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
+                }}
+              >
+                <span
+                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  data-testid={`comp-row-name-${component.id}`}
+                >
+                  {component.name}
+                </span>
+                {/* Board 641:2564 writes the count as "6 on this site", not
+                    "6 instances". The number is sample data; the words are the
+                    label, and copy on screen is decided by the board. */}
+                <span
+                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  data-testid={`comp-row-count-${component.id}`}
+                >
+                  {n} on this site{isLinked ? " · linked" : ""}
+                </span>
+                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
+              </div>
+    );
+  };
+
   return (
     <PanelFrame data-testid="comp-panel">
       {state.isStandaloneMode && (
@@ -253,41 +295,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           >
             YOUR COMPONENTS
           </div>
-          {state.components.map((component) => {
-            const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
-            return (
+          {own.map((component) => renderRow(component, false))}
+          {linked.length > 0 && (
+            <>
               <div
-                key={component.id}
-                role="button"
-                tabIndex={0}
-                draggable
-                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
-                data-testid={`comp-row-${component.id}`}
-                onClick={() => state.handleViewDetail(component)}
-                onDragStart={(e) => state.handleDragStart(e, component)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
-                }}
+                className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+                data-testid="comp-section-linked"
               >
-                <span
-                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
-                  data-testid={`comp-row-name-${component.id}`}
-                >
-                  {component.name}
-                </span>
-                {/* Board 641:2564 writes the count as "6 on this site", not
-                    "6 instances". The number is sample data; the words are the
-                    label, and copy on screen is decided by the board. */}
-                <span
-                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                  data-testid={`comp-row-count-${component.id}`}
-                >
-                  {n} on this site
-                </span>
-                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
+                LINKED FROM LIBRARY
               </div>
-            );
-          })}
+              {linked.map((component) => renderRow(component, true))}
+            </>
+          )}
         </div>
       </div>
       {/* Board 641:2596 panel footer — the screen's ONE primary button. */}
@@ -315,88 +334,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           state.confirmDeleteAction();
           addToast({ description: `"${name}" deleted`, tone: "warning", duration: 4000 });
         }}
-        /* Board 183:2 — the title asks the question and names the thing, the
-           button names the act. "Are you sure you want to…" in the body
-           repeated the question the title had already asked. */
-        title={`Delete "${state.confirmDelete?.name}"?`}
-        message="Instances already placed keep their content; they stop following this component. This cannot be undone."
-        confirmLabel="Delete component"
+        {...componentDeleteCopy(
+          state.confirmDelete?.name ?? "",
+          (state.confirmDelete && composer?.components?.getInstancesOfComponent?.(state.confirmDelete.id)?.length) || 0,
+        )}
+        confirmLabel="Delete"
         tone="destructive"
       />
-      <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
-        <ModalContent size="lg">
-          <ModalTitle>Rename Component</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <ModalBody>
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              <TextInput
-                type="text"
-                value={renameInput}
-                onChange={(e) => setRenameInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") state.confirmRename(renameInput);
-                }}
-                placeholder="Component name"
-                style={dialogInputStyles}
-              />
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
-                  Cancel
-                </Button>
-                <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
-                  Rename
-                </Button>
-              </div>
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </ModalRoot>
-      <ModalRoot open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
-        <ModalContent size="lg">
-          <ModalTitle>{`Select Variant — ${state.variantPicker?.componentName ?? ""}`}</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <ModalBody>
-            <div className="tw:flex tw:flex-col tw:gap-2">
-              {state.variantPicker?.variants.map((v) => {
-                const isCurrent = v.id === state.variantPicker?.currentVariantId;
-                return (
-                  <Button
-                    key={v.id}
-                    onClick={() => state.confirmVariant(v.id)}
-                    style={{
-                      padding: "10px 14px",
-                      borderRadius: "var(--bk-radius-sm)",
-                      fontSize: 13,
-                      cursor: "pointer",
-                      textAlign: "left" as const,
-                      background: isCurrent ? "var(--bk-alpha-accent-15)" : "var(--bk-bg-subtle)",
-                      border: isCurrent
-                        ? "1px solid var(--bk-accent)"
-                        : "1px solid var(--bk-border)",
-                      color: "var(--bk-ink)",
-                    }}
-                  >
-                    {v.name}
-                    {isCurrent && (
-                      <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bk-accent)" }}>
-                        (current)
-                      </span>
-                    )}
-                  </Button>
-                );
-              })}
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </ModalRoot>
     </PanelFrame>
   );
 };

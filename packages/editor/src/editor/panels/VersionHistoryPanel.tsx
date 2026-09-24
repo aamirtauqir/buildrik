@@ -24,7 +24,9 @@ import {
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button, TextField, useToast } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
+import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
+import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
@@ -108,17 +110,11 @@ export function VersionHistoryPanel({
     isLoading,
     loadError,
     retryLoad,
-    createVersion,
     restoreVersion,
     deleteVersion,
     compareVersions,
     updateAiSummary,
   } = useVersionHistory(composer);
-
-  // Save form state
-  const [showSaveForm, setShowSaveForm] = React.useState(false);
-  const [newVersionName, setNewVersionName] = React.useState("");
-  const [isSaving, setIsSaving] = React.useState(false);
 
   // Restore / delete confirmation + in-flight state
   const [restoreConfirmId, setRestoreConfirmId] = React.useState<string | null>(null);
@@ -152,12 +148,17 @@ export function VersionHistoryPanel({
   /* Board 163:220 draws the restore in flight, and its second line is the
      reassurance the engine now actually keeps: the work that was open is
      saved as its own version before anything is replaced. */
+  /* The safety save of the last restore, read by its toast's "Undo restore". */
+  const safetyIdRef = React.useRef<string | null>(null);
   const [restoring, setRestoring] = React.useState<{ targetName: string; savedAs: string | null } | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
     const onRestoring = (p: { targetName: string; savedAs: string | null }) => setRestoring(p);
-    const onRestored = () => setRestoring(null);
+    const onRestored = (p?: { safetyVersionId?: string }) => {
+      setRestoring(null);
+      safetyIdRef.current = p?.safetyVersionId ?? null;
+    };
     composer.on(EVENTS.VERSION_PRUNED, onPruned);
     composer.on(EVENTS.VERSION_RESTORING, onRestoring);
     composer.on(EVENTS.VERSION_RESTORED, onRestored);
@@ -175,31 +176,6 @@ export function VersionHistoryPanel({
     }
   }, [composer]);
 
-  // Handle create version
-  const handleCreateVersion = async () => {
-    const name = newVersionName.trim();
-    if (!name) return;
-    setIsSaving(true);
-    try {
-      await createVersion(name, "");
-      setNewVersionName("");
-      setShowSaveForm(false);
-      pushToast(`Saved '${name}'`, "success");
-    } catch {
-      pushToast("Save failed", "error");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleSaveFormKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleCreateVersion();
-    if (e.key === "Escape") {
-      setShowSaveForm(false);
-      setNewVersionName("");
-    }
-  };
-
   const handleRestoreClick = (versionId: string) => {
     setRestoreConfirmId(versionId);
   };
@@ -208,9 +184,22 @@ export function VersionHistoryPanel({
     setRestoreConfirmId(null);
     setRestoringId(versionId);
     const target = versions.find((v) => v.id === versionId);
+    safetyIdRef.current = null;
     try {
       await restoreVersion(versionId);
-      if (target) pushToast(`Restored to ${formatTime(target.createdAt)}`, "success");
+      /* G1-071: the restore saved the work on screen first; "Undo restore"
+         restores that save (itself a confirmed-safe restore). */
+      const safetyId = safetyIdRef.current;
+      addToast({
+          /* No target in this list = the Undo of a restore (its safety save
+             was created after the list was read). */
+          description: target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone",
+          tone: "success",
+          duration: 8000,
+          action: safetyId
+            ? { label: "Undo restore", onClick: () => void handleRestoreConfirm(safetyId) }
+            : undefined,
+        });
     } catch {
       pushToast("Restore failed", "error");
     } finally {
@@ -262,12 +251,15 @@ export function VersionHistoryPanel({
     [expandedId, compareResults, compareVersions, versions]
   );
 
-  // Filter versions by search query
+  /* G1-075: Named / Auto-saves / author, then the search query. */
+  const [savesFilter, setSavesFilter] = React.useState<SavesFilterValue>(ALL_SAVES);
+  const currentUserId = composer?.versions?.getCurrentUserId?.() ?? null;
   const filteredVersions = React.useMemo(() => {
-    if (!searchQuery.trim()) return versions;
+    const kept = applySavesFilter(versions, savesFilter);
+    if (!searchQuery.trim()) return kept;
     const query = searchQuery.toLowerCase();
-    return versions.filter((v) => v.name.toLowerCase().includes(query));
-  }, [versions, searchQuery]);
+    return kept.filter((v) => v.name.toLowerCase().includes(query));
+  }, [versions, searchQuery, savesFilter]);
 
   /* Board 162:2 puts a change count on every row. It is derived, not stored:
      the undo stack is the same source the board's sibling view (Saves ·
@@ -401,6 +393,15 @@ export function VersionHistoryPanel({
         </div>
       )}
 
+      {versions.length > 0 && (
+        <SavesFilter
+          versions={versions}
+          currentUserId={currentUserId}
+          value={savesFilter}
+          onChange={setSavesFilter}
+        />
+      )}
+
       {/* Version List — virtualization + row rendering owned by VersionList.
           See ./version-history/VersionList.tsx (D3 Stage 1). */}
       <VersionList
@@ -434,68 +435,7 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-      {/* Save Version FAB / inline form — fixed at bottom-right of saves-view */}
-      <div className="fab-container" data-testid="saves-footer">
-        {showSaveForm ? (
-          <div className="save-form open">
-            <div className="form-row">
-              <div className="form-field" style={{ flex: 1 }}>
-                <label className="form-label" htmlFor="bd-save-name">
-                  Version name *
-                </label>
-                <TextField
-                  id="bd-save-name"
-                  type="text"
-                  value={newVersionName}
-                  onChange={(e) => setNewVersionName(e.target.value)}
-                  onKeyDown={handleSaveFormKeyDown}
-                  placeholder="e.g. Homepage redesign"
-                  className="form-input"
-                  autoFocus
-                  maxLength={50}
-                />
-                <span className="form-hint">{newVersionName.length}/50</span>
-              </div>
-            </div>
-            <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
-              <Button
-                type="button"
-                onClick={() => {
-                  setShowSaveForm(false);
-                  setNewVersionName("");
-                }}
-                className="cancel-btn"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleCreateVersion}
-                className="save-btn"
-                disabled={!newVersionName.trim() || isSaving}
-              >
-                {isSaving ? "Saving..." : "Save Version"}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          /* Board 162:2 writes this as a labelled link at the foot of the
-             panel — "+ Save a version". It was a floating "+" circle with the
-             label only in a tooltip, so the one action that creates a NAMED
-             version (the kind the prune rule promises never to remove)
-             announced itself as an unlabelled dot. */
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            onClick={() => setShowSaveForm(true)}
-            data-testid="saves-save-version"
-            className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
-          >
-            + Save a version
-          </Button>
-        )}
-      </div>
+      <SaveVersionFooter composer={composer} />
     </div>
   );
 }

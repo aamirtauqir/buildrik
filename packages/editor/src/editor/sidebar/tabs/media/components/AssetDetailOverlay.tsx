@@ -6,8 +6,8 @@
  * ✨ Generate ABOVE the fold ("the one field with a legal consequence"), then
  * five 32h rows — Used in N places · Versions · Edit image · Optimise ·
  * Replace across site. Edit image opens the image-editor MODAL (cargo-sheets
- * §4: "Modals, not drill-in"); Optimise keeps the OptimizationPanel view until
- * its S3.6 board pass.
+ * §4: "Modals, not drill-in"); Optimise opens the same modal on its Optimise
+ * tab (4418:149547, G3-026) — the drawer's own optimise panel is gone.
  *
  * Versions view (146:32): 44h chips — dot · relative time · size delta,
  * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
@@ -29,8 +29,6 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
-import { generateContent } from "@/shared/utils/openai";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
@@ -40,19 +38,32 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
+import { Button, PanelFrame, Textarea } from "@/editor/chrome-ui";
+import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
-type View = "hub" | "used" | "versions" | "optimize";
+type View = "hub" | "used" | "versions";
 
 interface AssetDetailOverlayProps {
   item: LibraryItem;
   /** Back to the grid (the ‹ row). ESC does the same, one level at a time. */
   onClose(): void;
   onUpdate?(key: string, updates: Partial<LibraryItem>): Promise<void>;
-  onEditImage?(item: LibraryItem): void | Promise<void>;
+  /** Opens the image-editor modal; Optimise asks for its "optimise" tab. */
+  onEditImage?(item: LibraryItem, initialTab?: "optimise"): void | Promise<void>;
   composer?: Composer;
-  onOptimized?: (optimizedSrc: string) => void | Promise<void>;
   onReplaceAcross?(item: LibraryItem): void;
+  /** G3-022 — the server's alt-text model (AltTextService). `null` = it
+   *  could not run; `skipped` = the server kept text the user wrote. */
+  onGenerateAltText?(item: LibraryItem): Promise<{ altText: string; skipped: boolean } | null>;
+  /* Board 4418:61698 — the library's own actions, under the destination rows
+     (G3-021). Each row renders only when its handler is supplied. */
+  onInsert?(item: LibraryItem): void;
+  onRename?(item: LibraryItem): void;
+  onCopyUrl?(item: LibraryItem): void;
+  onDownload?(item: LibraryItem): void;
+  onDelete?(item: LibraryItem): void;
+  /** A viewer's reasons — Rename / Delete stay visible, disabled, titled. */
+  viewOnly?: { rename?: string; delete?: string };
 }
 
 const ROW =
@@ -93,8 +104,14 @@ export function AssetDetailOverlay({
   onUpdate,
   onEditImage,
   composer,
-  onOptimized,
   onReplaceAcross,
+  onGenerateAltText,
+  onInsert,
+  onRename,
+  onCopyUrl,
+  onDownload,
+  onDelete,
+  viewOnly,
 }: AssetDetailOverlayProps) {
   const [view, setView] = useState<View>("hub");
   // Escape reads the level from a ref: calling onClose() inside a setState
@@ -106,6 +123,7 @@ export function AssetDetailOverlay({
   }, [view]);
   const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [altBusy, setAltBusy] = useState(false);
+  const [altFailed, setAltFailed] = useState(false);
   const [metaError, setMetaError] = useState(false);
   // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
   // only carries width/height when the upload went through the WebP optimiser
@@ -238,6 +256,7 @@ export function AssetDetailOverlay({
 
   useEffect(() => {
     setAltDraft(item.altText ?? "");
+    setAltFailed(false);
     setView("hub");
     setMetaError(false);
     setPendingRestore(null);
@@ -269,28 +288,24 @@ export function AssetDetailOverlay({
     void onUpdate(item.key, { altText: next });
   }, [onUpdate, altDraft, item.altText, item.key]);
 
-  // ✨ Generate — writes the draft AND commits it, so the field has a value
-  // the moment the user looks at it.
+  /* ✨ Generate / Regenerate (G3-022) — the server's alt-text model through
+     AltTextService, which also writes the result to the asset. Its states are
+     the boards': generating (6623:149646), failed + Retry (6623:150370). */
   const generateAlt = useCallback(async () => {
-    if (altBusy) return;
+    if (altBusy || !onGenerateAltText) return;
     setAltBusy(true);
+    setAltFailed(false);
     try {
-      const alt = await generateContent(
-        `Write one concise alt text (max 125 characters, no quotes) for an image file named "${display}".`,
-        "headline",
-        "professional",
-      );
-      const clean = alt.replace(/^["']|["']$/g, "").trim().slice(0, 125);
-      if (clean && mountedRef.current) {
-        setAltDraft(clean);
-        void onUpdate?.(item.key, { altText: clean });
-      }
+      const result = await onGenerateAltText(item);
+      if (!mountedRef.current) return;
+      if (!result) setAltFailed(true);
+      else if (!result.skipped) setAltDraft(result.altText);
     } catch {
-      // AI unavailable — the field stays manual.
+      if (mountedRef.current) setAltFailed(true);
     } finally {
       if (mountedRef.current) setAltBusy(false);
     }
-  }, [altBusy, item.key, display, onUpdate]);
+  }, [altBusy, item, onGenerateAltText]);
 
   // The asset's own metadata wins; the measured bitmap is the fallback.
   const dims = item.width != null && item.height != null
@@ -298,7 +313,7 @@ export function AssetDetailOverlay({
     : natural;
 
   const showEdit = item.type === "img" && !!onEditImage;
-  const showOptimize = item.type === "img" && !!onOptimized;
+  const showOptimize = showEdit;
   const showReplace = (item.type === "img" || item.type === "vid") && !!onReplaceAcross;
   // Restore points + the live state — the count the hub row shows.
   const versionCount = dbVersions.length > 0 ? dbVersions.length + 1 : 0;
@@ -308,9 +323,7 @@ export function AssetDetailOverlay({
       ? `${display} · versions`
       : view === "used"
         ? `${display} · used in`
-        : view === "optimize"
-          ? `${display} · optimise`
-          : display;
+        : display;
 
   return (
     <div
@@ -397,34 +410,54 @@ export function AssetDetailOverlay({
               <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input" data-testid="media-detail-alt-label">
                 Alt text
               </label>
-              <TextField
-                id="med-alt-input"
-                className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]"
-                value={altDraft}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltDraft(e.target.value)}
-                onBlur={commitAltText}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    commitAltText();
-                    (e.currentTarget as HTMLInputElement).blur();
+              {/* Board 4418:61698 — one bordered box: the text, then the
+                  Generate link inside it. */}
+              <div className="tw:mt-1 tw:flex tw:flex-col tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:py-1.5" data-testid="media-alt-box">
+                <Textarea
+                  id="med-alt-input"
+                  rows={2}
+                  className="tw:resize-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:shadow-none tw:focus:ring-0"
+                  value={altDraft}
+                  disabled={altBusy}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    setAltDraft(e.target.value);
+                    setAltFailed(false);
+                  }}
+                  onBlur={commitAltText}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      commitAltText();
+                      e.currentTarget.blur();
+                    }
+                  }}
+                  placeholder={
+                    altBusy
+                      ? "Generating alt text…"
+                      : altFailed
+                        ? "Couldn't generate alt text — write it or retry"
+                        : "Describe this image for screen readers"
                   }
-                }}
-                placeholder="Describe this image for screen readers"
-                aria-label="Alt text"
-              />
-              <Button
-                type="button"
-                color="light"
-                size="xs"
-                variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)] tw:mt-1.5"
-                data-testid="media-alt-generate"
-                disabled={altBusy}
-                aria-busy={altBusy || undefined}
-                onClick={generateAlt}
-              >
-                {"✨"}&nbsp;&nbsp;{altBusy ? "Generating…" : "Generate"}
-              </Button>
+                  aria-label="Alt text"
+                  aria-invalid={altFailed || undefined}
+                />
+                {onGenerateAltText && item.type === "img" ? (
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:min-h-5 tw:self-start tw:text-[length:var(--bk-text-12)]"
+                    data-testid="media-alt-generate"
+                    disabled={altBusy}
+                    aria-busy={altBusy || undefined}
+                    onClick={generateAlt}
+                  >
+                    {"✨"}&nbsp;&nbsp;
+                    {altBusy ? "Generating…" : altFailed ? "Retry" : altDraft.trim() ? "Regenerate" : "Generate"}
+                  </Button>
+                ) : null}
+              </div>
             </div>
 
             {/* Board 233:1254-1274 — the five 32h destination rows. */}
@@ -457,7 +490,7 @@ export function AssetDetailOverlay({
               <Button
                 className={ROW}
                 data-testid="media-detail-optimize"
-                onClick={() => setView("optimize")}
+                onClick={() => onEditImage?.(item, "optimise")}
               >
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Optimise</span>
                 <span className={ROW_CHEVRON}>{"›"}</span>
@@ -473,6 +506,33 @@ export function AssetDetailOverlay({
                 <span className={ROW_CHEVRON}>{"›"}</span>
               </Button>
             ) : null}
+            {/* Board 4418:61698 — the library's actions, glyph-led, no chevron:
+                they act, they do not drill in. */}
+            <div className="tw:w-full" data-testid="media-detail-actions">
+              {[
+                { id: "insert", label: "Insert to canvas", icon: <SquarePlus size={14} />, fn: onInsert },
+                { id: "rename", label: "Rename…", icon: <Pencil size={14} />, fn: onRename, blocked: viewOnly?.rename },
+                { id: "copy-url", label: "Copy URL", icon: <Link2 size={14} />, fn: onCopyUrl },
+                { id: "download", label: "Download", icon: <Download size={14} />, fn: onDownload },
+                { id: "delete", label: "Delete", icon: <Trash2 size={14} />, fn: onDelete, blocked: viewOnly?.delete },
+              ].map((a) =>
+                a.fn ? (
+                  <Button
+                    key={a.id}
+                    className={ROW}
+                    data-testid={`media-detail-${a.id}`}
+                    disabled={Boolean(a.blocked)}
+                    title={a.blocked}
+                    onClick={() => a.fn?.(item)}
+                  >
+                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
+                      <span aria-hidden="true" className="tw:flex tw:text-[var(--bk-ink-soft)]">{a.icon}</span>
+                      <span className="tw:truncate">{a.label}</span>
+                    </span>
+                  </Button>
+                ) : null,
+              )}
+            </div>
           </>
         )
       ) : view === "versions" ? (
@@ -658,19 +718,7 @@ export function AssetDetailOverlay({
             </div>
           ) : null}
         </div>
-      ) : (
-        <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">
-          {/* No onClose: the ‹ back row is this screen's exit and board
-              1124:4562 draws no second one. */}
-          <OptimizationPanel
-            imageSrc={item.src}
-            onOptimized={async (src) => {
-              await onOptimized?.(src);
-              setView("hub");
-            }}
-          />
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

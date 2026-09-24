@@ -61,11 +61,11 @@ export const color = {
   "bg-elevated": "#FFFFFF",
   "border": "#E5E7EB",
   "border-medium": "#D1D5DB",
-  "border-strong": "#9CA3AF",
-  "border-input": "#9CA3AF",
+  "border-strong": "#868C97",
+  "border-input": "#868C97",
   "ink": "#111827",
   "ink-soft": "#4B5563",
-  "ink-muted": "#6B7280",
+  "ink-muted": "#6C7079",
   "ink-disabled": "#D1D5DB",
   "accent": "#1A56DB",
   "accent-hover": "#1E429F",
@@ -88,10 +88,14 @@ export const color = {
 export const space = [2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 48, 64] as const;
 
 export const radius = {
+  "xs": 2,
   "sm": 4,
   "md": 6,
   "lg": 8,
+  "xl": 12,
+  "2xl": 16,
   "full": 9999,
+  "card": 12,
 } as const;
 
 export const size = {
@@ -102,10 +106,29 @@ export const size = {
   "row-tall": 64,
   "rail": 60,
   "drawer": 280,
-  "panel-right": 360,
+  "panel-right": 300,
   "inspector": 300,
   "nav": 240,
   "footer": 32,
+  "sidebar": 256,
+  "control-xs": 28,
+  "control-sm": 32,
+  "control-md": 36,
+  "control-lg": 40,
+  "control-xl": 44,
+  "icon-xs": 12,
+  "icon-sm": 16,
+  "icon-md": 20,
+  "icon-lg": 24,
+  "row-nav": 36,
+  "row-table": 40,
+  "row-2line": 52,
+  "menu-item": 30,
+  "panel-footer": 44,
+  "dialog-sm": 480,
+  "dialog-md": 560,
+  "dialog-lg": 640,
+  "dialog-xl": 960,
 } as const;
 
 export const z = {

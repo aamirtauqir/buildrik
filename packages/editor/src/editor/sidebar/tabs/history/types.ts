@@ -6,14 +6,12 @@
 import type { Composer } from "../../../../engine";
 
 /**
- * Top-level History destinations.
+ * Top-level History destinations — board 4418:73791's tab row, Session ·
+ * Saves · Published (B8, G1-068), plus Activity (B6).
  *
- * `changes` used to sit here as a third peer. It is now a filter INSIDE Saves
- * (`SavesFilter`) — the Figma file already modelled it that way as
- * `History · Saves · changes`, one of nine states under `History · Saves`, and
- * a filter over the same list with the same entry point and the same
- * permissions is not a separate destination. See M1 in
- * docs/audits/2026-08-11-editor-job-architecture.md.
+ * `session` is the undo stack of this editing session. It was a filter chip
+ * inside Saves ("This session", M1); the v3 IA boards give it back its own
+ * tab, first in the row, and the chip is gone.
  *
  * `published` is new here and is a MOVE, not a new capability: the published-
  * version list already existed at two addresses (the Publish panel, and a
@@ -22,10 +20,7 @@ import type { Composer } from "../../../../engine";
  * `backups` is drawn in Figma but deliberately absent — 7 `[design-ahead]`
  * boards with no backing service.
  */
-export type HistoryView = "saves" | "published";
-
-/** Which list the Saves pane shows. `changes` is the old Changes tab. */
-export type SavesFilter = "milestones" | "changes";
+export type HistoryView = "session" | "saves" | "published";
 
 export interface HistoryTabProps {
   /** Composer instance */
@@ -36,6 +31,9 @@ export interface HistoryTabProps {
    *  Wins over the stored preference for one mount, so the ⋯ menu's "Publish
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
+  /** Opened by an Activity row (Activity is its own panel): draws
+   *  "‹ Activity" under the header until the user picks a tab. */
+  fromActivity?: boolean;
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
   rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;

@@ -31,7 +31,11 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
   dirtyCount,
   onDiscard,
   onReview,
-}) => (
+}) =>
+  /* The clean state is not drawn (7315:80955 and its pages end at the card):
+     "Brand is up to date" was a bar with nothing to act on. The bar appears
+     only while something is staged. */
+  !isDirty ? null : (
   <div
     data-screen-savebar="true"
     data-testid="brand-save-bar"

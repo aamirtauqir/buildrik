@@ -8,12 +8,14 @@ import type { Composer } from "../../../../../engine";
 import type { BlockData } from "../../../../../shared/types";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { CATALOG, flatCatalog } from "../catalog/catalog";
-import { TIPS } from "../catalog/tips";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
+import type { ComponentDefinition } from "@/shared/types/components";
 import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
+import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
+import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
@@ -62,20 +64,31 @@ const ls = {
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type DragStartFn = (e: React.DragEvent, el: FlatElEntry) => void;
+export type BlockDragStartFn = (e: React.DragEvent, block: BlockDefinition) => void;
+
+/** The one payload the canvas drop reads (`dropOperations.handleBlockDrop`
+ *  → `getBlockById(id)`); an element row and a block card write the same. */
+const NO_SAVED: ComponentDefinition[] = [];
+
+function setBlockPayload(e: React.DragEvent, payload: { id: string; label: string; category?: string }) {
+  e.dataTransfer.setData("block", JSON.stringify(payload));
+  e.dataTransfer.setData("text/plain", payload.id);
+  e.dataTransfer.effectAllowed = "copy";
+}
 export type ElClickFn = (el: FlatElEntry) => void;
 export type ToggleFavFn = (name: string) => void;
 
 export interface UseBuildTabReturn {
   // State
   favs: Set<string>;
+  /** Recently inserted element names, newest first (G2-115). */
+  recents: string[];
   openCats: Set<string>;
   searchQuery: string;
-  tipDismissed: boolean;
   favOpen: boolean;
   searchResults: InsertSearchHit[];
   allElements: FlatElEntry[];
   composer: Composer | null;
-  tipIdx: number;
   // Handlers
   setSearchQuery: (q: string) => void;
   toggleFav: ToggleFavFn;
@@ -85,21 +98,18 @@ export interface UseBuildTabReturn {
   restoreFavs: (snapshot: Set<string>) => void;
   favsInformed: boolean;
   markFavsInformed: () => void;
-  dismissTip: () => void;
-  tipPrev: () => void;
-  tipNext: () => void;
-  tipSetAt: (i: number) => void;
   handleDragStart: DragStartFn;
+  /** Board 4428:140817's `grip/⠿ drag to place` — a block card is a drag source too. */
+  handleBlockDragStart: BlockDragStartFn;
   handleElClick: ElClickFn;
-  /** Describes where the next clicked element will be inserted */
-  insertionContext: { type: string; label: string } | null;
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useBuildTab(
   composer: Composer | null,
-  onBlockClick?: (data: BlockData) => void
+  onBlockClick?: (data: BlockData) => void,
+  saved: ComponentDefinition[] = NO_SAVED
 ): UseBuildTabReturn {
   const [favs, setFavs] = React.useState<Set<string>>(() =>
     ls.getSet(STORAGE_KEYS.BUILD_FAVORITES)
@@ -118,14 +128,18 @@ export function useBuildTab(
   const [searchQuery, setSearchQueryRaw] = React.useState("");
   // Track which categories were open before a search started
   const preClearCatsRef = React.useRef<Set<string> | null>(null);
-  const [tipDismissed, setTipDismissed] = React.useState<boolean>(() =>
-    ls.getBool(STORAGE_KEYS.BUILD_TIP_DISMISSED)
-  );
   const [favsInformed, setFavsInformed] = React.useState<boolean>(() =>
     ls.getBool(STORAGE_KEYS.BUILD_FAVS_INFORMED)
   );
   const [favOpen, setFavOpen] = React.useState(false);
-  const [tipIdx, setTipIdx] = React.useState(0);
+  const [recents, setRecents] = React.useState<string[]>(() => [...ls.getSet(STORAGE_KEYS.BUILD_RECENT)]);
+  const noteRecent = React.useCallback((name: string) => {
+    setRecents((prev) => {
+      const next = [name, ...prev.filter((n) => n !== name)].slice(0, MAX_RECENT);
+      ls.saveSet(STORAGE_KEYS.BUILD_RECENT, new Set(next));
+      return next;
+    });
+  }, []);
 
   // Persist favs
   React.useEffect(() => {
@@ -167,30 +181,13 @@ export function useBuildTab(
     ls.saveBool(STORAGE_KEYS.BUILD_FAVS_INFORMED, true);
   }, []);
 
-  const dismissTip = React.useCallback(() => {
-    setTipDismissed(true);
-    ls.saveBool(STORAGE_KEYS.BUILD_TIP_DISMISSED, true);
-  }, []);
-
-  const tipPrev = React.useCallback(() => {
-    setTipIdx((prev) => (prev - 1 + TIPS.length) % TIPS.length);
-  }, []);
-
-  const tipNext = React.useCallback(() => {
-    setTipIdx((prev) => (prev + 1) % TIPS.length);
-  }, []);
-
-  const tipSetAt = React.useCallback((i: number) => {
-    setTipIdx(i);
-  }, []);
-
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
-    e.dataTransfer.setData(
-      "block",
-      JSON.stringify({ id: el.blockId, label: el.name, category: el.catId })
-    );
-    e.dataTransfer.setData("text/plain", el.blockId);
-    e.dataTransfer.effectAllowed = "copy";
+    setBlockPayload(e, { id: el.blockId, label: el.name, category: el.catId });
+    noteRecent(el.name);
+  }, [noteRecent]);
+
+  const handleBlockDragStart: BlockDragStartFn = React.useCallback((e, block) => {
+    setBlockPayload(e, { id: block.id, label: block.label, category: block.category });
   }, []);
 
   const handleElClick: ElClickFn = React.useCallback(
@@ -203,8 +200,9 @@ export function useBuildTab(
         }
       }
       onBlockClick?.({ id: el.blockId, label: el.name, category: el.catId });
+      noteRecent(el.name);
     },
-    [onBlockClick]
+    [onBlockClick, noteRecent]
   );
 
   const setSearchQuery = React.useCallback(
@@ -233,53 +231,16 @@ export function useBuildTab(
   // Board 138:53: search is flat and cross-source — elements, blocks AND
   // components (the board's third tag).
   const searchResults = React.useMemo(
-    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows),
-    [searchQuery]
+    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows, saved),
+    [searchQuery, saved]
   );
-
-  /* Selection ticker. insertionContext read composer.selection but listed only
-     [composer] as its dependency, so it was computed once and never again — it
-     would have named whatever was selected when the panel mounted. It had no
-     reader at all until the purpose line below started showing it, so the
-     staleness never surfaced. Same five events useLayerSelection listens to. */
-  const [selectionTick, setSelectionTick] = React.useState(0);
-  React.useEffect(() => {
-    if (!composer) return;
-    const bump = () => setSelectionTick((n) => n + 1);
-    const events = [
-      EVENTS.ELEMENT_SELECTED,
-      EVENTS.SELECTION_MULTIPLE,
-      EVENTS.SELECTION_CLEARED,
-      EVENTS.SELECTION_ADDED,
-      EVENTS.SELECTION_REMOVED,
-    ];
-    events.forEach((e) => composer.on(e, bump));
-    /* Block body, not a concise arrow: composer.off is chainable and returns the
-       Composer, which React would take for a destructor. */
-    return () => {
-      events.forEach((e) => composer.off(e, bump));
-    };
-  }, [composer]);
-
-  const insertionContext = React.useMemo((): { type: string; label: string } | null => {
-    if (!composer) return null;
-    const selectedIds = composer.selection.getSelectedIds();
-    if (selectedIds.length !== 1) return null;
-    const el = composer.elements.getElement(selectedIds[0]);
-    if (!el) return null;
-    const type = el.getType();
-    // Capitalize first letter for display
-    const label = type.charAt(0).toUpperCase() + type.slice(1);
-    return { type, label };
-  }, [composer, selectionTick]);
 
   return {
     favs,
+    recents,
     openCats,
     searchQuery,
-    tipDismissed,
     favOpen,
-    tipIdx,
     searchResults,
     allElements: flatCatalog,
     composer,
@@ -291,12 +252,8 @@ export function useBuildTab(
     restoreFavs,
     favsInformed,
     markFavsInformed,
-    dismissTip,
-    tipPrev,
-    tipNext,
-    tipSetAt,
     handleDragStart,
+    handleBlockDragStart,
     handleElClick,
-    insertionContext,
   };
 }

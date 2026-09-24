@@ -1,288 +1,172 @@
 /**
- * CreateComponentModal - Modal for creating reusable components
- * Allows users to save selected elements as reusable components
+ * CreateComponentModal — board 4418:142143 (C5 G1-098; owner rule: the board
+ * wins on anything visual).
+ *
+ *   Create component
+ *   Selected: <Page> › <Name> (<type>). Creating a master converts this
+ *   <Name> into its first instance. Nothing else changes unless you opt in below.
+ *   Name   [ … ]
+ *   Scope  [ This site ▾ ]
+ *   ☐ Also convert N other matching <Name> groups on this page
+ *                                        Cancel · Create component
+ *
+ * The board's three fields are the whole form. Description, category, tags,
+ * variant presets and the "Pre-fill from DS styles" toggle are gone (the
+ * pre-fill keeps its default, ON). Scope is This site / This page (popover
+ * 6971:77663): a page-scoped master is stored with the active page's id and
+ * offered only on that page (ComponentManager.getComponentsForPage). "Matching" is an identical copy of the selection on
+ * this page (engine/components/matchingGroups) — the only kind that becomes
+ * an instance with nothing on screen changing; the registry holds the active
+ * page only, which is why the sentence says page, not site.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput, Textarea, useToast } from "@/editor/chrome-ui";
+import {
+  Button,
+  Checkbox,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalRoot,
+  ModalTitle,
+  Select,
+  TextInput,
+  useToast,
+} from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
+import { findMatchingElements } from "../../../engine/components/matchingGroups";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
   onClose: () => void;
   composer: Composer | null;
   elementId: string | null;
-  /**
-   * Token bindings already extracted from the selection, when the caller has
-   * them (`tokenBindingResolver.resolveForElements`). Only the hint changes:
-   * the same checkbox can either promise "matching values" or name the number
-   * it found, and the number is the honest version.
-   */
-  selectionContext?: {
-    selectionIds: readonly string[];
-    extractedBindings: Map<string, string>;
-  };
 }
 
-// GAP-FIX: Default variant property presets
-const VARIANT_PRESETS = [
-  { name: "Size", values: ["S", "M", "L"], defaultValue: "M" },
-  { name: "State", values: ["Default", "Hover", "Disabled"], defaultValue: "Default" },
-  { name: "Theme", values: ["Light", "Dark"], defaultValue: "Light" },
-];
+function titleCase(s: string): string {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
 
-export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
-  isOpen,
-  onClose,
-  composer,
-  elementId,
-  selectionContext,
-}) => {
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [tags, setTags] = React.useState("");
-  const [isCreating, setIsCreating] = React.useState(false);
+export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOpen, onClose, composer, elementId }) => {
   const { addToast } = useToast();
+  const element = isOpen && composer && elementId ? composer.elements.getElement(elementId) : null;
+  const type = element?.getType() ?? "element";
+  const defaultName = (element && getLayerName(element)) || titleCase(type);
+  const activePage = composer?.elements.getActivePage();
+  const pageName = activePage?.name ?? "";
 
-  // GAP-FIX: Variant options state
-  const [isVariantSet, setIsVariantSet] = React.useState(false);
-  const [selectedVariantProps, setSelectedVariantProps] = React.useState<string[]>([]);
+  const [name, setName] = React.useState("");
+  const [convertMatching, setConvertMatching] = React.useState(false);
+  const [scope, setScope] = React.useState<"site" | "page">("site");
+  const [isCreating, setIsCreating] = React.useState(false);
 
-  // Spec §6.3 / D7: "Pre-fill from DS styles" toggle, default ON.
-  const [prefillFromDs, setPrefillFromDs] = React.useState(true);
-  /* null = the caller did not extract bindings, so say nothing about a count. */
-  const bindingCount = selectionContext ? selectionContext.extractedBindings.size : null;
+  const matches = React.useMemo(
+    () => (isOpen && composer && elementId ? findMatchingElements(composer, elementId) : []),
+    [isOpen, composer, elementId],
+  );
 
-  // Reset form when modal closes
   React.useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) setName(defaultName);
+    else {
       setName("");
-      setDescription("");
-      setCategory("");
-      setTags("");
-      setIsVariantSet(false);
-      setSelectedVariantProps([]);
-      setPrefillFromDs(true);
+      setConvertMatching(false);
+      setScope("site");
     }
-  }, [isOpen]);
-
-  // GAP-FIX: Toggle variant property selection
-  const toggleVariantProp = (propName: string) => {
-    setSelectedVariantProps((prev) =>
-      prev.includes(propName) ? prev.filter((p) => p !== propName) : [...prev, propName]
-    );
-  };
+  }, [isOpen, defaultName]);
 
   const handleSubmit = async () => {
-    if (!name.trim()) {
-      addToast({ description: "Component name is required", tone: "error" });
-      return;
-    }
-
-    if (!composer || !elementId) {
-      addToast({ description: "Invalid state", tone: "error" });
-      return;
-    }
-
+    if (!composer || !elementId || !name.trim()) return;
     setIsCreating(true);
     try {
-      // GAP-FIX: Build variant properties if variant set is enabled
-      const variantProperties =
-        isVariantSet && selectedVariantProps.length > 0
-          ? VARIANT_PRESETS.filter((preset) => selectedVariantProps.includes(preset.name)).map(
-              (preset) => ({
-                name: preset.name,
-                values: preset.values,
-                defaultValue: preset.defaultValue,
-              })
-            )
-          : undefined;
-
       const component = await composer.components.createComponent(name.trim(), elementId, {
-        description: description.trim() || undefined,
-        category: category.trim() || undefined,
-        tags: tags.trim() ? tags.split(",").map((t) => t.trim()) : undefined,
-        // GAP-FIX: Include variant properties if defined
-        variantProperties,
-        // Spec §6.3 / D7: persist user's "Pre-fill from DS styles" choice.
-        prefillFromDs,
+        prefillFromDs: true,
+        pageId: scope === "page" ? activePage?.id ?? null : null,
       });
-
-      if (component) {
-        addToast({
-          description: `Component "${name}" created successfully!`,
-          tone: "success",
-        });
-        onClose();
-      } else {
-        addToast({ description: "Failed to create component", tone: "error" });
+      if (!component) {
+        addToast({ description: "Couldn't create the component", tone: "error" });
+        return;
       }
-    } catch (error) {
+      const converted = composer.components.adoptInstances(component.id, [
+        elementId,
+        ...(convertMatching ? matches : []),
+      ]);
+      const others = converted - 1;
       addToast({
-        description: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        tone: "error",
+        tone: "success",
+        description:
+          others > 0
+            ? `“${component.name}” created — ${others} matching group${others === 1 ? "" : "s"} converted too.`
+            : `“${component.name}” created.`,
       });
+      onClose();
+    } catch (error) {
+      addToast({ description: error instanceof Error ? error.message : "Couldn't create the component", tone: "error" });
     } finally {
       setIsCreating(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && e.metaKey && name.trim()) {
-      handleSubmit();
-    }
-  };
-
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg" data-testid="create-component-modal">
-        <ModalTitle data-testid="create-component-title">Create Component</ModalTitle>
-        <ModalClose aria-label="Close modal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </ModalClose>
+      <ModalContent size="confirm" data-testid="create-component-modal">
+        <ModalTitle className="tw:text-[length:var(--bk-text-16)]" data-testid="create-component-title">
+          Create component
+        </ModalTitle>
         <ModalBody>
-    <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
-      <div>
-        <label className={FIELD_LABEL} data-testid="create-component-name-label">
-          Name <span className="tw:text-[var(--bk-accent-text)]">*</span>
-        </label>
-        <TextInput
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g., Hero Section"
-          data-testid="create-component-name"
-          autoFocus
-        />
-      </div>
-
-      <div>
-        <label className={FIELD_LABEL}>Description</label>
-        <Textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Optional description..."
-          data-testid="create-component-description"
-          rows={3}
-          className="tw:min-h-15 tw:resize-y tw:bg-white"
-        />
-      </div>
-
-      <div>
-        <label className={FIELD_LABEL}>Category</label>
-        <TextInput
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="e.g., Headers, Footers, Cards"
-          data-testid="create-component-category"
-        />
-      </div>
-
-      <div>
-        <label className={FIELD_LABEL}>Tags</label>
-        <TextInput
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="e.g., responsive, dark-mode (comma-separated)"
-          data-testid="create-component-tags"
-        />
-        <small className={HINT} data-testid="create-component-tags-hint">
-          Comma-separated tags for easier searching
-        </small>
-      </div>
-
-      {/* GAP-FIX: Variant Options Section */}
-      <div className={SUB_SECTION}>
-        <label className={FIELD_LABEL} data-testid="create-component-variant-label">Variant Options</label>
-        <label className={CHECK_LABEL} data-testid="create-component-variant-check-label">
-          <Checkbox
-            color="blue"
-            className="tw:bg-white tw:size-4 tw:cursor-pointer"
-            data-testid="create-component-variant-toggle"
-            checked={isVariantSet}
-            onChange={(e) => setIsVariantSet(e.target.checked)}
-          />
-          <span>This is a variant set (has multiple variants)</span>
-        </label>
-
-        {isVariantSet && (
-          <div
-            /* Board 1712:8412 fills this panel --flowbite/gray/50, not
-               --bk-bg-subtle, and the difference is not cosmetic: its two
-               hints are --bk-ink-muted (`var(--bk-gray-500)`), which lands at 4.39:1 on
-               `var(--bk-gray-100)` — under the 4.5 floor — and 4.66:1 on `var(--bk-gray-50)`. The
-               conformance run flagged both lines; the board's own fill is the
-               fix. */
-            className="tw:mt-3 tw:p-3 tw:rounded-lg tw:bg-[var(--bk-gray-50)]"
-            data-testid="create-component-variant-panel"
-          >
-            <small className={HINT} data-testid="create-component-variant-hint">
-              Select variant properties:
-            </small>
-            <div className="tw:flex tw:flex-wrap tw:gap-2 tw:mt-2">
-              {VARIANT_PRESETS.map((preset) => (
-                <Button
-                  key={preset.name}
-                  type="button"
-                  data-testid={`create-component-variant-chip-${preset.name}`}
-                  onClick={() => toggleVariantProp(preset.name)}
-                  className={`${CHIP} ${
-                    selectedVariantProps.includes(preset.name)
-                      ? "tw:bg-[var(--bk-accent)] tw:text-white"
-                      : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]"
-                  }`}
-                >
-                  {preset.name}
-                  {/* `tw:opacity-70` was here. --bk-ink-soft on --bk-bg-subtle is 6.4:1;
-                      at 70% it folds to 3.4:1, under the 4.5 floor for 12px text —
-                      measured once the contrast sweep was pointed at the real
-                      dialog (it had been scoped to a subtree the portalled modal
-                      is not in, so this read as a clean screen). No board draws
-                      this chip's value list, so nothing is conformed away: the
-                      smaller size already says it is secondary. */}
-                  <span className="tw:ml-0.5 tw:text-xs">({preset.values.join(", ")})</span>
-                </Button>
-              ))}
-            </div>
-            <small className={HINT}>You can configure variant values after creation</small>
+          <p className={LEAD} data-testid="create-component-lead">
+            Selected: {pageName ? `${pageName} › ` : ""}
+            {defaultName} ({type}). Creating a master converts this {defaultName} into its first instance.
+            Nothing else changes unless you opt in below.
+          </p>
+          <div className={ROW}>
+            <label htmlFor="create-component-name" className={LABEL}>
+              Name
+            </label>
+            <TextInput
+              id="create-component-name"
+              sizing="sm"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && name.trim()) void handleSubmit();
+              }}
+              autoFocus
+              data-testid="create-component-name"
+              className="tw:w-[240px]"
+            />
           </div>
-        )}
-      </div>
-
-      {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
-      <div className={SUB_SECTION}>
-        <label className={CHECK_LABEL} data-testid="create-component-prefill-label">
-          <Checkbox
-            color="blue"
-            className="tw:bg-white tw:size-4 tw:cursor-pointer"
-            data-testid="create-component-prefill-toggle"
-            checked={prefillFromDs}
-            onChange={(e) => setPrefillFromDs(e.target.checked)}
-          />
-          <span>Pre-fill from DS styles</span>
-        </label>
-        <small className={HINT} data-testid="create-component-prefill-hint">
-          {bindingCount === null
-            ? "Lift matching values into token / preset bindings on save. Recommended."
-            : bindingCount === 1
-              ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
-              : `${bindingCount} styles will bind to your DS tokens. Editing tokens later updates this component too.`}
-        </small>
-      </div>
-    </div>
+          <div className={ROW}>
+            <label htmlFor="create-component-scope" className={LABEL}>
+              Scope
+            </label>
+            <Select
+              id="create-component-scope"
+              sizing="sm"
+              value={scope}
+              onChange={(e) => setScope(e.target.value === "page" ? "page" : "site")}
+              className="tw:w-[240px]"
+              data-testid="create-component-scope"
+            >
+              <option value="site">This site</option>
+              {activePage ? <option value="page">This page</option> : null}
+            </Select>
+          </div>
+          {matches.length > 0 ? (
+            <label className={CHECK_ROW} data-testid="create-component-convert">
+              <Checkbox checked={convertMatching} onChange={(e) => setConvertMatching(e.target.checked)} />
+              Also convert {matches.length} other matching {defaultName} group{matches.length === 1 ? "" : "s"} on this page
+            </label>
+          ) : null}
         </ModalBody>
         <ModalFooter>
-          <Button color="light" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+          <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating}>
             Cancel
           </Button>
-          <Button data-testid="create-component-submit" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
-            {isCreating ? "Creating..." : "Create component"}
+          <Button size="xs" data-testid="create-component-submit" onClick={() => void handleSubmit()} disabled={!name.trim() || isCreating}>
+            {isCreating ? "Creating…" : "Create component"}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -290,21 +174,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   );
 };
 
-// ============================================================================
-// CLASSES
-// ============================================================================
-
-const FIELD_LABEL = "tw:block tw:mb-1.5 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]";
-const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
-/** Section separated by a rule — variant options, DS prefill. */
-const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]";
-const CHECK_LABEL = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
-/* `tw:h-7` is load-bearing and must set HEIGHT, not padding. These are flowbite
-   Buttons, whose own `tw:h-10` only loses to a utility setting the SAME
-   property — the class list here had px/py and no height, so every variant chip
-   shipped 40px tall against board 1712:8416's 28 (CLAUDE.md §Chrome, "a
-   DIFFERENT property does not conflict and loses"). The modal footer's
-   `[&_button]:h-7` does not reach these; they sit in the body. */
-const CHIP = "tw:flex tw:h-7 tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-[var(--bk-gray-200)] tw:text-xs tw:font-medium";
+/* Board 4418:142143: 12/18 muted lead; a 152px label column at 13/20 soft,
+   240px controls; 12px between rows; no ✕ (Esc and Cancel close); Cancel is
+   borderless. */
+const LEAD = "tw:m-0 tw:mb-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+const ROW = "tw:flex tw:items-center tw:gap-3 tw:mb-3";
+const LABEL = "tw:w-[152px] tw:flex-none tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
+const CHECK_ROW = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
 
 export default CreateComponentModal;

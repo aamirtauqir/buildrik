@@ -5,86 +5,71 @@
  * from a non-React callsite (an engine event, a worker result) still lands, and
  * so it survives HMR in dev. The provider only subscribes to it.
  *
+ * THE STACKING RULE lives here, in the store, not at the call sites (plan
+ * 2026-09-21 decisions #24 / #35). Ten fast drops used to stack ten toasts
+ * with ten Undo buttons, each reverting a different action than the one the
+ * user was looking at. Now:
+ *
+ *   - at most ONE transient toast is visible; the newest replaces it, so an
+ *     Undo on screen is always the undo of the LAST action;
+ *   - persistent toasts — `tone: "error"` or `duration: Infinity` — are never
+ *     replaced by a transient and are kept FIRST in the queue, so they render
+ *     above the transient in the bottom-anchored column;
+ *   - a toast that offers Undo lingers at least 8 s (decision #17 — a user who
+ *     expected a confirm sees the element vanish, and 5 s is not enough to
+ *     read, decide and reach the button); everything else defaults to 5 s.
+ *
+ * THE ANCHOR is the bottom-left of the CANVAS column, 16px above its toolbar
+ * (board 5940:148012, "Moved down · Undo"). The canvas column carries
+ * `data-bk-toast-anchor` and its footer toolbar `data-bk-toast-floor`; the
+ * viewport measures both.
+ * With no anchor mounted (full-page views) it falls back to the window's
+ * bottom-left. The overlay root is a sibling of `.bd-studio`, so this is
+ * measured, not inherited.
+ *
+ * THE SURFACE is the toast catalogue's (7574:194162): an ink bar, white 13px
+ * text, r8, actions as on-dark link buttons (blue-300), an 8px tone dot for
+ * success / warning / error. The owner retired decision #25's NO BLACK RULE
+ * for toasts on 2026-09-24. Lines=1 is a 36px bar that hugs its text; a toast
+ * with a title is the 420px two-line card. Every toast keeps its ✕ (the
+ * library's Close:B), though the catalogue draws it off on transients.
+ *
  * The viewport is aria-live="polite": announced when the user is idle rather
  * than interrupting mid-sentence. Errors use assertive, because "publish
  * failed" losing the race with a form label is worse than an interruption.
  *
- * API mirrors the previous library exactly — 34 call sites use
- * `useToast().addToast(...)` and none of them should have to change.
+ * API mirrors the previous library — call sites use `useToast().addToast(...)`
+ * and none of them had to change for the policy. The context value is a
+ * module constant (decision #43): a consumer renders once no matter how many
+ * toasts fire, because the queue is read by the viewport's own subscription,
+ * never through the context.
  *
  * @license BSD-3-Clause
  */
 import React from "react";
 import { createPortal } from "react-dom";
 import { Button } from "flowbite-react";
+import { X } from "lucide-react";
 import { getOverlayRoot } from "./OverlayRoot";
 
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/* Button Kind=link Size=sm, on-dark: 28 high, pad 8, 12px medium blue-300. */
+const LINK_BTN_CLASS =
+  "tw:h-7 tw:px-2 tw:py-0 tw:border-0 tw:bg-transparent tw:hover:bg-transparent tw:hover:underline " +
+  "tw:text-[var(--bk-blue-300)] tw:text-xs tw:font-medium tw:rounded-[6px] tw:focus:ring-0 " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-export type ToastTone = "info" | "success" | "warning" | "error" | "neutral" | "dark";
+const CLOSE_BTN_CLASS =
+  "tw:h-6 tw:w-6 tw:p-0 tw:border-0 tw:bg-transparent tw:hover:bg-white/10 tw:text-[var(--bk-gray-400)] " +
+  "tw:rounded-[6px] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-/**
- * The tone fills the card and colours the title — board 1177:4859, the toast
- * catalog. It was a 3px left border on a white card, which reads as the same
- * toast five times with a coloured tick mark; the board tints the whole
- * surface, and every value it draws is already a token pair: measured off the
- * frame, `var(--bk-green-100)`/`var(--bk-green-600)`, `var(--bk-blue-50)`/`var(--bk-blue-700)`, `var(--bk-red-100)`/`var(--bk-red-700)`, `var(--bk-yellow-50)`/`var(--bk-yellow-800)`
- * and `var(--bk-gray-100)` for the neutral one, in that order.
- *
- * Same-property values can't be additive (Row/PanelFrame precedent), so each
- * tone carries its own complete pair rather than layering on a base.
- */
-/* Each entry carries BOTH the fill and the ink. They are listed whole rather
-   than layered on a shared `text-[var(--bk-ink)]` because two utilities for
-   the same property on a PLAIN element do not merge — source order in the
-   compiled sheet would pick the winner, not the order they are concatenated
-   in (CLAUDE.md, "Overriding a flowbite default depends on WHERE the class
-   lands"). Same rule Row's SIZE table already follows. */
-const TONE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)]",
-  info: "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-ink)]",
-  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-ink)]",
-  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-ink)]",
-  error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-ink)]",
-  /* `dark` is the SIXTH tone and it does not touch the five above. Board
-     814:7027 draws all six undo/redo toasts on --color/ink with the message
-     in --flowbite/gray/200 — a transient "here is what just happened" bar,
-     not one of the five semantic tints board 1177:4859 catalogues. It is
-     declared here rather than at the call site so the ink ground, the ink
-     type colour and the readable action all move together; a caller that set
-     only the fill would have shipped ink-soft body text on ink. */
-  dark: "tw:bg-[var(--bk-ink)] tw:text-[var(--bk-gray-200)]",
+export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
+
+/** The catalogue's 8px tone dot. Neutral and info draw none. */
+const TONE_DOT_CLASS: Partial<Record<ToastTone, string>> = {
+  success: "tw:bg-[var(--bk-green-400)]",
+  warning: "tw:bg-[var(--bk-yellow-300)]",
+  error: "tw:bg-[var(--bk-error)]",
 };
-
-const TONE_TITLE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:text-[var(--bk-ink-soft)]",
-  info: "tw:text-[var(--bk-accent-text)]",
-  success: "tw:text-[var(--bk-success-text)]",
-  warning: "tw:text-[var(--bk-warning-text)]",
-  error: "tw:text-[var(--bk-error-text)]",
-  dark: "tw:text-white",
-};
-
-/* The body line. Every tinted tone keeps ink-soft on its own pale ground;
-   `dark` takes the board's --flowbite/gray/200 at 11 (814:7033/7063), which
-   is 12.6:1 on ink. */
-const TONE_BODY_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
-  info: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
-  success: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
-  warning: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
-  error: "tw:text-[var(--bk-ink-soft)] tw:text-xs",
-  dark: "tw:text-[var(--bk-gray-200)] tw:text-[11px]",
-};
-
-/* The reverse-action link. 814:7034 draws it #80B2FF, which is NOT a token —
-   the nearest step in the generated scale is --bk-blue-300 `var(--bk-blue-300)`, and
-   Gate 16's hex ratchet over chrome may only go down, so the literal cannot
-   be introduced. Measured on ink: `var(--bk-blue-300)` is 10.4:1, #80B2FF would be 8.0:1;
-   both clear AA, and the token is the one this repo can hold. */
-const DARK_BTN_CLASS =
-  "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-semibold tw:border-transparent tw:bg-transparent " +
-  "tw:text-[var(--bk-blue-300)] tw:hover:text-white tw:enabled:hover:bg-transparent";
 
 export interface ToastActionPayload {
   label: string;
@@ -96,18 +81,37 @@ export interface ToastInput {
   title?: string;
   description: string;
   action?: ToastActionPayload;
-  /** ms; Infinity persists until dismissed. Default 5000. */
+  /** ms; Infinity persists until dismissed. Default 5000; Undo toasts ≥ 8000. */
   duration?: number;
 }
 
 export interface QueuedToast extends ToastInput {
   id: string;
+  duration: number;
 }
 
 export interface UseToastReturn {
-  toasts: ReadonlyArray<QueuedToast>;
   addToast: (input: ToastInput) => string;
   removeToast: (id: string) => void;
+}
+
+/** Board 1177:4859's header: "Default 5000ms". */
+const TOAST_DEFAULT_DURATION = 5000;
+/** Decision #17: a toast offering Undo stays on screen at least this long. */
+const TOAST_UNDO_MIN_DURATION = 8000;
+
+/** Persistent toasts survive the next transient and sort first. */
+function isPersistent(t: QueuedToast): boolean {
+  return t.tone === "error" || !Number.isFinite(t.duration);
+}
+
+function offersUndo(input: ToastInput): boolean {
+  return input.action?.label.trim().toLowerCase() === "undo";
+}
+
+function resolveDuration(input: ToastInput): number {
+  const asked = input.duration ?? TOAST_DEFAULT_DURATION;
+  return offersUndo(input) ? Math.max(asked, TOAST_UNDO_MIN_DURATION) : asked;
 }
 
 type Listener = (toasts: QueuedToast[]) => void;
@@ -123,7 +127,13 @@ const store = (() => {
     },
     add(input: ToastInput) {
       const id = `toast-${++seq}`;
-      toasts = [...toasts, { ...input, id }];
+      const next: QueuedToast = { ...input, id, duration: resolveDuration(input) };
+      const pinned = toasts.filter(isPersistent);
+      /* Persistent first, in arrival order; then the ONE transient — a new
+         transient replaces the old, a new persistent slots in above it. */
+      toasts = isPersistent(next)
+        ? [...pinned, next, ...toasts.filter((t) => !isPersistent(t))]
+        : [...pinned, next];
       emit();
       return id;
     },
@@ -172,10 +182,42 @@ const store = (() => {
  */
 export const dismissToast = store.remove;
 
+/* One object for the life of the module. `store.add`/`store.remove` are the
+   same functions every time, so nothing here can change identity — the 104
+   consumers of `useToast()` never re-render because of a toast. */
+const TOAST_API: UseToastReturn = { addToast: store.add, removeToast: store.remove };
+
 const ToastContext = React.createContext<UseToastReturn | null>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ToastContext.Provider value={TOAST_API}>
+      {children}
+      <ToastViewport />
+    </ToastContext.Provider>
+  );
+}
+
+type Anchor = { left: number; bottom: number } | null;
+
+/** Board 5940:148012: 16px in from the canvas column's left edge
+ *  (`data-bk-toast-anchor`) and 16px above its footer toolbar
+ *  (`data-bk-toast-floor`, else the column's bottom). */
+function measureAnchor(): Anchor {
+  const el = document.querySelector("[data-bk-toast-anchor]");
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  if (!r.width && !r.height) return null;
+  const floor = el.querySelector("[data-bk-toast-floor]")?.getBoundingClientRect();
+  const top = floor && floor.height ? floor.top : r.bottom;
+  return { left: Math.round(r.left + ANCHOR_GAP), bottom: Math.round(window.innerHeight - top + ANCHOR_GAP) };
+}
+
+const ANCHOR_GAP = 16;
+
+function ToastViewport() {
   const [toasts, setToasts] = React.useState<QueuedToast[]>(() => [...store.toasts]);
+  const [anchor, setAnchor] = React.useState<Anchor>(null);
 
   React.useEffect(() => {
     const unsubscribe = store.subscribe(setToasts);
@@ -185,31 +227,35 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const value = React.useMemo<UseToastReturn>(
-    () => ({ toasts, addToast: store.add, removeToast: store.remove }),
-    [toasts],
-  );
+  /* Measured while something is showing: the drawer opening or the window
+     resizing moves the canvas column, and the toast moves with it. */
+  const showing = toasts.length > 0;
+  React.useLayoutEffect(() => {
+    if (!showing) return;
+    const update = () => setAnchor(measureAnchor());
+    update();
+    window.addEventListener("resize", update);
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    ro?.observe(document.body);
+    return () => {
+      window.removeEventListener("resize", update);
+      ro?.disconnect();
+    };
+  }, [showing]);
 
-  return (
-    <ToastContext.Provider value={value}>
-      {children}
-      <ToastViewport toasts={toasts} onDismiss={store.remove} />
-    </ToastContext.Provider>
-  );
-}
-
-function ToastViewport({ toasts, onDismiss }: { toasts: QueuedToast[]; onDismiss: (id: string) => void }) {
   if (typeof document === "undefined") return null;
   const hasError = toasts.some((t) => t.tone === "error");
   return createPortal(
     <div
-      className="tw:fixed tw:bottom-4 tw:right-4 tw:z-[80] tw:flex tw:flex-col tw:gap-2 tw:w-[360px] tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
+      className="tw:fixed tw:z-[80] tw:flex tw:flex-col tw:items-start tw:gap-2 tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
+      style={{ left: anchor?.left ?? ANCHOR_GAP, bottom: anchor?.bottom ?? ANCHOR_GAP }}
       role="status"
       aria-live={hasError ? "assertive" : "polite"}
       aria-atomic="false"
+      data-testid="toast-viewport"
     >
       {toasts.map((t, i) => (
-        <ToastItem key={t.id} toast={t} index={i} onDismiss={onDismiss} />
+        <ToastItem key={t.id} toast={t} index={i} onDismiss={store.remove} />
       ))}
     </div>,
     getOverlayRoot(),
@@ -228,8 +274,7 @@ function ToastItem({
   index: number;
   onDismiss: (id: string) => void;
 }) {
-  const { id, tone = "info", title, description, action, duration = 5000 } = toast;
-  const ghost = tone === "dark" ? DARK_BTN_CLASS : GHOST_BTN_CLASS;
+  const { id, tone = "info", title, description, action, duration } = toast;
 
   React.useEffect(() => {
     if (!Number.isFinite(duration)) return;
@@ -237,42 +282,66 @@ function ToastItem({
     return () => clearTimeout(timer);
   }, [id, duration, onDismiss]);
 
+  const persistent = isPersistent(toast);
+  const dotClass = TONE_DOT_CLASS[tone];
+  const dot = dotClass ? (
+    <span data-testid="toast-tone" aria-hidden="true" className={`tw:flex-none tw:size-2 tw:rounded-full ${dotClass}`} />
+  ) : null;
+  const actionButton = action ? (
+    <Button color="alternative" size="xs" onClick={action.onClick} className={LINK_BTN_CLASS}>
+      {action.label}
+    </Button>
+  ) : null;
+  /* Library Toast `Close:B` (IconButton 24, icon/x). The catalogue shows it
+     off on transients, but dismissing early is something users can do today,
+     so it stays on every toast (owner rule 2026-09-24: parity never silently
+     removes a capability — designer-notes.md). */
+  const closeButton = (
+    <Button
+      color="alternative"
+      size="xs"
+      className={`tw:flex-none ${CLOSE_BTN_CLASS}`}
+      aria-label="Dismiss notification"
+      onClick={() => onDismiss(id)}
+    >
+      <X size={16} aria-hidden="true" />
+    </Button>
+  );
+
   return (
     <div
       data-testid={`toast-item-${index}`}
+      data-persistent={persistent ? "true" : undefined}
       className={[
-        /* `dark` is a one-line bar (814:7032 is 36 tall with its text at y=10
-           and the reverse action as an inline LINK, not a 32-high button), so
-           it takes 10/10 insets and centres its row. The tinted tones keep
-           the 12 they had — they carry a title over a body and top-align. */
-        tone === "dark"
-          ? "tw:pointer-events-auto tw:flex tw:items-center tw:gap-2 tw:px-2.5 tw:py-2.5 tw:rounded-lg " +
-            "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[11px]"
-          : "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg " +
-          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px]",
-        TONE_CLASS[tone],
+        /* Lines=1: a 36px bar that hugs its text, pad 10/16, gap 16.
+           Lines=2 (a title): the 420px card, pad 16, gap 8. */
+        title
+          ? "tw:pointer-events-auto tw:flex tw:items-start tw:gap-3 tw:w-[420px] tw:max-w-full tw:p-4"
+          : "tw:pointer-events-auto tw:flex tw:items-center tw:gap-4 tw:min-h-9 tw:px-4 tw:py-1",
+        "tw:box-border tw:rounded-lg tw:bg-[var(--bk-ink)] tw:text-white",
+        "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:leading-5",
       ].join(" ")}
     >
-      <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-        {title ? <span className={`tw:font-medium ${TONE_TITLE_CLASS[tone]}`}>{title}</span> : null}
-        <span className={TONE_BODY_CLASS[tone]} data-testid={`toast-body-${index}`}>
-          {description}
-        </span>
-      </div>
-      {action ? (
-        <Button color="light" size="xs" onClick={action.onClick} className={ghost}>
-          {action.label}
-        </Button>
-      ) : null}
-      <Button
-        color="light"
-        size="xs"
-        className={`tw:flex-none ${ghost}`}
-        aria-label="Dismiss notification"
-        onClick={() => onDismiss(id)}
-      >
-        ✕
-      </Button>
+      {title ? (
+        <>
+          {dot ? <span className="tw:pt-1.5">{dot}</span> : null}
+          <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:min-w-0">
+            <span className="tw:text-sm tw:font-semibold">{title}</span>
+            <span data-testid={`toast-body-${index}`}>{description}</span>
+            {actionButton ? <div className="tw:flex tw:gap-2 tw:-ml-2">{actionButton}</div> : null}
+          </div>
+          {closeButton}
+        </>
+      ) : (
+        <>
+          {dot}
+          <span className="tw:min-w-0" data-testid={`toast-body-${index}`}>
+            {description}
+          </span>
+          {actionButton}
+          {closeButton}
+        </>
+      )}
     </div>
   );
 }

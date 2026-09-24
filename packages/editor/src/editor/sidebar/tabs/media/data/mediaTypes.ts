@@ -13,6 +13,7 @@ import type {
 import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
 import type { StockFailureReason } from "../../../../../services/stock/StockService";
+import type { AssetPickRequest } from "./assetPick";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };
 export type { StockFailureReason };
@@ -143,6 +144,18 @@ export interface ConfirmDeletePayload {
   isBulk: boolean;
 }
 
+/**
+ * P0 — folder delete confirmation. Distinct payload because the actor is a
+ * folder, not assets, and the modal's secondary action (Move files…) has no
+ * counterpart in the asset flow. SSOT: one source per domain.
+ */
+export interface ConfirmFolderDeletePayload {
+  folderId: string;
+  folderName: string;
+  assetCount: number;
+  subFolderCount: number;
+}
+
 // --- Upload failure tracking ---
 
 export interface FailedUpload {
@@ -267,7 +280,7 @@ export interface SelectionStateResult {
   executeDelete(): Promise<void>;
   cancelDelete(): void;
   /** §14 — shift-click range select. Anchored on last toggleSelect. */
-  shiftSelect(key: string): void;
+  shiftSelect(key: string, fallbackAnchor?: string | null): void;
   /** §14 — right-click "Select" entry: enter mode + pre-select one item. */
   enterSelectModeWith(key: string): void;
   /** Which of these assets are on a page, and which pages. The delete confirm
@@ -360,7 +373,7 @@ export interface MediaStateResult {
   toggleSelMode(): void;
   toggleSelect(key: string): void;
   selectAll(): void;
-  shiftSelect(key: string): void;
+  shiftSelect(key: string, fallbackAnchor?: string | null): void;
   enterSelectModeWith(key: string): void;
   checkInUse(keys: string[]): AssetUsage[];
   /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
@@ -438,12 +451,11 @@ export interface MediaStateResult {
   closeDetail(): void;
 
   // Selection context (canvas → media replace flow)
-  selectionContext: { elementId: string; label?: string } | null;
-  setSelectionContext(ctx: { elementId: string; label?: string } | null): void;
-
-  // §12 expanded-panel mode (320 ↔ 560)
-  panelExpanded: boolean;
-  setPanelExpanded(v: boolean): void;
+  selectionContext: AssetPickRequest | null;
+  setSelectionContext(ctx: AssetPickRequest | null): void;
+  /** Pick mode's "Use selected image": hands the asset to the field that
+   *  asked (`onSelect`) or replaces the element's media. */
+  applyPick(key: string): void;
 
   // §21 replace-across pair (old + new srcs flow into ReplaceAcrossDialog)
   replaceAcrossPair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null;
@@ -457,13 +469,6 @@ export interface MediaStateResult {
 }
 
 // --- Prop slices ---
-
-export interface TypePillsProps {
-  activeType: MediaTypeFilter;
-  counts: TypeCounts;
-  discMode: boolean;
-  onTypeChange(t: MediaTypeFilter): void;
-}
 
 export interface LibraryViewProps {
   items: LibraryItem[];
@@ -519,6 +524,9 @@ export interface UploadZoneProps {
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
   disabled?: boolean;
+  /** Audit G3-064: set for a VIEWER — the zone refuses files and says why
+   *  (board 6289:148485 "View only — ask an editor to upload"). */
+  viewOnlyReason?: string;
   /** Currently-uploading files. When any item has status "uploading"/"optimizing"/"processing",
    *  the zone applies med-upload-zone--uploading. Failed items render below the zone. */
   uploadQueue?: UploadProgress[];

@@ -4,6 +4,8 @@ import type { AIModel } from "../types";
 import { applyAiEdit } from "../applySetStyle";
 import {
   runPromptOnce,
+  AiRunError,
+  type AiErrorKind,
   type PlanStep,
   type ServerEdit,
   type PageElementRef,
@@ -44,19 +46,37 @@ export interface RunStep {
   edit?: ServerEdit;
 }
 
-export type RunPhase = "idle" | "planning" | "running" | "done";
+/** "review" — board 4418:104698: the plan is shown before anything runs; its
+ *  steps can be edited, and Run starts it (G2-132). */
+export type RunPhase = "idle" | "planning" | "review" | "running" | "done";
+
+/** The selected element a prompt is scoped to (ScopeChip's element scope). */
+export interface ElementTarget {
+  id: string;
+}
+
+function errorKindOf(e: unknown): AiErrorKind {
+  return e instanceof AiRunError ? e.kind : "other";
+}
 
 interface UseAgentRunnerResult {
   phase: RunPhase;
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
+  /** What kind of failure `error` is — boards 171:136 / 171:105 draw "not
+   *  configured" and "out of credit" as panel states, not as a run error. */
+  errorKind: AiErrorKind | null;
   /** Board 171:36 — a run the user stopped is not a run that finished, and
    *  `phase` alone could not tell them apart (stop() sets "done"). */
   stoppedByUser: boolean;
-  autoApply: boolean;
-  setAutoApply: (on: boolean) => void;
-  start: (prompt: string) => void;
+  /** Review phase: change what a step asks for before the run starts. */
+  editStep: (index: number, instruction: string) => void;
+  /** Review phase: run the plan as it stands. */
+  runPlan: () => void;
+  /** Plan and run a prompt. With an element target the plan is that one
+   *  step — the server planner only reasons about pages. */
+  start: (prompt: string, target?: ElementTarget) => void;
   approve: () => void;
   skip: () => void;
   stop: () => void;
@@ -75,21 +95,18 @@ export function useAgentRunner(
   const [steps, setSteps] = React.useState<RunStep[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(-1);
   const [error, setError] = React.useState<string | null>(null);
+  const [errorKind, setErrorKind] = React.useState<AiErrorKind | null>(null);
   const [stoppedByUser, setStoppedByUser] = React.useState(false);
-  const [autoApply, setAutoApplyState] = React.useState(false);
 
   const stepsRef = React.useRef<RunStep[]>([]);
   stepsRef.current = steps;
   const indexRef = React.useRef(-1);
   indexRef.current = currentIndex;
   const cancelledRef = React.useRef(false);
-  const autoApplyRef = React.useRef(false);
-  autoApplyRef.current = autoApply;
   const generateStepRef = React.useRef<(i: number) => void>(() => {});
   // Adoption telemetry: one agent.run report per run (start time + once-guard).
   const runStartRef = React.useRef(0);
   const reportedRef = React.useRef(true);
-  const setAutoApply = React.useCallback((on: boolean) => setAutoApplyState(on), []);
 
   const reportRun = React.useCallback(() => {
     if (reportedRef.current) return;
@@ -171,25 +188,7 @@ export function useAgentRunner(
         });
         if (cancelledRef.current) return;
         if (edit && edit.rows.length > 0) {
-          if (autoApplyRef.current) {
-            // Auto-apply mode (opt-in): apply without waiting for approval.
-            try {
-              const { proposals } = await applyAiEdit(composer, { applyOps: edit.applyOps });
-              if (proposals.length > 0) onProposal?.(proposals[0].actionId);
-              setStep(i, { status: "applied", edit });
-            } catch {
-              setStep(i, { status: "failed", edit });
-            }
-            /* No cancel re-check needed here, and one was tried. A review
-               reported that pressing Stop during the await above lets the run
-               continue; verified false — `advance` checks `cancelledRef` first
-               and returns without generating the next step. The in-flight edit
-               does still land and is marked `applied`, which is correct: it
-               applied, and hiding it would keep it out of Undo-all. */
-            advance(i + 1);
-          } else {
-            setStep(i, { status: "awaiting", edit });
-          }
+          setStep(i, { status: "awaiting", edit });
         } else {
           setStep(i, { status: "nochange" });
           advance(i + 1);
@@ -221,6 +220,7 @@ export function useAgentRunner(
         stepsRef.current = failed;
         setSteps(failed);
         setError(e instanceof Error ? e.message : "That step failed.");
+        setErrorKind(errorKindOf(e));
         setPhase("done");
         setCurrentIndex(-1);
         composer?.emit("ai:agent-run", { running: false, summary: "" });
@@ -229,30 +229,39 @@ export function useAgentRunner(
         reportRun();
       }
     },
-    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, onProposal, reportRun],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, reportRun],
   );
   generateStepRef.current = generateStep;
 
   const start = React.useCallback(
-    async (prompt: string) => {
+    async (prompt: string, target?: ElementTarget) => {
       if (!composer) return;
       cancelledRef.current = false;
       setStoppedByUser(false);
       runStartRef.current = Date.now();
       reportedRef.current = false;
       setError(null);
+      setErrorKind(null);
       setSteps([]);
       stepsRef.current = [];
       setCurrentIndex(-1);
       setPhase("planning");
       try {
-        const elements = gatherElements();
-        const { plan } = await runPromptOnce({
-          prompt,
-          scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
-          model,
-          intent: "plan",
-        });
+        let plan: PlanStep[] | null;
+        if (target) {
+          /* Decision #23: one conversation model. An element-scoped prompt
+             is a one-step plan on that element — it runs at once, through the
+             same step gate as any other run. */
+          plan = [{ title: prompt, scope: { kind: "element", id: target.id }, instruction: prompt }];
+        } else {
+          const elements = gatherElements();
+          ({ plan } = await runPromptOnce({
+            prompt,
+            scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
+            model,
+            intent: "plan",
+          }));
+        }
         if (cancelledRef.current) return;
         if (!plan || plan.length === 0) {
           setError("Couldn't break that into steps. Try a more specific build request.");
@@ -262,14 +271,21 @@ export function useAgentRunner(
         const runSteps: RunStep[] = plan.map((p) => ({ plan: p, status: "pending" }));
         stepsRef.current = runSteps;
         setSteps(runSteps);
-        setPhase("running");
-        generateStepRef.current(0);
+        /* A page plan waits for review (board 4418:104698 — "Edit plan ·
+           Run N steps"); an element prompt is one step and runs at once. */
+        if (target) {
+          setPhase("running");
+          generateStepRef.current(0);
+        } else {
+          setPhase("review");
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Planning failed");
+        setErrorKind(errorKindOf(e));
         setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
       }
     },
-    [composer, model, gatherElements, gatherTokens, gatherMediaAssets],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb],
   );
 
   const approve = React.useCallback(async () => {
@@ -296,6 +312,13 @@ export function useAgentRunner(
   const stop = React.useCallback(() => {
     cancelledRef.current = true;
     setStoppedByUser(true);
+    /* Board 4418:105261: what had not run when the user stopped is Skipped —
+       an awaiting step left as a live dot read as still running. */
+    const settled = stepsRef.current.map((s) =>
+      s.status === "pending" || s.status === "running" || s.status === "awaiting" ? { ...s, status: "skipped" as const } : s,
+    );
+    stepsRef.current = settled;
+    setSteps(settled);
     setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setCurrentIndex(-1);
     reportRun();
@@ -309,7 +332,22 @@ export function useAgentRunner(
     stepsRef.current = [];
     setCurrentIndex(-1);
     setError(null);
+    setErrorKind(null);
   }, []);
 
-  return { phase, steps, currentIndex, error, stoppedByUser, autoApply, setAutoApply, start, approve, skip, stop, reset };
+  const editStep = React.useCallback((index: number, instruction: string) => {
+    const next = stepsRef.current.map((s, i) =>
+      i === index ? { ...s, plan: { ...s.plan, title: instruction, instruction } } : s,
+    );
+    stepsRef.current = next;
+    setSteps(next);
+  }, []);
+
+  const runPlan = React.useCallback(() => {
+    if (stepsRef.current.length === 0) return;
+    setPhase("running");
+    generateStepRef.current(0);
+  }, []);
+
+  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, editStep, runPlan, start, approve, skip, stop, reset };
 }

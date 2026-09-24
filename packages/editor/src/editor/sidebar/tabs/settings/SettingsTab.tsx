@@ -17,7 +17,7 @@
  * `Changes not saved` + `Retry save` · `Loading settings…` · `Settings could
  * not load`), the save path, the Settings saved dialog, the Unsaved settings
  * guard (Back to canvas / Cancel / Done / Escape / any nav click while
- * dirty), the plan gate's `Upgrade`, and the doors: Fonts & colours → the
+ * dirty), the plan gate's `Upgrade`, and the doors: Brand ↗ → the
  * Brand panel, Export → the Export modal, Members / Billing → the dashboard.
  * The screen owns its cards, its load card and its save-error banner
  * (`ScreenProps.onLoadStateChange` / `saveError`).
@@ -26,8 +26,8 @@
  */
 
 import * as React from "react";
-import { ArrowUpRight, ChevronLeft, Search as SearchIcon } from "lucide-react";
-import { Button } from "@/editor/chrome-ui";
+import { ArrowUpRight, ChevronLeft, Search as SearchIcon, X } from "lucide-react";
+import { Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -62,8 +62,7 @@ import {
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
-import { SettingsSavedDialog } from "./components/SettingsSavedDialog";
-import { SearchSettingsModal } from "./components/SearchSettingsModal";
+import { searchSettings } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -101,16 +100,25 @@ function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
    `size="xs"` gives the Button its 32; everything else is replaced per
    property through twMerge (padding, alignment, type). The <a> rows for
    Members / Billing wear the same string — nothing in it needs a button. */
+/* 4418:127313: 36-tall rows (--bk-size-row-nav), 14px. */
 const NAV_ROW =
-  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
-  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:flex tw:h-[var(--bk-size-row-nav)] tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
+  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+  "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
 
 const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
+  /* 4418:127313 marks Overview with a dot, not a glyph. */
+  if (id === "overview") {
+    return (
+      <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+        <span className="tw:size-1.5 tw:rounded-full tw:bg-current" />
+      </span>
+    );
+  }
   const Icon = NAV_ICONS[id];
   return (
     <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
@@ -123,7 +131,7 @@ const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
 
 export const SettingsTab: React.FC<
   SettingsTabProps & {
-    /** Switch to the Brand (`design`) tab — the `Fonts & colours` door. */
+    /** Switch to the Brand (`design`) tab — the `Brand ↗` door. */
     onOpenDesignTab?: () => void;
     /** Deep-link screen id from `openLeftPanelToTab("settings", <id>)`. */
     initialScreen?: string;
@@ -147,6 +155,7 @@ export const SettingsTab: React.FC<
 
   // The site name, read from the composer the way the topbar reads it.
   const [siteName, setSiteName] = React.useState("Untitled site");
+  const { addToast } = useToast();
   React.useEffect(() => {
     if (!composer) return;
     const read = () => setSiteName(composer.getProjectMetadata?.()?.name || "Untitled site");
@@ -184,8 +193,9 @@ export const SettingsTab: React.FC<
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
-  const [savedOpen, setSavedOpen] = React.useState(false);
-  const [searchOpen, setSearchOpen] = React.useState(false);
+  /* G3-097 · 6816:60270: Search is an inline sidebar filter. null = closed;
+     a string (possibly empty) = the field is open with that query. */
+  const [query, setQuery] = React.useState<string | null>(null);
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
@@ -350,7 +360,7 @@ export const SettingsTab: React.FC<
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || savedOpen || searchOpen) return;
+      if (guardOpen) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
@@ -359,7 +369,7 @@ export const SettingsTab: React.FC<
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, savedOpen, searchOpen, requestLeave]);
+  }, [guardOpen, requestLeave]);
 
   // ─── The guard ────────────────────────────────────────────────────────
 
@@ -396,7 +406,9 @@ export const SettingsTab: React.FC<
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
 
-  const handleSave = React.useCallback(() => {
+  /* `then` runs after a save succeeds: the Saved toast after the footer's
+     Save, the pending nav / exit after the guard's Save and continue. */
+  const handleSave = React.useCallback((then?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
       console.error("[settings] save failed", err);
@@ -407,7 +419,16 @@ export const SettingsTab: React.FC<
       if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
       setScreenIsDirty(false);
-      setSavedOpen(true);
+      screenIsDirtyRef.current = false;
+      if (then) then();
+      /* 4418:165469 draws "Settings saved" as a toast (bottom-left, dark),
+         not a centred dialog: title, the site's line, "Return to settings". */
+      else
+        addToast({
+          title: "Settings saved",
+          description: `${siteName ? `${siteName} · ` : ""}Configuration saved. Your canvas content is unchanged.`,
+          action: { label: "Return to settings", onClick: () => {} },
+        });
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -450,7 +471,20 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, projectId]);
+  }, [composer, current, currentScreen, saving, projectId, addToast, siteName]);
+
+  /* The guard's Save and continue (4418:165478): save, then finish whatever
+     raised the guard. A failed save leaves the dialog down and the screen's
+     save-error banner up, with the edits still there. */
+  const handleSaveAndContinue = React.useCallback(() => {
+    const pending = pendingRef.current;
+    handleSave(() => {
+      pendingRef.current = null;
+      setGuardOpen(false);
+      if (!pending || pending.kind === "leave") leave();
+      else performNav(pending.id);
+    });
+  }, [handleSave, leave, performNav]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -532,6 +566,26 @@ export const SettingsTab: React.FC<
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
+  /* The filter: a screen matches on its own title / description / group, or
+     through one of its fields — then the row lands on that field (the
+     retired dialog's jump & focus). */
+  const trimmed = query?.trim() ?? "";
+  const matchField = React.useMemo(() => {
+    if (!trimmed) return null;
+    const byScreen = new Map<string, string | null>();
+    for (const e of searchSettings(trimmed)) {
+      const prev = byScreen.get(e.screen);
+      if (e.fieldId === undefined) byScreen.set(e.screen, null);
+      else if (prev === undefined) byScreen.set(e.screen, e.fieldId);
+    }
+    return byScreen;
+  }, [trimmed]);
+  const openFromRow = (id: SettingsNavId) => {
+    pendingFieldRef.current = matchField?.get(id) ?? null;
+    requestNav(id);
+  };
+  const closeSearch = () => setQuery(null);
+
   const renderRow = (n: SettingsNavDef) => {
     const active = currentScreen === n.id;
     if (n.kind === "external") {
@@ -545,7 +599,8 @@ export const SettingsTab: React.FC<
           data-testid={`set-nav-${n.id}`}
         >
           <NavRowIcon id={n.id} />
-          <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
+          {/* "Members ↗" — the arrow rides the label, as on the board. */}
+          <span className="tw:min-w-0 tw:truncate">{n.title}</span>
           <ArrowUpRight size={12} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
         </a>
       );
@@ -559,16 +614,13 @@ export const SettingsTab: React.FC<
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => requestNav(n.id)}
+        onClick={() => openFromRow(n.id)}
         data-testid={`set-nav-${n.id}`}
       >
         <NavRowIcon id={n.id} />
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
-        {rowLocked ? (
-          <span className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]">
-            Pro
-          </span>
-        ) : null}
+        {/* No "Pro" pill on the row (not drawn): a locked screen says so
+            itself, with its header's Upgrade. */}
+        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-locked={rowLocked || undefined}>{n.title}</span>
       </Button>
     );
   };
@@ -577,28 +629,71 @@ export const SettingsTab: React.FC<
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        <div className="tw:flex tw:flex-col tw:px-5 tw:pt-4">
+        {/* 4418:127313 — the Brand workspace's head: back link centred on the
+            first line, 24px title (with the search door at its right), the
+            site name under it. */}
+        <div className="tw:flex tw:justify-center tw:pt-5">
           <Button
             type="button"
             variant="link"
-            className="tw:h-auto tw:min-h-0 tw:self-start tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:no-underline"
+            className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
             onClick={requestLeave}
             data-testid="set-back"
           >
             <ChevronLeft size={12} aria-hidden />
             Back to canvas
           </Button>
-          <h2
-            className="tw:m-0 tw:mt-4 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
-            data-testid="set-title"
-          >
-            Settings
-          </h2>
-          <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
+        </div>
+        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-4">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+            <h2
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
+              data-testid="set-title"
+            >
+              Settings
+            </h2>
+            {query === null ? (
+              <IconButton label="Search settings" onClick={() => setQuery("")} data-testid="set-search-icon" className="tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
+                <SearchIcon size={14} aria-hidden />
+              </IconButton>
+            ) : null}
+          </div>
+          <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
             {siteName}
           </div>
+          {query !== null ? (
+            <div className="tw:relative tw:mt-4" data-testid="set-search">
+              <TextInput
+                type="search"
+                autoFocus
+                icon={SearchIcon}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeSearch();
+                  }
+                }}
+                placeholder="Search settings"
+                aria-label="Search settings"
+                theme={{ field: { input: { base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden" } } }}
+                data-testid="set-search-input"
+              />
+              <IconButton
+                label="Clear search"
+                onClick={closeSearch}
+                className="tw:absolute tw:right-1 tw:top-1 tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]"
+                data-testid="set-search-clear"
+              >
+                <X size={14} aria-hidden />
+              </IconButton>
+            </div>
+          ) : null}
         </div>
-        <nav className="tw:flex tw:flex-col tw:px-3 tw:pb-4 tw:pt-20" aria-label="Settings sections">
+        <nav className="tw:flex tw:flex-col tw:gap-px tw:px-4 tw:pb-4 tw:pt-4" aria-label="Settings sections">
+          {matchField ? null : (
           <Button
             type="button"
             variant="ghost"
@@ -611,12 +706,36 @@ export const SettingsTab: React.FC<
             <NavRowIcon id="overview" />
             <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
           </Button>
-          {GROUP_ORDER.map((group) => (
-            <React.Fragment key={group}>
-              <div className={`${SET_EYEBROW} tw:px-3 tw:pb-1 tw:pt-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
-              {SETTINGS_NAV.filter((n) => n.group === group).map(renderRow)}
-            </React.Fragment>
-          ))}
+          )}
+          {GROUP_ORDER.map((group) => {
+            const rows = SETTINGS_NAV.filter((n) => n.group === group && (!matchField || matchField.has(n.id)));
+            if (rows.length === 0) return null;
+            return (
+              <React.Fragment key={group}>
+                <div className={`${SET_EYEBROW} tw:flex tw:h-7 tw:items-center tw:px-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
+                {rows.map(renderRow)}
+              </React.Fragment>
+            );
+          })}
+          {matchField && matchField.size === 0 ? (
+            <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty">
+              {`No settings match "${trimmed}"`}
+            </p>
+          ) : null}
+          {trimmed ? (
+            /* 6816:60270's hand-off: the same query, everywhere (⌘K). */
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
+              onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
+              data-testid="set-search-everywhere"
+            >
+              <span className="tw:min-w-0 tw:break-words">{`Search everywhere for "${trimmed}"`}</span>
+              <Kbd>⌘K</Kbd>
+            </Button>
+          ) : null}
         </nav>
       </aside>
 
@@ -629,7 +748,7 @@ export const SettingsTab: React.FC<
         >
           <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
             <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
               data-testid="set-head-title"
             >
               {headTitle}
@@ -644,7 +763,7 @@ export const SettingsTab: React.FC<
               variant="secondary"
               size="xs"
               className={`${SET_BTN} tw:w-70 tw:shrink-0 tw:justify-start tw:gap-2 tw:font-normal tw:text-[var(--bk-ink-muted)]`}
-              onClick={() => setSearchOpen(true)}
+              onClick={() => setQuery((q) => q ?? "")}
               data-testid="set-search-open"
             >
               <SearchIcon size={14} aria-hidden />
@@ -672,7 +791,10 @@ export const SettingsTab: React.FC<
 
         {/* A locked screen has nothing to save and the frame (3397:32859)
             draws no footer under it — its only action is the header's Upgrade. */}
-        {locked ? null : (
+        {/* 4418:127313 draws no footer on a clean screen: the bar appears
+            while there is something to save, a save failed, or loading did —
+            and on the Overview, whose Done is its way out. */}
+        {locked || (!isOverview && !immediate && footStatus.text === "All changes saved") ? null : (
         <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:gap-4 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
           <span
             className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
@@ -695,7 +817,7 @@ export const SettingsTab: React.FC<
                 size="xs"
                 className={SET_BTN}
                 disabled={loadState !== "ready" || saving}
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 data-testid="set-foot-save"
               >
                 {saveError ? "Retry save" : "Save changes"}
@@ -706,17 +828,13 @@ export const SettingsTab: React.FC<
         )}
       </div>
 
-      <UnsavedSettingsDialog open={guardOpen} siteName={siteName} onKeepEditing={handleKeepEditing} onDiscard={handleDiscard} />
-      <SettingsSavedDialog open={savedOpen} siteName={siteName} onReturn={() => setSavedOpen(false)} />
-      <SearchSettingsModal
-        open={searchOpen}
+      <UnsavedSettingsDialog
+        open={guardOpen}
         siteName={siteName}
-        onClose={() => setSearchOpen(false)}
-        onOpen={(screenId, fieldId) => {
-          setSearchOpen(false);
-          pendingFieldRef.current = fieldId ?? null;
-          if (SETTINGS_NAV.some((n) => n.id === screenId)) requestNav(screenId as SettingsNavId);
-        }}
+        onKeepEditing={handleKeepEditing}
+        onDiscard={handleDiscard}
+        onSaveAndContinue={handleSaveAndContinue}
+        saving={saving}
       />
     </div>
   );

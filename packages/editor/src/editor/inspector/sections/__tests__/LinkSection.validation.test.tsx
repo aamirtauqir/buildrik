@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import { LinkSection } from "../LinkSection";
 
 /**
@@ -115,5 +115,14 @@ describe("LinkSection validation gates href writes", () => {
     const input = getModeInput(container);
     fireEvent.change(input, { target: { value: "hello@example.com" } });
     expect(sawInvalidHrefWrite(el, "mailto:hello@example.com")).toBe(true);
+  });
+});
+
+/* Board 4428:141642 draws the row as "Link  [None ▾]". */
+describe("LinkSection — board row copy", () => {
+  it("labels the type row Link and the empty choice None", () => {
+    renderLinkSection();
+    const select = screen.getByRole("combobox", { name: "Link" }) as HTMLSelectElement;
+    expect(Array.from(select.options).map((o) => o.textContent)).toContain("None");
   });
 });

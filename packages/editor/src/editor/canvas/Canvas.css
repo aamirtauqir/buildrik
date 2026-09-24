@@ -18,6 +18,14 @@
   /* Spacing indicators */
 }
 
+/* The page is a white card on the grey canvas (boards 5936:44788 /
+   4428:44164). legacy-components.css paints .buildrick-canvas with the app
+   grey, which filled the white frame edge to edge; the page content surface
+   is the card's own white. */
+.buildrick-canvas[data-buildrick-canvas] {
+  background: var(--bk-bg-card);
+}
+
 .buildrick-canvas {
   /* Override theme centering - web pages flow top-to-bottom */
   display: block !important;
@@ -34,22 +42,6 @@
   color: inherit;
 }
 
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--bk-alpha-accent-30);
-  outline-offset: -1px;
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].container,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].section,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].row,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].col {
-  outline: 1px dashed var(--bk-accent);
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id][data-selected="true"] {
-  outline: none;
-}
 
 /* CHROME TOKENS ON CUSTOMER CONTENT — REMOVED 2026-08-27.
    What stood here painted the user's own page in the EDITOR'S colours, fonts
@@ -141,6 +133,19 @@
   font-weight: 500;
   text-align: center;
   padding: var(--bk-space-8) var(--bk-space-16);
+}
+
+/* While the empty-page CTA is up (board 4428:44164) it is the one
+   invitation on the page; an empty starter container's dashed "Drop a block
+   here" strip under it was a second, competing one the board does not draw. */
+[data-empty-cta="true"] [data-buildrick-type="container"]:empty,
+[data-empty-cta="true"] [data-buildrick-type="columns"]:empty {
+  border-color: transparent;
+  background: transparent;
+}
+[data-empty-cta="true"] [data-buildrick-type="container"]:empty::after,
+[data-empty-cta="true"] [data-buildrick-type="columns"]:empty::after {
+  content: none;
 }
 
 /* View mode is a VIEW. An empty container's dashed box and its "Drop a block
@@ -323,37 +328,6 @@
   cursor: not-allowed !important;
 }
 
-.bd-selection-box {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1000; /* Z_LAYERS.selectionBox - use unified registry */
-  background: var(--bk-accent-subtle);
-  border: 1px solid var(--bk-accent);
-  border-radius: 4px;
-  box-shadow: var(--bk-shadow-focus);
-  /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
-}
-
-.bd-selection-box::before,
-.bd-selection-box::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--bk-accent);
-  border-radius: 2px;
-}
-
-.bd-selection-box::before {
-  top: -3px;
-  left: -3px;
-}
-
-.bd-selection-box::after {
-  bottom: -3px;
-  right: -3px;
-}
-
 @keyframes emptyCanvasPulse {
   0%, 100% {
     border-color: var(--bk-border);
@@ -406,7 +380,7 @@
   justify-content: center;
   z-index: 5;
   text-align: center;
-  padding: var(--bk-space-40);
+  padding: var(--bk-space-24);
   background: transparent;
   animation: bd-fade-in 0.4s ease-out;
   /* Board 297:2008 expresses the 12 between the sentence and the buttons as a
@@ -429,12 +403,73 @@
   margin: 0;
 }
 
+/* Board 4428:44164: the sentence under the title names the three routes. */
+.bd-canvas-empty-cta__subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--bk-ink-muted);
+  margin: 0;
+}
+
+/* The three template cards — swatch over name — at the board's 12 gap. */
+.bd-canvas-empty-cta__cards {
+  display: flex;
+  gap: var(--bk-space-12);
+  margin: var(--bk-space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.bd-canvas-empty-cta__thumb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  width: 148px;
+  height: 75px;
+  padding: var(--bk-space-8);
+  box-sizing: border-box;
+  border-radius: var(--bk-radius-md);
+  border: 1px solid var(--bk-border);
+  background: var(--bk-bg-card);
+}
+.bd-canvas-empty-cta__card:hover .bd-canvas-empty-cta__thumb,
+button:hover > .bd-canvas-empty-cta__thumb {
+  border-color: var(--bk-accent);
+}
+.bd-canvas-empty-cta__thumb-bar {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bk-gray-200);
+}
+.bd-canvas-empty-cta__thumb-row {
+  display: flex;
+  gap: var(--bk-space-4);
+  height: 14px;
+}
+.bd-canvas-empty-cta__thumb-row > span {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--bk-gray-200);
+}
+.bd-canvas-empty-cta__card-name {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--bk-ink);
+}
+
 /* 65:203 draws a 10 gap between the two buttons. There is no 10 on the 4-base
    scale and no token for it; 12 is the step the board's own grid rounds to. */
 .bd-canvas-empty-cta__actions {
   display: flex;
   align-items: center;
   gap: var(--bk-space-12);
+}
+/* Four actions on one line inside a fitted page card (board 4428:44164);
+   a button label never breaks across two lines. */
+.bd-canvas-empty-cta__actions > button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 @keyframes bd-fade-in {
@@ -471,34 +506,6 @@
 
 .buildrick-canvas [data-just-added="true"] {
   animation: bd-canvas-drop-fade-in 180ms ease-out;
-}
-
-.bd-canvas--component-view [data-buildrick-type] {
-  position: relative;
-  outline: 1px dashed var(--bk-accent);
-  outline-offset: -1px;
-}
-
-.bd-canvas--component-view [data-buildrick-type]::after {
-  content: attr(data-buildrick-type);
-  position: absolute;
-  top: -18px;
-  left: 0;
-  background: rgba(17, 17, 27, 0.85);
-  border: 1px solid var(--bk-accent);
-  border-radius: 4px;
-  padding: 2px var(--bk-space-8);
-  font-size: var(--bk-text-11);
-  font-weight: 600;
-  color: var(--bk-accent);
-  pointer-events: none;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-  white-space: nowrap;
-  text-transform: capitalize;
-}
-
-.bd-canvas--component-view [data-buildrick-type] [data-buildrick-type] {
-  outline-color: var(--bk-accent);
 }
 
 .buildrick-canvas {
@@ -776,6 +783,9 @@
  * how it will behave at that breakpoint on the published site.
  * Inline serialization is `--hide-<bp>: true` (see buildAttributeString). */
 [data-buildrick-canvas][data-device="desktop"] [style*="--hide-desktop: true"],
+/* Wide previews the Desktop styles (it stores as Desktop), so a
+   desktop-hidden element stays hidden there too (G2-008). */
+[data-buildrick-canvas][data-device="wide"] [style*="--hide-desktop: true"],
 [data-buildrick-canvas][data-device="tablet"] [style*="--hide-tablet: true"],
 [data-buildrick-canvas][data-device="mobile"] [style*="--hide-mobile: true"] {
   display: none !important;
@@ -802,3 +812,31 @@
   justify-content: safe center;
   overflow: auto;
 }
+
+/* View › Grid lines (GridOverlay sets background-size from the grid size).
+   Accent at 10% — the value the retired Emotion GridPattern drew. */
+.bd-canvas-grid {
+  --grid-line: color-mix(in srgb, var(--bk-accent) 10%, transparent);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+}
+
+/* G3-079 Collection list: records 2..N on the canvas are copies of the
+   template (record 1 renders into the real, editable children). Clicks and
+   hover pass through a copy to the list itself. */
+.buildrick-canvas [data-cms-repeater-clone] {
+  pointer-events: none;
+}
+
+/* An empty box inside a Collection list is the card's media slot, drawn as a
+   plain grey block on 4428:151488 — not the dashed "Drop a block here" strip,
+   which would repeat once per record. */
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty {
+  border: 0;
+}
+
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty::after {
+  content: none;
+}
+

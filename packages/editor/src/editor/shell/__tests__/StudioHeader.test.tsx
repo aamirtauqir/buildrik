@@ -21,9 +21,6 @@ vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => fa
 
 vi.mock("../../../shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({
-    railMode: "figma",
-    fourToolRail: false,
-    density: "full",
     readOnlyView: false,
   })),
 }));
@@ -87,16 +84,22 @@ vi.mock("../modals/CommandPalette", () => ({
 }));
 
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
+import { deriveLifecycleState } from "../lifecycle";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
-import { submitForReview, fetchReviewStatus, fetchReviewStatusOrNull } from "../../../services/ReviewService";
+import { submitForReview } from "../../../services/ReviewService";
 import type { ReviewStatus } from "../../../services/ReviewService";
 
 /* ReviewStatus gained two flag fields — whether reviews exist here at all, and
    whether publishing is gated on an approval — because `state: "none"` could
    not tell "reviews are off" from "never sent". Every case in this file was
    written against a workspace where reviews are on and publishing is not
-   gated, so that is the default; a case that cares says so. */
+   gated, so that is the default; a case that cares says so.
+
+   B4 (2026-09-22): the header no longer fetches the status or derives the
+   next move — `useLifecycle` does, once, in AquibraStudio, and both arrive
+   as props. `makeProps` derives `nextMove` from the same inputs the hook
+   would read, so every case below still describes a real state. */
 const reviewStatus = (o: Partial<ReviewStatus> = {}): ReviewStatus => ({
   state: "none",
   reviewerName: null,
@@ -109,28 +112,42 @@ const reviewStatus = (o: Partial<ReviewStatus> = {}): ReviewStatus => ({
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProps {
-  return {
+  const rs = overrides.reviewStatus ?? reviewStatus();
+  const merged = {
     composer: null,
-    saveStatus: "idle",
+    saveStatus: "idle" as const,
     isDirty: false,
     lastSaved: null,
     previewLoading: false,
     selectedElement: null,
     onSetPreviewLoading: vi.fn(),
     onSetExportLoading: vi.fn(),
-    onShowAI: vi.fn(),
     onShowExporter: vi.fn(),
     onSave: vi.fn(async () => "saved" as const),
     addToast: vi.fn(() => "id"),
     ...overrides,
+    reviewStatus: rs,
   };
+  const nextMove =
+    "nextMove" in overrides
+      ? (overrides.nextMove ?? null)
+      : deriveLifecycleState({
+          reviewState: rs.state,
+          reviewerName: rs.reviewerName,
+          reviewsEnabled: rs.reviewsEnabled,
+          editsRequireApproval: rs.editsRequireApproval,
+          isPublished: Boolean(merged.publishedUrl),
+          hasUnpublishedChanges: merged.isDirty || null,
+          isViewer: roleState.role === "VIEWER",
+          publishEnabled: isFeatureEnabled("publish") === true,
+          offline: Boolean(merged.isOffline) || merged.studioSyncStatus === "offline",
+          errorCount: (merged.issues ?? []).filter((i) => i.type === "error").length,
+        });
+  return { ...merged, nextMove };
 }
 
 function setViewMode(partial: Partial<ReturnType<typeof getEditorViewMode>>) {
   vi.mocked(getEditorViewMode).mockReturnValue({
-    railMode: "figma",
-    fourToolRail: false,
-    density: "full",
     readOnlyView: false,
     ...partial,
   });
@@ -157,12 +174,10 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("button", { name: "Site menu" })).toBeTruthy();
     });
 
-    // The Figma component has nine children: exit, name, save, review, spacer,
-    // presence, notifications, publish, menu. The first build of this container
-    // pushed the deleted shell topbar's Preview / Comment / Colour-mode buttons
-    // back into it through an `extra` slot; that slot is gone and these assert
-    // it stays gone.
-    it.each(["Preview", "Comment mode", "Color mode", "Ask AI", "Collaborate"])(
+    // The shell topbar on board 4418:123573 draws Preview (a text button, from
+    // the tools cluster); the deleted shell topbar's Comment-mode / Colour-mode
+    // / Ask AI / Collaborate buttons stay gone.
+    it.each(["Comment mode", "Color mode", "Ask AI", "Collaborate"])(
       "does not carry %s — not in the design",
       (name) => {
         render(<StudioHeader {...makeProps()} />);
@@ -170,10 +185,10 @@ describe("StudioHeader", () => {
       },
     );
 
-    // Topbar redesign D6/D14: the IssueChip is a permanent bar anchor with the
-    // honest total+breakdown copy (the old errors-noun label mislabelled
-    // 1 error + 2 warnings as "3 errors" — regression-critical).
-    it("carries the IssueChip with total count and severity breakdown", () => {
+    /* C3 (§16.1 row 11): the topbar carries only the Figma master's
+       controls. The Issues chip and the Live chip are gone; Issues opens from
+       the site menu and ⌘K, the live URL lives in the site menu. */
+    it("carries no Issues chip, whatever the count", () => {
       render(
         <StudioHeader
           {...makeProps({
@@ -181,33 +196,86 @@ describe("StudioHeader", () => {
             issues: [
               { id: "1", type: "error", message: "x" },
               { id: "2", type: "warning", message: "y" },
-              { id: "3", type: "warning", message: "z" },
             ] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      const chip = screen.getByRole("button", { name: "3 issues, 1 error" });
-      expect(chip.textContent).toBe("3");
+      expect(screen.queryByRole("button", { name: /issue/i })).toBeNull();
     });
 
-    it("the chip stays visible at zero issues — the all-clear anchor (D6)", () => {
-      render(<StudioHeader {...makeProps({ onOpenIssues: vi.fn(), issues: [] })} />);
-      expect(screen.getByRole("button", { name: "No issues" })).toBeTruthy();
+    it("carries no Live chip on a published site", () => {
+      render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
+      const bar = screen.getByTestId("topbar");
+      expect(within(bar).queryByRole("link")).toBeNull();
+      expect(bar.textContent).not.toContain("x.vercel.app");
     });
 
-    it("viewers get the chip with the fix door labelled shut", () => {
-      roleState.role = "VIEWER";
+    /* C5 G1-004 (boards 4418:126034 / :90494 / :123573): "Site › Page" —
+       the site crumb opens the Pages panel; the page crumb is where you are. */
+    it("the breadcrumb: site opens Pages, page is the current crumb and closes the drawer", () => {
+      const onOpenPages = vi.fn();
+      const onCloseDrawer = vi.fn();
+      const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
+      render(<StudioHeader {...makeProps({ onOpenPages, onCloseDrawer, composer: composer as never })} />);
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
+      expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
+      fireEvent.click(screen.getByTestId("topbar-crumb-site"));
+      expect(onOpenPages).toHaveBeenCalled();
+      expect(onCloseDrawer).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("topbar-crumb-page"));
+      expect(onCloseDrawer).toHaveBeenCalled();
+    });
+
+    /* 4428:140486 — a full-canvas view names the page crumb ("<site> › CMS")
+       through ui:crumb-context; null gives it back to the page. */
+    it("the page crumb follows ui:crumb-context", () => {
+      const handlers = new Map<string, (p: unknown) => void>();
+      const composer = {
+        on: vi.fn((ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn)),
+        off: vi.fn(),
+        emit: vi.fn(),
+        elements: { getActivePage: () => ({ name: "Menu" }) },
+      };
+      render(<StudioHeader {...makeProps({ composer: composer as never })} />);
+      act(() => handlers.get("ui:crumb-context")?.({ label: "CMS" }));
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("CMS");
+      act(() => handlers.get("ui:crumb-context")?.(null));
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
+    });
+
+    /* B6 / G1-019: the activity log opens in the editor (History ·
+       Activity), not a dashboard tab. */
+    it("the site menu's Activity log opens History · Activity in the editor", () => {
+      const onOpenActivity = vi.fn();
+      const open = vi.spyOn(window, "open").mockImplementation(() => null);
+      window.history.replaceState(null, "", "/?siteId=s1");
+      render(<StudioHeader {...makeProps({ onOpenActivity })} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      fireEvent.click(screen.getByTestId("site-menu-activity-log"));
+      expect(onOpenActivity).toHaveBeenCalled();
+      expect(open).not.toHaveBeenCalled();
+      window.history.replaceState(null, "", "/");
+      open.mockRestore();
+    });
+
+    it("the site menu's Issues row opens the panel and names the count", () => {
+      const onOpenIssues = vi.fn();
       render(
         <StudioHeader
           {...makeProps({
-            onOpenIssues: vi.fn(),
-            issues: [{ id: "1", type: "warning", message: "x" }] as StudioHeaderProps["issues"],
+            onOpenIssues,
+            issues: [
+              { id: "1", type: "error", message: "x" },
+              { id: "2", type: "warning", message: "y" },
+            ] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      expect(
-        screen.getByRole("button", { name: /1 issue, 1 warning — ask an editor to fix these/ }),
-      ).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      const row = screen.getByRole("menuitem", { name: /^Issues/ });
+      expect(row.getAttribute("title")).toBe("2 issues · 1 error, 1 warning — review before publish");
+      fireEvent.click(row);
+      expect(onOpenIssues).toHaveBeenCalled();
     });
   });
 
@@ -244,22 +312,18 @@ describe("StudioHeader", () => {
       expect(screen.getByTestId("bk-announce-assertive").textContent).toBe("");
     });
 
-    it("dirty work can be saved from the pill", () => {
+    /* B2 (decision #23): the pill's click is routed by state — History for the
+       three ordinary states, retry for error, the recovery dialog for a
+       conflict, nothing (a tooltip) offline. ⌘S is the save. The per-state
+       table is StudioHeader.savePill.test.tsx; this keeps the one assert the
+       old "saves from the pill" case protected: the save is still reachable. */
+    it("unsaved work opens History from the pill — ⌘S is the save", () => {
       const onSave = vi.fn();
-      save({ isDirty: true, onSave });
+      const onOpenHistory = vi.fn();
+      save({ isDirty: true, onSave, onOpenHistory });
       fireEvent.click(screen.getByRole("button", { name: /Unsaved changes/ }));
-      expect(onSave).toHaveBeenCalled();
-    });
-
-    it("a settled state is a status, not a button that does nothing", () => {
-      // Asserted on the pill itself: since eng D5 the only role=status in the
-      // tree is the header's announcement region, so querying by role here
-      // would pass no matter what SaveStatus rendered. `getByText("Saved")`
-      // resolves to the pill's own root element — RTL matches on a node's
-      // direct text, excluding its nested dot/stamp elements' contribution.
-      save({ lastSavedAt: Date.now() });
-      expect(screen.getByText("Saved").tagName).toBe("SPAN");
-      expect(screen.queryByRole("button", { name: /Saved/ })).toBeNull();
+      expect(onOpenHistory).toHaveBeenCalledTimes(1);
+      expect(onSave).not.toHaveBeenCalled();
     });
 
     it("clean and saved", () => {
@@ -288,13 +352,10 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
     });
 
-    it("flag on: Publish is live and fires the publish job", async () => {
+    it("flag on: Publish is live and fires the publish job", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
       render(<StudioHeader {...makeProps({ onVercelPublish })} />);
-      /* The CTA holds a disabled in-flight state until reviews.status answers —
-         clicking on the first paint is clicking the loading state. */
-      await act(async () => {});
       fireEvent.click(screen.getByRole("button", { name: "Publish" }));
       expect(onVercelPublish).toHaveBeenCalled();
     });
@@ -305,7 +366,9 @@ describe("StudioHeader", () => {
       const btn = screen.getByRole("button", { name: "Publish" });
       expect(btn.getAttribute("aria-disabled")).toBe("true");
       fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toBe("Can't publish while offline");
+      /* Two tooltips exist offline — the save pill carries its own (B2) — so
+         the assert names the CTA's by its text. */
+      expect(screen.getByText("Can't publish while offline").closest('[role="tooltip"]')).not.toBeNull();
     });
 
     it("blocking errors turn it into Publish anyway rather than hiding it", async () => {
@@ -319,101 +382,45 @@ describe("StudioHeader", () => {
     });
   });
 
-  // ── T4 publish-anyway confirm (plan §5, D12/D13, eng D9) ──────────────────
-  describe("publish-anyway confirm modal", () => {
-    const err = (id: string, message: string) => ({ id, type: "error" as const, message });
-    const warn = (id: string, message: string) => ({ id, type: "warning" as const, message });
-    /* async, and every caller awaits it: the CTA is state-dependent now, and
-       until `reviews.status` answers the shell holds an in-flight control
-       rather than guessing a verb. Asserting on the first paint would be
-       asserting on the loading state. */
-    const setup = async (issues: unknown[], extra: Partial<StudioHeaderProps> = {}) => {
+  // ── B4 · one publish door ────────────────────────────────────────────────
+  describe("the publish verb is a door, not a publish", () => {
+    /* The "Publish with N open errors?" confirm was this bar's private dialog,
+       so the Publish panel's identical verb skipped it. It is
+       PublishErrorsConfirmModal now, mounted by AquibraStudio, whose
+       `requestPublish` routes on `nextMove.gate` — this bar hands off and
+       opens nothing of its own (PublishErrorsConfirmModal.test.tsx). */
+    it("Publish anyway hands off to the shell's door — no dialog here", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
-      const onOpenIssues = vi.fn();
       render(
         <StudioHeader
           {...makeProps({
             onVercelPublish,
-            onOpenIssues,
-            issues: issues as StudioHeaderProps["issues"],
-            ...extra,
+            issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      await act(async () => {});
-      return { onVercelPublish, onOpenIssues };
-    };
-
-    it("errors > 0 opens the confirm instead of publishing in one click", async () => {
-      const { onVercelPublish } = await setup([err("1", "Broken link — Home / CTA")]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      expect(onVercelPublish).not.toHaveBeenCalled();
-      expect(screen.getByRole("dialog")).toBeTruthy();
-      // Board 1168:4732 words it "open errors" — the errors were already
-      // surfaced on the chip and left; this dialog is not reporting them anew.
-      expect(screen.getByText("Publish with 1 open error?")).toBeTruthy();
-      expect(screen.getByText("Broken link — Home / CTA")).toBeTruthy();
-    });
-
-    it("warnings alone publish directly — the chip already carried the signal", async () => {
-      const { onVercelPublish } = await setup([warn("1", "Missing alt")]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Publish anyway" }));
       expect(onVercelPublish).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole("dialog")).toBeNull();
     });
 
-    it("shows at most three rows, errors first, and +N more opens the panel", async () => {
-      const { onOpenIssues } = await setup([
-        warn("w1", "warn one"),
-        err("e1", "error one"),
-        warn("w2", "warn two"),
-        warn("w3", "warn three"),
-        err("e2", "error two"),
-      ]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      expect(screen.getByText("error one")).toBeTruthy();
-      expect(screen.getByText("error two")).toBeTruthy();
-      expect(screen.getByText("warn one")).toBeTruthy();
-      expect(screen.queryByText("warn three")).toBeNull();
-      fireEvent.click(screen.getByRole("button", { name: "+2 more warnings" }));
-      expect(onOpenIssues).toHaveBeenCalled();
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-
-    it("an open review round adds the D13 note", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({
-        state: "pending",
-        reviewerName: "Sana",
-        at: null,
-      }));
-      await setup([err("1", "x")]);
-      await screen.findByText("In review");
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      expect(screen.getByText(/A review round is open — Sana will see the published site/)).toBeTruthy();
-    });
-
-    it("no review round, no note", async () => {
-      await setup([err("1", "x")]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      expect(screen.queryByText(/review round is open/)).toBeNull();
-    });
-
-    /* Board 1168:4732 names the door by what it does: "Fix issues first". */
-    it("'Fix issues first' is the safe door — panel opens, nothing publishes", async () => {
-      const { onVercelPublish, onOpenIssues } = await setup([err("1", "x")]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      fireEvent.click(screen.getByRole("button", { name: "Fix issues first" }));
-      expect(onOpenIssues).toHaveBeenCalled();
+    it("a review verb opens the Review panel instead", async () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const onVercelPublish = vi.fn();
+      const onOpenReview = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({
+            onVercelPublish,
+            onOpenReview,
+            reviewStatus: reviewStatus({ editsRequireApproval: true }),
+          })}
+        />,
+      );
+      fireEvent.click(await screen.findByRole("button", { name: "Send for review" }));
+      expect(onOpenReview).toHaveBeenCalledTimes(1);
       expect(onVercelPublish).not.toHaveBeenCalled();
-    });
-
-    it("confirming publishes", async () => {
-      const { onVercelPublish } = await setup([err("1", "x")]);
-      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Publish anyway" }));
-      expect(onVercelPublish).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole("dialog")).toBeNull();
     });
   });
 
@@ -457,6 +464,27 @@ describe("StudioHeader", () => {
     /* Was: a viewer in view mode sees a disabled "Send for review". There is
        no send control in view mode at all now, for any role — the viewer
        gating that matters moved with the control, to the Review panel. */
+    /* Board 4418:126059: a viewer (always in view mode) keeps the topbar —
+       Preview works, Publish is drawn disabled with its reason. */
+    it("a viewer in view mode keeps Preview and a disabled Publish with its reason", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      setViewMode({ readOnlyView: true });
+      roleState.role = "VIEWER";
+      render(<StudioHeader {...makeProps()} />);
+      expect(screen.getByRole("button", { name: /Preview/ })).toBeInTheDocument();
+      const btn = screen.getByRole("button", { name: "Publish" });
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
+    });
+
+    it("an owner's own view mode stays the bare preview bar", () => {
+      setViewMode({ readOnlyView: true });
+      roleState.role = "OWNER";
+      render(<StudioHeader {...makeProps()} />);
+      expect(screen.queryByRole("button", { name: "Publish" })).toBeNull();
+    });
+
     it("a viewer in view mode is offered no send control at all", () => {
       setViewMode({ readOnlyView: true });
       roleState.role = "VIEWER";
@@ -465,26 +493,62 @@ describe("StudioHeader", () => {
     });
   });
 
-  describe("review status pill", () => {
-    it("shows the pending pill once the status lands", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({ state: "pending", reviewerName: null, at: null }));
-      render(<StudioHeader {...makeProps()} />);
-      expect(await screen.findByText("In review")).toBeTruthy();
+  /* Board B3-01 7569:190283 (C2): the chip is the status VERB plus the one
+     number that matters; the sentence rides in `title`. */
+  describe("review status chip", () => {
+    it("a pending round reads 'Waiting · <name>'", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "pending", reviewerName: "Sara" }) })} />);
+      expect(screen.getByText("Waiting · Sara")).toBeTruthy();
     });
 
-    it("names the reviewer on an approval", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({
-        state: "approved",
-        reviewerName: "Sara",
-        at: new Date().toISOString(),
-      }));
-      render(<StudioHeader {...makeProps()} />);
-      expect(await screen.findByText(/Approved by Sara/)).toBeTruthy();
+    it("an approval reads 'Approved' with who and when in the title", () => {
+      render(
+        <StudioHeader
+          {...makeProps({
+            reviewStatus: reviewStatus({ state: "approved", reviewerName: "Sara", at: new Date().toISOString() }),
+          })}
+        />,
+      );
+      expect(screen.getByText("Approved")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-pill").getAttribute("title")).toMatch(/^Approved by Sara · /);
     });
 
-    it("no review in flight, no pill", async () => {
-      render(<StudioHeader {...makeProps()} />);
-      await waitFor(() => expect(screen.queryByText(/In review|Approved/)).toBeNull());
+    it("changes requested carries the open count", () => {
+      render(
+        <StudioHeader
+          {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 2 })}
+        />,
+      );
+      expect(screen.getByText("Changes requested · 2")).toBeTruthy();
+    });
+
+    it("no count is a verb alone, never '· 0'", () => {
+      render(
+        <StudioHeader
+          {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 0 })}
+        />,
+      );
+      expect(screen.getByText("Changes requested")).toBeTruthy();
+    });
+
+    it("edited since approval says so", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "approved-edited-since" }) })} />);
+      expect(screen.getByText("Approved · edited since")).toBeTruthy();
+    });
+
+    it("'Not sent' only where a send is the site's next act (an approval workspace)", () => {
+      render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "none", editsRequireApproval: true }) })} />);
+      expect(screen.getByText("Not sent")).toBeTruthy();
+    });
+
+    it("no round: the Review door is still there, and opens the Review panel (board 4418:123573)", () => {
+      const onOpenReview = vi.fn();
+      render(<StudioHeader {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false }) })} />);
+      const door = screen.getByTestId("topbar-review-pill");
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Review");
+      expect(screen.getByTestId("topbar-review-chevron").textContent).toBe("›");
+      fireEvent.click(door);
+      expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -549,48 +613,34 @@ describe("StudioHeader", () => {
     const menuProps = {
       onOpenProjectSettings: vi.fn(),
       onOpenHistory: vi.fn(),
-      onOpenPublishHistory: vi.fn(),
       onExportHTML: vi.fn(),
-      onOpenTemplates: vi.fn(),
-      onOpenComponents: vi.fn(),
       onOpenShortcuts: vi.fn(),
       onOpenIssues: vi.fn(),
     };
 
     // Topbar redesign §3 (D8/D9, eng D8) — five named groups, no "More" dump,
     // no Exit row, "Enter view mode" naming.
-    it("opens with the regrouped items in plan order", () => {
+    /* Board 4418:126034 (C5 G1-016): the rows and groups are the board's;
+       SiteMenu.board.test pins the full list. Here: the container wires the
+       doors it owns. */
+    it("wires the board's rows the header owns", () => {
       render(<StudioHeader {...makeProps(menuProps)} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(labels).toEqual([
-        // F6/T9: jsdom's navigator.platform is not macOS, so both hints show the
-        // chord that actually works there (the handler takes ctrl OR meta).
         "Site settingsCtrl ,",
-        "Version historyCtrl H",
-        "Publish history",
-        "Export code",
-        "Templates",
-        "Components⇧A",
+        "Export site…",
+        "Issues",
         "Enter view mode",
-        "Invite teammates",
-        "Account settings",
-        /* Prints ⌘/ now: "?" opens the canvas cheat sheet, a different screen
-           from the one this row opens. */
         "Keyboard shortcutsCtrl /",
+        "Start collaborationPlanned",
+        "Invite teammates ↗",
+        "Account settings ↗",
       ]);
-    });
-
-    it("groups carry their plan names — the 'More' dump is gone (regression D8)", () => {
-      render(<StudioHeader {...makeProps(menuProps)} />);
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByText("Site")).toBeTruthy();
-      expect(screen.getByText("Build")).toBeTruthy();
-      expect(screen.getByText("Share")).toBeTruthy();
-      expect(screen.getByText("Workspace")).toBeTruthy();
-      expect(screen.queryByText("More")).toBeNull();
+      expect(screen.getByText("This site")).toBeTruthy();
+      expect(screen.getByText("Leaves the editor")).toBeTruthy();
       // D8: Exit lives ONLY on the bar's ‹ Exit — no menu duplicate.
-      expect(screen.queryByRole("menuitem", { name: /Exit/ })).toBeNull();
+      expect(screen.queryByRole("menuitem", { name: /^Exit/ })).toBeNull();
     });
 
     it.each(["Enter view mode", "Invite teammates", "Account settings"])(
@@ -612,7 +662,7 @@ describe("StudioHeader", () => {
         getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
       } as unknown as StudioHeaderProps["composer"];
       render(<StudioHeader {...makeProps({ ...menuProps, composer })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       // F7-B2: the emit runs a tick later so the loading state can paint.
       await waitFor(() => expect(emit).toHaveBeenCalledWith("ui:toggle:preview", {}));
     });
@@ -652,12 +702,13 @@ describe("StudioHeader", () => {
     it("offers the live URL only once the site has one", () => {
       render(<StudioHeader {...makeProps()} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.queryByRole("menuitem", { name: "View live site" })).toBeNull();
+      expect(screen.queryByRole("menuitem", { name: /View live site/ })).toBeNull();
       cleanup();
 
       render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByRole("menuitem", { name: "View live site" })).toBeTruthy();
+      expect(screen.getByRole("menuitem", { name: "View live site ↗" })).toBeTruthy();
+      // Off board 4418:126034 but kept (owner rule: never silently remove a capability).
       expect(screen.getByRole("menuitem", { name: "Copy live URL" })).toBeTruthy();
     });
 
@@ -690,11 +741,11 @@ describe("StudioHeader", () => {
     });
 
     it("fires a handler and closes", () => {
-      const onOpenHistory = vi.fn();
-      render(<StudioHeader {...makeProps({ onOpenHistory })} />);
+      const onOpenProjectSettings = vi.fn();
+      render(<StudioHeader {...makeProps({ onOpenProjectSettings })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Version history/ }));
-      expect(onOpenHistory).toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("menuitem", { name: /Site settings/ }));
+      expect(onOpenProjectSettings).toHaveBeenCalled();
       expect(screen.queryByRole("menu")).toBeNull();
     });
   });
@@ -931,29 +982,25 @@ describe("exit dialog — stranded mirrors", () => {
 // ── F3 · review pill is a door ──────────────────────────────────────────────
 describe("F3 review pill", () => {
   it("renders the pill as a button and clicking opens the review panel", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
-      state: "pending",
-      reviewerName: null,
-      at: new Date().toISOString(),
-    }));
     const onOpenReview = vi.fn();
-    render(<StudioHeader {...makeProps({ onOpenReview })} />);
-    const pill = await screen.findByRole("button", { name: "In review" });
+    render(
+      <StudioHeader
+        {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "pending", at: new Date().toISOString() }) })}
+      />,
+    );
+    const pill = await screen.findByRole("button", { name: "Waiting" });
     fireEvent.click(pill);
     expect(onOpenReview).toHaveBeenCalled();
   });
 
-  it("59-minute-old approval reads in minutes, not 'just now' (U1)", async () => {
+  it("59-minute-old approval reads in minutes, not 'just now' (U1) — in the chip's title", async () => {
     const at = new Date(Date.now() - 59 * 60_000).toISOString();
-    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
-      state: "approved",
-      reviewerName: "Sara",
-      at,
-    }));
-    render(<StudioHeader {...makeProps()} />);
-    const pill = await screen.findByText(/Approved by Sara/);
-    expect(pill.textContent).toMatch(/59m ago/);
-    expect(pill.textContent).not.toMatch(/just now/);
+    render(
+      <StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "approved", reviewerName: "Sara", at }) })} />,
+    );
+    const title = (await screen.findByTestId("topbar-review-pill")).getAttribute("title") ?? "";
+    expect(title).toMatch(/59m ago/);
+    expect(title).not.toMatch(/just now/);
   });
 });
 
@@ -968,37 +1015,16 @@ describe("T8 status grammar", () => {
    * result always could.
    */
   const toneOf = (labelEl: HTMLElement) => labelEl.parentElement!.className;
-  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-yellow-50");
+  /* #26: the warning tone is the status token, not a Tailwind literal. */
+  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-[var(--bk-warning-tint)]");
+
+  const changesRequested = () =>
+    reviewStatus({ state: "changes-requested", reviewerName: "Sara", at: new Date().toISOString() });
 
   it("a blocking review keeps the warning tone when it is the only amber", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
-      state: "changes-requested",
-      reviewerName: "Sara",
-      at: new Date().toISOString(),
-    }));
-    render(<StudioHeader {...makeProps()} />);
+    render(<StudioHeader {...makeProps({ reviewStatus: changesRequested() })} />);
     const label = await screen.findByText("Changes requested");
     expect(isWarningTone(label)).toBe(true);
-  });
-
-  it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
-      state: "changes-requested",
-      reviewerName: "Sara",
-      at: new Date().toISOString(),
-    }));
-    render(
-      <StudioHeader
-        {...makeProps({
-          isDirty: true, // save → unsaved (amber)
-          issues: [{ id: "i1", type: "warning", message: "Missing alt text" }],
-        })}
-      />,
-    );
-    const label = await screen.findByText("Changes requested");
-    // Demoted, not hidden — the copy is unchanged, only the shouting stops.
-    expect(toneOf(label)).toContain("tw:bg-[var(--bk-gray-100)]");
-    expect(isWarningTone(label)).toBe(false);
   });
 
   // T8 compact tier 3: two faces then "+N", so a crowded room cannot push the
@@ -1023,17 +1049,30 @@ describe("T8 status grammar", () => {
     expect(screen.getByLabelText("2 more")).toBeTruthy();
   });
 
-  it("errors do not spend the amber budget — an error chip is red, not amber", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
-      state: "changes-requested",
-      reviewerName: "Sara",
-      at: new Date().toISOString(),
-    }));
+  /* C5 G1-011 / CI-84: a session that DROPPED says "Offline" (the copy
+     existed in Presence; the header mapped `disconnected` to nothing). A
+     session never joined — or deliberately left — shows no pill. */
+  it("a dropped session shows the Offline pill; no session shows none", () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(true);
+    collab.current = { ...COLLAB_IDLE, users: [{ id: "u1", name: "Sara" }], currentUser: { id: "u1", name: "Sara" }, room: { id: "room-1" } } as never;
+    render(<StudioHeader {...makeProps()} />);
+    expect(within(screen.getByRole("banner")).getByText("Offline")).toBeTruthy();
+    cleanup();
+    collab.current = { ...COLLAB_IDLE, room: null } as never;
+    render(<StudioHeader {...makeProps()} />);
+    expect(within(screen.getByRole("banner")).queryByText("Offline")).toBeNull();
+  });
+
+  /* D7 rule 6 demoted the review chip beside an amber save AND an amber
+     Issues chip. C3 took the Issues chip off the bar, so there is no second
+     amber for it to step back from. */
+  it("keeps the warning tone beside an unsaved save — no Issues chip competes (C3)", async () => {
     render(
       <StudioHeader
         {...makeProps({
+          reviewStatus: changesRequested(),
           isDirty: true,
-          issues: [{ id: "i1", type: "error", message: "Broken link" }],
+          issues: [{ id: "i1", type: "warning", message: "Missing alt text" }],
         })}
       />,
     );
@@ -1154,7 +1193,7 @@ describe("F7 perf pair", () => {
           {...makeProps({ composer: asComposer(composer), onSetPreviewLoading })}
         />,
       );
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
       expect(emitSpy).not.toHaveBeenCalledWith("ui:toggle:preview", {});
       act(() => {
@@ -1195,45 +1234,3 @@ describe("F9 a11y", () => {
     expect(screen.queryByTestId("command-palette")).toBeNull();
   });
 });
-
-describe("StudioHeader — the review closing is an event, not furniture", () => {
-  /* Board 158:213 announces it: "Review closed — Sara approved v3". The product
-     had no such moment — the pill changed and the review bar vanished, both
-     silently, and the one thing a designer waits on arrived as the room quietly
-     rearranging itself. */
-  const settle = async () => { await act(async () => {}); };
-
-  it("says so when a live round comes back approved", async () => {
-    const addToast = vi.fn();
-    vi.mocked(fetchReviewStatus).mockResolvedValueOnce(
-      reviewStatus({ state: "pending", reviewerName: "Sana" }),
-    );
-    render(<StudioHeader {...makeProps({ addToast })} />);
-    await settle();
-    expect(addToast).not.toHaveBeenCalled();
-
-    /* The transition happens inside ONE mount — the focus refetch is how an
-       approval that landed while the editor was backgrounded arrives. A
-       remount would reset the ref and prove nothing. */
-    vi.mocked(fetchReviewStatusOrNull).mockResolvedValueOnce(
-      reviewStatus({ state: "approved", reviewerName: "Sana" }),
-    );
-    await act(async () => { window.dispatchEvent(new Event("focus")); });
-    await settle();
-    const said = addToast.mock.calls.map((c) => JSON.stringify(c[0])).join(" ");
-    expect(said).toMatch(/Review closed/);
-    expect(said).toMatch(/Sana/);
-  });
-
-  it("opening an already-approved site congratulates nobody", async () => {
-    // The mount is not a transition: last week's news is not an event.
-    const addToast = vi.fn();
-    vi.mocked(fetchReviewStatus).mockResolvedValueOnce(
-      reviewStatus({ state: "approved", reviewerName: "Sana" }),
-    );
-    render(<StudioHeader {...makeProps({ addToast })} />);
-    await settle();
-    expect(addToast).not.toHaveBeenCalled();
-  });
-});
-

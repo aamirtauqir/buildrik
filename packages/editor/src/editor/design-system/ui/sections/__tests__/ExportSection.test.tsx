@@ -48,10 +48,12 @@ describe("ExportSection", () => {
        became a token on 2026-08-29; testids are the durable half. */
     const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-']"));
     const text = container.textContent ?? "";
-    for (const label of ["CSS", "JSON", "Tailwind", "Figma Variables JSON"]) {
+    for (const label of ["CSS", "JSON", "Tailwind"]) {
       expect(text.includes(label), label).toBe(true);
     }
-    expect(rows.length).toBeGreaterThan(0);
+    // C5 G3-149: the Figma "Coming soon" row is gone.
+    expect(text).not.toMatch(/Figma Variables JSON/);
+    expect(rows.length).toBe(3);
   });
 
   /* Board 153:120 draws no chips on rows — title + muted desc, actions right.
@@ -94,6 +96,14 @@ describe("ExportSection", () => {
     // Figma is disabled now; selecting JSON above is the real assertion here.
   });
 
+  /* G3-123 · 6881:71312: a download reports "Export ready" as a toast. */
+  it("Download raises the Export ready toast with the kinds · tokens count", async () => {
+    const { getByTestId, findByText } = render(wrap(<ExportSection />));
+    fireEvent.click(getByTestId("brand-format-download-css"));
+    expect(await findByText("Export ready")).toBeTruthy();
+    expect(await findByText(/^\d+ kinds · \d+ tokens exported\. Download ready\.$/)).toBeTruthy();
+  });
+
   it("preview pane shows :root block by default (CSS format)", () => {
     const { getByTestId } = render(wrap(<ExportSection />));
     const preview = getByTestId("export-preview");
@@ -125,10 +135,18 @@ describe("ExportSection", () => {
   /* Board 153:120 leads with one "Dark strategy" row and its value at the
      right, not three radios buried under the CSS format — where a JSON
      exporter would never see the choice they are exporting under. */
-  it("dark strategy swaps @media for :root[data-theme]", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    const select = getByLabelText(/dark mode strategy/i) as HTMLSelectElement;
-    fireEvent.change(select, { target: { value: "data-attr" } });
+  /* Walk FAIL (4418:168885 "Dark-strategy menu"): the label was dead text
+     over a native <select>. "Dark strategy ▾" is the menu's trigger now. */
+  it("dark strategy is a menu: the ▾ label opens it, a pick swaps @media for :root[data-theme]", () => {
+    const { getByTestId, getByRole, queryByRole } = render(wrap(<ExportSection />));
+    expect(document.querySelector("select[aria-label='Dark mode strategy']")).toBeNull();
+    expect(getByTestId("brand-export-dark-value").textContent).toBe("media-query");
+    fireEvent.click(getByTestId("brand-export-dark-trigger"));
+    const menu = getByRole("menu", { name: "Dark strategy" });
+    expect(Array.from(menu.querySelectorAll('[role="menuitemradio"]')).map((i) => i.getAttribute("aria-checked"))).toEqual(["true", "false", "false"]);
+    fireEvent.click(getByTestId("brand-export-dark-option-data-attr"));
+    expect(queryByRole("menu", { name: "Dark strategy" })).toBeNull();
+    expect(getByTestId("brand-export-dark-value").textContent).toBe("data-attr");
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain(':root[data-theme="dark"]');
     expect(preview.textContent).not.toContain("@media (prefers-color-scheme: dark)");
@@ -138,7 +156,7 @@ describe("ExportSection", () => {
      greyed Figma line with neither — the board refusing to hand over a file it
      cannot make. This replaces an assertion on a single button whose LABEL
      changed with the selection; that button is gone. */
-  it("gives every live format its own Download, and Figma none", () => {
+  it("gives every format its own Download", () => {
     const { container } = render(wrap(<ExportSection />));
     for (const id of ["css", "json", "tailwind"]) {
       expect(container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
@@ -146,7 +164,7 @@ describe("ExportSection", () => {
     expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
   });
 
-  it("offers no way to preview or take the Figma stub", () => {
+  it("the preview offers only the three real formats", () => {
     const { container, getByLabelText, getByTestId } = render(wrap(<ExportSection />));
     const options = Array.from(
       (getByLabelText(/preview format/i) as HTMLSelectElement).options,

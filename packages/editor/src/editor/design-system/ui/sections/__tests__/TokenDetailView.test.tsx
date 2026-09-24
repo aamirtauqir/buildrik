@@ -1,5 +1,8 @@
 /**
- * TokenDetailView tests — drill-in detail surface (T8).
+ * TokenDetailView tests — the selected token's card (board 7315:80955, right
+ * column). Rewritten for C1 (ii): the card is a sibling of the token table,
+ * not a drill-in — no back link; the value is read-only until its Change is
+ * pressed; Rename / Delete live under the ⋯ menu.
  *
  * Mocks composer.designSystem.tokenUsage + lintState so the detail surface
  * can read counts + issues without wiring a full Composer.
@@ -8,7 +11,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent, act } from "@testing-library/react";
+import { render, fireEvent, act, screen } from "@testing-library/react";
 import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
 import { DSModeProvider } from "../../../state/DSModeContext";
@@ -122,6 +125,16 @@ const wrap = (
   mode: "beginner" | "pro" = "pro",
 ) => <DSModeProvider initialMode={mode}>{children}</DSModeProvider>;
 
+/** The dark field only exists once its Set / Change is pressed. */
+const openDark = (getByTestId: (id: string) => HTMLElement) =>
+  fireEvent.click(getByTestId("brand-token-action-dark"));
+
+/** Delete is a ⋯ menu item on the card's header. */
+const clickDelete = (getByTestId: (id: string) => HTMLElement) => {
+  fireEvent.click(getByTestId("brand-token-menu"));
+  fireEvent.click(screen.getByTestId("brand-token-action-delete"));
+};
+
 describe("TokenDetailView", () => {
   /* Regression: the Dark value field accepted text and threw it away on blur.
      `onBlur` was an empty handler whose comment said the engine-side commit was
@@ -130,17 +143,19 @@ describe("TokenDetailView", () => {
      outlived the limitation, so the field kept silently discarding input. */
   describe("dark value commit", () => {
     type ValueChange = (id: string, value: string, darkValue?: string) => void;
-    const renderDark = (onValueChange: ValueChange, token = colorToken) =>
-      render(
+    const renderDark = (onValueChange: ValueChange, token = colorToken) => {
+      const utils = render(
         wrap(
           <TokenDetailView
             token={token}
             composer={makeMockComposer({})}
-            onBack={() => {}}
             onValueChange={onValueChange}
           />,
         ),
       );
+      if (token.kind === "color") openDark(utils.getByTestId);
+      return utils;
+    };
 
     it("commits what was typed, carrying the unchanged light value", () => {
       const onValueChange = vi.fn();
@@ -189,52 +204,26 @@ describe("TokenDetailView", () => {
     });
   });
 
-  it("renders Back arrow button", () => {
-    const composer = makeMockComposer({});
-    const { getByText } = render(
-      wrap(
-        <TokenDetailView
-          token={colorToken}
-          composer={composer}
-          onBack={() => {}}
-        />,
-      ),
+  it("has no back link — the card is a sibling of the table, not a drill-in", () => {
+    const { queryByText } = render(
+      wrap(<TokenDetailView token={colorToken} composer={makeMockComposer({})} />),
     );
-    expect(getByText(/back to tokens/i)).toBeTruthy();
+    expect(queryByText(/back to tokens/i)).toBeNull();
   });
 
-  it("clicking Back arrow calls onBack", () => {
-    const composer = makeMockComposer({});
-    const onBack = vi.fn();
-    const { getByText } = render(
-      wrap(
-        <TokenDetailView
-          token={colorToken}
-          composer={composer}
-          onBack={onBack}
-        />,
-      ),
-    );
-    fireEvent.click(getByText(/back to tokens/i).closest("button")!);
-    expect(onBack).toHaveBeenCalledTimes(1);
-  });
-
-  it("Pro mode: shows token name + id + css var", () => {
+  it("Pro mode: shows token name + id", () => {
     const composer = makeMockComposer({});
     const { getByText } = render(
       wrap(
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
         "pro",
       ),
     );
     expect(getByText(colorToken.name)).toBeTruthy();
     expect(getByText(colorToken.id)).toBeTruthy();
-    // CSS var comes from engine SSOT `token.cssVar` (no client derive).
-    expect(getByText(colorToken.cssVar)).toBeTruthy();
   });
 
   it("Beginner mode: hides token id and css var", () => {
@@ -244,7 +233,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
         "beginner",
       ),
@@ -270,7 +258,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -284,13 +271,12 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
     const status = container.querySelector('[data-lint-status="pass"]');
     expect(status).toBeTruthy();
-    expect(getByText("pass")).toBeTruthy();
+    expect(getByText(/Brand checks pass/)).toBeTruthy();
   });
 
   it("Lint fail (1 issue) → amber message + Auto-fix + Ignore", () => {
@@ -308,7 +294,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -335,7 +320,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
           onValueChange={onValueChange}
         />,
       ),
@@ -351,14 +335,11 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
-    const labels = Array.from(container.querySelectorAll("div")).map(
-      (el) => el.textContent ?? "",
-    );
-    expect(labels.some((l) => l === "Dark value")).toBe(true);
+    expect(container.textContent).toContain("Dark value");
+    expect(container.querySelector('[data-testid="brand-token-value-dark"]')?.textContent).toBe("No dark value");
   });
 
   it("Non-color token (radius): Dark value row OMITTED", () => {
@@ -368,64 +349,47 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={radiusToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
-    const labels = Array.from(container.querySelectorAll("div")).map(
-      (el) => el.textContent ?? "",
-    );
-    expect(labels.some((l) => l === "Dark value")).toBe(false);
+    expect(container.textContent).not.toContain("Dark value");
   });
 
-  it("Action row renders Replace value, Rename ID, Delete token buttons", () => {
-    const composer = makeMockComposer({});
-    const { getByText } = render(
-      wrap(
-        <TokenDetailView
-          token={colorToken}
-          composer={composer}
-          onBack={() => {}}
-        />,
-      ),
+  it("Change on the value line; Rename and Delete under the ⋯ menu", () => {
+    const { getByTestId } = render(
+      wrap(<TokenDetailView token={colorToken} composer={makeMockComposer({})} onRename={() => {}} />),
     );
-    expect(getByText("Replace value")).toBeTruthy();
-    expect(getByText("Rename ID")).toBeTruthy();
-    expect(getByText("Delete token")).toBeTruthy();
+    expect(getByTestId("brand-token-action-replace").textContent).toBe("Change");
+    fireEvent.click(getByTestId("brand-token-menu"));
+    expect(screen.getByTestId("brand-token-action-rename").textContent).toMatch(/Rename token/);
+    expect(screen.getByTestId("brand-token-action-delete").textContent).toMatch(/Delete token/);
   });
 
-  it("Replace value click on color token opens ColorPicker inline", () => {
-    const composer = makeMockComposer({});
-    const { getByText, container } = render(
-      wrap(
-        <TokenDetailView
-          token={colorToken}
-          composer={composer}
-          onBack={() => {}}
-        />,
-      ),
-    );
-    fireEvent.click(getByText("Replace value"));
-    // ColorPicker uses .buildrick-design-picker className.
-    expect(container.querySelector(".buildrick-design-picker")).toBeTruthy();
-  });
-
-  it("Light value text input edits → onValueChange(id, newValue)", () => {
-    const composer = makeMockComposer({});
+  /* G3-140 · 7318:80959: the one picker, in a popover titled with the token,
+     its WORKSPACE PALETTE the other brand colours. */
+  it("Change on a color token opens the picker popover (title, palette, Apply)", () => {
+    const other = { ...colorToken, id: "color-accent", name: "Accent", value: "#15803D" };
     const onValueChange = vi.fn();
-    const { container } = render(
-      wrap(
-        <TokenDetailView
-          token={radiusToken}
-          composer={composer}
-          onBack={() => {}}
-          onValueChange={onValueChange}
-        />,
-      ),
+    const { getByTestId, queryByTestId, getByRole, getByText } = render(
+      wrap(<TokenDetailView token={colorToken} allTokens={[colorToken, other]} composer={makeMockComposer({})} onValueChange={onValueChange} />),
     );
-    const input = container.querySelector(
-      'input[aria-label="Light value"]',
-    ) as HTMLInputElement;
+    expect(queryByTestId("color-picker")).toBeNull();
+    fireEvent.click(getByTestId("brand-token-action-replace"));
+    expect(getByTestId("color-picker-title").textContent).toBe(colorToken.name);
+    fireEvent.click(getByRole("button", { name: "Use Accent #15803D" }));
+    fireEvent.click(getByText("Apply"));
+    expect(onValueChange).toHaveBeenCalledWith(colorToken.id, "#15803D");
+    expect(queryByTestId("color-picker")).toBeNull();
+  });
+
+  it("Change on a non-color token opens a text field → onValueChange(id, newValue)", () => {
+    const onValueChange = vi.fn();
+    const { getByTestId, container } = render(
+      wrap(<TokenDetailView token={radiusToken} composer={makeMockComposer({})} onValueChange={onValueChange} />),
+    );
+    expect(container.querySelector('input[aria-label="Value"]')).toBeNull();
+    fireEvent.click(getByTestId("brand-token-action-replace"));
+    const input = container.querySelector('input[aria-label="Value"]') as HTMLInputElement;
     fireEvent.change(input, { target: { value: "12px" } });
     expect(onValueChange).toHaveBeenCalledWith(radiusToken.id, "12px");
   });
@@ -440,7 +404,6 @@ describe("TokenDetailView", () => {
           token={colorToken}
           composer={composer}
           allTokens={allTokens}
-          onBack={() => {}}
         />,
       ),
     );
@@ -477,7 +440,6 @@ describe("TokenDetailView", () => {
           token={colorToken}
           composer={composer}
           allTokens={allTokens}
-          onBack={() => {}}
         />,
       ),
     );
@@ -520,7 +482,6 @@ describe("TokenDetailView", () => {
           token={colorToken}
           composer={composer}
           allTokens={allTokens}
-          onBack={() => {}}
         />
       );
     };
@@ -559,7 +520,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -590,7 +550,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -623,7 +582,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -652,7 +610,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -675,7 +632,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -703,7 +659,6 @@ describe("TokenDetailView", () => {
         <TokenDetailView
           token={colorToken}
           composer={composer}
-          onBack={() => {}}
         />,
       ),
     );
@@ -738,18 +693,17 @@ describe("TokenDetailView", () => {
     it("Pro + usage=0: clicking Delete hard-deletes immediately (no modal, no replaceWith)", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 0 } });
       const onDelete = vi.fn();
-      const { getByText, container } = render(
+      const { getByTestId, container } = render(
         wrap(
           <TokenDetailView
             token={colorToken}
             composer={composer}
             allTokens={[colorToken, candidate]}
-            onBack={() => {}}
             onDelete={onDelete}
           />,
         ),
       );
-      fireEvent.click(getByText("Delete token"));
+      clickDelete(getByTestId);
       expect(onDelete).toHaveBeenCalledTimes(1);
       // Called with single id arg (hard delete) — no replaceWith.
       expect(onDelete).toHaveBeenCalledWith(colorToken.id);
@@ -760,18 +714,17 @@ describe("TokenDetailView", () => {
     it("Pro + usage>0: clicking Delete opens picker modal instead of deleting", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 3 } });
       const onDelete = vi.fn();
-      const { getByText } = render(
+      const { getByTestId } = render(
         wrap(
           <TokenDetailView
             token={colorToken}
             composer={composer}
             allTokens={[colorToken, candidate]}
-            onBack={() => {}}
             onDelete={onDelete}
           />,
         ),
       );
-      fireEvent.click(getByText("Delete token"));
+      clickDelete(getByTestId);
       // No deletion yet — user has to confirm via modal.
       expect(onDelete).not.toHaveBeenCalled();
       // Modal mounted in portal (OverlayMount-backed).
@@ -782,18 +735,17 @@ describe("TokenDetailView", () => {
     it("Picker modal — selecting candidate + Confirm calls onDelete(id, { replaceWith })", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 3 } });
       const onDelete = vi.fn();
-      const { getByText } = render(
+      const { getByTestId } = render(
         wrap(
           <TokenDetailView
             token={colorToken}
             composer={composer}
             allTokens={[colorToken, candidate]}
-            onBack={() => {}}
             onDelete={onDelete}
           />,
         ),
       );
-      fireEvent.click(getByText("Delete token"));
+      clickDelete(getByTestId);
       // Pick candidate by clicking its row label (modal renders ids).
       const candidateRow = document.querySelector(
         `[data-replace-candidate="${candidate.id}"]`,
@@ -810,18 +762,17 @@ describe("TokenDetailView", () => {
 
     it("Picker modal — excludes the token being deleted from candidate list", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 2 } });
-      const { getByText } = render(
+      const { getByTestId } = render(
         wrap(
           <TokenDetailView
             token={colorToken}
             composer={composer}
             allTokens={[colorToken, candidate]}
-            onBack={() => {}}
             onDelete={() => {}}
           />,
         ),
       );
-      fireEvent.click(getByText("Delete token"));
+      clickDelete(getByTestId);
       // Self id must not appear as a selectable candidate row.
       expect(
         document.querySelector(`[data-replace-candidate="${colorToken.id}"]`),
@@ -835,18 +786,17 @@ describe("TokenDetailView", () => {
     it("Picker modal — excludes already-soft-deleted tokens (avoid bridge chain)", () => {
       const composer = makeMockComposer({ usage: { getUsage: () => 2 } });
       const soft: DesignToken = { ...candidate, id: "color.old.thing", replacedBy: candidate.id };
-      const { getByText } = render(
+      const { getByTestId } = render(
         wrap(
           <TokenDetailView
             token={colorToken}
             composer={composer}
             allTokens={[colorToken, candidate, soft]}
-            onBack={() => {}}
             onDelete={() => {}}
           />,
         ),
       );
-      fireEvent.click(getByText("Delete token"));
+      clickDelete(getByTestId);
       expect(
         document.querySelector(`[data-replace-candidate="${soft.id}"]`),
       ).toBeNull();

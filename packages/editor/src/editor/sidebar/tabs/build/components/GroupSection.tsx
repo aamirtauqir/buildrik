@@ -14,8 +14,9 @@ import type { FlatElEntry } from "../catalog/types";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import type { ComponentDefinition } from "../../../../../shared/types/components";
 import type { InsertGroup } from "../catalog/groups";
-import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
-import { Button, Tooltip } from "@/editor/chrome-ui";
+import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
+import { BK_TOOLTIP_CLASS, Button, Tooltip } from "@/editor/chrome-ui";
+import { BlockThumb } from "./BlockThumb";
 
 interface GroupSectionProps {
   group: InsertGroup;
@@ -27,10 +28,21 @@ interface GroupSectionProps {
   components?: BlockDefinition[];
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
+  /** FROM LIBRARY (board 4418:99857): the workspace's shared masters, listed
+   *  under SAVED COMPONENTS before "Manage components ›". */
+  library?: ReadonlyArray<{ componentId: string; name: string }>;
+  onLibraryInsert?: (componentId: string) => void;
   onDragStart: DragStartFn;
+  /** Board 4428:140817's grip — a block card drags onto the canvas too. */
+  onBlockDragStart?: BlockDragStartFn;
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
   onMineInsert?: (component: ComponentDefinition) => void;
+  /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
+  onManageComponents?: () => void;
+  /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
+  favs?: Set<string>;
+  onToggleFav?: (name: string) => void;
 }
 
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
@@ -103,18 +115,25 @@ export const Row: React.FC<{
    *  "Disabled without a reason is a bug" — the Button component doc. */
   disabled?: boolean;
   disabledReason?: string;
+  /** Enabled rows: hover/focus reports the row so the list can show its
+   *  one-line description (G2-108, board 4418:103591). */
+  onHoverChange?: (row: HTMLElement | null) => void;
   testId: string;
+  /** Board 4418:99857's trailing ⠿ — a drag hint; the row is the handle. */
+  grip?: boolean;
+  /** ★ favourite toggle (G2-115): shown on hover. */
+  fav?: { on: boolean; onToggle: () => void; testId: string };
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
         pinned
           ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
           : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
@@ -124,6 +143,10 @@ export const Row: React.FC<{
           : "tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]"
       }`}
       data-testid={testId}
+      onMouseEnter={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
+      onMouseLeave={onHoverChange ? () => onHoverChange(null) : undefined}
+      onFocus={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
+      onBlur={onHoverChange ? () => onHoverChange(null) : undefined}
       onClick={disabled ? undefined : onClick}
       onDragStart={disabled ? undefined : onDragStart}
       onKeyDown={(e) => {
@@ -178,6 +201,37 @@ export const Row: React.FC<{
           <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
         )}
       </span>
+      {fav ? (
+        <span
+          role="button"
+          tabIndex={0}
+          aria-pressed={fav.on}
+          aria-label={fav.on ? `Remove ${label} from favourites` : `Add ${label} to favourites`}
+          data-testid={fav.testId}
+          /* Hover-only either way: the boards draw element rows without it. */
+          className={`tw:w-[20px] tw:shrink-0 tw:text-center tw:text-[12px] tw:cursor-pointer tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 ${
+            fav.on ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-gray-400)]"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            fav.onToggle();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); fav.onToggle(); }
+          }}
+        >
+          {fav.on ? "★" : "☆"}
+        </span>
+      ) : null}
+      {grip ? (
+        <span
+          aria-hidden="true"
+          data-testid={`insert-row-grip-${testId}`}
+          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+        >
+          ⠿
+        </span>
+      ) : null}
     </div>
   );
 
@@ -185,7 +239,7 @@ export const Row: React.FC<{
   // need a media provider connected" is that board's sample). Ink bg, white
   // 12px — the Tooltip primitive's dark style.
   return disabled && disabledReason ? (
-    <Tooltip content={disabledReason} placement="bottom" arrow={false}>
+    <Tooltip content={disabledReason} placement="bottom" arrow={false} theme={{ target: "tw:w-full" }}>
       {row}
     </Tooltip>
   ) : (
@@ -193,24 +247,80 @@ export const Row: React.FC<{
   );
 };
 
+/* One description bubble per list, not a flowbite Tooltip per row: 53
+   tooltips (floating-ui each) made the drawer's first render 6–10s under
+   test load, against ~0.5s without them. The bubble sits under the hovered
+   (or focused) row — the same dark 12px surface as chrome-ui's Tooltip. */
+const ElementRows: React.FC<{
+  group: ElementRowGroup;
+  elements: FlatElEntry[];
+  favs?: Set<string>;
+  onToggleFav?: (name: string) => void;
+  onDragStart: DragStartFn;
+  onElClick: ElClickFn;
+}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick }) => {
+  const [tip, setTip] = React.useState<{ text: string; top: number } | null>(null);
+  return (
+    <div className="tw:relative">
+      {elements.map((el) => (
+        <Row
+          key={`${el.catId}-${el.name}`}
+          label={el.name}
+          iconHtml={el.iconHtml}
+          disabled={el.disabled}
+          disabledReason={el.disabled ? el.description : undefined}
+          onHoverChange={
+            el.disabled
+              ? undefined
+              : (row) => setTip(row ? { text: el.description, top: row.offsetTop + row.offsetHeight + 4 } : null)
+          }
+          testId={elRowTestId(group, el.name)}
+          fav={
+            onToggleFav && !el.disabled
+              ? { on: favs?.has(el.name) ?? false, onToggle: () => onToggleFav(el.name), testId: elFavTestId(group, el.name) }
+              : undefined
+          }
+          draggable
+          onDragStart={(e) => onDragStart(e, el)}
+          onClick={() => onElClick(el)}
+        />
+      ))}
+      {tip && (
+        <div
+          role="tooltip"
+          data-testid={`insert-${group === "elements" ? "el" : group === "favourites" ? "fav" : "recent"}-tip`}
+          style={{ top: tip.top }}
+          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-[var(--bk-gray-900)] tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
+        >
+          {tip.text}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/** Groups that list element rows. Their test ids are literal templates on
+ *  the declaring lines so the conformance anchor check can see them. */
+type ElementRowGroup = "favourites" | "recent" | "elements";
+const isElementRowGroup = (id: InsertGroup["id"]): id is ElementRowGroup => id === "favourites" || id === "recent" || id === "elements";
+const elRowTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-${n}` : g === "recent" ? `insert-recent-${n}` : `insert-el-${n}`);
+const elFavTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-fav-${n}` : g === "recent" ? `insert-recent-fav-${n}` : `insert-el-fav-${n}`);
+
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onElClick, onBlockInsert, onMineInsert,
+  group, isOpen, onToggle, elements, blocks, components, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
-    {isOpen && group.id === "elements" && elements?.map((el) => (
-      <Row
-        key={`${el.catId}-${el.name}`}
-        label={el.name}
-        iconHtml={el.iconHtml}
-        disabled={el.disabled}
-        disabledReason={el.disabled ? el.description : undefined}
-        testId={`insert-el-${el.name}`}
-        draggable
-        onDragStart={(e) => onDragStart(e, el)}
-        onClick={() => onElClick(el)}
+    {isOpen && isElementRowGroup(group.id) && elements && (
+      <ElementRows
+        group={group.id}
+        elements={elements}
+        favs={favs}
+        onToggleFav={onToggleFav}
+        onDragStart={onDragStart}
+        onElClick={onElClick}
       />
-    ))}
+    )}
     {/* Board 138:2: BLOCKS is a CARD GRID, not rows — `Card / media` (17:6):
         136×104, 136×76 thumb (4:3) on bg-subtle + a 12px label. Thumb is the
         block's preview when it has one, empty until then — the board names it
@@ -231,17 +341,66 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         onClick={() => onBlockInsert?.(c)}
       />
     ))}
-    {/* Board 1069:4970 (mine-expanded): the user's own components as plain
-        dense rows — same Row treatment as ELEMENTS. Empty registry = no rows;
-        the group header's live count already says 0. */}
-    {isOpen && group.id === "mine" && mine?.map((c) => (
-      <Row
-        key={c.id}
-        label={c.name}
-        testId={`insert-mine-${c.id}`}
-        onClick={() => onMineInsert?.(c)}
-      />
-    ))}
+    {isOpen && group.id === "mine" && mine && (
+      <>
+        {/* Board 4418:99857: dense rows with a ⠿ grip; each drags onto the
+            canvas as a component id (the drop instantiates it). */}
+        {mine.map((c) => (
+          <Row
+            key={c.id}
+            label={c.name}
+            testId={`insert-mine-${c.id}`}
+            grip
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("application/x-aquibra-component", c.id);
+              e.dataTransfer.effectAllowed = "copy";
+            }}
+            onClick={() => onMineInsert?.(c)}
+          />
+        ))}
+        {mine.length === 0 && !library?.length && (
+          <p
+            data-testid="insert-mine-empty"
+            className="tw:m-0 tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:py-[var(--bk-space-4)] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+          >
+            No saved components yet. Select an element and choose Save as component.
+          </p>
+        )}
+        {library && library.length > 0 && (
+          <>
+            <div
+              data-testid="insert-library-label"
+              className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:text-[11px] tw:leading-[16px] tw:font-semibold tw:tracking-[.5px] tw:text-[var(--bk-ink-muted)]"
+            >
+              FROM LIBRARY
+            </div>
+            {library.map((c) => (
+              <Row
+                key={c.componentId}
+                label={c.name}
+                testId={`insert-library-${c.componentId}`}
+                onClick={() => onLibraryInsert?.(c.componentId)}
+              />
+            ))}
+          </>
+        )}
+        {onManageComponents && (
+          <div
+            role="button"
+            tabIndex={0}
+            data-testid="insert-mine-manage"
+            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+            onClick={onManageComponents}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onManageComponents(); }
+            }}
+          >
+            Manage components ›
+          </div>
+        )}
+      </>
+    )}
     {/* A GRID, because the flex-wrap version missed two columns by ONE pixel
         and nobody could see why. Board 138:2 draws two cards side by side and
         the arithmetic under it reads 16 + 136 + 16 + 136 + 16 = 320 — right
@@ -252,35 +411,63 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         the card width cannot lose that way, and it earns the expanded drawer
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
-      <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
-        {blocks?.map((b) => (
-          <div
-            key={b.id}
-            role="button"
-            tabIndex={0}
-            className="tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none"
-            data-testid={`insert-block-${b.id}`}
-            onClick={() => onBlockInsert?.(b)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onBlockInsert?.(b); }
-            }}
-          >
-            {b.preview ? (
-              <img
-                src={b.preview}
-                alt=""
-                className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:object-cover"
-                data-testid={`insert-block-thumb-${b.id}`}
-              />
-            ) : (
-              <div className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)]" data-testid={`insert-block-thumb-${b.id}`} aria-hidden="true" />
-            )}
-            <p data-testid={`insert-block-label-${b.id}`} className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate">
-              {b.label}
-            </p>
-          </div>
-        ))}
-      </div>
+      <>
+        <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-2 tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
+          {/* Board 4428:140817 / 4428:145110: a card is its thumbnail over its
+              name; hovered, it names what it is and offers "Add <name>" or the
+              drag. The card IS the drag source — the board's grip is a hint,
+              not a separate handle. */}
+          {blocks?.map((b) => (
+            <div
+              key={b.id}
+              role="button"
+              tabIndex={0}
+              draggable={Boolean(onBlockDragStart)}
+              className="tw:group tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none tw:rounded-[var(--bk-radius-md)] tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+              data-testid={`insert-block-${b.id}`}
+              aria-label={`Add ${b.label}`}
+              title={b.description ? `${b.description} — click to add, or drag it onto the canvas` : `Click to add ${b.label}, or drag it onto the canvas`}
+              onClick={() => onBlockInsert?.(b)}
+              onDragStart={onBlockDragStart ? (e) => onBlockDragStart(e, b) : undefined}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onBlockInsert?.(b); }
+              }}
+            >
+              {b.preview ? (
+                <img
+                  src={b.preview}
+                  alt=""
+                  className="tw:h-[65px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:object-cover tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                  data-testid={`insert-block-thumb-${b.id}`}
+                />
+              ) : (
+                <BlockThumb
+                  blockId={b.id}
+                  className="tw:h-[65px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                />
+              )}
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-1 tw:min-w-0">
+                <p data-testid={`insert-block-label-${b.id}`} className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate tw:group-hover:text-[var(--bk-ink)]">
+                  {b.label}
+                </p>
+                {/* The board's Insert pill, hover-revealed (DESIGN.md anti-slop
+                    12: actions reveal on hover, never a per-row strip). */}
+                <span
+                  aria-hidden="true"
+                  data-testid={`insert-block-pill-${b.id}`}
+                  className="tw:hidden tw:group-hover:inline-flex tw:h-4 tw:shrink-0 tw:items-center tw:rounded-full tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent-text)]"
+                >
+                  Add
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Board 4428:140817's footnote under the grid. */}
+        <p data-testid="insert-blocks-note" className="tw:m-0 tw:px-[var(--bk-space-16)] tw:pb-[var(--bk-space-8)] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)]">
+          Blocks use your Brand colours and fonts.
+        </p>
+      </>
     )}
   </div>
 );

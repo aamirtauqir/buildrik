@@ -1,14 +1,18 @@
 /**
- * VariantSection — board 160:2 (Inspector · instance-selected).
+ * VariantSection — the inspector's instance doors.
  *
- * The band that says this thing came from a component: which variant it is on,
- * and the way back to the master. The board puts it ABOVE the style sections,
- * tinted, because it changes what everything below means — an instance's edits
- * are local until it is detached.
+ * Two board states, one component:
+ * - Component with variants — 4418:112330: a tinted band, "VARIANT" and a
+ *   [Large ▾] trigger, the property name under the label, "Reset to master".
+ *   The trigger's menu (6918:74827) lists the variants, then "Edit master ›"
+ *   and "Detach instance".
+ * - No variants — 6881:68947: two plain 28px rows, "Edit master · {name} ›"
+ *   and "Detach this instance". "Reset to master" stays as a third row so an
+ *   instance's own edits can still be undone (designer-notes).
  *
- * It used to render as an ordinary collapsible "Variants" section at the very
- * bottom of the column, under Animation and CSS classes, with chips instead of
- * the board's selects and no way at all to undo an instance's own edits.
+ * Detach confirms (6887:78306) and Reset confirms (6979:77597). Neither is
+ * gated on Pro mode any more (G2-125 / G2-069) — detaching used to live only
+ * behind the density toggle, in the Applies-to row.
  *
  * @license BSD-3-Clause
  */
@@ -16,140 +20,192 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";
-import { Button, Select } from "@/editor/chrome-ui";
-// ============================================================================
-// TYPES
-// ============================================================================
+import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
+import { Button, ConfirmDialog, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
 
 interface VariantSectionProps {
-  /** Composer instance */
   composer: Composer | null;
-  /** Selected element ID */
   elementId: string | null;
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
+interface InstanceInfo {
+  component: ComponentDefinition;
+  instanceId: string;
+  currentVariant: string | null;
+}
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
+/** "Home › Hero › Grid" — the page, then the instance's named ancestors. */
+function instancePath(composer: Composer, elementId: string): string {
+  const names: string[] = [];
+  let parent = composer.elements.getElement(elementId)?.getParent() ?? null;
+  while (parent?.getParent()) {
+    const type = parent.getType();
+    names.unshift(getLayerName(parent) ?? ELEMENT_TYPE_LABELS[type] ?? type);
+    parent = parent.getParent();
+  }
+  const page = composer.elements.getActivePage()?.name;
+  return [page, ...names].filter(Boolean).join(" › ");
+}
+
+const DOOR_ROW =
+  "tw:flex tw:w-full tw:h-7 tw:items-center tw:gap-2 tw:pl-7 tw:pr-4 tw:py-1 tw:rounded-none tw:border-0 " +
+  "tw:bg-transparent tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink)] tw:justify-start " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
 
 export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elementId }) => {
-  // State for component info
-  const [componentInfo, setComponentInfo] = React.useState<{
-    component: ComponentDefinition | null;
-    instanceId: string | null;
-    currentVariant: string | null;
-  }>({
-    component: null,
-    instanceId: null,
-    currentVariant: null,
-  });
+  const [info, setInfo] = React.useState<InstanceInfo | null>(null);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [confirm, setConfirm] = React.useState<"reset" | "detach" | null>(null);
+  const { addToast } = useToast();
 
-  // Check if selected element is a component instance
   React.useEffect(() => {
-    if (!composer || !elementId) {
-      setComponentInfo({ component: null, instanceId: null, currentVariant: null });
-      return;
-    }
-
-    const instance = composer.components?.getInstanceByElementId(elementId);
-    if (!instance) {
-      setComponentInfo({ component: null, instanceId: null, currentVariant: null });
-      return;
-    }
-
-    const component = composer.components?.getComponent(instance.componentId);
-    setComponentInfo({
-      component: component ?? null,
-      instanceId: instance.elementId,
-      currentVariant: instance.variantSelection?.variantId ?? null,
-    });
+    const instance = composer && elementId ? composer.components?.getInstanceByElementId(elementId) : null;
+    const component = instance ? composer?.components?.getComponent(instance.componentId) : null;
+    setInfo(
+      instance && component
+        ? { component, instanceId: instance.elementId, currentVariant: instance.variantSelection?.variantId ?? null }
+        : null,
+    );
   }, [composer, elementId]);
 
-  // Handle variant change
-  const handleVariantChange = React.useCallback(
-    (propertyName: string, value: string) => {
-      if (!composer || !componentInfo.instanceId || !componentInfo.component) return;
+  if (!composer || !info) return null;
+  const { component, instanceId } = info;
+  const variants = component.variants ?? [];
+  const properties = component.variantProperties ?? [];
+  const hasVariants = properties.length > 0 && variants.length > 0;
+  const current = variants.find((v) => v.id === info.currentVariant) ?? variants[0];
 
-      // Find or create variant ID based on property values
-      const variants = componentInfo.component.variants || [];
-      const matchingVariant = variants.find((v) => v.propertyValues[propertyName] === value);
-
-      if (matchingVariant) {
-        // Update instance variant selection
-        composer.components?.updateInstanceVariant?.(componentInfo.instanceId, matchingVariant.id);
-      }
-    },
-    [composer, componentInfo]
-  );
-
-  // Don't render if not a component instance or no variant properties
-  if (!componentInfo.component) {
-    return null;
-  }
-
-  const variantProperties = componentInfo.component.variantProperties || [];
-  const variants = componentInfo.component.variants || [];
-  /* This used to `return null` when a component had no variant properties,
-     which is the NORMAL case — most components define none. The whole band
-     went with it, including "Reset to master", so an element that genuinely
-     WAS an instance showed nothing at all: the inspector ran straight from the
-     pill row into TYPOGRAPHY with no sign the element was linked to anything.
-     Board 160:2 is exactly that state. Only the pickers depend on variants;
-     being an instance does not. */
-  const hasVariants = variantProperties.length > 0;
-
-  const currentValue = (propertyName: string): string => {
-    if (!componentInfo.currentVariant || variants.length === 0) {
-      const prop = variantProperties.find((p) => p.name === propertyName);
-      return prop?.defaultValue || "";
-    }
-    const currentVar = variants.find((v) => v.id === componentInfo.currentVariant);
-    return currentVar?.propertyValues[propertyName] || "";
+  const pickVariant = (variantId: string) => {
+    setMenuOpen(false);
+    composer.components?.updateInstanceVariant?.(instanceId, variantId);
+    setInfo({ ...info, currentVariant: variantId });
   };
 
+  const editMaster = () => {
+    setMenuOpen(false);
+    requestOpenMaster(composer, component.id);
+  };
+
+  const detach = async () => {
+    setConfirm(null);
+    try {
+      const ok = await composer.components.detachInstance(instanceId);
+      if (ok) {
+        setInfo(null);
+        return;
+      }
+      addToast({ description: "Couldn't detach this instance. It may already be detached.", tone: "error" });
+    } catch {
+      addToast({ description: "Couldn't detach this instance. Try again.", tone: "error" });
+    }
+  };
+
+  const reset = () => {
+    setConfirm(null);
+    void composer.components?.resetInstance?.(instanceId);
+  };
+
+  const resetLink = (
+    <Button
+      color="light"
+      size="xs"
+      data-testid="variant-reset"
+      className="tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)] tw:focus:ring-0"
+      onClick={() => setConfirm("reset")}
+    >
+      Reset to master
+    </Button>
+  );
+
   return (
-    <div className="tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2" data-testid="variant-band">
-      <div className="tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-accent)]">
-        {hasVariants ? "VARIANT" : "COMPONENT INSTANCE"}
-      </div>
-      {!hasVariants && (
-        <div className="tw:mb-1 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">
-          Linked to {componentInfo.component.name}. Edits here apply to this copy only.
+    <>
+      {hasVariants ? (
+        <div className="tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2" data-testid="variant-band">
+          <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
+            <div className="tw:min-w-0">
+              <div className="tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]">VARIANT</div>
+              <div className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                {properties.map((p) => p.name).join(" · ")}
+              </div>
+            </div>
+            <Popover
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)}
+              placement="bottom-end"
+              label="Variant"
+              trigger={
+                <Button
+                  color="light"
+                  size="xs"
+                  data-testid="variant-trigger"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  className="tw:h-[26px] tw:w-[160px] tw:rounded tw:justify-start tw:bg-white tw:border-[var(--bk-border)] tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  <span className="tw:truncate">{current?.name ?? "Default"}</span>
+                  <span aria-hidden className="tw:ml-1 tw:text-[var(--bk-ink-muted)]">▾</span>
+                </Button>
+              }
+            >
+              <Menu label="Variant" data-testid="variant-menu">
+                {variants.map((v) => (
+                  <MenuItem key={v.id} selected={v.id === current?.id} onClick={() => pickVariant(v.id)}>
+                    {v.name}
+                  </MenuItem>
+                ))}
+                <MenuSeparator />
+                <MenuItem data-testid="variant-edit-master" onClick={editMaster}>
+                  Edit master ›
+                </MenuItem>
+                <MenuItem
+                  data-testid="variant-detach"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setConfirm("detach");
+                  }}
+                >
+                  Detach instance
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </div>
+          {resetLink}
+        </div>
+      ) : (
+        <div data-testid="variant-band">
+          <Button color="light" data-testid="instance-edit-master" className={DOOR_ROW} onClick={editMaster}>
+            {`Edit master · ${component.name}  ›`}
+          </Button>
+          <Button color="light" data-testid="instance-detach" className={DOOR_ROW} onClick={() => setConfirm("detach")}>
+            Detach this instance
+          </Button>
+          <Button color="light" data-testid="variant-reset" className={DOOR_ROW} onClick={() => setConfirm("reset")}>
+            Reset to master
+          </Button>
         </div>
       )}
-      {variantProperties.map((prop) => (
-        <div key={prop.name} className="bdi-row-ctrl">
-          <label className="bdi-lb">{prop.name}</label>
-          <Select
-            value={currentValue(prop.name)}
-            onChange={(e) => handleVariantChange(prop.name, e.target.value)}
-            aria-label={`${prop.name} variant`}
-          >
-            {prop.values.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </Select>
-        </div>
-      ))}
-      <Button
-        color="light"
-        size="xs"
-        className="tw:mt-1 tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
-        onClick={() => {
-          if (componentInfo.instanceId) {
-            void composer?.components?.resetInstance?.(componentInfo.instanceId);
-          }
-        }}
-      >
-        Reset to master
-      </Button>
-    </div>
+      <ConfirmDialog
+        open={confirm === "detach"}
+        onClose={() => setConfirm(null)}
+        onConfirm={() => void detach()}
+        title={`Detach this ${component.name} instance?`}
+        message={`${instancePath(composer, instanceId)} · This instance becomes an independent container. Its content and appearance are kept; it will no longer follow updates to the ${component.name} master.`}
+        confirmLabel="Detach instance"
+        testId="instance-detach-confirm"
+      />
+      <ConfirmDialog
+        open={confirm === "reset"}
+        onClose={() => setConfirm(null)}
+        onConfirm={reset}
+        title={`Reset ${component.name} to master?`}
+        message="Overrides on this instance will be discarded."
+        confirmLabel="Reset"
+        testId="instance-reset-confirm"
+      />
+    </>
   );
 };
 

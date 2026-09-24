@@ -21,8 +21,9 @@ export interface PropertyConfig {
 // ============================================================================
 
 export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
+  /* G2-156: no href rows here — LinkSection (Settings › LINK) owns href for
+     link and button; two editors for one attribute disagreed. */
   link: [
-    { id: "href", label: "URL", type: "text", placeholder: "https://..." },
     {
       id: "target",
       label: "Open In",
@@ -40,7 +41,6 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
 
   button: [
     { id: "content", label: "Button Label", type: "textarea", placeholder: "Button text" },
-    { id: "href", label: "Link URL", type: "text", placeholder: "https://..." },
     {
       id: "target",
       label: "Open In",
@@ -63,8 +63,10 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
     { id: "disabled", label: "Disabled", type: "checkbox" },
   ],
 
+  /* G2-145: no Image URL / Video URL rows — MediaSourceRow ("Choose image",
+     "Manage video") owns a media element's source, and the library's From
+     URL tab covers a pasted link. */
   image: [
-    { id: "src", label: "Image URL", type: "text", placeholder: "https://..." },
     { id: "alt", label: "Alt Text", type: "text", placeholder: "Image description" },
     { id: "title", label: "Title", type: "text", placeholder: "Image title" },
     {
@@ -119,7 +121,6 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
   label: [{ id: "content", label: "Label Text", type: "textarea", placeholder: "Field label" }],
 
   video: [
-    { id: "src", label: "Video URL", type: "text", placeholder: "https://..." },
     { id: "poster", label: "Poster Image", type: "text", placeholder: "https://..." },
     { id: "autoplay", label: "Autoplay", type: "checkbox" },
     { id: "loop", label: "Loop", type: "checkbox" },

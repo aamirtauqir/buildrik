@@ -1,5 +1,12 @@
 /**
- * ColourModeSection — Brand › Colour mode, board 153:92.
+ * ColourModeSection — Brand › Colour mode, board 7316:80949 (C1 (ii); was
+ * the drawer's 153:92).
+ *
+ * One bordered card, a 48px row per colour token: the id, then either "No dark
+ * value" with a Set action, or "#LIGHT → #DARK" with a check. The tokens that
+ * still need a value come first — that is what the page is for. The Light /
+ * Dark switch is not on this page any more: the board draws it inside the
+ * live preview card, so the workspace passes it there.
  *
  * Deferred at M5 with the reason "its board lists tokens with NO DARK VALUE
  * plus a Set action each, and that query is not known to exist on the
@@ -15,136 +22,184 @@
  *     typed. Fixed earlier today, so `updateToken(id, value, darkValue)` is now
  *     reachable from the UI at all.
  *
- * Set is inline rather than a jump into Tokens. The row already names the token
- * and the only missing piece is one value; sending someone two levels away to
- * type it would be navigation standing in for a text field.
+ * Set opens "Set the dark-mode value" (7318:80995, G3-146) in place: three
+ * shades derived from the light value (`darkShadeSuggestions`), each with its
+ * contrast where it will be used; a pick writes the dark value. "Custom…"
+ * (not drawn; the free value the inline field used to take) opens the one
+ * colour picker.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, TextInput } from "@/editor/chrome-ui";
-import type { Composer } from "../../../../engine/Composer";
+import { Check } from "lucide-react";
+import { X } from "lucide-react";
+import { Button, IconButton, Popover } from "@/editor/chrome-ui";
+import { darkShadeSuggestions } from "../../utils/colorUtils";
+import { ColorPicker } from "../colors/ColorPicker";
 import { useColorRegistry } from "../../state/TokenRegistryContext";
-import { ColorModeToggle } from "../ColorModeToggle";
+import { useDSModeOptional } from "../../state/DSModeContext";
+import { filterTokensByMode } from "../../utils/semanticKind";
+import { displayValue } from "../colors/ColorTokenList";
+import { BrandCard, BrandRow } from "../BrandCard";
 
-export interface ColourModeSectionProps {
-  composer?: Composer | null;
-}
-
-export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }) => {
+export const ColourModeSection: React.FC = () => {
   const color = useColorRegistry();
+  const mode = useDSModeOptional()?.mode ?? "beginner";
   const [editing, setEditing] = React.useState<string | null>(null);
-  const [draft, setDraft] = React.useState("");
+  const [custom, setCustom] = React.useState(false);
 
   /* The unconditional question — which colour tokens have no dark value — not
-     the lint rule, which stays silent until the project has at least one. */
-  const missing = React.useMemo(
-    () => (color?.tokens ?? []).filter((t) => !t.darkValue),
-    [color?.tokens],
-  );
+     the lint rule, which stays silent until the project has at least one.
+     The same mode filter as the Colours page, so the two pages count the same
+     palette. */
+  const { missing, paired } = React.useMemo(() => {
+    const visible = filterTokensByMode(color?.tokens ?? [], mode);
+    return {
+      missing: visible.filter((t) => !t.darkValue),
+      paired: visible.filter((t) => t.darkValue),
+    };
+  }, [color?.tokens, mode]);
 
-  const commit = (id: string, lightValue: string) => {
-    const next = draft.trim();
+  const commit = (id: string, lightValue: string, darkValue: string) => {
     setEditing(null);
-    if (!next) return;
-    color.updateToken(id, lightValue, next);
+    setCustom(false);
+    color.updateToken(id, lightValue, darkValue);
+  };
+  const open = (id: string) => {
+    setCustom(false);
+    setEditing(id);
   };
 
-  return (
-    <div className="tw:flex tw:flex-col">
-      {composer && composer.colorMode ? (
-        /* 44 tall — 153:99. `py-2` around a 34px group measured 50, which is
-           six pixels of unboarded band above the first section header. */
-        <div className="tw:flex tw:h-11 tw:flex-none tw:items-center tw:px-3" data-testid="brand-colour-mode-preview">
-          <ColorModeToggle composer={composer} />
-        </div>
-      ) : null}
-
-      <div
-        /* `--bk-ink-soft`, not the board's `--color/ink-muted`: this header's
-           own fill is `--bk-gray-100`, where ink-muted measures 4.39:1 and
-           fails AA at 11px. Same substitution as DesignTabFooter's status line.
-           28 tall on a 16 inset with an 8px gap — 220:835, the shared Section
-           header. It shipped 12-in on a `py-1.5` hug, so the one band that
-           groups this list sat 4px inside every row it grouped. */
-        className="tw:flex tw:h-7 tw:items-center tw:justify-between tw:gap-2 tw:px-4 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-gray-100)]"
-        data-no-dark-header
-        data-testid="brand-nodark-header"
-      >
-        <span>No dark value</span>
-        <span className="tw:font-mono tw:tabular-nums tw:font-medium" data-no-dark-count>{missing.length}</span>
+  if (missing.length + paired.length === 0) {
+    return (
+      <div className="tw:py-6 tw:text-center tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]">
+        No colour tokens yet.
       </div>
+    );
+  }
 
-      {missing.length === 0 ? (
-        <div className="tw:px-3 tw:py-6 tw:text-center tw:text-xs tw:text-[var(--bk-ink-muted)]">
-          Every colour token has a dark value.
-        </div>
-      ) : (
-        <ul className="tw:flex tw:flex-col tw:list-none tw:m-0 tw:p-0">
-          {missing.map((t) => (
-            <li
-              key={t.id}
-              data-no-dark-row={t.id}
-              data-testid={`brand-nodark-row-${t.id}`}
-              className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4 tw:py-0"
-            >
-              {/*
-                The id, not the display name. Board 153:92 draws these rows as
-                mono ids (`brand/accent-soft`, `surface/raised`) and the mono
-                was already here — only the value was wrong. It matters on this
-                screen more than on any other: the live list holds both `Text`
-                and `Text Primary`, so a name cannot say which token you are
-                about to give a dark value to, and this row's whole job is to
-                let you set one without leaving to check.
-
-                The board's own ids are sample data in a different convention;
-                ours are `color-text` / `color-primary`, which serve the same
-                purpose. The name stays in the accessible label so a screen
-                reader still reads something human.
-              */}
-              <span
-                data-testid={`brand-nodark-name-${t.id}`}
-                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
-                title={t.name}
-              >
-                {t.id}
-              </span>
-              {editing === t.id ? (
-                <TextInput
-                  autoFocus
-                  value={draft}
-                  aria-label={`Dark value for ${t.name}`}
-                  className="tw:w-24 tw:[font-family:var(--bk-font-mono)]"
-                  onChange={(e) => setDraft(e.target.value)}
-                  onBlur={() => commit(t.id, t.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") commit(t.id, t.value);
-                    if (e.key === "Escape") setEditing(null);
-                  }}
-                />
-              ) : (
+  return (
+    <BrandCard label="Colour mode" data-testid="brand-colour-mode-list">
+      {/*
+        The id, not the display name — the board draws ids, and the live
+        palette holds both `Text` and `Text Primary`, so a name cannot say
+        which token you are about to give a dark value to. The name stays in
+        the title so it is still reachable.
+      */}
+      {missing.map((t) => (
+        <BrandRow
+          key={t.id}
+          data-no-dark-row={t.id}
+          data-testid={`brand-nodark-row-${t.id}`}
+          name={<span data-testid={`brand-nodark-name-${t.id}`} title={t.name}>{t.id}</span>}
+          sub="No dark value"
+          trailing={
+            <Popover
+              open={editing === t.id}
+              onClose={() => setEditing(null)}
+              placement="bottom-end"
+              label="Set the dark-mode value"
+              trigger={
                 <Button
-                  color="light"
                   size="xs"
+                  variant="link"
                   data-set-dark={t.id}
                   data-testid={`brand-nodark-set-${t.id}`}
-                  onClick={() => {
-                    setDraft(t.value);
-                    setEditing(t.id);
-                  }}
-                  /* 12/18 in `--color/accent-text` — 153:110 and its three
-                     siblings. flowbite's `size="xs"` link is 12/16, so the one
-                     action on each row sat two pixels short of its own row. */
-                  variant="link" className="tw:font-normal tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                  aria-haspopup="dialog"
+                  aria-expanded={editing === t.id}
+                  onClick={() => (editing === t.id ? setEditing(null) : open(t.id))}
+                  className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent-text)]"
                 >
                   Set
                 </Button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+              }
+            >
+              {editing === t.id && custom ? (
+                <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg">
+                  <ColorPicker
+                    initialHex={t.value}
+                    title={`${t.id} · dark`}
+                    onChange={() => {}}
+                    onCancel={() => setCustom(false)}
+                    onSave={(hex) => commit(t.id, t.value, hex)}
+                  />
+                </div>
+              ) : editing === t.id ? (
+                <div className="tw:flex tw:w-66 tw:flex-col tw:gap-3 tw:p-2" data-testid="dark-shade-popover">
+                  <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
+                    <div className="tw:flex tw:flex-col tw:gap-1">
+                      <span className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="dark-shade-crumb">
+                        Site brand › {t.id}
+                      </span>
+                      <span className="tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Set the dark-mode value</span>
+                    </div>
+                    <IconButton label="Close" onClick={() => setEditing(null)} className="tw:size-5 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
+                      <X size={14} aria-hidden />
+                    </IconButton>
+                  </div>
+                  <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                    Pick the value this token resolves to when the site is in dark mode.
+                  </p>
+                  <div className="tw:flex tw:flex-col tw:gap-2">
+                    {darkShadeSuggestions(t.value).map((sh, i) => (
+                      <Button
+                        key={sh.hex + sh.label}
+                        type="button"
+                        onClick={() => commit(t.id, t.value, sh.hex)}
+                        data-testid={`dark-shade-option-${i}`}
+                        data-hex={sh.hex}
+                        className={`tw:h-auto tw:min-h-0 tw:w-full tw:justify-start tw:gap-3 tw:rounded-md tw:border tw:bg-[var(--bk-gray-900)] tw:px-2.5 tw:py-2 tw:text-left tw:enabled:hover:bg-[var(--bk-gray-800)] ${
+                          i === 0 ? "tw:border-[var(--bk-accent)]" : "tw:border-transparent"
+                        }`}
+                      >
+                        <span className="tw:size-5 tw:flex-none tw:rounded" style={{ background: sh.hex }} aria-hidden />
+                        <span className="tw:flex tw:flex-col">
+                          <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-white">
+                            {sh.hex} · {sh.label}
+                          </span>
+                          <span className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-gray-400)]">
+                            contrast {sh.contrast.toFixed(1)}:1
+                            {sh.contrast < 3 ? " · fails large text" : sh.contrast < 4.5 ? " · fails body text" : ""}
+                          </span>
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="tw:flex tw:items-center tw:justify-between tw:border-t tw:border-[var(--bk-border)] tw:pt-3">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => setCustom(true)}
+                      data-testid="dark-shade-custom"
+                      className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:no-underline"
+                    >
+                      Custom…
+                    </Button>
+                    <Button type="button" variant="secondary" size="xs" onClick={() => setEditing(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+            </Popover>
+          }
+        />
+      ))}
+      {paired.map((t) => (
+        <BrandRow
+          key={t.id}
+          data-dark-row={t.id}
+          data-testid={`brand-dark-row-${t.id}`}
+          name={<span title={t.name}>{t.id}</span>}
+          sub={
+            <span data-testid={`brand-dark-pair-${t.id}`}>
+              {displayValue(t.value)} → {displayValue(t.darkValue ?? "")}
+            </span>
+          }
+          trailing={<Check size={12} aria-label="Has a dark value" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />}
+        />
+      ))}
+    </BrandCard>
   );
 };
 

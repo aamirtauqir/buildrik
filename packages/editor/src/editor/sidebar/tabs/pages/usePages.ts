@@ -22,10 +22,18 @@ import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import { slugify } from "@shared/utils/helpers/string";
-import type { PageItem } from "./types";
+import type { PageItem, PageStatus } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+
+/** A page's stored visibility → its panel status. Unset is "live" (what the
+ *  deploy does with it). C4 #26: a "password" stored before Password pages
+ *  were removed reads as "hidden" — it is unpublished, like a hidden page. */
+const PAGE_STATUSES: ReadonlyArray<PageStatus> = ["live", "draft", "hidden", "scheduled", "error"];
+function pageStatus(visibility: string | undefined): PageStatus {
+  if (visibility === "password") return "hidden";
+  return PAGE_STATUSES.find((s) => s === visibility) ?? "live";
+}
 
 interface ContextMenuState {
   pageId: string;
@@ -41,7 +49,7 @@ export interface UsePagesReturn {
   // Rename state
   renamingPageId: string | null;
   startRename: (pageId: string) => void;
-  commitRename: (pageId: string, name: string) => void;
+  commitRename: (pageId: string, name: string, updateUrl?: boolean) => void;
   cancelRename: () => void;
 
   // Context menu state
@@ -55,7 +63,6 @@ export interface UsePagesReturn {
   closeSettings: () => void;
 
   // Actions (all guard-checked)
-  addPage: () => void;
   selectPage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
   deletePage: (pageId: string) => void;
@@ -124,7 +131,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
                Every other reader already agrees: PageRow falls back to
                "live", and the settings drawer persists only live/hidden/
                password and reads anything else as "live". */
-            status: (p.settings?.visibility as PageItem["status"]) ?? "live",
+            status: pageStatus(p.settings?.visibility),
             seo: p.settings?.seo,
             head: p.settings?.head,
             updatedAt: p.updatedAt,
@@ -180,30 +187,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  const addPage = React.useCallback(() => {
-    if (!composer) return;
-    const name = getDefaultPageName(pages);
-    const slug = slugify(name);
-    try {
-      // Use createPage's synchronous return value directly. The previous
-      // setTimeout(60) + getAllPages().last() pattern broke when pages are
-      // prepended instead of appended and when PROJECT_CHANGED fired twice
-      // in a tick.
-      const newest = composer.elements.createPage(name, { slug });
-      // PageRow owns focus: when it mounts with isRenaming=true, its own
-      // effect selects + focuses the input. No rAF needed here — that was
-      // a timing race when the row hadn't mounted within one frame.
-      if (newest) setRenamingPageId(newest.id);
-    } catch (err) {
-      addToast({
-        description: "Couldn't add page right now. Try again.",
-        tone: "error",
-        duration: 4000,
-      });
-      console.error("[pages] addPage failed", err);
-    }
-  }, [composer, pages.length, addToast]);
-
   const selectPage = React.useCallback(
     (pageId: string) => {
       setContextMenu(null);
@@ -218,10 +201,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   }, []);
 
   const commitRename = React.useCallback(
-    (pageId: string, name: string) => {
+    (pageId: string, name: string, updateUrl = false) => {
       const trimmed = name.trim();
       if (trimmed && composer) {
-        composer.elements.updatePage(pageId, { name: trimmed });
+        // G2-076: "Update URL" moves the slug with the name (the engine keeps
+        // the old one in slugHistory); "Keep URL" renames only.
+        composer.elements.updatePage(pageId, updateUrl ? { name: trimmed, slug: slugify(trimmed) } : { name: trimmed });
       }
       setRenamingPageId(null);
     },
@@ -302,14 +287,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     (pageId: string) => {
       const page = pages.find((p) => p.id === pageId);
       setContextMenu(null);
-      if (page?.status === "external") {
-        addToast({
-          description: "External link pages can't be set as the homepage.",
-          tone: "warning",
-          duration: 4000,
-        });
-        return;
-      }
       if (!composer) return;
       try {
         composer.elements.setHomePage?.(pageId);
@@ -417,7 +394,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     settingsPageId,
     openSettings,
     closeSettings,
-    addPage,
     selectPage,
     duplicatePage,
     deletePage,

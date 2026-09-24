@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * usePageSettings — drawer state hook: seed-from-page, dirty tracking, save
- * (calls elements.updatePage), and save guards (slug error, empty password,
+ * (calls elements.updatePage), and save guards (slug error,
  * head-code validation). Also corroborates the score algorithm: indexing is
  * an all-or-nothing gate on the numeric score (SeoTab now labels it "Required",
  * not the former fictional "+40 pts").
@@ -71,10 +71,12 @@ describe("usePageSettings seed", () => {
     expect(result.current.seoTitle).toBe("About Us");
   });
 
-  it("maps password status to visibility=password", () => {
+  /* #21 / #26: a legacy password page arrives as "hidden" (usePages maps it —
+     see usePages.test "legacy password pages"); the drawer reads it Hidden. */
+  it("reads a hidden page as hidden", () => {
     const composer = createMockComposer({});
-    const { result } = setup(composer, page({ status: "password" }));
-    expect(result.current.visibility).toBe("password");
+    const { result } = setup(composer, page({ status: "hidden" }));
+    expect(result.current.visibility).toBe("hidden");
   });
 
   it("exposes the project domain from composer metadata", () => {
@@ -176,21 +178,6 @@ describe("usePageSettings save", () => {
     });
   });
 
-  it("blocks save and warns when password visibility has no password", async () => {
-    const composer = createMockComposer({});
-    const { result } = setup(composer, page({ status: "password" }));
-
-    await act(async () => {
-      await result.current.save();
-    });
-
-    expect(composer.elements.updatePage).not.toHaveBeenCalled();
-    expect(lastToast()).toMatchObject({
-      description: "Set an access password before saving",
-      tone: "warning",
-    });
-  });
-
   it("blocks save and sets headCodeError when the head code has an unclosed tag", async () => {
     const composer = createMockComposer({});
     const { result } = setup(composer, page());
@@ -205,19 +192,22 @@ describe("usePageSettings save", () => {
     expect(lastToast()).toMatchObject({ tone: "warning" });
   });
 
-  it("sets saveState=error and offers Retry when updatePage rejects", async () => {
+  /* #20: Done is the retry — the failure toast carries no Retry action. */
+  it("sets saveState=error, resolves false and offers no Retry when updatePage rejects", async () => {
     const composer = createMockComposer({});
     (composer.elements.updatePage as unknown as Mock).mockRejectedValueOnce(new Error("boom"));
     const { result } = setup(composer, page());
 
+    let ok: boolean | undefined;
     await act(async () => {
-      await result.current.save();
+      ok = await result.current.save();
     });
 
     await waitFor(() => expect(result.current.saveState).toBe("error"));
+    expect(ok).toBe(false);
     const toast = lastToast();
     expect(toast).toMatchObject({ tone: "error" });
-    expect(toast?.action?.label).toBe("Retry");
+    expect(toast?.action).toBeUndefined();
   });
 });
 

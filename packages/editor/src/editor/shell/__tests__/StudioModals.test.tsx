@@ -25,24 +25,24 @@ vi.mock("../../export", () => ({
     isOpen ? <div data-testid="modal-export" /> : null,
 }));
 vi.mock("../../media", () => ({
-  MediaLibraryPanel: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-media-library" /> : null,
   ImageEditorModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-image-editor" /> : null,
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-icon-picker" /> : null,
 }));
-vi.mock("../../panels/KeyboardShortcutsPanel", () => ({
-  KeyboardShortcutsPanel: ({ isOpen }: { isOpen: boolean }) =>
+vi.mock("../../canvas/controls/KeyboardLegend", () => ({
+  KeyboardLegend: () => null,
+}));
+vi.mock("../../canvas/controls/KeyboardCheatSheet", () => ({
+  KeyboardCheatSheet: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-shortcuts" /> : null,
 }));
 vi.mock("../modals/CMSCollectionSetupModal", () => ({
   CMSCollectionSetupModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-cms-setup" /> : null,
 }));
-vi.mock("../modals/CMSRecordsModal", () => ({
-  CMSRecordsModal: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-cms-records" /> : null,
+vi.mock("@/editor/sidebar/tabs/pages/components/NewPageModal", () => ({
+  NewPageModal: () => null,
 }));
 vi.mock("../modals/CreateComponentModal", () => ({
   CreateComponentModal: ({ isOpen }: { isOpen: boolean }) =>
@@ -72,10 +72,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onCloseExporter: vi.fn(),
     showShortcuts: false,
     onCloseShortcuts: vi.fn(),
-    showMediaLibrary: false,
-    onCloseMediaLibrary: vi.fn(),
-    onSelectMedia: vi.fn(),
-    mediaLibraryContext: null,
     showImageEditor: false,
     onCloseImageEditor: vi.fn(),
     imageEditorContext: null,
@@ -95,8 +91,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onCloseProjectSettings: vi.fn(),
     showCMSCollectionSetup: false,
     onCloseCMSCollectionSetup: vi.fn(),
-    showCMSRecords: false,
-    onCloseCMSRecords: vi.fn(),
     ...over,
   };
 }
@@ -113,13 +107,11 @@ const ALL_MARKERS = [
   "modal-save-template",
   "modal-export",
   "modal-shortcuts",
-  "modal-media-library",
   "modal-image-editor",
   "modal-icon-picker",
   "modal-collection-setup",
   "modal-create-component",
   "modal-cms-setup",
-  "modal-cms-records",
   "modal-command-palette",
 ];
 
@@ -150,11 +142,9 @@ describe("StudioModals — mounting contract", () => {
     ["showSaveTemplate", "modal-save-template"],
     ["showExporter", "modal-export"],
     ["showShortcuts", "modal-shortcuts"],
-    ["showMediaLibrary", "modal-media-library"],
     ["showCollectionSetup", "modal-collection-setup"],
     ["showCreateComponent", "modal-create-component"],
     ["showCMSCollectionSetup", "modal-cms-setup"],
-    ["showCMSRecords", "modal-cms-records"],
   ] as [keyof StudioModalsProps, string][])(
     "%s: true mounts only %s",
     (flag, marker) => {

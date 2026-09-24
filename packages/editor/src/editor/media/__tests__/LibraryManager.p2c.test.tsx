@@ -57,7 +57,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, downloaded = 1
   const { LibraryManager } = await import("../LibraryManager");
   const composer = makeComposer(USAGES);
   (composer.media as unknown as { downloadAssets: () => number }).downloadAssets = vi.fn(() => downloaded);
-  const utils = render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+  const utils = render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
   return { ...utils, composer };
 }
 
@@ -68,7 +68,8 @@ describe("Clone 3708:20650 / 20446 · Delete from the rail", () => {
     const requestDelete = vi.fn();
     await mountLibrary({ requestDelete });
     fireEvent.click(screen.getByTestId("mgr-asset-menu"));
-    fireEvent.click(rail().getByRole("button", { name: "Delete" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Delete" }));
     expect(requestDelete).toHaveBeenCalledWith("menu");
   });
 
@@ -111,7 +112,8 @@ describe("Clone 3701:20353 · Rename from the rail", () => {
     const renameItem = vi.fn(() => Promise.resolve());
     await mountLibrary({ renameItem });
     fireEvent.click(screen.getByTestId("mgr-asset-menu"));
-    fireEvent.click(rail().getByRole("button", { name: "Rename" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Rename" }));
     expect(screen.getByTestId("mgr-rename-title")).toHaveTextContent("Rename menu-cover.png");
     const input = screen.getByTestId("mgr-rename-input") as HTMLInputElement;
     expect(input.value).toBe("menu-cover.png");

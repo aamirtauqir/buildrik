@@ -33,6 +33,10 @@ import {
   minifyCSS,
   downloadFile,
   localeRedirectSnippet,
+  dropFontFamilies,
+  blockLinkPlan,
+  BLOCK_LINK_STYLE,
+  type LinkNodeView,
 } from "./ExportHelpers";
 import { devWarn } from "../../shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
@@ -76,6 +80,8 @@ export interface MultiPageExportFile {
   content: string;
   /** File type */
   type: "html" | "css" | "js" | "xml" | "tsx" | "json";
+  /** For a page's HTML: the page it was written from. */
+  pageId?: string;
 }
 
 /**
@@ -112,9 +118,11 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 /**
  * Whether a page is deployed at all.
  *
- * Page settings → Advanced offers Live / Hidden / Password. Both non-live
- * states are left out of a deploy — static hosting cannot ask for a password,
- * and publishing a page the owner believes is protected is the worse mistake.
+ * Page settings → Advanced offers Live / Hidden. Anything but unset or "live"
+ * is left out of a deploy — including a "password" value stored before
+ * Password pages were removed (C4 #26): static hosting cannot ask for a
+ * password, and publishing a page the owner believes is protected is the
+ * worse mistake.
  *
  * Exported because the Publish panel counts pages too, and a count that does
  * not match what ships is the same lie one layer up: it read "2 pages" for a
@@ -147,6 +155,49 @@ function hideRulesFor(selector: string, styles: Record<string, string>): string[
  */
 export function resolveHomePageId(pages: PageData[]): string | undefined {
   return (pages.find((p) => p.isHome) ?? pages[0])?.id;
+}
+
+/**
+ * Each page's published file name: the home page is index.html, every other
+ * page `<slug>.html`, numbered when two slugs collide. The export writes
+ * these files, and a CMS collection's template page is bound by the same
+ * name (`pageTemplatePath`, matched against the publish payload's paths by
+ * `appendDynamicPagesToPublish`), so both read it from here.
+ */
+export function pageFileNames(pages: PageData[]): Map<string, string> {
+  const homeId = resolveHomePageId(pages);
+  const used = new Set<string>(["index.html"]);
+  return new Map(
+    pages.map((p, index) => {
+      if (p.id === homeId) return [p.id, "index.html"];
+      const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
+      let name = `${slug}.html`;
+      for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
+      used.add(name);
+      return [p.id, name];
+    }),
+  );
+}
+
+type LiveElement = NonNullable<ReturnType<Composer["elements"]["getElement"]>>;
+
+/** blockLinkPlan's view of a live Element (single-file writer). */
+function readLiveNode(el: LiveElement): LinkNodeView<LiveElement> {
+  const stored = el.getData?.().tagName;
+  return {
+    tag: stored && stored !== "div" ? stored : getDefaultTagName(el.getType?.() || "div"),
+    href: el.getAttributes?.()?.href,
+    children: el.getChildren?.() ?? [],
+  };
+}
+
+/** blockLinkPlan's view of a saved page node (publish writer). */
+function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
+  return {
+    tag: el.tagName && el.tagName !== "div" ? el.tagName : getDefaultTagName(el.type),
+    href: el.attributes?.href,
+    children: el.children ?? [],
+  };
 }
 
 export class ExportEngine {
@@ -256,7 +307,13 @@ export class ExportEngine {
     return (this.composer.fonts?.getAllFonts({ source: "custom" }) ?? []).map((f) => f.family);
   }
 
-  private siteFontFaces(css: string): string {
+  /**
+   * `css` with the faces the site's ADDED fonts provide put ahead of every rule
+   * that names them, and with any added font that has no file on the server
+   * taken OUT of the stacks that name it — a page must not name a font it
+   * never loads (its only url is a session blob:, which dies with the tab).
+   */
+  private withSiteFontFaces(css: string, minify: boolean): string {
     const { css: faces, skipped } = siteFontFaceCSS(
       css,
       this.siteFontFamilies(),
@@ -266,10 +323,11 @@ export class ExportEngine {
       devWarn(
         "ExportEngine",
         `Site font "${family}" is not on the server yet (its only url is a session blob:) — ` +
-          "no @font-face was written for it; the exported page falls back to the next family in the stack"
+          "no @font-face was written for it and it was dropped from the font stacks that named it"
       );
     }
-    return faces;
+    const named = dropFontFamilies(css, skipped);
+    return faces ? faces + (minify ? "" : "\n\n") + named : named;
   }
 
   /**
@@ -319,8 +377,7 @@ export class ExportEngine {
     // The faces the site's ADDED fonts provide, ahead of every rule that
     // names them. Decided from the finished CSS — a family reaches it from an
     // element's style or from a site font token, and both count as a use.
-    const faces = this.siteFontFaces(css);
-    if (faces) css = `${faces}\n${css}`;
+    css = this.withSiteFontFaces(css, false);
 
     return cfg.minify ? minifyCSS(css) : css;
   }
@@ -367,12 +424,28 @@ export class ExportEngine {
        placeholder, name, required, download, and every aria- / data- attribute an
        element had. class and style come from their canonical fields above and
        below, so a raw attribute mirroring them would double-emit. */
+    // A linked section/container: the link goes on a wrapping <a> (see
+    // blockLinkPlan for the strategy and the nested-link rule).
+    const blockLink = blockLinkPlan(tag, attrs, children, readLiveNode);
+    const linkParts: string[] = [];
     for (const [key, value] of Object.entries(attrs)) {
       if (key === "class" || key === "style") continue;
       const out = key === "href" ? this.resolveHref(value) : value;
-      if (!isSafeAttrValue(key, out, tag)) continue;
+      const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
+      if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+      if (isLinkAttr) {
+        if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
+        continue;
+      }
       attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
+    // No wrapper when the href itself was refused as unsafe — an <a> without
+    // one would only restyle the section's cursor and focus order.
+    const openLink =
+      blockLink?.wrap && linkParts.some((p) => p.startsWith("href="))
+        ? `<a ${linkParts.join(" ")} style="${BLOCK_LINK_STYLE}">`
+        : "";
+    const closeLink = openLink ? "</a>" : "";
 
     // Build inline styles if configured
     if (config.cssStyle === "inline" && Object.keys(styles).length > 0) {
@@ -384,7 +457,7 @@ export class ExportEngine {
 
     // Self-closing tags
     if (["img", "input", "br", "hr"].includes(tag)) {
-      return `${indentStr}<${tag}${attrStr} />${newline}`;
+      return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}${newline}`;
     }
 
     // Build children content
@@ -398,7 +471,7 @@ export class ExportEngine {
       childContent = this.renderContent(content, contentFormat, type);
     }
 
-    return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>${newline}`;
+    return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}${newline}`;
   }
 
   /**
@@ -726,7 +799,14 @@ export class ExportEngine {
     const siteCss =
       siteTokensCSS(projectTokens) + siteFontCSS(siteFontsFromTokens(projectTokens));
 
-    let css = [baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
+    /* The reset leads, as in `generateCSS`: it carries the base body font
+       (THEME.fontFamily — what the canvas renders unstyled text in) and the
+       box-sizing/margin rules the canvas was designed under. This path never
+       emitted it, so every published page with no Brand body font rendered in
+       the browser's default SERIF, and the font links below had no base family
+       to fetch. The site's own font rules come after it, so they still win. */
+    const reset = options.minify ? RESET_CSS.replace(/\s+/g, " ") : RESET_CSS;
+    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 
     /* …and the @keyframes those styles reference. `generateCSS` has emitted
        them since the single-file export was found shipping `animation:
@@ -740,8 +820,7 @@ export class ExportEngine {
        stylesheet every page links — once, before any rule on any page that
        names them. Same reader as the single file; `generateCSS` above is a
        different assembly, so it has its own call. */
-    const faces = this.siteFontFaces(css);
-    if (faces) css = faces + (options.minify ? "" : "\n\n") + css;
+    css = this.withSiteFontFaces(css, !!options.minify);
 
     /* CMS export options. The default was "none", and nothing set it: publish
        calls exportAllPages({format,minify}) and the ZIP path does the same, so
@@ -759,18 +838,19 @@ export class ExportEngine {
     // Export each page
     for (const page of pages) {
       let html = this.exportPageToHtml(page, css);
+      const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       // Apply CMS resolution if mode is not 'none'
       if (cmsOptions.mode !== "none") {
-        html = await this.cmsResolver.resolve(html, cmsOptions);
+        html = await this.cmsResolver.resolve(html, { ...cmsOptions, pageFile: fileName });
       }
 
-      const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       files.push({
         name: fileName,
         content: html,
         type: "html",
+        pageId: page.id,
       });
     }
 
@@ -835,18 +915,7 @@ export class ExportEngine {
        deployed site answered 404 at its own root.
        The old rule also sent every slugless page to index.html, and two pages
        sharing a slug to the same file: one silently overwrote the other. */
-    const homeId = resolveHomePageId(pages);
-    const used = new Set<string>(["index.html"]);
-    this.pageHrefs = new Map(
-      pages.map((p, index) => {
-        if (p.id === homeId) return [p.id, "index.html"];
-        const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
-        let name = `${slug}.html`;
-        for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
-        used.add(name);
-        return [p.id, name];
-      }),
-    );
+    this.pageHrefs = pageFileNames(pages);
   }
 
   private resolveHref(href: string): string {
@@ -1027,9 +1096,24 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     // never rendered — that is the safety guarantee the escape default exists for.
     const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
     if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
-      return sanitizeHTML(content);
+      return sanitizeHTML(this.withSiteVariables(content, escapeHTML));
     }
-    return escapeHTML(content);
+    return escapeHTML(this.withSiteVariables(content));
+  }
+
+  /**
+   * {{site.<key>}} → the variable's value (CMS › Variables, saved in the
+   * project settings). A key with no variable stays as written, so a typo
+   * shows on the page rather than vanishing. `encode` escapes the value when
+   * it lands inside markup; plain text is escaped as a whole afterwards.
+   */
+  private withSiteVariables(content: string, encode: (v: string) => string = (v) => v): string {
+    const vars = this.composer.getProjectSettings?.()?.siteVariables;
+    if (!vars?.length || !content.includes("{{")) return content;
+    const byKey = new Map(vars.map((v) => [v.key, v.value]));
+    return content.replace(/\{\{\s*site\.([a-zA-Z][\w-]*)\s*\}\}/g, (m, key: string) =>
+      byKey.has(key) ? encode(byKey.get(key) ?? "") : m,
+    );
   }
 
   private renderPageElement(element: PageData["root"], indent = 1): string {
@@ -1080,6 +1164,11 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
       attrParts.push(`${key}="${escapeHTML(String(value))}"`);
     }
 
+    // A linked section/container: the link goes on a wrapping <a> (see
+    // blockLinkPlan for the strategy and the nested-link rule).
+    const blockLink = blockLinkPlan(tag, element.attributes ?? {}, children, readPageNode);
+    const linkParts: string[] = [];
+
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {
         // class/style/data-buildrick-id emitted above from their canonical
@@ -1089,10 +1178,22 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
         // is the writer the PUBLISH path uses, so resolving it only in the
         // live-Element writer above would have fixed nothing that ships.
         const out = key === "href" ? this.resolveHref(value) : value;
-        if (!isSafeAttrValue(key, out, tag)) continue;
+        const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
+        if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+        if (isLinkAttr) {
+          if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
+          continue;
+        }
         attrParts.push(`${key}="${escapeHTML(out)}"`);
       }
     }
+    // No wrapper when the href itself was refused as unsafe — an <a> without
+    // one would only restyle the section's cursor and focus order.
+    const openLink =
+      blockLink?.wrap && linkParts.some((p) => p.startsWith("href="))
+        ? `<a ${linkParts.join(" ")} style="${BLOCK_LINK_STYLE}">`
+        : "";
+    const closeLink = openLink ? "</a>" : "";
 
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
@@ -1107,7 +1208,7 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
 
     // Self-closing tags
     if (["img", "input", "br", "hr"].includes(tag)) {
-      return `${indentStr}<${tag}${attrStr} />\n`;
+      return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}\n`;
     }
 
     // Build children content
@@ -1121,7 +1222,7 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
       childContent = this.renderContent(content, contentFormat, element.type);
     }
 
-    return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>\n`;
+    return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}\n`;
   }
 
   // ============================================================================

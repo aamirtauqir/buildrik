@@ -131,33 +131,13 @@ export const editSubmenu: ContextAction[] = [
     group: "Edit",
     shortcut: "Del",
     isVisible: ({ isRoot }) => !isRoot,
-    handler: ({ composer, element, addToast }) => {
-      // Get element info for toast before deleting
-      const elementType = element.getType?.() || "element";
-      const elementName = getElementNameFromType(elementType);
-      const childCount = element.getChildren?.()?.length || 0;
-
-      runTransaction(composer, "context-delete", () => {
-        composer.elements.removeElement(element.getId());
-        composer.selection.select(null as never);
-      });
-
-      // Show undo toast
-      if (addToast) {
-        const message =
-          childCount > 0
-            ? `${elementName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
-            : `${elementName} deleted`;
-        addToast({
-          description: message,
-          tone: "info",
-          duration: 5000,
-          action: {
-            label: "Undo",
-            onClick: () => composer.history.undo(),
-          },
-        });
-      }
+    /* G2-051 (CI-13): the engine's delete — the WHOLE selection when the
+       clicked element is part of it, one transaction, and decision #17's
+       confirm for N > 1. It removed only the clicked element and raised its
+       own toast; useHistoryFeedback now raises the one "… deleted" + Undo for
+       every delete door, in one tone. */
+    handler: ({ composer }) => {
+      composer.commands.run("delete");
     },
   },
 ];

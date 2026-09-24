@@ -31,6 +31,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
 
 vi.mock("@/shared/utils/runtimeEnv", () => ({
   DASHBOARD_URL: "https://dash.test",
+  IS_DEV_BUILD: false,
 }));
 
 vi.mock("../usePublishJob", () => {

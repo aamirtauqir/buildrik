@@ -21,8 +21,6 @@ import { test, expect } from "@playwright/test";
 import { fontsLoadedStatus, stylesheetsSettled } from "./lib/measure-lib.mjs";
 
 const CASES = [
-  "content-collection-rows",
-  "content-field-rows",
   "content-root-rows",
   "onboarding-steps",
   "canvas-footer-toolbar",

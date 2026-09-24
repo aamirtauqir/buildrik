@@ -18,7 +18,8 @@
 import * as React from "react";
 import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem } from "../data/mediaTypes";
-import { Button } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "../hooks/useMediaWriteAccess";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 interface MediaContextMenuProps {
   x: number;
@@ -78,6 +79,11 @@ const ITEM =
 const ITEM_DANGER =
   `${ITEM} tw:text-[var(--bk-error)] tw:enabled:hover:bg-[var(--bk-error-tint)]`;
 
+/* Audit G3-064: a viewer's Rename… / Delete stay in the menu, focusable,
+   with the reason on a tooltip — `aria-disabled`, never `disabled`, which
+   would take the row out of the tab order and the reason with it. */
+const ITEM_VIEW_ONLY = `${ITEM_BASE} tw:text-[var(--bk-ink-muted)] tw:cursor-default`;
+
 /* 1163:13931 — bg-elevated on a --color/border edge, 8 radius, 6 top/bottom.
    The edge was missing entirely, so the menu's only separation from what it
    covers was its shadow. */
@@ -102,6 +108,7 @@ export function MediaContextMenu({
   onClose,
 }: MediaContextMenuProps) {
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const write = useMediaWriteAccess();
 
   useClickOutside(menuRef, onClose);
 
@@ -165,14 +172,22 @@ export function MediaContextMenu({
         >
           Select
         </Button>
-        <Button
-          role="menuitem"
-          className={ITEM}
-          data-testid="media-ctx-rename"
-          onClick={act(() => onRename(item))}
-        >
-          Rename…
-        </Button>
+        {write.canWrite ? (
+          <Button
+            role="menuitem"
+            className={ITEM}
+            data-testid="media-ctx-rename"
+            onClick={act(() => onRename(item))}
+          >
+            Rename…
+          </Button>
+        ) : (
+          <Tooltip content={write.reason("rename")} placement="right">
+            <Button role="menuitem" className={ITEM_VIEW_ONLY} data-testid="media-ctx-rename" aria-disabled="true">
+              Rename…
+            </Button>
+          </Tooltip>
+        )}
         {item.type === "img" ? (
           <Button
             role="menuitem"
@@ -230,14 +245,22 @@ export function MediaContextMenu({
 
         <div className="tw:h-px tw:my-[var(--bk-space-4)] tw:bg-[var(--bk-border)]" role="separator" />
 
-        <Button
-          role="menuitem"
-          className={ITEM_DANGER}
-          data-testid="media-ctx-delete"
-          onClick={act(() => onDelete(item))}
-        >
-          Delete
-        </Button>
+        {write.canWrite ? (
+          <Button
+            role="menuitem"
+            className={ITEM_DANGER}
+            data-testid="media-ctx-delete"
+            onClick={act(() => onDelete(item))}
+          >
+            Delete
+          </Button>
+        ) : (
+          <Tooltip content={write.reason("delete")} placement="right">
+            <Button role="menuitem" className={ITEM_VIEW_ONLY} data-testid="media-ctx-delete" aria-disabled="true">
+              Delete
+            </Button>
+          </Tooltip>
+        )}
       </div>
     </>
   );

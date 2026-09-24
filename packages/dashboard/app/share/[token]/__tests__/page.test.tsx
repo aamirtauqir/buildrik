@@ -1,0 +1,80 @@
+/**
+ * /share/<token> — what each token state renders. An open link renders the
+ * saved draft (DraftPreview) and counts the view; everything else gets the
+ * gate, and neither loads draft data.
+ */
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const resolveMock = vi.fn();
+const rowsMock = vi.fn();
+const viewMock = vi.fn();
+const cookieGet = vi.fn();
+
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: cookieGet }) }));
+vi.mock("@server/services/share-link.service", () => ({
+  resolveShareLink: (...a: unknown[]) => resolveMock(...a),
+  getShareDraftRows: (...a: unknown[]) => rowsMock(...a),
+  recordShareView: (...a: unknown[]) => viewMock(...a),
+}));
+vi.mock("../password-gate", () => ({ SharePasswordGate: () => null }));
+vi.mock("../draft-preview", () => ({ DraftPreview: () => null }));
+vi.mock("../unavailable", () => ({ ShareUnavailable: () => null }));
+
+import SharePage from "../page";
+import { SharePasswordGate } from "../password-gate";
+import { DraftPreview } from "../draft-preview";
+import { ShareUnavailable } from "../unavailable";
+
+const render = (query: Record<string, string> = {}) =>
+  SharePage({ params: Promise.resolve({ token: "tok" }), searchParams: Promise.resolve(query) });
+
+describe("SharePage", () => {
+  beforeEach(() => {
+    [resolveMock, rowsMock, viewMock, cookieGet].forEach((m) => m.mockReset());
+  });
+
+  it("passes the share_<token> cookie to the resolver", async () => {
+    cookieGet.mockReturnValue({ value: "proof" });
+    resolveMock.mockResolvedValue({ state: "locked" });
+    await render();
+    expect(cookieGet).toHaveBeenCalledWith("share_tok");
+    expect(resolveMock).toHaveBeenCalledWith("tok", "proof");
+  });
+
+  /* Expired / revoked / unknown links used to render the PASSWORD gate
+     ("This site is password protected") though none of them has a password. */
+  it.each(["expired", "revoked", "unknown"])("unavailable (%s) → its own card, not the password gate", async (reason) => {
+    resolveMock.mockResolvedValue({ state: "unavailable", reason });
+    const node = (await render()) as { type: unknown; props: Record<string, unknown> };
+    expect(node.type).toBe(ShareUnavailable);
+    expect(node.props).toEqual({ reason });
+    expect(rowsMock).not.toHaveBeenCalled();
+    expect(viewMock).not.toHaveBeenCalled();
+  });
+
+  it("locked → the password gate, no draft data, no view counted", async () => {
+    resolveMock.mockResolvedValue({ state: "locked" });
+    const node = (await render()) as { type: unknown };
+    expect(node.type).toBe(SharePasswordGate);
+    expect(rowsMock).not.toHaveBeenCalled();
+    expect(viewMock).not.toHaveBeenCalled();
+  });
+
+  it("passes ?page=<slug> through to the preview", async () => {
+    resolveMock.mockResolvedValue({ state: "open", linkId: "l1", siteId: "s1", siteName: "Bella" });
+    rowsMock.mockResolvedValue({});
+    const node = (await render({ page: "menu" })) as { props: Record<string, unknown> };
+    expect(node.props.initialPage).toBe("menu");
+  });
+
+  it("open → the saved draft of the link's site, and the view is counted", async () => {
+    resolveMock.mockResolvedValue({ state: "open", linkId: "l1", siteId: "s1", siteName: "Bella" });
+    const rows = { site: {}, pages: [], siteColumns: {}, siteFonts: [] };
+    rowsMock.mockResolvedValue(rows);
+    const node = (await render()) as { type: unknown; props: Record<string, unknown> };
+    expect(node.type).toBe(DraftPreview);
+    expect(node.props).toEqual({ siteName: "Bella", rows, initialPage: null });
+    expect(rowsMock).toHaveBeenCalledWith("s1");
+    expect(viewMock).toHaveBeenCalledWith("l1");
+  });
+});

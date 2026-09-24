@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { RepeaterRenderer } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 
 export type CMSExportMode = "static" | "template" | "none";
@@ -12,6 +13,11 @@ export type TemplateSyntax = "handlebars" | "liquid";
 export interface CMSExportOptions {
   mode: CMSExportMode;
   syntax?: TemplateSyntax;
+  /** The published file name of the page being resolved (pageFileNames).
+   *  On a collection's template page (pageTemplatePath), a binding to "the
+   *  record on this page" is written as the publish worker's {fieldSlug}
+   *  token, which it fills once per record. */
+  pageFile?: string;
 }
 
 /**
@@ -48,7 +54,7 @@ export class CMSExportResolver {
     }
 
     if (options.mode === "static") {
-      return this.resolveStatic(html);
+      return this.resolveStatic(html, options.pageFile);
     }
 
     if (options.mode === "template") {
@@ -61,7 +67,7 @@ export class CMSExportResolver {
   /**
    * Resolve with actual CMS content values (static mode)
    */
-  private async resolveStatic(html: string): Promise<string> {
+  private async resolveStatic(html: string, pageFile?: string): Promise<string> {
     /* Optional all the way down. Now that resolution is the DEFAULT rather than
        an opt-in flag, every export runs through here — including composers
        built without a CMS manager at all, where `composer.cms.bindings` threw
@@ -72,6 +78,10 @@ export class CMSExportResolver {
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
+    /* Collection lists first (G3-079): their per-record copies are what the
+       field bindings below then resolve over. A page without one is left
+       untouched by this step. */
+    await new RepeaterRenderer(this.composer).expandCollectionLists(doc);
     const elements = doc.querySelectorAll("[data-buildrick-id]");
     const promises: Promise<void>[] = [];
 
@@ -81,6 +91,11 @@ export class CMSExportResolver {
 
       const bindings = this.composer.cms.bindings.getBindings(elementId);
       bindings.forEach((binding) => {
+        const onPageRecord = !binding.itemId || binding.itemId === "context";
+        if (onPageRecord && pageFile && this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageTemplatePath === pageFile) {
+          this.applyValue(el as HTMLElement, binding.property, `{${binding.fieldSlug}}`);
+          return;
+        }
         const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {
           if (!value) return;
           this.applyValue(el as HTMLElement, binding.property, value);
@@ -196,15 +211,18 @@ export class CMSExportResolver {
 
     const itemVar = binding.itemVar || "item";
     const collectionVar = binding.collectionId;
-
-    if (syntax === "handlebars") {
-      const startComment = doc.createComment(`#each ${collectionVar} as |${itemVar}|`);
-      const endComment = doc.createComment("/each");
-      el.parentNode?.insertBefore(startComment, el);
-      el.parentNode?.insertBefore(endComment, el.nextSibling);
-    } else if (syntax === "liquid") {
-      const startComment = doc.createComment(`for ${itemVar} in ${collectionVar}`);
-      const endComment = doc.createComment("endfor");
+    const [open, close] =
+      syntax === "handlebars"
+        ? [`#each ${collectionVar} as |${itemVar}|`, "/each"]
+        : [`for ${itemVar} in ${collectionVar}`, "endfor"];
+    const startComment = doc.createComment(open);
+    const endComment = doc.createComment(close);
+    /* A Collection list (G3-079) repeats its children; the older repeater
+       repeats itself. */
+    if (binding.repeat === "children") {
+      el.insertBefore(startComment, el.firstChild);
+      el.appendChild(endComment);
+    } else {
       el.parentNode?.insertBefore(startComment, el);
       el.parentNode?.insertBefore(endComment, el.nextSibling);
     }

@@ -129,6 +129,9 @@ function makeComposer(): Composer {
     off: () => {},
     versions: {
       captureVisualSnapshot: () => "data:image/jpeg;base64,fake",
+      /* The "+ Save a version" footer (SaveVersionFooter) saves through the
+         engine directly — the Session tab has no version list to borrow. */
+      createVersion: (name: string, description?: string) => mocks.createVersion(name, description),
     },
   } as unknown as Composer;
 }
@@ -286,8 +289,8 @@ describe("VersionHistoryPanel — save flow", () => {
     // FAB / save button has aria-label "Save version".
     fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
 
-    // Form input appears — placeholder copy is "e.g. Homepage redesign".
-    const input = await screen.findByPlaceholderText(/homepage redesign/i);
+    // The Save a version modal (board 4418:165661) opens with its name field.
+    const input = await screen.findByLabelText("Version name");
     fireEvent.change(input, { target: { value: "Milestone 1" } });
 
     // Submit by Enter on input (handler line 585) OR click save button.

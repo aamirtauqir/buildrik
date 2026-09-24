@@ -62,7 +62,8 @@ describe("migrateLegacyPanelState", () => {
   });
 
   it("keeps 'ai', which stopped being folded into Add", () => {
-    expect(migrateLegacyPanelState({ leftPanelTab: "ai" }).leftPanelTab).toBe("ai");
+    // The AI drawer is gone (G2-127) — AI opens in the inspector column.
+    expect(migrateLegacyPanelState({ leftPanelTab: "ai" }).leftPanelTab).toBe("add");
   });
 
   it("keeps 'review', which the old valid-tab list never named", () => {

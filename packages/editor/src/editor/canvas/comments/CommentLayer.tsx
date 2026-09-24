@@ -136,7 +136,22 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
   const [orphanModal, setOrphanModal] = React.useState<ReviewComment[] | null>(null);
   // Re-measure trigger for pin positions (page switch, element edits, resize).
   const [tick, setTick] = React.useState(0);
-  const announcedOrphans = React.useRef<Set<string>>(new Set());
+  /* Orphans already announced, remembered per site across reloads: the modal
+     is an announcement, not a status. Two comments whose elements really were
+     deleted opened it on every load of the site (2026-09-25); the Detached
+     group in Review is where they live after the first telling. */
+  const announcedKey = `buildrick-orphans-announced-${currentSiteId() ?? "local"}`;
+  const announcedOrphans = React.useRef<Set<string> | null>(null);
+  if (announcedOrphans.current === null) {
+    let stored: string[] = [];
+    try {
+      const parsed: unknown = JSON.parse(window.localStorage.getItem(announcedKey) ?? "[]");
+      if (Array.isArray(parsed)) stored = parsed.filter((v): v is string => typeof v === "string");
+    } catch {
+      // unreadable or unavailable storage — announce as if fresh
+    }
+    announcedOrphans.current = new Set(stored);
+  }
   const lastOrphanIds = React.useRef<string[]>([]);
   const layerRef = React.useRef<HTMLDivElement | null>(null);
   // Session-only cache: engine element id → its label at the moment it died.
@@ -259,13 +274,23 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
   }, [modeOn, reattachingId, draft, composer]);
 
   // ── Orphan detection (active page only — others aren't in the DOM) ─────────
-  // Runs a beat AFTER the trigger: engine events (ELEMENT_DELETED etc.) fire
-  // before the canvas DOM re-syncs, so an immediate scan still sees the dead
-  // element. 150ms lets the render settle without being user-noticeable.
+  // Runs once the active page is the one rendered (see below), a beat after
+  // the trigger.
   React.useEffect(() => {
     const root = canvasRef.current;
     if (!root || !composer || comments.length === 0) return;
-    const timer = window.setTimeout(() => {
+    /* QA 2026-09-24: a page switch (tab or Locate) under load reached the
+       scan while the PREVIOUS page was still in the DOM — every pin of the
+       new page read as deleted, and "2 comments lost their element" moved
+       live comments to Detached. A timer cannot know when the page landed,
+       so the scan waits until the ACTIVE page's own root is rendered
+       (polled, bounded). No root id to check = nothing to wait for. */
+    const activeRootId = composer.elements.getActivePage?.()?.root?.id ?? null;
+    const pageRendered = () =>
+      activeRootId === null || root.querySelector(`[data-buildrick-id="${CSS.escape(activeRootId)}"]`) !== null;
+    let timer = 0;
+    let waited = 0;
+    const scan = () => {
       /* Nothing RENDERED yet = nothing decidable. A first version of this guard
          tested `root.childElementCount`, which was worse than no guard at all:
          the wrapper receives one empty container about 1.8s before the page
@@ -292,17 +317,42 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
          wrong announcement can never be taken back: the element arrives, the
          scan agrees it is fine, and `fresh` stays empty because the id is
          still marked as told. */
-      for (const id of [...announcedOrphans.current]) {
-        if (!ids.includes(id)) announcedOrphans.current.delete(id);
+      const announced = announcedOrphans.current!;
+      const before = announced.size;
+      for (const id of [...announced]) {
+        const c = comments.find((x) => x.id === id);
+        /* Forget an id whose comment is gone (resolved/deleted) or is on this
+           page and anchored again. One on another page is not judged here. */
+        const gone = c === undefined && comments.length > 0;
+        if (gone || (c?.pageId === activePageId && !ids.includes(id))) announced.delete(id);
       }
-      const fresh = ids.filter((id) => !announcedOrphans.current.has(id));
+      const fresh = ids.filter((id) => !announced.has(id));
       if (fresh.length > 0) {
-        fresh.forEach((id) => announcedOrphans.current.add(id));
+        fresh.forEach((id) => announced.add(id));
         setOrphanModal(comments.filter((c) => fresh.includes(c.id)));
       }
-    }, 150);
+      if (fresh.length > 0 || announced.size !== before) {
+        try {
+          window.localStorage.setItem(announcedKey, JSON.stringify([...announced]));
+        } catch {
+          // storage unavailable — the in-memory set still holds this session
+        }
+      }
+    };
+    const attempt = () => {
+      if (pageRendered()) {
+        scan();
+        return;
+      }
+      waited += 100;
+      /* Bounded: a page that never renders is not a page to judge. */
+      if (waited < 10_000) timer = window.setTimeout(attempt, 100);
+    };
+    /* Still a beat after the trigger: ELEMENT_DELETED fires before the
+       canvas re-syncs, so an immediate scan would still see the element. */
+    timer = window.setTimeout(attempt, 150);
     return () => window.clearTimeout(timer);
-  }, [comments, activePageId, composer, canvasRef, tick]);
+  }, [comments, activePageId, composer, canvasRef, tick, announcedKey]);
 
   // ── Click-to-pin (create) and click-to-reattach ────────────────────────────
   const hitTest = (e: React.MouseEvent): { el: HTMLElement | null; left: number; top: number } => {

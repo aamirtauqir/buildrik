@@ -7,7 +7,15 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
-import { THRESHOLDS } from "../../shared/constants";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+
+/** Grey left each side of the page card when the canvas fits on load. */
+const FIT_GUTTER = 60;
+import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
+import { stepZoom } from "../../shared/constants/canvas";
+import { getBreakpointForWidth } from "../../shared/constants/breakpoints";
+import type { DeviceType } from "../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
@@ -23,8 +31,6 @@ import {
   contentStyles,
   footerToolbarContainerStyles,
 } from "./canvasStyles";
-import { CommandPalette, KeyboardCheatSheet, useKeyboardCheatSheet } from "./controls";
-import { useInspectorMode } from "./controls/InspectorToggle";
 import {
   useCanvasDragDrop,
   useCanvasInlineEdit,
@@ -42,7 +48,6 @@ import {
   useSelectionBehavior,
   useCursorIntelligence,
   useCanvasSnapping,
-  useCanvasCommandPalette,
   useCanvasToolbarActions,
   useCanvasInlineCommands,
   useCanvasSize,
@@ -52,6 +57,7 @@ import {
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { keyframesStyleSheet } from "@/shared/constants/animationKeyframes";
 import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
+import { useSelectionReadout } from "./hooks/useSelectionReadout";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
 import { CommentLayer } from "./comments/CommentLayer";
@@ -69,23 +75,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       device,
       zoom,
-      inspectorOpen,
-      onToggleInspector,
       onAIRequest,
-      showComponentView = false,
       showSpacing = false,
       showBadges = false,
       showGuides = true,
       showGrid = false,
-      gridSize = 10,
-      // Redesign P2 (sev 3): resting canvas must read as the rendered page, not a
-      // blueprint. Per-element dashed outlines stay OFF by default — the single
-      // ElementHoverOverlay (hover) + selection outline give the affordance, and
-      // X-ray mode (showXRay) is the opt-in for the full-structure view.
-      showOutlines = false,
       showRulers = false,
       showXRay = false,
-      devMode = false,
       showFooterToolbar = true,
       readOnly = false,
       onZoomChange,
@@ -124,17 +120,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [addToast]
     );
 
-    /* Announced, not toasted.
-       Every successful drop raised a toast — "Inserted: Heading" — and building
-       a page of thirty elements meant thirty of them stacking over the canvas.
-       It also said nothing the canvas had not already said louder: the element
-       appears, `animateDropSuccess` flashes it, and it is auto-selected, which
-       moves the inspector.
-
-       Deleting it outright would have taken the one channel that DID reach a
-       screen reader, since the toast viewport is the editor's `role="status"`
-       region. So the message survives in a visually-hidden live region and the
-       visual noise goes. Walked live 2026-08-24: one routine drop, one toast. */
+    /* Selection is announced through one polite region. Insert feedback is
+       a toast again (decision #16, board 4428:145642 "Hero added" + Undo):
+       thirty drops used to mean thirty toasts, which is why it became a
+       hidden announcement in 2026-08 — the toast store now keeps ONE
+       transient on screen (newest replaces, Undo = the last drop), so the
+       toast is the SR channel as well as the visual one. */
     const [announcement, setAnnouncement] = React.useState({ text: "", seq: 0 });
     const announce = React.useCallback((text: string) => {
       /* The seq is load-bearing. A plain string skips the DOM mutation when the
@@ -148,17 +139,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     const handleDropSuccess = React.useCallback(
       (success: DropSuccess) => {
-        announce(`Inserted: ${success.elementLabel}`);
         /* An async drop is PROGRESS, not completion — an OS image drop reports
-           "Uploading file.png..." before the upload finishes. Removing its
-           visible signal made a slow upload look like an ignored drop, which
-           invites a second attempt and makes the eventual error read as
-           spurious. Completion stays silent; work-in-flight does not. */
+           "Uploading file.png..." before the upload finishes; that one has
+           nothing to undo yet. */
         if (success.pending) {
           addToast({ description: success.elementLabel, tone: "info", duration: 4000 });
+          return;
         }
+        addToast({
+          description: `${success.elementLabel} added`,
+          tone: "success",
+          action: { label: "Undo", onClick: () => composer?.history.undo() },
+        });
       },
-      [announce, addToast]
+      [addToast, composer]
     );
 
     // Core hooks
@@ -173,7 +167,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     });
 
     // Indicators and canvas size
-    const { spacingIndicators, guides } = useCanvasIndicators({
+    const selectedForReadout = React.useMemo(() => {
+      const el = selectedId && composer ? composer.elements.getElement(selectedId) : null;
+      return el ? { id: selectedId as string, type: el.getType?.() ?? "element" } : null;
+    }, [composer, selectedId]);
+    const { label: readoutLabel, dims: readoutDims } = useSelectionReadout(composer, selectedForReadout);
+
+    const { spacingIndicators } = useCanvasIndicators({
       composer,
       selectedId,
       showSpacing,
@@ -274,7 +274,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       addGuide,
       removeGuide,
       updateGuide,
-    } = useCanvasGuides({ enabled: showRulers });
+    } = useCanvasGuides({ composer, enabled: showRulers });
 
     // Hover, marquee, keyboard
     const { hoveredElementId, shouldShowHover, handleCanvasMouseMove, handleCanvasMouseLeave } =
@@ -287,15 +287,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         isResizing,
       });
 
-    // Inspector mode (persistent toggle)
-    const { isInspectorEnabled } = useInspectorMode();
-
     // Cursor intelligence - tracks modifier keys for smart hover display
     const { cursorState } = useCursorIntelligence({
       canvasRef,
       isDragging: Boolean(draggingElementId),
       isInvalidDrop: !isValidDrop && isDragOver,
-      inspectorEnabled: isInspectorEnabled,
     });
 
     // Live global custom CSS (Settings → Advanced) injected into the canvas.
@@ -400,18 +396,35 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
     }, [composer, zoom]);
 
-    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. BOTH command palettes emit
-       them — the shell's ⌘K (CommandPalette.tsx:125,132) and the canvas's own
-       ⌘⇧P (useCanvasCommandPalette.ts:113,121) — so "Zoom in" was a command you
-       could find, read and run, and nothing moved. Steps by THRESHOLDS.ZOOM_STEP
-       on the same percent scale ZoomControls uses. */
+    /* The grid spacing is the composer's setting (View ▸ Grid ▸ Size). */
+    const [gridSize, setGridSize] = React.useState(() => composer?.getState().gridSize ?? 10);
     React.useEffect(() => {
       if (!composer) return;
-      const step = (delta: number) => () => {
-        composer.setZoom(composer.getState().zoom + delta);
+      setGridSize(composer.getState().gridSize);
+      const onGrid = ({ gridSize: next }: { gridSize: number }) => setGridSize(next);
+      composer.on(EVENTS.GRID_CHANGED, onGrid);
+      return () => {
+        composer.off(EVENTS.GRID_CHANGED, onGrid);
       };
-      const zoomIn = step(THRESHOLDS.ZOOM_STEP);
-      const zoomOut = step(-THRESHOLDS.ZOOM_STEP);
+    }, [composer]);
+
+    /* G2-034: one Grid switch. Snapping (nudge, resize) follows the Grid
+       overlay; the separate snap setting and its ⌘K row are gone. */
+    React.useEffect(() => {
+      composer?.setSnapToGrid(showGrid);
+    }, [composer, showGrid]);
+
+    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
+       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
+       command you could find, read and run, and nothing moved. Steps to the
+       next preset, like ⌘=/⌘- (stepZoom, G2-016). */
+    React.useEffect(() => {
+      if (!composer) return;
+      const step = (direction: 1 | -1) => () => {
+        composer.setZoom(stepZoom(composer.getState().zoom, direction));
+      };
+      const zoomIn = step(1);
+      const zoomOut = step(-1);
       composer.on(EVENTS.ZOOM_IN, zoomIn);
       composer.on(EVENTS.ZOOM_OUT, zoomOut);
       return () => {
@@ -419,19 +432,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         composer.off(EVENTS.ZOOM_OUT, zoomOut);
       };
     }, [composer]);
-
-    // Command palette + cheat sheet (delegated to hooks)
-    const { isPaletteOpen, closePalette, commands } = useCanvasCommandPalette({
-      composer,
-      selectedId,
-      clear,
-      readOnly,
-    });
-    const {
-      isOpen: isCheatSheetOpen,
-      open: openCheatSheet,
-      close: closeCheatSheet,
-    } = useKeyboardCheatSheet(composer);
 
     // Emit hover events for LayersPanel sync
     React.useEffect(() => {
@@ -465,8 +465,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       syncFromComposer,
       addToast,
       onOpenContextMenu: (elementId, position) => {
-        // elementStack omitted: keyboard target is unambiguous (selectedId),
-        // unlike right-click where multiple elements may overlap
         setContextMenu({ x: position.x, y: position.y, elementId });
       },
     });
@@ -484,7 +482,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       completeDrag: sectionCompleteDrag,
       cancelDrag: sectionCancelDrag,
       setHoveredBoundary: setSectionHoveredBoundary,
-    } = useSectionReorder({ composer, canvasRef });
+    } = useSectionReorder({ composer, canvasRef, addToast });
 
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });
@@ -550,20 +548,29 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
     const isCanvasEmpty = pageIsEmpty && !projectLoading && !projectUnavailable;
+    /* Boards 5936:44788 / 4428:44164 draw the page as a card inside the
+       canvas — the 1024 desktop frame scaled to leave grey around it — not
+       edge to edge under the drawer and inspector. Once the project has
+       loaded, if the desktop frame is wider than its viewport, zoom to fit
+       its WIDTH with a 60 px gutter each side. Only on load: after that the
+       zoom is the user's. */
+    const didInitialFitRef = React.useRef(false);
+    React.useEffect(() => {
+      if (didInitialFitRef.current || projectLoading || !composer || device !== "desktop") return;
+      const frame = frameRef.current;
+      const viewport = scrollRef.current;
+      if (!frame || !viewport) return;
+      didInitialFitRef.current = true;
+      const fw = frame.offsetWidth;
+      const vw = viewport.clientWidth;
+      if (!fw || fw <= vw) return;
+      composer.setZoom(Math.max(10, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100)));
+    }, [projectLoading, composer, device]);
+
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
-    const {
-      handleSelectParent,
-      handleSelectAncestor,
-      handleToolbarDuplicate,
-      handleToolbarDelete,
-      handleToolbarCopy,
-      handleToolbarWrap,
-      handleToolbarMoveUp,
-      handleToolbarMoveDown,
-      handleToolbarUndo,
-    } = useCanvasToolbarActions({ composer, selectedId, addToast, select });
+    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer, selectedId, addToast });
 
     // Expose ref methods
     React.useImperativeHandle(ref, () => ({
@@ -583,9 +590,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // setContextMenu, so an unguarded close would dismiss the menu the instant
     // it opens (it only survived on already-selected elements).
     React.useEffect(() => {
-      if (contextMenu && contextMenu.elementId === selectedId) return;
+      /* A right-clicked member of a multi-selection keeps the selection
+         (G2-056), so the menu's element may be a member, not the primary. */
+      if (contextMenu && (contextMenu.elementId === selectedId || selectedIds.includes(contextMenu.elementId))) return;
       closeContextMenu();
-    }, [selectedId, closeContextMenu, contextMenu]);
+    }, [selectedId, selectedIds, closeContextMenu, contextMenu]);
 
     // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
     const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
@@ -623,7 +632,21 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [handleSelectionClick, pickMode, composer]
     );
 
-    // Context menu handler - includes element stack detection for "Select from stack" feature
+    /* The grey around the page is canvas too. The column's 24px padding and
+       the scroll area below the frame sit outside the frame's click handler,
+       so a click there used to change nothing — the walk at /edit/:id clicked
+       exactly there. Only a click that lands on those surfaces themselves
+       counts; the bar, overlays and the frame handle their own. */
+    const handleBackgroundClick = React.useCallback(
+      (e: React.MouseEvent) => {
+        if (!composer || (e.target !== wrapperRef.current && e.target !== scrollRef.current)) return;
+        composer.selection.clear();
+        composer.emit(EVENTS.UI_CANVAS_BACKGROUND_CLICK, {});
+      },
+      [composer]
+    );
+
+    // Context menu handler
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
@@ -637,28 +660,42 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         if (!id) return;
         const el = composer.elements.getElement(id);
         if (!el) return;
-        select(el);
+        /* G2-056: right-clicking a member of a multi-selection keeps the
+           selection, so the menu's Delete / Duplicate / Group act on all of
+           it; right-clicking anything else selects just that. */
+        const current = composer.selection.getSelectedIds?.() ?? [];
+        if (!(current.length > 1 && current.includes(id))) select(el);
 
-        // Detect all elements at this position for "Select from stack" feature
-        const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
-        const elementStack = elementsAtPoint
-          .filter((elem) => elem.hasAttribute("data-buildrick-id"))
-          .map((elem) => elem.getAttribute("data-buildrick-id")!)
-          .filter(Boolean);
-
-        setContextMenu({ x: e.clientX, y: e.clientY, elementId: id, elementStack });
+        setContextMenu({ x: e.clientX, y: e.clientY, elementId: id });
       },
       [composer, select, closeContextMenu, setContextMenu]
     );
 
-    const size = DEVICE_SIZES[device];
+    /* G2-014: "Custom width…" previews at a width of the user's choosing, in
+       the breakpoint that width falls in; any other device pick drops it. */
+    const [customWidth, setCustomWidth] = React.useState<{ width: number; device: DeviceType } | null>(null);
+    const activeCustomWidth = customWidth?.device === device ? customWidth.width : null;
+    const size = activeCustomWidth
+      ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
+      : DEVICE_SIZES[device];
+    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
        edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
        mouse-move stay: selection changes nothing when there is no inspector to
        drive, and comment pinning needs the pointer. */
     return (
-      <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles}>
+      /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
+         left and 16px above the footer toolbar (board 5940:148012) —
+         chrome-ui/Toast measures both. */
+      <div
+        ref={wrapperRef}
+        tabIndex={0}
+        onKeyDown={readOnly ? undefined : handleKeyDown}
+        onClick={handleBackgroundClick}
+        style={wrapperStyles}
+        data-bk-toast-anchor=""
+      >
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div
@@ -702,7 +739,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {/* Canvas Content */}
           <div
             ref={canvasRef}
-            className={`buildrick-canvas${showComponentView ? " bd-canvas--component-view" : ""}`}
+            className="buildrick-canvas"
             data-buildrick-canvas="true"
             // Conformance anchor, deliberately separate from the engine markers
             // above. `data-buildrick-canvas` and `.buildrick-canvas` are queried
@@ -711,11 +748,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             // refactor silently unhooks conformance.
             data-testid="canvas"
             data-device={device}
-            data-show-outlines={showOutlines ? "true" : undefined}
             data-xray-mode={showXRay ? "true" : undefined}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
+            data-empty-cta={isCanvasEmpty && !readOnly && !startedBlank ? "true" : undefined}
             style={contentStyles}
             dangerouslySetInnerHTML={canvasInnerHtml}
           />
@@ -728,22 +765,36 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              door as well as a wrong one. The container placeholder next to it
              was already suppressed; this larger one was missed.
 
-             Start blank goes to board 807:6558: the Insert drawer opens, and
-             the sentence becomes the next instruction. It used to only set a
+             Start blank: the Insert drawer opens and the prompt goes — the
+             v3 flow lands on the editor page (the 807:6558 sentence it used to
+             leave behind is on the archived page). It used to only set a
              flag that hid the whole CTA, so the one button a first-time user
              pressed left them on an empty canvas with no drawer and nothing to
              do. `ui:switch-tab` is the seam StudioPanels already listens on,
              and it opens the panel when it is closed. */}
-          {isCanvasEmpty && !readOnly && (
+          {isCanvasEmpty && !readOnly && !startedBlank && (
             <CanvasEmptyCTA
-              started={startedBlank}
+              span={emptyCtaSpan}
+              scale={scale}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
+              /* Board 4428:44164's two new doors reuse the seams that already
+                 exist: the Add drawer opened on BLOCKS (the canvas menu's
+                 "Replace with block…" does the same), and the AI panel (the
+                 inspector's ✦ chip). */
+              onAddBlock={() => {
+                if (!composer) return;
+                composer.emit("ui:switch-tab", { tab: "add" });
+                requestInsertGroup(composer, "blocks");
+              }}
+              onDescribe={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
               onStartBlank={() => {
                 setStartedBlank(true);
                 composer?.emit("ui:switch-tab", { tab: "add" });
               }}
             />
           )}
+
+          {!readOnly && <DeleteSelectionConfirm composer={composer} />}
 
           {/* All overlays delegated to CanvasOverlayGroup */}
           <CanvasOverlayGroup
@@ -760,7 +811,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             updateGuide={updateGuide}
             removeGuide={removeGuide}
             showGuides={showGuides}
-            guides={guides}
             snapLines={snapLines}
             selectedId={selectedId}
             selectedIds={selectedIds}
@@ -768,20 +818,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             setIsResizing={setIsResizing}
             showSpacing={showSpacing}
             spacingIndicators={spacingIndicators}
-            onSelectParent={handleSelectParent}
-            onSelectAncestor={handleSelectAncestor}
             onDuplicate={handleToolbarDuplicate}
             onDelete={handleToolbarDelete}
-            onCopy={handleToolbarCopy}
-            onWrap={handleToolbarWrap}
-            onMoveUp={handleToolbarMoveUp}
-            onMoveDown={handleToolbarMoveDown}
-            onUndo={handleToolbarUndo}
+            onOpenElementMenu={(elementId, point) => setContextMenu({ x: point.x, y: point.y, elementId })}
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}
-            isInspectorEnabled={isInspectorEnabled}
-            devMode={devMode}
             isDragOver={isDragOver}
             dropTargetId={dropTargetId}
             dropPosition={dropPosition}
@@ -810,7 +852,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
         {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
         {showFooterToolbar && onZoomChange && onOverlayChange && (
-          <div style={footerToolbarContainerStyles}>
+          <div style={footerToolbarContainerStyles} data-bk-toast-floor="">
             <CanvasFooterToolbar
               overlays={{
                 guides: showGuides,
@@ -825,11 +867,28 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
-              onHelpClick={openCheatSheet}
-              inspectorOpen={inspectorOpen}
-              onToggleInspector={onToggleInspector}
-              device={device === "watch" ? "mobile" : device}
-              onDeviceChange={onDeviceChange}
+              gridSize={gridSize}
+              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
+              readout={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
+              device={device}
+              onDeviceChange={
+                onDeviceChange
+                  ? (d) => {
+                      setCustomWidth(null);
+                      onDeviceChange(d);
+                    }
+                  : undefined
+              }
+              customWidth={activeCustomWidth}
+              onCustomWidth={
+                onDeviceChange
+                  ? (width) => {
+                      const bp = getBreakpointForWidth(width);
+                      if (bp !== device) onDeviceChange(bp);
+                      setCustomWidth({ width, device: bp });
+                    }
+                  : undefined
+              }
               canUndo={canUndo}
               canRedo={canRedo}
               onUndo={composer ? () => composer.history.undo() : undefined}
@@ -852,17 +911,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             onClose={closeContextMenu}
           />
         )}
-
-        {/* Command Palette (Cmd+Shift+P) */}
-        <CommandPalette
-          isOpen={isPaletteOpen}
-          onClose={closePalette}
-          commands={commands}
-          selectedId={selectedId}
-        />
-
-        {/* Keyboard Cheat Sheet ('?' key) */}
-        <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
 
         {/* ONE polite region for the canvas, not two. A successful drop selects
             the new element and then reports the insert, so a second region meant

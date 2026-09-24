@@ -64,6 +64,17 @@ describe("setDevice", () => {
     expect(frame().style.height).toBe("100%");
   });
 
+  /* Decision #26 deleted the Watch device; a saved "watch" must not
+     reach applyDeviceSize with no config behind it. */
+  it("ignores a device it has no preset for (legacy \"watch\")", () => {
+    viewport.setDevice("tablet");
+    composer.emit.mockClear();
+    viewport.setDevice("watch" as never);
+    expect(viewport.getDevice()).toBe("tablet");
+    expect(frame().style.width).toBe("768px");
+    expect(composer.emit).not.toHaveBeenCalled();
+  });
+
   it("a wide device with no height falls back to 100% height", () => {
     viewport.setDevice("wide");
     expect(frame().style.width).toBe("1920px");
@@ -110,7 +121,7 @@ describe("device registry", () => {
   it("getDevices returns a copy — mutating it does not affect the viewport", () => {
     const devices = viewport.getDevices();
     delete (devices as Record<string, unknown>).desktop;
-    expect(viewport.getDeviceConfig("desktop")).toEqual({ name: "Desktop", width: 1280 });
+    expect(viewport.getDeviceConfig("desktop")).toEqual({ name: "Desktop", width: 1024 });
   });
 
   it("addDevice registers a custom device config", () => {

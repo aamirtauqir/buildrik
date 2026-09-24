@@ -15,6 +15,8 @@ function makeMockComposer() {
   const setContent = vi.fn();
   const composer = {
     beginTransaction: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     endTransaction: vi.fn(),
     /* The real composer is an emitter; a commit announces itself. */
     emit: vi.fn(),

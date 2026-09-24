@@ -1,7 +1,7 @@
 /**
  * useCanvasElementDrag — drag payload / clone / drop-chain tests.
  *
- * Strategy: the sibling hooks (touch, keyboard-move, auto-scroll, DOM-sync)
+ * Strategy: the sibling hooks (keyboard-move, auto-scroll, DOM-sync)
  * are mocked so this file isolates the delegation handlers the hook attaches
  * to the canvas container. Drag events are simulated with plain Events (jsdom
  * has no DragEvent) carrying a fake dataTransfer object.
@@ -20,17 +20,6 @@ const mocks = vi.hoisted(() => ({
   clearDropTarget: vi.fn(),
   startAutoScroll: vi.fn(),
   stopAutoScroll: vi.fn(),
-}));
-
-vi.mock("../drag", () => ({
-  useTouchDrag: () => ({
-    touchHandlers: {
-      onTouchStart: vi.fn(),
-      onTouchMove: vi.fn(),
-      onTouchEnd: vi.fn(),
-      onTouchCancel: vi.fn(),
-    },
-  }),
 }));
 
 vi.mock("../useElementDragAutoScroll", () => ({
@@ -429,3 +418,25 @@ describe("useCanvasElementDrag", () => {
     });
   });
 });
+
+/* Decision #26: the editor is desktop-only (DESIGN.md) — touch drag (CI-50,
+   500 ms long-press) is deleted, so the canvas listens to no touch events. */
+describe("useCanvasElementDrag — no touch drag", () => {
+  it("attaches no touch listeners to the canvas", () => {
+    const canvas = document.createElement("div");
+    const add = vi.spyOn(canvas, "addEventListener");
+    const canvasRef = { current: canvas } as React.RefObject<HTMLDivElement>;
+    renderHook(() =>
+      useCanvasElementDrag({
+        composer: makeComposer() as unknown as Composer,
+        canvasRef,
+        onDraggingChange: vi.fn() as never,
+        onSnapLinesChange: vi.fn() as never,
+      }),
+    );
+    const types = add.mock.calls.map((c) => c[0]);
+    expect(types).toContain("dragstart");
+    expect(types.filter((t) => t.startsWith("touch"))).toEqual([]);
+  });
+});
+

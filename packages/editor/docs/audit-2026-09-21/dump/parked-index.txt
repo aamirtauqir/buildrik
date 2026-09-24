@@ -1,0 +1,477 @@
+# Parked (non-live) top-level frames on page 4418:45431 — names only · dumped 2026-09-21
+# Format: id|name|w×h[|H = hidden]
+## 4418:45432 REFERENCE · Specifications and behavior 
+4418:45433|REFERENCE VARIANT · Modal instances|1976x780
+4418:45539|REFERENCE VARIANT · Empty states|1544x902
+4418:45622|REFERENCE VARIANT · Permissions|976x788
+4418:45674|REFERENCE VARIANT · Modal instances|1880x932
+4418:45810|REFERENCE VARIANT · Orphan comments + AI states|1676x986
+4418:45917|REFERENCE VARIANT · Brand sub-screens + remaining chrome modals|1436x1085
+4418:46075|REFERENCE VARIANT · Device frames + zoom|1096x614
+4418:46124|REFERENCE VARIANT · Modal · open|1440x900
+4418:46138|REFERENCE VARIANT · Modal · dirty|1440x900
+4418:46151|REFERENCE VARIANT · Modal · success-then-close|1440x900
+4418:46161|REFERENCE VARIANT · S3.14 · cmdk · recent|640x420
+4418:46179|REFERENCE VARIANT · C6 · Recovery banner|1440x140
+4418:46186|REFERENCE VARIANT · J1 · Completeness Proof|800x1992
+4418:46189|REFERENCE VARIANT · J2 · Completeness Proof|800x1672
+4418:46192|REFERENCE VARIANT · J3-J6 · Completeness Proof|800x2068
+4418:46195|REFERENCE VARIANT · SPEC · Panel slots|1080x493
+4418:46218|REFERENCE VARIANT · Reference · index|1440x1163
+4418:46281|REFERENCE VARIANT · Reference · toast catalog|460x445
+4418:46328|REFERENCE VARIANT · Module Interaction Map · Collections → Publi…|1440x1319
+4418:46400|REFERENCE · Pages · settings · unsaved-warning (modal)|440x117
+4418:46409|REFERENCE · AI · one mark, one verb, one contract|1380x1360
+4418:46482|REFERENCE · Rail · selected vs open (two signals)|560x320
+4418:46500|REFERENCE · Topbar · Publish CTA states (five verbs · settled · …|1000x320
+4418:46524|REFERENCE · Topbar · location line|1440x320
+4418:46537|REFERENCE · Shell · full-page mode|1440x320
+4418:46548|REFERENCE · Shell · below 1024|1000x300
+4418:46554|REFERENCE · Shell · Issues joins the grid (right column, not a s…|1000x300
+4418:46579|REFERENCE · Shell · open decisions (700 vs 560 · two palettes · …|720x300
+4418:46584|REFERENCE · Drawer · width steps and the drag handle (280 ↔ 700)|1000x300
+4418:46602|REFERENCE · Full-screen Settings · Webhooks · forbidden|1440x900
+4418:46702|REFERENCE · Canvas · breadcrumb bar|720x36
+4418:46720|REFERENCE · Canvas · inline-edit toolbar (18 controls)|605x33
+4418:46765|REFERENCE · Popover · Canvas · AI · streaming|248x34
+4418:46772|REFERENCE · Popover · Canvas · AI · error|248x66
+4418:46778|REFERENCE · Components · variant-picker · detach-confirm|684x154
+4418:46797|REFERENCE · S3.3 · context-menu · right-click|2806x769
+4418:47050|REFERENCE · S3.2 · drop-target · insertion-indicators|2806x769
+4418:47224|REFERENCE · S1.1 · coach-dismissed|2806x769
+4418:47245|REFERENCE · S1.4 · 4 of 7|2806x769
+4418:47272|REFERENCE · S1.1c - First run - Start blank (Insert drawer opens…|2806x769
+4418:47359|REFERENCE · S1.4 · 0 of 7|340x440
+4418:47388|REFERENCE · S1.5 · retrying|2806x769
+4418:47396|REFERENCE · S1.2g · force-refresh · new-version-available|2806x769
+## 4418:48329 REFERENCE · Earlier UX analysis
+4418:48330|REFERENCE VARIANT · UX Architecture Analysis · 12-Point Audit|1200x10296
+## 4418:48372 ARCHIVE · Superseded designs
+4418:48373|ARCHIVE · B9.6 · Project settings modal|1540x399
+4418:48452|ARCHIVE · Inspector|1986x796
+4418:48818|ARCHIVE · S7 · Settings · Headers · locked (Pro)|1440x900
+4418:48841|ARCHIVE · S1.4 · minimized-pill|1440x900
+4418:48845|ARCHIVE · S1.4 · dismissed|1440x900
+4418:48847|ARCHIVE · S7 · Settings · Branding|1440x900
+4418:48890|ARCHIVE · S1.6 · viewer-editor-state · read-only-chrome|1440x900
+4418:49018|ARCHIVE · S1.5b · session-expired · unsaved-changes-warning|1440x900
+4418:49031|ARCHIVE · Shell · 1280 · pin auto-released (overlay)|1280x720
+4418:49239|ARCHIVE · Compare · restore-confirm|1080x776
+4418:49271|ARCHIVE · RETIRED|560x244
+4418:49295|ARCHIVE · S1.3 · new-page · loading|2807x769
+4418:49299|ARCHIVE · S1.3 · new-page · error|2806x769
+4418:49305|ARCHIVE · S3.7 · page-settings · SEO|580x817
+4418:49409|ARCHIVE · S2.0 · ai-chat-model|2806x410
+4418:49419|ARCHIVE · Modal · submitting|1440x900
+4418:49430|ARCHIVE · Modal · error|1440x900
+4418:49445|ARCHIVE · S7.0 · navigation-model · drill-in|1440x400
+4418:49448|STATE · Brand · root|1440x900
+4418:49685|STATE · Brand · empty|1440x900
+4418:49915|STATE · S2.1 · brief · empty|1440x900
+4418:50158|STATE · S2.1 · brief · typing|1440x900
+4418:50400|STATE · S2.3 · result · regen|1440x900
+4418:50629|STATE · S2.2 · generating · slow|1440x900
+4418:50877|STATE · S2.5 · chat · reject|1440x900
+4418:51135|STATE · S2.2 · generating · cancel-confirm|1440x900
+4418:51390|STATE · Inspector · single-selection|1440x900
+4418:51627|STATES · Archive · superseded designs (reference only)|1440x2268
+4418:51806|STATE · S2.1 · brief · submit|1440x900
+4418:52034|STATE · S2.3 · result · preview|1440x900
+4418:52268|STATE · S2.3 · result · accepted|1440x900
+4418:52498|STATE · S2.4 · unavailable · generic-error|1440x900
+4418:52734|STATE · S2.2 · generating · streaming|1440x900
+## 4418:52982 Create or replace a page · Templates
+4418:53093|ARCHIVE · Full-screen Templates · No results — superseded 19 Sep…|1440x900|H
+4418:53460|ARCHIVE · REFERENCE VARIANT · S1.1b · First run → Browse templat…|1440x900
+4418:53546|REFERENCE VARIANT · Superseded compact template entry|1440x900
+4418:53622|ARCHIVE · REFERENCE VARIANT · S1.1d - Template applied - First c…|1440x900
+4418:53849|FRAGMENT · Templates · create-page dialogs · strip of 2 dialogs,…|704x114
+4418:53884|REFERENCE VARIANT · Templates · usage-drawer|380x191
+4418:53894|ARCHIVE · REFERENCE VARIANT · Superseded compact template entry …|1440x900
+4418:55719|ARCHIVE · Content · Menu items › Choose template — superseded by…|1440x900
+4418:55929|REFERENCE · Templates · replace-confirm (generic) · superseded b…|560x164
+4418:57528|ARCHIVE · Templates · empty — superseded 19 Sep 2026 (Templates …|1440x900|H
+4418:57760|ARCHIVE · Templates · loading — superseded 19 Sep 2026 (Template…|1440x900|H
+## 4418:58291 Manage and choose assets · Media
+4418:58500|REFERENCE VARIANT · Media · fullpage · empty|1440x900
+4418:59135|ARCHIVE · CURRENT DESIGN · Media · modal · picker (choose for el…|720x620
+4418:59240|REFERENCE VARIANT · Media · delete-confirm · bulk type-DELETE (>…|440x217
+4418:59257|REFERENCE VARIANT · Media · modal · import-url · invalid|520x202
+4418:59271|REFERENCE VARIANT · Media · stock · photos · results|720x600
+4418:59388|REFERENCE VARIANT · Media · stock · no-results|720x400
+4418:59432|REFERENCE VARIANT · Media · stock · icons · empty|720x340
+4418:59448|REFERENCE VARIANT · Media · detail · context-menu · move-to-fold…|420x260
+4418:59461|REFERENCE VARIANT · Media · stock · search-failed|720x440
+4418:59480|REFERENCE VARIANT · Media drill-ins|1436x992
+4418:59609|REFERENCE VARIANT · Media · modal · replace-across · result-stat…|948x80
+4418:59632|REFERENCE VARIANT · Media · fullpage · folders · new-folder (inl…|240x301
+4418:59669|REFERENCE VARIANT · Media · stock · not-configured|720x400
+4418:59713|REFERENCE VARIANT · Media · stock · fonts · empty|720x340
+4418:59729|REFERENCE VARIANT · Media · delete-confirm · single file|440x122
+4418:59745|REFERENCE VARIANT · Media · detail · context-menu · asset (drawe…|420x260
+4418:59758|REFERENCE VARIANT · Media · detail · folder-menu · ＋ New folder …|420x260
+4418:60028|ARCHIVE · REFERENCE · Stock in canvas · superseded by contextual…|1440x900
+4418:60258|ARCHIVE · Media · Upload rejected · choose a smaller file — supe…|1440x900|H
+6289:147699|ARCHIVE · Media · folder-scoped · Menu photos · without scope li…|1440x900|H
+6289:147961|ARCHIVE · Media · Uploading — superseded 20 Sep 2026 · E-08: emp…|1440x900|H
+6289:148223|ARCHIVE · Media · Upload failed — superseded 20 Sep 2026 · E-08:…|1440x900|H
+## 4418:66500 Set site styles · Brand
+4418:66501|REFERENCE VARIANT · Brand · review-changes (modal)|520x265
+4418:66530|REFERENCE VARIANT · Modal · Brand · AI prompt · idle|720x228
+4418:66545|REFERENCE VARIANT · Modal · Brand · AI prompt · generating|720x227
+4418:66559|REFERENCE VARIANT · Modal · Brand · AI prompt · generated (no de…|720x236
+4418:66570|REFERENCE VARIANT · B9.5 · Migration progress modal|1040x470
+4418:66623|REFERENCE VARIANT · Modal · Brand · AI prompt · error|720x147
+4418:66634|ARCHIVE · CURRENT DESIGN · Design · Set fonts and colours · supe…|1440x900
+4418:66923|ARCHIVE · CURRENT DESIGN · Brand · Advanced · superseded by v3 2…|1440x900
+4418:67212..4418:73206|ARCHIVE · STATE · Brand · {token-detail, colour-mode, lint, lint-warnings, root · Beginner mode, tokens · add, tokens · replace, starters · applied, lint · suppressed, export · exported/imported/error, load-error, classes · empty, components · saved-empty, presets · bound/unbound/draft, loading, tokens, starters, classes, components, typography, import-export, dirty, presets} — ALL "superseded 21 Sep 2026 · Brand workspace"|1440x900
+## 4418:73419 Save and restore work · History
+4418:73420|REFERENCE · History · Published · roll-back confirm · superseded…|1440x900
+4418:73474|REFERENCE VARIANT · History · milestone suggestion banner (code:…|680x402
+4418:73517|REFERENCE VARIANT · History · Published · failed|1440x900
+4418:73529|REFERENCE VARIANT · Editor · reopened with unsaved work|900x400
+7292:81923|ANNOTATION · Backups · NOT IMPLEMENTED · no producer (moved out …|195x20
+7292:82374|ANNOTATION · Backups · NOT IMPLEMENTED · no producer (moved out …|195x20
+## 4418:79138 Select and organise · Layers
+4418:84410|ARCHIVE · Layers · list-view — superseded 20 Sep 2026 (SA-fix)|1440x900|H
+## 4418:84645 ARCHIVE · Manage structured content · Content
+4418:84708|REFERENCE VARIANT · Content · records (modal)|640x314
+4418:84770|REFERENCE VARIANT · Modal · CMS records · no-collections|640x132
+4418:84777|REFERENCE VARIANT · Modal · CMS records · none-published|640x188
+4418:84789|REFERENCE VARIANT · Modal · CMS records · empty|640x188
+4418:84799|ARCHIVE · Modal · CMS records · publish-error — superseded by 59…|640x180
+4418:84810|REFERENCE VARIANT · Media · modal · replace-across · all-failed …|624x95
+4418:84825..4418:87556|ARCHIVE · Content · (Manage collection records, Choose a collection, Menu items › Margherita/Unsaved/Fields/Dynamic pages/Price required/Price corrected, Create record for Price binding, Choose template dialog, Save record validation, Configure generated pages invalid/no eligible, Save corrected record) — all superseded by v3 CMS 4428:*|1440x900
+## 4418:90377 Manage site pages · Pages
+4418:90378|REFERENCE VARIANT · Pages · page tab bar (code: PageTabBar.tsx)|1080x920
+4418:90468|REFERENCE VARIANT · Modal · page-settings · save-failed|580x121
+4418:90477|REFERENCE VARIANT · Modal · page-settings · crash|580x116
+4418:90485|REFERENCE VARIANT · Pages · delete-page · confirm · inbound link…|440x117
+4418:91291|ARCHIVE · Pages · Our story / URL updated — superseded 20 Sep 20…|1440x900|H
+4418:91555|ARCHIVE · Manage pages · Menu actions — superseded 20 Sep 2026 ·…|1440x900|H
+4418:92224|ARCHIVE · Pages · Menu · Page SEO — superseded 20 Sep 2026 · sup…|1440x900|H
+4418:95537|ARCHIVE · STATE · Pages · command-palette (⌘K) — superseded 19 S…|1440x900
+## 4418:96852 Review and release · Publish
+4418:96853|ARCHIVE · Publish · pre-checks (modal · wizard step 1) — superse…|560x475
+4418:96922|REFERENCE VARIANT · Publish · pre-checks · blocked|520x475
+4418:96991|ARCHIVE · Publish · Confirm (modal · wizard step 2) — superseded…|560x361
+4418:97031|REFERENCE VARIANT · Publish · stale-approval (modal)|520x262
+4418:97050|REFERENCE VARIANT · Publish · issues-confirm (publish anyway)|500x260
+## 4418:99587 Build pages · Insert
+4418:99588|REFERENCE VARIANT · Modal · Add Child Element|380x225
+4418:99599|REFERENCE VARIANT · Modal · Add Child Element · refused|380x277
+## 4418:104264 Request and review changes · AI
+4418:104265|REFERENCE VARIANT · AI · in-canvas popover|1380x320
+4418:104293|REFERENCE VARIANT · AI · publish confirm|1120x340
+## 4418:107427 Edit selected elements · Inspector
+4418:107428|REFERENCE VARIANTS · Animation settings · Entrance / Attention /…|1120x721
+4418:107603|REFERENCE VARIANT · Inspector · empty · template-applied|300x169
+4418:107612|REFERENCE VARIANT · Inspector · token-picker popover|236x214
+4418:107638|REFERENCE VARIANT · Modal · Inspector · delete-confirm|720x132
+4418:107649|REFERENCE VARIANT · Popover · Inspector · token-picker · empty|228x162
+4418:107662|REFERENCE VARIANT · Popover · Inspector · token-picker · no-resu…|240x113
+4418:107673|REFERENCE VARIANT · Inspector · OPEN DECISIONS (V2 → V1)|720x812
+4418:108302|ARCHIVE · Configure form · Home / Reservation — superseded 20 Se…|1440x900|H
+4418:108491|ARCHIVE · Choose form destination · Home / Reservation — superse…|1440x900|H
+## 4418:115485 Inspect differences · Compare
+4418:115592|REFERENCE VARIANT · Compare · no-changes|1080x776
+4418:115609|REFERENCE VARIANT · Compare · single-page|1080x776
+4418:115636|REFERENCE VARIANT · Compare · loading-render|1080x776
+4418:115664|REFERENCE VARIANT · Compare · resend-confirm|1080x776
+## 4418:115731 Manage feedback and approval · Review
+4418:115732|REFERENCE VARIANT · Review · compare · load-error|280x300
+4418:115743|REFERENCE VARIANT · Review · compare · loading|280x260
+4418:115752|REFERENCE VARIANT · Orphan comments · detected|1440x900
+4418:119145|ARCHIVE · REFERENCE VARIANT · Send another review · confirmation…|1440x900
+4418:119372|ARCHIVE · REFERENCE VARIANT · Send another review · sending — su…|1440x900
+4418:119592|ARCHIVE · Revoke review access · confirmation — superseded 20 Se…|1440x900|H
+## 4418:121885 Inspect and sign off · Client review
+4418:121886|REFERENCE VARIANT · Client sign-off · A0 · identify · 1280|1280x720
+4418:121963|REFERENCE VARIANT · Client sign-off · F · dead-link · expired · …|1280x720
+4418:121984|REFERENCE VARIANT · Client sign-off · F · dead-link · not-found …|1280x720
+4418:121992|REFERENCE VARIANT · Client sign-off · F · dead-link · conflict ·…|1280x720
+4418:122039|REFERENCE VARIANT · Client sign-off · E · post-approval-edited ·…|1280x720
+## 4418:122213 Edit and navigate · Editor shell
+4418:122214|ARCHIVE · REFERENCE VARIANT · Shell state 1 · First run — supers…|1440x900
+4418:122282|REFERENCE VARIANT · Preview · Home · desktop|1440x900
+4418:122448|ARCHIVE · REFERENCE VARIANT · Shell state 4 · Multi-select — sup…|1440x900
+4418:122602|ARCHIVE · REFERENCE VARIANT · Shell state 9 · AI agent run — sup…|1440x900
+4418:122728|ARCHIVE · REFERENCE VARIANT · Shell state 10 · Offline — superse…|1440x900
+4418:123360|ARCHIVE · REFERENCE VARIANT · Shell state 3 · Element selected —…|1440x900
+4418:123762|ARCHIVE · REFERENCE VARIANT · Shell state 6 · Comment mode — sup…|1440x900
+4418:123974|ARCHIVE · REFERENCE VARIANT · Shell state 8 · Review active — su…|1440x900
+4418:124184|ARCHIVE · REFERENCE VARIANT · Shell state 13 · Presence (multipl…|1440x900
+4418:124394|ARCHIVE · REFERENCE VARIANT · Shell · 360 overlay panel (slot pr…|1440x900
+4418:124676|REFERENCE VARIANT · Upgrade modal (403 gate)|420x225
+4418:124700|REFERENCE VARIANT · Exit · guard|1308x117
+4418:125163|ARCHIVE · REFERENCE VARIANT · Insert · dragging — superseded 20 …|546x694
+4418:125195|ARCHIVE · Navigate · Editor tools · superseded 2026-09-14 (rail …|1440x900
+4418:126300|ARCHIVE · S1.3 · new-page · 3-way — superseded by 4428:151059|1440x900
+4418:126928|ARCHIVE · REFERENCE · Site menu (⋯) · superseded · rows moved to…|1440x900
+4418:127198|REFERENCE VARIANTS · Save indicator · five states|2806x308
+## 4418:127312 Configure site and workspace · Settings
+4418:127565|REFERENCE · Full-screen Settings · Export · superseded by the Ex|1440x900
+4418:128808|REFERENCE VARIANT · Full-screen Settings · Custom code · locked |1440x900
+4418:128908|REFERENCE VARIANT · S7.2 · Branding · pointer|720x560
+4418:129084..4418:131600|REFERENCE VARIANT · Full-screen Settings · {Domains loading/empty/load-error/save-error, Localization loading/load-error, Headers loading/load-error, Redirects loading/empty/load-error/validation-error, Forms loading/empty/error/inbox-loading/inbox-empty, Webhooks loading/empty/load-error, Analytics validation}|1440x900
+4418:132385|ARCHIVE · Leave Settings · Unsaved changes — superseded by 3737:|420x122
+6700:71994|ARCHIVE · Full-screen Settings · Export — superseded 19 Sep 2026|1440x900
+## 4418:135551 REFERENCE · Additional journey variants
+4418:135552|REFERENCE VARIANT · S1-stress · 40 pages · depth-5 tree · 62-cha|2807x769
+4418:135734|REFERENCE VARIANT · S1-keyboard · F6 region cycle + focus outlin|2806x769
+4418:135911..4418:136437|REFERENCE VARIANT · S5.1 · compose / sending / sent / error|1440x900
+4418:136615..4418:137442|REFERENCE VARIANT · S5.2 · none / pending / opened-not-acted / changes-requested / approved / approved-but-edited-since|1440x900
+4418:137603..4418:137941|REFERENCE VARIANT · S5.6 · approved-clean / approved-edited-since / re-sent|1440x900
+4418:138109..4418:138779|REFERENCE VARIANT · S5.3 · open-thread / no-comments / replied / resolved / show-resolved|1440x900
+4418:138947|REFERENCE VARIANT · S1.5 · network-error|2807x769
+4418:138953|REFERENCE VARIANT · S1.4 · 7 of 7|2806x769
+4418:138980|REFERENCE VARIANT · S1.2 · crash-recovery|2806x769
+4418:139056|REFERENCE VARIANT · S1.2 · load-error|2806x769
+4418:139129|REFERENCE VARIANT · S3.1 · pick-mode|2807x769
+4418:139297|REFERENCE VARIANT · S3.7 · page-settings · Social|1440x900
+4418:139327|REFERENCE VARIANT · S3.7 · page-settings · Advanced|2807x769
+4418:139360|REFERENCE VARIANT · S3.6 · media · editing|546x694
+4418:139393|REFERENCE VARIANT · S3.6 · media · optimizing|546x694
+4418:139426|REFERENCE VARIANT · S5.4 · gate · pending|1440x900
+4418:139437|REFERENCE VARIANT · S5.4 · gate · changes-requested|1440x900
+4418:139445|REFERENCE VARIANT · S1.2e - Offline - Connection restored (synci|2807x769
+4418:139652|REFERENCE VARIANT · S5.5 · reviewer-view · external-reviewer|1440x900
+4418:139686|REFERENCE VARIANT · S6.2 · custom-domain · DNS-verification|1440x900
+4418:139718|REFERENCE VARIANT · S6.3 · publish-changelog · diff-summary|1440x900
+4418:139768|REFERENCE VARIANT · S3.9 · undo-redo-toast · 6-variants|1440x320
+4418:139807|REFERENCE VARIANT · S3.10 · keyboard-shortcuts-overlay|640x934
+4418:139897|REFERENCE VARIANT · S3.11 · smart-guides-snap-indicators|1080x680
+4418:139937|REFERENCE VARIANT · S5.8 · multiplayer-cursor-following|800x360
+4418:139960|REFERENCE VARIANT · S6.4 · deploy-progress-pipeline|520x548
+4418:139997|REFERENCE VARIANT · S1.4 · setup-chip · footer-band|2806x308
+4418:140011|REFERENCE VARIANT · S1.6 · view-mode · stripped-chrome|2806x769
+4418:140023|REFERENCE VARIANT · Onboarding · achievement prompt · step compl|1440x852
+4418:140071|REFERENCE VARIANT · Onboarding · achievement prompt · final step|1440x852
+## 4418:140309 REFERENCE · Captions and annotations
+4418:140451|REFERENCE · [not-implemented] S6.5c · scheduled-publish · cancel|440x169
+## 4418:140491 Stay informed · Notifications and activity
+4418:140515|REFERENCE VARIANT · Notifications · all-read|360x812
+4418:140533|REFERENCE VARIANT · Notifications · empty|360x812
+4418:140543|REFERENCE VARIANT · Notifications · loading|360x812
+4418:140563|REFERENCE VARIANT · Notifications · no-jump-target|360x812
+4418:140576|REFERENCE VARIANT · Notifications · load-error|360x812
+4418:140871|ARCHIVE · S5.10 · activity-log — superseded by “Activity · Bella|1440x900
+## 4418:141141 Find editor actions · Commands
+4418:141142|REFERENCE · Replaced by unified Commands|640x420
+4418:141160|REFERENCE VARIANT · CmdK · typing|640x420
+4418:141196|REFERENCE VARIANT · CmdK · ai-offer|640x420
+4418:141204|REFERENCE VARIANT · CmdK · disabled-command|640x420
+4418:141309|REFERENCE VARIANT · Shortcuts · one screen (? and ⌘/)|1000x420
+## 4418:141361 Inspect the result · Preview
+4418:141362|REFERENCE VARIANT · Preview · what the sandbox drops (reference)|1080x659
+4418:141394|REFERENCE VARIANT · AI · one home|1380x836
+4418:141439|REFERENCE VARIANT · AI · placement|1380x1000
+## 4418:141767 Work on the page · Canvas
+4418:141768|REFERENCE · Canvas · toolbar states|1440x500
+4418:141850|REFERENCE · Canvas · zoom levels|900x480
+4418:141900|REFERENCE VARIANT · Canvas · context-menu · submenu anatomy|402x238
+4418:141960|REFERENCE VARIANT · Canvas · hover levels|980x162
+4418:141983|REFERENCE VARIANT · Popover · Canvas · AI · prompt|248x96
+4418:141991|REFERENCE VARIANT · Popover · Canvas · AI · diff|248x112
+4418:142007|REFERENCE VARIANT · Canvas · drop feedback|1000x470
+4418:142041|REFERENCE VARIANT · Canvas · element manipulated|1000x470
+4418:142069|REFERENCE VARIANT · Canvas · element locked · element hidden (an|1000x430
+4418:142081|REFERENCE VARIANT · Canvas · empty page|1000x400
+4418:142095|REFERENCE VARIANT · Canvas · keyboard, zoom and viewport (one ow|900x480
+## 4418:142142 Reuse site elements · Components
+4418:142367|REFERENCE VARIANT · Components · create (modal)|720x720
+## 4418:144789 LIBRARY · Clone-owned editor components
+4418:144988|Settings navigation / Job groups|200x812
+## 4418:145833 REFERENCE · Design decisions and implementation notes
+4418:145834..4418:145872|REFERENCE · Specification · Pages · {tree, folders-collapsed, bulk-select, one-page, load-error, listings, page tab bar, context-menu, command-palette, rename name-conflict, structure, drag drop indicator, homepage by position, local-only, rename URL offer, bulk one toast}|740xN
+4418:145874|REFERENCE · Specification · Media · stock · search-failed |740x79
+4418:145876|REFERENCE · Specification · [not-implemented] Media · local-only|740x100
+4418:145878..4418:145912|REFERENCE · Specification · Inspector · {INTERACTIONS add-trigger, profile FORM, profile SLIDER, profile FORM destination, [not-implemented] locked, breakpoint-override, disabled control reason, findability, [not-implemented] MOTION, multi-select, CSS classes duplicate, OPEN DECISIONS (V2 → V1)}|740xN
+4418:145886|REFERENCE · Open decision · nav grouping|1160x88
+4418:145888|REFERENCE · Open decision · rows that leave the app|1160x88
+4418:145915|REFERENCE · Specification · Canvas · keyboard, zoom and viewport|740x504
+4418:145924|REFERENCE · Specification · Components · delete-confirm (modal)|740x70
+4418:145926|REFERENCE · Specification · [design-ahead] History · Saves · cha|740x72
+4418:145928|REFERENCE · Specification · Shortcuts · one screen (? and ⌘/) |740x312
+4418:145934|REFERENCE · Specification · Preview · what the sandbox drops (re|740x208
+4418:145938|REFERENCE · Specification · AI · one home |740x272
+4418:145945|REFERENCE · Specification · AI · placement |740x296
+4418:145951|REFERENCE · Specification · S7 · Settings · SEO|740x130
+4418:145953|REFERENCE · Specification · Ecommerce · bound · inspector|740x66
+4418:145955..4418:145962|REFERENCE · Specification · S3.7 · page-settings · SEO / Social / Advanced|740xN
+4418:145966|REFERENCE · Specification · S6.4 · deploy-progress-pipeline |740x88
+4418:145969|REFERENCE · Specification · S1.6 · view-mode · stripped-chrome |740x56
+4418:145971|REFERENCE · Specification · Permissions |740x58
+4418:145973|REFERENCE · Specification · Module Interaction Map · Collections|740x546
+4418:145979..4418:145987|REFERENCE · Specification · Publish · loading / publishing / failed / [not-implemented] cancelled / [not-implemented] lost connection|740xN
+4418:145989|REFERENCE · Specification · AI · one mark, one verb, one contrac|740x440
+4418:146002|REFERENCE · Specification · Rail · selected vs open (two signals|740x72
+4418:146004|REFERENCE · Specification · Topbar · Publish CTA states (five ve|740x72
+4418:146006|REFERENCE · Specification · Site menu · Unpublish confirm (modal|740x88
+4418:146008|REFERENCE · Specification · Topbar · location line |740x72
+4418:146010|REFERENCE · Specification · Shell · full-page mode |740x72
+4418:146012|REFERENCE · Specification · Shell · below 1024 |740x144
+4418:146015|REFERENCE · Specification · Shell · Issues joins the grid (right|740x168
+4418:146018|REFERENCE · Specification · Shell · open decisions (700 vs 560 ·|740x188
+4418:146022|REFERENCE · Specification · Drawer · width steps and the drag ha|740x184
+4418:146026|REFERENCE · Specification · S1.5b · session-expired · unsaved-wa|740x105
+4418:146028|PROPOSED · Per-form email delivery controls · implementation not|300x1200
+4418:146118|REFERENCE · Component update requirements|780x420
+7096:76287|REFERENCE · Pill language · 20 Sep 2026|730x487
+7179:76318|CHANGELOG · Cognitive load fixes · 20 Sep 2026|1100x1110
+## 4418:146475 START HERE · Jobs, roles, recovery and audit implementation
+4418:146476|START HERE · Existing product walkthroughs|1440x1078
+4418:146546|VERIFY · Recovery, confirmation and role scenarios|1440x6390
+4418:147057|REFERENCE · Audit implementation · 75 design fixes|3240x4160
+4418:147441|REFERENCE · Re-audit · Full-screen Settings and Templates|3040x1750
+4418:147477|CHANGELOG · 13 Sep 2026 · Prototype completion|1440x3153
+## 4418:147640 Find and fix site issues
+4418:147853|ARCHIVE · Issues · fixing — superseded 20 Sep 2026|1440x900|H
+4418:148058|ARCHIVE · Issues · fix-failed — superseded 20 Sep 2026|1440x900|H
+## 4418:148284 PROPOSED · Reference designs by owning job
+4418:148285|PROPOSED · Media · stock · quota-strip|720x460
+4418:148335|PROPOSED · Inspector · flat scroll body|300x552
+4418:148400|PROPOSED · Brand · generate component with AI|700x470
+4418:148415|PROPOSED · Preview · share link|480x560
+4418:148496|PROPOSED · Preview · interaction test|1080x660
+4418:148538..4418:148642|PROPOSED · Preview · performance audit / issue detail / all-clear / running|480xN
+4418:148648|PROPOSED · Publish · Options|520x617
+4418:148704|PROPOSED · Orphan comments · dismissed|1440x900
+4418:148714|PROPOSED · S5.7 · comment-thread-micro-states|1200x520
+4418:148776..4418:148827|PROPOSED · S6.5 · scheduled-publish / scheduled / invalid-date|440x548
+4418:148852|PROPOSED · S1.2d - Conflict - Review both (Compare opens with co|1080x776
+4418:148886|PROPOSED · S5.9 · share-permissions-modal|520x576
+4418:148930|ARCHIVE · PROPOSED · History · Backups · restore-confirm — super|520x185|H
+4418:148938..4418:148952|PROPOSED · History · Backups · restoring / restored / creating / restore-failed|440xN
+4418:148957|PROPOSED · S7.1 · site-health-monitor · with-incidents|800x480
+4418:149032|PROPOSED · S7.1 · site-health-monitor · healthy|800x480
+## 4418:149159 Assets · Edit, organise and return · Flowbite
+4418:149905|REFERENCE · Assets / Flowbite handoff notes|1200x680
+## 4418:149946 Assets · Deep audit · OPEN issues · 10 Sep 2026
+4418:149947|REFERENCE · Assets audit · Evidence, priority and acceptance cri|3240x3541
+## 4418:150117 CURRENT · Assets selection and browsing · verified task stat
+4418:150706|ARCHIVE · Image picker · menu cover selected — superseded 19 Sep|720x620
+4418:150972|ARCHIVE · Image picker · team selected — superseded 19 Sep 2026 |720x620
+## 4418:154230 CURRENT DESIGN · Assets · Editing and version outcomes
+4418:154641|REFERENCE · QA / Editing scenarios and implementation contract|960x357
+## 4418:154684 CURRENT · Assets organisation and actions · audit fixes
+4418:156234|QA FIXTURE · Generated restaurant image · not original user medi|960x640
+4418:159515|QA · Assets · Implementation checkpoint|1100x876
+## 4418:159971 CMS · Media field integration
+4418:159972..4418:160516|ARCHIVE · CMS photo picker / CMS Photo · {hero-dark selected, menu-cover selected, team-photo selected, upload, uploaded, url, imported, search, restaurant-interior selected} — superseded 19 Sep 2026 by pick-mode|720x620
+6765:59444|ARCHIVE · stray clone — 19 Sep 2026|1440x900
+## 4418:160590 Media QA · Site fonts and heading integration
+4418:160600|REFERENCE · QA · Fonts round trip|620x472
+## 4418:160620 Media · Upload import stock · verified return states
+4418:161183|REFERENCE · Recently added images strip · embedded fragment, not|751x44
+## 4418:162551 Media QA · Typed video and SVG insertion
+4418:163369|REFERENCE · QA · Typed asset routes|620x392
+## 4418:163389 CMS · Pages, CMS and template completion
+4418:163390..4418:163920|ARCHIVE · Content · Menu items › Quattro Formaggi / Diavola / Marinara — superseded by 5940:1*|1440x900
+4418:164185..4418:164203|ARCHIVE · CURRENT DESIGN · Add Menu item / ready to save / Seasonal pizza / Complete required fields — superseded 19 Sep 2026|720xN
+4418:164827|ARCHIVE · Pages · Structure (CMS-completion copy) — superseded|1440x900|H
+## 4418:165562 Release · completed design journeys
+4418:165682|ARCHIVE · Issues · Fix text contrast (modal) — superseded 19 Sep|560x416
+4418:165693|ARCHIVE · Issues · Add image alt text (modal) — superseded 19 Se|560x543
+4418:165704|ARCHIVE · Issues · Fix link destination (modal) — superseded 19 |480x652
+## 4418:166008 CURRENT DESIGN · Builder completion
+4418:167217|ARCHIVE · Brand · Colours & type — superseded 20 Sep 2026 · H-17|1440x900|H
+4418:167445..4418:172307|ARCHIVE · CURRENT DESIGN · Brand · {Reusable styles, Starters, Classes, Component styles, Colour mode, Brand checks, Edit primary token, Primary colour staged, Primary colour saved to draft, Colour tokens, Token kind, Edit secondary/surface/text/border/success token} — superseded 20–21 Sep 2026|1440x900
+4418:170850|REFERENCE · Brand · Designed states board|2560x1336
+7001:77880|ARCHIVE · CURRENT DESIGN · Brand · Colour tokens · 7–18 (SA-fix)|1440x900
+## 4418:176726 LIBRARY · State panels · sources of the STATE host boards (panel-only 280×812 / 300×812 sources; every row here is the SOURCE of a STATE host board — not a screen)
+4418:176727|ARCHIVE · Brand · empty|280x812
+4418:176736|ARCHIVE · Brand · root|280x812
+4418:176752|ARCHIVE · Inspector · single-selection|300x812
+4418:176848..4418:177031|ARCHIVE · S2.1–S2.5 AI brief/generating/result/unavailable/chat panels|360x776
+4418:177068|ARCHIVE · S5.10 · activity-log — superseded by “Activity · Bella|280x812
+4418:177148|ARCHIVE · Templates · loading|280x812|H
+4418:177176..4418:177270|PROPOSED · Brand · loading / presets / presets bound / draft / unbound|280x812
+4418:177293..4418:177324|PROPOSED · Commerce · bound / sample-added / setup|320x812
+4418:177355|PROPOSED · Component properties and per-page usage · not impleme|280x812
+4418:177396|PROPOSED · Content · conditions|280x812
+4418:177412|PROPOSED · Content · conditions · empty|280x812
+4418:177421|PROPOSED · Content · variables · empty|280x812
+4418:177430|PROPOSED · Content · variables · key-error|280x812
+4418:177440|PROPOSED · History · Backups (tab)|280x812
+4418:177482|PROPOSED · History · Backups · empty|280x812
+4418:177503|PROPOSED · Inspector · MOTION · one section|300x812
+4418:177527|PROPOSED · Inspector · locked element|300x812
+4418:177609|PROPOSED · Issues · fix-failed|280x812
+4418:177625|PROPOSED · Issues · fixing|280x812
+4418:177640|PROPOSED · Layers · display-settings|280x812
+4418:177680|PROPOSED · Layers · empty|280x812
+4418:177692|PROPOSED · Layers · invalid-drop|280x812
+4418:177714|PROPOSED · Layers · list-view|280x812
+4418:177759|PROPOSED · Media · local-only assets|280x812
+4418:177808|PROPOSED · Preview · accessibility checker|280x812
+4418:177858|PROPOSED · Publish · cancelled|280x812
+4418:177881|PROPOSED · Publish · lost contact|280x812
+4418:177904|PROPOSED · Publish · published (simulated)|280x812
+4418:177928|PROPOSED · Review · reply-composer band|280x812
+4418:177937|REFERENCE VARIANT · AI · scoped-multi|280x812
+4418:177950..4418:178683|REFERENCE VARIANT · Brand · {classes, classes empty, colour-mode, components, components saved-empty, dirty, export error/exported/imported, import-export, lint, lint suppressed, lint-warnings, load-error, root Beginner mode, starters, starters applied, token-detail, tokens, tokens add, tokens replace, typography}|280x812
+4418:178715..4418:178737|REFERENCE VARIANT · Components · empty / load-error / loading|280x812
+4418:178763..4418:178845|REFERENCE VARIANT · Content · {collection empty, data no-source, data watching, dynamic-pages no-pattern, dynamic-pages none-published, empty, load-error, loading}|280x812
+4418:178873..4418:178894|REFERENCE VARIANT · History · Published · empty / load-error / loading|280x812
+4418:178903..4418:179446|REFERENCE VARIANT · History · Saves · {changes clear-confirm, changes load-error, changes restore-confirm, changes start-of-history, changes undo-unavailable, empty, load-error, loading, overflow, pruned-notice, restore-confirm, restoring, time-travel, time-travel no-preview, time-travel restore-confirm}|280x812
+4418:179484..4418:180078|REFERENCE VARIANT · Insert · {blocks-expanded rows, disabled-item, drop-refused, element-hover, favourites, load-error, loading, mine-expanded empty, no-results, tip-dismissed, transition-callout}|280x812
+4418:180126..4418:181547|REFERENCE VARIANT · Inspector · {CSS classes duplicate simplified, ai-agent-run, breakpoint-override, breakpoint-override collapsed, disabled control reason, error-boundary, findability, instance-selected, loading, multi-select, multi-select with context header, no-selection, profile FLEX/GRID/INPUT/SLIDER, pseudo-state, reach-all-like-this, reach-whole-site}|300x812
+4418:181572|REFERENCE VARIANT · Issues · empty|280x812
+4418:181579|REFERENCE VARIANT · Issues · filtered|280x812
+4418:181592..4418:181654|REFERENCE VARIANT · Layers · load-error / loading / multi-select / no-results|280x812
+4418:181665..4418:182110|REFERENCE VARIANT · Media · {bulk-select, detail filter-empty, detail search-scope failed/truncated, drill-in asset-detail alt-generate/device-only, drill-in icon-picker no-results, drill-in stock-browser no-results/not-configured/search-failed, drill-in used-in, used-in empty, versions, versions empty, empty, load-error, loading, quota-full, quota-warn}|280x812
+4418:182154..4418:182477|REFERENCE VARIANT · Pages · {bulk one toast per action, bulk-select, command-palette ⌘K, load-error, loading, no-results, one-page, structure, tree drag drop indicator, tree homepage by position}|280x812
+4418:182551|REFERENCE VARIANT · Publish · load-error|280x812
+4418:182562|REFERENCE VARIANT · Publish · loading|280x812
+4418:182592|REFERENCE VARIANT · Publish · no Vercel connection|280x812
+4418:182602|REFERENCE VARIANT · Publish · unavailable (feature off)|280x812
+4418:182613..4418:182723|REFERENCE VARIANT · Review panel · {empty, load-error, loading, older-round, review-closed} · Review foot revoke + invite · Review round-history load-error|280x812
+4418:182731|REFERENCE VARIANT · Templates · empty|280x812
+## 4428:139920 v3 · Phase 4 · Templates & Blocks
+4428:151059|ARCHIVE · Pages · New page · from template — superseded 19 Sep 2|1440x900
+5940:44869|ARCHIVE · Pages · New page · blank (selected) — superseded 19 Se|1440x900
+## 4428:143803 v3 · Phase 3 · Brand
+4428:143804|ARCHIVE · CURRENT DESIGN · Brand · Simple — superseded 21 Sep 20|1440x900
+4428:146069|ARCHIVE · CURRENT DESIGN · Brand · Colour edited (var-driven) — |1440x900
+4428:146338|ARCHIVE · CURRENT DESIGN · Brand · Simple · Saved — superseded 2|1440x900
+4428:146607|ARCHIVE · CURRENT DESIGN · Brand · Simple · first run — supersed|1440x900
+4428:146876|ARCHIVE · CURRENT DESIGN · Brand · Advanced — superseded 20 Sep |1440x900
+## 4433:46539 v3 · Phase 7–8 · Discoverability & Verify
+4433:141482|ARCHIVE · Add · Recent · superseded 2026-09-18 — single Add root|1440x900
+4444:46767|VERIFY · v3 IA · playback journeys (2026-09-14)|1440x428
+## 6767:58664 OVERLAYS · wrapped 19 Sep 2026 · media & CMS dialogs
+4418:156151|ARCHIVE · Assets · Delete asset confirmation — superseded 20 Sep|1440x900|H
+4418:156156|ARCHIVE · Assets · Delete complete — superseded 20 Sep 2026 · A-|1440x900|H
+4418:154218|ARCHIVE · Assets · No fonts found — superseded 19 Sep 2026 (sear|1440x900|H
+## 6771:61079 OVERLAYS · wrapped 19 Sep 2026 · editor dialogs & popovers
+4418:166001|ARCHIVE · Search settings — superseded 19 Sep 2026 by inline typ|1440x900|H
+4418:59340|ARCHIVE · Media · stock · searching — superseded 19 Sep 2026 · s|1440x900
+7071:79070..7071:79105|ARCHIVE · STATE · Topbar · save-status tooltip · saved / saving / unsaved / conflict / offline / error (CL TB-01)|1440x900|H
+## LOOSE (loose top-level frames)
+4418:149914|FRAGMENT · Image editor / Body · embedded part, not a screen|960x474
+4418:175125|ARCHIVE · Export · Failed — superseded by 3737:57018 (Release · |480x260
+4419:45431|START HERE · v3 IA plan (2026-09-14)|1400x1113
+6173:52251|CHANGELOG · 17 Sep 2026 · Surface Behavior Contract completion|4200x673
+6199:52221|CHANGELOG · Visual evidence board · 2026-09-17|4200x243
+6488:53047..6528:54766|ARCHIVE · Media Quick · Loading / Empty / Uploading / Upload failed / Permission / Default / No results (420 crop) — superseded 19 Sep|420x600
+6561:54703|ARCHIVE · Issues · Issue fixed (outcome dialog) — superseded 19 |480x240
+6681:55329|CHANGELOG · 18 Sep 2026 · IA audit implementation (22 findings)|4200x560
+6785:58635|CHANGELOG · 19 Sep 2026 · Surface audit implementation (34 findi|4200x523
+6825:60332|CHANGELOG · 19 Sep 2026 · Search architecture audit — implementa|4200x659
+6894:75002|CHANGELOG · 20 Sep 2026 · Interaction architecture audit — imple|4200x353
+7026:77969|CHANGELOG · 20 Sep 2026 · Signifier & Affordance audit — impleme|4200x289
+7049:77983|ARCHIVE · CURRENT DESIGN · Brand · all tokens — superseded 21 Se|1440x900
+7049:78364|ARCHIVE · CURRENT DESIGN · Brand · advanced revealed — supersede|1440x900
+7103:76289|ARCHIVE · CURRENT DESIGN · CMS · Menu items · record workspace ·|1440x900|H
+7196:78868|LIBRARY · typo-fix masters (TY)|1180x217
+7337:80964|CHANGELOG · Typography, spacing & layout implementation · 20–21 |1240x902
+# ---
+# Totals (3 calls, 38–39 of day budget): 714 parked top-level frames across 60 units (59 sections + loose).
+# Provenance notes for the gap matrix:
+#  - Comment mode 4418:123762 and Presence 4418:124184 are ARCHIVE · REFERENCE VARIANT (Editor shell section) — NOT live design.
+#  - S5.3 comment-thread reference variants 4418:138109..138779 (open-thread/no-comments/replied/resolved/show-resolved) + PROPOSED S5.7 comment-thread-micro-states 4418:148714 + PROPOSED Orphan comments dismissed 4418:148704 — reference only.
+#  - S5.8 multiplayer-cursor-following 4418:139937 + PROPOSED S5.9 share-permissions-modal 4418:148886 — reference/proposed only.
+#  - Brand v2 STATE boards (4418:49448..4418:52734 in ARCHIVE section, and 4418:167445..172307 / 4428:143804..146876 / 7049:*) all "superseded 21 Sep 2026 · Brand workspace" → live Brand = 7315:80955 family.
+#  - PROPOSED library: Backups tab, Commerce, Content conditions/variables, Layers list-view/display-settings, Media local-only, Preview a11y checker, Publish cancelled/lost-contact, Review reply-composer, Inspector MOTION/locked — all design-ahead, none live.
+#  - ANNOTATION · Backups · NOT IMPLEMENTED (7292:81923, 7292:82374) = existing annotation-card pattern for Phase 16.

@@ -9,6 +9,7 @@
  */
 import React from "react";
 import { OverlayMount } from "./OverlayMount";
+import { IconButton } from "./Icon";
 
 export type ModalKind = "question" | "flow" | "form";
 
@@ -17,37 +18,46 @@ export type ModalKind = "question" | "flow" | "form";
    own header comment). Exported here so both compose one source of truth
    instead of two copies of the same restyle. */
 export const MODAL_FRAME_BASE_CLASS =
-  "tw:z-[60] tw:flex tw:flex-col tw:bg-[var(--bk-bg-elevated)] tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:z-[60] tw:flex tw:flex-col tw:bg-[var(--bk-bg-elevated)] tw:rounded-[var(--bk-radius-card)] tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:max-h-[80vh] tw:max-w-[calc(100vw-32px)] tw:[font-family:var(--bk-font-ui)]";
-/* 16/14, not 20 — measured on 1164:4713, 1175:4827, 1205:4804 (media),
-   1170:4713/4749 (content), 1172:4840 (brand) and 184:24 (publish). */
-export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-4 tw:px-4 tw:pb-3";
-export const MODAL_TITLE_CLASS = "tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-ink)]";
-export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]";
-export const MODAL_BODY_CLASS = "tw:px-4 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-soft)]";
-/* The footer caps its buttons at 28: every one of those boards draws 28-29,
-   and flowbite's default is 40. Two classes deep so a `tw:` utility on the
-   button cannot lose to it on source order (CLAUDE.md §Chrome). */
+/* The dialog boards (7564:185450 delete folder, 6752:59256 New page, and
+   every confirm since the 2026-09-20 DS pass): pad 24, gap 16, radius 12
+   (radius/card), a 20/30 semibold title, 14/20 ink body, and the action row
+   right-aligned INSIDE the padding — no footer strip, no rule above it. */
+export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-6 tw:px-6 tw:pb-4";
+/* The head's ✕: 32 square, centred 36 in from the top-right corner. */
+const MODAL_CLOSE_CLASS = "tw:absolute tw:top-5 tw:right-5 tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
+export const MODAL_TITLE_CLASS =
+  "tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
+export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]";
+export const MODAL_BODY_CLASS =
+  "tw:px-6 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
+/* Buttons are Button md: 32 high, 16 inset, radius 8, 13/20 medium
+   (dialog/footer 7401:1280). Descendant, not child: a footer that wraps its
+   buttons in its own flex row still gets them — the delete confirm once
+   shipped flowbite's 40 because the selector only reached direct children. */
 export const MODAL_FOOT_CLASS =
-  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:py-3 tw:px-4 tw:border-t tw:border-[var(--bk-border)] " +
-  /* Descendant, not child: the child selectors caught a footer whose buttons
-     sit directly in it or one div down, and missed every modal that wraps them
-     in its own flex row — the delete confirm shipped 40-tall buttons against a
-     board drawing 28 because of exactly that. There is no case where a button
-     inside a modal footer should keep flowbite's 40.
+  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:pt-0 tw:pb-6 tw:px-6 " +
+  "tw:[&_button]:h-8 tw:[&_button]:min-h-0 tw:[&_button]:px-4 tw:[&_button]:py-1.5 " +
+  "tw:[&_button]:rounded-lg tw:[&_button]:text-[13px] tw:[&_button]:font-medium";
 
-     The INSET is the same fact and was missing: the design system's Button
-     (9:102) is 28h with 12/6 padding wherever a board instantiates it —
-     641:2597 in the Components library footer, 642:3397 and 642:3399 in the
-     create-component modal's own footer — and flowbite's default 20/10 was
-     surviving here because h-7 only constrains height. Height and inset travel
-     together or the button is not the board's button. */
-  "tw:[&_button]:h-7 tw:[&_button]:min-h-0 tw:[&_button]:px-3 tw:[&_button]:py-1.5";
+/** width/dialog-md 560 is the default; New page draws width/dialog-lg 640;
+ *  Backup failed (4428:151964) draws width/dialog-sm 480; "wide" is the board
+ *  token width/dialog-xl 960 (Permissions, 4418:133026) — named apart because
+ *  "xl" here was already 720. */
+export type ModalWidth = "sm" | "md" | "lg" | "xl" | "wide";
+const WIDTH_CLASS: Record<ModalWidth, string> = {
+  sm: "tw:w-[var(--bk-size-dialog-sm)]",
+  md: "tw:w-[var(--bk-size-dialog-md)]",
+  lg: "tw:w-[var(--bk-size-dialog-lg)]",
+  xl: "tw:w-[720px]",
+  wide: "tw:w-[var(--bk-size-dialog-xl)]",
+};
 
-const KIND_WIDTH_CLASS: Record<ModalKind, string> = {
-  question: "tw:w-[440px]",
-  form: "tw:w-[560px]",
-  flow: "tw:w-[720px]",
+const KIND_WIDTH: Record<ModalKind, ModalWidth> = {
+  question: "md",
+  form: "md",
+  flow: "xl",
 };
 
 export interface ModalProps {
@@ -56,6 +66,8 @@ export interface ModalProps {
   title: string;
   subtitle?: string;
   kind?: ModalKind;
+  /** Overrides the kind's width — "lg" (640) for the New page dialog. */
+  width?: ModalWidth;
   children?: React.ReactNode;
   footer?: React.ReactNode;
   dismissOnScrimClick?: boolean;
@@ -80,15 +92,17 @@ export interface ModalProps {
    * written conditionally.
    */
   testId?: string;
+  /** A ✕ at the head's right edge (6752:59256 New page draws one). */
+  closeButton?: boolean;
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick, dirty, testId,
+  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton,
 }: ModalProps) {
   const titleId = React.useId();
   return (
     <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
-      <div className={[MODAL_FRAME_BASE_CLASS, KIND_WIDTH_CLASS[kind]].join(" ")} data-testid={testId}>
+      <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]], closeButton ? "tw:relative" : ""].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
             {title}
@@ -100,6 +114,15 @@ export function Modal({
           <div className={MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
             {footer}
           </div>
+        ) : null}
+        {/* Last in the DOM so the dialog's first focus lands on its field,
+            not on the ✕; placed top-right by position. */}
+        {closeButton ? (
+          <IconButton label="Close" onClick={onClose} className={MODAL_CLOSE_CLASS} data-testid={`modal-close-${testId ?? "modal"}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </IconButton>
         ) : null}
       </div>
     </OverlayMount>

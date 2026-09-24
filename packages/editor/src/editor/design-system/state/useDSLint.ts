@@ -13,6 +13,7 @@ import type { Composer } from "../../../engine";
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
 import { buildContrastIssues } from "../utils/contrastLint";
+import { EVENTS } from "../../../shared/constants/events";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -38,8 +39,24 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
 
   const [issues, setIssues] = React.useState<readonly LintIssue[]>([]);
 
+  /* "Run checks" (Brand checks, 7316:84555): the one trigger this hook takes
+     from outside. It re-runs the same pass immediately instead of after the
+     edit debounce — coordinator-approved trigger-only change to state/. */
+  const [runNonce, setRunNonce] = React.useState(0);
+  const lastNonce = React.useRef(0);
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const run = () => setRunNonce((n) => n + 1);
+    composer.on(EVENTS.BRAND_CHECKS_RUN, run);
+    return () => {
+      composer.off(EVENTS.BRAND_CHECKS_RUN, run);
+    };
+  }, [composer]);
+
   React.useEffect(() => {
     if (!composer) return;
+    const immediate = runNonce !== lastNonce.current;
+    lastNonce.current = runNonce;
     const timer = window.setTimeout(() => {
       /* Contrast is computed here, not in DSLinter — it needs the resolved
          mode. Merged so the Lint destination, the banner and the colour
@@ -60,15 +77,14 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       const byToken = new Map<string, StoredLintIssue[]>();
       for (const issue of found) {
         const list = byToken.get(issue.tokenId);
-        if (list) list.push({ type: issue.rule, severity: issue.severity, message: issue.message });
-        else byToken.set(issue.tokenId, [
-          { type: issue.rule, severity: issue.severity, message: issue.message },
-        ]);
+        const stored: StoredLintIssue = { type: issue.rule, severity: issue.severity, message: issue.message, autoFixHint: issue.autoFixHint };
+        if (list) list.push(stored);
+        else byToken.set(issue.tokenId, [stored]);
       }
       composer.designSystem?.lintState?.setAllIssues(byToken);
-    }, DEBOUNCE_MS);
+    }, immediate ? 0 : DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [composer, allTokens]);
+  }, [composer, allTokens, runNonce]);
 
   return issues;
 }

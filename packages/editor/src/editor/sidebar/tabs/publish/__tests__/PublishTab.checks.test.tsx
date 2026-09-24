@@ -13,10 +13,10 @@
  * These tests assert the server contract instead, and the last describe is a
  * regression guard that the local heuristics never come back.
  *
- * MOVED 2026-08-14: the checklist now lives in the publish wizard's first step
- * (board 833:4518), not inline in the panel — it gates a publish, so it belongs
- * in the flow that publishes. Each test opens the wizard first; what it asserts
- * about the server contract is unchanged.
+ * MOVED 2026-08-14 into a wizard's first step; MOVED BACK 2026-09-22 (code-gap
+ * B4, owner decision G1-044): the rows are INLINE in the panel — board B3-10
+ * `7574:193972` — and the wizard is deleted. The rows render on mount; what
+ * these tests assert about the server contract is unchanged.
  *
  * @license BSD-3-Clause
  */
@@ -42,6 +42,21 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
+import { deriveLifecycleState } from "../../../../shell/lifecycle";
+
+/* No review in the path, nothing blocking: the plain `confirm` gate, so the
+   only thing that can shut the CTA in this file is the server's list. */
+const OPEN_MOVE = deriveLifecycleState({
+  reviewState: "none",
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: false,
+  hasUnpublishedChanges: null,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+});
 
 type ComposerProp = PublishTabProps["composer"];
 
@@ -89,38 +104,43 @@ function renderTab(ui: React.ReactElement) {
   return render(<ToastProvider>{ui}</ToastProvider>);
 }
 
-/** The checklist is the wizard's step 1 — open it the way a user does. */
-async function openWizard() {
-  const cta = await screen.findByText("Publish to production");
-  fireEvent.click(cta.closest("button") as HTMLButtonElement);
-}
+const cta = () => screen.getByTestId("publish-cta") as HTMLButtonElement;
 
 beforeEach(() => {
   fetchPrePublishChecks.mockReset();
 });
 
 describe("PublishTab — renders the server's readiness contract", () => {
-  it("renders every row the server returned, and only those", async () => {
+  it("renders the server's rows, except Favicon (spec B4 draws none)", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
-    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages", "Favicon"]) {
+    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
+    expect(screen.queryByText("Favicon")).toBeNull();
+  });
+
+  /* Re-walk 2026-09-24: "Publish to production" stayed clickable for a minute
+     of "Checking readiness…". Never publishable in an unknown state. */
+  it("keeps the primary disabled, with its reason, while the checks are pending", async () => {
+    fetchPrePublishChecks.mockReturnValue(new Promise(() => {}));
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    const cta = (await screen.findByTestId("publish-cta")) as HTMLButtonElement;
+    expect(cta.disabled).toBe(true);
+    expect(screen.getByTestId("publish-cta-reason").textContent).toBe("Checking readiness…");
   });
 
   it("passes the site id straight through to the server call", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_abc" />);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_abc" nextMove={OPEN_MOVE} />);
     await waitFor(() => expect(fetchPrePublishChecks).toHaveBeenCalledWith("site_abc"));
   });
 
   it("surfaces each non-passing row's server detail, not an invented hint", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await waitFor(() => expect(screen.getByText("No custom domain.")).toBeTruthy());
     expect(screen.getByText("1 page has no content blocks.")).toBeTruthy();
   });
@@ -130,20 +150,15 @@ describe("PublishTab — only a fail blocks the publish", () => {
   it("keeps Publish enabled when every non-pass row is a warning", async () => {
     fetchPrePublishChecks.mockResolvedValue(result({ ready: true }));
     const { getByText } = renderTab(
-      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
+      <PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
     );
-    await openWizard();
     await waitFor(() => expect(screen.getByText("SEO configured")).toBeTruthy());
-    // Warnings do not block: the gate lets the user through to Confirm.
-    expect((getByText("Continue to Confirm →").closest("button") as HTMLButtonElement).disabled).toBe(false);
-    expect(screen.getByText(/4 warnings — none block/)).toBeTruthy();
+    // Warnings do not block: the CTA stays live and the legend says which is which.
+    expect(cta().disabled).toBe(false);
+    expect(screen.getByTestId("publish-checks-legend").textContent).toBe("Red = blocks publish · Amber = advisory");
+    void getByText;
   });
 
-  /* The blocking row here used to be "Vercel connected". It cannot be any
-     more: a failing Vercel check now replaces the whole panel with board
-     784:4480 ("Connect Vercel to publish."), so there is no wizard to open
-     and the case this test is actually about — a blocking row killing
-     Continue — needs a row that leaves a publish path in place. */
   it("disables Publish when the server reports a blocking check", async () => {
     const checks = result({ ready: false });
     checks.checks[1] = {
@@ -153,28 +168,26 @@ describe("PublishTab — only a fail blocks the publish", () => {
     };
     fetchPrePublishChecks.mockResolvedValue(checks);
     const { getByText } = renderTab(
-      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
+      <PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />,
     );
-    await openWizard();
-    await waitFor(() => expect(screen.getByText(/blocking — Pages ready/)).toBeTruthy());
-    expect((getByText("Continue to Confirm →").closest("button") as HTMLButtonElement).disabled).toBe(true);
+    await waitFor(() => expect(screen.getByLabelText(/^Pages ready: blocking/)).toBeTruthy());
+    expect(cta().disabled).toBe(true);
+    // The blocking detail prints under the CTA — the reason travels with the refusal.
+    expect(screen.getByTestId("publish-blocked-by-checks").textContent).toContain("No pages found.");
+    void getByText;
   });
 
-  it("does not fire the publish handler while blocked", async () => {
+  it("does not open the publish door while blocked", async () => {
     const checks = result({ ready: false });
     checks.checks[1] = { label: "Pages ready", status: "fail", detail: "No pages found." };
     fetchPrePublishChecks.mockResolvedValue(checks);
-    const onVercelPublish = vi.fn();
-    const { getByText } = renderTab(
-      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={onVercelPublish} />,
+    const onRequestPublish = vi.fn();
+    renderTab(
+      <PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={onRequestPublish} />,
     );
-    await openWizard();
-    await waitFor(() => expect(screen.getByText(/blocking — Pages ready/)).toBeTruthy());
-    // The gate is the wizard's: Continue is dead, so Confirm is unreachable.
-    fireEvent.click(getByText("Continue to Confirm →"));
-    expect(screen.queryByText("Publish now")).toBeNull();
-    expect(onVercelPublish).not.toHaveBeenCalled();
-    void getByText;
+    await waitFor(() => expect(screen.getByLabelText(/^Pages ready: blocking/)).toBeTruthy());
+    fireEvent.click(cta());
+    expect(onRequestPublish).not.toHaveBeenCalled();
   });
 });
 
@@ -190,71 +203,72 @@ describe("PublishTab — fix affordances match severity and ownership", () => {
     checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
     fetchPrePublishChecks.mockResolvedValue(checks);
     const emit = vi.fn();
-    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     const link = (await screen.findByText("Connect")) as HTMLAnchorElement;
     expect(link.getAttribute("href")).toContain("/dashboard/settings/integrations");
     expect(emit).not.toHaveBeenCalled();
   });
 
-  it("board 893:4518 — the band names the block and the primary offers Connect", async () => {
+  it("board 893:4518 — the foot offers Connect Vercel beside the dead CTA", async () => {
     const checks = result({ ready: false });
     checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
     fetchPrePublishChecks.mockResolvedValue(checks);
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
-    await waitFor(() =>
-      expect(screen.getByText("✕ Blocked — connect Vercel to publish.")).toBeTruthy(),
-    );
-    // A disabled "Continue to Confirm →" would be a dead control whose only
-    // escape is Cancel; the board replaces it with the action that unblocks.
+    await waitFor(() => expect(screen.getByLabelText(/^Vercel connected: blocking/)).toBeTruthy());
+    // A disabled CTA whose only escape is nothing is a dead end; the board
+    // puts the action that unblocks beside it.
     expect(screen.getByRole("button", { name: "Connect Vercel" })).toBeTruthy();
-    expect(screen.queryByText("Continue to Confirm →")).toBeNull();
+    expect(cta().disabled).toBe(true);
   });
 
-  it("keeps the generic blocked band when the blocker is fixable in the editor", async () => {
+  it("offers no Connect Vercel when the blocker is fixable in the editor", async () => {
     const checks = result({ ready: false });
     checks.checks[1] = { label: "Pages ready", status: "fail", detail: "No pages found." };
     fetchPrePublishChecks.mockResolvedValue(checks);
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
-    await waitFor(() => expect(screen.getByText(/blocking — Pages ready/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByLabelText(/^Pages ready: blocking/)).toBeTruthy());
     expect(screen.queryByRole("button", { name: "Connect Vercel" })).toBeNull();
   });
 
   it("routes an in-editor warning to its owning tab", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
     const emit = vi.fn();
-    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Empty pages")).toBeTruthy());
-    /* "Empty pages" is fixed in the Pages tab. The row is the wizard's; its
-       Fix button closes the wizard and switches tabs, because a fix the user
-       cannot see is not a fix. */
+    /* "Empty pages" is fixed in the Pages tab: Fix › switches tabs, because a
+       fix the user cannot see is not a fix. */
     const row = screen.getByText("Empty pages").parentElement as HTMLElement;
     fireEvent.click(row.querySelector("button") as HTMLElement);
     expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "pages" });
+  });
+
+  it("routes a Settings warning to its exact pane (SEO › SEO, Domain › Domains)", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    const emit = vi.fn();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText("Domain connected")).toBeTruthy());
+    const row = screen.getByText("Domain connected").parentElement as HTMLElement;
+    fireEvent.click(row.querySelector("button") as HTMLElement);
+    expect(emit).toHaveBeenCalledWith("ui:settings-open", { screen: "domains" });
   });
 });
 
 describe("PublishTab — a failed load never reads as passing (DF5)", () => {
   it("shows Retry instead of a green checklist", async () => {
     fetchPrePublishChecks.mockRejectedValue(new Error("network"));
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await waitFor(() => expect(screen.getByText("Retry")).toBeTruthy());
-    expect(document.body.textContent).not.toContain("All checks pass");
+    expect(document.body.textContent).not.toContain("Red = blocks publish");
     expect(document.body.textContent).not.toContain("Vercel connected");
   });
 
   it("recovers when Retry succeeds", async () => {
     fetchPrePublishChecks.mockRejectedValueOnce(new Error("network")).mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     fireEvent.click(await screen.findByText("Retry"));
     await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
   });
@@ -263,8 +277,7 @@ describe("PublishTab — a failed load never reads as passing (DF5)", () => {
 describe("PublishTab — regression: the local heuristics stay dead", () => {
   it("never renders a locally-computed check label, even with settings that would satisfy them", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
 
     for (const dead of [
@@ -281,8 +294,7 @@ describe("PublishTab — regression: the local heuristics stay dead", () => {
   });
 
   it("does not call the server when there is no site id", async () => {
-    renderTab(<PublishTab composer={composerWith()} onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await waitFor(() =>
       expect(screen.getByText(/Open this site from the dashboard/)).toBeTruthy(),
     );
@@ -290,28 +302,23 @@ describe("PublishTab — regression: the local heuristics stay dead", () => {
   });
 });
 
-/* The row this replaced announced severity in words ("SEO configured:
-   warning. No meta title template."). The wizard's row carries severity in a
-   coloured disc, which is nothing at all to a screen reader — so the severity
-   is in the accessible name, and the disc carries an sr-only word. */
-describe("PublishWizard rows — severity is readable, not just visible", () => {
+/* The row carries severity in a coloured disc, which is nothing at all to a
+   screen reader — so the severity is in the accessible name, and the disc
+   carries an sr-only word. */
+describe("check rows — severity is readable, not just visible", () => {
   it("names the severity and the reason in the accessible name", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByLabelText(/^Vercel connected: passing/)).toBeTruthy());
     expect(screen.getByLabelText(/^SEO configured: warning\. No meta title template set\./)).toBeTruthy();
   });
 
   it("says blocking, not just red, when a check fails", async () => {
-    // Not the Vercel row: that failure now replaces the panel outright
-    // (board 784:4480), so the wizard it used to be read in never opens.
     const checks = result({ ready: false });
     checks.checks[1] = { label: "Pages ready", status: "fail", detail: "No pages found." };
     fetchPrePublishChecks.mockResolvedValue(checks);
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
-    await openWizard();
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() =>
       expect(screen.getByLabelText(/^Pages ready: blocking\. No pages found\./)).toBeTruthy(),

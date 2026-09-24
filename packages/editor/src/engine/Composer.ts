@@ -19,7 +19,7 @@ import type {
   ExportResult,
 } from "../shared/types";
 import { clamp, deepClone } from "../shared/utils/helpers";
-import { sanitizeElementTreeContent } from "../shared/utils/html";
+import { dropSessionMediaUrls, sanitizeElementTreeContent } from "../shared/utils/html";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
 import { CMSBindingManager } from "./cms/CMSBindingManager";
@@ -52,7 +52,6 @@ import { SelectionManager } from "./SelectionManager";
 import { StorageAdapter } from "./storage/StorageAdapter";
 import { GlobalStyleManager } from "./styles/GlobalStyleManager";
 import { StyleEngine } from "./styles/StyleEngine";
-import { TemplateManager } from "./templates/TemplateManager";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
@@ -99,6 +98,10 @@ export class Composer extends EventEmitter {
 
   // Project-wide settings (analytics, integrations)
   private projectSettings: ProjectSettings = {};
+  /* The DS project-migration version the loaded payload is at. Carried
+     through import → export so a save writes it back (Site.dsSchemaVersion);
+     dropped here, the migration re-ran on every open (walk A2, 2026-09-24). */
+  private dsSchemaVersion: number | undefined;
 
   // Project metadata (name, author, timestamps)
   private projectMetadata: import("../shared/types").ProjectMetadata = {
@@ -147,7 +150,6 @@ export class Composer extends EventEmitter {
   readonly styleBindings!: StyleDataBinding;
   readonly traitBindings!: TraitDataBinding;
   readonly textBindings!: TextDataBinding;
-  readonly templates!: TemplateManager;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
   readonly media!: MediaManager;
@@ -251,7 +253,6 @@ export class Composer extends EventEmitter {
     this.styleBindings = new StyleDataBinding(this);
     this.traitBindings = new TraitDataBinding(this);
     this.textBindings = new TextDataBinding(this);
-    this.templates = new TemplateManager(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
     this.media = new MediaManager(this.config.remoteSync);
@@ -261,7 +262,7 @@ export class Composer extends EventEmitter {
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
-    this.darkResolver = new DarkResolver(this);
+    this.darkResolver = new DarkResolver();
     this.colorMode = new ColorMode(this);
     this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
@@ -612,6 +613,7 @@ export class Composer extends EventEmitter {
       data.pages.forEach((page) => {
         if (page.root) {
           sanitizeElementTreeContent(page.root);
+          dropSessionMediaUrls(page.root, this.localMediaUrlRemap);
         }
         this.elements.importPage(page);
       });
@@ -634,6 +636,8 @@ export class Composer extends EventEmitter {
     this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
       emitProjectChanged: false,
     });
+
+    this.dsSchemaVersion = data.dsSchemaVersion;
 
     // Import project metadata
     if (data.metadata) {
@@ -677,6 +681,7 @@ export class Composer extends EventEmitter {
         updatedAt: new Date().toISOString(),
       },
       settings: this.projectSettings,
+      ...(this.dsSchemaVersion !== undefined ? { dsSchemaVersion: this.dsSchemaVersion } : {}),
       /* Without this the binding survives only the session that made it: the
          maps are in memory, and a reload republished the placeholder text.
          Guarded because HistoryManager snapshots from its own constructor
@@ -1179,7 +1184,6 @@ ${html}${interactionScript}
     if (this.globalStyles?.destroy) this.globalStyles.destroy();
     if (this.styleBindings?.destroy) this.styleBindings.destroy();
     if (this.traitBindings?.destroy) this.traitBindings.destroy();
-    if (this.templates?.destroy) this.templates.destroy();
     if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();

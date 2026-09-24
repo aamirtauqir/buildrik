@@ -1,6 +1,6 @@
 {
   "surface": "brand-pro-locked",
-  "board": "Brand \u00b7 root \u00b7 Beginner mode (Figma 154:132)",
+  "board": "Brand · root · Beginner mode (Figma 154:132)",
   "url": "http://localhost:5050/",
   "viewport": {
     "width": 1440,
@@ -337,10 +337,6 @@
       "testId": "brand-basic-note",
       "spec": "brand-pro-locked",
       "nodeId": "154:185"
-    },
-    {
-      "name": "basic-note-text",
-      "testId": "brand-basic-note-text"
     }
   ],
   "_note": [
@@ -351,7 +347,7 @@
     "",
     "WHAT THE BOARD WON:",
     "  the footnote's words. It shipped as \"Basic mode hides what you cannot edit",
-    "  yet. Switch to Pro to unlock.\" \u2014 a sentence that named the mode by a word",
+    "  yet. Switch to Pro to unlock.\" — a sentence that named the mode by a word",
     "  the toggle beside it does not use (the control says Beginner) and described",
     "  what is hidden as \"what you cannot edit yet\". 154:186 says \"Beginner hides",
     "  token IDs and empty foundations. Switch to Pro to show them.\", which names",
@@ -359,12 +355,12 @@
     "  non-semantic tokens; TokensSection folds empty foundation kinds behind one",
     "  disclosure row).",
     "  Everything in surfaces/brand-lint-warnings.json's `WHAT THE BOARD WON`",
-    "  applies here too \u2014 it is one chassis under four state boards.",
+    "  applies here too — it is one chassis under four state boards.",
     "",
-    "NOT CONFORMED \u2014 A CONTRAST FLOOR THE BOARD CANNOT WAIVE:",
+    "NOT CONFORMED — A CONTRAST FLOOR THE BOARD CANNOT WAIVE:",
     "  154:186 colours the footnote `--color/ink-muted` (#6B7280) on 154:185's",
     "  `--color/bg-subtle` (#F3F4F6) fill. Measured by measure.mjs, that pair is",
-    "  4.39:1 at 11px against a 4.5 WCAG AA floor \u2014 a FAIL, and it is what shipped",
+    "  4.39:1 at 11px against a 4.5 WCAG AA floor — a FAIL, and it is what shipped",
     "  before this pass too, unmeasured. The code now paints `--bk-ink-soft`",
     "  (#4B5563), the same substitution `DesignTabFooter` already documents for the",
     "  same pair on the same fill. The board keeps the fill, the 11/16 type and the",
@@ -376,6 +372,7 @@
     "NOT JOINED, same as the sibling recipes:",
     "  154:132 itself (the drawer's edge, not the panel's) and 1691:7219 (the",
     "  preview band's 82px Figma text-metric height). See",
-    "  surfaces/brand-lint-warnings.json for the full reasoning."
+    "  surfaces/brand-lint-warnings.json for the full reasoning.",
+    "2026-09-24: brand-basic-note-text removed with the note text span (f22ca69fb); target dropped, brand-basic-note still measured."
   ]
 }

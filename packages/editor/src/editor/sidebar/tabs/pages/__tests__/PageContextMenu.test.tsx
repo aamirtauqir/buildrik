@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { PageContextMenu } from "../components/PageContextMenu";
 import type { PageItem } from "../types";
 
@@ -21,6 +21,7 @@ const baseProps = {
   onDuplicate: vi.fn(),
   onDelete: vi.fn(),
   onSetHomepage: vi.fn(),
+  onReplaceLayout: vi.fn(),
   onCopyLink: vi.fn(),
   onSettings: vi.fn(),
 };
@@ -138,5 +139,37 @@ describe("PageContextMenu", () => {
     // The surface class ships `absolute`; the menu must stay click-positioned.
     expect(box.className).toContain("tw:!fixed");
     expect(box.style.position).toBe("fixed");
+  });
+});
+
+/* Board 6883:69504 (G2-078): Rename… · Duplicate · Set as homepage · Replace
+   layout with template… · Copy link · Page settings… · Delete page. The
+   replace-layout door existed only in ⌘K. */
+describe("PageContextMenu — Replace layout with template…", () => {
+  it("sits after Set as homepage and invokes onReplaceLayout + onClose", () => {
+    const onReplaceLayout = vi.fn();
+    const onClose = vi.fn();
+    render(<PageContextMenu pageId="p2" {...baseProps} onReplaceLayout={onReplaceLayout} onClose={onClose} />);
+    const labels = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
+    expect(labels.indexOf("Replace layout with template…")).toBe(labels.indexOf("Set as homepage") + 1);
+    fireEvent.click(screen.getByTestId("pages-menu-replace-layout"));
+    expect(onReplaceLayout).toHaveBeenCalledWith("p2");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PageContextMenu — 6883:69130", () => {
+  it("the homepage's menu says why Delete is off; another page's does not", () => {
+    render(<PageContextMenu {...baseProps} pageId="p1" />);
+    expect(screen.getByTestId("pages-menu-delete")).toBeDisabled();
+    expect(screen.getByTestId("pages-menu-delete-reason")).toHaveTextContent("Homepage can’t be deleted");
+    cleanup();
+    render(<PageContextMenu {...baseProps} pageId="p2" />);
+    expect(screen.queryByTestId("pages-menu-delete-reason")).toBeNull();
+  });
+
+  it("is 224 wide", () => {
+    render(<PageContextMenu {...baseProps} pageId="p2" />);
+    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-56");
   });
 });

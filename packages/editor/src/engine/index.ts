@@ -64,7 +64,6 @@ export { GlobalStyleManager } from "./styles/GlobalStyleManager";
 export type { GlobalStyle } from "./styles/GlobalStyleManager";
 
 // Templates
-export { TemplateManager } from "./templates/TemplateManager";
 
 // Canvas Indicators
 export { CanvasIndicators } from "./canvas/indicators";
@@ -118,9 +117,3 @@ export type {
   DragTarget,
 } from "../shared/types/canvas";
 
-export type {
-  Template,
-  TemplateSource,
-  TemplateFilter,
-  TemplateCategory,
-} from "../shared/types/templates";

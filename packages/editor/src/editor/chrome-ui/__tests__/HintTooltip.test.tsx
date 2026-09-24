@@ -156,3 +156,21 @@ describe("HintTooltip — the bubble is placed, not left at the origin", () => {
     expect(tip.style.left).not.toBe("");
   });
 });
+
+/* Board 4433:46540 (Rail · tooltip · Add): ink bubble, pad 6/10, r6, 12/18,
+   white label. Owner ruling 2026-09-24 lifted decision #25 for tooltips. */
+describe("HintTooltip — the board's ink bubble", () => {
+  it("renders ink with white 12px text, pad 6/10, radius 6", () => {
+    render(
+      <HintTooltip content="Add">
+        <button type="button">Add</button>
+      </HintTooltip>,
+    );
+    fireEvent.focus(screen.getByRole("button", { name: "Add" }));
+    const cls = screen.getByRole("tooltip").className;
+    for (const c of ["tw:bg-[var(--bk-ink)]", "tw:text-white", "tw:px-2.5", "tw:py-1.5", "tw:rounded-md", "tw:text-[length:var(--bk-text-12)]"]) {
+      expect(cls).toContain(c);
+    }
+    expect(cls).not.toContain("tw:bg-white");
+  });
+});

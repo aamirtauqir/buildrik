@@ -100,8 +100,8 @@ describe("SiteSettingsScreen — the frame's two cards, filled from the Site row
   it("draws Site identity and Social links, with the field ids the walk drives", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-card-site-identity")).toHaveTextContent("Site identity");
-    expect(screen.getByTestId("set-card-social-links")).toHaveTextContent("Social links");
+    expect(screen.getByTestId("set-card-site-identity")).toHaveTextContent("Site Identity");
+    expect(screen.getByTestId("set-card-social-links")).toHaveTextContent("Social Links");
     expect(siteName().id).toBe("site-name");
     expect(favicon().id).toBe("favicon-url");
     expect(language().id).toBe("site-language");
@@ -169,7 +169,7 @@ describe("SiteSettingsScreen — loading and load-error (3953:26363 / 3953:26503
     setup({ onLoadStateChange });
 
     expect(screen.getByTestId("set-load-card")).toBeInTheDocument();
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site identity");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site Identity");
     expect(screen.getByTestId("set-load-card")).toHaveTextContent("Site name, favicon, language and social profiles.");
     expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(screen.queryByTestId("set-load-retry")).toBeNull();
@@ -363,21 +363,22 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     expect(settings.seo.twitterHandle).toBe("@keepme");
   });
 
-  /* Board 1172:4867's Project settings modal is superseded by this screen;
-     its Author and Canvas grid live here and reach the engine on the flush. */
-  it("flush writes Author to the project metadata and the Canvas grid to the engine", async () => {
+  /* 4418:127313 draws no Canvas card. Author comes back (owner ruling
+     2026-09-24) in the empty cell beside Site Language, and reaches the
+     project metadata on the flush. */
+  it("Author sits in Site Identity and flushes to the project metadata; no Canvas card", async () => {
     let flush: (() => void) | null = null;
     const registerFlushHandler = vi.fn((h: (() => void) | null) => {
       flush = h;
     });
     const { composer } = setup({ registerFlushHandler });
     await loaded();
+    const ids = Array.from(document.querySelectorAll("#site-name, #favicon-url, #site-language, #site-author")).map((e) => e.id);
+    expect(ids).toEqual(["site-name", "favicon-url", "site-language", "site-author"]);
     fireEvent.change(screen.getByLabelText("Author"), { target: { value: "Bella Cucina team" } });
-    fireEvent.change(screen.getByRole("spinbutton", { name: /Grid size/ }), { target: { value: "8" } });
-    fireEvent.click(screen.getByRole("switch", { name: "Snap to grid" }));
     act(() => flush!());
     expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
-    expect(composer.setGridSize).toHaveBeenCalledWith(8);
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(true);
+    expect(screen.queryByRole("spinbutton", { name: /Grid size/ })).toBeNull();
+    expect(screen.queryByTestId("set-card-canvas")).toBeNull();
   });
 });

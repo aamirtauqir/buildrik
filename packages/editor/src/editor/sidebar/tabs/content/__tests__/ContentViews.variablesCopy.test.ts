@@ -1,13 +1,11 @@
 /**
- * The Variables empty state described a substitution that does not happen.
+ * The Variables empty state must say what a variable actually does.
  *
- * It read: "A variable is a value you write once and reuse — {{site.name}} in
- * any text on any page." Walked live: created `tagline` = "Bella Cucina",
- * typed {{site.tagline}} into a heading, and the canvas showed the braces
- * literally while `exportHTML` carried `{{site.tagline}}` and never the value.
- * The store is localStorage keyed by project id (contentPanelUtils), so the
- * publish worker cannot read it either, and the inspector's binding popover
- * lists collections only — nothing consumes a site variable today.
+ * Until G3-075 it could not promise substitution: variables lived in one
+ * browser's localStorage and nothing replaced {{site.*}}. They are now saved
+ * in the project settings and the export writes each value in place of its
+ * {{site.<key>}} (ExportEngine.withSiteVariables). The canvas still shows the
+ * braces as typed, and the copy says that too.
  *
  * @license BSD-3-Clause
  */
@@ -17,22 +15,19 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const views = readFileSync(join(__dirname, "..", "ContentViews.tsx"), "utf8");
-const utils = readFileSync(join(__dirname, "..", "contentPanelUtils.ts"), "utf8");
+const hook = readFileSync(join(__dirname, "..", "useContentPanel.ts"), "utf8");
+const exporter = readFileSync(join(__dirname, "..", "..", "..", "..", "..", "engine", "export", "ExportEngine.ts"), "utf8");
 const emptyState =
   views.slice(views.indexOf("No variables yet")).split("</div>")[0].replace(/\s+/g, " ");
 
 describe("Variables empty state", () => {
-  it("no longer promises substitution into page text", () => {
-    expect(emptyState).not.toMatch(/in any text on any page/i);
+  it("promises the published page, and admits the canvas shows braces", () => {
+    expect(emptyState).toMatch(/published page shows the value/i);
+    expect(emptyState).toMatch(/canvas shows the braces/i);
   });
 
-  it("says where the value lives and that pages do not read it", () => {
-    expect(emptyState).toMatch(/saved in this browser/i);
-    expect(emptyState).toMatch(/do not read it yet/i);
-  });
-
-  it("matches the store: variables are localStorage, not project data", () => {
-    expect(utils).toMatch(/window\.localStorage\?\.setItem/);
-    expect(utils).not.toMatch(/composer\.(setProjectSettings|updateProjectSettings)/);
+  it("matches the code: saved in the project, substituted by the export", () => {
+    expect(hook).toMatch(/setProjectSettings\(\{ \.\.\.composer\.getProjectSettings\(\), siteVariables: vars \}\)/);
+    expect(exporter).toMatch(/private withSiteVariables\(/);
   });
 });

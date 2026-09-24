@@ -21,7 +21,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { auth } from "@server/auth";
 import { prisma } from "@/lib/prisma";
-import { checkStorageQuota, createAsset } from "@server/services/media.service";
+import { assertMediaWrite, checkStorageQuota, createAsset } from "@server/services/media.service";
+import { PermissionError } from "@server/services/permission.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { MediaType } from "@buildrik/shared/schemas/media";
 
@@ -128,6 +129,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             `Upload would exceed quota: ${quota.usedBytes + parsedClientPayload.bytes} > ${quota.totalBytes}`
           );
         }
+
+        // A site-scoped upload is a write to that site: VIEWERs are refused
+        // BEFORE a token mints, or the blob would land with no row behind it
+        // (createAsset in onUploadCompleted re-checks and would refuse too).
+        await assertMediaWrite(userId, parsedClientPayload.siteId);
 
         // Phase B5+ codex re-review pass 3 P1 fix: validate folderId
         // ownership BEFORE issuing the token. Pre-fix, an attacker
@@ -267,6 +273,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 401 for auth, 403 for quota/size, 400 otherwise.
     const status =
       message.includes("Unauthenticated") ? 401
+      : error instanceof PermissionError ? (error.code === "NOT_FOUND" ? 404 : 403)
       : message.includes("quota") || message.includes("limit") ? 403
       : 400;
     return NextResponse.json({ error: message }, { status });

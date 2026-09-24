@@ -8,6 +8,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+import { SECTION_REGISTRY } from "../../sections/registry";
 import { useInspectorSections } from "../useInspectorSections";
 import { getProfileFor } from "../../config/elementProfiles";
 
@@ -25,14 +26,38 @@ function mount(type = "container", styles: Record<string, string> = {}) {
 
 beforeEach(() => localStorage.clear());
 
+
+/** Only the Style-tab keys — Settings / Effects open by default. */
+function styleKeys(set: Set<string>): string[] {
+  return [...set].filter((k) => (SECTION_REGISTRY[k.split(":")[1] as keyof typeof SECTION_REGISTRY]?.tab ?? "style") === "style");
+}
+
 describe("useInspectorSections — default seeding", () => {
   /* The profile boards open exactly the sections that carry a value and count
      them in the footer ("4 of 13 sections apply"). */
   it("opens the sections the element actually styles", () => {
     const { result } = mount("container", { padding: "24px", "background-color": "#fff" });
-    expect([...result.current.expandedSections].sort()).toEqual(
+    expect(styleKeys(result.current.expandedSections).sort()).toEqual(
       ["container:background", "container:spacing"].sort()
     );
+  });
+
+  /* Boards 4428:141642 / 142686: Settings and Effects open expanded. */
+  it("opens every Settings and Effects section by default", () => {
+    const { result } = mount("container");
+    const nonStyle = [...result.current.expandedSections].filter((k) => !styleKeys(new Set([k])).length);
+    expect(nonStyle.length).toBeGreaterThan(0);
+    for (const k of nonStyle) expect(SECTION_REGISTRY[k.split(":")[1] as keyof typeof SECTION_REGISTRY].tab).not.toBe("style");
+  });
+
+  /* ...except what those boards draw shut: ADVANCED on Settings, BLUR and
+     MORE EFFECTS on Effects (4428:142686). */
+  it("leaves ADVANCED, BLUR and MORE EFFECTS collapsed", () => {
+    const { result } = mount("container");
+    expect(result.current.expandedSections.has("container:opacity")).toBe(true);
+    expect(result.current.expandedSections.has("container:blur")).toBe(false);
+    expect(result.current.expandedSections.has("container:effects")).toBe(false);
+    expect(result.current.expandedSections.has("container:element-properties")).toBe(false);
   });
 
   /* Nothing set means nothing applies, and the footer says "0 of N sections
@@ -49,10 +74,10 @@ describe("useInspectorSections — default seeding", () => {
         }),
       { initialProps: { styles: {} as Record<string, string> } }
     );
-    expect([...result.current.expandedSections]).toEqual([]);
+    expect(styleKeys(result.current.expandedSections)).toEqual([]);
 
     rerender({ styles: { padding: "24px" } });
-    expect([...result.current.expandedSections]).toEqual(["container:spacing"]);
+    expect(styleKeys(result.current.expandedSections)).toEqual(["container:spacing"]);
   });
 });
 

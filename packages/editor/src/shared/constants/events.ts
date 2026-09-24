@@ -147,8 +147,6 @@ export const EVENTS = {
   VERSION_LOAD_FAILED: "version:load-failed",
   VERSION_PRUNED: "version:pruned",
   VERSION_DELETED: "version:deleted",
-  VERSION_EXPORTED: "version:exported",
-  VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
   /* Removed 2026-08-14, all five dead on arrival:
        VERSION_LOAD_ERROR   — a second name for VERSION_LOAD_FAILED (6 uses);
@@ -196,23 +194,9 @@ export const EVENTS = {
   // ============================================
   // Template Events
   // ============================================
-  TEMPLATE_LOADED: "template:loaded",
-  TEMPLATE_SAVED: "template:saved",
   TEMPLATE_SAVE_REQUESTED: "template:save-requested",
   TEMPLATE_APPLIED: "template:applied",
   TEMPLATE_REMOVED: "template:removed",
-  /** Template begins loading from a source */
-  TEMPLATE_LOADING: "template:loading",
-  /** Template load failed */
-  TEMPLATE_ERROR: "template:error",
-  /** Template deleted via TemplateManager */
-  TEMPLATE_DELETED: "template:deleted",
-  /** Template source registered with TemplateManager */
-  TEMPLATE_SOURCE_REGISTERED: "template:source:registered",
-  /** TemplateManager cache cleared */
-  TEMPLATE_CACHE_CLEARED: "template:cache:cleared",
-  /** Bulk template import completed */
-  TEMPLATES_IMPORTED: "templates:imported",
 
   // ============================================
   // CMS Events
@@ -339,24 +323,63 @@ export const EVENTS = {
   UI_ONBOARDING_REPLAY: "ui:onboarding-replay",
 
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
+  /** Any Add-page door (Pages footer, one-page link, empty state, page-tab
+   *  "+", ⌘K New page) asks for the New-page modal (decision #19). */
+  UI_NEW_PAGE_REQUESTED: "ui:new-page-requested",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
   /** Add panel expands one named group (`{ group: InsertGroupId }`). The
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** Add opens on its "Generate a block" screen (G2-117). */
+  UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
+  /** "Edit master ›" on an instance: the Components panel opens that
+   *  master's screen. Payload `{ componentId }`. */
+  UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
+  /** A click on the empty grey around the page (not an element, not chrome):
+   *  the canvas clears the selection and the shell closes the Layers drawer. */
+  UI_CANVAS_BACKGROUND_CLICK: "ui:canvas-background-click",
+  /** `delete` with N > 1 selected and no { confirmed } — the shell shows its
+   *  confirm (decision #17) and re-runs delete confirmed. Payload { count }. */
+  UI_REQUEST_DELETE_SELECTION: "ui:request-delete-selection",
   /** Inspector expands one section and scrolls it into view
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
-  /** Toggle the keyboard cheat sheet. It lives in Canvas behind the `?` key
-   *  only; ⌘K "Keyboard shortcuts" needs a door that is not a keystroke. */
+  /** A drawer asks the topbar field to search it — payload { placeholder } | null (board 4418:100087). */
+  UI_SEARCH_CONTEXT: "ui:search-context",
+  /** A full-canvas view names itself in the topbar's page crumb — payload
+   *  { label } | null ("<site> › CMS" while the CMS workspace is open,
+   *  4428:140486); null gives the crumb back to the active page. */
+  UI_CRUMB_CONTEXT: "ui:crumb-context",
+  /** The topbar field's query while a drawer owns it — payload { query }. */
+  UI_SEARCH_QUERY: "ui:search-query",
+  /** Start inline text editing on the canvas — payload { elementId } (G2-027). */
+  UI_INLINE_EDIT_REQUEST: "ui:inline-edit-request",
+  /** Toggle the one keyboard sheet (StudioModals). `?` and ⌘/ flip the same
+   *  state directly; this is the door for rows that are not a keystroke —
+   *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
   UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
+  /** Rail Help (board 4418:126882): the compact "Keyboard" legend card; its
+   *  "All shortcuts ›" opens the full sheet (UI_TOGGLE_CHEAT_SHEET). */
+  UI_TOGGLE_KEYBOARD_LEGEND: "ui:toggle:keyboard-legend",
+  /** Toggle the one ⌘K command palette (StudioHeader owns its state). ⌘⇧P —
+   *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
+   *  come in through here. */
+  UI_TOGGLE_COMMAND_PALETTE: "ui:toggle:command-palette",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
   UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
-  UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
+  /** Open the Issues panel. Its only door was the topbar Issues chip, which
+   *  decision 11 (2026-09-21) removes; the Publish panel's open-errors gate,
+   *  the site menu and a ⌘K command reach it through this instead. Handled
+   *  in AquibraStudio, which owns the panel. */
+  UI_OPEN_ISSUES: "ui:open-issues",
+  /** Open the one Compare (B8) on two sides. Every Compare door emits this;
+   *  `CompareHost`, mounted by the shell, is the only listener. */
+  UI_COMPARE_OPEN: "ui:compare-open",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
    *  leaves Settings for the Export modal, and a toggle emitted with the modal
@@ -367,13 +390,17 @@ export const EVENTS = {
    *  is mounted before Settings is — a listener inside the tab would miss an
    *  emit fired in the same gesture as the tab switch. */
   UI_SETTINGS_OPEN: "ui:settings-open",
+  /** Open the CMS workspace on a collection's table, and with `recordId` its
+   *  record sheet (`CmsOpenRequest`, editor/cms/cmsWorkspaceStore). Handled
+   *  in StudioPanels for the same reason as UI_SETTINGS_OPEN: the workspace is
+   *  lazy and unmounted until rail CMS is active. */
+  UI_CMS_OPEN: "ui:cms-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
   UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
   UI_TOGGLE_AI: "ui:toggle:ai",
-  UI_TOGGLE_COMPONENT_VIEW: "ui:toggle:component-view",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================
@@ -515,8 +542,13 @@ export const EVENTS = {
    *  the only thing that knows, and the topbar sits outside the provider that
    *  holds the staging — so it is announced rather than read. */
   BRAND_DIRTY_CHANGED: "brand:dirty-changed",
+  /** Brand checks' "Run checks": lint now, skipping the edit debounce. */
+  BRAND_CHECKS_RUN: "brand:checks-run",
   /** A review round went out (send or re-send, any of the three send sites). */
   REVIEW_SENT: "review:sent",
+  /** Re-ask `reviews.status` after a failed read — the Publish panel's
+   *  "Retry ›" on the unchecked gate. `useLifecycle` listens. */
+  REVIEW_STATUS_RETRY: "review:status-retry",
 
   // ============================================
   // Device/Zoom Events
@@ -864,8 +896,6 @@ export interface EventPayloads {
   [EVENTS.VERSION_LOAD_FAILED]: Record<string, never>;
   [EVENTS.VERSION_PRUNED]: { removed: number; kept: number };
   [EVENTS.VERSION_DELETED]: import("../types/versions").VersionDeletedPayload;
-  [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
-  [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_LIST_UPDATED]: { versions: import("../types/versions").NamedVersion[] };
 
   // Component Events (AQUI-027)
@@ -914,8 +944,17 @@ export interface EventPayloads {
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
+  [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
+  /** `query` pre-fills the field (a drawer re-announcing its live query). */
+  [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string; query?: string } | null;
+  [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
+  [EVENTS.UI_SEARCH_QUERY]: { query: string };
+  [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
+  [EVENTS.BRAND_CHECKS_RUN]: void;
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
+  [EVENTS.REVIEW_STATUS_RETRY]: void;
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
 }
 

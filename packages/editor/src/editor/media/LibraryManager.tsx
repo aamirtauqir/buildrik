@@ -11,12 +11,14 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, Search, Download, AlertCircle, X,
+  Upload, Search, AlertCircle, X, ChevronDown,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
+import { ConfirmFolderDeleteModal } from "../sidebar/tabs/media/components/ConfirmFolderDeleteModal";
+import { ReplaceAcrossDialog } from "../sidebar/tabs/media/components/ReplaceAcrossDialog";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { ImportResultModal, type ImportResult } from "./components/ImportResultModal";
@@ -26,7 +28,7 @@ import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
 import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
-import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "./components/ReplaceResultModal";
+import { ReplaceResultModal, type ReplaceOutcome } from "./components/ReplaceResultModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { VersionsModal } from "./components/VersionsModal";
@@ -34,7 +36,8 @@ import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
-import { useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "../../shared/types/media";
@@ -43,9 +46,8 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { generateAltTextRemote } from "../../services/AltTextService";
+import { regenerateAltText } from "../../services/AltTextService";
 import { createAssetVersion } from "../../services/MediaVersionService";
-import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
 /* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
@@ -72,10 +74,6 @@ interface LibraryManagerProps {
     imageSrc: string,
     onSave: (editedSrc: string, edits?: EditsSnapshot) => void | Promise<void>,
     door?: ImageEditorOptions,
-  ) => void;
-  onOpenIconPicker?: (
-    currentIcon: IconConfig | undefined,
-    onSelect: (icon: IconConfig) => void
   ) => void;
 }
 
@@ -105,8 +103,19 @@ const SORT_OPTIONS = [
    count line (3721:45960). */
 type MoveDoor = "selection" | "menu";
 
-export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
+export function LibraryManager({ composer, onClose, onOpenImageEditor }: LibraryManagerProps) {
   const state = useMediaState(composer);
+  /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
+     aria-disabled, with the reason on a tooltip. The rest of the media gate
+     lives in the grid, folder rail, details and menu components. */
+  const mediaWrite = useMediaWriteAccess();
+  const [uploadMenuOpen, setUploadMenuOpen] = React.useState(false);
+  const viewOnlyTip = (control: React.ReactElement) =>
+    mediaWrite.canWrite ? control : (
+      <Tooltip content={mediaWrite.reason("upload")} placement="bottom">
+        {control}
+      </Tooltip>
+    );
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
@@ -118,6 +127,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const dragDepth = React.useRef(0);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  /* P0 — folder delete confirm. Distinct from `state.confirmDelete` (assets)
+     because the payload is different (no in-use list, has sub-folder count)
+     and the secondary action (Move files…) belongs to the move picker, not
+     the asset delete. SSOT per type — see `ConfirmFolderDeletePayload`. */
+  const [folderConfirm, setFolderConfirm] = React.useState<{
+    folderId: string;
+    folderName: string;
+    assetCount: number;
+    subFolderCount: number;
+  } | null>(null);
 
   /* Clone 3585:23337 — the drawer's "Manage in full library" selects the file
      it just uploaded through the engine (`composer.media.selectAssets`) and
@@ -133,7 +152,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   // Keyboard shortcuts
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      /* An open ⋯ / Tags ▾ menu spends its Escape closing itself (chrome-ui
+         Popover marks it defaultPrevented): the first Escape closes the
+         menu, not the whole library. */
+      if (e.key === "Escape" && !e.defaultPrevented) onClose();
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         searchRef.current?.focus();
@@ -301,54 +323,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
-  /* Clone 3695:43897 → 3695:43900 / 3695:43903 — the run the picker started:
-     the srcs it replaces, the new src, the placements it is about to update
-     (the busy line names their pages) and, once the engine has answered,
-     the ids either way. The srcs are the FAMILY's (`familyOf`): the picker's
-     "across 1 use" counts a placement sitting on an applied version, so the
-     run must reach that version's src too, not only the original's — walked
-     live 2026-09-14, a family whose one placement was on v2 reported
-     "0 of 0 uses updated" and the canvas kept v2. */
-  const [replaceRun, setReplaceRun] = React.useState<{
+  /* Audit G3-027 / board 6940:79709 — the picked replacement opens Replace
+     across site: before → after, the PAGES it is used on (each can be
+     unticked), then "Replace N uses on M pages". The srcs are the FAMILY's
+     (`familyOf`): the picker's "across 1 use" counts a placement sitting on
+     an applied version, so the run must reach that version's src too — walked
+     live 2026-09-14, a family whose one placement was on v2 reported "0 of 0
+     uses updated" and the canvas kept v2. The dialog reports the run
+     (Clone 3695:43897 → 3695:43900 / 3695:43903). */
+  const [replacePair, setReplacePair] = React.useState<{
     sources: string[];
     newSrc: string;
-    targets: string[];
-    result: ReplaceOutcome | null;
+    oldLabel: string;
+    newLabel: string;
   } | null>(null);
-
-  /* One `replaceAcross` per src, each its own undo step, merged into one
-     outcome. A throw is the engine's rollback of that src's run — nothing
-     changed, so its placements are failed ones the card can offer to retry. */
-  const replaceSources = React.useCallback(
-    (sources: string[], newSrc: string): ReplaceOutcome => {
-      const outcome: ReplaceOutcome = { replaced: [], failed: [] };
-      for (const src of sources) {
-        try {
-          const result = resultIds(composer.mediaOps.replaceAcross(src, newSrc));
-          outcome.replaced.push(...result.replaced);
-          outcome.failed.push(...result.failed);
-        } catch {
-          outcome.failed.push(...composer.elements.findByMediaSrc(src).map((el) => el.getId()));
-        }
-      }
-      return outcome;
-    },
-    [composer],
-  );
-
-  const runReplaceAcross = React.useCallback(
-    (sources: string[], newSrc: string) => {
-      const targets = sources.flatMap((src) => composer.elements.findByMediaSrc(src).map((el) => el.getId()));
-      setReplaceRun({ sources, newSrc, targets, result: null });
-      /* A microtask later, so the busy card paints before the synchronous run. */
-      Promise.resolve()
-        .then(() => replaceSources(sources, newSrc))
-        .then((result) => {
-          setReplaceRun((prev) => (prev && prev.sources === sources && prev.newSrc === newSrc ? { ...prev, result } : prev));
-        });
-    },
-    [composer, replaceSources],
-  );
 
   /* ─── P2-B Move & drag ─────────────────────────────────────────────── */
   /* Clone 3683:19950 — the Move modal, from the bulk bar or the rail. */
@@ -368,6 +356,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
+  /* A1 / QA 2026-09-24: the folder-delete confirm's "Move files…" hands the
+     folder's files to the same Move modal (board B1-13 7564:185465). */
+  const [folderMoveItems, setFolderMoveItems] = React.useState<LibraryItem[] | null>(null);
   /* Clone 3721:45960 — a menu move's receipt is the count line (`Products ·
      team-photo.jpg moved`), not the rail, which keeps whatever it showed. It
      clears on the next scope or filter change. */
@@ -389,7 +380,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     async (keys: string[], folderId: string | null, from: MoveDoor = "selection") => {
       setAssetDrag(null);
       const items = keys
-        .map((k) => state.libraryItems.find((i) => i.key === k))
+        .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
       try {
@@ -580,18 +571,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setUploadDone(null);
   }, [uploadDone]);
 
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        composer.mediaOps.insertMedia(icon.name, "icon");
-        addToast({ description: `${icon.name} icon added`, tone: "success" });
-      } catch {
-        addToast({ description: "Could not add icon", tone: "error" });
-      }
-    });
-  }, [onOpenIconPicker, composer, addToast]);
-
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
      (its parent's key: a version's own key resolves to the same family). */
@@ -774,63 +753,98 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       <div className="mgr-top" data-testid="mgr-top">
         <h2 className="mgr-title">Asset library</h2>
 
-        <div className="mgr-middle">
-          <div className="mgr-search">
-            <Search size={14} />
-            {/* Clone 3721:43697 — while a tag is the filter the field leads
-                with its token, `Tag: menu · Clear filter ×`, where the
-                placeholder was; typing after it searches within the tag. */}
-            {state.tagFilter && (
-              <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
-                Tag: {state.tagFilter} · Clear filter
-                <IconButton
-                  size="sm"
-                  label="Clear the tag filter"
-                  className={SEARCH_TAG_CLEAR}
-                  data-testid="mgr-search-tag-clear"
-                  onClick={() => state.setTagFilter(null)}
-                >
-                  <X size={12} />
-                </IconButton>
-              </span>
-            )}
-            <TextInput
-              ref={searchRef}
-              type="text"
-              placeholder={state.tagFilter ? "" : "Search across all folders…"}
-              aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : undefined}
-              data-testid="mgr-search-input"
-              value={state.librarySearch}
-              onChange={(e) => state.setLibraryQuery(e.target.value)}
-            />
-            <span className="mgr-kbd">⌘K</span>
-          </div>
+        {/* Board 4418:58292 "mgr-top": title · a full-width search · the dark
+            Upload split button (▾ holds Import from URL and Add from stock) ·
+            ‹ Back to canvas. */}
+        <div className="mgr-search">
+          <Search size={16} />
+          {/* Clone 3721:43697 — while a tag is the filter the field leads
+              with its token, `Tag: menu · Clear filter ×`, where the
+              placeholder was; typing after it searches within the tag. */}
+          {state.tagFilter && (
+            <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
+              Tag: {state.tagFilter} · Clear filter
+              <IconButton
+                size="sm"
+                label="Clear the tag filter"
+                className={SEARCH_TAG_CLEAR}
+                data-testid="mgr-search-tag-clear"
+                onClick={() => state.setTagFilter(null)}
+              >
+                <X size={12} />
+              </IconButton>
+            </span>
+          )}
+          <TextInput
+            ref={searchRef}
+            type="text"
+            placeholder={state.tagFilter ? "" : "Search all assets…"}
+            aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : "Search all assets"}
+            data-testid="mgr-search-input"
+            value={state.librarySearch}
+            onChange={(e) => state.setLibraryQuery(e.target.value)}
+          />
         </div>
 
-        {/* Upload is the primary — it is the action the library exists for.
-            Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
-          <Button
-            className="mgr-btn"
-            data-testid="mgr-btn-import"
-            onClick={() => {
-              setImportDraft("");
-              setImportUrlOpen(true);
-            }}
-          >
-            <Download size={14} />
-            Import URL
-          </Button>
-          <Button className="mgr-btn-primary" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
-            <Upload size={14} />
-            Upload
-          </Button>
-          <Button className="mgr-btn" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
-            <Plus size={14} />
-            Add from stock
-          </Button>
+          <div className={`mgr-upload-split${mediaWrite.canWrite ? "" : " mgr-upload-split--view-only"}`}>
+            {viewOnlyTip(
+              <Button
+                className="mgr-btn-primary"
+                data-testid="mgr-btn-upload"
+                aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+                onClick={() => mediaWrite.canWrite && handleUploadClick()}
+              >
+                <Upload size={16} />
+                Upload
+              </Button>,
+            )}
+            <span className="mgr-upload-divider" aria-hidden="true" />
+            <Popover
+              open={uploadMenuOpen}
+              onClose={() => setUploadMenuOpen(false)}
+              placement="bottom-end"
+              label="More ways to add"
+              trigger={
+                <Button
+                  className="mgr-btn-primary mgr-upload-caret"
+                  data-testid="mgr-btn-upload-menu"
+                  aria-label="More ways to add"
+                  aria-haspopup="menu"
+                  aria-expanded={uploadMenuOpen}
+                  onClick={() => setUploadMenuOpen((v) => !v)}
+                >
+                  <ChevronDown size={16} />
+                </Button>
+              }
+            >
+              <Menu label="More ways to add">
+                <MenuItem
+                  data-testid="mgr-btn-import"
+                  aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+                  onClick={() => {
+                    setUploadMenuOpen(false);
+                    if (!mediaWrite.canWrite) return;
+                    setImportDraft("");
+                    setImportUrlOpen(true);
+                  }}
+                >
+                  Import from URL…
+                </MenuItem>
+                <MenuItem
+                  data-testid="mgr-btn-stock"
+                  onClick={() => {
+                    setUploadMenuOpen(false);
+                    setStockModalOpen(true);
+                  }}
+                >
+                  Add from stock…
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </div>
           <Button className="mgr-close" data-testid="mgr-btn-close" onClick={onClose}>
-            Close
+            ‹ Back to canvas
           </Button>
         </div>
       </div>
@@ -860,10 +874,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           setTagFilter={state.setTagFilter}
           folderCounts={state.folderCounts}
           onNewFolder={() => setCreateFolderOpen(true)}
-          deleteFolder={state.deleteFolder}
-          onTrashClick={() =>
-            addToast({ description: "Trash coming soon", tone: "info" })
-          }
+          deleteFolder={async (folderId: string) => {
+            /* P0 — close the silent-refusal gap. The hook rejects non-empty
+               folders unless force:true, and the old wrapper passed the bare
+               `state.deleteFolder` straight through: a non-empty click
+               threw FOLDER_NOT_EMPTY into the void, an empty click deleted
+               with no confirm. Inspect first → ALWAYS open the confirm modal
+               (plan §A1: empty → "Delete \"<name>\"?" with no Move files…;
+               non-empty → counts + warning + Move files…). The modal itself
+               decides whether to render the warning via isEmpty; the wrapper
+               never force-deletes silently. */
+            const folder = state.folders.find((f) => f.id === folderId);
+            const folderName = folder?.name ?? "Untitled";
+            const { assetCount, subFolderCount } = state.inspectFolder(folderId);
+            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount });
+          }}
           onMoveAssetToFolder={handleDropOnFolder}
           assetDragActive={assetDrag !== null}
         />
@@ -928,7 +953,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onReplaceAcross={(candidate) => {
             if (!selectedItem) return;
             const sources = versions.length > 0 ? versions.map((v) => v.item.src) : [selectedItem.src];
-            runReplaceAcross(sources, candidate.src);
+            setReplacePair({
+              sources,
+              newSrc: candidate.src,
+              oldLabel: selectedItem.displayName ?? selectedItem.name,
+              newLabel: candidate.displayName ?? candidate.name,
+            });
           }}
           composer={composer}
           addToast={addToast}
@@ -944,21 +974,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               generatedMetadata: undefined,
             });
           }}
-          onRegenerateAltText={async (key) => {
-            const result = await generateAltTextRemote(key);
-            if (!result) return null;
-            if (result.skipped) return result;
-            await composer.media.updateAsset(key, {
-              altText: result.altText,
-              generatedMetadata: {
-                altText: {
-                  generatedAt: new Date().toISOString(),
-                  model: result.model ?? DEFAULT_MODEL,
-                },
-              },
-            });
-            return result;
-          }}
+          // Regenerate is an explicit ask to REPLACE the current text.
+          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
@@ -1014,7 +1031,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onClose={() => setStockModalOpen(false)}
         photos={state.stockPhotos}
         videos={state.stockVideos}
-        icons={state.discIcons}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
@@ -1027,7 +1043,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             setStockSaved(saved);
           }
         }}
-        onOpenIconPicker={handleOpenIconPicker}
       />
       <StockSavedModal
         saved={stockSaved}
@@ -1044,6 +1059,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onReplaceInstead={handleReplaceInstead}
         />
       )}
+      {folderConfirm && (
+        <ConfirmFolderDeleteModal
+          payload={folderConfirm}
+          onCancel={() => setFolderConfirm(null)}
+          onConfirm={async () => {
+            /* Failure path: any throw here is NOT FOLDER_NOT_EMPTY (the
+               inspector already ran), so surface it via toast and KEEP the
+               folder. The ConfirmDeleteModal pattern is the same — execute
+               always closes the modal, success tells the toast. */
+            try {
+              await state.deleteFolder(folderConfirm.folderId, { force: true });
+              setFolderConfirm(null);
+            } catch {
+              setFolderConfirm(null);
+              addToast({ description: "Could not delete folder", tone: "error" });
+            }
+          }}
+          onMoveFiles={() => {
+            /* The folder's files go straight into the Move modal; the folder
+               itself stays until the user deletes it (now empty). */
+            const inFolder = state.allLibraryItems.filter((i) => (i.folderId ?? null) === folderConfirm.folderId);
+            setFolderConfirm(null);
+            setFolderMoveItems(inFolder);
+          }}
+        />
+      )}
       {state.ctxMenu && (
         <MediaContextMenu
           x={state.ctxMenu.x}
@@ -1057,6 +1098,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
+          /* G3-057 — the menu's "Replace across pages…" was a branch no
+             caller wired; it opens the same picker as the rail's ⋯. */
+          onReplaceAcross={(item) => {
+            setSelectedAssetId(item.key);
+            setReplacePickerOpen(true);
+          }}
         />
       )}
       {/* ─── P6-V Versions ──────────────────────────────────────────────── */}
@@ -1155,18 +1202,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       {/* One Move modal for both doors: the checked set (3683:19950) or the
           card menu's one file (3721:45952). */}
       <MoveAssetsModal
-        open={moveModalOpen || menuMoveTarget !== null}
-        items={menuMoveTarget ? [menuMoveTarget] : checkedItems}
+        open={moveModalOpen || menuMoveTarget !== null || folderMoveItems !== null}
+        items={menuMoveTarget ? [menuMoveTarget] : (folderMoveItems ?? checkedItems)}
         folders={state.allFolders}
         onClose={() => {
           setMoveModalOpen(false);
           setMenuMoveTarget(null);
+          setFolderMoveItems(null);
         }}
-        onMove={(folderId) =>
-          void (menuMoveTarget
-            ? runMove([menuMoveTarget.key], folderId, "menu")
-            : runMove(checkedItems.map((i) => i.key), folderId))
-        }
+        onMove={(folderId) => {
+          if (menuMoveTarget) void runMove([menuMoveTarget.key], folderId, "menu");
+          else if (folderMoveItems) {
+            setFolderMoveItems(null);
+            void runMove(folderMoveItems.map((i) => i.key), folderId);
+          } else void runMove(checkedItems.map((i) => i.key), folderId);
+        }}
       />
       <MoveFailedModal
         open={moveFailure !== null}
@@ -1175,22 +1225,17 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);
         }}
       />
-      {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
-          ./components/AssetDetailsPanel.tsx (D5 Stage 2). Its run reports
-          here: Replacing image → Replacement complete / Some uses could not
-          update → Retrying failed use (Clone 3695:43897 … 3695:43906). */}
-      {replaceRun && (
-        <ReplaceResultModal
-          open
+      {/* The replace-all picker lives inside <AssetDetailsPanel>; the pick
+          it hands over is scoped per page here before anything runs. */}
+      {replacePair && (
+        <ReplaceAcrossDialog
           composer={composer}
-          title="Replacement complete"
-          replaced={replaceRun.result?.replaced ?? []}
-          failed={replaceRun.result?.failed ?? []}
-          busy={replaceRun.result ? undefined : { label: replacingLabel(composer, replaceRun.targets) }}
-          /* The updated placements no longer match their old src, so the
-             same sources run again reach only the ones that failed. */
-          onRetry={async () => replaceSources(replaceRun.sources, replaceRun.newSrc)}
-          onDone={() => setReplaceRun(null)}
+          oldSrc={replacePair.sources[0]}
+          sources={replacePair.sources}
+          newSrc={replacePair.newSrc}
+          oldLabel={replacePair.oldLabel}
+          newLabel={replacePair.newLabel}
+          onClose={() => setReplacePair(null)}
         />
       )}
     </div>

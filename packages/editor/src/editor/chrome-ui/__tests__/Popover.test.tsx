@@ -8,6 +8,7 @@
  *
  * @license BSD-3-Clause
  */
+import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Popover, Menu, MenuItem, MenuGroup, MenuLabel } from "../index";
@@ -34,6 +35,55 @@ describe("Popover", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.pointerDown(document.body);
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  /* The Asset library closes on Escape; with its ⋯ open the first Escape must
+     only close the menu. The popover marks the Escape it spends. */
+  it("marks the Escape it spends defaultPrevented, so a host view stays open", () => {
+    render(<Harness onClose={() => {}} />);
+    const ev = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    document.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+  });
+
+  /* QA (integration 5e0d47902, a11y): Enter on the Layers ⋯ opens the menu
+     and focuses its first item; Escape closed it and left focus on <body>.
+     WAI-ARIA menu button: Escape returns focus to the trigger. */
+  it("Escape from inside the panel hands focus back to the trigger", () => {
+    function Stateful() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <Popover open={open} onClose={() => setOpen(false)} trigger={<Button>Open</Button>} label="Options">
+          <Menu label="Options">
+            <MenuItem onClick={() => {}}>First</MenuItem>
+          </Menu>
+        </Popover>
+      );
+    }
+    render(<Stateful />);
+    expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "First" }));
+    fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Open" }));
+  });
+
+  it("Escape with focus elsewhere does not steal it", () => {
+    function Stateful() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <>
+          <input aria-label="elsewhere" />
+          <Popover open={open} onClose={() => setOpen(false)} trigger={<Button>Open</Button>} label="Options">
+            <p>panel</p>
+          </Popover>
+        </>
+      );
+    }
+    render(<Stateful />);
+    const other = screen.getByLabelText("elsewhere");
+    other.focus();
+    fireEvent.keyDown(other, { key: "Escape" });
+    expect(document.activeElement).toBe(other);
   });
 
   it("a click inside does not close it", () => {
@@ -98,6 +148,26 @@ describe("Menu", () => {
     render(menu);
     fireEvent.keyDown(screen.getByRole("menu"), { key: "End" });
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Delete" }));
+  });
+
+  /* Board 5930:44801: a checkable row ends in a 14px check slot (r3,
+     gray-300 hairline) holding the ✓ — not a leading bare tick. */
+  it("draws a trailing 14px check slot, ticked when selected", () => {
+    render(
+      <Menu label="View">
+        <MenuItem selected>Snap guides</MenuItem>
+        <MenuItem selected={false}>Grid</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemcheckbox", { name: "Snap guides" });
+    const slot = on.querySelector("[data-check-slot]") as HTMLElement;
+    expect(slot).not.toBeNull();
+    expect(slot.className).toContain("tw:size-3.5");
+    expect(slot.className).toContain("tw:rounded-[3px]");
+    expect(slot.textContent).toBe("✓");
+    expect(on.lastElementChild).toBe(slot);
+    const off = screen.getByRole("menuitemcheckbox", { name: "Grid" }).querySelector("[data-check-slot]") as HTMLElement;
+    expect(off.textContent).toBe("");
   });
 
   it("a checkable item is a menuitemcheckbox, not a menuitem", () => {

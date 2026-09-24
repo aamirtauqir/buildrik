@@ -231,7 +231,6 @@ export const zIndex = {
   selectionBadge: 1002,
   pointerBadge: 1003,
   badge: 1004,
-  alignmentToolbar: 1050,
 
   // Drop feedback layers (2000-2999)
   dropFeedback: 2000,

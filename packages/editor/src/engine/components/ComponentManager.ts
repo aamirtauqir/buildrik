@@ -53,10 +53,6 @@ import {
   loadComponents,
   deleteComponent as deleteFromStorage,
   isStorageAvailable,
-  exportComponents as exportFromStorage,
-  importComponents as importToStorage,
-  downloadComponentsFile,
-  type ComponentExport,
 } from "./ComponentStorage";
 import {
   findInstanceContainingElement,
@@ -75,6 +71,12 @@ function generateComponentId(): string {
 /**
  * Manages the component registry and delegates instance/variant operations.
  */
+/** Is a master offered on this page? Every site-scoped one is; a "This page"
+ *  one (board 6971:77663) only on its own page. */
+export function inPageScope(component: ComponentDefinition, pageId: string | null | undefined): boolean {
+  return !component.pageId || component.pageId === pageId;
+}
+
 export class ComponentManager {
   private composer: Composer;
   private config: ComponentManagerConfig;
@@ -166,6 +168,8 @@ export class ComponentManager {
       variantProperties?: VariantProperty[];
       /** Spec §6.3 / D7: persist user's "Pre-fill from DS styles" choice. */
       prefillFromDs?: boolean;
+      /** "This page" scope (board 6971:77663); omitted = the whole site. */
+      pageId?: string | null;
     }
   ): Promise<ComponentDefinition | null> {
     const element = this.composer.elements.getElement(elementId);
@@ -187,6 +191,7 @@ export class ComponentManager {
       version: 1,
       variantProperties: options?.variantProperties,
       prefillFromDs: options?.prefillFromDs,
+      ...(options?.pageId ? { pageId: options.pageId } : {}),
     };
 
     await saveComponent(component, this.projectId);
@@ -198,6 +203,35 @@ export class ComponentManager {
     return component;
   }
 
+  /**
+   * Make existing elements instances of `componentId` (board 4418:142143:
+   * "Creating a master converts this Hero into its first instance", and the
+   * opt-in "Also convert N matching groups"). Callers pass elements whose
+   * tree already equals the master (see matchingGroups), so no overrides
+   * are recorded and nothing on the canvas moves.
+   */
+  adoptInstances(componentId: string, elementIds: readonly string[]): number {
+    const component = this.components.get(componentId);
+    if (!component) return 0;
+    let adopted = 0;
+    for (const elementId of elementIds) {
+      const element = this.composer.elements.getElement(elementId);
+      if (!element || this.instances.has(elementId)) continue;
+      const instance: ComponentInstance = {
+        elementId,
+        componentId,
+        overrides: [],
+        syncedVersion: component.version,
+        isDetached: false,
+      };
+      this.instances.set(elementId, instance);
+      element.setData("componentInstance", instance);
+      adopted++;
+    }
+    if (adopted > 0) this.composer.markDirty();
+    return adopted;
+  }
+
   getComponent(id: string): ComponentDefinition | undefined {
     return this.components.get(id);
   }
@@ -206,13 +240,31 @@ export class ComponentManager {
     return Array.from(this.components.values()).sort((a, b) => b.updatedAt - a.updatedAt);
   }
 
+  /**
+   * Bring a master from the workspace library (FROM LIBRARY, board 4418:99857)
+   * onto this site under its SAME id — that shared id is what links it to the
+   * other sites. Saved locally and announced like a created master, so the
+   * server mirror stores this site's copy. A master already here is returned
+   * as is. Page scope never travels with it: a library master is site-wide.
+   */
+  async adoptLibraryComponent(definition: ComponentDefinition): Promise<ComponentDefinition> {
+    const existing = this.components.get(definition.id);
+    if (existing) return existing;
+    const component: ComponentDefinition = { ...deepClone(definition), pageId: null };
+    await saveComponent(component, this.projectId);
+    this.components.set(component.id, component);
+    this.composer.emit(EVENTS.COMPONENT_CREATED, { component });
+    this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+    return component;
+  }
+
   getComponentsByCategory(category: string): ComponentDefinition[] {
     return this.getAllComponents().filter((c) => c.category === category);
   }
 
   async updateComponentMetadata(
     id: string,
-    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags">>
+    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags" | "thumbnail">>
   ): Promise<boolean> {
     const component = this.components.get(id);
     if (!component) return false;
@@ -489,24 +541,6 @@ export class ComponentManager {
       this.maps.instances,
       elementId
     );
-  }
-
-  // ─── Export / Import ─────────────────────────────────────────────────────────
-
-  async exportComponents(download: boolean = true): Promise<ComponentExport> {
-    const data = await exportFromStorage(this.projectId);
-    if (download) {
-      downloadComponentsFile(data);
-    }
-    return data;
-  }
-
-  async importComponents(file: File, clearExisting: boolean = false): Promise<number> {
-    const text = await file.text();
-    const data = JSON.parse(text) as ComponentExport;
-    const count = await importToStorage(data, clearExisting);
-    await this.loadComponentsFromStorage();
-    return count;
   }
 
   // ─── Configuration ───────────────────────────────────────────────────────────

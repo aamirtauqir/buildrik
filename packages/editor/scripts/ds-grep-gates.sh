@@ -159,7 +159,7 @@ CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/se
 # (2026-09-02): split by SURFACE — panel chrome stays <=4, overlays and form
 # atoms keep 8/12. Names below are the atoms DESIGN.md:507 lists, mapped to the
 # files that actually exist. Keep them in step when a file moves.
-FORM_ATOM_EXCLUDE='chrome-ui/Button\.tsx|chrome-ui/CopyButton\.tsx|chrome-ui/TextInput\.tsx|chrome-ui/TextField\.tsx|chrome-ui/FormField\.tsx|chrome-ui/Select\.tsx|chrome-ui/Tooltip\.tsx|chrome-ui/HelpTooltip\.tsx|chrome-ui/HintTooltip\.tsx|chrome-ui/Toast\.tsx|chrome-ui/Modal\.tsx|chrome-ui/ModalParts\.tsx|chrome-ui/UpgradeModal\.tsx|chrome-ui/ConfirmDialog\.tsx|chrome-ui/Chip\.tsx|chrome-ui/IssueChip\.tsx|shared/forms/'
+FORM_ATOM_EXCLUDE='chrome-ui/Button\.tsx|chrome-ui/CopyButton\.tsx|chrome-ui/TextInput\.tsx|chrome-ui/TextField\.tsx|chrome-ui/FormField\.tsx|chrome-ui/Select\.tsx|chrome-ui/Tooltip\.tsx|chrome-ui/HelpTooltip\.tsx|chrome-ui/HintTooltip\.tsx|chrome-ui/Toast\.tsx|chrome-ui/Modal\.tsx|chrome-ui/ModalParts\.tsx|chrome-ui/UpgradeModal\.tsx|chrome-ui/ConfirmDialog\.tsx|chrome-ui/Chip\.tsx|shared/forms/'
 
 # Overlays are not panel chrome either. DESIGN.md:507 puts Modal in the form-atom
 # tier with the full radius scale; A1.3 (:515) caps "panel chrome CONTAINERS —

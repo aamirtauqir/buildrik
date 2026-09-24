@@ -61,7 +61,7 @@ function translate(e: unknown): never {
     /* An OBJECT, not the bare code string: the global errorFormatter lifts a
        cause's enumerable fields with Object.entries, so a string arrived at the
        client as {0:"E",1:"X",2:"P"…} and the page could not read it. */
-    throw new TRPCError({ code, message: e.message, cause: { reason: e.code } });
+    throw new TRPCError({ code, message: e.message, cause: { reason: e.code, ...e.context } });
   }
   throw e;
 }

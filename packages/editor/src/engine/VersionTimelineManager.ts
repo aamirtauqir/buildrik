@@ -11,7 +11,6 @@ import type { ProjectData } from "../shared/types";
 import type {
   NamedVersion,
   VersionHistoryConfig,
-  VersionHistoryExport,
   CompareResult,
 } from "../shared/types/versions";
 import { DEFAULT_VERSION_HISTORY_CONFIG } from "../shared/types/versions";
@@ -24,9 +23,6 @@ import {
   loadVersion,
   deleteVersion as deleteVersionFromStorage,
   pruneVersions,
-  exportVersions as exportVersionsFromStorage,
-  importVersions as importVersionsToStorage,
-  downloadVersionsFile,
   isStorageAvailable,
   getStorageStats,
 } from "./storage/VersionHistoryStorage";
@@ -189,6 +185,11 @@ export class VersionTimelineManager {
    * Set the current user ID for team attribution on versions.
    * Called by the shell when session becomes available.
    */
+  /** The signed-in user's id, so a list can say "You" (G1-075). */
+  getCurrentUserId(): string | null {
+    return this.currentUserId;
+  }
+
   setCurrentUserId(userId: string | null): void {
     this.currentUserId = userId;
   }
@@ -196,7 +197,7 @@ export class VersionTimelineManager {
   /**
    * Create an auto-checkpoint
    */
-  async autoCheckpoint(label: string): Promise<NamedVersion | null> {
+  async autoCheckpoint(label: string, options: { title?: string } = {}): Promise<NamedVersion | null> {
     if (!this.config.enabled) return null;
 
     const snapshot = await this.captureSnapshotAsync();
@@ -222,8 +223,11 @@ export class VersionTimelineManager {
        project, there is nothing new to restore to. A NAMED version is never
        treated as the same thing: those are decisions, and a checkpoint taken
        after one is the "before I started today" point. */
+    /* A TITLED auto-version marks a moment the user will look for by name
+       (the template backup, #25) — it is taken even when the project matches
+       the newest auto-save, or the backup a toast promised would not exist. */
     const newest = this.versions[0];
-    if (newest?.isAutoCheckpoint && sameProject(newest.snapshot, snapshot)) {
+    if (!options.title && newest?.isAutoCheckpoint && sameProject(newest.snapshot, snapshot)) {
       return null;
     }
 
@@ -233,6 +237,7 @@ export class VersionTimelineManager {
       snapshot,
       createdAt: Date.now(),
       isAutoCheckpoint: true,
+      ...(options.title ? { title: options.title } : {}),
       projectId: this.projectId,
       visualSnapshot: null, // Skip visual snapshot for auto-checkpoints to save storage
       userId: this.currentUserId,
@@ -287,12 +292,14 @@ export class VersionTimelineManager {
        which made it a contract, not a nicety. A failed save aborts the
        restore; losing the work is the outcome this exists to prevent. */
     let savedAs: string | null = null;
+    let safetyVersionId: string | undefined;
     try {
       const safety = await this.createVersion(
         `Before restoring "${version.name}"`,
         "Automatic — the work that was open when a restore was requested.",
       );
       savedAs = safety.name;
+      safetyVersionId = safety.id;
     } catch {
       this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
       return false;
@@ -309,6 +316,7 @@ export class VersionTimelineManager {
     this.composer.emit(EVENTS.VERSION_RESTORED, {
       version,
       previousVersionId,
+      safetyVersionId,
     });
 
     return true;
@@ -348,47 +356,6 @@ export class VersionTimelineManager {
 
     this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
     return true;
-  }
-
-  // ============================================
-  // Export / Import
-  // ============================================
-
-  /**
-   * Export all versions to a file
-   */
-  async exportVersions(download: boolean = true): Promise<VersionHistoryExport> {
-    const data = await exportVersionsFromStorage(this.projectId);
-
-    if (download) {
-      downloadVersionsFile(data);
-    }
-
-    this.composer.emit(EVENTS.VERSION_EXPORTED, {
-      projectId: this.projectId,
-      count: data.versions.length,
-    });
-
-    return data;
-  }
-
-  /**
-   * Import versions from a file
-   */
-  async importVersions(file: File, clearExisting: boolean = false): Promise<number> {
-    const text = await file.text();
-    const data = JSON.parse(text) as VersionHistoryExport;
-
-    const count = await importVersionsToStorage(data, clearExisting);
-    await this.loadVersionsFromStorage();
-
-    this.composer.emit(EVENTS.VERSION_IMPORTED, {
-      projectId: this.projectId,
-      count,
-      filename: file.name,
-    });
-
-    return count;
   }
 
   // ============================================

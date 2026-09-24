@@ -84,17 +84,17 @@
      draws a fill here at all (32:3 has none, so the panel shows through), so
      the flat token says the same thing the gradient did and one fewer gate
      has to allow it. */
-  height: var(--bk-space-48);
+  /* Board 4428:141170 (v3): 44, the panel-header size. */
+  height: var(--bk-size-header);
   padding: 0 var(--bk-space-16);
   background: var(--bk-bg-panel);
   border-bottom: 1px solid var(--bk-border);
 }
+/* v3 draws the element glyph bare — ink-soft, no tinted tile. */
 .bdi-ehdr .bdi-eic {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
+  width: 16px;
+  height: 16px;
+  color: var(--bk-ink-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -135,8 +135,9 @@
      height/min-height: these are flowbite Buttons and their own min-height is
      40px, so padding alone could not reach the boards' 28px strip.
      nowrap: at 12px in a 300px panel the three pills wrapped to two lines. */
-  background: var(--bk-bg-subtle);
-  border-bottom: 1px solid var(--bk-border);
+  /* Board 4428:141170 (v3): a plain white row under the tabs, no rule. */
+  background: var(--bk-bg-panel);
+  border-bottom: none;
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   /* Boards 32:7 and 642:3255: 32h, x16, gap 8. Live was 5px/10px with gap 6,
@@ -169,7 +170,10 @@
   cursor: pointer;
   white-space: nowrap;
 }
-.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] { background: var(--bk-bg-card); }
+/* v3: the scope pill is bordered. */
+.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] { background: var(--bk-bg-card); border: 1px solid var(--bk-border); }
+/* v3: the label at 400 (size, face and muted ink come from .bdi-bpr). */
+.bdi-bpr .bdi-bpr-label { font-weight: 400; }
 /* ── Body ─────────────────────────────────────────────── */
 .bdi-body {
   padding: 0;
@@ -329,17 +333,19 @@
      gap), so nothing on screen moves; what changes is that the ROW is the box
      the boards measure, which is what lets a recipe join it. `.bdi-sec-body`
      drops its gap to 0 in the same change, or the pitch would become 40. */
-  min-height: 34px;
+  /* Board 4428:141170 (v3): a 32 row (--bk-size-row). */
+  min-height: var(--bk-size-row);
 }
 .bdi-row-ctrl button, .bdi-row-ctrl input, .bdi-row-ctrl select { height: var(--bk-size-row-dense); min-height: 0; }
+/* v3 right-aligns the label against its control. */
 .bdi-row-ctrl .bdi-lb {
   font: 400 12px var(--bk-font-ui);
   color: var(--bk-ink-soft);
   letter-spacing: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: flex-end;
+  text-align: right;
   gap: var(--bk-space-4);
 }
 .bdi-row-ctrl.disabled {
@@ -359,21 +365,22 @@
   align-items: center;
   height: var(--bk-size-row-dense);
   width: 100%;
-  background: var(--bk-gray-50);
+  /* v3 (board 4428:141170): a white field with a 1px --bk-border-input edge,
+     radius 6 — replacing the V1 board's gray-50/gray-100 frame. */
+  background: var(--bk-bg-card);
   /* A RESTING EDGE, not a transparent placeholder revealed on hover. Every
      control frame on boards 807:8342/8412/8475/8521/8567/8614 is drawn
      `bg-[--flowbite/gray/50] border-[--flowbite/gray/100]` — the field has an
      outline before you touch it. Transparent-until-hover meant a column of
      values with no boxes around them, and the hover state then read as the
      field APPEARING. */
-  border: 1px solid var(--bk-gray-100);
-  border-radius: 4px;
+  border: 1px solid var(--bk-border-input);
+  border-radius: 6px;
   overflow: hidden;
   transition: background 120ms, border-color 120ms, box-shadow 120ms;
   position: relative;
 }
 .bdi-fld:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
   border-color: var(--bk-border);
 }
 .bdi-fld:focus-within {
@@ -408,7 +415,8 @@
   background: transparent;
   border: none;
   outline: none;
-  font: 500 11px var(--bk-font-ui);
+  /* v3: values in the data face, Geist Mono 12. */
+  font: 400 12px var(--bk-font-mono);
   color: var(--bk-ink);
   font-variant-numeric: tabular-nums;
 }
@@ -461,10 +469,11 @@
      under it are the same 160x28 box on every profile board. */
   height: var(--bk-size-row-dense);
   padding: 0 6px 0 var(--bk-space-8);
-  background: var(--bk-gray-50);
-  border: 1px solid var(--bk-gray-100);
-  border-radius: 4px;
-  font: 500 11px var(--bk-font-ui);
+  /* v3: same white field, --bk-border-input edge, radius 6, 12px. */
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-input);
+  border-radius: 6px;
+  font: 400 12px var(--bk-font-ui);
   color: var(--bk-ink);
   cursor: pointer;
   transition: background 120ms, border-color 120ms;

@@ -103,6 +103,21 @@ describe("versionSync", () => {
     expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv1", userId: "user-42" });
   });
 
+  /* G1-075: the list names its authors; hydrate stores the name, and backfills
+     it onto a version cached before the list carried names. */
+  it("stores the author's name, and backfills it onto an already-cached version", async () => {
+    list.mockResolvedValueOnce([
+      { versionId: "srv1", createdBy: "user-42", createdByName: "Sara" },
+      { versionId: "local1", createdBy: "user-42", createdByName: "Sara" },
+    ]);
+    loadVersions.mockResolvedValueOnce([{ id: "local1", userId: "user-42" }]);
+    get.mockResolvedValueOnce({ id: "srv1", name: "Server one", snapshot: {}, createdAt: 0 });
+    await hydrateVersionsFromServer();
+    const saved = saveVersion.mock.calls.map((c) => c[0]);
+    expect(saved).toContainEqual(expect.objectContaining({ id: "local1", authorName: "Sara" }));
+    expect(saved).toContainEqual(expect.objectContaining({ id: "srv1", authorName: "Sara" }));
+  });
+
   it("leaves the author null when the server has none, rather than inventing one", async () => {
     list.mockResolvedValueOnce([{ versionId: "srv2" }]);
     loadVersions.mockResolvedValueOnce([]);
@@ -270,5 +285,27 @@ describe("versionSync hydrate edge paths", () => {
     window.history.replaceState({}, "", "/dashboard");
     await expect(hydrateVersionsFromServer()).resolves.toBe(0);
     expect(list).not.toHaveBeenCalled();
+  });
+});
+
+describe("versionSync hydrate is bounded (walk 2026-09-24: 50 sequential gets on open)", () => {
+  it("pulls only the newest HYDRATE_LIMIT missing versions, concurrently", async () => {
+    const { HYDRATE_LIMIT } = await import("../versionSync");
+    const rows = Array.from({ length: 50 }, (_, i) => ({ versionId: `v${i}` }));
+    list.mockResolvedValueOnce(rows);
+    loadVersions.mockResolvedValueOnce([]);
+    let inFlight = 0;
+    let peak = 0;
+    get.mockImplementation(async ({ versionId }: { versionId: string }) => {
+      inFlight++;
+      peak = Math.max(peak, inFlight);
+      await Promise.resolve();
+      inFlight--;
+      return { id: versionId };
+    });
+    await expect(hydrateVersionsFromServer()).resolves.toBe(HYDRATE_LIMIT);
+    expect(get).toHaveBeenCalledTimes(HYDRATE_LIMIT);
+    expect(get.mock.calls.map((c) => c[0].versionId)).toEqual(rows.slice(0, HYDRATE_LIMIT).map((r) => r.versionId));
+    expect(peak).toBeGreaterThan(1);
   });
 });

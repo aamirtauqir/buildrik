@@ -31,11 +31,11 @@ const TRY_PROMPTS = [
 export interface EmptyThreadProps {
   /** Runs one of the suggestions as a prompt. */
   onTry?: (prompt: string) => void;
-  /** Enters the longer-job flow (the agent plan the run boards draw). */
-  onDraft?: () => void;
+  /** Board 4418:104313 CREATE — opens Add › Generate a block (G2-117). */
+  onCreate?: () => void;
 }
 
-export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
+export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onCreate }) => (
   <div className="tw:flex tw:flex-col tw:pb-2">
     {/* Board 170:10 "Suggestions" is ONE block: the TRY label and the three
         prompts under it, which is why they share an anchor. */}
@@ -55,25 +55,28 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
       ))}
     </div>
 
+    {/* Board 4418:104313: the note says how a run goes now — plan first,
+        each step applied as it runs, undoable. */}
     <p
       className="tw:mx-4 tw:mt-3 tw:mb-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
       data-testid="ai-note"
     >
-      AI proposes a diff and never writes directly. Each Apply lands as one undo step — a
-      multi-step draft applies one step at a time.
+      Review the plan before running it. Completed steps apply immediately. You can undo applied edits.
     </p>
 
-    {/* Board 921:4478 "Draft": the label and the one row under it. */}
-    <div className="tw:flex tw:flex-col" data-testid="ai-draft">
-      <div className={BAND}>DRAFT</div>
+    {/* Board 4418:104313 CREATE: a new block is made in Add (G2-117). It
+        replaced 921:4478's DRAFT row — a brief is now just a prompt, which
+        plans first anyway. */}
+    <div className="tw:flex tw:flex-col tw:pt-6" data-testid="ai-create">
+      <div className={BAND}>CREATE</div>
       <Button
         color="light"
-        className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]"
-        data-testid="ai-draft-brief"
-        onClick={() => onDraft?.()}
-        disabled={!onDraft}
+        className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-start tw:gap-2 tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[13px] tw:text-[var(--bk-ink)]"
+        data-testid="ai-create-block"
+        onClick={() => onCreate?.()}
+        disabled={!onCreate}
       >
-        <span>✦ Draft a new section from a brief</span>
+        <span>✦&nbsp;&nbsp;Generate a block in Add</span>
         <span aria-hidden="true">›</span>
       </Button>
     </div>

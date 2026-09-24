@@ -11,8 +11,9 @@
  *
  * The ten children below ARE the component — exit, name, save, review,
  * spacer, tools, presence, notifications, publish, menu — in that order.
- * `tools` is the ONE bounded cluster (plan §2: Quick preview · Comments ·
- * IssueChip, typed as data props). There is deliberately no `extra` node
+ * `tools` is the ONE bounded cluster (plan §2: Quick preview · Comments,
+ * typed as data props; the IssueChip and the Live chip left the bar in C3 —
+ * Issues opens from the site menu and ⌘K, the live URL is a site-menu row). There is deliberately no `extra` node
  * slot: one existed for a day and the deleted shell topbar's Preview /
  * Comment / Colour-mode buttons walked straight back in through it. A bar
  * that can be extended per call site is a bar that drifts.
@@ -24,7 +25,6 @@ import { Button } from "flowbite-react";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
-import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 
@@ -40,7 +40,8 @@ import { Presence, type PresenceProps } from "./Presence";
    VERTICAL the boards also declare is nominal — 10 + a 20 line + 10 is 40 and
    the same node fixes its height at 32 — so it is carried as a box-model value
    the explicit height overrides, which is what Figma is doing too. */
-const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 tw:font-medium";
+/* Board 4418:123573 (v3 IA): Publish at 13/500. */
+const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -56,9 +57,22 @@ const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 
 
    Scoped to this button on purpose: the shared ghost class is used widely, and re-inking
    every ghost button in the editor is not what the topbar board says. */
+/* Board 4418:123573 (v3 IA): Exit is 13/500 in gray-700. */
 const EXIT_BTN_CLASS =
-  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[12px] tw:font-normal " +
-  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[13px] tw:font-medium " +
+  "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+
+/* Board 4418:123573: the shell search, 320×36, placeholder + ⌘K. It is the
+   ⌘K door — a button drawn as a field (the palette owns the typing). */
+const SEARCH_CLASS =
+  "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] " +
+  "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-ink-muted)] " +
+  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const SEARCH_KBD =
+  "tw:ml-auto tw:rounded tw:border tw:border-[var(--bk-border)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Board 4418:123573: Preview is a 76×32 bordered TEXT button, not an eye. */
+const PREVIEW_BTN_CLASS =
+  "tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -75,7 +89,7 @@ export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidd
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
  * `extra` slot let arbitrary buttons walk back into the bar within a day.
  * Role/view branching lives in the CONTAINER: it composes which fields to
- * pass (view mode: comments only; viewer: read-only-labelled issues); the
+ * pass (view mode: comments only); the
  * bar renders exactly what it receives and learns no roles.
  */
 export interface TopbarTools {
@@ -83,16 +97,10 @@ export interface TopbarTools {
   previewBusy?: boolean;
   commentsPressed?: boolean;
   onToggleComments?: () => void;
-  issues?: {
-    errors: number;
-    warnings: number;
-    onClick?: () => void;
-    readOnlyReason?: string;
-  };
 }
 
 /** Five review states share one pill; only the copy and tone differ. */
-export type ReviewTone = "info" | "warning" | "success";
+export type ReviewTone = "neutral" | "info" | "warning" | "success";
 export interface ReviewPill {
   label: string;
   tone: ReviewTone;
@@ -102,6 +110,15 @@ export interface ReviewPill {
 
 export interface TopbarProps {
   siteName: string;
+  /** The page being edited — the crumb after the site (board 4418:123573:
+   *  "Bella Cucina › Home"). Omit for no page crumb. */
+  pageName?: string | null;
+  /** The site crumb's click — board 4418:126034's hotspot/crumb-site opens
+   *  the Pages panel (4418:90494). Omit and the site name is plain text. */
+  onOpenPages?: () => void;
+  /** The page crumb's click — hotspot/crumb-page lands on the base shell
+   *  (4418:123573: drawer closed). Omit and the page is plain text. */
+  onPageCrumb?: () => void;
   onExit?: () => void;
   /**
    * What the leftmost control says and does. In view mode it leaves the MODE,
@@ -115,12 +132,21 @@ export interface TopbarProps {
       not operating. */
   save?: SaveState;
   savedAt?: number;
-  /** Save now — turns the save pill into a button for the states worth retrying. */
-  onSave?: () => void;
+  /** The save pill's click — the container routes it by state (B2): History
+   *  for saved/saving/unsaved, a retry for error, the recovery dialog for a
+   *  conflict. Omit for offline, where `saveHint` carries the reason. */
+  onSaveClick?: () => void;
+  /** The tooltip on a pill with nothing to click (offline). */
+  saveHint?: string;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
-  /** The daily-loop cluster: Quick preview · Comments · IssueChip. */
+  /** The daily-loop cluster: Quick preview · Comments. */
   tools?: TopbarTools | null;
+  /** The shell search field (⌘K). Omit and no field is drawn. */
+  onOpenSearch?: () => void;
+  /** Board 4418:100087: while a drawer owns search (Add → "Search elements…"),
+   *  the field is a real input that filters that drawer instead of ⌘K. */
+  contextSearch?: { placeholder: string; value: string; onChange: (value: string) => void } | null;
   presence?: PresenceProps | null;
   unreadCount?: number;
   onOpenNotifications?: () => void;
@@ -143,32 +169,19 @@ export interface TopbarProps {
   ctaLabel?: string;
   /** One sentence naming the site's position, as the button's title. */
   ctaHint?: string;
-  /**
-   * The live site, when there is one. Rendered as `● Live · domain` beside the
-   * save pill — the settled half of the CTA's story.
-   *
-   * Load-bearing next to `ctaLabel`: on a site that is live with nothing
-   * waiting, the derivation returns no next move and the CTA disappears. Without
-   * this chip, "your site is live" would have no representation in the shell at
-   * all, and a finished site would look identical to one that was never
-   * published.
-   */
-  liveUrl?: string | null;
   /** Replaces the built-in Publish button — e.g. an editor who sends for review instead. */
   action?: React.ReactNode;
   /** The ⋯ site menu — a node that owns its own trigger (SiteMenu). */
   menu?: React.ReactNode;
 }
 
-/** The host, for the live chip. A URL the server never validated must not
- *  throw inside a render — an unparseable one falls back to itself. */
-function hostOf(url: string): string {
-  try {
-    return new URL(url).host;
-  } catch {
-    return url;
-  }
-}
+const CRUMB_CLASS =
+  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-accent)] tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+const PAGE_CRUMB_CLASS =
+  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-ink)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
@@ -179,11 +192,10 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
+  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch, contextSearch,
 }: TopbarProps) {
-  const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
     <header
       // Conformance anchor. The bar wears only utility classes, so any selector
@@ -212,67 +224,123 @@ export function Topbar({
           200 column at 14/20. It shipped 13px in a 120..200 elastic box, so
           the site's own name read at the size of the controls around it and
           the whole bar re-laid itself when the name changed length. */}
+      {/* The breadcrumb (C5 G1-004): the site in accent opens the Pages
+          panel; the page crumb returns to the base shell. Board 4418:123573
+          puts the shell search at x356, so the crumb column is 267 (it was
+          681:26's 200). */}
       <span
-        className="tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)] tw:w-[200px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
-        title={siteName}
+        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[267px] tw:shrink tw:min-w-0 tw:whitespace-nowrap"
         data-testid="topbar-site-name"
       >
-        {siteName}
+        {onOpenPages ? (
+          <Button
+            color="light"
+            size="xs"
+            onClick={onOpenPages}
+            className={CRUMB_CLASS}
+            title={siteName}
+            data-testid="topbar-crumb-site"
+          >
+            {siteName}
+          </Button>
+        ) : (
+          <span className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]" title={siteName}>
+            {siteName}
+          </span>
+        )}
+        {pageName ? (
+          <>
+            <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]">›</span>
+            {onPageCrumb ? (
+              <Button
+                color="light"
+                size="xs"
+                onClick={onPageCrumb}
+                aria-current="page"
+                className={PAGE_CRUMB_CLASS}
+                title={pageName}
+                data-testid="topbar-crumb-page"
+              >
+                {pageName}
+              </Button>
+            ) : (
+              <span
+                aria-current="page"
+                className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
+                title={pageName}
+                data-testid="topbar-crumb-page"
+              >
+                {pageName}
+              </span>
+            )}
+          </>
+        ) : null}
       </span>
 
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
-
-      {liveUrl ? (
-        <a
-          href={liveUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          /* The domain, not the URL: `https://bella-cucina.vercel.app/` in a
-             56px bar pushes the site name out of it. The href keeps the whole
-             thing, and the title says where it goes. */
-          title={`Open the live site — ${liveUrl}`}
-          className={
-            "tw:inline-flex tw:flex-none tw:items-center tw:gap-1.5 tw:h-6 tw:px-2 tw:rounded " +
-            "tw:text-[12px] tw:text-[var(--bk-ink-soft)] tw:no-underline tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)] " +
-            "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:focus-visible:outline-none"
-          }
-        >
-          <span className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-green-600" aria-hidden="true" />
-          <span className="tw:sr-only">Live at </span>
-          {hostOf(liveUrl)}
-        </a>
+      {contextSearch ? (
+        <label className={`${SEARCH_CLASS} tw:text-[var(--bk-ink)] tw:focus-within:[box-shadow:var(--bk-shadow-focus)]`} data-testid="topbar-search">
+          <SearchGlyph />
+          <input
+            id={TOPBAR_CONTEXT_SEARCH_ID}
+            type="text"
+            className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:outline-none tw:placeholder:text-[var(--bk-ink-muted)] tw:focus:ring-0 tw:focus:[box-shadow:none]"
+            /* The field (the label) draws the focus ring; a11y.css's unlayered
+               `*:focus-visible` outline outranks any layered utility, so the
+               inner box's own ring is switched off here. */
+            style={{ outline: "none" }}
+            placeholder={contextSearch.placeholder}
+            aria-label={contextSearch.placeholder}
+            value={contextSearch.value}
+            onChange={(e) => contextSearch.onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && contextSearch.value) {
+                e.stopPropagation();
+                contextSearch.onChange("");
+              }
+            }}
+            data-testid="topbar-context-search"
+          />
+          {contextSearch.value ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              className="tw:border-0 tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-muted)] tw:cursor-pointer"
+              onClick={() => contextSearch.onChange("")}
+            >
+              ✕
+            </button>
+          ) : (
+            <kbd className={SEARCH_KBD}>⌘F</kbd>
+          )}
+        </label>
+      ) : onOpenSearch ? (
+        <button type="button" className={SEARCH_CLASS} onClick={onOpenSearch} data-testid="topbar-search">
+          <SearchGlyph />
+          <span className="tw:truncate">Search pages, layers, assets…</span>
+          <kbd className={SEARCH_KBD}>⌘K</kbd>
+        </button>
       ) : null}
+
+      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
+
 
       {review ? (
         <ReviewBadge {...review} />
       ) : null}
 
+      {/* Board 4418:123573: the comments toggle sits with the review chip. */}
+      {tools?.onToggleComments ? (
+        <IconButton label="Comments" pressed={Boolean(tools.commentsPressed)} onClick={tools.onToggleComments}>
+          <CommentIcon />
+        </IconButton>
+      ) : null}
+
 
       <span className="tw:flex-1" />
 
-      {hasTools && tools ? (
-        <span className="tw:inline-flex tw:items-center tw:gap-0.5 tw:pr-2 tw:mr-1 tw:border-r tw:border-[var(--bk-gray-200)]">
-          {tools.onPreview ? (
-            <IconButton
-              label="Quick preview"
-              onClick={tools.previewBusy ? undefined : tools.onPreview}
-              disabled={tools.previewBusy}
-              aria-busy={tools.previewBusy || undefined}
-            >
-              {tools.previewBusy ? <SpinnerIcon /> : <EyeIcon />}
-            </IconButton>
-          ) : null}
-          {tools.onToggleComments ? (
-            <IconButton label="Comments" pressed={Boolean(tools.commentsPressed)} onClick={tools.onToggleComments}>
-              <CommentIcon />
-            </IconButton>
-          ) : null}
-          {tools.issues ? <IssueChip {...tools.issues} /> : null}
-        </span>
-      ) : null}
 
       {presence ? <Presence {...presence} /> : null}
 
@@ -284,12 +352,30 @@ export function Topbar({
           <BellIcon />
         </IconButton>
         {unreadCount > 0 ? (
+          /* Board 4418:123573: a count badge, not a dot. */
           <span
-            className="tw:absolute tw:top-1 tw:right-0.5 tw:w-2 tw:h-2 tw:rounded-full tw:bg-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
+            className="tw:absolute tw:-top-0.5 tw:-right-1 tw:flex tw:min-w-5 tw:h-5 tw:items-center tw:justify-center tw:rounded-full tw:px-1 tw:bg-[var(--bk-accent)] tw:text-[11px] tw:font-medium tw:leading-none tw:text-white tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
             aria-hidden="true"
-          />
+            data-testid="topbar-unread-badge"
+          >
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
         ) : null}
       </span>
+
+      {tools?.onPreview ? (
+        <Button
+          color="light"
+          size="xs"
+          onClick={tools.previewBusy ? undefined : tools.onPreview}
+          disabled={tools.previewBusy}
+          aria-busy={tools.previewBusy || undefined}
+          className={PREVIEW_BTN_CLASS}
+          data-testid="topbar-preview"
+        >
+          {tools.previewBusy ? <SpinnerIcon /> : "Preview"}
+        </Button>
+      ) : null}
 
       {action ?? (
         publish === "hidden" ? null :
@@ -326,7 +412,8 @@ export function Topbar({
               aria-busy={publishBusy || undefined}
               onClick={() => {}}
               size="xs"
-              className={PUBLISH_BTN_CLASS}
+              /* Boards 4418:123573 / 4418:126059 draw a blocked Publish at 40%. */
+              className={`${PUBLISH_BTN_CLASS} tw:opacity-40`}
             >
               {ctaLabel ?? PUBLISH_LABEL[publish]}
             </Button>
@@ -355,16 +442,26 @@ const REVIEW_BASE_CLASS =
   "tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
   "tw:text-xs tw:font-medium tw:whitespace-nowrap";
 
-/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
-   information, not instructions: they sit on gray so the bar's colour budget
-   stays with the two signals that gate a publish (Issues chip, save trouble).
-   Only "Changes requested" — the one review state that blocks — keeps amber.
-   `info` and `success` are visually identical by design (same neutral
-   surface); only `warning` gets its own look. */
+/* Board B3-01 7569:190283, decision #26 (C2): tones via the status tokens —
+   warning-tint for Changes requested, success-tint for Approved, neutral
+   otherwise. (T8/D7 rule 3 had `success` on the neutral surface; the chip
+   set's tone variants were drawn since, and the container still demotes a
+   warning chip to neutral when two louder ambers are on the bar.) */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
+  /* Board 4418:123573: the permanent door — white, hairline border, accent. */
+  neutral: "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-accent)] tw:[box-shadow:inset_0_0_0_1px_var(--bk-border)]",
   info: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  success: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  warning: "tw:bg-yellow-50 tw:text-yellow-800",
+  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
+  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+};
+
+/* Board 4418:123573: a status dot leads, a › trails. The door with no round
+   has nothing to report, so no dot. */
+const REVIEW_DOT_CLASS: Record<ReviewTone, string | null> = {
+  neutral: null,
+  info: "tw:bg-[var(--bk-gray-500)]",
+  success: "tw:bg-[var(--bk-success)]",
+  warning: "tw:bg-[var(--bk-warning)]",
 };
 
 /* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
@@ -383,6 +480,7 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       </span>
     );
   }
+  const dot = REVIEW_DOT_CLASS[tone];
   return (
     <button
       type="button"
@@ -391,21 +489,27 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       onClick={onClick}
       data-testid="topbar-review-pill"
     >
+      {dot ? <span className={`tw:size-1.5 tw:flex-none tw:rounded-full ${dot}`} aria-hidden="true" /> : null}
       <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
+      <span aria-hidden="true" data-testid="topbar-review-chevron">›</span>
     </button>
   );
 }
 
 /* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
    Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
-function EyeIcon() {
+/** The topbar field's input id while a drawer owns search — ⌘F / "/" focus it. */
+export const TOPBAR_CONTEXT_SEARCH_ID = "topbar-context-search";
+
+function SearchGlyph() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-      <circle cx="12" cy="12" r="3" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
 }
+
 function CommentIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

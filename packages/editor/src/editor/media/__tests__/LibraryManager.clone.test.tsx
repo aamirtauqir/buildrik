@@ -74,10 +74,13 @@ async function mountLibrary(
   const onClose = vi.fn();
   const composer = makeComposer(usages, media, elements);
   const utils = render(
-    <LibraryManager composer={composer} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
+    <LibraryManager composer={composer} onClose={onClose} onOpenImageEditor={vi.fn()} />
   );
   return { ...utils, onClose, composer };
 }
+
+/** The header's ▾ — Import from URL and Add from stock live in its menu (4418:58292). */
+const openAddMenu = () => fireEvent.click(screen.getByTestId("mgr-btn-upload-menu"));
 
 describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", () => {
   it("titles the overlay 'Asset library' with no MANAGE tag and no breadcrumb", async () => {
@@ -87,14 +90,19 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(screen.queryByText("All Media")).toBeNull();
   });
 
-  it("orders the header Import URL · Upload (primary) · Add from stock · Close, and Close is a labelled text button", async () => {
+  /* Board 4418:58292 "mgr-top" (v3): Upload | ▾ is one dark split control —
+     the ▾ holds Import from URL and Add from stock — then ‹ Back to canvas.
+     This pinned the Clone's four loose buttons (Import URL · Upload · Add
+     from stock · Close). */
+  it("draws Upload | ▾ then ‹ Back to canvas; the ▾ holds Import from URL and Add from stock", async () => {
     const { onClose } = await mountLibrary();
     const top = screen.getByTestId("mgr-top");
-    const names = within(top).getAllByRole("button").map((b) => b.textContent?.trim());
-    expect(names).toEqual(["Import URL", "Upload", "Add from stock", "Close"]);
-    expect(screen.getByTestId("mgr-btn-upload").className).toContain("mgr-btn-primary");
-    expect(screen.getByTestId("mgr-btn-stock").className).not.toContain("mgr-btn-primary");
-    fireEvent.click(within(top).getByRole("button", { name: "Close" }));
+    const names = within(top).getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim());
+    expect(names).toEqual(["Upload", "More ways to add", "‹ Back to canvas"]);
+    openAddMenu();
+    expect(screen.getByTestId("mgr-btn-import")).toHaveTextContent("Import from URL…");
+    expect(screen.getByTestId("mgr-btn-stock")).toHaveTextContent("Add from stock…");
+    fireEvent.click(within(top).getByRole("button", { name: "‹ Back to canvas" }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -155,7 +163,7 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
     const setLibraryQuery = vi.fn();
     const setLibrarySearch = vi.fn();
     await mountLibrary({ setLibraryQuery, setLibrarySearch });
-    fireEvent.change(screen.getByPlaceholderText("Search across all folders…"), { target: { value: "menu" } });
+    fireEvent.change(screen.getByPlaceholderText("Search all assets…"), { target: { value: "menu" } });
     expect(setLibraryQuery).toHaveBeenCalledWith("menu");
     expect(setLibrarySearch).not.toHaveBeenCalled();
   });
@@ -194,14 +202,15 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
     expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Used in 1 place");
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual([
+    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
       "Insert to canvas",
       "Rename",
-      "Replace across site…",
-      "Delete",
+      "More actions",
     ]);
-    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-primary");
-    fireEvent.click(actions.getByRole("button", { name: "Delete" }));
+    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-ink");
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    expect(actions.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Replace across site…", "Delete"]);
+    fireEvent.click(actions.getByRole("menuitem", { name: "Delete" }));
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });
 
@@ -212,7 +221,11 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     const emit = vi.fn();
     await mountLibrary({ selMode: true, selectedKeys: new Set(["inter"]) }, {}, { emit });
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Manage font", "Rename", "Delete"]);
+    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
+      "Manage font",
+      "Rename",
+      "More actions",
+    ]);
     fireEvent.click(actions.getByRole("button", { name: "Manage font" }));
     expect(emit).toHaveBeenCalledWith("ui:site-fonts", { assetId: "inter" });
   });
@@ -311,7 +324,7 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
     fireEvent.click(screen.getByTestId("mgr-asset-menu"));
     fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
     expect(screen.getByTestId("mgr-create-folder")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "New folder" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mgr-create-folder-cancel"));
     expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
     expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
@@ -343,7 +356,7 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
     fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "products" } });
     fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
     expect(createFolder).not.toHaveBeenCalled();
-    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Folder name already exists" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mgr-create-folder-use"));
     expect(createFolder).toHaveBeenCalledWith("Products 2");
   });
@@ -547,7 +560,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
     await screen.findByTestId("mgr-det-move-result");
     mocks.state.mediaState = { ...mocks.state.mediaState, selectedKeys: new Set(["hero"]) };
     const { LibraryManager } = await import("../LibraryManager");
-    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
     expect(screen.queryByTestId("mgr-det-move-result")).toBeNull();
     expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
   });
@@ -559,7 +572,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
     await screen.findByTestId("mgr-det-move-result");
     mocks.state.mediaState = { ...mocks.state.mediaState, currentFolderId: "f1" };
     const { LibraryManager } = await import("../LibraryManager");
-    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
     expect(screen.queryByTestId("mgr-det-move-result")).toBeNull();
     expect(rail().getByRole("heading", { name: "2 assets selected" })).toBeInTheDocument();
   });
@@ -834,7 +847,7 @@ async function mountWithUpload(over: Partial<MediaStateResult>, uploadFile: Retu
   composer.media.uploadFile = uploadFile as unknown as typeof composer.media.uploadFile;
   mocks.state.mediaState = makeMediaState({ libraryItems: TEN, counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 }, ...over });
   const { LibraryManager } = await import("../LibraryManager");
-  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
   return { composer };
 }
 
@@ -847,6 +860,7 @@ const landsAs = (id: string) =>
   }));
 
 const importUrl = (url: string) => {
+  openAddMenu();
   fireEvent.click(screen.getByTestId("mgr-btn-import"));
   fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: url } });
   fireEvent.click(screen.getByTestId("import-url-go"));
@@ -860,6 +874,7 @@ describe("Clone 3397:18835 → 3695:43873 / 3695:43876 · Import image from URL,
     const uploadFile = landsAs("imported");
     await mountWithUpload({ libraryItems: [...TEN, IMPORTED], currentFolderId: "f1", allFolders: [makeFolder()] }, uploadFile);
 
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-import"));
     expect(screen.getByRole("heading", { name: "Import image from URL" })).toBeInTheDocument();
     fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: "https://cdn.example.com/hero-imported.jpg" } });
@@ -911,6 +926,7 @@ describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", ()
   it("Add from stock opens the dialog with no Insert door; Save to library resolves into `Stock image saved`, and View asset selects it in the rail", async () => {
     const saveToLibrary = vi.fn(() => Promise.resolve({ key: "stock1", name: "restaurant-interior.jpg" }));
     await mountLibrary({ libraryItems: [...TEN, STOCK], saveToLibrary });
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-stock"));
     expect(stockStub.props?.open).toBe(true);
     expect(stockStub.props).not.toHaveProperty("onInsert");
@@ -927,6 +943,7 @@ describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", ()
   it("a save the engine refused keeps the stock dialog open and shows no result", async () => {
     const saveToLibrary = vi.fn(() => Promise.resolve(null));
     await mountLibrary({ saveToLibrary });
+    openAddMenu();
     fireEvent.click(screen.getByTestId("mgr-btn-stock"));
     fireEvent.click(screen.getByTestId("stub-stock-save"));
     await vi.waitFor(() => expect(saveToLibrary).toHaveBeenCalledTimes(1));
@@ -954,9 +971,13 @@ const ok = (...ids: string[]) => ids.map((elementId) => ({ elementId, previousSr
 const bad = (...ids: string[]) => ids.map((elementId) => ({ elementId, error: "locked" }));
 
 /** Rail → Replace across site… → the picker → menu-cover.png. */
+/** Replace across site's primary — "Replace N uses on M pages". */
+const commitReplace = () => fireEvent.click(screen.getByTestId("rx-commit"));
+
 const pickMenuCover = () => {
   fireEvent.click(screen.getByTestId("mgr-asset-hero"));
-  fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+  fireEvent.click(screen.getByTestId("mgr-det-more"));
+  fireEvent.click(rail().getByRole("menuitem", { name: "Replace across site…" }));
   const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
   fireEvent.click(within(picker).getByText("menu-cover.png"));
 };
@@ -964,13 +985,14 @@ const pickMenuCover = () => {
 describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace across site…, from the library", () => {
   it("choosing the replacement closes the picker, shows Replacing image while the engine runs, then Replacement complete per page; Done closes it", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2", "e3"), failed: [], clean: true });
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2", "e3"), failed: [], clean: true });
     pickMenuCover();
     expect(screen.queryByText(/across 3 uses/)).toBeNull();
+    commitReplace();
     expect(screen.getByTestId("rx-result-title")).toHaveTextContent("Replacing image");
     expect(screen.getByTestId("rx-result-busy")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["home", "menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
     expect(screen.getByTestId("rx-result-note")).toHaveTextContent("Other elements are unchanged.");
@@ -982,10 +1004,11 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
 
   it("a placement the engine could not update is named; Retry failed use runs the engine again and completes", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross)
+    vi.mocked(composer.mediaOps.replaceAcrossSelective)
       .mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false })
       .mockReturnValueOnce({ replaced: ok("e3"), failed: [], clean: true });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("2 updated · 1 failed");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated");
@@ -998,17 +1021,18 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
       "Retrying Menu / Hero image only. The 2 successful updates will not be repeated.",
     );
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(2);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledTimes(2);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
   });
 
   it("a run the engine rolled back (it threw) is every placement failed, with Retry — never a busy card with no door", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockImplementationOnce(() => {
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockImplementationOnce(() => {
       throw new Error("transaction failed");
     });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("0 updated · 3 failed");
     expect(screen.getByTestId("rx-result-failed-0")).toHaveTextContent("Home / Hero: update could not be saved.");
@@ -1016,14 +1040,41 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
     expect(screen.getByTestId("rx-result-retry")).toBeInTheDocument();
   });
 
+  it("G3-027 · 6940:79709 — the pick opens Replace across site with each page ticked; unticking one scopes the run to the rest", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: [], clean: true });
+    pickMenuCover();
+    expect(screen.getByTestId("rx-title")).toHaveTextContent("Replace across site");
+    expect(screen.getByTestId("rx-dialog")).toHaveTextContent("hero-dark.jpg — 3 in total");
+    expect(screen.getByTestId("rx-page-home")).toBeChecked();
+    expect(screen.getByTestId("rx-page-menu")).toBeChecked();
+    expect(screen.getByTestId("rx-commit")).toHaveTextContent("Replace 3 uses on 2 pages");
+    fireEvent.click(screen.getByTestId("rx-page-menu"));
+    expect(screen.getByTestId("rx-commit")).toHaveTextContent("Replace 2 uses on 1 page");
+    expect(composer.mediaOps.replaceAcrossSelective).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("rx-commit"));
+    await screen.findByText("Replacement complete");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["home"]);
+    expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
+  });
+
+  it("Cancel on Replace across site runs nothing", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    pickMenuCover();
+    fireEvent.click(screen.getByTestId("rx-cancel"));
+    expect(screen.queryByTestId("rx-dialog")).toBeNull();
+    expect(composer.mediaOps.replaceAcrossSelective).not.toHaveBeenCalled();
+  });
+
   it("Close on the partial card leaves the engine's partial result standing", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false });
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     fireEvent.click(screen.getByTestId("rx-result-close"));
     expect(screen.queryByTestId("rx-result")).toBeNull();
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(1);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1115,7 +1166,9 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
       clean: true,
     };
   };
-  const composer = makeComposer(usages, { uploadFile: opts.uploadFile }, SITE, replaceAcross);
+  /* Replace across site lists pages from where the placements' src is now. */
+  const site = { ...SITE, findByMediaSrc: (src: string) => (src === placements.src ? [...PLACEMENTS.values()] : []) } as typeof SITE;
+  const composer = makeComposer(usages, { uploadFile: opts.uploadFile }, site, replaceAcross);
   const srcOf = (key: string) => family.find((i) => i.key === key)?.src;
   mocks.state.mediaState = makeMediaState({
     libraryItems: TEN.map((i) => (i.key === "hero" ? HERO : i)),
@@ -1127,7 +1180,7 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
   });
   const { LibraryManager } = await import("../LibraryManager");
   const onOpenImageEditor = vi.fn();
-  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={onOpenImageEditor} onOpenIconPicker={vi.fn()} />);
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={onOpenImageEditor} />);
   const door = () => onOpenImageEditor.mock.calls.at(-1) as EditorDoor;
   return { composer, onOpenImageEditor, door, placements };
 }
@@ -1204,7 +1257,8 @@ describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Don
   it("Optimize opens the same editor on its Optimise tab — the standalone optimiser is gone", async () => {
     const { door } = await mountVersions();
     selectHero();
-    fireEvent.click(rail().getByRole("button", { name: "Optimize" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Optimize" }));
     await vi.waitFor(() => expect(door()).toBeDefined());
     expect(door()[2]).toEqual(expect.objectContaining({ fileName: "hero-dark.jpg", initialTab: "optimise" }));
     expect(screen.queryByText(/Optimize image/i)).toBeNull();
@@ -1326,12 +1380,14 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
   it("Replace across site… on a family whose placements sit on an applied version reaches that version's src", async () => {
     const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
     selectHero();
-    fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Replace across site…" }));
     const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
     fireEvent.click(within(picker).getByText("menu-cover.png"));
+    commitReplace();
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero-v2", "blob:menu");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["p-home", "p-menu"]);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero-v2", "blob:menu", ["p-home", "p-menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(placements.src).toBe("blob:menu");
   });

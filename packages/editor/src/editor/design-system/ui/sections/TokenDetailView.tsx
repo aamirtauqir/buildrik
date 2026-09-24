@@ -1,54 +1,59 @@
 /**
- * TokenDetailView — drill-in detail surface for a single token (s02 right-pane).
+ * TokenDetailView — the selected token's card, board 7315:80955 (right
+ * column, under the live preview; Spacing 7576:197036 draws the same card).
  *
- * T8 of DS prototype-full-rewrite arc. Rendered by TokensRouter when the
- * user clicks any token row.
+ *   ┌ 468 ─────────────────────────────────────────────┐
+ *   │ ▇ 40  name                                    ⋯  │  ⋯ → Rename · Delete
+ *   │       id (Pro) / description                      │
+ *   │ Light value  #1A56DB                    [Change]  │  → inline editor
+ *   │ Dark value   #76A9FA                    [Change]  │  → inline field
+ *   │ Used by      34 elements                [View ›]  │  → element list
+ *   │ ✓ Brand checks pass · 8.6:1 contrast on white     │  or △ issue + fixes
+ *   │ ⓘ                                                 │  draft note
+ *   └───────────────────────────────────────────────────┘
  *
- * Layout (top → bottom):
- *   1. Back arrow header — `← Back to tokens`.
- *   2. Header block — 24px swatch / Aa / bar + name (16px) + ID mono + CSS var (Pro only).
- *   3. Field rows: Light value, Dark value (color only), Used by, Lint.
- *   4. Action button row: Replace, Rename, Delete.
- *   5. Beginner notice (only when dsMode !== "pro").
+ * The card is a SIBLING of the token table, not a drill-in: the workspace
+ * owns which token is selected and mounts this beside the preview. There is
+ * no back link; a row click swaps the token (the board's row reaction is
+ * "set 7 variables", not "navigate").
  *
- * Engine reads:
- *   - `composer.designSystem.tokenUsage.getUsage(id)` → number, subscribed
- *     via `"tokenUsage:changed"`.
- *   - `composer.designSystem.lintState.getIssues(id)` → readonly LintIssue[],
- *     subscribed via `"lint:changed"`.
- *   - `composer.designSystem.computeAutoFix(value, hint)` — pure helper for
- *     Auto-fix button.
+ * Engine reads (unchanged): usage from `tokenUsage` ("tokenUsage:changed"),
+ * findings from `lintState` ("lint:changed"), the reverse alias lookup from
+ * `aliasResolver` ("tokens:alias-changed"). Auto-fix goes through the
+ * history-aware `designSystem.applyAutoFix` so Cmd+Z reverts it.
  *
- * Aliased-by field — Arc D6.a (2026-05-16). When the project has any tokens
- * whose `aliasOf` equals this token's id, the row renders count + names.
- * Empty array → row is hidden. Re-renders on `tokens:alias-changed`.
+ * Departures from the board, recorded: "Used by 34 elements on 3 pages" —
+ * the tracker counts elements, not pages, so the page half is not printed;
+ * the ⋯ menu has no "Duplicate token" (no registry path for it).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Info } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { UsageRef } from "../../../../engine/designSystem/TokenUsageTracker";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "../../state/DSModeContext";
+import { calcContrastRatio } from "../../utils/colorUtils";
+import { findSurfaceToken, resolveSurface, shownValue } from "../../utils/contrastLint";
 import { ColorPicker } from "../colors/ColorPicker";
+import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
+import { BrandFontPopover } from "./BrandFontPopover";
 import { TokenReplaceModal } from "./TokenReplaceModal";
-import { Button, FieldRow, TextInput } from "@/editor/chrome-ui";
+import { TokenRenameDialog } from "./TokenRenameDialog";
+import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
   composer: Composer | null | undefined;
-  /**
-   * Full token list — used by the "Aliased by" row to compute reverse-lookup
-   * via `composer.aliasResolver.findAliasesOf(token.id, allTokens)`. Optional
-   * for back-compat with consumers that haven't been re-wired yet — when
-   * absent or empty, the row simply renders nothing.
-   */
+  /** Every token, for the reverse alias lookup and the contrast surface. */
   allTokens?: ReadonlyArray<DesignToken>;
-  onBack: () => void;
+  /** The preview mode — the contrast line reads the value the page shows. */
+  mode?: "light" | "dark";
   /** Commit a token edit. `darkValue` carries the dark-mode variant; only the
    *  color registry stores one, and passing it for other kinds is a no-op. */
   onValueChange?: (id: string, value: string, darkValue?: string) => void;
@@ -60,44 +65,34 @@ export interface TokenDetailViewProps {
    */
   onDelete?: (id: string, opts?: { replaceWith?: string }) => void;
   onRename?: (id: string, newId: string) => void;
+  /** After a delete — the caller drops its selection. */
+  onDeleted?: () => void;
 }
 
-/* Classes, not a style-const wall. The label+value pairs are chrome-ui's
-   FieldRow now — its label is `w-24`, which is the 96px this file had been
-   re-declaring five times. */
-
-const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:px-1 tw:py-3";
-const FIELD_ROW = "tw:border-t tw:border-[var(--bk-gray-200)] tw:py-2";
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
-/* 1700:6945 — 16px on `leading-[normal]`. `leading-tight` is 1.25, which at
-   16px is 20 and made the two-line header block taller than the board's 60. */
-const NAME = "tw:text-base tw:font-semibold tw:text-[var(--bk-ink)] tw:leading-[normal]";
-/* 11px, not `text-xs`'s 12 — 1700:6946. */
-const ID_MONO = `tw:text-[11px] tw:text-[var(--bk-ink-muted)] ${MONO}`;
-const CSS_VAR = `tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:mt-0.5 ${MONO}`;
-/** The quiet button look, previously six copies of the same class list. */
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
-const LINK_BTN = `${GHOST} tw:p-0 tw:text-left tw:inline-flex tw:items-center tw:gap-1.5`;
-/** The three detail actions — 13px text, no plate (1700:6960..6962). */
-const ACTION_LINK =
-  "tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:leading-[normal] tw:hover:underline";
+/* 7315:80955 detail rows: 13px muted label, 14px semibold value, 40px pitch,
+   the action on the right at 24 tall. */
+const ROW = "tw:flex tw:h-10 tw:items-center tw:gap-2";
+const LABEL = "tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const VALUE = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const VALUE_EMPTY = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const ACTION =
+  "tw:h-6 tw:flex-none tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
+const LINK = "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4";
 
-// ─── Preview slot ─────────────────────────────────────────────────────────────
+/* The 40px preview tile — the token's own colour, family or size is the one
+   computed value; everything else is chrome. */
+const TILE = "tw:flex tw:size-10 tw:flex-none tw:items-center tw:justify-center tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-alpha-ink-10)]";
 
-/* Each swatch is static chrome plus ONE genuinely computed value — the token's
-   own colour, font or size. The static half is classes; only the computed half
-   stays inline, which is exactly the exception CLAUDE.md carves out. */
-const SWATCH = "tw:inline-block tw:size-6 tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:flex-none";
-
-const previewSlot = (token: DesignToken): React.ReactNode => {
+const previewTile = (token: DesignToken): React.ReactNode => {
   if (token.kind === "color" || token.category === "colors") {
-    return <span aria-hidden="true" data-testid="brand-token-detail-swatch" className={SWATCH} style={{ background: token.value }} />;
+    return <span aria-hidden="true" data-testid="brand-token-detail-swatch" className={TILE} style={{ background: token.value }} />;
   }
   if (token.kind === "type" || token.category === "typography") {
     return (
       <span
         aria-hidden="true"
-        className="tw:inline-flex tw:items-center tw:justify-center tw:size-6 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)] tw:flex-none"
+        className={`${TILE} tw:bg-[var(--bk-gray-50)] tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]`}
         style={token.type === "font-family" ? { fontFamily: token.value } : undefined}
       >
         Aa
@@ -108,19 +103,14 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
     const num = parseFloat(token.value);
     const widthPx = Number.isFinite(num) ? Math.min(num, 24) : 8;
     return (
-      <span
-        aria-hidden="true"
-        className="tw:inline-block tw:w-6 tw:h-2 tw:bg-[var(--bk-gray-200)] tw:rounded-sm tw:flex-none tw:relative"
-      >
-        <span
-          className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:bg-[var(--bk-accent)] tw:rounded-sm"
-          style={{ width: widthPx }}
-        />
+      <span aria-hidden="true" className={`${TILE} tw:bg-[var(--bk-gray-50)]`}>
+        <span className="tw:relative tw:h-2 tw:w-6 tw:rounded-sm tw:bg-[var(--bk-gray-200)]">
+          <span className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:rounded-sm tw:bg-[var(--bk-accent)]" style={{ width: widthPx }} />
+        </span>
       </span>
     );
   }
-  // Default — neutral chip. Nothing computed here at all.
-  return <span aria-hidden="true" className={`${SWATCH} tw:bg-[var(--bk-gray-50)]`} />;
+  return <span aria-hidden="true" className={`${TILE} tw:bg-[var(--bk-gray-50)]`} />;
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -129,26 +119,23 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   token,
   composer,
   allTokens,
-  onBack,
+  mode = "light",
   onValueChange,
   onDelete,
   onRename,
+  onDeleted,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
   const isColor = token.kind === "color" || token.category === "colors";
 
   // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
-  // D6.b: breakdown drives the drill-in element list (click row → expand).
   const tracker = composer?.designSystem?.tokenUsage;
   const readBreakdown = React.useCallback(
-    (): readonly UsageRef[] =>
-      tracker?.getBreakdown?.(token.id) ?? [],
+    (): readonly UsageRef[] => tracker?.getBreakdown?.(token.id) ?? [],
     [tracker, token.id],
   );
-  const [usageRefs, setUsageRefs] = React.useState<readonly UsageRef[]>(
-    () => readBreakdown(),
-  );
+  const [usageRefs, setUsageRefs] = React.useState<readonly UsageRef[]>(() => readBreakdown());
   React.useEffect(() => {
     if (!tracker) return;
     setUsageRefs(readBreakdown());
@@ -176,17 +163,13 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     };
   }, [lintState, token.id]);
 
-  // ─ Aliased by: reverse-lookup via composer.aliasResolver. Re-subscribes to
-  // `tokens:alias-changed` so the row updates when any alias-edit fires. D6.a.
+  // ─ Aliased by: reverse-lookup via composer.aliasResolver (D6.a).
   const aliasResolver = composer?.aliasResolver;
   const computeAliases = React.useCallback((): readonly DesignToken[] => {
     if (!aliasResolver || !allTokens || allTokens.length === 0) return [];
     return aliasResolver.findAliasesOf(token.id, allTokens);
   }, [aliasResolver, allTokens, token.id]);
-
-  const [aliases, setAliases] = React.useState<readonly DesignToken[]>(() =>
-    computeAliases(),
-  );
+  const [aliases, setAliases] = React.useState<readonly DesignToken[]>(() => computeAliases());
   React.useEffect(() => {
     setAliases(computeAliases());
     if (!composer || typeof composer.on !== "function") return;
@@ -197,24 +180,56 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     };
   }, [composer, computeAliases]);
 
-  // ─ ColorPicker open state for color tokens (D3 — inline below value row).
-  const [pickerOpen, setPickerOpen] = React.useState(false);
+  /* The contrast the pass line reports: the token as the page shows it,
+     against the customer's page colour (never the editor's). */
+  const contrast = React.useMemo(() => {
+    if (!isColor) return null;
+    const surface = findSurfaceToken(allTokens ?? [token]);
+    const bg = resolveSurface(surface, mode);
+    const fg = shownValue(token, mode);
+    if (!fg || fg.toUpperCase() === bg.toUpperCase()) return null;
+    const ratio = calcContrastRatio(fg, bg);
+    if (!Number.isFinite(ratio)) return null;
+    const on = bg.toUpperCase() === "#FFFFFF" ? "white" : (surface?.friendlyName ?? surface?.name ?? bg);
+    return `${ratio.toFixed(1)}:1 contrast on ${on}`;
+  }, [isColor, allTokens, token, mode]);
 
-  // ─ Dark value local input (color tokens only).
+  // ─ Editors. The value line is read-only until its Change is pressed.
+  const [editingLight, setEditingLight] = React.useState(false);
+  /* A font role's Change opens the board's picker (7318:81029) first. */
+  const [fontPopoverOpen, setFontPopoverOpen] = React.useState(false);
+  /* 7318:80959's WORKSPACE PALETTE: the other brand colours, one swatch per
+     distinct value, eight at most (the board draws seven). */
+  const workspacePalette = React.useMemo(() => {
+    const seen = new Set<string>();
+    return (allTokens ?? [])
+      .filter((t) => t.type === "color" && t.id !== token.id && !t.replacedBy)
+      .filter((t) => {
+        const v = t.value.toUpperCase();
+        if (seen.has(v)) return false;
+        seen.add(v);
+        return true;
+      })
+      .slice(0, 8)
+      .map((t) => ({ id: t.id, name: t.name, value: t.value }));
+  }, [allTokens, token.id]);
+  const [editingDark, setEditingDark] = React.useState(false);
   const [darkInput, setDarkInput] = React.useState(token.darkValue ?? "");
   React.useEffect(() => {
     setDarkInput(token.darkValue ?? "");
-  }, [token.darkValue]);
+    setEditingLight(false);
+    setFontPopoverOpen(false);
+    setEditingDark(false);
+    setUsageExpanded(false);
+  }, [token.id, token.darkValue]);
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
-  // ─ CSS var name (Pro mode only). Prefer engine SSOT `token.cssVar`
-  // field; fallback only if absent. Engine field already canonical so
-  // we don't double-prefix (e.g. id="color-primary" + kind="colors"
-  // was producing "--ds-colors-color-primary" before this fix).
-  const cssVarName = React.useMemo(() => {
-    if (token.cssVar) return token.cssVar;
-    const kind = token.kind ?? token.category ?? "token";
-    return `--ds-${kind}-${token.id.replace(/\./g, "-")}`;
-  }, [token.cssVar, token.kind, token.category, token.id]);
+  const commitDark = () => {
+    const next = darkInput.trim();
+    setEditingDark(false);
+    if (next === (token.darkValue ?? "")) return;
+    onValueChange?.(token.id, token.value, next);
+  };
 
   // ─ Lint actions.
   const handleAutoFix = () => {
@@ -229,9 +244,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     if (typeof engineApply === "function") {
       const fixed = engineApply(token.id, hint);
       if (fixed === null) {
-        // Engine refused (token not found or value unchanged) — fall through
-        // to the old onValueChange path so callers without engine support
-        // still see the suppress side effect.
         const computed = composer.designSystem.computeAutoFix(token.value, hint);
         if (computed && computed !== token.value) onValueChange?.(token.id, computed);
       }
@@ -241,28 +253,13 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     }
     lintState?.suppress(token.id);
   };
+  const handleIgnore = () => lintState?.suppress(token.id);
 
-  const handleIgnore = () => {
-    lintState?.suppress(token.id);
-  };
-
-  // ─ Action buttons.
-  const handleReplaceValue = () => {
-    if (isColor) {
-      setPickerOpen(true);
-    }
-    // Non-color tokens: input already focusable above.
-  };
-
+  // ─ Menu actions.
+  const [renameOpen, setRenameOpen] = React.useState(false);
   const handleRenameId = () => {
-    // TODO(T8 follow-up): replace window.prompt with a proper modal once the
-    // confirm-dialog primitive is wired into TokensSection. MVP unblocks the
-    // arc — see plan T8 § acceptance.
-    if (typeof window === "undefined") return;
-    const next = window.prompt("Rename token ID:", token.id);
-    if (next && next !== token.id) {
-      onRename?.(token.id, next);
-    }
+    setMenuOpen(false);
+    setRenameOpen(true);
   };
 
   // B4 follow-up (2026-05-17): per-token consumer count drives the delete
@@ -270,10 +267,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   // open the picker modal; user picks a replacement which routes through
   // useColorTokens / useTokensForKind deleteToken(id, { replaceWith }).
   const consumerCount = composer?.designSystem?.tokenUsage?.getUsage(token.id) ?? 0;
-
-  // Candidates = same-kind tokens, excluding self + already-soft-deleted (so
-  // selecting one never produces a bridge chain). Fallback kind derivation
-  // mirrors TokensSection.handleTokenDelete dispatch rules.
   const tokenKind = token.kind ?? (token.category === "colors" ? "color" : undefined);
   const replaceCandidates = React.useMemo(
     () =>
@@ -285,131 +278,205 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       }),
     [allTokens, token.id, tokenKind],
   );
-
   const [replaceOpen, setReplaceOpen] = React.useState(false);
-
   const handleDelete = () => {
-    if (!isPro) return; // Beginner-blocked.
+    setMenuOpen(false);
+    if (!isPro || !onDelete) return; // Beginner-blocked, or no delete path.
     if (consumerCount === 0) {
       onDelete?.(token.id);
-      onBack();
+      onDeleted?.();
       return;
     }
     setReplaceOpen(true);
   };
-
   const handleReplaceConfirm = (replaceWithId: string) => {
     onDelete?.(token.id, { replaceWith: replaceWithId });
-    onBack();
+    onDeleted?.();
   };
 
-  // ─ Field renderers ──────────────────────────────────────────────────────────
-
-  const lintRow = (() => {
-    if (lintIssues.length === 0) {
-      return (
-        /* 11px in `--bk-success-text` (`var(--bk-green-600)`) — 1700:6958. `--bk-success` is
-           `var(--bk-green-500)`, which measures 3.0:1 on white; the board names the darker
-           text tone and it is the one that passes AA. */
-        <div className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[11px] tw:text-[var(--bk-success-text)]" data-testid="brand-token-lint-value" data-lint-status="pass">
-          <span aria-hidden="true">✓</span>
-          <span>pass</span>
-        </div>
-      );
-    }
-    const issue = lintIssues[0];
-    return (
-      <div className="tw:flex tw:flex-col tw:gap-1.5 tw:text-[11px] tw:text-[var(--bk-warning-text)]" data-testid="brand-token-lint-value" data-lint-status="fail">
-        <span>
-          <span aria-hidden="true">△ </span>
-          {issue.message}
-        </span>
-        <div className="tw:flex tw:gap-1.5">
-          {issue.autoFixHint && (
-            <Button
-              type="button"
-              color="light"
-              size="xs"
-              onClick={handleAutoFix}
-              aria-label="Auto-fix lint issue"
-              className={GHOST}
-            >
-              Auto-fix
-            </Button>
-          )}
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            onClick={handleIgnore}
-            aria-label="Ignore lint issue"
-            data-testid="brand-token-ignore"
-            className={GHOST}
-          >
-            Ignore
-          </Button>
-        </div>
-      </div>
-    );
-  })();
+  const subtitle = token.description ?? "";
+  const issue = lintIssues[0];
 
   return (
-    <div className={CONTAINER} data-token-detail-view={token.id}>
-      {/* Back arrow */}
-      <Button
-        type="button"
-        color="light"
-        onClick={onBack}
-        size="xs"
-        aria-label="Back to tokens"
-        className={`${GHOST} tw:self-start`}
-      >
-        <span aria-hidden="true">←</span>
-        <span>Back to tokens</span>
-      </Button>
-
-      {/* Header — preview + name + id + cssVar(Pro) */}
+    <section
+      aria-label={`${token.friendlyName ?? token.name} token`}
+      data-token-detail-view={token.id}
+      data-testid="brand-token-detail"
+      className="tw:flex tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:pb-4 tw:pt-4"
+    >
+      {/* Header — tile + name + id/description + ⋯ */}
       <div className="tw:flex tw:items-center tw:gap-3" data-testid="brand-token-detail-header">
-        {previewSlot(token)}
-        <div className="tw:flex tw:flex-col tw:min-w-0">
-          <span className={NAME} data-testid="brand-token-detail-name">{token.friendlyName ?? token.name}</span>
-          {isPro && <span className={ID_MONO} data-testid="brand-token-detail-id">{token.id}</span>}
-          {isPro && <span className={CSS_VAR}>{cssVarName}</span>}
+        {previewTile(token)}
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          {/* 7315:80955: Pro titles the card with the id ("color-primary") and
+              puts the name under it ("Blue 700"); Beginner, which hides ids,
+              titles it with the name over the description. */}
+          {isPro ? (
+            <>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+                data-testid="brand-token-detail-id"
+              >
+                {token.id}
+              </span>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                data-testid="brand-token-detail-name"
+              >
+                {token.friendlyName ?? token.name}
+              </span>
+            </>
+          ) : (
+            <>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+                data-testid="brand-token-detail-name"
+              >
+                {token.friendlyName ?? token.name}
+              </span>
+              {subtitle ? (
+                <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {subtitle}
+                </span>
+              ) : null}
+            </>
+          )}
+        </div>
+        <div data-testid="brand-token-actions">
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label="Token actions"
+            trigger={
+              <IconButton label="Token actions" onClick={() => setMenuOpen((v) => !v)} data-testid="brand-token-menu">
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu>
+              <MenuItem
+                onClick={handleRenameId}
+                disabled={!onRename}
+                title={onRename ? undefined : "Type and spacing tokens keep their IDs."}
+                data-testid="brand-token-action-rename"
+              >
+                Rename token…
+              </MenuItem>
+              <MenuItem
+                danger
+                onClick={handleDelete}
+                aria-disabled={!isPro || !onDelete || undefined}
+                disabled={!isPro || !onDelete}
+                title={
+                  !isPro
+                    ? "Delete is blocked in Beginner mode. Switch to Pro to delete tokens."
+                    : onDelete
+                      ? undefined
+                      : "Type and spacing tokens are part of the scale and cannot be deleted."
+                }
+                data-testid="brand-token-action-delete"
+              >
+                Delete token…
+              </MenuItem>
+            </Menu>
+          </Popover>
         </div>
       </div>
 
       {/* Light value */}
-      <FieldRow label="Light value" className={FIELD_ROW}>
-        <div className="tw:flex tw:flex-col tw:w-full tw:min-w-0">
-          {isColor ? (
-            <>
-              <div className="tw:flex tw:items-center tw:gap-2">
-                <TextInput
-                  type="text"
-                  value={token.value}
-                  onChange={(e) => onValueChange?.(token.id, e.target.value)}
-                  className={MONO}
-                  aria-label="Light value"
-                  data-testid="brand-token-value-light"
-                />
-              </div>
-              {pickerOpen && (
-                <div className="tw:mt-2">
-                  <ColorPicker
-                    initialHex={token.value}
-                    onChange={() => {
-                      /* live preview owned by picker; commit via onSave */
-                    }}
-                    onSave={(hex) => {
-                      onValueChange?.(token.id, hex);
-                      setPickerOpen(false);
-                    }}
-                    onCancel={() => setPickerOpen(false)}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
+      <div className={`${ROW} tw:mt-2`}>
+        <span className={LABEL}>{isColor ? "Light value" : "Value"}</span>
+        <span className={`${VALUE} ${isColor ? "" : MONO}`} data-testid="brand-token-value-light">
+          {displayValue(token.value)}
+        </span>
+        {token.type === "font-family" ? (
+          <BrandFontPopover
+            open={fontPopoverOpen}
+            onClose={() => setFontPopoverOpen(false)}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => (editingLight ? setEditingLight(false) : setFontPopoverOpen((v) => !v))}
+                aria-expanded={fontPopoverOpen || editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+            roleName={token.name}
+            value={token.value}
+            onPick={(family) => {
+              onValueChange?.(token.id, family);
+              setFontPopoverOpen(false);
+            }}
+            onAllFonts={() => {
+              setFontPopoverOpen(false);
+              setEditingLight(true);
+            }}
+            composer={composer}
+          />
+        ) : isColor ? (
+          /* 7318:80959 — the one colour picker, as a popover off Change. */
+          <Popover
+            open={editingLight}
+            onClose={() => setEditingLight(false)}
+            placement="bottom-end"
+            label={`${token.name} colour`}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => setEditingLight((v) => !v)}
+                aria-expanded={editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+          >
+            {/* -m-2 cancels the popover's own inset: the picker's header rule
+                and grey foot run edge to edge as on the board. */}
+            <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg" data-testid="brand-token-light-editor">
+              <ColorPicker
+                initialHex={token.value}
+                title={token.name}
+                palette={workspacePalette}
+                onChange={() => {
+                  /* live preview owned by picker; commit via onSave */
+                }}
+                onSave={(hex) => {
+                  onValueChange?.(token.id, hex);
+                  setEditingLight(false);
+                }}
+                onCancel={() => setEditingLight(false)}
+              />
+            </div>
+          </Popover>
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            onClick={() => setEditingLight((v) => !v)}
+            aria-expanded={editingLight}
+            data-testid="brand-token-action-replace"
+            className={ACTION}
+          >
+            Change
+          </Button>
+        )}
+      </div>
+      {editingLight && !isColor && (
+        <div className="tw:mb-2" data-testid="brand-token-light-editor">
+          {(
             <>
               {/* Clone 3721:44821 — a font-family token is picked, not only
                   typed: presets, the ADDED site fonts, `Manage site fonts`.
@@ -428,183 +495,185 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                 value={token.value}
                 onChange={(e) => onValueChange?.(token.id, e.target.value)}
                 className={MONO}
-                aria-label="Light value"
+                aria-label="Value"
+                autoFocus
               />
             </>
           )}
         </div>
-      </FieldRow>
+      )}
 
       {/* Dark value — color tokens only */}
       {isColor && (
-        <FieldRow label="Dark value" className={FIELD_ROW}>
-          <div className="tw:w-full tw:min-w-0">
-            <TextInput
-              type="text"
-              value={darkInput}
-              placeholder={token.darkValue ? "" : "+ add (currently falls back)"}
-              onChange={(e) => setDarkInput(e.target.value)}
-              onBlur={() => {
-                /* This handler was empty, with a comment saying the engine-side
-                   dark commit was "a separate follow-up (D4)". That stopped
-                   being true when `useColorTokens.updateToken` gained its third
-                   `darkValue` argument for the import path — but the comment
-                   froze the old limitation in place, so the field kept
-                   accepting text and discarding it on blur, silently. */
-                const next = darkInput.trim();
-                if (next === (token.darkValue ?? "")) return;
-                onValueChange?.(token.id, token.value, next);
-              }}
-              className={MONO}
-              aria-label="Dark value"
-            />
+        <>
+          <div className={ROW}>
+            <span className={LABEL}>Dark value</span>
+            {token.darkValue ? (
+              <span className={VALUE} data-testid="brand-token-value-dark">{displayValue(token.darkValue)}</span>
+            ) : (
+              <span className={VALUE_EMPTY} data-testid="brand-token-value-dark">No dark value</span>
+            )}
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              onClick={() => setEditingDark((v) => !v)}
+              aria-expanded={editingDark}
+              data-testid="brand-token-action-dark"
+              className={ACTION}
+            >
+              {token.darkValue ? "Change" : "Set"}
+            </Button>
           </div>
-        </FieldRow>
+          {editingDark && (
+            <div className="tw:mb-2">
+              <TextInput
+                type="text"
+                value={darkInput}
+                placeholder="#RRGGBB"
+                onChange={(e) => setDarkInput(e.target.value)}
+                onBlur={commitDark}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitDark();
+                  if (e.key === "Escape") {
+                    setDarkInput(token.darkValue ?? "");
+                    setEditingDark(false);
+                  }
+                }}
+                className={MONO}
+                aria-label="Dark value"
+                autoFocus
+              />
+            </div>
+          )}
+        </>
       )}
 
-      {/* Used by — click-to-expand element list (D6.b) */}
-      <FieldRow label="Used by" className={FIELD_ROW}>
-        <div className="tw:flex tw:flex-col tw:w-full tw:min-w-0">
-          <Button
-            type="button"
-            color="light"
-            onClick={() => {
-              if (usageCount > 0) setUsageExpanded((v) => !v);
-            }}
-            size="xs"
-            /* 11px in `--color/ink` — 1700:6955. The GHOST base paints
-               `--bk-ink-soft` at flowbite's 12, so the one line that states a
-               FACT about the token read quieter than the label naming it. */
-            className={`${LINK_BTN} tw:text-[11px] tw:text-[var(--bk-ink)]`}
-            aria-expanded={usageExpanded}
-            aria-disabled={usageCount === 0 || undefined}
-            disabled={usageCount === 0}
-            data-used-by-toggle
-            data-testid="brand-token-usedby-value"
-          >
-            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
-              {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
-            </span>
-            <span data-used-count={usageCount}>
-              {usageCount} {usageCount === 1 ? "element" : "elements"}
-            </span>
-          </Button>
-          {usageExpanded && usageCount > 0 && (
-            <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:mt-1.5 tw:pl-3.5" data-used-by-list role="list">
-              {usageRefs.map((ref, idx) => {
-                const el = composer?.elements?.getElement?.(ref.elementId);
-                const type = el?.getType?.();
-                const name = type
-                  ? (ELEMENT_TYPE_LABELS[type] ??
-                    type.charAt(0).toUpperCase() + type.slice(1))
-                  : ref.elementId;
-                return (
-                  <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
-                    <Button
-                      type="button"
-                      color="light"
-                      onClick={() => {
-                        const target = composer?.elements?.getElement?.(
-                          ref.elementId,
-                        );
-                        if (target) composer?.selection?.select(target);
-                      }}
-                      size="xs"
-                      aria-label={`Select ${name} · ${ref.styleProp}`}
-                      data-used-by-entry={ref.elementId}
-                      className={`${LINK_BTN} tw:w-full`}
-                    >
-                      <span>{name}</span>
-                      <span className={`tw:text-[var(--bk-ink-muted)] tw:text-[11px] ${MONO}`}>· {ref.styleProp}</span>
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-      </FieldRow>
+      {/* Used by */}
+      <div className={ROW}>
+        <span className={LABEL}>Used by</span>
+        <span className={VALUE} data-testid="brand-token-usedby-value" data-used-count={usageCount}>
+          {usageCount} {usageCount === 1 ? "element" : "elements"}
+        </span>
+        <Button
+          type="button"
+          variant="secondary"
+          size="xs"
+          onClick={() => setUsageExpanded((v) => !v)}
+          aria-expanded={usageExpanded}
+          aria-disabled={usageCount === 0 || undefined}
+          disabled={usageCount === 0}
+          data-used-by-toggle
+          className={ACTION}
+        >
+          View ›
+        </Button>
+      </div>
+      {usageExpanded && usageCount > 0 && (
+        <ul className="tw:mb-2 tw:flex tw:flex-col tw:gap-0.5 tw:pl-1" data-used-by-list role="list">
+          {usageRefs.map((ref, idx) => {
+            const el = composer?.elements?.getElement?.(ref.elementId);
+            const type = el?.getType?.();
+            const name = type
+              ? (ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1))
+              : ref.elementId;
+            return (
+              <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="xs"
+                  onClick={() => {
+                    const target = composer?.elements?.getElement?.(ref.elementId);
+                    if (target) composer?.selection?.select(target);
+                  }}
+                  aria-label={`Select ${name} · ${ref.styleProp}`}
+                  data-used-by-entry={ref.elementId}
+                  className={`${LINK} tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)]`}
+                >
+                  <span>{name}</span>
+                  <span className={`tw:ml-1 tw:text-[var(--bk-ink-muted)] ${MONO}`}>· {ref.styleProp}</span>
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {/* Aliased by — hidden when empty (D6.a) */}
       {aliases.length > 0 && (
-        <FieldRow label="Aliased by" className={FIELD_ROW}>
-          <span data-aliased-by-count={aliases.length}>
-            {aliases.length} ·{" "}
-            {aliases.map((a) => a.friendlyName ?? a.name).join(", ")}
-          </span>
-        </FieldRow>
-      )}
-
-      {/* Lint */}
-      <FieldRow label="Lint" className={FIELD_ROW}>
-        <div className="tw:w-full tw:min-w-0">{lintRow}</div>
-      </FieldRow>
-
-      {/* Action row */}
-      {/* 1700:6959 draws this row as three 13px TEXT actions — accent, accent,
-          `--bk-error-text` — not a filled primary next to a light next to a red
-          plate. Three bordered buttons on a 280 drawer wrapped, and the
-          destructive one was the loudest thing on a read-only detail screen. */}
-      <div className="tw:flex tw:gap-4 tw:mt-2" data-testid="brand-token-actions">
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={handleReplaceValue}
-          aria-label="Replace value"
-          data-testid="brand-token-action-replace"
-          className={`${ACTION_LINK} tw:text-[var(--bk-accent-text)]`}
-        >
-          Replace value
-        </Button>
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={handleRenameId}
-          aria-label="Rename ID"
-          aria-disabled={!onRename || undefined}
-          disabled={!onRename}
-          data-testid="brand-token-action-rename"
-          title={onRename ? "Rename token id" : "Rename API coming soon — edit value inline above"}
-          className={`${ACTION_LINK} tw:text-[var(--bk-accent-text)]`}
-        >
-          Rename ID
-        </Button>
-        {/* "Delete token", not "Delete" — 1700:6962. Beside two actions that
-            both name their object, the bare verb was the only one that did
-            not, on the one control that cannot be undone. */}
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={handleDelete}
-          aria-label="Delete token"
-          aria-disabled={!isPro || undefined}
-          disabled={!isPro}
-          data-testid="brand-token-action-delete"
-          className={`${ACTION_LINK} tw:text-[var(--bk-error-text)]`}
-        >
-          Delete token
-        </Button>
-      </div>
-
-      {/* Beginner notice */}
-      {!isPro && (
-        <div
-          className="tw:mt-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:rounded-md tw:text-[length:var(--bk-text-12)] tw:leading-normal"
-          role="note"
-          data-beginner-notice
-        >
-          <strong className="tw:block tw:mb-1">
-            Delete blocked in Beginner mode.
-          </strong>
-          <span>
-            Pro shows replace-with / cascade-clear when {usageCount}{" "}
-            {usageCount === 1 ? "element" : "elements"} bind.
+        <div className={ROW}>
+          <span className={LABEL}>Aliased by</span>
+          <span className={VALUE} data-aliased-by-count={aliases.length}>
+            {aliases.length} · {aliases.map((a) => a.friendlyName ?? a.name).join(", ")}
           </span>
         </div>
       )}
+
+      {/* Brand checks */}
+      <div className="tw:mt-1 tw:flex tw:min-h-6 tw:flex-col tw:justify-center tw:gap-1.5">
+        {issue ? (
+          <div
+            className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning-text)]"
+            data-testid="brand-token-lint-value"
+            data-lint-status="fail"
+          >
+            <span>
+              <span aria-hidden="true">△ </span>
+              {issue.message}
+            </span>
+            {issue.autoFixHint && (
+              <Button type="button" variant="link" size="xs" onClick={handleAutoFix} aria-label="Auto-fix lint issue" className={LINK}>
+                Auto-fix
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="link"
+              size="xs"
+              onClick={handleIgnore}
+              aria-label="Ignore lint issue"
+              data-testid="brand-token-ignore"
+              className={`${LINK} tw:text-[var(--bk-ink-muted)]`}
+            >
+              Ignore
+            </Button>
+          </div>
+        ) : (
+          /* `--bk-success-text` — the one green that passes AA at this size. */
+          <div
+            className="tw:flex tw:items-center tw:gap-1.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+            data-testid="brand-token-lint-value"
+            data-lint-status="pass"
+          >
+            <span aria-hidden="true" className="tw:text-[var(--bk-success-text)]">✓</span>
+            <span>Brand checks pass{contrast ? ` · ${contrast}` : ""}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ⓘ — the draft note (7318:81119) */}
+      <div className="tw:mt-3 tw:flex">
+        <HintTooltip content="Edits stay in the draft until you Save. Publish to put them live." placement="bottom">
+          <IconButton label="About drafts" className="tw:size-5 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]" data-testid="brand-token-draft-note">
+            <Info size={12} aria-hidden />
+          </IconButton>
+        </HintTooltip>
+      </div>
+
+      <TokenRenameDialog
+        open={renameOpen}
+        currentId={token.id}
+        takenIds={(allTokens ?? []).map((t) => t.id).filter((id) => id !== token.id)}
+        usage={usageCount}
+        siteName={composer?.getProjectMetadata?.()?.name}
+        onCancel={() => setRenameOpen(false)}
+        onRename={(newId) => {
+          setRenameOpen(false);
+          onRename?.(token.id, newId);
+        }}
+      />
+
       <TokenReplaceModal
         open={replaceOpen}
         onOpenChange={setReplaceOpen}
@@ -613,6 +682,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         usage={consumerCount}
         onConfirm={handleReplaceConfirm}
       />
-    </div>
+    </section>
   );
 };

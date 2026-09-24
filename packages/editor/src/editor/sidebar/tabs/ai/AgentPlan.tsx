@@ -1,7 +1,7 @@
 import * as React from "react";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
-import { Button, Checkbox } from "@/editor/chrome-ui";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 /* Utilities, not a stylesheet: this panel's CSS file is on the styling
    ratchet and new chrome belongs inline (DS SSOT §3). */
@@ -53,39 +53,41 @@ export interface AgentPlanProps {
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
-  autoApply: boolean;
-  onAutoApplyChange: (on: boolean) => void;
   onApprove: () => void;
   onSkip: () => void;
   onStop: () => void;
+  /** Board 4418:104698 — review: rewrite a step before the run starts. */
+  onEditStep: (index: number, instruction: string) => void;
+  /** Board 4418:104698 — "Run N steps". */
+  onRunPlan: () => void;
   /** Board 171:36 — a run the user stopped, told apart from one that finished. */
   stoppedByUser?: boolean;
-  /** Board 171:2 — re-run the same brief after a step failed. */
-  onRetry?: () => void;
-  /** Board 171:2 — take back the steps that did land. */
+  /** Boards 4418:105118 / 105261 / 105401 — take back the steps that landed. */
   onUndoAll?: () => void;
-  /** Clear a finished or stopped run and hand the panel back to chat.
-      Without it the plan's last frame is the only thing left on screen and
-      nothing else can be asked. */
+  /** Board 4418:105118 — back to the prompt (it is still in the field). */
+  onEditPrompt?: () => void;
+  /** "Keep N changes" / "Done": leave what applied and hand the panel back. */
   onDismiss?: () => void;
 }
 
-/** Board glyphs: done, in flight, waiting. Never colour alone — every row also
- *  carries its number and, when it is not simply pending, a word. */
+/** Board glyphs: ✓ done, ▲ failed, ○ pending, ⊘ skipped. Never colour alone —
+ *  a finished run also names each row's state. */
 const STEP_GLYPH: Record<RunStep["status"], string> = {
   pending: "○",
   running: "●",
   awaiting: "●",
   applied: "✓",
-  skipped: "–",
-  nochange: "–",
-  failed: "✕",
+  skipped: "⊘",
+  nochange: "⊘",
+  failed: "▲",
 };
 
 const STEP_WORD: Partial<Record<RunStep["status"], string>> = {
-  skipped: "skipped",
-  nochange: "no change",
-  failed: "failed",
+  applied: "Done",
+  pending: "Pending",
+  skipped: "Skipped",
+  nochange: "No change",
+  failed: "Failed",
 };
 
 const STEP_COLOR: Record<RunStep["status"], string> = {
@@ -109,46 +111,85 @@ function bandLabel(
   const failedAt = steps.findIndex((s) => s.status === "failed");
   if (failedAt >= 0) return `Stopped at step ${failedAt + 1}`;
   if (stoppedByUser) return "Stopped by you";
-  if (phase === "planning") return "Planning";
+  if (phase === "planning" || phase === "review") return "Planning";
   if (steps[currentIndex]?.status === "awaiting") return `Paused at step ${currentIndex + 1}`;
   if (phase === "running") return `Running · ${Math.min(currentIndex + 1, total)} of ${total}`;
   if (phase === "done") return `Done · ${doneCount} of ${total}`;
   return "";
 }
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/** "Step 1 is applied." / "Steps 1 and 3 are applied." / "Nothing was applied." */
+function appliedSentence(steps: RunStep[]): string {
+  const nums = steps.flatMap((s, i) => (s.status === "applied" ? [i + 1] : []));
+  if (nums.length === 0) return "Nothing was applied.";
+  if (nums.length === 1) return `Step ${nums[0]} is applied.`;
+  return `Steps ${nums.slice(0, -1).join(", ")} and ${nums.at(-1)} are applied.`;
+}
+
+/** "Steps 2 and 3 did not run." for the rows that never ran. */
+function notRunSentence(steps: RunStep[]): string {
+  const nums = steps.flatMap((s, i) => (s.status === "pending" || s.status === "skipped" ? [i + 1] : []));
+  if (nums.length === 0) return "";
+  if (nums.length === 1) return ` Step ${nums[0]} did not run.`;
+  return ` Steps ${nums.slice(0, -1).join(", ")} and ${nums.at(-1)} did not run.`;
+}
+
+const OUTLINE_BTN =
+  "tw:h-8 tw:whitespace-nowrap tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0";
+const PRIMARY_BTN = "tw:h-8 tw:whitespace-nowrap tw:rounded-md tw:px-3 tw:text-[13px] tw:font-medium tw:focus:ring-0";
+
 export const AgentPlan: React.FC<AgentPlanProps> = ({
   phase,
   steps,
   currentIndex,
   error,
-  autoApply,
-  onAutoApplyChange,
   onApprove,
   onSkip,
   onStop,
+  onEditStep,
+  onRunPlan,
   stoppedByUser,
-  onRetry,
   onUndoAll,
+  onEditPrompt,
   onDismiss,
 }) => {
-  const autoApplyToggle = (
-    <label className="bd-ai-agent-autoapply">
-      <Checkbox
-        color="blue"
-        className="tw:bg-white"
-        checked={autoApply}
-        onChange={(e) => onAutoApplyChange(e.target.checked)}
-      />
-      <span>Auto-apply steps (skip per-step approval)</span>
-    </label>
-  );
+  const [editing, setEditing] = React.useState(false);
 
   if (phase === "idle") {
     return (
       <div className="bd-ai-agent-empty">
-        {autoApplyToggle}
-        Describe what to build. The agent will plan it, then walk each step
-        {autoApply ? " and apply automatically" : " for your approval"}.
+        Describe what to build. The agent will plan it, show you the plan, then walk each step for your approval.
+      </div>
+    );
+  }
+
+  /* Board 4418:104577 — while nothing has come back yet (the plan call, or
+     the one step of an element-scoped run) the panel is "Thinking…" and a
+     Stop button: no run band, no step list. */
+  const thinking =
+    !error && (phase === "planning" || (phase === "running" && steps.length === 1 && steps[0].status === "running"));
+  if (thinking) {
+    return (
+      <div className="bd-ai-agent">
+        <p
+          data-testid="ai-thinking"
+          className="tw:m-0 tw:flex tw:h-14 tw:items-center tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+        >
+          Thinking…
+        </p>
+        <div className="tw:flex tw:h-14 tw:items-center tw:px-4">
+          <Button
+            type="button"
+            color="alternative"
+            aria-label="Stop run"
+            onClick={onStop}
+            className="tw:h-8 tw:w-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
+          >
+            Stop
+          </Button>
+        </div>
       </div>
     );
   }
@@ -156,44 +197,88 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   const gateStep = steps[currentIndex]?.status === "awaiting" ? steps[currentIndex] : null;
   const failedIndex = steps.findIndex((s) => s.status === "failed");
   const appliedCount = steps.filter((s) => s.status === "applied").length;
-  const skippedCount = steps.filter((s) => s.status === "skipped").length;
+  const review = phase === "review";
+  const finished = phase === "done";
 
   return (
     <div className="bd-ai-agent">
       <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
-
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
           <li
-            key={`${i}-${s.plan.title}`}
+            key={i}
             className={STEP_ROW}
             data-step-status={s.status}
             data-testid={`ai-run-step-${i + 1}`}
           >
+            {!review && (
+              <span
+                className="tw:w-3 tw:flex-none tw:text-center"
+                style={{ color: STEP_COLOR[s.status] }}
+                aria-hidden="true"
+                data-testid={`ai-run-glyph-${i + 1}`}
+              >
+                {STEP_GLYPH[s.status]}
+              </span>
+            )}
             <span
-              className="tw:w-3 tw:flex-none tw:text-center"
-              style={{ color: STEP_COLOR[s.status] }}
-              aria-hidden="true"
-              data-testid={`ai-run-glyph-${i + 1}`}
-            >
-              {STEP_GLYPH[s.status]}
-            </span>
-            {/* min-w-3, not 2.5: the boards put the glyph at 16, the index at
-                36 and the step title at 56, and a 10-wide index landed the
-                title at 54 — the row read 2px tight of every run board. */}
-            <span
-              className="tw:min-w-3 tw:text-[11px] tw:leading-4 tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]"
+              className={`tw:min-w-3 tw:text-[11px] tw:leading-4 tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)] ${review ? "tw:ml-5" : ""}`}
               data-testid={`ai-run-index-${i + 1}`}
             >{i + 1}</span>
-            <span className="tw:flex-1" data-testid={`ai-run-title-${i + 1}`}>{s.plan.title}</span>
-            {STEP_WORD[s.status] ? (
-              <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{STEP_WORD[s.status]}</span>
+            {review && editing ? (
+              <TextInput
+                sizing="sm"
+                aria-label={`Step ${i + 1}`}
+                data-testid={`ai-plan-edit-${i + 1}`}
+                value={s.plan.instruction}
+                onChange={(e) => onEditStep(i, e.target.value)}
+                className="tw:flex-1"
+              />
+            ) : (
+              <span className="tw:flex-1" data-testid={`ai-run-title-${i + 1}`}>{s.plan.title}</span>
+            )}
+            {/* Stopped / failed runs name each row's state (105118, 105261);
+                a clean finish does not (105401). */}
+            {finished && (error || stoppedByUser) && STEP_WORD[s.status] ? (
+              <span
+                className="tw:text-[11px]"
+                style={{ color: s.status === "applied" || s.status === "failed" ? STEP_COLOR[s.status] : "var(--bk-ink-muted)" }}
+              >
+                {STEP_WORD[s.status]}
+              </span>
             ) : null}
           </li>
         ))}
       </ol>
 
-      {(phase === "running" || phase === "planning") && (
+      {/* Board 4418:104698 — the plan waits: Edit plan · Run N steps. */}
+      {review && (
+        <div className="tw:flex tw:gap-2 tw:px-4 tw:py-3">
+          <Button
+            type="button"
+            color="light"
+            data-testid="ai-plan-edit"
+            onClick={() => setEditing((v) => !v)}
+            className={`${OUTLINE_BTN} tw:flex-1`}
+          >
+            {editing ? "Done editing" : "Edit plan"}
+          </Button>
+          <Button
+            type="button"
+            data-testid="ai-plan-run"
+            disabled={steps.some((s) => !s.plan.instruction.trim())}
+            onClick={() => {
+              setEditing(false);
+              onRunPlan();
+            }}
+            className={`${PRIMARY_BTN} tw:flex-1`}
+          >
+            Run {plural(steps.length, "step")}
+          </Button>
+        </div>
+      )}
+
+      {phase === "running" && (
         <Button
           type="button"
           color="light"
@@ -227,83 +312,95 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         </div>
       ) : null}
 
-      {/* Board 171:2 — which step failed, what survived it, and the two ways
-          on. "Nothing after step N ran" is the fact that makes the state safe
-          to sit in. */}
+      {/* Board 4418:105118 — which step failed, what survived it, and the
+          three ways on: Undo all · Keep N changes · Edit prompt. */}
       {error ? (
-        <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alert">
-          <p className={`${PANEL_TITLE} tw:text-[var(--bk-error)]`}>
+        <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="ai-run-failed">
+          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]">
             {failedIndex >= 0 ? `Step ${failedIndex + 1} failed — ${error}` : error}
           </p>
           {failedIndex >= 0 ? (
-            <p className={PANEL_BODY}>
-              {appliedCount > 0
-                ? `${appliedCount} step${appliedCount === 1 ? "" : "s"} kept.`
-                : "Nothing was applied."}{" "}
-              Nothing after step {failedIndex + 1} ran.
-            </p>
+            <p className={PANEL_BODY}>{appliedSentence(steps)} Edit your request before starting another run.</p>
           ) : null}
-          {(onUndoAll || onRetry) && (
+          <div className="tw:flex tw:gap-0 tw:[&>button]:px-2.5">
+            {onUndoAll && appliedCount > 0 ? (
+              <Button type="button" color="light" data-testid="ai-run-undo-all" onClick={onUndoAll} className={OUTLINE_BTN}>
+                Undo all
+              </Button>
+            ) : null}
+            {onDismiss && appliedCount > 0 ? (
+              <Button type="button" color="light" data-testid="ai-run-keep" onClick={onDismiss} className={OUTLINE_BTN}>
+                Keep {plural(appliedCount, "change")}
+              </Button>
+            ) : null}
+            {onEditPrompt ? (
+              <Button type="button" data-testid="ai-run-edit-prompt" onClick={onEditPrompt} className={PRIMARY_BTN}>
+                Edit prompt
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Board 4418:105261 — stopping is not finishing: what ran is kept,
+          and both ways on are offered as links. */}
+      {finished && !error && stoppedByUser ? (
+        <div className={`${PANEL} tw:bg-[var(--bk-bg-subtle)]`} data-testid="ai-run-stopped">
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
+            Stopped after step {steps.reduce((n, s, i) => (s.status === "applied" || s.status === "nochange" ? i + 1 : n), 0)}.
+          </p>
+          <p className={PANEL_BODY}>
+            {appliedSentence(steps)}
+            {notRunSentence(steps)}
+            {appliedCount > 0 ? " Undo all restores the page as it was before this run." : ""}
+          </p>
+          <div className="tw:flex tw:gap-4">
+            {onUndoAll && appliedCount > 0 ? (
+              <Button type="button" color="light" data-testid="ai-run-undo-all" className={DISMISS_LINK} onClick={onUndoAll}>
+                Undo all
+              </Button>
+            ) : null}
+            {onDismiss ? (
+              <Button type="button" color="light" data-testid="ai-run-keep" className={DISMISS_LINK} onClick={onDismiss}>
+                {appliedCount > 0 ? `Keep ${plural(appliedCount, "change")}` : "Ask something else"}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ) : finished && !error ? (
+        <>
+          {/* Board 4418:105401 — what changed, Undo all · Done. */}
+          <div className={`${PANEL} tw:bg-[var(--bk-success-tint)]`} data-testid="ai-run-applied">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-success-text)]">
+              {plural(appliedCount, "change")} applied
+            </p>
+            {steps
+              .filter((s) => s.status === "applied")
+              .flatMap((s) => s.edit?.rows ?? [])
+              .slice(0, 6)
+              .map((r, i) => (
+                <p key={i} className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+                  {r.field} → {r.to}
+                </p>
+              ))}
             <div className={PANEL_ACTIONS}>
-              {onUndoAll ? (
-                <Button type="button" color="light" onClick={onUndoAll} disabled={appliedCount === 0}>
+              {onUndoAll && appliedCount > 0 ? (
+                <Button type="button" color="light" data-testid="ai-run-undo-all" onClick={onUndoAll} className={`${OUTLINE_BTN} tw:w-[96px]`}>
                   Undo all
                 </Button>
               ) : <span />}
-              {onRetry ? (
-                <Button type="button" onClick={onRetry}>
-                  Retry
+              {onDismiss ? (
+                <Button type="button" data-testid="ai-run-done" onClick={onDismiss} className={`${PRIMARY_BTN} tw:w-[96px]`}>
+                  Done
                 </Button>
               ) : null}
             </div>
-          )}
-        </div>
+          </div>
+          <p className={`${PANEL_BODY} tw:px-4 tw:py-2`}>
+            Each approved step was applied. Undo all restores the page to its state before this run.
+          </p>
+        </>
       ) : null}
-
-      {/* Board 171:36 — stopping is not finishing. What already ran is kept,
-          and taking it back is offered here rather than left to ⌘Z. */}
-      {phase === "done" && !error && stoppedByUser ? (
-        <div className={`${PANEL} tw:bg-[var(--bk-bg-subtle)]`}>
-          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
-            Stopped after step {appliedCount + skippedCount}.
-          </p>
-          <p className={PANEL_BODY}>
-            What already ran is kept.
-            {appliedCount > 0
-              ? ` Undo all takes back the ${appliedCount} step${appliedCount === 1 ? "" : "s"} that applied.`
-              : ""}
-          </p>
-          {onUndoAll && appliedCount > 0 ? (
-            <Button type="button" color="light" className={DISMISS_LINK} onClick={onUndoAll}>
-              Undo all
-            </Button>
-          ) : null}
-          {onDismiss ? (
-            <Button type="button" color="light" className={DISMISS_LINK} onClick={onDismiss}>
-              Ask something else
-            </Button>
-          ) : null}
-        </div>
-      ) : phase === "done" && !error ? (
-        <div className={`${PANEL} tw:mx-4 tw:my-2 tw:rounded tw:bg-[var(--bk-success-tint)]`}>
-          <p className={`${PANEL_TITLE} tw:text-[var(--bk-success-text)]`}>
-            {appliedCount} change{appliedCount === 1 ? "" : "s"} applied
-            {skippedCount > 0 ? `, ${skippedCount} skipped` : ""}.
-          </p>
-          <p className={PANEL_BODY}>
-            {appliedCount > 1
-              ? `Each step is its own undo step — ⌘Z takes back the last of the ${appliedCount}.`
-              : "⌘Z takes it back."}
-          </p>
-          {onDismiss ? (
-            <Button type="button" color="light" className={DISMISS_LINK} onClick={onDismiss}>
-              Ask something else
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-
-      {phase !== "done" ? autoApplyToggle : null}
     </div>
   );
 };

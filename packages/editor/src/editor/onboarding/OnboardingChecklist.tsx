@@ -8,7 +8,8 @@
  * Replaces the old 3-component system (OnboardingModal + TourOverlay +
  * OnboardingProgress) with one cohesive, professional checklist widget.
  *
- * Position: fixed bottom-right, above the canvas toolbar.
+ * Position: fixed at the foot of the rail, above "? Help"; the panel opens to
+ * the rail's right.
  * Behaviour:
  *   - Collapsed: thin header pill showing progress
  *   - Expanded: full accordion checklist, one active step at a time
@@ -90,7 +91,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             ("2 of 7 complete") stays on the aria-label above, where it reads
             correctly; the visible chip follows the board. */}
         <span className={PILL_TEXT} data-testid="setup-chip-text">
-          {allDone ? "All done!" : `${completedCount}/${totalCount} done`}
+          {allDone ? "Done" : `${completedCount}/${totalCount}`}
         </span>
       </div>
     );
@@ -292,40 +293,26 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
    which covered its "Zoom in" row. A dismissible progress helper does not
    outrank an open menu — drawer height puts it above the canvas and below
    popovers (40), overlays (50) and modals (60). */
-/* IN THE STATUS BAR, NOT ON TOP OF THE WORK (2026-08-27).
+/* AT THE FOOT OF THE RAIL, NOT ON TOP OF THE WORK (2026-09-24).
 
-   `right-6 bottom-20` put the pill on the inspector: measured live at
-   1440x900 with an element selected, it sat on the "Background" row and held
-   it for the whole first session. Two further placements were measured and
-   both failed, which is the finding:
-
-     left of the inspector  → landed on the canvas toolbar's "X-Ray" button.
-                              That toolbar is NOT bottom-centred the way its
-                              floating-pill look suggests — it spans the full
-                              canvas width, x 380→1140 at y 796→836.
-     above the toolbar      → landed on the canvas breadcrumb's
-                              "← Parent / → Child".
-
-   There is no free bottom corner in this shell. Every bottom-anchored float
-   covers a control somewhere. The footer is the one band with room: 32 tall,
-   full width, and empty from x 105 to x 1328 — the selection readout on the
-   left, the device/zoom readout on the right, 1223px of nothing between.
-
-   So the collapsed chip lives in the footer band and covers only that gap, and
-   the panel opens upward from it. It is still `fixed` rather than a child of
-   StudioFooter — the orchestrator's state lives here, and a second mount point
-   would mean a second copy of it — but it occupies status-bar space and
-   nothing else. Right offset clears the device/zoom readout with room for its
-   longest label ("Tablet · 150%").
-
-   Underscores become spaces in a Tailwind arbitrary value, and `calc()` needs
-   them around the `+` or the declaration is invalid and silently drops. */
-const CHIP_RIGHT = "tw:right-[160px]";
+   It lived in the 32px status footer, the one band with room; the footer is
+   gone (the columns run to 900) and parked where it was, the chip floated on
+   the inspector's foot. No board places it. The rail between Brand and
+   "? Help" is empty on every screen, so the chip is a 44-wide rail plate
+   directly above Help (Help spans y850–894 at 900, so 56 from the bottom
+   leaves a 6px gap), and the
+   panel opens to the rail's right, bottom-aligned. It covers nothing and sits
+   beside the other "help me" door. The visible label is short ("3/7",
+   "Done") to fit the rail; the full sentence stays on the aria-label.
+   Logged in designer-notes.md. */
+const CHIP_POS = "tw:left-2 tw:bottom-[56px]";
 
 const PANEL =
-  `tw:fixed ${CHIP_RIGHT} tw:bottom-10 tw:w-80 tw:max-h-[540px] tw:bg-white ` +
+  `tw:fixed tw:left-[68px] tw:bottom-2 tw:w-80 tw:max-h-[540px] tw:bg-white ` +
   "tw:border tw:border-[var(--bk-gray-200)] " +
-  "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] tw:overflow-hidden tw:flex " +
+  /* Above the drawer it now opens beside (it rendered UNDER the Add drawer
+     at drawer height), still below popovers, overlays and modals. */
+  "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:calc(var(--bk-z-topbar)_+_1)] tw:overflow-hidden tw:flex " +
   "tw:flex-col tw:[font-family:var(--bk-font-ui)]";
 /* One above the footer, which is `--bk-z-topbar` (LayoutShell.css). At drawer
    height the chip was in the DOM at the right place and simply never painted —
@@ -345,13 +332,13 @@ const PANEL =
    ("0/7 done" … "7/7 done", "All done!") measures under the 86px the padding
    leaves. */
 const PILL =
-  `tw:fixed ${CHIP_RIGHT} tw:bottom-1 tw:flex tw:h-6 tw:w-24 tw:items-center tw:gap-[6px] tw:pl-[10px] tw:pr-2 ` +
+  `tw:fixed ${CHIP_POS} tw:flex tw:h-6 tw:w-11 tw:items-center tw:justify-center tw:gap-1 tw:px-1 ` +
   "tw:bg-[var(--bk-accent-tint)] tw:rounded-[12px] " +
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-1.5 tw:rounded-full tw:flex-none";
 const PILL_TEXT =
-  "tw:text-[12px] tw:leading-[normal] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap";
+  "tw:text-[11px] tw:leading-[normal] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap";
 const HEADER = "tw:flex tw:items-start tw:gap-2.5 tw:px-3.5 tw:pt-3.5 tw:pb-3";
 /* 14 / 13, not 13 / 11 — boards 296:1999 and 296:2030 size the title and the
    counter one step up from what shipped. */

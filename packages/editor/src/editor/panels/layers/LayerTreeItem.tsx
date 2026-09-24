@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import type { Composer } from "../../../engine";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { getDisplayName } from "./data/layerUtils";
@@ -96,7 +97,13 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      That rule was spelled out inline here, which is how it drifted from the
      copy in `getDisplayName` that search and the breadcrumb read. */
   const displayName = getDisplayName(layer.id, layer.type, customNames, layer.preview);
-  const canDrag = !!(composer && layer.depth > 0 && !isLocked);
+  /* Every row but a locked one drags — top-level rows (depth 0, the page
+     root's children) included; `depth > 0` barred reordering them (walk
+     2026-09-24). The page root itself is not a row. */
+  /* View mode (a VIEWER, board 4418:126059): Layers is for inspection —
+     select and expand only; no drag, rename, context menu, eye or lock. */
+  const readOnly = getEditorViewMode().readOnlyView;
+  const canDrag = !!(composer && !isLocked && !readOnly);
 
   // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits
   // between the label and the eye on component-linked rows. Only the
@@ -114,6 +121,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   // is not on any board and is gone with it.
   const isInstance = !!composer?.components?.isInstance?.(layer.id);
 
+  /* Display settings (board 4418:84113, decision 18). A dimmed row leaves the
+     list when "Show dimmed layers" is off — its children go with it, since a
+     dimmed parent dims them on the canvas too. */
+  if (isHidden && !displayPrefs.showDimmed) return null;
+  const isCmsBound =
+    displayPrefs.highlightCmsBound &&
+    !!composer &&
+    (composer.cms.bindings.getBindings(layer.id).length > 0 || composer.cms.bindings.hasCollectionBinding(layer.id));
+
   /* Board 1082:4640's indent ladder, read off the frame: chevrons sit at
      12 / 28 / 44 / 60 / 76 and labels at 40 / 56 / 72 — base 12, step 16.
      This was `16 + depth * 14`, so every row started 4px too far in and each
@@ -129,6 +145,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     isSelected ? "bdc-sel" : "",
     isCanvasHovered ? "bdc-canvas-hover" : "",
     isHidden ? "bdc-hidden" : "",
+    isCmsBound ? "bdc-cms-bound" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
     hasChildren ? "" : "bdc-leaf",
@@ -143,7 +160,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
       onSelect(layer.id, {});
     } else if (e.key === "F2") {
       e.preventDefault();
-      if (!isLocked) {
+      if (!isLocked && !readOnly) {
         onStartEditing(layer.id, displayName, e as unknown as React.MouseEvent);
       }
     } else if (e.key === "ArrowRight" && hasChildren && !isExpanded) {
@@ -191,10 +208,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         }}
         onContextMenu={(e) => {
           e.preventDefault();
-          onContextMenu(e, layer.id);
+          if (!readOnly) onContextMenu(e, layer.id);
         }}
         onDoubleClick={(e) => {
-          if (!isLocked) onStartEditing(layer.id, displayName, e);
+          if (!isLocked && !readOnly) onStartEditing(layer.id, displayName, e);
         }}
         onKeyDown={handleKeyDown}
       >
@@ -268,13 +285,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             {displayPrefs.showHtmlBadges && (
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
-            {displayPrefs.showElementIds && (
-              // 8-char slice truncates IDs with shared prefix (e.g. multiple
-              // elements born from one createElement burst share `el-mpebx*`
-              // and diverge only in the trailing 4 chars). Bumping to 12 +
-              // exposing the full id via title disambiguates the layer
-              // tree without ballooning row width.
-              <span className="bdc-lr-id" title={layer.id} aria-hidden>#{layer.id.slice(0, 12)}</span>
+            {isCmsBound && (
+              <span className="bdc-lr-tag" title="Bound to CMS" role="img" aria-label="Bound to CMS" data-testid={`layer-cms-badge-${layer.id}`}>
+                CMS
+              </span>
             )}
             {layer.breakpointOverrides?.mobile?.hidden && (
               <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
@@ -298,6 +312,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             Hiding an element ON THE SITE is the inspector's Visibility
             section, which writes a per-breakpoint hide into the styles the
             export emits. So this one says which of the two it is. */}
+        {readOnly ? null : (
         <Button
           type="button"
           className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
@@ -325,7 +340,11 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             )}
           </svg>
         </Button>
+        )}
 
+        {/* "Show lock badges" off hides the control on rows that are not
+            locked; a locked row keeps it, or it could never be unlocked. */}
+        {!readOnly && (displayPrefs.showLockBadges || isLocked) && (
         <Button
           type="button"
           className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
@@ -348,6 +367,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             )}
           </svg>
         </Button>
+        )}
       </div>
       {isExpanded && hasChildren && layer.children.map((child) => (
         <LayerTreeItem key={child.id} {...props} layer={child} />

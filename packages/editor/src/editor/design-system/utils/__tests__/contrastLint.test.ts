@@ -20,7 +20,7 @@
 import { describe, it, expect } from "vitest";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
-import { buildContrastIssues, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
+import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
 
 const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors") as DesignToken[];
 
@@ -81,5 +81,56 @@ describe("contrast lint — the page colour is findable under its semantic name"
 
   it("still prefers color-background when both are present", () => {
     expect(findSurfaceToken(colors)?.id).toBe("color-background");
+  });
+});
+
+describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
+  it("a token lighter than the page darkens; one darker than the page lightens", () => {
+    expect(contrastFixHint("#DDDDDD", "#FFFFFF")).toBe("darken-22");
+    expect(contrastFixHint("#333333", "#111111")).toBe("lighten-22");
+  });
+
+  it("every contrast issue carries a hint the Issues panel's Fix can act on", () => {
+    const tokens = [
+      { id: "color-background", name: "Background", kind: "color", category: "colors", value: "#FFFFFF" },
+      { id: "color-faint", name: "Faint", kind: "color", category: "colors", value: "#EEEEEE" },
+    ] as never;
+    const issues = buildContrastIssues(tokens, "light");
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "darken-22" });
+  });
+});
+
+/* Moved from ColorTokenList.contrast-surface.test.tsx when the Colours table
+   stopped drawing lint state (C1 (ii), board 7315:80955): the finding now
+   lives on the Brand checks page, which reads this function via useDSLint.
+   The regression it guards is unchanged — contrast used to be measured
+   against a hardcoded #0A0A0A, inverting every verdict. */
+describe("contrast is checked against the customer's surface, not a hardcoded one", () => {
+  const LIGHT_SITE = [
+    { id: "color-background", name: "Background", value: "#FFFFFF", darkValue: "#111827",
+      category: "colors", type: "color", kind: "color", group: "surface" },
+    { id: "color-text", name: "Text", value: "#111827", darkValue: "#F9FAFB",
+      category: "colors", type: "color", kind: "color", group: "surface" },
+    { id: "color-pale", name: "Pale", value: "#F5F5F5", darkValue: "#F5F5F5",
+      category: "colors", type: "color", kind: "color", group: "brand" },
+  ] as DesignToken[];
+  const flagged = (tokens: DesignToken[], mode: "light" | "dark") =>
+    buildContrastIssues(tokens, mode).map((i) => i.tokenId);
+
+  it("flags the near-white token on a white page, and only that one", () => {
+    expect(flagged(LIGHT_SITE, "light")).toEqual(["color-pale"]);
+  });
+
+  it("follows the customer into dark mode rather than assuming one surface", () => {
+    expect(flagged(LIGHT_SITE, "dark")).toEqual([]);
+  });
+
+  it("falls back to white, never to near-black, when the palette has no background token", () => {
+    const noSurface = [
+      { id: "color-paper", name: "Paper", value: "#F2F2F2",
+        category: "colors", type: "color", kind: "color", group: "brand" },
+    ] as DesignToken[];
+    expect(flagged(noSurface, "light")).toEqual(["color-paper"]);
   });
 });

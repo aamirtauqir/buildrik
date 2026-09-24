@@ -13,6 +13,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "../../shared/types/media";
 import { Portal } from "@/editor/chrome-ui";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
+import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
@@ -20,6 +21,7 @@ const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
+const BrandWorkspace = React.lazy(() => import("@/editor/design-system/ui/BrandWorkspace"));
 
 /** Props shared across all fullpage tabs (no pin concept in fullpage mode) */
 export interface FullPageCommonProps {
@@ -49,6 +51,9 @@ export interface FullPageRouterProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
+  /** `ui:browse-templates` — New-page name (#19), a template to preview, or
+   *  replace mode (4428:149355). */
+  templatesOpen?: TemplatesOpenRequest | null;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -62,16 +67,28 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
+  templatesOpen,
 }) => {
   switch (activeTab) {
+    /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
+       view's own sidebar carries `‹ Back to canvas`. Same portal, same reason
+       (the view owns its Escape and its dialogs). */
     case "templates":
       return (
-        <TemplatesTab
-          composer={composer}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          {...commonTabProps}
-        />
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="tpl-host"
+          >
+            <TemplatesTab
+              composer={composer}
+              onTemplateUsed={onSwitchToAdd}
+              onSwitchTab={onTemplatesSwitchTab}
+              request={templatesOpen}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
       );
 
     /* Clone 3695:45155 — the Asset library is edge-to-edge: no rail, no
@@ -90,7 +107,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               composer={composer}
               onClose={commonTabProps.onClose}
               onOpenImageEditor={commonTabProps.onOpenImageEditor}
-              onOpenIconPicker={commonTabProps.onOpenIconPicker}
             />
           </div>
         </Portal>
@@ -116,6 +132,28 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               onDirtyChange={onSettingsDirtyChange}
               openRequest={settingsOpen}
               onOpenDesignTab={onSwitchToDesign}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
+      );
+
+    /* Board 7315:80955 — Brand is a full-canvas workspace (owner decision
+       OD-1, 2026-09-21): its own 256 nav with `‹ Back to canvas`, a pane and
+       a preview column across the full 1440. Same portal as Settings, for the
+       same reason it is not an OverlayMount: the workspace owns its Escape,
+       its unsaved-draft guard and its dialogs. */
+    case "design":
+      return (
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="brand-host"
+          >
+            <BrandWorkspace
+              composer={composer}
+              projectId={projectId}
+              initialPage={activeSubTab}
               onClose={commonTabProps.onClose}
             />
           </div>

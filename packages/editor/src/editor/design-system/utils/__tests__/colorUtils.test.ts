@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  darkShadeSuggestions,
   expandShorthand,
   isValidHex,
   hexToRgb,
@@ -189,5 +190,36 @@ describe("wcagTooltip", () => {
     expect(wcagTooltip("aaa")).toContain("7:1");
     expect(wcagTooltip("aa")).toContain("4.5:1");
     expect(wcagTooltip("aa-large")).toContain("3:1");
+  });
+});
+
+describe("darkShadeSuggestions (G3-146)", () => {
+  /* Board 7318:80995: the options are named palette steps — "#76A9FA ·
+     Blue 400", "#A4CAFE · Blue 300", "#3F83F8 · Blue 500" for Blue 700. */
+  it("names palette steps for a palette colour (Blue 700 → Blue 400 / 300 / 500)", () => {
+    const s = darkShadeSuggestions("#1A56DB");
+    expect(s.map((x) => `${x.hex} · ${x.label}`)).toEqual([
+      "#76A9FA · Blue 400",
+      "#A4CAFE · Blue 300",
+      "#3F83F8 · Blue 500",
+    ]);
+  });
+
+  it("an off-palette colour keeps computed shades", () => {
+    const s = darkShadeSuggestions("#2D9CDB");
+    expect(s.map((x) => x.label)).toEqual(["Recommended", "Softer", "Stronger"]);
+  });
+
+  it("lifts an accent: three lighter shades, contrast measured on the dark surface", () => {
+    const s = darkShadeSuggestions("#1A56DB");
+    for (const x of s) {
+      expect(x.hex).toMatch(/^#[0-9A-F]{6}$/);
+      expect(x.contrast).toBeGreaterThan(calcContrastRatio("#1A56DB", "#111827"));
+    }
+  });
+
+  it("inverts a light surface to dark shades readable under light ink", () => {
+    const s = darkShadeSuggestions("#F8FAFC");
+    for (const x of s) expect(x.contrast).toBeGreaterThan(7);
   });
 });

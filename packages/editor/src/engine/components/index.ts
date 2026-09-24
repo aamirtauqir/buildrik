@@ -17,10 +17,6 @@ export {
   loadComponents,
   loadComponent,
   deleteComponent,
-  exportComponents,
-  importComponents,
-  downloadComponentsFile,
   isStorageAvailable,
   getStorageStats,
-  type ComponentExport,
 } from "./ComponentStorage";

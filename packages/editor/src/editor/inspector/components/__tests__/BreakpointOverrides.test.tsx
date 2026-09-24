@@ -104,3 +104,27 @@ describe("breakpoint overrides", () => {
     expect(value.className).not.toContain("tw:bg-[var(--bk-bg-subtle)]");
   });
 });
+
+describe("breakpoint overrides — board 4418:113785 summary + Revert all (G2-142)", () => {
+  it("counts the overrides and reverts them all in one transaction", () => {
+    const { composer, removeBreakpointStyleProperty } = makeComposer(
+      { padding: "24px", "font-size": "18px", gap: "8px" },
+      { padding: "16px" }
+    );
+    render(<BreakpointOverrides composer={composer} elementId="el-1" breakpoint="tablet" />);
+    expect(screen.getByTestId("breakpoint-overrides-summary").textContent).toContain("3 tablet overrides");
+    fireEvent.click(screen.getByTestId("breakpoint-overrides-revert-all"));
+    expect(removeBreakpointStyleProperty).toHaveBeenCalledTimes(3);
+    expect(removeBreakpointStyleProperty).toHaveBeenCalledWith("el-1", "tablet", "padding");
+    expect(removeBreakpointStyleProperty).toHaveBeenCalledWith("el-1", "tablet", "gap");
+    const c = composer as unknown as { beginTransaction: ReturnType<typeof vi.fn>; endTransaction: ReturnType<typeof vi.fn> };
+    expect(c.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(c.endTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the singular for one override", () => {
+    const { composer } = makeComposer({ padding: "24px" });
+    render(<BreakpointOverrides composer={composer} elementId="el-1" breakpoint="mobile" />);
+    expect(screen.getByTestId("breakpoint-overrides-summary").textContent).toContain("1 mobile override");
+  });
+});

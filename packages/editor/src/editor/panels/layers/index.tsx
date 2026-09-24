@@ -9,19 +9,26 @@ import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";
 import { LayersEmptyState } from "./components/LayersEmptyState";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
-import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
-import { LayerContextMenu } from "./components/LayerContextMenu";
+import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
-import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
+import { MoveToPageDialog } from "./components/MoveToPageDialog";
 import { LayersScrollThumb } from "./components/LayersScrollThumb";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
+import { findById as findLayer, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
-import { Button } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
+
+/** "Heading, Subtitle and Menu previews" — board 6887:78291's sentence. */
+function listNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "the selection";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
 
 export const LayersPanel: React.FC<LayersPanelProps> = ({
   composer,
@@ -77,8 +84,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     expandIds(ancestorIds);
   }, [isSearching, filterTree, treeLayers, getAncestorIdsForMatches, expandIds]);
 
-  // Inline confirm state for multi-layer delete (replaces window.confirm)
-  const [pendingBannerDelete, setPendingBannerDelete] = React.useState(false);
+  /* Board 6887:78291 "Delete 3 elements?" — the one confirm the Layers
+     tree asks for, and only for N ≥ 2 (decision 17: one element goes at
+     once with the Undo toast). Opened from the selection's context menu. */
+  const [deleteSelectionOpen, setDeleteSelectionOpen] = React.useState(false);
+  const { addToast } = useToast();
 
   // Feedback message for invalid drop operations (UX improvement)
   const [dropFeedback, setDropFeedback] = React.useState<{
@@ -271,10 +281,18 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
   const handleDragLeave = React.useCallback(
     (e: React.DragEvent) => {
-      const relatedTarget = e.relatedTarget as HTMLElement;
-      if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
-        state.setDragState((prev) => ({ ...prev, targetId: null, position: null }));
-      }
+      /* Chromium hands drag events a NULL relatedTarget, and a row's own
+         label/glyph children fire dragleave on it as the pointer crosses
+         them — so "no relatedTarget" cleared the drop line while the pointer
+         was still on the row, and with no further dragover the line never
+         came back (walk 2026-09-24: "no drop indicator"). Leaving means the
+         pointer is outside the row's box. */
+      const r = e.currentTarget.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top && e.clientY < r.bottom;
+      if (inside) return;
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      if (relatedTarget && e.currentTarget.contains(relatedTarget)) return;
+      state.setDragState((prev) => ({ ...prev, targetId: null, position: null }));
     },
     [state]
   );
@@ -311,30 +329,74 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     onLayerHover?.(null);
   }, [state, onLayerHover]);
 
-  const handleContextAction = useLayerContextActions(state);
+  const requestDeleteSelection = React.useCallback(() => setDeleteSelectionOpen(true), []);
+  /* "Move to page…" (4418:82847): the ids being moved, while the picker is open. */
+  const [moveIds, setMoveIds] = React.useState<string[] | null>(null);
+  const handleContextAction = useLayerContextActions(state, { requestDeleteSelection, requestMoveToPage: setMoveIds });
+  const activePage = composer?.elements.getActivePage?.();
+  const otherPages = React.useMemo(
+    () =>
+      moveIds
+        ? (composer?.elements.getAllPages?.() ?? []).filter((p) => p.id !== activePage?.id).map((p) => ({ id: p.id, name: p.name }))
+        : [],
+    [composer, moveIds, activePage?.id]
+  );
+  const moveSubject = React.useMemo(() => {
+    if (!moveIds) return "";
+    if (moveIds.length >= 2) return elementsLabel(moveIds.length);
+    /* The menu's own name for the row ("Heading"), so the title matches the
+       row that was clicked. */
+    const node = findLayer(state.layers, moveIds[0]);
+    const name = state.actionsHook.customNames.get(moveIds[0]) ?? node?.type ?? "element";
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }, [moveIds, state.layers, state.actionsHook.customNames]);
+  const confirmMoveToPage = React.useCallback(
+    (pageId: string) => {
+      if (!moveIds) return;
+      const target = otherPages.find((p) => p.id === pageId)?.name ?? "the page";
+      const subject = moveSubject;
+      setMoveIds(null);
+      if (!state.actionsHook.moveToPage(moveIds, pageId)) return;
+      state.selectionHook.clearSelection();
+      addToast({
+        description: `${subject} moved to ${target}`,
+        action: { label: "Undo", onClick: () => composer?.history.undo() },
+      });
+    },
+    [moveIds, otherPages, moveSubject, state.actionsHook, state.selectionHook, addToast, composer]
+  );
 
-  const handleBannerGroup = React.useCallback(() => {
-    state.actionsHook.groupLayers([...state.selectionHook.selectedIds], state.treeHook.layers);
-  }, [state.actionsHook, state.selectionHook, state.treeHook]);
+  /* The names the confirm reads out ("This removes Heading, Subtitle and
+     Menu previews."), in tree order. */
+  const selectedNames = React.useMemo(() => {
+    const names: string[] = [];
+    const walk = (items: typeof state.layers) => {
+      for (const item of items) {
+        if (state.selectionHook.selectedIds.has(item.id)) {
+          names.push(getDisplayName(item.id, item.type, state.actionsHook.customNames, item.preview));
+        }
+        walk(item.children);
+      }
+    };
+    walk(state.layers);
+    return names;
+  }, [state.layers, state.selectionHook.selectedIds, state.actionsHook.customNames]);
 
-  const handleBannerHide = React.useCallback(() => {
-    state.actionsHook.hideMultiple([...state.selectionHook.selectedIds]);
-  }, [state.actionsHook, state.selectionHook]);
-
-  const handleBannerDelete = React.useCallback(() => {
+  const confirmDeleteSelection = React.useCallback(() => {
     if (!composer) return;
-    setPendingBannerDelete(true);
-  }, [composer]);
-
-  const confirmBannerDelete = React.useCallback(() => {
-    if (!composer) return;
-    const ids = [...state.selectionHook.selectedIds];
-    composer.beginTransaction("delete-layers");
-    ids.forEach((id) => composer.elements.removeElement(id));
-    composer.endTransaction();
+    const n = selectedCount;
+    /* The engine's own delete: prunes to top-most elements and wraps one
+       transaction, so Undo puts all of them back at once. */
+    composer.commands.run("delete", { confirmed: true });
     state.selectionHook.clearSelection();
-    setPendingBannerDelete(false);
-  }, [composer, state.selectionHook]);
+    setDeleteSelectionOpen(false);
+    /* Board 6881:71749 "3 elements deleted" + Undo. */
+    addToast({
+      description: `${elementsLabel(n)} deleted`,
+      action: { label: "Undo", onClick: () => composer.history.undo() },
+      duration: 8000,
+    });
+  }, [composer, selectedCount, state.selectionHook, addToast]);
 
   // Filter tree by search only (no category filters in Minimal Tree design)
   const treeFiltered = state.filterTree(state.layers);
@@ -367,27 +429,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onClose={() => onDisplaySettingsToggle?.()}
         />
       )}
-      {/* Always mounted, empty when nothing is selected. Mounting it ON selection
-          inserted a block above the tree and pushed every row below it down —
-          between the two halves of a double-click, which broke rename on any row
-          that was not already selected. */}
-      <LayerBreadcrumb
-        selectedId={state.selectionHook.selectedIds.size === 1 ? [...state.selectionHook.selectedIds][0] : null}
-        layers={state.treeHook.layers}
-        customNames={state.actionsHook.customNames}
-        onSelect={state.selectionHook.selectLayer}
-      />
-      {/* What this panel is for. The empty state explains itself ("This page is
-          empty…"), but the moment one element existed the panel became a bare
-          tree — the reason to be here, and the fact that a row can be dragged
-          to reorder or nest, were nowhere on screen. Hidden while searching so
-          it does not sit above a result count. Drop positions verified against
-          types.ts:56 — "before" | "after" | "inside". */}
-      {state.layers.length > 0 && !state.searchHook.isSearching && (
-        <p data-testid="layers-purpose" className="tw:m-0 tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-          Every element on this page. Drag a row to reorder or nest it.
-        </p>
-      )}
+      {/* No breadcrumb band and no purpose line: v3 board 4418:81300 starts the
+          tree directly under the search band (first row y136). The selected
+          element's path lives in the canvas breadcrumb / status bar (G2-062). */}
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && matchCount > 0
@@ -402,20 +446,26 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           {dropFeedback.message}
         </div>
       )}
-      <LayerSelectionBanner
-        count={state.selectionHook.selectedIds.size}
-        onGroup={handleBannerGroup}
-        onHide={handleBannerHide}
-        onDelete={handleBannerDelete}
-        onExit={state.selectionHook.clearSelection}
+      {/* The multi-select banner is gone (audit G2-068): the count line in
+          the LayersTab footer and the selection's context menu carry it. */}
+      <ConfirmDialog
+        open={deleteSelectionOpen && selectedCount >= 2}
+        onClose={() => setDeleteSelectionOpen(false)}
+        onConfirm={confirmDeleteSelection}
+        title={`Delete ${elementsLabel(selectedCount)}?`}
+        message={`This removes ${listNames(selectedNames)}.`}
+        confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
+        tone="destructive"
+        testId="layers-delete-selection"
       />
-      {pendingBannerDelete && state.selectionHook.selectedIds.size > 1 && (
-        <div className="bdc-layers-confirm" role="alert">
-          <span>Delete {state.selectionHook.selectedIds.size} layers?</span>
-          <Button className="bdc-btn bdc-btn-danger" onClick={confirmBannerDelete}>Delete</Button>
-          <Button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</Button>
-        </div>
-      )}
+      <MoveToPageDialog
+        open={moveIds !== null}
+        subject={moveSubject}
+        fromPage={activePage?.name ?? "this page"}
+        pages={otherPages}
+        onMove={confirmMoveToPage}
+        onClose={() => setMoveIds(null)}
+      />
       {/* Clean Tree View - Maximum space for content. Wrapped so
           LayersScrollThumb (board 1082:4835) can sit OUTSIDE the scrollable
           element — a thumb rendered inside it would scroll away with the
@@ -434,6 +484,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <LayersNoResults
             search={state.search}
             onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
+            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
           />
         )}
 
@@ -482,7 +533,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           nodeId={state.contextMenu.nodeId}
           hasClipboard={!!composer?.clipboard?.length}
           nodeName={state.contextMenu.nodeName}
-          selectedCount={state.selectionHook.selectedIds.size}
+          selectedCount={selectedCount}
+          inSelection={state.selectionHook.selectedIds.has(state.contextMenu.nodeId)}
           onAction={handleContextAction}
           onClose={state.closeContextMenu}
         />

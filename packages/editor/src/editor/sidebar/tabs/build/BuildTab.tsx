@@ -1,9 +1,10 @@
 /**
  * BuildTab — Add tab shell.
  *
- * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
- * where panel-bottom is pinned (flex-shrink: 0) — ALWAYS, including during
- * search: board 138:53 draws Paste-HTML + TipsFooter under the results.
+ * Layout: PanelHeader / panel-scroll. Search is the topbar field, which this
+ * panel claims while it is open (board 4418:100087 "Search elements…").
+ * The first-use tip (7054:78348) opens beside the panel; there is no tips
+ * strip (G2-113).
  *
  * Sections mode (pre-built sections catalog + lazy chunk) was removed on
  * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
@@ -12,21 +13,27 @@
  * remains.
  */
 
+import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
-import { PanelFrame } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { SearchBar } from "../../shared/SearchBar";
 import { useBuildTab } from "./hooks/useBuildTab";
-import { useCallout } from "./hooks/useCallout";
-import { TipsFooter } from "./components/TipsFooter";
+import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { TransitionCallout } from "./components/TransitionCallout";
+import { takePendingGenerate, takePendingInsertGroup } from "./insertGroupRequest";
+import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
+import { inPageScope } from "@/engine/components/ComponentManager";
+import {
+  fetchComponentLibrary,
+  fetchLibraryComponent,
+  type LibraryComponentEntry,
+} from "@/services/componentSync";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -36,48 +43,95 @@ export interface BuildTabProps {
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
+  /** False while the drawer is closed but this tab stays mounted. */
+  isOpen?: boolean;
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({
-  composer, onBlockClick, isExpanded, onExpandToggle, onHelpClick, onClose,
+  composer, onBlockClick, onHelpClick, onClose, isOpen = true,
 }) => {
-  const tab = useBuildTab(composer, onBlockClick);
-  const callout = useCallout();
+  // MINE (board 1069:4970): the user's own components, inline, and
+  // searched with the rest (G2-111). Same load +
+  // subscribe shape useComponentsState uses.
+  /* G2-118: only masters in scope on the OPEN page (site-wide + "This page"
+     ones for it), and not the library-linked ones — board 4418:99857 lists
+     those under FROM LIBRARY instead. */
+  const [allMine, setAllMine] = React.useState<ComponentDefinition[]>([]);
+  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const load = () => {
+      const pageId = composer.elements.getActivePage()?.id;
+      setAllMine((composer.components?.getAllComponents() ?? []).filter((c) => inPageScope(c, pageId)));
+    };
+    const loadLibrary = () => void fetchComponentLibrary().then(setLibrary);
+    load();
+    loadLibrary();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
+    composer.on(EVENTS.PAGE_CHANGED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
+      composer.off(EVENTS.PAGE_CHANGED, load);
+    };
+  }, [composer]);
+  const mine = React.useMemo(() => {
+    const linked = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
+    return allMine.filter((c) => !linked.has(c.id));
+  }, [allMine, library]);
+  const tab = useBuildTab(composer, onBlockClick, mine);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
 
-  // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
-  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
-    () => new Set<InsertGroupId>(["elements"]),
+  // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸). A door that
+  // asks for a group ("Replace with block…", Brand › Component styles) opens
+  // that group ALONE and scrolls it into view — with ELEMENTS' 53 rows open
+  // above it, the asked-for group sat off-screen.
+  const [asked] = React.useState(() => (composer ? takePendingInsertGroup(composer) : undefined));
+  const [scrollTarget, setScrollTarget] = React.useState<InsertGroupId | null>(asked ?? null);
+  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() =>
+    new Set<InsertGroupId>(asked ? [asked] : ["favourites", "elements"]),
   );
-  // Context menu "Replace with block…" (v3 IA Q8) opens this panel AND asks
-  // for BLOCKS; without this the door lands on ELEMENTS and the user scrolls.
   React.useEffect(() => {
     if (!composer) return;
-    const open = ({ group }: { group: InsertGroupId }) =>
-      setOpenGroups((prev) => (prev.has(group) ? prev : new Set(prev).add(group)));
+    const open = ({ group }: { group: InsertGroupId }) => {
+      takePendingInsertGroup(composer);
+      setOpenGroups(new Set([group]));
+      setScrollTarget(group);
+    };
     composer.on(EVENTS.UI_INSERT_OPEN_GROUP, open);
     return () => {
       composer.off(EVENTS.UI_INSERT_OPEN_GROUP, open);
     };
   }, [composer]);
-  const { addToast } = useToast();
-
-  // MINE (board 1069:4970): the user's own components, inline. Same load +
-  // subscribe shape useComponentsState uses.
-  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
   React.useEffect(() => {
-    if (!composer?.components) return;
-    const load = () => setMine(composer.components?.getAllComponents() ?? []);
-    load();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    if (!scrollTarget) return;
+    document
+      .querySelector(`[data-testid="insert-section-${scrollTarget}"]`)
+      ?.scrollIntoView({ block: "start" });
+    setScrollTarget(null);
+  }, [scrollTarget]);
+  // G2-117: the "Generate a block" screen, opened by the row or a door.
+  const [generating, setGenerating] = React.useState(() => (composer ? takePendingGenerate(composer) : false));
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => {
+      takePendingGenerate(composer);
+      setGenerating(true);
+    };
+    composer.on(EVENTS.UI_INSERT_OPEN_GENERATE, open);
     return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+      composer.off(EVENTS.UI_INSERT_OPEN_GENERATE, open);
     };
   }, [composer]);
+  const { addToast } = useToast();
+
 
   const groups = React.useMemo(
-    () => buildInsertGroups(composer?.components ? mine.length : null),
-    [composer, mine.length],
+    () => buildInsertGroups(composer?.components ? mine.length + library.length : null, tab.favs.size, tab.recents.length),
+    [composer, mine.length, library.length, tab.favs.size, tab.recents.length],
   );
 
   // MINE row click — the same instantiate contract the Components surface
@@ -98,23 +152,29 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     }
   }, [composer, addToast]);
 
-  // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
-  // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
-  // XSS boundary) and gives the transaction/smart-placement/select/flash.
-  const pasteHtml = React.useCallback(async () => {
-    let text = "";
+  /* FROM LIBRARY: bring the workspace master onto this site under its shared
+     id (ComponentManager.adoptLibraryComponent — mirrored as this site's copy,
+     which is what "linked" means), then insert it like a saved one. */
+  const insertFromLibrary = React.useCallback(async (componentId: string) => {
+    if (!composer) return;
     try {
-      text = await navigator.clipboard.readText();
+      const existing = composer.components.getComponent(componentId);
+      const definition = existing ?? (await fetchLibraryComponent(componentId));
+      if (!definition) {
+        addToast({ description: "That component is no longer in the library.", tone: "warning" });
+        return;
+      }
+      const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
+      await insertMine(adopted);
     } catch {
-      addToast({ description: "Clipboard is not readable — allow clipboard access and try again.", tone: "warning" });
-      return;
+      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
     }
-    if (!text.trim()) {
-      addToast({ description: "Clipboard is empty — copy some HTML first.", tone: "warning" });
-      return;
-    }
-    onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: text });
-  }, [addToast, onBlockClick]);
+  }, [composer, addToast, insertMine]);
+
+  // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
+  // clipboard) and Insert sends the text down the SAME BlockData insert path
+  // everything else uses — insertBlock owns the XSS boundary.
+  const [pasteOpen, setPasteOpen] = React.useState(false);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -124,21 +184,44 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     });
   };
 
-  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F (board 137:10 —
-  // hijacks browser find while the Insert panel is mounted, same as Figma).
+  /* The topbar field searches this panel while it is open (4418:100087). */
+  /* Held in a ref: setSearchQuery changes identity with every query, and
+     re-running this effect would release and re-claim the field mid-typing. */
+  const setSearchQueryRef = React.useRef(tab.setSearchQuery);
+  setSearchQueryRef.current = tab.setSearchQuery;
+  React.useEffect(() => {
+    /* A closed drawer keeps this tab mounted — the topbar field must not keep
+       reading "Search elements…" with nothing on screen to search. */
+    if (!composer || !isOpen) return;
+    const onQuery = ({ query }: { query: string }) => setSearchQueryRef.current(query);
+    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
+    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search elements…" });
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
+      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
+    };
+  }, [composer, isOpen]);
+
+  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F. G2-105: ⌘F is
+  // taken only while focus is in this panel or its search field — anywhere
+  // else it stays the browser's find.
+  const panelRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const isCmdF = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f";
       if (e.key !== "/" && !isCmdF) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      if (!isCmdF) {
+      if (isCmdF) {
+        const inPanel = panelRef.current?.contains(target) || target.id === TOPBAR_CONTEXT_SEARCH_ID;
+        if (!inPanel) return;
+      } else {
         const tag = target.tagName;
         const inTypingContext =
           tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
         if (inTypingContext) return;
       }
-      const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
+      const input = document.getElementById(TOPBAR_CONTEXT_SEARCH_ID) as HTMLInputElement | null;
       if (!input) return;
       e.preventDefault();
       input.focus();
@@ -148,115 +231,137 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  if (generating && composer) {
+    return (
+      <PanelFrame className="bld-container">
+        <GenerateBlockScreen composer={composer} onBack={() => setGenerating(false)} />
+      </PanelFrame>
+    );
+  }
+
   return (
     <PanelFrame className="bld-container">
       {/* Board 137:2 header: title alone (the "N blocks · N categories"
           subtitle is not on the board), EXPAND before CLOSE — 16:6's first
           action is the corner-brackets expand (founder-confirmed 2026-08-06;
           the component description's "Pin" text is stale). */}
+      {/* Board 4428:140817: `Add · ⋯ · ✕` — no expand; the ⋯ holds Paste
+          HTML… (7063:78846), which was a pinned row above the tips. */}
       <PanelFrame.Header
         title="Add"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
+        actions={
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label="Add options"
+            trigger={
+              <IconButton
+                label="Add options"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                data-testid="add-panel-menu"
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label="Add options">
+              <MenuItem
+                data-testid="insert-paste-html"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setPasteOpen(true);
+                }}
+              >
+                Paste HTML…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
       />
 
-      <div className="bld-content">
-        <div
-          className="bld-search-wrap"
-          data-testid="insert-search-wrap"
-          onKeyDown={(e) => {
-            if (e.key === "Escape" && tab.searchQuery.length > 0) {
-              e.stopPropagation();
-              tab.setSearchQuery("");
-            }
-          }}
-        >
-          <SearchBar
-            id="bld-search-input"
-            value={tab.searchQuery}
-            onChange={tab.setSearchQuery}
-            placeholder="Search elements"
-            debounceMs={150}
-            kbdHint="⌘F"
-            testId="insert-search-box"
-          />
-        </div>
-
-        {/* What this panel is for. Insert opened straight onto a wall of 53
-            element tiles with nothing saying what a click does.
-
-            Every clause here is scoped to what the code actually does:
-            - "Click a row" covers all four groups — clicking inserts everywhere.
-            - "Drag elements" is deliberately narrow. Only the ELEMENTS group
-              passes `draggable` (GroupSection.tsx:189); blocks, components and
-              mine rows do not, so a blanket "drag onto the canvas" would have
-              been false for most of the panel — the same defect IA-13 fixed.
-            - "inside or next to … where it fits" is the smart-placement walk in
-              useBlockInsertion.ts:67-80, which climbs to the nearest ancestor
-              that accepts the block; "where it fits" carries the case where
-              none does and it lands at the page root. */}
-        {!isSearching && (
-          <p data-testid="insert-purpose" className="tw:m-0 tw:w-full tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-            {tab.insertionContext
-              ? `Click a row to add it inside or next to ${tab.insertionContext.label} where it fits. Drag elements onto the canvas instead.`
-              : "Click a row to add it at the end of the page. Drag elements onto the canvas instead."}
-          </p>
-        )}
-
+      <div className="bld-content" ref={panelRef}>
         {isSearching ? (
           <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
               hits={tab.searchResults}
               onDragStart={tab.handleDragStart}
+              onBlockDragStart={tab.handleBlockDragStart}
               onElClick={tab.handleElClick}
               onBlockInsert={(b) => onBlockClick?.(b)}
+              onSavedInsert={(c) => void insertMine(c)}
               onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>
         ) : (
           <div className="bld-scroll">
-            {callout.visible && <TransitionCallout />}
-
             {/* Board 137:2: source taxonomy, not element-type categories.
                 ELEMENTS/BLOCKS render inline; the navigate groups open their
                 owning tabs. Blocks insert through the SAME onBlockClick path
                 elements use — BlockDefinition extends BlockData. */}
             {groups.map((g) => (
+              <React.Fragment key={g.id}>
+              {/* Board 4418:103353: "✦  Generate a block with AI…" sits
+                  right above BLOCKS (G2-117). */}
+              {g.id === "blocks" && composer && (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  data-testid="insert-generate-block"
+                  className="tw:flex tw:items-center tw:h-8 tw:px-4 tw:rounded-[4px] tw:cursor-pointer tw:select-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+                  onClick={() => setGenerating(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setGenerating(true); }
+                  }}
+                >
+                  ✦&nbsp;&nbsp;Generate a block with AI…
+                </div>
+              )}
               <GroupSection
-                key={g.id}
                 group={g}
                 isOpen={openGroups.has(g.id)}
                 onToggle={() => toggleGroup(g)}
-                elements={g.id === "elements" ? elementRows : undefined}
+                elements={
+                  g.id === "elements"
+                    ? elementRows
+                    : g.id === "favourites"
+                      ? elementRows.filter((el) => tab.favs.has(el.name))
+                      : g.id === "recent"
+                        ? tab.recents.flatMap((n) => elementRows.find((el) => el.name === n) ?? [])
+                        : undefined
+                }
+                favs={tab.favs}
+                onToggleFav={tab.toggleFav}
                 blocks={g.id === "blocks" ? blockRows : undefined}
                 components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
+                library={g.id === "mine" ? library : undefined}
+                onLibraryInsert={(id) => void insertFromLibrary(id)}
                 onDragStart={tab.handleDragStart}
+                onBlockDragStart={tab.handleBlockDragStart}
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
+                onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
+              </React.Fragment>
             ))}
           </div>
         )}
 
-        {/* Board 138:53: the pinned bottom stays up DURING search too. */}
-        <div className="bld-panel-bottom">
-          {/* Board 1069:5011 — pinned above the tips band, no icon slot. */}
-          <Row label={"⌥  Paste HTML…"} noIcon pinned testId="insert-paste-html" onClick={() => void pasteHtml()} />
-          <TipsFooter
-            tipIdx={tab.tipIdx}
-            onPrev={tab.tipPrev}
-            onNext={tab.tipNext}
-            onDotClick={tab.tipSetAt}
-            dismissed={tab.tipDismissed}
-            onDismiss={tab.dismissTip}
-          />
-        </div>
+        <div ref={panelBottomRef} className="bld-panel-bottom" />
+        <FirstUseTip anchorRef={panelBottomRef} />
       </div>
+      <PasteHtmlModal
+        open={pasteOpen}
+        onClose={() => setPasteOpen(false)}
+        onInsert={(content) => onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content })}
+      />
     </PanelFrame>
   );
 };

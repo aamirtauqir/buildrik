@@ -55,7 +55,7 @@ describe("Page Service", () => {
   describe("updatePage", () => {
     it("updates page fields", async () => {
       const { updatePage } = await import("@/server/services/page.service");
-      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", updatedAt: new Date("2026-03-24T00:00:00Z") } as any);
+      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", siteId: "s1", updatedAt: new Date("2026-03-24T00:00:00Z") } as any);
       vi.mocked(prisma.page.update).mockResolvedValue({ id: "p1", name: "Updated Home" } as any);
 
       const result = await updatePage({ pageId: "p1", siteId: "s1", name: "Updated Home" });
@@ -64,7 +64,7 @@ describe("Page Service", () => {
 
     it("throws CONFLICT on optimistic lock failure", async () => {
       const { updatePage } = await import("@/server/services/page.service");
-      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", updatedAt: new Date("2026-03-24T12:00:00Z") } as any);
+      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", siteId: "s1", updatedAt: new Date("2026-03-24T12:00:00Z") } as any);
 
       await expect(updatePage({
         pageId: "p1", siteId: "s1", name: "Conflict",
@@ -90,8 +90,30 @@ describe("Page Service", () => {
     it("throws LAST_PAGE when only 1 page remains", async () => {
       const { deletePage } = await import("@/server/services/page.service");
       vi.mocked(prisma.page.count).mockResolvedValue(1);
+      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", siteId: "s1" } as any);
 
       await expect(deletePage({ pageId: "p1", siteId: "s1" })).rejects.toThrow("LAST_PAGE");
+    });
+  });
+
+  /* The router's EDITOR gate runs against input.siteId. A page id from another
+     site must not ride through on it (audit 2026-09-24). */
+  describe("site binding", () => {
+    it("updatePage refuses a page that belongs to another site", async () => {
+      const { updatePage } = await import("@/server/services/page.service");
+      vi.mocked(prisma.page.update).mockClear();
+      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p9", siteId: "other", updatedAt: new Date() } as any);
+      await expect(updatePage({ pageId: "p9", siteId: "s1", name: "x" })).rejects.toThrow("NOT_FOUND");
+      expect(prisma.page.update).not.toHaveBeenCalled();
+    });
+
+    it("deletePage refuses a page that belongs to another site", async () => {
+      const { deletePage } = await import("@/server/services/page.service");
+      vi.mocked(prisma.page.delete).mockClear();
+      vi.mocked(prisma.page.count).mockResolvedValue(3);
+      vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p9", siteId: "other" } as any);
+      await expect(deletePage({ pageId: "p9", siteId: "s1" })).rejects.toThrow("NOT_FOUND");
+      expect(prisma.page.delete).not.toHaveBeenCalled();
     });
   });
 });

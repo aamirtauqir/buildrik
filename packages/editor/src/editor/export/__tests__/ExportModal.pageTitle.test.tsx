@@ -1,5 +1,10 @@
+import * as React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+
+import { ToastProvider } from "@/editor/chrome-ui";
+/* ExportModal reports ready / failed through the toast (C5 G3-113). */
+const renderT = (ui: React.ReactElement) => render(ui, { wrapper: ToastProvider });
 import { ExportModal } from "../ExportModal";
 import { resolvePageTitle } from "../../../engine/export/SEOInjector";
 import type { PageData } from "../../../shared/types";
@@ -37,23 +42,23 @@ describe("the exported file is titled with the site's own name", () => {
   };
 
   it("seeds the title from the active page", async () => {
-    render(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Pricing" })} />);
+    renderT(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Pricing" })} />);
     expect((await titleField()).value).toBe("Pricing");
   });
 
   it("prefers the page's SEO meta title", async () => {
     const page = { id: "p", name: "Pricing", settings: { seo: { metaTitle: "Plans & Pricing" } } };
-    render(<ExportModal isOpen onClose={() => {}} composer={composerWith(page)} />);
+    renderT(<ExportModal isOpen onClose={() => {}} composer={composerWith(page)} />);
     expect((await titleField()).value).toBe("Plans & Pricing");
   });
 
   it("never falls back to our own brand name", async () => {
-    render(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Home" })} />);
+    renderT(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Home" })} />);
     expect((await titleField()).value).not.toMatch(/Buildrick/);
   });
 
   it("keeps a title the user typed", async () => {
-    render(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Home" })} />);
+    renderT(<ExportModal isOpen onClose={() => {}} composer={composerWith({ id: "p", name: "Home" })} />);
     const field = await titleField();
     fireEvent.change(field, { target: { value: "My Landing Page" } });
     expect((field as HTMLInputElement).value).toBe("My Landing Page");

@@ -1,7 +1,7 @@
 /**
  * defaultCommands — behavior of the built-in command closures against a
  * mock Composer: clipboard (copy/cut/paste), zoom, device presets,
- * duplicate/group/select, snap toggle.
+ * duplicate/group/select.
  *
  * DOM-coupled commands (nudge-* / reorder via commandOperations, preview's
  * window.open) are exercised only for their guard paths here.
@@ -71,10 +71,10 @@ function makeComposer() {
 let composer: ReturnType<typeof makeComposer>;
 let byId: Map<string, CommandData>;
 
-function run(id: string) {
+function run(id: string, options?: Record<string, unknown>) {
   const command = byId.get(id);
   if (!command) throw new Error(`command ${id} not in default set`);
-  return command.run(composer as unknown as Composer);
+  return command.run(composer as unknown as Composer, options);
 }
 
 beforeEach(() => {
@@ -259,11 +259,23 @@ describe("delete / duplicate / group", () => {
   /* Measured live at 49 -> 48 with three elements selected: delete read the
      PRIMARY element, exactly as cut did, and wrapped nothing in a transaction —
      so undoing a three-element delete would have taken three presses. */
-  it("delete takes the whole selection, in one transaction", () => {
+  /* Decision #17: more than one element asks first. Unconfirmed, delete
+     removes nothing and asks the shell for its dialog; the dialog (canvas or
+     Layers) runs it again with { confirmed: true }. */
+  it("delete with N > 1 selected asks instead of deleting", () => {
     composer.selection.getAllSelected.mockReturnValue([
       makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
     ]);
     run("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_REQUEST_DELETE_SELECTION, { count: 3 });
+  });
+
+  it("delete takes the whole selection, in one transaction, once confirmed", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
+    ]);
+    run("delete", { confirmed: true });
     expect(composer.elements.removeElement).toHaveBeenCalledTimes(3);
     expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
     expect(composer.endTransaction).toHaveBeenCalledTimes(1);
@@ -319,16 +331,17 @@ describe("delete / duplicate / group", () => {
 });
 
 describe("zoom", () => {
-  it("zoom-in adds 10 to the current zoom", () => {
-    composer.getState.mockReturnValue({ zoom: 120, snapToGrid: false, gridSize: 8 });
+  /* G2-016: one step rule — the next preset, same as ⌘=/⌘- and the flyout. */
+  it("zoom-in steps to the next preset", () => {
+    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: false, gridSize: 8 });
     run("zoom-in");
-    expect(composer.setZoom).toHaveBeenCalledWith(130);
+    expect(composer.setZoom).toHaveBeenCalledWith(150);
   });
 
-  it("zoom-out subtracts 10 from the current zoom", () => {
+  it("zoom-out steps to the previous preset", () => {
     composer.getState.mockReturnValue({ zoom: 120, snapToGrid: false, gridSize: 8 });
     run("zoom-out");
-    expect(composer.setZoom).toHaveBeenCalledWith(110);
+    expect(composer.setZoom).toHaveBeenCalledWith(100);
   });
 
   it("zoom-reset returns to 100", () => {
@@ -342,7 +355,6 @@ describe("device presets", () => {
     ["device-desktop", "desktop"],
     ["device-tablet", "tablet"],
     ["device-mobile", "mobile"],
-    ["device-watch", "watch"],
   ])("%s sets device %s", (commandId, device) => {
     run(commandId);
     expect(composer.setDevice).toHaveBeenCalledWith(device);
@@ -366,19 +378,13 @@ describe("selection + toggles", () => {
     expect(composer.selection.clear).toHaveBeenCalled();
   });
 
-  it("toggle-snap-to-grid flips the current state", () => {
-    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: false, gridSize: 8 });
-    run("toggle-snap-to-grid");
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(true);
-
-    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: true, gridSize: 8 });
-    run("toggle-snap-to-grid");
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(false);
+  /* G2-034: snapping follows the Grid overlay; there is no second switch. */
+  it("has no separate snap-to-grid command", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(ids).not.toContain("toggle-snap-to-grid");
   });
 
   it("ui-open-* commands emit their toggle events on the captured composer", () => {
-    run("ui-open-templates");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_TEMPLATES);
     run("ui-open-ai");
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_AI);
   });
@@ -440,7 +446,7 @@ describe("device presets carry no shortcut", () => {
      reads, while the user was toggling the Grid overlay. */
   it("leaves the flyout's and overlay bar's chords to the surfaces that print them", () => {
     const byId = new Map(buildDefaultCommands(composer as unknown as Composer).map((c) => [c.id, c]));
-    for (const id of ["zoom-reset", "zoom-in", "zoom-out", "toggle-snap-to-grid"]) {
+    for (const id of ["zoom-reset", "zoom-in", "zoom-out"]) {
       expect(byId.get(id)).toBeDefined();
       expect(byId.get(id)?.shortcut).toBeUndefined();
     }
@@ -448,8 +454,56 @@ describe("device presets carry no shortcut", () => {
 
   it("still exposes the presets by name for the palette", () => {
     const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
-    for (const id of ["device-desktop", "device-tablet", "device-mobile", "device-watch"]) {
+    for (const id of ["device-desktop", "device-tablet", "device-mobile"]) {
       expect(ids).toContain(id);
     }
+    // Decision #26: "Watch view" is deleted with the device.
+    expect(ids).not.toContain("device-watch");
+  });
+});
+
+/* B7 (2026-09-22): the canvas ⌘⇧P palette folded into this registry, so it is
+   the ONE command list the shell ⌘K reads. Two rules follow. */
+describe("one registry — ids are unique, the merged canvas rows are here", () => {
+  it("registers every id once", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("carries the Insert and Tools rows the canvas palette used to own", () => {
+    for (const [id, event, payload] of [
+      ["add-text", EVENTS.ELEMENT_QUICK_ADD, { type: "text" }],
+      ["add-image", EVENTS.ELEMENT_QUICK_ADD, { type: "image" }],
+      ["add-button", EVENTS.ELEMENT_QUICK_ADD, { type: "button" }],
+      ["add-container", EVENTS.ELEMENT_QUICK_ADD, { type: "container" }],
+      ["cms-records", EVENTS.CMS_MANAGE_RECORDS, {}],
+      ["save-template", EVENTS.TEMPLATE_SAVE_REQUESTED, {}],
+      ["open-analytics", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }],
+      ["open-export-settings", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }],
+      ["open-integrations", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }],
+    ] as const) {
+      composer.emit.mockClear();
+      run(id);
+      expect(composer.emit, id).toHaveBeenCalledWith(event, payload);
+    }
+  });
+
+  it("replace-media asks the media drawer for the selected element, and does nothing without one", () => {
+    run("replace-media");
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:media-selection-request", expect.anything());
+    composer.selection.getSelected.mockReturnValue(makeElement("img-1", "image"));
+    run("replace-media");
+    expect(composer.emit).toHaveBeenCalledWith("ui:media-selection-request", { elementId: "img-1", label: "Image" });
+  });
+
+  it("marks the rows that quietly return without a selection, so the palette can say so", () => {
+    const flagged = buildDefaultCommands(composer as unknown as Composer)
+      .filter((c) => c.requiresSelection)
+      .map((c) => c.id);
+    for (const id of ["delete", "duplicate", "copy", "cut", "nudge-up", "bring-forward", "send-to-back", "replace-media"]) {
+      expect(flagged).toContain(id);
+    }
+    expect(flagged).not.toContain("paste");
+    expect(flagged).not.toContain("select-all");
   });
 });

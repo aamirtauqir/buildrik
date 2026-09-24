@@ -26,11 +26,6 @@ vi.mock("../tabs/layers/LayersTab", () => ({
 vi.mock("../tabs/pages/PagesTab", () => ({
   default: () => <div data-testid="tab-pages" />,
 }));
-vi.mock("../tabs/templates/TemplatesTab", () => ({
-  TemplatesTab: (props: { onSwitchTab?: (tab: string) => void }) => (
-    <div data-testid="tab-templates" data-switch={props.onSwitchTab ? "wired" : "none"} />
-  ),
-}));
 vi.mock("../tabs/ComponentsTab", () => ({
   default: () => <div data-testid="tab-components-legacy" />,
 }));
@@ -38,8 +33,8 @@ vi.mock("../tabs/media/MediaTab", () => ({
   MediaTab: () => <div data-testid="tab-assets" />,
 }));
 vi.mock("../tabs/publish/PublishTab", () => ({
-  default: (props: { onVercelPublish?: () => Promise<void> }) => (
-    <div data-testid="tab-publish" data-vercel={props.onVercelPublish ? "wired" : "none"} />
+  default: (props: { onRequestPublish?: () => void }) => (
+    <div data-testid="tab-publish" data-vercel={props.onRequestPublish ? "wired" : "none"} />
   ),
 }));
 vi.mock("../tabs/history/HistoryTab", () => ({
@@ -48,10 +43,6 @@ vi.mock("../tabs/history/HistoryTab", () => ({
 vi.mock("../tabs/ai/AITab", () => ({
   AITab: () => <div data-testid="tab-ai" />,
 }));
-vi.mock("@/editor/design-system/ui/DesignSystemTab", () => ({
-  default: () => <div data-testid="tab-design" />,
-}));
-
 const noop = vi.fn();
 
 function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = {}) {
@@ -74,13 +65,11 @@ beforeEach(() => {
 describe("TabRouter — tab id → panel component mapping", () => {
   const cases: Array<[GroupedTabId, string]> = [
     ["add", "tab-build"],
-    ["templates", "tab-templates"],
     ["layers", "tab-layers"],
     ["pages", "tab-pages"],
     ["assets", "tab-assets"],
     ["publish", "tab-publish"],
     ["history", "tab-history"],
-    ["design", "tab-design"],
   ];
 
   it.each(cases)("activeTab=%s renders %s", async (tabId, testId) => {
@@ -102,22 +91,23 @@ describe("TabRouter — tab id → panel component mapping", () => {
     const { container } = renderRouter("settings");
     expect(container).toBeEmptyDOMElement();
   });
+
+  /* Brand graduated the same way on 2026-09-22 (C1 (i)): the 280/700 drawer is
+     retired for the full-canvas workspace (Figma 7315:80955), which
+     FullPageRouter mounts. A drawer copy here would be a second, invisible
+     BrandWorkspace with its own load effect and dirty announcement. */
+  it("renders nothing for design — the Brand workspace belongs to FullPageRouter", () => {
+    const { container } = renderRouter("design");
+    expect(container).toBeEmptyDOMElement();
+  });
 });
 
-describe("TabRouter — templates switch-tab wiring", () => {
-  // Regression: onTemplatesSwitchTab was declared on TabRouterProps but never
-  // destructured or forwarded, so TemplatesTab's "Go to page" success button
-  // (which calls onSwitchTab("pages")) was dead. The router must forward it.
-  it("forwards onTemplatesSwitchTab to TemplatesTab as onSwitchTab", async () => {
-    renderRouter("templates", { onTemplatesSwitchTab: vi.fn() });
-    const tab = await screen.findByTestId("tab-templates");
-    expect(tab.getAttribute("data-switch")).toBe("wired");
-  });
-
-  it("leaves onSwitchTab undefined when no switch handler is provided", async () => {
-    renderRouter("templates");
-    const tab = await screen.findByTestId("tab-templates");
-    expect(tab.getAttribute("data-switch")).toBe("none");
+/* Decision #24: Templates is a full-canvas view FullPageRouter mounts; a
+   drawer copy here would be a second, invisible catalogue. */
+describe("TabRouter — templates", () => {
+  it("renders nothing for templates — the view belongs to FullPageRouter", () => {
+    const { container } = renderRouter("templates");
+    expect(container).toBeEmptyDOMElement();
   });
 });
 
@@ -135,18 +125,18 @@ describe("TabRouter — components tab", () => {
   });
 });
 
-describe("TabRouter — publish action flag gating", () => {
-  const onVercelPublish = async () => {};
+describe("TabRouter — publish door flag gating", () => {
+  const onRequestPublish = () => {};
 
-  it("withholds onVercelPublish from PublishTab when the publish flag is OFF", async () => {
-    renderRouter("publish", { onVercelPublish });
+  it("withholds the publish door from PublishTab when the publish flag is OFF", async () => {
+    renderRouter("publish", { onRequestPublish });
     const tab = await screen.findByTestId("tab-publish");
     expect(tab.getAttribute("data-vercel")).toBe("none");
   });
 
-  it("passes onVercelPublish through when the publish flag is ON", async () => {
+  it("passes the publish door through when the publish flag is ON", async () => {
     flags.enabled.add("publish");
-    renderRouter("publish", { onVercelPublish });
+    renderRouter("publish", { onRequestPublish });
     const tab = await screen.findByTestId("tab-publish");
     expect(tab.getAttribute("data-vercel")).toBe("wired");
   });

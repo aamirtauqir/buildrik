@@ -1,9 +1,8 @@
 /**
- * Recently-run command tracking for the command palette (S3.14). A small
- * localStorage-backed MRU list of command ids, so ⌘K can surface "what you just
- * did" before you type. Read/write go through safeStorage (private-mode /
- * quota-safe). Kept separate from CommandPalette so the palette component stays
- * pure UI and this is unit-testable without a DOM render.
+ * Recently-run ⌘K commands (S3.14, restored 2026-09-24 under the owner's
+ * "never silently remove a capability" rule). A small localStorage MRU of
+ * palette row ids, newest first, so the empty palette can lead with what you
+ * just did. safeStorage keeps private-mode / quota failures silent.
  *
  * @license BSD-3-Clause
  */
@@ -17,7 +16,7 @@ export function getRecentCommandIds(): string[] {
   const raw = safeGet(KEY);
   if (!raw) return [];
   try {
-    const parsed = JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string").slice(0, MAX) : [];
   } catch {
     return [];

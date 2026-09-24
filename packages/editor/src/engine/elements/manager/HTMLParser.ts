@@ -18,6 +18,7 @@ import {
 import { parseHTML, parseInlineStyles } from "../../../shared/utils/parsers";
 import type { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
+import { resolvePlacement } from "./placement";
 
 /**
  * Manages HTML parsing and import operations
@@ -157,7 +158,14 @@ export class HTMLParser {
       childrenData.forEach((data, i) => {
         // Build tree WITHOUT parent - we'll add to parent manually at correct position
         const element = this.ctx.buildElementTree(data);
-        parent.addChild(element, index !== undefined ? index + i : undefined);
+        const at = index !== undefined ? index + i : undefined;
+        const place = resolvePlacement(element, parent, at) ?? { parent, index: at };
+        // Several elements lifted out of the same parent keep their order.
+        const prev = created[created.length - 1];
+        if (place.parent !== parent && prev?.getParent() === place.parent) {
+          place.index = place.parent.getChildIndex(prev) + 1;
+        }
+        place.parent.addChild(element, place.index);
         created.push(element);
       });
 

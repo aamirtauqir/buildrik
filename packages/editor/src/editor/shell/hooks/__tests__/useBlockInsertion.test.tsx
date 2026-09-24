@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { useBlockInsertion } from "../useBlockInsertion";
+import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 const mocks = vi.hoisted(() => ({
   addToast: vi.fn(),
@@ -77,7 +78,11 @@ describe("useBlockInsertion", () => {
     beginTransaction: ReturnType<typeof vi.fn>;
     endTransaction: ReturnType<typeof vi.fn>;
     emit: ReturnType<typeof vi.fn>;
-    elements: { getActivePage: ReturnType<typeof vi.fn>; getElement: ReturnType<typeof vi.fn> };
+    elements: {
+      getActivePage: ReturnType<typeof vi.fn>;
+      getElement: ReturnType<typeof vi.fn>;
+      removeElement: ReturnType<typeof vi.fn>;
+    };
     selection: { getSelectedIds: ReturnType<typeof vi.fn>; select: ReturnType<typeof vi.fn> };
   };
 
@@ -94,6 +99,7 @@ describe("useBlockInsertion", () => {
       elements: {
         getActivePage: vi.fn(() => ({ root: { id: "root-1" } })),
         getElement: vi.fn((id: string) => elements.get(id) ?? null),
+        removeElement: vi.fn(),
       },
       selection: {
         getSelectedIds: vi.fn(() => selectedIds),
@@ -134,6 +140,32 @@ describe("useBlockInsertion", () => {
     expect(mocks.insertBlock).not.toHaveBeenCalled();
   });
 
+  /* G2-055 (CI-23): "Replace with block…" is a real replace — the block takes
+     the marked element's slot and the element goes, in the same transaction. */
+  it("replaces the marked element in place when it is still selected", () => {
+    const root = elements.get("root-1")!;
+    const old = makeElement("sec-2", "section", { getParent: () => root as never });
+    elements.set("sec-2", old);
+    (root as unknown as { getChildIndex: (c: unknown) => number }).getChildIndex = (c) => (c === old ? 1 : -1);
+    selectedIds = ["sec-2"];
+    requestReplaceWithBlock(composer as unknown as Composer, "sec-2");
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.objectContaining({ id: "hero" }), "root-1", 1);
+    expect(composer.elements.removeElement).toHaveBeenCalledWith("sec-2");
+    expect(mocks.addToast).toHaveBeenCalledWith(expect.objectContaining({ description: expect.stringMatching(/replaced with Hero/) }));
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("a replace is dropped once the selection moved elsewhere (plain insert)", () => {
+    elements.set("sec-2", makeElement("sec-2", "section"));
+    selectedIds = [];
+    requestReplaceWithBlock(composer as unknown as Composer, "sec-2");
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+  });
+
   it("inserts at the page root end when nothing is selected", () => {
     const { result } = mountHook();
     act(() => result.current.handleBlockClick(heroBlock));
@@ -146,8 +178,14 @@ describe("useBlockInsertion", () => {
       3 // root child count
     );
     expect(composer.selection.select).toHaveBeenCalledWith(elements.get("new-1"));
+    /* Decision #16 / board 4428:145642: "Hero added" with an Undo that
+       reverts the insert's own transaction. */
     expect(mocks.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ tone: "success", description: "Inserted: Hero" })
+      expect.objectContaining({
+        tone: "success",
+        description: "Hero added",
+        action: expect.objectContaining({ label: "Undo" }),
+      })
     );
     expect(composer.endTransaction).toHaveBeenCalled();
   });

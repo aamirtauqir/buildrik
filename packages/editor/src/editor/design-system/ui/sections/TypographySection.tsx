@@ -1,5 +1,13 @@
 /**
- * TypographySection — board 153:57 (Brand · Typography), list half.
+ * TypographySection — Brand › Fonts & type styles, board 7316:81551 (C1 (ii);
+ * was the drawer's 153:57 list half).
+ *
+ * One card: the three font roles (Heading · Body · Mono — "<family> · <role> ·
+ * N weights"), then the type styles (the font-size tokens — "<family> · <size>").
+ * A row click selects the token; the workspace draws its card in the right
+ * column, where Change opens the font picker or the size field. The drawer's
+ * type-scale editor (B/I toggles, desktop/mobile specimen) is not on the board
+ * and went with it.
  *
  * The Brand panel had eight destinations and this was not one of them, so the
  * board's whole screen was missing: a site's fonts could be changed one type
@@ -25,21 +33,92 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
+import { getDefaultStyles } from "../../../../shared/constants/defaultStyles";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
+import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 
 export interface TypographySectionProps {
   composer?: Composer | null;
   /** The project's own type tokens; falls back to the seed when absent. */
   tokens?: readonly DesignToken[];
+  selectedTokenId?: string | null;
+  onSelectToken?: (tokenId: string) => void;
 }
 
 /** The three font slots the token model actually has, in the board's order. */
-const FONT_SLOTS: Array<{ id: string; role: string }> = [
-  { id: "font-heading", role: "Display" },
-  { id: "font-body", role: "Body" },
-  { id: "font-mono", role: "Mono" },
+const FONT_SLOTS: Array<{ id: string; title: string; role: string }> = [
+  { id: "font-heading", title: "Heading", role: "Display" },
+  { id: "font-body", title: "Body", role: "Body" },
+  { id: "font-mono", title: "Mono", role: "Mono" },
 ];
+
+/* The type styles are the font-size tokens, named the way a designer names
+   them, largest first (7316:81551 lists "Heading XL" above "Body text"). The
+   family is the one the site's CSS gives that role: headings take the display
+   face, the rest the body face — the same split `slotForType` makes. */
+const STYLE_NAMES: Record<string, { name: string; slot: "font-heading" | "font-body"; element: string }> = {
+  "font-size-4xl": { name: "Heading 1", slot: "font-heading", element: "h1" },
+  "font-size-3xl": { name: "Heading 2", slot: "font-heading", element: "h2" },
+  "font-size-2xl": { name: "Heading 3", slot: "font-heading", element: "h3" },
+  "font-size-xl": { name: "Sub-heading", slot: "font-body", element: "h5" },
+  "font-size-lg": { name: "Body large", slot: "font-body", element: "paragraph" },
+  "font-size-base": { name: "Body text", slot: "font-body", element: "paragraph" },
+  "font-size-sm": { name: "Caption", slot: "font-body", element: "text" },
+  "font-size-xs": { name: "Caption XS", slot: "font-body", element: "text" },
+};
+
+const WEIGHT_NAMES: Record<string, string> = {
+  "300": "Light", "400": "Regular", "500": "Medium", "600": "Semi Bold", "700": "Bold", "800": "Extra Bold",
+};
+
+/**
+ * "<Family> <Weight> <size>/<line>" — 7316:81551's type-style line. The size
+ * is the token's; the weight and line-height are what the canvas gives the
+ * element that role names (DEFAULT_ELEMENT_STYLES), the line rounded to px.
+ */
+function typeStyleLine(family: string, size: string, element: string): string {
+  const d = getDefaultStyles(element);
+  const px = parseFloat(size);
+  const weight = WEIGHT_NAMES[d["font-weight"] ?? "400"] ?? d["font-weight"];
+  const lh = parseFloat(d["line-height"] ?? "");
+  const line = Number.isFinite(px) && Number.isFinite(lh) ? `${Math.round(px)}/${Math.round(px * lh)}` : size;
+  return [family, weight, line].filter(Boolean).join(" ");
+}
+
+/** The type styles — the font-size tokens, largest first, each with its
+ *  board line. Shared by Fonts & type styles and Styles (7316:82153). */
+export function typeStyleRows(source: readonly DesignToken[]): Array<{ id: string; name: string; line: string }> {
+  const order = Object.keys(STYLE_NAMES);
+  return source
+    .filter((t) => t.type === "font-size")
+    .sort((a, b) => {
+      const ia = order.indexOf(a.id);
+      const ib = order.indexOf(b.id);
+      return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
+    })
+    .map((t) => {
+      const known = STYLE_NAMES[t.id];
+      const family = familyOf(String(source.find((f) => f.id === (known?.slot ?? "font-body"))?.value ?? ""));
+      return {
+        id: t.id,
+        name: known?.name ?? t.friendlyName ?? t.name,
+        line: typeStyleLine(family, t.value, known?.element ?? "text"),
+      };
+    });
+}
+
+/** "N roles · M active fonts" — the page header's caption. */
+export function fontsCaption(tokens: readonly DesignToken[]): string {
+  const families = new Set(
+    FONT_SLOTS.map(({ id }) => familyOf(String(tokens.find((t) => t.id === id)?.value ?? "")).toLowerCase())
+      .filter(Boolean),
+  );
+  const roles = FONT_SLOTS.filter(({ id }) => tokens.some((t) => t.id === id)).length;
+  return `${roles} role${roles === 1 ? "" : "s"} · ${families.size} active font${families.size === 1 ? "" : "s"}`;
+}
+
+
 
 /** `"Inter Tight"` and `Inter Tight, sans-serif` both name the same family. */
 function familyOf(value: string): string {
@@ -101,14 +180,19 @@ function weightsInUse(
   return weights.size === 0 ? 1 : weights.size;
 }
 
-export const TypographySection: React.FC<TypographySectionProps> = ({ composer, tokens }) => {
+export const TypographySection: React.FC<TypographySectionProps> = ({
+  composer,
+  tokens,
+  selectedTokenId = null,
+  onSelectToken,
+}) => {
   const source = tokens ?? DEFAULT_TOKENS;
 
   const read = React.useCallback(() => {
-    return FONT_SLOTS.map(({ id, role }) => {
+    return FONT_SLOTS.map(({ id, title, role }) => {
       const token = source.find((t) => t.id === id);
       const family = familyOf(String(token?.value ?? ""));
-      return { id, role, family, weights: weightsInUse(composer, family, id) };
+      return { id, title, role, family, weights: weightsInUse(composer, family, id) };
     }).filter((row) => row.family.length > 0);
   }, [composer, source]);
 
@@ -128,44 +212,55 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ composer, 
     };
   }, [composer, read]);
 
-  if (rows.length === 0) {
+  const styles = React.useMemo(() => typeStyleRows(source), [source]);
+
+  if (rows.length === 0 && styles.length === 0) {
     return (
-      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-        No fonts set. Pick a font family under Tokens and it appears here.
+      <p className="tw:m-0 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+        No fonts set. Pick a starter or import a brand to set the site's fonts.
       </p>
     );
   }
 
   return (
-    <div data-testid="brand-typography">
-      <div className="tw:flex tw:items-center tw:h-7 tw:px-3 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
-        ACTIVE FONTS
-      </div>
-      <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0">
-        {rows.map((row) => (
-          <li key={row.id} className="tw:flex tw:flex-col tw:gap-1 tw:px-3 tw:py-2">
-            {/* The name is set IN the family it names — the board's whole point
-                is that you can see the face without leaving the panel. */}
-            <span
-              className="tw:text-[17px] tw:leading-6 tw:text-[var(--bk-ink)]"
-              style={{ fontFamily: `${row.family}, sans-serif` }}
-            >
-              {row.family}
-            </span>
-            <span className="tw:flex tw:items-center tw:gap-2">
-              <span className="tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-                {row.role}
+    <BrandCard label="Fonts and type styles" data-testid="brand-typography">
+      {rows.map((r) => (
+        <BrandRow
+          key={r.id}
+          data-testid={`brand-type-row-${r.id}`}
+          data-type-row="role"
+          selected={selectedTokenId === r.id}
+          onSelect={() => onSelectToken?.(r.id)}
+          trailing={<BrandChevron />}
+          name={r.title}
+          sub={
+            <>
+              {/* The family is set IN the face it names — you can see the font
+                  without leaving the page. */}
+              <span data-testid={`brand-font-family-${r.id}`} style={{ fontFamily: `${r.family}, sans-serif` }}>{r.family}</span>
+              {" · "}
+              <span data-testid={`brand-font-role-${r.id}`}>{r.role}</span>
+              {" · "}
+              <span data-font-weights>
+                {r.weights === 0 ? "not used yet" : `${r.weights} weight${r.weights === 1 ? "" : "s"}`}
               </span>
-              <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                {row.weights === 0
-                  ? "not used yet"
-                  : `${row.weights} weight${row.weights === 1 ? "" : "s"} in use`}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+            </>
+          }
+        />
+      ))}
+      {styles.map((st) => (
+        <BrandRow
+          key={st.id}
+          data-testid={`brand-type-row-${st.id}`}
+          data-type-row="style"
+          selected={selectedTokenId === st.id}
+          onSelect={() => onSelectToken?.(st.id)}
+          trailing={<BrandChevron />}
+          name={st.name}
+          sub={st.line}
+        />
+      ))}
+    </BrandCard>
   );
 };
 

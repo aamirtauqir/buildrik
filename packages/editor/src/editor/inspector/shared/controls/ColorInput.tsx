@@ -1,20 +1,23 @@
 import { Popover, Button, TextField } from "@/editor/chrome-ui";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
- * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
+ * Checkerboard swatch + hex. Token binding preserved. (The eye toggle went
+ * with G2-161: it only flipped its own icon.)
  *
  * @license BSD-3-Clause
  */
 
-import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-import { TokenPickerPopover } from "../TokenPickerPopover";
+import { ColorFillPopover } from "../ColorFillPopover";
+import { useUpdateColorEverywhere } from "@/editor/design-system/ui/colors/useUpdateColorEverywhere";
+import { useDSModeOptional } from "../../../design-system/state/DSModeContext";
 import { DSBindingChip } from "../../sections/DSBindingChip";
+import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
 
 // ============================================================================
 // HELPERS
@@ -44,14 +47,6 @@ const resolveVar = (cssVar: string): string => {
 // Hex without "#" prefix — matches mock's "FFFFFF" display
 const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
 
-// Opacity stub: real alpha channel support would require parsing rgba/hex8.
-// For now, hidden value reports 0% and visible reports 100%.
-/* `getPercent` lived here and returned "100%" when shown, "0%" when hidden —
-   from the eye toggle's own boolean, never from an alpha channel. It reported
-   the state of the control standing next to it, in 30px that the hex value
-   needed: at a 181px control track the field was left with 34, and a six-digit
-   hex arrived as "1a…". One bit does not need two controls. */
-
 // ============================================================================
 // COLOR INPUT
 // ============================================================================
@@ -74,10 +69,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   composer,
   placeholder,
 }) => {
-  const [hidden, setHidden] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
+  const updateEverywhere = useUpdateColorEverywhere(composer);
+  const dsMode = useDSModeOptional();
   const tokenEntries = colorTokens.map((t) => ({
     id: t.id,
     name: t.name,
@@ -138,8 +134,9 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     : null;
 
   const handleChipClick = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
-  }, [composer]);
+    /* G3-156: open Brand ON the token, not its landing page. */
+    if (composer && tokenId) requestBrandToken(composer, tokenId);
+  }, [composer, tokenId]);
 
   /* ONLY when the value is bound. A chip carries the token's NAME, which the
      field cannot show; the off-ds chip carried a warning mark next to a hex the
@@ -151,7 +148,6 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   const chip =
     isBound && tokenId ? (
       <DSBindingChip
-        state="token"
         label={tokenId}
         onClick={composer ? handleChipClick : undefined}
       />
@@ -250,37 +246,32 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                       <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)" }} />
                     </Button>
                   ) : null}
-                  {/* An opacity reading and a hide toggle for a colour that is
-                      not set say nothing, and they cost the field the width it
-                      needs — "Mixed" arrived as "Mi…" in the batch panel. */}
-                  {value ? (
-                    <>
-                      <Button
-                        type="button"
-                        className="bdi-eye"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setHidden((v) => !v);
-                        }}
-                        aria-label={hidden ? "Show color" : "Hide color"}
-                        title={hidden ? "Show color" : "Hide color"}
-                      >
-                        {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
-                      </Button>
-                    </>
-                  ) : null}
                 </>
               )}
             </div>
           }
         >
-          <TokenPickerPopover
+          <ColorFillPopover
+            label={label}
             tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={true}
-            tokenLabel="color"
-            onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
+            boundTokenId={boundToken?.id ?? null}
+            currentHex={swatchColor === "transparent" ? "" : swatchColor}
+            onSelectToken={(cssVarRef) => {
+              onChange(cssVarRef);
+              setIsOpen(false);
+            }}
+            onCustomValue={(hex) => {
+              if (isBound) lastBoundRef.current = value;
+              onChange(hex);
+              setIsOpen(false);
+            }}
+            onUpdateToken={(id, hex) => {
+              updateEverywhere(id, hex);
+              setIsOpen(false);
+            }}
+            usageOf={(id) => composer?.designSystem?.tokenUsage?.getUsage?.(id) ?? 0}
+            showSearch={dsMode?.isPro ?? false}
+            onClose={() => setIsOpen(false)}
           />
         </Popover>
         {chip}

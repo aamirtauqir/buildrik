@@ -10,6 +10,31 @@ import { SECTION_PREVIEW, SECTION_SUBTITLE } from "../../shared/controls/control
 import { DisplayControls } from "./DisplayControls";
 import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
 import { PositionControls } from "./PositionControls";
+import { BK_SELECT_BARE_VALUE_THEME, Select } from "@/editor/chrome-ui";
+import { constraintTypeOf, valueForConstraint, type ConstraintType } from "../ConstraintControl";
+
+/* Board 4428:141170's "Size  Fill · Hug" row: width and height sizing modes.
+   An unset width reads Fill and an unset height Hug — what a block does. The
+   exact numbers (and min/max) stay in the Size section. */
+const SIZE_FIELD = "tw:flex-1 tw:min-w-0 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] tw:bg-[var(--bk-bg-card)]";
+
+function SizeModeSelect({ axis, value, onChange }: { axis: "width" | "height"; value: string; onChange: (property: string, value: string) => void }) {
+  const mode: ConstraintType = value ? constraintTypeOf(value) : axis === "width" ? "fill" : "hug";
+  return (
+    <div className={SIZE_FIELD}>
+      <Select
+        aria-label={axis === "width" ? "Width sizing" : "Height sizing"}
+        theme={BK_SELECT_BARE_VALUE_THEME}
+        value={mode}
+        onChange={(e) => onChange(axis, valueForConstraint(e.target.value as ConstraintType, value))}
+      >
+        <option value="fill">Fill</option>
+        <option value="hug">Hug</option>
+        <option value="fixed">{mode === "fixed" && value ? value : "Fixed"}</option>
+      </Select>
+    </div>
+  );
+}
 
 // ============================================================================
 // TYPES
@@ -74,7 +99,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       onToggle={onToggle}
       preview={layoutPreview}
       tier={tier}
-      id="inspector-section-display"
+      id="inspector-section-layout"
     >
       {/* ═══════════════════════════════════════════════════════════════════
           ESSENTIALS - Always visible
@@ -82,6 +107,13 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
 
       {/* Display (essential) */}
       <DisplayControls display={styles.display || ""} onChange={onChange} mixedKeys={mixedKeys} />
+      <div className="bdi-row-ctrl" role="group" aria-label="Size">
+        <label className="bdi-lb">Size</label>
+        <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2">
+          <SizeModeSelect axis="width" value={styles.width || ""} onChange={onChange} />
+          <SizeModeSelect axis="height" value={styles.height || ""} onChange={onChange} />
+        </div>
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           ADVANCED - Behind "More settings" toggle

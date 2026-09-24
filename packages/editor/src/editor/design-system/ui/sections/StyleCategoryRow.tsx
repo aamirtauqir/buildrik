@@ -1,99 +1,46 @@
 /**
- * StyleCategoryRow (Arc B1 T2) — single row in the Styles sub-tab left column.
- *
- * Shows the category at the left and its variant count at the right (board
- * 152:112), with cobalt active state (left border +
- * accent fg). Disabled when category has zero presets. Click → host router
- * setView({ category, variant: firstVariant }).
+ * StyleCategoryRow — one preset category on Brand › Presets, board 7316:83953
+ * (C1 (ii); was the drawer's 152:112): the category, plural as the board
+ * names it, over "N variants", ending in ›. Click drills into the category's
+ * detail (StylesRouter). A category with no presets is shown, disabled.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { PresetCategory } from "../../types";
-import { Button } from "@/editor/chrome-ui";
+import { BrandChevron, BrandRow } from "../BrandCard";
 
 export interface StyleCategoryRowProps {
   category: PresetCategory;
   variantCount: number;
-  isActive: boolean;
   onClick: () => void;
 }
 
 const CATEGORY_LABELS: Record<PresetCategory, string> = {
-  button: "Button",
-  card: "Card",
-  form: "Form input",
-  link: "Link",
-  badge: "Badge",
-  alert: "Alert",
-  tooltip: "Tooltip",
-  modal: "Modal",
+  button: "Buttons",
+  card: "Cards",
+  form: "Forms",
+  link: "Links",
+  badge: "Badges",
+  alert: "Alerts",
+  tooltip: "Tooltips",
+  modal: "Modals",
   nav: "Nav",
-  table: "Table",
-  layout: "Layout",
+  table: "Tables",
+  layout: "Layouts",
 };
 
-export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
-  category,
-  variantCount,
-  isActive,
-  onClick,
-}) => {
-  const enabled = variantCount > 0;
-  return (
-    <Button
-      type="button"
-      color="light"
-      size="xs"
-      data-category-row={category}
-      data-testid={`brand-preset-row-${category}`}
-      data-active={isActive ? "true" : undefined}
-      onClick={onClick}
-      disabled={!enabled}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
-        minHeight: 44,
-        padding: "0 16px",
-        paddingLeft: isActive ? 14 : 16,
-        background: isActive ? "var(--bk-bg-subtle)" : "transparent",
-        borderTop: "none",
-        borderRight: "none",
-        borderBottom: "none",
-        borderLeft: isActive
-          ? "2px solid var(--bk-accent)"
-          : "2px solid transparent",
-        borderRadius: 4,
-        cursor: enabled ? "pointer" : "not-allowed",
-        opacity: enabled ? 1 : 0.4,
-        textAlign: "left",
-        fontSize: 13,
-        color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
-        fontWeight: isActive ? 500 : 400,
-      }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-    >
-      {/* Board 152:112 splits the row: name at the left margin, count muted
-          at the right, like every other list in this panel. It used to read
-          "Button · 3 variants" as one run of text, so the counts did not line
-          up and the eye could not scan them. */}
-      {/* 13/20 for the name, 11/16 for the count — 306:2166 / 306:2167 and
-          their five siblings. Both inherited flowbite's `size="xs"` 12/16, so
-          the name was a pixel small and its line four short. */}
-      <span
-        data-testid={`brand-preset-label-${category}`}
-        className="tw:text-[13px] tw:leading-5"
-      >{CATEGORY_LABELS[category]}</span>
-      <span
-        data-testid={`brand-preset-count-${category}`}
-        className="tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-muted)]"
-      >
-        {/* One text node: split, "3" and "variants" reach the copy check as
-            separate strings and the board's "3 variants" matches neither. */}
-        {`${variantCount} ${variantCount === 1 ? "variant" : "variants"}`}
-      </span>
-    </Button>
-  );
-};
+export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({ category, variantCount, onClick }) => (
+  <BrandRow
+    data-category-row={category}
+    data-testid={`brand-preset-row-${category}`}
+    onSelect={onClick}
+    disabled={variantCount === 0}
+    trailing={<BrandChevron />}
+    name={<span data-testid={`brand-preset-label-${category}`}>{CATEGORY_LABELS[category]}</span>}
+    /* One text node: split, "3" and "variants" reach the copy check as
+       separate strings and the board's "3 variants" matches neither. */
+    sub={<span data-testid={`brand-preset-count-${category}`}>{`${variantCount} ${variantCount === 1 ? "variant" : "variants"}`}</span>}
+  />
+);

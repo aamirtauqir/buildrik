@@ -5,29 +5,21 @@
  */
 
 import type { Composer } from "../../engine";
+import { DEVICE_PREVIEW_SIZES } from "../../shared/constants/breakpoints";
 import type { DeviceType } from "../../shared/types";
 import type { CanvasOverlayState } from "./CanvasFooterToolbar";
 
 export interface CanvasProps {
   composer: Composer | null;
-  /** Inspector column visibility — forwarded to the footer's view toggles. */
-  inspectorOpen?: boolean;
-  /** Show or hide the inspector column. */
-  onToggleInspector?: () => void;
   device: DeviceType;
   zoom: number;
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
-  showComponentView?: boolean;
   showSpacing?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;
   showGrid?: boolean;
-  gridSize?: number;
-  showOutlines?: boolean;
   showRulers?: boolean;
   showXRay?: boolean;
-  /** Dev Mode - auto-enables Level 3/4 hover (boxmodel/hierarchy) without Alt/Shift */
-  devMode?: boolean;
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
   /**
@@ -62,13 +54,9 @@ export interface CanvasRef {
   getContent: () => string;
 }
 
-export const DEVICE_SIZES: Record<string, { width: string; height: string }> = {
-  // "wide" was missing — clicking the Wide breakpoint button caused the
-  // canvas to read undefined.width and crash the editor (StudioErrorBoundary).
-  // Width matches BreakpointDropdown.tsx { id: "wide", width: 1920 }.
-  wide: { width: "1920px", height: "100%" },
-  desktop: { width: "100%", height: "100%" },
-  tablet: { width: "768px", height: "1024px" },
-  mobile: { width: "375px", height: "812px" },
-  watch: { width: "196px", height: "230px" },
-};
+const px = (v: number | "100%") => (typeof v === "number" ? `${v}px` : v);
+
+/** Canvas frame size per device, in CSS — derived from DEVICE_PREVIEW_SIZES. */
+export const DEVICE_SIZES = Object.fromEntries(
+  Object.entries(DEVICE_PREVIEW_SIZES).map(([id, s]) => [id, { width: px(s.width), height: px(s.height) }])
+) as Record<DeviceType, { width: string; height: string }>;

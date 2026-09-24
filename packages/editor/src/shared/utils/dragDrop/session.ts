@@ -55,7 +55,6 @@ export function createDragSession(
     ghostElement: null,
     autoScrollTimer: null,
     isKeyboardDrag: false,
-    isTouchDrag: false,
     constraints: {
       axis: "none",
       minDistance: 5,

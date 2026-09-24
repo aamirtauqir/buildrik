@@ -1,9 +1,10 @@
 /**
  * Threading regression for the Create Collection prop path.
  *
- * Guards: ProInspector forwards its `onOpenCreateCollection` prop into
- * BindingPopover. The BindingPopover unit test covers the downstream hop
- * (its own click handler invokes the prop). This test covers the hop
+ * Guards: ProInspector forwards its `onOpenCreateCollection` prop into the
+ * tab content, which hands it to Settings › CONTENT (the binding door moved
+ * there from the header — G2-144). ContentSection's own test covers the
+ * downstream hop (its Create collection button invokes the prop). This test covers the hop
  * above — a rename on either side, or accidentally dropping the prop
  * spread, would make the spy observed here fire with the wrong shape or
  * not at all.
@@ -16,18 +17,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 
-// Mock BindingPopover as a probe that records every prop it received on
-// mount. Hoisted above the import so vitest's module registry intercepts.
-const bindingPopoverProps: Array<Record<string, unknown>> = [];
-vi.mock("../BindingPopover", () => ({
-  BindingPopover: (props: Record<string, unknown>) => {
-    bindingPopoverProps.push(props);
-    return null;
-  },
-}));
-
 // Keep the rest of ProInspector's heavy subtree out of the render — we
-// only care about whether the prop reaches BindingPopover. Most of these
+// only care about whether the prop reaches the tab content. Most of these
 // deps come from hooks/composer, which would require a real composer to
 // boot. Stub the components/hooks ProInspector imports that don't touch
 // the threading under test.
@@ -40,8 +31,12 @@ vi.mock("../MultiSelectToolbar", () => ({
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
+const tabContentProps: Array<Record<string, unknown>> = [];
 vi.mock("../../tabs/InspectorTabContent", () => ({
-  InspectorTabContent: () => null,
+  InspectorTabContent: (props: Record<string, unknown>) => {
+    tabContentProps.push(props);
+    return null;
+  },
 }));
 vi.mock("../../sections/VariantSection", () => ({
   VariantSection: () => null,
@@ -56,7 +51,7 @@ vi.mock("../DeleteConfirmModal", () => ({
 import { ProInspector } from "../../ProInspector";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+/* ProInspector mounts VariantSection, which reports a refused detach
    rather than swallowing it — so it needs the toast context. AquibraStudio
    wraps the whole studio in one, so every real mount has it and only these
    tests rendered the subtree bare. */
@@ -73,6 +68,7 @@ function makeMinimalComposer() {
       getElement: () => ({
         getStyles: () => ({}),
         getClasses: () => [],
+        getCustomData: () => undefined,
         getId: () => "el-1",
         getParent: () => null,
         getTagName: () => "div",
@@ -95,9 +91,9 @@ function makeMinimalComposer() {
   } as any;
 }
 
-describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => {
-  it("passes the exact callback prop through to BindingPopover", () => {
-    bindingPopoverProps.length = 0;
+describe("ProInspector threads onOpenCreateCollection to the Settings tab content", () => {
+  it("passes the exact callback prop through to InspectorTabContent", () => {
+    tabContentProps.length = 0;
     const spy = vi.fn();
 
     renderWithToast(
@@ -109,11 +105,11 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
       />
     );
 
-    const received = bindingPopoverProps[0];
-    expect(received, "BindingPopover must mount").toBeTruthy();
+    const received = tabContentProps[0];
+    expect(received, "InspectorTabContent must mount").toBeTruthy();
     expect(received.onOpenCreateCollection).toBe(spy);
 
-    // Simulate BindingPopover's footer click firing the received callback —
+    // Simulate CONTENT's Create collection click firing the received callback —
     // the same contract the real component uses. If the prop was dropped
     // or renamed upstream, `received.onOpenCreateCollection` would be
     // undefined and this call would throw.
@@ -122,7 +118,7 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
   });
 
   it("renders cleanly when onOpenCreateCollection is omitted", () => {
-    bindingPopoverProps.length = 0;
+    tabContentProps.length = 0;
     renderWithToast(
       <ProInspector
         selectedElement={{ id: "el-1", type: "box", tagName: "div" }}
@@ -130,6 +126,6 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
         currentBreakpoint="desktop"
       />
     );
-    expect(bindingPopoverProps[0]?.onOpenCreateCollection).toBeUndefined();
+    expect(tabContentProps[0]?.onOpenCreateCollection).toBeUndefined();
   });
 });

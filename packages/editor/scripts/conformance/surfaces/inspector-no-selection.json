@@ -2,17 +2,38 @@
   "surface": "inspector-no-selection",
   "board": "Inspector · no-selection (Figma 159:99)",
   "url": "http://localhost:5050/",
-  "viewport": { "width": 1440, "height": 900 },
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
   "steps": [
-    { "action": "waitFor", "testId": "rail-coach-got-it" },
-    { "action": "click", "testId": "rail-coach-got-it" },
-    { "action": "waitFor", "testId": "inspector-empty" }
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-empty"
+    }
   ],
   "contrastScope": "[data-testid=\"inspector-empty\"]",
   "targets": [
-    { "name": "empty-block", "testId": "inspector-empty", "spec": "inspector-no-selection", "nodeId": "159:100" },
-    { "name": "empty-text", "testId": "inspector-empty-text", "spec": "inspector-no-selection", "nodeId": "159:101" },
-    { "name": "ask-ai", "testId": "inspector-empty-ask-ai", "spec": "inspector-no-selection", "nodeId": "920:4717" }
+    {
+      "name": "empty-block",
+      "testId": "inspector-empty",
+      "spec": "inspector-no-selection",
+      "nodeId": "159:100"
+    },
+    {
+      "name": "empty-text",
+      "testId": "inspector-empty-text",
+      "spec": "inspector-no-selection",
+      "nodeId": "159:101"
+    }
   ],
   "_note": [
     "REACHED LIVE at the shell's own 1440x900: on first run nothing is",

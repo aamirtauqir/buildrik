@@ -36,8 +36,6 @@ export interface ComposerConfig {
   project?: ProjectConfig;
   /** Canvas configuration */
   canvas?: CanvasConfig;
-  /** Theme configuration */
-  theme?: ThemeConfig;
   /** Plugin configuration */
   plugins?: import("./plugins").PluginConfig[];
   /** Internationalization */
@@ -101,17 +99,6 @@ export interface CanvasConfig {
   gridSize?: number;
   /** Snap to grid */
   snapToGrid?: boolean;
-}
-
-export interface ThemeConfig {
-  /** Theme mode */
-  mode?: "light" | "dark" | "auto";
-  /** Primary color */
-  primaryColor?: string;
-  /** Accent color */
-  accentColor?: string;
-  /** Custom CSS variables */
-  variables?: Record<string, string>;
 }
 
 export interface PluginConfig {
@@ -261,6 +248,21 @@ export interface CommandData {
   shortcut?: string;
   /** Alternate keyboard shortcuts */
   shortcuts?: string[];
+  /**
+   * Where the command sits in the keyboard sheet and the ⌘K palette
+   * (Selection · Edit · View · Panels · Regions are the sheet's groups, board
+   * 7575:195538; "Navigation" bands under GO TO and "Pages" under PAGES in
+   * the palette). Absent → the palette's ACTIONS band, no sheet row.
+   */
+  group?: string;
+  /** Extra search terms the palette matches besides the label. */
+  keywords?: string[];
+  /**
+   * The command quietly returns without a selection. The palette reads this
+   * to render the row disabled with "nothing selected" instead of letting it
+   * run and do nothing.
+   */
+  requiresSelection?: boolean;
   /** Run command */
   run: (composer: Composer, options?: CommandOptions) => CommandResult;
   /** Stop command */

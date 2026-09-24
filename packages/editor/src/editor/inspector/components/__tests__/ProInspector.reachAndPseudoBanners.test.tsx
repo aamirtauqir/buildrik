@@ -13,7 +13,6 @@ import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 
-vi.mock("../BindingPopover", () => ({ BindingPopover: () => null }));
 vi.mock("../InspectorEmptyState", () => ({ InspectorEmptyState: () => null }));
 vi.mock("../MultiSelectToolbar", () => ({ MultiSelectToolbar: () => null }));
 vi.mock("../InspectorErrorBoundary", () => ({
@@ -25,9 +24,6 @@ vi.mock("../../tabs/InspectorTabContent", () => ({
 vi.mock("../../sections/VariantSection", () => ({ VariantSection: () => null }));
 vi.mock("../InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
-vi.mock("@/editor/components-catalog/ui/DetachInstanceButton", () => ({
-  DetachInstanceButton: () => null,
-}));
 
 import { ProInspector } from "../../ProInspector";
 
@@ -46,6 +42,7 @@ function makeComposer() {
       getElement: () => ({
         getStyles: () => ({}),
         getClasses: () => [],
+        getCustomData: () => undefined,
         getId: () => "el-1",
         getParent: () => null,
         getTagName: () => "button",

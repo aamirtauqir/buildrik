@@ -255,6 +255,27 @@ describe("saveProject", () => {
   });
 });
 
+describe("saveProject — no session Object URLs reach the server (walk 2026-09-24)", () => {
+  it("drops blob: src / background-image from the saved copy and leaves the live data alone", async () => {
+    await loadedSite("site-blob");
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+    const img = { id: "i1", type: "image", tagName: "img", attributes: { src: "blob:http://x/1", alt: "a" }, children: [] };
+    const bg = { id: "b1", type: "container", tagName: "div", styles: { "background-image": "url(blob:http://x/2)", color: "red" }, children: [] };
+    const ok = { id: "i2", type: "image", tagName: "img", attributes: { src: "https://cdn/x.png" }, children: [] };
+    const page = { id: "p1", name: "Home", slug: "home", root: { id: "r", type: "container", tagName: "div", children: [img, bg, ok] } };
+    const projectData = { version: "1.0" as const, pages: [page], styles: [], assets: [], metadata: { name: "T" } };
+
+    await saveProject("site-blob", projectData as never);
+
+    const sent = mocks.saveProjectMutate.mock.calls.at(-1)![0].projectData;
+    const [sImg, sBg, sOk] = sent.pages[0].root.children;
+    expect(sImg.attributes).toEqual({ alt: "a" });
+    expect(sBg.styles).toEqual({ color: "red" });
+    expect(sOk.attributes.src).toBe("https://cdn/x.png");
+    expect(img.attributes.src).toBe("blob:http://x/1");
+  });
+});
+
 describe("getSiteIdFromUrl", () => {
   it("extracts siteId from query params", () => {
     const originalLocation = window.location;
@@ -432,6 +453,30 @@ describe("save-conflict parsing (61-conflict)", () => {
     expect(mocks.saveProjectMutate).toHaveBeenLastCalledWith(
       expect.objectContaining({ expectedLastEditedAt: "2026-07-02T00:00:00.000Z" })
     );
+  });
+
+  /* Walk 2026-09-24: autosave and ⌘S 180 ms apart both sent the load-time
+     token; the second read as someone else's edit — a false conflict. */
+  it("a save issued while another is in flight waits for it and carries the NEW baseline", async () => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T", lastEditedAt: "2026-06-30T12:00:00.000Z" });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    await loadProject("s1");
+    let release!: () => void;
+    mocks.saveProjectMutate
+      .mockImplementationOnce(
+        () => new Promise((r) => (release = () => r({ success: true, savedAt: new Date("2026-07-02T00:00:00.000Z") }))),
+      )
+      .mockResolvedValueOnce({ success: true, savedAt: new Date("2026-07-02T00:00:01.000Z") });
+
+    const first = saveProject("s1", PROJECT);
+    const second = saveProject("s1", PROJECT);
+    await Promise.resolve();
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
+    release();
+    await first;
+    await second;
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(2);
+    expect(mocks.saveProjectMutate.mock.calls[1][0]).toMatchObject({ expectedLastEditedAt: "2026-07-02T00:00:00.000Z" });
   });
 
   it("setBaselineLastEditedAt forces the token (the 'Overwrite' escape hatch)", async () => {

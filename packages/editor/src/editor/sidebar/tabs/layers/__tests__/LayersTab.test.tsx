@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { LayerSelectionBanner } from "../../../../panels/layers/components/LayerSelectionBanner";
+import { render, screen, fireEvent } from "@testing-library/react";
+import type { Composer } from "../../../../../engine";
 
 // Mock deep dependencies before importing LayersTab
 vi.mock("@/editor/panels/layers/index", () => ({
@@ -20,6 +20,7 @@ vi.mock("@/editor/canvas/hooks/useComposerSelection", () => ({
 }));
 
 // Import after mocks are registered
+import { EVENTS } from "@/shared/constants/events";
 import { LayersTab } from "../LayersTab";
 
 // Patch window.matchMedia (jsdom doesn't implement it) — runs after env init
@@ -54,77 +55,99 @@ describe("LayersTab (no composer)", () => {
   });
 });
 
-// ─── LayerSelectionBanner (Screen R4Pf4 — multi-select action bar) ────────────
+// ─── Header ⋯ panel menu (board 7059:78962) ───────────────────────────────
 
-describe("LayerSelectionBanner", () => {
-  it("renders nothing when count < 2", () => {
-    const { container } = render(
-      <LayerSelectionBanner
-        count={1}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
-    );
-    expect(container.firstChild).toBeNull();
+describe("LayersTab — header ⋯ menu", () => {
+  const composer = () =>
+    ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), isProjectLoading: () => false }) as unknown as Composer;
+
+  it("4418:81300 — no search band in the drawer (the topbar field is the filter), no ⊞ ⊟ ⚙ glyphs", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.queryByLabelText("Search layers")).toBeNull();
+    expect(screen.queryByTestId("layers-toolbar")).toBeNull();
+    expect(screen.queryByLabelText("Expand all layers")).toBeNull();
+    expect(screen.queryByLabelText("Layer display settings")).toBeNull();
   });
 
-  it("shows selection count when 2+ layers selected", () => {
-    render(
-      <LayerSelectionBanner
-        count={3}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
-    );
-    expect(screen.getByText("3 selected")).toBeTruthy();
+  it("owns the topbar field (\"Search layers…\") while open, and gives it back when closed", () => {
+    const c = composer();
+    const { rerender } = render(<LayersTab composer={c} isOpen />);
+    expect(c.emit).toHaveBeenCalledWith(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search layers…" });
+    expect(c.on).toHaveBeenCalledWith(EVENTS.UI_SEARCH_QUERY, expect.any(Function));
+    // A closed drawer stays mounted (width 0) — the field must still come back.
+    rerender(<LayersTab composer={c} isOpen={false} />);
+    expect(c.emit).toHaveBeenLastCalledWith(EVENTS.UI_SEARCH_CONTEXT, null);
   });
 
-  it("calls onGroup when Group button is clicked", () => {
-    const onGroup = vi.fn();
+  it("Escape closes the drawer — but not from a text field or with a menu open", () => {
+    const onClose = vi.fn();
     render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={onGroup}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
+      <>
+        <input aria-label="rename" />
+        <LayersTab composer={null} onClose={onClose} />
+      </>
     );
-    screen.getByRole("button", { name: "Group" }).click();
-    expect(onGroup).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(screen.getByLabelText("rename"), { key: "Escape" });
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.keyDown(document.body, { key: "Escape" }); // closes the ⋯ menu only
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document.body, { key: "Escape" }); // now the drawer
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onDelete when Delete button is clicked", () => {
-    const onDelete = vi.fn();
-    render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={onDelete}
-        onExit={vi.fn()}
-      />
-    );
-    screen.getByRole("button", { name: "Delete" }).click();
-    expect(onDelete).toHaveBeenCalledTimes(1);
+  it("two-step Escape: with a selection it deselects and stays open; with none it closes", () => {
+    const onClose = vi.fn();
+    let selected = ["el-1"];
+    const clear = vi.fn(() => {
+      selected = [];
+    });
+    const c = {
+      ...composer(),
+      selection: { getSelectedIds: () => selected, clear },
+    } as unknown as Composer;
+    render(<LayersTab composer={c} onClose={onClose} />);
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(clear).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onExit when Done button is clicked", () => {
-    const onExit = vi.fn();
-    render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={onExit}
-      />
-    );
-    screen.getByRole("button", { name: "Done" }).click();
-    expect(onExit).toHaveBeenCalledTimes(1);
+  it("4418:79546 — the count footer carries the ⓘ dim-scope explainer", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.getByLabelText("About dimmed layers")).toBeTruthy();
+  });
+
+  it("the 700 wide view survives as a ⋯ row (no header button on the v3 board)", () => {
+    const onExpandToggle = vi.fn();
+    render(<LayersTab composer={null} isExpanded={false} onExpandToggle={onExpandToggle} />);
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-wide-view"));
+    expect(screen.queryByTestId("layers-wide-view")).toBeNull();
+    expect(onExpandToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("⋯ opens Expand all · Collapse all · Display settings…", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.queryByTestId("layers-expand-all")).toBeNull();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    expect(screen.getByRole("menu", { name: "Layers options" })).toBeTruthy();
+    expect(screen.getByTestId("layers-expand-all")).toHaveTextContent("Expand all");
+    expect(screen.getByTestId("layers-collapse-all")).toHaveTextContent("Collapse all");
+    expect(screen.getByTestId("layers-display-settings-toggle")).toHaveTextContent("Display settings…");
+  });
+
+  it("Expand all / Collapse all reach the tree through the composer, and the menu closes", () => {
+    const c = composer();
+    render(<LayersTab composer={c} />);
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-expand-all"));
+    expect(c.emit).toHaveBeenCalledWith("layers:expand-all", {});
+    expect(screen.queryByTestId("layers-expand-all")).toBeNull();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-collapse-all"));
+    expect(c.emit).toHaveBeenCalledWith("layers:collapse-all", {});
   });
 });

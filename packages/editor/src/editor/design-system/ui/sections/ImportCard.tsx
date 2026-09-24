@@ -113,14 +113,7 @@ function detectFormat(raw: string, fileName: string | null): string {
   return "Unknown format";
 }
 
-export interface ImportCardProps {
-  /** Board 306:2265 / 306:2298 put an "Imported tokens" / "Import failed" badge
-   *  under the back row. The badge belongs to the screen frame this card sits
-   *  inside, so the outcome is reported upward rather than drawn here. */
-  onOutcome?(outcome: "imported" | "import-failed"): void;
-}
-
-export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
+export const ImportCard: React.FC = () => {
   const [parsed, setParsed] = React.useState<ParsedState | null>(null);
   const [showPaste, setShowPaste] = React.useState(false);
   const [pasteBuffer, setPasteBuffer] = React.useState("");
@@ -170,10 +163,9 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
     const parsedJson = parseImportJSON(raw);
     if (parsedJson.errors.length > 0) {
       setParseErrors(parsedJson.errors);
-      /* Board 306:2298. The card already showed the error detail inline; what
-         it had no way to say was that the SCREEN is in a failed state, which is
-         what the badge under the back row is for. */
-      onOutcome?.("import-failed");
+      /* G3-123: the outcome is a toast (no pill band); the card keeps the
+         error detail inline. */
+      addToast({ title: "Import failed", description: "Nothing was imported — the errors are listed in the card.", tone: "error" });
       setParsed(null);
       return;
     }
@@ -234,7 +226,6 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
         (stats.skipped.length ? ` · skipped ${stats.skipped.join(", ")}` : ""),
       tone: "success",
     });
-    onOutcome?.("imported");
     handleCancel();
   };
 
@@ -253,7 +244,7 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
           <div
             role="button"
             tabIndex={0}
-            aria-label="Drop tokens.json or tailwind.config.ts, or click to browse"
+            aria-label="Drop tokens.json, or click to browse"
             data-testid="import-drop-zone"
             className={`${DROP_BASE} ${isDragOver ? DROP_ACTIVE : DROP_IDLE}`}
             onClick={() => fileInputRef.current?.click()}
@@ -267,14 +258,14 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            {/* Board 153:120/153:152 draw one centred line: "Drop .json or
-                .ts". The zone stays clickable (aria-label below keeps the
-                fuller, accurate hint for assistive tech). */}
-            Drop .json or .ts
+            {/* 4418:168885: "Drop tokens.json — JSON only". It is true: a .ts
+                Tailwind config only ever surfaced as a parse error, so the
+                picker no longer offers one. */}
+            Drop tokens.json — JSON only
             <TextInput
               ref={fileInputRef}
               type="file"
-              accept="application/json,.json,.ts,.js"
+              accept="application/json,.json"
               className="tw:hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];

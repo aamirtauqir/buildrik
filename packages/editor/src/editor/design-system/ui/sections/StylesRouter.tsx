@@ -26,6 +26,7 @@ import {
   PRESET_CATEGORIES,
 } from "../../state/StylePresetRegistryContext";
 import { StyleCategoryRow } from "./StyleCategoryRow";
+import { BrandCard } from "../BrandCard";
 import { PresetDetailPane } from "./PresetDetailPane";
 import { Button } from "@/editor/chrome-ui";
 type View =
@@ -137,39 +138,22 @@ export const StylesRouter: React.FC = () => {
   }
 
   return (
-    <div
-      data-styles-router
-      data-list-view
-      data-testid="brand-preset-list"
-      /* Flush and flush to the top: 306:2161 puts the first Preset row at the
-         back row's own baseline with no gap between rows. The 2px gap and the
-         8px top pad pushed six 44px rows 20px down the panel between them. */
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: 0,
-        overflowY: "auto",
-      }}
-    >
-      {PRESET_CATEGORIES.map((cat) => (
-        <StyleCategoryRow
-          key={cat}
-          category={cat}
-          variantCount={presetsByCategory[cat].length}
-          isActive={false}
-          onClick={() => {
-            const firstVariant =
-              presetsByCategory[cat][0]?.variant ?? "";
-            if (firstVariant) {
-              setView({
-                kind: "detail",
-                category: cat,
-                variant: firstVariant,
-              });
-            }
-          }}
-        />
-      ))}
+    <div data-styles-router data-list-view>
+      <BrandCard label="Presets" data-testid="brand-preset-list">
+        {PRESET_CATEGORIES.map((cat) => (
+          <StyleCategoryRow
+            key={cat}
+            category={cat}
+            variantCount={presetsByCategory[cat].length}
+            onClick={() => {
+              const firstVariant = presetsByCategory[cat][0]?.variant ?? "";
+              if (firstVariant) {
+                setView({ kind: "detail", category: cat, variant: firstVariant });
+              }
+            }}
+          />
+        ))}
+      </BrandCard>
     </div>
   );
 };

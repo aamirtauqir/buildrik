@@ -60,7 +60,8 @@ import type {
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
-import { Button, IconButton } from "@/editor/chrome-ui";
+import { Button, IconButton, Tooltip } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
@@ -132,9 +133,11 @@ const GHOST_BADGE =
    thumb, drawn while the card is hovered or anything in it has focus. The
    button is always in the tree (Tab reaches it, then it shows itself); only
    its opacity waits for the pointer. */
+/* 4418:58292 btn/more — on every card at rest: 24 square, 92% white over the
+   thumb, 1px border, radius 6, 16 glyph. */
 const CARD_MENU_BTN =
-  "tw:absolute tw:top-1.5 tw:right-1.5 tw:z-[1] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:shadow-[var(--bk-shadow-raised)] " +
-  "tw:opacity-0 tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 tw:enabled:hover:bg-[var(--bk-bg-card)]";
+  "tw:absolute tw:top-0.5 tw:right-0.5 tw:z-[1] tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] " +
+  "tw:bg-[color-mix(in_srgb,var(--bk-bg-card)_92%,transparent)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-card)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
@@ -232,6 +235,9 @@ export function AssetGrid({
   addToast,
 }: AssetGridProps) {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  /* Audit G3-064: a viewer's Upload CTAs and bulk Delete stay on screen,
+     `aria-disabled`, with the reason on a tooltip (board 6289:148485). */
+  const write = useMediaWriteAccess();
   /* Clone 4207:26629 / 4215:26635 — the drag image is the library's own
      ghost: the thumb (grid) or the row(s) (list) with an "N items" badge.
      `setDragImage` reads the element the moment dragstart fires, so the
@@ -519,16 +525,25 @@ export function AssetGrid({
           >
             Download
           </Button>
-          <Button
-            variant="link"
-            className={BULK_LINK_DANGER}
-            onClick={() => {
-              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
-              state.requestBulkDelete(items);
-            }}
-          >
-            Delete
-          </Button>
+          {write.canWrite ? (
+            <Button
+              variant="link"
+              className={BULK_LINK_DANGER}
+              data-testid="mgr-bulk-delete"
+              onClick={() => {
+                const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+                state.requestBulkDelete(items);
+              }}
+            >
+              Delete
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("delete")} placement="top">
+              <Button variant="link" className={`${BULK_LINK_MUTED} tw:cursor-default`} data-testid="mgr-bulk-delete" aria-disabled="true">
+                Delete
+              </Button>
+            </Tooltip>
+          )}
           <Button variant="link" className={BULK_LINK_MUTED} onClick={state.clearSelection}>
             ✕ Clear
           </Button>
@@ -622,7 +637,9 @@ export function AssetGrid({
           }
         >
           {visibleItems.map((item) => {
-            const isSelected = selectedAssetId === item.key;
+            /* 4418:156160 — in select mode every CHECKED card wears the ring;
+               otherwise the one file open in the rail does. */
+            const isSelected = state.selMode ? state.selectedKeys.has(item.key) : selectedAssetId === item.key;
             const thumbContent = thumbFor(item, viewMode);
 
             // Two drop targets read this drag: the canvas (src/type/name) and
@@ -657,10 +674,18 @@ export function AssetGrid({
               onAssetDragEnd();
             };
 
-            // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles.
+            /* Cmd/Ctrl-click checks one more file; entering select mode it
+               carries the file already open in the rail, so the second click
+               makes TWO, not one. Shift-click checks the range from the last
+               click (or the open file). In selMode a plain click toggles. */
             const onClick = (e: React.MouseEvent) => {
-              if (e.metaKey || e.ctrlKey) {
-                if (!state.selMode) state.toggleSelMode();
+              if (e.shiftKey) {
+                state.shiftSelect(item.key, selectedAssetId);
+              } else if (e.metaKey || e.ctrlKey) {
+                if (!state.selMode) {
+                  if (selectedAssetId && selectedAssetId !== item.key) state.enterSelectModeWith(selectedAssetId);
+                  else state.toggleSelMode();
+                }
                 state.toggleSelect(item.key);
               } else if (state.selMode) {
                 state.toggleSelect(item.key);
@@ -748,7 +773,7 @@ export function AssetGrid({
                       state.openCtxMenu(e, item, { x: box.left, y: box.bottom + 4 });
                     }}
                   >
-                    <MoreHorizontal size={14} />
+                    <MoreHorizontal size={16} />
                   </IconButton>
                   {/*
                     Board 1161:66/80/111 — the only badge on a card says what
@@ -762,30 +787,21 @@ export function AssetGrid({
                       {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "◆"}
                     </div>
                   )}
-                  {isSelected && (
-                    <div className="mgr-sel-check">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-                        <path d="M20 6 9 17l-5-5" />
-                      </svg>
-                    </div>
-                  )}
                 </div>
                 <div className="mgr-asset-meta" data-testid={`mgr-meta-${item.key}`}>
                   <div className="mgr-asset-name" data-testid={`mgr-name-${item.key}`}>{item.displayName ?? item.name}</div>
                   {/*
-                    Board 1161:55 — dot + "used ×3" / "unused". Dimensions and
-                    bytes moved to the details rail, which is where you go when
-                    you care; on the card the question is always "can I delete
-                    this?".
+                    4418:58292 meta — "used ×3" / "Unused", 11 muted, no dot.
+                    Dimensions and bytes live in the details rail; on the card
+                    the question is always "can I delete this?".
                   */}
                   <div
                     className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}
                     data-testid={`mgr-use-${item.key}`}
                   >
-                    <span className="mgr-use-dot" aria-hidden="true" />
                     {(usageMap.get(item.key) ?? 0) > 0
                       ? `used ×${usageMap.get(item.key)}`
-                      : "unused"}
+                      : "Unused"}
                   </div>
                 </div>
               </div>
@@ -812,9 +828,17 @@ export function AssetGrid({
           </p>
           {/* flowbite's `xs` IS the chrome's 32 (founder:density-32; the
               Clone's 44 is refused) — no height override to fight. */}
-          <Button size="xs" data-testid="mgr-empty-folder-upload" onClick={onUploadClick}>
-            Upload files
-          </Button>
+          {write.canWrite ? (
+            <Button size="xs" data-testid="mgr-empty-folder-upload" onClick={onUploadClick}>
+              Upload files
+            </Button>
+          ) : (
+            <Tooltip content={write.reason("upload")} placement="top">
+              <Button size="xs" data-testid="mgr-empty-folder-upload" aria-disabled="true" className="tw:opacity-55">
+                Upload files
+              </Button>
+            </Tooltip>
+          )}
         </div>
       ) : (
         <div className="mgr-empty" data-testid="mgr-empty">
@@ -833,10 +857,19 @@ export function AssetGrid({
             </p>
             {!state.librarySearch && (
               <div className="mgr-empty-actions" data-testid="mgr-empty-actions">
-                <Button className="mgr-btn-primary" data-testid="mgr-empty-upload" onClick={onUploadClick}>
-                  <Upload size={14} />
-                  Upload
-                </Button>
+                {write.canWrite ? (
+                  <Button className="mgr-btn-primary" data-testid="mgr-empty-upload" onClick={onUploadClick}>
+                    <Upload size={14} />
+                    Upload
+                  </Button>
+                ) : (
+                  <Tooltip content={write.reason("upload")} placement="top">
+                    <Button className="mgr-btn-primary tw:opacity-55" data-testid="mgr-empty-upload" aria-disabled="true">
+                      <Upload size={14} />
+                      Upload
+                    </Button>
+                  </Tooltip>
+                )}
                 <Button className="mgr-btn" data-testid="mgr-empty-stock" onClick={onOpenStockModal}>
                   <Search size={14} />
                   Browse stock

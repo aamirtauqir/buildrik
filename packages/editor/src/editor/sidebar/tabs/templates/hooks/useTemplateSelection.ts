@@ -1,151 +1,35 @@
 /**
- * useTemplateSelection — preview/detail state, modal flags, and filtered list.
+ * useTemplateSelection — the full-canvas Templates view's selection state:
+ * which template is previewed and whether the replace confirm is up. (The
+ * catalogue search went with parity to 4418:54134, which draws none.) Escape closes the replace confirm (the preview owns its
+ * own Escape).
+ *
+ * The drawer-era state — inline detail id, category / type / tag pills and
+ * pagination — went with the drawer (decision #24, audit G2-095/096).
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import {
-  type SiteCategory,
-  type TemplateItem,
-  type TemplateType,
-  SITE_TEMPLATES,
-  getMyTemplates,
-} from "../templatesData";
-
-const PAGE_SIZE = 6;
 
 export interface UseTemplateSelectionReturn {
   previewId: string | null;
   setPreviewId: React.Dispatch<React.SetStateAction<string | null>>;
-  /** Currently expanded card → drives the inline TemplateDetail panel. */
-  detailId: string | null;
-  setDetailId: React.Dispatch<React.SetStateAction<string | null>>;
   showReplace: boolean;
   setShowReplace: React.Dispatch<React.SetStateAction<boolean>>;
-  searchQ: string;
-  setSearchQ: React.Dispatch<React.SetStateAction<string>>;
-  activeFilter: SiteCategory;
-  setActiveFilter: React.Dispatch<React.SetStateAction<SiteCategory>>;
-  /** null = browse all categories. Set = drilled into Page or Section templates. */
-  templateType: TemplateType | null;
-  setTemplateType: React.Dispatch<React.SetStateAction<TemplateType | null>>;
-  /** Selected sub-category tag id (hero, features, pricing…). */
-  subCategory: string | null;
-  setSubCategory: React.Dispatch<React.SetStateAction<string | null>>;
-  /** 1-indexed current page. */
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  totalPages: number;
-  /** Filtered + searched template list — derived from searchQ and activeFilter */
-  filteredTemplates: TemplateItem[];
-  /** Slice of filteredTemplates for the current page. */
-  paginatedTemplates: TemplateItem[];
-  clearAll: () => void;
 }
 
 export function useTemplateSelection(showProgress: boolean): UseTemplateSelectionReturn {
   const [previewId, setPreviewId] = React.useState<string | null>(null);
-  const [detailId, setDetailId] = React.useState<string | null>(null);
   const [showReplace, setShowReplace] = React.useState(false);
-  const [searchQ, setSearchQ] = React.useState("");
-  const [activeFilter, setActiveFilter] = React.useState<SiteCategory>("all");
-  const [templateType, setTemplateType] = React.useState<TemplateType | null>(null);
-  const [subCategory, setSubCategory] = React.useState<string | null>(null);
-  const [currentPage, setCurrentPage] = React.useState(1);
 
-  // Auto-set templateType when top-level pill changes.
   React.useEffect(() => {
-    if (activeFilter === "site-pages") setTemplateType("page");
-    else if (activeFilter === "sections") setTemplateType("section");
-    else setTemplateType(null);
-  }, [activeFilter]);
-
-  const filteredTemplates = React.useMemo(() => {
-    const q = searchQ.toLowerCase().trim();
-    // "My Templates" reads the user's saved templates from localStorage.
-    if (activeFilter === "my-templates") {
-      const mine = getMyTemplates();
-      return q ? mine.filter((t) => t.name.toLowerCase().includes(q)) : mine;
-    }
-    return SITE_TEMPLATES.filter((t) => {
-      const mq = !q || t.name.toLowerCase().includes(q);
-      const mc = activeFilter === "all" || t.category === activeFilter;
-      const mt = !templateType || t.type === templateType;
-      const ms = !subCategory || t.subCategory === subCategory;
-      return mq && mc && mt && ms;
-    });
-  }, [searchQ, activeFilter, templateType, subCategory]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredTemplates.length / PAGE_SIZE));
-
-  // Reset to page 1 when filters change so the user isn't stranded on an
-  // empty page after narrowing the result set.
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQ, activeFilter, templateType, subCategory]);
-
-  const paginatedTemplates = React.useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredTemplates.slice(start, start + PAGE_SIZE);
-  }, [filteredTemplates, currentPage]);
-
-  // Keyboard navigation: Escape dismisses overlays in priority order; Arrow keys move selection.
-  React.useEffect(() => {
+    if (!showReplace) return;
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      const inInput = tag === "INPUT" || tag === "TEXTAREA";
-
-      if (e.key === "Escape") {
-        if (showProgress) return; // overlay handles its own Cancel
-        if (previewId) { setPreviewId(null); return; }
-        if (showReplace) { setShowReplace(false); return; }
-        if (detailId) { setDetailId(null); return; }
-        return;
-      }
-      if (inInput) return;
-      if (previewId) return;
-
-      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        if (showReplace || showProgress) return;
-        e.preventDefault();
-        const idx = detailId ? filteredTemplates.findIndex((t) => t.id === detailId) : -1;
-        const next = e.key === "ArrowRight" ? filteredTemplates[idx + 1] : filteredTemplates[idx - 1];
-        if (next) setDetailId(next.id);
-      }
+      if (e.key === "Escape" && !showProgress) setShowReplace(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [previewId, showReplace, detailId, filteredTemplates, showProgress]);
+  }, [showReplace, showProgress]);
 
-  const clearAll = React.useCallback(() => {
-    setSearchQ("");
-    setActiveFilter("all");
-    setTemplateType(null);
-    setSubCategory(null);
-    setDetailId(null);
-    setCurrentPage(1);
-  }, []);
-
-  return {
-    previewId,
-    setPreviewId,
-    detailId,
-    setDetailId,
-    showReplace,
-    setShowReplace,
-    searchQ,
-    setSearchQ,
-    activeFilter,
-    setActiveFilter,
-    templateType,
-    setTemplateType,
-    subCategory,
-    setSubCategory,
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    filteredTemplates,
-    paginatedTemplates,
-    clearAll,
-  };
+  return { previewId, setPreviewId, showReplace, setShowReplace };
 }

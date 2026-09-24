@@ -136,11 +136,22 @@ describe("Topbar", () => {
   it("previewBusy is disabled + aria-busy — re-clicks cannot stack exports", () => {
     const onPreview = vi.fn();
     render(<Topbar siteName="x" save="saved" tools={{ onPreview, previewBusy: true }} />);
-    const btn = screen.getByRole("button", { name: "Quick preview" });
+    const btn = screen.getByTestId("topbar-preview");
     expect(btn).toBeDisabled();
     expect(btn.getAttribute("aria-busy")).toBe("true");
     fireEvent.click(btn);
     expect(onPreview).not.toHaveBeenCalled();
+  });
+
+  /* Board 4418:123573: Preview is a bordered TEXT button; the shell search
+     field opens ⌘K; unread is a count badge. */
+  it("draws Preview as text, the search field, and the unread count", () => {
+    const onOpenSearch = vi.fn();
+    render(<Topbar siteName="x" save="saved" tools={{ onPreview: vi.fn() }} onOpenSearch={onOpenSearch} unreadCount={3} />);
+    expect(screen.getByTestId("topbar-preview")).toHaveTextContent("Preview");
+    fireEvent.click(screen.getByTestId("topbar-search"));
+    expect(onOpenSearch).toHaveBeenCalled();
+    expect(screen.getByTestId("topbar-unread-badge")).toHaveTextContent("3");
   });
 
   it("Comments carries aria-pressed from the container's mirrored state", () => {
@@ -211,5 +222,19 @@ describe("Shell frames", () => {
     );
     expect(screen.getByRole("banner")).toBeTruthy();
     expect(screen.getByRole("contentinfo")).toBeTruthy();
+  });
+});
+
+/* Board 4418:100087: while a drawer owns search the field is a real input. */
+describe("Topbar — contextual search", () => {
+  it("renders an input with the drawer's placeholder and reports typing", async () => {
+    const { render, screen, fireEvent } = await import("@testing-library/react");
+    const { Topbar } = await import("../Topbar");
+    const onChange = vi.fn();
+    render(<Topbar siteName="S" onOpenSearch={vi.fn()} contextSearch={{ placeholder: "Search elements…", value: "", onChange }} />);
+    const input = screen.getByPlaceholderText("Search elements…");
+    fireEvent.change(input, { target: { value: "but" } });
+    expect(onChange).toHaveBeenCalledWith("but");
+    expect(screen.queryByText("Search pages, layers, assets…")).toBeNull();
   });
 });

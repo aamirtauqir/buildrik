@@ -18,7 +18,19 @@ import {
   getTranslationSchema,
   setTranslationSchema,
   removeTranslationSchema,
+  listPageFoldersSchema,
+  createPageFolderSchema,
+  updatePageFolderSchema,
+  deletePageFolderSchema,
+  movePageToFolderSchema,
 } from "@buildrik/shared/schemas/pages";
+import {
+  listPageFolders,
+  createPageFolder,
+  updatePageFolder,
+  deletePageFolder,
+  movePageToFolder,
+} from "@/server/services/page-folder.service";
 import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
 
@@ -57,6 +69,7 @@ export const pagesRouter = router({
     try { return await updatePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "CONFLICT") throw new TRPCError({ code: "CONFLICT", message: "Page was updated elsewhere." });
+      if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
       throw e;
     }
   }),
@@ -65,6 +78,7 @@ export const pagesRouter = router({
     try { await deletePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "LAST_PAGE") throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot delete last page." });
+      if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
       throw e;
     }
   }),
@@ -97,4 +111,35 @@ export const pagesRouter = router({
       throw e;
     }
   }),
+
+  /* Personal page folders — this user's own grouping (page-folder.service).
+     EDITOR+ on the site; another member's folder answers NOT_FOUND. */
+  folders: router({
+    list: protectedProcedure.input(listPageFoldersSchema).query(({ ctx, input }) =>
+      translateFolderError(() => listPageFolders(ctx.session.user.id, input.siteId)),
+    ),
+    create: protectedProcedure.input(createPageFolderSchema).mutation(({ ctx, input }) =>
+      translateFolderError(() => createPageFolder(ctx.session.user.id, input)),
+    ),
+    update: protectedProcedure.input(updatePageFolderSchema).mutation(({ ctx, input }) =>
+      translateFolderError(() => updatePageFolder(ctx.session.user.id, input)),
+    ),
+    delete: protectedProcedure.input(deletePageFolderSchema).mutation(({ ctx, input }) =>
+      translateFolderError(() => deletePageFolder(ctx.session.user.id, input.folderId)),
+    ),
+    movePage: protectedProcedure.input(movePageToFolderSchema).mutation(({ ctx, input }) =>
+      translateFolderError(() => movePageToFolder(ctx.session.user.id, input)),
+    ),
+  }),
 });
+
+async function translateFolderError<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    if (e instanceof Error && e.message === "FOLDER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Folder not found." });
+    if (e instanceof Error && e.message === "PAGE_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
+    throw e;
+  }
+}

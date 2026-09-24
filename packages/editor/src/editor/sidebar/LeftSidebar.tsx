@@ -12,11 +12,9 @@ import type { EditsSnapshot } from "@shared/types/media";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
-import type { GroupedTabId, GroupedTabConfig, TabZone, RailTool } from "../rail/tabsConfig";
-import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailGroups } from "../rail/tabsConfig";
-import { getEditorViewMode } from "../../shared/utils/editorViewMode";
+import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
+import { getTabConfig, getFigmaRailGroups } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
-import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
@@ -35,6 +33,7 @@ import {
   Timer,
   Sparkles,
   Rocket,
+  HelpCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 // ============================================
@@ -66,6 +65,9 @@ export interface LeftSidebarProps {
   activeSubTab?: string;
   onTabChange: (tab: GroupedTabId) => void;
   drawerOpen: boolean;
+  /** The active tab renders in the right column (Publish · Review · History),
+   *  so the drawer must not mount a second, hidden copy of it. */
+  hostedInColumn?: boolean;
   onDrawerToggle: () => void;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
@@ -78,14 +80,10 @@ export interface LeftSidebarProps {
   /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
   pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
-  publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
   onCreateCollection?: () => void;
-  /** P0 review loop: full re-send, forwarded to ReviewTab. */
-  onResendReview?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
@@ -100,40 +98,20 @@ export interface LeftSidebarProps {
 }
 
 // ============================================
-// Zone rendering
+// Rail group rendering
 // ============================================
 
-const ZONES: TabZone[] = ["creation", "structure", "config"];
-
-// Stable empty set — avoids allocating a new Set on every render
-const EMPTY_SET: ReadonlySet<string> = new Set();
-// Stable set for when settings tab has unsaved changes
-const SETTINGS_DIRTY_SET: ReadonlySet<string> = new Set(["settings"]);
-
 function RailZone({
-  zone,
-  tabs: tabsOverride,
+  tabs,
   activeTab,
   drawerOpen,
   onBtnClick,
-  dirtyTabIds,
-  showLabels = false,
 }: {
-  zone: TabZone;
-  /** Explicit tab list. When omitted, all tabs in `zone` render (legacy path). */
-  tabs?: GroupedTabConfig[];
+  tabs: GroupedTabConfig[];
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
-  dirtyTabIds?: ReadonlySet<string>;
-  /** Figma 52:2 rail items carry a visible label under the icon. */
-  showLabels?: boolean;
 }) {
-  const tabs = React.useMemo(
-    () => tabsOverride ?? getTabsByZone(zone),
-    [tabsOverride, zone],
-  );
-
   return (
     <div className="ls-zone">
       {tabs.map((tab) => {
@@ -141,12 +119,21 @@ function RailZone({
         if (!Icon) return null;
         const isSelectedTab = tab.id === activeTab;
         const isVisibleActive = isSelectedTab && drawerOpen;
-        const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
           <HintTooltip
             key={tab.id}
-            content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
+            content={
+              /* Board 4433:46540: "Add  A" — white label, muted shortcut. */
+              tab.shortcut ? (
+                <span className="tw:inline-flex tw:gap-1.5">
+                  <span>{tab.label}</span>
+                  <span className="tw:font-normal tw:text-[var(--bk-gray-400)]">{tab.shortcut}</span>
+                </span>
+              ) : (
+                tab.label
+              )
+            }
             /* Beside the icon, not under it. `bottom` on this narrow vertical
                rail ran the bubble past the rail's width and into the open
                drawer — half on the rail, half on the panel. */
@@ -154,7 +141,7 @@ function RailZone({
           >
             <Button
               color="light"
-              className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+              className={`ls-btn ls-btn--labeled${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
               onClick={() => onBtnClick(tab.id)}
               role="tab"
               aria-selected={isVisibleActive}
@@ -180,9 +167,8 @@ function RailZone({
                   className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
                 />
               )}
-              {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
               <Icon size={20} />
-              {showLabels && <span className="ls-btn__label">{tab.label}</span>}
+              <span className="ls-btn__label">{tab.label}</span>
             </Button>
           </HintTooltip>
         );
@@ -204,153 +190,21 @@ function FigmaRail({
   activeTab,
   drawerOpen,
   onBtnClick,
-  dirtyTabIds,
 }: {
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
-  dirtyTabIds?: ReadonlySet<string>;
 }) {
   const groups = React.useMemo(() => getFigmaRailGroups(), []);
   return (
     <>
       {groups.map((g, i) => (
         <React.Fragment key={g.zone}>
-          <RailZone
-            zone={g.zone}
-            tabs={g.tabs}
-            activeTab={activeTab}
-            drawerOpen={drawerOpen}
-            onBtnClick={onBtnClick}
-            dirtyTabIds={dirtyTabIds}
-            showLabels
-          />
+          <RailZone tabs={g.tabs} activeTab={activeTab} drawerOpen={drawerOpen} onBtnClick={onBtnClick} />
           {i < groups.length - 1 && <div className="ls-divider" />}
         </React.Fragment>
       ))}
     </>
-  );
-}
-
-// ============================================
-// E3 — 4-tool rail (escape hatch: ?rail=e3)
-// ============================================
-// Each tool button opens its PRIMARY folded panel; the remaining folded tabs
-// (templates/components/media under Insert; publish/history under Site) reach
-// their panels via the composite sub-nav — built next. Default rail (11 buttons)
-// is unchanged, so this is additive + reversible.
-const TOOL_PRIMARY_TAB: Record<RailTool, GroupedTabId> = {
-  insert: "add",
-  pages: "pages",
-  styles: "design",
-  site: "settings",
-  assistant: "ai",
-  structure: "layers",
-};
-
-function FourToolRail({
-  activeTab,
-  drawerOpen,
-  onBtnClick,
-}: {
-  activeTab: GroupedTabId;
-  drawerOpen: boolean;
-  onBtnClick: (tabId: GroupedTabId) => void;
-}) {
-  const activeTool = getTabConfig(activeTab)?.tool;
-  return (
-    <div className="ls-zone">
-      {getRailTools().map(({ tool, meta }) => {
-        const Icon = ICON_MAP[meta.iconName];
-        if (!Icon) return null;
-        const isSelected = tool === activeTool;
-        const isVisibleActive = isSelected && drawerOpen;
-        return (
-          <HintTooltip
-            key={tool}
-            content={meta.label}
-            placement="bottom"
-          >
-            <Button
-              color="light"
-              className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
-              onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
-              role="tab"
-              aria-selected={isVisibleActive}
-              aria-label={meta.ariaLabel}
-              data-tool={tool}
-            >
-              {isVisibleActive && (
-                <div
-                  /* Board 199:2: 3px, flush to the RAIL edge, the full
-                     height of the item — measured at 1440x900 as x 0..2 over
-                     y 114..157, the same 44px as the tinted pill. It was 2px,
-                     inset from the edge and 8px in at each end, citing a
-                     prototype spec older than the board, which read as a tick
-                     floating beside the pill rather than a rule down its edge.
-                     The offset is the button's own centring inset, written
-                     from the two tokens that create it. */
-                  className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-r-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
-                />
-              )}
-              <Icon size={20} />
-            </Button>
-          </HintTooltip>
-        );
-      })}
-    </div>
-  );
-}
-
-// E3 composite sub-nav: in 4-tool mode, a tool that folds >1 tab (Insert: Add/
-// Templates/Components/Media; Site: Settings/Publish/History) shows a sub-tab row
-// at the top of its panel so every folded tab keeps its reach (acceptance #5).
-// Pages/Styles fold a single tab → no sub-nav. vibcoder Button keeps Gate 24 clean.
-function ToolSubNav({
-  activeTab,
-  onSubTabChange,
-}: {
-  activeTab: GroupedTabId;
-  onSubTabChange: (id: GroupedTabId) => void;
-}) {
-  const tool = getTabConfig(activeTab)?.tool;
-  const subs = tool ? getTabsByTool(tool) : [];
-  if (subs.length <= 1) return null;
-  return (
-    <div
-      role="tablist"
-      aria-label="Section"
-      style={{
-        display: "flex",
-        gap: 2,
-        padding: "6px 8px",
-        borderBottom: "1px solid var(--bk-border)",
-      }}
-    >
-      {subs.map((t) => {
-        const active = t.id === activeTab;
-        return (
-          <Button
-            key={t.id}
-            color="light"
-            size="xs"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onSubTabChange(t.id)}
-            style={{
-              fontSize: 12,
-              fontWeight: active ? 600 : 500,
-              padding: "4px 10px",
-              borderRadius: 6,
-              color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
-              background: active ? "var(--bk-accent-subtle)" : "transparent",
-            }}
-          >
-            {t.label}
-          </Button>
-        );
-      })}
-    </div>
   );
 }
 
@@ -364,6 +218,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   activeSubTab,
   onTabChange,
   drawerOpen,
+  hostedInColumn = false,
   onDrawerToggle,
   isExpanded: controlledExpanded,
   onExpandToggle: controlledExpandToggle,
@@ -374,11 +229,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onSettingsDirtyChange,
   pagesOpen,
   projectId,
-  publishJob,
-  onVercelPublish,
   onOpenLibrary,
   onCreateCollection,
-  onResendReview,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -403,42 +255,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     open: boolean;
     pendingTab: GroupedTabId | null;
   }>({ open: false, pendingTab: null });
-
-  /* Pages › "From template" opens Templates in NEW-PAGE mode. A prop, not an
-     event: the old UI_TEMPLATES_NEWPAGE_ON emit could never be heard —
-     TabRouter mounts one tab at a time, so TemplatesTab's listener did not
-     exist yet when the emit fired from the Pages tab, and the panel always
-     opened in gallery mode, whose apply REPLACES the current page. Found
-     live 2026-08-28 the first time the door was actually walked. Reset when
-     the visit leaves Templates — new-page mode belongs to the visit that
-     asked for it. */
-  const [templatesNewPage, setTemplatesNewPage] = React.useState(false);
-  React.useEffect(() => {
-    if (activeTab !== "templates") setTemplatesNewPage(false);
-  }, [activeTab]);
-
-  /* Site menu › Unpublish, same trap as the one above and caught the same way
-     — live, on the first cold click. StudioHeader opens the Publish panel and
-     then emits UI_UNPUBLISH_REQUEST synchronously; PublishTab subscribes in an
-     effect that has not run yet, so on a cold open the event was dropped and
-     the confirm appeared only on the SECOND click. This component is mounted
-     whenever the editor is not in view mode, so its listener is alive at emit
-     time. It latches the intent and hands it down as a prop; PublishTab
-     consumes it once and reports back, so a cancelled confirm cannot re-open
-     on the next visit. Cleared on leaving the tab for the same reason. */
-  const [unpublishIntent, setUnpublishIntent] = React.useState(false);
-  React.useEffect(() => {
-    if (!composer) return;
-    const latch = () => setUnpublishIntent(true);
-    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, latch);
-    return () => {
-      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, latch);
-    };
-  }, [composer]);
-  React.useEffect(() => {
-    if (activeTab !== "publish") setUnpublishIntent(false);
-  }, [activeTab]);
-  const consumeUnpublishIntent = React.useCallback(() => setUnpublishIntent(false), []);
 
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
@@ -519,13 +335,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
-  useSidebarKeyboard(safeTabChange);
+  const openAssistant = React.useCallback(() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }), [composer]);
+  useSidebarKeyboard(safeTabChange, openAssistant);
 
   const { addToast } = useToast();
-
-  // Rail mode — read once. Default "figma" (F1); "e3" and "legacy" are escape hatches.
-  const railMode = React.useMemo(() => getEditorViewMode().railMode, []);
-  const useFourToolRail = railMode === "e3";
 
   // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
@@ -568,62 +381,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const tabConfig = getTabConfig(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
 
-  // §12 — assets tab supports runtime width override (320 ↔ 560) via
-  // ui:media-panel-width composer event. Other tabs ignore the event.
-  const [mediaPanelOverride, setMediaPanelOverride] = React.useState<number | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    /* `null` means "no flow width" and CLEARS the override, so the panel falls
-       back to `--bk-size-drawer`. Emitting the default as a literal 320 pinned
-       Media and Templates to that number regardless of the token — which
-       quietly made the token non-authoritative for 2 of the 6 destinations. */
-    const handler = (payload: unknown) => {
-      const p = payload as { width?: number | null };
-      setMediaPanelOverride(typeof p?.width === "number" ? p.width : null);
-    };
-    composer.on("ui:media-panel-width", handler);
-    return () => {
-      composer.off("ui:media-panel-width", handler);
-    };
-  }, [composer]);
-  // Reset override when leaving assets tab — prevents stale 560 leaking to
-  // next tab opened.
-  React.useEffect(() => {
-    if (activeTab !== "assets") setMediaPanelOverride(null);
-  }, [activeTab]);
-  // prototype-v3 §2 — templates tab supports runtime width override
-  // (320 ↔ 700) via ui:templates-panel-width composer event when detail
-  // card opens. Other tabs ignore the event.
-  const [templatesPanelOverride, setTemplatesPanelOverride] = React.useState<number | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    const handler = (payload: unknown) => {
-      const p = payload as { width?: number | null };
-      setTemplatesPanelOverride(typeof p?.width === "number" ? p.width : null);
-    };
-    composer.on("ui:templates-panel-width", handler);
-    return () => {
-      composer.off("ui:templates-panel-width", handler);
-    };
-  }, [composer]);
-  // Reset override when leaving templates tab.
-  React.useEffect(() => {
-    if (activeTab !== "templates") setTemplatesPanelOverride(null);
-  }, [activeTab]);
-  // Header expand (board 16:6) widens ANY drawer to 700; the media/templates
-  // runtime overrides keep winning on their tabs — they carry flow-specific
-  // widths (560 detail, 700 gallery) the generic toggle must not fight.
-  // `null` means "no flow width" — the default comes from `--bk-size-drawer`
-  // in LeftSidebar.css, so the generated token is the single source.
-  const panelWidthOverride = activeTab === "assets" && mediaPanelOverride !== null
-    ? mediaPanelOverride
-    : activeTab === "templates" && templatesPanelOverride !== null
-    ? templatesPanelOverride
-    : isExpanded
-    ? 700
-    : null;
+  // Header expand (board 16:6) widens a drawer to 700. `null` means "no flow
+  // width" — the default comes from `--bk-size-drawer` in LeftSidebar.css, so
+  // the generated token is the single source.
+  const panelWidthOverride = isExpanded ? 700 : null;
 
   const commonTabProps = {
+    /* A closed drawer keeps its tab mounted (width 0); a tab that acts on
+       the shell while visible (Layers' topbar filter, its Escape) reads this. */
+    isOpen: drawerOpen,
     isExpanded,
     onExpandToggle: onExpandToggle ?? (() => {}),
     onClose: onDrawerToggle,
@@ -634,7 +400,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {/* Rail */}
       <nav
         ref={navRef}
-        className="ls-rail"
+        className="ls-rail ls-rail--figma"
         // Conformance anchor — see themes/fonts.css era note in Topbar.tsx.
         // `.ls-rail` happens to be stable today, but recipes select on testids
         // uniformly so a class rename can never silently unhook measurement.
@@ -644,41 +410,27 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         aria-orientation="vertical"
         onKeyDown={handleKeyDown}
       >
-        <div className="ls-logo">
-          <Layers size={28} />
-        </div>
-
-        <div className="ls-divider" />
-
-        {railMode === "e3" ? (
-          <FourToolRail
-            activeTab={activeTab}
-            drawerOpen={drawerOpen}
-            onBtnClick={handleBtnClick}
-          />
-        ) : railMode === "figma" ? (
-          <FigmaRail
-            activeTab={activeTab}
-            drawerOpen={drawerOpen}
-            onBtnClick={handleBtnClick}
-            dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
-          />
-        ) : (
-          ZONES.map((zone, i) => (
-            <React.Fragment key={zone}>
-              <RailZone
-                zone={zone}
-                activeTab={activeTab}
-                drawerOpen={drawerOpen}
-                onBtnClick={handleBtnClick}
-                dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
-              />
-              {i < ZONES.length - 1 && <div className="ls-divider" />}
-            </React.Fragment>
-          ))
-        )}
+        {/* Board 4418:123573: the rail starts with its first item — no logo
+            mark, no divider. */}
+        <FigmaRail activeTab={activeTab} drawerOpen={drawerOpen} onBtnClick={handleBtnClick} />
 
         <div className="ls-spacer" />
+
+        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089). It
+            opens the Keyboard legend card (4418:126882), whose "All shortcuts
+            ›" is the door to the one sheet (B7) — not a tab; the drawer stays. */}
+        <HintTooltip content="Keyboard shortcuts · ?" placement="right">
+          <Button
+            color="light"
+            className="ls-btn ls-btn--labeled"
+            onClick={() => composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {})}
+            aria-label="Help — keyboard shortcuts"
+            data-testid="rail-help"
+          >
+            <HelpCircle size={20} />
+            <span className="ls-btn__label">Help</span>
+          </Button>
+        </HintTooltip>
       </nav>
       {/* Panel */}
       <div
@@ -701,7 +453,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             Tabs without a PanelHeader (Layers, Add) can be closed by re-clicking
             the active rail icon, which now toggles drawerOpen. */}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
-          {useFourToolRail && <ToolSubNav activeTab={activeTab} onSubTabChange={handleBtnClick} />}
           <InspectorErrorBoundary
             key={errorKey}
             fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}
@@ -710,6 +461,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 sub-tab (⋯ → Publish history while History is already open)
                 must remount so the tab re-reads its initial screen. */}
             <div key={`${activeTab}:${activeSubTab ?? ""}`} className="ls-panel-animate">
+              {hostedInColumn ? null : (
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
                   activeTab={activeTab}
@@ -721,26 +473,16 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
-                  onSwitchToTemplates={() => {
-                    /* Boards 807:7252 and 1169:4725 — the new-page flow. */
-                    setTemplatesNewPage(true);
-                    safeTabChange("templates");
-                  }}
-                  templatesNewPageMode={templatesNewPage}
-                  unpublishIntent={unpublishIntent}
-                  onUnpublishIntentConsumed={consumeUnpublishIntent}
+                  onSwitchToTemplates={() => safeTabChange("templates")}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
-                  publishJob={publishJob}
-                  onVercelPublish={onVercelPublish}
-                  onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}
                   onCreateCollection={onCreateCollection}
-                  onResendReview={onResendReview}
                 />
               </React.Suspense>
+              )}
             </div>
           </InspectorErrorBoundary>
         </div>

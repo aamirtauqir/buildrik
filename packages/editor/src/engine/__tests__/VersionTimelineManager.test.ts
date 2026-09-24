@@ -12,11 +12,7 @@ vi.mock("../storage/VersionHistoryStorage", () => ({
   loadVersions: vi.fn(async () => []),
   loadVersion: vi.fn().mockResolvedValue(null),
   deleteVersion: vi.fn().mockResolvedValue(undefined),
-  deleteAllVersions: vi.fn().mockResolvedValue(undefined),
   pruneVersions: vi.fn().mockResolvedValue(undefined),
-  exportVersions: vi.fn().mockResolvedValue({ versions: [] }),
-  importVersions: vi.fn().mockResolvedValue(undefined),
-  downloadVersionsFile: vi.fn(),
   isStorageAvailable: () => true,
 }));
 
@@ -89,7 +85,9 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
     expect(order).toEqual(["save", "import"]);
     const restoring = emitted.find((e) => e.event === "version:restoring");
     expect(restoring?.payload).toMatchObject({ targetName: "Launch" });
-    expect((restoring?.payload as { savedAs: string }).savedAs).toContain("Launch");
+    expect((restoring?.payload as { savedAs: string }).savedAs).toContain("Launch");    // G1-071: the restored event carries the safety save — Undo restore's target.
+    const restored = emitted.find((e) => e.event === "version:restored");
+    expect(restored?.payload).toMatchObject({ safetyVersionId: "safety" });
   });
 
   it("aborts the restore when the safety save fails — losing the work is the failure mode", async () => {
@@ -192,6 +190,19 @@ describe("VersionTimelineManager.autoCheckpoint — a project nobody touched is 
     await m.reloadVersions();
     return { m, edit: (v: string) => { current = project(v); } };
   }
+
+  /* QA 2026-09-24 (#25): the template backup is a titled auto-version the
+     toast promises by name. Deduping it against an identical auto-save made
+     the promised row not exist. */
+  it("a TITLED auto-version is taken even when identical to the newest, and keeps its title", async () => {
+    const { m } = await makeManager();
+    expect(await m.autoCheckpoint("Auto: edit")).not.toBeNull();
+    const backup = await m.autoCheckpoint("Before template “Portfolio”", { title: "Before template “Portfolio”" });
+    expect(backup).not.toBeNull();
+    expect(backup!.title).toBe("Before template “Portfolio”");
+    expect(backup!.isAutoCheckpoint).toBe(true);
+    expect(m.getVersions()).toHaveLength(2);
+  });
 
   it("skips a checkpoint identical to the newest one", async () => {
     const { m } = await makeManager();

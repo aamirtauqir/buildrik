@@ -71,7 +71,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, usages: Record
   const { LibraryManager } = await import("../LibraryManager");
   const onClose = vi.fn();
   const utils = render(
-    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} />,
   );
   return { ...utils, onClose };
 }
@@ -80,7 +80,7 @@ async function rerenderWith(utils: { rerender: (ui: React.ReactElement) => void 
   mocks.state.mediaState = { ...mocks.state.mediaState, ...over };
   const { LibraryManager } = await import("../LibraryManager");
   utils.rerender(
-    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />,
   );
 }
 
@@ -116,6 +116,16 @@ describe("Clone 3721:43552 · Assets · Unused · browse — the card menu", () 
     expect(screen.getByTestId("mgr-scope-note")).toHaveTextContent("8 unused assets · No current site references.");
     fireEvent.click(screen.getByTestId("mgr-row-in-use"));
     expect(screen.queryByTestId("mgr-scope-note")).toBeNull();
+  });
+});
+
+/* G3-057: the card menu's "Replace across pages…" had no caller wiring it;
+   it opens the same replace picker the rail's ⋯ does, on that file. */
+describe("card menu · Replace across pages…", () => {
+  it("opens the replace picker for that file", async () => {
+    await mountLibrary(menuOpenOn());
+    fireEvent.click(within(screen.getByTestId("media-ctx-menu")).getByRole("menuitem", { name: "Replace across pages…" }));
+    expect(await screen.findByText(/Replace "team-photo.jpg" across/)).toBeInTheDocument();
   });
 });
 
@@ -223,8 +233,8 @@ describe("Clone 3721:43697 / 43902 / 44107 · Tag menu · team · food — the t
       setLibrarySearch,
       setLibraryQuery,
     });
-    const tags = within(screen.getByTestId("mgr-tags"));
-    expect(tags.getAllByRole("button").map((b) => b.textContent)).toEqual(["food", "menu", "team"]);
+    fireEvent.click(screen.getByTestId("mgr-row-tags"));
+    expect(screen.getAllByRole("menuitemradio").map((b) => b.textContent)).toEqual(["food", "menu", "team"]);
     fireEvent.click(screen.getByTestId("mgr-tag-menu"));
     expect(setTagFilter).toHaveBeenCalledWith("menu");
     // A tag is a filter, never a search string.
@@ -235,8 +245,9 @@ describe("Clone 3721:43697 / 43902 / 44107 · Tag menu · team · food — the t
   it("with a tag active: the chip is pressed, the search field carries the token, the count line names the tag", async () => {
     const setTagFilter = vi.fn();
     await mountLibrary({ tagFilter: "menu", libraryItems: TAGGED.filter((i) => i.key === "menu"), allLibraryItems: TAGGED, setTagFilter });
-    expect(screen.getByTestId("mgr-tag-menu")).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(screen.getByTestId("mgr-row-tags"));
+    expect(screen.getByTestId("mgr-tag-menu")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-checked", "false");
     expect(screen.getByTestId("mgr-search-tag-token")).toHaveTextContent("Tag: menu · Clear filter");
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 matching asset · Tag: menu");
     fireEvent.click(screen.getByRole("button", { name: "Clear the tag filter" }));
@@ -247,6 +258,7 @@ describe("Clone 3721:43697 / 43902 / 44107 · Tag menu · team · food — the t
     const setTagFilter = vi.fn();
     const setCurrentFolderId = vi.fn();
     await mountLibrary({ tagFilter: "menu", currentFolderId: "f1", allLibraryItems: TAGGED, setTagFilter, setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-row-tags"));
     fireEvent.click(screen.getByTestId("mgr-tag-team"));
     expect(setTagFilter).toHaveBeenCalledWith("team");
     expect(setCurrentFolderId).not.toHaveBeenCalled();
@@ -264,11 +276,12 @@ describe("Clone 3721:43697 / 43902 / 44107 · Tag menu · team · food — the t
     expect(screen.getByTestId("mgr-search-tag-token")).toHaveTextContent("Tag: food");
   });
 
-  it("no tag active: no token, the placeholder is the library's, and no TAGS group without tags", async () => {
+  it("no tag active: no token, the placeholder is the library's, and no tag chips (4418:58292 Tags ▾ row)", async () => {
     await mountLibrary({ libraryItems: TEN, allLibraryItems: TEN });
     expect(screen.queryByTestId("mgr-search-tag-token")).toBeNull();
-    expect(screen.getByPlaceholderText("Search across all folders…")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search all assets…")).toBeInTheDocument();
     expect(screen.queryByTestId("mgr-tags")).toBeNull();
+    expect(screen.getByTestId("mgr-row-tags")).toHaveTextContent("Tags ▾");
   });
 });
 

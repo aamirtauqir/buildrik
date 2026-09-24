@@ -182,23 +182,27 @@ describe("CMSBindingManager — field bindings", () => {
       ).resolves.toBe("42");
     });
 
+    /* G3-078: no record means "the record on this page". Outside a dynamic
+       page that previews the first PUBLISHED record (this pinned a fallback
+       before the page-record binding existed); with nothing published it is
+       still the fallback. */
     it.each([
       ["no itemId", undefined],
       ["context itemId", "context"],
-    ])("falls back for %s", async (_label, itemId) => {
+    ])("previews the first published record for %s, falling back when none is published", async (_label, itemId) => {
       const { cms, collection } = await setupWithContent();
       const manager = new CMSBindingManager(makeComposer().composer, cms);
-
-      await expect(
-        manager.resolveBinding({
-          binding: { sourceId: `cms:${collection.id}`, path: "title", type: "variable" },
-          collectionId: collection.id,
-          itemId,
-          fieldSlug: "title",
-          property: "content",
-          fallback: "FB",
-        })
-      ).resolves.toBe("FB");
+      const binding = {
+        binding: { sourceId: `cms:${collection.id}`, path: "title", type: "variable" as const },
+        collectionId: collection.id,
+        itemId,
+        fieldSlug: "title",
+        property: "content",
+        fallback: "FB",
+      };
+      await expect(manager.resolveBinding(binding)).resolves.toBe("Hello World");
+      const empty = await cms.createCollection("Empty");
+      await expect(manager.resolveBinding({ ...binding, collectionId: empty.id })).resolves.toBe("FB");
     });
 
     it("falls back for unknown items and null field values, defaulting to empty string", async () => {
@@ -463,5 +467,39 @@ describe("CMSBindingManager — a binding tells history it happened outside it",
 
     expect(runWithoutTracking).toHaveBeenCalledTimes(1);
     expect(calls).toEqual(["untracked-write", "announce"]);
+  });
+});
+
+/* G3-078 (4428:149540): the v3 inspector binds to "the record on this page"
+   — no record — and each bind from the inspector is one undo step. */
+describe("CMSBindingManager — page-record bindings and undo (G3-078)", () => {
+  it("previews the first published record when bound without a record", async () => {
+    const { cms, collection } = await setupWithContent();
+    const manager = new CMSBindingManager(makeComposer().composer, cms);
+    await expect(
+      manager.resolveBinding({
+        binding: { sourceId: `cms:${collection.id}`, path: "title", type: "variable" },
+        collectionId: collection.id,
+        fieldSlug: "title",
+        property: "content",
+      }),
+    ).resolves.toBe("Hello World");
+  });
+
+  it("with a history label, bind and unbind are recorded steps, not announced as unrecorded", async () => {
+    const { cms, collection } = await setupWithContent();
+    const { composer } = makeComposer({ "el-1": makeElementStub() });
+    const record = vi.fn();
+    const noteUnrecordedAction = vi.fn();
+    const flushPending = vi.fn();
+    Object.assign(composer, { history: { record, noteUnrecordedAction, flushPending, runWithoutTracking: (fn: () => void) => fn() } });
+    const manager = new CMSBindingManager(composer, cms);
+
+    manager.bindToField("el-1", collection.id, undefined, "title", "content", undefined, "Bind Title");
+    await vi.waitFor(() => expect(record).toHaveBeenCalledWith("Bind Title"));
+    manager.unbindAll("el-1", "Unbind Title");
+    expect(record).toHaveBeenCalledWith("Unbind Title");
+    expect(flushPending).toHaveBeenCalledTimes(2);
+    expect(noteUnrecordedAction).not.toHaveBeenCalled();
   });
 });

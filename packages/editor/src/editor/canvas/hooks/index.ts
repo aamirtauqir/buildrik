@@ -29,12 +29,6 @@ export {
   type UseDragAutoScrollResult,
 } from "./useDragAutoScroll";
 
-// Element drag sub-hooks
-export {
-  useTouchDrag,
-  type UseTouchDragOptions,
-  type UseTouchDragResult,
-} from "./drag";
 export {
   useCanvasInlineEdit,
   type UseCanvasInlineEditOptions,
@@ -52,12 +46,6 @@ export {
   type UseComposerSelectionOptions,
   type UseComposerSelectionResult,
 } from "./useComposerSelection";
-export {
-  useCanvasSelectionBox,
-  type UseCanvasSelectionBoxOptions,
-  type UseCanvasSelectionBoxReturn,
-  type SelectionRect,
-} from "./useCanvasSelectionBox";
 export {
   useSelectionRect,
   type UseSelectionRectOptions,
@@ -154,7 +142,6 @@ export {
 export { useSelectionAnimation } from "./useSelectionAnimation";
 
 // Extracted toolbar / palette / inline command hooks
-export { useCanvasCommandPalette } from "./useCanvasCommandPalette";
 export { useCanvasToolbarActions } from "./useCanvasToolbarActions";
 export { useCanvasInlineCommands } from "./useCanvasInlineCommands";
 

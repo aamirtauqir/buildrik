@@ -42,22 +42,20 @@ export interface UseEditorEventListenersOptions {
   composer: Composer | null;
   modals: Pick<
     UseStudioModalsReturn,
-    "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords" | "openSaveTemplate"
+    "openCreateComponent" | "openSaveAsComponent" | "openSaveTemplate" | "toggleShortcuts"
   >;
   state: EditorEventListenerStateSetters;
   /** Tracks whether the user has manually toggled spacing indicators
    *  (so we don't clobber their choice when overlay defaults arrive). */
-  hasManuallyToggledSpacingRef: React.MutableRefObject<boolean>;
 }
 
 export function useEditorEventListeners({
   composer,
   modals,
   state,
-  hasManuallyToggledSpacingRef,
 }: UseEditorEventListenersOptions): void {
   // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
-  const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate } = modals;
+  const { openCreateComponent, openSaveAsComponent, openSaveTemplate, toggleShortcuts } = modals;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { elementId: string }) => {
@@ -87,15 +85,16 @@ export function useEditorEventListeners({
     };
   }, [composer, openSaveAsComponent]);
 
-  // 2c) CMS_MANAGE_RECORDS → open the records management modal.
+  // 2c) CMS_MANAGE_RECORDS (⌘K "Manage CMS records") → the CMS workspace,
+  // which replaced the Records modal (4428:143182).
   React.useEffect(() => {
     if (!composer) return;
-    const handle = () => openCMSRecords();
+    const handle = () => composer.emit("ui:switch-tab", { tab: "content" });
     composer.on(EVENTS.CMS_MANAGE_RECORDS, handle);
     return () => {
       composer.off(EVENTS.CMS_MANAGE_RECORDS, handle);
     };
-  }, [composer, openCMSRecords]);
+  }, [composer]);
 
   // 2d) TEMPLATE_SAVE_REQUESTED → open the "Save as Template" modal (the open
   // handler + modal existed but had no caller — users couldn't save templates).
@@ -107,6 +106,18 @@ export function useEditorEventListeners({
       composer.off(EVENTS.TEMPLATE_SAVE_REQUESTED, handle);
     };
   }, [composer, openSaveTemplate]);
+
+  // 2e) UI_TOGGLE_CHEAT_SHEET → the one keyboard sheet (StudioModals). The
+  // ⌘K "Keyboard shortcuts" row, the site-menu row and the footer help button
+  // emit it; `?` and ⌘/ flip the same state from useEditorShortcuts.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => toggleShortcuts();
+    composer.on(EVENTS.UI_TOGGLE_CHEAT_SHEET, handle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_CHEAT_SHEET, handle);
+    };
+  }, [composer, toggleShortcuts]);
 
   // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
   const { setLeftPanelTab, setIsLeftPanelOpen } = state;
@@ -209,7 +220,9 @@ export function useEditorEventListeners({
     if (!composer?.canvas.indicators) return;
     const overlay = composer.canvas.indicators.getOverlay();
     setShowSpacingIndicators(
-      overlay.showSpacing ?? !hasManuallyToggledSpacingRef.current,
+      /* Off unless asked for: board 5936:44788 draws a selection with no
+         padding overlay. View › Spacing still turns it on. */
+      overlay.showSpacing ?? false,
     );
     setShowBadges(overlay.showBadges ?? false);
     setShowGuides(overlay.showGuides ?? true);
@@ -220,6 +233,5 @@ export function useEditorEventListeners({
     setShowBadges,
     setShowGuides,
     setShowGrid,
-    hasManuallyToggledSpacingRef,
   ]);
 }

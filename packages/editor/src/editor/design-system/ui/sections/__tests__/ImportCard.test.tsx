@@ -310,4 +310,14 @@ describe("ImportCard — paste fallback", () => {
     fireEvent.click(getByText(/^Parse$/i));
     expect(await findByText(/parse error/i)).toBeTruthy();
   });
+
+  /* G3-123: outcomes are toasts, not a pill band. */
+  it("a failed import says so in a toast; the card keeps the detail", async () => {
+    const { getByText, getByLabelText, findByText } = render(wrap(<ImportCard />));
+    fireEvent.click(getByText(/or paste JSON/i));
+    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: "{not json" } });
+    fireEvent.click(getByText(/^Parse$/i));
+    expect(await findByText("Import failed")).toBeTruthy();
+    expect(await findByText(/Nothing was imported/)).toBeTruthy();
+  });
 });

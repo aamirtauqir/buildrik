@@ -2,9 +2,14 @@
 /**
  * PublishTab — the panel's board-driven states.
  *
- * 641:2652 (idle) · 784:4250 (publishing) · 784:4326 (live) · 784:4480
- * (not-connected). Each board answers a different question, and each drops the
- * sections that would answer a question the user is no longer asking.
+ * B3-10 7574:193972 (idle: the four sections) · 784:4250 (publishing) ·
+ * 4418:98663 (cancelled) · 784:4326 (live) · 784:4480 (not-connected). Each
+ * board answers a different question, and each drops the sections that would
+ * answer a question the user is no longer asking.
+ *
+ * The panel reads `nextMove` for whether a publish may go ahead (B4); every
+ * case here hands it the plain `confirm` gate so the state under test is the
+ * job's, not the round's (PublishTab.gate.test.tsx covers the gate).
  *
  * @license BSD-3-Clause
  */
@@ -30,6 +35,19 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
+import { deriveLifecycleState } from "../../../../shell/lifecycle";
+
+const OPEN_MOVE = deriveLifecycleState({
+  reviewState: "none",
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: false,
+  hasUnpublishedChanges: null,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+});
 
 type ComposerProp = PublishTabProps["composer"];
 
@@ -50,6 +68,19 @@ const job = (over: Partial<NonNullable<PublishTabProps["publishJob"]>> = {}) =>
 
 function renderTab(ui: React.ReactElement) {
   return render(<ToastProvider>{ui}</ToastProvider>);
+}
+
+/** Board 4418:97118 draws Changes / Last deploy collapsed; open both. */
+async function expandSections() {
+  for (const name of ["Changes in this session", "Last deploy"]) {
+    const b = await screen.findByRole("button", { name });
+    if (b.getAttribute("aria-expanded") === "false") fireEvent.click(b);
+  }
+}
+
+/** Board 7045:77972: Unpublish lives in the panel ⋯. */
+async function openPublishMenu() {
+  fireEvent.click(await screen.findByTestId("publish-menu"));
 }
 
 beforeEach(() => {
@@ -75,10 +106,11 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
            test asserted "v4 · live" over a site with nothing published — the
            defect itself, pinned as the expectation. */
         publishedUrl="https://bellacucina.com"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       />,
     );
 
+    await expandSections();
     // The pre-deploy entry is not pending work and must not be counted.
     await waitFor(() => expect(screen.getByText("1 change")).toBeTruthy());
     expect(screen.getByText("Hero — new photo")).toBeTruthy();
@@ -95,13 +127,15 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
     fetchPublishHistory.mockResolvedValue([
       { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
     ]);
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
     expect(screen.queryByText("v1 · live")).toBeNull();
   });
 
   it("never-published reads as never published, not as an empty deploy", async () => {
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("This site has never been published.")).toBeTruthy());
   });
 });
@@ -112,17 +146,70 @@ describe("PublishTab — board 784:4250, publishing", () => {
       <PublishTab
         composer={composerWith([{ id: "e1", label: "Edit", timestamp: Date.now() }])}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "publishing", progress: 40 })}
       />,
     );
 
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
     expect(screen.getByText(/40%/)).toBeTruthy();
-    // Environment stays — where it is going is still the question.
+    // Release to stays — where it is going is still the question.
     expect(screen.getByText("Production")).toBeTruthy();
-    expect(screen.queryByText("Since last deploy")).toBeNull();
+    // The checks step aside for the run, which the board leads with.
+    expect(screen.queryByText("Pre-publish checks")).toBeNull();
+    // And the run can be cancelled from here.
+    expect(screen.getByTestId("publish-cancel")).toBeTruthy();
+    expect(screen.queryByText("Changes in this session")).toBeNull();
     expect(screen.queryByText("Last deploy")).toBeNull();
+  });
+});
+
+describe("PublishTab — cancel in flight, and the cancelled outcome", () => {
+  it("Cancel asks the job to cancel — the deploy job on the server, nothing else claimed", async () => {
+    const cancel = vi.fn(() => Promise.resolve());
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+        publishJob={{ ...job({ uiState: "publishing", jobId: "job-1", progress: 20 }), cancel }}
+      />,
+    );
+    fireEvent.click(await screen.findByTestId("publish-cancel"));
+    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(1));
+    expect(document.body.textContent).not.toMatch(/export.*cancel/i);
+  });
+
+  it("a refused cancel prints the server's sentence under the bar and the run continues", async () => {
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+        publishJob={job({ uiState: "publishing", jobId: "job-1", progress: 80, error: "This job cannot be cancelled." })}
+      />,
+    );
+    expect(await screen.findByTestId("publish-cancel-error")).toHaveTextContent("This job cannot be cancelled.");
+    expect(screen.getByText("Publishing to production…")).toBeTruthy();
+  });
+
+  it("board 4418:98663 — cancelled leads with the outcome and offers Publish again through the one door", async () => {
+    const onRequestPublish = vi.fn();
+    const reset = vi.fn();
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        nextMove={OPEN_MOVE}
+        onRequestPublish={onRequestPublish}
+        publishJob={{ ...job({ uiState: "cancelled", jobId: "job-1" }), reset }}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("Publish cancelled.")).toBeTruthy());
+    expect(screen.getByText("Nothing was deployed. Your work is saved.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-again"));
+    expect(reset).toHaveBeenCalledTimes(1);
+    expect(onRequestPublish).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -139,7 +226,7 @@ describe("PublishTab — board 784:4326, just published", () => {
       <PublishTab
         composer={composerWith()}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bellacucina.com" })}
       />,
     );
@@ -152,6 +239,28 @@ describe("PublishTab — board 784:4326, just published", () => {
     expect(
       (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
     ).toBe(true);
+  });
+});
+
+/* Board 4418:99089 (C5 G1-048): a dev simulation says nothing was deployed
+   and offers no live link — its URL can never resolve. */
+describe("PublishTab — a simulated publish says so", () => {
+  it("names the simulation and withholds View live site", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+        publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bella.dev-simulated.invalid" })}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("Simulated publish — nothing was deployed.")).toBeTruthy());
+    expect(screen.getByText(/PUBLISH_ALLOW_SIMULATION is on/)).toBeTruthy();
+    expect(screen.queryByText("View live site")).toBeNull();
+    expect(screen.queryByText("Published to production.")).toBeNull();
   });
 });
 
@@ -174,12 +283,12 @@ describe("PublishTab — a fresh load is not a fresh publish", () => {
         /* HistoryManager empties the undo stack on load, by design. */
         composer={composerWith()}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "published", jobId: null, publishedUrl: "https://bellacucina.com" })}
       />,
     );
 
-    await waitFor(() => expect(screen.getByText("Since last deploy")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Changes in this session")).toBeTruthy());
     // Nothing was published in this session, so the result board must not show.
     expect(screen.queryByText("Published to production.")).toBeNull();
     expect(screen.getByText("Last deploy")).toBeTruthy();
@@ -191,12 +300,12 @@ describe("PublishTab — a fresh load is not a fresh publish", () => {
 
 describe("PublishTab — board 784:4480, no publish path", () => {
   it("is one sentence and one action, not a checklist", () => {
-    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
     expect(container.textContent).toContain("Connect Vercel to publish.");
     expect(container.textContent).toContain("we host nothing");
     expect(screen.getByText("Connect Vercel")).toBeTruthy();
-    // The board draws no environment/changes/deploy sections here.
-    expect(container.textContent).not.toContain("SINCE LAST DEPLOY");
+    // The board draws no release/changes/deploy sections here.
+    expect(container.textContent).not.toContain("Changes in this session");
     expect(screen.queryByText("Publish to production")).toBeNull();
   });
 });
@@ -207,7 +316,7 @@ describe("PublishTab — board 784:4403, failed", () => {
       <PublishTab
         composer={composerWith([{ id: "e1", label: "Edit", timestamp: Date.now() }])}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "failed", error: "Build error on Menu — 3 unresolved links." })}
       />,
     );
@@ -218,7 +327,7 @@ describe("PublishTab — board 784:4403, failed", () => {
     expect(screen.getByText(/Nothing was deployed\./)).toBeTruthy();
     expect(screen.getByText("Try again")).toBeTruthy();
     // Same as publishing/live: the "what would go out" sections step aside.
-    expect(screen.queryByText("Since last deploy")).toBeNull();
+    expect(screen.queryByText("Changes in this session")).toBeNull();
     // The CTA stays live — a failed publish is retryable.
     expect(
       (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
@@ -230,7 +339,7 @@ describe("PublishTab — board 784:4403, failed", () => {
       <PublishTab
         composer={composerWith()}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "failed", error: "Timed out. Nothing was deployed." })}
       />,
     );
@@ -242,7 +351,7 @@ describe("PublishTab — board 784:4403, failed", () => {
 describe("PublishTab — board 781:4489, the deploy service is unreachable", () => {
   it("says so, and says nothing about environments it cannot read", async () => {
     fetchPublishHistory.mockRejectedValue(new Error("network"));
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
     /* Both halves: nothing went out, and the work is not lost. */
@@ -250,7 +359,7 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
     expect(screen.getByText("Try again")).toBeTruthy();
     // "no deploys yet" and "we cannot tell" are different facts.
     expect(screen.queryByText("This site has never been published.")).toBeNull();
-    expect(screen.queryByText("Since last deploy")).toBeNull();
+    expect(screen.queryByText("Changes in this session")).toBeNull();
     expect(
       (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
     ).toBe(true);
@@ -273,13 +382,14 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
         composer={composerWith()}
         projectId="site_1"
         publishedUrl="https://bellacucina.com"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       />,
     );
 
     await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
     failing = false;
     fireEvent.click(screen.getByText("Try again"));
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v2 · live")).toBeTruthy());
   });
 });
@@ -291,7 +401,7 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
 describe("PublishTab — which whole-body state wins", () => {
   it("no publish path beats an unreachable deploy service", async () => {
     fetchPublishHistory.mockRejectedValue(new Error("network"));
-    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
 
     await waitFor(() => expect(container.textContent).toContain("Connect Vercel to publish."));
     expect(container.textContent).not.toContain("Couldn't reach the deploy service.");
@@ -303,14 +413,14 @@ describe("PublishTab — which whole-body state wins", () => {
       <PublishTab
         composer={composerWith([{ id: "e1", label: "Edit", timestamp: Date.now() }])}
         projectId="site_1"
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "failed", error: "boom" })}
       />,
     );
 
     await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
     expect(screen.queryByText("Publish failed.")).toBeNull();
-    expect(screen.queryByText("Since last deploy")).toBeNull();
+    expect(screen.queryByText("Changes in this session")).toBeNull();
   });
 });
 
@@ -326,8 +436,9 @@ describe("PublishTab — which whole-body state wins", () => {
 describe("PublishTab — the zero-changes sentence tells the truth", () => {
   it("says the site is going live for the first time when nothing was ever deployed", async () => {
     fetchPublishHistory.mockResolvedValue([]);
-    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
+    await expandSections();
     await waitFor(() =>
       expect(screen.getByText("Publishing will put the whole site live for the first time.")).toBeInTheDocument(),
     );
@@ -347,8 +458,9 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
         rolledBackFrom: null,
       },
     ]);
-    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
+    await expandSections();
     await waitFor(() =>
       expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
     );
@@ -367,27 +479,115 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
         composer={composerWith()}
         projectId="site_1"
         publishedUrl="https://bellacucina.com"
-        /* Idle, not "published": the just-published state renders the result
-           section in place of Last deploy, and Unpublish lives in Last deploy. */
+        /* Idle, not "published": liveness comes from the last deploy, which
+           the just-published state replaces with the result section. */
         publishJob={{ ...job({ uiState: "idle", publishedUrl: "https://bellacucina.com" }), unpublished }}
-        onVercelPublish={vi.fn()}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       />,
     );
-    await waitFor(() => expect(screen.getByText("Unpublish site…")).toBeTruthy());
-    fireEvent.click(screen.getByText("Unpublish site…"));
+    await expandSections();
+    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
     expect(screen.getByText("Unpublish site?")).toBeTruthy();
     expect(unpublishSite).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Unpublish" }));
+    /* Typed confirm (board 4418:98016, decision 29 — wide action): the button
+       is dead until the word is typed, so a reflex Enter cannot take the site
+       down. */
+    const confirm = screen.getByTestId("unpublish-confirm-button") as HTMLButtonElement;
+    expect(confirm.disabled).toBe(true);
+    fireEvent.click(confirm);
+    expect(unpublishSite).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "unpublish" } });
+    expect(confirm.disabled).toBe(true);
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
+    expect(confirm.disabled).toBe(false);
+    fireEvent.click(confirm);
     await waitFor(() => expect(unpublishSite).toHaveBeenCalledWith("site_1"));
     await waitFor(() => expect(unpublished).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.queryByText("Unpublish site?")).toBeNull());
+  });
+
+  it("a failed unpublish keeps the dialog up — the site is still live", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 3, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    unpublishSite.mockRejectedValueOnce(new Error("Vercel refused"));
+    const unpublished = vi.fn();
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        publishedUrl="https://bellacucina.com"
+        publishJob={{ ...job({ uiState: "idle", publishedUrl: "https://bellacucina.com" }), unpublished }}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+      />,
+    );
+    await expandSections();
+    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
+    fireEvent.click(screen.getByTestId("unpublish-confirm-button"));
+    await waitFor(() => expect(unpublishSite).toHaveBeenCalled());
+    await waitFor(() => expect((screen.getByTestId("unpublish-confirm-button") as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getByText("Unpublish site?")).toBeTruthy();
+    expect(unpublished).not.toHaveBeenCalled();
+  });
+
+  it("the site menu's door lands on the same typed confirm (cold open)", async () => {
+    const consumed = vi.fn();
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        publishedUrl="https://bellacucina.com"
+        publishJob={job({ uiState: "idle", publishedUrl: "https://bellacucina.com" })}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+        initialUnpublish
+        onUnpublishIntentConsumed={consumed}
+      />,
+    );
+    expect(await screen.findByText("Unpublish site?")).toBeTruthy();
+    expect(screen.getByTestId("unpublish-word")).toBeTruthy();
+    expect(consumed).toHaveBeenCalledTimes(1);
   });
 
   it("does not offer Unpublish on a deploy that is not serving", async () => {
     fetchPublishHistory.mockResolvedValue([
       { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
     ]);
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
-    expect(screen.queryByText("Unpublish site…")).toBeNull();
+    await openPublishMenu();
+    expect(screen.getByRole("menuitem", { name: "All versions ›" })).toBeTruthy();
+    expect(screen.queryByRole("menuitem", { name: "Unpublish site…" })).toBeNull();
+  });
+});
+
+describe("PublishTab — board 4418:97118 flow (Fix ›, Release to, collapsed sections, ⋯)", () => {
+  it("Changes in this session and Last deploy start collapsed and open on their header", async () => {
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    const last = await screen.findByRole("button", { name: "Last deploy" });
+    expect(last.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText("This site has never been published.")).toBeNull();
+    fireEvent.click(last);
+    expect(await screen.findByText("This site has never been published.")).toBeTruthy();
+  });
+
+  it("Production and Preview deployment open Settings › Domains", async () => {
+    const composer = composerWith();
+    renderTab(<PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    fireEvent.click(await screen.findByTestId("publish-env-preview"));
+    expect(composer!.emit).toHaveBeenCalledWith("ui:settings-open", { screen: "domains" });
+  });
+
+  it("⋯ All versions › opens History on Published", async () => {
+    const composer = composerWith();
+    renderTab(<PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "All versions ›" }));
+    expect(composer!.emit).toHaveBeenCalledWith("panel:open", { panel: "history", screen: "published" });
   });
 });

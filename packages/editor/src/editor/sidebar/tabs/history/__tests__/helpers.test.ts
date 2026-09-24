@@ -1,6 +1,6 @@
 /**
  * helpers.test.ts — collapseIdenticalChanges grouping logic.
- * groupByDate + ActivityView error state are covered in HistoryTab.test.tsx;
+ * ActivityView error state is covered in HistoryTab.test.tsx;
  * this file fills the remaining helper gap only.
  */
 

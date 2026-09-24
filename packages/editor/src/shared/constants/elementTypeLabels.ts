@@ -48,6 +48,7 @@ export const ELEMENT_TYPE_LABELS: Record<string, string> = {
   hero: "Hero",
   features: "Features",
   grid: "Grid",
+  "collection-list": "Collection list",
   flex: "Flex",
   icon: "Icon",
   divider: "Divider",

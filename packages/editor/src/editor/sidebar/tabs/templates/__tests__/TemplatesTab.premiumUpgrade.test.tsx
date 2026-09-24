@@ -60,22 +60,22 @@ const premium = () => {
 const renderTab = () =>
   render(
     <>
-      <TemplatesTab composer={makeComposer() as never} isExpanded />
+      <TemplatesTab composer={makeComposer() as never} />
       <UpgradeModal />
     </>,
   );
 
 describe("Templates — a premium template reaches the boarded prompt", () => {
-  /** The detail pane swaps both apply buttons for this one when premium. */
+  /** A card opens the preview (decision #24); its Create page meets the gate. */
   const openDetail = async (name: string) =>
     fireEvent.click(await screen.findByRole("option", { name: `${name} template` }));
 
-  it("opens it from the detail pane, naming the template the user clicked", async () => {
+  it("opens it from the preview, naming the template the user clicked", async () => {
     const t = premium();
     renderTab();
 
     await openDetail(t.name);
-    fireEvent.click(screen.getByRole("button", { name: "🔒 Upgrade to use" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
 
     expect(screen.getByText("Upgrade Your Plan")).toBeTruthy();
     // This is the first premium click of the session, which is exactly where
@@ -90,13 +90,13 @@ describe("Templates — a premium template reaches the boarded prompt", () => {
     const composer = makeComposer();
     render(
       <>
-        <TemplatesTab composer={composer as never} isExpanded />
+        <TemplatesTab composer={composer as never} />
         <UpgradeModal />
       </>,
     );
 
     await openDetail(t.name);
-    fireEvent.click(screen.getByRole("button", { name: "🔒 Upgrade to use" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
 
     expect(composer.elements.importHTMLToActivePage).not.toHaveBeenCalled();
   });

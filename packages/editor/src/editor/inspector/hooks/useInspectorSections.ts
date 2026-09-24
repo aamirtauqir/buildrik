@@ -15,6 +15,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { ALL_PROFILE_ELEMENT_TYPES, getProfileFor } from "../config/elementProfiles";
+import { SECTION_REGISTRY } from "../sections/registry";
 import {
   ALL_REGISTRY_SECTION_IDS,
   sectionApplies,
@@ -111,6 +112,19 @@ export interface UseInspectorSectionsResult {
 // Hook
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Keys of the non-Style sections (Settings / Effects) in a profile. */
+const DRAWN_SHUT = new Set<string>(["element-properties", "blur", "effects"]);
+
+function openTabKeysForType(elementType: string): string[] {
+  return getProfileFor(elementType)
+    .order.filter((id) => {
+      const tab = SECTION_REGISTRY[id]?.tab;
+      /* ADVANCED (4428:141642), BLUR and MORE EFFECTS (4428:142686) stay shut, as drawn. */
+      return Boolean(tab && tab !== "style") && !DRAWN_SHUT.has(id);
+    })
+    .map((id) => `${elementType}:${id}`);
+}
+
 export function useInspectorSections({
   selectedElement,
   composer,
@@ -176,13 +190,29 @@ export function useInspectorSections({
     const userPrefs = loadUserPreferences();
     if (userPrefs && userPrefs.size > 0) return userPrefs;
     const initialType = selectedElement?.type || "container";
-    return new Set(getDefaultExpandedKeysForType(initialType));
+    return new Set([...getDefaultExpandedKeysForType(initialType), ...openTabKeysForType(initialType)]);
   });
 
   // Tracks element types the user has never touched. On first selection of
   // a type, seed defaults from the profile. Once the user toggles anything
   // for a type, we stop seeding for that type.
   const customizedTypesRef = React.useRef<Set<string>>(new Set());
+
+  /* Settings and Effects open their sections by default (boards 4428:141642 /
+     142686 draw those tabs expanded — a short list whose point is the
+     controls). Merged separately from the Style seeding above, which waits
+     for the element's styles to arrive. */
+  React.useEffect(() => {
+    const type = selectedElement?.type;
+    if (!type || customizedTypesRef.current.has(type)) return;
+    const keys = openTabKeysForType(type);
+    setExpandedSections((prev) => {
+      if (keys.every((k) => prev.has(k))) return prev;
+      const next = new Set(prev);
+      for (const k of keys) next.add(k);
+      return next;
+    });
+  }, [selectedElement?.type]);
 
   // Seed defaults when a new element type is first selected.
   React.useEffect(() => {
@@ -202,7 +232,8 @@ export function useInspectorSections({
     if (keys.length === 0) return;
 
     setExpandedSections((prev) => {
-      const hasAnyForType = Array.from(prev).some((k) => k.startsWith(`${type}:`));
+      const openTab = new Set(openTabKeysForType(type));
+      const hasAnyForType = Array.from(prev).some((k) => k.startsWith(`${type}:`) && !openTab.has(k));
       if (hasAnyForType) return prev;
 
       const next = new Set(prev);

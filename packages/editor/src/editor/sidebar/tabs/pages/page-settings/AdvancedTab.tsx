@@ -1,12 +1,15 @@
 /**
- * AdvancedTab — Visibility, schedule, password, indexing, head code.
+ * AdvancedTab — Visibility (Live · Hidden), indexing / follow, head code.
+ *
+ * Decision #21: Password is removed until the published-site middleware
+ * exists to enforce it; canonical URL comes later.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -21,7 +24,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           Visibility
         </div>
         <div style={{ display: "inline-flex", padding: 2, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
-          {(["live", "hidden", "password"] as const).map((v) => (
+          {(["live", "hidden"] as const).map((v) => (
             <Button
               key={v}
               color="light"
@@ -46,42 +49,14 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             </Button>
           ))}
         </div>
-        {s.visibility !== "live" && (
-          <HelperText className={BK_HELPER_CLASS}>
-            Not published. Hidden pages are left out of the deploy, and static
-            hosting cannot ask for a password — so a password page is left out
-            too, rather than going live unprotected. Until the published-site
-            middleware ships, this is the only way the setting can be kept.
-          </HelperText>
+        {s.visibility === "hidden" && (
+          <HelperText className={BK_HELPER_CLASS}>Not published. Hidden pages are left out of the deploy.</HelperText>
         )}
         <HelperText className={BK_HELPER_CLASS}>
           {s.visibility === "live" && "Page is publicly accessible."}
           {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
-          {s.visibility === "password" && "Visitors must enter a password to view this page."}
         </HelperText>
       </div>
-      {/* Password input — only when visibility=password */}
-      {s.visibility === "password" && (
-        <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
-          <div className="tw:flex tw:flex-nowrap tw:items-center tw:gap-2">
-            <TextInput
-              type={s.showPassword ? "text" : "password"}
-              value={s.password}
-              onChange={(e) => s.setPassword(e.target.value)}
-              placeholder="Enter password"
-              aria-label="Page access password"
-              style={{ flex: 1 }}
-            />
-            <Button color="light" size="xs" onClick={() => s.setShowPassword(!s.showPassword)} aria-label={s.showPassword ? "Hide password" : "Show password"}>
-              {s.showPassword ? "Hide" : "Show"}
-            </Button>
-            <Button color="light" size="xs" onClick={() => s.copyPassword()} aria-label="Copy password" disabled={!s.password}>
-              Copy
-            </Button>
-          </div>
-          <HelperText className={BK_HELPER_CLASS}>Share this password with visitors who need access.</HelperText>
-        </div>
-      )}
       {/* Indexing */}
       <div className="tw:flex tw:flex-col tw:gap-2">
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>

@@ -41,7 +41,7 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { CollectionView, FieldsView, RecordView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
@@ -56,26 +56,22 @@ import { getAllIcons } from "@/shared/constants/icons";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
 import { ReplaceAcrossDialog } from "@/editor/sidebar/tabs/media/components/ReplaceAcrossDialog";
-import { MediaLibraryPanel } from "@/editor/media/MediaLibraryPanel";
+import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
-import { saveSiteVariables } from "@/editor/sidebar/tabs/content/contentPanelUtils";
-import { CMSRecordsModal } from "@/editor/shell/modals/CMSRecordsModal";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
-import { InsertLoadingSkeleton, InsertLoadError } from "@/editor/sidebar/tabs/build/components/InsertStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
-/* ChatThread/AgentPlan carry `.bd-ai-*` styles that only AITab imports, so
-   the probe loads the panel's stylesheet the way production does. */
+/* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
+   loads the panel's stylesheet the way production does. */
 import "@/editor/sidebar/tabs/ai/AITab.css";
-import { ChatThread } from "@/editor/sidebar/tabs/ai/ChatThread";
 import { AgentPlan } from "@/editor/sidebar/tabs/ai/AgentPlan";
 import type { RunStep } from "@/editor/sidebar/tabs/ai/hooks/useAgentRunner";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
@@ -84,7 +80,7 @@ import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import {
-  DesignSystemTab,
+  BrandWorkspace,
   TokenRegistryProvider,
   StylePresetRegistryProvider,
 } from "@/editor/design-system";
@@ -104,8 +100,6 @@ import type { UploadProgress } from "@/shared/types/media";
 import { PageList } from "@/editor/sidebar/tabs/pages/components/PageList";
 import { ConfirmDeleteModal } from "@/editor/sidebar/tabs/media/components/ConfirmDeleteModal";
 import { ImportUrlModal } from "@/editor/media/components/ImportUrlModal";
-import { DrawerGallery } from "@/editor/sidebar/tabs/templates/components/DrawerGallery";
-import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
 import { ApplyProgressOverlay } from "@/editor/sidebar/tabs/templates/ApplyProgressOverlay";
 import { PublishTab } from "@/editor/sidebar/tabs/publish/PublishTab";
 import {
@@ -117,17 +111,14 @@ import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageTabBar } from "@/editor/shell/PageTabBar";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
-import { TemplateUsageDrawer } from "@/editor/sidebar/tabs/templates/components/TemplateUsageDrawer";
-import { PublishWizard } from "@/editor/sidebar/tabs/publish/PublishWizard";
+import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
-import { PageCommandPalette } from "@/editor/sidebar/tabs/pages/components/PageCommandPalette";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar } from "@/editor/chrome-ui";
-import { ReviewBar } from "@/editor/shell/ReviewBar";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
-import { KeyboardShortcutsPanel } from "@/editor/panels/KeyboardShortcutsPanel";
+import { KeyboardCheatSheet } from "@/editor/canvas/controls/KeyboardCheatSheet";
 import { AnimationEditor } from "@/editor/animation/AnimationEditor";
 import { useHistoryFeedback } from "@/editor/shell/hooks/useHistoryFeedback";
 import {
@@ -207,7 +198,7 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
       onUpload={async () => []}
       onRetryUpload={() => {}}
       onOpenDetail={() => {}}
-      onOpenIconPicker={() => {}}
+     
       onOpenStock={() => {}}
       onOpenLibrary={() => {}}
       onToggleSelection={() => {}}
@@ -265,28 +256,6 @@ const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
  * derives each row's label by differencing with its successor, so the fixture
  * supplies sizes rather than the labels themselves.
  */
-/* The optimise drill-in needs a source that actually SHRINKS. The shared
-   fixture is a 1x1 GIF, which WebP-encodes ten times larger, so the panel drew
-   its "+1069%" warning branch — the one state board 1124:4584 does not draw.
-   A 2400x1600 SVG carrying a padded comment gives a real byte count to start
-   from and a flat image that compresses to almost nothing, so the success
-   branch (green, a negative percentage) is what gets measured. */
-const OPTIMISE_ITEM: LibraryItem = MEDIA_ITEM({
-  key: "hero",
-  name: "hero-dark.jpg",
-  size: 840 * 1024,
-  width: 2400,
-  height: 1600,
-  src:
-    "data:image/svg+xml," +
-    encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='2400' height='1600'>" +
-        "<rect width='2400' height='1600' fill='#334155'/><!--" +
-        "padding".repeat(9000) +
-        "--></svg>",
-    ),
-});
-
 const VERSIONED_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
   name: "hero-dark.jpg",
@@ -506,7 +475,7 @@ function mgrHost(children: React.ReactNode) {
 /**
  * Media picker fixture (board 1164:4713).
  *
- * MediaLibraryPanel reads through `useMediaManager`, which is three
+ * UploadAssetModal reads through `useMediaManager`, which is three
  * `composer.media` calls and an event subscription — so the fixture answers
  * those and the panel mounts as it ships. The live picker cannot be measured
  * instead: it opens from an element that needs an asset, and a fresh demo
@@ -535,7 +504,7 @@ const PICKER_COMPOSER = {
     getAssets: () => PICKER_ASSETS,
     getAsset: (id: string) => PICKER_ASSETS.find((a) => a.id === id),
   },
-} as unknown as React.ComponentProps<typeof MediaLibraryPanel>["composer"];
+} as unknown as React.ComponentProps<typeof UploadAssetModal>["composer"];
 
 /**
  * Replace-across fixture (board 1164:4738 — the picker half).
@@ -674,16 +643,16 @@ const DETACH_COMPOSER = {
 } as unknown as React.ComponentProps<typeof ComponentDetailScreen>["composer"];
 
 /**
- * Brand · load-error fixture (board 781:4311).
+ * Brand · load-error fixture (board 781:4311; the drawer it drew is archived —
+ * the surface is the Brand workspace since C1 (i), 2026-09-22).
  *
- * The state is the `error` branch of `DesignSystemTab`, and nothing a user can
+ * The state is the `error` branch of `BrandWorkspace`, and nothing a user can
  * click produces it: `loadFromComposer` only sets `error` when reading the
  * project's own settings THROWS. So the composer here throws from
  * `getProjectSettings`, which is the one call that branch depends on, and the
- * panel under measurement is the real one — real PanelHeader, real
- * PanelErrorState, real copy, mounted under the same three providers
- * `StudioPanels.tsx:405-407` wraps it in. Nothing about the error block is
- * re-drawn here.
+ * surface under measurement is the real one — real PanelErrorState, real
+ * copy, mounted under the same three providers `StudioPanels.tsx:405-407`
+ * wraps it in. Nothing about the error block is re-drawn here.
  */
 const BRAND_ERROR_COMPOSER = {
   on: () => {},
@@ -711,7 +680,7 @@ const BRAND_ERROR_COMPOSER = {
     },
     tokenUsage: null,
   },
-} as unknown as React.ComponentProps<typeof DesignSystemTab>["composer"];
+} as unknown as React.ComponentProps<typeof BrandWorkspace>["composer"];
 
 /**
  * Layers · component-instance fixture (board 1082:4739).
@@ -769,7 +738,7 @@ function layerRow(layer: LayerItem) {
       onSelect={noop}
       onContextMenu={noop}
       getVisibleLayerIds={() => ["l0", "l1"]}
-      displayPrefs={{ showHtmlBadges: false, showElementIds: false, treeDensity: "compact" }}
+      displayPrefs={{ showDimmed: true, showLockBadges: true, treeDensity: "compact", highlightCmsBound: false, showHtmlBadges: false }}
     />
   );
 }
@@ -885,7 +854,7 @@ function LayersProbe({ select }: { select?: string[] }) {
        own error boundary renders the load-error block instead. */
     <ToastProvider>
       <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
-        <LayersTab composer={c} onExpandToggle={() => {}} onClose={() => {}} />
+        <LayersTab composer={c} onClose={() => {}} />
       </div>
     </ToastProvider>
   );
@@ -1167,7 +1136,6 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
-          onOpenListings={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -1481,8 +1449,9 @@ const APPLY_STEPS = [
  * reached there at all: each one needs an answer from the dashboard's AI
  * endpoint, which the standalone editor has no credentials for. So the probe
  * mounts the ONE block each state adds, in the branch production renders it
- * from — `ChatThread` with a streaming, textless message for the Thinking band,
- * and `AgentPlan` at the run phase for the band and the step rows.
+ * from — `AgentPlan` at phase "planning" for the Thinking band (decision #23
+ * retired the chat bubble that used to carry it), and at the run phase for the
+ * band and the step rows.
  *
  * 280 is the board frame. Nothing compared from these three depends on it (the
  * anchored properties are heights, fills and type), and it keeps a probe
@@ -1510,9 +1479,9 @@ const agentPlan = (over: Partial<React.ComponentProps<typeof AgentPlan>>) => (
     steps={[]}
     currentIndex={-1}
     error={null}
-    autoApply={false}
-    onAutoApplyChange={() => {}}
     onApprove={() => {}}
+    onEditStep={() => {}}
+    onRunPlan={() => {}}
     onSkip={() => {}}
     onStop={() => {}}
     {...over}
@@ -1826,23 +1795,6 @@ const MENU_RECORDS = [
   { id: "rec-marinara", collectionId: "menu-items", status: "draft", data: { name: "Marinara" } },
 ];
 
-/* Board 149:84 draws the record form over THREE fields — Name, Price,
-   Description — where 151:2 draws the same collection's field list with eight.
-   Two boards, two sample collections; the record screen gets the collection its
-   own board draws so each label joins the node above the input it belongs to. */
-const RECORD_COLLECTION = [
-  {
-    id: "menu-items",
-    name: "Menu items",
-    slug: "menu-items",
-    displayField: "name",
-    fields: [
-      { id: "rf-name", name: "Name", slug: "name", type: "text", order: 0 },
-      { id: "rf-price", name: "Price", slug: "price", type: "text", order: 1 },
-      { id: "rf-description", name: "Description", slug: "description", type: "textarea", order: 2 },
-    ],
-  },
-];
 const TEAM_RECORDS = Array.from({ length: 6 }, (_, i) => ({
   id: `rec-team-${i}`,
   collectionId: "team",
@@ -1884,31 +1836,6 @@ const CONTENT_VARIABLES = [
   { key: "hours", value: "Tue–Sun, from 5pm" },
 ];
 
-/* Board 1170:4749's own collection: three columns (Title · Price · Photo) plus
-   the fixed Updated. The third being an IMAGE field is the point — that column
-   is the only one the table renders as presence rather than as text. */
-const RECORDS_COLLECTION = [
-  {
-    id: "menu-items",
-    name: "Menu items",
-    slug: "menu-items",
-    displayField: "title",
-    fields: [
-      { id: "rcf-title", name: "Title", slug: "title", type: "text", order: 0 },
-      { id: "rcf-price", name: "Price", slug: "price", type: "text", order: 1 },
-      { id: "rcf-photo", name: "Photo", slug: "photo", type: "image", order: 2 },
-    ],
-  },
-];
-const RECORDS_ITEMS = [
-  { id: "rec-margherita", collectionId: "menu-items", status: "published", updatedAt: new Date().toISOString(),
-    data: { title: "Margherita", price: "$14", photo: "margherita.jpg" } },
-  { id: "rec-carbonara", collectionId: "menu-items", status: "published", updatedAt: "2026-08-05T10:00:00.000Z",
-    data: { title: "Carbonara", price: "$18", photo: "carbonara.jpg" } },
-  { id: "rec-tiramisu", collectionId: "menu-items", status: "draft", updatedAt: "2026-08-02T10:00:00.000Z",
-    data: { title: "Tiramisu", price: "$9", photo: "" } },
-];
-
 const CONTENT_PROJECT = "probe-content";
 
 function contentElement(e: (typeof CONDITION_ELEMENTS)[number]) {
@@ -1936,6 +1863,9 @@ function contentComposer({
   const noop = () => {};
   return {
     getProjectMetadata: () => ({ name: CONTENT_PROJECT }),
+    /* Variables live in the project settings (board 151:62's list). */
+    getProjectSettings: () => ({ siteVariables: CONTENT_VARIABLES }),
+    setProjectSettings: noop,
     cms: {
       collections: {
         initialize: async () => {},
@@ -1975,13 +1905,6 @@ function contentComposer({
  *  frame. Without a real height `CONTENT_BODY`'s `h-full` collapses and every
  *  `flex-1` region measures its content instead of its column. */
 function ContentPanelHost({ probe, composer }: { probe: string; composer: Composer }) {
-  /* Variables persist in localStorage keyed by the project NAME
-     (contentPanelUtils.storageKey). Seeded through the shipped writer so the
-     read path is identical to production's — and during THIS render rather
-     than in an effect: child effects run before parent effects, so an effect
-     here would write them after `useContentPanel` had already read, and board
-     151:62 would mount on an empty list. */
-  React.useMemo(() => saveSiteVariables(CONTENT_PROJECT, CONTENT_VARIABLES), []);
   return (
     <div data-probe={probe} className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
       <ContentTab composer={composer} hydrationStatus="ready" onCreateCollection={() => {}} onClose={() => {}} />
@@ -1991,16 +1914,7 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
 
 const CASES: Record<string, () => React.ReactElement> = {
   // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
-  "ai-thinking": () =>
-    aiHost(
-      "ai-thinking",
-      <ChatThread
-        messages={[{ id: "a1", role: "assistant", text: "", streaming: true, createdAt: 0 }]}
-        onAccept={() => {}}
-        onReject={() => {}}
-        onRegenerate={() => {}}
-      />,
-    ),
+  "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
   /* Planning has NO step rows in the shipped runner: `start()` clears `steps`,
      awaits the plan, then sets steps and phase "running" in the same breath.
      The board draws a plan-review gate over three pending rows, which is a new
@@ -2020,29 +1934,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   // to nothing while every gate stayed green — the probe silently measured
   // an empty page. e2e/ is typechecked now, and the coverage `S` used to give
   // is replaced by rendering the real converted views below.
-  "content-collection-rows": () => (
-    <div data-probe="content-collection-rows">
-      <CollectionView
-        collection={
-          {
-            id: "c1",
-            name: "Posts",
-            displayField: "title",
-            fields: [{ id: "f1", name: "Title", slug: "title", type: "text" }],
-          } as never
-        }
-        records={[
-          { id: "r0001", status: "published", data: { title: "Margherita" } } as never,
-          { id: "r0002", status: "draft", data: { title: "Marinara" } } as never,
-        ]}
-        onBack={() => {}}
-        onOpenRecord={() => {}}
-        onAddRecord={() => {}}
-        onOpenFields={() => {}}
-        onOpenDynamicPages={() => {}}
-      />
-    </div>
-  ),
   // The strike-through on a completed step used to be an inline
   // `textDecoration`, asserted in jsdom. It is a class now, and jsdom computes
   // "" for classes, so that assertion could no longer prove anything. This
@@ -2095,7 +1986,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onZoomChange={() => {}}
         onUndo={() => {}}
         onRedo={() => {}}
-        onHelpClick={() => {}}
       />
     </div>
   ),
@@ -2108,28 +1998,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onZoomChange={() => {}}
         onUndo={() => {}}
         onRedo={() => {}}
-        onHelpClick={() => {}}
-      />
-    </div>
-  ),
-  // Covers the non-interactive Row variant plus the required-badge and the
-  // row-action button, none of which the collection case reaches.
-  "content-field-rows": () => (
-    <div data-probe="content-field-rows">
-      <FieldsView
-        collection={
-          {
-            id: "c1",
-            name: "Posts",
-            fields: [
-              { id: "f1", name: "Title", slug: "title", type: "text", validation: { required: true } },
-              { id: "f2", name: "Body", slug: "body", type: "richtext" },
-            ],
-          } as never
-        }
-        onBack={() => {}}
-        onAddField={async () => {}}
-        onDeleteField={async () => {}}
       />
     </div>
   ),
@@ -2189,21 +2057,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   // ── Media drawer states (T6) — the 320 drawer the board specifies ─────────
   "media-drawer-grid": () => <div data-probe="media-drawer-grid" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">{mediaDrawer()}</div>,
-  /* Boards 303:1997 / 303:2032 — the drawer with a running media job naming
-     itself over the grid. Neither state is reachable here: the editing pill is
-     set when `onOpenImageEditor` fires (the modal lives in AquibraStudio), and
-     the optimizing pill is set inside an await around a real blob upload. The
-     pill is a prop, so the real panel is mounted with it. */
-  "media-status-editing": () => (
-    <div data-probe="media-status-editing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Image editor — crop · rotate · adjust" })}
-    </div>
-  ),
-  "media-status-optimizing": () => (
-    <div data-probe="media-status-optimizing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Optimizing → WebP…" })}
-    </div>
-  ),
   // One card, so a conformance target for `Card / media` resolves to exactly
   // one element — measure.mjs refuses ambiguity, and rightly: whichever card
   // happened to be first would be measured silently.
@@ -2285,28 +2138,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   "content-panel-no-source": () => (
     <ContentPanelHost probe="content-panel-no-source" composer={contentComposer({ sources: [] })} />
   ),
-  /* Board 1170:4749 — the records TABLE, a second record editor reachable only
-     from ⌘⇧P. Mounted directly because the modal is shell-owned: its `isOpen`
-     comes from AquibraStudio, which no probe may stage. */
-  "content-records": () => (
-    <div data-probe="content-records">
-      <CMSRecordsModal
-        composer={contentComposer({ collections: RECORDS_COLLECTION, records: RECORDS_ITEMS })}
-        isOpen
-        onClose={() => {}}
-      />
-    </div>
-  ),
   /* Board 1170:4713 — the collection-setup wizard, drawn at its SECOND step.
-     Shell-owned like the records modal, so it is mounted directly and the
+     Shell-owned, so it is mounted directly and the
      recipe walks it to step 2 through the wizard's own Next button. */
   "content-collection-setup": () => (
     <div data-probe="content-collection-setup">
       <CMSCollectionSetupModal composer={contentComposer()} isOpen onClose={() => {}} />
     </div>
-  ),
-  "content-panel-record": () => (
-    <ContentPanelHost probe="content-panel-record" composer={contentComposer({ collections: RECORD_COLLECTION })} />
   ),
   "content-loading": () => (
     <div data-probe="content-loading">
@@ -2336,19 +2174,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
       <LayersNoResults search="hero" onClear={() => {}} />
-    </div>
-  ),
-  // Insert boards 775:4053 / 781:4154. The catalog is static, so neither state
-  // is reachable in the app yet (the navigate groups go async next) — the
-  // probe is their only mount until then, same single-home rule as Layers.
-  "insert-loading": () => (
-    <div data-probe="insert-loading" style={{ width: 280, background: "#fff" }}>
-      <InsertLoadingSkeleton />
-    </div>
-  ),
-  "insert-load-error": () => (
-    <div data-probe="insert-load-error" style={{ width: 280, background: "#fff" }}>
-      <InsertLoadError onRetry={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
@@ -2411,14 +2236,12 @@ const CASES: Record<string, () => React.ReactElement> = {
     <div data-probe="components-detach-confirm">
       {drillHost(
         <DSModeProvider initialMode="pro">
-          <AutoOpen testid="component-detach">
+          <AutoOpen testid="component-detach-all">
             <ComponentDetailScreen
               component={DETACH_COMPONENT}
               composer={DETACH_COMPOSER}
               onBack={() => {}}
-              isInstanceSelected
               selectedElementId="el-1"
-              onDetachInstance={() => {}}
             />
           </AutoOpen>
         </DSModeProvider>,
@@ -2428,16 +2251,14 @@ const CASES: Record<string, () => React.ReactElement> = {
   "brand-load-error": () => (
     <div data-probe="brand-load-error">
       <ToastProvider>
-        {/* 280 x 812, the board's own frame. `onExpandToggle` + `onClose` are
-            what make PanelHeader draw the two 16px controls 781:4312 shows. */}
-        <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+        {/* 1440 x 900, the workspace's own frame (7315:80955). */}
+        <div className="tw:flex tw:h-[900px] tw:w-[1440px] tw:flex-col tw:overflow-hidden tw:bg-white">
           <DSModeProvider>
             <TokenRegistryProvider projectId="probe" composer={undefined}>
               <StylePresetRegistryProvider projectId="probe">
-                <DesignSystemTab
+                <BrandWorkspace
                   composer={BRAND_ERROR_COMPOSER}
                   projectId="probe"
-                  onExpandToggle={() => {}}
                   onClose={() => {}}
                 />
               </StylePresetRegistryProvider>
@@ -2678,40 +2499,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     </div>
   ),
-  // ── Content · unsaved-record (board 149:108) ─────────────────────────────
-  // The save bar renders only while the form is dirty, and dirtiness is a
-  // diff against the record the panel was opened with. A record whose stored
-  // status is draft, mounted with the toggle already on, is dirty on arrival —
-  // the same comparison the product makes, not a flag the fixture set.
-  "content-unsaved-record": () => (
-    <div data-probe="content-unsaved-record">
-      <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-        <RecordView
-          collection={
-            {
-              id: "c1",
-              name: "Menu",
-              displayField: "name",
-              fields: [
-                { id: "f1", name: "Name", slug: "name", type: "text" },
-                { id: "f2", name: "Price", slug: "price", type: "text" },
-                { id: "f3", name: "Description", slug: "description", type: "textarea" },
-              ],
-            } as never
-          }
-          record={
-            {
-              id: "r0001",
-              status: "draft",
-              data: { name: "Margherita", price: "$12", description: "Tomato, mozzarella, basil" },
-            } as never
-          }
-          onBack={() => {}}
-          onSave={async () => {}}
-        />
-      </div>
-    </div>
-  ),
   // ── History · Published · rollback flow (boards 184:2 / 184:24 / 184:37 /
   //    184:45 / 453:4064) ─────────────────────────────────────────────────
   // Five boards, one panel, and every one of them sits behind a real site:
@@ -2781,7 +2568,6 @@ const CASES: Record<string, () => React.ReactElement> = {
           composer={USAGE_COMPOSER}
           onClose={() => {}}
           onEditImage={() => {}}
-          onOptimized={() => {}}
           onReplaceAcross={() => {}}
         />,
       )}
@@ -2796,25 +2582,6 @@ const CASES: Record<string, () => React.ReactElement> = {
             composer={USAGE_COMPOSER}
             onClose={() => {}}
             onEditImage={() => {}}
-          />
-        </AutoOpen>,
-      )}
-    </div>
-  ),
-  /* Board 1124:4562 — the OPTIMISE drill-in, at the board's own 280x812. The
-     panel is `OptimizationPanel` inside `AssetDetailOverlay`'s fourth view, so
-     the probe mounts the real overlay and AutoOpen presses the hub's Optimise
-     row, which is how a person reaches it. */
-  "media-detail-optimize": () => (
-    <div data-probe="media-detail-optimize">
-      {drillHost(
-        <AutoOpen testid="media-detail-optimize">
-          <AssetDetailOverlay
-            item={OPTIMISE_ITEM}
-            composer={USAGE_COMPOSER}
-            onClose={() => {}}
-            onEditImage={() => {}}
-            onOptimized={() => {}}
           />
         </AutoOpen>,
       )}
@@ -2839,14 +2606,14 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   "media-fullpage-library": () => (
     <div data-probe="media-fullpage-library">
-      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />)}
+      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />)}
     </div>
   ),
   "media-fullpage-drag-over": () => (
     <div data-probe="media-fullpage-drag-over">
       {mgrHost(
         <AutoDragOver>
-          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />
+          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />
         </AutoDragOver>,
       )}
     </div>
@@ -2886,12 +2653,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-picker-modal": () => (
     <div data-probe="media-picker-modal">
       <ToastProvider>
-        <MediaLibraryPanel
-          isOpen
+        <UploadAssetModal
+          open
           onClose={() => {}}
-          onSelect={() => {}}
+          onUse={() => {}}
           composer={PICKER_COMPOSER}
-          forLabel="Hero · Image"
+          forLabel="Hero"
         />
       </ToastProvider>
     </div>
@@ -2964,29 +2731,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   // ── Templates states (boards 1138:13413 / 642:2832 / 1169:4725) ──────────
-  /* The built-in catalog is a static module array, so DrawerGallery's empty
-     branch cannot be reached by any prop — the catalog itself has to be empty,
-     which is exactly what the board draws and what a site whose only templates
-     are server-side sees when that pull returns nothing. Emptied here rather
-     than faked, so the branch under test is the shipped one. */
-  "templates-empty": () => {
-    SITE_TEMPLATES.length = 0;
-    return (
-      <div data-probe="templates-empty">
-        <PanelFrame>
-          <PanelFrame.Header title="Templates" onClose={() => {}} />
-          <PanelFrame.Body noScroll>
-            <DrawerGallery
-              searchQ=""
-              onSearchChange={() => {}}
-              onOpenTemplate={() => {}}
-              onBrowseAll={() => {}}
-            />
-          </PanelFrame.Body>
-        </PanelFrame>
-      </div>
-    );
-  },
   "templates-applying": () => (
     <div data-probe="templates-applying">
       <ApplyProgressOverlay
@@ -3025,7 +2769,8 @@ const CASES: Record<string, () => React.ReactElement> = {
         <PublishTab
           composer={null}
           onClose={() => {}}
-          onVercelPublish={async () => {}}
+          nextMove={null}
+          onRequestPublish={() => {}}
           publishJob={PUBLISH_JOB({
             uiState: "publishing",
             jobId: "job-1",
@@ -3100,16 +2845,15 @@ const CASES: Record<string, () => React.ReactElement> = {
 
   /* Boards 130:798 (S5.2 approved) and 130:201 (S5.2 pending). Both are the
      whole 1440 shell; what is THEIRS rather than the shell family's is the
-     review state — the topbar's review pill, and on the pending frame the
-     Review bar under it. The shell around them is measured on its own boards
-     (shell-default 681:26, the Layers / Inspector / Rail families), so this
-     case mounts the two real components that carry the state instead of a
-     shell whose every other pixel belongs to someone else's recipe.
+     review state — the topbar's review chip. (The pending frame also drew a
+     Review bar under the topbar; that component is retired — C2, owner
+     decision D3 — and the v3 IA's chip B3-01 carries the round.) The shell
+     around them is measured on its own boards, so this case mounts the real
+     component that carries the state.
 
-     The pill is the REAL chrome-ui ReviewBadge with the props StudioHeader
-     builds for each state (`REVIEW_PILL` + the "Approved by <name> · <ago>"
-     interpolation at StudioHeader.tsx:718-724), so nothing about it is a
-     fixture's opinion. */
+     The chip is the REAL chrome-ui ReviewBadge with the props StudioHeader's
+     `reviewChip` builds for each state, so nothing about it is a fixture's
+     opinion. */
   ...Object.fromEntries(
     (
       [
@@ -3139,17 +2883,14 @@ const CASES: Record<string, () => React.ReactElement> = {
               onExit={() => {}}
               save="saved"
               savedAt={Date.now() - 2 * 60_000}
-              onSave={() => {}}
+              onSaveClick={() => {}}
               review={
                 state === "approved"
-                  ? { label: "Approved by Sara Whitfield · 2h ago", tone: "success", onClick: () => {} }
-                  : { label: "In review", tone: "info", onClick: () => {} }
+                  ? { label: "Approved", tone: "success", title: "Approved by Sara Whitfield · 2h ago", onClick: () => {} }
+                  : { label: "Waiting · Sara Whitfield", tone: "info", title: "Sent to Sara Whitfield — waiting on approval", onClick: () => {} }
               }
               onPublish={() => {}}
             />
-            {state === "pending" ? (
-              <ReviewBar composer={reviewComposerStub()} onCompare={() => {}} onResend={async () => {}} />
-            ) : null}
           </div>
         );
       },
@@ -3271,7 +3012,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
@@ -3287,53 +3027,23 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub()}
         onResend={async () => ({ inviteEmailSent: true })}
-        onExportCurrentPages={async () => []}
       />,
     );
   },
-  /* Board 1169:4764 — the "Where 'X' is used" drawer, on its Used-in tab.
-     The drawer is a controlled component over a plain usage array (the real
-     one comes from templateUsage over a Composer), so it is mounted as the
-     product mounts it and the tab is clicked, not preset. */
-  "templates-usage-drawer": () => (
-    <div data-probe="templates-usage-drawer">
-      <TemplateUsageDrawer
-        open
-        onOpenChange={() => {}}
-        templateId="tpl-bistro"
-        templateName="Bistro Menu"
-        usage={[
-          { pageId: "menu", pageName: "Menu", appliedAt: "2026-08-02T09:00:00.000Z" },
-          { pageId: "menu-2", pageName: "Menu 2", appliedAt: "2026-09-07T09:00:00.000Z" },
-        ]}
-        onJumpToPage={() => {}}
-      />
-    </div>
-  ),
-  /* Board 914:4507 — the publish wizard's Confirm step. Reached the way a
-     person reaches it: mount the wizard, let it land on Review, click through.
-     The facts underneath are the real PublishConfirmFacts over the real
-     services; with no composer and no site the reads fail closed, which is a
-     STATE of those rows, not a stand-in for them. */
+  /* Board B3-10 7574:193972 — the ONE facts confirm both publish doors open
+     (the stepped wizard it replaced is gone, code-gap B4). The facts are the
+     real PublishConfirmFacts over the real services; with no composer and no
+     site the reads fail closed, which is a STATE of those rows, not a stand-in
+     for them. */
   "publish-confirm": () => (
     <div data-probe="publish-confirm">
-      <PublishWizard
-        open
-        onClose={() => {}}
-        onPublish={() => {}}
-        checkState="ready"
-        checks={{
-          ready: true,
-          checks: [
-            { label: "Vercel connected", status: "pass", detail: "Connected." },
-            { label: "Pages present", status: "pass", detail: "3 pages." },
-          ],
-        } as never}
-        onRetryChecks={() => {}}
+      <PublishConfirmModal
+        isOpen
         composer={null}
         publishedUrl="https://bellacucina.com"
         isPublished
-        rollbackTo={14}
+        onConfirm={() => {}}
+        onClose={() => {}}
       />
     </div>
   ),
@@ -3355,19 +3065,10 @@ const CASES: Record<string, () => React.ReactElement> = {
         onDuplicate={() => {}}
         onDelete={() => {}}
         onSetHomepage={() => {}}
+        onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
       />
-    </div>
-  ),
-  /* Board 1171:4767 — ⌘K over the Pages panel. The palette is anchored INSIDE
-     the panel (PagesTab.css positions it at top 59 / left 12), so the probe
-     mounts it inside the same relatively-positioned panel the tab renders it
-     in; hoisting it to the page would move every number this measures. */
-  "pages-command-palette": () => (
-    <div data-probe="pages-command-palette" style={{ width: 280, height: 812, position: "relative" }}>
-      {pagesPanel()}
-      <PageCommandPalette pages={PAGES_FIXTURE} onSelect={() => {}} onClose={() => {}} />
     </div>
   ),
   /* Boards 302:1978 / 302:2004 / 302:2026 — S3.7 page settings, one 580x520
@@ -3460,13 +3161,14 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
-  /* Board 815:4518 — the shell's keyboard-shortcuts modal (LEDGER 2026-09-02
-     settles that this board is the SHELL panel, not the canvas cheat sheet:
-     it draws Save/Undo/Redo, which are app-wide chords). Controlled by one
+  /* Board 815:4518 → 7575:195538 "Keyboard shortcuts · full" — the ONE
+     keyboard sheet (B7, 2026-09-22; the ⌘/ panel this case used to mount is
+     deleted). Its rows derive from the command registry, so it takes a REAL
+     Composer — the registry is built in the constructor. Controlled by one
      boolean, so the probe opens it the way ⌘/ does. */
   "keyboard-shortcuts": () => (
     <div data-probe="keyboard-shortcuts">
-      <KeyboardShortcutsPanel isOpen onClose={() => {}} />
+      <KeyboardCheatSheet isOpen onClose={() => {}} composer={layersComposer()} />
     </div>
   ),
   /* Board 429:2350 — the animation editor's Entrance card. The editor takes
@@ -3765,7 +3467,8 @@ const CASES: Record<string, () => React.ReactElement> = {
             composer={null}
             projectId="probe-site"
             onClose={() => {}}
-            onVercelPublish={async () => {}}
+            nextMove={null}
+            onRequestPublish={() => {}}
             publishJob={PUBLISH_JOB()}
           />
         </ToastProvider>
@@ -3856,7 +3559,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           <SaveStatus state="saving" />
           <SaveStatus state="saved" savedAt={Date.now()} />
           <SaveStatus state="unsaved" />
-          <SaveStatus state="error" onRetry={() => {}} />
+          <SaveStatus state="error" onClick={() => {}} />
         </div>
       ),
       "s1-2f-save-indicator-saved-stale": () => (

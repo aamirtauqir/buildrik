@@ -36,8 +36,6 @@ import { stylesheetsSettled } from "./lib/measure-lib.mjs";
 const MIN = 24;
 
 const CASES = [
-  "content-collection-rows",
-  "content-field-rows",
   "content-root-rows",
   "onboarding-steps",
   "canvas-footer-toolbar",

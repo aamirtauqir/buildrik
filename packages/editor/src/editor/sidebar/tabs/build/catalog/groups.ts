@@ -22,7 +22,7 @@ import { flatCatalog } from "./catalog";
 import type { FlatElEntry } from "./types";
 import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "../../../../../blocks/blockRegistry";
 
-export type InsertGroupId = "elements" | "blocks" | "components" | "mine";
+export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
 
 export interface InsertGroup {
   id: InsertGroupId;
@@ -42,14 +42,23 @@ export const componentRows: BlockDefinition[] = componentBlockDefinitions;
 
 const componentIds = new Set(componentRows.map((c) => c.id));
 
-/** BLOCKS — the rest of the registry, inserted via the existing insertBlock path. */
-export const blockRows: BlockDefinition[] = getBlockDefinitions().filter((b) => !componentIds.has(b.id));
+/** BLOCKS — sections only (board 4428:140817, G2-110 / G2-107): the registry's
+ *  `Sections` folder, inserted via the existing insertBlock path. The rest of
+ *  the registry was 40 rows that duplicated ELEMENTS one for one. */
+export const blockRows: BlockDefinition[] = getBlockDefinitions().filter(
+  (b) => b.category === "Sections" && !componentIds.has(b.id),
+);
 
-export function buildInsertGroups(mineCount: number | null): InsertGroup[] {
+/** ★ FAVOURITES (board 4418:103353) and RECENT lead the list only while they
+ *  have rows. */
+export function buildInsertGroups(mineCount: number | null, favCount = 0, recentCount = 0): InsertGroup[] {
   return [
+    ...(favCount ? [{ id: "favourites" as const, label: "★ FAVOURITES", count: favCount, kind: "inline" as const }] : []),
+    ...(recentCount ? [{ id: "recent" as const, label: "RECENT", count: recentCount, kind: "inline" as const }] : []),
     { id: "elements", label: "ELEMENTS", count: elementRows.length, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
-    { id: "components", label: "COMPONENTS", count: componentRows.length, kind: "inline" },
-    { id: "mine", label: "MINE", count: mineCount, kind: "inline" },
+    /* Board 4428:140817 names them by where they come from. */
+    { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },
+    { id: "mine", label: "SAVED COMPONENTS", count: mineCount, kind: "inline" },
   ];
 }

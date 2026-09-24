@@ -62,14 +62,12 @@ export interface SaveState {
 
 /** Overlay visibility state */
 export interface OverlayState {
-  showComponentView: boolean;
   showXRay: boolean;
   showSpacingIndicators: boolean;
   showBadges: boolean;
   showGuides: boolean;
   showGrid: boolean;
   showRulers: boolean;
-  devMode: boolean;
   showSuggestions: boolean;
 }
 
@@ -89,6 +87,9 @@ export interface Issue {
    */
   tokenId?: string;
   autoFixHint?: string;
+  /** The element the issue is about, when a producer knows one (broken link,
+   *  missing alt). Token issues resolve theirs through token usage instead. */
+  elementId?: string;
   /** Where the issue lives, e.g. "Brand › color.accent". Shown under the message. */
   location?: string;
   /**
@@ -135,17 +136,14 @@ export interface UseStudioStateReturn {
 
   // Overlay toggles
   overlays: OverlayState;
-  setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setShowXRay: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSpacingIndicators: React.Dispatch<React.SetStateAction<boolean>>;
   setShowBadges: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGuides: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGrid: React.Dispatch<React.SetStateAction<boolean>>;
   setShowRulers: React.Dispatch<React.SetStateAction<boolean>>;
-  setDevMode: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuggestions: React.Dispatch<React.SetStateAction<boolean>>;
   toggleOverlay: (overlay: keyof OverlayState) => void;
-  toggleDevMode: () => void;
 
   // Sync status
   syncStatus: SyncStatus;
@@ -235,7 +233,6 @@ export function useStudioState(): UseStudioStateReturn {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(true);
 
   // Overlay states
-  const [showComponentView, setShowComponentView] = React.useState(false);
   const [showXRay, setShowXRay] = React.useState(savedState?.overlays?.showXRay ?? false);
   const [showSpacingIndicators, setShowSpacingIndicators] = React.useState(
     savedState?.overlays?.showSpacingIndicators ?? false
@@ -244,7 +241,6 @@ export function useStudioState(): UseStudioStateReturn {
   const [showGuides, setShowGuides] = React.useState(savedState?.overlays?.showGuides ?? true);
   const [showGrid, setShowGrid] = React.useState(savedState?.overlays?.showGrid ?? false);
   const [showRulers, setShowRulers] = React.useState(savedState?.overlays?.showRulers ?? false);
-  const [devMode, setDevMode] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
 
   // Sync status for collaboration
@@ -342,25 +338,21 @@ export function useStudioState(): UseStudioStateReturn {
   // Computed overlay state object
   const overlays: OverlayState = React.useMemo(
     () => ({
-      showComponentView,
       showXRay,
       showSpacingIndicators,
       showBadges,
       showGuides,
       showGrid,
       showRulers,
-      devMode,
       showSuggestions,
     }),
     [
-      showComponentView,
       showXRay,
       showSpacingIndicators,
       showBadges,
       showGuides,
       showGrid,
       showRulers,
-      devMode,
       showSuggestions,
     ]
   );
@@ -368,9 +360,6 @@ export function useStudioState(): UseStudioStateReturn {
   // Generic overlay toggle
   const toggleOverlay = React.useCallback((overlay: keyof OverlayState) => {
     switch (overlay) {
-      case "showComponentView":
-        setShowComponentView((prev) => !prev);
-        break;
       case "showXRay":
         setShowXRay((prev) => !prev);
         break;
@@ -389,28 +378,10 @@ export function useStudioState(): UseStudioStateReturn {
       case "showRulers":
         setShowRulers((prev) => !prev);
         break;
-      case "devMode":
-        setDevMode((prev) => !prev);
-        break;
       case "showSuggestions":
         setShowSuggestions((prev) => !prev);
         break;
     }
-  }, []);
-
-  // Dev Mode master toggle - enables/disables multiple features at once
-  const toggleDevMode = React.useCallback(() => {
-    setDevMode((prev) => {
-      const newState = !prev;
-      // When enabling dev mode, turn on all dev features
-      // When disabling, turn them off
-      setShowGrid(newState);
-      setShowGuides(newState);
-      setShowSpacingIndicators(newState);
-      setShowBadges(newState);
-      setShowComponentView(newState);
-      return newState;
-    });
   }, []);
 
   // Issue management helpers
@@ -470,17 +441,14 @@ export function useStudioState(): UseStudioStateReturn {
 
     // Overlay toggles
     overlays,
-    setShowComponentView,
     setShowXRay,
     setShowSpacingIndicators,
     setShowBadges,
     setShowGuides,
     setShowGrid,
     setShowRulers,
-    setDevMode,
     setShowSuggestions,
     toggleOverlay,
-    toggleDevMode,
 
     // Sync status
     syncStatus,
