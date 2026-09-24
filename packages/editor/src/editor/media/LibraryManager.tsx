@@ -45,9 +45,8 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { generateAltTextRemote } from "../../services/AltTextService";
+import { regenerateAltText } from "../../services/AltTextService";
 import { createAssetVersion } from "../../services/MediaVersionService";
-import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
 /* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
@@ -1019,22 +1018,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               generatedMetadata: undefined,
             });
           }}
-          onRegenerateAltText={async (key) => {
-            // Regenerate is an explicit ask to REPLACE the current text.
-            const result = await generateAltTextRemote(key, { force: true });
-            if (!result) return null;
-            if (result.skipped) return result;
-            await composer.media.updateAsset(key, {
-              altText: result.altText,
-              generatedMetadata: {
-                altText: {
-                  generatedAt: new Date().toISOString(),
-                  model: result.model ?? DEFAULT_MODEL,
-                },
-              },
-            });
-            return result;
-          }}
+          // Regenerate is an explicit ask to REPLACE the current text.
+          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}

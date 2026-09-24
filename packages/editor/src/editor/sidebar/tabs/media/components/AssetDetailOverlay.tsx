@@ -30,7 +30,6 @@
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
-import { generateContent } from "@/shared/utils/openai";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
@@ -40,7 +39,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
+import { Button, PanelFrame, Textarea } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
 type View = "hub" | "used" | "versions" | "optimize";
@@ -54,6 +53,9 @@ interface AssetDetailOverlayProps {
   composer?: Composer;
   onOptimized?: (optimizedSrc: string) => void | Promise<void>;
   onReplaceAcross?(item: LibraryItem): void;
+  /** G3-022 — the server's alt-text model (AltTextService). `null` = it
+   *  could not run; `skipped` = the server kept text the user wrote. */
+  onGenerateAltText?(item: LibraryItem): Promise<{ altText: string; skipped: boolean } | null>;
   /* Board 4418:61698 — the library's own actions, under the destination rows
      (G3-021). Each row renders only when its handler is supplied. */
   onInsert?(item: LibraryItem): void;
@@ -105,6 +107,7 @@ export function AssetDetailOverlay({
   composer,
   onOptimized,
   onReplaceAcross,
+  onGenerateAltText,
   onInsert,
   onRename,
   onCopyUrl,
@@ -122,6 +125,7 @@ export function AssetDetailOverlay({
   }, [view]);
   const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [altBusy, setAltBusy] = useState(false);
+  const [altFailed, setAltFailed] = useState(false);
   const [metaError, setMetaError] = useState(false);
   // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
   // only carries width/height when the upload went through the WebP optimiser
@@ -254,6 +258,7 @@ export function AssetDetailOverlay({
 
   useEffect(() => {
     setAltDraft(item.altText ?? "");
+    setAltFailed(false);
     setView("hub");
     setMetaError(false);
     setPendingRestore(null);
@@ -285,28 +290,24 @@ export function AssetDetailOverlay({
     void onUpdate(item.key, { altText: next });
   }, [onUpdate, altDraft, item.altText, item.key]);
 
-  // ✨ Generate — writes the draft AND commits it, so the field has a value
-  // the moment the user looks at it.
+  /* ✨ Generate / Regenerate (G3-022) — the server's alt-text model through
+     AltTextService, which also writes the result to the asset. Its states are
+     the boards': generating (6623:149646), failed + Retry (6623:150370). */
   const generateAlt = useCallback(async () => {
-    if (altBusy) return;
+    if (altBusy || !onGenerateAltText) return;
     setAltBusy(true);
+    setAltFailed(false);
     try {
-      const alt = await generateContent(
-        `Write one concise alt text (max 125 characters, no quotes) for an image file named "${display}".`,
-        "headline",
-        "professional",
-      );
-      const clean = alt.replace(/^["']|["']$/g, "").trim().slice(0, 125);
-      if (clean && mountedRef.current) {
-        setAltDraft(clean);
-        void onUpdate?.(item.key, { altText: clean });
-      }
+      const result = await onGenerateAltText(item);
+      if (!mountedRef.current) return;
+      if (!result) setAltFailed(true);
+      else if (!result.skipped) setAltDraft(result.altText);
     } catch {
-      // AI unavailable — the field stays manual.
+      if (mountedRef.current) setAltFailed(true);
     } finally {
       if (mountedRef.current) setAltBusy(false);
     }
-  }, [altBusy, item.key, display, onUpdate]);
+  }, [altBusy, item, onGenerateAltText]);
 
   // The asset's own metadata wins; the measured bitmap is the fallback.
   const dims = item.width != null && item.height != null
@@ -413,34 +414,54 @@ export function AssetDetailOverlay({
               <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input" data-testid="media-detail-alt-label">
                 Alt text
               </label>
-              <TextField
-                id="med-alt-input"
-                className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]"
-                value={altDraft}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltDraft(e.target.value)}
-                onBlur={commitAltText}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    commitAltText();
-                    (e.currentTarget as HTMLInputElement).blur();
+              {/* Board 4418:61698 — one bordered box: the text, then the
+                  Generate link inside it. */}
+              <div className="tw:mt-1 tw:flex tw:flex-col tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:py-1.5" data-testid="media-alt-box">
+                <Textarea
+                  id="med-alt-input"
+                  rows={2}
+                  className="tw:resize-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:shadow-none tw:focus:ring-0"
+                  value={altDraft}
+                  disabled={altBusy}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    setAltDraft(e.target.value);
+                    setAltFailed(false);
+                  }}
+                  onBlur={commitAltText}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      commitAltText();
+                      e.currentTarget.blur();
+                    }
+                  }}
+                  placeholder={
+                    altBusy
+                      ? "Generating alt text…"
+                      : altFailed
+                        ? "Couldn't generate alt text — write it or retry"
+                        : "Describe this image for screen readers"
                   }
-                }}
-                placeholder="Describe this image for screen readers"
-                aria-label="Alt text"
-              />
-              <Button
-                type="button"
-                color="light"
-                size="xs"
-                variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)] tw:mt-1.5"
-                data-testid="media-alt-generate"
-                disabled={altBusy}
-                aria-busy={altBusy || undefined}
-                onClick={generateAlt}
-              >
-                {"✨"}&nbsp;&nbsp;{altBusy ? "Generating…" : "Generate"}
-              </Button>
+                  aria-label="Alt text"
+                  aria-invalid={altFailed || undefined}
+                />
+                {onGenerateAltText && item.type === "img" ? (
+                  <Button
+                    type="button"
+                    color="light"
+                    size="xs"
+                    variant="link"
+                    className="tw:min-h-5 tw:self-start tw:text-[length:var(--bk-text-12)]"
+                    data-testid="media-alt-generate"
+                    disabled={altBusy}
+                    aria-busy={altBusy || undefined}
+                    onClick={generateAlt}
+                  >
+                    {"✨"}&nbsp;&nbsp;
+                    {altBusy ? "Generating…" : altFailed ? "Retry" : altDraft.trim() ? "Regenerate" : "Generate"}
+                  </Button>
+                ) : null}
+              </div>
             </div>
 
             {/* Board 233:1254-1274 — the five 32h destination rows. */}

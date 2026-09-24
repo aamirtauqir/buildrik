@@ -24,6 +24,7 @@ import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
+import { regenerateAltText } from "../../../../services/AltTextService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
@@ -267,6 +268,10 @@ function MediaTabWithComposer({
           composer={composer}
           onOptimized={handleOptimized}
           onReplaceAcross={handleReplaceAcross}
+          /* A local-only file has no server row for the model to read. */
+          onGenerateAltText={(it) =>
+            it.assetId ? regenerateAltText(composer.media, it.key, it.assetId) : Promise.resolve(null)
+          }
           onInsert={(it) => state.insertToCanvas(it.key)}
           onRename={setRenameTarget}
           onCopyUrl={state.copyUrl}
