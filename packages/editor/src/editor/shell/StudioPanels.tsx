@@ -292,6 +292,17 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   const rightColumnTab = !readOnlyView && isLeftPanelOpen && RIGHT_COLUMN_TABS.has(activeTabId);
   useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
 
+  /* A click on the empty canvas closes the Layers drawer (prototype B10 /
+     C4#18) — the canvas clears the selection itself. */
+  React.useEffect(() => {
+    if (!composer || !isLeftPanelOpen || activeTabId !== "layers") return;
+    const close = () => onLeftPanelToggle?.();
+    composer.on(EVENTS.UI_CANVAS_BACKGROUND_CLICK, close);
+    return () => {
+      composer.off(EVENTS.UI_CANVAS_BACKGROUND_CLICK, close);
+    };
+  }, [composer, isLeftPanelOpen, activeTabId, onLeftPanelToggle]);
+
   /* The site menu's Unpublish emits UI_UNPUBLISH_REQUEST in the same gesture
      that opens the Publish panel, before PublishTab has subscribed. This
      component is always mounted, so it latches the intent and hands it down;
