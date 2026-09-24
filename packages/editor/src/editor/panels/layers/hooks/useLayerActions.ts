@@ -16,8 +16,8 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import {
-  LAYER_NAME_KEY,
   getLayerName,
   renameElement,
   loadSetFromStorage,

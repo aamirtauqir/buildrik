@@ -11,11 +11,8 @@ import { EVENTS } from "../../../shared/constants/events";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
-/** `section` -> `Section`, matching the board's `Section · Hero` casing;
- *  the SSOT label first (`collection-list` -> `Collection list`, 4428:151488). */
-const cap = (s: string) => ELEMENT_TYPE_LABELS[s] ?? (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /**
  * The selected element's rendered size, read from the canvas DOM. Re-read per
@@ -106,7 +103,7 @@ export function useSelectionReadout(
       : master
         ? `Component instance · ${master.name}`
         : selectedElement
-          ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
+          ? `${elementTypeLabel(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
         : "Nothing selected";
   return { label, dims: elementDims(selectedElement?.id) };
 }

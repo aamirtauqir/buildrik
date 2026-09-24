@@ -14,6 +14,7 @@ import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
+import { LAYER_NAME_KEY, nextCopyName } from "../../../shared/constants/elementTypeLabels";
 
 /**
  * Manages element CRUD operations
@@ -235,6 +236,11 @@ export class ElementCRUD {
 
     // Add after original in parent
     const parent = original.getParent();
+    const name = original.getCustomData(LAYER_NAME_KEY);
+    if (typeof name === "string" && name) {
+      const siblings = (parent?.getChildren() ?? []).map((el) => el.getCustomData(LAYER_NAME_KEY)).filter((n): n is string => typeof n === "string");
+      clone.setData(LAYER_NAME_KEY, nextCopyName(name, siblings));
+    }
     if (parent) {
       const place = resolvePlacement(clone, parent, parent.getChildIndex(original) + 1);
       if (place) place.parent.addChild(clone, place.index);
