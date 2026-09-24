@@ -40,7 +40,20 @@ export interface BuildTabProps {
 export const BuildTab: React.FC<BuildTabProps> = ({
   composer, onBlockClick, onHelpClick, onClose,
 }) => {
-  const tab = useBuildTab(composer, onBlockClick);
+  // MINE (board 1069:4970): the user's own components, inline, and
+  // searched with the rest (G2-111). Same load +
+  // subscribe shape useComponentsState uses.
+  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const load = () => setMine(composer.components?.getAllComponents() ?? []);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
+  const tab = useBuildTab(composer, onBlockClick, mine);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
@@ -65,18 +78,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, [composer]);
   const { addToast } = useToast();
 
-  // MINE (board 1069:4970): the user's own components, inline. Same load +
-  // subscribe shape useComponentsState uses.
-  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
-  React.useEffect(() => {
-    if (!composer?.components) return;
-    const load = () => setMine(composer.components?.getAllComponents() ?? []);
-    load();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
-    };
-  }, [composer]);
 
   const groups = React.useMemo(
     () => buildInsertGroups(composer?.components ? mine.length : null),
@@ -224,8 +225,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               query={tab.searchQuery}
               hits={tab.searchResults}
               onDragStart={tab.handleDragStart}
+              onBlockDragStart={tab.handleBlockDragStart}
               onElClick={tab.handleElClick}
               onBlockInsert={(b) => onBlockClick?.(b)}
+              onSavedInsert={(c) => void insertMine(c)}
               onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>

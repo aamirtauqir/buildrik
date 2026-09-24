@@ -1,34 +1,49 @@
 /**
- * SearchResults — board 138:53 (Insert · searching).
+ * SearchResults — board 4418:100087 (Insert · searching).
  *
- * ONE flat list across sources: 32h rows, label 13 ink left, source-group
- * tag 11 caps ink-soft right (tracking .5). No results header, no category
- * sections, no cards — the board draws search flat and cross-source.
+ * ONE flat list across sources: 32h rows — label 13 ink, a grey source chip
+ * right after it ([Element] / [Block] / [Component]), then "+ Add" (12 medium
+ * accent) and a 28-wide ⠿ grip at the right edge. No results header, no
+ * category sections. Every row inserts on click and drags onto the canvas.
  * Pure render — matching lives in utils/search.ts.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { InsertSearchHit } from "../utils/search";
-import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
+import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import type { ComponentDefinition } from "@/shared/types/components";
 import { Button } from "@/editor/chrome-ui";
 
 interface SearchResultsProps {
   query: string;
   hits: InsertSearchHit[];
   onDragStart: DragStartFn;
+  onBlockDragStart: BlockDragStartFn;
   onElClick: ElClickFn;
   onBlockInsert: (block: BlockDefinition) => void;
+  onSavedInsert: (component: ComponentDefinition) => void;
   onClearSearch: () => void;
 }
+
+/** The board's chip names the kind of thing a row inserts. Built-in and saved
+ *  components are both "Component". */
+const CHIP: Record<InsertSearchHit["group"], string> = {
+  ELEMENTS: "Element",
+  BLOCKS: "Block",
+  COMPONENTS: "Component",
+  SAVED: "Component",
+};
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   query,
   hits,
   onDragStart,
+  onBlockDragStart,
   onElClick,
   onBlockInsert,
+  onSavedInsert,
   onClearSearch,
 }) => {
   if (!hits.length) {
@@ -63,8 +78,20 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     );
   }
 
-  const activate = (hit: InsertSearchHit) =>
-    hit.group === "ELEMENTS" ? onElClick(hit.el) : onBlockInsert(hit.block);
+  const activate = (hit: InsertSearchHit) => {
+    if (hit.group === "ELEMENTS") onElClick(hit.el);
+    else if (hit.group === "SAVED") onSavedInsert(hit.component);
+    else onBlockInsert(hit.block);
+  };
+
+  const dragStart = (e: React.DragEvent, hit: InsertSearchHit) => {
+    if (hit.group === "ELEMENTS") onDragStart(e, hit.el);
+    else if (hit.group === "SAVED") {
+      // The canvas drop reads a saved component by id (useDropExecution).
+      e.dataTransfer.setData("application/x-aquibra-component", hit.component.id);
+      e.dataTransfer.effectAllowed = "copy";
+    } else onBlockDragStart(e, hit.block);
+  };
 
   return (
     <div role="status" aria-live="polite" data-testid="insert-search-results">
@@ -73,11 +100,12 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           key={hit.key}
           role="button"
           tabIndex={0}
-          draggable={hit.group === "ELEMENTS"}
-          className="tw:flex tw:items-center tw:h-[var(--bk-size-row)] tw:px-[16px] tw:gap-[8px] tw:rounded-[4px] tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+          draggable
+          aria-label={`Add ${hit.label} (${CHIP[hit.group]})`}
+          className="tw:flex tw:items-center tw:h-[var(--bk-size-row)] tw:pl-[16px] tw:pr-[16px] tw:rounded-[4px] tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
           data-testid={`insert-hit-${hit.key}`}
           onClick={() => activate(hit)}
-          onDragStart={hit.group === "ELEMENTS" ? (e) => onDragStart(e, hit.el) : undefined}
+          onDragStart={(e) => dragStart(e, hit)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -86,16 +114,32 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           }}
         >
           <span
-            className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]"
+            className="tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]"
             data-testid={`insert-hit-label-${hit.key}`}
           >
             {hit.label}
           </span>
           <span
-            className="tw:text-[11px] tw:leading-[16px] tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]"
-            data-testid={`insert-hit-group-${hit.key}`}
+            className="tw:ml-[6px] tw:shrink-0 tw:inline-flex tw:items-center tw:h-[22px] tw:px-[8px] tw:rounded-[var(--bk-radius-full)] tw:bg-[var(--bk-gray-100)] tw:text-[11px] tw:leading-[16px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
+            data-testid={`insert-hit-chip-${hit.key}`}
           >
-            {hit.group}
+            {CHIP[hit.group]}
+          </span>
+          {/* The whole row inserts; "+ Add" is its visible affordance, so the
+              click bubbles to the row rather than being a second control. */}
+          <span
+            aria-hidden="true"
+            className="tw:ml-auto tw:pl-[8px] tw:shrink-0 tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-accent)]"
+            data-testid={`insert-hit-add-${hit.key}`}
+          >
+            + Add
+          </span>
+          <span
+            aria-hidden="true"
+            className="tw:ml-[4px] tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+            data-testid={`insert-hit-grip-${hit.key}`}
+          >
+            ⠿
           </span>
         </div>
       ))}

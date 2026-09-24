@@ -13,6 +13,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useBuildTab } from "../useBuildTab";
 import type { InsertSearchHit } from "../../utils/search";
+import type { ComponentDefinition } from "@/shared/types/components";
 
 const labels = (hits: InsertSearchHit[]): string[] => hits.map((h) => h.label);
 
@@ -68,5 +69,25 @@ describe("useBuildTab — searchResults", () => {
     act(() => result.current.setSearchQuery("e")); // broad query spanning sources
     const keys = result.current.searchResults.map((h) => h.key);
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  /* Board 4418:100087 answers "button" from every source. Blocks and built-in
+     components carry no tags, so they match on what they insert as well as
+     their name: a section that contains a <button> is a "button" hit. */
+  it("matches blocks and components by the elements they insert", () => {
+    const { result } = renderHook(() => useBuildTab(null));
+    act(() => result.current.setSearchQuery("button"));
+    const groups = new Set(result.current.searchResults.map((h) => h.group));
+    expect(groups.has("ELEMENTS")).toBe(true);
+    expect(groups.has("BLOCKS")).toBe(true);
+    expect(labels(result.current.searchResults)).toContain("CTA");
+  });
+
+  it("includes saved components by name (G2-111)", () => {
+    const mine = [{ id: "c1", name: "Menu card" }] as unknown as ComponentDefinition[];
+    const { result } = renderHook(() => useBuildTab(null, undefined, mine));
+    act(() => result.current.setSearchQuery("menu c"));
+    const hit = result.current.searchResults.find((h) => h.group === "SAVED");
+    expect(hit?.label).toBe("Menu card");
   });
 });
