@@ -68,6 +68,21 @@ const ACTION_BTN = "tw:w-full tw:px-0 tw:gap-1.5 tw:justify-center";
 // Component
 // ============================================
 
+/** Board 4418:142410 — the title names the component; the body says what
+ *  happens to its instances, counted on this site. */
+export function componentDeleteCopy(name: string, instances: number): { title: string; message: string } {
+  const fate =
+    instances === 0
+      ? "No instances on this site use it."
+      : instances === 1
+        ? "1 instance on this site will become an independent element and keep its content."
+        : `${instances} instances on this site will become independent elements and keep their content.`;
+  return {
+    title: `Delete “${name}”?`,
+    message: `${fate} The saved ${name} component will be permanently deleted.`,
+  };
+}
+
 export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   component,
   composer,
@@ -401,12 +416,9 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={confirmDeleteAction}
-        title="Delete Component"
-        message={
-          instanceCount > 0
-            ? `This component has ${instanceCount} instance(s). Deleting will detach all instances. Continue?`
-            : `Are you sure you want to delete "${component.name}"?`
-        }
+        /* Board 4418:142410: names the component, says what happens to its
+           instances (real count). One copy for both delete doors. */
+        {...componentDeleteCopy(component.name, instanceCount)}
         confirmLabel="Delete"
         tone="destructive"
       />
