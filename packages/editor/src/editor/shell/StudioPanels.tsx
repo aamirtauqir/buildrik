@@ -536,6 +536,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             activeSubTab={leftPanelSubTab}
             onTabChange={handleRailTabChange}
             drawerOpen={isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
+            /* QA 2026-09-24: the closed drawer still mounted a second copy of
+               the column's panel (two subscriptions, two fetches). */
+            hostedInColumn={RIGHT_COLUMN_TABS.has(activeTabId)}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}

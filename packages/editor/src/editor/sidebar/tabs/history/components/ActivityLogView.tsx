@@ -84,6 +84,13 @@ const ROW_SUMMARY = "tw:text-[13px] tw:text-[var(--bk-ink)] tw:m-0 tw:whitespace
 const ROW_DEEP_LINK =
   "tw:text-[12px] tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline tw:self-start";
 
+/** A row's `actionUrl` is written for the dashboard — often relative
+ *  ("?page=page-1") — so it resolves against the site's dashboard page, never
+ *  against the editor's own URL (QA 2026-09-24: the link reopened the editor). */
+function dashboardHref(actionUrl: string, siteId: string): string {
+  return new URL(actionUrl, `${DASHBOARD_URL}/dashboard/sites/${siteId}`).toString();
+}
+
 export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
   const [filter, setFilter] = React.useState<ActivityFilter>("all");
   const [state, setState] = React.useState<LoadState>("loading");
@@ -249,12 +256,11 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
                 <p className={ROW_SUMMARY}>{r.summary}</p>
                 {r.actionUrl && (
                   <a
-                    href={r.actionUrl}
+                    href={dashboardHref(r.actionUrl, siteId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={ROW_DEEP_LINK}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleOpen(r.actionUrl as string);
-                    }}
+                    data-testid="activity-dashboard-link"
                   >
                     View in dashboard
                   </a>
