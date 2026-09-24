@@ -97,6 +97,24 @@ describe("LayersTab — header ⋯ menu", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("two-step Escape: with a selection it deselects and stays open; with none it closes", () => {
+    const onClose = vi.fn();
+    let selected = ["el-1"];
+    const clear = vi.fn(() => {
+      selected = [];
+    });
+    const c = {
+      ...composer(),
+      selection: { getSelectedIds: () => selected, clear },
+    } as unknown as Composer;
+    render(<LayersTab composer={c} onClose={onClose} />);
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(clear).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("4418:79546 — the count footer carries the ⓘ dim-scope explainer", () => {
     render(<LayersTab composer={null} />);
     expect(screen.getByLabelText("About dimmed layers")).toBeTruthy();

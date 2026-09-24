@@ -75,7 +75,7 @@ const DIM_SCOPE_TIP =
 /* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
 const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]";
 
-/* Escape closes the drawer (owner ruling 2026-09-24) — but a key meant for
+/* Escape deselects, then closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
    open menu or dialog, or focus on the canvas (where Escape deselects). */
 function escapeIsOurs(e: KeyboardEvent): boolean {
@@ -164,15 +164,22 @@ export const LayersTab: React.FC<LayersTabProps> = ({
 
   React.useEffect(() => {
     if (!onClose || menuOpen || !isOpen) return;
+    /* Two steps, as the prototype is wired: with something selected Escape
+       deselects; with nothing selected it closes the drawer. */
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || !escapeIsOurs(e)) return;
+      const selection = composer?.selection;
+      if (selection && (selection.getSelectedIds?.().length ?? 0) > 0) {
+        selection.clear();
+        return;
+      }
       onClose();
     };
     /* Capture: the canvas's global shortcuts claim Escape (deselect) and
        mark it handled before a bubbling listener would ever see it. */
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [onClose, menuOpen, isOpen]);
+  }, [composer, onClose, menuOpen, isOpen]);
 
   const handleLayerHover = React.useCallback(
     (id: string | null) => {
