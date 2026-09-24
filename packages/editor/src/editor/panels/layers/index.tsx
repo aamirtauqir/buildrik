@@ -102,6 +102,15 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     setDropFeedback({ message, type: "error" });
   }, []);
 
+  /* The row's own name, for the refusal copy (4418:83699 names both layers). */
+  const nameOf = React.useCallback(
+    (id: string) => {
+      const item = findLayer(state.layers, id);
+      return item ? getDisplayName(id, item.type, state.actionsHook.customNames, item.preview) : "This layer";
+    },
+    [state.layers, state.actionsHook.customNames]
+  );
+
   // Handle layer drop for reordering
   const handleLayerDrop = React.useCallback(
     (sourceId: string, targetId: string, position: "before" | "after" | "inside") => {
@@ -131,11 +140,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         newParent = targetEl;
         const parentType = newParent.getType() as ElementType;
         if (!canHaveChildren(parentType)) {
-          showDropError(`${parentType} cannot contain children`);
+          showDropError(`${nameOf(targetId)} can’t contain ${nameOf(sourceId)}. Drop into a container instead.`);
           return;
         }
         if (!canNestElement(sourceType, parentType)) {
-          showDropError(`${sourceType} cannot be nested inside ${parentType}`);
+          showDropError(`${nameOf(sourceId)} can’t go inside ${nameOf(targetId)}. Drop into a container instead.`);
           return;
         }
         index = newParent.getChildCount();
@@ -151,7 +160,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
         const parentType = parent.getType() as ElementType;
         if (!canNestElement(sourceType, parentType)) {
-          showDropError(`${sourceType} cannot be placed in ${parentType}`);
+          showDropError(`${nameOf(sourceId)} can’t go inside ${nameOf(parent.getId())}. Drop into a container instead.`);
           return;
         }
 
@@ -177,7 +186,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       // Post-move selection reconciliation: force re-emit selection event
       setTimeout(() => composer.selection.reselect(), 0);
     },
-    [composer, state.lockedIds, showDropError]
+    [composer, state.lockedIds, showDropError, nameOf]
   );
 
   // Scroll to selected element helper
@@ -448,12 +457,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             ? "No layers match your search"
             : ""}
       </div>
-      {/* Drop feedback message (UX improvement - Phase 3) */}
-      {dropFeedback && (
-        <div className="bdc-layers-drop-alert" role="alert" aria-live="assertive">
-          {dropFeedback.message}
-        </div>
-      )}
       {/* The multi-select banner is gone (audit G2-068): the count line in
           the LayersTab footer and the selection's context menu carry it. */}
       <ConfirmDialog
@@ -534,6 +537,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             displayPrefs={state.displayPrefs}
           />
         ))}
+        {dropFeedback && (
+          /* v3 4418:83699: the refusal is a dark card under the rows. */
+          <div
+            className="tw:mx-1 tw:mt-1 tw:rounded-md tw:bg-[var(--bk-ink)] tw:px-3 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-on)]"
+            role="alert"
+            aria-live="assertive"
+            data-testid="layers-drop-alert"
+          >
+            {dropFeedback.message}
+          </div>
+        )}
         {dimmedSelection && (
           /* v3 4418:79800: the selected layer is dimmed — say what dimming
              is (editor only) and where site hiding lives, with the way back. */

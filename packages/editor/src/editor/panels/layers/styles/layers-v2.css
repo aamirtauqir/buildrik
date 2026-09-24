@@ -399,16 +399,6 @@
    Drop feedback alert
    ========================================================================== */
 
-.bdc-layers-drop-alert {
-  display: flex;
-  align-items: center;
-  padding: 6px 16px;
-  background: var(--bk-ink);
-  /* ONE colour: `color` was declared twice, so `--bk-error` won and this read
-     red on near-black ink at 3.76:1 — under AA for 12px. */
-  color: var(--bk-accent-on);
-  font: 400 12px/16px var(--bk-font-ui);
-}
 
 /* ==========================================================================
    LayersTab outer section — override chrome.css .bdc-panel which assumes
