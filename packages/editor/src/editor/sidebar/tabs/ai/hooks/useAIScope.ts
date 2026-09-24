@@ -1,8 +1,23 @@
+/**
+ * useAIScope — what the AI panel's run may touch, following the selection.
+ *
+ * The selection manager announces changes in steps: `select()` emits
+ * selected(new) and THEN deselected(old); `selectMultiple()` emits
+ * multiple(all) and THEN selected(first). Reacting to each event let the
+ * last one win — "Whole page" after picking a second element, the first
+ * element after a multi-select (L2-V3, boards 6881:65478 / 69981). The hook
+ * now reads the selection once it has settled (a microtask after the last
+ * event of a burst).
+ *
+ * @license BSD-3-Clause
+ */
 import * as React from "react";
-import type { Composer } from "../../../../../engine";
-import type { Element } from "../../../../../engine/elements/Element";
+import type { Composer } from "@/engine";
+import type { Element } from "@/engine/elements/Element";
 import type { AIScope, AIScopeStatus } from "../types";
-import { EVENTS } from "../../../../../shared/constants/events";
+import { EVENTS } from "@/shared/constants/events";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 
 interface UseAIScopeResult {
   scope: AIScope;
@@ -11,58 +26,83 @@ interface UseAIScopeResult {
   unlock: () => void;
 }
 
-function deriveLabel(el: Element): string {
-  const named = el.getAttribute?.("aria-label");
-  return named || el.getType();
+/** The kind of thing the boards append to the name: "Hero section",
+ *  "Heading text", "Menu preview image", "Flex container". */
+const NOUN: Record<string, string> = {
+  section: "section",
+  hero: "section",
+  container: "container",
+  flex: "container",
+  grid: "container",
+  columns: "container",
+  "collection-list": "list",
+  heading: "text",
+  paragraph: "text",
+  text: "text",
+  image: "image",
+  video: "video",
+  button: "button",
+  link: "link",
+  input: "input",
+  textarea: "input",
+  select: "input",
+  form: "form",
+};
+
+/** "Hero section" — the layer's name (else aria-label, else the type label)
+ *  and the kind, unless the name already is the kind ("Image"). */
+export function scopeLabel(el: Element): string {
+  const type = el.getType();
+  const name =
+    (typeof el.getCustomData === "function" ? getLayerName(el) : undefined) ??
+    el.getAttribute?.("aria-label") ??
+    ELEMENT_TYPE_LABELS[type] ??
+    type.charAt(0).toUpperCase() + type.slice(1);
+  const noun = NOUN[type];
+  return noun && name.toLowerCase() !== noun ? `${name} ${noun}` : name;
 }
 
+function scopeOf(selected: readonly Element[]): AIScope {
+  if (selected.length > 1) return { kind: "multi", count: selected.length };
+  if (selected.length === 1) return { kind: "element", id: selected[0].getId(), label: scopeLabel(selected[0]) };
+  return { kind: "page" };
+}
+
+const SELECTION_EVENTS = [
+  EVENTS.ELEMENT_SELECTED,
+  EVENTS.ELEMENT_DESELECTED,
+  EVENTS.SELECTION_MULTIPLE,
+  EVENTS.SELECTION_ADDED,
+  EVENTS.SELECTION_REMOVED,
+  EVENTS.SELECTION_CLEARED,
+] as const;
+
 export function useAIScope(composer: Composer | null): UseAIScopeResult {
-  const [scope, setScope] = React.useState<AIScope>({ kind: "page" });
+  const [scope, setScope] = React.useState<AIScope>(
+    () => scopeOf(composer?.selection?.getAllSelected?.() ?? []),
+  );
   const [status, setStatus] = React.useState<AIScopeStatus>("idle");
   const statusRef = React.useRef<AIScopeStatus>("idle");
   statusRef.current = status;
 
   React.useEffect(() => {
     if (!composer) return;
-
-    const onSelected = (el: Element) => {
-      if (statusRef.current === "locked") return;
-      setScope({ kind: "element", id: el.getId(), label: deriveLabel(el) });
+    let queued = false;
+    let live = true;
+    const sync = () => {
+      if (queued) return;
+      queued = true;
+      queueMicrotask(() => {
+        queued = false;
+        if (!live || statusRef.current === "locked") return;
+        setScope(scopeOf(composer.selection?.getAllSelected?.() ?? []));
+      });
     };
-    const onDeselected = () => {
-      if (statusRef.current === "locked") return;
-      setScope({ kind: "page" });
-    };
-    const onMulti = (els: Element[]) => {
-      if (statusRef.current === "locked") return;
-      setScope({ kind: "multi", count: els.length });
-    };
-
-    composer.on(EVENTS.ELEMENT_SELECTED, onSelected);
-    composer.on(EVENTS.ELEMENT_DESELECTED, onDeselected);
-    composer.on(EVENTS.SELECTION_MULTIPLE, onMulti);
-
-    // Seed from the CURRENT selection. The events above only fire on future
-    // selection changes, so an element selected BEFORE this panel mounted would
-    // otherwise leave the scope stuck on "page" — and submits would chat
-    // (intent "text") instead of editing the element (intent "style-command").
-    if (statusRef.current !== "locked") {
-      const current = composer.selection?.getAllSelected?.() ?? [];
-      if (current.length > 1) {
-        setScope({ kind: "multi", count: current.length });
-      } else if (current.length === 1) {
-        setScope({
-          kind: "element",
-          id: current[0].getId(),
-          label: deriveLabel(current[0]),
-        });
-      }
-    }
-
+    for (const evt of SELECTION_EVENTS) composer.on(evt, sync);
+    if (statusRef.current !== "locked") setScope(scopeOf(composer.selection?.getAllSelected?.() ?? []));
     return () => {
-      composer.off(EVENTS.ELEMENT_SELECTED, onSelected);
-      composer.off(EVENTS.ELEMENT_DESELECTED, onDeselected);
-      composer.off(EVENTS.SELECTION_MULTIPLE, onMulti);
+      live = false;
+      for (const evt of SELECTION_EVENTS) composer.off(evt, sync);
     };
   }, [composer]);
 
