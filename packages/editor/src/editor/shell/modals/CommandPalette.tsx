@@ -84,6 +84,11 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     ["publish", "Open Publish", () => openPanel("publish")],
     ["ai", "Open AI assistant", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })],
     ["templates", "Browse Templates", () => openPanel("templates")],
+    /* C4 #19: one of the New-page doors, from anywhere — the same event every
+       door emits. */
+    ["new-page", "New page", () => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), ["page", "create", "add page"]],
+    /* 4428:149355: the catalogue opens in replace mode for the active page. */
+    ["replace-layout", "Replace layout with template…", () => composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })],
     ["review", "Open Review", () => openPanel("review")],
     ["activity", "Open Activity", () => openPanel("activity")],
     ["issues", "Open Issues", () => composer?.emit(EVENTS.UI_OPEN_ISSUES, undefined), ["problems", "errors", "warnings", "checks"]],
@@ -171,29 +176,10 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     handler: run(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })),
   });
 
-  /* C4 #19: ⌘K is one of the New-page doors, from anywhere — not only while
-     the Pages panel has its rows registered. Same event every door emits.
-     MORE, so it answers a query without adding a row the board's resting
-     list does not draw. */
-  commands.push({
-    id: "add-new-page",
-    label: "New page",
-    group: "More",
-    keywords: ["page", "create", "add page"],
-    handler: run(() => composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {})),
-  });
-
   // TOOLS
   fromRegistry("cms-records", "Tools");
   fromRegistry("save-template", "Tools");
   commands.push(
-    {
-      id: "templates-replace-layout",
-      label: "Replace layout with template…",
-      group: "Tools",
-      /* 4428:149355: the catalogue opens in replace mode for the active page. */
-      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })),
-    },
     { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
     {
       id: "tools-stock",
