@@ -69,42 +69,6 @@ export type ProgrammingLanguage =
 
 export type CodeStyle = "concise" | "verbose" | "documented" | "minimal";
 
-/** Content type suggestions */
-export const CONTENT_TYPES: Record<ContentType, { label: string; description: string }> = {
-  headline: { label: "Headline", description: "Attention-grabbing title" },
-  paragraph: { label: "Paragraph", description: "Body text content" },
-  tagline: { label: "Tagline", description: "Short memorable phrase" },
-  cta: { label: "Call to Action", description: "Button or action text" },
-  description: { label: "Description", description: "Product or service description" },
-  "bullet-points": { label: "Bullet Points", description: "List of key points" },
-  faq: { label: "FAQ", description: "Question and answer pair" },
-  testimonial: { label: "Testimonial", description: "Customer review" },
-  bio: { label: "Bio", description: "Person or company biography" },
-  "meta-description": { label: "Meta Description", description: "SEO meta text" },
-  "social-post": { label: "Social Post", description: "Social media content" },
-  "email-subject": { label: "Email Subject", description: "Email subject line" },
-  "email-body": { label: "Email Body", description: "Email content" },
-  "feature-list": { label: "Feature List", description: "Product features with benefits" },
-  "pricing-description": { label: "Pricing Description", description: "Pricing plan details" },
-  "team-bio": { label: "Team Bio", description: "Team member biography" },
-};
-
-/** Tone suggestions */
-export const TONES: Record<ToneType, { label: string; emoji: string }> = {
-  professional: { label: "Professional", emoji: "💼" },
-  casual: { label: "Casual", emoji: "😊" },
-  friendly: { label: "Friendly", emoji: "👋" },
-  formal: { label: "Formal", emoji: "🎩" },
-  playful: { label: "Playful", emoji: "🎉" },
-  urgent: { label: "Urgent", emoji: "⚡" },
-  inspirational: { label: "Inspirational", emoji: "✨" },
-  technical: { label: "Technical", emoji: "🔧" },
-  conversational: { label: "Conversational", emoji: "💬" },
-  authoritative: { label: "Authoritative", emoji: "📢" },
-  empathetic: { label: "Empathetic", emoji: "❤️" },
-  witty: { label: "Witty", emoji: "😄" },
-};
-
 export const TONE_INSTRUCTIONS: Record<ToneType, string> = {
   professional: "Business-appropriate, clear, concise. Credibility and expertise focused.",
   casual: "Relaxed, conversational. Contractions OK. Approachable and simple.",

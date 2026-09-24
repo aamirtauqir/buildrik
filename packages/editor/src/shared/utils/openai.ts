@@ -19,8 +19,6 @@ import {
   isValidContentType,
   isValidTone,
   buildEnhancedPrompt,
-  CONTENT_TYPES,
-  TONES,
   TONE_INSTRUCTIONS,
   CONTENT_TYPE_PROMPTS,
 } from "../../services/ai/AIPromptLibrary";
@@ -41,7 +39,7 @@ export type {
   AIErrorCode,
 };
 
-export { CONTENT_TYPES, TONES, TONE_INSTRUCTIONS, CONTENT_TYPE_PROMPTS, createAIError };
+export { TONE_INSTRUCTIONS, CONTENT_TYPE_PROMPTS, createAIError };
 
 // =============================================================================
 // CONFIGURATION & CONSTANTS
