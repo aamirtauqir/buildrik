@@ -73,7 +73,11 @@ describe("CanvasFooterToolbar — the View menu (board 5930:44801)", () => {
 
   it("reflects active overlay state as a checked row, and counts it on the trigger", () => {
     renderToolbar({ overlays: { ...ALL_OFF, grid: true } });
-    expect(screen.getByTestId("canvas-view-menu-trigger").textContent).toContain("View · 1");
+    const trigger = screen.getByTestId("canvas-view-menu-trigger");
+    expect(trigger.textContent).toContain("View · 1");
+    // The board draws the trigger plain whether overlays are on or off.
+    expect(trigger.className).not.toContain("--bk-bg-subtle");
+    expect(trigger.className).not.toContain("font-semibold");
     openMenu();
     expect(screen.getByTestId("canvas-view-grid").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("canvas-view-spacing").getAttribute("aria-checked")).toBe("false");
