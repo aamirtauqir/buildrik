@@ -55,11 +55,10 @@ describe("AITab skeleton", () => {
        "quick actions" this panel does not have. */
     expect(screen.getByRole("button", { name: "Make the hero warmer" })).toBeInTheDocument();
     expect(
-      screen.getByText(/AI proposes a diff and never writes directly/),
+      screen.getByText(/Review the plan before running it/),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Draft a new section from a brief/ }),
-    ).toBeInTheDocument();
+    // Board 4418:104313 CREATE replaced DRAFT.
+    expect(screen.getByTestId("ai-create-block").textContent).toContain("Generate a block in Add");
   });
 
   it("renders a composer textarea", () => {

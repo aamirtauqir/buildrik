@@ -44,6 +44,8 @@ const STATE_LINK =
   "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
 import { DEFAULT_MODEL, type AIModel } from "./types";
 import "./AITab.css";
+import { useAiQuota, quotaLeftLabel } from "./hooks/useAiQuota";
+import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 export interface AITabProps {
   composer: Composer | null;
@@ -74,9 +76,6 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
      remembers it — the runner does not keep the prompt. */
   const lastPrompt = React.useRef<{ text: string; target?: { id: string } } | null>(null);
   const [guard, setGuard] = React.useState(false);
-  /* Board 921:4478's DRAFT row leads to the brief-entry frame (AgentPlan's
-     idle state); a run ending (reset → idle) hands the panel back. */
-  const [briefing, setBriefing] = React.useState(false);
   const promptRef = React.useRef<HTMLDivElement>(null);
 
   const run = React.useCallback(
@@ -107,9 +106,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
      4418:105118 / 105261 / 105401 all draw it); leaving the run — Done or
      Keep N changes — clears it by remounting the composer. */
   const [composerKey, setComposerKey] = React.useState(0);
+  /* G2-129: the daily counter — drawn only when the quota read answers. */
+  const quota = useAiQuota(agent.phase);
   React.useEffect(() => {
     if (agent.phase === "done") unlock();
-    if (agent.phase !== "idle") setBriefing(false);
   }, [agent.phase, unlock]);
 
   /* The three panel states replace the run only while nothing from it has
@@ -194,7 +194,12 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
       {/* Board 4418:106796 draws no composer: nothing here will run. */}
       {failedKind === "not-configured" ? null : (
         <div ref={promptRef}>
-          <PromptComposer key={composerKey} onSubmit={submit} streaming={live} />
+          <PromptComposer
+            key={composerKey}
+            onSubmit={submit}
+            streaming={live}
+            quotaLabel={(quota && quotaLeftLabel(quota)) || undefined}
+          />
         </div>
       )}
       {guard && scope.kind === "multi" ? (
@@ -263,14 +268,11 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           </Button>
           {continueByHand}
         </div>
-      ) : agent.phase === "idle" && !briefing ? (
+      ) : agent.phase === "idle" ? (
         <div className="bd-ai-thread">
           <EmptyThread
             onTry={submit}
-            onDraft={() => {
-              setBriefing(true);
-              promptRef.current?.querySelector("textarea")?.focus();
-            }}
+            onCreate={composer ? () => requestGenerateBlock(composer) : undefined}
           />
         </div>
       ) : (

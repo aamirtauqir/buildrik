@@ -8,9 +8,9 @@
  *
  * One single-shot AI run (runPromptOnce, page scope) asked for one new
  * section after the target; the edit lands through applyAiEdit, which wraps it
- * in ONE transaction — so Undo is one history step. The daily counter the
- * boards draw ("7 generations left today") needs a server quota read that does
- * not exist; it is not drawn (designer-notes).
+ * in ONE transaction — so Undo is one history step. The daily counter
+ * ("7 generations left today") draws only when the ai.quota read answers
+ * (useAiQuota, G2-129).
  *
  * @license BSD-3-Clause
  */
@@ -24,6 +24,7 @@ import { applyAiEdit } from "../../ai/applySetStyle";
 import { runPromptOnce, AiRunError, type AiErrorKind, type ServerEdit } from "../../ai/hooks/runPromptOnce";
 import { gatherTokens, gatherMediaAssets } from "../../ai/hooks/aiScopeContext";
 import { DEFAULT_MODEL } from "../../ai/types";
+import { useAiQuota, quotaLeftLabel } from "../../ai/hooks/useAiQuota";
 
 /** Where the new block goes: after this top-level element of the page. */
 export interface GenerateTarget {
@@ -94,6 +95,8 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
   const [phase, setPhase] = React.useState<Phase>({ kind: "idle" });
   const target = React.useMemo(() => generateTarget(composer), [composer]);
   const runId = React.useRef(0);
+  const quota = useAiQuota(phase.kind);
+  const quotaLabel = quota && quotaLeftLabel(quota, phase.kind === "idle" ? "generations" : undefined);
 
   const run = async () => {
     const id = ++runId.current;
@@ -157,6 +160,11 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
             }}
             className="tw:resize-none tw:bg-white tw:text-[13px] tw:leading-5"
           />
+          {quotaLabel && (
+            <div className="tw:-mt-6 tw:mr-3 tw:relative tw:text-right tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="generate-quota">
+              {quotaLabel}
+            </div>
+          )}
         </div>
 
         {phase.kind === "idle" && (
