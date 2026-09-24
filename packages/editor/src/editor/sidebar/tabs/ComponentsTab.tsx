@@ -49,6 +49,12 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   });
   const { addToast } = useToast();
 
+  // Board 4418:143126: the last Detach all, reported at the top of the list.
+  const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
+  React.useEffect(() => {
+    if (state.detailComponent) setDetached(null);
+  }, [state.detailComponent]);
+
   /* Board 4418:142419: Components is reached from Add ("Manage components ›"),
      and the drawer says so with a back row above its header. */
   const backRow = composer && (
@@ -144,6 +150,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
+        onDetachedAll={(count) => {
+          const { id, name } = state.detailComponent!;
+          setDetached({ id, name, count });
+        }}
         selectedElementId={state.canvasSelection[0] ?? null}
       />
     );
@@ -245,13 +255,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const linked = state.components.filter((c) => linkedIds.has(c.id));
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+    const justDetached = detached?.id === component.id && n === 0;
     return (
               <div
                 key={component.id}
                 role="button"
                 tabIndex={0}
                 draggable
-                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+                className={`tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none tw:hover:bg-[var(--bk-bg-subtle)]${justDetached ? " tw:opacity-40" : ""}`}
                 data-testid={`comp-row-${component.id}`}
                 onClick={() => state.handleViewDetail(component)}
                 onDragStart={(e) => state.handleDragStart(e, component)}
@@ -281,7 +292,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
                   data-testid={`comp-row-count-${component.id}`}
                 >
-                  {n} on this site{isLinked ? " · linked" : ""}
+                  {justDetached ? "0 linked instances" : `${n} on this site${isLinked ? " · linked" : ""}`}
                 </span>
               </div>
     );
@@ -317,6 +328,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
         <div aria-live="polite">
           <span className="bd-sr-only">{state.components.length} components found</span>
+          {detached && (
+            <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-3 tw:py-2 tw:text-[var(--bk-ink)]" role="status" data-testid="comp-detach-notice">
+              <p className="tw:m-0 tw:text-[14px] tw:leading-[normal]">
+                {detached.count} instance{detached.count === 1 ? "" : "s"} detached
+              </p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[normal]">
+                {detached.name} is still saved. Existing page content keeps its appearance.
+              </p>
+            </div>
+          )}
           <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink)]" data-testid="comp-intro">
             Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.
           </p>

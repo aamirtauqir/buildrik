@@ -34,6 +34,8 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
+  /** Detach all finished — the list reports the count (board 4418:143126). */
+  onDetachedAll?: (count: number) => void;
   /** The element currently selected on canvas — what "Update component" promotes. */
   selectedElementId?: string | null;
 }
@@ -90,6 +92,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
+  onDetachedAll,
   selectedElementId = null,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
@@ -249,11 +252,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const structure = component.masterTree?.children ?? [];
   const siteName = composer?.getProjectMetadata?.()?.name || "this site";
 
-  const confirmDetachAll = () => {
+  const confirmDetachAll = async () => {
     setShowDetachAll(false);
     if (!composer) return;
-    for (const inst of instances) void composer.components.detachInstance(inst.elementId);
-    addToast({ description: `Detached ${instances.length} instance${instances.length === 1 ? "" : "s"} of "${component.name}".`, tone: "success", duration: 4000 });
+    await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    onDetachedAll?.(instances.length);
+    onBack();
   };
 
   const commitRename = async () => {
@@ -431,14 +435,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onConfirm={confirmUpdateAction}
         title="Update component"
         message={
-          /* The undo caveat is measured, not assumed: with history primed, one
-             Cmd+Z after an update reverted the instance on the canvas and left
-             the component at the new version — element history holds the pages,
-             not the component definition. */
+          /* ⌘Z alone reverts the pages, not the component definition (measured),
+             so the way back is the toast's Undo, which restores the master. */
           (instanceCount > 0
             ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
             : `Replace "${component.name}" with the element selected on the canvas? `) +
-          "Undo won't take the component back — it reverts the pages, not the component itself."
+          "To go back, use Undo on the confirmation that follows."
         }
         confirmLabel="Update component"
         tone="destructive"
@@ -447,7 +449,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         open={showDetachAll}
         testId="component-detach-all-confirm"
         onClose={() => setShowDetachAll(false)}
-        onConfirm={confirmDetachAll}
+        onConfirm={() => void confirmDetachAll()}
         title={`Detach all ${instanceCount} instance${instanceCount === 1 ? "" : "s"} of ${component.name}?`}
         message={`They become independent elements and keep their content and appearance; they will no longer follow updates to the ${component.name} master.`}
         confirmLabel="Detach all"

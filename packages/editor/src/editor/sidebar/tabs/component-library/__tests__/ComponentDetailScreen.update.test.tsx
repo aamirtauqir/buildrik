@@ -96,10 +96,9 @@ describe("ComponentDetailScreen — Update component", () => {
     expect(updateComponentMaster).not.toHaveBeenCalled();
     // The dialog names what it costs before anything happens.
     expect(screen.getByText(/2 instance\(s\) will change/i)).toBeInTheDocument();
-    /* Measured live: one Cmd+Z after an update reverts the instance on the
-       canvas and leaves the component at the new version, because element
-       history holds the pages and not the component definition. */
-    expect(screen.getByText(/reverts the pages, not the component itself/i)).toBeInTheDocument();
+    /* ⌘Z alone reverts the pages, not the master — the dialog points at the
+       toast's Undo, which does restore it. */
+    expect(screen.getByText(/use Undo on the confirmation that follows/i)).toBeInTheDocument();
 
     fireEvent.click(confirmButton());
 

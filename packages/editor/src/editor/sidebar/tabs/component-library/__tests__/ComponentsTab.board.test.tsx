@@ -52,6 +52,36 @@ describe("ComponentsTab — board 4418:142419", () => {
     expect(screen.queryByTestId("comp-row-new-hdr")).toBeNull();
   });
 
+  /* Board 4418:143126: after Detach all, the list opens on "N instances
+     detached" + "{name} is still saved…", and that master's row is dimmed
+     with "0 linked instances". */
+  it("reports a Detach all on the list and dims the master's row", async () => {
+    const composer = createMockComposer({ components: [c("menu", "Menu card"), c("hdr", "Site header")] });
+    const live = new Map<string, string[]>([["menu", ["i1", "i2"]], ["hdr", ["i3"]]]);
+    Object.assign(composer.components, {
+      isAvailable: () => true,
+      getInstancesOfComponent: (id: string) => (live.get(id) ?? []).map((elementId) => ({ elementId })),
+      detachInstance: vi.fn(async (elementId: string) => {
+        for (const [k, v] of live) live.set(k, v.filter((x) => x !== elementId));
+        return true;
+      }),
+      isInstance: () => false,
+    });
+    render(
+      <ToastProvider>
+        <ComponentsTab composer={composer as never} onCreateNew={vi.fn()} />
+      </ToastProvider>,
+    );
+    fireEvent.click(await screen.findByTestId("comp-row-menu"));
+    fireEvent.click(await screen.findByTestId("component-detach-all"));
+    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
+    const notice = await screen.findByTestId("comp-detach-notice");
+    expect(notice.textContent).toBe("2 instances detachedMenu card is still saved. Existing page content keeps its appearance.");
+    expect(screen.getByTestId("comp-row-count-menu").textContent).toBe("0 linked instances");
+    expect(screen.getByTestId("comp-row-menu").className).toContain("tw:opacity-40");
+    expect(screen.getByTestId("comp-row-hdr").className).not.toContain("tw:opacity-40");
+  });
+
   it("the empty state keeps the back row too", async () => {
     mount([]);
     expect((await screen.findByTestId("comp-back-row")).textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
