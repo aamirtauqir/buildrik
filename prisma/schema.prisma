@@ -1155,6 +1155,10 @@ model SiteComponent {
   componentId String // engine ComponentDefinition.id — canonical dedupe key
   name        String
   payload     Json
+  /// Scope (board 6971:77663): null = "This site"; a page id = "This page",
+  /// offered only while that page is open and never shared to the library.
+  /// No FK — a deleted page leaves an orphan the editor never shows.
+  pageId      String?
   createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

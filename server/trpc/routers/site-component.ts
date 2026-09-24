@@ -16,6 +16,8 @@ import {
   getComponentUsage,
   renameWorkspaceComponent,
   deleteWorkspaceComponent,
+  listComponentLibrary,
+  getLibraryComponent,
 } from "@/server/services/site-component.service";
 import {
   upsertSiteComponentSchema,
@@ -24,6 +26,8 @@ import {
   deleteSiteComponentSchema,
   componentUsageSchema,
   renameWorkspaceComponentSchema,
+  componentLibrarySchema,
+  libraryComponentSchema,
 } from "@buildrik/shared/schemas/site-component";
 import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
@@ -51,7 +55,13 @@ export const siteComponentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       // Stamp the caller — never trust a client-supplied createdBy.
-      return upsertSiteComponent({ ...input, createdBy: ctx.session.user.id });
+      try {
+        return await upsertSiteComponent({ ...input, createdBy: ctx.session.user.id });
+      } catch (e) {
+        if (e instanceof Error && e.message === "PAGE_NOT_FOUND")
+          throw new TRPCError({ code: "BAD_REQUEST", message: "That page is not on this site." });
+        throw e;
+      }
     }),
 
   list: protectedProcedure
@@ -73,6 +83,23 @@ export const siteComponentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       return deleteSiteComponent(input.siteId, input.componentId);
+    }),
+
+  // FROM LIBRARY (board 4418:99857): the workspace's shared masters seen from
+  // this site. Reading is open to any member of the site; bringing one onto the
+  // site goes through `upsert`, which is EDITOR+.
+  library: protectedProcedure
+    .input(componentLibrarySchema)
+    .query(async ({ ctx, input }) => {
+      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      return listComponentLibrary(input.siteId);
+    }),
+
+  libraryGet: protectedProcedure
+    .input(libraryComponentSchema)
+    .query(async ({ ctx, input }) => {
+      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      return getLibraryComponent(input.siteId, input.componentId);
     }),
 
   // C1: the component browser — every master across the agency's workspace with

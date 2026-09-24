@@ -9,6 +9,8 @@ const upsert = vi.fn();
 const del = vi.fn();
 const list = vi.fn();
 const get = vi.fn();
+const library = vi.fn();
+const libraryGet = vi.fn();
 
 vi.mock("../api-client", () => ({
   getBuildrikClient: () => ({
@@ -17,6 +19,8 @@ vi.mock("../api-client", () => ({
       delete: { mutate: del },
       list: { query: list },
       get: { query: get },
+      library: { query: library },
+      libraryGet: { query: libraryGet },
     },
   }),
 }));
@@ -36,6 +40,8 @@ import {
   onComponentSyncError,
   retryComponentSync,
   getComponentSyncPendingCount,
+  fetchComponentLibrary,
+  fetchLibraryComponent,
 } from "../componentSync";
 
 beforeEach(async () => {
@@ -234,5 +240,28 @@ describe("componentSync hydrate edge paths", () => {
     window.history.replaceState({}, "", "/dashboard");
     await expect(hydrateComponentsFromServer()).resolves.toBe(0);
     expect(list).not.toHaveBeenCalled();
+  });
+});
+
+describe("componentSync — G2-118 scope + library", () => {
+  it("sends the master's page scope; a site-wide master sends null", async () => {
+    await mirrorComponentUpsert({ id: "c1", name: "Hero", pageId: "page-home" } as never);
+    expect(upsert).toHaveBeenLastCalledWith(expect.objectContaining({ componentId: "c1", pageId: "page-home" }));
+    await mirrorComponentUpsert(comp("c2"));
+    expect(upsert).toHaveBeenLastCalledWith(expect.objectContaining({ componentId: "c2", pageId: null }));
+  });
+
+  it("reads the library for the URL site, and [] when the read fails", async () => {
+    library.mockResolvedValueOnce([{ componentId: "b", name: "Button", siteCount: 2, onThisSite: false, updatedAt: new Date() }]);
+    await expect(fetchComponentLibrary()).resolves.toEqual([{ componentId: "b", name: "Button", siteCount: 2, onThisSite: false }]);
+    expect(library).toHaveBeenCalledWith({ siteId: "site-123" });
+    library.mockRejectedValueOnce(new Error("offline"));
+    await expect(fetchComponentLibrary()).resolves.toEqual([]);
+  });
+
+  it("fetches one library master's definition for this site", async () => {
+    libraryGet.mockResolvedValueOnce({ id: "b", name: "Button" });
+    await expect(fetchLibraryComponent("b")).resolves.toEqual({ id: "b", name: "Button" });
+    expect(libraryGet).toHaveBeenCalledWith({ siteId: "site-123", componentId: "b" });
   });
 });
