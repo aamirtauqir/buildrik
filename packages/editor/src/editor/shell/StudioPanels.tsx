@@ -243,8 +243,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   const [aiInInspector, setAiInInspector] = React.useState(false);
   /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
      the drawn no-selection board is still the default state — collapsing it
-     automatically was tried before and rendered that board off-viewport
-     (see the `inspectorOpen` comment below). This is the opt-out. */
+     automatically was tried before and rendered that board off-viewport.
+     This is the opt-out. */
   const [inspectorShown, setInspectorShown] = React.useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     try { return localStorage.getItem("buildrick-inspector-shown") !== "false"; }
@@ -312,18 +312,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     getTabMode(activeTabId) === "fullpage" ||
     (activeTabId === "assets" && mediaFullPage);
 
-  /* The toast viewport anchors to the CANVAS region's bottom-right, not the
-     window's (plan 2026-09-21 decision #35): it adds `--bk-inspector-w` to its
-     `right`. Written on the document root, not `.bd-studio`, because the
-     overlay root is a sibling of the shell, not a descendant. */
   const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown;
-  React.useLayoutEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--bk-inspector-w", inspectorOpen ? "var(--bk-size-inspector)" : "0px");
-    return () => {
-      root.style.removeProperty("--bk-inspector-w");
-    };
-  }, [inspectorOpen]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
