@@ -24,7 +24,7 @@ import {
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, Modal, useToast } from "@/editor/chrome-ui";
 import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
 import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
@@ -84,6 +84,8 @@ const SKELETON_BAR_W = ["tw:w-[132px]", "tw:w-[96px]", "tw:w-[150px]", "tw:w-[11
 const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-16)] tw:py-2.5";
 /* Board 4418:74511 — 13/20 ink-soft body, then a 12/16 muted footnote. */
+/* 4418:173587 / 6881:70883 — the details overlay's 13/20 ink lines. */
+const DETAILS_LINE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const RESTORE_CONFIRM_BODY = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 const RESTORE_CONFIRM_SUB = "tw:mt-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
@@ -276,6 +278,8 @@ export function VersionHistoryPanel({
     : null;
 
   // Version currently awaiting restore confirmation (rendered outside the list).
+  const [detailsId, setDetailsId] = React.useState<string | null>(null);
+  const detailsVersion = detailsId ? versions.find((v) => v.id === detailsId) ?? null : null;
   const restoreConfirmVersion = restoreConfirmId
     ? filteredVersions.find((v) => v.id === restoreConfirmId) ?? null
     : null;
@@ -405,7 +409,50 @@ export function VersionHistoryPanel({
         onDeleteConfirm={handleDeleteConfirm}
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
+        onDetails={setDetailsId}
       />
+
+      {/* Board 4418:173587 — a save's details, with the two things one does
+          next: compare it with the current draft, or restore it. */}
+      <Modal
+        open={detailsVersion !== null}
+        onClose={() => setDetailsId(null)}
+        testId="history-save-details"
+        title="Saved version"
+        footer={
+          <>
+            <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" onClick={() => setDetailsId(null)}>
+              Close
+            </Button>
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => {
+                if (detailsVersion) void handleCompare(detailsVersion.id);
+                setDetailsId(null);
+              }}
+            >
+              Compare with current
+            </Button>
+            <Button
+              size="xs"
+              onClick={() => {
+                if (detailsVersion) handleRestoreClick(detailsVersion.id);
+                setDetailsId(null);
+              }}
+            >
+              Restore this save…
+            </Button>
+          </>
+        }
+      >
+        <p className={DETAILS_LINE}>{composer?.getProjectMetadata?.()?.name || "Untitled site"}</p>
+        <p className={DETAILS_LINE}>Inspect this save before restoring it. Your live site stays unchanged.</p>
+        <p className={`${DETAILS_LINE} tw:mt-4`}>Selected save</p>
+        <p className={`${DETAILS_LINE} tw:mt-2`} data-testid="history-save-details-line">
+          {detailsVersion ? `${versionDisplayName(detailsVersion)} · ${formatTime(detailsVersion.createdAt)}` : ""}
+        </p>
+      </Modal>
 
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}

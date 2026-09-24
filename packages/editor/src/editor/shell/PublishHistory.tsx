@@ -98,6 +98,8 @@ const ROW_TIME = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* The ⋯ shows on hover or focus, as 4418:74024 draws the rows bare. */
 const ROW_MORE =
   "tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 tw:aria-expanded:opacity-100 tw:size-6 tw:p-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/* 6881:71292 draws the menu items at a 30 pitch. */
+const ROW_MENU_ITEM = "tw:h-[30px] tw:px-2.5";
 const MENU_REASON = "tw:px-3 tw:pb-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* The Modal body already insets 24 (117a5a13e); the v3 boards (4418:73440,
    73462, 6881:70883) align the body text with the title, so no extra inset. */
@@ -382,6 +384,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                 >
                   <Menu label={`v${r.version} actions`}>
                     <MenuItem
+                      className={ROW_MENU_ITEM}
                       onClick={() => {
                         setRowMenu(null);
                         setDetails(r);
@@ -391,6 +394,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                     </MenuItem>
                     {onCompareWithCurrent ? (
                       <MenuItem
+                        className={ROW_MENU_ITEM}
                         onClick={() => {
                           setRowMenu(null);
                           onCompareWithCurrent({ id: r.id, version: r.version });
@@ -401,6 +405,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                     ) : null}
                     {onCompare && prev ? (
                       <MenuItem
+                        className={ROW_MENU_ITEM}
                         aria-label={`Compare v${prev.version} to v${r.version}`}
                         onClick={() => {
                           setRowMenu(null);
@@ -415,7 +420,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                     {!isLive ? (
                       <MenuItem
                         aria-disabled={why ? "true" : undefined}
-                        className={why ? "tw:cursor-not-allowed tw:text-[var(--bk-ink-disabled)] tw:hover:bg-transparent" : undefined}
+                        className={why ? `${ROW_MENU_ITEM} tw:cursor-not-allowed tw:text-[var(--bk-ink-disabled)] tw:hover:bg-transparent` : ROW_MENU_ITEM}
                         onClick={
                           why
                             ? undefined

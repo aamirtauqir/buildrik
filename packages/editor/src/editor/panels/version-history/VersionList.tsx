@@ -58,6 +58,9 @@ const OVERSCAN = 5;
 
 // ─── Date helpers ─────────────────────────────────────────────────────
 
+/* 6930:82577 draws the row menu's items at a 30 pitch (as SavesFilter). */
+const ROW_MENU_ITEM = "tw:h-[30px] tw:px-2.5";
+
 function getDateGroup(timestamp: number): string {
   const now = new Date();
   const date = new Date(timestamp);
@@ -111,6 +114,7 @@ interface VersionRowProps {
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
   onCompare: () => void;
+  onDetails: () => void;
   /** Changes this version captured since the previous one. Absent = not known. */
   changeCount?: number;
 }
@@ -124,6 +128,7 @@ export function VersionRow({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
+  onDetails,
   changeCount,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
@@ -230,7 +235,18 @@ export function VersionRow({
                 }
               >
                 <Menu label={`${versionDisplayName(version)} actions`}>
+                  {/* 6902:73326's door to the details overlay (4418:173587). */}
                   <MenuItem
+                    className={ROW_MENU_ITEM}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDetails();
+                    }}
+                  >
+                    View details
+                  </MenuItem>
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
                     disabled={isRestoring}
                     aria-label={`Restore "${versionDisplayName(version)}"`}
                     onClick={() => {
@@ -241,6 +257,7 @@ export function VersionRow({
                     Restore to draft…
                   </MenuItem>
                   <MenuItem
+                    className={ROW_MENU_ITEM}
                     aria-label={`Compare "${versionDisplayName(version)}"`}
                     onClick={() => {
                       setMenuOpen(false);
@@ -250,6 +267,7 @@ export function VersionRow({
                     Compare with current
                   </MenuItem>
                   <MenuItem
+                    className={ROW_MENU_ITEM}
                     danger
                     aria-label={`Delete "${versionDisplayName(version)}"`}
                     onClick={() => {
@@ -290,6 +308,7 @@ export interface VersionListProps {
   onDeleteConfirm: (versionId: string) => void;
   onDeleteCancel: () => void;
   onCompare: (versionId: string) => void;
+  onDetails: (versionId: string) => void;
   /** version id -> changes captured. Ids absent mean "not known". */
   changeCounts?: Map<string, number>;
 }
@@ -304,6 +323,7 @@ export function VersionList({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
+  onDetails,
   changeCounts,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
@@ -373,6 +393,7 @@ export function VersionList({
             onDeleteConfirm={() => onDeleteConfirm(v.id)}
             onDeleteCancel={onDeleteCancel}
             onCompare={() => onCompare(v.id)}
+            onDetails={() => onDetails(v.id)}
             changeCount={changeCounts?.get(v.id)}
           />
         </div>
@@ -388,6 +409,7 @@ export function VersionList({
       onDeleteConfirm,
       onDeleteCancel,
       onCompare,
+      onDetails,
     ],
   );
 

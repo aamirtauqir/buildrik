@@ -549,3 +549,18 @@ describe("VersionHistoryPanel — board 4418:74511 restore confirm", () => {
     expect(labels).toEqual(["Cancel", "Restore draft"]);
   });
 });
+
+describe("VersionHistoryPanel — board 4418:173587 saved version details", () => {
+  it("opens from the row ⋯ and leads to restore", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByRole("menuitem", { name: "View details" }));
+    expect(await screen.findByTestId("history-save-details")).toBeInTheDocument();
+    expect(screen.getByText("Inspect this save before restoring it. Your live site stays unchanged.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Restore this save…" }));
+    expect(await screen.findByText("Restore “Save A” to the draft?")).toBeInTheDocument();
+  });
+});
