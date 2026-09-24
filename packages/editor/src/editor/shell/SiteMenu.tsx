@@ -118,6 +118,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         onClose={() => setOpen(false)}
         placement="bottom-end"
         label="Site menu"
+        /* 4418:126034 hangs the menu 2px under the 56 bar, not 4px under the ⋯. */
+        className="tw:mt-3"
         trigger={
           <IconButton
             label="Site menu"
@@ -132,7 +134,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           </IconButton>
         }
       >
-        <Menu label="Site menu" data-testid="site-menu">
+        {/* Board 4418:126034: a 278-wide menu on a 28 row pitch. The row
+            height goes through a descendant selector — MenuItem is a plain
+            element, where a same-property class would tie, not win. */}
+        <Menu label="Site menu" data-testid="site-menu" className="tw:w-[260px] tw:[&_[role=menuitem]]:h-7">
           {readOnlyView ? (
             <MenuGroup>
               {onToggleReadOnlyView ? (

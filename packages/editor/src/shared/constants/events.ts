@@ -334,6 +334,10 @@ export const EVENTS = {
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
   /** Add opens on its "Generate a block" screen (G2-117). */
   UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
+  /** ⌘⇧V (board 7063:78846): the shell routes it to Add's Paste HTML dialog. */
+  UI_PASTE_HTML_REQUESTED: "ui:paste-html-requested",
+  /** Add opens its Paste HTML dialog (held until the panel mounts). */
+  UI_INSERT_OPEN_PASTE_HTML: "ui:insert-open-paste-html",
   /** "Edit master ›" on an instance: the Components panel opens that
    *  master's screen. Payload `{ componentId }`. */
   UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
@@ -377,6 +381,13 @@ export const EVENTS = {
    *  the site menu and a ⌘K command reach it through this instead. Handled
    *  in AquibraStudio, which owns the panel. */
   UI_OPEN_ISSUES: "ui:open-issues",
+  /** Open the Permissions dialog for the signed-in role (boards 4418:133026
+   *  viewer, 5905:44701 owner). The viewer notice opens its own; every other
+   *  role reaches it from ⌘K "Permissions". `PermissionsHost` listens. */
+  UI_OPEN_PERMISSIONS: "ui:open-permissions",
+  /** Toggle History time-travel (4418:74736). ⌃⇧T is bound globally by
+   *  `TimeTravelHost`, the only listener; History ⋯ › Time-Travel emits this. */
+  UI_TIME_TRAVEL_TOGGLE: "ui:time-travel-toggle",
   /** Open the one Compare (B8) on two sides. Every Compare door emits this;
    *  `CompareHost`, mounted by the shell, is the only listener. */
   UI_COMPARE_OPEN: "ui:compare-open",
@@ -945,6 +956,8 @@ export interface EventPayloads {
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_OPEN_PERMISSIONS]: void;
+  [EVENTS.UI_TIME_TRAVEL_TOGGLE]: void;
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
   /** `query` pre-fills the field (a drawer re-announcing its live query). */
   [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string; query?: string } | null;

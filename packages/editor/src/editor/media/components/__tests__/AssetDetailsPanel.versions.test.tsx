@@ -53,6 +53,9 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
     ...over,
   };
   const utils = render(<AssetDetailsPanel {...props} />);
+  /* 4418:58292 — VERSIONS / USED IN sit behind "Details ▸"; these tests read them open. */
+  const details = utils.queryByTestId("mgr-det-details-toggle");
+  if (details) fireEvent.click(details);
   return { ...utils, props };
 }
 
@@ -229,7 +232,7 @@ describe("AssetDetailsPanel — action row", () => {
   it("Delete requests deletion by key", () => {
     const { props } = mount();
     fireEvent.click(screen.getByTestId("mgr-det-more"));
-    fireEvent.click(screen.getByText("Delete"));
+    fireEvent.click(screen.getByText("Delete…"));
     expect(props.onRequestDelete).toHaveBeenCalledWith("asset-1");
   });
 });

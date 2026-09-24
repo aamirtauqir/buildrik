@@ -60,6 +60,7 @@ vi.mock("@lib/trpc/client", () => ({
           return { mutate: resolveMutate, mutateAsync: vi.fn(), isPending: false, error: null };
         },
       },
+      requestNewLink: { useMutation: () => ({ mutate: vi.fn(), isSuccess: false, isPending: false, isError: false }) },
     },
   },
 }));

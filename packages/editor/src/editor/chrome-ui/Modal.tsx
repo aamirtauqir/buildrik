@@ -36,15 +36,21 @@ export const MODAL_BODY_CLASS =
    (dialog/footer 7401:1280). Descendant, not child: a footer that wraps its
    buttons in its own flex row still gets them — the delete confirm once
    shipped flowbite's 40 because the selector only reached direct children. */
-export const MODAL_FOOT_CLASS =
-  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:pt-0 tw:pb-6 tw:px-6 " +
+const MODAL_FOOT_BUTTONS =
   "tw:[&_button]:h-8 tw:[&_button]:min-h-0 tw:[&_button]:px-4 tw:[&_button]:py-1.5 " +
   "tw:[&_button]:rounded-lg tw:[&_button]:text-[13px] tw:[&_button]:font-medium";
+export const MODAL_FOOT_CLASS = "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:pt-0 tw:pb-6 tw:px-6 " + MODAL_FOOT_BUTTONS;
+/* Form dialogs draw the DS "Footer" instead (7431:145583, e.g. Create
+   component 4418:142143): a top rule and 16/24 padding. Confirms keep the
+   bare action row above (7564:185450, 4428:151964). */
+export const MODAL_FOOT_DIVIDED_CLASS =
+  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:py-4 tw:px-6 tw:border-t tw:border-[var(--bk-border)] " + MODAL_FOOT_BUTTONS;
 
 /** width/dialog-md 560 is the default; New page draws width/dialog-lg 640;
- *  Backup failed (4428:151964) draws width/dialog-sm 480; "wide" is the board
- *  token width/dialog-xl 960 (Permissions, 4418:133026) — named apart because
- *  "xl" here was already 720. */
+ *  the republish confirm family (4418:73440 / 73452 / 73462) and Backup failed
+ *  (4428:151964) draw width/dialog-sm 480; "wide" is the board token
+ *  width/dialog-xl 960 (Permissions, 4418:133026) — named apart because "xl"
+ *  here was already 720. */
 export type ModalWidth = "sm" | "md" | "lg" | "xl" | "wide";
 const WIDTH_CLASS: Record<ModalWidth, string> = {
   sm: "tw:w-[var(--bk-size-dialog-sm)]",

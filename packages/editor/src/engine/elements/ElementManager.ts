@@ -303,8 +303,8 @@ export class ElementManager {
   }
 
   /** Paste element from clipboard data */
-  pasteElement(data: ElementData, target: Element, index?: number): Element | null {
-    return this.elementCRUD.pasteElement(data, target, index);
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
+    return this.elementCRUD.pasteElement(data, target, index, announce);
   }
 
   // ============================================

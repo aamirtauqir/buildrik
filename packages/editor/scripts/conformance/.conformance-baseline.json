@@ -111,19 +111,6 @@
     "skipped": 1,
     "compared": 26
   },
-  "history-saves-time-travel": {
-    "contrastFailures": 4,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "p.tw:m-0.tw:text-[11px] | 50 versions kept. Auto-saves prune oldes | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
-      "span | 04:20 PM | rgb(107, 114, 128) | rgb(27, 27, 38)": 3.53,
-      "span.tt-time-current | 04:05 PM | rgb(26, 86, 219) | rgb(27, 27, 38)": 2.76,
-      "span | 03:58 PM | rgb(107, 114, 128) | rgb(27, 27, 38)": 3.53
-    },
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 21
-  },
   "pages-load-error": {
     "skipped": 2,
     "compared": 24

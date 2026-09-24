@@ -230,6 +230,7 @@ function MediaTabWithComposer({
           onCopyUrl={state.copyUrl}
           onDownload={(it) => composer.media.downloadAssets([{ src: it.src, name: it.displayName ?? it.name }])}
           onDelete={(it) => state.requestDelete(it.key)}
+          onExpand={onOpenLibrary ? (it) => { composer.media.selectAssets([it.key]); onOpenLibrary(); } : undefined}
           viewOnly={write.canWrite ? undefined : { rename: write.reason("rename"), delete: write.reason("delete") }}
         />
       )}

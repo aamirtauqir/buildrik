@@ -94,7 +94,7 @@ describe("CMSCollectionSetupModal — the board's single modal", () => {
     create();
     const clash = screen.getByTestId("cms-setup-clash");
     expect(clash).toHaveTextContent("Collection name already exists");
-    expect(clash).toHaveTextContent("A collection named “menu items” already exists.");
+    expect(clash).toHaveTextContent("A collection named “menu items” already exists in");
     expect(collections.createCollection).not.toHaveBeenCalled();
     // 6887:72969: "Use <name> 3" creates under that name at once.
     fireEvent.click(screen.getByTestId("cms-setup-clash-use"));
@@ -116,7 +116,7 @@ describe("CMSCollectionSetupModal — the board's single modal", () => {
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByTestId("cms-setup-name")).toHaveValue("Menu items");
     create();
-    fireEvent.click(screen.getByTestId("cms-setup-cancel"));
+    fireEvent.click(screen.getByTestId("cms-setup-clash-cancel"));
     expect(screen.queryByTestId("cms-setup-clash")).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("cms-setup-cancel"));

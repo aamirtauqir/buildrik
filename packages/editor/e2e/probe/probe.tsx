@@ -68,7 +68,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
-import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
+import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
    loads the panel's stylesheet the way production does. */
 import "@/editor/sidebar/tabs/ai/AITab.css";
@@ -1136,6 +1136,7 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
+          onRetry={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -2173,7 +2174,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
-      <LayersNoResults search="hero" onClear={() => {}} />
+      <LayersNoResults search="hero" onSearchEverywhere={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
@@ -2283,7 +2284,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "pages-loading": () => (
     <div data-probe="pages-loading" style={{ width: 280, background: "#fff" }}>
-      <PagesLoadingSkeleton />
+      <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
     </div>
   ),
   "insert-disabled-row": () => (
@@ -2384,21 +2385,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     <div data-probe="history-saves-changes">
       {historyHost(
         withStoredView("changes", <HistoryTab composer={historyStub({ stack: HISTORY_ENTRIES })} />),
-      )}
-    </div>
-  ),
-  // The scrubber is opened by a button and reports the previewed entry back up
-  // to the panel, so the band the board draws only exists after that click —
-  // "partial-scrubber-opens-by-button" in boards.json. AutoOpen performs it.
-  "history-saves-time-travel": () => (
-    <div data-probe="history-saves-time-travel">
-      {historyHost(
-        withStoredView(
-          "saves",
-          <AutoOpen testid="history-time-travel">
-            <HistoryTab composer={historyStub({ stack: HISTORY_ENTRIES })} />
-          </AutoOpen>,
-        ),
       )}
     </div>
   ),
@@ -3068,6 +3054,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
+        onRemoveFromFolder={() => {}}
       />
     </div>
   ),

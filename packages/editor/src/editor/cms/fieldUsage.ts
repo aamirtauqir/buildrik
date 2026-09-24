@@ -9,7 +9,7 @@
  */
 import type { Composer } from "@/engine";
 import type { CMSCollection } from "@/shared/types/cms";
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 
 export interface FieldUse {
@@ -25,7 +25,7 @@ function usedByLabel(composer: Composer, elementId: string): string {
   const el = composer.elements.getElement(elementId);
   if (!el) return elementId;
   const type = el.getType?.() ?? "element";
-  return getLayerName(el) ?? ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1);
+  return getLayerName(el) ?? elementTypeLabel(type);
 }
 
 export function fieldUsage(composer: Composer | null, collection: CMSCollection): Map<string, FieldUse[]> {

@@ -40,3 +40,17 @@ describe("useSelectionReadout — layer name", () => {
     expect(label({ type: "section" })).toBe("Section");
   });
 });
+
+/* Board 4418:166980: after "Hero created as a component" the bar reads
+   "Component instance · Hero · 680 × 250" — the master's name, not the layer's. */
+describe("useSelectionReadout — component instance", () => {
+  it("an instance reads Component instance · master name", () => {
+    const composer = composerWith({ type: "section", layerName: "Hero section" }) as unknown as Record<string, unknown>;
+    composer.components = {
+      getInstanceByElementId: (id: string) => (id === "e1" ? { componentId: "c1" } : undefined),
+      getComponent: (id: string) => (id === "c1" ? { name: "Hero" } : undefined),
+    };
+    const { result } = renderHook(() => useSelectionReadout(composer as unknown as Composer, { id: "e1", type: "section" }));
+    expect(result.current.label).toBe("Component instance · Hero");
+  });
+});

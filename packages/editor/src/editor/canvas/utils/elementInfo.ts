@@ -265,3 +265,37 @@ export function getElementInfo(element: HTMLElement): ElementInfo {
     hasLink,
   };
 }
+
+/**
+ * Where an element lives, as the boards write it: "Home › Hero › Content" —
+ * the active page, then the element's ancestors under the page root, each by
+ * its layer name or type label. `includeSelf` adds the element itself.
+ */
+export function elementLocation(
+  composer: {
+    elements: {
+      getElement(id: string): LocatedElement | undefined;
+      getActivePage(): { name?: string } | undefined;
+    };
+  },
+  elementId: string,
+  includeSelf = false,
+): string {
+  const names: string[] = [];
+  const self = composer.elements.getElement(elementId);
+  let node = includeSelf ? self ?? null : self?.getParent() ?? null;
+  while (node?.getParent()) {
+    const layer = node.getCustomData?.("layerName");
+    names.unshift(typeof layer === "string" && layer ? layer : getElementNameFromType(node.getType()));
+    node = node.getParent();
+  }
+  const page = composer.elements.getActivePage()?.name;
+  return [page, ...names].filter(Boolean).join(" › ");
+}
+
+interface LocatedElement {
+  getParent(): LocatedElement | null;
+  getType(): string;
+  getCustomData?(key: string): unknown;
+}
+
