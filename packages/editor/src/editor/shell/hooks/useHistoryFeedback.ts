@@ -69,6 +69,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "touch-move-element": "Moved element",
   nudge: "Moved element",
   "move-layer": "Reordered layer",
+  "move-to-page": "Moved to another page",
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
