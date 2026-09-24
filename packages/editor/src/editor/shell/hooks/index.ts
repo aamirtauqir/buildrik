@@ -21,6 +21,5 @@ export {
   type OverlayState,
 } from "./useStudioState";
 
-export { useTemplateManager, type UseTemplateManagerResult } from "./useTemplateManager";
 export { useMediaManager, type UseMediaManagerResult } from "./useMediaManager";
 export { useBlockInsertion, type UseBlockInsertionResult } from "./useBlockInsertion";

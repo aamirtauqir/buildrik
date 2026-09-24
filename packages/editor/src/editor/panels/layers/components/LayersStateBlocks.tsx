@@ -78,9 +78,27 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
   works. Distinct from LayersEmptyState on purpose: an empty page is a fact
   about the document, a filtered-out tree is a fact about the search box.
 */
-export const LayersNoResults: React.FC<{ search: string; onClear: () => void }> = ({ search, onClear }) => (
+/* Board 4418:83498 (v3, audit G2-059): "No layers match your search." and a
+   hand-off to ⌘K — "Search everywhere for “<query>”" — above Clear search. */
+export const LayersNoResults: React.FC<{
+  search: string;
+  onClear: () => void;
+  onSearchEverywhere?: (query: string) => void;
+}> = ({ search, onClear, onSearchEverywhere }) => (
   <div className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pb-8 tw:pt-9 tw:text-[13px]" data-testid="layers-no-results" role="status">
-    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="layers-no-results-text">Nothing matches &lsquo;{search}&rsquo;.</p>
+    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="layers-no-results-text">No layers match your search.</p>
+    {onSearchEverywhere && (
+      <Button
+        type="button"
+        color="light"
+        size="xs"
+        variant="link" className="tw:min-h-6 tw:self-start"
+        data-testid="layers-search-everywhere"
+        onClick={() => onSearchEverywhere(search)}
+      >
+        Search everywhere for &ldquo;{search}&rdquo;
+      </Button>
+    )}
     <Button
       type="button"
       color="light"

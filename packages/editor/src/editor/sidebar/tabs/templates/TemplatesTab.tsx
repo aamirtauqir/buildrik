@@ -11,8 +11,8 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast, Button, TextField, openUpgrade } from "@/editor/chrome-ui";
-import { Search, X } from "lucide-react";
+import { useToast, Button, openUpgrade } from "@/editor/chrome-ui";
+import { X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { type TemplateItem, SITE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
@@ -56,7 +56,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   newPageName,
 }) => {
   const { addToast } = useToast();
-  const [showSearch, setShowSearch] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
 
@@ -107,12 +106,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // ── Derived ──
   /* G2-103: saved templates are first-class — listed, previewed, applied —
      beside the built-ins. Read once per visit; a save happens outside the view. */
-  const catalogue = React.useMemo<TemplateItem[]>(() => [...PAGE_TEMPLATES, ...getMyTemplates()], []);
+  /* "⟳ Reload catalogue" re-reads the saved templates (the built-ins are a
+     static module). */
+  const [reloadKey, setReloadKey] = React.useState(0);
+  const catalogue = React.useMemo<TemplateItem[]>(
+    () => [...PAGE_TEMPLATES, ...getMyTemplates()],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reloadKey is the trigger
+    [reloadKey],
+  );
+  const siteName = composer?.getProjectMetadata?.()?.name;
   const findTemplate = (id: string | null) => (id ? catalogue.find((t) => t.id === id) ?? null : null);
-  const visible = sel.searchQ.trim()
-    ? catalogue.filter((t) => t.name.toLowerCase().includes(sel.searchQ.trim().toLowerCase()))
-    : catalogue;
-
   // S9: which pages each template was applied to (page.meta.appliedTemplates).
   const usageMap = useTemplateUsageMap(composer);
   const activePageInfo = composer?.elements?.getActivePage?.();
@@ -402,8 +405,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       <aside className="tpl-ws-side" data-testid="tpl-ws-side" aria-label="Page templates">
         <Button
           color="light"
-          size="xs"
-          variant="link"
           className="tpl-ws-back"
           data-testid="tpl-ws-back"
           onClick={previewTemplate ? () => sel.setPreviewId(null) : onClose}
@@ -411,6 +412,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           {previewTemplate ? "‹ Back to templates" : "‹ Back to canvas"}
         </Button>
         <div className="tpl-ws-title">Templates</div>
+        {siteName && <div className="tpl-ws-site">{siteName}</div>}
         <div className="tpl-ws-label">PAGE TEMPLATES</div>
         <Button
           className="tpl-ws-row"
@@ -418,7 +420,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           aria-current={previewTemplate ? undefined : "true"}
           onClick={() => sel.setPreviewId(null)}
         >
-          All page templates · {catalogue.length}
+          <span className="tpl-ws-row-name">All page templates</span>
+          <span className="tpl-ws-row-count">{catalogue.length}</span>
         </Button>
         {catalogue.map((t) => (
           <Button
@@ -428,11 +431,17 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             aria-current={previewTemplate?.id === t.id ? "true" : undefined}
             onClick={() => sel.setPreviewId(t.id)}
           >
-            {t.name}
+            <span className="tpl-ws-row-name">{t.name}</span>
           </Button>
         ))}
+        <p className="tpl-ws-help">
+          Preview the layout first. Then choose whether to create a new page or replace {activePageInfo?.name ?? "this page"}.
+        </p>
+        <Button variant="link" className="tpl-ws-reload" data-testid="tpl-ws-reload" onClick={() => setReloadKey((k) => k + 1)}>
+          ⟳&nbsp;&nbsp;Reload catalogue
+        </Button>
       </aside>
-      <PanelFrame className="tpl-shell tpl-ws-main">
+      <div className="tpl-shell tpl-ws-main">
       {previewTemplate ? (
         /* Board 4418:53202 — the preview lives in the view, not in a modal. */
         <TemplatePreview
@@ -449,66 +458,28 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
       ) : (
       <>
-        <PanelFrame.Header
-          title="Templates"
-          subtitle="Preview a template, then create a page or replace this one."
-          onClose={onClose}
-        >
-          <Button
-            className="tpl-header-btn"
-            onClick={() => setShowSearch(!showSearch)}
-            aria-label={showSearch ? "Close search" : "Search templates"}
-          >
-            <Search size={16} />
-          </Button>
-        </PanelFrame.Header>
-        {showSearch && (
-          <div className="tpl-search-wrap">
-            <div className="tpl-search-input-box">
-              <Search size={16} className="tpl-search-icon" />
-              <TextField
-                className="tpl-search-input"
-                placeholder="Search templates..."
-                value={sel.searchQ}
-                onChange={(e) => sel.setSearchQ(e.target.value)}
-                aria-label="Search templates"
-                autoFocus
+        {/* Board 4418:54134 main: heading, one line of what happens, then
+            the cards four across. */}
+        <div className="tpl-ws-catalogue">
+          <h1 className="tpl-ws-heading">Page templates</h1>
+          <p className="tpl-ws-desc">
+            Preview a template, then create a page or replace {activePageInfo?.name ?? "this page"}. Templates saved
+            from a page keep the styles captured with them.
+          </p>
+          <div className="tpl-grid" role="listbox" aria-label="Available templates">
+            {catalogue.map((tpl) => (
+              <TemplateCard
+                key={tpl.id}
+                template={tpl}
+                isApplied={appliedId === tpl.id}
+                onClick={(id) => sel.setPreviewId(id)}
               />
-              {sel.searchQ.length > 0 && (
-                <Button className="tpl-search-clear" onClick={() => sel.setSearchQ("")} aria-label="Clear search">
-                  <X size={14} />
-                </Button>
-              )}
-            </div>
+            ))}
           </div>
-        )}
-        {/* G2-095: board 4418:54134 is one flat list — no pills, tags or pages. */}
-        <div className="tpl-content">
-          {visible.length === 0 ? (
-            <div className="tpl-empty">
-              <Search size={32} className="tpl-empty-icon" />
-              <p className="tpl-empty-text">No templates found for &ldquo;{sel.searchQ.trim()}&rdquo;</p>
-              <Button className="tpl-empty-btn" onClick={() => sel.setSearchQ("")}>
-                Clear search
-              </Button>
-            </div>
-          ) : (
-            <div className="tpl-grid" role="listbox" aria-label="Available templates">
-              {visible.map((tpl) => (
-                <TemplateCard
-                  key={tpl.id}
-                  template={tpl}
-                  isApplied={appliedId === tpl.id}
-                  onClick={(id) => sel.setPreviewId(id)}
-                  highlightQuery={sel.searchQ.trim() || undefined}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </>
       )}
-      </PanelFrame>
+      </div>
       {/* Error banner */}
       {applyError && (
         <div className="tpl-error-banner">

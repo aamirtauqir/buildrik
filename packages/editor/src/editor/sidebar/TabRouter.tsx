@@ -175,6 +175,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onOpenLibrary={onOpenLibrary}
           onOpenImageEditor={onOpenImageEditor}
           onOpenIconPicker={onOpenIconPicker}
+          initialStockQuery={activeSubTab?.startsWith("stock") ? activeSubTab.slice(6) : undefined}
           {...commonTabProps}
         />
       );

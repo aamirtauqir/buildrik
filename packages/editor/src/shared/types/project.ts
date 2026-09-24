@@ -223,10 +223,10 @@ export interface PageSettings {
   head?: string;
   /** SEO metadata */
   seo?: PageSEO;
-  /** Page visibility / publication status */
-  visibility?: "live" | "hidden" | "password";
-  /** Access password (used when visibility = "password") */
-  password?: string;
+  /** Page visibility. Live · Hidden (C4 #26 removed Password pages; a stored
+   *  "password" from before decision #21 is read as Hidden by the Pages panel
+   *  and stays unpublished — `isPageLive` ships only unset / "live"). */
+  visibility?: "live" | "hidden";
 }
 
 /**

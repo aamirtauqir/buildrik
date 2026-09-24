@@ -54,7 +54,7 @@
     },
     {
       "surface": "Layers · empty page",
-      "copy": "This page is empty. Drop something on the canvas to see it here.",
+      "copy": "No layers yet. Add an element to start building.",
       "status": "ships",
       "file": null,
       "shipsInstead": "LayersEmptyState.tsx renders no matching string"

@@ -20,5 +20,4 @@ export { StudioModals } from "./StudioModals";
 export type { StudioModalsProps } from "./StudioModals";
 
 // Hooks (available to external modules that need studio-level state)
-export { useTemplateManager, type UseTemplateManagerResult } from "./hooks/useTemplateManager";
 export { useMediaManager, type UseMediaManagerResult } from "./hooks/useMediaManager";

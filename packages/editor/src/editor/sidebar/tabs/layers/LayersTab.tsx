@@ -57,10 +57,6 @@ export interface LayersTabProps {
   onElementSelect?: (elementId: string) => void;
   canvasHoveredId?: string | null;
   onAddBlockClick?: () => void;
-  /** Retained for call-site compat. Unused in the new-design Layers tab. */
-  isExpanded?: boolean;
-  /** Retained for call-site compat. Unused in the new-design Layers tab. */
-  onExpandToggle?: () => void;
   /** Header help action (board 208:191 — the 16:6 Panel header's first slot). */
   onHelpClick?: () => void;
   /** Header close action (16:6 second slot — "closing is the last thing you do"). */
@@ -85,8 +81,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   onAddBlockClick,
   onHelpClick,
   onClose,
-  isExpanded,
-  onExpandToggle,
 }) => {
   const { selectedElement: selectedEl, selectedId } = useComposerSelection({ composer });
   const projectLoading = useProjectLoading(composer);
@@ -150,8 +144,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           which PanelHeader drops. The count lives in the footer. */}
       <PanelFrame.Header
         title="Layers"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={

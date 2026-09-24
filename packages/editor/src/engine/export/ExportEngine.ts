@@ -112,9 +112,11 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 /**
  * Whether a page is deployed at all.
  *
- * Page settings → Advanced offers Live / Hidden / Password. Both non-live
- * states are left out of a deploy — static hosting cannot ask for a password,
- * and publishing a page the owner believes is protected is the worse mistake.
+ * Page settings → Advanced offers Live / Hidden. Anything but unset or "live"
+ * is left out of a deploy — including a "password" value stored before
+ * Password pages were removed (C4 #26): static hosting cannot ask for a
+ * password, and publishing a page the owner believes is protected is the
+ * worse mistake.
  *
  * Exported because the Publish panel counts pages too, and a count that does
  * not match what ships is the same lie one layer up: it read "2 pages" for a

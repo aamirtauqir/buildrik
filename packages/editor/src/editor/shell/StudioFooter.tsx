@@ -41,7 +41,7 @@ import type { DeviceType } from "../../shared/types";
 import { Button, POPOVER_BASE_CLASS } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { useProjectLoading } from "./hooks/useProjectLoading";
-import { loadMapFromStorage } from "../panels/layers/hooks/layersPersistence";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { EVENTS } from "../../shared/constants/events";
 import { ZOOM_PRESETS } from "../../shared/constants/canvas";
 
@@ -145,12 +145,11 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
 
   const customName = React.useMemo(() => {
     if (!selectedElement || !pageId) return null;
-    /* A rename that just happened wins over the store: the panel persists in
-       an effect, so reading storage in the same tick would return the name
-       the user just replaced. */
+    /* A rename that just happened wins; otherwise the name is the element's
+       own data (saved with the project — G2-061). */
     if (renamed && renamed.id === selectedElement.id) return renamed.name;
-    return loadMapFromStorage(pageId).get(selectedElement.id) ?? null;
-  }, [selectedElement, pageId, renamed]);
+    return getLayerName(composer?.elements.getElement(selectedElement.id)) ?? null;
+  }, [selectedElement, pageId, renamed, composer]);
 
   /* Board 66:4 (Multi-select): "3 elements selected". The prop carries ONE
      element — the shell's primary — so a three-element selection printed the

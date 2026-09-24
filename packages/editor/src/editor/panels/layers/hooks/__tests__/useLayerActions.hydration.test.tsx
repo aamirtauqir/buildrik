@@ -21,7 +21,6 @@ import { getStorageKey } from "../layersPersistence";
 
 const PAGE = "page-1";
 const HIDDEN_KEY = getStorageKey(PAGE, "hidden");
-const LOCKED_KEY = getStorageKey(PAGE, "locked");
 
 beforeEach(() => localStorage.clear());
 
@@ -36,12 +35,6 @@ describe("useLayerActions — stored layer state survives a mount", () => {
     act(() => result.current.hydrateFromStorage(PAGE));
     expect([...result.current.hiddenIds]).toEqual(["el-a", "el-b"]);
     expect(JSON.parse(localStorage.getItem(HIDDEN_KEY) || "[]")).toEqual(["el-a", "el-b"]);
-  });
-
-  it("does not overwrite stored locked ids either", () => {
-    localStorage.setItem(LOCKED_KEY, JSON.stringify(["el-c"]));
-    renderHook(() => useLayerActions(null, PAGE));
-    expect(JSON.parse(localStorage.getItem(LOCKED_KEY) || "[]")).toEqual(["el-c"]);
   });
 
   it("still persists a change made after hydration", () => {

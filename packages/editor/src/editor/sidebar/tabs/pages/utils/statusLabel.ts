@@ -13,9 +13,8 @@ const LABELS: Record<PageStatus, string> = {
   live: "Live",
   draft: "Draft",
   scheduled: "Scheduled",
-  hidden: "Hidden",
-  password: "Password",
-  external: "External",
+  /* Board 4418:93381 names the state for what it does. */
+  hidden: "Hidden from publish",
   error: "Error",
 };
 

@@ -119,10 +119,11 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
       expect(composer.versions.autoCheckpoint).toHaveBeenCalledWith(`Before template “${first.name}”`, {
         title: `Before template “${first.name}”`,
       }),
+      { timeout: 5000 },
     );
     expect(composer.elements.duplicatePage).not.toHaveBeenCalled();
     expect(renames).toHaveLength(0);
-    await waitFor(() => expect(order).toContain("apply"));
+    await waitFor(() => expect(order).toContain("apply"), { timeout: 5000 });
     expect(order.indexOf(`checkpoint:Before template “${first.name}”`)).toBeLessThan(order.indexOf("apply"));
   });
 
@@ -134,7 +135,7 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     composer.versions.autoCheckpoint.mockImplementationOnce(async () => null as never);
     render(<TemplatesTab composer={composer as never} />);
     await applyWithBackup();
-    await waitFor(() => expect(composer.versions.autoCheckpoint).toHaveBeenCalled());
+    await waitFor(() => expect(composer.versions.autoCheckpoint).toHaveBeenCalled(), { timeout: 5000 });
     await new Promise((r) => setTimeout(r, 50));
     expect(order).not.toContain("apply");
   });

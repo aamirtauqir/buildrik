@@ -28,8 +28,8 @@ const home: PageItem = {
 };
 
 describe("PageRow", () => {
-  // Board 140:2: plain rows carry NO slug, NO status chip, NO icon —
-  // only Home (roof glyph) and external (link glyph) draw one.
+  // Board 140:2: plain rows carry NO slug, NO icon — only Home draws one
+  // (roof glyph). Status chips are v3 (4418:93381), below.
   it("renders the name; no slug on the tree row", () => {
     const { container } = render(<PageRow page={home} {...baseProps} />);
     expect(container.querySelector(".bd-pg-row-name")).toHaveTextContent("Home");
@@ -62,14 +62,19 @@ describe("PageRow", () => {
     expect(container.querySelector(".bd-pg-row.nested")).not.toBeNull();
   });
 
-  it("no home/status chips on the tree row; status still announced", () => {
-    const { container } = render(
-      <PageRow page={{ ...home, status: "draft", isHome: false }} {...baseProps} />,
-    );
-    expect(container.querySelector(".bd-pg-home-chip")).toBeNull();
+  /* C5 G2-071 — board 4418:93381 (v3) draws the status on the row: "Draft"
+     and "Hidden from publish" chips; a live page draws none. This test used
+     to assert no chip at all (V1 board 140:2). */
+  it("draws the board's status chip for a non-live page, none for a live one", () => {
+    const { container, rerender } = render(<PageRow page={{ ...home, isHome: false }} {...baseProps} />);
     expect(container.querySelector(".bd-pg-chip")).toBeNull();
+    expect(container.querySelector(".bd-pg-home-chip")).toBeNull();
+    rerender(<PageRow page={{ ...home, status: "draft", isHome: false }} {...baseProps} />);
+    expect(screen.getByTestId("page-status-chip-p1").textContent).toBe("Draft");
+    rerender(<PageRow page={{ ...home, status: "hidden", isHome: false }} {...baseProps} />);
+    expect(screen.getByTestId("page-status-chip-p1").textContent).toBe("Hidden from publish");
     const row = container.querySelector(".bd-pg-row");
-    expect(row?.getAttribute("aria-label") ?? "").toContain("Draft");
+    expect(row?.getAttribute("aria-label") ?? "").toContain("Hidden from publish");
   });
 
   it("long name shows title attribute for tooltip", () => {
@@ -124,6 +129,8 @@ describe("PageRow", () => {
     expect(screen.queryByTestId("page-dirty-dot")).toBeNull();
     rerender(<PageRow {...baseProps} page={home} isDirty />);
     expect(screen.getByTestId("page-dirty-dot")).toBeInTheDocument();
+    /* 4418:93381: "● Unpublished" — the dot carries its word. */
+    expect(screen.getByTestId("page-dirty-label-p1").textContent).toBe("Unpublished");
   });
 
   it("announces unsaved changes in the row label", () => {
