@@ -18,7 +18,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { PanelHeaderSize, useToast } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -37,6 +37,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { RightColumnPanel } from "./RightColumnPanel";
 import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
@@ -595,7 +596,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         {readOnlyView ? null : (
         <LayoutShell.Inspector>
           {rightColumnTab ? (
-            <PanelHeaderSize.Provider value="column">
+            <RightColumnPanel>
               <TabRouter
                 activeTab={activeTabId}
                 activeSubTab={leftPanelSubTab}
@@ -611,7 +612,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 onRequestPublish={onRequestPublish}
                 onResendReview={onResendReview}
               />
-            </PanelHeaderSize.Provider>
+            </RightColumnPanel>
           ) : aiInInspector ? (
             <AITab
               composer={composer}

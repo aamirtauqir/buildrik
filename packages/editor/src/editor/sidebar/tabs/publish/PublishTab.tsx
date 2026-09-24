@@ -85,7 +85,7 @@ export interface PublishTabProps {
  * "Publish · pre-checks", founder decision 2026-08-05).
  *
  * Settings rows open Settings ON their pane (UI_SETTINGS_OPEN): SEO › SEO,
- * Domain › Domains, Favicon › General. Page rows switch to the Pages panel.
+ * Domain › Domains. Page rows switch to the Pages panel.
  */
 type FixTarget = { tab: string } | { screen: SettingsNavId };
 const FIX_TARGETS: Record<string, FixTarget> = {
@@ -93,7 +93,6 @@ const FIX_TARGETS: Record<string, FixTarget> = {
   "SEO configured": { screen: "seo" },
   "Domain connected": { screen: "domains" },
   "Empty pages": { tab: "pages" },
-  Favicon: { screen: "general" },
 };
 
 /** The board's row rhythm: label left, value right, one line. */
@@ -343,7 +342,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     }
     setCheckState("loading");
     try {
-      setChecks(await fetchPrePublishChecks(siteId));
+      const result = await fetchPrePublishChecks(siteId);
+      /* Spec B4 draws no Favicon row. It is advisory server-side (never a
+         `fail`), so dropping it changes no gate. */
+      setChecks({ ...result, checks: result.checks.filter((c) => c.label !== "Favicon") });
       setCheckState("ready");
     } catch {
       // DF5: never fall back to a fake-passing checklist — show Retry.
@@ -489,10 +491,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* `waiting` and `unchecked` print their own reason in the gate banner. */
   const gateSpeaks = nextMove?.gate === "waiting" || nextMove?.gate === "unchecked";
   const gateShut = nextMove === null || gateSpeaks || nextMove.blockedReason !== null;
-  const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut;
+  /* Never publishable in an unknown state (re-walk 2026-09-24: the CTA stayed
+     clickable through a 60 s "Checking readiness…"). A disabled primary always
+     says why. */
+  const checksPending = !noPublishPath && checkState === "loading";
+  const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut || checksPending;
   const ctaReason: string | null = isPublishing
     ? `${isPublished ? "Update" : "Publishing"} in progress — please wait.`
-    : nextMove === null
+    : checksPending
+      ? "Checking readiness…"
+      : snapshot.error
+        ? "Couldn't read the deploy history — try again above."
+        : nextMove === null
       ? "Nothing has changed since the last deploy."
       : !gateSpeaks && nextMove.blockedReason
         ? nextMove.blockedReason
