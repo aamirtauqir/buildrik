@@ -132,7 +132,7 @@ describe("CommandPalette — doors", () => {
     ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
-    ["Generate a block with AI…", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
+    ["Generate a block with AI…", EVENTS.UI_INSERT_OPEN_GENERATE, {}],
     ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, { replace: true }],
     ["Open History", EVENTS.UI_PANEL_OPEN, { panel: "history" }],
     ["Search stock photos", EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock" }],

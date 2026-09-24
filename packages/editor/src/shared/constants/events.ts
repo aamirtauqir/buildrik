@@ -332,6 +332,8 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** Add opens on its "Generate a block" screen (G2-117). */
+  UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
   /** "Edit master ›" on an instance: the Components panel opens that
    *  master's screen. Payload `{ componentId }`. */
   UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",

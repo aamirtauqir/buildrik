@@ -23,7 +23,8 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { takePendingInsertGroup } from "./insertGroupRequest";
+import { takePendingGenerate, takePendingInsertGroup } from "./insertGroupRequest";
+import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
@@ -89,6 +90,19 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       ?.scrollIntoView({ block: "start" });
     setScrollTarget(null);
   }, [scrollTarget]);
+  // G2-117: the "Generate a block" screen, opened by the row or a door.
+  const [generating, setGenerating] = React.useState(() => (composer ? takePendingGenerate(composer) : false));
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => {
+      takePendingGenerate(composer);
+      setGenerating(true);
+    };
+    composer.on(EVENTS.UI_INSERT_OPEN_GENERATE, open);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_OPEN_GENERATE, open);
+    };
+  }, [composer]);
   const { addToast } = useToast();
 
 
@@ -175,6 +189,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  if (generating && composer) {
+    return (
+      <PanelFrame className="bld-container">
+        <GenerateBlockScreen composer={composer} onBack={() => setGenerating(false)} />
+      </PanelFrame>
+    );
+  }
+
   return (
     <PanelFrame className="bld-container">
       {/* Board 137:2 header: title alone (the "N blocks · N categories"
@@ -241,8 +263,24 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 owning tabs. Blocks insert through the SAME onBlockClick path
                 elements use — BlockDefinition extends BlockData. */}
             {groups.map((g) => (
+              <React.Fragment key={g.id}>
+              {/* Board 4418:103353: "✦  Generate a block with AI…" sits
+                  right above BLOCKS (G2-117). */}
+              {g.id === "blocks" && composer && (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  data-testid="insert-generate-block"
+                  className="tw:flex tw:items-center tw:h-8 tw:px-4 tw:rounded-[4px] tw:cursor-pointer tw:select-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+                  onClick={() => setGenerating(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setGenerating(true); }
+                  }}
+                >
+                  ✦&nbsp;&nbsp;Generate a block with AI…
+                </div>
+              )}
               <GroupSection
-                key={g.id}
                 group={g}
                 isOpen={openGroups.has(g.id)}
                 onToggle={() => toggleGroup(g)}
@@ -267,6 +305,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onMineInsert={(c) => void insertMine(c)}
                 onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
+              </React.Fragment>
             ))}
           </div>
         )}
