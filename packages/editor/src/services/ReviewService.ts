@@ -117,6 +117,12 @@ export interface SubmitOutcome {
   reviewUrl: string | null;
 }
 
+/** A round's client review link from its token. Built here, where
+ *  `DASHBOARD_URL` lives, so no UI assembles an origin. */
+export function reviewLinkUrl(token: string): string {
+  return `${DASHBOARD_URL}/review/${token}`;
+}
+
 export async function submitForReview(
   note?: string,
   changeSummary?: string,
@@ -134,7 +140,7 @@ export async function submitForReview(
   })) as { inviteEmailSent?: boolean | null; token?: string | null };
   return {
     inviteEmailSent: r?.inviteEmailSent ?? null,
-    reviewUrl: r?.token ? `${DASHBOARD_URL}/review/${r.token}` : null,
+    reviewUrl: r?.token ? reviewLinkUrl(r.token) : null,
   };
 }
 
@@ -175,6 +181,9 @@ export interface CurrentRound {
   roundNumber: number;
   totalRounds: number;
   openCommentCount: number;
+  /** The client link's token while that link still opens (null: no client
+   *  invited, or revoked, or expired) — `reviewLinkUrl` builds the URL. */
+  token: string | null;
 }
 
 /**

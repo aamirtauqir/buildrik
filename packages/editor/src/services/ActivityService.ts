@@ -10,13 +10,11 @@
  * NotificationService). Filter narrowing is server-side — passing the chosen
  * filter does not filter client-side.
  *
- * The `activity.recent` tRPC procedure is the planned endpoint (code-gap
- * plan B6) and is not registered in the dashboard `AppRouter` yet
- * (needs-dashboard). The call is typed here by the shape the view needs,
- * and a failure is thrown as an `ActivityReadError` whose `reason` tells the
- * view which state to draw: `unavailable` (the procedure does not exist —
- * NOT_FOUND), `unauthorized` (signed out / no role), `failed` (anything
- * else, retryable). Never a fake-empty list.
+ * `activity.recent` (dashboard `server/trpc/routers/activity.ts`) is typed
+ * through `AppRouter`. A failure is thrown as an `ActivityReadError` whose
+ * `reason` tells the view which state to draw: `unavailable` (NOT_FOUND),
+ * `unauthorized` (signed out / no role), `failed` (anything else,
+ * retryable). Never a fake-empty list.
  *
  * @license BSD-3-Clause
  */
@@ -46,12 +44,6 @@ export class ActivityReadError extends Error {
   }
 }
 
-/** The planned procedure's shape — absent from `AppRouter` until the
- *  dashboard half lands, so the typed client cannot name it. */
-interface ActivityRecentClient {
-  activity: { recent: { query(input: { siteId: string; filter: ActivityFilter }): Promise<ActivityEntry[]> } };
-}
-
 function failureOf(err: unknown): ActivityReadFailure {
   const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
   if (code === "NOT_FOUND") return "unavailable";
@@ -65,10 +57,9 @@ export async function fetchRecentActivity(
   filter: ActivityFilter,
 ): Promise<ActivityEntry[]> {
   if (!siteId) return [];
-  const client = getBuildrikClient(DASHBOARD_URL) as unknown as ActivityRecentClient;
   let rows: ActivityEntry[];
   try {
-    rows = await client.activity.recent.query({ siteId, filter });
+    rows = await getBuildrikClient(DASHBOARD_URL).activity.recent.query({ siteId, filter });
   } catch (err) {
     throw new ActivityReadError(failureOf(err));
   }
