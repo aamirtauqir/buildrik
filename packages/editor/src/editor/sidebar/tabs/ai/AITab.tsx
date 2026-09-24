@@ -21,6 +21,25 @@ const STATE_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-mut
    muted body. */
 const ERROR_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]";
 const ERROR_BODY = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Board 4418:106671: same size, but --color/error (red-600), not error-text.
+   A whole constant rather than a second colour utility — two on one plain
+   element resolve by stylesheet order. */
+const QUOTA_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]";
+/* Board 4418:106796's not-configured title: 13/20 ink regular. */
+const NOTICE_TITLE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+
+/** The quota gate's sentence carries its reset as ISO ("Resets at
+ *  2026-08-16T00:00:00.000Z."); board 4418:106671 reads it as a time. */
+export function readableQuotaMessage(message: string | null): string {
+  if (!message) return "";
+  return message.replace(/Resets at (\d{4}-\d{2}-\d{2}T[\d:.]+Z)/, (_m, iso: string) => {
+    const at = new Date(iso);
+    if (Number.isNaN(at.getTime())) return _m;
+    if (at.getUTCHours() === 0 && at.getUTCMinutes() === 0) return "Resets at midnight UTC";
+    return `Resets at ${at.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`;
+  });
+}
+
 const STATE_LINK =
   "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
 import { DEFAULT_MODEL, type AIModel } from "./types";
@@ -174,9 +193,12 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           to sit at the bottom, chat-style, under states that had replaced the
           thread entirely. */}
       <ScopeChip scope={scope} status={status} />
-      <div ref={promptRef}>
-        <PromptComposer key={composerKey} onSubmit={submit} onStop={agent.stop} streaming={live} />
-      </div>
+      {/* Board 4418:106796 draws no composer: nothing here will run. */}
+      {failedKind === "not-configured" ? null : (
+        <div ref={promptRef}>
+          <PromptComposer key={composerKey} onSubmit={submit} streaming={live} />
+        </div>
+      )}
       {guard && scope.kind === "multi" ? (
         <p className={`${STATE_BODY} tw:px-4 tw:py-2`} role="status" data-testid="ai-multi-guard">
           {MULTI_GUARD}
@@ -190,9 +212,15 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
       {failedKind === "not-configured" ? (
         /* Board 4418:106796. */
         <div className={STATE_BLOCK} data-testid="ai-state-not-configured">
-          <p className={STATE_TITLE}>AI isn&rsquo;t available on this workspace.</p>
-          <p className={STATE_BODY}>
-            No AI provider is configured for this deployment, so nothing here will run.
+          {lastPrompt.current ? (
+            <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="ai-state-prompt">
+              Your prompt: {lastPrompt.current.text}
+            </p>
+          ) : null}
+          <p className={NOTICE_TITLE}>AI isn&rsquo;t available on this workspace.</p>
+          <p className={ERROR_BODY}>
+            No AI provider is configured for this deployment. Ask your workspace owner to arrange setup with the
+            deployment administrator. Nothing has changed on your site.
           </p>
           <Button
             color="light"
@@ -203,19 +231,14 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             View workspace owner ↗
           </Button>
           {continueByHand}
-          {lastPrompt.current ? (
-            <p className={STATE_BODY} data-testid="ai-state-prompt">Your prompt: {lastPrompt.current.text}</p>
-          ) : null}
         </div>
       ) : failedKind === "quota" ? (
         /* Board 4418:106671. */
         <div className={`${STATE_BLOCK} tw:bg-[var(--bk-warning-tint)]`} data-testid="ai-state-quota">
-          <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>AI is out of credit.</p>
-          <p className={STATE_BODY}>
-            {/* The server's own sentence carries the real limit and reset time
-                — the board's "(10…" is sample data. */}
-            Nothing was changed. {agent.error}
-          </p>
+          <p className={QUOTA_TITLE}>AI is out of credit.</p>
+          {/* The server's own sentence carries the real limit and reset — the
+              board's "(10) · midnight UTC" is sample data; the shape is read. */}
+          <p className={ERROR_BODY}>Nothing was changed. {readableQuotaMessage(agent.error)}</p>
           <Button
             color="light"
             size="xs"
