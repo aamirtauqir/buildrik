@@ -192,6 +192,8 @@ describe("Clone 3397:18325 · Choose an image — the picker", () => {
     expect(screen.getByPlaceholderText("Search videos…")).toBeInTheDocument();
     expect(screen.getByTestId("picker-hint")).toHaveTextContent("MP4, WebM, OGV or MOV · up to 100 MB for this video field.");
     expect(use()).toHaveTextContent("Use selected video");
+    // The title names the kind — it said "Choose an image" over videos.
+    expect(screen.getByTestId("picker-title")).toHaveTextContent("Choose a video");
   });
 
   it("Cancel closes without choosing", () => {

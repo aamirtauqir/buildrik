@@ -54,7 +54,6 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
       isOpen: ctx.isOpen,
       onToggle: ctx.onToggle,
       tier: ctx.tier,
-      onOpenMediaLibrary: ctx.onOpenMediaLibrary,
       onOpenIconPicker: ctx.onOpenIconPicker,
     }),
     // ElementPropertiesSection.getPropertiesForType already returns [] for

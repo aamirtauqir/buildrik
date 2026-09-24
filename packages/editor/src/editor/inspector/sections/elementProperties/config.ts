@@ -63,10 +63,9 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
     { id: "disabled", label: "Disabled", type: "checkbox" },
   ],
 
-  /* G2-145: no Image URL row — MediaSourceRow ("Choose image") owns an
-     image's source, and the library's From URL covers a pasted link. Video
-     keeps its URL row until its source row can assign a video (today
-     "Manage video" only opens Assets). */
+  /* G2-145: no Image URL / Video URL rows — MediaSourceRow ("Choose image",
+     "Manage video") owns a media element's source, and the library's From
+     URL tab covers a pasted link. */
   image: [
     { id: "alt", label: "Alt Text", type: "text", placeholder: "Image description" },
     { id: "title", label: "Title", type: "text", placeholder: "Image title" },
@@ -122,7 +121,6 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
   label: [{ id: "content", label: "Label Text", type: "textarea", placeholder: "Field label" }],
 
   video: [
-    { id: "src", label: "Video URL", type: "text", placeholder: "https://..." },
     { id: "poster", label: "Poster Image", type: "text", placeholder: "https://..." },
     { id: "autoplay", label: "Autoplay", type: "checkbox" },
     { id: "loop", label: "Loop", type: "checkbox" },

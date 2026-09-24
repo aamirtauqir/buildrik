@@ -35,14 +35,29 @@ const CHEF = { id: "chef", name: "chef-intro", mimeType: "video/mp4", src: "blob
 const LOGO = { id: "logo", name: "logo-mark", mimeType: "image/svg+xml", src: "blob:logo" };
 
 describe("MediaSourceRow — Clone 3724:43815 / 44339 / 3721:45178", () => {
-  it("a video reads 'Video source · chef-intro.mp4 · Manage video' and Manage opens the library with the file selected", () => {
-    const { composer, selectAssets, emit } = makeComposer({ src: "blob:chef", assets: [CHEF] });
-    render(<MediaSourceRow composer={composer} selectedElement={{ id: "v1", type: "video" }} />);
+  /* Owner decision (G2-145, 2026-09-24): "Manage video" picks a video like
+     "Choose image" picks an image, so the Video URL row can go. The pick
+     writes src AND the <source> child, as the URL row did. */
+  it("a video reads 'Video source · chef-intro.mp4 · Manage video'; Manage picks a video and writes src + <source>", () => {
+    const setAttribute = vi.fn();
+    const sourceSet = vi.fn();
+    const onOpenMediaLibrary = vi.fn();
+    const { composer } = makeComposer({ src: "blob:chef", assets: [CHEF] });
+    const el = (composer as unknown as { elements: { getElement: () => Record<string, unknown> } }).elements.getElement();
+    Object.assign(el, {
+      setAttribute,
+      getChildren: () => [{ getTagName: () => "SOURCE", setAttribute: sourceSet }],
+    });
+    Object.assign(composer as object, { beginTransaction: vi.fn(), endTransaction: vi.fn() });
+    render(<MediaSourceRow composer={composer} selectedElement={{ id: "v1", type: "video" }} onOpenMediaLibrary={onOpenMediaLibrary} />);
     expect(screen.getByTestId("inspector-source-label")).toHaveTextContent("Video source");
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("chef-intro.mp4");
     fireEvent.click(screen.getByRole("button", { name: "Manage video" }));
-    expect(selectAssets).toHaveBeenCalledWith(["chef"]);
-    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "assets", fullPage: true });
+    expect(onOpenMediaLibrary).toHaveBeenCalledWith(["video"], expect.any(Function));
+    const pick = onOpenMediaLibrary.mock.calls[0][1] as (a: { src: string }) => void;
+    pick({ src: "blob:new" });
+    expect(setAttribute).toHaveBeenCalledWith("src", "blob:new");
+    expect(sourceSet).toHaveBeenCalledWith("src", "blob:new");
   });
 
   it("an SVG reads 'SVG image source · logo-mark.svg · Manage SVG'", () => {
