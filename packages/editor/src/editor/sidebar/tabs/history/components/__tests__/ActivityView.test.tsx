@@ -83,66 +83,14 @@ describe("ActivityView — non-happy states", () => {
   });
 });
 
-describe("ActivityView — clear-history confirm FSM", () => {
-  it("hides the Clear control entirely when no handler is supplied", () => {
-    setHistory([entry()], false);
+describe("ActivityView — board 4418:73791 draws no header band", () => {
+  it("has no Undo History / Clear / Time-Travel controls (they live in the History ⋯)", () => {
     renderView();
-    expect(screen.queryByRole("button", { name: /clear/i })).toBeNull();
-  });
-
-  it("disables Clear when there is nothing to clear", () => {
-    setHistory([entry()], false);
-    renderView({ onClearHistory: vi.fn(), canClear: false } as never);
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeDisabled();
-  });
-
-  it("Clear → confirm reveals Clear-all + Cancel; Clear-all fires the handler", () => {
-    const onClearHistory = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onClearHistory, canClear: true } as never);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear undo history" }));
-    expect(screen.getByRole("button", { name: "Confirm clear history" })).toBeInTheDocument();
-    expect(onClearHistory).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Confirm clear history" }));
-    expect(onClearHistory).toHaveBeenCalledTimes(1);
-    // Returns to the idle Clear button.
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeInTheDocument();
-  });
-
-  it("Cancel backs out of the confirm state without clearing", () => {
-    const onClearHistory = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onClearHistory, canClear: true } as never);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear undo history" }));
-    fireEvent.click(screen.getByRole("button", { name: "Cancel clear" }));
-    expect(onClearHistory).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Clear undo history" })).toBeInTheDocument();
+    expect(screen.queryByText("Undo History")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Clear undo history|Time-Travel/ })).toBeNull();
   });
 });
 
-describe("ActivityView — time-travel trigger", () => {
-  it("renders and fires the Time-Travel button when a handler is provided", () => {
-    const onOpenTimeTravel = vi.fn();
-    setHistory([entry()], false);
-    renderView({ onOpenTimeTravel } as never);
-    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/i }));
-    expect(onOpenTimeTravel).toHaveBeenCalledTimes(1);
-  });
-});
-
-/* The header comment above says the react-window body "needs a measured height
-   (always 0 under jsdom)" — and that gap hid a real defect for the whole life
-   of this panel. The height was measured in a mount-time `useLayoutEffect`
-   with `[]` deps, which ran while the component was still rendering its
-   loading skeleton: the ref'd scroll host does not exist in that branch, the
-   effect returned early, and it never ran again. `measuredHeight` stayed 0, so
-   `{measuredHeight > 0 && <VariableSizeList/>}` rendered nothing at all.
-   Measured live with three real undo entries: History → All changes drew its
-   header over an empty 430px box — no rows, and not the empty state either.
-   These tests stub the two things jsdom lacks, so the branch is covered. */
 /* jsdom reports 0 for every clientHeight, and the virtualized body only renders
    when it measures a non-zero host — so any test that needs real rows has to
    stub it. Shared by the mount test below and the restore-confirm tests. */
@@ -158,6 +106,7 @@ const withHeight = (px: number) => {
     if (original) Object.defineProperty(HTMLElement.prototype, "clientHeight", original);
   };
 };
+
 
 describe("ActivityView — the list body actually mounts", () => {
   it("renders rows after loading finishes, not an empty box", () => {

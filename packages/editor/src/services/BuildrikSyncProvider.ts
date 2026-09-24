@@ -415,6 +415,25 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
   }
 }
 
+/* Saves run one at a time. Two in flight at once (autosave + ⌘S, 180 ms
+   apart on the walk) both carried the same `expectedLastEditedAt`; the first
+   advanced the server's row, so the second read as another writer's change —
+   a false "Conflict — reload" with nobody else on the site. Chained, each save
+   leaves with the baseline the previous one returned. */
+let _saveChain: Promise<unknown> = Promise.resolve();
+
+export function saveProject(
+  siteId: string,
+  projectData: ProjectData
+): Promise<{ success: boolean; savedAt: Date }> {
+  const run = _saveChain.then(
+    () => saveProjectNow(siteId, projectData),
+    () => saveProjectNow(siteId, projectData),
+  );
+  _saveChain = run.catch(() => undefined);
+  return run;
+}
+
 /**
  * P0.2b dual-save: routes Site-column fields to siteDetail.settings.update
  * (canonical for those fields server-side) and the rest of projectData to
@@ -422,7 +441,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
  *
  * Both calls run in parallel. If only one half changes, the other is skipped.
  */
-export async function saveProject(
+async function saveProjectNow(
   siteId: string,
   projectData: ProjectData
 ): Promise<{ success: boolean; savedAt: Date }> {
