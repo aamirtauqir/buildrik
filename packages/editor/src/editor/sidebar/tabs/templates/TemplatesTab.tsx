@@ -15,7 +15,7 @@ import { useToast, Button, openUpgrade } from "@/editor/chrome-ui";
 import { X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { type TemplateItem, SITE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
+import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
@@ -33,21 +33,30 @@ import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 
 /** The sidebar lists the built-in page templates (board 4418:54134). */
-const PAGE_TEMPLATES = SITE_TEMPLATES.filter((t) => t.type === "page");
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
 export { getRecentTemplates, addRecentTemplate, getTemplateById } from "./templatesData";
+
+/** `ui:browse-templates` — what the door that opened the view asked for. */
+export interface TemplatesOpenRequest {
+  /** The New-page modal's name (#19): Create page makes the page under it. */
+  newPageName?: string;
+  /** New page's "Add to site navigation" — applied once the page exists. */
+  addToNavigation?: boolean;
+  /** Open straight onto this template's preview (a ⌘K template row). */
+  previewId?: string;
+  /** Board 4428:149355 replace mode: the catalogue picks a layout FOR the
+   *  active page (Pages row / ⌘K "Replace layout with template…"). */
+  replace?: boolean;
+}
 
 export interface TemplatesTabProps {
   composer: Composer | null;
   onTemplateUsed?: () => void;
   onSwitchTab?: (tab: string) => void;
   onClose?: () => void;
-  /** The New-page modal's name (#19): Create page makes the page under it. */
-  newPageName?: string;
-  /** New page's "Add to site navigation" — applied once the page exists. */
-  addToNavigation?: boolean;
+  request?: TemplatesOpenRequest | null;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
@@ -55,9 +64,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onTemplateUsed,
   onSwitchTab,
   onClose,
-  newPageName,
-  addToNavigation,
+  request,
 }) => {
+  const newPageName = request?.newPageName;
+  const addToNavigation = request?.addToNavigation;
+  const replaceMode = Boolean(request?.replace);
   const { addToast } = useToast();
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
@@ -94,6 +105,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   } = useTemplateApply(composer);
 
   const sel = useTemplateSelection(showProgress);
+  /* A ⌘K template row lands on its preview. Keyed on the request object: a
+     fresh request per door, so the same row twice re-opens it. */
+  const { setPreviewId } = sel;
+  React.useEffect(() => {
+    if (request?.previewId) setPreviewId(request.previewId);
+  }, [request, setPreviewId]);
 
   /* P2 fix (codex A4): backup-current-page checkbox state for ReplaceModal.
      When checked, the apply path duplicates the current page as
@@ -400,6 +417,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // ── Render ──
   const tName = findTemplate(pendingId.current)?.name ?? "Template";
   const previewTemplate = findTemplate(sel.previewId);
+  const pageLabel = activePageInfo?.name ?? "this page";
+  /* Replace mode's Cancel (4428:149355 → Build · Manage pages). */
+  const backToPages = () => onSwitchTab?.("pages");
 
   return (
     <div className="tpl-ws" data-testid="tpl-workspace">
@@ -411,9 +431,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           color="light"
           className="tpl-ws-back"
           data-testid="tpl-ws-back"
-          onClick={previewTemplate ? () => sel.setPreviewId(null) : onClose}
+          onClick={previewTemplate ? () => sel.setPreviewId(null) : replaceMode ? backToPages : onClose}
         >
-          {previewTemplate ? "‹ Back to templates" : "‹ Back to canvas"}
+          {previewTemplate ? "‹ Back to templates" : replaceMode ? "‹ Back to Pages" : "‹ Back to canvas"}
         </Button>
         <div className="tpl-ws-title">Templates</div>
         {siteName && <div className="tpl-ws-site">{siteName}</div>}
@@ -439,7 +459,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           </Button>
         ))}
         <p className="tpl-ws-help">
-          Preview the layout first. Then choose whether to create a new page or replace {activePageInfo?.name ?? "this page"}.
+          {replaceMode
+            ? `Choose a layout for ${pageLabel}. Your current ${pageLabel} is saved to History before it is replaced.`
+            : `Preview the layout first. Then choose whether to create a new page or replace ${pageLabel}.`}
         </p>
         <Button variant="link" className="tpl-ws-reload" data-testid="tpl-ws-reload" onClick={() => setReloadKey((k) => k + 1)}>
           ⟳&nbsp;&nbsp;Reload catalogue
@@ -467,9 +489,19 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <div className="tpl-ws-catalogue">
           <h1 className="tpl-ws-heading">Page templates</h1>
           <p className="tpl-ws-desc">
-            Preview a template, then create a page or replace {activePageInfo?.name ?? "this page"}. Templates saved
-            from a page keep the styles captured with them.
+            {replaceMode ? `Pick a layout for ${pageLabel}.` : `Preview a template, then create a page or replace ${pageLabel}.`}{" "}
+            Templates saved from a page keep the styles captured with them.
           </p>
+          {replaceMode && (
+            /* 4428:149355: what this visit is for, with its way out. */
+            <div className="tpl-replace-banner" data-testid="tpl-replace-banner" role="status">
+              <span className="tpl-replace-banner-lead">Replacing: {pageLabel}</span>
+              <span className="tpl-replace-banner-note">· your current layout is backed up first</span>
+              <Button variant="link" className="tpl-replace-banner-cancel" onClick={backToPages}>
+                Cancel
+              </Button>
+            </div>
+          )}
           <div className="tpl-grid" role="listbox" aria-label="Available templates">
             {catalogue.map((tpl) => (
               <TemplateCard
@@ -477,6 +509,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 template={tpl}
                 isApplied={appliedId === tpl.id}
                 onClick={(id) => sel.setPreviewId(id)}
+                useLabel={replaceMode ? `Use for ${pageLabel}` : undefined}
+                onUse={replaceMode ? handleApplyToCurrent : undefined}
               />
             ))}
           </div>

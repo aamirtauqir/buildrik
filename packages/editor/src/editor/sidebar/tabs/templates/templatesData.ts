@@ -256,5 +256,8 @@ export const SITE_TEMPLATES: TemplateItem[] = [
 ];
 
 /** Get template by ID */
+/** The full-canvas catalogue's built-ins (4418:54134 lists page templates only). */
+export const PAGE_TEMPLATES = SITE_TEMPLATES.filter((t) => t.type === "page");
+
 export const getTemplateById = (id: string): TemplateItem | undefined =>
   SITE_TEMPLATES.find((t) => t.id === id);

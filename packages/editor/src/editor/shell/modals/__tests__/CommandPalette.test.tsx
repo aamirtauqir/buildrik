@@ -133,7 +133,7 @@ describe("CommandPalette — doors", () => {
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
     ["Generate a block with AI…", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
-    ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, {}],
+    ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, { replace: true }],
     ["Open History", EVENTS.UI_PANEL_OPEN, { panel: "history" }],
     ["Search stock photos", EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock" }],
   ];
@@ -341,5 +341,23 @@ describe("CommandPalette — RECENT band (restored capability, off-board)", () =
     renderPalette();
     const recent = screen.getByTestId("cmdk-band-recent").parentElement as HTMLElement;
     expect(within(recent).queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent)).toEqual(["Open Pages"]);
+  });
+});
+
+describe("CommandPalette — TEMPLATES rows (catalogue search, kept)", () => {
+  it("a template answers a query under TEMPLATES and opens on its preview", () => {
+    const { composer, onClose } = renderPalette();
+    type("restaurant");
+    expect(bands()).toContain("Templates");
+    const row = screen.getAllByTestId(/^cmdk-row-template-/)[0];
+    const id = row.getAttribute("data-testid")!.replace("cmdk-row-template-", "");
+    fireEvent.click(row);
+    expect(composer?.emit).toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, { previewId: id });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("templates are not in the opening list", () => {
+    renderPalette();
+    expect(bands()).not.toContain("Templates");
   });
 });

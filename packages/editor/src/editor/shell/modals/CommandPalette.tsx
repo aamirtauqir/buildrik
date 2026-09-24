@@ -26,6 +26,7 @@ import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 // =============================================================================
 // TYPES
@@ -54,7 +55,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -190,7 +191,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       id: "templates-replace-layout",
       label: "Replace layout with template…",
       group: "Tools",
-      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})),
+      /* 4428:149355: the catalogue opens in replace mode for the active page. */
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })),
     },
     { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
     {
@@ -234,6 +236,19 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
         const siteId = getSiteIdFromUrl();
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
       }),
+    });
+  }
+
+  /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws
+     none); the owner kept the capability, so a template answers a query here
+     and opens on its preview. Searchable only, never in the opening list. */
+  for (const t of [...PAGE_TEMPLATES, ...getMyTemplates()]) {
+    commands.push({
+      id: `template-${t.id}`,
+      label: t.name,
+      group: "Templates",
+      keywords: ["template"],
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { previewId: t.id })),
     });
   }
 
