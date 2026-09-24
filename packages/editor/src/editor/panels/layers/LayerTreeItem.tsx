@@ -205,7 +205,11 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         }}
         onContextMenu={(e) => {
           e.preventDefault();
-          if (!readOnly) onContextMenu(e, layer.id);
+          if (readOnly) return;
+          /* 4418:79546: the right-clicked row becomes the selection (a row
+             inside a multi-selection keeps it — 6881:71323). */
+          if (!isSelected) onSelect(layer.id, {});
+          onContextMenu(e, layer.id);
         }}
         onDoubleClick={(e) => {
           if (!isLocked && !readOnly) onStartEditing(layer.id, displayName, e);

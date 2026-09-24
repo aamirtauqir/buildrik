@@ -78,19 +78,20 @@ describe("LayerContextMenu — 3 selected, clicked row inside", () => {
 });
 
 describe("LayerContextMenu — clicked row outside the selection", () => {
-  it("is the single row's menu: rows name the layer (4418:79546), Rename live, Group off", () => {
+  it("is the single row's menu: rows name the layer (4418:79546), Rename and Group live (4418:82409 groups one)", () => {
     mount({ inSelection: false });
     expect(screen.getByRole("menu", { name: "Actions for Heading" })).toBeTruthy();
     expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut · Heading$/);
     expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete · Heading$/);
     expect(screen.getByTestId("layer-menu-move-to-page")).toHaveTextContent(/^Move to page… · Heading$/);
     expect(screen.getByTestId("layer-menu-rename")).not.toBeDisabled();
-    expect(screen.getByTestId("layer-menu-group")).toBeDisabled();
+    expect(screen.getByTestId("layer-menu-group")).toHaveTextContent(/^Group · Heading$/);
+    expect(screen.getByTestId("layer-menu-group")).not.toBeDisabled();
   });
 
   it("one row selected reads the same way", () => {
     mount({ selectedCount: 1, inSelection: true });
     expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut · Heading$/);
-    expect(screen.getByTestId("layer-menu-group")).toBeDisabled();
+    expect(screen.getByTestId("layer-menu-group")).not.toBeDisabled();
   });
 });
