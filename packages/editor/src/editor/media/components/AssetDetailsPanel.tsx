@@ -66,6 +66,9 @@ const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
    accent: 40 tall, radius 8, 13 regular white. */
 const RAIL_INSERT = "mgr-btn-ink tw:w-full tw:shrink-0 tw:justify-center";
 const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
+/* 4418:58292 row/Details — a 32 row, no fill: "Details ▸" left, the summary right. */
+const DETAILS_ROW =
+  "tw:h-8 tw:min-h-0 tw:w-full tw:shrink-0 tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:shadow-none tw:enabled:hover:bg-transparent";
 /* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
 const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
@@ -241,6 +244,9 @@ export function AssetDetailsPanel({
     );
   const [regenerating, setRegenerating] = React.useState(false);
   const [moreOpen, setMoreOpen] = React.useState(false);
+  /* 4418:58292 / 7093:78271 — TAGS, VERSIONS and USED IN sit behind one
+     "Details ▸" row whose right side summarises them. */
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
   const runMore = (fn: () => void) => () => {
     setMoreOpen(false);
     fn();
@@ -254,7 +260,7 @@ export function AssetDetailsPanel({
       data-testid={`mgr-det-${action}`}
       onClick={runMore(run)}
     >
-      {write.canWrite ? label : `${label} · View only`}
+      {write.canWrite ? label : `${label.replace(/…$/, "")} · View only`}
     </MenuItem>
   );
   /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
@@ -372,6 +378,10 @@ export function AssetDetailsPanel({
       : isFont
         ? `${selectedItem.siteFont ? "Site font · added" : "Uploaded · not added"} · ${ext}`
         : `Selected asset · ${ext}`;
+  const versionCount = Math.max(1, versions.length);
+  const detailsSummary = `${versionCount} ${versionCount === 1 ? "version" : "versions"} · ${
+    usageCount === 0 ? "not used yet" : `used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`
+  }`;
   const usedLine =
     usageCount === 0
       ? "Not used on this site"
@@ -411,7 +421,26 @@ export function AssetDetailsPanel({
             />
           )}
 
-          {onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className={DETAILS_ROW}
+            aria-expanded={detailsOpen}
+            data-testid="mgr-det-details-toggle"
+            onClick={() => setDetailsOpen((v) => !v)}
+          >
+            <span className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2">
+              <span className="tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
+                Details {detailsOpen ? "▾" : "▸"}
+              </span>
+              <span className="tw:text-[length:var(--bk-text-11)] tw:font-normal tw:leading-4 tw:text-[var(--bk-gray-500)]" data-testid="mgr-det-summary">
+                {detailsSummary}
+              </span>
+            </span>
+          </Button>
+
+          {detailsOpen && onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
 
           {/* Clone 3695:45529 / 3697:20326 (Phase 6): the family, newest
               first — `v2 · Latest saved` over `v1 · Original` — drawn only
@@ -420,7 +449,7 @@ export function AssetDetailsPanel({
               placements, not a flag on the row. A row is the door to Asset
               versions, where applying is the explicit step; the `_v1234`
               stem heuristic and its Revert button are gone with it. */}
-          {versions.length > 1 && (
+          {detailsOpen && versions.length > 1 && (
             <section className="mgr-det-section" data-testid="mgr-det-versions">
               <h4 className="mgr-det-label">Versions</h4>
               <div className="mgr-version-list">
@@ -448,85 +477,88 @@ export function AssetDetailsPanel({
             </section>
           )}
 
-          <section className="mgr-det-section" data-testid="mgr-det-used">
-            <h4 className="mgr-det-label">Used in</h4>
-            <p className="mgr-det-used-line">{usedLine}</p>
-          </section>
-        </div>
+          {detailsOpen && (
+            <section className="mgr-det-section" data-testid="mgr-det-used">
+              <h4 className="mgr-det-label">Used in</h4>
+              <p className="mgr-det-used-line">{usedLine}</p>
+            </section>
+          )}
 
-        {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
-            full set; a video has no Edit image; a font is neither inserted
-            nor replaced across the site — Manage font · Rename · Delete
-            (3696:21550 / 3705:21059; Manage font opens the Site fonts
-            dialog, 3686:42317, on this file, and is drawn in the board's
-            quiet fill). Insert to canvas is the PRIMARY: 3705:20396 and
-            4207:26629 (the later section) draw it filled, over
-            3695:20340's outlined one. */}
-        <div className="mgr-det-actions" data-testid="mgr-det-actions">
-          {!isFont && (
-            <Button size="xs" className={RAIL_INSERT} onClick={() => onInsert(selectedItem.key)}>
-              Insert to canvas
-            </Button>
-          )}
-          {isFont && onManageFont && (
-            <Button
-              size="xs"
-              variant="secondary"
-              className={RAIL_QUIET}
-              onClick={() => onManageFont(selectedItem)}
-              data-testid="mgr-det-manage-font"
-            >
-              Manage font
-            </Button>
-          )}
-          {/* 4418:58292 — one quiet button and a ⋯: "Edit image" for an
-              image, else Rename. The rest of the old stack (Rename · Replace
-              across site… · Optimize · Delete) lives in the ⋯, unchanged —
-              same gates, same reasons, same doors. */}
-          <div className="mgr-det-actions-row">
-            {isImage ? (
-              <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
-                Edit image
+          {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
+              full set; a video has no Edit image; a font is neither inserted
+              nor replaced across the site — Manage font · Rename · Delete
+              (3696:21550 / 3705:21059; Manage font opens the Site fonts
+              dialog, 3686:42317, on this file, and is drawn in the board's
+              quiet fill). Insert to canvas is the PRIMARY: 3705:20396 and
+              4207:26629 (the later section) draw it filled, over
+              3695:20340's outlined one. */}
+          <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
+            {!isFont && (
+              <Button size="xs" className={RAIL_INSERT} onClick={() => onInsert(selectedItem.key)}>
+                Insert to canvas
               </Button>
-            ) : (
-              gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
             )}
-            <Popover
-              open={moreOpen}
-              onClose={() => setMoreOpen(false)}
-              placement="top-end"
-              label="More actions"
-              trigger={
-                <Button
-                  className="mgr-btn mgr-btn-more"
-                  aria-label="More actions"
-                  aria-haspopup="menu"
-                  aria-expanded={moreOpen}
-                  data-testid="mgr-det-more"
-                  onClick={() => setMoreOpen((v) => !v)}
-                >
-                  ⋯
+            {isFont && onManageFont && (
+              <Button
+                size="xs"
+                variant="secondary"
+                className={RAIL_QUIET}
+                onClick={() => onManageFont(selectedItem)}
+                data-testid="mgr-det-manage-font"
+              >
+                Manage font
+              </Button>
+            )}
+            {/* 4418:58292 — one quiet button and a ⋯: "Edit image" for an
+                image, else Rename. The rest of the old stack (Rename · Replace
+                across site… · Optimize · Delete) lives in the ⋯, unchanged —
+                same gates, same reasons, same doors. */}
+            <div className="mgr-det-actions-row">
+              {isImage ? (
+                <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
+                  Edit image
                 </Button>
-              }
-            >
-              <Menu label="More actions">
-                {isImage && menuGated("rename", "Rename", () => onOpenRename(selectedItem))}
-                {!isFont && (
-                  <MenuItem
-                    disabled={usageCount === 0}
-                    title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
-                    onClick={runMore(() => setReplaceAllPickerOpen(true))}
+              ) : (
+                gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
+              )}
+              <Popover
+                open={moreOpen}
+                onClose={() => setMoreOpen(false)}
+                placement="top-end"
+                label="More actions"
+                trigger={
+                  <Button
+                    className="mgr-btn mgr-btn-more"
+                    aria-label="More actions"
+                    aria-haspopup="menu"
+                    aria-expanded={moreOpen}
+                    data-testid="mgr-det-more"
+                    onClick={() => setMoreOpen((v) => !v)}
                   >
-                    Replace across site…
-                  </MenuItem>
-                )}
-                {selectedItem.type === "img" && onOptimizeImage && (
-                  <MenuItem onClick={runMore(() => onOptimizeImage(selectedItem))}>Optimize</MenuItem>
-                )}
-                <MenuSeparator />
-                {menuGated("delete", "Delete", () => onRequestDelete(selectedItem.key), true)}
-              </Menu>
-            </Popover>
+                    ⋯
+                  </Button>
+                }
+              >
+                <Menu label="More actions">
+                  {/* 7093:78242 — Rename… · Replace across site… · Delete… (each opens a dialog). */}
+                  {isImage && menuGated("rename", "Rename…", () => onOpenRename(selectedItem))}
+                  {!isFont && (
+                    <MenuItem
+                      disabled={usageCount === 0}
+                      title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
+                      onClick={runMore(() => setReplaceAllPickerOpen(true))}
+                    >
+                      Replace across site…
+                    </MenuItem>
+                  )}
+                  {selectedItem.type === "img" && onOptimizeImage && (
+                    <MenuItem onClick={runMore(() => onOptimizeImage(selectedItem))}>Optimize</MenuItem>
+                  )}
+                  <MenuSeparator />
+                  {menuGated("delete", "Delete…", () => onRequestDelete(selectedItem.key), true)}
+                </Menu>
+              </Popover>
+            </div>
           </div>
         </div>
       </div>

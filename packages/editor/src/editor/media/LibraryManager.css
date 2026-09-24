@@ -183,8 +183,8 @@
 
 .mgr-body {
   display: grid;
-  /* 4418:58292 (Editor v3 · IA) — rail · grid · 320 details. */
-  grid-template-columns: var(--bk-size-nav) 1fr 320px;
+  /* 4418:58292 (Editor v3 · IA) — 256 rail · grid · 320 details. */
+  grid-template-columns: 256px 1fr 320px;
   min-height: 0;
   overflow: hidden;
 }
@@ -196,15 +196,15 @@
 }
 
 .mgr-left {
-  background: var(--bk-bg-subtle);
+  background: var(--bk-bg-panel);
   border: 0 solid var(--bk-border);
   border-right-width: 1px;
-  /* 1159:4642 — 12 top and 12 either side. The horizontal inset was 0 and the
-     rows carried their own, so the rail's rows ran to its edge. */
-  padding: var(--bk-space-12) var(--bk-space-12) 0;
+  /* 4418:58292 col-rail — white, 24 top, 16 either side, 6 between rows;
+     the rows carry their own 12 inset. */
+  padding: var(--bk-space-24) var(--bk-space-16) 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   overflow: hidden;
 }
 
@@ -216,7 +216,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 /* 1160:26 / 1160:42 — the rail's groups are separated by a 10-high GAP, not
@@ -227,34 +227,31 @@
   flex-shrink: 0;
 }
 
-/* 1160:16 / 1160:27 / 1160:43 — 10px group captions at the rail's own inset.
-   The COLOUR deviates from the board on purpose: those nodes name
-   --color/ink-muted, which measures 4.39:1 on this rail's --color/bg-subtle
-   ground and fails AA. Seven instances of exactly that pair were fixed here on
-   2026-09-08 against board 1205:4829; re-introducing three would be conforming
-   a defect. --bk-ink-soft is 7.0:1. */
+/* 4418:58292 — SMART / FOLDERS: 11/500 caps, 0.88 tracking, gray-500. The
+   rail is white now, where gray-500 reads 4.8:1 (it failed AA on the old
+   bg-subtle rail, which is why this used ink-soft). */
 .mgr-tree-section {
-  margin: 0 0 var(--bk-space-8);
+  margin: 0;
   font-size: var(--bk-text-11);
-  font-weight: 600;
-  color: var(--bk-ink-soft);
+  font-weight: 500;
+  color: var(--bk-gray-500);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.88px;
 }
 
 .mgr-node {
   display: flex;
   align-items: center;
-  /* Board 1205:4829 — 8, not 6. Every row in this rail, at every depth. */
-  gap: var(--bk-space-8);
-  padding: 6px var(--bk-space-8);
-  /* Clone 3698:20337 at density 32 (founder:density-32): every rail row is
-     the chrome's control height. Padding alone left it at the text's own
-     ~26, so the rail's rows were the one control in the library under 32. */
-  min-height: var(--bk-size-row);
-  border-radius: var(--bk-radius-md);
-  font-size: var(--bk-text-12);
-  color: var(--bk-ink-soft);
+  /* 4418:58292 — 12 between glyph and name, every row, every depth. */
+  gap: var(--bk-space-12);
+  padding: 0 var(--bk-space-12);
+  /* 4418:58292 row/* — a 36 nav row (--bk-size-row-nav), 14 ink, radius 8.
+     The v3 board displaced the Clone's 32/12 density rows (3698:20337);
+     padding alone would leave the row at the text's own height. */
+  min-height: var(--bk-size-row-nav);
+  border-radius: var(--bk-radius-lg);
+  font-size: var(--bk-text-14);
+  color: var(--bk-ink);
   cursor: pointer;
 }
 
@@ -265,7 +262,7 @@
 
 .mgr-node.active {
   background: var(--bk-accent-tint);
-  color: var(--bk-ink);
+  color: var(--bk-accent-text);
   font-weight: 600;
 }
 
@@ -275,7 +272,8 @@
   flex-shrink: 0;
 }
 
-.mgr-node .mgr-chev.hidden { visibility: hidden; }
+/* 4418:58292 — a row with nothing to expand has no chevron slot. */
+.mgr-node .mgr-chev.hidden { display: none; }
 
 .mgr-node .mgr-node-ico {
   width: 14px; height: 14px;
@@ -292,12 +290,12 @@
 }
 
 .mgr-node .mgr-node-count {
-  font-size: 11px;
-  color: var(--bk-ink-soft);
+  font-size: var(--bk-text-13);
+  color: var(--bk-gray-500);
   font-variant-numeric: tabular-nums;
 }
 
-.mgr-node.active .mgr-node-count { color: var(--bk-accent); }
+.mgr-node.active .mgr-node-count { color: var(--bk-gray-500); }
 
 /* Board 1205:4849 / 1205:4853 — a nested folder is inset 16, not 20. */
 .mgr-node.depth-1 { padding-left: var(--bk-space-16); }
@@ -305,97 +303,30 @@
 .mgr-node.depth-2 { padding-left: 36px; }
 
 .mgr-main {
-  background: var(--bk-bg-card, #fff);
+  background: var(--bk-gray-50);
   display: flex;
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  /* 1159:4643 — 12 top, 16 either side, 12 between blocks. The columns'
-     children each carried their own 20 inset instead. */
-  padding: var(--bk-space-12) var(--bk-space-24) 0;
-  gap: var(--bk-space-12);
+  /* 4418:58292 col-grid — gray-50, 24 top, 16 either side, 20 between
+     blocks. The columns' children carry no inset of their own. */
+  padding: var(--bk-space-24) var(--bk-space-16) 0;
+  gap: 20px;
 }
 
 /* 1161:35 — the toolbar is a plain 8-gap row. Its rule was a second border
    inside a column that already has one on its left. */
 .mgr-subbar {
+  /* 4418:58292 grid-toolbar — a 28 white band on the gray-50 column. */
+  min-height: 28px;
+  background: var(--bk-bg-card);
   padding: 0;
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
   flex-shrink: 0;
 }
-
-.mgr-subbar .mgr-pills {
-  display: flex;
-  gap: 6px;
-}
-
-.mgr-pill {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 10px;
-  border-radius: var(--bk-radius-lg);
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-soft);
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  border: none;
-}
-
-.mgr-pill.active {
-  background: var(--bk-accent-tint);
-  color: var(--bk-ink);
-}
-
 .mgr-spacer { flex: 1; }
-
-.mgr-sort {
-  font-size: 11px;
-  color: var(--bk-ink-soft);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-card);
-  cursor: pointer;
-}
-
-.mgr-sort svg { width: 12px; height: 12px; color: var(--bk-ink-muted); }
-
-/* Clone 3695:45155 — "Grid · 3 columns" and "List" are words in the toolbar
-   line, not an icon pill: no fill behind them, the active one in ink. */
-.mgr-view-toggle {
-  display: inline-flex;
-}
-
-.mgr-view-toggle button {
-  /* flowbite's Button carries its own background, border and min-height at a
-     specificity a bare element selector loses to. */
-  height: 24px;
-  min-height: 0;
-  padding: 0 6px;
-  border-radius: 3px;
-  background: transparent !important;
-  border: 0 !important;
-  color: var(--bk-ink-soft);
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.mgr-view-toggle button.active {
-  color: var(--bk-ink);
-}
-
 .mgr-grid {
   /* Board 1174:4876 — the 2 / 3 / 4 toggle sets the column count, so the
      count is a variable now instead of a fixed 5 with a media-query 4.
@@ -410,7 +341,7 @@
      181 in its 772 band). The V1 board (1174:4876) sized the card instead
      and let the row fill; that is the reading the Clone displaced. */
   grid-template-columns: repeat(var(--mgr-cols, 3), minmax(0, 1fr));
-  gap: var(--bk-space-12);
+  gap: var(--bk-space-16);
   align-content: start;
 }
 
@@ -480,60 +411,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-
-.mgr-sort-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.mgr-sort-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-}
-
-.mgr-sort-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 51;
-  min-width: 160px;
-  background: var(--bk-bg-card, #fff);
-  border: 1px solid var(--bk-border, #D1D9E6);
-  border-radius: var(--bk-radius-md);
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
-  padding: var(--bk-space-4);
-  display: flex;
-  flex-direction: column;
-}
-
-.mgr-sort-item {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  justify-content: space-between;
-  padding: 6px 10px;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  color: var(--bk-ink-soft);
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.mgr-sort-item:hover { background: var(--bk-bg-subtle); }
-
-.mgr-sort-item.active { color: var(--bk-accent); font-weight: 600; }
-
-.mgr-sort-sep {
-  height: 1px;
-  background: var(--bk-border);
-  margin: var(--bk-space-4) 0;
-}
-
 .mgr-chev-btn {
   width: 14px;
   height: 14px;
@@ -733,16 +610,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-4);
-  margin-top: var(--bk-space-8);
+  margin-top: 0;
 }
 
+/* 4418:58292 — ALT TEXT: 11/500 caps, 0.88 tracking, gray-600. */
 .mgr-det-label {
   margin: 0;
   font-size: var(--bk-text-11);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0.88px;
   text-transform: uppercase;
-  color: var(--bk-ink-muted);
+  color: var(--bk-gray-600);
 }
 
 .mgr-det-heading {
@@ -774,8 +652,9 @@
   gap: var(--bk-space-8);
 }
 
+/* 4418:58292 — the actions follow the Details row in the column's own flow. */
 .mgr-det-actions--inline {
-  padding: var(--bk-space-8) 0 0;
+  padding: 0;
   border-top-width: 0;
 }
 
@@ -811,14 +690,18 @@
 }
 .mgr-det-actions .mgr-btn-ink:hover { filter: brightness(1.25); }
 
+/* 4418:58292 act-row — Edit image: 11/500 ink-soft on a bordered white
+   32 row; the ⋯ beside it is a 24 square, centred on the row. */
+.mgr-det-actions-row { align-items: center; }
 .mgr-det-actions-row .mgr-btn {
   flex: 1 1 0;
   width: auto;
+  font-size: var(--bk-text-11);
 }
-/* 4418:58292 — the ⋯ beside Edit image is a square of the row's height. */
 .mgr-det-actions-row .mgr-btn-more {
   flex: none;
-  width: var(--bk-size-row);
+  width: 24px;
+  height: 24px;
   padding: 0;
 }
 
@@ -1019,60 +902,6 @@
   color: var(--bk-ink-muted);
   white-space: nowrap;
 }
-.mgr-fmt-strip { display: flex; gap: var(--bk-space-4); }
-/* Two classes deep on purpose: flowbite's Button carries tw:h-10 and tw:px-4,
-   and a single-class rule ties on specificity and loses on source order —
-   these chips shipped 40 tall. */
-.mgr-subbar .mgr-fmt,
-.mgr-subbar .mgr-gridn-btn,
-.mgr-subbar .mgr-sort {
-  height: 22px;
-  min-height: 0;
-  line-height: 1;
-}
-.mgr-fmt {
-  padding: 2px 6px;
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-sm);
-  background: transparent;
-  color: var(--bk-ink-muted);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  cursor: pointer;
-}
-.mgr-fmt.active {
-  background: var(--bk-accent-tint);
-  border-color: var(--bk-accent);
-  color: var(--bk-accent-text);
-}
-.mgr-gridn { display: flex; gap: 2px; }
-.mgr-gridn-btn {
-  padding: 2px 6px;
-  border: 0;
-  border-radius: var(--bk-radius-sm);
-  background: transparent;
-  color: var(--bk-ink-muted);
-  font: 400 var(--bk-text-11) var(--bk-font-ui);
-  cursor: pointer;
-}
-.mgr-gridn-btn.active {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent-text);
-  font-weight: 500;
-}
-.mgr-selectall {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--bk-radius-sm);
-  background: transparent;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-}
-.mgr-selectall:hover { color: var(--bk-ink); background: var(--bk-bg-subtle); }
-
 /* ─── Board 1163:4641 list view ──────────────────────────────────────── */
 .mgr-list-head,
 .mgr-list-row {

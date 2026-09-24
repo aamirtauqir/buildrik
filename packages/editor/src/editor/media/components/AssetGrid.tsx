@@ -41,7 +41,6 @@
 
 import {
   Check,
-  CheckSquare,
   ChevronDown,
   FolderOpen,
   MoreHorizontal,
@@ -53,14 +52,14 @@ import * as React from "react";
 import { flushSync } from "react-dom";
 import type {
   LibraryItem,
+  MediaBucket,
   MediaSortBy,
   MediaStateResult,
-  MediaTypeFilter,
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
-import { Button, IconButton, Tooltip } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Tooltip } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
@@ -73,13 +72,28 @@ interface ToastInput {
 
 // ─── Constants (kept here — sibling of "what tabs exist" pattern) ────────
 
-const TYPE_PILLS: ReadonlyArray<{ id: MediaTypeFilter; label: string }> = [
-  { id: "all", label: "All" },
+/* 7093:78182 — FORMAT: All · Images · Video · Icons. Fonts is not drawn but
+   is a kind the library holds, so it joins the list whenever a font does. */
+const FORMAT_ROWS: ReadonlyArray<{ id: MediaBucket; label: string }> = [
   { id: "img", label: "Images" },
-  { id: "vid", label: "Videos" },
+  { id: "vid", label: "Video" },
   { id: "ico", label: "Icons" },
   { id: "fnt", label: "Fonts" },
 ];
+
+/* 4418:58292 grid-toolbar — 28-high outlined buttons, 11 ink-soft, radius 4;
+   the ⋯ is a 24 square at radius 6; Grid · List is a 24 segmented pair. */
+const TOOLBAR_BTN =
+  "tw:h-7 tw:min-h-0 tw:px-2.5 tw:py-0 tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] " +
+  "tw:text-[length:var(--bk-text-11)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:shadow-none";
+const TOOLBAR_MORE =
+  "tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
+const SEGMENTED =
+  "tw:flex tw:h-6 tw:items-center tw:gap-0.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-0.5";
+const SEGMENT =
+  "tw:h-5 tw:min-h-0 tw:px-2 tw:py-0 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:shadow-none tw:text-[length:var(--bk-text-11)] tw:leading-4";
+const SEGMENT_ON = "tw:bg-[var(--bk-bg-subtle)] tw:font-semibold tw:text-[var(--bk-ink)]";
+const SEGMENT_OFF = "tw:bg-transparent tw:font-normal tw:text-[var(--bk-ink-soft)]";
 
 /* Board 1163:4641 draws the bulk bar's actions as 11/500 text on the accent
    tint — accent for Move/Download, error ink for Delete, muted for Clear —
@@ -89,14 +103,15 @@ const BULK_LINK = "tw:min-h-6 tw:text-[11px] tw:font-medium";
 const BULK_LINK_DANGER = `${BULK_LINK} tw:text-[var(--bk-error-text)]`;
 const BULK_LINK_MUTED = "tw:min-h-6 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 
-/* Clone 3695:44951 — the sort names its key AND its direction on the button
-   ("Date added", "Name A–Z"), so the menu's separate Ascending/Descending row
-   no longer has to be opened to learn which way the list runs. */
-const SORT_OPTIONS: ReadonlyArray<{ value: MediaSortBy; label: string }> = [
-  { value: "date", label: "Date added" },
-  { value: "name", label: "Name" },
-  { value: "size", label: "Size" },
-  { value: "type", label: "Type" },
+/* 6930:80054 — Date added · Name A→Z · Name Z→A · File size; each option
+   carries its direction. Type is not drawn and stays (a sort the library had);
+   "Reverse order" keeps oldest-first / smallest-first reachable. */
+const SORT_OPTIONS: ReadonlyArray<{ value: MediaSortBy; dir: "asc" | "desc"; label: string }> = [
+  { value: "date", dir: "desc", label: "Date added" },
+  { value: "name", dir: "asc", label: "Name A→Z" },
+  { value: "name", dir: "desc", label: "Name Z→A" },
+  { value: "size", dir: "desc", label: "File size" },
+  { value: "type", dir: "asc", label: "Type" },
 ];
 
 /* Clone 3695:19968 — the Type column prints the format a person would say:
@@ -140,8 +155,10 @@ const CARD_MENU_BTN =
   "tw:bg-[color-mix(in_srgb,var(--bk-bg-card)_92%,transparent)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-card)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
-  if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
-  return SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Date added";
+  if (sort === "name") return dir === "asc" ? "Name A→Z" : "Name Z→A";
+  const option = SORT_OPTIONS.find((o) => o.value === sort);
+  if (!option) return "Date added";
+  return dir === option.dir ? option.label : `${option.label} (reversed)`;
 }
 
 /* Clone 3696:20326 — a video with no poster is a neutral tile under its play
@@ -298,6 +315,20 @@ export function AssetGrid({
       ? `${n} ${n === 1 ? "result" : "results"} for "${searchQuery}"`
       : `${n} ${n === 1 ? "file" : "files"} · ${scopeLabel}`;
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
+  const [filterOpen, setFilterOpen] = React.useState(false);
+  const [colsOpen, setColsOpen] = React.useState(false);
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const formatRows = React.useMemo(
+    () => FORMAT_ROWS.filter((r) => r.id !== "fnt" || state.libraryItems.some((i) => i.type === "fnt")),
+    [state.libraryItems],
+  );
+  const filterLabel = state.fmtFilter
+    ? `Filter · ${state.fmtFilter.toUpperCase()}`
+    : state.activeTypes.size === 1
+      ? `Filter · ${FORMAT_ROWS.find((r) => state.activeTypes.has(r.id))?.label ?? ""}`
+      : state.activeTypes.size > 1
+        ? `Filter · ${state.activeTypes.size} kinds`
+        : "Filter";
 
   /* Clone 3700:20353 — an empty FOLDER is not an empty library. Only for a
      folder scope that truly holds nothing: a folder whose assets a search or
@@ -367,130 +398,215 @@ export function AssetGrid({
           {movedNote ? `${scopeLabel} · ${movedNote} moved` : countLabel}
         </span>
 
-        {availableFormats.length > 0 && (
-          <div className="mgr-fmt-strip" role="group" aria-label="Filter by format" data-testid="mgr-fmt-strip">
-            {availableFormats.map((fmt) => (
-              <Button
-                key={fmt}
-                className={`mgr-fmt${state.fmtFilter === fmt ? " active" : ""}`}
-                data-testid={`mgr-fmt-${fmt}`}
-                aria-pressed={state.fmtFilter === fmt}
-                onClick={() => state.setFmtFilter(state.fmtFilter === fmt ? "" : fmt)}
+        {/* 4418:58292 / 7093:78182 — one "Filter ▾" button; its popover holds
+            FORMAT (All · Images · Video · Icons, one-of). The per-extension
+            chips that used to sit in this row live under it as FILE TYPE, so a
+            JPG-only view is still one click away and the button names it
+            ("Filter · JPG", 6879:61904). */}
+        <Popover
+          open={filterOpen}
+          onClose={() => setFilterOpen(false)}
+          placement="bottom"
+          label="Filter"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className={TOOLBAR_BTN}
+              aria-haspopup="menu"
+              aria-expanded={filterOpen}
+              data-testid="mgr-filter"
+              onClick={() => setFilterOpen((o) => !o)}
+            >
+              <span className="tw:flex tw:items-center tw:gap-1">
+                {filterLabel}
+                <ChevronDown size={12} aria-hidden="true" />
+              </span>
+            </Button>
+          }
+        >
+          <Menu label="Filter" className="tw:w-[200px]">
+            <MenuLabel>Format</MenuLabel>
+            <MenuItem
+              radio
+              selected={state.activeTypes.size === 0 && !state.fmtFilter}
+              data-testid="mgr-filter-all"
+              onClick={() => { state.setType("all"); setFilterOpen(false); }}
+            >
+              All
+            </MenuItem>
+            {formatRows.map((row) => (
+              <MenuItem
+                key={row.id}
+                radio
+                selected={state.activeTypes.size === 1 && state.activeTypes.has(row.id)}
+                data-testid={`mgr-filter-${row.id}`}
+                onClick={() => { state.setType(row.id); setFilterOpen(false); }}
               >
-                {fmt.toUpperCase()}
-              </Button>
+                {row.label}
+              </MenuItem>
             ))}
-          </div>
-        )}
-
-        {state.activeTypes.size > 0 && (
-          <Button
-            className="mgr-fmt active"
-            aria-label="Clear the type filter carried in from the drawer"
-            onClick={() => state.setType("all")}
-          >
-            {[...state.activeTypes].join(" + ")} ✕
-          </Button>
-        )}
+            {availableFormats.length > 0 ? (
+              <>
+                <MenuSeparator />
+                <MenuLabel>File type</MenuLabel>
+                {availableFormats.map((fmt) => (
+                  <MenuItem
+                    key={fmt}
+                    radio
+                    selected={state.fmtFilter === fmt}
+                    data-testid={`mgr-fmt-${fmt}`}
+                    onClick={() => { state.setFmtFilter(state.fmtFilter === fmt ? "" : fmt); setFilterOpen(false); }}
+                  >
+                    {fmt.toUpperCase()}
+                  </MenuItem>
+                ))}
+              </>
+            ) : null}
+          </Menu>
+        </Popover>
 
         <div className="mgr-spacer" />
 
-        {/* Clone 3695:45155 — the view reads as words: "Grid · 3 columns  2 3 4
-            List". The V1 board's icon pair (1161:35) is gone; a label that says
-            the column count is the only place that count was ever printed. */}
-        <div className="mgr-view-toggle">
-          <Button
-            className={viewMode === "grid" ? "active" : ""}
-            data-testid="mgr-view-grid"
-            onClick={() => setViewMode("grid")}
-            aria-pressed={viewMode === "grid"}
-          >
-            Grid · {state.gridN} columns
-          </Button>
-        </div>
-
-        {/* Board's 2 / 3 / 4 — columns per row, not a view mode. */}
-        <div className="mgr-gridn" role="group" aria-label="Columns" data-testid="mgr-gridn">
-          {([2, 3, 4] as const).map((n) => (
+        {/* 4418:58292 — Grid · List as a 24-high segmented pair. */}
+        <div className={SEGMENTED} role="group" aria-label="View" data-testid="mgr-view">
+          {(["grid", "list"] as const).map((mode) => (
             <Button
-              key={n}
-              className={`mgr-gridn-btn${state.gridN === n ? " active" : ""}`}
-              data-testid={`mgr-gridn-${n}`}
-              aria-pressed={state.gridN === n}
-              onClick={() => {
-                state.setGridN(n);
-                setViewMode("grid");
-              }}
+              key={mode}
+              type="button"
+              color="light"
+              size="xs"
+              className={`${SEGMENT} ${viewMode === mode ? SEGMENT_ON : SEGMENT_OFF}`}
+              data-testid={`mgr-view-${mode}`}
+              aria-pressed={viewMode === mode}
+              onClick={() => setViewMode(mode)}
             >
-              {n}
+              {mode === "grid" ? "Grid" : "List"}
             </Button>
           ))}
         </div>
 
-        <div className="mgr-view-toggle">
-          <Button
-            className={viewMode === "list" ? "active" : ""}
-            data-testid="mgr-view-list"
-            onClick={() => setViewMode("list")}
-            aria-pressed={viewMode === "list"}
-          >
-            List
-          </Button>
-        </div>
+        {/* 7093:78204 — "Grid ▾" sets the column count (COLUMNS 2 / 3 / 4). */}
+        <Popover
+          open={colsOpen}
+          onClose={() => setColsOpen(false)}
+          placement="bottom-end"
+          label="Columns"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className={TOOLBAR_BTN}
+              aria-haspopup="menu"
+              aria-expanded={colsOpen}
+              aria-label={`Grid · ${state.gridN} columns`}
+              data-testid="mgr-gridn"
+              onClick={() => setColsOpen((o) => !o)}
+            >
+              <span className="tw:flex tw:items-center tw:gap-1">
+                Grid
+                <ChevronDown size={12} aria-hidden="true" />
+              </span>
+            </Button>
+          }
+        >
+          <Menu label="Columns" className="tw:w-[160px]">
+            <MenuLabel>Columns</MenuLabel>
+            {([2, 3, 4] as const).map((cols) => (
+              <MenuItem
+                key={cols}
+                radio
+                selected={state.gridN === cols}
+                data-testid={`mgr-gridn-${cols}`}
+                onClick={() => {
+                  state.setGridN(cols);
+                  setViewMode("grid");
+                  setColsOpen(false);
+                }}
+              >
+                {cols} columns
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
 
-        <div className="mgr-sort-wrap">
-          <Button className="mgr-sort" data-testid="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
-            {sortButtonLabel(state.sort, state.sortDir)}
-            <ChevronDown size={12} />
-          </Button>
-          {sortMenuOpen && (
-            <>
-              <div className="mgr-sort-scrim" onClick={() => setSortMenuOpen(false)} />
-              <div className="mgr-sort-menu">
+        {/* 7093:78219 — the ⋯ holds "Sort by  <key> ▾" (its options,
+            6930:80054, open in place) and "Select assets…", which enters the
+            list's select mode (the toolbar ☑ it replaces). */}
+        <Popover
+          open={moreOpen}
+          onClose={() => { setMoreOpen(false); setSortMenuOpen(false); }}
+          placement="bottom-end"
+          label="Library options"
+          trigger={
+            <IconButton
+              label="Library options"
+              className={TOOLBAR_MORE}
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              data-testid="mgr-more"
+              onClick={() => setMoreOpen((o) => !o)}
+            >
+              <MoreHorizontal size={16} />
+            </IconButton>
+          }
+        >
+          <Menu label="Library options" className="tw:w-[220px]">
+            <MenuItem data-testid="mgr-sort" aria-expanded={sortMenuOpen} onClick={() => setSortMenuOpen((o) => !o)}>
+              <span className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2">
+                Sort by
+                <span className="tw:flex tw:items-center tw:gap-1 tw:text-[var(--bk-ink-soft)]">
+                  {sortButtonLabel(state.sort, state.sortDir)}
+                  <ChevronDown size={12} aria-hidden="true" />
+                </span>
+              </span>
+            </MenuItem>
+            {sortMenuOpen ? (
+              <>
                 {SORT_OPTIONS.map((opt) => (
-                  <Button
-                    key={opt.value}
-                    className={`mgr-sort-item${state.sort === opt.value ? " active" : ""}`}
+                  <MenuItem
+                    key={opt.label}
+                    radio
+                    selected={state.sort === opt.value && (opt.value !== "name" || state.sortDir === opt.dir)}
+                    data-testid={`mgr-sort-${opt.value}${opt.value === "name" ? `-${opt.dir}` : ""}`}
                     onClick={() => {
-                      state.setSort(opt.value, state.sortDir);
+                      state.setSort(opt.value, opt.dir);
                       setSortMenuOpen(false);
+                      setMoreOpen(false);
                     }}
                   >
                     {opt.label}
-                    {state.sort === opt.value && <Check size={12} />}
-                  </Button>
+                  </MenuItem>
                 ))}
-                <div className="mgr-sort-sep" />
-                <Button
-                  className="mgr-sort-item"
-                  onClick={() => {
-                    state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
-                    setSortMenuOpen(false);
-                  }}
-                >
-                  {state.sortDir === "asc" ? "Ascending ↑" : "Descending ↓"}
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Clone 3695:19968 — the toolbar's ☑ ENTERS select mode: the List with
-            its checkbox column and nothing checked ("Assets · List · no
-            selection"). It used to select every file at once (V1 1163:4641's
-            reading); select-all now lives in the list header's checkbox, where
-            a person expects it. Pressing it again leaves select mode. */}
-        <Button
-          className="mgr-selectall"
-          aria-label={state.selMode ? "Exit select mode" : "Select files"}
-          aria-pressed={state.selMode}
-          onClick={() => {
-            if (!state.selMode) setViewMode("list");
-            state.toggleSelMode();
-          }}
-        >
-          <CheckSquare size={13} />
-        </Button>
+                {state.sort !== "name" ? (
+                  <MenuItem
+                    data-testid="mgr-sort-reverse"
+                    onClick={() => {
+                      state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
+                      setSortMenuOpen(false);
+                      setMoreOpen(false);
+                    }}
+                  >
+                    Reverse order
+                  </MenuItem>
+                ) : null}
+              </>
+            ) : null}
+            <MenuSeparator />
+            <MenuItem
+              data-testid="mgr-select-mode"
+              onClick={() => {
+                if (!state.selMode) setViewMode("list");
+                state.toggleSelMode();
+                setMoreOpen(false);
+              }}
+            >
+              {state.selMode ? "Done selecting" : "Select assets…"}
+            </MenuItem>
+          </Menu>
+        </Popover>
       </div>
       )}
 
@@ -777,14 +893,14 @@ export function AssetGrid({
                   </IconButton>
                   {/*
                     Board 1161:66/80/111 — the only badge on a card says what
-                    KIND of file it is (▶ video, ◆ vector, Aa font); an image
+                    KIND of file it is (▶ video, SVG vector — 4418:58292 — Aa font); an image
                     needs none. The old "UP/STOCK/AI" provenance badge sat on
                     every card saying where it came from, which is the one
                     thing the grid never has to answer.
                   */}
                   {item.type !== "img" && (
                     <div className="mgr-kind" aria-hidden="true">
-                      {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "◆"}
+                      {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "SVG"}
                     </div>
                   )}
                 </div>
