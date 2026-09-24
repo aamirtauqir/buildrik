@@ -21,8 +21,6 @@ vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => fa
 
 vi.mock("../../../shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({
-    railMode: "figma",
-    fourToolRail: false,
     readOnlyView: false,
   })),
 }));
@@ -150,8 +148,6 @@ function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProp
 
 function setViewMode(partial: Partial<ReturnType<typeof getEditorViewMode>>) {
   vi.mocked(getEditorViewMode).mockReturnValue({
-    railMode: "figma",
-    fourToolRail: false,
     readOnlyView: false,
     ...partial,
   });

@@ -358,13 +358,6 @@ html.bk-read-only-view.bk-viewer-chrome { --layout-rail-width: var(--bk-size-rai
   }
 }
 
-/* Minimum supported width warning */
-@media (max-width: 1024px) {
-  .layout-shell {
-    /* Show warning overlay - handled by component */
-  }
-}
-
 /* Accessibility */
 .layout-shell__rail:focus-visible,
 .layout-shell__drawer:focus-visible,
