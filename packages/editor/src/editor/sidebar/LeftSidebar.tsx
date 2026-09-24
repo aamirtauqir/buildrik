@@ -248,12 +248,13 @@ function FigmaRail({
 // (templates/components/media under Insert; publish/history under Site) reach
 // their panels via the composite sub-nav — built next. Default rail (11 buttons)
 // is unchanged, so this is additive + reversible.
-const TOOL_PRIMARY_TAB: Record<RailTool, GroupedTabId> = {
+/* The assistant has no drawer — AI opens in the inspector column (G2-127) —
+   and RAIL_TOOLS does not draw it. */
+const TOOL_PRIMARY_TAB: Partial<Record<RailTool, GroupedTabId>> = {
   insert: "add",
   pages: "pages",
   styles: "design",
   site: "settings",
-  assistant: "ai",
   structure: "layers",
 };
 
@@ -283,7 +284,10 @@ function FourToolRail({
             <Button
               color="light"
               className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
-              onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
+              onClick={() => {
+                const tab = TOOL_PRIMARY_TAB[tool];
+                if (tab) onBtnClick(tab);
+              }}
               role="tab"
               aria-selected={isVisibleActive}
               aria-label={meta.ariaLabel}
@@ -490,7 +494,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
-  useSidebarKeyboard(safeTabChange);
+  const openAssistant = React.useCallback(() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }), [composer]);
+  useSidebarKeyboard(safeTabChange, openAssistant);
 
   const { addToast } = useToast();
 

@@ -22,7 +22,7 @@ describe("tabsConfig — E3 tool mapping", () => {
     }
   });
 
-  it("maps all 14 tabs exactly as designed", () => {
+  it("maps all 13 tabs exactly as designed (AI is an inspector panel, not a tab — G2-127)", () => {
     const map = Object.fromEntries(GROUPED_TABS_CONFIG.map((t) => [t.id, t.tool]));
     expect(map).toEqual({
       add: "insert",
@@ -37,7 +37,6 @@ describe("tabsConfig — E3 tool mapping", () => {
       activity: "site", // its own right-column panel (owner, 2026-09-25), off-rail
       review: "site", // P0 wedge loop — folds under the site tool, off-rail
       content: "site", // P4.2 data front-door — off-rail, folds under site tool
-      ai: "assistant",
       layers: "structure",
     });
   });
@@ -49,11 +48,11 @@ describe("tabsConfig — E3 tool mapping", () => {
     }
   });
 
-  it("AI and structure leave the rail (topbar ✨ / footer ⌗), nothing else does", () => {
+  it("structure leaves the rail (footer ⌗), nothing else does", () => {
     const offRail = GROUPED_TABS_CONFIG.filter(
       (t) => !(RAIL_TOOLS as readonly RailTool[]).includes(t.tool),
     ).map((t) => t.id);
-    expect(offRail.sort()).toEqual(["ai", "layers"]);
+    expect(offRail.sort()).toEqual(["layers"]);
   });
 
   it("Insert folds the four creation surfaces", () => {

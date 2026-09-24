@@ -73,9 +73,9 @@ describe("tabsConfig helpers", () => {
   });
 
   describe("GROUPED_TABS_CONFIG integrity", () => {
-    it("has 14 tabs defined", () => {
+    it("has 13 tabs defined (AI lives in the inspector, G2-127)", () => {
       // 11 + review (P0 wedge, off-rail) + content (P4.2 data front-door, off-rail)
-      expect(GROUPED_TABS_CONFIG).toHaveLength(14);
+      expect(GROUPED_TABS_CONFIG).toHaveLength(13);
     });
 
     it("every tab has required fields", () => {

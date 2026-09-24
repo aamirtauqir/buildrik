@@ -45,7 +45,7 @@ describe("tabsConfig — Figma rail", () => {
   });
 
   it("the off-rail panels still exist in config (re-route, never delete)", () => {
-    const offRail = ["ai", "templates", "components", "settings", "publish", "history", "review"] as const;
+    const offRail = ["templates", "components", "settings", "publish", "history", "review"] as const;
     for (const id of offRail) {
       expect(RAIL_FIGMA_IDS.has(id), `"${id}" must NOT be in the rail`).toBe(false);
       expect(
@@ -56,7 +56,7 @@ describe("tabsConfig — Figma rail", () => {
   });
 
   it("rail + off-rail partition every tab (nothing stranded, nothing invented)", () => {
-    const offRail = ["ai", "templates", "components", "settings", "publish", "history", "activity", "review"];
+    const offRail = ["templates", "components", "settings", "publish", "history", "activity", "review"];
     const all = GROUPED_TABS_CONFIG.map((t) => t.id).sort();
     const accounted = [...RAIL_FIGMA_IDS, ...offRail].sort();
     expect(accounted).toEqual(all);
@@ -65,7 +65,7 @@ describe("tabsConfig — Figma rail", () => {
   it("every off-rail panel keeps a keyboard shortcut (⌘K nav commands derive from config)", () => {
     // Off-rail reachability contract: ⌘K lists "Open {label} panel" for every
     // tab in GROUPED_TABS_CONFIG, and each off-rail tab keeps its shortcut.
-    for (const id of ["ai", "templates", "components", "settings", "publish", "history", "review"] as const) {
+    for (const id of ["templates", "components", "settings", "publish", "history", "review"] as const) {
       expect(getTabConfig(id)?.shortcut, `"${id}" must keep its shortcut`).toBeTruthy();
     }
   });
