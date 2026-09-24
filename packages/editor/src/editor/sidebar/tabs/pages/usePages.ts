@@ -40,7 +40,7 @@ export interface UsePagesReturn {
   // Rename state
   renamingPageId: string | null;
   startRename: (pageId: string) => void;
-  commitRename: (pageId: string, name: string) => void;
+  commitRename: (pageId: string, name: string, updateUrl?: boolean) => void;
   cancelRename: () => void;
 
   // Context menu state
@@ -192,10 +192,12 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   }, []);
 
   const commitRename = React.useCallback(
-    (pageId: string, name: string) => {
+    (pageId: string, name: string, updateUrl = false) => {
       const trimmed = name.trim();
       if (trimmed && composer) {
-        composer.elements.updatePage(pageId, { name: trimmed });
+        // G2-076: "Update URL" moves the slug with the name (the engine keeps
+        // the old one in slugHistory); "Keep URL" renames only.
+        composer.elements.updatePage(pageId, updateUrl ? { name: trimmed, slug: slugify(trimmed) } : { name: trimmed });
       }
       setRenamingPageId(null);
     },

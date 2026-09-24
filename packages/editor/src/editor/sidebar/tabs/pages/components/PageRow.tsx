@@ -18,6 +18,8 @@ import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 import { Button, TextField } from "@/editor/chrome-ui";
+import { slugify } from "@shared/utils/helpers/string";
+import { RenameUrlDecision } from "./RenameUrlDecision";
 
 interface Props {
   page: PageItem;
@@ -38,7 +40,8 @@ interface Props {
   /** Toggle multi-select for this page. */
   onToggleSelect?: (e: React.MouseEvent | React.KeyboardEvent) => void;
   onSelect: () => void;
-  onRenameCommit: (name: string) => void;
+  /** `updateUrl` answers the URL decision (G2-076); absent = the URL was not at stake. */
+  onRenameCommit: (name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
@@ -84,10 +87,29 @@ export const PageRow = React.memo<Props>(
       }
     }, [isRenaming, page.name]);
 
-    const commitOnce = (value: string) => {
+    /* G2-076: a new name whose slug differs from the page's URL waits for
+       Keep URL / Update URL. The home page answers on "/" whatever it is
+       called, so its rename never asks. */
+    const [pendingName, setPendingName] = React.useState<string | null>(null);
+    React.useEffect(() => {
+      if (!isRenaming) setPendingName(null);
+    }, [isRenaming]);
+
+    const finish = (value: string, updateUrl?: boolean) => {
       if (committedRef.current) return;
       committedRef.current = true;
-      onRenameCommit(value);
+      setPendingName(null);
+      onRenameCommit(value, updateUrl);
+    };
+
+    const commitOnce = (value: string) => {
+      if (committedRef.current) return;
+      const nextSlug = slugify(value);
+      if (!page.isHome && value !== page.name && nextSlug && nextSlug !== page.slug) {
+        setPendingName(value);
+        return;
+      }
+      finish(value);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -321,6 +343,20 @@ export const PageRow = React.memo<Props>(
             </svg>
           </Button>
         </div>
+        {isRenaming && pendingName !== null && (
+          <RenameUrlDecision
+            pageId={page.id}
+            fromSlug={page.slug}
+            toSlug={slugify(pendingName)}
+            onKeep={() => finish(pendingName, false)}
+            onUpdate={() => finish(pendingName, true)}
+            onCancel={() => {
+              committedRef.current = true;
+              setPendingName(null);
+              onRenameCancel();
+            }}
+          />
+        )}
       </div>
     );
   },
