@@ -76,7 +76,6 @@ export function computeEffectiveStyles(
 export function deriveCssContext(
   selectedElement: { id: string; type: string } | null,
   composer?: Composer | null,
-  devMode = false,
   effectiveStyles?: Record<string, string>,
   currentBreakpoint: BreakpointId = "desktop",
   currentPseudoState: PseudoStateId = "normal",
@@ -87,7 +86,6 @@ export function deriveCssContext(
   const inspectorContext = buildInspectorContext({
     elementType,
     display: "",
-    devMode,
   });
 
   const fallback: CssContext = {
@@ -125,7 +123,6 @@ export function deriveCssContext(
   const updatedInspectorContext = buildInspectorContext({
     elementType: selectedElement.type,
     display,
-    devMode,
   });
 
   return {

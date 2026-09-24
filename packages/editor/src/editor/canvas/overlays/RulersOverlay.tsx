@@ -7,7 +7,6 @@
 
 import * as React from "react";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { canvasTokens } from "../../../styles/tokens";
 
 export interface RulersOverlayProps {
   /** Current zoom level (percentage) */
@@ -25,13 +24,61 @@ const MAJOR_TICK = 100;
 /** Minor tick interval */
 const MINOR_TICK = 10;
 
-/** Colors - using design tokens */
-const COLORS = {
-  background: canvasTokens.colors.surface.background,
-  tick: "var(--bk-ink-soft)",
-  number: "var(--bk-ink-muted)",
-  hover: canvasTokens.colors.primary.alpha30,
-};
+/* Colours are tokens, resolved before painting: a 2D canvas cannot read
+   var(--…) — the assignment is silently ignored, which is how the rulers
+   painted as solid black bars (the old background was also the dark-theme
+   #0A0A0A surface). Named fallbacks cover a detached node. */
+const TOKENS = {
+  background: ["--bk-bg-panel", "white"],
+  edge: ["--bk-border", "lightgray"],
+  tick: ["--bk-gray-400", "gray"],
+  number: ["--bk-ink-muted", "gray"],
+  hover: ["--bk-accent", "blue"],
+} as const;
+type RulerColors = Record<keyof typeof TOKENS, string>;
+
+function resolveColors(el: Element): RulerColors {
+  const cs = getComputedStyle(el);
+  const out = {} as RulerColors;
+  for (const [k, [name, fallback]] of Object.entries(TOKENS) as [keyof typeof TOKENS, readonly [string, string]][]) {
+    out[k] = cs.getPropertyValue(name).trim() || fallback;
+  }
+  return out;
+}
+
+/** Drag out of a ruler (walk, /edit/:id): past 4px of travel the release point
+ *  places a guide ACROSS the drag, and the click that follows is swallowed. */
+function useRulerDrag(
+  axis: "x" | "y",
+  scale: number,
+  onDragGuide: (position: number) => void,
+): { onMouseDown: (e: React.MouseEvent<HTMLCanvasElement>) => void; dragged: React.MutableRefObject<boolean> } {
+  const dragged = React.useRef(false);
+  const onMouseDown = React.useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (e.button !== 0) return;
+      dragged.current = false;
+      const rect = e.currentTarget.getBoundingClientRect();
+      // Overlay origin: the top ruler starts RULER_SIZE in on x, the left ruler on y.
+      const originX = axis === "x" ? rect.left : rect.left - RULER_SIZE;
+      const originY = axis === "y" ? rect.top : rect.top - RULER_SIZE;
+      const start = axis === "y" ? e.clientY : e.clientX;
+      const move = (ev: MouseEvent) => {
+        if (Math.abs((axis === "y" ? ev.clientY : ev.clientX) - start) > 4) dragged.current = true;
+      };
+      const up = (ev: MouseEvent) => {
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+        if (Math.abs((axis === "y" ? ev.clientY : ev.clientX) - start) > 4) dragged.current = true;
+        if (dragged.current) onDragGuide(axis === "y" ? (ev.clientY - originY) / scale : (ev.clientX - originX) / scale);
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+    },
+    [axis, scale, onDragGuide],
+  );
+  return { onMouseDown, dragged };
+}
 
 /**
  * Horizontal ruler (top edge)
@@ -40,7 +87,8 @@ const HorizontalRuler: React.FC<{
   width: number;
   zoom: number;
   onCreateGuide: (position: number) => void;
-}> = ({ width, zoom, onCreateGuide }) => {
+  onDragGuide: (position: number) => void;
+}> = ({ width, zoom, onCreateGuide, onDragGuide }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [hoverPos, setHoverPos] = React.useState<number | null>(null);
 
@@ -52,52 +100,61 @@ const HorizontalRuler: React.FC<{
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    const COLORS = resolveColors(canvas);
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = width * dpr;
+    canvas.width = (width - RULER_SIZE) * dpr;
     canvas.height = RULER_SIZE * dpr;
     ctx.scale(dpr, dpr);
 
     // Background
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, width, RULER_SIZE);
+    ctx.fillStyle = COLORS.edge;
+    ctx.fillRect(0, RULER_SIZE - 1, width, 1);
 
     // Ticks
     ctx.fillStyle = COLORS.tick;
     ctx.font = "10px Inter, sans-serif";
     ctx.textAlign = "center";
 
-    const step = MINOR_TICK * scale;
-    const majorStep = MAJOR_TICK * scale;
-
-    for (let x = 0; x <= width; x += step) {
-      const isMajor = Math.round(x / majorStep) * majorStep === Math.round(x);
+    /* The overlay is already scaled with the page, so the ruler draws in page
+       pixels: a tick every 10, labelled every 100. The canvas starts
+       RULER_SIZE in, so page position p sits at canvas x p - RULER_SIZE. It
+       used to scale again, which squeezed 0–1000 into the first third. */
+    for (let p = MINOR_TICK * Math.ceil(RULER_SIZE / MINOR_TICK); p <= width; p += MINOR_TICK) {
+      const isMajor = p % MAJOR_TICK === 0;
       const tickHeight = isMajor ? 10 : 5;
-
+      const x = p - RULER_SIZE;
       ctx.fillRect(x, RULER_SIZE - tickHeight, 1, tickHeight);
-
-      if (isMajor && x > 0) {
+      if (isMajor) {
         ctx.fillStyle = COLORS.number;
-        ctx.fillText(String(Math.round(x / scale)), x, 10);
+        ctx.fillText(String(p), x, 10);
         ctx.fillStyle = COLORS.tick;
       }
     }
 
-    // Hover indicator
+    // Hover indicator (hoverPos is in screen pixels)
     if (hoverPos !== null) {
       ctx.fillStyle = COLORS.hover;
-      ctx.fillRect(hoverPos - 1, 0, 2, RULER_SIZE);
+      ctx.fillRect(hoverPos / scale - 1, 0, 2, RULER_SIZE);
     }
   }, [width, zoom, scale, hoverPos]);
+
+  const drag = useRulerDrag("y", scale, onDragGuide);
 
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
       // Guides are placed in overlay coordinates; the ruler starts RULER_SIZE in.
       const x = e.clientX - rect.left + RULER_SIZE;
+      if (drag.dragged.current) {
+        drag.dragged.current = false;
+        return;
+      }
       onCreateGuide(x / scale);
     },
-    [scale, onCreateGuide]
+    [scale, onCreateGuide, drag.dragged]
   );
 
   const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -120,6 +177,7 @@ const HorizontalRuler: React.FC<{
            fell through to the page and no guide could ever be placed. */
         pointerEvents: "auto",
       }}
+      onMouseDown={drag.onMouseDown}
       onClick={handleClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverPos(null)}
@@ -134,7 +192,8 @@ const VerticalRuler: React.FC<{
   height: number;
   zoom: number;
   onCreateGuide: (position: number) => void;
-}> = ({ height, zoom, onCreateGuide }) => {
+  onDragGuide: (position: number) => void;
+}> = ({ height, zoom, onCreateGuide, onDragGuide }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [hoverPos, setHoverPos] = React.useState<number | null>(null);
 
@@ -146,56 +205,61 @@ const VerticalRuler: React.FC<{
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    const COLORS = resolveColors(canvas);
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = RULER_SIZE * dpr;
-    canvas.height = height * dpr;
+    canvas.height = (height - RULER_SIZE) * dpr;
     ctx.scale(dpr, dpr);
 
     // Background
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, RULER_SIZE, height);
+    ctx.fillStyle = COLORS.edge;
+    ctx.fillRect(RULER_SIZE - 1, 0, 1, height);
 
     // Ticks
     ctx.fillStyle = COLORS.tick;
     ctx.font = "10px Inter, sans-serif";
     ctx.textAlign = "right";
 
-    const step = MINOR_TICK * scale;
-    const majorStep = MAJOR_TICK * scale;
-
-    for (let y = 0; y <= height; y += step) {
-      const isMajor = Math.round(y / majorStep) * majorStep === Math.round(y);
+    for (let p = MINOR_TICK * Math.ceil(RULER_SIZE / MINOR_TICK); p <= height; p += MINOR_TICK) {
+      const isMajor = p % MAJOR_TICK === 0;
       const tickWidth = isMajor ? 10 : 5;
-
+      const y = p - RULER_SIZE;
       ctx.fillRect(RULER_SIZE - tickWidth, y, tickWidth, 1);
-
-      if (isMajor && y > 0) {
+      if (isMajor) {
         ctx.save();
         ctx.translate(10, y);
         ctx.rotate(-Math.PI / 2);
         ctx.fillStyle = COLORS.number;
         ctx.textAlign = "left";
-        ctx.fillText(String(Math.round(y / scale)), 2, 0);
+        ctx.fillText(String(p), 2, 0);
         ctx.restore();
         ctx.fillStyle = COLORS.tick;
       }
     }
 
-    // Hover indicator
+    // Hover indicator (hoverPos is in screen pixels)
     if (hoverPos !== null) {
       ctx.fillStyle = COLORS.hover;
-      ctx.fillRect(0, hoverPos - 1, RULER_SIZE, 2);
+      ctx.fillRect(0, hoverPos / scale - 1, RULER_SIZE, 2);
     }
   }, [height, zoom, scale, hoverPos]);
+
+  const drag = useRulerDrag("x", scale, onDragGuide);
 
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
       const y = e.clientY - rect.top + RULER_SIZE;
+      if (drag.dragged.current) {
+        drag.dragged.current = false;
+        return;
+      }
       onCreateGuide(y / scale);
     },
-    [scale, onCreateGuide]
+    [scale, onCreateGuide, drag.dragged]
   );
 
   const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -218,6 +282,7 @@ const VerticalRuler: React.FC<{
            fell through to the page and no guide could ever be placed. */
         pointerEvents: "auto",
       }}
+      onMouseDown={drag.onMouseDown}
       onClick={handleClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverPos(null)}
@@ -256,16 +321,19 @@ export const RulersOverlay: React.FC<RulersOverlayProps> = ({
           left: 0,
           width: RULER_SIZE,
           height: RULER_SIZE,
-          background: COLORS.background,
+          background: "var(--bk-bg-panel)",
+          borderRight: "1px solid var(--bk-border)",
+          borderBottom: "1px solid var(--bk-border)",
+          boxSizing: "border-box",
           zIndex: Z_LAYERS.rulers + 1, // Corner above ruler lines
         }}
       />
 
       {/* Horizontal ruler (top) */}
-      <HorizontalRuler width={canvasSize.width} zoom={zoom} onCreateGuide={handleHorizontalGuide} />
+      <HorizontalRuler width={canvasSize.width / (zoom / 100)} zoom={zoom} onCreateGuide={handleHorizontalGuide} onDragGuide={handleVerticalGuide} />
 
       {/* Vertical ruler (left) */}
-      <VerticalRuler height={canvasSize.height} zoom={zoom} onCreateGuide={handleVerticalGuide} />
+      <VerticalRuler height={canvasSize.height / (zoom / 100)} zoom={zoom} onCreateGuide={handleVerticalGuide} onDragGuide={handleHorizontalGuide} />
     </>
   );
 };

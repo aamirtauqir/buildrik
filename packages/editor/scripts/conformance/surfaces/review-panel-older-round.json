@@ -50,7 +50,8 @@
     "    re-send block also carries `Revoke link`, which 158:105/158:162 require.",
     "  229:1104 Re-send fill — `--flowbite/blue/600`, against the product's one",
     "    accent #1A56DB. Label only. Same call as 157:2.",
-    "  1753:8430 — the designer annotation itself."
+    "  1753:8430 — the designer annotation itself.",
+    "2026-09-24 (gates): 410fee584 took the progress bar, the \"Round N of M\" strip and \"Compare with approved\" out of the Review body (4418:115784; one status line, Compare rounds / Round history in the ⋯ menu 7071:79114); their targets are dropped. The round list is now opened from ⋯ > Round history › (review-round-menu -> review-menu-round-history)."
   ],
   "url": "http://localhost:5051/e2e/probe/probe.html?case=review-panel-older-round&siteId=probe-site",
   "viewport": {
@@ -60,11 +61,19 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "review-rounds-toggle"
+      "testId": "review-round-menu"
     },
     {
       "action": "click",
-      "testId": "review-rounds-toggle"
+      "testId": "review-round-menu"
+    },
+    {
+      "action": "waitFor",
+      "testId": "review-menu-round-history"
+    },
+    {
+      "action": "click",
+      "testId": "review-menu-round-history"
     },
     {
       "action": "waitFor",
@@ -84,36 +93,6 @@
       "testId": "panel-header-title",
       "spec": "review-panel-older-round",
       "nodeId": "I208:681;16:7"
-    },
-    {
-      "name": "progress-block",
-      "testId": "review-progress",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:175"
-    },
-    {
-      "name": "progress-track",
-      "testId": "review-progress-track",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:176"
-    },
-    {
-      "name": "progress-count",
-      "testId": "review-progress-count",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:178"
-    },
-    {
-      "name": "sent-meta-block",
-      "testId": "review-sent-meta",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:179"
-    },
-    {
-      "name": "sent-line",
-      "testId": "review-sent-line",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:180"
     },
     {
       "name": "rounds-rows",
@@ -138,30 +117,6 @@
       "testId": "review-rounds-note-text",
       "spec": "review-panel-older-round",
       "nodeId": "157:220"
-    },
-    {
-      "name": "round-strip-label",
-      "testId": "review-rounds-toggle",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:209"
-    },
-    {
-      "name": "compare-block",
-      "testId": "review-compare-block",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:211"
-    },
-    {
-      "name": "compare-button",
-      "testId": "review-compare",
-      "spec": "review-panel-older-round",
-      "nodeId": "229:1102"
-    },
-    {
-      "name": "compare-label",
-      "testId": "review-compare",
-      "spec": "review-panel-older-round",
-      "nodeId": "I229:1102;9:31"
     },
     {
       "name": "primary-label",

@@ -21,7 +21,7 @@ describe("SelectionLabel — the board's accent tag", () => {
     canvas.getBoundingClientRect = rect(0, 0, 800, 600);
     el.getBoundingClientRect = rect(100, 80, 600, 200);
     const ref = { current: canvas };
-    const composer = { elements: { getElement: () => ({ getType: () => "section", getTagName: () => "SECTION" }) } };
+    const composer = { elements: { getElement: () => ({ getType: () => "section", getTagName: () => "SECTION", getCustomData: () => undefined }) } };
     render(<SelectionLabel composer={composer as never} elementId="hero" canvasRef={ref} />);
     const tag = screen.getByTestId("canvas-selection-tag");
     expect(tag).toHaveTextContent("Section");
@@ -30,6 +30,28 @@ describe("SelectionLabel — the board's accent tag", () => {
     expect(tag.style.left).toBe("98px");
     expect(tag.style.top).toBe("56px");
     expect(tag.querySelector("button")).toBeNull();
+    canvas.remove();
+  });
+
+  it("reads Type · name when the element carries a layer name (board: Section · Hero)", () => {
+    const canvas = document.createElement("div");
+    const el = document.createElement("section");
+    el.setAttribute("data-buildrick-id", "hero");
+    canvas.appendChild(el);
+    document.body.appendChild(canvas);
+    const composer = {
+      elements: {
+        getElement: () => ({
+          getType: () => "section",
+          getTagName: () => "SECTION",
+          getCustomData: (k: string) => (k === "layerName" ? "Hero" : undefined),
+        }),
+      },
+      on: () => {},
+      off: () => {},
+    };
+    render(<SelectionLabel composer={composer as never} elementId="hero" canvasRef={{ current: canvas }} />);
+    expect(screen.getByTestId("canvas-selection-tag")).toHaveTextContent("Section · Hero");
     canvas.remove();
   });
 });

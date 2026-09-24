@@ -1,6 +1,7 @@
 /**
- * Stroke Section — border (width, style, color) + advanced (individual sides + outline).
- * Corner radius split into its own section (CornerRadiusSection).
+ * Border Section — width, style, color and corner radius (G2-154: the
+ * separate Corner radius section folded back in), + advanced (individual
+ * sides + outline).
  */
 
 import * as React from "react";
@@ -10,22 +11,17 @@ import {
   SelectRow,
   ColorInput,
   InputWithUnit,
+  CornerRadiusInput,
   MoreSettingsToggle,
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueIndicator } from "../shared/controls";
+import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
 export interface BorderSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  /**
-   * Multi-property writes. Unused by the hand-written section (it routes
-   * everything through `onChange`), but kept on the prop contract so the
-   * schema-driven replacement — which uses it for corners4 linked-mode
-   * shorthand writes — can be swapped in with no registry changes.
-   */
-  onBatchChange?: (changes: Record<string, string>) => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */
@@ -54,6 +50,23 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   isMultiSelect,
   composer,
 }) => {
+  const [radiusLinked, setRadiusLinked] = React.useState(true);
+  const { top: tl, right: tr, bottom: br, left: bl } = parseCssShorthand(styles["border-radius"] || "");
+  const radii = {
+    tl: tl || styles["border-top-left-radius"] || "",
+    tr: tr || styles["border-top-right-radius"] || "",
+    br: br || styles["border-bottom-right-radius"] || "",
+    bl: bl || styles["border-bottom-left-radius"] || "",
+  };
+  const CORNER_PROP = {
+    tl: "border-top-left-radius",
+    tr: "border-top-right-radius",
+    br: "border-bottom-right-radius",
+    bl: "border-bottom-left-radius",
+  } as const;
+  const handleRadius = (corner: keyof typeof CORNER_PROP, value: string) =>
+    onChange(radiusLinked ? "border-radius" : CORNER_PROP[corner], value);
+
   // Preview: width + style, shown as indicator pill
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
   const borderWidth = styles["border-width"];
@@ -105,6 +118,17 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           value={styles["border-color"] || ""}
           onChange={(v) => onChange("border-color", v)}
           composer={composer}
+        />
+      </div>
+
+      {/* Corner radius — its own section until G2-154 folded it in. */}
+      <div style={{ position: "relative" }}>
+        <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
+        <CornerRadiusInput
+          values={radii}
+          onChange={handleRadius}
+          linked={radiusLinked}
+          onLinkToggle={() => setRadiusLinked(!radiusLinked)}
         />
       </div>
 

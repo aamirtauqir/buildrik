@@ -29,7 +29,7 @@
     },
     {
       "action": "waitFor",
-      "testId": "brand-nodark-header"
+      "testId": "brand-colour-mode-list"
     },
     {
       "action": "hover",
@@ -68,7 +68,7 @@
     },
     {
       "name": "preview-toggle",
-      "testId": "brand-colour-mode-preview",
+      "testId": "brand-colour-mode-seg",
       "spec": "brand-colour-mode",
       "nodeId": "153:99"
     },
@@ -89,18 +89,6 @@
       "testId": "brand-colour-mode-seg-dark",
       "spec": "brand-colour-mode",
       "nodeId": "153:103"
-    },
-    {
-      "name": "section-header",
-      "testId": "brand-nodark-header",
-      "spec": "brand-colour-mode",
-      "nodeId": "220:835"
-    },
-    {
-      "name": "section-header-fill",
-      "testId": "brand-nodark-header",
-      "spec": "brand-colour-mode",
-      "nodeId": "I220:835;220:6"
     },
     {
       "name": "row-color-primary",
@@ -228,6 +216,7 @@
     "`surface/raised`, `ink/quiet`, `border/hairline`) are a different naming",
     "convention from the project's (`color-primary`, `color-secondary`, ...), and",
     "the board draws four rows where the demo project has 17. The four board rows",
-    "are joined to the first four live rows; all four state identical properties."
+    "are joined to the first four live rows; all four state identical properties.",
+    "2026-09-24 re-pointed (95feec6c4, Colour mode is one card of rows): waits on brand-colour-mode-list; the section header band is gone (targets dropped); the preview toggle is the Light/Dark switch brand-colour-mode-seg."
   ]
 }

@@ -178,6 +178,27 @@ export function useSectionReorder({
     };
   }, [canvasRef, enabled, computeBoundaries]);
 
+  /* Size changes without markup changes (images loading, the zoom-fit
+     settling) move sections too. */
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!enabled || !canvas || typeof ResizeObserver === "undefined") return;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        computeBoundaries();
+      });
+    });
+    observer.observe(canvas);
+    for (const child of Array.from(canvas.children)) observer.observe(child);
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [canvasRef, enabled, computeBoundaries]);
+
   // Also recompute on window resize / scroll
   React.useEffect(() => {
     if (!enabled) return;
@@ -189,11 +210,15 @@ export function useSectionReorder({
 
   // ── Drag operations ─────────────────────────────────────────────────────
 
+  /* A drag measures again: layout can move with no element event — zoom-fit
+     on load, images and fonts arriving — and the walk at /edit/:id found the
+     handles 100px off their sections, resolving drops against stale tops. */
   const startDrag = React.useCallback(
     (sectionId: string, fromIndex: number) => {
+      computeBoundaries();
       setDragState({ sectionId, fromIndex, toIndex: fromIndex });
     },
-    []
+    [computeBoundaries]
   );
 
   const updateDrag = React.useCallback(

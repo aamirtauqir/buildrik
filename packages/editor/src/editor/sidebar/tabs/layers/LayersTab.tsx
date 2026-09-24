@@ -286,7 +286,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
               dims the element for you; the published site still shows it. */}
           <span className="tw:ml-auto tw:flex">
-            <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-[240px] tw:whitespace-normal">
+            <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
               <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />

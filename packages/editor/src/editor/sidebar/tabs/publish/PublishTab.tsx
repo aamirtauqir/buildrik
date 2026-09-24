@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "../../../../engine";
@@ -85,7 +85,7 @@ export interface PublishTabProps {
  * "Publish · pre-checks", founder decision 2026-08-05).
  *
  * Settings rows open Settings ON their pane (UI_SETTINGS_OPEN): SEO › SEO,
- * Domain › Domains, Favicon › General. Page rows switch to the Pages panel.
+ * Domain › Domains. Page rows switch to the Pages panel.
  */
 type FixTarget = { tab: string } | { screen: SettingsNavId };
 const FIX_TARGETS: Record<string, FixTarget> = {
@@ -93,11 +93,23 @@ const FIX_TARGETS: Record<string, FixTarget> = {
   "SEO configured": { screen: "seo" },
   "Domain connected": { screen: "domains" },
   "Empty pages": { tab: "pages" },
-  Favicon: { screen: "general" },
 };
 
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
+
+/** "Home, Menu and Contact". */
+function listNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** Board 7045:77984 — the primary's tooltip: what it replaces and what ships. */
+export function publishTooltip(lastLiveVersion: number | null, pageNames: string[]): string {
+  const lead = lastLiveVersion !== null ? `Replaces LIVE · v${lastLiveVersion}.` : "First publish.";
+  if (pageNames.length === 0) return lead;
+  return `${lead} ${listNames(pageNames)} ${pageNames.length === 1 ? "is" : "are"} included.`;
+}
 
 /** Board 4418:97118's RELEASE TO row: label left, the value muted on the
     right with a ›. The whole row opens Settings › Domains, where the
@@ -330,7 +342,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     }
     setCheckState("loading");
     try {
-      setChecks(await fetchPrePublishChecks(siteId));
+      const result = await fetchPrePublishChecks(siteId);
+      /* Spec B4 draws no Favicon row. It is advisory server-side (never a
+         `fail`), so dropping it changes no gate. */
+      setChecks({ ...result, checks: result.checks.filter((c) => c.label !== "Favicon") });
       setCheckState("ready");
     } catch {
       // DF5: never fall back to a fake-passing checklist — show Retry.
@@ -476,10 +491,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* `waiting` and `unchecked` print their own reason in the gate banner. */
   const gateSpeaks = nextMove?.gate === "waiting" || nextMove?.gate === "unchecked";
   const gateShut = nextMove === null || gateSpeaks || nextMove.blockedReason !== null;
-  const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut;
+  /* Never publishable in an unknown state (re-walk 2026-09-24: the CTA stayed
+     clickable through a 60 s "Checking readiness…"). A disabled primary always
+     says why. */
+  const checksPending = !noPublishPath && checkState === "loading";
+  const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut || checksPending;
   const ctaReason: string | null = isPublishing
     ? `${isPublished ? "Update" : "Publishing"} in progress — please wait.`
-    : nextMove === null
+    : checksPending
+      ? "Checking readiness…"
+      : snapshot.error
+        ? "Couldn't read the deploy history — try again above."
+        : nextMove === null
       ? "Nothing has changed since the last deploy."
       : !gateSpeaks && nextMove.blockedReason
         ? nextMove.blockedReason
@@ -871,16 +894,35 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   chip sized to its label, 28 tall. The remaining 50% dim is
                   `themes/ux-fixes.css`'s global `button:disabled { opacity:
                   .5 }`, left global deliberately. */}
-              <Button
-                onClick={onRequestPublish}
-                disabled={ctaDisabled}
-                className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
-                data-testid="publish-cta"
-              >
-                {/* One label, in every state. The board names the destination
-                    and never draws an "Update" variant. */}
-                {isPublishing ? "Publishing…" : "Publish to production"}
-              </Button>
+              {(() => {
+                const cta = (
+                  <Button
+                    onClick={onRequestPublish}
+                    disabled={ctaDisabled}
+                    className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                    data-testid="publish-cta"
+                  >
+                    {/* One label, in every state. The board names the destination
+                        and never draws an "Update" variant. */}
+                    {isPublishing ? "Publishing…" : "Publish to production"}
+                  </Button>
+                );
+                /* Board 7045:77984: hovering the live primary says what it
+                   replaces and which pages ship. A disabled primary has its
+                   reason printed under it instead. */
+                return ctaDisabled || snapshot.loading ? (
+                  cta
+                ) : (
+                  <Tooltip
+                    content={publishTooltip(
+                      snapshot.lastDeploy?.isLive ? snapshot.lastDeploy.version : null,
+                      snapshot.pageNames,
+                    )}
+                  >
+                    {cta}
+                  </Tooltip>
+                );
+              })()}
               {/* Board 893:4518 swaps the primary's neighbour for Connect
                   Vercel when the connection is the blocker. */}
               {blockedOnVercel && !isPublishing ? (

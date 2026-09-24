@@ -272,3 +272,25 @@ describe("versionSync hydrate edge paths", () => {
     expect(list).not.toHaveBeenCalled();
   });
 });
+
+describe("versionSync hydrate is bounded (walk 2026-09-24: 50 sequential gets on open)", () => {
+  it("pulls only the newest HYDRATE_LIMIT missing versions, concurrently", async () => {
+    const { HYDRATE_LIMIT } = await import("../versionSync");
+    const rows = Array.from({ length: 50 }, (_, i) => ({ versionId: `v${i}` }));
+    list.mockResolvedValueOnce(rows);
+    loadVersions.mockResolvedValueOnce([]);
+    let inFlight = 0;
+    let peak = 0;
+    get.mockImplementation(async ({ versionId }: { versionId: string }) => {
+      inFlight++;
+      peak = Math.max(peak, inFlight);
+      await Promise.resolve();
+      inFlight--;
+      return { id: versionId };
+    });
+    await expect(hydrateVersionsFromServer()).resolves.toBe(HYDRATE_LIMIT);
+    expect(get).toHaveBeenCalledTimes(HYDRATE_LIMIT);
+    expect(get.mock.calls.map((c) => c[0].versionId)).toEqual(rows.slice(0, HYDRATE_LIMIT).map((r) => r.versionId));
+    expect(peak).toBeGreaterThan(1);
+  });
+});

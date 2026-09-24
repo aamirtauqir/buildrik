@@ -200,3 +200,14 @@ describe("ActivityLogView — deep-link", () => {
     expect(screen.queryByText("View in dashboard")).toBeNull();
   });
 });
+
+describe("ActivityLogView — rows open their subject in the editor", () => {
+  it("a row click reports its kind; without a handler rows are inert", async () => {
+    fetchRecentActivity.mockResolvedValueOnce(SAMPLE_ROWS);
+    const onOpenRow = vi.fn();
+    render(<ActivityLogView siteId="site_1" onOpenRow={onOpenRow} />);
+    const rows = await screen.findAllByTestId("activity-row-open");
+    fireEvent.click(rows[0]);
+    expect(onOpenRow).toHaveBeenCalledWith(SAMPLE_ROWS[0].kind);
+  });
+});

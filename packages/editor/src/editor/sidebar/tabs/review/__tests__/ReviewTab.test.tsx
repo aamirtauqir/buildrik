@@ -223,10 +223,10 @@ describe("load states", () => {
 });
 
 describe("actions", () => {
-  it("posts an internal reply then reloads the thread", async () => {
+  it("posts a team-only page comment then reloads the thread", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    fireEvent.change(screen.getByPlaceholderText(/internal note/i), { target: { value: "fixed the contrast" } });
+    fireEvent.change(screen.getByPlaceholderText(/^Comment on /), { target: { value: "fixed the contrast" } });
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
     await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "page-home"));
     await waitFor(() => expect(fetchReviewComments.mock.calls.length).toBeGreaterThan(1));
@@ -319,10 +319,11 @@ describe("actions", () => {
     expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
   });
 
-  it("the note composer says it is internal (G1-056)", async () => {
-    renderTab();
+  it("the composer is the board's page comment, and still says it is team-only (G1-056)", async () => {
+    renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] } } });
     await screen.findByText(/hero photo is too dark/);
-    expect(screen.getByPlaceholderText("Add an internal note…")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Comment on Home…")).toBeInTheDocument();
+    expect(screen.getByTestId("review-composer-meta").textContent).toBe("Page comment · Home · team only");
   });
 
   /* The harness supplies onResend by default, which is exactly why nothing
@@ -483,6 +484,20 @@ describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as
     expect(within(moved).queryByRole("button", { name: "Locate ›" })).toBeNull();
   });
 
+  it("clicking the comment body locates it too; its buttons stay its buttons", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const composer = makeComposer();
+    renderTab({ composer });
+    const body = await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(body);
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+    const row = body.closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Resolve" }));
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+  });
+
   it("an unanchored comment has no Locate ›", async () => {
     fetchReviewComments.mockResolvedValue([COMMENTS[0]]); // targetSelector: null
     renderTab({ composer: makeComposer() });
@@ -518,3 +533,17 @@ describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as
   });
 });
 
+describe("ReviewTab — opened from History › Activity", () => {
+  it("draws ‹ Activity, which goes back to the Activity view", async () => {
+    const emit = vi.fn();
+    renderTab({ fromActivity: true, composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
+    fireEvent.click(await screen.findByRole("button", { name: "‹ Activity" }));
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "history", screen: "activity" });
+  });
+
+  it("no back row when opened any other way", async () => {
+    renderTab();
+    await screen.findByTestId("review-status-line");
+    expect(screen.queryByTestId("back-to-activity")).toBeNull();
+  });
+});

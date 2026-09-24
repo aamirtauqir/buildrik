@@ -290,6 +290,25 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
   });
 
+  /* Brand › Component styles and "Replace with block…" land here asking for
+     BLOCKS; with ELEMENTS' 53 rows still open above it, the asked-for group
+     sat off-screen. The asked group opens alone and scrolls into view. */
+  it("a request opens that group alone and scrolls it into view", () => {
+    const scrolled: string[] = [];
+    const orig = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function () { scrolled.push((this as HTMLElement).dataset.testid ?? ""); };
+    const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
+    requestInsertGroup(composer as never, "blocks");
+    render(
+      <ToastProvider>
+        <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
+      </ToastProvider>,
+    );
+    Element.prototype.scrollIntoView = orig;
+    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "false");
+    expect(scrolled).toContain("insert-section-blocks");
+  });
+
   it("the request is consumed once — the next mount is back to ELEMENTS only", () => {
     const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
     requestInsertGroup(composer as never, "blocks");

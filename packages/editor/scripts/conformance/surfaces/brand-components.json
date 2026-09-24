@@ -25,11 +25,11 @@
     },
     {
       "action": "click",
-      "testId": "brand-row-components"
+      "testId": "brand-row-component-styles"
     },
     {
       "action": "waitFor",
-      "testId": "brand-ai-row"
+      "testId": "brand-components-list"
     },
     {
       "action": "hover",
@@ -173,24 +173,10 @@
       "nodeId": "153:53"
     },
     {
-      "name": "ai-row",
-      "testId": "brand-ai-row",
-      "spec": "brand-components",
-      "nodeId": "153:55"
-    },
-    {
       "name": "ai-cta",
-      "testId": "brand-ai-cta",
+      "testId": "brand-page-action",
       "spec": "brand-components",
       "nodeId": "153:56"
-    },
-    {
-      "name": "saved-header",
-      "testId": "brand-saved-header"
-    },
-    {
-      "name": "saved-empty",
-      "testId": "brand-saved-empty"
     }
   ],
   "_note": [
@@ -236,6 +222,7 @@
     "`AI_CTA`, `AI_DESC`, `SKETCH` and the whole `CatalogPreview` component (with",
     "its `ComponentType` import) have no reader since the card grid became a row",
     "list. CLAUDE.md bans dead code; deleting it is not this board's job and it is",
-    "one commit for whoever takes it."
+    "one commit for whoever takes it.",
+    "2026-09-24 re-pointed (48cc5b236, Component styles is one card; AI is the header page action): nav row brand-row-component-styles, waits on brand-components-list, ai-cta -> brand-page-action; the pinned AI strip and saved-components band were removed (targets dropped)."
   ]
 }

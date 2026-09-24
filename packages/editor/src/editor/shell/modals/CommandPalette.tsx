@@ -400,11 +400,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         onKeyDown={handleKeyDown}
         className="tw:fixed tw:top-12 tw:left-1/2 tw:flex tw:max-h-[800px] tw:w-160 tw:max-w-[calc(100vw-32px)] tw:-translate-x-1/2 tw:flex-col tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
-        {/* Input row — 16/12 inset, ⌕ at 15px, the field at 12px, the scope chip. */}
+        {/* Input row — 16/12 inset, ⌕ at 16 (the board's 15 snapped to --bk-text-16), the field at 12px, the scope chip. */}
         <div data-testid="cmdk-query" className="tw:flex tw:flex-none tw:items-center tw:gap-2 tw:px-4 tw:py-3">
           {/* The input row is the card's focus: the caret is the indicator, and
               the board draws no ring around the field. */}
-          <span aria-hidden="true" className="tw:flex-none tw:text-[15px] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
+          <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-16)] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
             ⌕
           </span>
           <TextInput

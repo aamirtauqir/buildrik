@@ -73,7 +73,6 @@ function makeCssContext(overrides: Partial<CssContext> = {}): CssContext {
       isMedia: false,
       isFlexContainer: false,
       isGridContainer: false,
-      devMode: false,
     } as unknown as CssContext["inspectorContext"],
     selectedElements: [],
     mixedKeys: new Set<string>(),
@@ -95,7 +94,6 @@ function renderTab(opts: {
   tabId: "style" | "element" | "effects";
   elementType: string;
   cssContext?: Partial<CssContext>;
-  devMode?: boolean;
   expanded?: Set<string>;
 }) {
   const composer = makeComposer();
@@ -121,7 +119,6 @@ function renderTab(opts: {
       expandedSections={opts.expanded ?? new Set()}
       onToggleSection={vi.fn()}
       advancedState={NO_OP_ADVANCED}
-      devMode={opts.devMode ?? false}
       tier="pro"
       showAll={false}
       onShowAllChange={vi.fn()}
@@ -147,7 +144,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: false,
           isFlexContainer: false,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -173,7 +169,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: true,
           isFlexContainer: false,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -199,7 +194,6 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
           isMedia: false,
           isFlexContainer: true,
           isGridContainer: false,
-          devMode: false,
         } as unknown as CssContext["inspectorContext"],
       },
     });
@@ -265,34 +259,10 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     expect(screen.queryByRole("button", { name: /Link section/i })).not.toBeInTheDocument();
   });
 
-  it("all-css is only rendered in dev mode", () => {
-    const { rerender } = renderTab({
-      tabId: "element",
-      elementType: "container",
-      devMode: false,
-    });
+  /* G2-160: the dev-flag "All CSS" section is gone. */
+  it("renders no All CSS section", () => {
+    renderTab({ tabId: "element", elementType: "container" });
     expect(screen.queryByRole("button", { name: /All CSS section/i })).not.toBeInTheDocument();
-
-    rerender(
-      <InspectorTabContent
-        tabId="element"
-        composer={makeComposer() as never}
-        selectedElement={{ id: "el-1", type: "container" }}
-        styles={{}}
-        onChange={vi.fn()}
-        onBatchChange={vi.fn()}
-        cssContext={makeCssContext({ elementType: "container" })}
-        propertyStates={{}}
-          expandedSections={new Set()}
-        onToggleSection={vi.fn()}
-        advancedState={NO_OP_ADVANCED}
-        devMode={true}
-        tier="pro"
-        showAll={false}
-        onShowAllChange={vi.fn()}
-      />
-    );
-    expect(screen.getByRole("button", { name: /All CSS section/i })).toBeInTheDocument();
   });
 
   it("css-classes is universal — every element type has it", () => {

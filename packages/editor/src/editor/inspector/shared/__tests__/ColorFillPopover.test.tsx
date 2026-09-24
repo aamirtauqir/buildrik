@@ -46,9 +46,11 @@ describe("ColorFillPopover", () => {
     expect(screen.queryByText(/Design tab/)).toBeNull();
   });
 
+  /* Board 4428:142922 always draws RECENT; before anything is applied it
+     says so. */
   it("a custom hex applies and then shows under RECENT", () => {
     const p = setup();
-    expect(screen.queryByTestId("fill-recent")).toBeNull();
+    expect(screen.getByTestId("fill-recent")).toHaveTextContent("Colours you apply show here");
     const hex = screen.getByTestId("fill-custom-hex");
     fireEvent.change(hex, { target: { value: "#ef4444" } });
     fireEvent.keyDown(hex, { key: "Enter" });
@@ -57,9 +59,19 @@ describe("ColorFillPopover", () => {
     expect(screen.getByRole("button", { name: "Use #EF4444" })).toBeTruthy();
   });
 
-  it("Detach shows only while bound and applies the resolved colour", () => {
+  it("Detach sits beside the custom field, live only while bound, and applies the resolved colour", () => {
+    const unbound = setup();
+    expect(screen.getByTestId("fill-detach")).toBeDisabled();
+    expect(unbound.onCustomValue).not.toHaveBeenCalled();
+  });
+
+  it("the bound tile carries the board's selection mark and its ✎; Detach applies the resolved colour", () => {
     const p = setup({ boundTokenId: "color-primary", currentHex: "#1A56DB" });
-    expect(screen.getAllByRole("option")[0].getAttribute("aria-selected")).toBe("true");
+    const selected = screen.getAllByRole("option")[0];
+    expect(selected.getAttribute("aria-selected")).toBe("true");
+    expect(selected.className).toContain("tw:border-2");
+    expect(selected.className).toContain("tw:border-[var(--bk-accent)]");
+    expect(selected.className).toContain("tw:size-8");
     fireEvent.click(screen.getByTestId("fill-detach"));
     expect(p.onCustomValue).toHaveBeenCalledWith("#1A56DB");
   });
