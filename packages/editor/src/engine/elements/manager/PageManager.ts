@@ -24,6 +24,7 @@ import { EVENTS } from "../../../shared/constants";
 import type { PageData, SlugChange } from "../../../shared/types";
 import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
+import { liftParserHoisted } from "./liftParserHoisted";
 
 /** Max slug-history entries kept per page. Oldest evicts. */
 const SLUG_HISTORY_CAP = 100;
@@ -366,6 +367,10 @@ export class PageManager {
       slugManuallySet: pageData.slugManuallySet ?? false,
       slugHistory: pageData.slugHistory ?? [],
     };
+    /* Saved nestings the HTML parser breaks up (a heading inside a heading)
+       are lifted the way the browser renders them, so model and DOM agree. */
+    const lifted = liftParserHoisted(normalized.root);
+    if (lifted) console.info(`[pages] "${normalized.name}": lifted ${lifted} element(s) out of parents the browser would not keep them in`);
     this.ctx.pages.set(normalized.id, normalized);
     this.ctx.buildElementTree(normalized.root);
     this.registerRoute(normalized);

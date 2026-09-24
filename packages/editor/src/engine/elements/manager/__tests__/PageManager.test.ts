@@ -388,6 +388,27 @@ describe("PageManager.importPage — legacy normalization", () => {
     expect(imported.slugManuallySet).toBe(false);
     expect(imported.slugHistory).toEqual([]);
   });
+
+  /* Walk 2026-09-24 (scratch-ver): headings saved inside headings. The
+     browser hoists them out of the rendered canvas; the load lifts them the
+     same way so the model matches the DOM, and says so once. */
+  it("lifts nestings the HTML parser breaks up, before the tree is built", () => {
+    const { pm, ctx } = makeHarness();
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    pm.importPage({
+      id: "p1",
+      name: "Home",
+      slug: "home",
+      root: {
+        id: "r1",
+        type: "container",
+        children: [{ id: "a", type: "heading", children: [{ id: "b", type: "heading", children: [] }] }],
+      },
+    } as PageData);
+    expect(ctx.pages.get("p1")!.root.children!.map((c) => c.id)).toEqual(["a", "b"]);
+    expect(info).toHaveBeenCalledTimes(1);
+    info.mockRestore();
+  });
 });
 
 describe("PageManager.recordAppliedTemplate (S9 — emits TEMPLATE_APPLIED)", () => {
