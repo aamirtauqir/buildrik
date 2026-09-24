@@ -4,8 +4,6 @@
  */
 
 export * from "./types";
-export * from "./styles";
 export { ComponentIcon } from "./ComponentIcon";
-export { ComponentRow } from "./ComponentRow";
 export { useComponentsState } from "./useComponentsState";
 export { ComponentDetailScreen } from "./ComponentDetailScreen";

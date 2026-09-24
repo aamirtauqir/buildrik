@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act, within } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab, type BuildTabProps } from "../BuildTab";
 import { requestInsertGroup } from "../insertGroupRequest";
@@ -88,15 +88,24 @@ describe("BuildTab — board 137:2 taxonomy", () => {
 /* G2-108 — board 4418:103591: an element row's one-line description is its
    hover tooltip (it used to live only in search matching). */
 describe("BuildTab — element row description on hover (G2-108)", () => {
-  it("an enabled ELEMENTS row carries its catalog description as a tooltip", () => {
+  it("hovering an enabled ELEMENTS row shows its catalog description", () => {
     renderTab();
+    expect(screen.queryByTestId("insert-el-tip")).toBeNull();
     const row = screen.getByTestId("insert-el-Container");
-    // flowbite Tooltip: <div target>{row}</div><div role="tooltip">…</div>
-    const tip = row.parentElement?.nextElementSibling;
-    expect(tip?.getAttribute("role")).toBe("tooltip");
-    expect(tip?.textContent).toBe("Generic wrapper box for grouping elements");
-    // The target wrapper spans the row, so the hover fill still fills the panel.
-    expect(row.parentElement?.className).toContain("tw:w-full");
+    fireEvent.mouseEnter(row);
+    const tip = screen.getByTestId("insert-el-tip");
+    expect(tip.getAttribute("role")).toBe("tooltip");
+    expect(tip.textContent).toBe("Generic wrapper box for grouping elements");
+    expect(tip.className).toContain("tw:bg-gray-900");
+    fireEvent.mouseLeave(row);
+    expect(screen.queryByTestId("insert-el-tip")).toBeNull();
+  });
+
+  /* One bubble for the list, not a Tooltip per row — 53 flowbite tooltips
+     made this panel's first render 6–10s under load. */
+  it("mounts no per-row tooltip", () => {
+    renderTab();
+    expect(document.querySelectorAll('[role="tooltip"]').length).toBe(0);
   });
 });
 
@@ -175,6 +184,9 @@ describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
+  /* Button queries are scoped to the dialog: an unscoped getByRole walks the
+     accessibility tree of the whole drawer (53 element rows) and took 2–5s a
+     call under load — the timeout the integration run hit. */
   it("opens the modal prefilled from the clipboard; Insert sends it through onBlockClick", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
@@ -187,7 +199,7 @@ describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)"
     const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
     await waitFor(() => expect(field.value).toBe("<div><p>hi</p></div>"));
     expect(onBlockClick).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+    fireEvent.click(within(screen.getByTestId("paste-html-modal")).getByRole("button", { name: "Insert" }));
     expect(onBlockClick).toHaveBeenCalledTimes(1);
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({
       id: "pasted-html",
@@ -204,10 +216,10 @@ describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)"
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
     const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
-    expect(screen.getByRole("button", { name: "Insert" })).toBeDisabled();
+    expect(within(screen.getByTestId("paste-html-modal")).getByRole("button", { name: "Insert" })).toBeDisabled();
     fireEvent.change(field, { target: { value: '<p onclick="x()">a</p><script>1</script><script>2</script>' } });
     expect(screen.getByText("2 <script> tags and 1 event handler will be removed")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(within(screen.getByTestId("paste-html-modal")).getByRole("button", { name: "Cancel" }));
     expect(onBlockClick).not.toHaveBeenCalled();
   });
 });
