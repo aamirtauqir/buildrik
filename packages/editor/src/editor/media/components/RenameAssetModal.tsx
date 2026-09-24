@@ -24,7 +24,7 @@ import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
-  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_BTN_GHOST, LIBRARY_MODAL_BTN_SECONDARY,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "./libraryModal";
@@ -96,7 +96,7 @@ export function RenameAssetModal({ item, libraryItems, onRename, onClose }: Rena
             </p>
           </ModalBody>
           <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-rename-foot">
-            <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="mgr-rename-cancel" onClick={onClose}>
+            <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="mgr-rename-cancel" onClick={onClose}>
               Cancel
             </Button>
             <Button size="xs" className={LIBRARY_MODAL_BTN_PRIMARY} data-testid="mgr-rename-edit" onClick={() => setTaken(false)}>
@@ -133,7 +133,7 @@ export function RenameAssetModal({ item, libraryItems, onRename, onClose }: Rena
           />
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-rename-foot">
-          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="mgr-rename-cancel" onClick={onClose}>
+          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="mgr-rename-cancel" onClick={onClose}>
             Cancel
           </Button>
           <Button size="xs" className={LIBRARY_MODAL_BTN_PRIMARY} data-testid="mgr-rename-save" onClick={save} disabled={!canSave}>
