@@ -10,6 +10,7 @@
 import { createBuildrikApiClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import type { ComparePage } from "../shared/utils/html";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -253,4 +254,11 @@ export interface PublishDiff {
  *  fetch error — same rule as fetchPublishHistory. */
 export async function fetchPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
   return getClient().sites.publishDiff.query({ siteId, fromJobId, toJobId });
+}
+
+/** The pages one published version shipped — a Compare side (B8). `null` =
+ *  the payload was pruned past the retained window (a state). THROWS on a
+ *  fetch error, same rule as fetchPublishHistory. */
+export async function fetchPublishedSnapshot(siteId: string, jobId: string): Promise<ComparePage[] | null> {
+  return getClient().sites.publishedSnapshot.query({ siteId, jobId });
 }

@@ -12,9 +12,9 @@
  *
  * `activity.recent` (dashboard `server/trpc/routers/activity.ts`) is typed
  * through `AppRouter`. A failure is thrown as an `ActivityReadError` whose
- * `reason` tells the view which state to draw: `unavailable` (NOT_FOUND),
- * `unauthorized` (signed out / no role), `failed` (anything else,
- * retryable). Never a fake-empty list.
+ * `reason` tells the view which state to draw: `unauthorized` (signed out, no
+ * role, or the site is gone — NOT_FOUND; retrying will not fix any of them),
+ * `failed` (anything else, retryable). Never a fake-empty list.
  *
  * @license BSD-3-Clause
  */
@@ -35,7 +35,7 @@ export interface ActivityEntry {
   createdAt: string | Date;
 }
 
-export type ActivityReadFailure = "unavailable" | "unauthorized" | "failed";
+export type ActivityReadFailure = "unauthorized" | "failed";
 
 export class ActivityReadError extends Error {
   constructor(readonly reason: ActivityReadFailure) {
@@ -46,8 +46,7 @@ export class ActivityReadError extends Error {
 
 function failureOf(err: unknown): ActivityReadFailure {
   const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
-  if (code === "NOT_FOUND") return "unavailable";
-  if (code === "UNAUTHORIZED" || code === "FORBIDDEN") return "unauthorized";
+  if (code === "UNAUTHORIZED" || code === "FORBIDDEN" || code === "NOT_FOUND") return "unauthorized";
   return "failed";
 }
 

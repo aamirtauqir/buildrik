@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const fetchApprovedSnapshot = vi.fn();
 const fetchPublishHistory = vi.fn();
 const fetchPublishDiff = vi.fn();
+const fetchPublishedSnapshot = vi.fn();
 const exportPublishPages = vi.fn();
 
 vi.mock("@/services/ReviewService", () => ({
@@ -19,6 +20,7 @@ vi.mock("@/services/ReviewService", () => ({
 vi.mock("@/services/PublishService", () => ({
   fetchPublishHistory: (...a: unknown[]) => fetchPublishHistory(...a),
   fetchPublishDiff: (...a: unknown[]) => fetchPublishDiff(...a),
+  fetchPublishedSnapshot: (...a: unknown[]) => fetchPublishedSnapshot(...a),
 }));
 vi.mock("../exportPublishPages", () => ({
   exportPublishPages: (...a: unknown[]) => exportPublishPages(...a),
@@ -52,6 +54,7 @@ beforeEach(() => {
   ]);
   fetchPublishDiff.mockResolvedValue({ retained: true, pages: [], added: 0, removed: 0, changed: 0 });
   exportPublishPages.mockResolvedValue(page("<h1>current</h1>"));
+  fetchPublishedSnapshot.mockResolvedValue(page("<h1>v5</h1>"));
 });
 afterEach(cleanup);
 
@@ -100,7 +103,10 @@ describe("CompareHost", () => {
     expect(exportPublishPages).not.toHaveBeenCalled();
   });
 
-  it("leaving published on one side moves the other back to a page source", async () => {
+  /* post-Oct-1 R3: a published version is a page set now
+     (`sites.publishedSnapshot`), so leaving published on one side keeps the
+     other where it is and compares the two as pages. */
+  it("a published version against the current draft compares the shipped pages", async () => {
     openOn({
       left: { kind: "published", jobId: "j5", version: 5 },
       right: { kind: "published", jobId: "j6", version: 6 },
@@ -108,8 +114,10 @@ describe("CompareHost", () => {
     });
     await screen.findByTestId("publish-diff");
     fireEvent.change(screen.getByLabelText("Compare to"), { target: { value: "current" } });
-    await waitFor(() => expect((screen.getByLabelText("Compare from") as HTMLSelectElement).value).toBe("approved"));
+    await waitFor(() => expect(fetchPublishedSnapshot).toHaveBeenCalledWith("s1", "j5"));
+    expect((screen.getByLabelText("Compare from") as HTMLSelectElement).value).toBe("published:j5:5");
     expect(await screen.findByTestId("compare-pane-approved")).toBeInTheDocument();
+    expect(exportPublishPages).toHaveBeenCalled();
   });
 
   it("identical sides say there are no differences (#31)", async () => {

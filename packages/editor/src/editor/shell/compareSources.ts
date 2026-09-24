@@ -7,11 +7,9 @@
  * what the two sides were. A side is now one of four sources, and this file is
  * where a source becomes pages.
  *
- * Published pages are the one source the editor cannot fetch: `publishDiff`
- * keeps the HTML inside the service by design, and `sites.publishedSnapshot`
- * is not a registered procedure yet (needs-dashboard). So a published side
- * only pairs with another published side, where the server's own page-by-page
- * diff is the body.
+ * A published side's pages come from `sites.publishedSnapshot` (post-Oct-1
+ * R3), so it pairs with any other source. Two published sides still render the
+ * server's own page-by-page diff (CompareHost).
  *
  * @license BSD-3-Clause
  */
@@ -20,6 +18,7 @@ import type { NamedVersion } from "@/shared/types/versions";
 import type { CompareSource } from "@/shared/types/compare";
 import type { ComparePage } from "@/shared/utils/html";
 import { fetchApprovedSnapshot } from "@/services/ReviewService";
+import { fetchPublishedSnapshot } from "@/services/PublishService";
 import { exportPublishPages } from "./exportPublishPages";
 
 export interface SourceOption {
@@ -136,10 +135,15 @@ export async function renderSavedVersionPages(version: NamedVersion): Promise<Co
 
 /**
  * One side's pages. `null` = the source has no pages to show (an approval that
- * predates snapshot capture). Throws on transport failure so the host shows a
+ * predates snapshot capture, a published version whose payload was pruned, or
+ * no site to ask about). Throws on transport failure so the host shows a
  * retryable error, never a fake-empty diff (DF5).
  */
-export async function loadSourcePages(composer: Composer, source: CompareSource): Promise<ComparePage[] | null> {
+export async function loadSourcePages(
+  composer: Composer,
+  source: CompareSource,
+  siteId: string | null,
+): Promise<ComparePage[] | null> {
   switch (source.kind) {
     case "approved":
       return fetchApprovedSnapshot();
@@ -150,6 +154,6 @@ export async function loadSourcePages(composer: Composer, source: CompareSource)
       return version ? renderSavedVersionPages(version) : null;
     }
     case "published":
-      throw new Error("A published version compares with another published version.");
+      return siteId ? fetchPublishedSnapshot(siteId, source.jobId) : null;
   }
 }

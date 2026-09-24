@@ -11,12 +11,10 @@
  *   error        a retryable failure → Retry
  *   empty        service returned []
  *   ready        rows render
- *   permission   UNAUTHORIZED / FORBIDDEN — retrying will not fix it
- *   unavailable  NOT_FOUND: `activity.recent` is not on the dashboard yet
- *                (needs-dashboard). Also not retryable.
- * The last two offer "Open in dashboard" (DASHBOARD_URL, the same door the
- * site menu used before this tab existed). Never a permanently blank tab —
- * decision #31.
+ *   permission   UNAUTHORIZED / FORBIDDEN / NOT_FOUND — retrying will not
+ *                fix it; offers "Open in dashboard" (DASHBOARD_URL, the same
+ *                door the site menu used before this tab existed).
+ * Never a permanently blank tab — decision #31.
  *
  * `role="status"` + `aria-live="polite"` on the list region so a screen
  * reader announces the new row set after a filter change without re-reading
@@ -39,7 +37,7 @@ import {
 } from "@/services/ActivityService";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
-type LoadState = "loading" | "ready" | "empty" | "error" | "permission" | "unavailable";
+type LoadState = "loading" | "ready" | "empty" | "error" | "permission";
 
 const FILTER_LIST: ActivityFilter[] = ["all", "edits", "comments", "publish"];
 
@@ -104,7 +102,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
       } catch (e) {
         if (seq !== fetchSeq.current) return;
         const reason = e instanceof ActivityReadError ? e.reason : "failed";
-        setState(reason === "unauthorized" ? "permission" : reason === "unavailable" ? "unavailable" : "error");
+        setState(reason === "unauthorized" ? "permission" : "error");
       }
     },
     [siteId],
@@ -208,18 +206,11 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
           </div>
         )}
 
-        {(state === "permission" || state === "unavailable") && (
-          <div
-            className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]"
-            data-testid={`activity-${state}`}
-          >
+        {state === "permission" && (
+          <div className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]" data-testid="activity-permission">
             <EmptyState
-              title={state === "permission" ? "Can't show activity in the editor" : "Activity isn't in the editor yet"}
-              body={
-                state === "permission"
-                  ? "Open the activity log in the dashboard to see who edited, commented, or published."
-                  : "The activity log lives in the dashboard for now — it opens in a new tab."
-              }
+              title="Can't show activity in the editor"
+              body="Open the activity log in the dashboard to see who edited, commented, or published."
               action={
                 <Button
                   type="button"
