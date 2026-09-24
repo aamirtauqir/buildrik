@@ -973,6 +973,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         <p className={`${META} tw:px-4 tw:pb-2`} data-testid="publish-footer-meta">
           {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
         </p>
+      ) : justPublished && !simulated ? (
+        /* 4418:97787: why the primary is off right after a publish. */
+        <p className={`${META} tw:px-4 tw:pb-2`} data-testid="publish-footer-meta">
+          No page changes{snapshot.lastDeploy ? ` since v${snapshot.lastDeploy.version}` : ""}. Edit a page to publish an
+          update.
+        </p>
       ) : null}
       <div
         className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
@@ -1008,14 +1014,15 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                     /* 4418:97118 draws the blocked CTA as the accent at 40%, one
                        line, 13px — not a grey chip. */
                     className={`tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:whitespace-nowrap tw:px-3 tw:py-1.5 tw:text-[13px] tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-white ${
-                      /* 4418:97570 draws "Publishing…" at full strength. */
-                      isPublishing ? "tw:disabled:opacity-100" : "tw:disabled:opacity-40"
+                      /* 4418:97570 draws "Publishing…" and 97787 "No new
+                         changes" at full strength. */
+                      isPublishing || justPublished ? "tw:disabled:opacity-100" : "tw:disabled:opacity-40"
                     }`}
                     data-testid="publish-cta"
                   >
                     {/* One label, in every state. The board names the destination
                         and never draws an "Update" variant. */}
-                    {isPublishing ? "Publishing…" : "Publish to production"}
+                    {isPublishing ? "Publishing…" : justPublished ? "No new changes" : "Publish to production"}
                   </Button>
                 );
                 /* Board 7045:77984: hovering the live primary says what it

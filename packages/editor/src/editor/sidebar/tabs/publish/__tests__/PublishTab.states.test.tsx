@@ -235,10 +235,11 @@ describe("PublishTab — board 784:4326, just published", () => {
     expect(screen.getByText(/LIVE · v15/)).toBeTruthy(); // 4418:97787
     expect((screen.getByText("View live site") as HTMLAnchorElement).href).toContain("bellacucina.com");
     expect(screen.getByText("Compare v14 → v15")).toBeTruthy();
-    // Nothing pending — the button has nothing to send.
-    expect(
-      (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
-    ).toBe(true);
+    // Nothing pending — the button says so (4418:97787) and has nothing to send.
+    expect((screen.getByText("No new changes").closest("button") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByTestId("publish-footer-meta").textContent).toMatch(
+      /^No page changes since v15\. Edit a page to publish an\s+update\.$/,
+    );
   });
 });
 
