@@ -47,11 +47,13 @@
 
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
-import { Button, Select, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
+import { DEFAULT_TOKENS } from "../constants";
+import type { SpacingPreset } from "../state/useSpacingTokens";
 import {
   useColorRegistry,
   useTypeRegistry,
@@ -182,6 +184,13 @@ const NAV_ROW_ON =
 const NAV_COUNT =
   "tw:flex-none tw:tabular-nums tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
+/* Spacing's ⋯ menu: the three presets on the 4px grid (useSpacingTokens). */
+const SPACING_PRESETS: [SpacingPreset, string][] = [
+  ["compact", "Compact · 2px"],
+  ["normal", "Normal · 4px"],
+  ["spacious", "Spacious · 6px"],
+];
+
 const PAGE_ACTION =
   "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
 
@@ -246,6 +255,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   );
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
+  const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [guardOpen, setGuardOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
@@ -813,6 +823,51 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
               + Add token
             </Button>
+            {page === "spacing" ? (
+              /* Owner ruling 2026-09-24: applying a whole preset comes back
+                 (removed in 91ab74b33 for parity) — in a menu, so the page
+                 still draws no chips (7576:197036). Both actions stage. */
+              <Popover
+                open={spacingMenuOpen}
+                onClose={() => setSpacingMenuOpen(false)}
+                placement="bottom-end"
+                label="Spacing actions"
+                trigger={
+                  <IconButton label="Spacing actions" onClick={() => setSpacingMenuOpen((v) => !v)} data-testid="brand-spacing-menu">
+                    ⋯
+                  </IconButton>
+                }
+              >
+                <Menu label="Spacing actions">
+                  <MenuLabel>Apply preset</MenuLabel>
+                  {SPACING_PRESETS.map(([p, label]) => (
+                    <MenuItem
+                      key={p}
+                      radio
+                      selected={spacing.activePreset === p}
+                      onClick={() => {
+                        spacing.applyPreset(p);
+                        setSpacingMenuOpen(false);
+                      }}
+                      data-testid={`spacing-preset-${p}`}
+                    >
+                      {label}
+                    </MenuItem>
+                  ))}
+                  <MenuSeparator />
+                  <MenuItem
+                    onClick={() => {
+                      spacing.stageDefaults(DEFAULT_TOKENS);
+                      setSpacingMenuOpen(false);
+                      addToast({ description: "Spacing reset to defaults — review and Save to keep it.", tone: "info" });
+                    }}
+                    data-testid="spacing-reset-defaults"
+                  >
+                    Reset to defaults
+                  </MenuItem>
+                </Menu>
+              </Popover>
+            ) : null}
             </div>
           );
         }
