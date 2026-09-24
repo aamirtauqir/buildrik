@@ -337,7 +337,7 @@ export const PageRow = React.memo<Props>(
             </>
           )}
 
-          <span style={{ flex: 1 }} aria-hidden="true" />
+          {!isRenaming && <span style={{ flex: 1 }} aria-hidden="true" />}
 
           {searchContext && (
             <span
@@ -379,6 +379,12 @@ export const PageRow = React.memo<Props>(
             </svg>
           </Button>
         </div>
+        {/* v3 4418:93108: the keys, under the field, while it is open. */}
+        {isRenaming && pendingName === null && (
+          <p className={`bd-pg-rename-hint${nested ? " nested" : ""}`} data-testid={`page-rename-hint-${page.id}`}>
+            Enter to save · Esc to cancel
+          </p>
+        )}
         {isRenaming && pendingName !== null && (
           <RenameUrlDecision
             pageId={page.id}

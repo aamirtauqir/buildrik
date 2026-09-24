@@ -23,6 +23,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  MenuSeparator,
   PanelFrame,
   Popover,
 } from "@/editor/chrome-ui";
@@ -333,12 +334,22 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           `actions` slot. No ⌘K keycap — the topbar field is the ⌘K door. */}
       <PanelFrame.Header
         title="Pages"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={
           <>
+            {bulkMode ? (
+              /* v3 7069:78984: select mode swaps the ⋯ for "Done". */
+              <Button
+                color="light"
+                size="xs"
+                className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-xs tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                data-testid="pages-select-done"
+                onClick={leaveSelectMode}
+              >
+                Done
+              </Button>
+            ) : (
             <Popover
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
@@ -356,21 +367,32 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 </IconButton>
               }
             >
-              <Menu label="Pages options">
+              {/* v3 7069:79383: Select pages… · Listings · Show structure, a
+                  rule, Reload. The board's ⌘R hint is not drawn — ⌘R is the
+                  browser's reload and nothing here binds it. "Widen panel"
+                  is the header's old expand button, as in Layers. */}
+              <Menu label="Pages options" className="tw:w-56">
                 <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
                   Select pages…
-                </MenuItem>
-                <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
-                  Show structure
-                </MenuItem>
-                <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
-                  Reload
                 </MenuItem>
                 <MenuItem data-testid="pages-open-listings" onClick={runMenu(() => setView("listings"))}>
                   Listings
                 </MenuItem>
+                <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
+                  Show structure
+                </MenuItem>
+                <MenuSeparator />
+                <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
+                  Reload
+                </MenuItem>
+                {onExpandToggle && (
+                  <MenuItem data-testid="pages-wide-view" onClick={runMenu(onExpandToggle)}>
+                    {isExpanded ? "Narrow panel" : "Widen panel"}
+                  </MenuItem>
+                )}
               </Menu>
             </Popover>
+            )}
           </>
         }
       />

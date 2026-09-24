@@ -34,13 +34,23 @@ function mount(): MockComposer {
 const openMenu = () => fireEvent.click(screen.getByTestId("pages-panel-menu"));
 
 describe("PagesTab — header ⋯ menu", () => {
-  it("offers Select pages… · Show structure · Reload · Listings; the band links are gone", () => {
+  it("offers Select pages… · Listings · Show structure · Reload (v3 7069:79383); the band links are gone", () => {
     mount();
     expect(screen.queryByText(/Listings/)).toBeNull();
     expect(screen.queryByText(/Structure/)).toBeNull();
     openMenu();
     const labels = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
-    expect(labels).toEqual(["Select pages…", "Show structure", "Reload", "Listings"]);
+    expect(labels).toEqual(["Select pages…", "Listings", "Show structure", "Reload"]);
+  });
+
+  it("select mode swaps the ⋯ for Done, which leaves it (v3 7069:78984)", () => {
+    mount();
+    openMenu();
+    fireEvent.click(screen.getByTestId("pages-menu-select"));
+    expect(screen.queryByTestId("pages-panel-menu")).toBeNull();
+    fireEvent.click(screen.getByTestId("pages-select-done"));
+    expect(document.querySelector(".bd-pg-panel")?.classList.contains("bulk-mode")).toBe(false);
+    expect(screen.getByTestId("pages-panel-menu")).toBeInTheDocument();
   });
 
   it("Select pages… turns bulk mode on with nothing selected; Escape leaves it", () => {
