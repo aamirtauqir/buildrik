@@ -175,6 +175,44 @@ export function sanitizeElementTreeContent(data: ElementData): void {
 }
 
 /**
+ * Session object URLs (`blob:`) die with the window that made them, so a
+ * stored one is a broken image on every later open (walk 2026-09-24: three
+ * load errors per open). A persisted tree must carry none: a `src`/`poster`
+ * that `remap` knows (a local asset re-created this session) is re-pointed,
+ * any other is dropped, and a background image built on one is removed.
+ * Mutates `data`; returns how many were dropped.
+ */
+const SESSION_URL_ATTRS = ["src", "poster"] as const;
+const BG_KEYS = ["background-image", "backgroundImage"] as const;
+export function dropSessionMediaUrls(data: ElementData, remap: Readonly<Record<string, string>> = {}): number {
+  let dropped = 0;
+  const attrs = data.attributes;
+  if (attrs) {
+    for (const name of SESSION_URL_ATTRS) {
+      const v = attrs[name];
+      if (typeof v !== "string" || !v.startsWith("blob:")) continue;
+      if (remap[v]) attrs[name] = remap[v];
+      else {
+        delete attrs[name];
+        dropped++;
+      }
+    }
+  }
+  const styles = data.styles;
+  if (styles) {
+    for (const key of BG_KEYS) {
+      const v = styles[key];
+      if (typeof v === "string" && v.includes("blob:")) {
+        delete styles[key];
+        dropped++;
+      }
+    }
+  }
+  for (const child of data.children ?? []) dropped += dropSessionMediaUrls(child, remap);
+  return dropped;
+}
+
+/**
  * Strip all HTML tags, keep text only
  */
 export function stripAllTags(html: string): string {

@@ -10,6 +10,7 @@
 
 import { createBuildrikApiClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
+import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 
@@ -410,14 +411,27 @@ export async function saveProject(
     throw new ProjectNotLoadedError(siteId, _missingSites.has(siteId));
   }
   const client = getClient();
-  const siteColumnPatch = extractSiteColumnPatch(projectData);
+  /* Never persist a session Object URL: it is a broken image on every later
+     open. The live element keeps its preview; once its upload reaches the
+     server the element is re-pointed (MediaManager.replaceAssetId) and the
+     next save stores the server URL. */
+  const persisted: ProjectData = {
+    ...projectData,
+    pages: projectData.pages.map((page) => {
+      if (!page.root || !JSON.stringify(page.root).includes("blob:")) return page;
+      const root = structuredClone(page.root);
+      dropSessionMediaUrls(root);
+      return { ...page, root };
+    }),
+  };
+  const siteColumnPatch = extractSiteColumnPatch(persisted);
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
 
   // Both mutations start in the same tick so the httpBatchLink still batches
   // them; they are AWAITED separately so one cannot speak for the other.
   const primaryCall = client.sites.saveProject.mutate({
     siteId,
-    projectData,
+    projectData: persisted,
     // 61-conflict: opt into behind-copy detection.
     expectedLastEditedAt: _baselineLastEditedAt,
   });

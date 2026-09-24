@@ -19,7 +19,7 @@ import type {
   ExportResult,
 } from "../shared/types";
 import { clamp, deepClone } from "../shared/utils/helpers";
-import { sanitizeElementTreeContent } from "../shared/utils/html";
+import { dropSessionMediaUrls, sanitizeElementTreeContent } from "../shared/utils/html";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
 import { CMSBindingManager } from "./cms/CMSBindingManager";
@@ -609,6 +609,7 @@ export class Composer extends EventEmitter {
       data.pages.forEach((page) => {
         if (page.root) {
           sanitizeElementTreeContent(page.root);
+          dropSessionMediaUrls(page.root, this.localMediaUrlRemap);
         }
         this.elements.importPage(page);
       });

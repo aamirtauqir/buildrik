@@ -74,6 +74,7 @@ export {
   ALLOWED_URL_SCHEMES,
   sanitizeHTML,
   sanitizeElementTreeContent,
+  dropSessionMediaUrls,
   stripAllTags,
   removeTags,
   isSafeUrl,
