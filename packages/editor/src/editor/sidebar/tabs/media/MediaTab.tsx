@@ -17,6 +17,8 @@ import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
+import { RenameAssetModal } from "@/editor/media/components/RenameAssetModal";
+import { useMediaWriteAccess } from "./hooks/useMediaWriteAccess";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
 import "./MediaTab.css";
@@ -114,6 +116,16 @@ function MediaTabWithComposer({
      saved / failed state; the optimise job shows a persistent "Optimizing → WebP…" toast
      that the outcome replaces. */
   const { removeToast } = useToast();
+  const write = useMediaWriteAccess();
+  /* G3-021: the hub's Rename… opens the library's own rename modal. */
+  const [renameTarget, setRenameTarget] = React.useState<LibraryItem | null>(null);
+  /* A deleted asset takes its open hub with it (the delete lands after the
+     confirm; a cancelled confirm leaves the hub where it was). */
+  const detailKey = state.detailItem?.key;
+  const detailGone = detailKey != null && !state.libraryItems.some((i) => i.key === detailKey);
+  React.useEffect(() => {
+    if (detailGone) state.closeDetail();
+  }, [detailGone, state]);
 
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(initialStockQuery !== undefined);
   const { discSearchAll } = state;
@@ -247,13 +259,28 @@ function MediaTabWithComposer({
       )}
       {state.detailItem && (
         <AssetDetailOverlay
-          item={state.detailItem}
+          /* The live row, so a rename from the hub shows at once. */
+          item={state.libraryItems.find((i) => i.key === state.detailItem?.key) ?? state.detailItem}
           onUpdate={state.updateItem}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
           composer={composer}
           onOptimized={handleOptimized}
           onReplaceAcross={handleReplaceAcross}
+          onInsert={(it) => state.insertToCanvas(it.key)}
+          onRename={setRenameTarget}
+          onCopyUrl={state.copyUrl}
+          onDownload={(it) => composer.media.downloadAssets([{ src: it.src, name: it.displayName ?? it.name }])}
+          onDelete={(it) => state.requestDelete(it.key)}
+          viewOnly={write.canWrite ? undefined : { rename: write.reason("rename"), delete: write.reason("delete") }}
+        />
+      )}
+      {renameTarget && (
+        <RenameAssetModal
+          item={renameTarget}
+          libraryItems={state.libraryItems}
+          onRename={state.renameItem}
+          onClose={() => setRenameTarget(null)}
         />
       )}
       {/*

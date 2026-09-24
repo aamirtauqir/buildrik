@@ -41,6 +41,7 @@ import {
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
 import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
+import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
 type View = "hub" | "used" | "versions" | "optimize";
 
@@ -53,6 +54,15 @@ interface AssetDetailOverlayProps {
   composer?: Composer;
   onOptimized?: (optimizedSrc: string) => void | Promise<void>;
   onReplaceAcross?(item: LibraryItem): void;
+  /* Board 4418:61698 — the library's own actions, under the destination rows
+     (G3-021). Each row renders only when its handler is supplied. */
+  onInsert?(item: LibraryItem): void;
+  onRename?(item: LibraryItem): void;
+  onCopyUrl?(item: LibraryItem): void;
+  onDownload?(item: LibraryItem): void;
+  onDelete?(item: LibraryItem): void;
+  /** A viewer's reasons — Rename / Delete stay visible, disabled, titled. */
+  viewOnly?: { rename?: string; delete?: string };
 }
 
 const ROW =
@@ -95,6 +105,12 @@ export function AssetDetailOverlay({
   composer,
   onOptimized,
   onReplaceAcross,
+  onInsert,
+  onRename,
+  onCopyUrl,
+  onDownload,
+  onDelete,
+  viewOnly,
 }: AssetDetailOverlayProps) {
   const [view, setView] = useState<View>("hub");
   // Escape reads the level from a ref: calling onClose() inside a setState
@@ -473,6 +489,33 @@ export function AssetDetailOverlay({
                 <span className={ROW_CHEVRON}>{"›"}</span>
               </Button>
             ) : null}
+            {/* Board 4418:61698 — the library's actions, glyph-led, no chevron:
+                they act, they do not drill in. */}
+            <div className="tw:w-full" data-testid="media-detail-actions">
+              {[
+                { id: "insert", label: "Insert to canvas", icon: <SquarePlus size={14} />, fn: onInsert },
+                { id: "rename", label: "Rename…", icon: <Pencil size={14} />, fn: onRename, blocked: viewOnly?.rename },
+                { id: "copy-url", label: "Copy URL", icon: <Link2 size={14} />, fn: onCopyUrl },
+                { id: "download", label: "Download", icon: <Download size={14} />, fn: onDownload },
+                { id: "delete", label: "Delete", icon: <Trash2 size={14} />, fn: onDelete, blocked: viewOnly?.delete },
+              ].map((a) =>
+                a.fn ? (
+                  <Button
+                    key={a.id}
+                    className={ROW}
+                    data-testid={`media-detail-${a.id}`}
+                    disabled={Boolean(a.blocked)}
+                    title={a.blocked}
+                    onClick={() => a.fn?.(item)}
+                  >
+                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
+                      <span aria-hidden="true" className="tw:flex tw:text-[var(--bk-ink-soft)]">{a.icon}</span>
+                      <span className="tw:truncate">{a.label}</span>
+                    </span>
+                  </Button>
+                ) : null,
+              )}
+            </div>
           </>
         )
       ) : view === "versions" ? (
