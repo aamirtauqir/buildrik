@@ -37,6 +37,7 @@ import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
+import { RecordPreview } from "./RecordPreview";
 import { resolveUrl } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 
@@ -133,6 +134,7 @@ export function RecordSheet({
     return () => window.clearTimeout(id);
   }, [leaving]);
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [previewOpen, setPreviewOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
 
   React.useEffect(() => {
@@ -294,7 +296,7 @@ export function RecordSheet({
 
   return (
     <div
-      className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:flex tw:flex-col tw:gap-2 tw:overflow-hidden tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel)] tw:px-8 tw:pb-3"
+      className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:flex tw:overflow-hidden tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel)]"
       role="dialog"
       aria-label={`Record · ${crumb}`}
       data-testid="cms-sheet"
@@ -305,6 +307,7 @@ export function RecordSheet({
         }
       }}
     >
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2 tw:px-8 tw:pb-3">
       <header className="tw:flex tw:h-11 tw:w-[280px] tw:flex-none tw:items-center tw:gap-2 tw:px-4">
         <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
           {title}
@@ -372,6 +375,17 @@ export function RecordSheet({
             {row.map(control)}
           </div>
         ))}
+        {/* 7116:76427 — "Preview ▸" opens the read-only card beside the form. */}
+        <Button
+          size="xs"
+          variant="link"
+          aria-expanded={previewOpen}
+          className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium"
+          data-testid="cms-sheet-preview"
+          onClick={() => setPreviewOpen((o) => !o)}
+        >
+          Preview ▸
+        </Button>
       </div>
 
       <footer className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:pt-2">
@@ -411,6 +425,10 @@ export function RecordSheet({
           </Button>
         </div>
       </footer>
+      </div>
+      {previewOpen ? (
+        <RecordPreview collection={collection} record={record} form={form} title={title} onDelete={record ? () => void remove() : undefined} />
+      ) : null}
 
       {/* 6879:67190 — the danger action first, the safe one last; "Keep
           editing" takes focus, and Escape / the scrim give the same answer. */}

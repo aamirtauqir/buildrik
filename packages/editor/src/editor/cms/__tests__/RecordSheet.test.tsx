@@ -173,3 +173,19 @@ describe("RecordSheet", () => {
     expect(screen.getByTestId("cms-sheet-save")).toBeEnabled();
   });
 });
+
+describe("RecordSheet · Preview ▸ (7116:76427)", () => {
+  it("opens a read-only card from the form's current values, with the saved status", async () => {
+    mount();
+    await openRow();
+    expect(screen.queryByTestId("cms-record-preview")).toBeNull();
+    fireEvent.click(screen.getByTestId("cms-sheet-preview"));
+    const card = screen.getByTestId("cms-record-preview-card");
+    expect(card).toHaveTextContent("Margherita");
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$15" } });
+    expect(card).toHaveTextContent("$15");
+    expect(screen.getByTestId("cms-record-preview-status")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("cms-sheet-preview"));
+    expect(screen.queryByTestId("cms-record-preview")).toBeNull();
+  });
+});
