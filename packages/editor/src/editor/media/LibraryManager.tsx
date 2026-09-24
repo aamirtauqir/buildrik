@@ -1020,7 +1020,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             });
           }}
           onRegenerateAltText={async (key) => {
-            const result = await generateAltTextRemote(key);
+            // Regenerate is an explicit ask to REPLACE the current text.
+            const result = await generateAltTextRemote(key, { force: true });
             if (!result) return null;
             if (result.skipped) return result;
             await composer.media.updateAsset(key, {
