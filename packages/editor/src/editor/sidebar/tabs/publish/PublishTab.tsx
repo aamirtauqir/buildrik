@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "../../../../engine";
@@ -276,10 +276,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      than opening an empty list. */
   /* 4418:97570 / 97787 / 97355: while a run is in flight or has just ended,
      the panel shows the run and ENVIRONMENT only — no checks, no changes. */
+  const failedAt = (() => {
+    const steps = hasFailed ? publishJob?.steps ?? [] : [];
+    const i = steps.findIndex((st) => st.status === "failed");
+    return i >= 0 ? { index: i + 1, total: steps.length } : null;
+  })();
   const connectionRefused = hasFailed && /token|connection|unauthori[sz]ed|reconnect/i.test(error ?? "");
   const resultState = isPublishing || justPublished || hasFailed;
   const failedSteps = hasFailed && publishJob?.steps?.length ? publishJob.steps : null;
   const [logOpen, setLogOpen] = React.useState(false);
+  const [reconnectOpen, setReconnectOpen] = React.useState(false);
 
   /* Board 784:4250's "step 2 of 4". The worker marks exactly one step
      `running`; before it does, or once the list is exhausted, there is no
@@ -533,7 +539,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       </p>
       <div className="tw:mt-3 tw:flex tw:items-center tw:gap-4">
         {connectionRefused ? (
-          <Button size="xs" onClick={openIntegrations} className="tw:h-7 tw:px-3" data-testid="publish-repair">
+          <Button size="xs" onClick={() => setReconnectOpen(true)} className="tw:h-7 tw:px-3" data-testid="publish-repair">
             Repair connection
           </Button>
         ) : (
@@ -553,11 +559,30 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             has always returned the `steps` column — the link names the step
             that failed and the ones that never ran. */}
         {failedSteps && (
-          <Button color="light" size="xs" onClick={() => setLogOpen((v) => !v)} aria-expanded={logOpen} className={TEXT_LINK}>
-            {logOpen ? "Hide log" : "View log"}
+          <Button color="light" size="xs" onClick={() => setLogOpen(true)} aria-haspopup="dialog" className={TEXT_LINK}>
+            View log
           </Button>
         )}
       </div>
+      {/* 4418:98003 — the log is a dialog: where it stopped, why, and what
+          is still live; the step list follows. */}
+      <Modal
+        open={Boolean(failedSteps) && logOpen}
+        onClose={() => setLogOpen(false)}
+        testId="publish-log"
+        title={`Publish log · ${siteName} / Production`}
+        footer={
+          <Button size="xs" onClick={() => setLogOpen(false)}>
+            Back to publish
+          </Button>
+        }
+      >
+        {failedAt ? <p className={LOG_LINE}>Attempt failed at step {failedAt.index} of {failedAt.total}.</p> : null}
+        {error ? <p className={LOG_LINE}>{error}</p> : null}
+        <p className={LOG_LINE}>
+          No new deployment was created.
+          {snapshot.lastDeploy?.isLive ? ` Current live version: v${snapshot.lastDeploy.version}.` : ""}
+        </p>
       {failedSteps && logOpen && (
         <ul className="tw:m-0 tw:mt-2 tw:list-none tw:p-0" aria-label="Build log">
           {failedSteps.map((s) => (
@@ -583,6 +608,40 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ))}
         </ul>
       )}
+      </Modal>
+      {/* 4418:98009 — reconnecting happens in the dashboard; the dialog says
+          so, names the site, and offers the way back once it is done. */}
+      <Modal
+        open={reconnectOpen}
+        onClose={() => setReconnectOpen(false)}
+        testId="publish-reconnect"
+        title="Reconnect Vercel · Workspace"
+        footer={
+          <>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:border-transparent tw:bg-transparent"
+              onClick={() => {
+                setReconnectOpen(false);
+                publishJob?.reset?.();
+                void loadChecks();
+              }}
+            >
+              Connection restored · review publish
+            </Button>
+            <Button size="xs" onClick={openIntegrations}>
+              Open dashboard
+            </Button>
+          </>
+        }
+      >
+        <p className={LOG_LINE}>Open workspace connections in the dashboard to reconnect Vercel.</p>
+        <p className={LOG_LINE}>
+          {[siteName, "Production", snapshot.production.value].filter(Boolean).join(" · ")}
+        </p>
+        <p className={LOG_LINE}>Return after the connection is restored, then review the publish details again.</p>
+      </Modal>
     </section>
   );
 
@@ -1041,6 +1100,8 @@ const META = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)]";
    semibold heading. */
 /* The outcome block sits on the run block's 24 gutter and 32 top
    (4418:97787 / 97355), with the board's air before ENVIRONMENT. */
+/* 4418:98003 / 98009 — the dialog lines, 13 ink with 12 between. */
+const LOG_LINE = "tw:m-0 tw:mb-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const RESULT_BLOCK = "tw:px-2 tw:pt-5 tw:pb-8";
 const RESULT_TITLE_SUCCESS = "tw:m-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-success-text)]";
 const RESULT_TITLE_ERROR = "tw:m-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-error-text)]";
