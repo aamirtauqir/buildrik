@@ -80,16 +80,6 @@ export interface DropZoneRegistry {
 // KEYBOARD SUPPORT
 // =============================================================================
 
-/** Keyboard drag step sizes */
-export interface KeyboardDragConfig {
-  /** Small step (arrow keys) */
-  smallStep: number;
-  /** Large step (arrow + shift) */
-  largeStep: number;
-  /** Index step (for list reordering) */
-  indexStep: number;
-}
-
 // =============================================================================
 // DRAG GHOST OPTIONS
 // =============================================================================

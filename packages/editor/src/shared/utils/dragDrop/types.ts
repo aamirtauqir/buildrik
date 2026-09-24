@@ -225,7 +225,6 @@ export type {
   DragEventHandler,
   DropZone,
   DropZoneRegistry,
-  KeyboardDragConfig,
   DragGhostOptions,
   AutoScrollConfig,
 } from "./configTypes";
