@@ -507,9 +507,14 @@ describe("StudioHeader", () => {
       expect(screen.getByText("Not sent")).toBeTruthy();
     });
 
-    it("no review in flight, no pill", async () => {
-      render(<StudioHeader {...makeProps()} />);
-      await waitFor(() => expect(screen.queryByText(/In review|Approved/)).toBeNull());
+    it("no round: the Review door is still there, and opens the Review panel (board 4418:123573)", () => {
+      const onOpenReview = vi.fn();
+      render(<StudioHeader {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false }) })} />);
+      const door = screen.getByTestId("topbar-review-pill");
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Review");
+      expect(screen.getByTestId("topbar-review-chevron").textContent).toBe("›");
+      fireEvent.click(door);
+      expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
   });
 
