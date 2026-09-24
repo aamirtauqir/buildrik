@@ -257,28 +257,6 @@ const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
  * derives each row's label by differencing with its successor, so the fixture
  * supplies sizes rather than the labels themselves.
  */
-/* The optimise drill-in needs a source that actually SHRINKS. The shared
-   fixture is a 1x1 GIF, which WebP-encodes ten times larger, so the panel drew
-   its "+1069%" warning branch — the one state board 1124:4584 does not draw.
-   A 2400x1600 SVG carrying a padded comment gives a real byte count to start
-   from and a flat image that compresses to almost nothing, so the success
-   branch (green, a negative percentage) is what gets measured. */
-const OPTIMISE_ITEM: LibraryItem = MEDIA_ITEM({
-  key: "hero",
-  name: "hero-dark.jpg",
-  size: 840 * 1024,
-  width: 2400,
-  height: 1600,
-  src:
-    "data:image/svg+xml," +
-    encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='2400' height='1600'>" +
-        "<rect width='2400' height='1600' fill='#334155'/><!--" +
-        "padding".repeat(9000) +
-        "--></svg>",
-    ),
-});
-
 const VERSIONED_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
   name: "hero-dark.jpg",
@@ -2620,7 +2598,6 @@ const CASES: Record<string, () => React.ReactElement> = {
           composer={USAGE_COMPOSER}
           onClose={() => {}}
           onEditImage={() => {}}
-          onOptimized={() => {}}
           onReplaceAcross={() => {}}
         />,
       )}
@@ -2635,25 +2612,6 @@ const CASES: Record<string, () => React.ReactElement> = {
             composer={USAGE_COMPOSER}
             onClose={() => {}}
             onEditImage={() => {}}
-          />
-        </AutoOpen>,
-      )}
-    </div>
-  ),
-  /* Board 1124:4562 — the OPTIMISE drill-in, at the board's own 280x812. The
-     panel is `OptimizationPanel` inside `AssetDetailOverlay`'s fourth view, so
-     the probe mounts the real overlay and AutoOpen presses the hub's Optimise
-     row, which is how a person reaches it. */
-  "media-detail-optimize": () => (
-    <div data-probe="media-detail-optimize">
-      {drillHost(
-        <AutoOpen testid="media-detail-optimize">
-          <AssetDetailOverlay
-            item={OPTIMISE_ITEM}
-            composer={USAGE_COMPOSER}
-            onClose={() => {}}
-            onEditImage={() => {}}
-            onOptimized={() => {}}
           />
         </AutoOpen>,
       )}

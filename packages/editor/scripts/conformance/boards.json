@@ -4213,16 +4213,16 @@
     },
     {
       "nodeId": "1124:4562",
-      "name": "S3.6 · media · optimise (drill-in)",
+      "name": "S3.6 · media · optimise (drill-in) — SUPERSEDED 2026-09-24 by the image editor Optimise tab 4418:149547 (G3-026)",
       "family": "S3 flows",
       "state": "media · optimise",
       "width": 280,
       "height": 812,
-      "status": "active",
-      "authority": "board",
-      "recipe": "s3-flows-media-optimise",
+      "status": "out-of-scope",
+      "authority": "superseded:4418-149547",
+      "recipe": null,
       "verifiedNote": "conformed + measured 2026-09-08 (recipe s3-flows-media-optimise): 35 compared, 27 pass, 0 fail, 8 unknown. NOT a duplicate of s3-flows-media-optimizing (303:2032, the drawer's status pill) — different board, different component, no shared node or testId. OptimizationPanel.tsx was built to it and unmeasured. Fixed: the optimised figure was --bk-success #0E9F6E at 3.39:1 on white and the board's own --color/success-text #057A55 repairs it (the warning branch's #C27803 at 3.51:1 moved with it); the same min-h-6 chip trap; the same wrong-token chip fill; and board 1124:4568's line is '2400x1600 · 840 KB' where the product printed THE BYTES ALONE — so the line telling you what you are about to shrink never said how big it is. Two of its three contrast failures are now GONE, both fixed by conforming to the board.",
-      "verified": "drift-fixed"
+      "verified": "no"
     },
     {
       "nodeId": "1138:4527",
@@ -8378,6 +8378,6 @@
       "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
     }
   ],
-  "coveredFloor": 188,
+  "coveredFloor": 187,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

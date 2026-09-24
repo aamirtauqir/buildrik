@@ -1505,16 +1505,6 @@
     "skipped": 3,
     "compared": 54
   },
-  "s3-flows-media-optimise": {
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "span.tw:absolute.tw:bottom-2 | 2400×1600 · 46.28 KB | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
-    },
-    "nonTextPairs": {},
-    "skipped": 7,
-    "compared": 35
-  },
   "s1-editor-assembled-1440-drawer-pinned": {
     "skipped": 4,
     "compared": 21,

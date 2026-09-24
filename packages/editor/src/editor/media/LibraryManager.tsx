@@ -46,9 +46,8 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { generateAltTextRemote } from "../../services/AltTextService";
+import { regenerateAltText } from "../../services/AltTextService";
 import { createAssetVersion } from "../../services/MediaVersionService";
-import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
 /* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
@@ -75,10 +74,6 @@ interface LibraryManagerProps {
     imageSrc: string,
     onSave: (editedSrc: string, edits?: EditsSnapshot) => void | Promise<void>,
     door?: ImageEditorOptions,
-  ) => void;
-  onOpenIconPicker?: (
-    currentIcon: IconConfig | undefined,
-    onSelect: (icon: IconConfig) => void
   ) => void;
 }
 
@@ -108,7 +103,7 @@ const SORT_OPTIONS = [
    count line (3721:45960). */
 type MoveDoor = "selection" | "menu";
 
-export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
+export function LibraryManager({ composer, onClose, onOpenImageEditor }: LibraryManagerProps) {
   const state = useMediaState(composer);
   /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
      aria-disabled, with the reason on a tooltip. The rest of the media gate
@@ -576,18 +571,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setUploadDone(null);
   }, [uploadDone]);
 
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        composer.mediaOps.insertMedia(icon.name, "icon");
-        addToast({ description: `${icon.name} icon added`, tone: "success" });
-      } catch {
-        addToast({ description: "Could not add icon", tone: "error" });
-      }
-    });
-  }, [onOpenIconPicker, composer, addToast]);
-
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
      (its parent's key: a version's own key resolves to the same family). */
@@ -991,22 +974,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               generatedMetadata: undefined,
             });
           }}
-          onRegenerateAltText={async (key) => {
-            // Regenerate is an explicit ask to REPLACE the current text.
-            const result = await generateAltTextRemote(key, { force: true });
-            if (!result) return null;
-            if (result.skipped) return result;
-            await composer.media.updateAsset(key, {
-              altText: result.altText,
-              generatedMetadata: {
-                altText: {
-                  generatedAt: new Date().toISOString(),
-                  model: result.model ?? DEFAULT_MODEL,
-                },
-              },
-            });
-            return result;
-          }}
+          // Regenerate is an explicit ask to REPLACE the current text.
+          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
@@ -1062,7 +1031,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onClose={() => setStockModalOpen(false)}
         photos={state.stockPhotos}
         videos={state.stockVideos}
-        icons={state.discIcons}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
@@ -1075,7 +1043,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             setStockSaved(saved);
           }
         }}
-        onOpenIconPicker={handleOpenIconPicker}
       />
       <StockSavedModal
         saved={stockSaved}

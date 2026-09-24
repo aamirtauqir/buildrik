@@ -71,7 +71,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, usages: Record
   const { LibraryManager } = await import("../LibraryManager");
   const onClose = vi.fn();
   const utils = render(
-    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} />,
   );
   return { ...utils, onClose };
 }
@@ -80,7 +80,7 @@ async function rerenderWith(utils: { rerender: (ui: React.ReactElement) => void 
   mocks.state.mediaState = { ...mocks.state.mediaState, ...over };
   const { LibraryManager } = await import("../LibraryManager");
   utils.rerender(
-    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />,
+    <LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />,
   );
 }
 

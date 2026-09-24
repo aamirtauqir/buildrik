@@ -57,7 +57,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, downloaded = 1
   const { LibraryManager } = await import("../LibraryManager");
   const composer = makeComposer(USAGES);
   (composer.media as unknown as { downloadAssets: () => number }).downloadAssets = vi.fn(() => downloaded);
-  const utils = render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+  const utils = render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
   return { ...utils, composer };
 }
 

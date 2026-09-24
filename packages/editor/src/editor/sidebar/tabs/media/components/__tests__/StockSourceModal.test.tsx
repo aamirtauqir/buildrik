@@ -21,7 +21,7 @@ import { describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { StockSourceModal } from "../StockSourceModal";
-import type { DiscIcon, StockPhoto, StockVideo } from "../../data/mediaTypes";
+import type { StockPhoto, StockVideo } from "../../data/mediaTypes";
 
 function photo(over: Partial<StockPhoto> = {}): StockPhoto {
   return {
@@ -50,15 +50,12 @@ function video(over: Partial<StockVideo> = {}): StockVideo {
   };
 }
 
-const icon: DiscIcon = { id: "ico_1", name: "User", category: "General", svgDataUrl: "data:image/svg+xml;base64,PHN2Zy8+" };
-
 function mount(over: Partial<React.ComponentProps<typeof StockSourceModal>> = {}) {
   const props: React.ComponentProps<typeof StockSourceModal> = {
     open: true,
     onClose: vi.fn(),
     photos: [],
     videos: [],
-    icons: [],
     loading: { img: false, vid: false, ico: false, fnt: false },
     searchQuery: "",
     searchFailed: null,
@@ -93,11 +90,12 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     expect(screen.queryByText("Use")).toBeNull();
   });
 
-  it("keeps the code's sources behind a compact switch — Photos · Videos · Icons — with Photos pressed", () => {
+  it("keeps the code's sources behind a compact switch — Photos · Videos (G3-036: no Icons) — with Photos pressed", () => {
     mount();
     const sw = screen.getByTestId("stock-source-switch");
     const names = within(sw).getAllByRole("button").map((b) => b.textContent?.trim());
-    expect(names).toEqual(["Photos", "Videos", "Icons"]);
+    expect(names).toEqual(["Photos", "Videos"]);
+    expect(screen.queryByTestId("stock-browse-icons")).toBeNull();
     expect(within(sw).getByRole("button", { name: "Photos" })).toHaveAttribute("aria-pressed", "true");
     expect(within(sw).getByRole("button", { name: "Videos" })).toHaveAttribute("aria-pressed", "false");
     /* Fonts have no file to save (MediaManager.getFonts is four stub
@@ -185,31 +183,6 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     fireEvent.click(card);
     fireEvent.click(save());
     expect(onSave).toHaveBeenCalledWith("vid", expect.objectContaining({ id: "v1" }));
-  });
-
-  it("Icons: the stubs are cards too, Save hands up `ico`, and Browse full icon library stays the door to the picker", () => {
-    const onSave = vi.fn(() => Promise.resolve());
-    const onOpenIconPicker = vi.fn();
-    mount({ icons: [icon], onSave, onOpenIconPicker });
-    fireEvent.click(screen.getByRole("button", { name: "Icons" }));
-    const card = screen.getByTestId("stock-card-ico_1");
-    expect(within(card).getByTestId("stock-card-title")).toHaveTextContent("User");
-    fireEvent.click(card);
-    fireEvent.click(save());
-    expect(onSave).toHaveBeenCalledWith("ico", expect.objectContaining({ id: "ico_1" }));
-    fireEvent.click(screen.getByTestId("stock-browse-icons"));
-    expect(onOpenIconPicker).toHaveBeenCalledTimes(1);
-  });
-
-  /* Seen live: with no provider key the photo search fails "not configured",
-     and the Icons source — the engine's own list, filtered client-side —
-     showed that failure instead of its icons. */
-  it("a provider failure never blanks the Icons source", () => {
-    mount({ searchQuery: "star", searchFailed: "not-configured", icons: [icon] });
-    expect(screen.getByTestId("stock-failed")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Icons" }));
-    expect(screen.queryByTestId("stock-failed")).toBeNull();
-    expect(screen.getByTestId("stock-card-ico_1")).toBeInTheDocument();
   });
 
   it("switching the source drops the selection — the primary cannot save a photo from the Videos view", () => {

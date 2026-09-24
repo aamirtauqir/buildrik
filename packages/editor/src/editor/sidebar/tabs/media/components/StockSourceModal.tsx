@@ -9,8 +9,10 @@
  * shows 3695:45573 "Stock image saved". A save the engine refused leaves the
  * dialog open with its selection.
  *
- * The code's sources stay — photos, videos, icons — behind the compact
- * switch beside the search. Fonts are dropped: `MediaManager.getFonts` is
+ * The code's sources stay — photos and videos — behind the compact switch
+ * beside the search. The Icons source is gone (G3-036): it was four demo
+ * glyphs whose only real path was a link to the Select Icon modal, which
+ * the library's own Icons door already opens. Fonts are dropped: `MediaManager.getFonts` is
  * four stub families with no file, so there is nothing a "save to library"
  * dialog could save; the inspector's Font picker is their door, which is
  * what the old Use button's toast already said. The orientation group, the
@@ -32,9 +34,8 @@
 
 import * as React from "react";
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
-import { SquareArrowOutUpRight } from "lucide-react";
 import { SearchBar } from "../../../shared/SearchBar";
-import type { DiscIcon, StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
+import type { StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
@@ -43,15 +44,14 @@ import {
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
 
-export type StockKind = "img" | "vid" | "ico";
-export type StockItem = StockPhoto | StockVideo | DiscIcon;
+export type StockKind = "img" | "vid";
+export type StockItem = StockPhoto | StockVideo;
 
 interface StockSourceModalProps {
   open: boolean;
   onClose(): void;
   photos: StockPhoto[];
   videos: StockVideo[];
-  icons: DiscIcon[];
   loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   searchQuery: string;
   /** WHY the last search failed, or null/absent when it did not (blocker A-STOCK). */
@@ -60,14 +60,11 @@ interface StockSourceModalProps {
   onLoadMore(type: "img" | "vid"): void;
   /** Save the ONE selected result. Resolves when it has settled; closing is the orchestrator's. */
   onSave(type: StockKind, item: StockItem): Promise<unknown> | void;
-  /** "Browse full icon library" — the Lucide picker, a different asset model. */
-  onOpenIconPicker?(): void;
 }
 
 const SOURCES: ReadonlyArray<{ id: StockKind; label: string; noun: string }> = [
   { id: "img", label: "Photos", noun: "photos" },
   { id: "vid", label: "Videos", noun: "videos" },
-  { id: "ico", label: "Icons", noun: "icons" },
 ];
 
 const PROVIDER_LABEL: Record<string, string> = { unsplash: "Unsplash", pexels: "Pexels", pixabay: "Pixabay" };
@@ -165,14 +162,12 @@ export function StockSourceModal({
   onClose,
   photos,
   videos,
-  icons,
   loading,
   searchQuery,
   searchFailed,
   onSearch,
   onLoadMore,
   onSave,
-  onOpenIconPicker,
 }: StockSourceModalProps) {
   const [source, setSource] = React.useState<StockKind>("img");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
@@ -189,11 +184,10 @@ export function StockSourceModal({
 
   if (!open) return null;
 
-  const results: StockItem[] = source === "img" ? photos : source === "vid" ? videos : icons;
+  const results: StockItem[] = source === "img" ? photos : videos;
   const selected = selectedId === null ? null : (results.find((r) => r.id === selectedId) ?? null);
   const isLoading = loading[source];
   const noun = SOURCES.find((s) => s.id === source)?.noun ?? "photos";
-  const needsQuery = source !== "ico";
 
   const switchSource = (next: StockKind) => {
     setSource(next);
@@ -253,19 +247,6 @@ export function StockSourceModal({
           </div>
 
           <div className="tw:min-h-0 tw:flex-1 tw:overflow-auto" data-testid="stock-results">
-            {source === "ico" && onOpenIconPicker ? (
-              <Button
-                type="button"
-                color="light"
-                size="xs"
-                variant="link"
-                className="tw:mb-2 tw:h-auto tw:min-h-0 tw:gap-1 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
-                data-testid="stock-browse-icons"
-                onClick={onOpenIconPicker}
-              >
-                Browse full icon library <SquareArrowOutUpRight size={12} aria-hidden="true" />
-              </Button>
-            ) : null}
 
             {isLoading ? (
               <p className={`${STATE} tw:text-[var(--bk-accent-text)]`} data-testid="stock-loading">
@@ -273,7 +254,7 @@ export function StockSourceModal({
               </p>
             ) : null}
 
-            {!isLoading && needsQuery && searchQuery.length === 0 ? (
+            {!isLoading && searchQuery.length === 0 ? (
               <p className={STATE} data-testid="stock-idle">
                 Search to see stock {noun}.
               </p>
@@ -282,10 +263,7 @@ export function StockSourceModal({
             {/* A failed request is not an empty result, and the three failures
                 are not each other. Until the service carried a reason, all four
                 rendered "No photos found for …" (blocker A-STOCK). */}
-            {/* The failure belongs to the provider sources: icons are the
-                engine's own list, filtered client-side, so an unconfigured
-                photo key must not blank them (seen live 2026-09-13). */}
-            {!isLoading && needsQuery && searchFailed && searchQuery.length > 0 ? (
+            {!isLoading && searchFailed && searchQuery.length > 0 ? (
               <p className={STATE} role="alert" data-testid="stock-failed">
                 {FAILURE_COPY[searchFailed].message}
                 {FAILURE_COPY[searchFailed].retryable ? (
@@ -305,14 +283,14 @@ export function StockSourceModal({
               </p>
             ) : null}
 
-            {!isLoading && (!needsQuery || !searchFailed) && results.length === 0 && (!needsQuery || searchQuery.length > 0) ? (
+            {!isLoading && !searchFailed && results.length === 0 && searchQuery.length > 0 ? (
               <p className={STATE} data-testid="stock-empty">
-                {needsQuery ? `No ${noun} found for "${searchQuery}"` : "No icons found."}
+                {`No ${noun} found for "${searchQuery}"`}
               </p>
             ) : null}
 
             {results.length > 0 ? (
-              <div className={`tw:grid tw:gap-2 ${source === "ico" ? "tw:grid-cols-4" : "tw:grid-cols-2"}`}>
+              <div className="tw:grid tw:grid-cols-2 tw:gap-2">
                 {source === "img"
                   ? photos.map((p) => (
                       <Card key={p.id} id={p.id} selected={selectedId === p.id} onSelect={() => setSelectedId(p.id)}>
@@ -335,25 +313,10 @@ export function StockSourceModal({
                       </Card>
                     ))
                   : null}
-                {source === "ico"
-                  ? icons.map((ico) => (
-                      <Card key={ico.id} id={ico.id} selected={selectedId === ico.id} onSelect={() => setSelectedId(ico.id)}>
-                        <span className="tw:flex tw:aspect-[3/2] tw:w-full tw:items-center tw:justify-center tw:rounded-md tw:bg-[var(--bk-bg-subtle)]">
-                          <img src={ico.svgDataUrl} alt={ico.name} className="tw:size-6" />
-                        </span>
-                        <span className={TITLE} data-testid="stock-card-title">
-                          {ico.name}
-                        </span>
-                        <span className={CREDIT} data-testid="stock-tile-attribution">
-                          {ico.category}
-                        </span>
-                      </Card>
-                    ))
-                  : null}
               </div>
             ) : null}
 
-            {source !== "ico" && results.length > 0 ? (
+            {results.length > 0 ? (
               <Button
                 type="button"
                 size="xs"
