@@ -106,11 +106,14 @@ export const Row: React.FC<{
    *  "Disabled without a reason is a bug" — the Button component doc. */
   disabled?: boolean;
   disabledReason?: string;
+  /** Enabled rows: the catalog's one-line description, shown on hover
+   *  (G2-108, board 4418:103591). */
+  description?: string;
   testId: string;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, description, testId, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
@@ -187,8 +190,11 @@ export const Row: React.FC<{
   // Board 138:198: the disabled row's tooltip IS the reason ("Video blocks
   // need a media provider connected" is that board's sample). Ink bg, white
   // 12px — the Tooltip primitive's dark style.
-  return disabled && disabledReason ? (
-    <Tooltip content={disabledReason} placement="bottom" arrow={false}>
+  // An enabled row's tooltip is its description (G2-108). The target wrapper
+  // is widened so the row keeps its full-width hover fill.
+  const tip = disabled ? disabledReason : description;
+  return tip ? (
+    <Tooltip content={tip} placement="bottom" arrow={false} theme={{ target: "tw:w-full" }}>
       {row}
     </Tooltip>
   ) : (
@@ -208,6 +214,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         iconHtml={el.iconHtml}
         disabled={el.disabled}
         disabledReason={el.disabled ? el.description : undefined}
+        description={el.disabled ? undefined : el.description}
         testId={`insert-el-${el.name}`}
         draggable
         onDragStart={(e) => onDragStart(e, el)}

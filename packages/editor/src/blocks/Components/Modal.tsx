@@ -19,7 +19,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     },
     styles: {
       padding: "12px 24px",
-      background: "#8b5cf6",
+      background: BLOCK_COLORS.accent,
       color: BLOCK_COLORS.accentOn,
       border: "none",
       borderRadius: "8px",

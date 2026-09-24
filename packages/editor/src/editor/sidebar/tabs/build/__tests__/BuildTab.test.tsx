@@ -85,6 +85,21 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 });
 
+/* G2-108 — board 4418:103591: an element row's one-line description is its
+   hover tooltip (it used to live only in search matching). */
+describe("BuildTab — element row description on hover (G2-108)", () => {
+  it("an enabled ELEMENTS row carries its catalog description as a tooltip", () => {
+    renderTab();
+    const row = screen.getByTestId("insert-el-Container");
+    // flowbite Tooltip: <div target>{row}</div><div role="tooltip">…</div>
+    const tip = row.parentElement?.nextElementSibling;
+    expect(tip?.getAttribute("role")).toBe("tooltip");
+    expect(tip?.textContent).toBe("Generic wrapper box for grouping elements");
+    // The target wrapper spans the row, so the hover fill still fills the panel.
+    expect(row.parentElement?.className).toContain("tw:w-full");
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846). */
 describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
   it("reads the clipboard and sends content through onBlockClick", async () => {

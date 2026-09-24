@@ -68,7 +68,7 @@ export class GlobalStyleManager extends EventEmitter {
       system: true,
       styles: {
         padding: "12px 24px",
-        background: "#667eea",
+        background: "#1A56DB",
         color: "#ffffff",
         border: "none",
         "border-radius": "8px",
@@ -88,8 +88,8 @@ export class GlobalStyleManager extends EventEmitter {
       styles: {
         padding: "12px 24px",
         background: "transparent",
-        color: "#667eea",
-        border: "2px solid #667eea",
+        color: "#1A56DB",
+        border: "2px solid #1A56DB",
         "border-radius": "8px",
         "font-weight": "600",
         cursor: "pointer",
