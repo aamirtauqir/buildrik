@@ -20,7 +20,7 @@ import { itemMatches } from "./hooks/useLayerSearch";
 import { findById as findLayer, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
-import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
@@ -391,6 +391,13 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     });
   }, [composer, selectedCount, state.selectionHook, addToast]);
 
+  const dimmedSelection = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount > 1 || !state.hiddenIds.has(id)) return null;
+    const item = findLayer(state.layers, id);
+    return item ? { id, name: getDisplayName(id, item.type, state.actionsHook.customNames, item.preview) } : null;
+  }, [selectedElement?.id, selectedCount, state.hiddenIds, state.layers, state.actionsHook.customNames]);
+
   // Filter tree by search only (no category filters in Minimal Tree design)
   const treeFiltered = state.filterTree(state.layers);
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
@@ -527,6 +534,24 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             displayPrefs={state.displayPrefs}
           />
         ))}
+        {dimmedSelection && (
+          /* v3 4418:79800: the selected layer is dimmed — say what dimming
+             is (editor only) and where site hiding lives, with the way back. */
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:pt-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="layers-dimmed-note">
+            <p className="tw:m-0">{dimmedSelection.name} is dimmed in the editor. It still appears on the live site.</p>
+            <p className="tw:m-0">To hide on the site, use Inspector → Visibility.</p>
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className="tw:h-7 tw:px-4 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:focus:ring-0"
+              data-testid="layers-dimmed-show"
+              onClick={(e: React.MouseEvent) => state.toggleVisibility(dimmedSelection.id, e)}
+            >
+              Show normally in editor
+            </Button>
+          </div>
+        )}
       </div>
       <LayersScrollThumb containerRef={state.treeContainerRef} />
       </div>

@@ -328,7 +328,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         {readOnly ? null : (
         <Button
           type="button"
-          className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
+          className={`bdc-lr-eye tw:focus:ring-0${isHidden ? " bdc-off" : ""}`}
           data-testid={`layer-eye-${layer.id}`}
           title={
             isHidden
@@ -344,6 +344,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
                 <path d="M3 3l18 18" />
                 <path d="M10.6 10.6a2 2 0 002.8 2.8" />
                 <path d="M9.9 5.1A9.5 9.5 0 0121 12a9.5 9.5 0 01-2.1 3" />
+                <path d="M6.6 6.6A13.5 13.5 0 002 12s4 7 10 7a9.7 9.7 0 005.4-1.6" />
               </>
             ) : (
               <>
@@ -360,7 +361,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         {!readOnly && (displayPrefs.showLockBadges || isLocked) && (
         <Button
           type="button"
-          className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
+          className={`bdc-lr-lock tw:focus:ring-0${isLocked ? " bdc-on" : ""}`}
           data-testid={`layer-lock-${layer.id}`}
           title={isLocked ? "Unlock element" : "Lock element"}
           aria-label={isLocked ? "Unlock element" : "Lock element"}

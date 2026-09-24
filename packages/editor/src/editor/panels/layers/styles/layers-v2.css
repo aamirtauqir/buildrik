@@ -24,7 +24,7 @@
      compressing them below the 28px above — their apparent height was an
      accident of how tall the eye/lock buttons happened to be. */
   flex-shrink: 0;
-  padding: 0 8px;  /* board: lock ends 8 from the row's right edge; the LEFT gutter is LayerTreeItem's depth ladder (12 + depth*16) */
+  padding: 0 16px 0 8px;  /* v3 7059:78941: lock ends 16 from the row's right edge; the LEFT gutter is LayerTreeItem's depth ladder */
   border-radius: 4px;
   font: 400 13px var(--bk-font-ui);
   color: var(--bk-ink);
@@ -207,9 +207,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 20px;
+  width: 24px; height: 24px; /* v3 7059:78941: 24 squares, 16 glyphs */
   min-height: 0;
-  padding: 2px;
+  padding: 4px;
   opacity: 1;
   transition: color 120ms;
   background: transparent;
@@ -219,8 +219,8 @@
 
 .bdc-lr-eye svg,
 .bdc-lr-lock svg {
-  width: 11px;
-  height: 11px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.6;
@@ -303,7 +303,7 @@
    for the depth ladder. */
 .bdc-layers-tree.bdc-layers-tree-compact .bdc-lr {
   height: var(--bk-size-row-dense);
-  padding: 2px var(--bk-space-8);
+  padding: 2px var(--bk-space-16) 2px var(--bk-space-8); /* lock ends 16 in (7059:78941) */
 }
 /* "Compact rows" off (C4 #18): the standard 32. Both heights were 28, so the
    display option toggled a class that changed nothing (QA 2026-09-24). */

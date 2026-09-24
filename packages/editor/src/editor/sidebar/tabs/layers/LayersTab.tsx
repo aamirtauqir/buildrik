@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -222,6 +222,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               <MenuItem data-testid="layers-collapse-all" onClick={runMenu(() => composer?.emit("layers:collapse-all", {}))}>
                 Collapse all
               </MenuItem>
+              <MenuSeparator />
               <MenuItem
                 data-testid="layers-display-settings-toggle"
                 onClick={runMenu(() => setDisplaySettingsOpen((v) => !v))}
