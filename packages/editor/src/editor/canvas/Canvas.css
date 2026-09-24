@@ -276,11 +276,6 @@
   pointer-events: none;
 }
 
-[data-buildrick-id][data-drop-target="true"] {
-  outline: 2px solid var(--bk-success);
-  outline-offset: 2px;
-  transition: outline-color 150ms ease;
-}
 
 .bd-clone-mode {
   cursor: copy !important;
@@ -589,41 +584,12 @@ button:hover > .bd-canvas-empty-cta__thumb {
   font-family: var(--bk-font-ui);
 }
 
-[data-buildrick-id][data-drop-target="true"][data-drop-valid="true"] {
-  box-shadow: var(--bk-shadow-focus);
-  transition: box-shadow 150ms ease, outline 150ms ease;
-}
 
-/* Board 4428:139921: an insert BETWEEN elements paints only the line and its
-   "Drop here" pill — the neighbour the line sits against gets no ring. */
-[data-buildrick-id][data-drop-target="true"]:is([data-drop-position="before"], [data-drop-position="after"]) {
-  outline: none;
-  box-shadow: none;
-}
+/* A valid drop target draws no ring of its own: DropFeedbackOverlay paints
+   the cue — the target box for a move, the accent outline + tag for an Add
+   drag (4418:100890), the line + "Drop here" pill between elements
+   (4428:139921). The green outline / focus shadow that sat here doubled it. */
 
-[data-buildrick-id][data-drop-target="true"][data-drop-valid="true"][data-has-children="true"]::after {
-  content: '+';
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bk-success);
-  color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--bk-radius-full);
-  font-size: var(--bk-text-13);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-  pointer-events: none;
-}
-
-[data-buildrick-id][data-drop-target="true"]:is([data-drop-position="before"], [data-drop-position="after"])::after {
-  content: none;
-}
 
 @keyframes flashOnDrop {
   0% {

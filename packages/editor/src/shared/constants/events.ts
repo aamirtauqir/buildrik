@@ -334,6 +334,11 @@ export const EVENTS = {
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
   /** Add opens on its "Generate a block" screen (G2-117). */
   UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
+  /** An Add-drawer drag started (`{ label }`) or ended (`{ label: null }`) —
+   *  board 4418:100890's drag state (canvas cue, drawer note, readout). */
+  UI_INSERT_DRAG: "ui:insert-drag",
+  /** Where that drag would land now (`InsertDragTarget | null`), from the canvas. */
+  UI_INSERT_DRAG_TARGET: "ui:insert-drag-target",
   /** ⌘⇧V (board 7063:78846): the shell routes it to Add's Paste HTML dialog. */
   UI_PASTE_HTML_REQUESTED: "ui:paste-html-requested",
   /** Add opens its Paste HTML dialog (held until the panel mounts). */

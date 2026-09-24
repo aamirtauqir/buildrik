@@ -23,6 +23,7 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
+import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
@@ -127,6 +128,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     };
   }, [composer]);
   const { addToast } = useToast();
+  const insertDrag = useInsertDrag(composer);
 
 
   const groups = React.useMemo(
@@ -358,6 +360,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onDragStart={tab.handleDragStart}
                 onBlockDragStart={tab.handleBlockDragStart}
                 onElClick={tab.handleElClick}
+                insertPath={insertDrag.target?.path ?? null}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
                 onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}

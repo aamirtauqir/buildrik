@@ -20,6 +20,8 @@ import { BlockThumb } from "./BlockThumb";
 import { BlockPreviewCard } from "./BlockPreviewCard";
 
 interface GroupSectionProps {
+  /** Where a held row would land ("Home › Hero › Content"), board 4418:100890. */
+  insertPath?: string | null;
   group: InsertGroup;
   isOpen: boolean;
   onToggle: () => void;
@@ -143,7 +145,7 @@ export const Row: React.FC<{
       } ${
         disabled
           ? "tw:cursor-not-allowed"
-          : "tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]"
+          : "tw:cursor-pointer tw:hover:bg-[var(--bk-bg-subtle)]"
       }`}
       data-testid={testId}
       onMouseEnter={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
@@ -261,13 +263,16 @@ const ElementRows: React.FC<{
   onToggleFav?: (name: string) => void;
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
-}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick }) => {
+  insertPath: string | null;
+}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick, insertPath }) => {
   const [tip, setTip] = React.useState<{ text: string; top: number } | null>(null);
+  // Board 4418:100890: the row being dragged carries a note saying where it lands.
+  const [dragging, setDragging] = React.useState<string | null>(null);
   return (
     <div className="tw:relative">
       {elements.map((el) => (
+        <React.Fragment key={`${el.catId}-${el.name}`}>
         <Row
-          key={`${el.catId}-${el.name}`}
           label={el.name}
           iconHtml={el.iconHtml}
           disabled={el.disabled}
@@ -284,9 +289,25 @@ const ElementRows: React.FC<{
               : undefined
           }
           draggable
-          onDragStart={(e) => onDragStart(e, el)}
+          onDragStart={(e) => {
+            setTip(null);
+            setDragging(el.name);
+            window.addEventListener("dragend", () => setDragging(null), { once: true });
+            onDragStart(e, el);
+          }}
           onClick={() => onElClick(el)}
         />
+        {dragging === el.name && (
+          <p
+            data-testid="insert-drag-note"
+            className="tw:m-0 tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:py-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          >
+            {insertPath
+              ? `Place the element in ${insertPath}. Release to drop it, or Esc to cancel.`
+              : "Drag it onto the canvas. Release to drop it, or Esc to cancel."}
+          </p>
+        )}
+        </React.Fragment>
       ))}
       {tip && (
         <div
@@ -404,7 +425,7 @@ const BlockGrid: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
+  group, isOpen, onToggle, elements, blocks, components, mine, library, onLibraryInsert, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav, insertPath,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -416,6 +437,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         onToggleFav={onToggleFav}
         onDragStart={onDragStart}
         onElClick={onElClick}
+        insertPath={insertPath ?? null}
       />
     )}
     {/* Board 138:2: BLOCKS is a CARD GRID, not rows — `Card / media` (17:6):
