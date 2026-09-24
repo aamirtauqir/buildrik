@@ -290,7 +290,7 @@ const ElementRows: React.FC<{
           role="tooltip"
           data-testid={`insert-${group === "elements" ? "el" : group === "favourites" ? "fav" : "recent"}-tip`}
           style={{ top: tip.top }}
-          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-gray-900 tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
+          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-[var(--bk-gray-900)] tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
         >
           {tip.text}
         </div>

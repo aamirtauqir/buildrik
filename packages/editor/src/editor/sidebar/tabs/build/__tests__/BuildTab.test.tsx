@@ -96,7 +96,7 @@ describe("BuildTab — element row description on hover (G2-108)", () => {
     const tip = screen.getByTestId("insert-el-tip");
     expect(tip.getAttribute("role")).toBe("tooltip");
     expect(tip.textContent).toBe("Generic wrapper box for grouping elements");
-    expect(tip.className).toContain("tw:bg-gray-900");
+    expect(tip.className).toContain("tw:bg-[var(--bk-gray-900)]");
     fireEvent.mouseLeave(row);
     expect(screen.queryByTestId("insert-el-tip")).toBeNull();
   });
