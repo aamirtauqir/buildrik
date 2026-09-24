@@ -58,6 +58,7 @@ import {
   snapshotEdits,
   sourceFormatOf,
   statusLine,
+  previewInfo,
   validateResize,
   type EditsSnapshot,
   type ImageDraft,
@@ -108,13 +109,16 @@ const SUBTITLE = "tw:m-0 tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-[
    over chrome-ui's Tabs, whose roving tabindex puts the SELECTED tab in the
    tab order: opened on Optimise from the rail, the focus ring sat on Crop
    (walked live 2026-09-14). Tabs tints the selected chip itself. */
+/* 4418:149321: the selected tab is a SOLID accent pill with white text. */
 const TAB_CHIP =
-  "tw:w-28 tw:px-0 tw:font-medium tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-200)]";
+  "tw:w-28 tw:px-0 tw:font-medium tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-200)] " +
+  "tw:aria-selected:bg-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-on)] tw:aria-selected:hover:bg-[var(--bk-accent-hover)]";
+/* 4418:149321: the preview sits on a flat gray-200 plate (no card edge, no
+   dashed well), with the info lines under the image. */
 const PREVIEW_CARD =
-  "tw:flex tw:min-h-0 tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-4";
-const WELL =
-  "tw:relative tw:min-h-0 tw:flex-1 tw:overflow-hidden tw:rounded-[var(--bk-radius-md)] tw:border tw:border-dashed " +
-  "tw:border-[var(--bk-gray-300)] tw:bg-[var(--bk-bg-subtle)]";
+  "tw:flex tw:min-h-0 tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:bg-[var(--bk-gray-200)] tw:p-4";
+const WELL = "tw:relative tw:min-h-0 tw:flex-1 tw:overflow-hidden tw:rounded-[var(--bk-radius-md)]";
+const INFO_LINE = "tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 const STATUS =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]";
 const FOOT_NOTE = "tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -330,7 +334,29 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 />
               )}
             </div>
-            <div className="tw:mt-4 tw:flex tw:h-8 tw:items-center tw:justify-between tw:border-t tw:border-[var(--bk-border)] tw:pt-4">
+            {/* 4418:149321 info block: Crop · Preset · Format left, the tone
+                lines centred. The mono output size and Reset all are kept
+                on the last row (the board has no place for them — designer
+                notes). */}
+            {!saved && (
+            <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-1" data-testid="image-editor-info">
+              {(() => {
+                const lines = previewInfo(draft, sourceFormat);
+                return (
+                  <>
+                    {lines.slice(0, 3).map((l) => (
+                      <p key={l} className={INFO_LINE}>
+                        {l}
+                      </p>
+                    ))}
+                    <p className={`${INFO_LINE} tw:mt-2 tw:text-center`}>{lines[3]}</p>
+                    <p className={`${INFO_LINE} tw:text-center`}>{lines[4]}</p>
+                  </>
+                );
+              })()}
+            </div>
+            )}
+            <div className="tw:mt-2 tw:flex tw:h-8 tw:items-center tw:justify-between">
               <span className={STATUS} data-testid="image-editor-status">
                 {statusLine(draft, crop)}
               </span>
@@ -338,7 +364,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 <Button
                   size="xs"
                   variant="ghost"
-                  className={`${LIBRARY_MODAL_BTN_PRIMARY} tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
+                  className={`${LIBRARY_MODAL_BTN_PRIMARY} tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-300)]`}
                   data-testid="image-editor-reset"
                   onClick={() => setDraft(INITIAL_DRAFT)}
                 >
