@@ -67,7 +67,6 @@ import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetu
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
-import { InsertLoadingSkeleton, InsertLoadError } from "@/editor/sidebar/tabs/build/components/InsertStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
@@ -2321,19 +2320,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
       <LayersNoResults search="hero" onClear={() => {}} />
-    </div>
-  ),
-  // Insert boards 775:4053 / 781:4154. The catalog is static, so neither state
-  // is reachable in the app yet (the navigate groups go async next) — the
-  // probe is their only mount until then, same single-home rule as Layers.
-  "insert-loading": () => (
-    <div data-probe="insert-loading" style={{ width: 280, background: "#fff" }}>
-      <InsertLoadingSkeleton />
-    </div>
-  ),
-  "insert-load-error": () => (
-    <div data-probe="insert-load-error" style={{ width: 280, background: "#fff" }}>
-      <InsertLoadError onRetry={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no

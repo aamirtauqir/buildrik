@@ -75,8 +75,6 @@
     "packages/editor/src/editor/sidebar/tabs/ai/ScopeChip.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/components/SearchResults.tsx",
-    "packages/editor/src/editor/sidebar/tabs/build/components/TipsFooter.tsx",
-    "packages/editor/src/editor/sidebar/tabs/build/components/TransitionCallout.tsx",
     "packages/editor/src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/component-library/ComponentIcon.tsx",
     "packages/editor/src/editor/sidebar/tabs/component-library/ComponentRow.tsx",

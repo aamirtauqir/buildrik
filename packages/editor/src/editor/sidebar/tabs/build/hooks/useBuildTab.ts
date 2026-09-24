@@ -8,7 +8,6 @@ import type { Composer } from "../../../../../engine";
 import type { BlockData } from "../../../../../shared/types";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { CATALOG, flatCatalog } from "../catalog/catalog";
-import { TIPS } from "../catalog/tips";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import { blockRows, componentRows } from "../catalog/groups";
@@ -80,12 +79,10 @@ export interface UseBuildTabReturn {
   favs: Set<string>;
   openCats: Set<string>;
   searchQuery: string;
-  tipDismissed: boolean;
   favOpen: boolean;
   searchResults: InsertSearchHit[];
   allElements: FlatElEntry[];
   composer: Composer | null;
-  tipIdx: number;
   // Handlers
   setSearchQuery: (q: string) => void;
   toggleFav: ToggleFavFn;
@@ -95,10 +92,6 @@ export interface UseBuildTabReturn {
   restoreFavs: (snapshot: Set<string>) => void;
   favsInformed: boolean;
   markFavsInformed: () => void;
-  dismissTip: () => void;
-  tipPrev: () => void;
-  tipNext: () => void;
-  tipSetAt: (i: number) => void;
   handleDragStart: DragStartFn;
   /** Board 4428:140817's `grip/⠿ drag to place` — a block card is a drag source too. */
   handleBlockDragStart: BlockDragStartFn;
@@ -130,14 +123,10 @@ export function useBuildTab(
   const [searchQuery, setSearchQueryRaw] = React.useState("");
   // Track which categories were open before a search started
   const preClearCatsRef = React.useRef<Set<string> | null>(null);
-  const [tipDismissed, setTipDismissed] = React.useState<boolean>(() =>
-    ls.getBool(STORAGE_KEYS.BUILD_TIP_DISMISSED)
-  );
   const [favsInformed, setFavsInformed] = React.useState<boolean>(() =>
     ls.getBool(STORAGE_KEYS.BUILD_FAVS_INFORMED)
   );
   const [favOpen, setFavOpen] = React.useState(false);
-  const [tipIdx, setTipIdx] = React.useState(0);
 
   // Persist favs
   React.useEffect(() => {
@@ -177,23 +166,6 @@ export function useBuildTab(
   const markFavsInformed = React.useCallback(() => {
     setFavsInformed(true);
     ls.saveBool(STORAGE_KEYS.BUILD_FAVS_INFORMED, true);
-  }, []);
-
-  const dismissTip = React.useCallback(() => {
-    setTipDismissed(true);
-    ls.saveBool(STORAGE_KEYS.BUILD_TIP_DISMISSED, true);
-  }, []);
-
-  const tipPrev = React.useCallback(() => {
-    setTipIdx((prev) => (prev - 1 + TIPS.length) % TIPS.length);
-  }, []);
-
-  const tipNext = React.useCallback(() => {
-    setTipIdx((prev) => (prev + 1) % TIPS.length);
-  }, []);
-
-  const tipSetAt = React.useCallback((i: number) => {
-    setTipIdx(i);
   }, []);
 
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
@@ -288,9 +260,7 @@ export function useBuildTab(
     favs,
     openCats,
     searchQuery,
-    tipDismissed,
     favOpen,
-    tipIdx,
     searchResults,
     allElements: flatCatalog,
     composer,
@@ -302,10 +272,6 @@ export function useBuildTab(
     restoreFavs,
     favsInformed,
     markFavsInformed,
-    dismissTip,
-    tipPrev,
-    tipNext,
-    tipSetAt,
     handleDragStart,
     handleBlockDragStart,
     handleElClick,

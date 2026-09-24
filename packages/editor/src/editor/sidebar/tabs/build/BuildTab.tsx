@@ -2,8 +2,8 @@
  * BuildTab — Add tab shell.
  *
  * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
- * where panel-bottom is pinned (flex-shrink: 0) — ALWAYS, including during
- * search: board 138:53 draws Paste-HTML + TipsFooter under the results.
+ * The first-use tip (7054:78348) opens beside the panel; there is no tips
+ * strip (G2-113).
  *
  * Sections mode (pre-built sections catalog + lazy chunk) was removed on
  * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
@@ -18,12 +18,10 @@ import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { SearchBar } from "../../shared/SearchBar";
 import { useBuildTab } from "./hooks/useBuildTab";
-import { useCallout } from "./hooks/useCallout";
-import { TipsFooter } from "./components/TipsFooter";
+import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { TransitionCallout } from "./components/TransitionCallout";
 import { takePendingInsertGroup } from "./insertGroupRequest";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -44,7 +42,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const callout = useCallout();
+  const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
 
   // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
@@ -254,8 +252,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         ) : (
           <div className="bld-scroll">
-            {callout.visible && <TransitionCallout />}
-
             {/* Board 137:2: source taxonomy, not element-type categories.
                 ELEMENTS/BLOCKS render inline; the navigate groups open their
                 owning tabs. Blocks insert through the SAME onBlockClick path
@@ -280,17 +276,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
-        {/* Board 138:53: the pinned bottom stays up DURING search too. */}
-        <div className="bld-panel-bottom">
-          <TipsFooter
-            tipIdx={tab.tipIdx}
-            onPrev={tab.tipPrev}
-            onNext={tab.tipNext}
-            onDotClick={tab.tipSetAt}
-            dismissed={tab.tipDismissed}
-            onDismiss={tab.dismissTip}
-          />
-        </div>
+        <div ref={panelBottomRef} className="bld-panel-bottom" />
+        <FirstUseTip anchorRef={panelBottomRef} />
       </div>
     </PanelFrame>
   );
