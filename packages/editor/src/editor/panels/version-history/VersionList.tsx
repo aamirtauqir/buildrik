@@ -31,7 +31,8 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
+import { MoreHorizontal } from "lucide-react";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 
 interface ListChildComponentProps {
@@ -128,6 +129,7 @@ export function VersionRow({
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showPreview, setShowPreview] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [previewRect, setPreviewRect] = React.useState<DOMRect | null>(null);
 
   const relative = formatRelativeTime(version.createdAt);
@@ -204,30 +206,61 @@ export function VersionRow({
                 </Button>
               </>
             ) : (
-              <>
-                <Button
-                  onClick={onCompare}
-                  className="action-btn primary"
-                  aria-label={`Compare "${versionDisplayName(version)}"`}
-                >
-                  Compare
-                </Button>
-                <Button
-                  onClick={onRestore}
-                  className="action-btn"
-                  disabled={isRestoring}
-                  aria-label={`Restore "${versionDisplayName(version)}"`}
-                >
-                  {isRestoring ? "..." : "Restore"}
-                </Button>
-                <Button
-                  onClick={onDeleteRequest}
-                  className="action-btn danger"
-                  aria-label={`Delete "${versionDisplayName(version)}"`}
-                >
-                  ×
-                </Button>
-              </>
+              /* Board 6930:82577 — a save's actions live in its ⋯: Restore to
+                 draft… · Compare with current. Delete stays as a third item
+                 (parity never drops a capability). The board's "Name this
+                 version…" is not built: siteVersions has no rename endpoint. */
+              <Popover
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                placement="bottom-end"
+                label={`${versionDisplayName(version)} actions`}
+                trigger={
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="action-btn"
+                    aria-label={`${versionDisplayName(version)} actions`}
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
+                    onClick={() => setMenuOpen((v) => !v)}
+                  >
+                    <MoreHorizontal size={14} aria-hidden="true" />
+                  </Button>
+                }
+              >
+                <Menu label={`${versionDisplayName(version)} actions`}>
+                  <MenuItem
+                    disabled={isRestoring}
+                    aria-label={`Restore "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onRestore();
+                    }}
+                  >
+                    Restore to draft…
+                  </MenuItem>
+                  <MenuItem
+                    aria-label={`Compare "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onCompare();
+                    }}
+                  >
+                    Compare with current
+                  </MenuItem>
+                  <MenuItem
+                    danger
+                    aria-label={`Delete "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDeleteRequest();
+                    }}
+                  >
+                    Delete…
+                  </MenuItem>
+                </Menu>
+              </Popover>
             )}
           </div>
         </div>

@@ -175,6 +175,12 @@ afterEach(() => {
   cleanup();
 });
 
+
+/* Board 6930:82577: a save's actions live in its row ⋯. */
+function openSaveMenu(name: string) {
+  fireEvent.click(screen.getByRole("button", { name: `${name} actions` }));
+}
+
 describe("VersionHistoryPanel — empty + availability states", () => {
   it("renders empty-state copy when versions list is empty", async () => {
     mocks.state.versions = [];
@@ -222,6 +228,7 @@ describe("VersionHistoryPanel — restore flow", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Save A");
     const restoreBtn = screen.getByLabelText('Restore "Save A"');
     fireEvent.click(restoreBtn);
 
@@ -244,6 +251,7 @@ describe("VersionHistoryPanel — delete flow", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("To delete");
     fireEvent.click(screen.getByLabelText('Delete "To delete"'));
     const confirmBtn = await screen.findByLabelText("Confirm delete");
     fireEvent.click(confirmBtn);
@@ -267,6 +275,7 @@ describe("VersionHistoryPanel — compare flow", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
 
     await waitFor(() => {
