@@ -34,6 +34,15 @@ import type { SectionId } from "../sections/registry";
 export interface ElementProfile {
   /** Ordered section ids, board order. */
   order: SectionId[];
+  /** Sections this profile hides on Beginner (behind "Show all") on top of
+   *  the registry's ADVANCED tag — e.g. a container's numeric SIZE, whose
+   *  Fill/Hug modes LAYOUT already carries (board 4428:141170). */
+  advanced?: readonly SectionId[];
+}
+
+/** Hidden on Beginner for this profile: registry-ADVANCED or listed here. */
+export function isAdvancedIn(profile: ElementProfile, id: SectionId, registryTier: string | undefined): boolean {
+  return registryTier === "advanced" || Boolean(profile.advanced?.includes(id));
 }
 
 // ============================================================================
@@ -67,6 +76,7 @@ const CONTAINER_PROFILE: ElementProfile = {
     "css-classes",
     "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Text-like elements — board 807:8342. Typography leads; the board draws no
@@ -115,6 +125,7 @@ const FLEX_PROFILE: ElementProfile = {
     "css-classes",
     "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Explicit grid container — board 807:8475. Columns is a grid underneath, so
@@ -140,6 +151,7 @@ const GRID_PROFILE: ElementProfile = {
     "css-classes",
     "all-css",
   ],
+  advanced: ["size"],
 };
 
 /** Image / video / icon / lottie / svg / audio / embeds — board 807:8521.

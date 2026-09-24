@@ -13,9 +13,10 @@ import { SizeSection } from "../SizeSection";
 import { SpacingSection } from "../SpacingSection";
 
 export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
+  /* Board 4428:141170: LAYOUT (Display + Size modes) leads a container's
+     Beginner Style tab — no longer ADVANCED. */
   layout: defineSection({
     tab: "style",
-    tier: "advanced",
     Component: LayoutSection,
     advancedKey: "layout",
     /* Extracted from this section's own advanced block, not from a registry
