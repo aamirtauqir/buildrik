@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { saveProjectDataSchema } from "../sites";
+import { editorSaveProjectSchema, saveProjectDataSchema } from "../sites";
 
 describe("saveProjectDataSchema", () => {
   it("accepts dsSchemaVersion as optional non-negative integer", () => {
@@ -42,5 +42,17 @@ describe("saveProjectDataSchema", () => {
       dsSchemaVersion: 0,
     };
     expect(() => saveProjectDataSchema.parse(valid)).not.toThrow();
+  });
+});
+
+/* Walk A2 (2026-09-24): the editor save stripped dsSchemaVersion, so the DS
+   migration re-ran on every open. */
+describe("editorSaveProjectSchema — dsSchemaVersion", () => {
+  it("keeps the migration version on the editor's save", () => {
+    const parsed = editorSaveProjectSchema.parse({
+      siteId: "s",
+      projectData: { version: "1.0.0", pages: [], styles: [], assets: [], dsSchemaVersion: 3 },
+    });
+    expect(parsed.projectData.dsSchemaVersion).toBe(3);
   });
 });
