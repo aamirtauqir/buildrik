@@ -12,9 +12,9 @@
  *   - Copy · Wrap · Move up/down → the element menu (More).
  *   - ✦ Edit with AI → the inspector header's ✦ AI.
  *
- * Surface: the board draws a near-black pill; DESIGN.md's NO BLACK RULE
- * (decision #25) bans near-black chrome, and that conflict is with the owner.
- * Until it is ruled on the pill keeps the light chrome surface.
+ * Surface: the board's ink pill (library "Selection toolbar": color/ink, r8,
+ * pad 4, gap 4, 24px IconButtons with white icons, More on the accent fill).
+ * The owner lifted decision #25's NO BLACK RULE for this control 2026-09-24.
  *
  * @license BSD-3-Clause
  */
@@ -41,9 +41,11 @@ export interface UnifiedSelectionToolbarProps {
 /** Inset from the element's top-right corner (board 5936:44788). */
 const INSET = 8;
 
-const PILL =
-  "tw:flex tw:items-center tw:gap-0.5 tw:p-0.5 tw:rounded-lg tw:border tw:border-[var(--bk-border)] " +
-  "tw:bg-[var(--bk-bg-card)] tw:[box-shadow:var(--bk-shadow-raised)]";
+const PILL = "tw:flex tw:items-center tw:gap-1 tw:p-1 tw:rounded-lg tw:bg-[var(--bk-ink)]";
+/* On-ink IconButton: white glyph, a white-10% hover instead of the light
+   chrome's grey. */
+const ON_INK = "tw:text-white tw:hover:bg-white/10 tw:hover:text-white";
+const ON_ACCENT = "tw:text-white tw:bg-[var(--bk-accent)] tw:hover:bg-[var(--bk-accent-hover)] tw:hover:text-white";
 
 export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = ({
   composer,
@@ -112,15 +114,16 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         pointerEvents: "auto",
       }}
     >
-      <IconButton size="sm" label="Duplicate (⌘D)" data-testid="selection-toolbar-duplicate" onClick={onDuplicate}>
+      <IconButton size="sm" className={ON_INK} label="Duplicate (⌘D)" data-testid="selection-toolbar-duplicate" onClick={onDuplicate}>
         <Copy size={14} aria-hidden="true" />
       </IconButton>
-      <IconButton size="sm" label="Delete (⌫)" data-testid="selection-toolbar-delete" onClick={onDelete}>
+      <IconButton size="sm" className={ON_INK} label="Delete (⌫)" data-testid="selection-toolbar-delete" onClick={onDelete}>
         <Trash2 size={14} aria-hidden="true" />
       </IconButton>
       <IconButton
         ref={moreRef}
         size="sm"
+        className={ON_ACCENT}
         label="More"
         aria-haspopup="menu"
         data-testid="selection-toolbar-more"

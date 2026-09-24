@@ -144,6 +144,9 @@ export interface TopbarProps {
   tools?: TopbarTools | null;
   /** The shell search field (⌘K). Omit and no field is drawn. */
   onOpenSearch?: () => void;
+  /** Board 4418:100087: while a drawer owns search (Add → "Search elements…"),
+   *  the field is a real input that filters that drawer instead of ⌘K. */
+  contextSearch?: { placeholder: string; value: string; onChange: (value: string) => void } | null;
   presence?: PresenceProps | null;
   unreadCount?: number;
   onOpenNotifications?: () => void;
@@ -191,7 +194,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch, contextSearch,
 }: TopbarProps) {
   return (
     <header
@@ -277,7 +280,43 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {onOpenSearch ? (
+      {contextSearch ? (
+        <label className={`${SEARCH_CLASS} tw:text-[var(--bk-ink)] tw:focus-within:[box-shadow:var(--bk-shadow-focus)]`} data-testid="topbar-search">
+          <SearchGlyph />
+          <input
+            id={TOPBAR_CONTEXT_SEARCH_ID}
+            type="text"
+            className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:outline-none tw:placeholder:text-[var(--bk-ink-muted)] tw:focus:ring-0 tw:focus:[box-shadow:none]"
+            /* The field (the label) draws the focus ring; a11y.css's unlayered
+               `*:focus-visible` outline outranks any layered utility, so the
+               inner box's own ring is switched off here. */
+            style={{ outline: "none" }}
+            placeholder={contextSearch.placeholder}
+            aria-label={contextSearch.placeholder}
+            value={contextSearch.value}
+            onChange={(e) => contextSearch.onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && contextSearch.value) {
+                e.stopPropagation();
+                contextSearch.onChange("");
+              }
+            }}
+            data-testid="topbar-context-search"
+          />
+          {contextSearch.value ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              className="tw:border-0 tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-muted)] tw:cursor-pointer"
+              onClick={() => contextSearch.onChange("")}
+            >
+              ✕
+            </button>
+          ) : (
+            <kbd className={SEARCH_KBD}>⌘F</kbd>
+          )}
+        </label>
+      ) : onOpenSearch ? (
         <button type="button" className={SEARCH_CLASS} onClick={onOpenSearch} data-testid="topbar-search">
           <SearchGlyph />
           <span className="tw:truncate">Search pages, layers, assets…</span>
@@ -458,6 +497,9 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
 
 /* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
    Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
+/** The topbar field's input id while a drawer owns search — ⌘F / "/" focus it. */
+export const TOPBAR_CONTEXT_SEARCH_ID = "topbar-context-search";
+
 function SearchGlyph() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

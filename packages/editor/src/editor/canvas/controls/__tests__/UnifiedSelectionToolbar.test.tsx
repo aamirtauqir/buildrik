@@ -52,4 +52,23 @@ describe("UnifiedSelectionToolbar", () => {
     expect(p.onDelete).toHaveBeenCalled();
     expect(p.onOpenMenu).toHaveBeenCalledWith("e1", expect.objectContaining({ x: expect.any(Number) }));
   });
+
+  /* Owner ruling 2026-09-24: the board's ink pill (library "Selection
+     toolbar": color/ink, r8, pad 4, gap 4, 24px IconButtons, white icons,
+     More on the accent fill). */
+  it("is the board's ink pill with white 24px buttons and More on accent", () => {
+    setup();
+    const bar = screen.getByTestId("selection-toolbar");
+    expect(bar.className).toContain("tw:bg-[var(--bk-ink)]");
+    expect(bar.className).toContain("tw:rounded-lg");
+    expect(bar.className).toContain("tw:p-1");
+    expect(bar.className).toContain("tw:gap-1");
+    expect(bar.className).not.toContain("bk-bg-card");
+    for (const id of ["duplicate", "delete"]) {
+      const b = screen.getByTestId(`selection-toolbar-${id}`);
+      expect(b.className).toContain("tw:text-white");
+      expect(b.className).toContain("tw:h-6");
+    }
+    expect(screen.getByTestId("selection-toolbar-more").className).toContain("tw:bg-[var(--bk-accent)]");
+  });
 });

@@ -64,9 +64,7 @@ export interface ConfirmDialogProps {
 const SUCCESS_CLOSE_MS = 1400;
 
 /* Board 183:60's card: a 40 success disc, the result at 13/20 ink, then
-   "Closing…" at 11/16 muted, centred on a 392 column — the modal's 440 less
-   24 a side, so this block adds 8 to MODAL_BODY_CLASS's 16 rather than
-   restating the padding and drifting from it. */
+   "Closing…" at 11/16 muted, centred in the body column. */
 const SUCCESS_BODY = "tw:px-2 tw:pt-4 tw:pb-6 tw:text-center";
 /* `--bk-success-text`, not `--bk-success`: board 183:67 fixes the mark at
    16/600 white, and white on `var(--bk-green-500)` is 3.39 — under the 4.5 a 16px face needs
@@ -141,7 +139,7 @@ export function ConfirmDialog({
             color="light"
             size="xs"
             onClick={onClose}
-            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]"
           >
             {cancelLabel}
           </Button>

@@ -6,10 +6,6 @@
  * @license BSD-3-Clause
  */
 
-import type { ElementType } from "../../types";
-import { ELEMENT_CATEGORIES } from "./derived";
-import { isLandmarkType, isHeadingType, isContainerType, canHaveChildren } from "./typeChecks";
-import { RECOMMENDED_MAX_DEPTH, type TreeAnalysis } from "./types";
 
 // =============================================================================
 // TREE OPERATIONS
@@ -248,96 +244,4 @@ export function countElements<T extends { children?: T[] }>(
   }
 
   return count;
-}
-
-// =============================================================================
-// STATISTICS & ANALYSIS
-// =============================================================================
-
-/**
- * Analyze tree structure and return detailed statistics
- */
-export function analyzeTree<T extends { type: ElementType; children?: T[] }>(
-  root: T
-): TreeAnalysis {
-  const flattened = flattenTree(root);
-  const depths = flattened.map((f) => f.depth);
-  const types = flattened.map((f) => f.element.type);
-
-  const typeCounts: Record<string, number> = {};
-  for (const type of types) {
-    typeCounts[type] = (typeCounts[type] || 0) + 1;
-  }
-
-  const categoryCounts: Record<string, number> = {};
-  for (const type of types) {
-    const categories = ELEMENT_CATEGORIES[type] || [];
-    for (const cat of categories) {
-      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-    }
-  }
-
-  const landmarks = flattened
-    .filter((f) => isLandmarkType(f.element.type))
-    .map((f) => f.element.type);
-
-  const headings = flattened.filter((f) => isHeadingType(f.element.type)).map((f) => f.element);
-
-  const emptyContainers = flattened.filter(
-    (f) =>
-      isContainerType(f.element.type) &&
-      canHaveChildren(f.element.type) &&
-      (!f.element.children || f.element.children.length === 0)
-  ).length;
-
-  const deeplyNested = flattened.filter((f) => f.depth > RECOMMENDED_MAX_DEPTH);
-
-  return {
-    totalElements: flattened.length,
-    maxDepth: Math.max(...depths),
-    averageDepth: depths.reduce((a, b) => a + b, 0) / depths.length,
-    elementTypeCounts: typeCounts,
-    categoryCounts,
-    landmarkElements: landmarks,
-    headingElements: headings,
-    emptyContainers,
-    deeplyNestedCount: deeplyNested.length,
-    recommendations: generateRecommendations(flattened, landmarks, emptyContainers),
-  };
-}
-
-/**
- * Generate recommendations based on analysis
- */
-function generateRecommendations(
-  flattened: { element: { type: ElementType }; depth: number }[],
-  landmarks: ElementType[],
-  emptyContainers: number
-): string[] {
-  const recommendations: string[] = [];
-
-  if (!landmarks.includes("nav") && !landmarks.includes("navbar")) {
-    recommendations.push("Consider adding a navigation landmark (nav) for accessibility");
-  }
-
-  if (landmarks.filter((l) => l === "header").length > 1) {
-    recommendations.push(
-      "Multiple header landmarks detected - consider using only one main header"
-    );
-  }
-
-  if (emptyContainers > 0) {
-    recommendations.push(
-      `${emptyContainers} empty container(s) detected - consider removing or populating them`
-    );
-  }
-
-  const maxDepth = Math.max(...flattened.map((f) => f.depth));
-  if (maxDepth > RECOMMENDED_MAX_DEPTH) {
-    recommendations.push(
-      `Deep nesting detected (${maxDepth} levels) - consider simplifying the structure`
-    );
-  }
-
-  return recommendations;
 }

@@ -145,7 +145,17 @@ function RailZone({
         return (
           <HintTooltip
             key={tab.id}
-            content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
+            content={
+              /* Board 4433:46540: "Add  A" — white label, muted shortcut. */
+              tab.shortcut ? (
+                <span className="tw:inline-flex tw:gap-1.5">
+                  <span>{tab.label}</span>
+                  <span className="tw:font-normal tw:text-[var(--bk-gray-400)]">{tab.shortcut}</span>
+                </span>
+              ) : (
+                tab.label
+              )
+            }
             /* Beside the icon, not under it. `bottom` on this narrow vertical
                rail ran the bubble past the rail's width and into the open
                drawer — half on the rail, half on the panel. */

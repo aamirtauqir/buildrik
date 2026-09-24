@@ -19,20 +19,20 @@
  *     expected a confirm sees the element vanish, and 5 s is not enough to
  *     read, decide and reach the button); everything else defaults to 5 s.
  *
- * THE ANCHOR is the bottom-right of the CANVAS region, not of the window: the
- * viewport's `right` adds `--bk-inspector-w`, which the shell sets to the
- * inspector's width while it is open and to 0 while it is closed, so a toast
- * never sits over the inspector footer's Publish/Save row. The overlay root is
- * a sibling of `.bd-studio`, not a descendant (chrome-reset.css:64), so the
- * shell writes the variable on the document root — a value on `.bd-studio`
- * would never reach this portal.
+ * THE ANCHOR is the bottom-left of the CANVAS column, 16px above its toolbar
+ * (board 5940:148012, "Moved down · Undo"). The canvas column carries
+ * `data-bk-toast-anchor` and its footer toolbar `data-bk-toast-floor`; the
+ * viewport measures both.
+ * With no anchor mounted (full-page views) it falls back to the window's
+ * bottom-left. The overlay root is a sibling of `.bd-studio`, so this is
+ * measured, not inherited.
  *
- * THE SURFACE follows DESIGN.md's NO BLACK RULE (decision #25): every tone is a
- * pale tint or the neutral grey on a hairline, never ink. The Figma library's
- * dark two-line toast (board 814:7027 drew the undo/redo bar on --color/ink)
- * loses to DESIGN.md, the same call the founder made for the tooltip on
- * 2026-08-27. The box-sizing/border reset is carried on the card itself; the
- * `.bd-studio` reset does not reach this portal (TODOS.md:476).
+ * THE SURFACE is the toast catalogue's (7574:194162): an ink bar, white 13px
+ * text, r8, actions as on-dark link buttons (blue-300), an 8px tone dot for
+ * success / warning / error. The owner retired decision #25's NO BLACK RULE
+ * for toasts on 2026-09-24. Lines=1 is a 36px bar that hugs its text; a toast
+ * with a title is the 420px two-line card. Every toast keeps its ✕ (the
+ * library's Close:B), though the catalogue draws it off on transients.
  *
  * The viewport is aria-live="polite": announced when the user is idle rather
  * than interrupting mid-sentence. Errors use assertive, because "publish
@@ -49,43 +49,26 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { Button } from "flowbite-react";
+import { X } from "lucide-react";
 import { getOverlayRoot } from "./OverlayRoot";
 
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/* Button Kind=link Size=sm, on-dark: 28 high, pad 8, 12px medium blue-300. */
+const LINK_BTN_CLASS =
+  "tw:h-7 tw:px-2 tw:py-0 tw:border-0 tw:bg-transparent tw:hover:bg-transparent tw:hover:underline " +
+  "tw:text-[var(--bk-blue-300)] tw:text-xs tw:font-medium tw:rounded-[6px] tw:focus:ring-0 " +
+  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+const CLOSE_BTN_CLASS =
+  "tw:h-6 tw:w-6 tw:p-0 tw:border-0 tw:bg-transparent tw:hover:bg-white/10 tw:text-[var(--bk-gray-400)] " +
+  "tw:rounded-[6px] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
 
-/**
- * The tone fills the card and colours the title — board 1177:4859, the toast
- * catalog. It was a 3px left border on a white card, which reads as the same
- * toast five times with a coloured tick mark; the board tints the whole
- * surface, and every value it draws is already a token pair: measured off the
- * frame, `var(--bk-green-100)`/`var(--bk-green-600)`, `var(--bk-blue-50)`/`var(--bk-blue-700)`, `var(--bk-red-100)`/`var(--bk-red-700)`, `var(--bk-yellow-50)`/`var(--bk-yellow-800)`
- * and `var(--bk-gray-100)` for the neutral one, in that order.
- *
- * Same-property values can't be additive (Row/PanelFrame precedent), so each
- * tone carries its own complete pair rather than layering on a base.
- */
-/* Each entry carries BOTH the fill and the ink. They are listed whole rather
-   than layered on a shared `text-[var(--bk-ink)]` because two utilities for
-   the same property on a PLAIN element do not merge — source order in the
-   compiled sheet would pick the winner, not the order they are concatenated
-   in (CLAUDE.md, "Overriding a flowbite default depends on WHERE the class
-   lands"). Same rule Row's SIZE table already follows. */
-const TONE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)]",
-  info: "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-ink)]",
-  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-ink)]",
-  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-ink)]",
-  error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-ink)]",
-};
-
-const TONE_TITLE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:text-[var(--bk-ink-soft)]",
-  info: "tw:text-[var(--bk-accent-text)]",
-  success: "tw:text-[var(--bk-success-text)]",
-  warning: "tw:text-[var(--bk-warning-text)]",
-  error: "tw:text-[var(--bk-error-text)]",
+/** The catalogue's 8px tone dot. Neutral and info draw none. */
+const TONE_DOT_CLASS: Partial<Record<ToastTone, string>> = {
+  success: "tw:bg-[var(--bk-green-400)]",
+  warning: "tw:bg-[var(--bk-yellow-300)]",
+  error: "tw:bg-[var(--bk-error)]",
 };
 
 export interface ToastActionPayload {
@@ -215,8 +198,26 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+type Anchor = { left: number; bottom: number } | null;
+
+/** Board 5940:148012: 16px in from the canvas column's left edge
+ *  (`data-bk-toast-anchor`) and 16px above its footer toolbar
+ *  (`data-bk-toast-floor`, else the column's bottom). */
+function measureAnchor(): Anchor {
+  const el = document.querySelector("[data-bk-toast-anchor]");
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  if (!r.width && !r.height) return null;
+  const floor = el.querySelector("[data-bk-toast-floor]")?.getBoundingClientRect();
+  const top = floor && floor.height ? floor.top : r.bottom;
+  return { left: Math.round(r.left + ANCHOR_GAP), bottom: Math.round(window.innerHeight - top + ANCHOR_GAP) };
+}
+
+const ANCHOR_GAP = 16;
+
 function ToastViewport() {
   const [toasts, setToasts] = React.useState<QueuedToast[]>(() => [...store.toasts]);
+  const [anchor, setAnchor] = React.useState<Anchor>(null);
 
   React.useEffect(() => {
     const unsubscribe = store.subscribe(setToasts);
@@ -226,13 +227,28 @@ function ToastViewport() {
     };
   }, []);
 
+  /* Measured while something is showing: the drawer opening or the window
+     resizing moves the canvas column, and the toast moves with it. */
+  const showing = toasts.length > 0;
+  React.useLayoutEffect(() => {
+    if (!showing) return;
+    const update = () => setAnchor(measureAnchor());
+    update();
+    window.addEventListener("resize", update);
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    ro?.observe(document.body);
+    return () => {
+      window.removeEventListener("resize", update);
+      ro?.disconnect();
+    };
+  }, [showing]);
+
   if (typeof document === "undefined") return null;
   const hasError = toasts.some((t) => t.tone === "error");
   return createPortal(
     <div
-      /* `right` = 16px + the inspector's width while it is open (0 when
-         closed) — the shell owns `--bk-inspector-w`; see the header. */
-      className="tw:fixed tw:bottom-4 tw:right-[calc(16px_+_var(--bk-inspector-w,0px))] tw:z-[80] tw:flex tw:flex-col tw:gap-2 tw:w-[360px] tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
+      className="tw:fixed tw:z-[80] tw:flex tw:flex-col tw:items-start tw:gap-2 tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
+      style={{ left: anchor?.left ?? ANCHOR_GAP, bottom: anchor?.bottom ?? ANCHOR_GAP }}
       role="status"
       aria-live={hasError ? "assertive" : "polite"}
       aria-atomic="false"
@@ -266,45 +282,66 @@ function ToastItem({
     return () => clearTimeout(timer);
   }, [id, duration, onDismiss]);
 
+  const persistent = isPersistent(toast);
+  const dotClass = TONE_DOT_CLASS[tone];
+  const dot = dotClass ? (
+    <span data-testid="toast-tone" aria-hidden="true" className={`tw:flex-none tw:size-2 tw:rounded-full ${dotClass}`} />
+  ) : null;
+  const actionButton = action ? (
+    <Button color="alternative" size="xs" onClick={action.onClick} className={LINK_BTN_CLASS}>
+      {action.label}
+    </Button>
+  ) : null;
+  /* Library Toast `Close:B` (IconButton 24, icon/x). The catalogue shows it
+     off on transients, but dismissing early is something users can do today,
+     so it stays on every toast (owner rule 2026-09-24: parity never silently
+     removes a capability — designer-notes.md). */
+  const closeButton = (
+    <Button
+      color="alternative"
+      size="xs"
+      className={`tw:flex-none ${CLOSE_BTN_CLASS}`}
+      aria-label="Dismiss notification"
+      onClick={() => onDismiss(id)}
+    >
+      <X size={16} aria-hidden="true" />
+    </Button>
+  );
+
   return (
     <div
       data-testid={`toast-item-${index}`}
-      data-persistent={isPersistent(toast) ? "true" : undefined}
+      data-persistent={persistent ? "true" : undefined}
       className={[
-        /* Library Toast Lines=1 is a single bar with its text and action on
-           one centred row; Lines=2 carries a title over a body and
-           top-aligns. Which one a toast is follows from whether it has a
-           title, not from its tone. */
+        /* Lines=1: a 36px bar that hugs its text, pad 10/16, gap 16.
+           Lines=2 (a title): the 420px card, pad 16, gap 8. */
         title
-          ? "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3"
-          : "tw:pointer-events-auto tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5",
-        /* The reset for portalled chrome: box-sizing and an explicit hairline,
-           because `.bd-studio`'s reset never reaches `#bk-overlay-root`. */
-        "tw:box-border tw:rounded-lg tw:border tw:border-solid tw:border-[var(--bk-border)]",
-        "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px]",
-        TONE_CLASS[tone],
+          ? "tw:pointer-events-auto tw:flex tw:items-start tw:gap-3 tw:w-[420px] tw:max-w-full tw:p-4"
+          : "tw:pointer-events-auto tw:flex tw:items-center tw:gap-4 tw:min-h-9 tw:px-4 tw:py-1",
+        "tw:box-border tw:rounded-lg tw:bg-[var(--bk-ink)] tw:text-white",
+        "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:leading-5",
       ].join(" ")}
     >
-      <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-        {title ? <span className={`tw:font-medium ${TONE_TITLE_CLASS[tone]}`}>{title}</span> : null}
-        <span className="tw:text-[var(--bk-ink-soft)] tw:text-xs" data-testid={`toast-body-${index}`}>
-          {description}
-        </span>
-      </div>
-      {action ? (
-        <Button color="light" size="xs" onClick={action.onClick} className={GHOST_BTN_CLASS}>
-          {action.label}
-        </Button>
-      ) : null}
-      <Button
-        color="light"
-        size="xs"
-        className={`tw:flex-none ${GHOST_BTN_CLASS}`}
-        aria-label="Dismiss notification"
-        onClick={() => onDismiss(id)}
-      >
-        ✕
-      </Button>
+      {title ? (
+        <>
+          {dot ? <span className="tw:pt-1.5">{dot}</span> : null}
+          <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:min-w-0">
+            <span className="tw:text-sm tw:font-semibold">{title}</span>
+            <span data-testid={`toast-body-${index}`}>{description}</span>
+            {actionButton ? <div className="tw:flex tw:gap-2 tw:-ml-2">{actionButton}</div> : null}
+          </div>
+          {closeButton}
+        </>
+      ) : (
+        <>
+          {dot}
+          <span className="tw:min-w-0" data-testid={`toast-body-${index}`}>
+            {description}
+          </span>
+          {actionButton}
+          {closeButton}
+        </>
+      )}
     </div>
   );
 }

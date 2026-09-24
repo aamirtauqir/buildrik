@@ -113,12 +113,14 @@ export interface UseInspectorSectionsResult {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Keys of the non-Style sections (Settings / Effects) in a profile. */
+const DRAWN_SHUT = new Set<string>(["element-properties", "blur"]);
+
 function openTabKeysForType(elementType: string): string[] {
   return getProfileFor(elementType)
     .order.filter((id) => {
       const tab = SECTION_REGISTRY[id]?.tab;
-      /* ADVANCED (element properties) stays shut, as the board draws it. */
-      return Boolean(tab && tab !== "style") && id !== "element-properties";
+      /* ADVANCED (4428:141642) and BLUR (4428:142686) stay shut, as drawn. */
+      return Boolean(tab && tab !== "style") && !DRAWN_SHUT.has(id);
     })
     .map((id) => `${elementType}:${id}`);
 }

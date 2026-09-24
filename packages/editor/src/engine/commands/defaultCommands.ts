@@ -7,6 +7,7 @@
  */
 
 import { EVENTS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
 import type { CommandData, ElementType } from "../../shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
@@ -393,24 +394,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
 
     // ============================================
-    // Snap to Grid
-    // ============================================
-    /* No chord. ⌘' is printed on the canvas overlay bar for the Grid overlay
-       and bound there; both listeners sit on window and both used to run, so
-       one press toggled the overlay AND flipped this setting — which resize
-       reads, and which nothing on screen shows changing. Same tie-break as
-       ⌘1–⌘4 below: the printed chord wins, the command keeps its palette row. */
-    {
-      id: "toggle-snap-to-grid",
-      label: "Toggle snap to grid",
-      group: "View",
-      run: (c) => {
-        const current = c.getState().snapToGrid;
-        c.setSnapToGrid(!current);
-      },
-    },
-
-    // ============================================
     // Selection
     // ============================================
     {
@@ -501,28 +484,19 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Zoom
     // ============================================
-    /* Also chordless, for the same reason and with a visible symptom: ⌘= and
-       ⌘- are printed beside the zoom flyout's + and − buttons, which step
-       through ZOOM_PRESETS, while these step by 10. Measured at 100%: the
-       button gave 150, the chord gave 110. CanvasFooterToolbar owns all five
-       of the flyout's printed rows (fit, selection, 100%, in, out). */
+    /* Chordless: CanvasFooterToolbar owns all five of the flyout's printed
+       rows (fit, selection, 100%, in, out). Same preset step (stepZoom). */
     {
       id: "zoom-in",
       label: "Zoom in",
       group: "View",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current + 10);
-      },
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, 1)),
     },
     {
       id: "zoom-out",
       label: "Zoom out",
       group: "View",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current - 10);
-      },
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, -1)),
     },
     {
       id: "zoom-reset",
@@ -558,6 +532,15 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Mobile view",
       group: "View",
       run: (c) => c.setDevice("mobile"),
+    },
+    /* The canvas bar dropped its W/D/T/M buttons for View ▸ Breakpoint
+       (board 5936:44788), whose list is Desktop · Tablet · Mobile; Wide stays
+       reachable here. */
+    {
+      id: "device-wide",
+      label: "Wide view",
+      group: "View",
+      run: (c) => c.setDevice("wide"),
     },
 
     // ============================================

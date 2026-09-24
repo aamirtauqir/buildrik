@@ -15,7 +15,6 @@ import type { SpacingIndicator, CanvasGuide } from "../../../shared/types/canvas
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
 import { RichTextEditor } from "../../panels/RichTextEditor";
 import {
-  guidesContainerStyles,
   spotsOverlayStyles,
   getMarqueeStyles,
 } from "../canvasStyles";
@@ -26,7 +25,6 @@ import type { MarqueeState } from "../hooks/useCanvasMarquee";
 import type { SnapLine } from "../hooks/useCanvasSnapping";
 import type { CursorState } from "../hooks/useCursorIntelligence";
 import type { SectionBoundary, SectionDragState } from "../hooks/useSectionReorder";
-import { GuideLines } from "../shared";
 import { CanvasSpotSpacing } from "../spots";
 import {
   SelectionBoxOverlay,
@@ -82,9 +80,6 @@ export interface CanvasOverlayGroupProps {
   // Hover
   shouldShowHover: boolean;
   hoveredElementId: string | null;
-  /** Inspector mode forces full hover detail (drift-fix 2026-05-22 —
-   *  Canvas was passing these but interface didn't declare them). */
-  isInspectorEnabled?: boolean;
   /** Dev mode debug overlay flag — unused today but parent passes it. */
   devMode?: boolean;
 
@@ -102,9 +97,6 @@ export interface CanvasOverlayGroupProps {
 
   // Guides & Snapping
   showGuides: boolean;
-  // Parent passes CanvasGuide[] (ruler-placed). The legacy SpacingIndicator[]
-  // type here didn't match what GuideLines actually accepts — fixed 2026-05-22.
-  guides: CanvasGuide[];
   snapLines: SnapLine[];
 
   // Indicators
@@ -156,7 +148,6 @@ export function CanvasOverlayGroup({
   onOpenElementMenu,
   shouldShowHover,
   hoveredElementId,
-  isInspectorEnabled,
   isResizing,
   setIsResizing,
   cursorState,
@@ -168,7 +159,6 @@ export function CanvasOverlayGroup({
   dropSlotRect,
   dropTargetPath,
   showGuides,
-  guides,
   snapLines,
   showSpacing,
   spacingIndicators,
@@ -211,7 +201,6 @@ export function CanvasOverlayGroup({
           altHeld={cursorState?.altHeld}
           shiftHeld={cursorState?.shiftHeld}
           isCloneMode={cursorState?.ctrlHeld}
-          inspectorEnabled={isInspectorEnabled}
         />
       )}
 
@@ -242,13 +231,6 @@ export function CanvasOverlayGroup({
         />
       )}
 
-      {/* Persistent canvas guides (user-placed via rulers) */}
-      {showGuides && guides.length > 0 && (
-        <div aria-hidden style={guidesContainerStyles}>
-          <GuideLines guides={guides} canvasSize={canvasSize} showCenterGuides={false} />
-        </div>
-      )}
-
       {/* Snap lines during drag — single renderer, zoom-aware */}
       {showGuides && <SmartGuidesOverlay snapLines={snapLines} zoom={zoom} />}
 
@@ -277,11 +259,6 @@ export function CanvasOverlayGroup({
               elementId={selectedId}
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
               onSelectParent={onSelectParent}
-              /* SelectionLabel's ancestor dropdown calls onAncestorClick and
-                 nothing supplied it, so every row closed the dropdown and
-                 selected nothing. The handler was already here — the two
-                 siblings below take it as onSelectAncestor. */
-              onAncestorClick={onSelectAncestor}
             />
           )}
           {selectedIds.length === 1 && !isResizing && canvasRef.current && (

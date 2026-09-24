@@ -15,6 +15,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Composer } from "../Composer";
 import { THRESHOLDS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
 
 describe("Composer.setZoom — percent, not fraction", () => {
   /* Composer.initialize touches a 2d canvas context, which jsdom does not
@@ -61,13 +62,13 @@ describe("Composer.setZoom — percent, not fraction", () => {
     expect(composer.getState().zoom).toBe(THRESHOLDS.ZOOM_MAX);
   });
 
-  it("steps by ZOOM_STEP the way the zoom commands do", () => {
+  it("steps through the presets the way the zoom commands do", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const composer = new Composer({} as any);
     composer.setZoom(100);
-    composer.setZoom(composer.getState().zoom + THRESHOLDS.ZOOM_STEP);
-    expect(composer.getState().zoom).toBe(100 + THRESHOLDS.ZOOM_STEP);
-    composer.setZoom(composer.getState().zoom - THRESHOLDS.ZOOM_STEP);
+    composer.setZoom(stepZoom(composer.getState().zoom, 1));
+    expect(composer.getState().zoom).toBe(150);
+    composer.setZoom(stepZoom(composer.getState().zoom, -1));
     expect(composer.getState().zoom).toBe(100);
   });
 });

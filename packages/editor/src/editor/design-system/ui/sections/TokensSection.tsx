@@ -18,7 +18,6 @@
 import * as React from "react";
 import { ColorTokenList } from "../colors/ColorTokenList";
 import { KindTokenList } from "../tokens/KindTokenList";
-import { SpacingPresets, SPACING_PRESET_LABELS } from "../spacing/SpacingPresets";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -38,15 +37,22 @@ import {
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { filterTokensByMode } from "../../utils/semanticKind";
 import type { TokenKind } from "../../types";
+import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { Composer } from "../../../../engine/Composer";
+
+/* The PRESET column (7576:197036): the spacing preset a token's value came
+   from, or "custom" once hand-edited. */
+const SPACING_PRESET_LABELS: Record<SpacingPreset, string> = {
+  compact: "Compact",
+  normal: "Normal",
+  spacious: "Spacious",
+};
 
 interface TokensSectionProps {
   /** The page's kind. Type tokens have their own page (TypographySection). */
   openKind: Exclude<TokenKind, "type">;
   /** The empty colour library's "+ Add a color" opens the workspace's modal. */
   onAddTokenClick?: () => void;
-  /** Spacing's Reset defaults stages the factory scale at workspace scope. */
-  onResetSpacingToDefaults?: () => void;
   composer?: Composer | null;
   selectedTokenId?: string | null;
   onSelectToken?: (tokenId: string) => void;
@@ -55,7 +61,6 @@ interface TokensSectionProps {
 export const TokensSection: React.FC<TokensSectionProps> = ({
   openKind,
   onAddTokenClick,
-  onResetSpacingToDefaults,
   composer,
   selectedTokenId = null,
   onSelectToken,
@@ -137,12 +142,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     const visible = filterTokensByMode(spacing.tokens, mode);
     const preset = spacing.activePreset;
     return (
-      <>
-        <SpacingPresets
-          activePreset={preset}
-          onPresetApply={spacing.applyPreset}
-          onResetToDefaults={() => onResetSpacingToDefaults?.()}
-        />
+
         <KindTokenList
           tokens={visible}
           savedTokens={spacing.savedTokens}
@@ -154,7 +154,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
           presetOf={() => (preset ? SPACING_PRESET_LABELS[preset] : "custom")}
           {...selection}
         />
-      </>
     );
   }
 

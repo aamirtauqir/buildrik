@@ -55,6 +55,15 @@ const COLUMNS = ["Token", "Light", "Dark", "Used"] as const;
    state, and the primitive scale Pro reveals. */
 const GROUP_ORDER = ["semantic", "brand", "surface", "state", "primitive"];
 
+/** The table's row order — the workspace selects the first row by default. */
+export function orderColourTokens(tokens: readonly DesignToken[]): DesignToken[] {
+  return [...tokens].sort((a, b) => {
+    const ga = GROUP_ORDER.indexOf(a.group ?? "");
+    const gb = GROUP_ORDER.indexOf(b.group ?? "");
+    return (ga === -1 ? GROUP_ORDER.length : ga) - (gb === -1 ? GROUP_ORDER.length : gb);
+  });
+}
+
 /** Hex reads as the board prints it — upper-case; anything else as typed. */
 export function displayValue(value: string): string {
   return /^#[0-9a-f]{3,8}$/i.test(value) ? value.toUpperCase() : value;
@@ -101,15 +110,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   isPro,
   hiddenByModeCount = 0,
 }) => {
-  const ordered = React.useMemo(
-    () =>
-      [...tokens].sort((a, b) => {
-        const ga = GROUP_ORDER.indexOf(a.group ?? "");
-        const gb = GROUP_ORDER.indexOf(b.group ?? "");
-        return (ga === -1 ? GROUP_ORDER.length : ga) - (gb === -1 ? GROUP_ORDER.length : gb);
-      }),
-    [tokens],
-  );
+  const ordered = React.useMemo(() => orderColourTokens(tokens), [tokens]);
 
   if (ordered.length === 0) {
     return (

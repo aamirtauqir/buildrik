@@ -13,7 +13,15 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
+import { Modal, Button } from "@/editor/chrome-ui";
+
+/* dialog/footer buttons (7401:1280): Cancel is plain gray-700 text; the
+   secondary is outlined; primary accent; destructive red. Size comes from
+   the Modal foot. */
+const CANCEL_CLASS = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]";
+const SECONDARY_CLASS = "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-gray-700)]";
+const PRIMARY_CLASS = "tw:border-0 tw:bg-[var(--bk-accent)] tw:hover:bg-[var(--bk-accent-hover)] tw:text-[var(--bk-accent-on)]";
+const DESTRUCTIVE_CLASS = "tw:border-0 tw:bg-[var(--bk-error)] tw:text-[var(--bk-accent-on)]";
 import type { ConfirmFolderDeletePayload } from "../data/mediaTypes";
 
 interface ConfirmFolderDeleteModalProps {
@@ -44,60 +52,49 @@ export function ConfirmFolderDeleteModal({
     ? null
     : `${assetCount} ${assetCount === 1 ? "file" : "files"} and ${subFolderCount} ${subFolderCount === 1 ? "folder" : "folders"}`;
 
+  /* Board frame (560, pad 24, 20/30 title, 32px right-aligned actions)
+     comes from chrome-ui's Modal. Empty: board B1-12 (7564:185450) — a body
+     line and a BLUE Delete, since an empty folder takes nothing with it.
+     Non-empty keeps the code's contract (Move files… or delete with
+     contents); the red destructive button stays because files DO go. */
   return (
-    <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
-      <ModalContent
-        srTitle={isEmpty ? `Delete folder ${folderName}` : `Folder ${folderName} is not empty`}
-        className="tw:p-4"
-      >
-        <h3
-          className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-ink)]"
-          id="mgr-folder-del-title"
-        >
-          {isEmpty
-            ? `Delete "${folderName}"?`
-            : `Folder "${folderName}" isn't empty`}
-        </h3>
-
-        {!isEmpty && summary && (
-          <p className="tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-            It holds {summary}. Move them first, or delete the folder with its contents.
-          </p>
-        )}
-
-        {!isEmpty && (
+    <Modal
+      open
+      onClose={onCancel}
+      title={isEmpty ? `Delete “${folderName}”?` : `“${folderName}” isn’t empty`}
+      testId="mgr-folder-del"
+      footer={
+        <>
+          <Button color="alternative" className={CANCEL_CLASS} onClick={onCancel}>
+            Cancel
+          </Button>
+          {onMoveFiles && !isEmpty && (
+            <Button color="alternative" className={SECONDARY_CLASS} onClick={onMoveFiles}>
+              Move files…
+            </Button>
+          )}
+          <Button
+            className={isEmpty ? PRIMARY_CLASS : DESTRUCTIVE_CLASS}
+            onClick={onConfirm}
+          >
+            Delete{!isEmpty ? " folder with contents" : ""}
+          </Button>
+        </>
+      }
+    >
+      {isEmpty ? (
+        "The folder is empty. Deleting it does not touch any file in the library."
+      ) : (
+        <>
+          <p className="tw:m-0">It holds {summary}. Move them first, or delete the folder with its contents.</p>
           <div
             className="tw:mt-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text,var(--bk-warning))]"
             role="alert"
           >
             ⚠ Deleting this folder will remove its contents along with it.
           </div>
-        )}
-
-        {/* Actions */}
-        <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
-          <Button
-            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-          {onMoveFiles && !isEmpty && (
-            <Button
-              className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
-              onClick={onMoveFiles}
-            >
-              Move files…
-            </Button>
-          )}
-          <Button
-            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border-0 tw:bg-[var(--bk-error)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)]"
-            onClick={onConfirm}
-          >
-            Delete{!isEmpty ? " folder with contents" : ""}
-          </Button>
-        </div>
-      </ModalContent>
-    </ModalRoot>
+        </>
+      )}
+    </Modal>
   );
 }

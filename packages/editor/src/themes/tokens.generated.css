@@ -120,6 +120,7 @@
   --bk-radius-xl: 12px;
   --bk-radius-2xl: 16px;
   --bk-radius-full: 9999px;
+  --bk-radius-card: 12px;
 
   /* ── Size · the shell's committed numbers ─────────────────────── */
 
@@ -149,6 +150,10 @@
   --bk-size-row-2line: 52px;
   --bk-size-menu-item: 30px;
   --bk-size-panel-footer: 44px;
+  --bk-size-dialog-sm: 480px;
+  --bk-size-dialog-md: 560px;
+  --bk-size-dialog-lg: 640px;
+  --bk-size-dialog-xl: 960px;
 
   /* ── Z-index ──────────────────────────────────────────────────── */
 

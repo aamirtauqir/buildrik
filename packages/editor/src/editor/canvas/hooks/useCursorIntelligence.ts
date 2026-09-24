@@ -5,8 +5,7 @@
  * Provides visual feedback through cursor changes:
  * - Default: pointer (can select)
  * - Over text: text (can edit)
- * - Alt held: zoom-in (inspect mode)
- * - Shift+drag: pin icon (sibling mode)
+ * - Alt held: zoom-in (hierarchy hover)
  * - Ctrl+drag: copy (clone mode)
  * - Invalid drop: not-allowed
  *
@@ -24,8 +23,7 @@ export type CursorContext =
   | "default" // Normal state
   | "element" // Over selectable element
   | "text" // Over editable text
-  | "inspect" // Alt held - inspect mode
-  | "sibling" // Shift held during drag
+  | "hierarchy" // Alt held - hover shows the parent chain
   | "clone" // Ctrl/Cmd held during drag
   | "invalid" // Invalid drop target
   | "dragging" // Currently dragging
@@ -50,8 +48,6 @@ export interface UseCursorIntelligenceOptions {
   isDragging?: boolean;
   /** Whether current drop is invalid */
   isInvalidDrop?: boolean;
-  /** Whether inspector mode is enabled */
-  inspectorEnabled?: boolean;
 }
 
 export interface UseCursorIntelligenceResult {
@@ -71,8 +67,7 @@ const CURSOR_MAP: Record<CursorContext, string> = {
   default: "default",
   element: "pointer",
   text: "text",
-  inspect: "zoom-in",
-  sibling: "crosshair", // Visual hint for sibling mode
+  hierarchy: "zoom-in",
   clone: "copy",
   invalid: "not-allowed",
   dragging: "grabbing",
@@ -91,7 +86,6 @@ export function useCursorIntelligence({
   canvasRef,
   isDragging = false,
   isInvalidDrop = false,
-  inspectorEnabled = false,
 }: UseCursorIntelligenceOptions): UseCursorIntelligenceResult {
   const [context, setContext] = React.useState<CursorContext>("default");
   const [modifiers, setModifiers] = React.useState({
@@ -187,24 +181,19 @@ export function useCursorIntelligence({
       return CURSOR_MAP.clone;
     }
 
-    // 3. Sibling mode (Shift + drag)
-    if (isDragging && modifiers.shiftHeld) {
-      return CURSOR_MAP.sibling;
-    }
-
-    // 4. Dragging state
+    // 3. Dragging state
     if (isDragging) {
       return CURSOR_MAP.dragging;
     }
 
-    // 5. Inspect mode (Alt held or inspector enabled)
-    if (modifiers.altHeld || inspectorEnabled) {
-      return CURSOR_MAP.inspect;
+    // 4. Hierarchy hover (Alt held)
+    if (modifiers.altHeld) {
+      return CURSOR_MAP.hierarchy;
     }
 
-    // 6. Default context-based cursor
+    // 5. Default context-based cursor
     return CURSOR_MAP[context] || CURSOR_MAP.default;
-  }, [context, modifiers, isDragging, isInvalidDrop, inspectorEnabled]);
+  }, [context, modifiers, isDragging, isInvalidDrop]);
 
   // Apply cursor to canvas
   React.useEffect(() => {

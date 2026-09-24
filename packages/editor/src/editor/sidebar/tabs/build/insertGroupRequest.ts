@@ -28,3 +28,22 @@ export function takePendingInsertGroup(composer: Composer): InsertGroupId | unde
   pending.delete(composer);
   return group;
 }
+
+/* G2-055 (CI-23): "Replace with block…" opens BLOCKS with the element marked;
+   the next block inserted while that element is still the selection takes
+   its place instead of landing beside it. */
+const replaceTargets = new WeakMap<Composer, string>();
+
+export function requestReplaceWithBlock(composer: Composer, elementId: string): void {
+  replaceTargets.set(composer, elementId);
+  requestInsertGroup(composer, "blocks");
+}
+
+/** The element a block insert should replace — only while it is still the one
+ *  selected element. Read once: a replace is spent by the insert that uses it. */
+export function takeReplaceTarget(composer: Composer): string | undefined {
+  const id = replaceTargets.get(composer);
+  replaceTargets.delete(composer);
+  const selected = composer.selection.getSelectedIds();
+  return id && selected.length === 1 && selected[0] === id ? id : undefined;
+}

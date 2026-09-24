@@ -9,19 +9,6 @@
 import type { ElementType } from "../../types";
 
 // =============================================================================
-// CONSTANTS
-// =============================================================================
-
-/** Maximum allowed nesting depth */
-export const MAX_NESTING_DEPTH = 30;
-
-/** Recommended maximum nesting depth */
-export const RECOMMENDED_MAX_DEPTH = 15;
-
-/** Maximum children per element (performance safeguard) */
-export const MAX_CHILDREN_COUNT = 500;
-
-// =============================================================================
 // ELEMENT CATEGORIES (Aquibra + HTML5 Content Model)
 // =============================================================================
 
@@ -114,37 +101,6 @@ export interface ElementRule {
 // VALIDATION TYPES
 // =============================================================================
 
-export interface ValidationIssue {
-  type: "error" | "warning" | "info";
-  code: string;
-  message: string;
-  path: string[];
-  elementType: ElementType;
-  parentType?: ElementType;
-  suggestion?: string;
-}
-
-export interface TreeStatistics {
-  totalElements: number;
-  maxDepth: number;
-  averageDepth: number;
-  elementTypeCounts: Record<string, number>;
-  landmarkCount: number;
-  interactiveCount: number;
-  headingLevels: number[];
-  emptyContainers: number;
-}
-
-export interface TreeValidationResult {
-  valid: boolean;
-  errors: ValidationIssue[];
-  warnings: ValidationIssue[];
-  info: ValidationIssue[];
-  depth: number;
-  elementCount: number;
-  statistics: TreeStatistics;
-}
-
 export interface ValidationOptions {
   /** Use strict HTML5 compliance */
   strictMode?: boolean;
@@ -172,15 +128,3 @@ export interface AutoFixSuggestion {
   description: string;
 }
 
-export interface TreeAnalysis {
-  totalElements: number;
-  maxDepth: number;
-  averageDepth: number;
-  elementTypeCounts: Record<string, number>;
-  categoryCounts: Record<string, number>;
-  landmarkElements: ElementType[];
-  headingElements: { type: ElementType }[];
-  emptyContainers: number;
-  deeplyNestedCount: number;
-  recommendations: string[];
-}

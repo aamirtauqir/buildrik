@@ -41,5 +41,4 @@ export {
   filterTree,
   flattenTree,
   countElements,
-  analyzeTree,
 } from "./treeOps";
