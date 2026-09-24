@@ -9,7 +9,7 @@
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../constants";
 import type { ElementType } from "../../types";
-import { canNestElement, canHaveChildren, isVoidType, isInteractiveType } from "../nesting";
+import { insideRefusal, isInteractiveType, type InsideRefusal } from "../nesting";
 
 /** Reasons why a drop might be invalid */
 export type InvalidDropReason =
@@ -35,7 +35,12 @@ export interface DropValidationResult {
 }
 
 /** Text element types that cannot contain children */
-const TEXT_ELEMENT_TYPES = new Set<string>(["text", "span", "paragraph", "heading", "label"]);
+const INSIDE_MESSAGES: Record<InsideRefusal, (child: string, parent: string) => string> = {
+  VOID_ELEMENT: () => "This element cannot have children (img, input, br, etc.)",
+  TEXT_ELEMENT: () => "Text elements cannot contain other elements",
+  INTERACTIVE_NESTING: () => "Interactive elements cannot be nested inside each other",
+  NESTING_FORBIDDEN: (child, parent) => `${child} cannot be placed inside ${parent}`,
+};
 
 /**
  * Validate whether a drop operation is allowed
@@ -96,42 +101,12 @@ export function validateDrop(
     };
   }
 
-  // For "inside" drops, validate nesting rules
+  // For "inside" drops, validate nesting rules — the same rule the engine's
+  // own writes apply (nesting/placement.ts).
   if (dropPosition === "inside" && effectiveParentType) {
-    // Check: Void elements cannot have children
-    if (isVoidType(effectiveParentType)) {
-      return {
-        isValid: false,
-        reason: "VOID_ELEMENT",
-        message: "This element cannot have children (img, input, br, etc.)",
-      };
-    }
-
-    // Check: Text elements generally cannot have children
-    if (TEXT_ELEMENT_TYPES.has(effectiveParentType) && !canHaveChildren(effectiveParentType)) {
-      return {
-        isValid: false,
-        reason: "TEXT_ELEMENT",
-        message: "Text elements cannot contain other elements",
-      };
-    }
-
-    // Check: Interactive elements cannot nest
-    if (isInteractiveType(sourceType) && isInteractiveType(effectiveParentType)) {
-      return {
-        isValid: false,
-        reason: "INTERACTIVE_NESTING",
-        message: "Interactive elements cannot be nested inside each other",
-      };
-    }
-
-    // Check: General nesting rules
-    if (!canNestElement(sourceType, effectiveParentType)) {
-      return {
-        isValid: false,
-        reason: "NESTING_FORBIDDEN",
-        message: `${sourceType} cannot be placed inside ${effectiveParentType}`,
-      };
+    const refusal = insideRefusal(sourceType, effectiveParentType);
+    if (refusal) {
+      return { isValid: false, reason: refusal, message: INSIDE_MESSAGES[refusal](sourceType, effectiveParentType) };
     }
   }
 
