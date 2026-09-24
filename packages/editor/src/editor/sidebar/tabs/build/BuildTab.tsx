@@ -35,10 +35,12 @@ export interface BuildTabProps {
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
+  /** False while the drawer is closed but this tab stays mounted. */
+  isOpen?: boolean;
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({
-  composer, onBlockClick, onHelpClick, onClose,
+  composer, onBlockClick, onHelpClick, onClose, isOpen = true,
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -133,7 +135,9 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const setSearchQueryRef = React.useRef(tab.setSearchQuery);
   setSearchQueryRef.current = tab.setSearchQuery;
   React.useEffect(() => {
-    if (!composer) return;
+    /* A closed drawer keeps this tab mounted — the topbar field must not keep
+       reading "Search elements…" with nothing on screen to search. */
+    if (!composer || !isOpen) return;
     const onQuery = ({ query }: { query: string }) => setSearchQueryRef.current(query);
     composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
     composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search elements…" });
@@ -141,7 +145,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
       composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
     };
-  }, [composer]);
+  }, [composer, isOpen]);
 
   // Search focus shortcuts: "/" (typing-context-safe) and ⌘F. G2-105: ⌘F is
   // taken only while focus is in this panel or its search field — anywhere

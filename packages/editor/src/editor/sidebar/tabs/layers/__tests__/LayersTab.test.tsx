@@ -20,6 +20,7 @@ vi.mock("@/editor/canvas/hooks/useComposerSelection", () => ({
 }));
 
 // Import after mocks are registered
+import { EVENTS } from "@/shared/constants/events";
 import { LayersTab } from "../LayersTab";
 
 // Patch window.matchMedia (jsdom doesn't implement it) — runs after env init
@@ -60,11 +61,49 @@ describe("LayersTab — header ⋯ menu", () => {
   const composer = () =>
     ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), isProjectLoading: () => false }) as unknown as Composer;
 
-  it("the toolbar carries only the search box — no ⊞ ⊟ ⚙ glyphs", () => {
+  it("4418:81300 — no search band in the drawer (the topbar field is the filter), no ⊞ ⊟ ⚙ glyphs", () => {
     render(<LayersTab composer={null} />);
-    expect(screen.getByLabelText("Search layers")).toBeTruthy();
+    expect(screen.queryByLabelText("Search layers")).toBeNull();
+    expect(screen.queryByTestId("layers-toolbar")).toBeNull();
     expect(screen.queryByLabelText("Expand all layers")).toBeNull();
     expect(screen.queryByLabelText("Layer display settings")).toBeNull();
+  });
+
+  it("owns the topbar field (\"Search layers…\") while open, and gives it back when closed", () => {
+    const c = composer();
+    const { rerender } = render(<LayersTab composer={c} isOpen />);
+    expect(c.emit).toHaveBeenCalledWith(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search layers…" });
+    expect(c.on).toHaveBeenCalledWith(EVENTS.UI_SEARCH_QUERY, expect.any(Function));
+    // A closed drawer stays mounted (width 0) — the field must still come back.
+    rerender(<LayersTab composer={c} isOpen={false} />);
+    expect(c.emit).toHaveBeenLastCalledWith(EVENTS.UI_SEARCH_CONTEXT, null);
+  });
+
+  it("Escape closes the drawer — but not from a text field or with a menu open", () => {
+    const onClose = vi.fn();
+    render(
+      <>
+        <input aria-label="rename" />
+        <LayersTab composer={null} onClose={onClose} />
+      </>
+    );
+    fireEvent.keyDown(screen.getByLabelText("rename"), { key: "Escape" });
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.keyDown(document.body, { key: "Escape" }); // closes the ⋯ menu only
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document.body, { key: "Escape" }); // now the drawer
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("the 700 wide view survives as a ⋯ row (no header button on the v3 board)", () => {
+    const onExpandToggle = vi.fn();
+    render(<LayersTab composer={null} isExpanded={false} onExpandToggle={onExpandToggle} />);
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-wide-view"));
+    expect(screen.queryByTestId("layers-wide-view")).toBeNull();
+    expect(onExpandToggle).toHaveBeenCalledTimes(1);
   });
 
   it("⋯ opens Expand all · Collapse all · Display settings…", () => {
