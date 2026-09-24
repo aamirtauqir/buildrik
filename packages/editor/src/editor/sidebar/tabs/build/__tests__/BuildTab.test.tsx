@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act, within } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab, type BuildTabProps } from "../BuildTab";
-import { requestInsertGroup } from "../insertGroupRequest";
+import { requestGenerateBlock, requestInsertGroup } from "../insertGroupRequest";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeEach(() => {
@@ -178,6 +178,30 @@ describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
     fireEvent.click(screen.getByTestId("insert-group-recent"));
     fireEvent.click(screen.getByTestId("insert-recent-Heading"));
     expect(onBlockClick).toHaveBeenCalledTimes(2);
+  });
+});
+
+/* G2-117 — board 4418:103353 row → the Generate a block screen. */
+describe("BuildTab — ✦ Generate a block with AI… (G2-117)", () => {
+  const composer = () =>
+    ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [] }, elements: { getElement: () => null, getActivePage: () => ({ name: "Home", root: { id: "r" } }) } }) as never;
+
+  it("the row sits right above BLOCKS and opens the screen; ‹ Add returns", () => {
+    renderTab({ composer: composer() });
+    const row = screen.getByTestId("insert-generate-block");
+    expect(row.textContent).toBe("✦\u00a0\u00a0Generate a block with AI…");
+    expect(row.nextElementSibling?.getAttribute("data-testid")).toBe("insert-section-blocks");
+    fireEvent.click(row);
+    expect(screen.getByTestId("generate-block")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("generate-back"));
+    expect(screen.queryByTestId("generate-block")).toBeNull();
+  });
+
+  it("a door that asked before the panel mounted opens straight on the screen", () => {
+    const c = composer();
+    requestGenerateBlock(c);
+    renderTab({ composer: c });
+    expect(screen.getByTestId("generate-block")).toBeTruthy();
   });
 });
 
