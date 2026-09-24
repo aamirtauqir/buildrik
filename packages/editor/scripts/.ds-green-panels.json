@@ -32,7 +32,6 @@
     "packages/editor/src/editor/inspector/sections/layout/OverflowVisibilityControls.tsx",
     "packages/editor/src/editor/inspector/sections/layout/PositionControls.tsx",
     "packages/editor/src/editor/inspector/sections/layout/index.tsx",
-    "packages/editor/src/editor/inspector/renderer/featureFlags.ts",
     "packages/editor/src/editor/inspector/sections/typography/TypographyControls.tsx",
     "packages/editor/src/editor/inspector/sections/typography/index.tsx",
     "packages/editor/src/editor/inspector/shared/controls/ButtonControls.tsx",
@@ -116,7 +115,7 @@
   ],
   "lastDriftAudit": "2026-05-18",
   "driftedRemoved": {
-    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23).",
+    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame. +6 stale 2026-09-24: deleted by the code-gap run \u2014 LayerSelectionBanner (B10), TemplatePreviewModal/TemplateDetail/TemplatePagination (C4 #24, C5 G2 templates), ChatMessage/ChatThread (L2, #23). +1 stale 2026-09-25: inspector/renderer/featureFlags.ts deleted with the unused schema/renderer pipeline (L2 ef385a55a, G2-154).",
     "stale": [
       "packages/editor/src/shared/ui/SemanticBadge.tsx",
       "packages/editor/src/shared/ui/HelpTooltip.tsx",
@@ -139,7 +138,8 @@
       "packages/editor/src/editor/sidebar/tabs/ai/ChatThread.tsx",
       "packages/editor/src/editor/sidebar/tabs/templates/TemplatePreviewModal.tsx",
       "packages/editor/src/editor/sidebar/tabs/templates/components/TemplateDetail.tsx",
-      "packages/editor/src/editor/sidebar/tabs/templates/components/TemplatePagination.tsx"
+      "packages/editor/src/editor/sidebar/tabs/templates/components/TemplatePagination.tsx",
+      "packages/editor/src/editor/inspector/renderer/featureFlags.ts"
     ],
     "drifted": [
       "packages/editor/src/editor/sidebar/tabs/component-library/CreateComponentModal.tsx",
