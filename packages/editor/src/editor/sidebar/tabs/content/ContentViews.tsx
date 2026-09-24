@@ -24,6 +24,7 @@ import {
   Popover,
   Menu,
   MenuItem,
+  MenuSeparator,
   ListRow,
   Row,
   SectionHeader,
@@ -37,6 +38,7 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
+import { RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
@@ -425,20 +427,29 @@ export function SourcesView({
   sources,
   onBack,
   onImportJson,
-  onRemoveSource,
+  actions,
 }: {
   sources: DataSource[];
   onBack: () => void;
   onImportJson: (json: string) => string | null;
-  /** Board 151:46 draws a `⋯` on every source row. `DataManager` has had
-   *  `unregisterSource` all along and no UI ever called it, so a source could
-   *  be added and never removed. */
-  onRemoveSource?: (id: string) => void;
+  /** The row ⋯ (6930:80567: Rename · Re-sync · Delete…). Board 151:46 drew
+   *  the ⋯; `unregisterSource` had no UI caller, so a source could be added
+   *  and never removed. */
+  actions?: SourceRowActions;
 }) {
   const [adding, setAdding] = React.useState(false);
   const [json, setJson] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
+  const [renaming, setRenaming] = React.useState<DataSource | null>(null);
+  const [resyncing, setResyncing] = React.useState<DataSource | null>(null);
+  const [deleting, setDeleting] = React.useState<DataSource | null>(null);
+  /* A source with a provider pulls from it; imported JSON has none, so
+     Re-sync asks for the current data instead. */
+  const resync = async (s: DataSource) => {
+    if (!actions) return;
+    if (!(await actions.refresh(s.id))) setResyncing(s);
+  };
   return (
     <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
@@ -468,7 +479,7 @@ export function SourcesView({
                   {status.label}
                 </span>
               </span>
-              {onRemoveSource && (
+              {actions && (
                 <span className={ROW_ACTIONS}>
                   <Popover
                     open={menuFor === s.id}
@@ -481,14 +492,16 @@ export function SourcesView({
                       </IconButton>
                     }
                   >
-                    <Menu>
-                      <MenuItem
-                        onClick={() => {
-                          setMenuFor(null);
-                          onRemoveSource(s.id);
-                        }}
-                      >
-                        Remove source
+                    <Menu label={`Actions for ${s.name}`}>
+                      <MenuItem data-testid={`content-source-rename-${s.id}`} onClick={() => { setMenuFor(null); setRenaming(s); }}>
+                        Rename
+                      </MenuItem>
+                      <MenuItem data-testid={`content-source-resync-${s.id}`} onClick={() => { setMenuFor(null); void resync(s); }}>
+                        Re-sync
+                      </MenuItem>
+                      <MenuSeparator />
+                      <MenuItem data-testid={`content-source-delete-${s.id}`} onClick={() => { setMenuFor(null); setDeleting(s); }}>
+                        Delete…
                       </MenuItem>
                     </Menu>
                   </Popover>
@@ -551,8 +564,55 @@ export function SourcesView({
           </>
         )}
       </div>
+      {actions ? (
+        <>
+          {renaming ? (
+            <RenameDialog
+              key={renaming.id}
+              open
+              onClose={() => setRenaming(null)}
+              title="Rename source"
+              label="Source name"
+              initial={renaming.name}
+              validate={(next) => (next ? null : "A source needs a name.")}
+              onSave={(next) => actions.rename(renaming.id, next)}
+              testId="content-source-rename"
+            />
+          ) : null}
+          {resyncing ? (
+            <ResyncJsonDialog
+              key={resyncing.id}
+              open
+              onClose={() => setResyncing(null)}
+              name={resyncing.name}
+              current={resyncing.data}
+              onResync={(data) => actions.replaceData(resyncing.id, data)}
+            />
+          ) : null}
+          <ConfirmDialog
+            open={deleting != null}
+            onClose={() => setDeleting(null)}
+            onConfirm={() => {
+              if (deleting) actions.remove(deleting.id);
+              setDeleting(null);
+            }}
+            title={`Delete “${deleting?.name ?? ""}”?`}
+            message="The source and its data leave this site. Elements bound to it stop receiving its data."
+            confirmLabel="Delete source"
+            tone="destructive"
+          />
+        </>
+      ) : null}
     </div>
   );
+}
+
+export interface SourceRowActions {
+  rename: (id: string, name: string) => void;
+  /** Pulls from the source's own provider; false when it has none. */
+  refresh: (id: string) => Promise<boolean>;
+  replaceData: (id: string, data: unknown) => void;
+  remove: (id: string) => void;
 }
 
 /* ── Variables (151:62) ──────────────────────────────────────────────────── */
@@ -572,6 +632,8 @@ export function VariablesView({
   const [editKey, setEditKey] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
+  const [renaming, setRenaming] = React.useState<string | null>(null);
+  const [deleting, setDeleting] = React.useState<string | null>(null);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
 
@@ -652,12 +714,16 @@ export function VariablesView({
                     </IconButton>
                   }
                 >
-                  <Menu>
-                    <MenuItem onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
+                  <Menu label={`Actions for ${v.key}`}>
+                    <MenuItem data-testid={`content-var-edit-${v.key}`} onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
                       Edit value
                     </MenuItem>
-                    <MenuItem onClick={() => { setMenuFor(null); onChange(variables.filter((x) => x.key !== v.key)); }}>
-                      Delete variable
+                    <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
+                      Rename
+                    </MenuItem>
+                    <MenuSeparator />
+                    <MenuItem data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
+                      Delete…
                     </MenuItem>
                   </Menu>
                 </Popover>
@@ -708,6 +774,37 @@ export function VariablesView({
           </Button>
         )}
       </div>
+      {renaming != null ? (
+      <RenameDialog
+        key={renaming}
+        open
+        onClose={() => setRenaming(null)}
+        title="Rename variable"
+        label="Key"
+        initial={renaming}
+        validate={(next) =>
+          !isValidVariableKey(next)
+            ? "Keys are letters/digits/dashes, starting with a letter."
+            : variables.some((x) => x.key === next)
+              ? "A variable with this key already exists."
+              : null
+        }
+        onSave={(next) => onChange(variables.map((x) => (x.key === renaming ? { ...x, key: next } : x)))}
+        testId="content-var-rename"
+      />
+      ) : null}
+      <ConfirmDialog
+        open={deleting != null}
+        onClose={() => setDeleting(null)}
+        onConfirm={() => {
+          onChange(variables.filter((x) => x.key !== deleting));
+          setDeleting(null);
+        }}
+        title={`Delete {{site.${deleting ?? ""}}}?`}
+        message="The variable and its value are removed."
+        confirmLabel="Delete variable"
+        tone="destructive"
+      />
     </div>
   );
 }

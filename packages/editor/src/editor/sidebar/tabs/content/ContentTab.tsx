@@ -33,6 +33,7 @@ import {
   CONTENT_BODY,
   SECTION_H,
   SourcesView,
+  type SourceRowActions,
   VariablesView,
 } from "./ContentViews";
 
@@ -117,11 +118,27 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   /* Board 151:46 puts a `⋯` on each source row. DataManager.unregisterSource
      has existed since the manager shipped and no UI ever called it, so a source
      could be added and never removed. */
-  const removeSource = (id: string) => {
-    if (!composer) return;
-    composer.data.unregisterSource(id);
-    reload();
-  };
+  const sourceActions: SourceRowActions | undefined = composer
+    ? {
+        rename: (id, name) => {
+          composer.data.renameSource(id, name);
+          reload();
+        },
+        refresh: async (id) => {
+          const pulled = await composer.data.refreshSource(id);
+          if (pulled) reload();
+          return pulled;
+        },
+        replaceData: (id, data) => {
+          composer.data.updateSourceData(id, data);
+          reload();
+        },
+        remove: (id) => {
+          composer.data.unregisterSource(id);
+          reload();
+        },
+      }
+    : undefined;
 
   const selectElement = (id: string) => {
     const el = composer?.elements.getElement(id);
@@ -211,7 +228,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           sources={panel.sources}
           onBack={() => setView({ kind: "root" })}
           onImportJson={importJson}
-          onRemoveSource={removeSource}
+          actions={sourceActions}
         />
       );
       break;
