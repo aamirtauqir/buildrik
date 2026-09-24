@@ -20,17 +20,18 @@ const page: PageItem = { id: "p1", name: "Menu", slug: "menu", isHome: false };
 
 function mount(updatePage = vi.fn().mockResolvedValue(undefined)) {
   const onClose = vi.fn();
-  const composer = { elements: { updatePage }, getProjectMetadata: () => ({}) } as never;
+  const emit = vi.fn();
+  const composer = { elements: { updatePage }, emit, getProjectMetadata: () => ({ name: "Bella Cucina" }) } as never;
   render(
     <ToastProvider>
       <PageSettingsDrawer page={page} allPages={[page]} composer={composer} onClose={onClose} />
     </ToastProvider>,
   );
-  return { onClose, updatePage };
+  return { onClose, updatePage, emit };
 }
 
 const editTitle = (v = "Menu — Bella Cucina") =>
-  fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: v } });
+  fireEvent.change(screen.getByLabelText("Meta title · page override"), { target: { value: v } });
 
 afterEach(() => vi.useRealTimers());
 
@@ -58,7 +59,7 @@ describe("PageSettingsDrawer — Done / Cancel", () => {
     fireEvent.click(screen.getByTestId("pg-drawer-tabbtn-social"));
     expect(screen.queryByTestId("pages-unsaved-modal")).toBeNull();
     fireEvent.click(screen.getByTestId("pg-drawer-tabbtn-seo"));
-    expect(screen.getByLabelText("Meta title")).toHaveValue("Menu — Bella Cucina");
+    expect(screen.getByLabelText("Meta title · page override")).toHaveValue("Menu — Bella Cucina");
   });
 
   it("Done saves once, closes, and toasts Page settings saved", async () => {
@@ -93,7 +94,44 @@ describe("PageSettingsDrawer — Done / Cancel", () => {
     fireEvent.click(screen.getByTestId("pg-drawer-done"));
     expect(await screen.findByText("Save failed — your changes are still here.")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Meta title")).toHaveValue("Menu — Bella Cucina");
+    expect(screen.getByLabelText("Meta title · page override")).toHaveValue("Menu — Bella Cucina");
     expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+  });
+
+  /* 6887:73801: the saved toast carries Manage pages. */
+  it("the saved toast offers Manage pages, which opens the Pages panel", async () => {
+    const { emit } = mount();
+    editTitle();
+    fireEvent.click(screen.getByTestId("pg-drawer-done"));
+    const action = await screen.findByRole("button", { name: "Manage pages" });
+    fireEvent.click(action);
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "pages" });
+  });
+
+  /* 6887:73809: the SEO form's note and its "Site SEO defaults ›" door. */
+  it("SEO names what the overrides affect; Site SEO defaults closes and opens Settings › SEO", () => {
+    const { onClose, emit } = mount();
+    expect(screen.getByTestId("seo-override-note")).toHaveTextContent("Bella Cucina · These overrides affect Menu only.");
+    fireEvent.click(screen.getByTestId("seo-site-defaults"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith("ui:settings-open", { screen: "seo" });
+  });
+
+  it("with an unsaved edit, Site SEO defaults asks first; Discard closes and goes", () => {
+    const { onClose, emit } = mount();
+    editTitle();
+    fireEvent.click(screen.getByTestId("seo-site-defaults"));
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("pages-unsaved-discard"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith("ui:settings-open", { screen: "seo" });
+  });
+
+  it("Search indexing is on the SEO form and drives the same switch", () => {
+    mount();
+    const sel = screen.getByTestId("seo-input-indexing") as HTMLSelectElement;
+    expect(sel.value).toBe("index");
+    fireEvent.change(sel, { target: { value: "noindex" } });
+    expect(sel.value).toBe("noindex");
   });
 });

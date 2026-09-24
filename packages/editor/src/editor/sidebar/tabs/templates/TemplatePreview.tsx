@@ -25,6 +25,9 @@ export interface TemplatePreviewProps {
   usedOn?: ReadonlyArray<{ id: string; name: string }>;
   /** Jump to one of those pages (closes the view). */
   onOpenPage?: (pageId: string) => void;
+  /** A dialog over the preview (the Create page / Replace confirm) owns
+   *  Escape while it is open — Escape closes it, not the preview. */
+  dialogOpen?: boolean;
 }
 
 type ViewportMode = "desktop" | "tablet" | "mobile";
@@ -41,6 +44,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   onCreatePage,
   onReplacePage,
   onBack,
+  dialogOpen = false,
   usedOn = [],
   onOpenPage,
 }) => {
@@ -50,6 +54,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
 
   /* Escape belongs to the preview: back to the catalogue, not out of the view. */
   React.useEffect(() => {
+    if (dialogOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       e.preventDefault();
@@ -58,7 +63,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
     };
     document.addEventListener("keydown", onKey, true);
     return () => document.removeEventListener("keydown", onKey, true);
-  }, [onBack]);
+  }, [onBack, dialogOpen]);
 
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col" data-testid="tpl-ws-preview">
