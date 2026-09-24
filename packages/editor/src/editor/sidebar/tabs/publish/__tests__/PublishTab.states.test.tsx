@@ -116,7 +116,7 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
     expect(screen.getByText("Hero — new photo")).toBeTruthy();
     expect(screen.queryByText("Ancient edit")).toBeNull();
     expect(screen.getByText("3 pages")).toBeTruthy();
-    expect(screen.getByText("v4 · live")).toBeTruthy();
+    expect(screen.getByText("LIVE · v4")).toBeTruthy(); // 7051:78633
   });
 
   it("a finished deploy on a site that is not serving does not read as live", async () => {
@@ -129,8 +129,8 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
     ]);
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await expandSections();
-    await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
-    expect(screen.queryByText("v1 · live")).toBeNull();
+    await waitFor(() => expect(screen.getByText("Not live · v1")).toBeTruthy());
+    expect(screen.queryByText("LIVE · v1")).toBeNull();
   });
 
   it("never-published reads as never published, not as an empty deploy", async () => {
@@ -390,7 +390,7 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
     failing = false;
     fireEvent.click(screen.getByText("Try again"));
     await expandSections();
-    await waitFor(() => expect(screen.getByText("v2 · live")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("LIVE · v2")).toBeTruthy());
   });
 });
 
@@ -486,7 +486,7 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
       />,
     );
     await expandSections();
-    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("LIVE · v3")).toBeTruthy());
     await openPublishMenu();
     fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
     expect(screen.getByText("Unpublish site?")).toBeTruthy();
@@ -524,7 +524,7 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
       />,
     );
     await expandSections();
-    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("LIVE · v3")).toBeTruthy());
     await openPublishMenu();
     fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
     fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
@@ -559,7 +559,7 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
     ]);
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
     await expandSections();
-    await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Not live · v1")).toBeTruthy());
     await openPublishMenu();
     expect(screen.getByRole("menuitem", { name: "All versions ›" })).toBeTruthy();
     expect(screen.queryByRole("menuitem", { name: "Unpublish site…" })).toBeNull();

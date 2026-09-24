@@ -93,6 +93,7 @@ const FIX_TARGETS: Record<string, FixTarget> = {
   "SEO configured": { screen: "seo" },
   "Domain connected": { screen: "domains" },
   "Empty pages": { tab: "pages" },
+  Favicon: { screen: "general" },
 };
 
 /** The board's row rhythm: label left, value right, one line. */
@@ -343,9 +344,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     setCheckState("loading");
     try {
       const result = await fetchPrePublishChecks(siteId);
-      /* Spec B4 draws no Favicon row. It is advisory server-side (never a
-         `fail`), so dropping it changes no gate. */
-      setChecks({ ...result, checks: result.checks.filter((c) => c.label !== "Favicon") });
+      /* 7051:78232 / 7051:78633 draw the server's Favicon row too (with
+         Fix ›), so every server row renders — the list is the server's. */
+      setChecks(result);
       setCheckState("ready");
     } catch {
       // DF5: never fall back to a fake-passing checklist — show Retry.
@@ -851,12 +852,26 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <SkeletonRows widths={["tw:w-24"]} />
           ) : snapshot.lastDeploy ? (
             <>
+              {/* 7051:78633: "● LIVE · v6" with its date, then "All versions ›". */}
               <div className={ROW}>
-                <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                  v{snapshot.lastDeploy.version} · {snapshot.lastDeploy.isLive ? "live" : "not live"}
+                <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:text-[var(--bk-ink)]">
+                  {snapshot.lastDeploy.isLive ? (
+                    <span className="tw:size-2 tw:rounded-full tw:bg-[var(--bk-ink)]" aria-hidden="true" />
+                  ) : null}
+                  {snapshot.lastDeploy.isLive ? "LIVE · " : "Not live · "}v{snapshot.lastDeploy.version}
                 </span>
                 <span className={META}>{snapshot.lastDeploy.when}</span>
               </div>
+              <Button
+                color="light"
+                size="xs"
+                disabled={!composer}
+                onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "published" })}
+                className={`${CHECK_DOOR} tw:mt-1 tw:self-start`}
+                data-testid="publish-last-deploy-all"
+              >
+                All versions ›
+              </Button>
             </>
           ) : (
             <p className={META}>This site has never been published.</p>
