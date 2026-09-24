@@ -245,6 +245,10 @@ export interface MenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButto
   /** One-of-many choice (a device, a zoom level): role menuitemradio, and
    *  `selected` marks the current one. */
   radio?: boolean;
+  /** How a radio marks the current row: a leading bare tick (default); a
+   *  trailing grey ✓ on a tinted medium row (breakpoints, 5930:44781); or a
+   *  leading check slot on every row (zoom levels, 7048:78046). */
+  tick?: "leading" | "trailing" | "box";
 }
 
 const MENU_ITEM_BASE =
@@ -256,7 +260,9 @@ const CHECK_SLOT =
   "tw:flex tw:size-3.5 tw:flex-none tw:items-center tw:justify-center tw:rounded-[3px] tw:border tw:border-[var(--bk-gray-300)] " +
   "tw:text-[11px] tw:leading-none tw:text-[var(--bk-ink-soft)]";
 
-export function MenuItem({ icon, kbd, selected, danger, radio, disabled, className, children, ...rest }: MenuItemProps) {
+export function MenuItem({ icon, kbd, selected, danger, radio, tick = "leading", disabled, className, children, ...rest }: MenuItemProps) {
+  const radioTick = radio && selected !== undefined ? tick : null;
+  const current = radioTick === "trailing" && selected ? "tw:!bg-[var(--bk-gray-100)] tw:font-medium" : null;
   const stateClass = disabled
     ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-[var(--bk-gray-300)]"
     : danger
@@ -268,21 +274,31 @@ export function MenuItem({ icon, kbd, selected, danger, radio, disabled, classNa
       type="button"
       role={radio ? "menuitemradio" : selected === undefined ? "menuitem" : "menuitemcheckbox"}
       aria-checked={selected === undefined ? undefined : selected}
-      className={[MENU_ITEM_BASE, stateClass, className].filter(Boolean).join(" ")}
+      className={[MENU_ITEM_BASE, stateClass, current, className].filter(Boolean).join(" ")}
       disabled={disabled}
       aria-disabled={disabled || undefined}
       tabIndex={-1}
       {...rest}
     >
       {/* A radio keeps the leading tick (one-of-many). */}
-      {radio && selected !== undefined ? (
+      {radioTick === "leading" ? (
         <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-[var(--bk-accent-text)]">
+          {selected ? "✓" : ""}
+        </span>
+      ) : null}
+      {radioTick === "box" ? (
+        <span aria-hidden="true" data-check-slot="" className={CHECK_SLOT}>
           {selected ? "✓" : ""}
         </span>
       ) : null}
       {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
       <span className="tw:flex-1 tw:text-left">{children}</span>
       {kbd ? <span className="tw:ml-auto tw:text-[var(--bk-ink-muted)] tw:text-[11px]">{kbd}</span> : null}
+      {radioTick === "trailing" && selected ? (
+        <span aria-hidden="true" className="tw:flex-none tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+          ✓
+        </span>
+      ) : null}
       {/* Board 5930:44801: a checkable row ENDS in a 14px check slot (r3,
           gray-300 hairline) that holds the ✓ — not a leading bare tick. */}
       {!radio && selected !== undefined ? (

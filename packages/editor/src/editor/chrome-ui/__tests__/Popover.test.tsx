@@ -150,6 +150,39 @@ describe("Menu", () => {
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Delete" }));
   });
 
+  /* Board 5930:44781: the breakpoint list marks the current row with a
+     trailing grey ✓ on a tinted, medium-weight row; board 7048:78046: the
+     zoom list leads every row with a check slot. */
+  it("radio tick='trailing' tints the current row and ends it in a ✓", () => {
+    render(
+      <Menu label="Breakpoint">
+        <MenuItem radio tick="trailing" selected>Desktop</MenuItem>
+        <MenuItem radio tick="trailing" selected={false} kbd="768px">Tablet</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemradio", { name: /Desktop/ });
+    expect(on.className).toContain("tw:!bg-[var(--bk-gray-100)]");
+    expect(on.className).toContain("tw:font-medium");
+    expect(on.lastElementChild?.textContent).toBe("✓");
+    expect(on.firstElementChild?.textContent).toBe("Desktop");
+    expect(screen.getByRole("menuitemradio", { name: /Tablet/ }).textContent).toBe("Tablet768px");
+  });
+
+  it("radio tick='box' leads every row with a check slot", () => {
+    render(
+      <Menu label="Zoom">
+        <MenuItem radio tick="box" selected>100%</MenuItem>
+        <MenuItem radio tick="box" selected={false}>50%</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemradio", { name: /100%/ });
+    expect((on.firstElementChild as HTMLElement).hasAttribute("data-check-slot")).toBe(true);
+    expect(on.firstElementChild?.textContent).toBe("✓");
+    const off = screen.getByRole("menuitemradio", { name: /50%/ }).firstElementChild as HTMLElement;
+    expect(off.hasAttribute("data-check-slot")).toBe(true);
+    expect(off.textContent).toBe("");
+  });
+
   /* Board 5930:44801: a checkable row ends in a 14px check slot (r3,
      gray-300 hairline) holding the ✓ — not a leading bare tick. */
   it("draws a trailing 14px check slot, ticked when selected", () => {
