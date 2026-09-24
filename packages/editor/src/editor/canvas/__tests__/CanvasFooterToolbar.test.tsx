@@ -244,3 +244,14 @@ describe("CanvasFooterToolbar — View ▸ Grid", () => {
     expect(onGridSizeChange).toHaveBeenCalledWith(12);
   });
 });
+
+describe("CanvasFooterToolbar — disabled undo/redo (board 4418:103591)", () => {
+  it("a disabled undo draws no fill", () => {
+    renderToolbar({ onUndo: vi.fn(), canUndo: false, onRedo: vi.fn(), canRedo: false });
+    for (const name of ["Undo", "Redo"]) {
+      const cls = screen.getByRole("button", { name }).className;
+      expect(cls).toContain("tw:disabled:bg-transparent");
+      expect(cls).not.toContain("tw:disabled:bg-[var(--bk-bg-subtle)]");
+    }
+  });
+});

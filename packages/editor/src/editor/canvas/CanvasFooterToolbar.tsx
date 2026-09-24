@@ -109,10 +109,12 @@ const RedoIcon = () => (
   </svg>
 );
 
-/** Square icon control in the bar — undo/redo/help all share this box. */
+/** Square icon control in the bar — undo/redo/help all share this box. The
+ *  board draws a disabled ↶ ↷ as a muted glyph with no fill, so the Button's
+ *  disabled fill is cleared. */
 const EDIT_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
-  "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
+  "tw:border tw:border-transparent tw:bg-transparent tw:disabled:bg-transparent tw:text-[var(--bk-ink-soft)] " +
   "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
 
 /**
