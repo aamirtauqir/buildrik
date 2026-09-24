@@ -103,7 +103,15 @@ export async function hydrateVersionsFromServer(): Promise<number> {
   try {
     const remote = await client().siteVersions.list.query({ siteId });
     if (!remote.length) return 0;
-    const localIds = new Set((await loadVersions(siteId)).map((v) => v.id));
+    const local = await loadVersions(siteId);
+    const localIds = new Set(local.map((v) => v.id));
+    /* Backfill author names onto versions already cached (G1-075): the list
+       carries them; a version hydrated before it did has only the id. */
+    const nameById = new Map(remote.map((r) => [r.versionId, r.createdByName ?? null]));
+    for (const v of local) {
+      const name = nameById.get(v.id);
+      if (name && !v.authorName) await saveVersion({ ...v, authorName: name });
+    }
     const missing = remote.filter((r) => !localIds.has(r.versionId)).slice(0, HYDRATE_LIMIT);
     for (let i = 0; i < missing.length; i += HYDRATE_CHUNK) {
       const chunk = missing.slice(i, i + HYDRATE_CHUNK);
@@ -130,6 +138,7 @@ export async function hydrateVersionsFromServer(): Promise<number> {
           ...(payload as NamedVersion),
           projectId: siteId,
           userId: r.createdBy ?? null,
+          authorName: r.createdByName ?? null,
         });
         added++;
       }
