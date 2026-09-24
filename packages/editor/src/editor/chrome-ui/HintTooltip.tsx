@@ -52,13 +52,13 @@ export interface HintTooltipProps {
 
    12px, not `text-sm`'s 14: this is a hint, and it was rendering at body size.
 
-   The founder resolved the DESIGN.md-vs-board conflict on 2026-08-27 in
-   DESIGN.md's favour; see chrome-ui/tooltipTheme.ts. */
+   Surface: board 4433:46540 (Rail · tooltip · Add) — ink bubble, pad 6/10,
+   r6, 12/18, white label. The owner lifted decision #25's NO BLACK RULE for
+   tooltips on 2026-09-24 (it had gone DESIGN.md's way on 2026-08-27). */
 const BUBBLE_CLASS =
-  "tw:fixed tw:max-w-[280px] tw:whitespace-normal tw:rounded-lg tw:px-3 tw:py-2 " +
-  "tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-[color:var(--bk-ink-soft)] " +
-  "tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-16)] tw:font-medium " +
-  "tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:fixed tw:max-w-[280px] tw:whitespace-normal tw:rounded-md tw:px-2.5 tw:py-1.5 " +
+  "tw:bg-[var(--bk-ink)] tw:text-white " +
+  "tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:font-medium " +
   "tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 
 /* The registry's top layer. A `tw:z-*` utility cannot carry a var(), so this

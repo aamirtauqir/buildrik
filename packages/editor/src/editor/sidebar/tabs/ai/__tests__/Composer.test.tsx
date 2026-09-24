@@ -63,7 +63,9 @@ describe("Composer", () => {
     expect(onStop).toHaveBeenCalled();
   });
 
-  it("clears textarea after submit", () => {
+  /* Board 4418:106919: "Your prompt is still here". AITab remounts the
+     composer after a clean run, which is what empties it. */
+  it("keeps the prompt in the textarea after submit", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
@@ -74,6 +76,6 @@ describe("Composer", () => {
     const ta = screen.getByPlaceholderText(/Ask AI/i) as HTMLTextAreaElement;
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
-    expect(ta.value).toBe("");
+    expect(ta.value).toBe("Hello");
   });
 });

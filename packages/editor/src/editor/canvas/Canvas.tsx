@@ -663,7 +663,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        mouse-move stay: selection changes nothing when there is no inspector to
        drive, and comment pinning needs the pointer. */
     return (
-      <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles}>
+      /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
+         left and 16px above the footer toolbar (board 5940:148012) —
+         chrome-ui/Toast measures both. */
+      <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles} data-bk-toast-anchor="">
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div
@@ -826,7 +829,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
         {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
         {showFooterToolbar && onZoomChange && onOverlayChange && (
-          <div style={footerToolbarContainerStyles}>
+          <div style={footerToolbarContainerStyles} data-bk-toast-floor="">
             <CanvasFooterToolbar
               overlays={{
                 guides: showGuides,

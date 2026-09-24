@@ -19,18 +19,18 @@ afterEach(cleanup);
 describe("ModalDescription", () => {
   it("insets by default, matching the body and title", () => {
     render(<ModalDescription>Subtitle</ModalDescription>);
-    expect(screen.getByText("Subtitle").className).toMatch(/tw:px-5/);
+    expect(screen.getByText("Subtitle").className).toMatch(/tw:px-6/);
   });
 
   it("opts out for callers that wrap their own padded header", () => {
     // MigrationProgressModal and AIPromptModal both do; without this they
     // would be inset twice.
     render(<ModalDescription inset={false}>Subtitle</ModalDescription>);
-    expect(screen.getByText("Subtitle").className).not.toMatch(/tw:px-5/);
+    expect(screen.getByText("Subtitle").className).not.toMatch(/tw:px-6/);
   });
 
   it("agrees with ModalTitle on the left inset", () => {
-    // The defect was the two disagreeing. Both are pl-5 / px-5, so a reader
+    // The defect was the two disagreeing. Both are pl-6 / px-6, so a reader
     // sees one left edge, not two.
     render(
       <>
@@ -38,14 +38,14 @@ describe("ModalDescription", () => {
         <ModalDescription>Subtitle</ModalDescription>
       </>,
     );
-    expect(screen.getByText("Title").className).toMatch(/tw:pl-5/);
-    expect(screen.getByText("Subtitle").className).toMatch(/tw:px-5/);
+    expect(screen.getByText("Title").className).toMatch(/tw:pl-6/);
+    expect(screen.getByText("Subtitle").className).toMatch(/tw:px-6/);
   });
 
   it("keeps the caller's className", () => {
     render(<ModalDescription className="tw:mt-1">Subtitle</ModalDescription>);
     const el = screen.getByText("Subtitle");
-    expect(el.className).toMatch(/tw:px-5/);
+    expect(el.className).toMatch(/tw:px-6/);
     expect(el.className).toMatch(/tw:mt-1/);
   });
 });

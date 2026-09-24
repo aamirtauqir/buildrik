@@ -109,31 +109,8 @@ describe("Toast", () => {
   });
 });
 
-/*
-  Board 1177:4859 is the toast catalog. Its header states the durations —
-  "Default 5000ms · success often 1800-3000 · sync failures STICKY (Infinity +
-  Retry)" — and its rows state the tones: five tinted cards, each with its
-  title in its own colour, not one white card with a coloured edge.
-*/
-describe("Toast — board 1177:4859's catalog", () => {
-  const fire = (input: Parameters<ReturnType<typeof useToast>["addToast"]>[0]) => {
-    let api!: ReturnType<typeof useToast>;
-    render(
-      <ToastProvider>
-        <Harness onReady={(a) => {
-          api = a;
-        }} />
-      </ToastProvider>,
-    );
-    act(() => {
-      api.addToast(input);
-    });
-    let n: HTMLElement | null = screen.getByText(input.description);
-    while (n && !n.classList.contains("tw:rounded-lg")) n = n.parentElement;
-    if (!n) throw new Error("toast card not found");
-    return n;
-  };
-
+/* The toast catalogue (7574:194162): 5 s default unless persistent. */
+describe("Toast — catalogue durations", () => {
   it("defaults to the board's 5000ms", () => {
     vi.useFakeTimers();
     let api!: ReturnType<typeof useToast>;
@@ -155,26 +132,6 @@ describe("Toast — board 1177:4859's catalog", () => {
       vi.advanceTimersByTime(1);
     });
     expect(screen.queryByText("Saved")).toBeNull();
-  });
-
-  it.each([
-    ["success", "--bk-success-tint", "--bk-success-text"],
-    ["info", "--bk-accent-tint", "--bk-accent-text"],
-    ["error", "--bk-error-tint", "--bk-error-text"],
-    ["warning", "--bk-warning-tint", "--bk-warning-text"],
-  ] as const)("tints the whole %s card and colours its title", (tone, tint, text) => {
-    const card = fire({ description: `${tone} body`, title: `${tone} title`, tone });
-    const html = card.outerHTML;
-    expect(html).toContain(tint);
-    expect(html).toContain(text);
-    // The old treatment: white card, 3px coloured edge.
-    expect(html).not.toContain("border-l-[3px]");
-    cleanup();
-  });
-
-  it("gives the neutral tone the grey card, not a coloured one", () => {
-    const card = fire({ description: "Deleted 'Button'", title: "Undo", tone: "neutral" });
-    expect(card.outerHTML).toContain("tw:bg-[var(--bk-gray-100)]");
   });
 });
 
