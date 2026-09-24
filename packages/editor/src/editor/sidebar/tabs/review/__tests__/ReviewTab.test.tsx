@@ -6,9 +6,9 @@
  * was the pre-board panel, and a test protecting removed design is how
  * "No pages yet" survived for months (PageList.test.tsx:55).
  *
- * What it protects now: the frame every board shares (progress "N of M", the
- * sent line, the round line, Compare, one primary button whose label is the
- * state), the bodies that differ per board, and the behaviours the boards
+ * What it protects now: the frame every board shares (the status line, the
+ * ⋯ menu's Compare rounds / Round history, one primary button whose label is
+ * the state), the bodies that differ per board, and the behaviours the boards
  * imply — the re-send confirm REPLACING the primary, the revoke confirm being
  * inline and race-safe, resolve reaching the canvas.
  */
@@ -77,23 +77,30 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe("the frame every board shares", () => {
-  it("counts resolved of total, and says who it went to and when", async () => {
+describe("the frame every board shares (board 4418:115784)", () => {
+  it("is one status line — counts and who it waits on; no progress bar, no round strip, no Compare button", async () => {
     renderTab();
-    expect(await screen.findByText("1 of 3")).toBeInTheDocument();
-    expect(screen.getByText("Sent 2d ago · Sara Khan")).toBeInTheDocument();
-    expect(screen.getByText(/Round 2 of 3/)).toBeInTheDocument();
+    expect(await screen.findByTestId("review-status-line")).toHaveTextContent("2 open · 1 resolved · Awaiting Sara Khan");
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.queryByText(/Round 2 of 3/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Compare with approved" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
   });
 
-  /* The strip is a HISTORY toggle now (reviews.rounds, 2026-08-28), but still
-     no ‹ › pager: comments carry no round id by design (contracts §6.4), so an
-     older round's comments cannot be paged to, and a chevron that cannot move
-     is a dead control. */
-  it("has no round pager — the strip toggles a header-line history instead", async () => {
+  it("the panel ⋯ holds Compare rounds and Round history ›, as board 7071:79114 draws", async () => {
+    const emit = vi.fn();
+    renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Compare rounds" }));
+    expect(emit).toHaveBeenCalledWith("ui:compare-open", expect.objectContaining({ left: { kind: "approved" }, right: { kind: "current" } }));
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    expect(await screen.findByRole("menuitem", { name: "Round history ›" })).toBeInTheDocument();
+  });
+
+  it("Send is the blue primary even while disabled", async () => {
     renderTab();
-    await screen.findByText(/Round 2 of 3/);
-    expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId("review-rounds-toggle")).toBeInTheDocument();
+    const send = await screen.findByRole("button", { name: "Send" });
+    expect(send.className).toContain("tw:disabled:bg-[var(--bk-accent)]");
   });
 });
 
@@ -377,13 +384,14 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
 });
 
 describe("the previous-rounds history (board 157:169, the buildable half)", () => {
-  it("opens on the strip and prints each earlier round as a header line", async () => {
+  it("opens from the ⋯ menu and prints each earlier round as a header line", async () => {
     vi.mocked(fetchRounds).mockResolvedValueOnce([
       { id: "rr-old", roundNumber: 1, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-20T10:00:00Z", createdAt: "2026-08-18T10:00:00Z" },
       { id: "r1", roundNumber: 2, status: "PENDING", reviewerName: null, revoked: false, resolvedAt: null, createdAt: "2026-08-25T10:00:00Z" },
     ]);
     renderTab();
-    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByTestId("review-menu-round-history"));
     /* The current round is not its own history. The line is the board's
        (1753:8423-8429): outcome then a RELATIVE age, not "Approved by <name>"
        and a locale date — the name is already on the sent line above, and the
@@ -395,7 +403,8 @@ describe("the previous-rounds history (board 157:169, the buildable half)", () =
   it("a failed history read says so and offers a retry — it does not impersonate 'no history'", async () => {
     vi.mocked(fetchRounds).mockRejectedValueOnce(new Error("net"));
     renderTab();
-    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    fireEvent.click(await screen.findByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByTestId("review-menu-round-history"));
     expect(await screen.findByText(/Couldn't load the history/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
   });

@@ -674,8 +674,8 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       expect(screen.getByRole("menuitem", { name: "View live site ↗" })).toBeTruthy();
-      // Board 4418:126034 has no "Copy live URL".
-      expect(screen.queryByRole("menuitem", { name: "Copy live URL" })).toBeNull();
+      // Off board 4418:126034 but kept (owner rule: never silently remove a capability).
+      expect(screen.getByRole("menuitem", { name: "Copy live URL" })).toBeTruthy();
     });
 
     /* SH-A-11: Unpublish is ADMIN on the server (sites.ts:425) and the row was

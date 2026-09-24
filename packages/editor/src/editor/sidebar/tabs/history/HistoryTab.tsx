@@ -131,8 +131,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     if (initialView) return initialView; // deep link wins for this mount
     if (stored === "published") return "published";
     if (stored === "activity") return "activity";
-    if (stored === "changes") return "session";
-    return "saves";
+    if (stored === "saves") return "saves";
+    return "session"; // board 4418:73791 opens on Session
   });
 
   const [searchQuery, setSearchQuery] = React.useState("");

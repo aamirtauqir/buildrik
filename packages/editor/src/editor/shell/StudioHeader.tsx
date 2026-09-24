@@ -718,6 +718,21 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onToggleComments: toggleComments,
       };
 
+  const copyLiveUrl = React.useCallback(() => {
+    if (!publishedUrl) return;
+    // navigator.clipboard is absent on insecure origins, and writeText can be
+    // refused. Either way the user hears about it rather than pressing again.
+    const done = navigator.clipboard?.writeText(publishedUrl);
+    if (!done) {
+      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
+      return;
+    }
+    void done.then(
+      () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
+      () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
+    );
+  }, [publishedUrl, addToast]);
+
   // F3: every review state opens the same door — the Review panel.
   const review: ReviewPill = { ...reviewChip(reviewStatus, openCommentCount), onClick: onOpenReview };
 
@@ -824,6 +839,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   }
             }
             publishedUrl={publishedUrl}
+            onCopyLiveUrl={copyLiveUrl}
+            onReplayOnboarding={
+              viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
+            }
             siteId={siteIdForMenu}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={toggleReadOnlyView}
