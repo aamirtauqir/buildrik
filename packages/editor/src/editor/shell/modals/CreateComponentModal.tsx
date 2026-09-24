@@ -115,7 +115,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="confirm" data-testid="create-component-modal">
-        <ModalTitle className="tw:text-[length:var(--bk-text-16)]" data-testid="create-component-title">
+        <ModalTitle data-testid="create-component-title">
           Create component
         </ModalTitle>
         <ModalBody>

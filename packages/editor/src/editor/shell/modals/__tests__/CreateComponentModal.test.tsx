@@ -52,6 +52,9 @@ describe("CreateComponentModal — board 4418:142143", () => {
     const { composer } = makeComposer();
     renderModal(composer);
     expect(screen.getByTestId("create-component-title")).toHaveTextContent("Create component");
+    // The board's dialog title is 20/600 (the Modal default), not 16.
+    expect(screen.getByTestId("create-component-title").className).toContain("--bk-text-20");
+    expect(screen.getByTestId("create-component-title").className).not.toContain("--bk-text-16");
     expect(screen.getByTestId("create-component-lead")).toHaveTextContent(
       /^Selected: Home › .+ \(section\)\. Creating a master converts this .+ into its first instance\. Nothing else changes unless you opt in below\.$/,
     );
