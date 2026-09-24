@@ -55,6 +55,7 @@ import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
 import { ReattachModal, reattachCandidates } from "./ReattachModal";
+import { BackToActivityRow } from "../history/components/BackToActivityRow";
 import { anchorSelector } from "@/editor/canvas/comments/commentAnchors";
 import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
 import {
@@ -71,6 +72,8 @@ import {
 } from "../../../../services/ReviewService";
 
 export interface ReviewTabProps {
+  /** Opened from a History › Activity row: draw the "‹ Activity" row. */
+  fromActivity?: boolean;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
@@ -139,6 +142,7 @@ interface Group {
 }
 
 export const ReviewTab: React.FC<ReviewTabProps> = ({
+  fromActivity = false,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -393,14 +397,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     ) : null;
 
   const header = (
-    <PanelHeader
-      title="Review"
-      actions={roundMenu}
-      isExpanded={isExpanded}
-      onExpandToggle={onExpandToggle}
-      onHelpClick={onHelpClick}
-      onClose={onClose}
-    />
+    <>
+      <PanelHeader
+        title="Review"
+        actions={roundMenu}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
+      {fromActivity ? (
+        <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "activity" })} />
+      ) : null}
+    </>
   );
 
   /* Locate › (B3, board rows of 4418:115784): `locateComment` is the one

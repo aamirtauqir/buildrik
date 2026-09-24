@@ -24,6 +24,7 @@ import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import { TimeTravelIcon } from "./icons";
 import type { HistoryView, HistoryTabProps } from "./types";
+import { BackToActivityRow } from "./components/BackToActivityRow";
 import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
@@ -136,6 +137,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   });
 
   const [searchQuery, setSearchQuery] = React.useState("");
+  /* Set when an Activity row opened Published or Session here; the back row
+     shows until the user picks a tab themselves. */
+  const [fromActivity, setFromActivity] = React.useState(false);
   const [showScrubber, setShowScrubber] = React.useState(false);
 
   const {
@@ -210,12 +214,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             aria-selected={activeView === view}
             className={`view-tab${activeView === view ? " active" : ""}`}
             data-testid={`history-view-tab-${view}`}
-            onClick={() => setActiveView(view)}
+            onClick={() => {
+              setActiveView(view);
+              setFromActivity(false);
+            }}
           >
             {VIEW_LABEL[view]}
           </Button>
         ))}
       </div>
+      {fromActivity && activeView !== "activity" ? (
+        <BackToActivityRow
+          onBack={() => {
+            setActiveView("activity");
+            setFromActivity(false);
+          }}
+        />
+      ) : null}
       {/* Session/Saves chrome. Published renders its own list and takes no
           search query, so showing a dead search field over it would be a lie. */}
       {(activeView === "session" || activeView === "saves") && (
@@ -383,7 +398,17 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           /* Site-scoped activity log (B6). The list owns its own chrome
              (filter chips + role=status region) — Saves' approval band /
              prune note are Saves-only. */
-          <ActivityLogView siteId={siteId ?? null} />
+          <ActivityLogView
+            siteId={siteId ?? null}
+            onOpenRow={(kind) => {
+              if (kind === "comment") {
+                composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "review", screen: "from-activity" });
+                return;
+              }
+              setActiveView(kind === "publish" ? "published" : "session");
+              setFromActivity(true);
+            }}
+          />
         )}
         </div>
 

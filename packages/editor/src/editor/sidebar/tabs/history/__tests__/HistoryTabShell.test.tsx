@@ -31,6 +31,13 @@ vi.mock("../components/ActivityView", () => ({
   ),
 }));
 
+vi.mock("../components/ActivityLogView", () => ({
+  ActivityLogView: ({ onOpenRow }: { onOpenRow?: (k: "edit" | "comment" | "publish") => void }) => (
+    <div data-testid="activity-log">
+      <button onClick={() => onOpenRow?.("publish")}>open publish row</button>
+    </div>
+  ),
+}));
 vi.mock("../components/TimeTravelScrubber", () => ({
   TimeTravelScrubber: ({
     onPreviewChange,
@@ -379,5 +386,16 @@ describe("HistoryTab — board 163:113 preview band", () => {
     fireEvent.click(screen.getByTestId("tt-preview"));
     fireEvent.click(screen.getByRole("button", { name: "Exit (Esc)" }));
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+  });
+});
+
+describe("HistoryTab — an Activity row opens in place, with the way back", () => {
+  it("a publish row lands on Published with ‹ Activity; the back row returns and goes", () => {
+    renderTab({ initialView: "activity" });
+    fireEvent.click(screen.getByRole("button", { name: "open publish row" }));
+    expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
+    expect(screen.getByTestId("history-view-tab-activity").getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByTestId("back-to-activity")).toBeNull();
   });
 });

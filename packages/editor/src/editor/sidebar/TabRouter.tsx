@@ -228,6 +228,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <ReviewTab
           {...commonTabProps}
           composer={composer}
+          fromActivity={activeSubTab === "from-activity"}
           onResend={onResendReview}
         />
       );
