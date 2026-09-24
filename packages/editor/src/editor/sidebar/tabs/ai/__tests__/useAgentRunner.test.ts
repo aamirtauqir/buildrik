@@ -59,6 +59,7 @@ describe("useAgentRunner", () => {
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
 
     await act(async () => { result.current.start("build a pricing page"); });
+    act(() => { result.current.runPlan(); });
     await waitFor(() => expect(result.current.steps).toHaveLength(2));
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
 
@@ -89,6 +90,7 @@ describe("useAgentRunner", () => {
     );
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
     act(() => { result.current.skip(); });
     await waitFor(() => expect(result.current.phase).toBe("done"));
@@ -107,22 +109,9 @@ describe("useAgentRunner", () => {
     });
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
     await waitFor(() => expect(result.current.steps[1].status).toBe("awaiting"));
     expect(result.current.steps[0].status).toBe("nochange");
-  });
-
-  it("auto-apply mode applies every step without approve() + runs to done", async () => {
-    runPromptOnce.mockImplementation(async (args: { intent: string }) =>
-      args.intent === "plan"
-        ? { plan: PLAN, edit: null, text: "" }
-        : { plan: null, edit: editWithRows(1), text: "" },
-    );
-    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
-    act(() => { result.current.setAutoApply(true); });
-    await act(async () => { result.current.start("build"); });
-    await waitFor(() => expect(result.current.phase).toBe("done"));
-    expect(result.current.steps.every((s) => s.status === "applied")).toBe(true);
-    expect(applyAiEdit).toHaveBeenCalledTimes(2);
   });
 
   it("stop ends the run mid-flight", async () => {
@@ -133,6 +122,7 @@ describe("useAgentRunner", () => {
     );
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
     act(() => { result.current.stop(); });
     expect(result.current.phase).toBe("done");
@@ -152,26 +142,6 @@ describe("useAgentRunner", () => {
      user stopped it. It does not: `advance` re-checks `cancelledRef` and
      returns. This test exists because the claim was plausible enough to be
      worth pinning, so the behaviour cannot regress into being true. */
-  it("stop during an auto-apply await does not advance to the next step", async () => {
-    let calls = 0;
-    runPromptOnce.mockImplementation(async (args: { intent: string }) => {
-      if (args.intent === "plan") return { plan: PLAN, edit: null, text: "" };
-      calls += 1;
-      return { plan: null, edit: editWithRows(1), text: "" };
-    });
-    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
-    // Stop lands while applyAiEdit is in flight.
-    applyAiEdit.mockImplementation(async () => {
-      act(() => { result.current.stop(); });
-      return { applied: 1, proposals: [] };
-    });
-    act(() => { result.current.setAutoApply(true); });
-    await act(async () => { result.current.start("x"); });
-    await waitFor(() => expect(result.current.phase).toBe("done"));
-    // Step 1 was generated; step 2 must never have been.
-    expect(calls).toBe(1);
-  });
-
   it("a failed step stops the run instead of quietly continuing", async () => {
     let call = 0;
     runPromptOnce.mockImplementation(async (args: { intent: string }) => {
@@ -182,6 +152,7 @@ describe("useAgentRunner", () => {
     });
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
 
     await waitFor(() => expect(result.current.phase).toBe("done"));
     expect(result.current.steps[0].status).toBe("failed");
@@ -220,9 +191,39 @@ describe("useAgentRunner", () => {
     runPromptOnce.mockRejectedValue(new AiRunError("AI provider not configured", "not-configured"));
     const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
+    act(() => { result.current.runPlan(); });
     await waitFor(() => expect(result.current.phase).toBe("done"));
     expect(result.current.errorKind).toBe("not-configured");
     act(() => { result.current.reset(); });
     expect(result.current.errorKind).toBeNull();
+  });
+
+  /* G2-132 — board 4418:104698: a page plan waits for review; a step can be
+     edited before Run, and nothing runs until then. */
+  it("a page plan waits in review, takes step edits, and runs on runPlan", async () => {
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    runPromptOnce.mockResolvedValueOnce({ text: "", edit: null, plan: PLAN.map((p) => ({ ...p, scope: { kind: "page" } })) });
+    await act(async () => { result.current.start("build"); });
+    expect(result.current.phase).toBe("review");
+    expect(runPromptOnce).toHaveBeenCalledTimes(1);
+    act(() => { result.current.editStep(1, "a warmer tint"); });
+    expect(result.current.steps[1].plan.instruction).toBe("a warmer tint");
+    expect(result.current.steps[1].plan.title).toBe("a warmer tint");
+    runPromptOnce.mockResolvedValue({ text: "", edit: null, plan: null });
+    act(() => { result.current.runPlan(); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(runPromptOnce.mock.calls[2][0].prompt).toBe("a warmer tint");
+  });
+
+  it("stop marks what had not run as skipped", async () => {
+    runPromptOnce.mockImplementation(async (args: { intent: string }) =>
+      args.intent === "plan" ? { plan: PLAN.map((p) => ({ ...p, scope: { kind: "page" } })), edit: null, text: "" } : { plan: null, edit: editWithRows(1), text: "" },
+    );
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("build"); });
+    act(() => { result.current.runPlan(); });
+    await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
+    act(() => { result.current.stop(); });
+    expect(result.current.steps.map((s) => s.status)).toEqual(["skipped", "skipped"]);
   });
 });

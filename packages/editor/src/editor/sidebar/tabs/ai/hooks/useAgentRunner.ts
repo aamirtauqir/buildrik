@@ -46,7 +46,9 @@ export interface RunStep {
   edit?: ServerEdit;
 }
 
-export type RunPhase = "idle" | "planning" | "running" | "done";
+/** "review" — board 4418:104698: the plan is shown before anything runs; its
+ *  steps can be edited, and Run starts it (G2-132). */
+export type RunPhase = "idle" | "planning" | "review" | "running" | "done";
 
 /** The selected element a prompt is scoped to (ScopeChip's element scope). */
 export interface ElementTarget {
@@ -68,8 +70,10 @@ interface UseAgentRunnerResult {
   /** Board 171:36 — a run the user stopped is not a run that finished, and
    *  `phase` alone could not tell them apart (stop() sets "done"). */
   stoppedByUser: boolean;
-  autoApply: boolean;
-  setAutoApply: (on: boolean) => void;
+  /** Review phase: change what a step asks for before the run starts. */
+  editStep: (index: number, instruction: string) => void;
+  /** Review phase: run the plan as it stands. */
+  runPlan: () => void;
   /** Plan and run a prompt. With an element target the plan is that one
    *  step — the server planner only reasons about pages. */
   start: (prompt: string, target?: ElementTarget) => void;
@@ -93,20 +97,16 @@ export function useAgentRunner(
   const [error, setError] = React.useState<string | null>(null);
   const [errorKind, setErrorKind] = React.useState<AiErrorKind | null>(null);
   const [stoppedByUser, setStoppedByUser] = React.useState(false);
-  const [autoApply, setAutoApplyState] = React.useState(false);
 
   const stepsRef = React.useRef<RunStep[]>([]);
   stepsRef.current = steps;
   const indexRef = React.useRef(-1);
   indexRef.current = currentIndex;
   const cancelledRef = React.useRef(false);
-  const autoApplyRef = React.useRef(false);
-  autoApplyRef.current = autoApply;
   const generateStepRef = React.useRef<(i: number) => void>(() => {});
   // Adoption telemetry: one agent.run report per run (start time + once-guard).
   const runStartRef = React.useRef(0);
   const reportedRef = React.useRef(true);
-  const setAutoApply = React.useCallback((on: boolean) => setAutoApplyState(on), []);
 
   const reportRun = React.useCallback(() => {
     if (reportedRef.current) return;
@@ -188,25 +188,7 @@ export function useAgentRunner(
         });
         if (cancelledRef.current) return;
         if (edit && edit.rows.length > 0) {
-          if (autoApplyRef.current) {
-            // Auto-apply mode (opt-in): apply without waiting for approval.
-            try {
-              const { proposals } = await applyAiEdit(composer, { applyOps: edit.applyOps });
-              if (proposals.length > 0) onProposal?.(proposals[0].actionId);
-              setStep(i, { status: "applied", edit });
-            } catch {
-              setStep(i, { status: "failed", edit });
-            }
-            /* No cancel re-check needed here, and one was tried. A review
-               reported that pressing Stop during the await above lets the run
-               continue; verified false — `advance` checks `cancelledRef` first
-               and returns without generating the next step. The in-flight edit
-               does still land and is marked `applied`, which is correct: it
-               applied, and hiding it would keep it out of Undo-all. */
-            advance(i + 1);
-          } else {
-            setStep(i, { status: "awaiting", edit });
-          }
+          setStep(i, { status: "awaiting", edit });
         } else {
           setStep(i, { status: "nochange" });
           advance(i + 1);
@@ -247,7 +229,7 @@ export function useAgentRunner(
         reportRun();
       }
     },
-    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, onProposal, reportRun],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, reportRun],
   );
   generateStepRef.current = generateStep;
 
@@ -289,8 +271,14 @@ export function useAgentRunner(
         const runSteps: RunStep[] = plan.map((p) => ({ plan: p, status: "pending" }));
         stepsRef.current = runSteps;
         setSteps(runSteps);
-        setPhase("running");
-        generateStepRef.current(0);
+        /* A page plan waits for review (board 4418:104698 — "Edit plan ·
+           Run N steps"); an element prompt is one step and runs at once. */
+        if (target) {
+          setPhase("running");
+          generateStepRef.current(0);
+        } else {
+          setPhase("review");
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Planning failed");
         setErrorKind(errorKindOf(e));
@@ -324,6 +312,13 @@ export function useAgentRunner(
   const stop = React.useCallback(() => {
     cancelledRef.current = true;
     setStoppedByUser(true);
+    /* Board 4418:105261: what had not run when the user stopped is Skipped —
+       an awaiting step left as a live dot read as still running. */
+    const settled = stepsRef.current.map((s) =>
+      s.status === "pending" || s.status === "running" || s.status === "awaiting" ? { ...s, status: "skipped" as const } : s,
+    );
+    stepsRef.current = settled;
+    setSteps(settled);
     setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setCurrentIndex(-1);
     reportRun();
@@ -340,5 +335,19 @@ export function useAgentRunner(
     setErrorKind(null);
   }, []);
 
-  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, autoApply, setAutoApply, start, approve, skip, stop, reset };
+  const editStep = React.useCallback((index: number, instruction: string) => {
+    const next = stepsRef.current.map((s, i) =>
+      i === index ? { ...s, plan: { ...s.plan, title: instruction, instruction } } : s,
+    );
+    stepsRef.current = next;
+    setSteps(next);
+  }, []);
+
+  const runPlan = React.useCallback(() => {
+    if (stepsRef.current.length === 0) return;
+    setPhase("running");
+    generateStepRef.current(0);
+  }, []);
+
+  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, editStep, runPlan, start, approve, skip, stop, reset };
 }
