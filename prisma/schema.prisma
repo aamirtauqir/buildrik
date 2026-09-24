@@ -23,6 +23,7 @@ model User {
   language          String    @default("en")
   timezone          String    @default("UTC")
   emailVerified     DateTime?
+  pageFolders       PageFolder[]
   twoFactorEnabled  Boolean   @default(false)
   twoFactorSecret   String?
   backupCodes       String[]
@@ -378,6 +379,7 @@ model Site {
   sitePages       Page[]
   domains         Domain[]
   shareLinks      ShareLink[]
+  pageFolders     PageFolder[]
   permissions     SitePermission[]
   analytics       SiteAnalytics[]
   formBlocks      FormBlock[]
@@ -1563,4 +1565,28 @@ model WebhookDelivery {
 
   @@index([webhookId, createdAt])
   @@map("webhook_deliveries")
+}
+
+/// Personal page folders — one member's OWN arrangement of a site's pages in
+/// the editor's Pages panel (boards 4418:92679 / 6887:77925). Pages stay shared;
+/// only this user's grouping is stored. `pageIds` is ordered and holds each page
+/// at most once across the user's folders on the site (enforced in
+/// page-folder.service). Deleted pages are pruned on read, not by FK.
+/// Replaces the per-browser localStorage store the editor used before.
+model PageFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  siteId    String
+  name      String
+  position  Int      @default(0)
+  collapsed Boolean  @default(false)
+  pageIds   String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([userId, siteId])
+  @@map("page_folders")
 }

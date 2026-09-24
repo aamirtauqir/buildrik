@@ -1,13 +1,18 @@
 /**
- * useFolders — Sidebar-only page folder management.
+ * useFolders — the Pages panel's PERSONAL page folders.
  *
- * Folders are a UI organisational concept, NOT stored in the engine.
- * Persisted to localStorage keyed by SITE (or "default" when the editor is
- * running without one). It was keyed by `composer.id` until 2026-09-03 —
- * a property Composer does not have, so the cast reading it always produced
- * null, every site in a browser shared the one "default" blob, and folders
- * created on one site appeared on the next, drawn identically to real page
- * rows.
+ * Folders are a UI organisational concept, NOT stored in the engine: they are
+ * this user's own grouping of the site's (shared) pages. With a site open they
+ * live on the server (`pages.folders.*`, per user × site, via
+ * PageFolderService) and follow the user across devices; they used to live in
+ * this browser's localStorage only. localStorage stays as the offline/demo
+ * copy: the panel paints from it at once, then the server's answer replaces it.
+ * A site's folders that exist only in this browser (created before the server
+ * store) are uploaded once, on the first load that finds none on the server.
+ *
+ * Every change is applied locally first and then sent; ids of folders created
+ * this session are temporary until the server answers, and calls naming one
+ * wait for its real id. A failed call re-reads the server's state.
  *
  * Responsibilities:
  * - CRUD: create, rename, delete folder
@@ -20,6 +25,7 @@
 
 import * as React from "react";
 import type { FolderItem } from "./types";
+import { pageFolderRemote } from "@/services/PageFolderService";
 
 const STORAGE_KEY_PREFIX = "pg-folders-v1-";
 
@@ -117,13 +123,87 @@ export function useFolders(
     [siteId]
   );
 
+  /* ── Server sync ─────────────────────────────────────────────────────── */
+  /** temp id (created this session) → the server's id, once it answers. */
+  const serverIds = React.useRef(new Map<string, Promise<string | null>>());
+  const resolveId = React.useCallback(
+    (id: string) => serverIds.current.get(id) ?? Promise.resolve(id),
+    []
+  );
+
+  const adopt = React.useCallback(
+    (serverFolders: FolderItem[]) => {
+      setFolders(serverFolders);
+      persist(siteId, serverFolders);
+    },
+    [siteId]
+  );
+
+  const reload = React.useCallback(() => {
+    if (!siteId) return;
+    void pageFolderRemote.list(siteId).then((list) => {
+      if (list) adopt(list);
+    });
+  }, [siteId, adopt]);
+
+  /** Send a change; a refusal or failure re-reads the server's truth. */
+  const send = React.useCallback(
+    (call: () => Promise<unknown>) => {
+      if (!siteId) return;
+      void call().then((ok) => {
+        if (ok === null) reload();
+      });
+    },
+    [siteId, reload]
+  );
+
+  React.useEffect(() => {
+    if (!siteId) return;
+    let cancelled = false;
+    void (async () => {
+      const list = await pageFolderRemote.list(siteId);
+      if (cancelled || !list) return; // offline / demo: keep the local copy
+      const local = load(siteId);
+      if (list.length > 0 || local.length === 0) {
+        adopt(list);
+        return;
+      }
+      // One-time upload of folders that only ever lived in this browser.
+      for (const folder of local) {
+        const created = await pageFolderRemote.create(siteId, folder.name);
+        if (!created) return; // try again next load; local copy untouched
+        for (const pageId of folder.pageIds) {
+          await pageFolderRemote.movePage(siteId, pageId, created.id);
+        }
+        if (folder.collapsed) await pageFolderRemote.update(created.id, { collapsed: true });
+      }
+      const uploaded = await pageFolderRemote.list(siteId);
+      if (!cancelled && uploaded) adopt(uploaded);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [siteId, adopt]);
+
   const createFolder = React.useCallback(
     (name: string): string => {
       const id = newId();
-      update((prev) => [...prev, { id, name: name.trim() || "Untitled Folder", pageIds: [], collapsed: false }]);
+      const finalName = name.trim() || "Untitled Folder";
+      update((prev) => [...prev, { id, name: finalName, pageIds: [], collapsed: false }]);
+      if (siteId) {
+        const created = pageFolderRemote.create(siteId, finalName).then((folder) => {
+          if (!folder) {
+            reload();
+            return null;
+          }
+          update((prev) => prev.map((f) => (f.id === id ? { ...f, id: folder.id } : f)));
+          return folder.id;
+        });
+        serverIds.current.set(id, created);
+      }
       return id;
     },
-    [update]
+    [update, siteId, reload]
   );
 
   const renameFolder = React.useCallback(
@@ -133,24 +213,40 @@ export function useFolders(
       update((prev) =>
         prev.map((f) => (f.id === folderId ? { ...f, name: trimmed } : f))
       );
+      send(async () => {
+        const id = await resolveId(folderId);
+        return id ? pageFolderRemote.update(id, { name: trimmed }) : null;
+      });
     },
-    [update]
+    [update, send, resolveId]
   );
 
   const deleteFolder = React.useCallback(
     (folderId: string) => {
       update((prev) => prev.filter((f) => f.id !== folderId));
+      send(async () => {
+        const id = await resolveId(folderId);
+        return id ? pageFolderRemote.remove(id) : null;
+      });
     },
-    [update]
+    [update, send, resolveId]
   );
+
+  const foldersRef = React.useRef(folders);
+  foldersRef.current = folders;
 
   const toggleCollapse = React.useCallback(
     (folderId: string) => {
+      const collapsed = !foldersRef.current.find((f) => f.id === folderId)?.collapsed;
       update((prev) =>
-        prev.map((f) => (f.id === folderId ? { ...f, collapsed: !f.collapsed } : f))
+        prev.map((f) => (f.id === folderId ? { ...f, collapsed } : f))
       );
+      send(async () => {
+        const id = await resolveId(folderId);
+        return id ? pageFolderRemote.update(id, { collapsed }) : null;
+      });
     },
-    [update]
+    [update, send, resolveId]
   );
 
   const movePageToFolder = React.useCallback(
@@ -166,8 +262,12 @@ export function useFolders(
           return { ...f, pageIds: f.pageIds.filter((id) => id !== pageId) };
         })
       );
+      send(async () => {
+        const id = await resolveId(folderId);
+        return id && siteId ? pageFolderRemote.movePage(siteId, pageId, id) : null;
+      });
     },
-    [update]
+    [update, send, resolveId, siteId]
   );
 
   const removePageFromFolder = React.useCallback(
@@ -175,10 +275,12 @@ export function useFolders(
       update((prev) =>
         prev.map((f) => ({ ...f, pageIds: f.pageIds.filter((id) => id !== pageId) }))
       );
+      send(() => (siteId ? pageFolderRemote.movePage(siteId, pageId, null) : Promise.resolve(null)));
     },
-    [update]
+    [update, send, siteId]
   );
 
+  // Local only: the server drops deleted pages from its answer on read.
   const pruneDeletedPages = React.useCallback(
     (livePids: Set<string>) => {
       update((prev) =>
