@@ -44,6 +44,8 @@ import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+import { useEditorRole } from "./hooks/useEditorRole";
+import { ViewerRoleNotice } from "./ViewerRoleNotice";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
@@ -223,6 +225,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* URL-derived, so it is stable for the life of the document — view mode
      is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
   const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
+  const editorRole = useEditorRole();
   /* A root class, not a prop, because the surfaces that still leak editing
      chrome into view mode are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
@@ -336,7 +339,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && activeTabId === "content";
-  const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen;
+  /* A workspace VIEWER is always in view mode, and board 4418:126059 keeps
+     the column for them: it holds the role notice. */
+  const viewerNotice = readOnlyView && editorRole === "VIEWER";
+  const inspectorOpen =
+    viewerNotice || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -610,8 +617,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that
-            replaces them (boards 170:*). Absent in view mode. */}
-        {readOnlyView ? null : (
+            replaces them (boards 170:*). In view mode it is absent — except
+            for a workspace VIEWER, who is always in view mode and gets the
+            role notice board 4418:126059 draws in this column. */}
+        {readOnlyView ? (
+          viewerNotice ? (
+            <LayoutShell.Inspector>
+              <ViewerRoleNotice role="VIEWER" />
+            </LayoutShell.Inspector>
+          ) : null
+        ) : (
         <LayoutShell.Inspector>
           {rightColumnTab ? (
             <RightColumnPanel>

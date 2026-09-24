@@ -85,7 +85,9 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
     expect(order).toEqual(["save", "import"]);
     const restoring = emitted.find((e) => e.event === "version:restoring");
     expect(restoring?.payload).toMatchObject({ targetName: "Launch" });
-    expect((restoring?.payload as { savedAs: string }).savedAs).toContain("Launch");
+    expect((restoring?.payload as { savedAs: string }).savedAs).toContain("Launch");    // G1-071: the restored event carries the safety save — Undo restore's target.
+    const restored = emitted.find((e) => e.event === "version:restored");
+    expect(restored?.payload).toMatchObject({ safetyVersionId: "safety" });
   });
 
   it("aborts the restore when the safety save fails — losing the work is the failure mode", async () => {
