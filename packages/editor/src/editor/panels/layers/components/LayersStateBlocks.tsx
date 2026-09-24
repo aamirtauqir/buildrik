@@ -1,6 +1,6 @@
 /**
- * Layers panel state blocks — boards 775:4130 (loading), 781:4217 (load-error),
- * 782:4260 (no-results). One home so LayersTab, LayersPanel and the probe all
+ * Layers panel state blocks — v3 boards 4418:83074 (loading), 4418:83295
+ * (load-error), 4418:83498 (no-results), 4418:83911 (empty). One home so LayersTab, LayersPanel and the probe all
  * render the same block — the conformance recipes measure these testIds.
  *
  * @license BSD-3-Clause
@@ -9,42 +9,15 @@ import * as React from "react";
 import { Button, Kbd, SkeletonBlock } from "@/editor/chrome-ui";
 
 /*
-  Board `775:4130`. Seven rows on the tree's own row height (h-8), indent ladder
-  16/32/48 so the placeholder reads as a nested tree, not a flat list. Bar
-  widths deliberately uneven — identical bars read as a graphic, uneven ones
-  read as text that is coming. Icon square is 12px radius 3 (board is EXACT on
-  radius, so the icon carries its own rounded-[3px] instead of SkeletonBlock's
-  default rounded 4).
+  v3 board 4418:83074: five centred 12px pills on a 24px pitch, widths
+  232 / 200 / 220 / 176 / 212 — a list arriving, not a tree drawn in grey.
 */
-const SKELETON_ROWS: ReadonlyArray<{ pl: string; bar: string }> = [
-  /* Bar widths are board 775:4130's seven `sk` frames — 92 / 96 / 110 / 70 /
-     86 / 124 / 104 — re-extracted 2026-09-02 after the drawer redraw. Rows 0,
-     2 and 3 were 132 / 150 / 110, which the stale 320-era spec had hidden. */
-  { pl: "tw:pl-4", bar: "tw:w-[92px]" },
-  { pl: "tw:pl-8", bar: "tw:w-[96px]" },
-  { pl: "tw:pl-12", bar: "tw:w-[110px]" },
-  { pl: "tw:pl-12", bar: "tw:w-[70px]" },
-  { pl: "tw:pl-8", bar: "tw:w-[86px]" },
-  { pl: "tw:pl-4", bar: "tw:w-[124px]" },
-  { pl: "tw:pl-8", bar: "tw:w-[104px]" },
-];
-
-const SK_ICON =
-  "tw:size-3 tw:shrink-0 tw:animate-pulse tw:rounded-[3px] tw:bg-[var(--bk-gray-100)] tw:motion-reduce:animate-none";
+const SKELETON_BARS = ["tw:w-[232px]", "tw:w-[200px]", "tw:w-[220px]", "tw:w-[176px]", "tw:w-[212px]"];
 
 export const LayersLoadingSkeleton: React.FC = () => (
-  <div data-testid="layers-loading" aria-busy="true" aria-label="Loading layers">
-    {/* Row 0 is written out (not mapped) because check-anchors greps for the
-        literal data-testid strings the recipe names. */}
-    <div className={`tw:flex tw:h-8 tw:items-center tw:gap-2 ${SKELETON_ROWS[0].pl}`} data-testid="layers-sk-row">
-      <div aria-hidden="true" className={SK_ICON} data-testid="layers-sk-icon" />
-      <SkeletonBlock className={`tw:h-2.5 ${SKELETON_ROWS[0].bar}`} data-testid="layers-sk-bar" />
-    </div>
-    {SKELETON_ROWS.slice(1).map((row, i) => (
-      <div key={i} className={`tw:flex tw:h-8 tw:items-center tw:gap-2 ${row.pl}`}>
-        <div aria-hidden="true" className={SK_ICON} />
-        <SkeletonBlock className={`tw:h-2.5 ${row.bar}`} />
-      </div>
+  <div className="tw:flex tw:flex-col tw:items-center tw:gap-3 tw:pt-[26px]" data-testid="layers-loading" aria-busy="true" aria-label="Loading layers">
+    {SKELETON_BARS.map((w) => (
+      <SkeletonBlock key={w} className={`tw:h-3 tw:rounded-full ${w}`} data-testid="layers-sk-bar" />
     ))}
   </div>
 );
