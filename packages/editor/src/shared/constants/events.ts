@@ -332,6 +332,9 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** "Edit master ›" on an instance: the Components panel opens that
+   *  master's screen. Payload `{ componentId }`. */
+  UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
   /** `delete` with N > 1 selected and no { confirmed } — the shell shows its
    *  confirm (decision #17) and re-runs delete confirmed. Payload { count }. */
   UI_REQUEST_DELETE_SELECTION: "ui:request-delete-selection",

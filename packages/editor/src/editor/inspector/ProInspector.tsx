@@ -11,7 +11,6 @@ import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { ScopeDropdown } from "./components/ScopeDropdown";
-import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
@@ -446,12 +445,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           current={currentPseudoState}
           onChange={setCurrentPseudoState}
           withOverrides={statesWithOverrides}
-        />
-        {/* S6: detach catalog/user-saved instance — pro-mode only, hides
-            itself when selectedElement is not an instance. Self-gated. */}
-        <DetachInstanceButton
-          composer={composer ?? null}
-          selectedElementId={selectedElement?.id}
         />
       </div>
       <LockedBanner composer={composer} elementId={selectedElement.id} />

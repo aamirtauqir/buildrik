@@ -125,7 +125,7 @@ export class ElementSerialization {
    * verbatim in `181c3ab0`, "Initial commit"), has no rationale in any commit,
    * and contradicts the design of record: `setStyle`/`setAttribute` already
    * record per-instance overrides (`ElementStyles.ts:126-139`, `:33-46`), the
-   * inspector already mounts `VariantSection` and `DetachInstanceButton` for
+   * inspector already mounts `VariantSection` (variant, reset, detach) for
    * instances, and `VariantSection`'s board is literally named
    * "Inspector · instance-selected". The invariant was not enforced either —
    * a Layers row click and the auto-select after a component drop both select
