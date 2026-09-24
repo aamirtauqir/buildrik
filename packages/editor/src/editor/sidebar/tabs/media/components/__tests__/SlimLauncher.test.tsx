@@ -231,12 +231,13 @@ const MB = 1024 * 1024;
 
 /* Clone 3437:36027 (Build · Choose media) — the drawer baseline. */
 describe("Clone 3437:36027 · drawer baseline", () => {
+  /* Board 7077:79219 draws it as the dark tooltip, not a native title. */
   it("Upload names the kinds and the code's own limits on its tooltip — not the board's 50 MB", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-upload-action")).toHaveAttribute(
-      "title",
-      "Images, videos and fonts · up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
-    );
+    expect(screen.getByTestId("media-upload-action")).not.toHaveAttribute("title");
+    expect(
+      screen.getByText("Images, videos and fonts · up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font"),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId("media-footer-accepts")).toBeNull();
   });
 

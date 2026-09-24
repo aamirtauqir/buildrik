@@ -809,12 +809,20 @@ export function SlimLauncher(props: SlimLauncherProps) {
           className={`tw:flex tw:items-center tw:gap-1 tw:px-4 tw:pt-2 tw:pb-10 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
         >
+            {/* Board 7077:79219 — the limits are a dark tooltip above Upload,
+                flush with its left edge (was a native title). */}
+            <Tooltip
+              content={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
+              placement="top-start"
+              arrow={false}
+              className="tw:rounded-sm tw:text-[11px] tw:font-normal tw:leading-4"
+              theme={{ target: "tw:min-w-0 tw:flex-1" }}
+            >
             <Button
               type="button"
               size="xs"
-              className={`tw:h-7 tw:min-w-0 tw:flex-1 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
+              className={`tw:h-7 tw:w-full tw:min-w-0 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
               data-testid="media-upload-action"
-              title={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
               aria-disabled={write.canWrite ? undefined : "true"}
               disabled={write.canWrite && props.storage.used >= props.storage.total}
               onClick={write.canWrite ? () => uploadInputRef.current?.click() : undefined}
@@ -824,6 +832,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 Upload
               </span>
             </Button>
+            </Tooltip>
           <Popover
             open={addFromOpen}
             onClose={() => setAddFromOpen(false)}
