@@ -16,7 +16,6 @@ import { Braces, Database, GitBranch, Table2 } from "lucide-react";
 import {
   ConfirmDialog,
   Button,
-  Checkbox,
   EmptyState,
   EmptyStateActions,
   EmptyStateDesc,
@@ -90,16 +89,6 @@ const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-4 t
 /* 151:70 — the {{site.*}} key is 12/16, and `text-xs` carries Tailwind's own
    16… which is right here, but only by accident: state it. */
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-accent-text)]";
-/* 151:12 / 151:17 / 151:38 draw this 11/16 in `--color/ink-disabled`, and the
-   code followed them — so board and code AGREED on `var(--bk-gray-300)`, which is 1.47:1 on
-   white. Nothing failed, because agreement is what the diff checks; that is the
-   one case where agreement is not evidence.
-   A tag stating a field is MANDATORY is not decoration, and `ink-disabled` is
-   the token for a control you cannot use — WCAG exempts inactive controls
-   precisely so they can be dim. Wrong token for the job (founder call
-   2026-09-08): ink-soft, 7.56:1. Size and line box are unchanged, so the boards
-   still win everything they are right about. */
-const REQUIRED_TAG = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 /* Boards 303:2067 and 303:2083 both draw the Sources status as the file's own
    Badge (12:16): a bordered pill, 10/2 padding, 12/16 medium. The two states
    differ only in ramp — grey for "nothing connected", green for "watching".
@@ -246,155 +235,6 @@ export function RootView({
       <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
       <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
       <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
-    </div>
-  );
-}
-
-/* ── Fields (151:2) ──────────────────────────────────────────────────────── */
-
-const FIELD_TYPES = ["text", "textarea", "richtext", "number", "boolean", "image", "date", "slug", "reference"] as const;
-
-/** Board 151:2 writes the type as prose — "Rich text", not the `richtext` slug
- *  the model stores. The slug is an identifier; a field list is read, not
- *  parsed. */
-const FIELD_TYPE_LABEL: Record<string, string> = {
-  text: "Text",
-  textarea: "Long text",
-  richtext: "Rich text",
-  number: "Number",
-  boolean: "Boolean",
-  image: "Image",
-  date: "Date",
-  slug: "Slug",
-  reference: "Reference",
-};
-
-export function FieldsView({
-  collection,
-  onBack,
-  onAddField,
-  onDeleteField,
-}: {
-  collection: CMSCollection;
-  onBack?: () => void;
-  onAddField: (name: string, type: string, required: boolean) => Promise<void>;
-  onDeleteField: (fieldId: string) => Promise<void>;
-}) {
-  const [adding, setAdding] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [type, setType] = React.useState<string>("text");
-  const [required, setRequired] = React.useState(false);
-  const [confirmDelete, setConfirmDelete] = React.useState<CMSField | null>(null);
-  const [menuFor, setMenuFor] = React.useState<string | null>(null);
-
-  return (
-    <div className={CONTENT_BODY}>
-      {onBack ? <Crumb label={`${collection.name} · fields`} onClick={onBack} /> : null}
-      <div className={SCROLL}>
-        {collection.fields.map((f) => (
-          <Row key={f.id} size="stack" data-field-row data-testid={`content-fieldrow-${f.id}`}>
-            <span className={ROW_STACK}>
-              <span className={ROW_TITLE} data-testid={`content-fieldrow-name-${f.id}`}>{f.name}</span>
-              <span className={SUB} data-testid={`content-fieldrow-type-${f.id}`}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
-            </span>
-            <span className={ROW_ACTIONS}>
-              {/* 151:12 — the `required` tag is ink-DISABLED, a step quieter
-                  than the type line beside it. It was ink-muted, which read as
-                  a second piece of content rather than a tag. */}
-              {f.validation?.required && <span className={REQUIRED_TAG} data-testid={`content-fieldrow-req-${f.id}`}>required</span>}
-              {/* Board 151:2 draws `⋯`, not a bare ✕: delete is not the only
-                  thing a field row will ever offer, and a destructive glyph
-                  sitting permanently on every row invites the mis-click.
-                  IconButton (32x32) rather than a text Button carrying a glyph —
-                  that sizes to the glyph and measured 21.92x18, under WCAG
-                  2.5.8's 24x24 minimum. */}
-              <Popover
-                open={menuFor === f.id}
-                onClose={() => setMenuFor(null)}
-                placement="bottom-end"
-                label={`Actions for ${f.name}`}
-                trigger={
-                  <IconButton
-                    label={`Actions for field ${f.name}`}
-                    onClick={() => setMenuFor((p) => (p === f.id ? null : f.id))}
-                  >
-                    ⋯
-                  </IconButton>
-                }
-              >
-                <Menu>
-                  <MenuItem
-                    onClick={() => {
-                      setMenuFor(null);
-                      setConfirmDelete(f);
-                    }}
-                  >
-                    Delete field
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </span>
-          </Row>
-        ))}
-        {adding ? (
-          <div className={INLINE_FORM}>
-            <TextInput
-              placeholder="Field name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              aria-label="Field name"
-              autoFocus
-            />
-            <div className={FORM_ROW}>
-              <Select value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
-                {FIELD_TYPES.map((t) => (
-                  <option key={t} value={t}>{FIELD_TYPE_LABEL[t] ?? t}</option>
-                ))}
-              </Select>
-              <label className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:cursor-pointer">
-                <Checkbox
-                  color="blue"
-                  className="tw:bg-white"
-                  checked={required}
-                  onChange={(e) => setRequired(e.target.checked)}
-                />
-                <span>required</span>
-              </label>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!name.trim()}
-                onClick={() => {
-                  void onAddField(name, type, required).then(() => {
-                    setAdding(false);
-                    setName("");
-                    setRequired(false);
-                  });
-                }}
-              >
-                Add
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-field" onClick={() => setAdding(true)}>
-            + Add field
-          </Button>
-        )}
-      </div>
-      <ConfirmDialog
-        open={confirmDelete != null}
-        onClose={() => setConfirmDelete(null)}
-        onConfirm={() => {
-          if (confirmDelete) void onDeleteField(confirmDelete.id);
-          setConfirmDelete(null);
-        }}
-        title="Delete field?"
-        message={`"${confirmDelete?.name}" and its values on every record will be removed.`}
-        confirmLabel="Delete field"
-        tone="destructive"
-      />
     </div>
   );
 }
