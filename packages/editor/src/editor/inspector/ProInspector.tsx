@@ -22,6 +22,7 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { ElementNameField } from "./components/ElementNameField";
 import { LockedBanner } from "./components/LockedBanner";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
@@ -363,7 +364,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <ElementIcon size="sm" />
         </div>
         <div className="bdi-ename">
-          <div className="bdi-n" data-testid="inspector-element-name">{elementLabel}</div>
+          {/* G2-139: the layer name (else the type), renamed in place. */}
+          <ElementNameField composer={composer} elementId={selectedElement.id} typeLabel={elementLabel} />
         </div>
         <div className="bdi-eact">
           {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`

@@ -19,6 +19,7 @@ import type { LayerItem } from "../types";
 import {
   LAYER_NAME_KEY,
   getLayerName,
+  renameElement,
   loadSetFromStorage,
   saveSetToStorage,
   takeLegacyLayerState,
@@ -53,6 +54,21 @@ export function useLayerActions(
   const [hiddenIds, setHiddenIds] = React.useState<Set<string>>(new Set());
   const [lockedIds, setLockedIds] = React.useState<Set<string>>(new Set());
   const [customNames, setCustomNames] = React.useState<Map<string, string>>(new Map());
+  /* A rename from anywhere (the inspector header, G2-139) — follow it. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onRenamed = ({ id, name }: { id: string; name: string | null }) =>
+      setCustomNames((prev) => {
+        const next = new Map(prev);
+        if (name) next.set(id, name);
+        else next.delete(id);
+        return next;
+      });
+    composer.on(EVENTS.ELEMENT_RENAMED, onRenamed);
+    return () => {
+      composer.off(EVENTS.ELEMENT_RENAMED, onRenamed);
+    };
+  }, [composer]);
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editingName, setEditingName] = React.useState("");
   /* The page whose stored state has actually been loaded. Persistence is
@@ -191,12 +207,7 @@ export function useLayerActions(
          announcement it would keep showing the old one until something else
          happened to re-render it. */
       /* Saved with the project (G2-061): the element carries its name. */
-      const el = composer?.elements.getElement(editingId);
-      if (el) {
-        el.setData(LAYER_NAME_KEY, trimmed || undefined);
-        composer?.markDirty();
-      }
-      composer?.emit(EVENTS.ELEMENT_RENAMED, { id: editingId, name: trimmed || null });
+      renameElement(composer, editingId, trimmed);
     }
     setEditingId(null);
     setEditingName("");
