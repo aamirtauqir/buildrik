@@ -13,6 +13,7 @@
  * remains.
  */
 
+import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
 import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
@@ -22,7 +23,6 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { PasteHtmlModal } from "./components/PasteHtmlModal";
 import { takePendingInsertGroup } from "./insertGroupRequest";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -103,20 +103,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     }
   }, [composer, addToast]);
 
-  // Paste HTML… (6887:78320, G2-112): the clipboard prefills a modal that
-  // shows what sanitising strips; Insert takes the SAME BlockData path every
-  // other insert uses (useBlockInsertion → insertBlock owns the XSS boundary).
-  // An unreadable clipboard just opens the field empty to paste into.
-  const [pasteHtmlText, setPasteHtmlText] = React.useState<string | null>(null);
-  const pasteHtml = React.useCallback(async () => {
-    let text = "";
-    try {
-      text = await navigator.clipboard.readText();
-    } catch {
-      text = "";
-    }
-    setPasteHtmlText(text.trim() ? text : "");
-  }, []);
+  // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
+  // clipboard) and Insert sends the text down the SAME BlockData insert path
+  // everything else uses — insertBlock owns the XSS boundary.
+  const [pasteOpen, setPasteOpen] = React.useState(false);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -206,7 +196,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 data-testid="insert-paste-html"
                 onClick={() => {
                   setMenuOpen(false);
-                  void pasteHtml();
+                  setPasteOpen(true);
                 }}
               >
                 Paste HTML…
@@ -257,18 +247,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
-        <PasteHtmlModal
-          open={pasteHtmlText !== null}
-          initialHtml={pasteHtmlText ?? ""}
-          onClose={() => setPasteHtmlText(null)}
-          onInsert={(html) => {
-            setPasteHtmlText(null);
-            onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: html });
-          }}
-        />
         <div ref={panelBottomRef} className="bld-panel-bottom" />
         <FirstUseTip anchorRef={panelBottomRef} />
       </div>
+      <PasteHtmlModal
+        open={pasteOpen}
+        onClose={() => setPasteOpen(false)}
+        onInsert={(content) => onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content })}
+      />
     </PanelFrame>
   );
 };

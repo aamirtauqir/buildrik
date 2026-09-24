@@ -154,15 +154,19 @@ describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)"
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() =>
-      expect((screen.getByTestId("paste-html-input") as HTMLTextAreaElement).value).toBe("<div><p>hi</p></div>"),
-    );
+    /* Board 6887:78320: a modal, prefilled from the clipboard; Insert inserts. */
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    await waitFor(() => expect(field.value).toBe("<div><p>hi</p></div>"));
     expect(onBlockClick).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByTestId("paste-html-insert"));
-    expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "pasted-html", content: "<div><p>hi</p></div>" });
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({
+      id: "pasted-html",
+      content: "<div><p>hi</p></div>",
+    });
   });
 
-  it("an unreadable clipboard still opens the modal, empty, to paste into", async () => {
+  it("says what sanitising will strip, and Insert waits for some HTML", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
       clipboard: { readText: vi.fn().mockRejectedValue(new Error("denied")) },
@@ -170,9 +174,12 @@ describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)"
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(screen.getByTestId("paste-html-modal")).toBeTruthy());
-    expect((screen.getByTestId("paste-html-input") as HTMLTextAreaElement).value).toBe("");
-    expect((screen.getByTestId("paste-html-insert") as HTMLButtonElement).disabled).toBe(true);
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    expect(screen.getByRole("button", { name: "Insert" })).toBeDisabled();
+    fireEvent.change(field, { target: { value: '<p onclick="x()">a</p><script>1</script><script>2</script>' } });
+    expect(screen.getByText("2 <script> tags and 1 event handler will be removed")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onBlockClick).not.toHaveBeenCalled();
   });
 });
 

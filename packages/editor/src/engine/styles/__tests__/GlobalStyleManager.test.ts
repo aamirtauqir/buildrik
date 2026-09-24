@@ -11,15 +11,6 @@ import { GlobalStyleManager } from "../GlobalStyleManager";
 import type { GlobalStyle } from "../GlobalStyleManager";
 import { EVENTS } from "@shared/constants/events";
 
-const SYSTEM_IDS = [
-  "btn-primary",
-  "btn-secondary",
-  "heading-1",
-  "heading-2",
-  "body-text",
-  "container",
-  "card",
-];
 
 /**
  * Composer mock with typed handles on the spies. GlobalStyleManager
@@ -85,27 +76,11 @@ const customStyle = (overrides?: Partial<GlobalStyle>): GlobalStyle => ({
   ...overrides,
 });
 
-describe("GlobalStyleManager defaults", () => {
-  let manager: GlobalStyleManager;
-  let harness: ReturnType<typeof makeComposerHarness>;
-
-  beforeEach(() => {
-    harness = makeComposerHarness();
-    manager = new GlobalStyleManager(harness.composer);
-  });
-
-  it("registers the 7 system defaults on construction", () => {
-    expect(manager.getAll().map((s) => s.id).sort()).toEqual([...SYSTEM_IDS].sort());
-  });
-
-  it("flags all defaults as system styles", () => {
-    expect(manager.getAll().every((s) => s.system === true)).toBe(true);
-  });
-
-  it("organizes defaults into Buttons / Typography / Layout categories", () => {
-    expect(manager.getByCategory("Buttons")).toHaveLength(2);
-    expect(manager.getByCategory("Typography")).toHaveLength(3);
-    expect(manager.getByCategory("Layout")).toHaveLength(2);
+/* G2-165: the seven built-in presets (purple #667eea buttons etc.) are
+   gone, and with them the "system style" concept. A new manager is empty. */
+describe("GlobalStyleManager — no built-ins", () => {
+  it("starts empty", () => {
+    expect(new GlobalStyleManager(makeComposerHarness().composer).getAll()).toEqual([]);
   });
 });
 
@@ -122,7 +97,7 @@ describe("GlobalStyleManager.define", () => {
     manager.define(customStyle());
 
     expect(manager.get("custom-1")?.name).toBe("Custom Style");
-    expect(manager.getAll()).toHaveLength(SYSTEM_IDS.length + 1);
+    expect(manager.getAll()).toHaveLength(1);
   });
 
   it("emits style:defined with the style", () => {
@@ -145,7 +120,6 @@ describe("GlobalStyleManager.define", () => {
   it("throws on duplicate id", () => {
     manager.define(customStyle());
     expect(() => manager.define(customStyle())).toThrow('Global style "custom-1" already exists');
-    expect(() => manager.define(customStyle({ id: "btn-primary" }))).toThrow(/already exists/);
   });
 });
 
@@ -167,14 +141,11 @@ describe("GlobalStyleManager lookup — get / getByCategory / search", () => {
   });
 
   it("search matches names case-insensitively", () => {
-    const ids = manager.search("BUTTON").map((s) => s.id);
-    expect(ids).toContain("btn-primary");
-    expect(ids).toContain("btn-secondary");
+    expect(manager.search("CUSTOM STYLE").map((s) => s.id)).toEqual(["custom-1"]);
   });
 
   it("search matches tags", () => {
-    expect(manager.search("cta").map((s) => s.id)).toEqual(["btn-primary"]);
-    expect(manager.search("custom").map((s) => s.id)).toEqual(["custom-1"]);
+    expect(manager.search("test").map((s) => s.id)).toEqual(["custom-1"]);
   });
 
   it("search returns [] when nothing matches", () => {
@@ -218,20 +189,6 @@ describe("GlobalStyleManager.update", () => {
 
   it("throws for unknown ids", () => {
     expect(() => manager.update("nope", { name: "x" })).toThrow('Global style "nope" not found');
-  });
-
-  it("throws when updating a system style's styles", () => {
-    expect(() => manager.update("btn-primary", { styles: { color: "red" } })).toThrow(
-      'Cannot modify system style "btn-primary"'
-    );
-    expect(manager.get("btn-primary")?.styles.color).toBe("#ffffff");
-  });
-
-  // Current behavior: the system guard only blocks `updates.styles` —
-  // metadata (name/category/tags) on system styles can still be rewritten.
-  it("allows metadata-only updates on system styles (current behavior)", () => {
-    manager.update("btn-primary", { name: "Renamed System" });
-    expect(manager.get("btn-primary")?.name).toBe("Renamed System");
   });
 
   it("re-applies styles to all elements in the tree bound to the style", () => {
@@ -290,11 +247,6 @@ describe("GlobalStyleManager.delete", () => {
     expect(manager.get("custom-1")).toBeUndefined();
     expect(handler).toHaveBeenCalledWith({ id: "custom-1" });
     expect(harness.markDirty).toHaveBeenCalledTimes(1);
-  });
-
-  it("throws for system styles", () => {
-    expect(() => manager.delete("card")).toThrow('Cannot delete system style "card"');
-    expect(manager.get("card")).toBeDefined();
   });
 
   it("throws for unknown ids", () => {
@@ -392,7 +344,7 @@ describe("GlobalStyleManager export / import / clear / destroy", () => {
     manager = new GlobalStyleManager(harness.composer);
   });
 
-  it("export returns only non-system styles", () => {
+  it("export returns every defined style", () => {
     expect(manager.export()).toEqual([]);
 
     const style = customStyle();
@@ -408,31 +360,26 @@ describe("GlobalStyleManager export / import / clear / destroy", () => {
     expect(manager.get("custom-2")).toBeDefined();
   });
 
-  it("import never overrides existing ids (system or custom)", () => {
+  it("import never overrides existing ids", () => {
     manager.define(customStyle());
-
-    manager.import([
-      customStyle({ name: "Evil Override" }),
-      customStyle({ id: "btn-primary", name: "Evil System Override" }),
-    ]);
-
+    manager.import([customStyle({ name: "Evil Override" })]);
     expect(manager.get("custom-1")?.name).toBe("Custom Style");
-    expect(manager.get("btn-primary")?.name).toBe("Primary Button");
   });
 
   it("import emits styles:imported with the INPUT count (skipped duplicates included)", () => {
     const handler = vi.fn();
     manager.on(EVENTS.STYLES_IMPORTED, handler);
 
-    // btn-primary already exists and is skipped, but count reflects the
-    // input array length — current behavior, documents the quirk.
-    manager.import([customStyle(), customStyle({ id: "btn-primary" })]);
+    // custom-1 already exists and is skipped, but count reflects the input
+    // array length — current behavior, documents the quirk.
+    manager.define(customStyle());
+    manager.import([customStyle(), customStyle({ id: "custom-2" })]);
 
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler).toHaveBeenCalledWith({ count: 2 });
   });
 
-  it("clear removes only non-system styles and emits styles:cleared", () => {
+  it("clear removes every style and emits styles:cleared", () => {
     manager.define(customStyle());
     const handler = vi.fn();
     manager.on(EVENTS.STYLES_CLEARED, handler);
@@ -440,11 +387,11 @@ describe("GlobalStyleManager export / import / clear / destroy", () => {
     manager.clear();
 
     expect(manager.get("custom-1")).toBeUndefined();
-    expect(manager.getAll().map((s) => s.id).sort()).toEqual([...SYSTEM_IDS].sort());
+    expect(manager.getAll()).toEqual([]);
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it("destroy clears non-system styles and removes all listeners", () => {
+  it("destroy clears the styles and removes all listeners", () => {
     manager.define(customStyle());
     const definedHandler = vi.fn();
     const clearedHandler = vi.fn();
