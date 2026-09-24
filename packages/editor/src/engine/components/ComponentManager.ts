@@ -71,6 +71,12 @@ function generateComponentId(): string {
 /**
  * Manages the component registry and delegates instance/variant operations.
  */
+/** Is a master offered on this page? Every site-scoped one is; a "This page"
+ *  one (board 6971:77663) only on its own page. */
+export function inPageScope(component: ComponentDefinition, pageId: string | null | undefined): boolean {
+  return !component.pageId || component.pageId === pageId;
+}
+
 export class ComponentManager {
   private composer: Composer;
   private config: ComponentManagerConfig;
@@ -162,6 +168,8 @@ export class ComponentManager {
       variantProperties?: VariantProperty[];
       /** Spec §6.3 / D7: persist user's "Pre-fill from DS styles" choice. */
       prefillFromDs?: boolean;
+      /** "This page" scope (board 6971:77663); omitted = the whole site. */
+      pageId?: string | null;
     }
   ): Promise<ComponentDefinition | null> {
     const element = this.composer.elements.getElement(elementId);
@@ -183,6 +191,7 @@ export class ComponentManager {
       version: 1,
       variantProperties: options?.variantProperties,
       prefillFromDs: options?.prefillFromDs,
+      ...(options?.pageId ? { pageId: options.pageId } : {}),
     };
 
     await saveComponent(component, this.projectId);
@@ -229,6 +238,24 @@ export class ComponentManager {
 
   getAllComponents(): ComponentDefinition[] {
     return Array.from(this.components.values()).sort((a, b) => b.updatedAt - a.updatedAt);
+  }
+
+  /**
+   * Bring a master from the workspace library (FROM LIBRARY, board 4418:99857)
+   * onto this site under its SAME id — that shared id is what links it to the
+   * other sites. Saved locally and announced like a created master, so the
+   * server mirror stores this site's copy. A master already here is returned
+   * as is. Page scope never travels with it: a library master is site-wide.
+   */
+  async adoptLibraryComponent(definition: ComponentDefinition): Promise<ComponentDefinition> {
+    const existing = this.components.get(definition.id);
+    if (existing) return existing;
+    const component: ComponentDefinition = { ...deepClone(definition), pageId: null };
+    await saveComponent(component, this.projectId);
+    this.components.set(component.id, component);
+    this.composer.emit(EVENTS.COMPONENT_CREATED, { component });
+    this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+    return component;
   }
 
   getComponentsByCategory(category: string): ComponentDefinition[] {

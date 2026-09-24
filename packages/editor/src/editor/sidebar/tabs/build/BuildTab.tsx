@@ -28,6 +28,12 @@ import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
+import { inPageScope } from "@/engine/components/ComponentManager";
+import {
+  fetchComponentLibrary,
+  fetchLibraryComponent,
+  type LibraryComponentEntry,
+} from "@/services/componentSync";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -47,16 +53,33 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // MINE (board 1069:4970): the user's own components, inline, and
   // searched with the rest (G2-111). Same load +
   // subscribe shape useComponentsState uses.
-  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
+  /* G2-118: only masters in scope on the OPEN page (site-wide + "This page"
+     ones for it), and not the library-linked ones — board 4418:99857 lists
+     those under FROM LIBRARY instead. */
+  const [allMine, setAllMine] = React.useState<ComponentDefinition[]>([]);
+  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
   React.useEffect(() => {
     if (!composer?.components) return;
-    const load = () => setMine(composer.components?.getAllComponents() ?? []);
+    const load = () => {
+      const pageId = composer.elements.getActivePage()?.id;
+      setAllMine((composer.components?.getAllComponents() ?? []).filter((c) => inPageScope(c, pageId)));
+    };
+    const loadLibrary = () => void fetchComponentLibrary().then(setLibrary);
     load();
+    loadLibrary();
     composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
+    composer.on(EVENTS.PAGE_CHANGED, load);
     return () => {
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
+      composer.off(EVENTS.PAGE_CHANGED, load);
     };
   }, [composer]);
+  const mine = React.useMemo(() => {
+    const linked = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
+    return allMine.filter((c) => !linked.has(c.id));
+  }, [allMine, library]);
   const tab = useBuildTab(composer, onBlockClick, mine);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const panelBottomRef = React.useRef<HTMLDivElement>(null);
@@ -107,8 +130,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
 
   const groups = React.useMemo(
-    () => buildInsertGroups(composer?.components ? mine.length : null, tab.favs.size, tab.recents.length),
-    [composer, mine.length, tab.favs.size, tab.recents.length],
+    () => buildInsertGroups(composer?.components ? mine.length + library.length : null, tab.favs.size, tab.recents.length),
+    [composer, mine.length, library.length, tab.favs.size, tab.recents.length],
   );
 
   // MINE row click — the same instantiate contract the Components surface
@@ -128,6 +151,25 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       addToast({ description: "Couldn't add component. Try again.", tone: "error" });
     }
   }, [composer, addToast]);
+
+  /* FROM LIBRARY: bring the workspace master onto this site under its shared
+     id (ComponentManager.adoptLibraryComponent — mirrored as this site's copy,
+     which is what "linked" means), then insert it like a saved one. */
+  const insertFromLibrary = React.useCallback(async (componentId: string) => {
+    if (!composer) return;
+    try {
+      const existing = composer.components.getComponent(componentId);
+      const definition = existing ?? (await fetchLibraryComponent(componentId));
+      if (!definition) {
+        addToast({ description: "That component is no longer in the library.", tone: "warning" });
+        return;
+      }
+      const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
+      await insertMine(adopted);
+    } catch {
+      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
+    }
+  }, [composer, addToast, insertMine]);
 
   // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
   // clipboard) and Insert sends the text down the SAME BlockData insert path
@@ -298,6 +340,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 blocks={g.id === "blocks" ? blockRows : undefined}
                 components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
+                library={g.id === "mine" ? library : undefined}
+                onLibraryInsert={(id) => void insertFromLibrary(id)}
                 onDragStart={tab.handleDragStart}
                 onBlockDragStart={tab.handleBlockDragStart}
                 onElClick={tab.handleElClick}

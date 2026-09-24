@@ -3,24 +3,53 @@
   "board": "Media · quota-warn (Figma 145:199)",
   "_note": "Probe: 842 MB of 1 GB, the board's own numbers, which is the ≥80% branch of StorageQuotaBar. The waitFor is on `media-quota-track` — the band is null below 80% in the drawer, so a fixture that mis-set the storage would render nothing here and the panel-level wait would still have passed. The band was on a Tailwind ramp rather than this system's tokens (`bg-yellow-50` / `text-amber-700` / `bg-amber-500` against --color/warning-tint, --color/warning-text and --color/warning, all of which ship as --bk-*), its number was 11/16 against the board's 12/18, its track was rounded-full against radius 2, and the block was 64 tall against 78. Board won on all of it. NOT joined: 145:248's w-248 and 145:249's w-202 — the track is w-full inside a panel whose 1px CSS border consumes 2px that a Figma stroke does not (see media-no-results), and the fill is a percentage of it. Their fills, heights and radii ARE joined. Also skipped: 145:205 (inner search field, authority=open:input-fill), 145:208 (the folder row's Select) and 155:5's w-126 text frame.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-quota-warn",
-  "viewport": { "width": 280, "height": 812 },
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
   "steps": [
-    { "action": "waitFor", "testId": "media-quota-track" }
+    {
+      "action": "waitFor",
+      "testId": "media-quota-track"
+    }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "panel",        "testId": "media-panel",         "spec": "media-quota-warn", "nodeId": "145:199" },
-    { "name": "panel-header", "testId": "panel-header",        "spec": "media-quota-warn", "nodeId": "208:321" },
-    { "name": "search",       "testId": "media-search",        "spec": "media-quota-warn", "nodeId": "145:204" },
-    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-quota-warn", "nodeId": "145:207" },
-    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-quota-warn", "nodeId": "145:210" },
-    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-quota-warn", "nodeId": "145:211" },
-    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-quota-warn", "nodeId": "145:214" },
-    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-quota-warn", "nodeId": "145:217" },
-    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-quota-warn", "nodeId": "145:220" },
-    { "name": "asset-grid",   "testId": "media-grid",          "spec": "media-quota-warn", "nodeId": "145:223" },
-    { "name": "quota-band",   "testId": "media-quota-band",    "spec": "media-quota-warn", "nodeId": "145:246" },
-    { "name": "quota-number", "testId": "media-quota-bar",     "spec": "media-quota-warn", "nodeId": "145:247" },
-    { "name": "footer",       "testId": "media-footer",        "spec": "media-quota-warn", "nodeId": "145:243" }
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-quota-warn",
+      "nodeId": "145:199"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-quota-warn",
+      "nodeId": "208:321"
+    },
+    {
+      "name": "asset-grid",
+      "testId": "media-grid",
+      "spec": "media-quota-warn",
+      "nodeId": "145:223"
+    },
+    {
+      "name": "quota-band",
+      "testId": "media-quota-band",
+      "spec": "media-quota-warn",
+      "nodeId": "145:246"
+    },
+    {
+      "name": "quota-number",
+      "testId": "media-quota-bar",
+      "spec": "media-quota-warn",
+      "nodeId": "145:247"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-quota-warn",
+      "nodeId": "145:243"
+    }
   ]
 }

@@ -1109,22 +1109,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "s3-flows-media-editing": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 1,
-    "compared": 33
-  },
-  "s3-flows-media-optimizing": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 40
-  },
   "media-drill-in-versions": {
     "skipped": 0,
     "compared": 31,

@@ -55,6 +55,8 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
         componentId: component.id,
         name: component.name,
         payload: component as unknown as Record<string, unknown>,
+        // Scope (board 6971:77663): null = the whole site.
+        pageId: component.pageId ?? null,
       }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[component-sync] upsert mirror failed (kept locally)", e)
@@ -101,4 +103,37 @@ export async function hydrateComponentsFromServer(): Promise<number> {
     console.warn("[component-sync] hydrate from server failed", e);
   }
   return added;
+}
+
+/** One entry of the workspace component library (FROM LIBRARY, board 4418:99857). */
+export interface LibraryComponentEntry {
+  componentId: string;
+  name: string;
+  /** Sites in the workspace that carry it, this one included. */
+  siteCount: number;
+  /** Already linked on this site (it then lists under LINKED FROM LIBRARY). */
+  onThisSite: boolean;
+}
+
+/** The workspace's shared masters as seen from this site; [] when there is no
+ *  site (demo) or the read fails — the group then simply has no rows. */
+export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> {
+  const siteId = currentSiteId();
+  if (!siteId) return [];
+  try {
+    const rows = await client().siteComponents.library.query({ siteId });
+    return rows.map(({ componentId, name, siteCount, onThisSite }) => ({ componentId, name, siteCount, onThisSite }));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[component-sync] library read failed", e);
+    return [];
+  }
+}
+
+/** A library master's full definition, to bring onto this site. */
+export async function fetchLibraryComponent(componentId: string): Promise<ComponentDefinition | null> {
+  const siteId = currentSiteId();
+  if (!siteId) return null;
+  const payload = await client().siteComponents.libraryGet.query({ siteId, componentId });
+  return (payload as ComponentDefinition | null) ?? null;
 }
