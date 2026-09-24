@@ -38,6 +38,7 @@ import {
 import type { Composer } from "../../../engine";
 import { findMatchingElements } from "../../../engine/components/matchingGroups";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { EVENTS } from "@/shared/constants";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -94,13 +95,15 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
         ...(convertMatching ? matches : []),
       ]);
       const others = converted - 1;
+      // Board 4418:166980: "Hero created as a component", then the drawer
+      // shows Components with the new master badged New.
       addToast({
-        tone: "success",
         description:
           others > 0
-            ? `“${component.name}” created — ${others} matching group${others === 1 ? "" : "s"} converted too.`
-            : `“${component.name}” created.`,
+            ? `${component.name} created as a component · ${others} matching group${others === 1 ? "" : "s"} converted`
+            : `${component.name} created as a component`,
       });
+      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" });
       onClose();
     } catch (error) {
       addToast({ description: error instanceof Error ? error.message : "Couldn't create the component", tone: "error" });

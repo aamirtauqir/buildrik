@@ -42,6 +42,13 @@ const SELECTION_EVENTS = [
   EVENTS.SELECTION_CLEARED,
 ] as const;
 
+const INSTANCE_EVENTS = [
+  EVENTS.COMPONENT_INSTANTIATED,
+  EVENTS.INSTANCE_DETACHED,
+  EVENTS.COMPONENT_UPDATED,
+  EVENTS.COMPONENT_DELETED,
+] as const;
+
 export function useSelectionReadout(
   composer: Composer | null,
   selectedElement: { id: string; type: string } | null
@@ -78,12 +85,28 @@ export function useSelectionReadout(
     };
   }, [composer]);
 
+  // Board 4418:166980: an instance reads "Component instance · {master}".
+  // Re-read when an element becomes / stops being an instance or a master is renamed.
+  const [, setInstanceTick] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const bump = () => setInstanceTick((n) => n + 1);
+    for (const evt of INSTANCE_EVENTS) composer.on(evt, bump);
+    return () => {
+      for (const evt of INSTANCE_EVENTS) composer.off(evt, bump);
+    };
+  }, [composer]);
+  const instance = selectedElement ? composer?.components?.getInstanceByElementId?.(selectedElement.id) : undefined;
+  const master = instance ? composer?.components?.getComponent?.(instance.componentId) : undefined;
+
   const label = projectLoading
     ? "Loading…"
     : selectionCount > 1
       ? `${selectionCount} elements selected`
-      : selectedElement
-        ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
+      : master
+        ? `Component instance · ${master.name}`
+        : selectedElement
+          ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
         : "Nothing selected";
   return { label, dims: elementDims(selectedElement?.id) };
 }

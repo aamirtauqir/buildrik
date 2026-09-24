@@ -442,3 +442,20 @@ describe("ComponentManager — snapshot / restore for toast Undo", () => {
     expect(mgr.snapshotComponent("ghost")).toBeNull();
   });
 });
+
+/* Board 4418:166980: the element a master is made from becomes its first
+   instance, and the canvas bar re-reads as "Component instance · Hero" — it
+   needs an event to hear that on. */
+describe("ComponentManager.adoptInstances", () => {
+  it("links the element and announces COMPONENT_INSTANTIATED", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    composer.emit.mockClear();
+    expect(mgr.adoptInstances(comp.id, [card.getId()])).toBe(1);
+    expect(mgr.isInstance(card.getId())).toBe(true);
+    const ev = emitsOf(composer, EVENTS.COMPONENT_INSTANTIATED);
+    expect(ev).toHaveLength(1);
+    expect(ev[0][1]).toMatchObject({ component: comp, parentId: page.root.id, instance: { elementId: card.getId() } });
+  });
+});

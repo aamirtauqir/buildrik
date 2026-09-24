@@ -236,6 +236,11 @@ export class ComponentManager {
       };
       this.instances.set(elementId, instance);
       element.setData("componentInstance", instance);
+      this.composer.emit(EVENTS.COMPONENT_INSTANTIATED, {
+        instance,
+        component,
+        parentId: element.getParent()?.getId() ?? "",
+      });
       adopted++;
     }
     if (adopted > 0) this.composer.markDirty();

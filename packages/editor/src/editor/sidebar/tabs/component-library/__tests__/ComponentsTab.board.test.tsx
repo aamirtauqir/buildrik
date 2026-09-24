@@ -45,6 +45,13 @@ describe("ComponentsTab — board 4418:142419", () => {
     expect(screen.getByTestId("comp-footer").textContent).toBe("+ Create component");
   });
 
+  /* Board 4418:166980: a master made in this session is badged New. */
+  it("badges a master created this session New, and only that one", async () => {
+    mount([{ ...(c("hero", "Hero") as object), createdAt: Date.now() + 1 } as never, c("hdr", "Site header")]);
+    expect((await screen.findByTestId("comp-row-new-hero")).textContent).toBe("New");
+    expect(screen.queryByTestId("comp-row-new-hdr")).toBeNull();
+  });
+
   it("the empty state keeps the back row too", async () => {
     mount([]);
     expect((await screen.findByTestId("comp-back-row")).textContent?.replace(/\s+/g, " ")).toBe("‹ Add");

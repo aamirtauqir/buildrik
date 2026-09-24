@@ -22,6 +22,9 @@ import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/co
 export type { ComponentsTabProps };
 
 
+/** Masters created since this page loaded are badged New (board 4418:166980). */
+const isNew = (createdAt: number) => createdAt >= performance.timeOrigin;
+
 const SECTION_HEADER =
   "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
@@ -257,11 +260,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 }}
               >
                 <span
-                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  className="tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
                   data-testid={`comp-row-name-${component.id}`}
                 >
                   {component.name}
                 </span>
+                {isNew(component.createdAt) && (
+                  <span
+                    className="tw:flex tw:h-5 tw:shrink-0 tw:items-center tw:rounded tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent)]"
+                    data-testid={`comp-row-new-${component.id}`}
+                  >
+                    New
+                  </span>
+                )}
+                <span className="tw:flex-1" aria-hidden="true" />
                 {/* Board 641:2564 writes the count as "6 on this site", not
                     "6 instances". The number is sample data; the words are the
                     label, and copy on screen is decided by the board. */}
