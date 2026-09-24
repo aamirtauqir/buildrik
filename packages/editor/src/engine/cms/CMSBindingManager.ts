@@ -96,7 +96,9 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     itemId: string | undefined,
     fieldSlug: string,
     property: string,
-    fallback?: string
+    fallback?: string,
+    /** Makes the bind one undo step (the inspector passes it; loads don't). */
+    historyLabel?: string
   ): void {
     const binding: CMSElementBinding = {
       binding: {
@@ -111,7 +113,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       fallback,
     };
 
-    this.bind(elementId, binding);
+    this.bind(elementId, binding, historyLabel);
   }
 
   /**
@@ -121,9 +123,14 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     try {
       const { collectionId, itemId, fieldSlug, fallback } = binding;
 
-      // If no itemId, we can't resolve (would need context)
+      /* No record: the binding follows "the record on this page" (4428:149540).
+         On a dynamic page the publish worker fills it per record from the
+         template's {fieldSlug} token (CMSExportResolver); everywhere else —
+         the canvas, a plain page — it previews the first published record. */
       if (!itemId || itemId === "context") {
-        return fallback || "";
+        const first = (await this.cmsManager.queryContent({ collectionId, status: "published", filter: {} })).items[0];
+        const v = first?.data[fieldSlug];
+        return v === undefined || v === null ? fallback || "" : String(v);
       }
 
       // Get the content item. Only published records may resolve: static

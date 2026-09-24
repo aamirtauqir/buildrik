@@ -11,5 +11,3 @@
 
 export { DeleteConfirmModal } from "./DeleteConfirmModal";
 export type { DeleteConfirmModalProps } from "./DeleteConfirmModal";
-export { BindingPopover } from "./BindingPopover";
-export type { BindingPopoverProps } from "./BindingPopover";

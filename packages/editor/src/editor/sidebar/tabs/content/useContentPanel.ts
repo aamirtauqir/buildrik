@@ -12,13 +12,12 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
+import type { SiteVariable } from "@/shared/types/project";
 import type { ConditionBinding, ConditionExpression, DataSource } from "@/shared/types/data";
 import {
   SITE_VARS_SOURCE_ID,
-  loadSiteVariables,
-  saveSiteVariables,
+  loadLegacySiteVariables,
   variablesToSourceData,
-  type SiteVariable,
 } from "./contentPanelUtils";
 
 export type ContentView =
@@ -136,11 +135,20 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
 
   // Mount: load persisted variables, register the live source, load the rest.
   React.useEffect(() => {
-    const vars = loadSiteVariables(projectId);
+    /* Variables live in the project (saved with it, so export and publish
+       see them). A site that still has them only in this browser's
+       localStorage moves them into the project once. */
+    let vars = composer?.getProjectSettings()?.siteVariables;
+    if (!vars && composer) {
+      const legacy = loadLegacySiteVariables(projectId);
+      if (legacy.length) composer.setProjectSettings({ ...composer.getProjectSettings(), siteVariables: legacy });
+      vars = legacy;
+    }
+    vars = vars ?? [];
     setVariablesState(vars);
     registerSiteSource(vars);
     reload();
-  }, [projectId, registerSiteSource, reload]);
+  }, [composer, projectId, registerSiteSource, reload]);
 
   /* The collection whose records `records` holds, so an engine event can
      re-read the same list (the CMS workspace table and the drawer both read
@@ -251,10 +259,11 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
   const setVariables = React.useCallback(
     (vars: SiteVariable[]) => {
       setVariablesState(vars);
-      saveSiteVariables(projectId, vars);
-      if (composer) registerSiteSource(vars);
+      if (!composer) return;
+      composer.setProjectSettings({ ...composer.getProjectSettings(), siteVariables: vars });
+      registerSiteSource(vars);
     },
-    [composer, projectId, registerSiteSource],
+    [composer, registerSiteSource],
   );
 
   const removeCondition = React.useCallback(

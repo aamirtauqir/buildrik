@@ -269,7 +269,17 @@ export interface PageSEO {
 /**
  * Project-wide settings for analytics and integrations
  */
+/** A site variable — written once in CMS › Variables, used as {{site.<key>}}
+ *  in any text; the export writes the value in its place. */
+export interface SiteVariable {
+  key: string;
+  value: string;
+}
+
 export interface ProjectSettings {
+  /** CMS › Variables. Saved with the project so export and publish see them
+   *  (they lived in one browser's localStorage, where publish could not). */
+  siteVariables?: SiteVariable[];
   /** Analytics tracking configuration */
   analytics?: AnalyticsConfig;
   /** Third-party service integrations */
