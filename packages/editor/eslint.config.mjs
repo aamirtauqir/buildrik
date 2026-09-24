@@ -84,7 +84,7 @@ export default [
   // Global ignores: generated output, static assets, harness helper scripts and
   // untracked scratch files at the package root. `eslint .` visits all of these;
   // none is shipped code.
-  { ignores: [".flowbite-react/**", "assets/**", "e2e/**/*.mjs", "*.mjs", "dist/**"] },
+  { ignores: [".flowbite-react/**", "assets/**", "e2e/**/*.mjs", "*.mjs", "dist/**", "docs/**"] },
   js.configs.recommended,
   // Files outside src/ that `eslint .` still visits. Without a TS parser they
   // fail to PARSE ("Unexpected token <" / "as"), which is an error, which made
@@ -98,7 +98,9 @@ export default [
       parserOptions: { ecmaVersion: 2022, sourceType: "module", ecmaFeatures: { jsx: true } },
     },
     // TypeScript resolves names; `no-undef` on a .ts file only reports DOM/Node globals.
-    rules: { "no-undef": "off" },
+    // Base `no-unused-vars` flags parameter names inside function TYPES
+    // (`(p: unknown) => void`); src/ turns it off for the same reason.
+    rules: { "no-undef": "off", "no-unused-vars": "off" },
   },
   // Base config — DS V1 rules apply to everything in src/.
   {

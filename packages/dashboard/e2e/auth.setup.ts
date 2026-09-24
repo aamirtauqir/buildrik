@@ -39,6 +39,18 @@ setup("authenticate via magic-link", async ({ page }) => {
       create: { userId: user.id, step: "CHECKLIST", completed: true, dismissed: false },
     });
 
+    // Agency (/dashboard/agency) is gated on the per-workspace `agency_layer`
+    // flag and redirects to /dashboard without it. The seed sets no flags, so
+    // the smoke floor's Agency route needs this precondition owned here too.
+    const memberships = await prisma.workspaceMember.findMany({ where: { userId: user.id }, select: { workspaceId: true } });
+    for (const { workspaceId } of memberships) {
+      await prisma.workspaceFeature.upsert({
+        where: { workspaceId_key: { workspaceId, key: "agency_layer" } },
+        update: { enabled: true },
+        create: { workspaceId, key: "agency_layer", enabled: true },
+      });
+    }
+
     token = randomUUID();
     await prisma.verificationToken.create({
       data: {

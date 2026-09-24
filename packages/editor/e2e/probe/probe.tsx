@@ -1836,31 +1836,6 @@ const CONTENT_VARIABLES = [
   { key: "hours", value: "Tue–Sun, from 5pm" },
 ];
 
-/* Board 1170:4749's own collection: three columns (Title · Price · Photo) plus
-   the fixed Updated. The third being an IMAGE field is the point — that column
-   is the only one the table renders as presence rather than as text. */
-const RECORDS_COLLECTION = [
-  {
-    id: "menu-items",
-    name: "Menu items",
-    slug: "menu-items",
-    displayField: "title",
-    fields: [
-      { id: "rcf-title", name: "Title", slug: "title", type: "text", order: 0 },
-      { id: "rcf-price", name: "Price", slug: "price", type: "text", order: 1 },
-      { id: "rcf-photo", name: "Photo", slug: "photo", type: "image", order: 2 },
-    ],
-  },
-];
-const RECORDS_ITEMS = [
-  { id: "rec-margherita", collectionId: "menu-items", status: "published", updatedAt: new Date().toISOString(),
-    data: { title: "Margherita", price: "$14", photo: "margherita.jpg" } },
-  { id: "rec-carbonara", collectionId: "menu-items", status: "published", updatedAt: "2026-08-05T10:00:00.000Z",
-    data: { title: "Carbonara", price: "$18", photo: "carbonara.jpg" } },
-  { id: "rec-tiramisu", collectionId: "menu-items", status: "draft", updatedAt: "2026-08-02T10:00:00.000Z",
-    data: { title: "Tiramisu", price: "$9", photo: "" } },
-];
-
 const CONTENT_PROJECT = "probe-content";
 
 function contentElement(e: (typeof CONDITION_ELEMENTS)[number]) {
