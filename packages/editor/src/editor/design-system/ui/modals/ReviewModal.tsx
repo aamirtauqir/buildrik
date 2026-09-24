@@ -27,6 +27,14 @@ export interface ReviewModalProps {
   onDiscardAll?: () => void;
   /** How many places on the site are bound to the tokens being changed. */
   usageCount?: number;
+  /** G3-124: the other kinds' staged rows (radius, shadow, …), one section
+   *  each — the workspace computes them with its own dirty rule. */
+  otherSections?: ReviewSection[];
+}
+
+export interface ReviewSection {
+  title: string;
+  rows: { id: string; name: string; was: string; now: string }[];
 }
 
 /* Four `rgba(255,255,255,0.0x)` values in here were dark-theme leftovers —
@@ -88,6 +96,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   onClose,
   onDiscardAll,
   usageCount,
+  otherSections = [],
 }) => {
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
@@ -103,7 +112,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     return saved !== undefined && t.value !== saved.value;
   });
   const totalChanges =
-    changedEntries.length + changedTypeTokens.length + changedSpacingTokens.length;
+    changedEntries.length +
+    changedTypeTokens.length +
+    changedSpacingTokens.length +
+    otherSections.reduce((n, sec) => n + sec.rows.length, 0);
 
   const typeRows = changedTypeTokens.map((t) => ({
     id: t.id,
@@ -200,6 +212,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
           <ValueDiffSection title="Typography Changes" rows={typeRows} />
           <ValueDiffSection title="Spacing Changes" rows={spacingRows} />
+          {otherSections.map((sec) => (
+            <ValueDiffSection key={sec.title} title={sec.title} rows={sec.rows} />
+          ))}
 
           {/* 11/16 — 1172:4858. */}
           <p data-testid="brand-review-consequence" className="tw:mt-3 tw:mb-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">

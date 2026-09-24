@@ -47,8 +47,10 @@ describe("the paths that create a default page route through the helper", () => 
     "engine/Composer.ts",
     "editor/shell/hooks/useComposerInit.ts",
     "editor/shell/hooks/useStudioHandlers.ts",
-    "editor/shell/PageTabBar.tsx",
-    "editor/sidebar/tabs/pages/usePages.ts",
+    /* PageTabBar and usePages no longer create pages: since C4 #19 every
+       Add-page door asks for the New-page modal, which is the one creator
+       (and names the page through the helper). */
+    "editor/sidebar/tabs/pages/components/NewPageModal.tsx",
     /* Both of these were missing from the first version of this list, and the
        list is the whole point. `dropOperations` came from the codex review;
        `RecoveryManager` came from re-running the grep WITHOUT `| head -10`,

@@ -59,6 +59,7 @@ import { ConflictModal } from "./modals/ConflictModal";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
+import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import "../../themes/ux-fixes.css";
 import "./chrome.css";
 // flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
@@ -660,6 +661,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
               const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
               setIssuesOpen(false);
               if (target) composer.selection.select(target);
+              /* Brand ON the issue's token — it landed on the first colour
+                 row (walk B9: color-primary opened color-action). */
+              else if (issue.tokenId) requestBrandToken(composer, issue.tokenId);
               else composer.emit("ui:switch-tab", { tab: "design" });
             }}
             // applyAutoFix already wraps the rewrite in one transaction, which
@@ -671,9 +675,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
                 ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
                 : null
             }
-            onOpenBrand={() => {
+            onOpenBrand={(tokenId) => {
               setIssuesOpen(false);
-              composer.emit("ui:switch-tab", { tab: "design" });
+              if (tokenId) requestBrandToken(composer, tokenId);
+              else composer.emit("ui:switch-tab", { tab: "design" });
             }}
             onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
           />

@@ -178,3 +178,35 @@ export function wcagTooltip(level: WcagLevel): string {
       return "Cannot measure — background has transparency";
   }
 }
+
+// ─── Dark-mode shade suggestions (G3-146, board 7318:80995) ──────────────────
+
+export interface DarkShadeSuggestion {
+  hex: string;
+  label: string;
+  /** Contrast against the surface the shade will sit on in dark mode. */
+  contrast: number;
+}
+
+const DARK_SURFACE = "#111827";
+const LIGHT_INK = "#F9FAFB";
+
+/**
+ * Three dark-mode values for a light-mode colour. An ink or accent colour
+ * lifts (brighter, softer) so it reads on a dark surface; a light surface
+ * colour inverts to a dark one. Contrast is measured where the shade will
+ * be used: a lifted colour against the dark surface, an inverted surface
+ * against light ink.
+ */
+export function darkShadeSuggestions(lightHex: string): DarkShadeSuggestion[] {
+  const base = hexToHsb(expandShorthand(lightHex));
+  const rgb = hexToRgb(expandShorthand(lightHex));
+  const isSurface = rgb ? relativeLuminance(rgb.r, rgb.g, rgb.b) > 0.6 : false;
+  const steps: Array<[string, number, number]> = isSurface
+    ? [["Recommended", 0.6, 0.16], ["Deeper", 0.5, 0.1], ["Softer", 0.7, 0.24]]
+    : [["Recommended", 0.7, 0.97], ["Softer", 0.5, 0.98], ["Stronger", 0.85, 0.94]];
+  return steps.map(([label, sat, bright]) => {
+    const hex = hsbToHex({ h: base.h, s: base.s * sat, b: isSurface ? bright : Math.max(base.b, bright), a: 1 }).slice(0, 7).toUpperCase();
+    return { hex, label, contrast: calcContrastRatio(isSurface ? LIGHT_INK : hex, isSurface ? hex : DARK_SURFACE) };
+  });
+}

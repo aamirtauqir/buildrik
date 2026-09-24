@@ -26,8 +26,8 @@
  */
 
 import * as React from "react";
-import { ArrowUpRight, ChevronLeft, Search as SearchIcon } from "lucide-react";
-import { Button, IconButton, useToast } from "@/editor/chrome-ui";
+import { ArrowUpRight, ChevronLeft, Search as SearchIcon, X } from "lucide-react";
+import { Button, IconButton, Kbd, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -62,7 +62,7 @@ import {
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
-import { SearchSettingsModal } from "./components/SearchSettingsModal";
+import { searchSettings } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -193,7 +193,9 @@ export const SettingsTab: React.FC<
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
-  const [searchOpen, setSearchOpen] = React.useState(false);
+  /* G3-097 · 6816:60270: Search is an inline sidebar filter. null = closed;
+     a string (possibly empty) = the field is open with that query. */
+  const [query, setQuery] = React.useState<string | null>(null);
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
@@ -358,7 +360,7 @@ export const SettingsTab: React.FC<
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || searchOpen) return;
+      if (guardOpen) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
@@ -367,7 +369,7 @@ export const SettingsTab: React.FC<
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, searchOpen, requestLeave]);
+  }, [guardOpen, requestLeave]);
 
   // ─── The guard ────────────────────────────────────────────────────────
 
@@ -564,6 +566,26 @@ export const SettingsTab: React.FC<
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
+  /* The filter: a screen matches on its own title / description / group, or
+     through one of its fields — then the row lands on that field (the
+     retired dialog's jump & focus). */
+  const trimmed = query?.trim() ?? "";
+  const matchField = React.useMemo(() => {
+    if (!trimmed) return null;
+    const byScreen = new Map<string, string | null>();
+    for (const e of searchSettings(trimmed)) {
+      const prev = byScreen.get(e.screen);
+      if (e.fieldId === undefined) byScreen.set(e.screen, null);
+      else if (prev === undefined) byScreen.set(e.screen, e.fieldId);
+    }
+    return byScreen;
+  }, [trimmed]);
+  const openFromRow = (id: SettingsNavId) => {
+    pendingFieldRef.current = matchField?.get(id) ?? null;
+    requestNav(id);
+  };
+  const closeSearch = () => setQuery(null);
+
   const renderRow = (n: SettingsNavDef) => {
     const active = currentScreen === n.id;
     if (n.kind === "external") {
@@ -592,7 +614,7 @@ export const SettingsTab: React.FC<
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => requestNav(n.id)}
+        onClick={() => openFromRow(n.id)}
         data-testid={`set-nav-${n.id}`}
       >
         <NavRowIcon id={n.id} />
@@ -630,15 +652,48 @@ export const SettingsTab: React.FC<
             >
               Settings
             </h2>
-            <IconButton label="Search settings" onClick={() => setSearchOpen(true)} data-testid="set-search-icon" className="tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
-              <SearchIcon size={14} aria-hidden />
-            </IconButton>
+            {query === null ? (
+              <IconButton label="Search settings" onClick={() => setQuery("")} data-testid="set-search-icon" className="tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
+                <SearchIcon size={14} aria-hidden />
+              </IconButton>
+            ) : null}
           </div>
           <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
             {siteName}
           </div>
+          {query !== null ? (
+            <div className="tw:relative tw:mt-4" data-testid="set-search">
+              <TextInput
+                type="search"
+                autoFocus
+                icon={SearchIcon}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeSearch();
+                  }
+                }}
+                placeholder="Search settings"
+                aria-label="Search settings"
+                theme={{ field: { input: { base: "tw:pr-8 tw:[&::-webkit-search-cancel-button]:hidden" } } }}
+                data-testid="set-search-input"
+              />
+              <IconButton
+                label="Clear search"
+                onClick={closeSearch}
+                className="tw:absolute tw:right-1 tw:top-1 tw:size-6 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]"
+                data-testid="set-search-clear"
+              >
+                <X size={14} aria-hidden />
+              </IconButton>
+            </div>
+          ) : null}
         </div>
         <nav className="tw:flex tw:flex-col tw:gap-px tw:px-4 tw:pb-4 tw:pt-4" aria-label="Settings sections">
+          {matchField ? null : (
           <Button
             type="button"
             variant="ghost"
@@ -651,12 +706,36 @@ export const SettingsTab: React.FC<
             <NavRowIcon id="overview" />
             <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
           </Button>
-          {GROUP_ORDER.map((group) => (
-            <React.Fragment key={group}>
-              <div className={`${SET_EYEBROW} tw:flex tw:h-7 tw:items-center tw:px-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
-              {SETTINGS_NAV.filter((n) => n.group === group).map(renderRow)}
-            </React.Fragment>
-          ))}
+          )}
+          {GROUP_ORDER.map((group) => {
+            const rows = SETTINGS_NAV.filter((n) => n.group === group && (!matchField || matchField.has(n.id)));
+            if (rows.length === 0) return null;
+            return (
+              <React.Fragment key={group}>
+                <div className={`${SET_EYEBROW} tw:flex tw:h-7 tw:items-center tw:px-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
+                {rows.map(renderRow)}
+              </React.Fragment>
+            );
+          })}
+          {matchField && matchField.size === 0 ? (
+            <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-search-empty">
+              {`No settings match "${trimmed}"`}
+            </p>
+          ) : null}
+          {trimmed ? (
+            /* 6816:60270's hand-off: the same query, everywhere (⌘K). */
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className="tw:mt-4 tw:h-auto tw:min-h-0 tw:w-full tw:items-start tw:justify-between tw:gap-2 tw:rounded-md tw:px-2.5 tw:py-2 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]"
+              onClick={() => composer?.emit?.(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query: trimmed })}
+              data-testid="set-search-everywhere"
+            >
+              <span className="tw:min-w-0 tw:break-words">{`Search everywhere for "${trimmed}"`}</span>
+              <Kbd>⌘K</Kbd>
+            </Button>
+          ) : null}
         </nav>
       </aside>
 
@@ -684,7 +763,7 @@ export const SettingsTab: React.FC<
               variant="secondary"
               size="xs"
               className={`${SET_BTN} tw:w-70 tw:shrink-0 tw:justify-start tw:gap-2 tw:font-normal tw:text-[var(--bk-ink-muted)]`}
-              onClick={() => setSearchOpen(true)}
+              onClick={() => setQuery((q) => q ?? "")}
               data-testid="set-search-open"
             >
               <SearchIcon size={14} aria-hidden />
@@ -756,16 +835,6 @@ export const SettingsTab: React.FC<
         onDiscard={handleDiscard}
         onSaveAndContinue={handleSaveAndContinue}
         saving={saving}
-      />
-      <SearchSettingsModal
-        open={searchOpen}
-        siteName={siteName}
-        onClose={() => setSearchOpen(false)}
-        onOpen={(screenId, fieldId) => {
-          setSearchOpen(false);
-          pendingFieldRef.current = fieldId ?? null;
-          if (SETTINGS_NAV.some((n) => n.id === screenId)) requestNav(screenId as SettingsNavId);
-        }}
       />
     </div>
   );

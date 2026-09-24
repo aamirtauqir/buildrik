@@ -251,6 +251,47 @@ export class ElementManager {
     return true;
   }
 
+  /**
+   * "Add to site navigation" (New page, board 6752:59256). Every nav on the
+   * site whose links sit together in one group gets a link to the page: a copy
+   * of that group's last link (so it matches the others), labelled with the
+   * page name and pointing at `#page:<id>` — the internal-link scheme the
+   * Link inspector writes and the exporter resolves. A nav with no link group
+   * (a raw-HTML navbar block, a nav of buttons) is left alone, and a group
+   * that already links to the page is not given a second link.
+   * Returns how many navs took the link.
+   */
+  addPageToNavigation(pageId: string): number {
+    const page = this.getPage(pageId);
+    if (!page) return 0;
+    const href = `#page:${pageId}`;
+    const isLink = (el: Element) => el.getType() === "link" || el.getTagName() === "a";
+    const isNav = (el: Element) => el.getTagName() === "nav" || el.getType() === "nav" || el.getType() === "navbar";
+    const linkGroup = (nav: Element): Element | null => {
+      const queue: Element[] = [nav];
+      while (queue.length) {
+        const el = queue.shift()!;
+        const kids = el.getChildren();
+        if (kids.length > 0 && kids.every(isLink)) return el;
+        queue.push(...kids);
+      }
+      return null;
+    };
+    let added = 0;
+    for (const nav of this.getAllElements().filter(isNav)) {
+      const group = linkGroup(nav);
+      if (!group) continue;
+      const links = group.getChildren();
+      if (links.some((a) => a.getAttribute("href") === href)) continue;
+      const copy = this.duplicateElement(links[links.length - 1].getId());
+      if (!copy) continue;
+      copy.setContent(page.name);
+      copy.setAttribute("href", href);
+      added++;
+    }
+    return added;
+  }
+
   /** Duplicate element */
   duplicateElement(id: string): Element | null {
     return this.elementCRUD.duplicateElement(id);
@@ -316,13 +357,16 @@ export class ElementManager {
   }
 
   /**
-   * Clone element data with new IDs
+   * Clone element data with new IDs. DEEP: `toJSON()` hands out the live
+   * element's own `attributes` object, so a spread clone shared it — setting
+   * the duplicate's href (or src, alt…) rewrote the original's too.
    */
   private cloneElementData(data: ElementData): ElementData {
+    const { children, ...own } = data;
     return {
-      ...data,
+      ...structuredClone(own),
       id: generateId("el"),
-      children: data.children?.map((c) => this.cloneElementData(c)),
+      children: children?.map((c) => this.cloneElementData(c)),
     };
   }
 

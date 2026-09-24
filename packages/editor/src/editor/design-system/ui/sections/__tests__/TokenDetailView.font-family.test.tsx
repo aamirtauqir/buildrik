@@ -62,8 +62,11 @@ const renderDetail = (token: DesignToken, composer: Composer, onValueChange = vi
       <TokenDetailView token={token} composer={composer} onValueChange={onValueChange} />
     </DSModeProvider>,
   );
-  /* C1 (ii): the card's value line is read-only until Change is pressed. */
+  /* C1 (ii): the card's value line is read-only until Change is pressed. A
+     font role's Change opens the board's picker (7318:81029); "All fonts ›"
+     reaches the full picker these tests cover. */
   fireEvent.click(screen.getByTestId("brand-token-action-replace"));
+  if (token.type === "font-family") fireEvent.click(screen.getByTestId("brand-font-all"));
   return onValueChange;
 };
 
@@ -159,10 +162,60 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
       </DSModeProvider>,
     );
     fireEvent.click(screen.getByTestId("brand-token-action-replace"));
+    fireEvent.click(screen.getByTestId("brand-font-all"));
     const list = openTokenPicker();
     fireEvent.click(within(list).getByRole("option", { name: /^Lora/ }));
     expect(onToken).toHaveBeenCalledWith("font-heading", "Lora");
     expect(onHeading).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Font family" })).toHaveTextContent("Inter Variable");
+  });
+});
+
+describe("TokenDetailView — the Brand font picker popover (7318:81029)", () => {
+  const openPopover = (token: DesignToken, composer: Composer, onValueChange = vi.fn()) => {
+    render(
+      <DSModeProvider initialMode="pro">
+        <TokenDetailView token={token} composer={composer} onValueChange={onValueChange} />
+      </DSModeProvider>,
+    );
+    fireEvent.click(screen.getByTestId("brand-token-action-replace"));
+    return onValueChange;
+  };
+
+  it("Change opens the board's popover: title, current selection, site fonts with sources, Manage, Cancel", () => {
+    const { composer } = composerWithFonts(["Brand Sans"]);
+    openPopover(fontToken, composer);
+    const pop = screen.getByTestId("brand-font-popover");
+    expect(within(pop).getByText("Heading Font")).toBeInTheDocument();
+    expect(within(pop).getByText("Current selection")).toBeInTheDocument();
+    expect(screen.getByTestId("brand-font-current")).toHaveTextContent("Inter · Built in");
+    const rows = within(pop).getAllByRole("option").map((o) => o.textContent?.replace("✓", "").trim());
+    expect(rows).toEqual(["Inter · Built in", "Geist Mono · Built in", "Brand Sans · Uploaded"]);
+    expect(within(pop).getAllByRole("option")[0]).toHaveAttribute("aria-selected", "true");
+    expect(within(pop).getByTestId("brand-font-manage")).toHaveTextContent("Manage site fonts ›");
+    expect(within(pop).getByTestId("brand-font-cancel")).toHaveTextContent("Cancel");
+    // No inline editor until "All fonts ›".
+    expect(screen.queryByTestId("brand-token-font-picker")).toBeNull();
+  });
+
+  it("a row writes the family and closes; Cancel closes without a write", () => {
+    const { composer } = composerWithFonts(["Brand Sans"]);
+    const onValueChange = openPopover(fontToken, composer);
+    fireEvent.click(screen.getByTestId("brand-font-option-Brand Sans"));
+    expect(onValueChange).toHaveBeenCalledWith("font-heading", "Brand Sans");
+    expect(screen.queryByTestId("brand-font-popover")).toBeNull();
+    fireEvent.click(screen.getByTestId("brand-token-action-replace"));
+    fireEvent.click(screen.getByTestId("brand-font-cancel"));
+    expect(screen.queryByTestId("brand-font-popover")).toBeNull();
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("a family from elsewhere (Google / typed) is listed first as Custom; Manage opens Site fonts", () => {
+    const { composer, emit } = composerWithFonts([]);
+    openPopover({ ...fontToken, value: "Lora" }, composer);
+    expect(screen.getByTestId("brand-font-current")).toHaveTextContent("Lora · Custom");
+    fireEvent.click(screen.getByTestId("brand-font-manage"));
+    expect(emit).toHaveBeenCalledWith("ui:site-fonts", {});
+    expect(screen.queryByTestId("brand-font-popover")).toBeNull();
   });
 });

@@ -1,7 +1,10 @@
 /**
  * Analytics — Clone 3397:32295 (`Visitors / Analytics`): Google Analytics
  * (enable · Measurement ID · Connection status · Last received data), Google
- * Tag Manager, Meta Pixel, then Microsoft Clarity and Consent below the fold.
+ * Tag Manager, Meta Pixel, then Microsoft Clarity below the fold. No Consent
+ * card (G3-108, 4418:127827): its switch recorded a flag nothing reads — no
+ * banner, no export effect — so it is hidden until wired; the stored value is
+ * written back unchanged on the flush.
  * Label-left rows at 32, as SEO's Indexing card draws them.
  *
  * Two sources. The ids and toggles are the composer's `projectSettings.
@@ -23,7 +26,7 @@ import { Badge, Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
-import { Input, LoadCard, SCREEN_FIELD_ERROR, SCREEN_INFO, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
+import { Input, LoadCard, SCREEN_FIELD_ERROR, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
 import { ConnectionVerifiedDialog, eventsPhrase } from "../components/ConnectionVerifiedDialog";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
@@ -164,7 +167,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const [pixelEnabled, setPixelEnabled] = React.useState(stored.pixelEnabled);
   const [clarityId, setClarityId] = React.useState(stored.clarityId);
   const [clarityEnabled, setClarityEnabled] = React.useState(stored.clarityEnabled);
-  const [cookieConsent, setCookieConsent] = React.useState(stored.cookieConsent);
+  const cookieConsent = stored.cookieConsent;
   const [status, setStatus] = React.useState<AnalyticsStatus | null>(null);
   const [verifying, setVerifying] = React.useState(false);
   /** The Connection verified dialog's subject, while it is open. */
@@ -186,7 +189,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     setPixelEnabled(stored.pixelEnabled);
     setClarityId(stored.clarityId);
     setClarityEnabled(stored.clarityEnabled);
-    setCookieConsent(stored.cookieConsent);
   }, [
     stored.gaId,
     stored.gaEnabled,
@@ -197,7 +199,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     stored.pixelEnabled,
     stored.clarityId,
     stored.clarityEnabled,
-    stored.cookieConsent,
   ]);
 
   const load = useServerLoad<AnalyticsStatus>(
@@ -492,37 +493,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
             )}
           </div>
         </Row>
-      </Section>
-
-      {/* 3397:34148 heads this card Consent and names the row Cookie Consent —
-          the card is the category, the row is the setting. */}
-      <Section title="Consent">
-        <Row stem="cookie-consent" label="Cookie Consent">
-          <div className={SWITCH_CELL}>
-            <ToggleSwitch
-              id="cookie-consent"
-              checked={cookieConsent}
-              onChange={(next) => {
-                setCookieConsent(next);
-                markDirty();
-              }}
-              aria-labelledby="cookie-consent-label"
-              sizing="sm"
-              data-testid="set-an-consent"
-            />
-          </div>
-        </Row>
-        {/* `cookieConsent` is written here and read by nothing — no export
-            path, no publish worker, no runtime — and `generateAnalyticsScripts`
-            injects each enabled provider outright, with no consent check and
-            no gtag consent mode. A compliance promise is the worst kind to
-            leave unbacked, so the note says what the switch does today: it
-            records the preference. */}
-        <div className={SCREEN_INFO}>
-          Records the preference only. Buildrick does not render a consent banner yet, and the
-          analytics above load as soon as the page does — they do not wait for consent. If you
-          need GDPR consent today, add your own banner in Settings → Custom code.
-        </div>
       </Section>
 
       <ConnectionVerifiedDialog

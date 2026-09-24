@@ -34,7 +34,7 @@ const family = (v: string | undefined) => String(v ?? "").split(",")[0].trim().r
  * fonts — so the fonts are the site's own (heading + body when they differ),
  * and the colour is the starter's primary on its page colour.
  */
-export function starterLine(starter: StarterDS, headingFont: string, bodyFont: string): string {
+function starterLine(starter: StarterDS, headingFont: string, bodyFont: string): string {
   const fonts = headingFont && headingFont !== bodyFont ? `${headingFont} + ${bodyFont}` : bodyFont;
   const hex = (id: string) => starter.tokens.find((t) => t.id === id)?.value?.toUpperCase();
   const primary = hex("color-primary");

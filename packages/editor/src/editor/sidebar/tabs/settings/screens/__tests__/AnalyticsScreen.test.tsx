@@ -84,16 +84,19 @@ const pixelInput = () => screen.getByLabelText("Pixel ID") as HTMLInputElement;
 const clarityInput = () => screen.getByLabelText("Clarity Project ID") as HTMLInputElement;
 const gaSwitch = () => screen.getByRole("switch", { name: "Enable Google Analytics" });
 const pixelSwitch = () => screen.getByRole("switch", { name: "Enable Meta Pixel" });
-const consentSwitch = () => screen.getByRole("switch", { name: "Cookie Consent" });
 
 const loaded = () => waitFor(() => expect(screen.getByTestId("set-card-google-analytics")).toBeInTheDocument());
 
 describe("AnalyticsScreen — the frame's cards and rows", () => {
-  it("draws the five cards in 3397:32295's order, each with its label-left rows", async () => {
+  /* G3-108: 4418:127827 draws four cards. The Cookie Consent switch recorded
+     a flag nothing reads (no banner, no export effect) — hidden until wired;
+     the stored value is kept on the flush. */
+  it("draws the board's four cards in order, each with its label-left rows — no Consent card", async () => {
     setup();
     await loaded();
     const cards = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
-    expect(cards).toEqual(["Google Analytics", "Google Tag Manager", "Meta Pixel", "Microsoft Clarity", "Consent"]);
+    expect(cards).toEqual(["Google Analytics", "Google Tag Manager", "Meta Pixel", "Microsoft Clarity"]);
+    expect(screen.queryByRole("switch", { name: "Cookie Consent" })).toBeNull();
 
     const ga = within(screen.getByTestId("set-card-google-analytics"));
     expect(ga.getByTestId("set-field-label-enable-google-analytics")).toHaveTextContent("Enable Google Analytics");
@@ -105,7 +108,6 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("GTM Container ID");
     expect(screen.getByTestId("set-field-label-pixel-id")).toHaveTextContent("Pixel ID");
     expect(screen.getByTestId("set-field-label-clarity-project-id")).toHaveTextContent("Clarity Project ID");
-    expect(screen.getByTestId("set-field-label-cookie-consent")).toHaveTextContent("Cookie Consent");
   });
 
   it("gives every control the id Search lands on, and the brief's testids", async () => {
@@ -119,7 +121,6 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(pixelInput().id).toBe("pixel-id");
     expect(screen.getByRole("switch", { name: "Enable Microsoft Clarity" }).id).toBe("enable-microsoft-clarity");
     expect(clarityInput().id).toBe("clarity-project-id");
-    expect(consentSwitch().id).toBe("cookie-consent");
 
     expect(screen.getByTestId("set-an-ga-enable")).toBe(gaSwitch());
     expect(screen.getByTestId("set-an-ga-id")).toBe(gaInput());
@@ -140,17 +141,15 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(clarityInput().value).toBe("abcdefghij");
     expect(gaSwitch()).toHaveAttribute("aria-checked", "true");
     expect(pixelSwitch()).toHaveAttribute("aria-checked", "true");
-    expect(consentSwitch()).toHaveAttribute("aria-checked", "false");
   });
 
-  it("defaults: empty ids, tracking off, cookie consent ON, the honesty note under it", async () => {
+  it("defaults: empty ids, tracking off", async () => {
     setup();
     await loaded();
     expect(gaInput().value).toBe("");
     expect(pixelInput().value).toBe("");
     expect(gaSwitch()).toHaveAttribute("aria-checked", "false");
-    expect(consentSwitch()).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByText(/Records the preference only/)).toHaveTextContent("they do not wait for consent");
+    expect(screen.queryByText(/Records the preference only/)).toBeNull();
   });
 });
 
@@ -467,7 +466,7 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     const { composer } = setup({ onDirtyChange });
     await loaded();
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
-    fireEvent.click(consentSwitch());
+    fireEvent.click(pixelSwitch());
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
     fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
@@ -500,7 +499,6 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
 
     // Enable pixel WITHOUT an id — flushed `enabled` must resolve false.
     fireEvent.click(pixelSwitch());
-    fireEvent.click(consentSwitch());
 
     expect(flush).toBeTypeOf("function");
     act(() => flush!());
@@ -517,7 +515,8 @@ describe("AnalyticsScreen — dirty wiring + flush handler", () => {
     expect(settings.analytics.googleAnalytics).toEqual({ enabled: true, measurementId: "G-4XQ2P7B1KD", verifiedAt: VERIFIED });
     expect(settings.analytics.googleTagManager).toEqual({ enabled: true, containerId: "GTM-ABC1234", verifiedAt: VERIFIED });
     expect(settings.analytics.facebookPixel).toEqual({ enabled: false, pixelId: "" });
-    expect(settings.analytics.cookieConsent).toEqual({ enabled: false });
+    // No switch any more: the stored preference (default true) is kept as is.
+    expect(settings.analytics.cookieConsent).toEqual({ enabled: true });
   });
 
   it("an edited Measurement ID is flushed without a verifiedAt", async () => {

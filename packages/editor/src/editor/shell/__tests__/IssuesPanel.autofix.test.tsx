@@ -80,7 +80,8 @@ describe("Issues · fix-failed", () => {
     expect(screen.getByText(/comes from your brand tokens/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Open Brand" }));
-    expect(onOpenBrand).toHaveBeenCalledTimes(1);
+    // Walk B9: Brand opens ON the issue's token, not the first colour row.
+    expect(onOpenBrand).toHaveBeenCalledWith("color.accent");
   });
 
   it("Ignore once suppresses that token and dismisses the band", async () => {

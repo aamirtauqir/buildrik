@@ -96,7 +96,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      That rule was spelled out inline here, which is how it drifted from the
      copy in `getDisplayName` that search and the breadcrumb read. */
   const displayName = getDisplayName(layer.id, layer.type, customNames, layer.preview);
-  const canDrag = !!(composer && layer.depth > 0 && !isLocked);
+  /* Every row but a locked one drags — top-level rows (depth 0, the page
+     root's children) included; `depth > 0` barred reordering them (walk
+     2026-09-24). The page root itself is not a row. */
+  const canDrag = !!(composer && !isLocked);
 
   // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits
   // between the label and the eye on component-linked rows. Only the

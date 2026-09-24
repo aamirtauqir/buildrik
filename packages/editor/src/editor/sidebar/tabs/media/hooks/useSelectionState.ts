@@ -140,15 +140,18 @@ export function useSelectionState(
    * Turns on select mode if it wasn't on.
    */
   const shiftSelect = useCallback(
-    (key: string) => {
+    (key: string, fallbackAnchor?: string | null) => {
       setSelMode(true);
-      if (!anchorKey || anchorKey === key) {
+      /* The details rail's open asset is where a range starts when nothing
+         was checked yet — plain click opens it without setting the anchor. */
+      const anchor = anchorKey ?? fallbackAnchor ?? null;
+      if (!anchor || anchor === key) {
         setSelectedKeys(new Set([key]));
         setAnchorKey(key);
         return;
       }
       const order = libraryItems.map((i) => i.key);
-      const a = order.indexOf(anchorKey);
+      const a = order.indexOf(anchor);
       const b = order.indexOf(key);
       if (a === -1 || b === -1) {
         setSelectedKeys(new Set([key]));
@@ -157,6 +160,7 @@ export function useSelectionState(
       }
       const [lo, hi] = a < b ? [a, b] : [b, a];
       setSelectedKeys(new Set(order.slice(lo, hi + 1)));
+      setAnchorKey(anchor);
     },
     [anchorKey, libraryItems],
   );

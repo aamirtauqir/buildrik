@@ -365,13 +365,21 @@ describe("TokenDetailView", () => {
     expect(screen.getByTestId("brand-token-action-delete").textContent).toMatch(/Delete token/);
   });
 
-  it("Change on a color token opens the ColorPicker inline", () => {
-    const { getByTestId, container } = render(
-      wrap(<TokenDetailView token={colorToken} composer={makeMockComposer({})} />),
+  /* G3-140 · 7318:80959: the one picker, in a popover titled with the token,
+     its WORKSPACE PALETTE the other brand colours. */
+  it("Change on a color token opens the picker popover (title, palette, Apply)", () => {
+    const other = { ...colorToken, id: "color-accent", name: "Accent", value: "#15803D" };
+    const onValueChange = vi.fn();
+    const { getByTestId, queryByTestId, getByRole, getByText } = render(
+      wrap(<TokenDetailView token={colorToken} allTokens={[colorToken, other]} composer={makeMockComposer({})} onValueChange={onValueChange} />),
     );
-    expect(container.querySelector(".buildrick-design-picker")).toBeNull();
+    expect(queryByTestId("color-picker")).toBeNull();
     fireEvent.click(getByTestId("brand-token-action-replace"));
-    expect(container.querySelector(".buildrick-design-picker")).toBeTruthy();
+    expect(getByTestId("color-picker-title").textContent).toBe(colorToken.name);
+    fireEvent.click(getByRole("button", { name: "Use Accent #15803D" }));
+    fireEvent.click(getByText("Apply"));
+    expect(onValueChange).toHaveBeenCalledWith(colorToken.id, "#15803D");
+    expect(queryByTestId("color-picker")).toBeNull();
   });
 
   it("Change on a non-color token opens a text field → onValueChange(id, newValue)", () => {

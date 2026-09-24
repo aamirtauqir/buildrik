@@ -342,7 +342,7 @@
    ========================================================================== */
 
 .bdc-menu {
-  /* Board 1082:4564: 140w card, radius 8, 4px vertical padding only — items
+  /* Board 1082:4564: card, radius 8, 4px vertical padding only — items
      run full-bleed. The 180 here (and the comment claiming the board said so)
      was stale: re-extracted 2026-09-08 the frame is w-[140px], and the widest
      label, "Group selection", is ~103px at 13px + 24 of inset. `13px/normal`,
@@ -353,7 +353,9 @@
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
   padding: var(--bk-space-4) 0;
-  width: 140px;
+  /* v3 4418:79546: 224 wide — every row now names its target ("Move to
+     page… · Heading"), which the V1 140 frame wrapped onto two lines. */
+  width: 224px;
   font: 400 13px/normal var(--bk-font-ui);
 }
 
@@ -374,6 +376,9 @@
   cursor: pointer;
   width: 100%;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bdc-menu-item:hover { background: var(--bk-bg-subtle); }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
@@ -505,39 +510,6 @@
    now ride as children of TabFrame.Header; layout sourced from
    PanelHeader's HeaderActions. */
 
-/* Board 142:7 Toolbar — 36h band: the search box (the ⊞ ⊟ ⚙ cluster moved
-   under the header ⋯ menu, board 7059:78962).
-   Measured 2026-09-08 against 142:7, which all five Layers state boards repeat:
-   the band is inset 12 on BOTH sides (it was 16 on the left, so the search box
-   started 4px inside where every board puts it) and the cluster is spaced 8,
-   not 4. `py-4` is the board's own box and 36 - 4 - 4 = 28 is the field's
-   height exactly, so it renders identically to the centring it replaces. */
-.bdc-ltoolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: var(--bk-space-36);
-  padding: var(--bk-space-4) var(--bk-space-12);
-  flex-shrink: 0;
-}
-
-/* Search field (board 142:8 — 28h subtle box inside the toolbar) */
-.bdc-psearch {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-  gap: 6px;
-  height: var(--bk-size-row-dense);
-  /* Board 142:8: px-8 py-4 on a 28 box — 28 - 4 - 4 is the input's own 20px
-     line box, so the padded box and the centred one render the same. */
-  padding: var(--bk-space-4) var(--bk-space-8);
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  font: 500 11px var(--bk-font-ui);
-}
-
 /* Count footer — v3 board 4418:81300 "Count footer" (7420:128318) is 32 tall
    (was 28 off V1 142:58). */
 .bdc-lcount {
@@ -556,23 +528,6 @@
   font: 400 var(--bk-text-12)/18px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-.bdc-psearch svg {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
-.bdc-psearch input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-}
-.bdc-psearch input::placeholder {
-  color: var(--bk-ink-muted);
-}
-
 /* panel body container — holds the scrollable tree region */
 .bdc-pbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .bdc-pbody-scroll { overflow-y: auto; }

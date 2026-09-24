@@ -111,10 +111,12 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   const [twitter, setTwitter] = React.useState(social.value.twitter);
   const [facebook, setFacebook] = React.useState(social.value.facebook);
   const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
-  /* 4418:127313 draws Site Identity as name · favicon · language, and no
-     Canvas card: the Author field and the grid size / snap controls the old
-     Project settings modal carried are not on the board (owner parity order,
-     2026-09-24). Snap lives in the canvas View menu (⌘;). */
+  /* 4418:127313 draws Site Identity as name · favicon · language. Author is
+     the project metadata's, not the Site row's (read once on mount, written on
+     the flush); owner ruling 2026-09-24 keeps it, in the empty cell beside
+     Site Language so the card is the board's height. No Canvas card: grid
+     lives in the canvas View menu. */
+  const [author, setAuthor] = React.useState(() => composer?.getProjectMetadata?.()?.author ?? "");
   /* null = no Site row read (the standalone demo), so nothing to check
      against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
   const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
@@ -161,8 +163,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   // composer.saveProject(). Pulls latest local state from refs so the
   // closure stays single — re-registering per keystroke would defeat the
   // fan-out reduction this whole refactor exists for.
-  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin });
-  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin };
+  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author });
+  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author };
   React.useEffect(() => {
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
@@ -188,8 +190,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
          after the mirror wrote `Site.name` (walked live 2026-09-14). */
       const name = s.siteName.trim();
       const meta = composer.getProjectMetadata?.();
-      if (name && name !== meta?.name) {
-        composer.updateProjectMetadata?.({ name });
+      const author = s.author.trim();
+      if ((name && name !== meta?.name) || author !== (meta?.author ?? "")) {
+        composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
       }
     });
     return () => registerFlushHandler(null);
@@ -271,6 +274,15 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
               {languageError}
             </div>
           )}
+        </Field>
+        <Field label="Author" htmlFor="site-author">
+          <Input
+            id="site-author"
+            type="text"
+            value={author}
+            onChange={(e) => { setAuthor(e.target.value); identity.markDirty(); }}
+            placeholder="Who this site belongs to"
+          />
         </Field>
       </Section>
 

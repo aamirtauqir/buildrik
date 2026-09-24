@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  darkShadeSuggestions,
   expandShorthand,
   isValidHex,
   hexToRgb,
@@ -189,5 +190,21 @@ describe("wcagTooltip", () => {
     expect(wcagTooltip("aaa")).toContain("7:1");
     expect(wcagTooltip("aa")).toContain("4.5:1");
     expect(wcagTooltip("aa-large")).toContain("3:1");
+  });
+});
+
+describe("darkShadeSuggestions (G3-146)", () => {
+  it("lifts an accent: three lighter shades, contrast measured on the dark surface", () => {
+    const s = darkShadeSuggestions("#1A56DB");
+    expect(s.map((x) => x.label)).toEqual(["Recommended", "Softer", "Stronger"]);
+    for (const x of s) {
+      expect(x.hex).toMatch(/^#[0-9A-F]{6}$/);
+      expect(x.contrast).toBeGreaterThan(calcContrastRatio("#1A56DB", "#111827"));
+    }
+  });
+
+  it("inverts a light surface to dark shades readable under light ink", () => {
+    const s = darkShadeSuggestions("#F8FAFC");
+    for (const x of s) expect(x.contrast).toBeGreaterThan(7);
   });
 });

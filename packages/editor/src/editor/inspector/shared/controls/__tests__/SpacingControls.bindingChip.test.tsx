@@ -45,7 +45,7 @@ describe("SpacingBox · DSBindingChip integration", () => {
     expect(chips.length).toBe(0);
   });
 
-  it("clicking a token chip emits UI_OPEN_DESIGN_PANEL", () => {
+  it("clicking a token chip opens Brand ON that token (G3-156)", () => {
     render(
       <SpacingBox
         margin={{ ...baseSides, left: "var(--buildrick-design-spacing-lg)" }}
@@ -57,6 +57,6 @@ describe("SpacingBox · DSBindingChip integration", () => {
     );
     const chip = screen.getByRole("button", { name: /Jump to token spacing-lg/i });
     fireEvent.click(chip);
-    expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+    expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, { tokenId: "spacing-lg" });
   });
 });

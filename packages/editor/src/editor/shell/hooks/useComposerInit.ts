@@ -190,8 +190,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // editor still loads — DS migrations are forward-fix, not load-gating.
             // The run-then-import step is shared with the migration modal's
             // Restore / Retry (A2), so a re-run lands tokens the way this does.
+            let migrated = false;
             try {
-              importMigratedProject(instance, data, siteId);
+              migrated = importMigratedProject(instance, data, siteId);
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -239,6 +240,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }
             setIsDirty(false);
+            /* A migration that moved the version is an unsaved change: left
+               clean, its dsSchemaVersion never reached the server and the
+               "Updating your project" modal returned on every open (walk A2,
+               2026-09-24). A project:changed schedules the autosave that
+               persists it — once; the next load is at the target and skips. */
+            if (migrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.

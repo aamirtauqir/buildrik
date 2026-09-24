@@ -96,6 +96,14 @@ describe("ExportSection", () => {
     // Figma is disabled now; selecting JSON above is the real assertion here.
   });
 
+  /* G3-123 · 6881:71312: a download reports "Export ready" as a toast. */
+  it("Download raises the Export ready toast with the kinds · tokens count", async () => {
+    const { getByTestId, findByText } = render(wrap(<ExportSection />));
+    fireEvent.click(getByTestId("brand-format-download-css"));
+    expect(await findByText("Export ready")).toBeTruthy();
+    expect(await findByText(/^\d+ kinds · \d+ tokens exported\. Download ready\.$/)).toBeTruthy();
+  });
+
   it("preview pane shows :root block by default (CSS format)", () => {
     const { getByTestId } = render(wrap(<ExportSection />));
     const preview = getByTestId("export-preview");
@@ -127,10 +135,18 @@ describe("ExportSection", () => {
   /* Board 153:120 leads with one "Dark strategy" row and its value at the
      right, not three radios buried under the CSS format — where a JSON
      exporter would never see the choice they are exporting under. */
-  it("dark strategy swaps @media for :root[data-theme]", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    const select = getByLabelText(/dark mode strategy/i) as HTMLSelectElement;
-    fireEvent.change(select, { target: { value: "data-attr" } });
+  /* Walk FAIL (4418:168885 "Dark-strategy menu"): the label was dead text
+     over a native <select>. "Dark strategy ▾" is the menu's trigger now. */
+  it("dark strategy is a menu: the ▾ label opens it, a pick swaps @media for :root[data-theme]", () => {
+    const { getByTestId, getByRole, queryByRole } = render(wrap(<ExportSection />));
+    expect(document.querySelector("select[aria-label='Dark mode strategy']")).toBeNull();
+    expect(getByTestId("brand-export-dark-value").textContent).toBe("media-query");
+    fireEvent.click(getByTestId("brand-export-dark-trigger"));
+    const menu = getByRole("menu", { name: "Dark strategy" });
+    expect(Array.from(menu.querySelectorAll('[role="menuitemradio"]')).map((i) => i.getAttribute("aria-checked"))).toEqual(["true", "false", "false"]);
+    fireEvent.click(getByTestId("brand-export-dark-option-data-attr"));
+    expect(queryByRole("menu", { name: "Dark strategy" })).toBeNull();
+    expect(getByTestId("brand-export-dark-value").textContent).toBe("data-attr");
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain(':root[data-theme="dark"]');
     expect(preview.textContent).not.toContain("@media (prefers-color-scheme: dark)");
