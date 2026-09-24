@@ -94,22 +94,31 @@ describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(onBlockClick).toHaveBeenCalledTimes(1));
+    /* Board 6887:78320: a modal, prefilled from the clipboard; Insert inserts. */
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    await waitFor(() => expect(field.value).toBe("<div><p>hi</p></div>"));
+    expect(onBlockClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({
       id: "pasted-html",
       content: "<div><p>hi</p></div>",
     });
   });
 
-  it("empty clipboard → warns, never inserts", async () => {
+  it("says what sanitising will strip, and Insert waits for some HTML", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
-      clipboard: { readText: vi.fn().mockResolvedValue("   ") },
+      clipboard: { readText: vi.fn().mockRejectedValue(new Error("denied")) },
     });
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(screen.getByText(/Clipboard is empty/)).toBeTruthy());
+    const field = (await screen.findByLabelText("HTML")) as HTMLTextAreaElement;
+    expect(screen.getByRole("button", { name: "Insert" })).toBeDisabled();
+    fireEvent.change(field, { target: { value: '<p onclick="x()">a</p><script>1</script><script>2</script>' } });
+    expect(screen.getByText("2 <script> tags and 1 event handler will be removed")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onBlockClick).not.toHaveBeenCalled();
   });
 });

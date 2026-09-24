@@ -12,6 +12,7 @@
  * remains.
  */
 
+import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
 import { IconButton, Menu, MenuItem, PanelFrame, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
@@ -103,23 +104,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     }
   }, [composer, addToast]);
 
-  // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
-  // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
-  // XSS boundary) and gives the transaction/smart-placement/select/flash.
-  const pasteHtml = React.useCallback(async () => {
-    let text = "";
-    try {
-      text = await navigator.clipboard.readText();
-    } catch {
-      addToast({ description: "Clipboard is not readable — allow clipboard access and try again.", tone: "warning" });
-      return;
-    }
-    if (!text.trim()) {
-      addToast({ description: "Clipboard is empty — copy some HTML first.", tone: "warning" });
-      return;
-    }
-    onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: text });
-  }, [addToast, onBlockClick]);
+  // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
+  // clipboard) and Insert sends the text down the SAME BlockData insert path
+  // everything else uses — insertBlock owns the XSS boundary.
+  const [pasteOpen, setPasteOpen] = React.useState(false);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -188,7 +176,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 data-testid="insert-paste-html"
                 onClick={() => {
                   setMenuOpen(false);
-                  void pasteHtml();
+                  setPasteOpen(true);
                 }}
               >
                 Paste HTML…
@@ -292,6 +280,11 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           />
         </div>
       </div>
+      <PasteHtmlModal
+        open={pasteOpen}
+        onClose={() => setPasteOpen(false)}
+        onInsert={(content) => onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content })}
+      />
     </PanelFrame>
   );
 };
