@@ -158,7 +158,13 @@ export function RecordSheet({
     setSaveError(null);
     try {
       await onSave(form, published);
-      addToast({ tone: "success", title: "Record saved", description: `${collection.name} · Changes to this record are live in the CMS.` });
+      /* 6561:54690 — the collection rides in the title; the body says what
+         the save reached and what it did not yet. */
+      addToast({
+        tone: "success",
+        title: `Record saved · ${collection.name}`,
+        description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+      });
       onClose();
     } catch (e) {
       /* A published record is validated against the collection's rules
@@ -184,10 +190,11 @@ export function RecordSheet({
     }
     await onDelete(record);
     onClose();
+    /* 6881:70387 — "<name> deleted · <collection>", what went, what Undo does. */
     addToast({
       tone: "success",
-      title: `${title} deleted`,
-      description: collection.name,
+      title: `${title} deleted · ${collection.name}`,
+      description: "The record is gone. Undo restores it.",
       action: { label: "Undo", onClick: () => void onRestore(record) },
     });
   };
@@ -495,7 +502,7 @@ export function RecordSheet({
             await onDelete(record);
             setTypedDelete(false);
             onClose();
-            addToast({ tone: "success", title: `${title} deleted`, description: `${collection.name} · The record and its generated page are gone.` });
+            addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });
           }}
           name={title}
           consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
