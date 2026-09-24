@@ -19,6 +19,7 @@
  */
 
 import * as React from "react";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { usePageSettings } from "./usePageSettings";
@@ -79,12 +80,28 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     onClose();
   };
 
+  /* What to do once the dialog has closed — set by a door that leaves it
+     (Site SEO defaults), run after the close or the discard. */
+  const afterCloseRef = React.useRef<(() => void) | null>(null);
+  const close = () => {
+    onClose();
+    afterCloseRef.current?.();
+    afterCloseRef.current = null;
+  };
+
   const handleClose = () => {
     if (s.isDirty || s.saveState === "error") {
       s.setShowDiscardConfirm(true);
       return;
     }
-    onClose();
+    close();
+  };
+
+  /* 6887:73809 "Site SEO defaults ›" → full-screen Settings › SEO defaults,
+     through the same unsaved guard as ✕. */
+  const openSiteDefaults = () => {
+    afterCloseRef.current = () => composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "seo" });
+    handleClose();
   };
 
   // ESC — the same guarded close as the scrim. Skipped while the discard modal
@@ -152,7 +169,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         <div className="bd-pg-drawer-body" data-testid="pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} />
+              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} onOpenSiteDefaults={openSiteDefaults} />
             </div>
           )}
           {s.activeTab === "social" && (
@@ -185,13 +202,15 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           the edits away and closes, Keep editing returns to the form. */}
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
-        pendingTab={s.activeTab}
         onDiscard={() => {
           s.discard();
           s.setShowDiscardConfirm(false);
-          onClose();
+          close();
         }}
-        onCancel={() => s.setShowDiscardConfirm(false)}
+        onCancel={() => {
+          afterCloseRef.current = null;
+          s.setShowDiscardConfirm(false);
+        }}
       />
     </>
   );
