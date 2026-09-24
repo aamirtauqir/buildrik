@@ -198,6 +198,21 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const [editingLight, setEditingLight] = React.useState(false);
   /* A font role's Change opens the board's picker (7318:81029) first. */
   const [fontPopoverOpen, setFontPopoverOpen] = React.useState(false);
+  /* 7318:80959's WORKSPACE PALETTE: the other brand colours, one swatch per
+     distinct value, eight at most (the board draws seven). */
+  const workspacePalette = React.useMemo(() => {
+    const seen = new Set<string>();
+    return (allTokens ?? [])
+      .filter((t) => t.type === "color" && t.id !== token.id && !t.replacedBy)
+      .filter((t) => {
+        const v = t.value.toUpperCase();
+        if (seen.has(v)) return false;
+        seen.add(v);
+        return true;
+      })
+      .slice(0, 8)
+      .map((t) => ({ id: t.id, name: t.name, value: t.value }));
+  }, [allTokens, token.id]);
   const [editingDark, setEditingDark] = React.useState(false);
   const [darkInput, setDarkInput] = React.useState(token.darkValue ?? "");
   React.useEffect(() => {
@@ -405,6 +420,46 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             }}
             composer={composer}
           />
+        ) : isColor ? (
+          /* 7318:80959 — the one colour picker, as a popover off Change. */
+          <Popover
+            open={editingLight}
+            onClose={() => setEditingLight(false)}
+            placement="bottom-end"
+            label={`${token.name} colour`}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => setEditingLight((v) => !v)}
+                aria-expanded={editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+          >
+            {/* -m-2 cancels the popover's own inset: the picker's header rule
+                and grey foot run edge to edge as on the board. */}
+            <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg" data-testid="brand-token-light-editor">
+              <ColorPicker
+                initialHex={token.value}
+                title={token.name}
+                palette={workspacePalette}
+                onChange={() => {
+                  /* live preview owned by picker; commit via onSave */
+                }}
+                onSave={(hex) => {
+                  onValueChange?.(token.id, hex);
+                  setEditingLight(false);
+                }}
+                onCancel={() => setEditingLight(false)}
+              />
+            </div>
+          </Popover>
         ) : (
           <Button
             type="button"
@@ -419,21 +474,9 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           </Button>
         )}
       </div>
-      {editingLight && (
+      {editingLight && !isColor && (
         <div className="tw:mb-2" data-testid="brand-token-light-editor">
-          {isColor ? (
-            <ColorPicker
-              initialHex={token.value}
-              onChange={() => {
-                /* live preview owned by picker; commit via onSave */
-              }}
-              onSave={(hex) => {
-                onValueChange?.(token.id, hex);
-                setEditingLight(false);
-              }}
-              onCancel={() => setEditingLight(false)}
-            />
-          ) : (
+          {(
             <>
               {/* Clone 3721:44821 — a font-family token is picked, not only
                   typed: presets, the ADDED site fonts, `Manage site fonts`.

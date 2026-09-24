@@ -77,7 +77,7 @@ const WEIGHT_NAMES: Record<string, string> = {
  * is the token's; the weight and line-height are what the canvas gives the
  * element that role names (DEFAULT_ELEMENT_STYLES), the line rounded to px.
  */
-export function typeStyleLine(family: string, size: string, element: string): string {
+function typeStyleLine(family: string, size: string, element: string): string {
   const d = getDefaultStyles(element);
   const px = parseFloat(size);
   const weight = WEIGHT_NAMES[d["font-weight"] ?? "400"] ?? d["font-weight"];
