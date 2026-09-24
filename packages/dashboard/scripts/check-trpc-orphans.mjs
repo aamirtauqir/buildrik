@@ -58,7 +58,6 @@ const ALLOWED = {
   "dashboard.quickActions": "Home's quick actions are a fixed list now (components/dashboard/quick-actions.tsx).",
   "dashboard.recentSites": "Home shows recent ACTIVITY, not recent sites; the sites list is its own screen.",
   "auth.logout": "Sign-out goes through NextAuth signOut + /api/auth/logout.",
-  "ai.quota": "G2-129: the editor AI panel counter reads it — L5 is wiring the UI (2026-09-24); remove this entry with that commit.",
   "sites.getProjectData": "The editor loads through sites.get; saves through sites.saveProject.",
   "sites.saveProjectData": "Superseded by sites.saveProject (editorSaveProjectSchema) — see packages/shared/schemas/sites.ts.",
   "upload.limits": "Upload limits are read from PLAN_LIMITS on the client.",
