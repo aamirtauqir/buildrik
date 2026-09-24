@@ -195,6 +195,15 @@ export async function getShareDraftRows(siteId: string) {
     },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
+  /* The site's ADDED fonts (Site fonts dialog — `userMetadata.siteFont`), the
+     same set the editor's Composer registers from the media library. Without
+     them the scratch render cannot write their @font-face, and the preview
+     named e.g. 'Inter Var' while loading nothing (2026-09-24). */
+  const fontAssets = await prisma.mediaAsset.findMany({
+    where: { siteId, type: "font", userMetadata: { path: ["siteFont"], equals: true } },
+    select: { filename: true, url: true },
+    orderBy: { createdAt: "asc" },
+  });
   const { sitePages, name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion, ...columns } = site;
   const pages = sitePages.filter((p) => {
     const visibility = (p.settings as { visibility?: unknown } | null)?.visibility;
@@ -204,5 +213,6 @@ export async function getShareDraftRows(siteId: string) {
     site: { name, publishedUrl, projectStyles, projectSettings, dsSchemaVersion },
     pages,
     siteColumns: { name, ...columns },
+    siteFonts: fontAssets,
   };
 }

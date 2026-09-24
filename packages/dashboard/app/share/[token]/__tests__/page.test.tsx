@@ -48,7 +48,7 @@ describe("SharePage", () => {
 
   it("open → the saved draft of the link's site, and the view is counted", async () => {
     resolveMock.mockResolvedValue({ state: "open", linkId: "l1", siteId: "s1", siteName: "Bella" });
-    const rows = { site: {}, pages: [], siteColumns: {} };
+    const rows = { site: {}, pages: [], siteColumns: {}, siteFonts: [] };
     rowsMock.mockResolvedValue(rows);
     const node = (await render()) as { type: unknown; props: Record<string, unknown> };
     expect(node.type).toBe(DraftPreview);

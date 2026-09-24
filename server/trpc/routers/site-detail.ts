@@ -454,6 +454,17 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
           if (e instanceof Error && e.message === "EDITORS_CANNOT_CREATE_LINKS")
             throw new TRPCError({ code: "FORBIDDEN", message: "Editors cannot create share links for this workspace" });
+          // Plan limits reached the client as a bare 500 (a password link on
+          // FREE, walk 2026-09-24). FORBIDDEN + the plan's reason, like the
+          // page limit in pages.create.
+          if (e instanceof Error && e.message === "PASSWORD_LINKS_NOT_AVAILABLE")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Password-protected share links need the Pro plan or higher." });
+          if (e instanceof Error && e.message === "EXPIRY_EXCEEDS_PLAN")
+            throw new TRPCError({ code: "FORBIDDEN", message: "That expiry is longer than your plan allows." });
+          if (e instanceof Error && e.message === "SHARE_LINK_LIMIT")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Your plan allows 3 active share links per site. Revoke one or upgrade." });
+          if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
           throw e;
         }
       }),

@@ -20,6 +20,8 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 
 const commentMutate = vi.fn();
 const resolveMutate = vi.fn();
+const commentHookOptions = vi.fn();
+const resolveHookOptions = vi.fn();
 
 vi.mock("@lib/trpc/client", () => ({
   trpc: {
@@ -47,10 +49,16 @@ vi.mock("@lib/trpc/client", () => ({
       comments: { useQuery: () => ({ data: [], isLoading: false }) },
       identify: { useMutation: () => ({ mutate: vi.fn(), mutateAsync: vi.fn() }) },
       comment: {
-        useMutation: () => ({ mutate: commentMutate, mutateAsync: vi.fn(), isPending: false, error: null }),
+        useMutation: (opts?: unknown) => {
+          commentHookOptions(opts);
+          return { mutate: commentMutate, mutateAsync: vi.fn(), isPending: false, error: null };
+        },
       },
       resolve: {
-        useMutation: () => ({ mutate: resolveMutate, mutateAsync: vi.fn(), isPending: false, error: null }),
+        useMutation: (opts?: unknown) => {
+          resolveHookOptions(opts);
+          return { mutate: resolveMutate, mutateAsync: vi.fn(), isPending: false, error: null };
+        },
       },
     },
   },
@@ -129,5 +137,45 @@ describe("Request changes carries the note the client typed", () => {
     act(() => onError());
     expect(screen.getByText("Your change request wasn’t sent.")).toBeTruthy();
     expect(screen.getByText("Send again")).toBeTruthy();
+  });
+});
+
+/* Board 4418:122170: the red "not sent" box is the whole error UI. The
+   provider's DEFAULT mutation onError raises a global "Something went wrong"
+   toast; TanStack replaces that default when the hook passes its own onError,
+   so both hooks the send path uses must pass one — and it must not toast. */
+describe("a failed change request raises no global toast", () => {
+  it("comment and resolve replace the provider's default onError", () => {
+    render(<ReviewClient token="tok" />);
+    for (const spy of [commentHookOptions, resolveHookOptions]) {
+      const opts = spy.mock.calls.at(-1)?.[0] as { onError?: (e: unknown) => unknown } | undefined;
+      expect(typeof opts?.onError).toBe("function");
+    }
+  });
+
+  /* The mechanism itself, on a real QueryClient configured like the provider:
+     a hook-level onError REPLACES defaultOptions.mutations.onError. If a
+     react-query upgrade ever merged them instead, the toast would be back. */
+  it("a hook-level onError replaces the provider's default (real QueryClient)", async () => {
+    const { QueryClient, MutationObserver } = await import("@tanstack/react-query");
+    const providerDefault = vi.fn();
+    const client = new QueryClient({ defaultOptions: { mutations: { onError: providerDefault } } });
+    const fail = () => Promise.reject(new Error("boom"));
+
+    const handled = new MutationObserver(client, { mutationFn: fail, onError: () => undefined });
+    await handled.mutate().catch(() => undefined);
+    expect(providerDefault).not.toHaveBeenCalled();
+
+    const unhandled = new MutationObserver(client, { mutationFn: fail });
+    await unhandled.mutate().catch(() => undefined);
+    expect(providerDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it("the replacement handler adds nothing to the page", () => {
+    document.body.innerHTML = '<div id="trpc-toast-root"></div>';
+    render(<ReviewClient token="tok" />);
+    const opts = resolveHookOptions.mock.calls.at(-1)?.[0] as { onError: (e: unknown) => unknown };
+    opts.onError(new Error("INTERNAL_SERVER_ERROR"));
+    expect(document.getElementById("trpc-toast-root")?.childElementCount ?? 0).toBe(0);
   });
 });
