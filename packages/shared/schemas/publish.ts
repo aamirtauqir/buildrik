@@ -125,4 +125,8 @@ export const publishDiffInput = z.object({
   toJobId: z.string().min(1),
 });
 export type PublishDiffInput = z.infer<typeof publishDiffInput>;
+
+/** One COMPLETED publish job of a site whose pages Compare renders. */
+export const publishedSnapshotInput = z.object({ siteId: z.string().min(1), jobId: z.string().min(1) });
+export type PublishedSnapshotInput = z.infer<typeof publishedSnapshotInput>;
 export type RollbackInput = z.infer<typeof rollbackInput>;

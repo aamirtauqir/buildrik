@@ -32,6 +32,7 @@ import {
   cancelPublish,
   unpublishSite,
   getPublishDiff,
+  getPublishedSnapshot,
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
@@ -51,7 +52,7 @@ import {
   getScheduledPublish,
   ScheduledPublishError,
 } from "@/server/services/scheduled-publish.service";
-import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, publishedSnapshotInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
@@ -542,6 +543,27 @@ export const sitesRouter = router({
         throw e;
       }
       return getPublishDiff(input.siteId, input.fromJobId, input.toJobId);
+    }),
+
+  // The pages one published version shipped, for the editor's Compare (B8).
+  // EDITOR, like publishHistory/publishDiff. Lazy, its own query: full HTML
+  // per page (see getPublishedSnapshot for why this one returns HTML).
+  publishedSnapshot: protectedProcedure
+    .input(publishedSnapshotInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await getPublishedSnapshot(input.siteId, input.jobId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "That published version was not found." });
+        throw e;
+      }
     }),
 
   // P1: roll back = re-publish a prior version as a NEW job (contract §5).
