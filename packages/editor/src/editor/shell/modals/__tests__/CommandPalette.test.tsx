@@ -10,7 +10,7 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import { CommandPalette } from "../CommandPalette";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -78,6 +78,7 @@ const bands = () => screen.queryAllByTestId(/^cmdk-band-/).map((b) => b.textCont
 const labels = () => screen.queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent ?? "");
 
 afterEach(cleanup);
+beforeEach(() => localStorage.clear());
 
 describe("CommandPalette — board 4418:141220 structure", () => {
   it("draws the board's input, scope chip, bands and legend", () => {
@@ -296,5 +297,49 @@ describe("CommandPalette — keys and a11y", () => {
     expect(box.getAttribute("aria-activedescendant")).toBe(within(list).getAllByRole("option")[0].id);
     fireEvent.keyDown(box, { key: "ArrowDown" });
     expect(box.getAttribute("aria-activedescendant")).toBe(within(list).getAllByRole("option")[1].id);
+  });
+});
+
+describe("CommandPalette — RECENT band (restored capability, off-board)", () => {
+  it("no RECENT band until something has run", () => {
+    renderPalette();
+    expect(bands()[0]).toBe("Navigate");
+  });
+
+  it("a run command leads the next empty palette under RECENT, newest first", () => {
+    renderPalette();
+    fireEvent.click(screen.getByText("Open Layers"));
+    cleanup();
+    renderPalette();
+    fireEvent.click(screen.getByText("Zoom to 50%"));
+    cleanup();
+    renderPalette();
+    expect(bands()[0]).toBe("Recent");
+    const recent = screen.getByTestId("cmdk-band-recent").parentElement as HTMLElement;
+    expect(within(recent).queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent)).toEqual([
+      "Zoom to 50%",
+      "Open Layers",
+    ]);
+  });
+
+  it("a RECENT row runs its command; typing hides the band", () => {
+    const first = renderPalette();
+    fireEvent.click(screen.getByText("Zoom to 50%"));
+    expect(first.composer?.setZoom).toHaveBeenCalledTimes(1);
+    cleanup();
+    const { composer } = renderPalette();
+    fireEvent.click(screen.getByTestId("cmdk-row-recent-view-zoom-50"));
+    expect(composer?.setZoom).toHaveBeenCalledWith(50);
+    cleanup();
+    renderPalette();
+    type("zoom");
+    expect(bands()).not.toContain("Recent");
+  });
+
+  it("a recent id that no longer exists is skipped", () => {
+    localStorage.setItem("buildrick:command-recents", JSON.stringify(["gone", "nav-pages"]));
+    renderPalette();
+    const recent = screen.getByTestId("cmdk-band-recent").parentElement as HTMLElement;
+    expect(within(recent).queryAllByTestId(/^cmdk-label-/).map((l) => l.textContent)).toEqual(["Open Pages"]);
   });
 });
