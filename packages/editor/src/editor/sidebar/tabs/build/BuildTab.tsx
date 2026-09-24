@@ -22,6 +22,7 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
+import { PasteHtmlModal } from "./components/PasteHtmlModal";
 import { takePendingInsertGroup } from "./insertGroupRequest";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -102,23 +103,20 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     }
   }, [composer, addToast]);
 
-  // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
-  // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
-  // XSS boundary) and gives the transaction/smart-placement/select/flash.
+  // Paste HTML… (6887:78320, G2-112): the clipboard prefills a modal that
+  // shows what sanitising strips; Insert takes the SAME BlockData path every
+  // other insert uses (useBlockInsertion → insertBlock owns the XSS boundary).
+  // An unreadable clipboard just opens the field empty to paste into.
+  const [pasteHtmlText, setPasteHtmlText] = React.useState<string | null>(null);
   const pasteHtml = React.useCallback(async () => {
     let text = "";
     try {
       text = await navigator.clipboard.readText();
     } catch {
-      addToast({ description: "Clipboard is not readable — allow clipboard access and try again.", tone: "warning" });
-      return;
+      text = "";
     }
-    if (!text.trim()) {
-      addToast({ description: "Clipboard is empty — copy some HTML first.", tone: "warning" });
-      return;
-    }
-    onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: text });
-  }, [addToast, onBlockClick]);
+    setPasteHtmlText(text.trim() ? text : "");
+  }, []);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -258,6 +256,15 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
+        <PasteHtmlModal
+          open={pasteHtmlText !== null}
+          initialHtml={pasteHtmlText ?? ""}
+          onClose={() => setPasteHtmlText(null)}
+          onInsert={(html) => {
+            setPasteHtmlText(null);
+            onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: html });
+          }}
+        />
         <div ref={panelBottomRef} className="bld-panel-bottom" />
         <FirstUseTip anchorRef={panelBottomRef} />
       </div>

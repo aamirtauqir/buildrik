@@ -100,9 +100,10 @@ describe("BuildTab — element row description on hover (G2-108)", () => {
   });
 });
 
-/* Paste HTML… moved into the panel ⋯ (board 7063:78846). */
-describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
-  it("reads the clipboard and sends content through onBlockClick", async () => {
+/* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
+   modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
+describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
+  it("opens the modal prefilled from the clipboard; Insert sends it through onBlockClick", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
       clipboard: { readText: vi.fn().mockResolvedValue("<div><p>hi</p></div>") },
@@ -110,23 +111,25 @@ describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(onBlockClick).toHaveBeenCalledTimes(1));
-    expect(onBlockClick.mock.calls[0][0]).toMatchObject({
-      id: "pasted-html",
-      content: "<div><p>hi</p></div>",
-    });
+    await waitFor(() =>
+      expect((screen.getByTestId("paste-html-input") as HTMLTextAreaElement).value).toBe("<div><p>hi</p></div>"),
+    );
+    expect(onBlockClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("paste-html-insert"));
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "pasted-html", content: "<div><p>hi</p></div>" });
   });
 
-  it("empty clipboard → warns, never inserts", async () => {
+  it("an unreadable clipboard still opens the modal, empty, to paste into", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
-      clipboard: { readText: vi.fn().mockResolvedValue("   ") },
+      clipboard: { readText: vi.fn().mockRejectedValue(new Error("denied")) },
     });
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
-    await waitFor(() => expect(screen.getByText(/Clipboard is empty/)).toBeTruthy());
-    expect(onBlockClick).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByTestId("paste-html-modal")).toBeTruthy());
+    expect((screen.getByTestId("paste-html-input") as HTMLTextAreaElement).value).toBe("");
+    expect((screen.getByTestId("paste-html-insert") as HTMLButtonElement).disabled).toBe(true);
   });
 });
 
