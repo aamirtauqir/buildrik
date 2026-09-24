@@ -70,6 +70,19 @@ function renderTab(ui: React.ReactElement) {
   return render(<ToastProvider>{ui}</ToastProvider>);
 }
 
+/** Board 4418:97118 draws Changes / Last deploy collapsed; open both. */
+async function expandSections() {
+  for (const name of ["Changes in this session", "Last deploy"]) {
+    const b = await screen.findByRole("button", { name });
+    if (b.getAttribute("aria-expanded") === "false") fireEvent.click(b);
+  }
+}
+
+/** Board 7045:77972: Unpublish lives in the panel ⋯. */
+async function openPublishMenu() {
+  fireEvent.click(await screen.findByTestId("publish-menu"));
+}
+
 beforeEach(() => {
   fetchPublishHistory.mockReset().mockResolvedValue([]);
 });
@@ -97,6 +110,7 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
       />,
     );
 
+    await expandSections();
     // The pre-deploy entry is not pending work and must not be counted.
     await waitFor(() => expect(screen.getByText("1 change")).toBeTruthy());
     expect(screen.getByText("Hero — new photo")).toBeTruthy();
@@ -114,12 +128,14 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
       { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
     ]);
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
     expect(screen.queryByText("v1 · live")).toBeNull();
   });
 
   it("never-published reads as never published, not as an empty deploy", async () => {
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("This site has never been published.")).toBeTruthy());
   });
 });
@@ -373,6 +389,7 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
     await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
     failing = false;
     fireEvent.click(screen.getByText("Try again"));
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v2 · live")).toBeTruthy());
   });
 });
@@ -421,6 +438,7 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
     fetchPublishHistory.mockResolvedValue([]);
     renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
+    await expandSections();
     await waitFor(() =>
       expect(screen.getByText("Publishing will put the whole site live for the first time.")).toBeInTheDocument(),
     );
@@ -442,6 +460,7 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
     ]);
     renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
+    await expandSections();
     await waitFor(() =>
       expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
     );
@@ -460,14 +479,16 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
         composer={composerWith()}
         projectId="site_1"
         publishedUrl="https://bellacucina.com"
-        /* Idle, not "published": the just-published state renders the result
-           section in place of Last deploy, and Unpublish lives in Last deploy. */
+        /* Idle, not "published": liveness comes from the last deploy, which
+           the just-published state replaces with the result section. */
         publishJob={{ ...job({ uiState: "idle", publishedUrl: "https://bellacucina.com" }), unpublished }}
         nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       />,
     );
-    await waitFor(() => expect(screen.getByText("Unpublish site…")).toBeTruthy());
-    fireEvent.click(screen.getByText("Unpublish site…"));
+    await expandSections();
+    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
     expect(screen.getByText("Unpublish site?")).toBeTruthy();
     expect(unpublishSite).not.toHaveBeenCalled();
     /* Typed confirm (board 4418:98016, decision 29 — wide action): the button
@@ -502,7 +523,10 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
         nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
       />,
     );
-    fireEvent.click(await screen.findByText("Unpublish site…"));
+    await expandSections();
+    await waitFor(() => expect(screen.getByText("v3 · live")).toBeTruthy());
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
     fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
     fireEvent.click(screen.getByTestId("unpublish-confirm-button"));
     await waitFor(() => expect(unpublishSite).toHaveBeenCalled());
@@ -534,7 +558,36 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
       { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
     ]);
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await expandSections();
     await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
-    expect(screen.queryByText("Unpublish site…")).toBeNull();
+    await openPublishMenu();
+    expect(screen.getByRole("menuitem", { name: "All versions ›" })).toBeTruthy();
+    expect(screen.queryByRole("menuitem", { name: "Unpublish site…" })).toBeNull();
+  });
+});
+
+describe("PublishTab — board 4418:97118 flow (Fix ›, Release to, collapsed sections, ⋯)", () => {
+  it("Changes in this session and Last deploy start collapsed and open on their header", async () => {
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    const last = await screen.findByRole("button", { name: "Last deploy" });
+    expect(last.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText("This site has never been published.")).toBeNull();
+    fireEvent.click(last);
+    expect(await screen.findByText("This site has never been published.")).toBeTruthy();
+  });
+
+  it("Production and Preview deployment open Settings › Domains", async () => {
+    const composer = composerWith();
+    renderTab(<PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    fireEvent.click(await screen.findByTestId("publish-env-preview"));
+    expect(composer!.emit).toHaveBeenCalledWith("ui:settings-open", { screen: "domains" });
+  });
+
+  it("⋯ All versions › opens History on Published", async () => {
+    const composer = composerWith();
+    renderTab(<PublishTab composer={composer} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await openPublishMenu();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "All versions ›" }));
+    expect(composer!.emit).toHaveBeenCalledWith("panel:open", { panel: "history", screen: "published" });
   });
 });

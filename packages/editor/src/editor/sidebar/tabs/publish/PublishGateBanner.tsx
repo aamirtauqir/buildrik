@@ -19,7 +19,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { NextMove } from "@/editor/shell/lifecycle";
-import { CheckIcon, CHECK_ROW, CHECK_LABEL, CHECK_DETAIL } from "./PrePublishChecks";
+import { CheckIcon, CHECK_ROW, CHECK_LABEL, checkDetailClass } from "./PrePublishChecks";
 
 const LINK =
   "tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
@@ -69,7 +69,7 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
     >
       <CheckIcon status={blocks ? "fail" : "warning"} />
       <span className={CHECK_LABEL}>Client approval</span>
-      <span className={CHECK_DETAIL} data-testid="publish-check-approval-detail">
+      <span className={checkDetailClass(blocks ? "fail" : "warning")} data-testid="publish-check-approval-detail">
         {nextMove.gate === "unchecked" ? "Couldn't check" : blocks ? "Blocks publish" : "Advisory"}
       </span>
       <Button color="light" size="xs" className={LINK} onClick={() => openDoor(composer, nextMove.gate)}>
