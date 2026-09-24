@@ -33,7 +33,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchPrePublishChecks, unpublishSite } from "../../../../services/PublishService";
 import { EVENTS } from "@/shared/constants";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
-import { PrePublishChecks } from "./PrePublishChecks";
+import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
@@ -126,7 +126,7 @@ const EnvRow: React.FC<{ label: string; value: string | null; empty: string; onO
     size="xs"
     onClick={onOpen}
     disabled={!onOpen}
-    className={`${ROW} tw:h-auto tw:w-full tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:font-normal tw:hover:bg-transparent`}
+    className={`${ROW} tw:h-8 tw:w-full tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:font-normal tw:hover:bg-transparent`}
     data-testid={`publish-env-${label === "Preview deployment" ? "preview" : "production"}`}
   >
     <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{label}</span>
@@ -454,7 +454,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
           target="_blank"
           rel="noopener noreferrer"
-          className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+          className={`${CHECK_DOOR} tw:no-underline`}
         >
           Connect
         </a>
@@ -471,7 +471,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             ? composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: target.screen })
             : composer?.emit("ui:switch-tab", { tab: target.tab })
         }
-        className={`tw:flex-none ${TEXT_LINK}`}
+        className={CHECK_DOOR}
       >
         Fix ›
       </Button>
@@ -802,7 +802,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             published now. The count pair is the header; the rows are the
             changes themselves. Absent during a run and right after one. */}
         {!isPublishing && !justPublished && !hasFailed && (
-        <section className={SECTION} aria-label="Changes in this session">
+        <section className={`${SECTION} ${COLLAPSED_SECTION}`} aria-label="Changes in this session">
           <CollapsibleTitle title="Changes in this session" open={changesOpen} onToggle={() => setChangesOpen((v) => !v)} />
           {!changesOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-36", "tw:w-28", "tw:w-20", "tw:w-32"]} />
@@ -845,7 +845,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board B3-10's LAST DEPLOY — what is live right now, and therefore
             what a rollback would return to. */}
         {!isPublishing && !justPublished && !hasFailed && (
-        <section className={SECTION} aria-label="Last deploy">
+        <section className={`${SECTION} ${COLLAPSED_SECTION}`} aria-label="Last deploy">
           <CollapsibleTitle title="Last deploy" open={lastDeployOpen} onToggle={() => setLastDeployOpen((v) => !v)} />
           {!lastDeployOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-24"]} />
@@ -872,6 +872,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           naming what the publish replaces, the CTA sized to its label, and
           the gate's reason with its door beside it. A bordered white band on
           16px gutters with 10 above and below. */}
+      {/* 4418:97118 prints what the publish replaces ABOVE the footer's rule. */}
+      {!noPublishPath && !snapshot.loading && !snapshot.error ? (
+        <p className={`${META} tw:px-4 tw:pb-2`} data-testid="publish-footer-meta">
+          {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
+        </p>
+      ) : null}
       <div
         className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
         data-testid="publish-footer"
@@ -884,11 +890,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </Button>
         ) : (
           <>
-            {!snapshot.loading && !snapshot.error ? (
-              <p className={META} data-testid="publish-footer-meta">
-                {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
-              </p>
-            ) : null}
             <div className="tw:flex tw:items-center tw:gap-3">
               {/* Boards 781:4526 / 784:4287 draw "Button · disabled" as a grey
                   chip sized to its label, 28 tall. The remaining 50% dim is
@@ -899,7 +900,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   <Button
                     onClick={onRequestPublish}
                     disabled={ctaDisabled}
-                    className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                    /* 4418:97118 draws the blocked CTA as the accent at 40%, one
+                       line, 13px — not a grey chip. */
+                    className="tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:whitespace-nowrap tw:px-3 tw:py-1.5 tw:text-[13px] tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-white tw:disabled:opacity-40"
                     data-testid="publish-cta"
                   >
                     {/* One label, in every state. The board names the destination
@@ -930,6 +933,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   Connect Vercel
                 </Button>
               ) : null}
+              {/* 4418:97118: the gate's reason and door stack BESIDE the CTA. */}
+              {!isPublishing ? <PublishGateBanner nextMove={nextMove} composer={composer} /> : null}
             </div>
             {ctaReason ? (
               <p className="tw:m-0 tw:text-[11px] tw:leading-[1.4] tw:text-[var(--bk-ink-muted)]" data-testid="publish-cta-reason">
@@ -941,7 +946,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 {blocking.map((c) => c.detail).join(" ")}
               </p>
             )}
-            {!isPublishing ? <PublishGateBanner nextMove={nextMove} composer={composer} /> : null}
           </>
         )}
       </div>
@@ -974,7 +978,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 // Classes
 // ============================================
 
-const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-4";
+const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3";
+/* 4418:97118 stacks the two collapsible headers at a 28 pitch right under
+   RELEASE TO — they sit 4 apart, not a full section gap. */
+const COLLAPSED_SECTION = "tw:-mt-3";
 /* Board B3-10 sets these sections on the panel surface itself — no cards. */
 const SECTION = "tw:flex tw:flex-col tw:gap-0";
 /* The board's section label: 11px, uppercase, tracked, ink-muted. */
