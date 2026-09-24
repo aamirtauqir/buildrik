@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { installDomShims, makeFakeComposer, openPage, renderWorkspace } from "./brandWorkspaceHarness";
+import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
 
 /* The AI entry is gated on the SAME flag that decides whether an AIClient is
    built at all (useComposerInit.ts:132). Default the mock ON so the entry
@@ -267,5 +267,37 @@ describe("BrandWorkspace › dark preview chrome (T10)", () => {
     const utils = renderWorkspace(composer);
     utils.unmount();
     expect(composer.off).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
+  });
+});
+
+describe("BrandWorkspace › Component styles — a section row hands off to Add › Blocks", () => {
+  it("clean: closes Brand, switches to Add and asks for BLOCKS", () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    const utils = renderWorkspace(composer, { onClose });
+    act(() => openPage(utils, "component-styles"));
+    const row = utils.container.querySelector<HTMLElement>("[data-section-row]")!;
+    fireEvent.click(row);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
+    expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
+  });
+
+  it("dirty: the discard guard comes first; Keep editing stays, Discard goes", async () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    const utils = await renderOnRadius(composer, { onClose });
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    await waitFor(() => expect(utils.getByText("Unsaved brand changes")).toBeTruthy());
+    act(() => openPage(utils, "component-styles"));
+    fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(await utils.findByRole("button", { name: /Keep editing/ }));
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
+
+    fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
+    fireEvent.click(await utils.findByRole("button", { name: "Discard changes" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
   });
 });

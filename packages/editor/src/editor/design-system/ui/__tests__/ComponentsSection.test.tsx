@@ -1,65 +1,48 @@
 /**
- * ComponentsSection — Brand › Component styles, board 7316:82755 (C1 (ii)).
+ * ComponentsSection — Brand › Component styles, board 7316:82755.
  *
- * One card, a row per catalogue component ("Default appearance · N variants"),
- * then the saved components. The AI action moved to the workspace header —
- * its tests are in BrandWorkspace.pages.test.tsx.
+ * Owner ruling 2026-09-24: the page lists the SITE SECTIONS — the Add ›
+ * Blocks set (Hero, Features, Menu grid, …) — not UI controls. One card, a
+ * row per section: its name over "Default appearance", ending in a ›. A row
+ * hands off to its section (the workspace opens Add › Blocks). The AI action
+ * is the workspace header's (BrandWorkspace.pages.test.tsx).
  *
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ComponentsSection } from "../sections/ComponentsSection";
-import { CATALOG } from "../../../components-catalog/catalog";
+import { blockRows } from "@/editor/sidebar/tabs/build/catalog/groups";
 
-beforeEach(() => {
-  localStorage.clear();
-});
-
-describe("ComponentsSection — the Component styles card", () => {
-  it("renders a row per CATALOG entry inside one card", () => {
-    const { getByTestId } = render(<ComponentsSection composer={null} />);
-    const card = getByTestId("brand-components-list");
-    expect(card.querySelectorAll("[data-catalog-card]").length).toBe(CATALOG.length);
+describe("ComponentsSection — site sections", () => {
+  it("lists the Add › Blocks sections, in their order, and nothing else", () => {
+    const { getByTestId } = render(<ComponentsSection />);
+    const rows = getByTestId("brand-components-list").querySelectorAll("[data-section-row]");
+    expect(Array.from(rows).map((r) => r.getAttribute("data-section-row"))).toEqual(blockRows.map((b) => b.id));
+    const names = blockRows.map((b) => b.label);
+    for (const n of ["Hero", "Features", "Menu grid", "Footer", "Navbar"]) expect(names.some((x) => x.startsWith(n))).toBe(true);
+    // No UI controls (the old catalogue) and no saved components.
+    expect(getByTestId("brand-components-list").querySelector("[data-catalog-card],[data-saved-card]")).toBeNull();
   });
 
-  it("each row names the component over 'Default appearance · N variants'", () => {
-    const { getByTestId } = render(<ComponentsSection composer={null} />);
-    const first = CATALOG[0];
-    expect(getByTestId(`brand-comp-label-${first.id}`).textContent).toBe(first.name);
-    expect(getByTestId(`brand-comp-meta-${first.id}`).textContent).toMatch(/^Default appearance · \d+ variants?$/);
+  it("each row reads name over 'Default appearance' and ends in a ›", () => {
+    const { getByTestId } = render(<ComponentsSection />);
+    const first = blockRows[0];
+    const row = getByTestId(`brand-comp-row-${first.id}`);
+    expect(getByTestId(`brand-comp-label-${first.id}`).textContent).toBe(first.label);
+    expect(getByTestId(`brand-comp-meta-${first.id}`).textContent).toBe("Default appearance");
+    expect(row.textContent?.trim().endsWith("›")).toBe(true);
   });
 
-  it("counts instances in use when the composer reports them", () => {
-    const composer = {
-      components: {
-        getAllComponents: () => [],
-        getInstancesOfComponent: (id: string) => (id === CATALOG[0].id ? [1, 2] : []),
-      },
-    } as never;
-    const { getByTestId } = render(<ComponentsSection composer={composer} />);
-    expect(getByTestId(`brand-comp-meta-${CATALOG[0].id}`).textContent).toMatch(/· 2 in use$/);
-  });
-
-  it("lists saved components in the same card", () => {
-    const composer = {
-      components: {
-        getAllComponents: () => [{ id: "cmp-1", name: "Menu card" }],
-        getInstancesOfComponent: () => [1],
-      },
-    } as never;
-    const { container } = render(<ComponentsSection composer={composer} />);
-    const saved = container.querySelector('[data-saved-card="cmp-1"]');
-    expect(saved?.textContent).toMatch(/Menu card/);
-    expect(saved?.textContent).toMatch(/Saved component · 1 instance$/);
-  });
-
-  it("draws none of the drawer's furniture: no pinned AI strip, no read-only callout, no dead row buttons", () => {
-    const { container } = render(<ComponentsSection composer={null} />);
-    expect(container.querySelector("[data-ai-assist-cta]")).toBeNull();
-    expect(container.querySelector("[data-readonly-footer]")).toBeNull();
-    expect(container.querySelector("button")).toBeNull();
+  it("a row opens its section (click and Enter)", () => {
+    const onOpenSection = vi.fn();
+    const { getByTestId } = render(<ComponentsSection onOpenSection={onOpenSection} />);
+    const id = blockRows[1].id;
+    fireEvent.click(getByTestId(`brand-comp-row-${id}`));
+    fireEvent.keyDown(getByTestId(`brand-comp-row-${id}`), { key: "Enter" });
+    expect(onOpenSection).toHaveBeenCalledTimes(2);
+    expect(onOpenSection).toHaveBeenCalledWith(id);
   });
 });

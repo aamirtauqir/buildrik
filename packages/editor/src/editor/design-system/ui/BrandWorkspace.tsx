@@ -109,6 +109,7 @@ import { ClassesSection } from "./sections/ClassesSection";
 import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -596,19 +597,36 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   };
 
   // ─ The door out (7315:80955 KEY_D: if draft → 7317:80979, else → canvas) ─
-  const requestLeave = React.useCallback(() => {
+  /* What runs once the workspace has closed — a Component styles row's hand-
+     off to Add › Blocks. Held across the guard; Keep editing drops it. */
+  const afterLeaveRef = React.useRef<(() => void) | null>(null);
+  const requestLeave = React.useCallback((then?: () => void) => {
+    afterLeaveRef.current = then ?? null;
     if (isDirtyRef.current) {
       setGuardOpen(true);
       return;
     }
     onClose?.();
+    then?.();
   }, [onClose]);
 
   const handleGuardDiscard = () => {
     setGuardOpen(false);
     handleDiscard();
     onClose?.();
+    afterLeaveRef.current?.();
+    afterLeaveRef.current = null;
   };
+
+  /* Component styles (7316:82755) lists the Add › Blocks sections; a row
+     leaves Brand for Add with BLOCKS open, where that section lives. */
+  const openSectionInAdd = React.useCallback(() => {
+    requestLeave(() => {
+      if (!composer) return;
+      composer.emit?.(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+      requestInsertGroup(composer, "blocks");
+    });
+  }, [requestLeave, composer]);
 
   // Escape is the same door, guarded the same way. The dialogs own their own
   // Escape while they are up; an input keeps its own.
@@ -918,7 +936,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           />
         );
       case "component-styles":
-        return <ComponentsSection composer={composer} />;
+        return <ComponentsSection onOpenSection={openSectionInAdd} />;
       case "classes":
         return <ClassesSection composer={composer} />;
       case "presets":
@@ -1039,7 +1057,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             type="button"
             variant="link"
             className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
-            onClick={requestLeave}
+            onClick={() => requestLeave()}
             data-testid="brand-back-link"
           >
             <ChevronLeft size={12} aria-hidden />
@@ -1236,7 +1254,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       <BrandDiscardDialog
         open={guardOpen}
         count={totalDirty}
-        onKeepEditing={() => setGuardOpen(false)}
+        onKeepEditing={() => {
+          setGuardOpen(false);
+          afterLeaveRef.current = null;
+        }}
         onDiscard={handleGuardDiscard}
       />
 
