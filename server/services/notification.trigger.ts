@@ -8,6 +8,8 @@ interface CreateNotificationInput {
   actorId?: string;
   actorName?: string;
   actionUrl?: string;
+  /** The site this is about, when it is about one — the editor bell lists one site. */
+  siteId?: string;
   priority?: "high" | "medium" | "low";
 }
 
@@ -40,6 +42,7 @@ export async function createNotification(input: CreateNotificationInput) {
         actorId: input.actorId,
         actorName: input.actorName,
         actionUrl: input.actionUrl,
+        siteId: input.siteId,
         priority,
       },
     });
@@ -48,11 +51,17 @@ export async function createNotification(input: CreateNotificationInput) {
   }
 }
 
-export async function notifyWorkspaceOwner(workspaceId: string, type: string, message: string, actionUrl?: string) {
+export async function notifyWorkspaceOwner(
+  workspaceId: string,
+  type: string,
+  message: string,
+  actionUrl?: string,
+  siteId?: string,
+) {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
     select: { ownerId: true },
   });
   if (!workspace) return;
-  return createNotification({ userId: workspace.ownerId, type, message, actionUrl });
+  return createNotification({ userId: workspace.ownerId, type, message, actionUrl, siteId });
 }

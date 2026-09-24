@@ -60,6 +60,7 @@ export async function submitForm(
     "FORM_SUBMISSION_RECEIVED",
     `New form submission on "${site!.name}"`,
     `/dashboard/sites/${siteId}`,
+    siteId,
   ).catch(() => {});
 
   prisma.workspaceMember.findFirst({

@@ -36,5 +36,9 @@ export const listNotificationsSchema = z.object({
   filter: z.enum(["all", "unread", "mentions"]).default("all"),
 });
 
+/** Optional site scope for the bell reads. The editor passes its site
+ *  (decision 9: the editor bell lists this site only); the dashboard omits it. */
+export const notificationSiteScopeInput = z.object({ siteId: z.string().min(1) }).optional();
+
 export type NotificationData = z.infer<typeof notificationSchema>;
 export type ListNotificationsInput = z.infer<typeof listNotificationsSchema>;

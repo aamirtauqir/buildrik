@@ -796,12 +796,17 @@ model Notification {
   actorName String?
   message   String
   actionUrl String?
+  /// The site the notification is about, when it is about one (publish
+  /// outcome, form submission). Lets the editor's bell list this site only
+  /// (decision 9). No FK: a deleted site leaves history, not a cascade.
+  siteId    String?
   read      Boolean  @default(false)
   emailSent Boolean  @default(false)
   priority  String   @default("medium")
   createdAt DateTime @default(now())
 
   @@index([userId, read])
+  @@index([userId, siteId, createdAt])
   @@map("notifications")
 }
 

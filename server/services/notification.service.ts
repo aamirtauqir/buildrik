@@ -22,9 +22,11 @@ export async function listNotifications(userId: string, input: ListNotifications
   return { data, total, page, perPage };
 }
 
-export async function getUnreadCount(userId: string) {
+/* `siteId` narrows to one site's notifications — the editor's bell (decision
+   9: "this site"). Omitted = every notification the user has (the dashboard). */
+export async function getUnreadCount(userId: string, siteId?: string) {
   return prisma.notification.count({
-    where: { userId, read: false },
+    where: { userId, read: false, ...(siteId ? { siteId } : {}) },
   });
 }
 
@@ -38,9 +40,9 @@ export async function markAsRead(notificationId: string, userId: string, read = 
   });
 }
 
-export async function markAllAsRead(userId: string) {
+export async function markAllAsRead(userId: string, siteId?: string) {
   return prisma.notification.updateMany({
-    where: { userId, read: false },
+    where: { userId, read: false, ...(siteId ? { siteId } : {}) },
     data: { read: true },
   });
 }
@@ -65,9 +67,9 @@ export async function muteNotificationType(userId: string, type: string) {
   });
 }
 
-export async function getRecentNotifications(userId: string, limit = 5) {
+export async function getRecentNotifications(userId: string, siteId?: string, limit = 5) {
   return prisma.notification.findMany({
-    where: { userId },
+    where: { userId, ...(siteId ? { siteId } : {}) },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
