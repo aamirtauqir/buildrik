@@ -67,7 +67,12 @@ function renderTab(props = {}) {
   );
 }
 
+/* Locate › polls for the anchor for up to 5s (review/locate.ts). Real
+   timers let that poll outlive the file and throw `document is not defined`
+   after jsdom is torn down, which failed CI with every test green. Fake
+   timers that still advance keep waitFor working; afterEach drops the rest. */
 beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
   [fetchCurrentRound, fetchReviewComments, postReply, resolveReviewComment, revokeReview].forEach((m) => m.mockReset());
   fetchCurrentRound.mockResolvedValue(ROUND);
   fetchReviewComments.mockResolvedValue(COMMENTS);
@@ -75,7 +80,11 @@ beforeEach(() => {
   resolveReviewComment.mockResolvedValue(undefined);
   revokeReview.mockResolvedValue({ revoked: true });
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.clearAllTimers();
+  vi.useRealTimers();
+});
 
 describe("the frame every board shares (board 4418:115784)", () => {
   it("is one status line — counts and who it waits on; no progress bar, no round strip, no Compare button", async () => {

@@ -54,7 +54,9 @@ jobs:
   build-and-test:
     name: build + test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 15 → 25 on 2026-09-25: ~10,700 tests now (7,758 when set); the editor
+    # suite alone took 12m and the root suite was cancelled at the cap.
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -202,7 +204,8 @@ jobs:
     # Room for the conformance sweep as waves land. Revisit if a full run
     # approaches this; the escape hatch is per-surface scoping (see
     # docs/plans/2026-08-03-editor-figma-conformance.md).
-    timeout-minutes: 20
+    # 20 → 35 on 2026-09-25: Figma conformance alone ran 18m and hit the cap.
+    timeout-minutes: 35
 
     steps:
       - name: Checkout
