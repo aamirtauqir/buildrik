@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0.0] Code-gap Oct 1 — Editor v3 to Figma — 2026-09-24
+
+The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawers, inspector, canvas, CMS, media, publish and settings. Tracked row by row in `packages/editor/docs/plans/2026-09-23-c5-ledger.md`.
+
+### Added
+- Activity panel, page folders (personal + shared), draft share links (`/share/<token>`), viewer read-only editor, container links.
+- Publish confirm step, AI generate-a-block composer with daily quota, ⌘K "Jump to property", Pages / Records / Templates bands in ⌘K.
+- CMS workspace (fields, Configure dialogs, open-on-record), asset details rail, stock assets modal.
+
+### Changed
+- Layers delete: single = instant + Undo, multi = confirm. Escape closes right-column panels; Layers Escape is two-step.
+- Toasts, rail tooltips and selection toolbar are dark per the boards. History shows Saves (auto-versions), no Backups tab.
+- Canvas selection tag is a plain label; Select parent lives in the inspector ⋯, the ← key and Layers.
+
+### Fixed
+- Server authz: viewer media writes, `upload.presign` with no check, cross-site `pages.update`, `domains.check` writing DNS state before the site check, unsigned share password cookie.
+- Publish panel remounted the editor; 50× `siteVersions.get` load storm; migration rerun on every open; `darkValue` lost on save; nested headings; published sites missing their base font; Share creating duplicate links; CMS key rename / duplicate key.
+
+### Deploy
+- Run `prisma migrate deploy` BEFORE deploying: `20260924120000_page_folders`, `20260924140000_site_component_page_scope`.
+
 ## Buildrik DS V1 — 2026-04-19
 
 Supersedes Theme Unification V3 (which shipped ~65% complete). DS V1 delivers
