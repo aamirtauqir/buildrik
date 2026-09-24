@@ -74,6 +74,7 @@ export type SectionId =
   // Element tab
   | "link"
   | "content"
+  | "collection"
   | "element-properties"
   | "css-classes"
   // Effects tab

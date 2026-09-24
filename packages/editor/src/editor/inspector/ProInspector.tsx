@@ -11,6 +11,7 @@ import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { ScopeDropdown } from "./components/ScopeDropdown";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -319,7 +320,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     ? getElementIcon(selectedElement.type)
     : getElementIcon("default");
   const elementLabel = selectedElement?.type
-    ? selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)
+    ? (ELEMENT_TYPE_LABELS[selectedElement.type] ??
+      selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1))
     : "Element";
 
   // Multi-select short-circuit

@@ -821,3 +821,22 @@ button:hover > .bd-canvas-empty-cta__thumb {
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
 }
+
+/* G3-079 Collection list: records 2..N on the canvas are copies of the
+   template (record 1 renders into the real, editable children). Clicks and
+   hover pass through a copy to the list itself. */
+.buildrick-canvas [data-cms-repeater-clone] {
+  pointer-events: none;
+}
+
+/* An empty box inside a Collection list is the card's media slot, drawn as a
+   plain grey block on 4428:151488 — not the dashed "Drop a block here" strip,
+   which would repeat once per record. */
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty {
+  border: 0;
+}
+
+[data-buildrick-type="collection-list"] [data-buildrick-type="container"]:empty::after {
+  content: none;
+}
+

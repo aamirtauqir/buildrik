@@ -10,6 +10,7 @@ import { CSSClassesSection } from "../CSSClassesSection";
 import { ElementPropertiesSection } from "../elementProperties";
 import { LINKABLE_TYPES, LinkSection } from "../LinkSection";
 import { ContentSection } from "../ContentSection";
+import { CollectionListSection } from "../CollectionListSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
@@ -38,6 +39,22 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
       elementId: ctx.selectedElement.id,
       composer: ctx.composer ?? null,
       onOpenCreateCollection: ctx.onOpenCreateCollection,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
+  }),
+
+  /* G3-079 — the Collection list's binding: which collection its children
+     repeat over, and how many records. Only the collection-list profile
+     lists it. */
+  collection: defineSection({
+    tab: "element",
+    Component: CollectionListSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
       isOpen: ctx.isOpen,
       onToggle: ctx.onToggle,
       tier: ctx.tier,
