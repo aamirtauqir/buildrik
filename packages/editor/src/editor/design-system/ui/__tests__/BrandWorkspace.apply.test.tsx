@@ -65,7 +65,7 @@ describe("BrandWorkspace — pages", () => {
     expect(utils.getByTestId("brand-row-presets").getAttribute("aria-current")).toBe("page");
   });
 
-  it("lists the board's nav in its order, Styles included, the other kinds as one row", () => {
+  it("lists the board's nav in its order, Styles included, the other kinds on Spacing's switch", () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     /* The label cell only — Colours carries its palette count beside it. */
@@ -74,15 +74,16 @@ describe("BrandWorkspace — pages", () => {
     );
     expect(labels).toEqual([
       "Colours", "Colour mode", "Fonts & type styles", "Styles", "Component styles", "Classes",
-      "Presets", "Brand checks", "Starters", "Spacing", "Other tokens", "Import / export",
+      "Presets", "Brand checks", "Starters", "Spacing", "Import / export",
     ]);
     // No Beginner / Pro switch and no clean-state footer (7315:80955 draws neither).
     expect(utils.queryByText("Brand is up to date")).toBeNull();
     expect(utils.container.querySelector('[data-testid="brand-basic-note"]')).toBeNull();
-    fireEvent.click(utils.container.querySelector('[data-section-id="tokens"]')!);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Tokens");
+    fireEvent.click(utils.container.querySelector('[data-section-id="spacing"]')!);
     fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
-    expect((utils.getByTestId("brand-kind-switch") as HTMLSelectElement).value).toBe("kind-imagery");
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Imagery");
+    // Spacing stays the current nav row on a kind page.
+    expect(utils.getByTestId("brand-row-spacing").getAttribute("aria-current")).toBe("page");
   });
 
   it("editing a radius token surfaces the dirty signal (14-kind aggregation)", async () => {
@@ -94,7 +95,7 @@ describe("BrandWorkspace — pages", () => {
     });
     // The nav row for that kind carries the dot; the chip reads Draft.
     expect(
-      utils.getByTestId("brand-row-tokens").querySelector('[aria-label="unsaved changes"]'),
+      utils.getByTestId("brand-row-spacing").querySelector('[aria-label="unsaved changes"]'),
     ).toBeTruthy();
     expect(utils.getByText("Draft")).toBeTruthy();
   });

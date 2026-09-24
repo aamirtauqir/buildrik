@@ -313,7 +313,9 @@ export const SeoScreen: React.FC<ScreenProps> = ({
           <pre
             id="seo-robots"
             aria-labelledby="seo-robots-label"
-            className="tw:m-0 tw:min-w-0 tw:flex-1 tw:overflow-x-auto tw:whitespace-pre tw:rounded-lg tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+            /* 4418:127438: a 520-wide white box in the border hairline, not a
+               full-width tinted block. */
+            className="tw:m-0 tw:w-[520px] tw:max-w-full tw:flex-none tw:overflow-x-auto tw:whitespace-pre tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
           >
             {robotsPreview({ robotsTxt, allowIndexing, origin })}
           </pre>
