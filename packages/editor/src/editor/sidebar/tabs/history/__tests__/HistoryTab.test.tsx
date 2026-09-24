@@ -1,69 +1,12 @@
 /**
  * History Tab Tests — pencil screens 33-36
- * Covers: groupByDate helper, ActivityView error state, date group headers
+ * Covers: ActivityView error state
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
-import { groupByDate } from "../helpers";
 import { ActivityView } from "../components/ActivityView";
-
-// ── groupByDate helper tests ──────────────────────────────────────────────────
-
-describe("groupByDate", () => {
-  const now = Date.now();
-  const yesterday = now - 86400000;
-  const twoDaysAgo = now - 2 * 86400000;
-
-  it("groups today's items under 'Today'", () => {
-    const items = [{ timestamp: now, id: "a" }];
-    const groups = groupByDate(items);
-    expect(groups[0].label).toBe("Today");
-    expect(groups[0].items).toHaveLength(1);
-  });
-
-  it("groups yesterday's items under 'Yesterday'", () => {
-    const items = [{ timestamp: yesterday, id: "b" }];
-    const groups = groupByDate(items);
-    expect(groups[0].label).toBe("Yesterday");
-  });
-
-  it("groups older items under a locale date label (e.g. 'Apr 7')", () => {
-    const items = [{ timestamp: twoDaysAgo, id: "c" }];
-    const groups = groupByDate(items);
-    // Label should be a short date string, not Today/Yesterday
-    expect(groups[0].label).not.toBe("Today");
-    expect(groups[0].label).not.toBe("Yesterday");
-    // Should be a readable date like "Apr 7"
-    expect(groups[0].label).toMatch(/[A-Z][a-z]{2} \d+/);
-  });
-
-  it("returns multiple groups when items span different days", () => {
-    const items = [
-      { timestamp: now, id: "a" },
-      { timestamp: yesterday, id: "b" },
-    ];
-    const groups = groupByDate(items);
-    expect(groups).toHaveLength(2);
-    expect(groups[0].label).toBe("Today");
-    expect(groups[1].label).toBe("Yesterday");
-  });
-
-  it("groups multiple items under the same day label", () => {
-    const items = [
-      { timestamp: now, id: "a" },
-      { timestamp: now + 1000, id: "b" },
-    ];
-    const groups = groupByDate(items);
-    expect(groups).toHaveLength(1);
-    expect(groups[0].items).toHaveLength(2);
-  });
-
-  it("returns empty array for empty input", () => {
-    expect(groupByDate([])).toHaveLength(0);
-  });
-});
 
 // ── ActivityView error state ──────────────────────────────────────────────────
 

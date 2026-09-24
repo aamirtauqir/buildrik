@@ -25,7 +25,7 @@ import {
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button, useToast } from "@/editor/chrome-ui";
-import { SaveVersionModal } from "./version-history/SaveVersionModal";
+import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
@@ -109,15 +109,11 @@ export function VersionHistoryPanel({
     isLoading,
     loadError,
     retryLoad,
-    createVersion,
     restoreVersion,
     deleteVersion,
     compareVersions,
     updateAiSummary,
   } = useVersionHistory(composer);
-
-  // Save form state
-  const [showSaveForm, setShowSaveForm] = React.useState(false);
 
   // Restore / delete confirmation + in-flight state
   const [restoreConfirmId, setRestoreConfirmId] = React.useState<string | null>(null);
@@ -173,18 +169,6 @@ export function VersionHistoryPanel({
       setCurrentVisualSnapshot(composer.versions.captureVisualSnapshot());
     }
   }, [composer]);
-
-  // Save a version (board 4418:165661) — the modal owns the name; a failure
-  // rejects so the modal stays open with it.
-  const handleCreateVersion = async (name: string) => {
-    try {
-      await createVersion(name, "");
-      pushToast(`Saved '${name}'`, "success");
-    } catch (err) {
-      pushToast("Save failed", "error");
-      throw err;
-    }
-  };
 
   const handleRestoreClick = (versionId: string) => {
     setRestoreConfirmId(versionId);
@@ -420,30 +404,7 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-      {/* "+ Save a version" opens the modal (board 4418:165661). */}
-      <div className="fab-container" data-testid="saves-footer">
-        {/* Board 162:2 writes this as a labelled link at the foot of the
-            panel — "+ Save a version". It was a floating "+" circle with the
-            label only in a tooltip, so the one action that creates a NAMED
-            version (the kind the prune rule promises never to remove)
-            announced itself as an unlabelled dot. */}
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={() => setShowSaveForm(true)}
-          data-testid="saves-save-version"
-          className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
-        >
-          + Save a version
-        </Button>
-      </div>
-      <SaveVersionModal
-        open={showSaveForm}
-        siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}
-        onClose={() => setShowSaveForm(false)}
-        onSave={handleCreateVersion}
-      />
+      <SaveVersionFooter composer={composer} />
     </div>
   );
 }

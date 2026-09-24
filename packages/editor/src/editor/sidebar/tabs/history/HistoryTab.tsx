@@ -18,6 +18,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { ActivityLogView } from "./components/ActivityLogView";
@@ -462,6 +463,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         {(activeView === "session" || activeView === "saves") && savesSettled && (
           <SavesPruneNote composer={composer} view={activeView} />
         )}
+        {/* Saves draws this footer inside its own list; Session (4418:73791)
+            draws the same one under its rows. */}
+        {activeView === "session" && <SaveVersionFooter composer={composer} />}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       <ConfirmDialog

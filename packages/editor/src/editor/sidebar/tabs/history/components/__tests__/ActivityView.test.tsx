@@ -201,3 +201,50 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
     }
   });
 });
+
+/* Board 4418:73791 — the Session list is plain 44-tall rows: "label · author"
+   at the left, the time in mono at the right. No date bands, no badges, no
+   relative time, no keyboard-hint footer. The row still expands to its diff
+   and the time is still the (confirmed) restore. */
+describe("ActivityView — Session rows are board 4418:73791", () => {
+  it("draws label · author and the time, with none of the old row furniture", () => {
+    const restore = withHeight(400);
+    try {
+      setHistory([
+        entry({ id: "h2", label: "Hero copy edited", userId: "cmpa9ohx10000wrjux4ecumzo", timestamp: 1_700_000_100_000 }),
+        entry({ id: "h1", label: "Move heading" }),
+      ]);
+      const view = renderView();
+      expect(screen.getByTestId("history-change-label-0").textContent).toBe("Hero copy edited · You");
+      // the first row is not drawn highlighted before anything picks it
+      expect(screen.getByTestId("history-change-0").className).not.toMatch(/focused/);
+      expect(screen.getByTestId("history-change-label-1").textContent).toBe("Move heading");
+      expect(screen.getByTestId("history-change-time-0").textContent).toMatch(/\d{1,2}:\d{2}/);
+      expect(view.container.querySelector(".date-group-header")).toBeNull();
+      expect(view.container.querySelector(".keyboard-hints")).toBeNull();
+      expect(view.container.querySelector(".entry-badge")).toBeNull();
+      expect(screen.queryByText("Current")).toBeNull();
+      expect(screen.queryByText(/ago$|Just now/)).toBeNull();
+    } finally {
+      restore();
+    }
+  });
+
+  it("still expands a row to its changes", () => {
+    const restore = withHeight(400);
+    try {
+      setHistory([
+        entry({
+          id: "h1",
+          label: "Restyle",
+          changes: [{ property: "color", operation: "replace", type: "style", description: "color" }] as never,
+        }),
+      ]);
+      renderView();
+      fireEvent.click(screen.getByTestId("history-change-0"));
+      expect(screen.getByRole("region", { name: "Changes detail" })).toBeInTheDocument();
+    } finally {
+      restore();
+    }
+  });
+});

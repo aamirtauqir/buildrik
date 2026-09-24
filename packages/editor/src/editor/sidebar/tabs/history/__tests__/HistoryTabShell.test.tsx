@@ -110,6 +110,7 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
 }));
 
 import { HistoryTab } from "../HistoryTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 vi.mock("../../../../shell/PublishHistory", () => ({
   PublishHistory: ({ siteId }: { siteId: string }) => (
@@ -119,6 +120,7 @@ vi.mock("../../../../shell/PublishHistory", () => ({
 
 const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {}) =>
   render(
+    <ToastProvider>
     <HistoryTab
       composer={null}
       isExpanded={false}
@@ -127,6 +129,7 @@ const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {})
       onClose={() => {}}
       {...props}
     />
+    </ToastProvider>
   );
 
 /** Saves is the default view; this session's changes are the Session tab. */
@@ -169,6 +172,15 @@ describe("HistoryTab shell", () => {
     showChanges();
     expect(screen.getByTestId("activity-view")).toBeInTheDocument();
     expect(screen.queryByTestId("saves-panel")).toBeNull();
+  });
+
+  /* 4418:73791 ends the Session tab with the same "+ Save a version" footer
+     Saves carries — it was only on Saves. */
+  it("Session carries the + Save a version footer", () => {
+    renderTab();
+    expect(screen.getByTestId("saves-save-version")).toHaveTextContent("+ Save a version");
+    fireEvent.click(screen.getByTestId("saves-save-version"));
+    expect(screen.getByRole("dialog")).toHaveTextContent("Save a version");
   });
 
   it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {
