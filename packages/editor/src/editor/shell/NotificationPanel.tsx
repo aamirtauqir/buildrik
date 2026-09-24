@@ -16,6 +16,7 @@ import * as React from "react";
 import { EmptyState, PanelHeader, ROW_META_CLASS, Row, SkeletonBlock, Button, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
+import { AlertTriangle, Check, PenLine } from "lucide-react";
 import {
   fetchRecentNotifications,
   fetchUnreadCount,
@@ -66,8 +67,20 @@ function dayBand(iso: string | Date): string {
     .toUpperCase();
 }
 
-/** The dot carries the kind, the way the board colours it: a publish failure
- *  is not the same event as an approval. */
+/** Board 4418:140492: every row leads with its TYPE — ✓ for a site going
+ *  live or an approval, ▲ for a failure, a pen for anything someone wrote
+ *  (form submissions, comments, review replies). Unread is the tint and the
+ *  left accent bar, not a dot, so the glyph is free to say what happened. */
+function typeGlyph(type: string): { icon: React.ReactNode; label: string } {
+  if (/FAIL/i.test(type)) {
+    return { icon: <AlertTriangle size={12} className="tw:text-[var(--bk-error)]" />, label: "Failed" };
+  }
+  if (/SUCCESS|APPROV|LIVE|PUBLISHED/i.test(type)) {
+    return { icon: <Check size={12} className="tw:text-[var(--bk-success)]" />, label: "Done" };
+  }
+  return { icon: <PenLine size={12} className="tw:text-[var(--bk-ink-muted)]" />, label: "Update" };
+}
+
 /** Unread badge count, refreshable after a read lands. */
 export function useUnreadCount(): { count: number; refresh: () => void } {
   const [count, setCount] = React.useState(0);
@@ -186,7 +199,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
              button rendered directly above the "You're all caught up" empty
              state, offering to mark zero rows read. */
           state === "ready" && ordered.length > 0 ? (
-            <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+            <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[12px] tw:text-[var(--bk-accent)] tw:hover:underline">
               Mark all read
             </Button>
           ) : null
@@ -283,16 +296,16 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
                   The bar is painted by `.bk-notif-row--unread::before`, and the
                   word survives for screen readers, which is what the dot's
                   `label` was doing. */}
-              {n.read ? (
-                <span className="bk-notif-row__spacer" aria-hidden="true" />
-              ) : (
-                /* `role=img` + aria-label rather than a visually-hidden word:
-                   `bd-sr-only` clips text to a 1px box but does not hide it
-                   from a colour sweep, and ink-on-accent inside an 8px disc
-                   reported 2.87:1 — a contrast failure over text nobody can
-                   see. The accessible name is the same either way. */
-                <span className="bk-notif-row__dot" role="img" aria-label="Unread" />
-              )}
+              {/* Board 4418:140492: the type glyph leads every row; unread is
+                  the accent-tint ground and the 2px left bar (::before). */}
+              <span
+                className="bk-notif-row__icon"
+                role="img"
+                aria-label={`${typeGlyph(n.type).label}${n.read ? "" : ", unread"}`}
+                data-testid={`notifications-row-icon-${index}`}
+              >
+                {typeGlyph(n.type).icon}
+              </span>
               <span className="bk-notif-row__body">
                 <span className="bk-notif-row__text" data-testid={`notifications-row-text-${index}`}>
                   {n.actorName ? `${n.actorName} ` : ""}
@@ -350,7 +363,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
             className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]"
             onClick={seeAll}
           >
-            See all notifications
+            View all activity ›
           </Button>
         </div>
       ) : null}

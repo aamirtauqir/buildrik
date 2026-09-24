@@ -2,93 +2,74 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
-import { InputField } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
+import { PageCrumb, SnapshotFrame, pageLabel, type SnapshotPage } from "@/components/reviews/signoff-snapshot";
 
 /**
- * Every state of the client review page, per `2026-07-18-j5-signoff-wireframes.md`
- * §S5.5: A0 identify · A viewing · B commenting · C changes requested ·
- * D approved · E post-approval-edited · F dead link.
+ * Every state of the client review page — Figma family "Client sign-off":
+ *   A0 identify (no board — kept, restyled to the family's card)
+ *   A  viewing              4418:121903 (+ Menu 173613 / Contact 173649 snapshots)
+ *   B  commenting           4418:121999, send failed 4418:122170
+ *   C  changes requested    4418:121951
+ *   D  approved             4418:121939 (E, edited since approval, shares it)
+ *   F  dead link · revoked  4418:121971 (expired / not found / answered share it)
  *
  * Written for a restaurant owner who got a link from their designer. No account,
- * no jargon, and the two buttons that matter say what happens when you press them.
+ * no jargon, and the buttons that matter say what happens when you press them.
  */
 
-const DEAD_LINK_COPY: Record<string, { title: string; body: string }> = {
+const DEAD_LINK_COPY: Record<string, { title: string; body: (agency: string) => string }> = {
   EXPIRED: {
     title: "This link has expired",
-    body: "Review links work for 90 days. Ask your designer to send a new one — your earlier comments are still saved.",
+    body: () =>
+      "Review links work for 90 days. Ask your designer to send a new one — your earlier comments are still saved.",
   },
   REVOKED: {
-    title: "There's a newer version",
-    body: "Your designer sent an updated link, which replaced this one. Check your email for the most recent message.",
+    title: "This review link was revoked",
+    body: (agency) =>
+      `This link is no longer active. Ask ${agency} for a new one — your earlier notes are still with your designer.`,
   },
   NOT_FOUND: {
     title: "This link doesn't work",
-    body: "It may have been copied incompletely. Try clicking the link in your email again rather than pasting it.",
+    body: () =>
+      "It may have been copied incompletely. Try clicking the link in your email again rather than pasting it.",
   },
   CONFLICT: {
     title: "You've already answered this",
-    body: "This round is closed. If you have more to say, your designer can send a new round.",
+    body: () => "This round is closed. If you have more to say, your designer can send a new round.",
   },
 };
 
-/** The frozen site, rendered in a fully-sandboxed iframe (no scripts, unique
- *  origin) so the reviewed site's markup can never touch the review page. Shows
- *  the snapshot taken at send, never the live draft (contracts §1.6). Multi-page
- *  snapshots get a tab per page; a missing snapshot degrades to an honest note. */
-function SitePreview({ pages }: { pages: { path: string; html: string }[] | null }) {
-  const [active, setActive] = useState(0);
-  if (!pages || pages.length === 0) {
-    return (
-      <div className="flex h-[420px] items-center justify-center rounded-lg border border-dashed border-[#D1D5DB]">
-        <p className="text-[13px] text-[#6B7280]">Preview unavailable for this version.</p>
-      </div>
-    );
-  }
-  const idx = Math.min(active, pages.length - 1);
-  const label = (p: string) => p.replace(/\.html$/, "").replace(/^index$/, "Home") || "Home";
-  return (
-    <div className="overflow-hidden rounded-lg border border-[#E5E7EB]">
-      {pages.length > 1 ? (
-        <div className="flex gap-1 overflow-x-auto border-b border-[#E5E7EB] bg-[#F9FAFB] px-2 py-1.5">
-          {pages.map((p, i) => (
-            <button
-              key={p.path}
-              onClick={() => setActive(i)}
-              className={`shrink-0 rounded px-2.5 py-1 text-[12px] ${
-                i === idx ? "bg-white font-semibold text-[#111827] shadow-sm" : "text-[#6B7280]"
-              }`}
-            >
-              {label(p.path)}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      <iframe
-        title="Site preview"
-        srcDoc={pages[idx].html}
-        sandbox=""
-        className="h-[600px] w-full bg-white"
-      />
-    </div>
-  );
-}
+/* Text-only action (boards: "View the design", "Try this link again", "Back to
+   design") — the ghost Button with its border and fill taken away. `tw:`-
+   prefixed because it overrides flowbite's own (prefixed) theme classes, and
+   twMerge only resolves a conflict within one prefix. */
+const TEXT_ACTION =
+  "tw:border-transparent tw:bg-transparent tw:shadow-none tw:font-normal tw:text-[#111827] tw:hover:bg-[#F3F4F6]";
+/* The card and notes-row actions are 28px tall on every board that draws them
+   (4418:121951 / 121971 / 121999); the footer's pair is 36. */
+const COMPACT = "tw:h-7 tw:text-[13px]";
 
 function Shell({
   agency,
+  crumb,
+  round,
   children,
   footer,
 }: {
   agency: string;
+  crumb: React.ReactNode;
+  round: string | null;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
       {/* The agency's name leads, not ours. The client hired them, not us. */}
-      <header className="h-14 shrink-0 flex items-center gap-3 px-6 bg-white border-b border-[#E5E7EB]">
-        <span className="text-[13px] font-semibold text-[#111827]">{agency}</span>
-        <span className="text-[12px] text-[#6B7280]">is asking for your feedback</span>
+      <header className="h-14 shrink-0 flex items-center gap-8 px-6 bg-white border-b border-[#E5E7EB]">
+        <span className="text-[13px] font-medium text-[#111827]">{agency}</span>
+        <span className="flex-1 text-[12px] text-[#4B5563]">{crumb}</span>
+        {round ? <span className="pr-6 text-[12px] text-[#111827]">{round}</span> : null}
       </header>
       <main className="flex-1 flex flex-col">{children}</main>
       {/* Sticky, not static. At 1280x720 the two buttons this page exists for
@@ -112,15 +93,34 @@ function Shell({
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
+/** The family's message card (C · D · F): 440 wide, 120px under the header. */
+function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex-1 flex items-center justify-center p-6">
-      <div className="w-full max-w-[440px] rounded-lg border border-[#E5E7EB] bg-white p-8">
-        {children}
-      </div>
+    <div className="flex-1 flex justify-center px-6 pt-[120px]">
+      <div className="h-fit w-full max-w-[440px] rounded-lg border border-[#E5E7EB] bg-white p-6">{children}</div>
     </div>
   );
 }
+
+function CardText({ title, body }: { title: string; body: string }) {
+  return (
+    <>
+      <h1 className="text-[20px] font-semibold leading-7 text-[#111827]">{title}</h1>
+      <p className="mt-1 text-[13px] leading-5 text-[#4B5563]">{body}</p>
+    </>
+  );
+}
+
+const crumbOf = (...parts: React.ReactNode[]) => (
+  <>
+    {parts.map((p, i) => (
+      <span key={i}>
+        {i > 0 ? " · " : null}
+        {p}
+      </span>
+    ))}
+  </>
+);
 
 export function ReviewClient({ token }: { token: string }) {
   const review = trpc.clientReview.get.useQuery({ token }, { retry: false });
@@ -138,17 +138,22 @@ export function ReviewClient({ token }: { token: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [draft, setDraft] = useState("");
-  /* One confirm, two intents. Approve had a confirm and Request changes went
-     straight to the mutation — and Request changes is the terminal, no-way-back
-     one that carries the client's reasoning. */
-  const [asking, setAsking] = useState<"approve" | "changes" | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+  /* Where the client is. "auto" is the state's own screen — the snapshot (A)
+     while the round is open, the message card (C/D) once it is closed; the
+     other two are where the client chose to go from there. */
+  const [view, setView] = useState<"auto" | "snapshot" | "notes">("auto");
+  const [confirmApprove, setConfirmApprove] = useState(false);
+  /* 4418:122170: the change request did not land. Nothing is lost — the notes
+     stay, the draft stays — and the primary becomes "Send again". */
+  const [sendFailed, setSendFailed] = useState(false);
 
   if (review.isLoading) {
     return (
-      <Shell agency="Loading">
-        <Centered>
+      <Shell agency="Loading" crumb={null} round={null}>
+        <Card>
           <p className="text-[13px] text-[#6B7280]">Opening your review…</p>
-        </Centered>
+        </Card>
       </Shell>
     );
   }
@@ -161,16 +166,27 @@ export function ReviewClient({ token }: { token: string }) {
        alone made two of these four screens unreachable: the router maps EXPIRED
        and REVOKED to one FORBIDDEN on purpose, so both landed on the malformed
        copy and told a client with a perfectly well-formed link to click it
-       again. `cause.reason` is what the router now sends alongside it. */
-    const reason = (review.error.data?.cause as { reason?: string } | undefined)?.reason;
+       again. `cause.reason` is what the router sends alongside it — and, for a
+       revoked or expired link, the agency and round it belonged to. */
+    const cause = review.error.data?.cause as
+      | { reason?: string; agencyName?: string | null; roundNumber?: number }
+      | undefined;
     const code = review.error.data?.code ?? "NOT_FOUND";
-    const copy = DEAD_LINK_COPY[reason ?? ""] ?? DEAD_LINK_COPY[code] ?? DEAD_LINK_COPY.NOT_FOUND;
+    const copy = DEAD_LINK_COPY[cause?.reason ?? ""] ?? DEAD_LINK_COPY[code] ?? DEAD_LINK_COPY.NOT_FOUND;
     return (
-      <Shell agency="Buildrick">
-        <Centered>
-          <h1 className="text-[20px] font-semibold text-[#111827]">{copy.title}</h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">{copy.body}</p>
-        </Centered>
+      <Shell
+        agency={cause?.agencyName ?? "Buildrick"}
+        crumb="is asking for your feedback"
+        round={cause?.roundNumber ? `Round ${cause.roundNumber}` : null}
+      >
+        <Card>
+          <CardText title={copy.title} body={copy.body(cause?.agencyName ?? "your designer")} />
+          <div className="mt-4 flex gap-3">
+            <Button variant="ghost" size="sm" className={`${TEXT_ACTION} ${COMPACT}`} onClick={() => void review.refetch()}>
+              Try this link again
+            </Button>
+          </div>
+        </Card>
       </Shell>
     );
   }
@@ -179,23 +195,23 @@ export function ReviewClient({ token }: { token: string }) {
   // The agency (workspace) name leads the header — the client hired them, not us.
   // Falls back to a neutral label if the workspace has no name.
   const agency = data.agencyName ?? "Your design team";
-  const signedIn = Boolean(data.reviewer);
+  const round = data.roundNumber;
+  const pages: SnapshotPage[] = data.snapshotPages ?? [];
+  const activeIndex = Math.min(pageIndex, Math.max(pages.length - 1, 0));
+  const activePage = pages[activeIndex] ?? null;
+  const pageCrumb = <PageCrumb pages={pages} active={activeIndex} onPick={setPageIndex} />;
 
   // A0 · first visit. A signature, not a login — there is no password field
   // here and never will be. The email must match the one invited, so an
   // approval carries a name that means something in a dispute six weeks later.
-  if (!signedIn) {
+  if (!data.reviewer) {
     return (
-      <Shell agency={agency}>
-        <Centered>
-          <h1 className="text-[20px] font-semibold text-[#111827]">
-            {data.siteName} is ready for you to look at
-          </h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
-            Before you start, tell us who you are. This goes on your comments and
-            your approval so your designer knows who said what — it is not an
-            account, and there is no password.
-          </p>
+      <Shell agency={agency} crumb="is asking for your feedback" round={`Review round ${round}`}>
+        <Card>
+          <CardText
+            title={`${data.siteName} is ready for you to look at`}
+            body="Before you start, tell us who you are. This goes on your comments and your approval so your designer knows who said what — it is not an account, and there is no password."
+          />
           <form
             className="mt-6 flex flex-col gap-4"
             onSubmit={(e) => {
@@ -208,17 +224,10 @@ export function ReviewClient({ token }: { token: string }) {
           >
             <label className="flex flex-col gap-1.5">
               <span className="text-[12px] font-medium text-[#4B5563]">Your name</span>
-              <InputField
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                maxLength={120}
-              />
+              <InputField value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-medium text-[#4B5563]">
-                The email this link was sent to
-              </span>
+              <span className="text-[12px] font-medium text-[#4B5563]">The email this link was sent to</span>
               <InputField
                 type="email"
                 value={email}
@@ -227,240 +236,271 @@ export function ReviewClient({ token }: { token: string }) {
                 maxLength={320}
               />
             </label>
-            {identify.error ? (
-              <p className="text-[12px] text-[#E02424]">{identify.error.message}</p>
-            ) : null}
-            <button
-              type="submit"
-              disabled={identify.isPending}
-              className="h-10 rounded bg-[#1A56DB] text-[13px] font-semibold text-white disabled:opacity-40"
-            >
+            {identify.error ? <p className="text-[12px] text-[#E02424]">{identify.error.message}</p> : null}
+            <Button type="submit" disabled={identify.isPending}>
               {identify.isPending ? "One moment…" : `Look at ${data.siteName}`}
-            </button>
+            </Button>
           </form>
-        </Centered>
+        </Card>
       </Shell>
     );
   }
 
-  // D · approved, and E · approved but edited since. Both are terminal for the
-  // client; E exists because "approved" stops being true the moment the
+  const reviewer = data.reviewer;
+  const signedCrumb = crumbOf(data.siteName, pageCrumb, `Signed as ${reviewer.name}`);
+  const open = data.status === "PENDING";
+
+  const addNote = () =>
+    comment.mutate(
+      { token, body: draft },
+      {
+        onSuccess: () => {
+          setDraft("");
+          // Show the note we just posted — otherwise the page is write-only and
+          // the client can't tell it landed.
+          void utils.clientReview.comments.invalidate({ token });
+        },
+      },
+    );
+
+  /* The reason and the verdict were independent controls: typing did nothing
+     until "Add note" was clicked, so typing and then asking for changes closed
+     the round with the text discarded and no way back. On a sign-off product
+     the reason IS the deliverable, so an unsent draft is sent first and the
+     round only closes if it lands. */
+  const sendChangeRequest = () => {
+    setSendFailed(false);
+    const closeRound = () =>
+      resolve.mutate(
+        { token, status: "CHANGES_REQUESTED" },
+        {
+          onSuccess: () => {
+            setView("auto");
+            void utils.clientReview.get.invalidate();
+          },
+          onError: () => setSendFailed(true),
+        },
+      );
+    const note = draft.trim();
+    if (!note) return closeRound();
+    comment.mutate(
+      { token, body: note },
+      {
+        onSuccess: () => {
+          setDraft("");
+          void utils.clientReview.comments.invalidate({ token });
+          closeRound();
+        },
+        onError: () => setSendFailed(true),
+      },
+    );
+  };
+
+  const notesPanel = (
+    <aside className="flex h-[500px] w-[320px] shrink-0 flex-col rounded-lg border border-[#E5E7EB] bg-white p-4">
+      <p className="text-[13px] font-medium text-[#111827]">Your notes</p>
+      {comments.data && comments.data.length > 0 ? (
+        <ul className="mt-3 flex max-h-[180px] flex-col gap-2 overflow-y-auto">
+          {comments.data.map((c) => (
+            <li key={c.id} className="rounded-md bg-[#F3F4F6] px-3 py-3 text-[13px] leading-5 text-[#111827]">
+              <p className="whitespace-pre-wrap">{c.body}</p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder="Anything you'd like changed?"
+        aria-label="Your note"
+        maxLength={2000}
+        className="mt-3 h-[72px] w-full resize-none rounded-md border border-[#D1D5DB] px-3 py-2 text-[13px] text-[#111827] outline-none focus:border-[#1A56DB]"
+      />
+      <Button className="mt-3 tw:w-full" onClick={addNote} disabled={!draft.trim() || comment.isPending}>
+        {comment.isPending ? "Sending…" : "Add note"}
+      </Button>
+      {comment.error && !sendFailed ? (
+        <p className="mt-2 text-[12px] text-[#E02424]">{comment.error.message}</p>
+      ) : null}
+      {open && !draft.trim() && !(comments.data && comments.data.length > 0) ? (
+        /* No board draws an empty notes list (they all show notes). Sending
+           a change request with none means the designer is not told what to
+           change — say so, as the old confirm did. */
+        <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">
+          Your designer will not be told what to change unless you add a note.
+        </p>
+      ) : null}
+      {sendFailed ? (
+        <div role="alert" className="mt-3 rounded-md bg-[#FDE8E8] px-3 py-3">
+          <p className="text-[13px] font-medium text-[#C81E1E]">Your change request wasn&rsquo;t sent.</p>
+          <p className="mt-1 text-[12px] leading-5 text-[#4B5563]">
+            Nothing was lost — your notes are still here. Check your connection and send again.
+          </p>
+        </div>
+      ) : null}
+    </aside>
+  );
+
+  /* B · commenting — the page shrunk beside the notes (4418:121999). While the
+     round is open the notes lead to "Send change request"; once it is closed
+     (C's "Add another note") there is nothing left to send, only a way back. */
+  if (view === "notes") {
+    return (
+      <Shell agency={agency} crumb={signedCrumb} round={`Review round ${round}`}>
+        <div className="mx-auto flex w-full max-w-[1050px] flex-col pt-6">
+          <div className="flex gap-8">
+            <section className="flex h-[500px] flex-1 justify-center rounded-lg bg-white pt-2">
+              <SnapshotFrame page={activePage} scale={0.55} height={420} />
+            </section>
+            {notesPanel}
+          </div>
+          <div className="mt-8 flex items-center gap-3 pl-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`${TEXT_ACTION} ${COMPACT}`}
+              onClick={() => setView("auto")}
+            >
+              {open ? "Back to design" : "Back"}
+            </Button>
+            {open ? (
+              <Button
+                size="sm"
+                className={`${COMPACT} ${sendFailed ? "tw:min-w-[152px]" : ""}`}
+                onClick={sendChangeRequest}
+                disabled={resolve.isPending || comment.isPending}
+              >
+                {comment.isPending || resolve.isPending
+                  ? "Sending…"
+                  : sendFailed
+                    ? "Send again"
+                    : "Send change request"}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </Shell>
+    );
+  }
+
+  // D · approved, E · approved but edited since, C · changes requested. Terminal
+  // for the client; E exists because "approved" stops being true the moment the
   // designer touches the page again, and pretending otherwise is how a client
   // ends up feeling they signed off on something they never saw.
-  if (data.status !== "PENDING") {
+  if (!open && view === "auto") {
     const approved = data.status === "APPROVED";
     return (
-      <Shell agency={agency}>
-        <Centered>
-          <h1 className="text-[20px] font-semibold text-[#111827]">
-            {approved ? "You approved this" : "You asked for changes"}
-          </h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
-            {approved
-              ? data.editedSinceApproval
-                ? /* State E. The page's doc comment has claimed this state since
-                     it shipped; the payload only started carrying the flag on
-                     2026-08-28. Without it a returning client was congratulated
-                     about a version that no longer exists. */
-                  `Heads up — ${agency} has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.`
-                : `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
-              : `Your notes are with your designer. They'll send a new link when the changes are ready for you.`}
-          </p>
-          <p className="mt-4 text-[12px] text-[#6B7280]">
-            Signed as {data.reviewer!.name} · {data.reviewer!.email}
-          </p>
-        </Centered>
+      /* No snapshot on this screen, so the page is named, not switchable. */
+      <Shell
+        agency={agency}
+        crumb={crumbOf(data.siteName, activePage ? pageLabel(activePage.path) : "Home", `Signed as ${reviewer.name}`)}
+        round={approved ? `Round ${round}` : `Review round ${round}`}
+      >
+        <Card>
+          <CardText
+            title={approved ? "You approved this" : "You asked for changes"}
+            body={
+              approved
+                ? data.editedSinceApproval
+                  ? /* State E. The payload carries the flag since 2026-08-28;
+                       without it a returning client was congratulated about a
+                       version that no longer exists. */
+                    `Heads up — ${agency} has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.`
+                  : `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
+                : "Your notes are with your designer. They'll send a new link when the changes are ready for you."
+            }
+          />
+          <div className="mt-4 flex gap-3">
+            <Button variant="ghost" size="sm" className={`${TEXT_ACTION} ${COMPACT}`} onClick={() => setView("snapshot")}>
+              {approved ? "View what you approved" : "View the design"}
+            </Button>
+            {approved ? null : (
+              <Button size="sm" className={COMPACT} onClick={() => setView("notes")}>
+                Add another note
+              </Button>
+            )}
+          </div>
+        </Card>
       </Shell>
     );
   }
 
-  // A · viewing, B · commenting. The site preview is the remaining piece: the
-  // client must see the SNAPSHOT frozen when the link was sent, not the live
-  // draft (contracts §1.6), so this cannot just embed the current site.
+  // A · viewing (4418:121903) — and, for a closed round, the same snapshot with
+  // only a way back. The client must see the SNAPSHOT frozen when the link was
+  // sent, not the live draft (contracts §1.6), so this cannot embed the site.
+  const approveLine = `${reviewer.name} · Approve Round ${round}${data.changeSummary ? `: ${data.changeSummary}` : "."}`;
   return (
     <Shell
       agency={agency}
+      crumb={crumbOf(data.siteName, pageCrumb, open ? "Review snapshot" : `Signed as ${reviewer.name}`)}
+      round={`Review round ${round}`}
       footer={
         <div className="mx-auto flex w-full max-w-[1100px] items-center gap-3">
-          <p className="flex-1 text-[12px] text-[#6B7280]">
-            Signed as {data.reviewer!.name}. You are looking at the version sent to
-            you {new Date(data.sentAt).toLocaleDateString()} — later edits will not
-            change it.
+          <p className="flex-1 text-[12px] leading-5 text-[#4B5563]">
+            {open
+              ? `${approveLine} Approval applies to this sent snapshot only — later draft edits are excluded.`
+              : `Signed as ${reviewer.name} · the version sent to you ${new Date(data.sentAt).toLocaleDateString()}.`}
           </p>
-          <button
-            onClick={() => setAsking("changes")}
-            disabled={resolve.isPending}
-            className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827] disabled:opacity-40"
-          >
-            Request changes
-          </button>
-          <button
-            onClick={() => setAsking("approve")}
-            disabled={resolve.isPending}
-            className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
-          >
-            Approve this design
-          </button>
+          {open ? (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setView("notes")} disabled={resolve.isPending}>
+                Request changes
+              </Button>
+              <Button size="sm" className="tw:min-w-[157px]" onClick={() => setConfirmApprove(true)} disabled={resolve.isPending}>
+                Approve Round {round}
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setView("auto")}>
+              Back
+            </Button>
+          )}
         </div>
       }
     >
-      <div className="mx-auto flex w-full max-w-[1100px] flex-1 gap-6 p-6">
-        <section className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-8">
-          {data.changeSummary ? (
-            <div className="mb-6 rounded-lg bg-[#F3F4F6] px-4 py-3">
-              <p className="text-[12px] font-semibold text-[#111827]">What&rsquo;s new</p>
-              <p className="mt-1 text-[13px] text-[#4B5563]">{data.changeSummary}</p>
-            </div>
-          ) : null}
-          {/* The site frozen at send, rendered by the editor's ExportEngine and
-              stored on the review request. ExportEngine runs in the editor (not
-              Next), so the HTML is produced at send time and served here as a
-              static, sandboxed snapshot — never the live draft (contracts §1.6). */}
-          <SitePreview pages={data.snapshotPages} />
-        </section>
-
-        <aside className="w-[320px] shrink-0 rounded-lg border border-[#E5E7EB] bg-white">
-          <div className="border-b border-[#E5E7EB] px-4 py-3">
-            <p className="text-[13px] font-semibold text-[#111827]">Your notes</p>
-          </div>
-          <div className="p-4">
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Anything you'd like changed?"
-              maxLength={2000}
-              className="h-28 w-full resize-none rounded border border-[#D1D5DB] p-3 text-[13px] outline-none focus:border-[#1A56DB]"
-            />
-            <button
-              onClick={() =>
-                comment.mutate(
-                  { token, body: draft },
-                  {
-                    onSuccess: () => {
-                      setDraft("");
-                      // Show the note we just posted — otherwise the page is
-                      // write-only and the client can't tell it landed.
-                      void utils.clientReview.comments.invalidate({ token });
-                    },
-                  },
-                )
-              }
-              disabled={!draft.trim() || comment.isPending}
-              className="mt-3 h-9 w-full rounded bg-[#1A56DB] text-[13px] font-semibold text-white disabled:opacity-40"
-            >
-              {comment.isPending ? "Sending…" : "Add note"}
-            </button>
-            {comment.error ? (
-              <p className="mt-2 text-[12px] text-[#E02424]">{comment.error.message}</p>
-            ) : null}
-            {comments.data && comments.data.length > 0 ? (
-              <ul className="mt-4 space-y-3 border-t border-[#E5E7EB] pt-4">
-                {comments.data.map((c) => (
-                  <li key={c.id} className="text-[13px] leading-relaxed text-[#374151]">
-                    <p className="whitespace-pre-wrap">{c.body}</p>
-                    <p className="mt-1 text-[11px] text-[#9CA3AF]">
-                      {new Date(c.createdAt).toLocaleString()}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        </aside>
+      <div className="mt-4 mb-3 flex-1 bg-white pt-4">
+        <SnapshotFrame page={activePage} height={600} />
       </div>
 
       {/* Approval is the signature the whole product exists to collect, so it
           is the one action that asks twice — and the confirm says what it means
-          rather than "Are you sure?". */}
-      {asking ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.4)] p-6">
-          <div className="w-full max-w-[440px] rounded-lg bg-white p-6">
-            <h2 className="text-[16px] font-semibold text-[#111827]">
-              {asking === "approve"
-                ? `Approve ${data.siteName}?`
-                : `Request changes to ${data.siteName}?`}
-            </h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
-              {asking === "approve"
-                ? "This tells your designer the design is settled and they can put it live. You are approving the version you have been looking at."
-                : draft.trim()
-                  ? "Your note below is sent with this, so your designer knows what to change. This closes the round and you cannot reopen it."
-                  : "Your designer will not be told what to change, because you have not written a note. This closes the round and you cannot reopen it."}
-            </p>
-            {comment.error && asking === "changes" ? (
-              /* The note failed, so the round was NOT closed — saying nothing
-                 here would look like the button was simply dead. */
-              <p className="mt-3 text-[12px] text-[#E02424]">
-                Your note could not be sent, so nothing was submitted: {comment.error.message}
-              </p>
-            ) : null}
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setAsking(null)}
-                className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827]"
-              >
-                {asking === "approve" ? "Not yet" : "Go back"}
-              </button>
-              <button
-                onClick={() => {
-                  if (asking === "approve") {
-                    resolve.mutate(
-                      { token, status: "APPROVED" },
-                      {
-                        onSuccess: () => {
-                          setAsking(null);
-                          utils.clientReview.get.invalidate();
-                        },
-                      },
-                    );
-                    return;
-                  }
-                  /* The reason and the verdict were independent controls:
-                     typing did nothing until "Add note" was clicked, so typing
-                     and then clicking Request changes closed the round with the
-                     text discarded and no way back. On a sign-off product the
-                     reason IS the deliverable, so it is sent first and the
-                     round only closes if it lands. */
-                  const closeRound = () =>
-                    resolve.mutate(
-                      { token, status: "CHANGES_REQUESTED" },
-                      {
-                        onSuccess: () => {
-                          setAsking(null);
-                          utils.clientReview.get.invalidate();
-                        },
-                      },
-                    );
-                  const note = draft.trim();
-                  if (!note) return closeRound();
-                  comment.mutate(
-                    { token, body: note },
-                    {
-                      onSuccess: () => {
-                        setDraft("");
-                        void utils.clientReview.comments.invalidate({ token });
-                        closeRound();
-                      },
+          rather than "Are you sure?". No board draws it; the behaviour stays. */}
+      <Modal
+        open={confirmApprove}
+        onClose={() => setConfirmApprove(false)}
+        title={`Approve ${data.siteName}?`}
+        width={440}
+        footer={
+          <div className="flex justify-end gap-3">
+            <Button variant="ghost" onClick={() => setConfirmApprove(false)}>
+              Not yet
+            </Button>
+            <Button
+              disabled={resolve.isPending}
+              onClick={() =>
+                resolve.mutate(
+                  { token, status: "APPROVED" },
+                  {
+                    onSuccess: () => {
+                      setConfirmApprove(false);
+                      setView("auto");
+                      void utils.clientReview.get.invalidate();
                     },
-                  );
-                }}
-                disabled={resolve.isPending || comment.isPending}
-                className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
-              >
-                {asking === "approve"
-                  ? resolve.isPending
-                    ? "Approving…"
-                    : "Yes, approve"
-                  : comment.isPending
-                    ? "Sending your note…"
-                    : resolve.isPending
-                      ? "Submitting…"
-                      : "Send and request changes"}
-              </button>
-            </div>
+                  },
+                )
+              }
+            >
+              {resolve.isPending ? "Approving…" : "Yes, approve"}
+            </Button>
           </div>
-        </div>
-      ) : null}
+        }
+      >
+        <p className="text-[13px] leading-relaxed text-[#4B5563]">
+          This tells your designer the design is settled and they can put it live. You are approving the
+          version you have been looking at.
+        </p>
+        {resolve.error ? <p className="mt-3 text-[12px] text-[#E02424]">{resolve.error.message}</p> : null}
+      </Modal>
     </Shell>
   );
 }

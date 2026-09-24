@@ -66,6 +66,9 @@ export interface LeftSidebarProps {
   activeSubTab?: string;
   onTabChange: (tab: GroupedTabId) => void;
   drawerOpen: boolean;
+  /** The active tab renders in the right column (Publish · Review · History),
+   *  so the drawer must not mount a second, hidden copy of it. */
+  hostedInColumn?: boolean;
   onDrawerToggle: () => void;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
@@ -370,6 +373,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   activeSubTab,
   onTabChange,
   drawerOpen,
+  hostedInColumn = false,
   onDrawerToggle,
   isExpanded: controlledExpanded,
   onExpandToggle: controlledExpandToggle,
@@ -679,6 +683,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 sub-tab (⋯ → Publish history while History is already open)
                 must remount so the tab re-reads its initial screen. */}
             <div key={`${activeTab}:${activeSubTab ?? ""}`} className="ls-panel-animate">
+              {hostedInColumn ? null : (
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
                   activeTab={activeTab}
@@ -699,6 +704,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onCreateCollection={onCreateCollection}
                 />
               </React.Suspense>
+              )}
             </div>
           </InspectorErrorBoundary>
         </div>

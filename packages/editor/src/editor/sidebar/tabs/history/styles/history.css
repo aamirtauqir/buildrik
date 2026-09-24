@@ -30,43 +30,35 @@
    and resolves off Inter's own metrics. */
 .view-switcher {
   display: flex;
+  align-items: center;
+  gap: var(--bk-space-4);
   height: var(--bk-space-40);
-  /* `border: 0 solid <colour>` then a bottom WIDTH, rather than the shorthand
-     `border-bottom: 1px solid <colour>`. Same paint, but the element's
-     border-COLOR is now the board's on all four edges — and border-top-color
-     is what a computed-style read reports, so the shorthand made this rule
-     unmeasurable (it read `var(--bk-gray-900)`, the inherited `color`). */
   border: 0 solid var(--bk-border);
-  border-bottom-width: 1px;
-  /* The board fills it bg-panel. It had no fill of its own and showed whatever
-     the host painted behind the panel. */
   background: var(--bk-bg-panel);
   padding: 0 var(--bk-space-12);
 }
 
-/* Board 4418:73791 — four plain labels (Session · Saves · Published, plus
-   B6's Activity) sharing the drawer's width. The 16 inset and the helper
-   line under each label were the two-tab design; with four they ran
-   Activity off the 280 drawer. */
+/* Board 4418:73791 — pill tabs: 28 tall, the active one a gray-100 pill in
+   ink, the rest muted text. No underline. Session · Saves · Published ·
+   Activity (Saves holds the board's Backups slot, owner decision). */
 .view-tab {
   display: flex;
   flex: 1 1 0;
   min-width: 0;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--bk-space-4);
+  height: var(--bk-space-28);
+  padding: 0 var(--bk-space-8);
   font-size: 13px;
   line-height: normal;
   font-weight: 400;
-  /* 1657:7155 — the inactive tab is ink-MUTED (`var(--bk-gray-500)`); it was ink-soft. */
   color: var(--bk-ink-muted);
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  border-radius: var(--bk-radius-md);
   cursor: pointer;
   font-family: inherit;
-  transition: color 150ms ease-out, border-color 150ms ease-out;
+  transition: color 150ms ease-out, background-color 150ms ease-out;
 }
 
 .view-tab:hover {
@@ -74,9 +66,9 @@
 }
 
 .view-tab.active {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--bk-ink);
-  border-bottom-color: var(--bk-accent);
+  background: var(--bk-gray-100);
 }
 
 /* 1657:7162 — 53 tall, which is 8 + the 36 box + 8 + the rule. It was 46,
@@ -641,121 +633,6 @@
 .fab svg {
   width: 20px;
   height: 20px;
-}
-
-.save-form {
-  margin: 0 var(--bk-space-8) var(--bk-space-8);
-  padding: var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  display: none;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  animation: slideUp 200ms ease-out;
-}
-
-.save-form.open {
-  display: flex;
-}
-
-@keyframes slideUp{
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }}
-
-.form-row {
-  display: flex;
-  gap: var(--bk-space-8);
-  align-items: flex-start;
-}
-
-.form-field {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-4);
-}
-
-.form-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--bk-ink-soft);
-}
-
-.form-input {
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-sm);
-  padding: 7px 10px;
-  font-size: 13px;
-  color: var(--bk-ink);
-  font-family: inherit;
-  transition: border-color 150ms ease-out;
-  outline: none;
-}
-
-.form-input::placeholder {
-  color: var(--bk-ink-muted);
-}
-
-.form-input:focus {
-  border-color: var(--bk-accent);
-}
-
-.form-input.error {
-  border-color: var(--bk-error);
-}
-
-.form-hint {
-  font-size: 11px;
-  color: var(--bk-ink-muted);
-  align-self: flex-end;
-}
-
-.save-btn {
-  padding: 7px var(--bk-space-16);
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  border: none;
-  border-radius: var(--bk-radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 150ms ease-out;
-  white-space: nowrap;
-}
-
-.save-btn:hover {
-  background: var(--bk-accent-hover);
-}
-
-.save-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  padding: 7px var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-soft);
-  border: none;
-  border-radius: var(--bk-radius-sm);
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 150ms ease-out;
-}
-
-.cancel-btn:hover {
-  background: var(--bk-gray-200);
-  color: var(--bk-ink);
 }
 
 /* Board 168:82: an empty diff view reads as broken, so the empty case says

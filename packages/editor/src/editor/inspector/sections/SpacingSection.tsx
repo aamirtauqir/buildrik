@@ -143,9 +143,8 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       tier={tier}
       id="inspector-section-spacing"
     >
-      {/* Board 32:2 / 807:8342 — Padding as one row of two numbers (vertical,
-          horizontal), Gap under it, Margin as the shorthand it usually is
-          ("0 auto"). The four-side box that used to lead this section is a
+      {/* Board 4428:141170 — Padding as one row of two numbers (vertical,
+          horizontal), Gap under it. The four-side box that used to lead this section is a
           good editor and a 150px one; it holds the per-side case, which is
           the rarer one, and moved behind More settings with it. */}
       <div className="bdi-row-ctrl" role="group" aria-label="Padding">
@@ -179,34 +178,36 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         placeholder="0"
       />
 
-      <div className="bdi-row-ctrl" role="group" aria-label="Margin">
-        <label className="bdi-lb">Margin</label>
-        <div className="bdi-pair">
-          <div className="tw:relative">
-            <MixedValueIndicator prop="margin" mixedKeys={mixedKeys} />
-            <InputWithUnit
-              label=""
-              ariaLabel="Margin top and bottom"
-              value={marginValues.top || ""}
-              onChange={(v) => onBatchChange({ "margin-top": v, "margin-bottom": v })}
-              placeholder="0"
-            />
-          </div>
-          <span className="bdi-pair-sep" aria-hidden="true" />
-          <InputWithUnit
-            label=""
-            ariaLabel="Margin left and right"
-            value={marginValues.left || ""}
-            onChange={(v) => onBatchChange({ "margin-left": v, "margin-right": v })}
-            units={["px", "%", "rem", "auto"]}
-            placeholder="0"
-          />
-        </div>
-      </div>
-
-      {/* ─── Advanced: per-side box, row-gap, column-gap ─── */}
+      {/* ─── Advanced: margin, per-side box, row-gap, column-gap ───
+          Board 4428:141170 draws SPACING as Padding + Gap only; Margin moved
+          behind More settings with the per-side box. */}
       {advancedExpanded && (
         <>
+          <div className="bdi-row-ctrl" role="group" aria-label="Margin">
+            <label className="bdi-lb">Margin</label>
+            <div className="bdi-pair">
+              <div className="tw:relative">
+                <MixedValueIndicator prop="margin" mixedKeys={mixedKeys} />
+                <InputWithUnit
+                  label=""
+                  ariaLabel="Margin top and bottom"
+                  value={marginValues.top || ""}
+                  onChange={(v) => onBatchChange({ "margin-top": v, "margin-bottom": v })}
+                  placeholder="0"
+                />
+              </div>
+              <span className="bdi-pair-sep" aria-hidden="true" />
+              <InputWithUnit
+                label=""
+                ariaLabel="Margin left and right"
+                value={marginValues.left || ""}
+                onChange={(v) => onBatchChange({ "margin-left": v, "margin-right": v })}
+                units={["px", "%", "rem", "auto"]}
+                placeholder="0"
+              />
+            </div>
+          </div>
+
           {/* Link-all-sides toggles. When linked, editing one side applies to
               all four (margin or padding). */}
           <div style={{ display: "flex", gap: 4, margin: "6px 0" }}>
@@ -282,7 +283,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
-          advancedCount={4}
+          advancedCount={5}
         />
       )}
     </Section>

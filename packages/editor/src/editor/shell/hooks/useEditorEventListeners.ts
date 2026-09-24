@@ -47,14 +47,12 @@ export interface UseEditorEventListenersOptions {
   state: EditorEventListenerStateSetters;
   /** Tracks whether the user has manually toggled spacing indicators
    *  (so we don't clobber their choice when overlay defaults arrive). */
-  hasManuallyToggledSpacingRef: React.MutableRefObject<boolean>;
 }
 
 export function useEditorEventListeners({
   composer,
   modals,
   state,
-  hasManuallyToggledSpacingRef,
 }: UseEditorEventListenersOptions): void {
   // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
   const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate, toggleShortcuts } = modals;
@@ -221,7 +219,9 @@ export function useEditorEventListeners({
     if (!composer?.canvas.indicators) return;
     const overlay = composer.canvas.indicators.getOverlay();
     setShowSpacingIndicators(
-      overlay.showSpacing ?? !hasManuallyToggledSpacingRef.current,
+      /* Off unless asked for: board 5936:44788 draws a selection with no
+         padding overlay. View › Spacing still turns it on. */
+      overlay.showSpacing ?? false,
     );
     setShowBadges(overlay.showBadges ?? false);
     setShowGuides(overlay.showGuides ?? true);
@@ -232,6 +232,5 @@ export function useEditorEventListeners({
     setShowBadges,
     setShowGuides,
     setShowGrid,
-    hasManuallyToggledSpacingRef,
   ]);
 }

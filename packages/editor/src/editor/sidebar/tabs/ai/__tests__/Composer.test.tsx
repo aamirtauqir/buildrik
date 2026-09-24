@@ -8,7 +8,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={onSubmit}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
@@ -23,7 +22,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={onSubmit}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
@@ -37,7 +35,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );
@@ -46,21 +43,15 @@ describe("Composer", () => {
   });
 
   it("the primary reads 'Plan changes' (board 4418:104454)", () => {
-    render(<Composer onSubmit={vi.fn()} onStop={vi.fn()} streaming={false} />);
+    render(<Composer onSubmit={vi.fn()} streaming={false} />);
     expect(screen.getByRole("button", { name: "Plan changes" })).toHaveTextContent("Plan changes");
   });
 
-  it("send button flips to stop while streaming and calls onStop", () => {
-    const onStop = vi.fn();
-    render(
-      <Composer
-        onSubmit={vi.fn()}
-        onStop={onStop}
-        streaming={true}
-      />,
-    );
-    fireEvent.click(screen.getByLabelText(/stop/i));
-    expect(onStop).toHaveBeenCalled();
+  /* Board 4418:104577: while a run is live the field shows only the prompt;
+     Stop is the button under the Thinking band (AgentPlan). */
+  it("shows no button in the field while streaming", () => {
+    render(<Composer onSubmit={vi.fn()} streaming={true} />);
+    expect(screen.queryByRole("button")).toBeNull();
   });
 
   /* Board 4418:106919: "Your prompt is still here". AITab remounts the
@@ -69,7 +60,6 @@ describe("Composer", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
-        onStop={vi.fn()}
         streaming={false}
       />,
     );

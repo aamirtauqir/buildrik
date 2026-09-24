@@ -262,14 +262,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           saveAsComponentContext?.selectionIds[0] ??
           null
         }
-        selectionContext={
-          saveAsComponentContext
-            ? {
-                selectionIds: saveAsComponentContext.selectionIds,
-                extractedBindings: saveAsComponentContext.extractedBindings,
-              }
-            : undefined
-        }
       />
 
       {/* CMS Collection Setup Modal (WS-14a) */}

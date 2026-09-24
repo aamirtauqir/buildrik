@@ -11,7 +11,7 @@
 import * as React from "react";
 import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
+import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
 import {
   containerStyles,
@@ -24,6 +24,7 @@ import { useComponentsState } from "./component-library/useComponentsState";
 
 import "./component-library/ComponentsTab.css";
 export type { ComponentsTabProps };
+
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
@@ -315,12 +316,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           state.confirmDeleteAction();
           addToast({ description: `"${name}" deleted`, tone: "warning", duration: 4000 });
         }}
-        /* Board 183:2 — the title asks the question and names the thing, the
-           button names the act. "Are you sure you want to…" in the body
-           repeated the question the title had already asked. */
-        title={`Delete "${state.confirmDelete?.name}"?`}
-        message="Instances already placed keep their content; they stop following this component. This cannot be undone."
-        confirmLabel="Delete component"
+        {...componentDeleteCopy(
+          state.confirmDelete?.name ?? "",
+          (state.confirmDelete && composer?.components?.getInstancesOfComponent?.(state.confirmDelete.id)?.length) || 0,
+        )}
+        confirmLabel="Delete"
         tone="destructive"
       />
       <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>

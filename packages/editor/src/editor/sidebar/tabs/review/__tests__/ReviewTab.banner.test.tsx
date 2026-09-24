@@ -91,14 +91,13 @@ const mount = (composer: unknown = makeComposer(), props: Record<string, unknown
   );
 
 describe("the banner — when the board's band exists", () => {
-  it("shows the count and the walk; Compare and Re-send are the panel's own", async () => {
+  it("shows the count and the walk; Re-send is the panel's own", async () => {
     fetchCurrentRound.mockResolvedValue(round());
     fetchReviewComments.mockResolvedValue([comment(), comment({ id: "c2" }), comment({ id: "c3" })]);
     mount();
     expect(await screen.findByTestId("review-banner")).toBeTruthy();
     expect(screen.getByTestId("review-banner-line").textContent).toBe("3 open");
     expect(screen.getByRole("button", { name: "Next ›" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Compare with approved" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Re-send for review" })).toBeTruthy();
   });
 
