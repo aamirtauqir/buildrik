@@ -1,3 +1,4 @@
+import { isTokenVar, resolveTokenVar } from "../../shared/tokenBindingDetection";
 import { Popover, Button } from "@/editor/chrome-ui";
 /**
  * FontControls - Font weight, style, and decoration controls
@@ -19,7 +20,6 @@ import { useTypeRegistry } from "../../../design-system/state/TokenRegistryConte
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator, labelTestId, rowTestId } from "../../shared/controls";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_SLOT, CHAIN_TRIGGER } from "../../shared/controls/controlClasses";
-import { getCssVariable } from "@/shared/utils/getCssVariable";
 // Font weight options
 export const FONT_WEIGHTS = [
   { value: "100", label: "Thin (100)" },
@@ -37,12 +37,6 @@ export const FONT_WEIGHTS = [
 // HELPERS
 // ============================================================================
 
-const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
-
-const resolveVar = (cssVar: string): string => {
-  const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
-  return getCssVariable(varName);
-};
 
 // ============================================================================
 // TYPE CHAIN BUTTON
@@ -71,7 +65,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
     return (
       <Button
         type="button"
-        onClick={() => onChange(resolveVar(value))}
+        onClick={() => onChange(resolveTokenVar(value))}
         aria-label={`Unlink ${property} type token`}
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         className={CHAIN_BOUND}

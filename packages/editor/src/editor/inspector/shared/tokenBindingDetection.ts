@@ -14,12 +14,25 @@
  * @license BSD-3-Clause
  */
 
+import { getCssVariable } from "@/shared/utils/getCssVariable";
+
 const TOKEN_VAR_PATTERN = /^var\((--buildrick-design-[A-Za-z0-9_-]+)\)$/;
 const TOKEN_VAR_PREFIX = "--buildrick-design-";
 
 /** True when the value is a `var(--buildrick-design-...)` reference. */
 export function isTokenVar(value: string): boolean {
   return TOKEN_VAR_PATTERN.test(value);
+}
+
+/**
+ * The current value a token `var()` stands for ("40px"), read from the page's
+ * custom properties; "" when it does not resolve. One helper for every control
+ * that shows or unlinks a bound value (SizeSection, FontControls and
+ * InputWithUnit each carried their own copy).
+ */
+export function resolveTokenVar(value: string): string {
+  const name = value.replace(/^var\(/, "").replace(/\)$/, "");
+  return getCssVariable(name);
 }
 
 /**

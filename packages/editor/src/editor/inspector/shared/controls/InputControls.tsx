@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import { isTokenVar, resolveTokenVar } from "../tokenBindingDetection";
 import { Info, X } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
@@ -129,7 +130,6 @@ function isValidCSSNumber(val: string): boolean {
   return /^-?[\d.]+$/.test(val) && !isNaN(parseFloat(val));
 }
 
-const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   label,
@@ -150,8 +150,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     if (val === "auto" || val === "none" || val === "inherit") {
       return { num: "", unit: val };
     }
+    /* A token-bound value shows what it resolves to ("40", px) — the raw
+       `var(--buildrick-design-…)` leaked into the field (6894:74644). The
+       value itself stays bound until the field is edited. */
     if (isTokenVar(val)) {
-      return { num: val, unit: "px" };
+      const resolved = resolveTokenVar(val);
+      const m = resolved.match(/^(-?[\d.]+)(.*)$/);
+      return m ? { num: m[1], unit: m[2] || "px" } : { num: resolved || val, unit: "px" };
     }
     const match = val.match(/^(-?[\d.]+)(.*)$/);
     if (match) {
