@@ -15,11 +15,13 @@ import * as React from "react";
 import { MoreHorizontal, Table2 } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
 import { DynamicPagesPane } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
 import { FieldsTable } from "./FieldsTable";
+import { FieldInspector } from "./FieldInspector";
+import { fieldUsage } from "./fieldUsage";
 import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
@@ -74,10 +76,12 @@ function plural(n: number, one: string, many = `${one}s`): string {
 
 export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
+  const { addToast } = useToast();
   const ws = useCmsWorkspace();
   const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
+  const [fieldId, setFieldId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
 
@@ -157,6 +161,22 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       </Button>
     ) : null;
 
+  const usage = fieldUsage(composer, collection);
+  const selectedField = ws.tab === "fields" ? collection.fields.find((f) => f.id === fieldId) ?? null : null;
+  const deleteField = async (id: string) => {
+    const field = collection.fields.find((f) => f.id === id);
+    setFieldId(null);
+    await panel.deleteField(collection.id, id);
+    if (field) addToast({ tone: "success", title: "Field deleted", description: `${field.name} has been removed from ${collection.name}.` });
+  };
+  /* "Open the binding" — select the bound element and go back to the canvas. */
+  const openUse = (elementId: string) => {
+    const el = composer?.elements.getElement(elementId);
+    if (!composer || !el) return;
+    composer.selection.select(el);
+    composer.emit("ui:switch-tab", { tab: "layers" });
+  };
+
   let body: React.ReactNode;
   if (ws.tab === "records") {
     body = isEmpty ? (
@@ -181,7 +201,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       />
     );
   } else if (ws.tab === "fields") {
-    body = <FieldsTable composer={composer} collection={collection} onDeleteField={(fieldId) => panel.deleteField(collection.id, fieldId)} />;
+    body = <FieldsTable collection={collection} usage={usage} selectedId={selectedField?.id ?? null} onSelect={setFieldId} />;
   } else if (ws.tab === "dynamic-pages") {
     body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
   } else if (ws.tab === "settings") {
@@ -191,10 +211,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   }
 
   const hint =
-    isEmpty
+    selectedField
+      ? null
+      : isEmpty
       ? { title: "Add your first record", hint: "It opens here for editing." }
       : ws.tab === "dynamic-pages"
         ? { title: "Select a page", hint: "Generated pages open here and under Pages." }
+        : ws.tab === "fields"
+          ? { title: "Select a field", hint: "Click a row to open its settings — type, key and validation." }
         : ws.tab === "settings"
           ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
           : null;
@@ -261,6 +285,18 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
           collection={collection}
           onClose={() => setAddingField(false)}
           onAdd={(name, type, required) => panel.addField(collection.id, name, type, required)}
+        />
+      ) : null}
+      {selectedField ? (
+        <FieldInspector
+          composer={composer}
+          collection={collection}
+          field={selectedField}
+          records={panel.records}
+          uses={usage.get(selectedField.slug) ?? []}
+          onClose={() => setFieldId(null)}
+          onDeleteField={deleteField}
+          onOpenUse={openUse}
         />
       ) : null}
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
