@@ -1159,6 +1159,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
+          /* G3-057 — the menu's "Replace across pages…" was a branch no
+             caller wired; it opens the same picker as the rail's ⋯. */
+          onReplaceAcross={(item) => {
+            setSelectedAssetId(item.key);
+            setReplacePickerOpen(true);
+          }}
         />
       )}
       {/* ─── P6-V Versions ──────────────────────────────────────────────── */}

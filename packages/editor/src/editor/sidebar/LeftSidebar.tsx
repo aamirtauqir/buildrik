@@ -380,39 +380,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const tabConfig = getTabConfig(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
 
-  // §12 — assets tab supports runtime width override (320 ↔ 560) via
-  // ui:media-panel-width composer event. Other tabs ignore the event.
-  const [mediaPanelOverride, setMediaPanelOverride] = React.useState<number | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    /* `null` means "no flow width" and CLEARS the override, so the panel falls
-       back to `--bk-size-drawer`. Emitting the default as a literal 320 pinned
-       Media and Templates to that number regardless of the token — which
-       quietly made the token non-authoritative for 2 of the 6 destinations. */
-    const handler = (payload: unknown) => {
-      const p = payload as { width?: number | null };
-      setMediaPanelOverride(typeof p?.width === "number" ? p.width : null);
-    };
-    composer.on("ui:media-panel-width", handler);
-    return () => {
-      composer.off("ui:media-panel-width", handler);
-    };
-  }, [composer]);
-  // Reset override when leaving assets tab — prevents stale 560 leaking to
-  // next tab opened.
-  React.useEffect(() => {
-    if (activeTab !== "assets") setMediaPanelOverride(null);
-  }, [activeTab]);
-  // Header expand (board 16:6) widens ANY drawer to 700; the media runtime
-  // override keeps winning on its tab — it carries a flow-specific width
-  // (560 detail) the generic toggle must not fight.
-  // `null` means "no flow width" — the default comes from `--bk-size-drawer`
-  // in LeftSidebar.css, so the generated token is the single source.
-  const panelWidthOverride = activeTab === "assets" && mediaPanelOverride !== null
-    ? mediaPanelOverride
-    : isExpanded
-    ? 700
-    : null;
+  // Header expand (board 16:6) widens a drawer to 700. `null` means "no flow
+  // width" — the default comes from `--bk-size-drawer` in LeftSidebar.css, so
+  // the generated token is the single source.
+  const panelWidthOverride = isExpanded ? 700 : null;
 
   const commonTabProps = {
     /* A closed drawer keeps its tab mounted (width 0); a tab that acts on

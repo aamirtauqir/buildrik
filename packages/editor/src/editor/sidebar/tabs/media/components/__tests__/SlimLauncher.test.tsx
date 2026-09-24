@@ -54,9 +54,24 @@ const baseProps = () => ({
 describe("SlimLauncher — §10 default 280px experience", () => {
   // v3 IA Q4 (2026-09-14): the panel is "Assets" — rail label, header and
   // the Webflow/Framer term the target user already uses.
-  it("renders panel header with 'Assets' title", () => {
-    render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByRole("heading", { name: /^Assets$/ })).toBeInTheDocument();
+  it("the header reads 'Assets · N' (board 4418:59771)", () => {
+    render(<SlimLauncher {...baseProps()} libraryItems={[makeItem({ key: "a" }), makeItem({ key: "b" })]} />);
+    expect(screen.getByRole("heading", { name: "Assets · 2" })).toBeInTheDocument();
+  });
+
+  it("G3-002: no expand brackets — 'Manage assets ›' is the one door to the library", () => {
+    render(<SlimLauncher {...baseProps()} onOpenLibrary={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /^Expand/ })).toBeNull();
+    expect(screen.getByTestId("media-manage-assets")).toHaveTextContent(/^Manage assets$/);
+  });
+
+  it("G3-011: the header ⋯ offers 'Select assets…' (7077:79223) and it enters select mode", async () => {
+    const onToggleSelection = vi.fn();
+    const user = userEvent.setup();
+    render(<SlimLauncher {...baseProps()} onToggleSelection={onToggleSelection} />);
+    await user.click(screen.getByTestId("media-panel-menu"));
+    await user.click(screen.getByRole("menuitem", { name: "Select assets…" }));
+    expect(onToggleSelection).toHaveBeenCalledTimes(1);
   });
 
   it("renders TypePills row", () => {
@@ -220,7 +235,7 @@ describe("Clone 3437:36027 · drawer baseline", () => {
     expect(composer.emit).toHaveBeenCalledWith("ui:site-fonts", {});
   });
 
-  it("'Manage assets ↗' sits under the header and opens the full library", async () => {
+  it("'Manage assets ›' sits under the header and opens the full library", async () => {
     const onOpenLibrary = vi.fn();
     const user = userEvent.setup();
     render(<SlimLauncher {...baseProps()} onOpenLibrary={onOpenLibrary} />);
