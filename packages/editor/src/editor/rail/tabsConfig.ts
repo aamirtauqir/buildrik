@@ -14,7 +14,6 @@
 
 export type GroupedTabId =
   | "add"
-  | "ai"
   | "templates"
   | "layers"
   | "pages"
@@ -65,17 +64,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "top",
     pattern: "card-drill-in",
     shortcut: "A",
-    mode: "panel",
-    zone: "creation",
-  },
-  {
-    id: "ai",
-    iconName: "Sparkles",
-    label: "AI",
-    ariaLabel: "AI assistant — chat with Claude to edit elements",
-    section: "top",
-    pattern: "standalone",
-    shortcut: "I",
     mode: "panel",
     zone: "creation",
   },

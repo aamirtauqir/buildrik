@@ -335,7 +335,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
-  useSidebarKeyboard(safeTabChange);
+  const openAssistant = React.useCallback(() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }), [composer]);
+  useSidebarKeyboard(safeTabChange, openAssistant);
 
   const { addToast } = useToast();
 
