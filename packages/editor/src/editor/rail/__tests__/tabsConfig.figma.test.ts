@@ -56,7 +56,7 @@ describe("tabsConfig — Figma rail", () => {
   });
 
   it("rail + off-rail partition every tab (nothing stranded, nothing invented)", () => {
-    const offRail = ["ai", "templates", "components", "settings", "publish", "history", "review"];
+    const offRail = ["ai", "templates", "components", "settings", "publish", "history", "activity", "review"];
     const all = GROUPED_TABS_CONFIG.map((t) => t.id).sort();
     const accounted = [...RAIL_FIGMA_IDS, ...offRail].sort();
     expect(accounted).toEqual(all);

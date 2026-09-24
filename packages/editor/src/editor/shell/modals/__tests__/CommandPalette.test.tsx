@@ -128,7 +128,7 @@ describe("CommandPalette — doors", () => {
     ["Open Asset library", EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }],
     ["Open AI assistant", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
     ["Browse Templates", EVENTS.UI_PANEL_OPEN, { panel: "templates" }],
-    ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "activity" }],
+    ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
     ["Generate a block with AI…", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],

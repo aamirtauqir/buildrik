@@ -55,7 +55,7 @@ import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
 import { ReattachModal, reattachCandidates } from "./ReattachModal";
-import { BackToActivityRow } from "../history/components/BackToActivityRow";
+import { BackToActivityRow } from "../activity/BackToActivityRow";
 import { anchorSelector } from "@/editor/canvas/comments/commentAnchors";
 import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
 import {
@@ -407,7 +407,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         onClose={onClose}
       />
       {fromActivity ? (
-        <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "activity" })} />
+        <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "activity" })} />
       ) : null}
     </>
   );

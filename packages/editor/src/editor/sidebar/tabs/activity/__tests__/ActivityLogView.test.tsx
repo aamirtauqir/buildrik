@@ -12,7 +12,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { ActivityLogView } from "../components/ActivityLogView";
+import { ActivityLogView } from "../ActivityLogView";
 import { ActivityReadError, type ActivityEntry } from "@/services/ActivityService";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
@@ -76,7 +76,7 @@ describe("ActivityLogView — state machine", () => {
     expect(region.getAttribute("data-state")).toBe("ready");
     expect(region.getAttribute("aria-live")).toBe("polite");
     expect(region.getAttribute("role")).toBe("status");
-    expect(screen.getAllByTestId("activity-kind").length).toBe(3);
+    expect(screen.getAllByTestId("activity-row-open").length).toBe(3);
   });
 
   it("renders the empty state when the service returns no rows", async () => {
@@ -209,5 +209,19 @@ describe("ActivityLogView — rows open their subject in the editor", () => {
     const rows = await screen.findAllByTestId("activity-row-open");
     fireEvent.click(rows[0]);
     expect(onOpenRow).toHaveBeenCalledWith(SAMPLE_ROWS[0].kind);
+  });
+});
+
+/* Board 4418:140587 — a row is the subject over "who · when", an accent ›
+   at the right, no kind label and no card. */
+describe("ActivityLogView — rows are board 4418:140587", () => {
+  it("draws the subject, then 'actor · Today HH:MM', and a ›", async () => {
+    fetchRecentActivity.mockResolvedValueOnce([{ ...SAMPLE_ROWS[0], createdAt: new Date().toISOString() }]);
+    renderView();
+    await screen.findByTestId("activity-rows");
+    expect(screen.getByTestId("activity-row-title").textContent).toBe("Edited the hero headline.");
+    expect(screen.getByTestId("activity-row-meta").textContent).toMatch(/^Sara · Today \d{2}:\d{2}$/);
+    expect(screen.getByTestId("activity-row-open").textContent).toContain("›");
+    expect(screen.queryByTestId("activity-kind")).toBeNull();
   });
 });

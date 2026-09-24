@@ -24,6 +24,7 @@ export type GroupedTabId =
   | "settings"
   | "publish"
   | "history"
+  | "activity"
   | "review"
   | "content";
 
@@ -234,6 +235,20 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     shortcut: "H",
     mode: "panel",
     zone: "config",
+  },
+  {
+    // Board 4418:140587 — its own right-column panel (owner, 2026-09-25), not
+    // a tab inside History. Off-rail (no `zone`), no shortcut: its doors are
+    // the site menu's "Activity log", ⌘K "Open Activity" and the
+    // notifications popover's "View all activity ›".
+    id: "activity",
+    tool: "site",
+    iconName: "Activity",
+    label: "Activity",
+    ariaLabel: "Site activity — edits, comments and publishes",
+    section: "bottom",
+    pattern: "standalone",
+    mode: "panel",
   },
   {
     // P0 wedge: the editor-side review loop. Sits BELOW a divider, not in the

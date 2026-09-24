@@ -75,6 +75,19 @@ describe("NotificationPanel — the way to the rest of them", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("opens the Activity panel when the editor gives it one (board 4418:140492 → 4418:140587)", async () => {
+    fetchRecentNotifications.mockResolvedValue([row()]);
+    const onNavigate = vi.fn();
+    const onClose = vi.fn();
+    const onOpenActivity = vi.fn();
+    render(<NotificationPanel onClose={onClose} onNavigate={onNavigate} onOpenActivity={onOpenActivity} />);
+
+    fireEvent.click(await screen.findByText("View all activity ›"));
+    expect(onOpenActivity).toHaveBeenCalled();
+    expect(onNavigate).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it("does not offer it over an empty list — there is nothing more to see", async () => {
     fetchRecentNotifications.mockResolvedValue([]);
     render(<NotificationPanel onClose={vi.fn()} />);

@@ -1,8 +1,8 @@
 /**
  * HistoryTab shell tests — verifies the chrome after M1 + M2:
- *   - View switcher: Session / Saves / Published / Activity
+ *   - View switcher: Session / Saves / Published (Activity is its own panel)
  *   - Helper text under each tab
- *   - Session · Saves · Published · Activity tabs (board 4418:73791, B8)
+ *   - Session · Saves · Published tabs (board 4418:73791, B8)
  *   - Search bar is Saves-only (Published takes no query)
  *   - `initialView` deep link lands on Published
  *   - Time-Travel scrubber toggles via Ctrl+Shift+T
@@ -31,13 +31,6 @@ const openMenuItem = (name: RegExp | string) => {
   fireEvent.click(screen.getByRole("menuitem", { name }));
 };
 
-vi.mock("../components/ActivityLogView", () => ({
-  ActivityLogView: ({ onOpenRow }: { onOpenRow?: (k: "edit" | "comment" | "publish") => void }) => (
-    <div data-testid="activity-log">
-      <button onClick={() => onOpenRow?.("publish")}>open publish row</button>
-    </div>
-  ),
-}));
 vi.mock("../components/TimeTravelScrubber", () => ({
   TimeTravelScrubber: ({
     onPreviewChange,
@@ -110,6 +103,7 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
 }));
 
 import { HistoryTab } from "../HistoryTab";
+import { EVENTS } from "@/shared/constants/events";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 vi.mock("../../../../shell/PublishHistory", () => ({
@@ -142,16 +136,15 @@ describe("HistoryTab shell", () => {
   afterEach(cleanup);
 
   /* Board 4418:73791 draws Session · Saves · Published (Backups has no
-     service); Activity is B6's. "This session" was a filter chip inside Saves
+     service); Activity is its own panel (owner, 2026-09-25). "This session" was a filter chip inside Saves
      and is the Session tab now — the chip is gone. */
-  it("renders Session · Saves · Published · Activity, Session selected by default (4418:73791)", () => {
+  it("renders Session · Saves · Published, Session selected by default (4418:73791)", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(4);
+    expect(tabs).toHaveLength(3);
     expect(tabs[0]).toHaveTextContent(/Session/);
     expect(tabs[1]).toHaveTextContent(/Saves/);
     expect(tabs[2]).toHaveTextContent(/Published/);
-    expect(tabs[3]).toHaveTextContent(/Activity/);
     expect(tabs[0].getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByRole("button", { name: "This session" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Saved versions" })).toBeNull();
@@ -410,13 +403,20 @@ describe("HistoryTab — board 163:113 preview band", () => {
   });
 });
 
-describe("HistoryTab — an Activity row opens in place, with the way back", () => {
-  it("a publish row lands on Published with ‹ Activity; the back row returns and goes", () => {
-    renderTab({ initialView: "activity" });
-    fireEvent.click(screen.getByRole("button", { name: "open publish row" }));
+describe("HistoryTab — opened by an Activity row, with the way back", () => {
+  it("draws ‹ Activity, which reopens the Activity panel", () => {
+    const emit = vi.fn();
+    renderTab({ initialView: "published", fromActivity: true, composer: { emit, on: () => {}, off: () => {} } as never });
     expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
-    expect(screen.getByTestId("history-view-tab-activity").getAttribute("aria-selected")).toBe("true");
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "activity" });
+  });
+
+  it("draws no back row when opened any other way, and a stored 'activity' view lands on Session", () => {
+    window.localStorage.setItem("buildrick-history-view", "activity");
+    renderTab();
     expect(screen.queryByTestId("back-to-activity")).toBeNull();
+    expect(screen.getByTestId("history-view-tab-session").getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByTestId("history-view-tab-activity")).toBeNull();
   });
 });
