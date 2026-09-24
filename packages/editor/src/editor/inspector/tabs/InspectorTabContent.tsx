@@ -79,7 +79,6 @@ export interface InspectorTabContentProps {
     s: (i: IconConfig) => void
   ) => void;
   onOpenCreateCollection?: () => void;
-  devMode: boolean;
   /** Beginner hides the registry's ADVANCED-tagged sections behind "Show all
    *  (N more)" (board 4428:141170); Pro shows everything (4428:141406). */
   tier: InspectorTier;
@@ -109,7 +108,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenMediaLibrary,
     onOpenIconPicker,
     onOpenCreateCollection,
-    devMode,
     tier,
     showAll,
     onShowAllChange,
@@ -151,7 +149,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
       propertyStates,
       onOpenMediaLibrary,
       onOpenIconPicker,
-      devMode,
       tabId,
     };
     return orderedIds.filter((id) => {
@@ -179,7 +176,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     propertyStates,
     onOpenMediaLibrary,
     onOpenIconPicker,
-    devMode,
     tabId,
   ]);
 
@@ -222,7 +218,6 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           onOpenMediaLibrary,
           onOpenIconPicker,
           onOpenCreateCollection,
-          devMode,
           tabId,
           tier: sectionTier,
           // Wave 2: multi-select — optional, default to empty/false so test

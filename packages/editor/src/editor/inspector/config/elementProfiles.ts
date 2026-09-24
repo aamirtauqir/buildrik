@@ -73,7 +73,6 @@ const CONTAINER_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -98,7 +97,6 @@ const TEXT_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -121,7 +119,6 @@ const FLEX_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -146,7 +143,6 @@ const GRID_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
   advanced: ["size"],
 };
@@ -171,7 +167,6 @@ const MEDIA_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -195,7 +190,6 @@ const BUTTON_PROFILE: ElementProfile = {
     "content",
     "element-properties",
     "css-classes",
-    "all-css",
   ],
 };
 
@@ -219,7 +213,6 @@ const INPUT_PROFILE: ElementProfile = {
     "visibility",
     "content",
     "css-classes",
-    "all-css",
   ],
 };
 

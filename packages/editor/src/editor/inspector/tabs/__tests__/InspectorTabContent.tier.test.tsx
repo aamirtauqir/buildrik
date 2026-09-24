@@ -57,7 +57,6 @@ function makeCssContext(elementType: string): CssContext {
       isMedia: false,
       isFlexContainer: false,
       isGridContainer: false,
-      devMode: false,
     } as unknown as CssContext["inspectorContext"],
     selectedElements: [],
     mixedKeys: new Set<string>(),
@@ -88,7 +87,6 @@ function renderTier(tier: "beginner" | "pro", showAll = false, onShowAllChange =
       expandedSections={new Set()}
       onToggleSection={vi.fn()}
       advancedState={NO_OP_ADVANCED}
-      devMode={false}
       tier={tier}
       showAll={showAll}
       onShowAllChange={onShowAllChange}
