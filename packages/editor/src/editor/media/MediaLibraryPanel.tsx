@@ -86,7 +86,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   onClose,
   onSelect,
   allowedTypes = EVERY_PICKER_KIND,
-  title = "Choose an image",
+  title,
   forLabel,
   composer = null,
 }) => {
@@ -122,6 +122,9 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   const single = allowedTypes.length === 1;
   const kind = kindLabel(allowedTypes);
   const noun = single ? kindNoun(allowedTypes[0]) : "file";
+  /* Default title names what is being chosen — "Choose an image" (Clone
+     3397:18325) read over a video field too. */
+  const heading = title ?? `Choose ${/^[aeiou]/.test(noun) ? "an" : "a"} ${noun}`;
   const searchPlaceholder = single && (allowedTypes[0] === "image" || allowedTypes[0] === "video") ? `Search ${noun}s…` : "Search library…";
 
   /* Clone 3695:45529: a saved version (`versionOf`) is reachable only through
@@ -204,9 +207,9 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg" srTitle={title} data-testid="picker">
+      <ModalContent size="lg" srTitle={heading} data-testid="picker">
         <h2 className={LIBRARY_MODAL_TITLE} data-testid="picker-title">
-          {title}
+          {heading}
         </h2>
         <ModalBody className="tw:flex tw:min-h-0 tw:flex-col tw:gap-3">
           <p className={LIBRARY_MODAL_BODY} data-testid="picker-for-label">

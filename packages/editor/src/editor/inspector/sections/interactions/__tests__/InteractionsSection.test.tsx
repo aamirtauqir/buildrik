@@ -7,6 +7,7 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import { EVENTS } from "@/shared/constants/events";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionsSection } from "../index";
+import { DEFAULT_ANIMATION } from "@/shared/types/animations";
 import type { Interaction } from "../types";
 import { DEFAULT_ANIMATION_CONFIG } from "../../../../../engine/interactions/types";
 
@@ -135,5 +136,35 @@ describe("InteractionsSection", () => {
       fireEvent.click(screen.getByText("On hover"));
     });
     expect(screen.getByRole("button", { name: /On hover/ })).toBeInTheDocument();
+  });
+});
+
+/* G2-157 (option A, owner-approved): the element's CSS animation is a row
+   in Interactions, labelled by its own trigger; data and export unchanged. */
+describe("InteractionsSection — the element animation row", () => {
+  const anim = { ...DEFAULT_ANIMATION, type: "fadeIn", trigger: "load" as const };
+
+  it("shows the animation as '<trigger> · <preset> ›'", () => {
+    renderOpen({ interactions: [], onInteractionsChange: vi.fn(), animation: anim, onAnimationChange: vi.fn() });
+    const row = screen.getByRole("button", { name: /On page load/ });
+    expect(row).toHaveTextContent("Fade In");
+  });
+
+  it("labels by the animation's actual trigger", () => {
+    renderOpen({ interactions: [], onInteractionsChange: vi.fn(), animation: { ...anim, trigger: "hover" }, onAnimationChange: vi.fn() });
+    expect(screen.getByRole("button", { name: /On hover/ })).toBeInTheDocument();
+  });
+
+  it("opens to the animation editor; Remove clears the animation", () => {
+    const onAnimationChange = vi.fn();
+    renderOpen({ interactions: [], onInteractionsChange: vi.fn(), animation: anim, onAnimationChange });
+    fireEvent.click(screen.getByRole("button", { name: /On page load/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove animation" }));
+    expect(onAnimationChange).toHaveBeenCalledWith(null);
+  });
+
+  it("no animation, no row", () => {
+    renderOpen({ interactions: [], onInteractionsChange: vi.fn(), animation: null, onAnimationChange: vi.fn() });
+    expect(screen.queryByRole("button", { name: /On page load/ })).toBeNull();
   });
 });

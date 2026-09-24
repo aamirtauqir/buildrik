@@ -81,7 +81,6 @@ export type SectionId =
   | "shadow"
   | "blur"
   | "effects"
-  | "animation"
   | "interactions"
   | "visibility";
 
