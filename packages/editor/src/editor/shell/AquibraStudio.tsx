@@ -606,7 +606,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showGrid={state.overlays.showGrid}
         showRulers={state.overlays.showRulers}
         showXRay={state.overlays.showXRay}
-        devMode={state.overlays.devMode}
         onOverlayChange={(overlay, enabled) => {
           if (overlay === "guides") state.setShowGuides(enabled);
           else if (overlay === "spacing") state.setShowSpacingIndicators(enabled);

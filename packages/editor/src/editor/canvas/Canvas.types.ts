@@ -18,11 +18,8 @@ export interface CanvasProps {
   showBadges?: boolean;
   showGuides?: boolean;
   showGrid?: boolean;
-  showOutlines?: boolean;
   showRulers?: boolean;
   showXRay?: boolean;
-  /** Dev Mode - auto-enables Level 3/4 hover (boxmodel/hierarchy) without Alt/Shift */
-  devMode?: boolean;
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
   /**

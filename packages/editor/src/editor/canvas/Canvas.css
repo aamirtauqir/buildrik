@@ -43,22 +43,6 @@
 }
 
 
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--bk-alpha-accent-30);
-  outline-offset: -1px;
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].container,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].section,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].row,
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].col {
-  outline: 1px dashed var(--bk-accent);
-}
-
-.buildrick-canvas[data-show-outlines="true"] [data-buildrick-id][data-selected="true"] {
-  outline: none;
-}
-
 /* CHROME TOKENS ON CUSTOMER CONTENT — REMOVED 2026-08-27.
    What stood here painted the user's own page in the EDITOR'S colours, fonts
    and spacing, using `--bk-*` tokens. `--bk-*` is the chrome namespace; the
@@ -827,4 +811,13 @@ button:hover > .bd-canvas-empty-cta__thumb {
   align-items: center;
   justify-content: safe center;
   overflow: auto;
+}
+
+/* View › Grid lines (GridOverlay sets background-size from the grid size).
+   Accent at 10% — the value the retired Emotion GridPattern drew. */
+.bd-canvas-grid {
+  --grid-line: color-mix(in srgb, var(--bk-accent) 10%, transparent);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
 }
