@@ -74,10 +74,6 @@ interface LibraryManagerProps {
     onSave: (editedSrc: string, edits?: EditsSnapshot) => void | Promise<void>,
     door?: ImageEditorOptions,
   ) => void;
-  onOpenIconPicker?: (
-    currentIcon: IconConfig | undefined,
-    onSelect: (icon: IconConfig) => void
-  ) => void;
 }
 
 /* 3720:43313 — `replaceAcross` is synchronous, so the Applying card would
@@ -106,7 +102,7 @@ const SORT_OPTIONS = [
    count line (3721:45960). */
 type MoveDoor = "selection" | "menu";
 
-export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
+export function LibraryManager({ composer, onClose, onOpenImageEditor }: LibraryManagerProps) {
   const state = useMediaState(composer);
   /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
      aria-disabled, with the reason on a tooltip. The rest of the media gate
@@ -608,18 +604,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setUploadDone(null);
   }, [uploadDone]);
 
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        composer.mediaOps.insertMedia(icon.name, "icon");
-        addToast({ description: `${icon.name} icon added`, tone: "success" });
-      } catch {
-        addToast({ description: "Could not add icon", tone: "error" });
-      }
-    });
-  }, [onOpenIconPicker, composer, addToast]);
-
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
      (its parent's key: a version's own key resolves to the same family). */
@@ -1075,7 +1059,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onClose={() => setStockModalOpen(false)}
         photos={state.stockPhotos}
         videos={state.stockVideos}
-        icons={state.discIcons}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
@@ -1088,7 +1071,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             setStockSaved(saved);
           }
         }}
-        onOpenIconPicker={handleOpenIconPicker}
       />
       <StockSavedModal
         saved={stockSaved}
