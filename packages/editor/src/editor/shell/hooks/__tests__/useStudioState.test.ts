@@ -51,7 +51,6 @@ describe("useStudioState", () => {
         showGuides: true,
         showGrid: false,
         showRulers: false,
-        devMode: false,
         showSuggestions: true,
       });
     });
@@ -206,7 +205,6 @@ describe("useStudioState", () => {
       "showGuides",
       "showGrid",
       "showRulers",
-      "devMode",
       "showSuggestions",
     ];
 
@@ -222,31 +220,6 @@ describe("useStudioState", () => {
       }
       act(() => result.current.toggleOverlay(key));
       expect(result.current.overlays[key]).toBe(before[key]);
-    });
-
-    it("toggleDevMode ON enables grid/guides/spacing/badges", () => {
-      const { result } = renderHook(() => useStudioState());
-      act(() => result.current.toggleDevMode());
-      expect(result.current.overlays).toMatchObject({
-        devMode: true,
-        showGrid: true,
-        showGuides: true,
-        showSpacingIndicators: true,
-        showBadges: true,
-      });
-    });
-
-    it("toggleDevMode OFF disables the dev feature set again", () => {
-      const { result } = renderHook(() => useStudioState());
-      act(() => result.current.toggleDevMode());
-      act(() => result.current.toggleDevMode());
-      expect(result.current.overlays).toMatchObject({
-        devMode: false,
-        showGrid: false,
-        showGuides: false,
-        showSpacingIndicators: false,
-        showBadges: false,
-      });
     });
   });
 

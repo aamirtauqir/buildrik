@@ -140,6 +140,51 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     expect(order).not.toContain("apply");
   });
 
+  /* G2-100, board 4428:151964: the failure is a dialog, not a toast —
+     "<Page> backup could not be saved" · Cancel · Replace without a backup ·
+     Try the backup again. */
+  async function failBackup(order: string[]) {
+    const made = makeComposer(["Home"], order);
+    made.composer.versions.autoCheckpoint.mockImplementationOnce(async () => null as never);
+    render(<TemplatesTab composer={made.composer as never} />);
+    await applyWithBackup();
+    await screen.findByText("Home backup could not be saved", undefined, { timeout: 5000 });
+    return made.composer;
+  }
+
+  it("a failed backup opens the Backup failed dialog (board 4428:151964)", async () => {
+    await failBackup([]);
+    expect(screen.getByText(/Home has not been replaced\. Retry creating the backup, or go back and pick another layout\./)).toBeTruthy();
+    for (const name of ["Cancel", "Replace without a backup", "Try the backup again"])
+      expect(screen.getByRole("button", { name })).toBeTruthy();
+  });
+
+  it("Try the backup again retries the checkpoint, then replaces", async () => {
+    const order: string[] = [];
+    const composer = await failBackup(order);
+    fireEvent.click(screen.getByRole("button", { name: "Try the backup again" }));
+    await waitFor(() => expect(order).toContain("apply"), { timeout: 5000 });
+    expect(composer.versions.autoCheckpoint).toHaveBeenCalledTimes(2);
+    expect(order.indexOf("apply")).toBeGreaterThan(order.findIndex((o) => o.startsWith("checkpoint:")));
+  });
+
+  it("Replace without a backup replaces with no second checkpoint", async () => {
+    const order: string[] = [];
+    const composer = await failBackup(order);
+    fireEvent.click(screen.getByRole("button", { name: "Replace without a backup" }));
+    await waitFor(() => expect(order).toContain("apply"), { timeout: 5000 });
+    expect(composer.versions.autoCheckpoint).toHaveBeenCalledTimes(1);
+  });
+
+  it("Cancel replaces nothing", async () => {
+    const order: string[] = [];
+    await failBackup(order);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(order).not.toContain("apply");
+    expect(screen.queryByText("Home backup could not be saved")).toBeNull();
+  });
+
   it("says where the backup lives", async () => {
     const { composer } = makeComposer();
     render(<TemplatesTab composer={composer as never} />);

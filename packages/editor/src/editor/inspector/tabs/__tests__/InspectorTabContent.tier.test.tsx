@@ -73,10 +73,10 @@ const NO_OP_ADVANCED: UseAdvancedSettingsReturn = {
   expandedGroups: new Set(),
 };
 
-function renderTier(tier: "beginner" | "pro", showAll = false, onShowAllChange = vi.fn()) {
+function renderTier(tier: "beginner" | "pro", showAll = false, onShowAllChange = vi.fn(), tabId: "style" | "effects" = "style") {
   return render(
     <InspectorTabContent
-      tabId="style"
+      tabId={tabId}
       composer={makeComposer() as never}
       selectedElement={{ id: "el-1", type: "container" }}
       styles={{}}
@@ -140,5 +140,20 @@ describe("InspectorTabContent — Beginner / Pro tier", () => {
     // ?density=fewer sliced at three and would have cut it.
     expect(screen.getByRole("button", { name: /Background section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Border section/i })).toBeInTheDocument();
+  });
+
+  /* Board 4428:142686 (Beginner Effects): OPACITY · SHADOW · BLUR ·
+     MORE EFFECTS (collapsed row) · INTERACTIONS — the advanced effects are
+     their own collapsed section on the board, not behind "Show all". */
+  it("Beginner Effects draws MORE EFFECTS as a collapsed section, with no Show-all row", () => {
+    renderTier("beginner", false, vi.fn(), "effects");
+    const more = screen.getByRole("button", { name: /More effects section/i });
+    expect(more).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByTestId("inspector-show-all")).not.toBeInTheDocument();
+    const heads = screen.getAllByRole("button", { name: /section/i }).map((b) => b.getAttribute("aria-label") ?? b.textContent);
+    const at = (re: RegExp) => heads.findIndex((h) => re.test(h ?? ""));
+    expect(at(/Blur/i)).toBeGreaterThanOrEqual(0);
+    expect(at(/Blur/i)).toBeLessThan(at(/More effects/i));
+    expect(at(/More effects/i)).toBeLessThan(at(/Interactions/i));
   });
 });

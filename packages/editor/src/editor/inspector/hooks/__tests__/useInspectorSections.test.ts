@@ -50,11 +50,13 @@ describe("useInspectorSections — default seeding", () => {
     for (const k of nonStyle) expect(SECTION_REGISTRY[k.split(":")[1] as keyof typeof SECTION_REGISTRY].tab).not.toBe("style");
   });
 
-  /* ...except what those boards draw shut: ADVANCED on Settings, BLUR on Effects. */
-  it("leaves ADVANCED and BLUR collapsed", () => {
+  /* ...except what those boards draw shut: ADVANCED on Settings, BLUR and
+     MORE EFFECTS on Effects (4428:142686). */
+  it("leaves ADVANCED, BLUR and MORE EFFECTS collapsed", () => {
     const { result } = mount("container");
     expect(result.current.expandedSections.has("container:opacity")).toBe(true);
     expect(result.current.expandedSections.has("container:blur")).toBe(false);
+    expect(result.current.expandedSections.has("container:effects")).toBe(false);
     expect(result.current.expandedSections.has("container:element-properties")).toBe(false);
   });
 

@@ -200,6 +200,8 @@ describe("Templates — full-canvas view (decision #24)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
     fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
     await waitFor(() => expect(screen.getByTestId("tpl-create-success")).toBeInTheDocument(), { timeout: 5000 });
+    /* It names the page it made, not the placeholder "Template". */
+    expect(screen.getByTestId("tpl-create-success").textContent).not.toContain("‘Template’");
     await new Promise((r) => requestAnimationFrame(() => r(null)));
     expect(onTemplateUsed).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Done" }));

@@ -70,6 +70,7 @@ import {
   columns3BlockConfig,
   gridBlockConfig,
   flexBlockConfig,
+  collectionListBlockConfig,
 } from "./Layout";
 import {
   imageBlockConfig,
@@ -131,6 +132,7 @@ export const blockDefinitions: BlockDefinition[] = [
   columns3BlockConfig,
   gridBlockConfig,
   flexBlockConfig,
+  collectionListBlockConfig,
 
   // Form blocks
   formBlockConfig,

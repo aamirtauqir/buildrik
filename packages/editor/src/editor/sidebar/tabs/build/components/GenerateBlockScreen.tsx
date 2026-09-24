@@ -49,7 +49,7 @@ export function generateTarget(composer: Composer): GenerateTarget {
 export type GenerateFn = (composer: Composer, prompt: string, target: GenerateTarget) => Promise<ServerEdit | null>;
 
 /** The real run: one page-scope prompt, applied as one undo step. */
-export const generateBlock: GenerateFn = async (composer, prompt, target) => {
+const generateBlock: GenerateFn = async (composer, prompt, target) => {
   const elements = composer.elements.getAllElements().slice(0, 200).map((el) => ({
     id: el.getId(),
     type: el.getType(),
