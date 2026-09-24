@@ -185,6 +185,11 @@ export class VersionTimelineManager {
    * Set the current user ID for team attribution on versions.
    * Called by the shell when session becomes available.
    */
+  /** The signed-in user's id, so a list can say "You" (G1-075). */
+  getCurrentUserId(): string | null {
+    return this.currentUserId;
+  }
+
   setCurrentUserId(userId: string | null): void {
     this.currentUserId = userId;
   }
@@ -287,12 +292,14 @@ export class VersionTimelineManager {
        which made it a contract, not a nicety. A failed save aborts the
        restore; losing the work is the outcome this exists to prevent. */
     let savedAs: string | null = null;
+    let safetyVersionId: string | undefined;
     try {
       const safety = await this.createVersion(
         `Before restoring "${version.name}"`,
         "Automatic — the work that was open when a restore was requested.",
       );
       savedAs = safety.name;
+      safetyVersionId = safety.id;
     } catch {
       this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
       return false;
@@ -309,6 +316,7 @@ export class VersionTimelineManager {
     this.composer.emit(EVENTS.VERSION_RESTORED, {
       version,
       previousVersionId,
+      safetyVersionId,
     });
 
     return true;

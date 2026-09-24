@@ -93,12 +93,12 @@ describe("CommandPalette — board 4418:141220 structure", () => {
     renderPalette();
     expect(labels()).toEqual([
       "Open Pages", "Open Add", "Open Layers", "Open Assets", "Open Asset library", "Open CMS", "Open Brand",
-      "Open Publish", "Open AI assistant", "Browse Templates", "Open Review", "Open Activity", "Open Issues",
+      "Open Publish", "Open AI assistant", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
       "Open Site settings", "Open Components", "Keyboard shortcuts",
       "Undo", "Duplicate · Select an element first", "Replace selected media · Select an element first",
       "Zoom to 50%", "Preview Home page",
       "Add text", "Add container", "Generate a block with AI…",
-      "Manage CMS records", "Save page as template", "Replace layout with template…", "Open History",
+      "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
   });
@@ -129,7 +129,7 @@ describe("CommandPalette — doors", () => {
     ["Open Asset library", EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }],
     ["Open AI assistant", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
     ["Browse Templates", EVENTS.UI_PANEL_OPEN, { panel: "templates" }],
-    ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "activity" }],
+    ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
     ["Generate a block with AI…", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
@@ -187,11 +187,11 @@ describe("CommandPalette — search", () => {
     expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
   });
 
-  it("C4 #19: \"New page\" answers from anywhere (no Pages rows registered) and asks for the New-page modal", () => {
+  it("C4 #19: \"New page\" sits in NAVIGATE (4418:141220), answers from anywhere, and asks for the New-page modal", () => {
     const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY }));
-    expect(labels()).not.toContain("New page");
+    expect(labels()).toContain("New page");
     type("new page");
-    fireEvent.click(screen.getByTestId("cmdk-row-add-new-page"));
+    fireEvent.click(screen.getByTestId("cmdk-row-nav-new-page"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
   });
 
@@ -359,5 +359,68 @@ describe("CommandPalette — TEMPLATES rows (catalogue search, kept)", () => {
   it("templates are not in the opening list", () => {
     renderPalette();
     expect(bands()).not.toContain("Templates");
+  });
+});
+
+describe("CommandPalette — jump rows (layers, assets) + clear search", () => {
+  const el = (id: string, type: string, content = "", layerName?: string) => ({
+    getId: () => id,
+    getType: () => type,
+    getContent: () => content,
+    getCustomData: (k: string) => (k === "layerName" ? layerName : undefined),
+  });
+  function jumpComposer() {
+    const base = makeComposer({ registry: BOARD_REGISTRY });
+    const hero = el("h1", "heading", "Wood-fired pizza tonight");
+    const box = el("c1", "container", "", "Menu grid");
+    const selectEl = vi.fn();
+    return Object.assign(base, {
+      elements: {
+        ...base.elements,
+        getActivePage: () => ({ name: "Home", root: { id: "root" } }),
+        getElement: (id: string) => (id === "root" ? { getDescendants: () => [hero, box] } : null),
+      },
+      selection: { ...base.selection, select: selectEl },
+      media: { getAssets: () => [{ id: "a1", name: "hero-pasta.png" }], selectAssets: vi.fn() },
+      __selectEl: selectEl,
+      __hero: hero,
+    });
+  }
+
+  it("a layer answers a query under LAYERS by its name or text; the row selects it and opens Layers", () => {
+    const composer = jumpComposer();
+    renderPalette(composer);
+    type("menu grid");
+    expect(bands()).toContain("Layers");
+    expect(screen.getByTestId("cmdk-label-layer-c1")).toHaveTextContent("Menu grid");
+    type("wood-fired");
+    fireEvent.click(screen.getByTestId("cmdk-row-layer-h1"));
+    expect(composer.__selectEl).toHaveBeenCalledWith(composer.__hero);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "layers" });
+  });
+
+  it("an asset answers a query under ASSETS; the row opens the Asset library on it", () => {
+    const composer = jumpComposer();
+    renderPalette(composer);
+    type("pasta");
+    expect(bands()).toContain("Assets");
+    fireEvent.click(screen.getByTestId("cmdk-row-asset-a1"));
+    expect(composer.media.selectAssets).toHaveBeenCalledWith(["a1"]);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true });
+  });
+
+  it("layers and assets are not in the opening list", () => {
+    renderPalette(jumpComposer());
+    expect(bands()).not.toContain("Layers");
+    expect(bands()).not.toContain("Assets");
+  });
+
+  it("a clear button appears with a query and empties it, keeping focus in the field", () => {
+    renderPalette();
+    expect(screen.queryByTestId("cmdk-clear")).toBeNull();
+    type("zoom");
+    fireEvent.click(screen.getByTestId("cmdk-clear"));
+    expect(input()).toHaveValue("");
+    expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
   });
 });

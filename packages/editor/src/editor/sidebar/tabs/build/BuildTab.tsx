@@ -67,7 +67,9 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // above it, the asked-for group sat off-screen.
   const [asked] = React.useState(() => (composer ? takePendingInsertGroup(composer) : undefined));
   const [scrollTarget, setScrollTarget] = React.useState<InsertGroupId | null>(asked ?? null);
-  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() => new Set([asked ?? "elements"]));
+  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() =>
+    new Set<InsertGroupId>(asked ? [asked] : ["favourites", "elements"]),
+  );
   React.useEffect(() => {
     if (!composer) return;
     const open = ({ group }: { group: InsertGroupId }) => {
@@ -91,8 +93,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
 
   const groups = React.useMemo(
-    () => buildInsertGroups(composer?.components ? mine.length : null),
-    [composer, mine.length],
+    () => buildInsertGroups(composer?.components ? mine.length : null, tab.favs.size, tab.recents.length),
+    [composer, mine.length, tab.favs.size, tab.recents.length],
   );
 
   // MINE row click — the same instantiate contract the Components surface
@@ -244,7 +246,17 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 group={g}
                 isOpen={openGroups.has(g.id)}
                 onToggle={() => toggleGroup(g)}
-                elements={g.id === "elements" ? elementRows : undefined}
+                elements={
+                  g.id === "elements"
+                    ? elementRows
+                    : g.id === "favourites"
+                      ? elementRows.filter((el) => tab.favs.has(el.name))
+                      : g.id === "recent"
+                        ? tab.recents.flatMap((n) => elementRows.find((el) => el.name === n) ?? [])
+                        : undefined
+                }
+                favs={tab.favs}
+                onToggleFav={tab.toggleFav}
                 blocks={g.id === "blocks" ? blockRows : undefined}
                 components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}

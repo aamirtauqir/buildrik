@@ -141,8 +141,8 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   onCancel,
   onConfirm,
 }) => (
-  /* Board 1169:4725 — the question names the template, the answer names the
-     page and where it lands. "Create page?" over "Using: X" named neither. */
+  /* Boards 1169:4725 / 4418:54243 — the question names the template, the
+     answer names the page and says nothing else changes. */
   <Modal
     open
     onClose={onCancel}
@@ -159,7 +159,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
     }
   >
     <p className="tw:m-0">
-      A new page ‘{newPageName}’ will be added after your current pages.
+      A new page named ‘{newPageName}’ will be added. Your current pages stay unchanged.
     </p>
   </Modal>
 );

@@ -24,6 +24,7 @@ import {
   retryComponentSync,
 } from "../../../services/componentSync";
 import { currentSiteId } from "../../../services/ReviewService";
+import { captureComponentThumbnail } from "@/editor/sidebar/tabs/component-library/captureComponentThumbnail";
 
 export function useComponentSync(
   composer: Composer | null,
@@ -46,7 +47,13 @@ export function useComponentSync(
     const onUpsert = (p: ComponentCreatedPayload | ComponentUpdatedPayload) =>
       void mirrorComponentUpsert(p.component);
     const onDeleted = (p: ComponentDeletedPayload) => void mirrorComponentDelete(p.componentId);
+    /* A new master gets its preview picture from the canvas node it was made
+       from (G2-122, captureComponentThumbnail.ts). */
+    const onCreated = (p: ComponentCreatedPayload) => {
+      if (p.sourceElementId) void captureComponentThumbnail(composer, p.component.id, p.sourceElementId);
+    };
     composer.on(EVENTS.COMPONENT_CREATED, onUpsert);
+    composer.on(EVENTS.COMPONENT_CREATED, onCreated);
     composer.on(EVENTS.COMPONENT_UPDATED, onUpsert);
     composer.on(EVENTS.COMPONENT_DELETED, onDeleted);
 
@@ -96,6 +103,7 @@ export function useComponentSync(
 
     return () => {
       composer.off(EVENTS.COMPONENT_CREATED, onUpsert);
+      composer.off(EVENTS.COMPONENT_CREATED, onCreated);
       composer.off(EVENTS.COMPONENT_UPDATED, onUpsert);
       composer.off(EVENTS.COMPONENT_DELETED, onDeleted);
       unsubscribe?.();

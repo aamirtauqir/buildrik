@@ -1,33 +1,31 @@
+// @vitest-environment jsdom
 /**
- * Detach confirm — board 1170:4792.
- *
- * Replaces `DetachConfirmModal.test.tsx`, which asserted the design this
- * board retired: a title naming the instance ("Detach instance #3 from
- * master?"), a "Master: X · 7 instances total" strip, and four glyph bullets
- * about resolved bindings and free-form editing. The board asks one question
- * and answers it in one sentence, so the modal is chrome-ui's ConfirmDialog
- * now and there is no separate component left to test.
- *
+ * ComponentDetailScreen — the master screen, board 4418:142876 (G2-122):
+ * scope block, Detach all (confirmed), inline rename (G2-124), STRUCTURE and
+ * USED ON. Per-instance detach moved to the inspector (G2-125).
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { ComponentDetailScreen } from "../ComponentDetailScreen";
-import { DSModeProvider } from "../../../../design-system/state/DSModeContext";
 import type { Composer } from "../../../../../engine";
 import type { ComponentDefinition } from "../../../../../shared/types/components";
 
 function makeComponent(): ComponentDefinition {
   return {
     id: "cmp-1",
-    name: "Hero banner",
+    name: "Menu card",
     masterTree: {
       id: "el-master",
-      type: "div",
+      type: "container",
       styles: {},
-      children: [],
+      children: [
+        { id: "a", type: "image", children: [] },
+        { id: "b", type: "heading", children: [], data: { layerName: "Title" } },
+        { id: "c", type: "text", children: [], dataBindings: { content: { source: "cms" } } },
+      ],
     } as unknown as ComponentDefinition["masterTree"],
     createdAt: 0,
     updatedAt: 0,
@@ -35,71 +33,84 @@ function makeComponent(): ComponentDefinition {
   };
 }
 
-/** Enough composer for the detach path: a selection, and an instance list. */
-function makeComposer(selectedId: string | null): Composer {
-  return {
-    selection: { getSelectedIds: () => (selectedId ? [selectedId] : []) },
-    components: { getInstancesOfComponent: () => [{ elementId: "el-1" }] },
+const root = (id: string) => ({ getId: () => id, getParent: () => null });
+function makeComposer() {
+  const detachInstance = vi.fn(async (_id: string) => true);
+  const updateComponent = vi.fn(async () => true);
+  const setActivePage = vi.fn();
+  const pageOf: Record<string, string> = { e1: "r-home", e2: "r-home", e3: "r-menu" };
+  const composer = {
+    selection: { getSelectedIds: () => [] },
+    getProjectMetadata: () => ({ name: "Bella Cucina" }),
+    elements: {
+      getAllPages: () => [
+        { id: "home", name: "Home", root: { id: "r-home" } },
+        { id: "menu", name: "Menu", root: { id: "r-menu" } },
+        { id: "about", name: "About", root: { id: "r-about" } },
+      ],
+      getElement: (id: string) => ({ getId: () => id, getParent: () => root(pageOf[id]) }),
+      setActivePage,
+    },
+    components: {
+      getInstancesOfComponent: () => [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }],
+      detachInstance,
+      updateComponent,
+    },
   } as unknown as Composer;
+  return { composer, detachInstance, updateComponent, setActivePage };
 }
 
-function renderDetail(composer: Composer, onDetachInstance: () => void) {
-  return render(
+const renderMaster = (composer: Composer) =>
+  render(
     <ToastProvider>
-      <DSModeProvider initialMode="pro">
-        <ComponentDetailScreen
-          component={makeComponent()}
-          composer={composer}
-          onBack={() => {}}
-          isInstanceSelected
-          selectedElementId="el-1"
-          onDetachInstance={onDetachInstance}
-        />
-      </DSModeProvider>
+      <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={() => {}} />
     </ToastProvider>,
   );
-}
 
-describe("ComponentDetailScreen — detach confirm (board 1170:4792)", () => {
-  it("asks the board's question and names the component it stops following", () => {
-    const onDetach = vi.fn();
-    const { getByText, queryByText } = renderDetail(makeComposer("el-1"), onDetach);
-
-    fireEvent.click(getByText(/Detach instance/i));
-
-    expect(getByText("Detach from component?")).toBeTruthy();
-    expect(
-      getByText(
-        /This copy stops receiving updates from "Hero banner"\. The component itself is untouched\./,
-      ),
-    ).toBeTruthy();
-    // The retired body: master/bindings vocabulary aimed at nobody.
-    expect(queryByText(/resolved bindings will be snapshotted/i)).toBeNull();
-    expect(queryByText(/free-form/i)).toBeNull();
-    expect(queryByText(/instances total/i)).toBeNull();
-    // Confirming is what detaches — opening the dialog must not.
-    expect(onDetach).not.toHaveBeenCalled();
+describe("ComponentDetailScreen — master screen (4418:142876)", () => {
+  it("draws the scope block with the real instance count and site name", () => {
+    renderMaster(makeComposer().composer);
+    expect(screen.getByText(/^Master component ·/).textContent).toBe("Master component · Menu card");
+    expect(screen.getByTestId("component-linked").textContent).toBe(
+      "3 linked instances on Bella Cucina. Updating this master affects those instances. Inserting adds one instance.",
+    );
+    expect(screen.getByTestId("component-insert").textContent).toBe("Insert from saved components");
+    expect(screen.getByTestId("component-update").textContent).toBe("Update from selection…");
+    expect(screen.getByTestId("component-delete").textContent).toBe("Delete Menu card master");
+    expect(screen.queryByText("Type")).toBeNull();
+    expect(screen.queryByText("Tags")).toBeNull();
   });
 
-  it("detaches on confirm and not on cancel", () => {
-    const onDetach = vi.fn();
-    const { getByText } = renderDetail(makeComposer("el-1"), onDetach);
-
-    fireEvent.click(getByText(/Detach instance/i));
-    fireEvent.click(getByText("Cancel"));
-    expect(onDetach).not.toHaveBeenCalled();
-
-    fireEvent.click(getByText(/Detach instance/i));
-    fireEvent.click(getByText("Detach"));
-    expect(onDetach).toHaveBeenCalledTimes(1);
+  it("Detach all confirms, then detaches every instance", () => {
+    const { composer, detachInstance } = makeComposer();
+    renderMaster(composer);
+    fireEvent.click(screen.getByTestId("component-detach-all"));
+    expect(detachInstance).not.toHaveBeenCalled();
+    expect(screen.getByText("Detach all 3 instances of Menu card?")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
+    expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]);
   });
 
-  it("skips the confirm when nothing is selected — it would have nothing to name", () => {
-    const onDetach = vi.fn();
-    const { getByText, queryByText } = renderDetail(makeComposer(null), onDetach);
+  it("STRUCTURE lists the master's parts; USED ON the pages with instances, which open on click", () => {
+    const { composer, setActivePage } = makeComposer();
+    renderMaster(composer);
+    expect(screen.getByTestId("component-structure-header").textContent).toContain("3");
+    const rows = screen.getAllByTestId("component-structure-row").map((r) => r.textContent);
+    expect(rows).toEqual(["Imageimage", "Titleheading", "Texttext · CMS bound"]);
+    expect(screen.getByTestId("component-usedon-home").textContent).toBe("Home2 instances");
+    expect(screen.getByTestId("component-usedon-menu").textContent).toBe("Menu1 instance");
+    expect(screen.queryByTestId("component-usedon-about")).toBeNull();
+    fireEvent.click(screen.getByTestId("component-usedon-menu"));
+    expect(setActivePage).toHaveBeenCalledWith("menu");
+  });
 
-    fireEvent.click(getByText(/Detach instance/i));
-    expect(queryByText("Detach from component?")).toBeNull();
-    expect(onDetach).toHaveBeenCalledTimes(1);
+  it("the name renames inline (G2-124)", async () => {
+    const { composer, updateComponent } = makeComposer();
+    renderMaster(composer);
+    fireEvent.click(screen.getByTestId("component-name"));
+    const input = screen.getByTestId("component-rename-input");
+    fireEvent.change(input, { target: { value: "  Dish card " } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(updateComponent).toHaveBeenCalledWith("cmp-1", { name: "Dish card" });
   });
 });

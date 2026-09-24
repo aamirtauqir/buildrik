@@ -536,7 +536,7 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 580px;
+  width: var(--bk-size-dialog-md);
   height: 520px;
   display: flex;
   flex-direction: column;
@@ -638,17 +638,17 @@
   font-weight: 500;
   color: var(--bk-ink-muted);
 }
-/* Board field rows: 42h inputs, radius 8, 14px text (drawn instances win
-   over the Input component doc's 36h — founder precedent: drawn > description). */
+/* v3 boards 6887:73809 / 73848 / 73882: 32h fields, radius 6, 13px text
+   (the S3.7 boards drew 42h / radius 8 / 14px). */
 /* Every text-ish input, not just [type=text]: the OG image field is
    `type="url"` and missed all three rules, so it shipped 10px shorter than
    the two fields above it with a different radius and type size. */
 .bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]) {
-  min-height: 42px;
-  border-radius: var(--bk-radius-lg);
-  font-size: 14px;
+  height: 32px;
+  border-radius: var(--bk-radius-md);
+  font-size: 13px;
 }
-.bd-pg-drawer-body textarea { border-radius: var(--bk-radius-lg); font-size: 14px; }
+.bd-pg-drawer-body textarea { border-radius: var(--bk-radius-md); font-size: 13px; }
 /* Decision #20 foot — Cancel · Done, right-aligned, under a hairline
    (boards 6887:73809 / 73848 / 73882). */
 .bd-pg-drawer-foot {

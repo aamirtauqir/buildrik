@@ -22,7 +22,7 @@ import { flatCatalog } from "./catalog";
 import type { FlatElEntry } from "./types";
 import { getBlockDefinitions, componentBlockDefinitions, type BlockDefinition } from "../../../../../blocks/blockRegistry";
 
-export type InsertGroupId = "elements" | "blocks" | "components" | "mine";
+export type InsertGroupId = "favourites" | "recent" | "elements" | "blocks" | "components" | "mine";
 
 export interface InsertGroup {
   id: InsertGroupId;
@@ -49,8 +49,12 @@ export const blockRows: BlockDefinition[] = getBlockDefinitions().filter(
   (b) => b.category === "Sections" && !componentIds.has(b.id),
 );
 
-export function buildInsertGroups(mineCount: number | null): InsertGroup[] {
+/** ★ FAVOURITES (board 4418:103353) and RECENT lead the list only while they
+ *  have rows. */
+export function buildInsertGroups(mineCount: number | null, favCount = 0, recentCount = 0): InsertGroup[] {
   return [
+    ...(favCount ? [{ id: "favourites" as const, label: "★ FAVOURITES", count: favCount, kind: "inline" as const }] : []),
+    ...(recentCount ? [{ id: "recent" as const, label: "RECENT", count: recentCount, kind: "inline" as const }] : []),
     { id: "elements", label: "ELEMENTS", count: elementRows.length, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
     /* Board 4428:140817 names them by where they come from. */

@@ -890,6 +890,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onRead={refreshUnread}
             onNavigate={navigateFromNotification}
             addToast={addToast}
+            onOpenActivity={onOpenActivity}
           />
         </div>
       ) : null}

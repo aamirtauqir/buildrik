@@ -13,6 +13,7 @@ import { generateId } from "../../../shared/utils/helpers";
 import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../../shared/utils/html";
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
+import { resolvePlacement } from "./placement";
 
 /**
  * Manages element CRUD operations
@@ -74,11 +75,14 @@ export class ElementCRUD {
    * Add element to parent
    */
   addElement(element: Element, parentId: string, index?: number): boolean {
-    const parent = this.ctx.elements.get(parentId);
-    if (!parent) return false;
+    const asked = this.ctx.elements.get(parentId);
+    if (!asked) return false;
+    const place = resolvePlacement(element, asked, index);
+    if (!place) return false;
+    const { parent, index: at } = place;
 
-    parent.addChild(element, index);
-    this.ctx.composer.emit(EVENTS.ELEMENT_CREATED, { element, parent, index });
+    parent.addChild(element, at);
+    this.ctx.composer.emit(EVENTS.ELEMENT_CREATED, { element, parent, index: at });
     this.ctx.composer.markDirty();
 
     return true;
@@ -165,9 +169,13 @@ export class ElementCRUD {
    */
   moveElement(elementId: string, newParentId: string, index?: number): boolean {
     const element = this.ctx.elements.get(elementId);
-    const newParent = this.ctx.elements.get(newParentId);
+    const asked = this.ctx.elements.get(newParentId);
 
-    if (!element || !newParent) return false;
+    if (!element || !asked) return false;
+    const place = resolvePlacement(element, asked, index);
+    if (!place) return false;
+    const newParent = place.parent;
+    index = place.index;
 
     // Reject moving an element into itself or one of its own descendants —
     // that would create a parent cycle (a.parent === b while b.parent === a)
@@ -228,8 +236,8 @@ export class ElementCRUD {
     // Add after original in parent
     const parent = original.getParent();
     if (parent) {
-      const index = parent.getChildIndex(original);
-      parent.addChild(clone, index + 1);
+      const place = resolvePlacement(clone, parent, parent.getChildIndex(original) + 1);
+      if (place) place.parent.addChild(clone, place.index);
     }
 
     this.ctx.composer.emit(EVENTS.ELEMENT_DUPLICATED, { original, clone });
@@ -261,10 +269,11 @@ export class ElementCRUD {
     // This creates and registers all elements including children
     const newElement = this.ctx.buildElementTree(clonedData);
 
-    // Add to target at index
-    target.addChild(newElement, index);
+    // Add to target at index — or after it when it may not hold this element
+    const place = resolvePlacement(newElement, target, index) ?? { parent: target, index };
+    place.parent.addChild(newElement, place.index);
 
-    this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target, index });
+    this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target: place.parent, index: place.index });
     this.ctx.composer.markDirty();
 
     return newElement;

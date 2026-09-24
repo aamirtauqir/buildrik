@@ -30,6 +30,14 @@ import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
+import { FROM_ACTIVITY } from "./tabs/activity/BackToActivityRow";
+
+/** History's deep-link sub-screen: "published", or an Activity row's
+ *  "from-activity:published" / "from-activity:session". */
+function historyView(sub: string | undefined): "published" | "session" | undefined {
+  const view = sub?.startsWith(`${FROM_ACTIVITY}:`) ? sub.slice(FROM_ACTIVITY.length + 1) : sub;
+  return view === "published" || view === "session" ? view : undefined;
+}
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
@@ -41,6 +49,7 @@ const MediaTab = React.lazy(() =>
 );
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
+const ActivityTab = React.lazy(() => import("./tabs/activity/ActivityTab").then((m) => ({ default: m.ActivityTab })));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
 const AITab = React.lazy(() =>
@@ -197,12 +206,16 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         />
       );
 
+    case "activity":
+      return <ActivityTab composer={composer} projectId={projectId} onClose={commonTabProps.onClose} />;
+
     case "history":
       return (
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          initialView={activeSubTab === "published" || activeSubTab === "activity" ? activeSubTab : undefined}
+          initialView={historyView(activeSubTab)}
+          fromActivity={activeSubTab?.startsWith(`${FROM_ACTIVITY}:`) ?? false}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={
@@ -229,7 +242,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <ReviewTab
           {...commonTabProps}
           composer={composer}
-          fromActivity={activeSubTab === "from-activity"}
+          fromActivity={activeSubTab === FROM_ACTIVITY}
           onResend={onResendReview}
         />
       );

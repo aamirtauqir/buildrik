@@ -70,6 +70,8 @@
 /* View mode: collapse the rail column. Columns 2 and 4 are already 0px here —
    StudioPanels passes drawerOpen/inspectorOpen false — so one property does it. */
 html.bk-read-only-view { --layout-rail-width: 0px; }
+/* A workspace VIEWER keeps the rail (board 4418:126059). */
+html.bk-read-only-view.bk-viewer-chrome { --layout-rail-width: var(--bk-size-rail); }
 
 /* Drawer open state - expand drawer column */
 .layout-shell--drawer-open {

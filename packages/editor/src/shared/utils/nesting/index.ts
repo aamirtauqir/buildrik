@@ -114,6 +114,14 @@ export {
   isValidNesting,
 } from "./validator";
 
+export {
+  TEXT_ELEMENT_TYPES,
+  insideRefusal,
+  engineMayPlaceInside,
+  parserHoists,
+  type InsideRefusal,
+} from "./placement";
+
 // =============================================================================
 // OPERATIONS EXPORTS
 // =============================================================================

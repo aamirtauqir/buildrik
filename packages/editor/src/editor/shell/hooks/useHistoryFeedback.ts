@@ -69,6 +69,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "touch-move-element": "Moved element",
   nudge: "Moved element",
   "move-layer": "Reordered layer",
+  "move-to-page": "Moved to another page",
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
@@ -93,6 +94,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "link-change": "Changed link",
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",
+  "bind-collection-list": "Bound the collection list",
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",

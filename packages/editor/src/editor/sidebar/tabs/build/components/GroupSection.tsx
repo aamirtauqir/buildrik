@@ -15,7 +15,7 @@ import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import type { ComponentDefinition } from "../../../../../shared/types/components";
 import type { InsertGroup } from "../catalog/groups";
 import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
-import { Button, Tooltip } from "@/editor/chrome-ui";
+import { BK_TOOLTIP_CLASS, Button, Tooltip } from "@/editor/chrome-ui";
 import { BlockThumb } from "./BlockThumb";
 
 interface GroupSectionProps {
@@ -36,6 +36,9 @@ interface GroupSectionProps {
   onMineInsert?: (component: ComponentDefinition) => void;
   /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
   onManageComponents?: () => void;
+  /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
+  favs?: Set<string>;
+  onToggleFav?: (name: string) => void;
 }
 
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
@@ -108,23 +111,25 @@ export const Row: React.FC<{
    *  "Disabled without a reason is a bug" — the Button component doc. */
   disabled?: boolean;
   disabledReason?: string;
-  /** Enabled rows: the catalog's one-line description, shown on hover
-   *  (G2-108, board 4418:103591). */
-  description?: string;
+  /** Enabled rows: hover/focus reports the row so the list can show its
+   *  one-line description (G2-108, board 4418:103591). */
+  onHoverChange?: (row: HTMLElement | null) => void;
   testId: string;
   /** Board 4418:99857's trailing ⠿ — a drag hint; the row is the handle. */
   grip?: boolean;
+  /** ★ favourite toggle (G2-115): shown on hover. */
+  fav?: { on: boolean; onToggle: () => void; testId: string };
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, description, testId, grip, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
         pinned
           ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
           : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
@@ -134,6 +139,10 @@ export const Row: React.FC<{
           : "tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]"
       }`}
       data-testid={testId}
+      onMouseEnter={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
+      onMouseLeave={onHoverChange ? () => onHoverChange(null) : undefined}
+      onFocus={onHoverChange ? (e) => onHoverChange(e.currentTarget) : undefined}
+      onBlur={onHoverChange ? () => onHoverChange(null) : undefined}
       onClick={disabled ? undefined : onClick}
       onDragStart={disabled ? undefined : onDragStart}
       onKeyDown={(e) => {
@@ -188,6 +197,28 @@ export const Row: React.FC<{
           <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
         )}
       </span>
+      {fav ? (
+        <span
+          role="button"
+          tabIndex={0}
+          aria-pressed={fav.on}
+          aria-label={fav.on ? `Remove ${label} from favourites` : `Add ${label} to favourites`}
+          data-testid={fav.testId}
+          /* Hover-only either way: the boards draw element rows without it. */
+          className={`tw:w-[20px] tw:shrink-0 tw:text-center tw:text-[12px] tw:cursor-pointer tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 ${
+            fav.on ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-gray-400)]"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            fav.onToggle();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); fav.onToggle(); }
+          }}
+        >
+          {fav.on ? "★" : "☆"}
+        </span>
+      ) : null}
       {grip ? (
         <span
           aria-hidden="true"
@@ -203,11 +234,8 @@ export const Row: React.FC<{
   // Board 138:198: the disabled row's tooltip IS the reason ("Video blocks
   // need a media provider connected" is that board's sample). Ink bg, white
   // 12px — the Tooltip primitive's dark style.
-  // An enabled row's tooltip is its description (G2-108). The target wrapper
-  // is widened so the row keeps its full-width hover fill.
-  const tip = disabled ? disabledReason : description;
-  return tip ? (
-    <Tooltip content={tip} placement="bottom" arrow={false} theme={{ target: "tw:w-full" }}>
+  return disabled && disabledReason ? (
+    <Tooltip content={disabledReason} placement="bottom" arrow={false} theme={{ target: "tw:w-full" }}>
       {row}
     </Tooltip>
   ) : (
@@ -215,25 +243,80 @@ export const Row: React.FC<{
   );
 };
 
+/* One description bubble per list, not a flowbite Tooltip per row: 53
+   tooltips (floating-ui each) made the drawer's first render 6–10s under
+   test load, against ~0.5s without them. The bubble sits under the hovered
+   (or focused) row — the same dark 12px surface as chrome-ui's Tooltip. */
+const ElementRows: React.FC<{
+  group: ElementRowGroup;
+  elements: FlatElEntry[];
+  favs?: Set<string>;
+  onToggleFav?: (name: string) => void;
+  onDragStart: DragStartFn;
+  onElClick: ElClickFn;
+}> = ({ group, elements, favs, onToggleFav, onDragStart, onElClick }) => {
+  const [tip, setTip] = React.useState<{ text: string; top: number } | null>(null);
+  return (
+    <div className="tw:relative">
+      {elements.map((el) => (
+        <Row
+          key={`${el.catId}-${el.name}`}
+          label={el.name}
+          iconHtml={el.iconHtml}
+          disabled={el.disabled}
+          disabledReason={el.disabled ? el.description : undefined}
+          onHoverChange={
+            el.disabled
+              ? undefined
+              : (row) => setTip(row ? { text: el.description, top: row.offsetTop + row.offsetHeight + 4 } : null)
+          }
+          testId={elRowTestId(group, el.name)}
+          fav={
+            onToggleFav && !el.disabled
+              ? { on: favs?.has(el.name) ?? false, onToggle: () => onToggleFav(el.name), testId: elFavTestId(group, el.name) }
+              : undefined
+          }
+          draggable
+          onDragStart={(e) => onDragStart(e, el)}
+          onClick={() => onElClick(el)}
+        />
+      ))}
+      {tip && (
+        <div
+          role="tooltip"
+          data-testid={`insert-${group === "elements" ? "el" : group === "favourites" ? "fav" : "recent"}-tip`}
+          style={{ top: tip.top }}
+          className={`tw:pointer-events-none tw:absolute tw:left-2 tw:z-10 tw:max-w-[264px] tw:bg-gray-900 tw:font-medium tw:shadow-sm ${BK_TOOLTIP_CLASS}`}
+        >
+          {tip.text}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/** Groups that list element rows. Their test ids are literal templates on
+ *  the declaring lines so the conformance anchor check can see them. */
+type ElementRowGroup = "favourites" | "recent" | "elements";
+const isElementRowGroup = (id: InsertGroup["id"]): id is ElementRowGroup => id === "favourites" || id === "recent" || id === "elements";
+const elRowTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-${n}` : g === "recent" ? `insert-recent-${n}` : `insert-el-${n}`);
+const elFavTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-fav-${n}` : g === "recent" ? `insert-recent-fav-${n}` : `insert-el-fav-${n}`);
+
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents,
+  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert, onManageComponents, favs, onToggleFav,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
-    {isOpen && group.id === "elements" && elements?.map((el) => (
-      <Row
-        key={`${el.catId}-${el.name}`}
-        label={el.name}
-        iconHtml={el.iconHtml}
-        disabled={el.disabled}
-        disabledReason={el.disabled ? el.description : undefined}
-        description={el.disabled ? undefined : el.description}
-        testId={`insert-el-${el.name}`}
-        draggable
-        onDragStart={(e) => onDragStart(e, el)}
-        onClick={() => onElClick(el)}
+    {isOpen && isElementRowGroup(group.id) && elements && (
+      <ElementRows
+        group={group.id}
+        elements={elements}
+        favs={favs}
+        onToggleFav={onToggleFav}
+        onDragStart={onDragStart}
+        onElClick={onElClick}
       />
-    ))}
+    )}
     {/* Board 138:2: BLOCKS is a CARD GRID, not rows — `Card / media` (17:6):
         136×104, 136×76 thumb (4:3) on bg-subtle + a 12px label. Thumb is the
         block's preview when it has one, empty until then — the board names it

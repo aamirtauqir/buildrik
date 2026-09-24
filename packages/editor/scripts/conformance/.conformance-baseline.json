@@ -280,10 +280,6 @@
     "skipped": 2,
     "compared": 12
   },
-  "content-unsaved-record": {
-    "skipped": 0,
-    "compared": 23
-  },
   "onboarding-achievement-step-complete": {
     "skipped": 5,
     "compared": 34,
@@ -856,35 +852,9 @@
     "skipped": 0,
     "compared": 97
   },
-  "content-collection": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 85
-  },
   "media-loading": {
     "skipped": 0,
     "compared": 69
-  },
-  "content-fields": {
-    "contrastFailures": 3,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "span.tw:text-[11px].tw:leading-4 | required | rgb(209, 213, 219) | rgb(255, 255, 255)": 1.47
-    },
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 79
-  },
-  "content-record": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 3,
-    "compared": 24
   },
   "inspector-multi-select": {
     "skipped": 8,
@@ -948,14 +918,6 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 59
-  },
-  "content-records": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 6,
-    "compared": 11
   },
   "inspector-profile-text": {
     "skipped": 6,

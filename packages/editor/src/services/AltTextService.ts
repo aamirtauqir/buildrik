@@ -39,9 +39,14 @@ export interface AltTextRemoteResult {
  */
 export async function generateAltTextRemote(
   assetId: string,
+  /** `force`: the library's explicit Regenerate — replace existing alt text.
+   *  The upload auto-trigger omits it, so a typed alt text is never lost. */
+  opts: { force?: boolean } = {},
 ): Promise<AltTextRemoteResult | null> {
   try {
-    const result = await getClient().media.generateAltText.mutate({ assetId });
+    const result = await getClient().media.generateAltText.mutate(
+      opts.force ? { assetId, force: true } : { assetId },
+    );
     return result as AltTextRemoteResult;
   } catch {
     return null;

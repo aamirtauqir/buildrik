@@ -39,11 +39,11 @@ describe("PageSettingsDrawer — ESC", () => {
 
   it("stops a dirty drawer at the discard modal instead of closing", () => {
     const onClose = mount();
-    fireEvent.change(screen.getByLabelText("Meta title"), {
+    fireEvent.change(screen.getByLabelText("Meta title · page override"), {
       target: { value: "Edited title" },
     });
     escape();
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByText("Discard unsaved SEO changes?")).toBeInTheDocument();
+    expect(screen.getByText("Discard unsaved changes?")).toBeInTheDocument();
   });
 });

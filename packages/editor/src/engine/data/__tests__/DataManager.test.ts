@@ -433,3 +433,31 @@ describe("destroy", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("row actions — rename and re-sync (Sources ⋯, 6930:80567)", () => {
+  it("renames a source without touching its id or data, and says so", () => {
+    const m = makeManager();
+    m.registerSource(userSource());
+    const onUpdate = vi.fn();
+    m.on(EVENTS.DATA_SOURCE_UPDATED, onUpdate);
+    m.renameSource("user", "Members");
+    expect(m.getSource("user")?.name).toBe("Members");
+    expect(m.getSource("user")?.data).toEqual(userSource().data);
+    expect(onUpdate).toHaveBeenCalledWith({ id: "user", data: userSource().data });
+    expect(() => m.renameSource("nope", "x")).toThrow();
+  });
+
+  it("re-syncs a provider-backed source from getData", async () => {
+    const m = makeManager();
+    m.registerSource({ id: "live", name: "Live", type: "function", getData: () => [{ n: 2 }] });
+    expect(await m.refreshSource("live")).toBe(true);
+    expect(m.getSource("live")?.data).toEqual([{ n: 2 }]);
+  });
+
+  it("reports a static source as having nothing to pull from", async () => {
+    const m = makeManager();
+    m.registerSource(userSource());
+    expect(await m.refreshSource("user")).toBe(false);
+    expect(m.getSource("user")?.data).toEqual(userSource().data);
+  });
+});

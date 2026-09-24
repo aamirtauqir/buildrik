@@ -17,7 +17,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
+import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
@@ -72,6 +72,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const { addToast } = useToast();
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
   /** G2-100: the page whose backup could not be written — the Backup failed dialog is open. */
+  /** The page the create flow just made — the Page created modal names it. */
+  const [createdPageName, setCreatedPageName] = React.useState<string | null>(null);
   const [backupFailedPage, setBackupFailedPage] = React.useState<string | null>(null);
 
 
@@ -197,11 +199,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     startApply();
   }
 
-  function handleAddAsNewPage(id: string) {
+  /* 4418:54243: Create page asks first — "Create a page from ‘X’?" naming
+     the page it will add. The role and Pro gates answer before the question. */
+  const [createConfirmId, setCreateConfirmId] = React.useState<string | null>(null);
+  function requestAddAsNewPage(id: string) {
     if (denyApply()) return;
     const t = findTemplate(id);
     if (!t) return;
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
+    setCreateConfirmId(id);
+  }
+
+  function handleAddAsNewPage(id: string) {
     addAsNewPageRef.current = true;
     pendingId.current = id;
     startApply();
@@ -338,7 +347,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
     // P2 fix (codex A6): success modal now fires AFTER actual page creation +
     // HTML import, not on confirm-click. Renders only in newPage flow.
-    if (wasNewPageMode) setCreateResult("success");
+    if (wasNewPageMode) {
+      /* Named now: pendingId is cleared just below, and the modal read the
+         template name from it on the next render — "‘Template’ is ready". */
+      setCreatedPageName(composer?.elements.getActivePage()?.name ?? t.name);
+      setCreateResult("success");
+    }
 
     pendingId.current = null;
     addAsNewPageRef.current = false;
@@ -374,7 +388,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           version: t.version ?? DEFAULT_TEMPLATE_VERSION,
         });
       }
-      onTemplateUsed?.();
+      /* A new page ends on "Page created" (1169:4725), whose Done / Open page
+         settings leave the view. Leaving here too unmounted the view — and
+         that dialog with it — before it was ever seen (walked live). */
+      if (!wasNewPageMode) onTemplateUsed?.();
     });
     setApplyStepIndex(APPLY_STEPS.length);
     await paint();
@@ -407,12 +424,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (sel.previewId || sel.showReplace || showProgress || createResult) return;
+      if (sel.previewId || sel.showReplace || showProgress || createResult || createConfirmId) return;
       onClose?.();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [sel.previewId, sel.showReplace, showProgress, createResult, onClose]);
+  }, [sel.previewId, sel.showReplace, showProgress, createResult, createConfirmId, onClose]);
 
   // ── Render ──
   const tName = findTemplate(pendingId.current)?.name ?? "Template";
@@ -473,9 +490,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <TemplatePreview
           template={previewTemplate}
           pageName={activePageInfo?.name}
-          onCreatePage={(t) => handleAddAsNewPage(t.id)}
+          onCreatePage={(t) => requestAddAsNewPage(t.id)}
           onReplacePage={(t) => handleApplyToCurrent(t.id)}
           onBack={() => sel.setPreviewId(null)}
+          dialogOpen={Boolean(createConfirmId) || sel.showReplace}
           usedOn={(usageMap.get(previewTemplate.id) ?? []).map((u) => ({ id: u.pageId, name: u.pageName }))}
           onOpenPage={(pageId) => {
             composer?.elements.setActivePage?.(pageId);
@@ -566,9 +584,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onRetry={() => { setBackupFailedPage(null); void replaceCurrentPage(); }}
         />
       )}
+      {createConfirmId && (() => {
+        const t = findTemplate(createConfirmId);
+        if (!t) return null;
+        return (
+          <CreatePageConfirmModal
+            templateName={t.name}
+            newPageName={newPageName ?? t.name}
+            onCancel={() => setCreateConfirmId(null)}
+            onConfirm={() => {
+              setCreateConfirmId(null);
+              handleAddAsNewPage(t.id);
+            }}
+          />
+        );
+      })()}
       {createResult === "success" && (
         <CreatePageSuccessModal
-          pageName={tName}
+          pageName={createdPageName ?? tName}
           onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
           onOpenPageSettings={() => {
             setCreateResult(null);

@@ -10,125 +10,9 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import { ContentTab } from "../ContentTab";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
-
-type Handler = (p: unknown) => void;
-
-function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentItem[] }) {
-  let collections = opts?.collections ?? [];
-  let items = opts?.items ?? [];
-  const listeners = new Map<string, Set<Handler>>();
-  const sources = new Map<string, { id: string; name: string; type: string; data?: unknown }>();
-  const elements: Array<{
-    getId: () => string;
-    getType: () => string;
-    getContent: () => string;
-    getDataBindings: () => Record<string, unknown>;
-    removeDataBinding: (p: string) => void;
-  }> = [];
-  const updateCollection = vi.fn((id: string, updates: Record<string, unknown>) => {
-    collections = collections.map((c) => (c.id === id ? { ...c, ...updates } : c));
-    return Promise.resolve(collections.find((c) => c.id === id) ?? null);
-  });
-
-  const composer = {
-    on: (ev: string, fn: Handler) => (listeners.get(ev) ?? listeners.set(ev, new Set()).get(ev)!).add(fn),
-    off: (ev: string, fn: Handler) => listeners.get(ev)?.delete(fn),
-    emit: (ev: string, p?: unknown) => listeners.get(ev)?.forEach((fn) => fn(p)),
-    getProjectMetadata: () => ({ name: "test-proj" }),
-    elements: {
-      getAllElements: () => elements,
-      getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,
-    },
-    selection: { select: vi.fn() },
-    data: {
-      /* DataManager is an emitter — the panel subscribes to its
-         source:registered/updated/unregistered events so the Sources view does
-         not go stale when a source changes from elsewhere. The mock omitted
-         on/off, which made it a weaker DataManager than the real one. */
-      on: vi.fn(),
-      off: vi.fn(),
-      getSource: (id: string) => sources.get(id),
-      registerSource: vi.fn((s: { id: string; name: string; type: string; data?: unknown }) => {
-        if (sources.has(s.id)) throw new Error(`Data source "${s.id}" already exists`);
-        sources.set(s.id, s);
-      }),
-      updateSourceData: vi.fn((id: string, data: unknown) => {
-        const s = sources.get(id);
-        if (s) s.data = data;
-      }),
-      getAllSources: () => [...sources.values()],
-      importSampleData: vi.fn((json: string) => {
-        const parsed = JSON.parse(json) as Record<string, unknown>;
-        for (const key of Object.keys(parsed)) {
-          sources.set(key, {
-            id: key,
-            name: key,
-            type: Array.isArray(parsed[key]) ? "array" : "object",
-            data: parsed[key],
-          });
-        }
-      }),
-      bindCondition: vi.fn(),
-    },
-    cms: {
-      collections: {
-        on: vi.fn(),
-        off: vi.fn(),
-        initialize: vi.fn(() => Promise.resolve()),
-        getAllCollections: () => collections,
-        getCollection: (id: string) => collections.find((c) => c.id === id) ?? null,
-        getContentItems: vi.fn((cid: string) => Promise.resolve(items.filter((i) => i.collectionId === cid))),
-        createContentItem: vi.fn((cid: string, data: Record<string, unknown>) => {
-          const item: CMSContentItem = {
-            id: `it-${items.length + 1}`,
-            collectionId: cid,
-            data,
-            status: "draft",
-            createdAt: "",
-            updatedAt: "",
-          };
-          items = [...items, item];
-          return Promise.resolve(item);
-        }),
-        updateContentItem: vi.fn((id: string, updates: Partial<CMSContentItem>) => {
-          items = items.map((i) => (i.id === id ? { ...i, ...updates } : i));
-          return Promise.resolve(items.find((i) => i.id === id) ?? null);
-        }),
-        deleteContentItem: vi.fn(() => Promise.resolve(true)),
-        addField: vi.fn(() => Promise.resolve(null)),
-        deleteField: vi.fn(() => Promise.resolve(true)),
-        /* Mutates the array the getters read from, so a save is observable the
-           way it is in the engine — a spy that only records the call would pass
-           even if the panel never re-read the collection. */
-        updateCollection,
-      },
-    },
-  };
-  return { composer, elements, sources, updateCollection };
-}
-
-const MENU = {
-  id: "col-1",
-  name: "Menu items",
-  slug: "menu-items",
-  fields: [
-    { id: "f1", name: "Name", slug: "name", type: "text", order: 0 },
-    { id: "f2", name: "Price", slug: "price", type: "text", order: 1 },
-    { id: "f3", name: "Published?", slug: "pub", type: "boolean", order: 2 },
-  ],
-  displayField: "name",
-} as unknown as CMSCollection;
-
-const ITEM: CMSContentItem = {
-  id: "it-1",
-  collectionId: "col-1",
-  data: { name: "Margherita", price: "$12", pub: true },
-  status: "published",
-  createdAt: "",
-  updatedAt: "",
-};
 
 beforeEach(() => localStorage.clear());
 afterEach(() => cleanup());
@@ -171,96 +55,6 @@ describe("ContentTab", () => {
     expect(newCollectionRow.tagName).toBe("DIV");
     fireEvent.click(newCollectionRow);
     expect(onCreateCollection).toHaveBeenCalledTimes(1);
-  });
-
-  it("drills into a collection, opens a record, saves edits back through the engine", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    expect(await screen.findByText("1 record")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Margherita"));
-    const nameInput = await screen.findByLabelText("Name");
-    fireEvent.change(nameInput, { target: { value: "Margherita Extra" } });
-    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    await waitFor(() =>
-      expect(composer.cms.collections.updateContentItem).toHaveBeenCalledWith(
-        "it-1",
-        expect.objectContaining({
-          data: expect.objectContaining({ name: "Margherita Extra" }),
-          status: "published",
-        }),
-      ),
-    );
-  });
-
-  /* Deleting one FIELD asked first; deleting the whole record did not — and CMS
-     records are not in the undo stack. Measured live: the row vanished on the
-     click and ⌘Z did not bring it back. */
-  it("asks before deleting a record, and only deletes on confirm", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Margherita"));
-    fireEvent.click(screen.getByRole("button", { name: /delete record/i }));
-
-    expect(await screen.findByText(/Delete record\?/)).toBeInTheDocument();
-    expect(composer.cms.collections.deleteContentItem).not.toHaveBeenCalled();
-
-    const dialog = screen.getByRole("dialog");
-    fireEvent.click(within(dialog).getByRole("button", { name: /delete record/i }));
-    await waitFor(() =>
-      expect(composer.cms.collections.deleteContentItem).toHaveBeenCalledWith("it-1"),
-    );
-  });
-
-  it("cancelling keeps the record", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Margherita"));
-    fireEvent.click(screen.getByRole("button", { name: /delete record/i }));
-    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /cancel/i }));
-
-    expect(composer.cms.collections.deleteContentItem).not.toHaveBeenCalled();
-  });
-
-  /* Publishing runs the collection's rules now (CollectionManager throws
-     CMSValidationError). The panel used to let that reject unheard: the promise
-     failed, the view moved on, and the "required" tag beside the field named a
-     check nothing ran. Walked live — the message lands under the field and the
-     record stays a draft. */
-  it("shows the rejection under the field when a publish fails validation", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    vi.mocked(composer.cms.collections.updateContentItem).mockRejectedValueOnce(
-      new CMSValidationError({ name: "Name is required" }),
-    );
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Margherita"));
-    fireEvent.change(await screen.findByLabelText("Name"), { target: { value: "" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent("Name is required");
-    // still on the record, with the edit intact — not bounced back to the list
-    expect(screen.getByLabelText("Name")).toBeInTheDocument();
-  });
-
-  it("fields view lists types + required and adds a field through the engine", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(screen.getByText("Fields"));
-    expect(await screen.findByText("Published?")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
-    fireEvent.change(screen.getByLabelText("Field name"), { target: { value: "Photo URL" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
-    await waitFor(() =>
-      expect(composer.cms.collections.addField).toHaveBeenCalledWith(
-        "col-1",
-        expect.objectContaining({ name: "Photo URL", slug: "photo-url", type: "text" }),
-      ),
-    );
   });
 
   it("variables: add registers the live 'site' source and persists", async () => {
@@ -338,66 +132,6 @@ describe("ContentTab", () => {
      `onOpenDynamicPages` is supplied, and ContentTab never supplied it, so the
      row board 149:50 draws had never rendered once. This fails without the
      wiring. */
-  it("reaches Dynamic pages from a collection and saves the URL pattern", async () => {
-    const { composer, updateCollection } = makeEngine({ collections: [MENU], items: [] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-
-    const row = await screen.findByText("Dynamic pages");
-    fireEvent.click(row);
-
-    const input = await screen.findByLabelText("URL pattern");
-    fireEvent.change(input, { target: { value: "/menu/{slug}" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-
-    await waitFor(() =>
-      expect(updateCollection).toHaveBeenCalledWith(MENU.id, { pageSlugPattern: "/menu/{slug}" }),
-    );
-  });
-
-  /* Two conditions decide whether a dynamic page is ever emitted, and the
-     record count is neither. Both were read off the service, then confirmed by
-     running it against a real collection:
-
-       resolveDynamicPages(...)        -> [{ slug: "/" }]      (pattern names no field)
-       appendDynamicPagesToPublish(...) -> ["index.html"]      (no template bound)
-
-     while this screen said "Generates 1 page from published records". */
-  it("warns when the URL pattern names a field the collection does not have", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Dynamic pages"));
-    const input = await screen.findByLabelText("URL pattern");
-    fireEvent.change(input, { target: { value: "/{slug}" } });
-    expect(
-      await screen.findByText(/no field called "slug", so every record resolves to the same URL/i),
-    ).toBeTruthy();
-    // a pattern built from a real field says nothing of the sort
-    fireEvent.change(input, { target: { value: "/menu/{name}" } });
-    await waitFor(() => expect(screen.queryByText(/no field called/i)).toBeNull());
-  });
-
-  it("says publishing emits nothing while no template page is bound", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Dynamic pages"));
-    fireEvent.change(await screen.findByLabelText("URL pattern"), { target: { value: "/menu/{name}" } });
-    expect(await screen.findByText(/no template page is bound/i)).toBeTruthy();
-  });
-
-  it("drops the template warning once the collection carries a template path", async () => {
-    const bound = { ...MENU, pageTemplatePath: "menu/_template/index.html" } as unknown as CMSCollection;
-    const { composer } = makeEngine({ collections: [bound], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Dynamic pages"));
-    fireEvent.change(await screen.findByLabelText("URL pattern"), { target: { value: "/menu/{name}" } });
-    await waitFor(() => expect(screen.queryByText(/no template page is bound/i)).toBeNull());
-    expect(screen.getByText(/Generates 1 page from published records/i)).toBeTruthy();
-  });
-
   it("subscribes to DataManager's own events so the Sources view cannot go stale", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
@@ -442,28 +176,16 @@ describe("ContentTab", () => {
      returned to the collection and threw the value away without a word. The
      view already knows it is dirty — it renders "Unsaved changes · Discard ·
      Save" — so the crumb was the one exit that discarded silently. */
-  it("asks before the crumb throws away an edited record", async () => {
+  it("a collection row opens it in the CMS workspace and stays selected (4428:143182)", async () => {
+    cmsWorkspace.reset();
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Margherita"));
-    fireEvent.change(await screen.findByLabelText("Name"), { target: { value: "Margherita Extra" } });
-    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
-
-    // The crumb names the SAVED record, not the field being typed into.
-    fireEvent.click(screen.getByRole("button", { name: "Back to Margherita" }));
-    expect(await screen.findByText("Discard changes?")).toBeInTheDocument();
-    // Still in the record until the question is answered.
-    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
-  });
-
-  it("leaves a clean record without asking", async () => {
-    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Menu items"));
-    fireEvent.click(await screen.findByText("Margherita"));
-    fireEvent.click(screen.getByRole("button", { name: "Back to Margherita" }));
-    expect(await screen.findByText("1 record")).toBeInTheDocument();
-    expect(screen.queryByText("Discard changes?")).not.toBeInTheDocument();
+    const row = await screen.findByTestId("content-collection-col-1");
+    fireEvent.click(row);
+    expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", tab: "records", recordId: null });
+    // the drawer stays on its list, with the open collection marked
+    await waitFor(() => expect(screen.getByTestId("content-collection-col-1")).toHaveAttribute("aria-current", "true"));
+    expect(screen.getByTestId("content-open-sources")).toBeInTheDocument();
+    cmsWorkspace.reset();
   });
 });

@@ -42,13 +42,16 @@ export const MODAL_FOOT_CLASS =
   "tw:[&_button]:rounded-lg tw:[&_button]:text-[13px] tw:[&_button]:font-medium";
 
 /** width/dialog-md 560 is the default; New page draws width/dialog-lg 640;
- *  Backup failed (4428:151964) draws width/dialog-sm 480. */
-export type ModalWidth = "sm" | "md" | "lg" | "xl";
+ *  Backup failed (4428:151964) draws width/dialog-sm 480; "wide" is the board
+ *  token width/dialog-xl 960 (Permissions, 4418:133026) — named apart because
+ *  "xl" here was already 720. */
+export type ModalWidth = "sm" | "md" | "lg" | "xl" | "wide";
 const WIDTH_CLASS: Record<ModalWidth, string> = {
   sm: "tw:w-[var(--bk-size-dialog-sm)]",
   md: "tw:w-[var(--bk-size-dialog-md)]",
   lg: "tw:w-[var(--bk-size-dialog-lg)]",
   xl: "tw:w-[720px]",
+  wide: "tw:w-[var(--bk-size-dialog-xl)]",
 };
 
 const KIND_WIDTH: Record<ModalKind, ModalWidth> = {
