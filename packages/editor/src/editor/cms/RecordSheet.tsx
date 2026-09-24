@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
@@ -38,7 +38,7 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
-import { resolveUrl } from "./DynamicPagesPane";
+import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 
 export type OpenMediaLibrary = (
@@ -147,7 +147,8 @@ export function RecordSheet({
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
   const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
-  const title = record ? recordTitle(collection, record) : `New ${collection.name.replace(/s$/, "")}`;
+  const singular = collection.name.replace(/s$/, "");
+  const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
 
   const guard = (go: () => void) => (dirty ? setLeaveTo(() => go) : go());
@@ -191,7 +192,21 @@ export function RecordSheet({
     });
   };
 
-  const set = (slug: string, v: unknown) => setForm((p) => ({ ...p, [slug]: v }));
+  /* 6749:59940 — a new record's slug follows its name ("auto from name")
+     until someone types into the slug field itself. */
+  const nameSlug = collection.displayField ?? "name";
+  const autoSlug = !record && collection.fields.some((f) => f.slug === "slug") && collection.fields.some((f) => f.slug === nameSlug);
+  const [slugTouched, setSlugTouched] = React.useState(false);
+  const nameField = collection.fields.find((f) => f.slug === nameSlug);
+  const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
+  const set = (slug: string, v: unknown) => {
+    if (slug === "slug") setSlugTouched(true);
+    setForm((p) => ({
+      ...p,
+      [slug]: v,
+      ...(autoSlug && !slugTouched && slug === nameSlug ? { slug: slugify(String(v ?? "")) } : {}),
+    }));
+  };
 
   const control = (f: CMSField) => {
     const id = `cms-field-${f.slug}`;
@@ -279,7 +294,7 @@ export function RecordSheet({
           type={type}
           sizing="sm"
           className={CONTROL}
-          placeholder={f.placeholder}
+          placeholder={autoSlug && f.slug === "slug" ? "auto from name" : f.placeholder}
           value={v === undefined || v === null ? "" : String(v)}
           onChange={(e) => set(f.slug, f.type === "number" && e.target.value !== "" ? Number(e.target.value) : e.target.value)}
         />
@@ -391,15 +406,18 @@ export function RecordSheet({
       <footer className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:pt-2">
         <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
           <span
-            className={`tw:size-1.5 tw:rounded-full ${missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
+            className={`tw:size-1.5 tw:rounded-full ${!record && !dirty ? "tw:bg-[var(--bk-ink-muted)]" : missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
             aria-hidden="true"
           />
+          {!record && !dirty ? <TriangleAlert size={12} className="tw:flex-none tw:text-[var(--bk-warning-text)]" aria-hidden="true" /> : null}
           <span
             className={`tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium ${missing.length ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-success-text)]"}`}
           >
-            {missing.length
-              ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
-              : "Eligible for publishing"}
+            {!record && !dirty
+              ? "Not eligible — not saved yet"
+              : missing.length
+                ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
+                : "Eligible for publishing"}
           </span>
           <ToggleSwitch
             checked={published}
@@ -410,17 +428,27 @@ export function RecordSheet({
           />
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">
-          <span
-            className={`tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-            role={saveError ? "alert" : undefined}
-            data-testid="cms-sheet-state"
-          >
-            {saveError ?? (dirty ? "Unsaved changes on this record" : "No unsaved changes on this record")}
+          <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+            <span
+              className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
+              role={saveError ? "alert" : undefined}
+              data-testid="cms-sheet-state"
+            >
+              {saveError ??
+                (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
+            </span>
+            {/* 6749:59940 — a new record says what Save needs and what it does. */}
+            {!record && !saveError ? (
+              <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-sheet-new-hint">
+                {nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this {singular} with every
+                field above. Publishing the site makes it live.
+              </span>
+            ) : null}
           </span>
           <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
             Cancel
           </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={(!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+          <Button size="xs" className={SMALL_BTN} disabled={(!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
             {saveError ? "Retry save" : "Save record"}
           </Button>
         </div>

@@ -28,7 +28,7 @@ export interface DynamicPagesPaneProps {
 
 /** The publish service's slug rule (`applyPattern` in cms.service.ts), for
  *  the preview list only — the server resolves the real URLs. */
-function slugify(s: string): string {
+export function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 export function resolveUrl(pattern: string, data: Record<string, unknown>): string {
