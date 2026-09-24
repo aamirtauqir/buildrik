@@ -117,7 +117,9 @@ export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }
      Without a door (view mode) it stays "Saved". */
   const label = state === "saved" ? (onClick ? "History ›" : "Saved") : COPY[state];
   const actionable = Boolean(onClick);
-  const classes = [BASE_CLASS, STATE_CLASS[state], className].filter(Boolean).join(" ");
+  /* Board 4418:123573: the door reads as a link — blue text, green dot. */
+  const stateClass = state === "saved" && onClick ? "tw:bg-transparent tw:text-[var(--bk-accent)]" : STATE_CLASS[state];
+  const classes = [BASE_CLASS, stateClass, className].filter(Boolean).join(" ");
   const dot = (
     <span
       className={`tw:w-1.5 tw:h-1.5 tw:rounded-full tw:flex-none ${DOT_CLASS[state]}`}

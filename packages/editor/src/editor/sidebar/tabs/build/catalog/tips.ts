@@ -1,28 +1,12 @@
 /**
- * tips.ts — PRO TIP carousel data for the Build Tab footer
+ * tips.ts — the Add panel's first-use tips (board 7054:78348, G2-113): one
+ * shown per Add session, "Got it" moves on to the next, four in all.
  * @license BSD-3-Clause
  */
 
-export interface Tip {
-  bold: string;
-  body: string;
-}
-
-export const TIPS: Tip[] = [
-  {
-    bold: "Drag to canvas",
-    body: " — Drag an element card onto the canvas to place it.",
-  },
-  {
-    bold: "/ to search",
-    body: " — Press / to jump to search. Esc or ✕ to clear.",
-  },
-  {
-    bold: "My Components",
-    body: " — Once available, save any element as a reusable component from the right-click menu.",
-  },
-  {
-    bold: "Browse categories",
-    body: " — Click any category row to expand it in-place and explore elements.",
-  },
+export const TIPS: readonly string[] = [
+  "Drag ⠿ to place an element exactly",
+  "Press / to search elements",
+  "Right-click an element › Save as component to reuse it",
+  "Click a group header to open it",
 ];

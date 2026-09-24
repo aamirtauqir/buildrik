@@ -332,6 +332,12 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** "Edit master ›" on an instance: the Components panel opens that
+   *  master's screen. Payload `{ componentId }`. */
+  UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
+  /** A click on the empty grey around the page (not an element, not chrome):
+   *  the canvas clears the selection and the shell closes the Layers drawer. */
+  UI_CANVAS_BACKGROUND_CLICK: "ui:canvas-background-click",
   /** `delete` with N > 1 selected and no { confirmed } — the shell shows its
    *  confirm (decision #17) and re-runs delete confirmed. Payload { count }. */
   UI_REQUEST_DELETE_SELECTION: "ui:request-delete-selection",
@@ -339,6 +345,12 @@ export const EVENTS = {
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
+  /** A drawer asks the topbar field to search it — payload { placeholder } | null (board 4418:100087). */
+  UI_SEARCH_CONTEXT: "ui:search-context",
+  /** The topbar field's query while a drawer owns it — payload { query }. */
+  UI_SEARCH_QUERY: "ui:search-query",
+  /** Start inline text editing on the canvas — payload { elementId } (G2-027). */
+  UI_INLINE_EDIT_REQUEST: "ui:inline-edit-request",
   /** Toggle the one keyboard sheet (StudioModals). `?` and ⌘/ flip the same
    *  state directly; this is the door for rows that are not a keystroke —
    *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
@@ -922,6 +934,9 @@ export interface EventPayloads {
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
+  [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string } | null;
+  [EVENTS.UI_SEARCH_QUERY]: { query: string };
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.BRAND_CHECKS_RUN]: void;

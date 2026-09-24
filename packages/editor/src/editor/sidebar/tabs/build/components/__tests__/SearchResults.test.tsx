@@ -12,6 +12,7 @@ import { SearchResults } from "../SearchResults";
 import type { InsertSearchHit } from "../../utils/search";
 import type { FlatElEntry } from "../../catalog/types";
 import type { BlockDefinition } from "../../../../../../blocks/blockRegistry";
+import type { ComponentDefinition } from "@/shared/types/components";
 
 const el: FlatElEntry = {
   name: "Button",
@@ -25,9 +26,12 @@ const el: FlatElEntry = {
 
 const block = { id: "button-group", label: "Button group", elementType: "container" } as BlockDefinition;
 
+const saved = { id: "cmp-1", name: "CTA button", root: { type: "button" } } as unknown as ComponentDefinition;
+
 const hits: InsertSearchHit[] = [
   { key: "el-basic-Button", label: "Button", group: "ELEMENTS", el },
   { key: "block-button-group", label: "Button group", group: "BLOCKS", block },
+  { key: "saved-cmp-1", label: "CTA button", group: "SAVED", component: saved },
 ];
 
 const noop = vi.fn();
@@ -38,21 +42,30 @@ const renderResults = (over: Partial<React.ComponentProps<typeof SearchResults>>
       query="button"
       hits={hits}
       onDragStart={noop}
+      onBlockDragStart={noop}
       onElClick={noop}
       onBlockInsert={noop}
+      onSavedInsert={noop}
       onClearSearch={noop}
       {...over}
     />
   );
 
-describe("SearchResults — flat cross-source list (138:53)", () => {
-  it("renders one flat row per hit with the source-group tag on the right", () => {
+/* Board 4418:100087 (Insert · searching): each 32px row is the label, a grey
+   [Element] / [Block] / [Component] chip right after it, then "+ Add" and a ⠿
+   grip at the right edge. It replaced 138:53's uppercase group tag. */
+describe("SearchResults — cross-source rows (4418:100087)", () => {
+  it("one row per hit: label, a source chip, + Add and a grip", () => {
     renderResults();
     expect(screen.getByTestId("insert-search-results")).toBeInTheDocument();
-    expect(screen.getByText("Button")).toBeInTheDocument();
-    expect(screen.getByText("ELEMENTS")).toBeInTheDocument();
-    expect(screen.getByText("Button group")).toBeInTheDocument();
-    expect(screen.getByText("BLOCKS")).toBeInTheDocument();
+    const chips = hits.map((h) => screen.getByTestId(`insert-hit-chip-${h.key}`).textContent);
+    expect(chips).toEqual(["Element", "Block", "Component"]);
+    expect(screen.queryByText("ELEMENTS")).toBeNull();
+    expect(screen.queryByText("BLOCKS")).toBeNull();
+    for (const h of hits) {
+      expect(screen.getByTestId(`insert-hit-add-${h.key}`).textContent).toBe("+ Add");
+      expect(screen.getByTestId(`insert-hit-grip-${h.key}`).textContent).toBe("⠿");
+    }
   });
 
   it("has NO results header and NO category sections — the board draws neither", () => {
@@ -68,17 +81,28 @@ describe("SearchResults — flat cross-source list (138:53)", () => {
     expect(onElClick).toHaveBeenCalledWith(el);
   });
 
-  it("block row click → onBlockInsert with the definition", () => {
+  it("block row click and its + Add → onBlockInsert with the definition", () => {
     const onBlockInsert = vi.fn();
     renderResults({ onBlockInsert });
     fireEvent.click(screen.getByTestId("insert-hit-block-button-group"));
+    fireEvent.click(screen.getByTestId("insert-hit-add-block-button-group"));
+    expect(onBlockInsert).toHaveBeenCalledTimes(2);
     expect(onBlockInsert).toHaveBeenCalledWith(block);
   });
 
-  it("element rows are draggable, block rows are not", () => {
+  it("saved component row → onSavedInsert", () => {
+    const onSavedInsert = vi.fn();
+    renderResults({ onSavedInsert });
+    fireEvent.click(screen.getByTestId("insert-hit-saved-cmp-1"));
+    expect(onSavedInsert).toHaveBeenCalledWith(saved);
+  });
+
+  it("every row is a drag source; a saved component drags as a component id", () => {
     renderResults();
-    expect(screen.getByTestId("insert-hit-el-basic-Button")).toHaveAttribute("draggable", "true");
-    expect(screen.getByTestId("insert-hit-block-button-group")).toHaveAttribute("draggable", "false");
+    for (const h of hits) expect(screen.getByTestId(`insert-hit-${h.key}`)).toHaveAttribute("draggable", "true");
+    const setData = vi.fn();
+    fireEvent.dragStart(screen.getByTestId("insert-hit-saved-cmp-1"), { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith("application/x-aquibra-component", "cmp-1");
   });
 });
 

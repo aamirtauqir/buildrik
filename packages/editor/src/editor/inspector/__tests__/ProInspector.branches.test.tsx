@@ -35,7 +35,7 @@ vi.mock("../components/BindingPopover", () => ({ BindingPopover: () => null }));
 import { ProInspector } from "../ProInspector";
 import { ToastProvider } from "@/editor/chrome-ui";
 
-/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+/* ProInspector mounts VariantSection, which reports a refused detach
    rather than swallowing it — so it needs the toast context. AquibraStudio
    wraps the whole studio in one, so every real mount has it and only these
    tests rendered the subtree bare. */

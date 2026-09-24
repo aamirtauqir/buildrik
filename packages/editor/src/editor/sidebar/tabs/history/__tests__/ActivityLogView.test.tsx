@@ -175,16 +175,22 @@ describe("ActivityLogView — filter behaviour", () => {
 });
 
 describe("ActivityLogView — deep-link", () => {
-  it("opens row.actionUrl in a new tab via window.open when the link is clicked", async () => {
+  it("an absolute actionUrl is the link, in a new tab", async () => {
     fetchRecentActivity.mockResolvedValueOnce(SAMPLE_ROWS);
     renderView();
     const links = await screen.findAllByText("View in dashboard");
-    fireEvent.click(links[0]);
-    expect(window.open).toHaveBeenCalledWith(
-      "https://app.buildrick.io/dashboard/sites/s1#edit-1",
-      "_blank",
-      "noopener,noreferrer",
-    );
+    expect(links[0].getAttribute("href")).toBe("https://app.buildrick.io/dashboard/sites/s1#edit-1");
+    expect(links[0].getAttribute("target")).toBe("_blank");
+    expect(links[0].getAttribute("rel")).toBe("noopener noreferrer");
+  });
+
+  /* QA 2026-09-24: a relative actionUrl ("?page=page-1") resolved against the
+     editor's own URL, so "View in dashboard" reopened the editor. */
+  it("a relative actionUrl resolves against the site's dashboard page, not the editor", async () => {
+    fetchRecentActivity.mockResolvedValueOnce([{ ...SAMPLE_ROWS[0], actionUrl: "?page=page-1" }]);
+    renderView();
+    const link = await screen.findByText("View in dashboard");
+    expect(link.getAttribute("href")).toBe(`${DASHBOARD_URL}/dashboard/sites/site_1?page=page-1`);
   });
 
   it("does not render the deep-link when actionUrl is null", async () => {

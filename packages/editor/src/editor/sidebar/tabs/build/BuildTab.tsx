@@ -1,9 +1,10 @@
 /**
  * BuildTab — Add tab shell.
  *
- * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
- * where panel-bottom is pinned (flex-shrink: 0) — ALWAYS, including during
- * search: board 138:53 draws Paste-HTML + TipsFooter under the results.
+ * Layout: PanelHeader / panel-scroll. Search is the topbar field, which this
+ * panel claims while it is open (board 4418:100087 "Search elements…").
+ * The first-use tip (7054:78348) opens beside the panel; there is no tips
+ * strip (G2-113).
  *
  * Sections mode (pre-built sections catalog + lazy chunk) was removed on
  * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
@@ -14,17 +15,14 @@
 
 import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { SearchBar } from "../../shared/SearchBar";
 import { useBuildTab } from "./hooks/useBuildTab";
-import { useCallout } from "./hooks/useCallout";
-import { TipsFooter } from "./components/TipsFooter";
+import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { TransitionCallout } from "./components/TransitionCallout";
 import { takePendingInsertGroup } from "./insertGroupRequest";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -43,9 +41,22 @@ export interface BuildTabProps {
 export const BuildTab: React.FC<BuildTabProps> = ({
   composer, onBlockClick, onHelpClick, onClose,
 }) => {
-  const tab = useBuildTab(composer, onBlockClick);
+  // MINE (board 1069:4970): the user's own components, inline, and
+  // searched with the rest (G2-111). Same load +
+  // subscribe shape useComponentsState uses.
+  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const load = () => setMine(composer.components?.getAllComponents() ?? []);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
+  const tab = useBuildTab(composer, onBlockClick, mine);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const callout = useCallout();
+  const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
 
   // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
@@ -68,18 +79,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, [composer]);
   const { addToast } = useToast();
 
-  // MINE (board 1069:4970): the user's own components, inline. Same load +
-  // subscribe shape useComponentsState uses.
-  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
-  React.useEffect(() => {
-    if (!composer?.components) return;
-    const load = () => setMine(composer.components?.getAllComponents() ?? []);
-    load();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
-    };
-  }, [composer]);
 
   const groups = React.useMemo(
     () => buildInsertGroups(composer?.components ? mine.length : null),
@@ -117,21 +116,42 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     });
   };
 
-  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F (board 137:10 —
-  // hijacks browser find while the Insert panel is mounted, same as Figma).
+  /* The topbar field searches this panel while it is open (4418:100087). */
+  /* Held in a ref: setSearchQuery changes identity with every query, and
+     re-running this effect would release and re-claim the field mid-typing. */
+  const setSearchQueryRef = React.useRef(tab.setSearchQuery);
+  setSearchQueryRef.current = tab.setSearchQuery;
+  React.useEffect(() => {
+    if (!composer) return;
+    const onQuery = ({ query }: { query: string }) => setSearchQueryRef.current(query);
+    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
+    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search elements…" });
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
+      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
+    };
+  }, [composer]);
+
+  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F. G2-105: ⌘F is
+  // taken only while focus is in this panel or its search field — anywhere
+  // else it stays the browser's find.
+  const panelRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const isCmdF = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f";
       if (e.key !== "/" && !isCmdF) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      if (!isCmdF) {
+      if (isCmdF) {
+        const inPanel = panelRef.current?.contains(target) || target.id === TOPBAR_CONTEXT_SEARCH_ID;
+        if (!inPanel) return;
+      } else {
         const tag = target.tagName;
         const inTypingContext =
           tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
         if (inTypingContext) return;
       }
-      const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
+      const input = document.getElementById(TOPBAR_CONTEXT_SEARCH_ID) as HTMLInputElement | null;
       if (!input) return;
       e.preventDefault();
       input.focus();
@@ -186,64 +206,22 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         }
       />
 
-      <div className="bld-content">
-        <div
-          className="bld-search-wrap"
-          data-testid="insert-search-wrap"
-          onKeyDown={(e) => {
-            if (e.key === "Escape" && tab.searchQuery.length > 0) {
-              e.stopPropagation();
-              tab.setSearchQuery("");
-            }
-          }}
-        >
-          <SearchBar
-            id="bld-search-input"
-            value={tab.searchQuery}
-            onChange={tab.setSearchQuery}
-            placeholder="Search elements"
-            debounceMs={150}
-            kbdHint="⌘F"
-            testId="insert-search-box"
-          />
-        </div>
-
-        {/* What this panel is for. Insert opened straight onto a wall of 53
-            element tiles with nothing saying what a click does.
-
-            Every clause here is scoped to what the code actually does:
-            - "Click a row" covers all four groups — clicking inserts everywhere.
-            - "Drag elements" is deliberately narrow. Only the ELEMENTS group
-              passes `draggable` (GroupSection.tsx:189); blocks, components and
-              mine rows do not, so a blanket "drag onto the canvas" would have
-              been false for most of the panel — the same defect IA-13 fixed.
-            - "inside or next to … where it fits" is the smart-placement walk in
-              useBlockInsertion.ts:67-80, which climbs to the nearest ancestor
-              that accepts the block; "where it fits" carries the case where
-              none does and it lands at the page root. */}
-        {!isSearching && (
-          <p data-testid="insert-purpose" className="tw:m-0 tw:w-full tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
-            {tab.insertionContext
-              ? `Click a row to add it inside or next to ${tab.insertionContext.label} where it fits. Drag elements onto the canvas instead.`
-              : "Click a row to add it at the end of the page. Drag elements onto the canvas instead."}
-          </p>
-        )}
-
+      <div className="bld-content" ref={panelRef}>
         {isSearching ? (
           <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
               hits={tab.searchResults}
               onDragStart={tab.handleDragStart}
+              onBlockDragStart={tab.handleBlockDragStart}
               onElClick={tab.handleElClick}
               onBlockInsert={(b) => onBlockClick?.(b)}
+              onSavedInsert={(c) => void insertMine(c)}
               onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>
         ) : (
           <div className="bld-scroll">
-            {callout.visible && <TransitionCallout />}
-
             {/* Board 137:2: source taxonomy, not element-type categories.
                 ELEMENTS/BLOCKS render inline; the navigate groups open their
                 owning tabs. Blocks insert through the SAME onBlockClick path
@@ -263,22 +241,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
+                onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
             ))}
           </div>
         )}
 
-        {/* Board 138:53: the pinned bottom stays up DURING search too. */}
-        <div className="bld-panel-bottom">
-          <TipsFooter
-            tipIdx={tab.tipIdx}
-            onPrev={tab.tipPrev}
-            onNext={tab.tipNext}
-            onDotClick={tab.tipSetAt}
-            dismissed={tab.tipDismissed}
-            onDismiss={tab.dismissTip}
-          />
-        </div>
+        <div ref={panelBottomRef} className="bld-panel-bottom" />
+        <FirstUseTip anchorRef={panelBottomRef} />
       </div>
       <PasteHtmlModal
         open={pasteOpen}

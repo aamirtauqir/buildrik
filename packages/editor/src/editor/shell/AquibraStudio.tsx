@@ -52,12 +52,9 @@ import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
-import { StudioFooter } from "./StudioFooter";
-import { StructurePopover } from "./StructurePopover";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
-import { getTabMode, type GroupedTabId } from "../rail/tabsConfig";
 import { ConflictModal } from "./modals/ConflictModal";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
@@ -359,10 +356,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // can re-open it (B2, decision #23) with the same three ways out.
   const [conflict, setConflict] = React.useState<{ serverToken: string; open: boolean } | null>(null);
 
-  // Redesign P4 (51-layers): the footer ⌗ opens the structure tree as a floating
-  // popover over the canvas, not the left drawer. Open-only trigger; close via the
-  // popover's X / Esc / outside-click.
-  const [structureOpen, setStructureOpen] = React.useState(false);
   React.useEffect(() => {
     const onConflict = (e: Event) => {
       const token = (e as CustomEvent<{ serverLastEditedAt: string }>).detail?.serverLastEditedAt;
@@ -751,41 +744,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           setConflict(null);
           saveProject();
         }}
-      />
-
-      <footer
-        className="layout-shell__footer"
-        role="contentinfo"
-        aria-label="Editor status"
-      >
-        <StudioFooter
-          composer={composer}
-          device={state.device}
-          zoom={state.zoom}
-          /* F15 — a full-page tab replaces the canvas, so the footer's selection
-             readout and zoom control describe something that is not on screen.
-             The footer is a flex sibling OUTSIDE LayoutShell's grid, which is
-             why `.layout-shell--fullpage` cannot reach it and the mode has to
-             be handed over explicitly. StudioPanels derives the same condition
-             from the same tab for its own grid. */
-          fullPage={getTabMode((state.leftPanelTab as GroupedTabId) || "add") === "fullpage"}
-          onZoomChange={(z) => {
-            state.setZoom(z);
-            if (composer) composer.setZoom(z);
-          }}
-          selectedElement={selectedElement}
-          // Drive the connection pill from the real save state — it was
-          // hardcoded "Connected · main" regardless of save failures.
-          syncConnected={state.saveState.status !== "error"}
-          onOpenStructure={() => setStructureOpen(true)}
-        />
-      </footer>
-
-      <StructurePopover
-        open={structureOpen}
-        onClose={() => setStructureOpen(false)}
-        composer={composer}
-        selectedElement={selectedElement}
       />
 
       <PreviewOverlay

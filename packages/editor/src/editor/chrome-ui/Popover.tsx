@@ -15,7 +15,7 @@
 import React from "react";
 import { ROW_ICON_CLASS } from "./Row";
 
-export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right";
+export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right" | "right-end";
 
 /* inline/block and each placement supply their own full set — same-property
    values (display; top/bottom/left/right) can't be additive across variants
@@ -30,6 +30,8 @@ const PLACEMENT_CLASS: Record<PopoverPlacement, string> = {
   top: "tw:bottom-[calc(100%+4px)] tw:left-0",
   "top-end": "tw:bottom-[calc(100%+4px)] tw:right-0",
   right: "tw:left-[calc(100%+4px)] tw:top-0",
+  /* Bottom-aligned: a sub-menu opened from a row low on screen grows up. */
+  "right-end": "tw:left-[calc(100%+4px)] tw:bottom-0",
 };
 /** Exported for the rare cross-file borrower that wraps its own positioned
  *  box in the popover "look" without using the Popover component itself

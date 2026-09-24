@@ -1,8 +1,9 @@
 /**
  * SiteMenu — board 4418:126034 (C5 G1-016/020/025; owner rule: the board
- * wins on anything visual). Three groups, exactly the board's rows; the
- * panel doors, Plugins, Ask AI, Site health, Copy live URL and Getting
- * started are gone from the menu (each panel keeps its own door).
+ * wins on anything visual). Three groups in the board's order; the panel
+ * doors, Plugins and Ask AI are gone (each panel keeps its own door).
+ * Getting started, Copy live URL and Site health ↗ stay although the board
+ * lacks them (owner rule: parity never silently removes a capability).
  *
  * @license BSD-3-Clause
  */
@@ -33,6 +34,8 @@ const all = {
   onUnpublish: vi.fn(),
   siteId: "site_42",
   publishedUrl: "https://bella.example",
+  onReplayOnboarding: vi.fn(),
+  onCopyLiveUrl: vi.fn(),
 };
 
 describe("SiteMenu — board 4418:126034", () => {
@@ -54,18 +57,21 @@ describe("SiteMenu — board 4418:126034", () => {
       "Enter view mode",
       "Keyboard shortcuts",
       "Share preview link",
+      "Copy live URL",
+      "Getting started",
       "Start collaborationPlanned",
       "Unpublish site…",
       "View live site ↗",
+      "Site health ↗",
       "Invite teammates ↗",
       "Account settings ↗",
     ]);
   });
 
-  it("carries none of the rows the board dropped", () => {
+  it("carries none of the rows the board and the owner dropped", () => {
     render(<ToastProvider><SiteMenu {...all} /></ToastProvider>);
     openMenu();
-    for (const gone of ["Version history", "Review", "Publish panel", "Publish history", "Templates", "Components", "Brand", "Plugins", "Ask AI", "Site health", "Copy live URL", "Getting started"]) {
+    for (const gone of ["Version history", "Review", "Publish panel", "Publish history", "Templates", "Components", "Brand", "Plugins", "Ask AI"]) {
       expect(screen.queryByRole("menuitem", { name: new RegExp(`^${gone}`) })).toBeNull();
     }
   });

@@ -1,5 +1,5 @@
 /**
- * nesting/treeOps — traversal, ancestry, clone/map/filter/flatten, analysis.
+ * nesting/treeOps — traversal, ancestry, clone/map/filter/flatten.
  *
  * @license BSD-3-Clause
  */
@@ -19,7 +19,6 @@ import {
   filterTree,
   flattenTree,
   countElements,
-  analyzeTree,
 } from "../treeOps";
 
 type Node = { id?: string; type: ElementType; children?: Node[]; level?: number };
@@ -161,39 +160,5 @@ describe("mapTree / filterTree / flattenTree / countElements", () => {
   it("countElements counts all, or only matches with a predicate", () => {
     expect(countElements(tree())).toBe(5);
     expect(countElements(tree(), (e) => e.type === "container")).toBe(1);
-  });
-});
-
-describe("analyzeTree", () => {
-  it("produces type/category counts, landmarks, headings and recommendations", () => {
-    const analysis = analyzeTree(tree());
-    expect(analysis.totalElements).toBe(5);
-    expect(analysis.maxDepth).toBe(2);
-    expect(analysis.elementTypeCounts.container).toBe(1);
-    expect(analysis.landmarkElements).toContain("section");
-    expect(analysis.landmarkElements).toContain("nav");
-    expect(analysis.headingElements).toHaveLength(1);
-    // an empty 'nav' container counts toward emptyContainers recommendation
-    expect(Array.isArray(analysis.recommendations)).toBe(true);
-  });
-
-  it("recommends adding a nav landmark when none exists", () => {
-    const noNav: Node = { id: "r", type: "container", children: [{ id: "t", type: "text" }] };
-    const analysis = analyzeTree(noNav);
-    expect(analysis.recommendations.some((r) => /navigation landmark/i.test(r))).toBe(true);
-  });
-
-  it("flags multiple header landmarks", () => {
-    const twoHeaders: Node = {
-      id: "r",
-      type: "container",
-      children: [
-        { id: "h1", type: "header" },
-        { id: "h2", type: "header" },
-        { id: "n", type: "nav" },
-      ],
-    };
-    const analysis = analyzeTree(twoHeaders);
-    expect(analysis.recommendations.some((r) => /header/i.test(r))).toBe(true);
   });
 });

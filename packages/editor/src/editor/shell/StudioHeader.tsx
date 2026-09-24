@@ -144,19 +144,20 @@ export interface StudioHeaderProps {
  * requested, success-tint for Approved, neutral otherwise.
  *
  * "Not sent" is drawn only where a send is the site's next act — an
- * approval workspace. Elsewhere a round that was never opened is not a
- * status, and the chip stays away as it always did.
+ * approval workspace. Elsewhere, with no round, the control is still there:
+ * board 4418:123573 draws a permanent Review door ("Review ›"), so the
+ * no-round state is that door without a count (owner flag 2026-09-24).
  */
 function reviewChip(
   status: ReviewStatus,
   openCount: number | null,
-): Omit<ReviewPill, "onClick"> | null {
+): Omit<ReviewPill, "onClick"> {
   const who = status.reviewerName;
   switch (status.state) {
     case "none":
       return status.reviewsEnabled && status.editsRequireApproval
         ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
-        : null;
+        : { label: "Review", tone: "neutral", title: "Open Review" };
     case "pending":
       return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
     case "opened-not-acted":
@@ -242,6 +243,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /* The page crumb (G1-004) follows the active page: a switch, a load, a
      rename (PROJECT_CHANGED carries page:updated). */
   const [pageName, setPageName] = React.useState<string | null>(null);
+  /* Board 4418:100087: a drawer that owns search (Add) turns the shell field
+     into its search box; the ⌘K door comes back when it closes. */
+  const [searchCtx, setSearchCtx] = React.useState<{ placeholder: string } | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  React.useEffect(() => {
+    if (!composer) return;
+    const onCtx = (ctx: { placeholder: string } | null) => {
+      setSearchCtx(ctx);
+      setSearchQuery("");
+    };
+    composer.on(EVENTS.UI_SEARCH_CONTEXT, onCtx);
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_CONTEXT, onCtx);
+    };
+  }, [composer]);
+
   React.useEffect(() => {
     if (!composer) return;
     const read = () => setPageName(composer.elements?.getActivePage?.()?.name ?? null);
@@ -717,14 +734,23 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onToggleComments: toggleComments,
       };
 
-  const pill = reviewChip(reviewStatus, openCommentCount);
-  const review: ReviewPill | null = pill
-    ? {
-        ...pill,
-        // F3: every review state opens the same door — the Review panel.
-        onClick: onOpenReview,
-      }
-    : null;
+  const copyLiveUrl = React.useCallback(() => {
+    if (!publishedUrl) return;
+    // navigator.clipboard is absent on insecure origins, and writeText can be
+    // refused. Either way the user hears about it rather than pressing again.
+    const done = navigator.clipboard?.writeText(publishedUrl);
+    if (!done) {
+      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
+      return;
+    }
+    void done.then(
+      () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
+      () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
+    );
+  }, [publishedUrl, addToast]);
+
+  // F3: every review state opens the same door — the Review panel.
+  const review: ReviewPill = { ...reviewChip(reviewStatus, openCommentCount), onClick: onOpenReview };
 
   return (
     <div className="bk-header" ref={headerRef}>
@@ -744,6 +770,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
         /* Board 4418:123573's shell search is the ⌘K door. */
         onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
+        contextSearch={
+          searchCtx && composer
+            ? {
+                placeholder: searchCtx.placeholder,
+                value: searchQuery,
+                onChange: (query) => {
+                  setSearchQuery(query);
+                  composer.emit(EVENTS.UI_SEARCH_QUERY, { query });
+                },
+              }
+            : null
+        }
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
@@ -829,6 +867,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   }
             }
             publishedUrl={publishedUrl}
+            onCopyLiveUrl={copyLiveUrl}
+            onReplayOnboarding={
+              viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
+            }
             siteId={siteIdForMenu}
             siteName={siteName}
             pageName={pageName}

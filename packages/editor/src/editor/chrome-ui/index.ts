@@ -41,7 +41,7 @@ export { Chip, type ChipProps } from "./Chip";
 export { SkeletonBlock, type SkeletonBlockProps } from "./Skeleton";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
-export { Topbar, SiteMenuIcon } from "./Topbar";
+export { Topbar, SiteMenuIcon, TOPBAR_CONTEXT_SEARCH_ID } from "./Topbar";
 export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } from "./Topbar";
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";

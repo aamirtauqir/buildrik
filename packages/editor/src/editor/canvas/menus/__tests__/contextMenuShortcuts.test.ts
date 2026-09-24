@@ -151,7 +151,8 @@ describe("context menu shortcut column", () => {
   it("prints no tooltip chord the app does not honour as printed", () => {
     // The selection toolbar (5936:44788) prints no chords in tooltips; the
     // footer toolbar still does.
-    expect(tooltipChords.length).toBeGreaterThan(2);
+    // Undo ⌘Z + Redo ⌘⇧Z (the "?" help button left the bar, 5936:44788).
+    expect(tooltipChords.length).toBeGreaterThanOrEqual(2);
     const wrong = tooltipChords
       .map((t) => ({ ...t, chord: keys.normalizeShortcut(chordFromGlyphs(t.raw)) }))
       .map((t) => ({ ...t, commandId: keys.findCommandId(t.chord) }))

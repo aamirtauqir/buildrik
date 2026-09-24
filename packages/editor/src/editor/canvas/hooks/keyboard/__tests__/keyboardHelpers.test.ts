@@ -280,23 +280,21 @@ describe("moveElementPosition", () => {
     expect(setStyle).toHaveBeenCalledWith("left", "4px");
   });
 
-  it("uses transform translate for static/relative flow elements", () => {
-    const { composer, setStyle } = makeMoveComposer({ position: "static" });
-
-    moveElementPosition(composer, "el", 12, -6);
-
-    expect(setStyle).toHaveBeenCalledWith("transform", "translate(12px, -6px)");
+  it("moves a relative element by its top/left too", () => {
+    const { composer, setStyle } = makeMoveComposer({ position: "relative", top: "2px" });
+    expect(moveElementPosition(composer, "el", 3, 4)).toBe(true);
+    expect(setStyle).toHaveBeenCalledWith("top", "6px");
+    expect(setStyle).toHaveBeenCalledWith("left", "3px");
   });
 
-  it("accumulates onto an existing translate and preserves other transforms", () => {
-    const { composer, setStyle } = makeMoveComposer({
-      // no explicit position → defaults to "static" branch
-      transform: "translate(10px, 5px) rotate(45deg)",
-    });
-
-    moveElementPosition(composer, "el", 3, 4);
-
-    expect(setStyle).toHaveBeenCalledWith("transform", "translate(13px, 9px) rotate(45deg)");
+  /* G2-047 (CI-62): an in-flow element is not nudged with a hidden transform. */
+  it("refuses an in-flow (static or unset) element and writes nothing", () => {
+    for (const styles of [{ position: "static" }, { transform: "rotate(45deg)" }] as Record<string, string>[]) {
+      const { composer, setStyle, beginTransaction } = makeMoveComposer(styles);
+      expect(moveElementPosition(composer, "el", 12, -6)).toBe(false);
+      expect(setStyle).not.toHaveBeenCalled();
+      expect(beginTransaction).not.toHaveBeenCalled();
+    }
   });
 
   it("wraps mutations in a keyboard-move transaction", () => {

@@ -2,6 +2,25 @@
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import type { LayerItem } from "../types";
 
+/* Text-ish layers carry the first words of their own copy — see
+   LayerItem.preview. Only these types: a container's "content" is its
+   children's text concatenated, which would make every wrapper row read
+   like the page. Tags stripped, because content can hold inline HTML. */
+const PREVIEWABLE = new Set([
+  "text", "heading", "paragraph", "button", "link", "label", "quote", "list-item",
+]);
+
+/** The first words of a text-ish layer's copy — the name Layers shows for an
+ *  unnamed layer, and the canvas bar readout with it. */
+export function getLayerPreview(
+  element: { getType(): string; getContent?(): string } | null | undefined,
+): string | undefined {
+  if (!element || !PREVIEWABLE.has(element.getType())) return undefined;
+  const raw = (element.getContent?.() ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (!raw) return undefined;
+  return raw.length > 32 ? `${raw.slice(0, 32)}…` : raw;
+}
+
 /**
  * Flatten tree in depth-first order (all nodes, regardless of expand state).
  * Used for keyboard navigation range-select and search ancestor collection.

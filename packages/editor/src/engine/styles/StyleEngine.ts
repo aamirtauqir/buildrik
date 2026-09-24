@@ -167,33 +167,6 @@ export class StyleEngine {
   }
 
   // ============================================
-  // Media Queries
-  // ============================================
-
-  /**
-   * Set rule for specific device
-   */
-  setDeviceRule(
-    selector: string,
-    properties: Record<string, string>,
-    device: "tablet" | "mobile"
-  ): StyleData {
-    const mediaQuery = this.getDeviceMediaQuery(device);
-    return this.setRule(selector, properties, { mediaQuery });
-  }
-
-  /**
-   * Get media query for device
-   */
-  private getDeviceMediaQuery(device: "tablet" | "mobile"): string {
-    const queries = {
-      tablet: "(max-width: 991px)",
-      mobile: "(max-width: 575px)",
-    };
-    return queries[device];
-  }
-
-  // ============================================
   // Breakpoint Styles
   // ============================================
 

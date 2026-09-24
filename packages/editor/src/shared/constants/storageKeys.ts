@@ -36,9 +36,7 @@ export const STORAGE_KEYS = {
 
   // ─── Canvas Controls ──────────────────────────────────────────
   /** Saved canvas guides (horizontal/vertical guide positions) */
-  GUIDES: "buildrick-guides",
   /** Inspector mode enabled/disabled */
-  INSPECTOR_MODE: "buildrick-inspector-mode",
   /** Recent commands from command palette */
   RECENT_COMMANDS: "buildrick-recent-commands",
 
@@ -59,18 +57,12 @@ export const STORAGE_KEYS = {
   BUILD_RECENT: "buildrick-build-recent",
   /** Open category IDs in Build tab accordion (sessionStorage) */
   BUILD_OPEN_CATS: "buildrick-build-open-cats",
-  /** Whether the onboarding tip in Build tab has been dismissed */
-  BUILD_TIP_DISMISSED: "buildrick-build-tip-dismissed",
+  /** How many of the Add panel's first-use tips have been shown (G2-113) */
+  BUILD_TIPS_SEEN: "buildrick-build-tips-seen",
   /** Whether the user has been informed that favorites are browser-local only */
   BUILD_FAVS_INFORMED: "buildrick-build-favs-informed",
   /** @deprecated — Sections mode removed 2026-04-23. Cleaned on next read of BUILD_OPEN_CATS. */
   BUILD_MODE: "buildrick-build-mode",
-  /** @deprecated — Quick Picks removed in v4. Cleaned on TransitionCallout dismiss. */
-  BUILD_PICKS: "buildrick-build-picks",
-  /** @deprecated — Quick Picks FTUE removed in v4. Cleaned on TransitionCallout dismiss. */
-  BUILD_FTUE_SEEN: "buildrick-build-ftue-seen",
-  /** One-time flag: user has seen the "Quick Picks removed" v4 transition callout */
-  BUILD_V4_TRANSITION_SEEN: "buildrick-build-v4-transition-seen",
 
   // ─── Components Tab ───────────────────────────────────────────
   /** Favorite component IDs in the components library */

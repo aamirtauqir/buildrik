@@ -65,8 +65,8 @@ const EXIT_BTN_CLASS =
 /* Board 4418:123573: the shell search, 320×36, placeholder + ⌘K. It is the
    ⌘K door — a button drawn as a field (the palette owns the typing). */
 const SEARCH_CLASS =
-  "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] " +
-  "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-gray-400)] " +
+  "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] " +
+  "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-ink-muted)] " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const SEARCH_KBD =
   "tw:ml-auto tw:rounded tw:border tw:border-[var(--bk-border)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -100,7 +100,7 @@ export interface TopbarTools {
 }
 
 /** Five review states share one pill; only the copy and tone differ. */
-export type ReviewTone = "info" | "warning" | "success";
+export type ReviewTone = "neutral" | "info" | "warning" | "success";
 export interface ReviewPill {
   label: string;
   tone: ReviewTone;
@@ -144,6 +144,9 @@ export interface TopbarProps {
   tools?: TopbarTools | null;
   /** The shell search field (⌘K). Omit and no field is drawn. */
   onOpenSearch?: () => void;
+  /** Board 4418:100087: while a drawer owns search (Add → "Search elements…"),
+   *  the field is a real input that filters that drawer instead of ⌘K. */
+  contextSearch?: { placeholder: string; value: string; onChange: (value: string) => void } | null;
   presence?: PresenceProps | null;
   unreadCount?: number;
   onOpenNotifications?: () => void;
@@ -191,7 +194,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch, contextSearch,
 }: TopbarProps) {
   return (
     <header
@@ -277,7 +280,43 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {onOpenSearch ? (
+      {contextSearch ? (
+        <label className={`${SEARCH_CLASS} tw:text-[var(--bk-ink)] tw:focus-within:[box-shadow:var(--bk-shadow-focus)]`} data-testid="topbar-search">
+          <SearchGlyph />
+          <input
+            id={TOPBAR_CONTEXT_SEARCH_ID}
+            type="text"
+            className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:outline-none tw:placeholder:text-[var(--bk-ink-muted)] tw:focus:ring-0 tw:focus:[box-shadow:none]"
+            /* The field (the label) draws the focus ring; a11y.css's unlayered
+               `*:focus-visible` outline outranks any layered utility, so the
+               inner box's own ring is switched off here. */
+            style={{ outline: "none" }}
+            placeholder={contextSearch.placeholder}
+            aria-label={contextSearch.placeholder}
+            value={contextSearch.value}
+            onChange={(e) => contextSearch.onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && contextSearch.value) {
+                e.stopPropagation();
+                contextSearch.onChange("");
+              }
+            }}
+            data-testid="topbar-context-search"
+          />
+          {contextSearch.value ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              className="tw:border-0 tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-muted)] tw:cursor-pointer"
+              onClick={() => contextSearch.onChange("")}
+            >
+              ✕
+            </button>
+          ) : (
+            <kbd className={SEARCH_KBD}>⌘F</kbd>
+          )}
+        </label>
+      ) : onOpenSearch ? (
         <button type="button" className={SEARCH_CLASS} onClick={onOpenSearch} data-testid="topbar-search">
           <SearchGlyph />
           <span className="tw:truncate">Search pages, layers, assets…</span>
@@ -408,9 +447,20 @@ const REVIEW_BASE_CLASS =
    set's tone variants were drawn since, and the container still demotes a
    warning chip to neutral when two louder ambers are on the bar.) */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
+  /* Board 4418:123573: the permanent door — white, hairline border, accent. */
+  neutral: "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-accent)] tw:[box-shadow:inset_0_0_0_1px_var(--bk-border)]",
   info: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
   success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
   warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+};
+
+/* Board 4418:123573: a status dot leads, a › trails. The door with no round
+   has nothing to report, so no dot. */
+const REVIEW_DOT_CLASS: Record<ReviewTone, string | null> = {
+  neutral: null,
+  info: "tw:bg-[var(--bk-gray-500)]",
+  success: "tw:bg-[var(--bk-success)]",
+  warning: "tw:bg-[var(--bk-warning)]",
 };
 
 /* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
@@ -429,6 +479,7 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       </span>
     );
   }
+  const dot = REVIEW_DOT_CLASS[tone];
   return (
     <button
       type="button"
@@ -437,13 +488,18 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       onClick={onClick}
       data-testid="topbar-review-pill"
     >
+      {dot ? <span className={`tw:size-1.5 tw:flex-none tw:rounded-full ${dot}`} aria-hidden="true" /> : null}
       <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
+      <span aria-hidden="true" data-testid="topbar-review-chevron">›</span>
     </button>
   );
 }
 
 /* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
    Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
+/** The topbar field's input id while a drawer owns search — ⌘F / "/" focus it. */
+export const TOPBAR_CONTEXT_SEARCH_ID = "topbar-context-search";
+
 function SearchGlyph() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

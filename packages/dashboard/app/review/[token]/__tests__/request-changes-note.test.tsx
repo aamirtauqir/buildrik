@@ -9,12 +9,14 @@
  * worth nothing to the designer who receives it.
  *
  * Approve had an explicit confirm; the terminal, irreversible path carrying
- * the client's reasoning had none.
+ * the client's reasoning had none. Since the Figma parity pass (board
+ * 4418:121999) "Request changes" opens the notes beside the snapshot and the
+ * round closes only from "Send change request" there — the second step.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 
 const commentMutate = vi.fn();
 const resolveMutate = vi.fn();
@@ -32,6 +34,7 @@ vi.mock("@lib/trpc/client", () => ({
           data: {
             siteName: "Bella Cucina",
             agencyName: "Studio",
+            roundNumber: 3,
             status: "PENDING",
             sentAt: "2026-09-01T00:00:00.000Z",
             reviewer: { name: "Sam", email: "sam@example.com" },
@@ -67,19 +70,21 @@ const typeNote = (text: string) => {
 };
 
 describe("Request changes carries the note the client typed", () => {
-  it("does not close the round straight from the button", () => {
+  const openNotes = () => fireEvent.click(screen.getByText("Request changes"));
+
+  it("does not close the round straight from the button — it opens the notes", () => {
     render(<ReviewClient token="t" />);
-    fireEvent.click(screen.getByText("Request changes"));
-    // A confirm, like Approve has — this path is terminal and cannot be reopened.
+    openNotes();
     expect(resolveMutate).not.toHaveBeenCalled();
-    expect(screen.getByText("Request changes to Bella Cucina?")).toBeTruthy();
+    expect(screen.getByText("Your notes")).toBeTruthy();
+    expect(screen.getByText("Send change request")).toBeTruthy();
   });
 
   it("sends the typed note before closing the round", () => {
     render(<ReviewClient token="t" />);
+    openNotes();
     typeNote("The hero photo is too dark");
-    fireEvent.click(screen.getByText("Request changes"));
-    fireEvent.click(screen.getByText("Send and request changes"));
+    fireEvent.click(screen.getByText("Send change request"));
 
     expect(commentMutate).toHaveBeenCalledWith(
       { token: "t", body: "The hero photo is too dark" },
@@ -99,18 +104,30 @@ describe("Request changes carries the note the client typed", () => {
 
   it("says plainly that no note means no reason reaches the designer", () => {
     render(<ReviewClient token="t" />);
-    fireEvent.click(screen.getByText("Request changes"));
+    openNotes();
     expect(screen.getByText(/will not be told what to change/)).toBeTruthy();
   });
 
-  it("still closes the round with no note, once confirmed", () => {
+  it("still closes the round with no note", () => {
     render(<ReviewClient token="t" />);
-    fireEvent.click(screen.getByText("Request changes"));
-    fireEvent.click(screen.getByText("Send and request changes"));
+    openNotes();
+    fireEvent.click(screen.getByText("Send change request"));
     expect(commentMutate).not.toHaveBeenCalled();
     expect(resolveMutate).toHaveBeenCalledWith(
       { token: "t", status: "CHANGES_REQUESTED" },
       expect.anything(),
     );
+  });
+
+  /* 4418:122170: a request that did not land keeps everything and offers
+     "Send again" — the round is still open. */
+  it("a failed send says nothing was lost and offers Send again", () => {
+    render(<ReviewClient token="t" />);
+    openNotes();
+    fireEvent.click(screen.getByText("Send change request"));
+    const onError = resolveMutate.mock.calls[0][1].onError as () => void;
+    act(() => onError());
+    expect(screen.getByText("Your change request wasn’t sent.")).toBeTruthy();
+    expect(screen.getByText("Send again")).toBeTruthy();
   });
 });

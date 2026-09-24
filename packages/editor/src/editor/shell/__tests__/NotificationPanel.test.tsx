@@ -69,7 +69,7 @@ describe("NotificationPanel — the way to the rest of them", () => {
     const onClose = vi.fn();
     render(<NotificationPanel onClose={onClose} onNavigate={onNavigate} />);
 
-    const link = await screen.findByText("See all notifications");
+    const link = await screen.findByText("View all activity ›");
     fireEvent.click(link);
     expect(onNavigate).toHaveBeenCalledWith("/dashboard/notifications");
     expect(onClose).toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe("NotificationPanel — the way to the rest of them", () => {
     render(<NotificationPanel onClose={vi.fn()} />);
 
     await screen.findByText("You're all caught up");
-    expect(screen.queryByText("See all notifications")).not.toBeInTheDocument();
+    expect(screen.queryByText("View all activity ›")).not.toBeInTheDocument();
   });
 
   it("keeps a notification whose target is gone as information, not a button", async () => {
@@ -107,5 +107,25 @@ describe("NotificationPanel — the way to the rest of them", () => {
     expect(note.textContent).toMatch(/What this points to was deleted/);
     expect(note.textContent).toMatch(/The notification is kept, but there’s nothing to jump to\./);
     expect(container.querySelector('[data-jump-gone="true"] [data-jump-gone-note]')).toBeNull();
+  });
+});
+
+describe("NotificationPanel — board 4418:140492", () => {
+  it("leads each row with its type glyph and says unread in its name; the age sits on the row", async () => {
+    fetchRecentNotifications.mockResolvedValue([
+      row({ id: "a", type: "PUBLISH_SUCCESS", read: false }),
+      row({ id: "b", type: "PUBLISH_FAILED", read: true, createdAt: new Date(Date.now() - 86_400_000).toISOString() }),
+      row({ id: "c", type: "FORM_SUBMISSION", read: true }),
+    ]);
+    render(<NotificationPanel onClose={vi.fn()} />);
+    const labels = (await screen.findAllByRole("img")).map((i) => i.getAttribute("aria-label"));
+    expect(labels).toEqual(["Done, unread", "Update", "Failed"]);
+    expect(screen.getByTestId("notifications-row-meta-0").textContent).not.toBe("");
+  });
+
+  it("Mark all read is an accent link", async () => {
+    fetchRecentNotifications.mockResolvedValue([row()]);
+    render(<NotificationPanel onClose={vi.fn()} />);
+    expect((await screen.findByRole("button", { name: "Mark all read" })).className).toContain("tw:text-[var(--bk-accent)]");
   });
 });

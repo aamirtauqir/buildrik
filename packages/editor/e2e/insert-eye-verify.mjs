@@ -39,15 +39,15 @@ await shot("blocks-grid");
 await page.locator('[data-testid="insert-group-blocks"]').click(); // collapse back
 
 // Searching (138:53)
-await page.locator("#bld-search-input").fill("button");
+await page.locator("[data-testid=\"topbar-context-search\"]").fill("button");
 await page.waitForTimeout(500);
 await shot("searching");
 
 // No-results (138:106)
-await page.locator("#bld-search-input").fill("pizza oven");
+await page.locator("[data-testid=\"topbar-context-search\"]").fill("pizza oven");
 await page.waitForTimeout(500);
 await shot("no-results");
-await page.locator("#bld-search-input").fill("");
+await page.locator("[data-testid=\"topbar-context-search\"]").fill("");
 await page.waitForTimeout(500);
 
 // Tip-dismissed (138:244)

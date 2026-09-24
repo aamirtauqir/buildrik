@@ -11,7 +11,6 @@ import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { ScopeDropdown } from "./components/ScopeDropdown";
-import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -34,6 +33,7 @@ import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
 import { MediaSourceRow } from "./sections/MediaSourceRow";
+import { TextContentRow } from "./sections/TextContentRow";
 import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
@@ -446,12 +446,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           onChange={setCurrentPseudoState}
           withOverrides={statesWithOverrides}
         />
-        {/* S6: detach catalog/user-saved instance — pro-mode only, hides
-            itself when selectedElement is not an instance. Self-gated. */}
-        <DetachInstanceButton
-          composer={composer ?? null}
-          selectedElementId={selectedElement?.id}
-        />
       </div>
       <LockedBanner composer={composer} elementId={selectedElement.id} />
 
@@ -593,6 +587,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           {activeTab === "style" && (
             <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
           )}
+          {activeTab === "style" && <TextContentRow composer={composer} selectedElement={selectedElement} />}
           <InspectorErrorBoundary>
             <InspectorTabContent
               tabId={activeTab}

@@ -23,7 +23,9 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Progress, SkeletonBlock, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, useToast } from "@/editor/chrome-ui";
+import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
+import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import type { NextMove } from "../../../shell/lifecycle";
@@ -82,47 +84,60 @@ export interface PublishTabProps {
  * match the severity or the panel implies the warning is blocking (Figma
  * "Publish · pre-checks", founder decision 2026-08-05).
  *
- * Settings sub-sections are not addressable today: `ui:switch-tab` takes a tab
- * id only (StudioPanels), so SEO / Domain / Favicon all land on Settings rather
- * than their exact pane.
+ * Settings rows open Settings ON their pane (UI_SETTINGS_OPEN): SEO › SEO,
+ * Domain › Domains, Favicon › General. Page rows switch to the Pages panel.
  */
-const FIX_TARGETS: Record<string, { tab: string; label: string }> = {
-  "Pages ready": { tab: "pages", label: "Add a page" },
-  "SEO configured": { tab: "settings", label: "Fix" },
-  "Domain connected": { tab: "settings", label: "Fix" },
-  "Empty pages": { tab: "pages", label: "Fix" },
-  Favicon: { tab: "settings", label: "Fix" },
+type FixTarget = { tab: string } | { screen: SettingsNavId };
+const FIX_TARGETS: Record<string, FixTarget> = {
+  "Pages ready": { tab: "pages" },
+  "SEO configured": { screen: "seo" },
+  "Domain connected": { screen: "domains" },
+  "Empty pages": { tab: "pages" },
+  Favicon: { screen: "general" },
 };
 
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
 
-/** Board B3-10's RELEASE TO row — value on the right, chevron when the value
-    is somewhere you can actually go. */
-const EnvRow: React.FC<{ label: string; value: string | null; href?: string | null; empty: string }> = ({
+/** Board 4418:97118's RELEASE TO row: label left, the value muted on the
+    right with a ›. The whole row opens Settings › Domains, where the
+    environment is configured (the live site stays one click away in the
+    site menu and the published block). */
+const EnvRow: React.FC<{ label: string; value: string | null; empty: string; onOpen?: () => void }> = ({
   label,
   value,
-  href,
   empty,
+  onOpen,
 }) => (
-  <div className={ROW}>
+  <Button
+    color="light"
+    size="xs"
+    onClick={onOpen}
+    disabled={!onOpen}
+    className={`${ROW} tw:h-auto tw:w-full tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:font-normal tw:hover:bg-transparent`}
+    data-testid={`publish-env-${label === "Preview deployment" ? "preview" : "production"}`}
+  >
     <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{label}</span>
-    {value && href ? (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="tw:min-w-0 tw:truncate tw:text-[12px] tw:text-[var(--bk-accent)] tw:no-underline"
-        title={value}
-      >
-        {value} ›
-      </a>
-    ) : (
-      <span className={`${META} tw:min-w-0 tw:truncate`} title={value ?? empty}>
-        {value ?? empty}
-      </span>
-    )}
-  </div>
+    <span className={`${META} tw:flex tw:min-w-0 tw:items-center tw:gap-1`} title={value ?? empty}>
+      <span className="tw:truncate">{value ?? empty}</span>
+      <span aria-hidden="true">›</span>
+    </span>
+  </Button>
+);
+
+/** Board 4418:97118 draws CHANGES IN THIS SESSION and LAST DEPLOY as
+    collapsed section headers with a trailing chevron. */
+const CollapsibleTitle: React.FC<{ title: string; open: boolean; onToggle: () => void }> = ({ title, open, onToggle }) => (
+  <Button
+    color="light"
+    size="xs"
+    onClick={onToggle}
+    aria-expanded={open}
+    className={`${SECTION_TITLE} tw:h-6 tw:w-full tw:justify-between tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:hover:bg-transparent`}
+  >
+    {title}
+    {open ? <ChevronDown size={12} aria-hidden="true" /> : <ChevronRight size={12} aria-hidden="true" />}
+  </Button>
 );
 
 /** Board 778:4238: the labels stay, the values become bars. Widths are
@@ -359,6 +374,61 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const openIntegrations = () =>
     window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener");
 
+  const openDomains = composer ? () => composer.emit(EVENTS.UI_SETTINGS_OPEN, { screen: "domains" }) : undefined;
+  const [changesOpen, setChangesOpen] = React.useState(false);
+  const [lastDeployOpen, setLastDeployOpen] = React.useState(false);
+
+  /* Board 7045:77972 — the panel ⋯: All versions › (History › Published) and,
+     while the site is live, Unpublish site… (the confirm below). */
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId);
+  const publishMenu = (
+    <Popover
+      open={menuOpen}
+      onClose={() => setMenuOpen(false)}
+      placement="bottom-end"
+      label="Publish actions"
+      trigger={
+        <Button
+          color="light"
+          size="xs"
+          className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+          aria-label="Publish actions"
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+          data-testid="publish-menu"
+        >
+          <MoreHorizontal size={14} aria-hidden="true" />
+        </Button>
+      }
+    >
+      <Menu label="Publish actions">
+        <MenuItem
+          disabled={!composer}
+          onClick={() => {
+            setMenuOpen(false);
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "published" });
+          }}
+        >
+          All versions ›
+        </MenuItem>
+        {canUnpublish ? (
+          <MenuItem
+            danger
+            disabled={unpublishing}
+            onClick={() => {
+              setMenuOpen(false);
+              setConfirmUnpublish(true);
+            }}
+          >
+            {unpublishing ? "Unpublishing…" : "Unpublish site…"}
+          </MenuItem>
+        ) : null}
+      </Menu>
+    </Popover>
+  );
+
   const renderFix = (label: string): React.ReactNode => {
     /* Board 893:4518 puts `Connect` on the Vercel row, not `Fix` — the fix is
        not in this editor, so it opens the dashboard's integrations page
@@ -381,7 +451,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <Button
         color="light"
         size="xs"
-        onClick={() => composer?.emit("ui:switch-tab", { tab: target.tab })}
+        onClick={() =>
+          "screen" in target
+            ? composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: target.screen })
+            : composer?.emit("ui:switch-tab", { tab: target.tab })
+        }
         className={`tw:flex-none ${TEXT_LINK}`}
       >
         Fix ›
@@ -481,6 +555,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     <PanelFrame className="tw:h-full">
       <PanelFrame.Header
         title="Publish"
+        actions={publishMenu}
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
@@ -692,10 +767,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               <EnvRow
                 label={snapshot.production.label}
                 value={snapshot.production.value}
-                href={publishedUrl}
                 empty="Not published yet"
+                onOpen={openDomains}
               />
-              <EnvRow label="Preview deployment" value={snapshot.preview.value} empty="None" />
+              <EnvRow label="Preview deployment" value={snapshot.preview.value} empty="None" onOpen={openDomains} />
             </>
           )}
         </section>
@@ -705,10 +780,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             changes themselves. Absent during a run and right after one. */}
         {!isPublishing && !justPublished && !hasFailed && (
         <section className={SECTION} aria-label="Changes in this session">
-          <div className={ROW}>
-            <h3 className={SECTION_TITLE}>Changes in this session</h3>
-          </div>
-          {snapshot.loading ? (
+          <CollapsibleTitle title="Changes in this session" open={changesOpen} onToggle={() => setChangesOpen((v) => !v)} />
+          {!changesOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-36", "tw:w-28", "tw:w-20", "tw:w-32"]} />
           ) : (
           <>
@@ -750,8 +823,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             what a rollback would return to. */}
         {!isPublishing && !justPublished && !hasFailed && (
         <section className={SECTION} aria-label="Last deploy">
-          <h3 className={SECTION_TITLE}>Last deploy</h3>
-          {snapshot.loading ? (
+          <CollapsibleTitle title="Last deploy" open={lastDeployOpen} onToggle={() => setLastDeployOpen((v) => !v)} />
+          {!lastDeployOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-24"]} />
           ) : snapshot.lastDeploy ? (
             <>
@@ -761,17 +834,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 </span>
                 <span className={META}>{snapshot.lastDeploy.when}</span>
               </div>
-              {snapshot.lastDeploy.isLive && siteId && (
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => setConfirmUnpublish(true)}
-                  disabled={unpublishing}
-                  className="tw:mt-1 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-error)]"
-                >
-                  {unpublishing ? "Unpublishing…" : "Unpublish site…"}
-                </Button>
-              )}
             </>
           ) : (
             <p className={META}>This site has never been published.</p>

@@ -37,6 +37,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -289,6 +290,18 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      the way it did (openLeftPanelToTab / ui:switch-tab); only where they
      render moved. ✕ closes the panel and the inspector returns. */
   const rightColumnTab = !readOnlyView && isLeftPanelOpen && RIGHT_COLUMN_TABS.has(activeTabId);
+  useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
+
+  /* A click on the empty canvas closes the Layers drawer (prototype B10 /
+     C4#18) — the canvas clears the selection itself. */
+  React.useEffect(() => {
+    if (!composer || !isLeftPanelOpen || activeTabId !== "layers") return;
+    const close = () => onLeftPanelToggle?.();
+    composer.on(EVENTS.UI_CANVAS_BACKGROUND_CLICK, close);
+    return () => {
+      composer.off(EVENTS.UI_CANVAS_BACKGROUND_CLICK, close);
+    };
+  }, [composer, isLeftPanelOpen, activeTabId, onLeftPanelToggle]);
 
   /* The site menu's Unpublish emits UI_UNPUBLISH_REQUEST in the same gesture
      that opens the Publish panel, before PublishTab has subscribed. This
@@ -525,6 +538,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             activeSubTab={leftPanelSubTab}
             onTabChange={handleRailTabChange}
             drawerOpen={isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
+            /* QA 2026-09-24: the closed drawer still mounted a second copy of
+               the column's panel (two subscriptions, two fetches). */
+            hostedInColumn={RIGHT_COLUMN_TABS.has(activeTabId)}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}

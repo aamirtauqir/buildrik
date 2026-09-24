@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab, type BuildTabProps } from "../BuildTab";
 import { requestInsertGroup } from "../insertGroupRequest";
@@ -44,9 +44,10 @@ describe("BuildTab — board 137:2 taxonomy", () => {
 
   // TEMPLATES is OUT of Insert (founder, 2026-08-07) — templates own a full
   // flow (rail tab, Pages new-page, first-run) and never lived here.
-  it("renders the four source groups: ELEMENTS BLOCKS COMPONENTS MINE — no TEMPLATES", () => {
+  /* Board 4428:140817 names the component groups by where they come from. */
+  it("renders the four source groups: ELEMENTS BLOCKS BUILT-IN COMPONENTS SAVED COMPONENTS — no TEMPLATES", () => {
     renderTab();
-    for (const label of ["ELEMENTS", "BLOCKS", "COMPONENTS", "MINE"]) {
+    for (const label of ["ELEMENTS", "BLOCKS", "BUILT-IN COMPONENTS", "SAVED COMPONENTS"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
     expect(screen.queryByText("TEMPLATES")).toBeNull();
@@ -84,9 +85,68 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 });
 
-/* Paste HTML… moved into the panel ⋯ (board 7063:78846). */
-describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
-  it("reads the clipboard and sends content through onBlockClick", async () => {
+/* G2-108 — board 4418:103591: an element row's one-line description is its
+   hover tooltip (it used to live only in search matching). */
+describe("BuildTab — element row description on hover (G2-108)", () => {
+  it("an enabled ELEMENTS row carries its catalog description as a tooltip", () => {
+    renderTab();
+    const row = screen.getByTestId("insert-el-Container");
+    // flowbite Tooltip: <div target>{row}</div><div role="tooltip">…</div>
+    const tip = row.parentElement?.nextElementSibling;
+    expect(tip?.getAttribute("role")).toBe("tooltip");
+    expect(tip?.textContent).toBe("Generic wrapper box for grouping elements");
+    // The target wrapper spans the row, so the hover fill still fills the panel.
+    expect(row.parentElement?.className).toContain("tw:w-full");
+  });
+});
+
+/* G2-111 — board 4418:99857: SAVED COMPONENTS rows carry a ⠿ grip and drag
+   onto the canvas; the group ends in "Manage components ›"; an empty group
+   says how to make one. */
+describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
+  const composerWith = (saved: Array<{ id: string; name: string }>) => {
+    const emit = vi.fn();
+    return {
+      emit,
+      composer: {
+        on: vi.fn(), off: vi.fn(), emit,
+        components: { getAllComponents: () => saved },
+      } as unknown as NonNullable<BuildTabProps["composer"]>,
+    };
+  };
+
+  it("rows drag as a component id and draw a grip", () => {
+    const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    const row = screen.getByTestId("insert-mine-c1");
+    expect(row).toHaveAttribute("draggable", "true");
+    expect(screen.getByTestId("insert-row-grip-insert-mine-c1").textContent).toBe("⠿");
+    const setData = vi.fn();
+    fireEvent.dragStart(row, { dataTransfer: { setData, effectAllowed: "" } });
+    expect(setData).toHaveBeenCalledWith("application/x-aquibra-component", "c1");
+  });
+
+  it("Manage components › opens the Components panel", () => {
+    const { composer, emit } = composerWith([{ id: "c1", name: "Menu card" }]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByTestId("insert-mine-manage"));
+    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
+  });
+
+  it("an empty group says how to save one", () => {
+    const { composer } = composerWith([]);
+    renderTab({ composer });
+    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    expect(screen.getByTestId("insert-mine-empty").textContent).toMatch(/No saved components yet/);
+  });
+});
+
+/* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
+   modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
+describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
+  it("opens the modal prefilled from the clipboard; Insert sends it through onBlockClick", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
       clipboard: { readText: vi.fn().mockResolvedValue("<div><p>hi</p></div>") },
@@ -123,34 +183,44 @@ describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
   });
 });
 
-describe("BuildTab — search", () => {
-  it("swaps the group view for the flat cross-source SearchResults (138:53)", async () => {
-    const { container } = renderTab();
-    const input = container.querySelector("#bld-search-input") as HTMLInputElement;
-    expect(input).toBeTruthy();
+/* Board 4418:100087: no search box in the drawer — the topbar field reads
+   "Search elements…" while Add is open and its query filters this panel. */
+describe("BuildTab — search through the topbar field", () => {
+  const emitterComposer = () => {
+    const handlers = new Map<string, Set<(p: unknown) => void>>();
+    const emitted: Array<[string, unknown]> = [];
+    const composer = {
+      on: (e: string, h: (p: unknown) => void) => {
+        if (!handlers.has(e)) handlers.set(e, new Set());
+        handlers.get(e)!.add(h);
+      },
+      off: (e: string, h: (p: unknown) => void) => handlers.get(e)?.delete(h),
+      emit: (e: string, p: unknown) => {
+        emitted.push([e, p]);
+        handlers.get(e)?.forEach((h) => h(p));
+      },
+    };
+    return { composer: composer as unknown as BuildTabProps["composer"], emitted };
+  };
 
-    fireEvent.change(input, { target: { value: "button" } });
-
-    // SearchBar debounces (150ms) before pushing the query up to the hook.
-    await waitFor(() => expect(screen.getByTestId("insert-search-results")).toBeTruthy());
-    // Flat rows with the source tag on the right — no results header.
-    // "Button" hits BOTH sources (element + block) — that IS the contract.
-    expect(screen.getAllByText("Button").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("ELEMENTS").length).toBeGreaterThan(0);
-    expect(screen.queryByText(/results? for/i)).toBeNull();
-    // Board 138:53: the pinned bottom stays visible during search.
-    expect(screen.getByTestId("add-panel-menu")).toBeTruthy();
+  it("draws no search box or purpose line, and claims the topbar field", () => {
+    const { composer, emitted } = emitterComposer();
+    const { container, unmount } = renderTab({ composer });
+    expect(container.querySelector("input[type='search'], #bld-search-input")).toBeNull();
+    expect(screen.queryByText(/Click a row to add it/)).toBeNull();
+    expect(emitted).toContainEqual(["ui:search-context", { placeholder: "Search elements…" }]);
+    unmount();
+    expect(emitted[emitted.length - 1]).toEqual(["ui:search-context", null]);
   });
 
-  it("shows the no-results state for an unmatched query", async () => {
-    const { container } = renderTab();
-    const input = container.querySelector("#bld-search-input") as HTMLInputElement;
-
-    fireEvent.change(input, { target: { value: "zzznotablock" } });
-
-    await waitFor(() =>
-      expect(screen.getByText("Nothing matches ‘zzznotablock’.")).toBeTruthy()
-    );
+  it("a topbar query swaps the groups for the flat results (138:53) and the no-results state", async () => {
+    const { composer } = emitterComposer();
+    renderTab({ composer });
+    act(() => composer!.emit("ui:search-query" as never, { query: "button" } as never));
+    await waitFor(() => expect(screen.getByTestId("insert-search-results")).toBeTruthy());
+    expect(screen.getAllByText("Button").length).toBeGreaterThan(0);
+    act(() => composer!.emit("ui:search-query" as never, { query: "zzznotablock" } as never));
+    await waitFor(() => expect(screen.getByText("Nothing matches ‘zzznotablock’.")).toBeTruthy());
   });
 });
 
@@ -248,5 +318,26 @@ describe("BuildTab — BLOCKS to board 4428:140817", () => {
     const labels = Array.from(document.querySelectorAll('[data-testid^="insert-block-label-"]')).map((e) => e.textContent);
     expect(labels).toEqual(["Hero", "Features", "Menu grid", "Testimonials", "CTA", "Contact", "Footer", "Navbar"]);
     expect(screen.getByTestId("insert-blocks-grid").className).toMatch(/tw:grid-cols-2/);
+  });
+});
+
+describe("BuildTab — the topbar claim is stable while typing", () => {
+  it("claims the field once, however many queries arrive", () => {
+    const handlers = new Map<string, Set<(p: unknown) => void>>();
+    const emitted: string[] = [];
+    const composer = {
+      on: (e: string, h: (p: unknown) => void) => {
+        if (!handlers.has(e)) handlers.set(e, new Set());
+        handlers.get(e)!.add(h);
+      },
+      off: (e: string, h: (p: unknown) => void) => handlers.get(e)?.delete(h),
+      emit: (e: string, p: unknown) => {
+        emitted.push(e);
+        handlers.get(e)?.forEach((h) => h(p));
+      },
+    } as unknown as BuildTabProps["composer"];
+    renderTab({ composer });
+    for (const q of ["b", "bu", "but", ""]) act(() => composer!.emit("ui:search-query" as never, { query: q } as never));
+    expect(emitted.filter((e) => e === "ui:search-context")).toHaveLength(1);
   });
 });
