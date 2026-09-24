@@ -22,10 +22,10 @@ import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
   Button,
-  ConfirmDialog,
   IconButton,
   Menu,
   MenuItem,
+  Modal,
   Popover,
   Select,
   Textarea,
@@ -122,6 +122,15 @@ export function RecordSheet({
   const [saving, setSaving] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [leaveTo, setLeaveTo] = React.useState<null | (() => void)>(null);
+  /* The safe answer takes focus: the Modal focuses its first control, which in
+     the board's order is Discard — Enter would throw the edits away. */
+  const keepRef = React.useRef<HTMLButtonElement | null>(null);
+  const leaving = leaveTo !== null;
+  React.useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => keepRef.current?.focus(), 0);
+    return () => window.clearTimeout(id);
+  }, [leaving]);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
 
@@ -402,21 +411,35 @@ export function RecordSheet({
         </div>
       </footer>
 
-      <ConfirmDialog
+      {/* 6879:67190 — the danger action first, the safe one last; "Keep
+          editing" takes focus, and Escape / the scrim give the same answer. */}
+      <Modal
         open={leaveTo !== null}
         onClose={() => setLeaveTo(null)}
-        onConfirm={() => {
-          const go = leaveTo;
-          setLeaveTo(null);
-          go?.();
-        }}
         title="Discard record changes?"
-        message={`${crumb} has unsaved changes. Keep editing to save them, or leave and lose them.`}
-        confirmLabel="Discard and leave"
-        cancelLabel="Keep editing"
-        tone="destructive"
+        kind="form"
         testId="cms-discard"
-      />
+        footer={
+          <>
+            <Button
+              variant="danger"
+              onClick={() => {
+                const go = leaveTo;
+                setLeaveTo(null);
+                go?.();
+              }}
+              data-testid="cms-discard-confirm"
+            >
+              Discard and leave
+            </Button>
+            <Button ref={keepRef} variant="secondary" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
+              Keep editing
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0">{`${crumb} has unsaved changes. Keep editing to finish them, or discard the edits and leave the record.`}</p>
+      </Modal>
       {record ? (
         <TypedDeleteDialog
           open={typedDelete}
