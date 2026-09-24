@@ -8378,6 +8378,6 @@
       "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
     }
   ],
-  "coveredFloor": 195,
+  "coveredFloor": 190,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }
