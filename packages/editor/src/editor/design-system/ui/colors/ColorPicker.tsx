@@ -266,7 +266,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const BAR = "tw:relative tw:h-2";
   const BAR_CANVAS = "tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full";
   const KNOB =
-    "tw:pointer-events-none tw:absolute tw:top-1/2 tw:size-3.5 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white tw:shadow-[var(--bk-shadow-sm)]";
+    "tw:pointer-events-none tw:absolute tw:top-1/2 tw:size-3.5 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white tw:shadow-[var(--bk-shadow-raised)]";
 
   return (
     <div className="tw:flex tw:w-70 tw:flex-col" data-testid="color-picker">
