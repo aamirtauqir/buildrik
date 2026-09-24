@@ -15,12 +15,6 @@ export {
 } from "./elementProfiles";
 export type { ElementProfile } from "./elementProfiles";
 
-// Properties Registry (dead functions purged in Commit B)
-export {
-  PROPERTIES,
-} from "./propertiesRegistry";
-export type { PropertyDefinition, PropertyType } from "./propertiesRegistry";
-
 // CSS Context
 export { deriveCssContext, getPropertyStates } from "./cssContext";
 export type { CssContext } from "./cssContext";
