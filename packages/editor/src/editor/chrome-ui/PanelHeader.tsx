@@ -119,8 +119,12 @@ const SIZE_CLASS: Record<"drawer" | "panel" | "column", string> = {
      (`I208:171;16:7`, `I781:4490;16:7`, `I1138:13414;16:7`), and the class
      list carried the size without the line-height, so the label sat on the
      font's own ~13px normal. */
+  /* Editor v3 · IA (page 4418:45431) draws every drawer title 14/500 ink on
+     a 20 line — "Panel header" in 4418:100087, 4418:123573, 4418:126059,
+     4418:140587… (10 boards agree). The 11px ink-soft label above was page
+     1:3's, now archived. */
   drawer:
-    "tw:h-11 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)]",
+    "tw:h-11 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]",
   panel:
     "tw:h-12 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
   column:

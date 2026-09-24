@@ -217,6 +217,26 @@ describe("BuildTab — Collection list row (G3-079)", () => {
   });
 });
 
+/* Board 4428:145110 — hovering a block card opens its preview card. */
+describe("BuildTab — block hover preview (4428:145110)", () => {
+  it("after a beat, names the block, says what it is, and Add inserts it", () => {
+    vi.useFakeTimers();
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    fireEvent.mouseEnter(screen.getByTestId("insert-block-hero"));
+    expect(screen.queryByTestId("insert-block-preview")).toBeNull();
+    act(() => { vi.advanceTimersByTime(350); });
+    const card = screen.getByTestId("insert-block-preview");
+    expect(card.textContent).toContain("Full-width headline, subtitle and a button.");
+    expect(card.textContent).toContain("or drag it onto the canvas");
+    fireEvent.click(screen.getByTestId("insert-block-preview-add"));
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "hero" });
+    expect(screen.queryByTestId("insert-block-preview")).toBeNull();
+    vi.useRealTimers();
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {
