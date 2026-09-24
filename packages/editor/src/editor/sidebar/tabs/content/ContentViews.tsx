@@ -34,7 +34,8 @@ import {
 } from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
-import { conditionSummary, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
+import type { SiteVariable } from "@/shared/types/project";
+import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 import { RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
 
@@ -488,18 +489,13 @@ export function VariablesView({
             nothing at all, so an empty Variables screen was one blue link on
             white with no clue what a variable is for. */}
         {variables.length === 0 && !adding && (
-          /* This said a variable is reusable "in any text on any page", naming
-             the {{site.*}} form. Nothing substitutes it: typed into a heading
-             it renders literally on the canvas AND comes out literally in the
-             exported HTML (walked live — the export carried the raw braces and
-             no value). The store is localStorage keyed by project, so the
-             publish worker cannot see it either, and the inspector's binding
-             popover offers collections only. Until variables move into the
-             project and something reads them, the screen says what is true. */
+          /* Variables are saved with the project and the export writes their
+             value wherever {{site.<key>}} appears in text (G3-075). The canvas
+             still shows the braces as typed — say so. */
           <div className={`${SUB} tw:p-3`}>
-            No variables yet. A variable is a value you write once and reuse in
-            this panel — <span className={MONO}>{" {{site.name}} "}</span> is
-            saved in this browser, and pages do not read it yet.
+            No variables yet. Write a value once, then type{" "}
+            <span className={MONO}>{"{{site.name}}"}</span> in any text: the
+            published page shows the value; the canvas shows the braces.
           </div>
         )}
         {variables.map((v) => (

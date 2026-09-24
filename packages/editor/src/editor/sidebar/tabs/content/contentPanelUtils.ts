@@ -7,16 +7,13 @@
  */
 import type { CMSField } from "@/shared/types/cms";
 import type { ConditionBinding, ConditionExpression, LogicGroup } from "@/shared/types/data";
+import type { SiteVariable } from "@/shared/types/project";
 
 /** DataManager source id that carries the site variables ({{site.*}}). */
 export const SITE_VARS_SOURCE_ID = "site";
 
 const SITE_VARS_KEY_PREFIX = "buildrick-site-variables";
 
-export interface SiteVariable {
-  key: string;
-  value: string;
-}
 
 function storageKey(projectId: string | null): string {
   return projectId ? `${SITE_VARS_KEY_PREFIX}-${projectId}` : SITE_VARS_KEY_PREFIX;
@@ -25,7 +22,8 @@ function storageKey(projectId: string | null): string {
 /** Load persisted site variables (editor-side persistence; the DataManager
  *  source is re-registered from this on panel mount so {{site.*}} bindings
  *  resolve for real). */
-export function loadSiteVariables(projectId: string | null): SiteVariable[] {
+/** Variables saved before they moved into the project — read once to migrate. */
+export function loadLegacySiteVariables(projectId: string | null): SiteVariable[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage?.getItem(storageKey(projectId));
@@ -40,15 +38,6 @@ export function loadSiteVariables(projectId: string | null): SiteVariable[] {
     );
   } catch {
     return [];
-  }
-}
-
-export function saveSiteVariables(projectId: string | null, vars: SiteVariable[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage?.setItem(storageKey(projectId), JSON.stringify(vars));
-  } catch {
-    // Storage blocked (private mode) — variables stay session-only.
   }
 }
 

@@ -1096,9 +1096,24 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     // never rendered — that is the safety guarantee the escape default exists for.
     const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
     if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
-      return sanitizeHTML(content);
+      return sanitizeHTML(this.withSiteVariables(content, escapeHTML));
     }
-    return escapeHTML(content);
+    return escapeHTML(this.withSiteVariables(content));
+  }
+
+  /**
+   * {{site.<key>}} → the variable's value (CMS › Variables, saved in the
+   * project settings). A key with no variable stays as written, so a typo
+   * shows on the page rather than vanishing. `encode` escapes the value when
+   * it lands inside markup; plain text is escaped as a whole afterwards.
+   */
+  private withSiteVariables(content: string, encode: (v: string) => string = (v) => v): string {
+    const vars = this.composer.getProjectSettings?.()?.siteVariables;
+    if (!vars?.length || !content.includes("{{")) return content;
+    const byKey = new Map(vars.map((v) => [v.key, v.value]));
+    return content.replace(/\{\{\s*site\.([a-zA-Z][\w-]*)\s*\}\}/g, (m, key: string) =>
+      byKey.has(key) ? encode(byKey.get(key) ?? "") : m,
+    );
   }
 
   private renderPageElement(element: PageData["root"], indent = 1): string {

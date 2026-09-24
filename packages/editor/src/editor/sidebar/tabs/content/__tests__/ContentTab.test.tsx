@@ -57,7 +57,7 @@ describe("ContentTab", () => {
     expect(onCreateCollection).toHaveBeenCalledTimes(1);
   });
 
-  it("variables: add registers the live 'site' source and persists", async () => {
+  it("variables: moves legacy browser-only variables into the project, then adds and persists there", async () => {
     localStorage.setItem(
       "buildrick-site-variables-test-proj",
       JSON.stringify([{ key: "name", value: "Bella Cucina" }]),
@@ -72,7 +72,10 @@ describe("ContentTab", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add" }));
     expect(await screen.findByText("{{site.phone}}")).toBeInTheDocument();
     expect(sources.get("site")?.data).toEqual({ name: "Bella Cucina", phone: "+44 20" });
-    expect(JSON.parse(localStorage.getItem("buildrick-site-variables-test-proj") ?? "[]")).toHaveLength(2);
+    expect(composer.getProjectSettings().siteVariables).toEqual([
+      { key: "name", value: "Bella Cucina" },
+      { key: "phone", value: "+44 20" },
+    ]);
   });
 
   it("conditions: lists element condition bindings with summaries and removes them", async () => {

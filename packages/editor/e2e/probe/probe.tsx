@@ -61,7 +61,6 @@ import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
-import { saveSiteVariables } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { Composer } from "@/engine/Composer";
@@ -1911,6 +1910,9 @@ function contentComposer({
   const noop = () => {};
   return {
     getProjectMetadata: () => ({ name: CONTENT_PROJECT }),
+    /* Variables live in the project settings (board 151:62's list). */
+    getProjectSettings: () => ({ siteVariables: CONTENT_VARIABLES }),
+    setProjectSettings: noop,
     cms: {
       collections: {
         initialize: async () => {},
@@ -1950,13 +1952,6 @@ function contentComposer({
  *  frame. Without a real height `CONTENT_BODY`'s `h-full` collapses and every
  *  `flex-1` region measures its content instead of its column. */
 function ContentPanelHost({ probe, composer }: { probe: string; composer: Composer }) {
-  /* Variables persist in localStorage keyed by the project NAME
-     (contentPanelUtils.storageKey). Seeded through the shipped writer so the
-     read path is identical to production's — and during THIS render rather
-     than in an effect: child effects run before parent effects, so an effect
-     here would write them after `useContentPanel` had already read, and board
-     151:62 would mount on an empty list. */
-  React.useMemo(() => saveSiteVariables(CONTENT_PROJECT, CONTENT_VARIABLES), []);
   return (
     <div data-probe={probe} className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
       <ContentTab composer={composer} hydrationStatus="ready" onCreateCollection={() => {}} onClose={() => {}} />
