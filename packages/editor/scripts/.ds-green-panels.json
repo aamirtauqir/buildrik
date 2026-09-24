@@ -73,7 +73,6 @@
     "packages/editor/src/editor/sidebar/tabs/build/components/SearchResults.tsx",
     "packages/editor/src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/component-library/ComponentIcon.tsx",
-    "packages/editor/src/editor/sidebar/tabs/component-library/ComponentRow.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/HistoryTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/components/ActivityView.tsx",
     "packages/editor/src/editor/sidebar/tabs/history/components/DiffRow.tsx",

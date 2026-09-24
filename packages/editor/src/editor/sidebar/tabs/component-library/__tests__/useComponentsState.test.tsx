@@ -148,108 +148,6 @@ describe("useComponentsState — canvas selection sync", () => {
   });
 });
 
-describe("useComponentsState — rename dialog machine", () => {
-  it("handleRename opens the dialog with the component's current name", () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-
-    expect(result.current.renameTarget).toEqual({ id: "c1", currentName: "Hero Section" });
-  });
-
-  it("handleRename is a no-op for an unknown component id", () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.handleRename("ghost");
-    });
-
-    expect(result.current.renameTarget).toBeNull();
-  });
-
-  it("confirmRename commits the trimmed name via updateComponent and closes", async () => {
-    const { composer, result } = setup();
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-    await act(async () => {
-      await result.current.confirmRename("  New Hero  ");
-    });
-
-    expect(asMock(composer.components.updateComponent)).toHaveBeenCalledWith("c1", {
-      name: "New Hero",
-    });
-    expect(result.current.renameTarget).toBeNull();
-    expect(result.current.pendingToast).toEqual({
-      message: "Component renamed",
-      variant: "success",
-    });
-  });
-
-  it("cancel path (setRenameTarget(null)) closes without calling updateComponent", () => {
-    const { composer, result } = setup();
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-    act(() => {
-      result.current.setRenameTarget(null);
-    });
-
-    expect(result.current.renameTarget).toBeNull();
-    expect(asMock(composer.components.updateComponent)).not.toHaveBeenCalled();
-  });
-
-  it("confirmRename with the unchanged name skips updateComponent but closes", async () => {
-    const { composer, result } = setup();
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-    await act(async () => {
-      await result.current.confirmRename("Hero Section");
-    });
-
-    expect(asMock(composer.components.updateComponent)).not.toHaveBeenCalled();
-    expect(result.current.renameTarget).toBeNull();
-  });
-
-  it("confirmRename with a whitespace-only name skips updateComponent but closes", async () => {
-    const { composer, result } = setup();
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-    await act(async () => {
-      await result.current.confirmRename("   ");
-    });
-
-    expect(asMock(composer.components.updateComponent)).not.toHaveBeenCalled();
-    expect(result.current.renameTarget).toBeNull();
-  });
-
-  it("surfaces an error toast when updateComponent rejects (dialog still closes)", async () => {
-    const { composer, result } = setup();
-    asMock(composer.components.updateComponent).mockRejectedValueOnce(new Error("nope"));
-
-    act(() => {
-      result.current.handleRename("c1");
-    });
-    await act(async () => {
-      await result.current.confirmRename("Fresh Name");
-    });
-
-    expect(result.current.pendingToast).toEqual({
-      message: "Couldn't rename component.",
-      variant: "error",
-    });
-    expect(result.current.renameTarget).toBeNull();
-  });
-});
-
 describe("useComponentsState — duplicate", () => {
   it("handleDuplicate calls duplicateComponent and toasts success", async () => {
     const { composer, result } = setup();
@@ -351,26 +249,6 @@ describe("useComponentsState — delete confirm machine", () => {
     expect(result.current.confirmDelete).toBeNull();
   });
 
-  it("KNOWN (pin): favorites orphan — deleting a component leaves its id in favorites", async () => {
-    // KNOWN (pin): confirmDeleteAction never prunes the deleted id from the
-    // favorites list (or its localStorage mirror), so favorites accumulates
-    // orphaned ids of deleted components. Pinning current behavior, not fixing.
-    const { result } = setup();
-
-    act(() => {
-      result.current.toggleFavorite("c1");
-    });
-    expect(result.current.favorites).toContain("c1");
-
-    act(() => {
-      result.current.handleDelete("c1");
-    });
-    await act(async () => {
-      await result.current.confirmDeleteAction();
-    });
-
-    expect(result.current.favorites).toContain("c1");
-  });
 });
 
 describe("useComponentsState — insert / instantiate", () => {

@@ -8,7 +8,6 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { type ComponentFilter, FAVORITES_STORAGE_KEY } from "../componentsData";
 import { takePendingMaster } from "./openMasterRequest";
 
 const MAX_COMPONENTS = 100;
@@ -18,25 +17,12 @@ export interface DeleteConfirmState {
   id: string;
   name: string;
 }
-export interface RenameDialogState {
-  id: string;
-  currentName: string;
-}
 export interface PendingToastState {
   message: string;
   variant: "info" | "warning" | "error" | "success";
 }
-export interface VariantPickerState {
-  id: string;
-  componentName: string;
-  variants: Array<{ id: string; name: string }>;
-  currentVariantId: string | null;
-  instanceElementId: string;
-}
-
 interface UseComponentsStateParams {
   composer: Composer | null;
-  externalSearchQuery?: string;
   selectedComponentId?: string | null;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   onClose?: () => void;
@@ -46,16 +32,12 @@ interface UseComponentsStateParams {
 
 export function useComponentsState({
   composer,
-  externalSearchQuery,
   selectedComponentId,
   onComponentSelect,
   onClose,
   onExpandToggle,
   onHelpClick,
 }: UseComponentsStateParams) {
-  // Internal search state for standalone mode
-  const [internalSearchQuery, setInternalSearchQuery] = React.useState("");
-  const searchQuery = externalSearchQuery ?? internalSearchQuery;
   const [components, setComponents] = React.useState<ComponentDefinition[]>([]);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -77,29 +59,11 @@ export function useComponentsState({
   // Detail view navigation state
   const [detailComponent, setDetailComponent] = React.useState<ComponentDefinition | null>(null);
 
-  // Filter and favorites state
-  const [activeFilter, setActiveFilter] = React.useState<ComponentFilter>("all");
-  const [favorites, setFavorites] = React.useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]") as string[];
-    } catch {
-      return [];
-    }
-  });
-  const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<string>>(new Set());
   const [canvasSelection, setCanvasSelection] = React.useState<string[]>([]);
 
   // Dialog state (replaces native alert/confirm/prompt)
   const [confirmDelete, setConfirmDelete] = React.useState<DeleteConfirmState | null>(null);
-  const [renameTarget, setRenameTarget] = React.useState<RenameDialogState | null>(null);
-  const [variantPicker, setVariantPicker] = React.useState<VariantPickerState | null>(null);
   const [pendingToast, setPendingToast] = React.useState<PendingToastState | null>(null);
-
-  // Persist favorites
-  React.useEffect(() => {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-  }, [favorites]);
 
   // Listen for canvas selection changes
   React.useEffect(() => {
@@ -122,23 +86,6 @@ export function useComponentsState({
       composer.off("selection:multiple", handleSelectionChange);
     };
   }, [composer]);
-
-  // Toggle favorite
-  const toggleFavorite = React.useCallback((id: string, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
-  }, []);
-
-  const isFavorite = React.useCallback((id: string) => favorites.includes(id), [favorites]);
-
-  // Toggle group collapse
-  const toggleGroup = React.useCallback((group: string) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      next.has(group) ? next.delete(group) : next.add(group);
-      return next;
-    });
-  }, []);
 
   // Load components and subscribe to updates
   React.useEffect(() => {
@@ -164,64 +111,6 @@ export function useComponentsState({
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, handleUpdate);
     };
   }, [composer]);
-
-  // Filter components by search and active filter
-  const filteredComponents = React.useMemo(() => {
-    let result = [...components];
-
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (c) =>
-          c.name.toLowerCase().includes(query) ||
-          c.category?.toLowerCase().includes(query) ||
-          c.tags?.some((t) => t.toLowerCase().includes(query))
-      );
-    }
-
-    switch (activeFilter) {
-      case "ui":
-        result = result.filter(
-          (c) =>
-            c.category?.toLowerCase() === "ui" ||
-            c.tags?.some((t) =>
-              ["button", "input", "form", "card", "badge"].includes(t.toLowerCase())
-            )
-        );
-        break;
-      case "sections":
-        result = result.filter(
-          (c) =>
-            c.category?.toLowerCase() === "sections" ||
-            c.tags?.some((t) =>
-              ["hero", "navbar", "footer", "cta", "features"].includes(t.toLowerCase())
-            )
-        );
-        break;
-      case "saved":
-        result = result.filter((c) => c.category !== "Presets" && c.category !== "Team");
-        break;
-      case "favorites":
-        result = result.filter((c) => favorites.includes(c.id));
-        break;
-      case "all":
-      default:
-        break;
-    }
-
-    return result;
-  }, [components, searchQuery, activeFilter, favorites]);
-
-  // Group by category
-  const groupedComponents = React.useMemo(() => {
-    const groups: Record<string, ComponentDefinition[]> = {};
-    filteredComponents.forEach((c) => {
-      const category = c.category || "Uncategorized";
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(c);
-    });
-    return groups;
-  }, [filteredComponents]);
 
   // Drag handler
   const handleDragStart = React.useCallback(
@@ -269,7 +158,6 @@ export function useComponentsState({
       const component = composer.components.getComponent(componentId);
       if (component) {
         setConfirmDelete({ id: componentId, name: component.name });
-        setOpenMenuId(null);
       }
     },
     [composer]
@@ -294,105 +182,12 @@ export function useComponentsState({
   const handleDuplicate = React.useCallback(
     async (componentId: string) => {
       if (!composer) return;
-      setOpenMenuId(null);
       try {
         await composer.components.duplicateComponent(componentId);
         setPendingToast({ message: "Component duplicated", variant: "success" });
       } catch {
         setPendingToast({ message: "Couldn't duplicate component.", variant: "error" });
       }
-    },
-    [composer]
-  );
-
-  // Rename a component — opens Modal instead of native prompt()
-  const handleRename = React.useCallback(
-    (componentId: string) => {
-      if (!composer) return;
-      const component = composer.components?.getComponent(componentId);
-      if (!component) return;
-
-      setRenameTarget({ id: componentId, currentName: component.name });
-      setOpenMenuId(null);
-    },
-    [composer]
-  );
-
-  // Actual rename after modal submission
-  const confirmRename = React.useCallback(
-    async (newName: string) => {
-      if (!composer || !renameTarget) return;
-      if (newName.trim() && newName !== renameTarget.currentName) {
-        try {
-          await composer.components.updateComponent(renameTarget.id, { name: newName.trim() });
-          setPendingToast({ message: "Component renamed", variant: "success" });
-        } catch {
-          setPendingToast({ message: "Couldn't rename component.", variant: "error" });
-        }
-      }
-      setRenameTarget(null);
-    },
-    [composer, renameTarget]
-  );
-
-  // Swap variant — opens Modal instead of native prompt/alert
-  const handleSwapVariant = React.useCallback(
-    (componentId: string) => {
-      if (!composer) return;
-      const component = composer.components?.getComponent(componentId);
-      if (!component?.variants?.length) {
-        setPendingToast({ message: "This component has no variants defined.", variant: "warning" });
-        setOpenMenuId(null);
-        return;
-      }
-
-      const currentSelectedId = canvasSelection[0];
-      if (!currentSelectedId) {
-        setPendingToast({
-          message: "Select a component instance on the canvas first.",
-          variant: "warning",
-        });
-        setOpenMenuId(null);
-        return;
-      }
-
-      const instance = composer.components?.getInstanceByElementId(currentSelectedId);
-      if (!instance || instance.componentId !== componentId) {
-        setPendingToast({
-          message: "Select an instance of this component on the canvas first.",
-          variant: "warning",
-        });
-        setOpenMenuId(null);
-        return;
-      }
-
-      setVariantPicker({
-        id: componentId,
-        componentName: component.name,
-        variants: component.variants.map((v) => ({ id: v.id, name: v.name })),
-        currentVariantId: instance.variantSelection?.variantId ?? null,
-        instanceElementId: instance.elementId,
-      });
-      setOpenMenuId(null);
-    },
-    [composer, canvasSelection]
-  );
-
-  // Actual variant swap after picker selection
-  const confirmVariant = React.useCallback(
-    (variantId: string) => {
-      if (!composer || !variantPicker) return;
-      composer.components?.updateInstanceVariant?.(variantPicker.instanceElementId, variantId);
-      setVariantPicker(null);
-    },
-    [composer, variantPicker]
-  );
-
-  // Check if component has variants
-  const hasVariants = React.useCallback(
-    (componentId: string): boolean => {
-      const component = composer?.components?.getComponent(componentId);
-      return Boolean(component?.variants?.length);
     },
     [composer]
   );
@@ -453,14 +248,6 @@ export function useComponentsState({
     composer.components?.detachInstance?.(currentSelectedId);
   }, [composer, canvasSelection]);
 
-  // Close menu when clicking outside
-  React.useEffect(() => {
-    if (!openMenuId) return;
-    const handleClickOutside = () => setOpenMenuId(null);
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [openMenuId]);
-
   // Derived state
   const canCreateComponent = canvasSelection.length > 0;
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
@@ -472,33 +259,14 @@ export function useComponentsState({
   const handleHelpClickFn = onHelpClick;
 
   return {
-    // Search
-    internalSearchQuery,
-    setInternalSearchQuery,
-    searchQuery,
     // Components
     components,
-    filteredComponents,
-    groupedComponents,
     // Selection
     selectedId,
     setSelectedId,
     // Detail view
     detailComponent,
     setDetailComponent,
-    // Filters
-    activeFilter,
-    setActiveFilter,
-    // Favorites
-    favorites,
-    toggleFavorite,
-    isFavorite,
-    // Groups
-    collapsedGroups,
-    toggleGroup,
-    // Menu
-    openMenuId,
-    setOpenMenuId,
     // Canvas selection
     canvasSelection,
     canCreateComponent,
@@ -507,9 +275,6 @@ export function useComponentsState({
     handleInstantiate,
     handleDelete,
     handleDuplicate,
-    handleRename,
-    handleSwapVariant,
-    hasVariants,
     handleViewDetail,
     handleBackFromDetail,
     handleDetailInsert,
@@ -520,12 +285,6 @@ export function useComponentsState({
     confirmDelete,
     setConfirmDelete,
     confirmDeleteAction,
-    renameTarget,
-    setRenameTarget,
-    confirmRename,
-    variantPicker,
-    setVariantPicker,
-    confirmVariant,
     pendingToast,
     setPendingToast,
     // Loading & Error
@@ -539,4 +298,5 @@ export function useComponentsState({
     isStandaloneMode,
     handleHelpClick: handleHelpClickFn,
   };
+
 }
