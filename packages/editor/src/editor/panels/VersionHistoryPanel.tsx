@@ -147,12 +147,17 @@ export function VersionHistoryPanel({
   /* Board 163:220 draws the restore in flight, and its second line is the
      reassurance the engine now actually keeps: the work that was open is
      saved as its own version before anything is replaced. */
+  /* The safety save of the last restore, read by its toast's "Undo restore". */
+  const safetyIdRef = React.useRef<string | null>(null);
   const [restoring, setRestoring] = React.useState<{ targetName: string; savedAs: string | null } | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
     const onRestoring = (p: { targetName: string; savedAs: string | null }) => setRestoring(p);
-    const onRestored = () => setRestoring(null);
+    const onRestored = (p?: { safetyVersionId?: string }) => {
+      setRestoring(null);
+      safetyIdRef.current = p?.safetyVersionId ?? null;
+    };
     composer.on(EVENTS.VERSION_PRUNED, onPruned);
     composer.on(EVENTS.VERSION_RESTORING, onRestoring);
     composer.on(EVENTS.VERSION_RESTORED, onRestored);
@@ -178,9 +183,22 @@ export function VersionHistoryPanel({
     setRestoreConfirmId(null);
     setRestoringId(versionId);
     const target = versions.find((v) => v.id === versionId);
+    safetyIdRef.current = null;
     try {
       await restoreVersion(versionId);
-      if (target) pushToast(`Restored to ${formatTime(target.createdAt)}`, "success");
+      /* G1-071: the restore saved the work on screen first; "Undo restore"
+         restores that save (itself a confirmed-safe restore). */
+      const safetyId = safetyIdRef.current;
+      addToast({
+          /* No target in this list = the Undo of a restore (its safety save
+             was created after the list was read). */
+          description: target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone",
+          tone: "success",
+          duration: 8000,
+          action: safetyId
+            ? { label: "Undo restore", onClick: () => void handleRestoreConfirm(safetyId) }
+            : undefined,
+        });
     } catch {
       pushToast("Restore failed", "error");
     } finally {

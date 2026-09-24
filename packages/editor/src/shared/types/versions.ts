@@ -117,6 +117,9 @@ export interface VersionCreatedPayload {
 export interface VersionRestoredPayload {
   version: NamedVersion;
   previousVersionId?: string;
+  /** The version the work on screen was saved as before the restore — what
+   *  "Undo restore" restores (G1-071). */
+  safetyVersionId?: string;
 }
 
 /**
