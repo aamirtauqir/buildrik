@@ -93,7 +93,10 @@ describe("BrandWorkspace › Import / export", () => {
     await waitFor(() => {
       expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
-    expect(utils.getByTestId("brand-section-status-imported")).toBeTruthy();
+    // G3-123: no status pill band — the import toast says it.
+    expect(utils.queryByTestId("brand-section-status-imported")).toBeNull();
+    expect(utils.queryByTestId("brand-section-status")).toBeNull();
+    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
   });
 
   it("ADD via import lights the dirty marker (adds count, not just modifications)", async () => {

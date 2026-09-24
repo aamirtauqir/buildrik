@@ -96,7 +96,6 @@ import { BrandPreview } from "./BrandPreview";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { orderColourTokens } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
-import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
@@ -247,9 +246,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Brand checks page can never disagree. */
   const lintIssues = useDSLint(composer);
-  /* Board 306:2217 puts a "Warnings suppressed" pill on the root. Read here
-     rather than stored: `useDSLint` re-renders this component whenever
-     `lint:changed` fires, which is every suppress and unsuppress. */
+  /* Ignored (suppressed) checks, named in the Brand checks caption (G3-123:
+     no pill band). Read here rather than stored: `useDSLint` re-renders this
+     component whenever `lint:changed` fires, every suppress and unsuppress. */
   const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
   const [page, setPage] = React.useState<BrandPageId>(() =>
     initialPage && isPageId(initialPage) ? initialPage : LANDING
@@ -344,13 +343,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     ready: brandLoaded,
   });
 
-  /* Cleared when the page changes: a badge saying "Exported CSS" on a page
-     the user walked back into later is stale news dressed as fresh. */
-  const [lastExport, setLastExport] = React.useState<string | null>(null);
-  const [importOutcome, setImportOutcome] = React.useState<"imported" | "import-failed" | null>(null);
-  React.useEffect(() => {
-    if (page !== "export") { setLastExport(null); setImportOutcome(null); }
-  }, [page]);
 
   const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
   const stylesDirty = useStylesSectionTotalDirty();
@@ -748,7 +740,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
-      case "brand-checks":     return brandChecksCaption(lintIssues);
+      case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
       case "starters":         return "Pick a starter, then apply it to the draft";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
@@ -978,7 +970,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           /* 4418:168885: a 760 panel centred in the main area — no page
              header, no preview column. Its ✕ goes back to Colours. */
           <div className="tw:mx-auto tw:w-full tw:max-w-[760px]">
-            <ExportSection onExported={setLastExport} onImportOutcome={setImportOutcome} onClose={() => openPage("colours")} />
+            <ExportSection onClose={() => openPage("colours")} />
           </div>
         );
       default: {
@@ -1136,28 +1128,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             />
           ) : (
             <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
-              {/* Board 306:2161 draws a status badge in the band under the back
-                  row. Its two siblings (bound / unbound) specify a state nothing
-                  can answer — elements carry no preset reference — so only this
-                  one ships. See SectionStatusBadge's note. */}
-              {page === "presets" && presetsStatus(stylesDirty > 0) && (
-                <SectionStatusBadge status="draft" />
-              )}
-              {/* Board 306:2232 — "Exported CSS" after a download. The Copy
-                  button carries its own feedback; Download had none at all. */}
-              {page === "export" && lastExport && (
-                <SectionStatusBadge status="exported" detail={lastExport} />
-              )}
-              {/* Boards 306:2265 / 4418:168885 — the import outcome, "⚠ Import
-                  failed" being the row the workspace board draws. The card shows
-                  its own error DETAIL inline; this says what state the page is in. */}
-              {page === "export" && !lastExport && importOutcome && (
-                <SectionStatusBadge status={importOutcome} />
-              )}
-              {page === "brand-checks" && suppressedCount > 0 ? (
-                <SectionStatusBadge status="warnings-suppressed" role="status" />
-              ) : null}
-
               {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
                   with Browse starters · Import — the workspace's first-run state,
                   on the landing page, until the first Save. The sentence is the

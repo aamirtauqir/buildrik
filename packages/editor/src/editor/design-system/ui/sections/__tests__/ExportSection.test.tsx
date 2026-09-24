@@ -96,6 +96,14 @@ describe("ExportSection", () => {
     // Figma is disabled now; selecting JSON above is the real assertion here.
   });
 
+  /* G3-123 · 6881:71312: a download reports "Export ready" as a toast. */
+  it("Download raises the Export ready toast with the kinds · tokens count", async () => {
+    const { getByTestId, findByText } = render(wrap(<ExportSection />));
+    fireEvent.click(getByTestId("brand-format-download-css"));
+    expect(await findByText("Export ready")).toBeTruthy();
+    expect(await findByText(/^\d+ kinds · \d+ tokens exported\. Download ready\.$/)).toBeTruthy();
+  });
+
   it("preview pane shows :root block by default (CSS format)", () => {
     const { getByTestId } = render(wrap(<ExportSection />));
     const preview = getByTestId("export-preview");

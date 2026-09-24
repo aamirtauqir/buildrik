@@ -75,6 +75,8 @@ describe("LintSection", () => {
   it("captions the page with the count, and says when auto-fix is available", () => {
     expect(brandChecksCaption([warn, err])).toBe("2 issues");
     expect(brandChecksCaption([{ ...warn, autoFixHint: "darken-22" }])).toBe("1 issue · auto-fix available");
+    // G3-123: ignored checks ride the caption (no "Warnings suppressed" pill).
+    expect(brandChecksCaption([warn], 3)).toBe("1 issue · 3 ignored");
   });
 
   it("keys rows by rule AND token so one token can hold two findings", () => {

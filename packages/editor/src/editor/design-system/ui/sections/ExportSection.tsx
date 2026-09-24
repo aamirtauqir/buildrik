@@ -27,7 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, CopyButton, IconButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
+import { Button, CopyButton, IconButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME, useToast } from "@/editor/chrome-ui";
 import { X } from "lucide-react";
 
 const TOKEN_KINDS_COUNT = 14;
@@ -136,18 +136,12 @@ function chipForFormat(format: ExportFormat, droppedCount: number): ChipSpec {
 }
 
 export interface ExportSectionProps {
-  /** Board 306:2232 puts an "Exported CSS" badge under the back row after an
-   *  export. The badge belongs to the screen frame, which this section sits
-   *  inside, so the outcome is reported upward rather than drawn here. */
-  onExported?(formatLabel: string): void;
-  /** Boards 306:2265 / 306:2298 — passed straight through to the ImportCard
-   *  that owns the outcome. */
-  onImportOutcome?(outcome: "imported" | "import-failed"): void;
   /** The panel's ✕ (4418:168885) — back to the workspace's landing page. */
   onClose?(): void;
 }
 
-export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImportOutcome, onClose }) => {
+export const ExportSection: React.FC<ExportSectionProps> = ({ onClose }) => {
+  const { addToast } = useToast();
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -319,7 +313,12 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                     onClick={(e) => {
                       e.preventDefault();
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
-                      onExported?.(label);
+                      /* G3-123 · 6881:71312: the outcome is a toast. */
+                      addToast({
+                        title: "Export ready",
+                        description: `${TOKEN_KINDS_COUNT} kinds · ${stats.tokensCount} tokens exported. Download ready.`,
+                        tone: "success",
+                      });
                     }}
                     variant="link" className="tw:font-normal tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-accent-text)]"
                   >
@@ -332,7 +331,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         </div>
       </div>
 
-      <ImportCard onOutcome={onImportOutcome} />
+      <ImportCard />
       <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2.5">
         <div data-testid="export-stats" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {statsLine}
