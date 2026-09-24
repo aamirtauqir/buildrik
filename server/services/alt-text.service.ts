@@ -28,6 +28,7 @@ import type { Prisma } from "@prisma/client";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import { getOpenAI } from "./openai.client";
 import { assertProviderConfigured } from "./ai.service";
+import { assertMediaWrite } from "./media.service";
 
 const ALT_TEXT_PROMPT = [
   "Generate concise alt text for this image suitable for screen readers.",
@@ -127,11 +128,12 @@ export async function applyAltTextToAsset(
 ): Promise<ApplyAltTextResult> {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: assetId },
-    select: { userId: true, url: true, type: true, altText: true },
+    select: { userId: true, url: true, type: true, altText: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("ASSET_NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
   if (asset.type !== "image") {
     throw new Error("NOT_IMAGE");
   }

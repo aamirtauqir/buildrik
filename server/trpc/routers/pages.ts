@@ -57,6 +57,7 @@ export const pagesRouter = router({
     try { return await updatePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "CONFLICT") throw new TRPCError({ code: "CONFLICT", message: "Page was updated elsewhere." });
+      if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
       throw e;
     }
   }),
@@ -65,6 +66,7 @@ export const pagesRouter = router({
     try { await deletePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "LAST_PAGE") throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot delete last page." });
+      if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
       throw e;
     }
   }),

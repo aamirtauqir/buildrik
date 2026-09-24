@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import { checkSiteRole } from "@/server/services/permission.service";
 import type {
   CreateAssetInput,
   CreateAssetVersionInput,
@@ -20,6 +21,20 @@ import type {
  * Replaces editor's IndexedDB-only model (decision #8). Editor IndexedDB
  * stays as offline cache; this service is the durable source of truth.
  */
+
+/**
+ * Role gate for every media WRITE. Ownership (`row.userId === userId`) only
+ * says the row is yours; it never said you may still edit the site it belongs
+ * to. A VIEWER's `createFolder({ siteId })` returned 200 (walk 2026-09-24), and
+ * an EDITOR demoted to VIEWER kept full write access to the assets they had
+ * uploaded. A site-scoped row is workspace content, so writing it takes the
+ * site-edit tier (EDITOR/DESIGNER+); throws PermissionError("FORBIDDEN").
+ * A row with no site (`siteId` null) is the caller's personal library and
+ * belongs to nobody else — ownership remains its only gate.
+ */
+export async function assertMediaWrite(userId: string, siteId: string | null | undefined): Promise<void> {
+  if (siteId) await checkSiteRole(prisma, userId, siteId, "EDITOR");
+}
 
 async function getUserPlan(userId: string): Promise<PlanName> {
   const member = await prisma.workspaceMember.findFirst({
@@ -147,6 +162,7 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
   // update branch to repair bytes when the existing row has bytes=0,
   // because that case is "completion handler raced ahead with no bytes
   // info"; the client's later call carries the real value.
+  await assertMediaWrite(userId, input.siteId);
   const quota = await checkStorageQuota(userId);
 
   // Validate folder ownership if set.
@@ -285,11 +301,12 @@ async function createAssetAtomic(
 export async function updateAsset(userId: string, input: UpdateAssetInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
-    select: { userId: true },
+    select: { userId: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
 
   // Validate folder ownership if changing.
   if (input.folderId) {
@@ -320,11 +337,12 @@ export async function updateAsset(userId: string, input: UpdateAssetInput) {
 export async function deleteAsset(userId: string, input: DeleteAssetInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
-    select: { userId: true, url: true },
+    select: { userId: true, url: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
   // Versions cascade-delete via FK constraint.
   await prisma.mediaAsset.delete({ where: { id: input.assetId } });
 
@@ -367,11 +385,12 @@ export async function deleteAsset(userId: string, input: DeleteAssetInput) {
 export async function moveAsset(userId: string, input: MoveAssetInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
-    select: { userId: true },
+    select: { userId: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
   if (input.folderId) {
     const folder = await prisma.mediaFolder.findUnique({
       where: { id: input.folderId },
@@ -410,11 +429,12 @@ export async function listAssetVersions(userId: string, input: ListAssetVersions
 export async function createAssetVersion(userId: string, input: CreateAssetVersionInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
-    select: { userId: true },
+    select: { userId: true, siteId: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, asset.siteId);
 
   // Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard.
   // Pre-fix, createAssetVersion accepted any client-supplied URL and
@@ -470,11 +490,12 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
 export async function restoreAssetVersion(userId: string, input: RestoreAssetVersionInput) {
   const version = await prisma.mediaAssetVersion.findUnique({
     where: { id: input.versionId },
-    include: { asset: { select: { userId: true } } },
+    include: { asset: { select: { userId: true, siteId: true } } },
   });
   if (!version || version.asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+  await assertMediaWrite(userId, version.asset.siteId);
 
   // Phase B5++ codex re-review pass 4 P1 fix: defense-in-depth URL
   // guard at restore time too. createAssetVersion now blocks adding
