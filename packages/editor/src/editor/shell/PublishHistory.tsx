@@ -99,14 +99,9 @@ const ROW_TIME = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const ROW_MORE =
   "tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 tw:aria-expanded:opacity-100 tw:size-6 tw:p-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 const MENU_REASON = "tw:px-3 tw:pb-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-/* THE 24 GUTTER. Every modal in this family insets its content 24 from the
-   frame: 184:29 and 184:30 are 392 in a 440, 184:52/184:53 are 392, 453:4071/
-   453:4072 are 392, 184:42's progress track is 392, and 184:7's picker rows are
-   512 in a 560. `MODAL_BODY_CLASS` gives every modal body 16, which is the
-   chassis eight other boards are measured against and not something these five
-   get to move — so the extra 8 lives here, on the bodies that need it, and the
-   chassis is untouched. */
-const MODAL_INSET = "tw:px-2";
+/* The Modal body already insets 24 (117a5a13e); the v3 boards (4418:73440,
+   73462, 6881:70883) align the body text with the title, so no extra inset. */
+const MODAL_INSET = "tw:px-0";
 /* 184:29 — the sentence is ink-MUTED and 13/20; the body's own face is
    ink-soft, which is right for a paragraph and a shade too present for the
    line that explains a consequence. */
