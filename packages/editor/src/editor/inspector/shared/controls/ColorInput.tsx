@@ -11,7 +11,9 @@ import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-import { TokenPickerPopover } from "../TokenPickerPopover";
+import { ColorFillPopover } from "../ColorFillPopover";
+import { useUpdateColorEverywhere } from "@/editor/design-system/ui/colors/useUpdateColorEverywhere";
+import { useDSModeOptional } from "../../../design-system/state/DSModeContext";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import type { Composer } from "../../../../engine";
@@ -69,6 +71,8 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
+  const updateEverywhere = useUpdateColorEverywhere(composer);
+  const dsMode = useDSModeOptional();
   const tokenEntries = colorTokens.map((t) => ({
     id: t.id,
     name: t.name,
@@ -246,13 +250,27 @@ export const ColorInput: React.FC<ColorInputProps> = ({
             </div>
           }
         >
-          <TokenPickerPopover
+          <ColorFillPopover
+            label={label}
             tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={true}
-            tokenLabel="color"
-            onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
+            boundTokenId={boundToken?.id ?? null}
+            currentHex={swatchColor === "transparent" ? "" : swatchColor}
+            onSelectToken={(cssVarRef) => {
+              onChange(cssVarRef);
+              setIsOpen(false);
+            }}
+            onCustomValue={(hex) => {
+              if (isBound) lastBoundRef.current = value;
+              onChange(hex);
+              setIsOpen(false);
+            }}
+            onUpdateToken={(id, hex) => {
+              updateEverywhere(id, hex);
+              setIsOpen(false);
+            }}
+            usageOf={(id) => composer?.designSystem?.tokenUsage?.getUsage?.(id) ?? 0}
+            showSearch={dsMode?.isPro ?? false}
+            onClose={() => setIsOpen(false)}
           />
         </Popover>
         {chip}
