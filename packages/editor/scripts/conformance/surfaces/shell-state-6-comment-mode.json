@@ -85,18 +85,6 @@
       "nodeId": "200:197"
     },
     {
-      "name": "footer-dims",
-      "testId": "footer-selection-dims",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:198"
-    },
-    {
-      "name": "footer-zoom",
-      "testId": "footer-device-zoom",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:200"
-    },
-    {
       "name": "comment-layer",
       "testId": "comment-capture-layer"
     }
@@ -173,6 +161,7 @@
     "  -multi-select, -renaming, -display-settings), measured at the panel's own",
     "  width. Asserting it a sixth time through a 1440 shell would add nothing",
     "  and would fight the 143:* / 1082:* board conflicts already recorded",
-    "  there."
+    "  there.",
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
   ]
 }

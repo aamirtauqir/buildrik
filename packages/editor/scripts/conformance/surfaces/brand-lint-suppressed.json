@@ -1,6 +1,6 @@
 {
   "surface": "brand-lint-suppressed",
-  "board": "Brand \u00b7 lint \u00b7 suppressed (Figma 306:2217)",
+  "board": "Brand · lint · suppressed (Figma 306:2217)",
   "url": "http://localhost:5050/",
   "viewport": {
     "width": 1440,
@@ -29,11 +29,7 @@
     },
     {
       "action": "click",
-      "testId": "brand-row-tokens"
-    },
-    {
-      "action": "click",
-      "testId": "brand-kind-color"
+      "testId": "brand-row-colours"
     },
     {
       "action": "click",
@@ -58,10 +54,6 @@
     {
       "action": "click",
       "testId": "brand-back-link"
-    },
-    {
-      "action": "waitFor",
-      "testId": "brand-section-status-warnings-suppressed"
     },
     {
       "action": "waitFor",
@@ -367,58 +359,49 @@
       "testId": "brand-row-chevron-export",
       "spec": "brand-lint-suppressed",
       "nodeId": "1691:7462"
-    },
-    {
-      "name": "suppressed-badge",
-      "testId": "brand-section-status-warnings-suppressed",
-      "spec": "brand-lint-suppressed",
-      "nodeId": "I333:2360;12:11"
-    },
-    {
-      "name": "suppressed-badge-pill-unjoined",
-      "testId": "brand-section-status"
     }
   ],
   "_note": [
     "MEASURED LIVE, and the suppression is real: Brand -> Tokens -> color ->",
     "`color-action` -> Ignore. `LintState.suppress()` puts the token id in the",
     "suppressed set, `suppressedCount()` answers 1, and the root then renders the",
-    "pill 306:2217 draws. No probe and no planted flag \u2014 the only reason this state",
+    "pill 306:2217 draws. No probe and no planted flag — the only reason this state",
     "looked unreachable is that the control lives two screens down, in",
     "TokenDetailView, not on the Lint screen.",
     "",
     "WHAT THE BOARD WON:",
     "  the pill is the family's Badge instance (333:2360), not a second pill built",
     "  beside it. The root rendered its own span at `px-2` with `leading-none`",
-    "  while `SectionStatusBadge` \u2014 the same component on the board, already",
-    "  rendering the Presets and Import/export states \u2014 sat one import away. It is",
+    "  while `SectionStatusBadge` — the same component on the board, already",
+    "  rendering the Presets and Import/export states — sat one import away. It is",
     "  now one component with a per-status label, colour and leading, so the four",
     "  Badge instances in this family cannot drift apart again.",
     "  10px inset (was 8) and a 16px line (was `leading-none`, i.e. 12) on every",
     "  instance; 18px on this one, which is the only one the boards lead at 18.",
     "",
-    "NOT JOINED \u2014 a Figma frame artifact:",
+    "NOT JOINED — a Figma frame artifact:",
     "  333:2360 itself. Its properties are right (`yellow/100` fill = --bk-yellow-100,",
     "  `yellow/500` edge = --bk-warning, 10/2 inset, radius full) but the frame",
     "  carries `width: 105px`, and its OWN label does not fit in it: `Warnings",
     "  suppressed` at 12/500 Inter measures 146.9 including the board's own 20px of",
     "  padding. The board clips its own text by 42px. Measured rather than assumed",
-    "  \u2014 the pill was joined once and failed exactly there.",
+    "  — the pill was joined once and failed exactly there.",
     "  The pill's fill, edge, radius and inset ARE checked, on the two sibling",
     "  instances whose frames carry no width: 333:2356 (brand-presets-draft) and",
     "  333:2358 (brand-starters-applied). One component, so one measurement covers",
     "  all four.",
-    "  I333:2360;12:11, the label, IS joined \u2014 12/18 in --color/warning-text.",
+    "  I333:2360;12:11, the label, IS joined — 12/18 in --color/warning-text.",
     "",
     "  Also not joined: 306:2217 itself (the drawer's edge) and 1691:7402 (the",
     "  preview band's 82px text-metric height). See brand-lint-warnings.json.",
     "",
     "The final `hover` step parks the pointer on the panel title. Without it the",
-    "pointer stays where the last click left it \u2014 over the Beginner/Pro toggle \u2014",
+    "pointer stays where the last click left it — over the Beginner/Pro toggle —",
     "and the contrast sweep reads a hover state instead of the resting screen.",
     "",
     "CHECK-BOARD-COPY: one lead, `components`, triaged in",
-    "brand-lint-warnings.json \u2014 two boards of this chassis disagree about that",
-    "label and the code keeps `Component styles`."
+    "brand-lint-warnings.json — two boards of this chassis disagree about that",
+    "label and the code keeps `Component styles`.",
+    "2026-09-24 re-pointed: Tokens -> colour kind drill-in was deleted (38f0c4926 kind drill-in list; f22ca69fb Brand nav); colour tokens are the Colours page, reached by brand-row-colours. The suppressed status pill is gone (10cb835b7, outcomes are toasts): its wait step and two badge targets dropped."
   ]
 }

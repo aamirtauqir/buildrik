@@ -15,12 +15,6 @@
   "contrastScope": "[data-probe]",
   "targets": [
     {
-      "name": "search-band",
-      "testId": "insert-search-wrap",
-      "spec": "insert-elements-expanded",
-      "nodeId": "1069:4533"
-    },
-    {
       "name": "group-header-elements",
       "testId": "insert-group-elements",
       "spec": "insert-elements-expanded",
@@ -79,12 +73,6 @@
       "testId": "insert-row-label-insert-paste-html",
       "spec": "insert-elements-expanded",
       "nodeId": "1069:4703"
-    },
-    {
-      "name": "tips",
-      "testId": "insert-tips",
-      "spec": "insert-elements-expanded",
-      "nodeId": "1069:4704"
     },
     {
       "name": "paste-html",
@@ -155,6 +143,7 @@
     "own `iconHtml` glyph instead — a founder call recorded in",
     "GroupSection.tsx:127-140 (53 element types were visually identical).",
     "The square is still what a row with no artwork gets, which is why the",
-    "COMPONENTS and MINE recipes do join it."
+    "COMPONENTS and MINE recipes do join it.",
+    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover."
   ]
 }

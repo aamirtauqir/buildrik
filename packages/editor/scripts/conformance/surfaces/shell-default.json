@@ -34,10 +34,6 @@
     {
       "name": "canvas",
       "testId": "canvas"
-    },
-    {
-      "name": "breakpoint-switcher",
-      "testId": "breakpoint-switcher"
     }
   ],
   "_note": [
@@ -59,7 +55,8 @@
     "`states` are measured in ONE page visit: default, then each state applied,",
     "read and reset, then default read AGAIN and compared byte-for-byte against",
     "the first. That re-read is the whole safety argument for sharing a page \u2014",
-    "a hover left on, or focus never blurred, looks exactly like real drift."
+    "a hover left on, or focus never blurred, looks exactly like real drift.",
+    "2026-09-24 (gates): breakpoint-switcher target dropped \u2014 the canvas bar was rebuilt to 5936:44788 in ef6492be0 (no breakpoint switcher)."
   ],
   "states": [
     {
