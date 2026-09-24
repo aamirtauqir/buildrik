@@ -238,19 +238,14 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   if (forms.length === 0) {
     return (
       <Screen>
-        {/* Said "Drop a Form block onto a page in the canvas to start collecting
-            submissions", which no part of the product performs. Walked it:
-            inserting a Form exports `<form class=… data-buildrick-id=…>` with
-            no action and no submit script, so the published page posts
-            nowhere; the public endpoint (/api/public/forms/[siteId]/[blockId])
-            is never called; and nothing creates a FormBlock row except site
-            duplication, so this inbox has nothing to list. Capturing
-            submissions is unbuilt, not misconfigured — the screen says so
-            rather than sending someone to the canvas to wait for rows that
-            cannot arrive. */}
+        {/* A FormBlock row is created when a page with a Form is PUBLISHED:
+            the publish worker points every action-less <form> at
+            /api/public/forms/<siteId>/<elementId> and upserts the row under
+            that id (lib/publish-forms.ts, a10f19233). Before that first
+            publish there is nothing to list — the copy says so. */}
         <Section
           title="Forms"
-          desc="A Form block renders on the published page, but its submissions are not captured yet — this inbox stays empty until that is wired."
+          desc="Publish a page with a Form block and its submissions arrive here."
         >
           <div className={EMPTY}>No forms yet.</div>
         </Section>
