@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CmsWorkspace } from "../CmsWorkspace";
 import { cmsWorkspace } from "../cmsWorkspaceStore";
 import { PAGE_SIZE } from "../RecordsTable";
@@ -50,7 +51,7 @@ describe("CmsWorkspace · root (4428:140486)", () => {
   it("names the site, counts collections and records, and offers + New collection", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     const onCreate = vi.fn();
-    render(<CmsWorkspace composer={composer as never} onCreateCollection={onCreate} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} onCreateCollection={onCreate} /></ToastProvider>);
     expect(screen.getByText("CMS · test-proj")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent("1 collection · 1 record"));
     fireEvent.click(screen.getByTestId("cms-ws-new-collection"));
@@ -60,7 +61,7 @@ describe("CmsWorkspace · root (4428:140486)", () => {
 
   it("invites the first collection when there are none (6881:79324)", async () => {
     const { composer } = makeEngine();
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-ws-empty")).toHaveTextContent("Create your first collection");
   });
 });
@@ -72,7 +73,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
       items: [rec("r1", { name: "Margherita", price: "$12", category: "Pizza", available: true, description: "Tomato" })],
     });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const table = await screen.findByTestId("cms-table");
     const heads = within(table).getAllByRole("columnheader").map((h) => h.textContent);
     expect(heads).toEqual(["Name", "Price", "Category", "Available", "Updated"]);
@@ -90,7 +91,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
   it("marks a missing required value in its cell (Tiramisu · Price required)", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Tiramisu", category: "Dessert" })] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-row-r1")).toHaveTextContent("Price required");
   });
 
@@ -100,7 +101,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
       items: [rec("a", { name: "Diavola" }), rec("b", { name: "Caprese" }), rec("c", { name: "Margherita" })],
     });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-row-a");
     const names = () => screen.getAllByTestId(/^cms-row-[abc]$/).map((r) => r.textContent?.split("·")[0]);
     fireEvent.click(screen.getByTestId("cms-th-name"));
@@ -117,7 +118,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     const contexts: unknown[] = [];
     composer.on(EVENTS.UI_SEARCH_CONTEXT, (c) => contexts.push(c));
     cmsWorkspace.openCollection("col-1");
-    const { unmount } = render(<CmsWorkspace composer={composer as never} />);
+    const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-row-a");
     expect(contexts).toContainEqual({ placeholder: "Search Menu items…" });
     composer.emit(EVENTS.UI_SEARCH_QUERY, { query: "mar" });
@@ -133,7 +134,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     const items = Array.from({ length: PAGE_SIZE + 3 }, (_, i) => rec(`r${i}`, { name: `Dish ${i}` }));
     const { composer } = makeEngine({ collections: [FULL], items });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-pager-range")).toHaveTextContent(`1–${PAGE_SIZE} of ${PAGE_SIZE + 3}`);
     fireEvent.click(screen.getByTestId("cms-pager-next"));
     expect(screen.getByTestId("cms-pager-range")).toHaveTextContent(`${PAGE_SIZE + 1}–${PAGE_SIZE + 3}`);
@@ -143,7 +144,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
   it("a row click and + Add record open the side sheet through the store", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-row-r1"));
     expect(cmsWorkspace.get().recordId).toBe("r1");
     cmsWorkspace.openRecord(null);
@@ -156,7 +157,7 @@ describe("CmsWorkspace · empty collection (4428:148905)", () => {
   it("offers Add record and Import JSON, with the hint column", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-ws-no-records")).toHaveTextContent("No records yet");
     expect(screen.getByTestId("cms-ws-empty-import")).toHaveTextContent("Import JSON");
     expect(screen.getByTestId("cms-ws-hint")).toHaveTextContent("Add your first record");
@@ -165,7 +166,7 @@ describe("CmsWorkspace · empty collection (4428:148905)", () => {
   it("imports records from a JSON file through createContentItem", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-ws-no-records");
     const file = new File([JSON.stringify([{ name: "Margherita", price: "$12" }])], "menu.json", { type: "application/json" });
     fireEvent.change(screen.getByTestId("cms-import-input"), { target: { files: [file] } });
@@ -181,7 +182,7 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
   it("Fields lists types and adds a field through the engine", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByRole("tab", { name: "Fields" }));
     expect(await screen.findByText("Published?")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
@@ -198,7 +199,7 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
   it("⋯ opens Dynamic pages and Settings, and offers Import JSON", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     cmsWorkspace.openCollection("col-1");
-    render(<CmsWorkspace composer={composer as never} />);
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-ws-more"));
     expect(screen.getByTestId("cms-ws-menu-import")).toHaveTextContent("Import JSON…");
     fireEvent.click(screen.getByTestId("cms-ws-menu-dynamic"));

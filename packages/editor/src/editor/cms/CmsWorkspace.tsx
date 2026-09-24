@@ -20,12 +20,15 @@ import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
 import { DynamicPagesView, FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
+import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
   /** The B13 New collection modal (shell-owned). */
   onCreateCollection?: () => void;
+  /** The Assets pick mode, for a record's image field (G3-081). */
+  onOpenMediaLibrary?: OpenMediaLibrary;
 }
 
 const HEADER =
@@ -66,7 +69,7 @@ function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-export function CmsWorkspace({ composer, onCreateCollection }: CmsWorkspaceProps) {
+export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
   const ws = useCmsWorkspace();
   const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
@@ -127,6 +130,7 @@ export function CmsWorkspace({ composer, onCreateCollection }: CmsWorkspaceProps
   }
 
   const count = panel.records.length;
+  const sheetRecord = ws.recordId && ws.recordId !== "new" ? panel.records.find((r) => r.id === ws.recordId) ?? null : null;
   const isEmpty = ws.tab === "records" && count === 0;
   const primary =
     ws.tab === "records" ? (
@@ -248,6 +252,26 @@ export function CmsWorkspace({ composer, onCreateCollection }: CmsWorkspaceProps
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
       </section>
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
+      {ws.recordId && (ws.recordId === "new" || sheetRecord) ? (
+        <RecordSheet
+          key={ws.recordId}
+          collection={collection}
+          record={sheetRecord}
+          onClose={() => cmsWorkspace.openRecord(null)}
+          onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
+          onSave={(data, published) =>
+            panel.saveRecord(collection.id, ws.recordId === "new" ? null : ws.recordId, data, published)
+          }
+          onDelete={async (r) => {
+            await panel.deleteRecord(r.id);
+            await loadRecords(collection.id);
+          }}
+          onRestore={async (r) => {
+            await panel.saveRecord(collection.id, null, r.data, r.status === "published");
+          }}
+          onOpenMediaLibrary={onOpenMediaLibrary}
+        />
+      ) : null}
       {importer.input}
     </div>
   );

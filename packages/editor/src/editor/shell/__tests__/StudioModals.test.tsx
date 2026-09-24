@@ -43,10 +43,6 @@ vi.mock("../modals/CMSCollectionSetupModal", () => ({
   CMSCollectionSetupModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-cms-setup" /> : null,
 }));
-vi.mock("../modals/CMSRecordsModal", () => ({
-  CMSRecordsModal: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-cms-records" /> : null,
-}));
 vi.mock("@/editor/sidebar/tabs/pages/components/NewPageModal", () => ({
   NewPageModal: () => null,
 }));
@@ -101,8 +97,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onCloseProjectSettings: vi.fn(),
     showCMSCollectionSetup: false,
     onCloseCMSCollectionSetup: vi.fn(),
-    showCMSRecords: false,
-    onCloseCMSRecords: vi.fn(),
     ...over,
   };
 }
@@ -125,7 +119,6 @@ const ALL_MARKERS = [
   "modal-collection-setup",
   "modal-create-component",
   "modal-cms-setup",
-  "modal-cms-records",
   "modal-command-palette",
 ];
 
@@ -160,7 +153,6 @@ describe("StudioModals — mounting contract", () => {
     ["showCollectionSetup", "modal-collection-setup"],
     ["showCreateComponent", "modal-create-component"],
     ["showCMSCollectionSetup", "modal-cms-setup"],
-    ["showCMSRecords", "modal-cms-records"],
   ] as [keyof StudioModalsProps, string][])(
     "%s: true mounts only %s",
     (flag, marker) => {

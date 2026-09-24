@@ -84,7 +84,8 @@ export interface StudioPanelsProps {
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void
+    onSelect: (asset: MediaAsset) => void,
+    forLabel?: string,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -601,7 +602,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           {cmsWorkspaceOpen ? (
             <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
               <React.Suspense fallback={null}>
-                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} />
+                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} onOpenMediaLibrary={onOpenMediaLibrary} />
               </React.Suspense>
             </div>
           ) : null}

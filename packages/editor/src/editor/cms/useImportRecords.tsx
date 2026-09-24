@@ -10,7 +10,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { CMSCollection } from "@/shared/types/cms";
 import { Button, Progress, TextInput } from "@/editor/chrome-ui";
-import { parseRecordsJson, type SkippedRow } from "@/editor/shell/modals/parseRecordsJson";
+import { parseRecordsJson, type SkippedRow } from "./parseRecordsJson";
 
 type Outcome =
   | { kind: "error"; reason: string }

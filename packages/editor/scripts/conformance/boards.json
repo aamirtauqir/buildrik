@@ -5,7 +5,7 @@
  "generatedAt": "2026-08-14",
  "counts": {
   "total": 632,
-  "active": 519,
+  "active": 514,
   "designAhead": 41,
   "outOfScope": 57,
   "activeFamilies": 36,
@@ -16,7 +16,7 @@
    "drift-open": 3,
    "driven": 13
   },
-  "retired": 15
+  "retired": 20
  },
  "activeFamilies": [
   "AI",
@@ -838,11 +838,11 @@
    "state": "collection",
    "width": 280,
    "height": 812,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
-   "recipe": "content-collection",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe content-collection): 84/85, 1 UNKNOWN LEFT DELIBERATELY: 233:1309 states line-height 20 on the ROW and its twin 233:1304 does not (Figma hoists a text style when an instance's children all share it). Making it pass would mean putting a line-height on chrome-ui Row's `default` size.",
-   "verified": "drift-fixed"
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-24 (R5 / G3-068·069·071): the v3 CMS workspace replaced the drawer's collection, record and fields drill-ins and the ⌘K Records modal — a collection opens as the records table (4428:143182), a record in the side sheet (4428:144760), Fields as the workspace tab (4428:147552). Was: conformed + measured 2026-09-08 (recipe content-collection): 84/85, 1 UNKNOWN LEFT DELIBERATELY: 233:1309 states line-height 20 on the ROW and its twin 233:1304 does not (Figma hoists a text style when an instance's children all share it). Making it pass would mean putting a line-height on chrome-ui Row's `default` size.",
+   "verified": "unreachable"
   },
   {
    "nodeId": "151:87",
@@ -890,11 +890,11 @@
    "state": "fields",
    "width": 280,
    "height": 812,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
-   "recipe": "content-fields",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe content-fields): 79/79. FOUND, NOT FIXED — the sharpest contrast finding of the tranche: the word 'required' reads at 1.47:1, --bk-ink-disabled #d1d5db on white. Not a near-miss like the ink-muted family: under the 3:1 large-text floor and barely above invisible. The board specifies it (151:12 names --color/ink-disabled) and the code already followed it before this pass — but A TAG STATING A FIELD IS MANDATORY IS NOT DECORATION, and ink-disabled is the token for a control you cannot use. Needs a founder call (token value or board edit).",
-   "verified": "drift-fixed"
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-24 (R5 / G3-068·069·071): the v3 CMS workspace replaced the drawer's collection, record and fields drill-ins and the ⌘K Records modal — a collection opens as the records table (4428:143182), a record in the side sheet (4428:144760), Fields as the workspace tab (4428:147552). Was: conformed + measured 2026-09-08 (recipe content-fields): 79/79. FOUND, NOT FIXED — the sharpest contrast finding of the tranche: the word 'required' reads at 1.47:1, --bk-ink-disabled #d1d5db on white. Not a near-miss like the ink-muted family: under the 3:1 large-text floor and barely above invisible. The board specifies it (151:12 names --color/ink-disabled) and the code already followed it before this pass — but A TAG STATING A FIELD IS MANDATORY IS NOT DECORATION, and ink-disabled is the token for a control you cannot use. Needs a founder call (token value or board edit).",
+   "verified": "unreachable"
   },
   {
    "nodeId": "453:4010",
@@ -929,11 +929,11 @@
    "state": "record",
    "width": 280,
    "height": 812,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
-   "recipe": "content-record",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe content-record): 24/24. NOT conformed, with numbers for the founder call: record inputs are 42/64 against the board's 32/56, radius 8 vs 6, value font 14 vs 13. NEW EVIDENCE that strengthens rather than resolves authority=open:input-fill — board 1170:4713 draws the same control 42 TALL (agreeing with the theme, disagreeing with 149:108's 32) and asks radius 4 where 149:108 asks 6 and the theme ships 8. THREE BOARDS, THREE ANSWERS.",
-   "verified": "drift-fixed"
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-24 (R5 / G3-068·069·071): the v3 CMS workspace replaced the drawer's collection, record and fields drill-ins and the ⌘K Records modal — a collection opens as the records table (4428:143182), a record in the side sheet (4428:144760), Fields as the workspace tab (4428:147552). Was: conformed + measured 2026-09-08 (recipe content-record): 24/24. NOT conformed, with numbers for the founder call: record inputs are 42/64 against the board's 32/56, radius 8 vs 6, value font 14 vs 13. NEW EVIDENCE that strengthens rather than resolves authority=open:input-fill — board 1170:4713 draws the same control 42 TALL (agreeing with the theme, disagreeing with 149:108's 32) and asks radius 4 where 149:108 asks 6 and the theme ships 8. THREE BOARDS, THREE ANSWERS.",
+   "verified": "unreachable"
   },
   {
    "nodeId": "148:2",
@@ -955,11 +955,11 @@
    "state": "unsaved-record",
    "width": 280,
    "height": 812,
-   "status": "active",
+   "status": "retired",
    "authority": "board:149-108",
-   "recipe": "content-unsaved-record",
-   "verified": "drift-fixed",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe content-unsaved-record): 23 properties. BOARD won. Field labels were text-xs's 16 line-height against 18; the 'Published' label had NO COLOUR OF ITS OWN and inherited whatever the host painted (the demo host paints body #0F172A, not --bk-ink); the save bar's Discard was ink-soft (board ink-muted) and all three words were 12/16 against 12/18. NOT conformed: the three Content inputs — BK_TEXT_INPUT_THEME is 42/64 tall against the board's 32/56, radius 8 vs 6, flowbite gray-300 vs --color/border-input. boards.json holds this at authority=open:input-fill on exactly this ground (1172:4867 vs 1205:4804 disagree), so the targets are SKIPPED, not passed. 10px per field is the largest single number measured in this tranche and needs a founder call."
+   "recipe": null,
+   "verified": "unreachable",
+   "verifiedNote": "RETIRED 2026-09-24 (R5 / G3-068·069·071): the v3 CMS workspace replaced the drawer's collection, record and fields drill-ins and the ⌘K Records modal — a collection opens as the records table (4428:143182), a record in the side sheet (4428:144760), Fields as the workspace tab (4428:147552). Was: conformed + measured 2026-09-08 (recipe content-unsaved-record): 23 properties. BOARD won. Field labels were text-xs's 16 line-height against 18; the 'Published' label had NO COLOUR OF ITS OWN and inherited whatever the host painted (the demo host paints body #0F172A, not --bk-ink); the save bar's Discard was ink-soft (board ink-muted) and all three words were 12/16 against 12/18. NOT conformed: the three Content inputs — BK_TEXT_INPUT_THEME is 42/64 tall against the board's 32/56, radius 8 vs 6, flowbite gray-300 vs --color/border-input. boards.json holds this at authority=open:input-fill on exactly this ground (1172:4867 vs 1205:4804 disagree), so the targets are SKIPPED, not passed. 10px per field is the largest single number measured in this tranche and needs a founder call."
   },
   {
    "nodeId": "151:62",
@@ -5112,11 +5112,11 @@
    "state": "records",
    "width": 640,
    "height": 222,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
-   "recipe": "content-records",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe content-records): 11/11. The table was the PANEL's 13px scale inside a 640 modal — now 10px semibold heads / 11px cells / 7px rows / 10px inset, with row hierarchy ink -> ink-soft -> 10px ink-muted for media and the board's bordered white 22px row actions instead of borderless ghosts. NOT conformed: <tr> cannot take padding or gap. The board draws thead and rows as flex frames with gap-12 / pl-10 / py-7; the VISUAL values are conformed (12 as per-cell px-1.5, 10 as first:pl-2.5, 7 as cell py) but the property pair does not exist on either side. Keeping a real <table> is deliberate.",
-   "verified": "drift-fixed"
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-24 (R5 / G3-068·069·071): the v3 CMS workspace replaced the drawer's collection, record and fields drill-ins and the ⌘K Records modal — a collection opens as the records table (4428:143182), a record in the side sheet (4428:144760), Fields as the workspace tab (4428:147552). Was: conformed + measured 2026-09-08 (recipe content-records): 11/11. The table was the PANEL's 13px scale inside a 640 modal — now 10px semibold heads / 11px cells / 7px rows / 10px inset, with row hierarchy ink -> ink-soft -> 10px ink-muted for media and the board's bordered white 22px row actions instead of borderless ghosts. NOT conformed: <tr> cannot take padding or gap. The board draws thead and rows as flex frames with gap-12 / pl-10 / py-7; the VISUAL values are conformed (12 as per-cell px-1.5, 10 as first:pl-2.5, 7 as cell py) but the property pair does not exist on either side. Keeping a real <table> is deliberate.",
+   "verified": "unreachable"
   },
   {
    "nodeId": "1170:4777",
