@@ -1,5 +1,5 @@
 /**
- * StateDropdown — compact pseudo-state chooser (`Base ▾`).
+ * StateDropdown — compact pseudo-state chooser (`▸` at base, `:hover ▾` once picked).
  *
  * Replaces the StatePills row. Matches Figma node 32-2: pseudo-state is one
  * compact dropdown in the breakpoint/state pill row (`This ▾ · Desktop ▾ ·
@@ -62,14 +62,21 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
         aria-label={`State: ${PSEUDO_LABELS[current]}`}
         style={{ border: "none", cursor: "pointer" }}
       >
-        <span>{PSEUDO_LABELS[current]}</span>
-        {current !== "normal" && (
-          <span
-            aria-hidden="true"
-            style={{ width: 5, height: 5, borderRadius: "var(--bk-radius-full)", background: "currentColor" }}
-          />
+        {/* Board 4428:141170 draws "This element ▸" — no "Base" pill. At
+            the base state the door is the ▸ alone; a picked state keeps its
+            name, so the row still says where a write lands. */}
+        {current === "normal" ? (
+          <span aria-hidden="true">▸</span>
+        ) : (
+          <>
+            <span>{PSEUDO_LABELS[current]}</span>
+            <span
+              aria-hidden="true"
+              style={{ width: 5, height: 5, borderRadius: "var(--bk-radius-full)", background: "currentColor" }}
+            />
+            <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />
+          </>
         )}
-        <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />
       </Button>
       {open && (
         <div

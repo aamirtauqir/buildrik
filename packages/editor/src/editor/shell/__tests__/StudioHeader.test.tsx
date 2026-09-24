@@ -507,9 +507,14 @@ describe("StudioHeader", () => {
       expect(screen.getByText("Not sent")).toBeTruthy();
     });
 
-    it("no review in flight, no pill", async () => {
-      render(<StudioHeader {...makeProps()} />);
-      await waitFor(() => expect(screen.queryByText(/In review|Approved/)).toBeNull());
+    it("no round: the Review door is still there, and opens the Review panel (board 4418:123573)", () => {
+      const onOpenReview = vi.fn();
+      render(<StudioHeader {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false }) })} />);
+      const door = screen.getByTestId("topbar-review-pill");
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Review");
+      expect(screen.getByTestId("topbar-review-chevron").textContent).toBe("›");
+      fireEvent.click(door);
+      expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -669,8 +674,8 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       expect(screen.getByRole("menuitem", { name: "View live site ↗" })).toBeTruthy();
-      // Board 4418:126034 has no "Copy live URL".
-      expect(screen.queryByRole("menuitem", { name: "Copy live URL" })).toBeNull();
+      // Off board 4418:126034 but kept (owner rule: never silently remove a capability).
+      expect(screen.getByRole("menuitem", { name: "Copy live URL" })).toBeTruthy();
     });
 
     /* SH-A-11: Unpublish is ADMIN on the server (sites.ts:425) and the row was

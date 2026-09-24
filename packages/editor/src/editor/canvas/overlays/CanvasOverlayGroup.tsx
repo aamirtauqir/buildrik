@@ -62,8 +62,6 @@ export interface CanvasOverlayGroupProps {
   // Selection
   selectedId: string | null;
   selectedIds: string[];
-  onSelectParent: () => void;
-  onSelectAncestor: (id: string) => void;
   onDuplicate: () => void;
   onDelete: () => void;
   /**
@@ -140,8 +138,6 @@ export function CanvasOverlayGroup({
   removeGuide,
   selectedId,
   selectedIds,
-  onSelectParent,
-  onSelectAncestor,
   onDuplicate,
   onDelete,
   readOnly = false,
@@ -250,15 +246,13 @@ export function CanvasOverlayGroup({
             selectedIds={selectedIds}
             onResizeStateChange={setIsResizing}
           />
-          {/* Legacy label only when the unified toolbar is hidden (resize /
-              multi-select) — both render at the same spot and the toolbar's
-              backdrop blur smears the dark label pill underneath. */}
-          {selectedId && canvasRef.current && (selectedIds.length !== 1 || isResizing) && (
+          {/* Board 5940:148012: the accent "Section · Hero" tag above the
+              selection, alongside the toolbar. */}
+          {selectedId && canvasRef.current && (
             <SelectionLabel
               composer={composer}
               elementId={selectedId}
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
-              onSelectParent={onSelectParent}
             />
           )}
           {selectedIds.length === 1 && !isResizing && canvasRef.current && (

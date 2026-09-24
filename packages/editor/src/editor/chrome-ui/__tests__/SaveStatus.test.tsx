@@ -63,4 +63,12 @@ describe("SaveStatus", () => {
     // Only the dot indicator — no separate stamp element.
     expect(root.children).toHaveLength(1);
   });
+
+  it("the History door is a blue link with a green dot (board 4418:123573)", () => {
+    render(<SaveStatus state="saved" savedAt={Date.now()} onClick={() => {}} />);
+    const btn = screen.getByRole("button", { name: /History ›/ });
+    expect(btn.className).toContain("tw:text-[var(--bk-accent)]");
+    expect(btn.className).not.toContain("--bk-success-text");
+    expect(btn.querySelector('[aria-hidden="true"]')!.className).toContain("--bk-success");
+  });
 });

@@ -33,11 +33,25 @@ describe("DisplayControls", () => {
     expect(screen.getByRole("button", { name: "Block" })).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("keeps every mode reachable in one row", () => {
-    renderDisplay("block");
-    for (const name of ["Block", "Flex", "Grid", "I-Block", "Inline", "None"]) {
+  /* Board 4428:141170: ▭ ▤ ▦ segments and a ▾ chip for the rest — every
+     mode stays reachable. */
+  it("draws Block/Flex/Grid as segments and the rest behind the ▾ chip", () => {
+    const { onChange } = renderDisplay("block");
+    for (const name of ["Block", "Flex", "Grid"]) {
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     }
+    expect(screen.queryByRole("button", { name: "Inline" })).toBeNull();
+    const more = screen.getByRole("combobox", { name: "More display modes" });
+    const values = Array.from((more as HTMLSelectElement).options).map((o) => o.value);
+    expect(values).toEqual(expect.arrayContaining(["inline-block", "inline", "none"]));
+    fireEvent.change(more, { target: { value: "none" } });
+    expect(onChange).toHaveBeenCalledWith("display", "none");
+  });
+
+  it("a mode from the chip shows in the chip, not as a pressed segment", () => {
+    renderDisplay("inline");
+    expect(screen.getByRole("combobox", { name: "More display modes" })).toHaveValue("inline");
+    expect(screen.getByRole("button", { name: "Block" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("renders a Mixed badge when display differs across selection", () => {

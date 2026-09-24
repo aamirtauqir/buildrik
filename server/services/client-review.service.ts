@@ -43,10 +43,19 @@ export class ClientReviewError extends Error {
     | "NOT_INVITED"
     | "EMAIL_MISMATCH",
     message: string,
+    /** What a dead-link screen may still name: the agency and the round.
+     *  Only set for REVOKED / EXPIRED — a token that resolved to a real row. */
+    public context?: { agencyName: string | null; roundNumber: number },
   ) {
     super(message);
     this.name = "ClientReviewError";
   }
+}
+
+/** A round's number within its site: 1 for the first request ever sent. Same
+ *  counting as the editor's `reviews.currentRound` (one row per round). */
+function roundNumberOf(siteId: string, createdAt: Date): Promise<number> {
+  return prisma.reviewRequest.count({ where: { siteId, createdAt: { lte: createdAt } } });
 }
 
 function mintToken(): string {
@@ -117,11 +126,18 @@ async function requireLiveReview(token: string) {
     },
   });
   if (!review) throw new ClientReviewError("INVALID_TOKEN", "This review link is not valid.");
+  /* A revoked or expired link still resolved to a real round, so its page may
+     name the agency and the round (boards 4418:121971 / 122159 draw both). An
+     INVALID token names nothing — it proves nothing about any site. */
+  const dead = async () => ({
+    agencyName: review.site.workspace?.name ?? null,
+    roundNumber: await roundNumberOf(review.siteId, review.createdAt),
+  });
   if (review.revokedAt) {
-    throw new ClientReviewError("REVOKED", "This review link was replaced by a newer one.");
+    throw new ClientReviewError("REVOKED", "This review link was replaced by a newer one.", await dead());
   }
   if (review.expiresAt && review.expiresAt < new Date()) {
-    throw new ClientReviewError("EXPIRED", "This review link has expired.");
+    throw new ClientReviewError("EXPIRED", "This review link has expired.", await dead());
   }
   return review;
 }
@@ -142,6 +158,8 @@ export async function getReviewByToken(token: string) {
     reviewId: review.id,
     siteId: review.siteId,
     siteName: review.site.name,
+    /** "Review round N" / "Approve Round N" on the client page (board 4418:121903). */
+    roundNumber: await roundNumberOf(review.siteId, review.createdAt),
     /** The agency (workspace) name — leads the page header. The client hired the
      *  agency, not us. Null falls back to a neutral label on the page. */
     agencyName: review.site.workspace?.name ?? null,

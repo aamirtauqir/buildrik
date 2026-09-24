@@ -22,6 +22,7 @@ import {
   removeEngineBrowserStubs,
 } from "@/engine/__tests__/test-utils/realComposer";
 import { InspectorElementMenu } from "../InspectorElementMenu";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -49,7 +50,8 @@ const open = (elementId: string) => {
       composer={composer}
       selectedElementId={elementId}
       onRequestDelete={() => {}}
-    />
+    />,
+    { wrapper: ToastProvider },
   );
   fireEvent.click(screen.getByRole("button", { name: /element actions|more/i }));
   return view;

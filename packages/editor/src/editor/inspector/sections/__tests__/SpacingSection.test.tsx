@@ -64,6 +64,15 @@ describe("SpacingSection — the board's rows", () => {
     });
   });
 
+  /* Board 4428:141170 draws SPACING as Padding + Gap; Margin sits behind
+     More settings. */
+  it("keeps the Margin row behind More settings", () => {
+    renderSpacing();
+    expect(screen.queryByRole("group", { name: "Margin" })).toBeNull();
+    renderBox();
+    expect(screen.getByRole("group", { name: "Margin" })).toBeInTheDocument();
+  });
+
   it("gap is its own row", () => {
     const { onChange } = renderSpacing({ styles: { gap: "16px" } });
     const row = screen.getByText("Gap").closest(".bdi-row-ctrl") as HTMLElement;
@@ -160,7 +169,7 @@ describe("SpacingSection — advanced gap disclosure", () => {
     expect(screen.queryByText("Row gap")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Margin" })).not.toBeInTheDocument();
     const toggle = screen.getByRole("button", { name: "More settings" });
-    expect(toggle).toHaveTextContent("4");
+    expect(toggle).toHaveTextContent("5");
     fireEvent.click(toggle);
     expect(onAdvancedToggle).toHaveBeenCalledTimes(1);
   });
