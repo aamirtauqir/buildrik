@@ -8,7 +8,7 @@ export interface ScopeChipProps {
 
 function describeScope(scope: AIScope): string {
   if (scope.kind === "element") return scope.label;
-  if (scope.kind === "multi") return `${scope.count} selected`;
+  if (scope.kind === "multi") return `${scope.count} selected elements`;
   return "Whole page";
 }
 

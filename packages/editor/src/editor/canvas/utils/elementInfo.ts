@@ -3,6 +3,7 @@
  * Shared utilities for getting element names, types, and box model info
  * @license BSD-3-Clause
  */
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 
 // Text elements that support inline editing
 export const TEXT_ELEMENT_TAGS = new Set([
@@ -141,6 +142,9 @@ export function getFriendlyName(element: HTMLElement): string {
 export function getElementNameFromType(type: string, tagName?: string): string {
   const normalized = type.toLowerCase();
   if (TYPE_NAME_MAP[normalized]) return TYPE_NAME_MAP[normalized];
+  /* The element's own type label before its DOM tag — a collection list read
+     "Div" and an icon "Span" on the selection tag (L2-V3, 4428:151488). */
+  if (ELEMENT_TYPE_LABELS[normalized]) return ELEMENT_TYPE_LABELS[normalized];
   if (tagName) {
     const tagNormalized = tagName.toLowerCase();
     return TAG_NAME_MAP[tagNormalized] || tagName.charAt(0).toUpperCase() + tagName.slice(1);

@@ -9,6 +9,7 @@
 
 import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
 import { TypographySection } from "../typography";
+import { CONTAINER_TYPES } from "@/shared/utils/html/typeMapping";
 
 export const TYPOGRAPHY_SECTIONS: Record<string, AnySectionEntry> = {
   typography: defineSection({
@@ -24,9 +25,11 @@ export const TYPOGRAPHY_SECTIONS: Record<string, AnySectionEntry> = {
       ...adaptBaseStyleProps(ctx),
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
+      inherited: ctx.cssContext.inspectorContext.isTextLike !== true,
     }),
-    // Text-like elements only. cssContext.inspectorContext exposes isTextLike.
+    /* Text-like elements, and containers — board 7056:78382 draws TYPOGRAPHY
+       on a Section: the family and size its text inherits. */
     shouldRender: (ctx) =>
-      ctx.cssContext.inspectorContext.isTextLike === true,
+      ctx.cssContext.inspectorContext.isTextLike === true || CONTAINER_TYPES.has(ctx.selectedElement.type),
   }),
 };

@@ -61,13 +61,16 @@
 /* The running text the target sits inside. Parent sets size and weight; this
    only needed the muted colour, and without it the label and the target read at
    the same emphasis — which defeats the point of highlighting the target. */
+/* "Scope: Hero section" is one accent line on the tinted band — the target
+   is not set apart (6881:63246 … 69981; 4418:104454 draws it grey, the
+   per-element boards blue, and they are the majority). */
 .bd-ai-scope-text {
   color: var(--bk-accent);
 }
 
 .bd-ai-scope-target {
-  color: var(--bk-accent);
-  font-weight: 500;
+  color: inherit;
+  font-weight: inherit;
 }
 
 .bd-ai-scope-lock {
