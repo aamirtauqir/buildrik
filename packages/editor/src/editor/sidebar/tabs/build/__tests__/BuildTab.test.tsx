@@ -206,6 +206,17 @@ describe("BuildTab — ✦ Generate a block with AI… (G2-117)", () => {
   });
 });
 
+/* G3-079 — board 4428:151488: "Collection list" is an ELEMENTS row that
+   inserts L2's collection-list block. */
+describe("BuildTab — Collection list row (G3-079)", () => {
+  it("inserts the collection-list block", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-el-Collection list"));
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({ id: "collection-list", label: "Collection list" });
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {

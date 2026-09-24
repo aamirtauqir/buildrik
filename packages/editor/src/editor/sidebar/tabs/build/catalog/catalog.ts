@@ -40,6 +40,16 @@ export const CATALOG: CatEntry[] = [
         tags: ["anchor", "url", "href", "navigation", "hyperlink"],
       },
       {
+        // G3-079 (board 4428:151488): repeats its card once per CMS record —
+        // bind it under Settings › Collection.
+        name: "Collection list",
+        iconHtml:
+          '<rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="18" height="4" rx="1"/>',
+        blockId: "collection-list",
+        description: "Repeats its card for every item in a CMS collection",
+        tags: ["cms", "collection", "repeater", "list", "dynamic", "loop", "items"],
+      },
+      {
         name: "List",
         iconHtml:
           '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
