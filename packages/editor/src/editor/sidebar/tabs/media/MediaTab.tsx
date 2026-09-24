@@ -111,12 +111,6 @@ function MediaTabWithComposer({
   }, [composer, isOpen, assetTotal, state.librarySearch]);
   const { addToast } = useToast();
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
-  /* G3-019: the long-running media jobs report through the standard dark
-     toast, not a status pill over the grid. The image editor needs no
-     "editor open" notice — its modal is the notice, and it draws its own
-     saved / failed state; the optimise job shows a persistent "Optimizing → WebP…" toast
-     that the outcome replaces. */
-  const { removeToast } = useToast();
   const write = useMediaWriteAccess();
   /* G3-021: the hub's Rename… opens the library's own rename modal. */
   const [renameTarget, setRenameTarget] = React.useState<LibraryItem | null>(null);
@@ -145,7 +139,7 @@ function MediaTabWithComposer({
      second card once the stem heuristic went. Done opens the fullpage library
      on the parent, where Asset versions lives. */
   const handleEditImage = React.useCallback(
-    (item: LibraryItem) => {
+    (item: LibraryItem, initialTab?: "optimise") => {
       if (!onOpenImageEditor) return;
       const parentKey = item.versionOf ?? item.key;
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
@@ -169,6 +163,7 @@ function MediaTabWithComposer({
       };
       onOpenImageEditor(item.src, onSave, {
         fileName: item.displayName ?? item.name,
+        ...(initialTab ? { initialTab } : {}),
         onDone: () => {
           composer.media.selectAssets([parentKey]);
           onOpenLibrary?.();
@@ -178,39 +173,6 @@ function MediaTabWithComposer({
     [onOpenImageEditor, composer, onOpenLibrary]
   );
 
-  // §18 — Optimize is now a tab inside the §15 detail drawer. handleOptimized
-  // is passed to the drawer as onOptimized; OptimizationPanel inside the tab
-  // calls it with the new data-URL, which we upload as a versioned copy.
-  const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
-    const item = state.detailItem;
-    if (!item) return;
-    const progressId = addToast({ description: "Optimizing → WebP…", tone: "info", duration: Infinity });
-    try {
-      const res = await fetch(optimizedSrc);
-      const blob = await res.blob();
-      const timestamp = new Date().getTime();
-      const cleanName = item.name.replace(/(_v\d+)?$/, "");
-      const ext = blob.type.split("/")[1] || "webp";
-      const fileName = `${cleanName}_opt_v${timestamp % 10000}`;
-      const file = new File([blob], `${fileName}.${ext}`, { type: blob.type });
-      await state.upload([file]);
-      showToast(`Optimized ${item.name} ✓`, "success");
-      // Record a server-side restore point of the pre-optimize asset.
-      if (item.assetId) {
-        createAssetVersion({
-          assetId: item.assetId,
-          url: item.src,
-          bytes: item.size,
-          edits: { via: "optimize", newFile: fileName },
-        }).catch(() => {});
-      }
-    } catch (err) {
-      console.error("Failed to save optimized image:", err);
-      showToast("Could not save optimized image", "error");
-    } finally {
-      removeToast(progressId);
-    }
-  }, [state, showToast, addToast, removeToast]);
 
   // §21 — context-menu trigger. Opens file picker; on upload-complete,
   // sets replaceAcrossPair which mounts ReplaceAcrossDialog. Defined here
@@ -266,7 +228,6 @@ function MediaTabWithComposer({
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
           composer={composer}
-          onOptimized={handleOptimized}
           onReplaceAcross={handleReplaceAcross}
           /* A local-only file has no server row for the model to read. */
           onGenerateAltText={(it) =>

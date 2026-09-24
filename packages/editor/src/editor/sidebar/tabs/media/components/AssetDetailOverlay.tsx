@@ -6,8 +6,8 @@
  * ✨ Generate ABOVE the fold ("the one field with a legal consequence"), then
  * five 32h rows — Used in N places · Versions · Edit image · Optimise ·
  * Replace across site. Edit image opens the image-editor MODAL (cargo-sheets
- * §4: "Modals, not drill-in"); Optimise keeps the OptimizationPanel view until
- * its S3.6 board pass.
+ * §4: "Modals, not drill-in"); Optimise opens the same modal on its Optimise
+ * tab (4418:149547, G3-026) — the drawer's own optimise panel is gone.
  *
  * Versions view (146:32): 44h chips — dot · relative time · size delta,
  * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
@@ -29,7 +29,6 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
@@ -42,16 +41,16 @@ import {
 import { Button, PanelFrame, Textarea } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
-type View = "hub" | "used" | "versions" | "optimize";
+type View = "hub" | "used" | "versions";
 
 interface AssetDetailOverlayProps {
   item: LibraryItem;
   /** Back to the grid (the ‹ row). ESC does the same, one level at a time. */
   onClose(): void;
   onUpdate?(key: string, updates: Partial<LibraryItem>): Promise<void>;
-  onEditImage?(item: LibraryItem): void | Promise<void>;
+  /** Opens the image-editor modal; Optimise asks for its "optimise" tab. */
+  onEditImage?(item: LibraryItem, initialTab?: "optimise"): void | Promise<void>;
   composer?: Composer;
-  onOptimized?: (optimizedSrc: string) => void | Promise<void>;
   onReplaceAcross?(item: LibraryItem): void;
   /** G3-022 — the server's alt-text model (AltTextService). `null` = it
    *  could not run; `skipped` = the server kept text the user wrote. */
@@ -105,7 +104,6 @@ export function AssetDetailOverlay({
   onUpdate,
   onEditImage,
   composer,
-  onOptimized,
   onReplaceAcross,
   onGenerateAltText,
   onInsert,
@@ -315,7 +313,7 @@ export function AssetDetailOverlay({
     : natural;
 
   const showEdit = item.type === "img" && !!onEditImage;
-  const showOptimize = item.type === "img" && !!onOptimized;
+  const showOptimize = showEdit;
   const showReplace = (item.type === "img" || item.type === "vid") && !!onReplaceAcross;
   // Restore points + the live state — the count the hub row shows.
   const versionCount = dbVersions.length > 0 ? dbVersions.length + 1 : 0;
@@ -325,9 +323,7 @@ export function AssetDetailOverlay({
       ? `${display} · versions`
       : view === "used"
         ? `${display} · used in`
-        : view === "optimize"
-          ? `${display} · optimise`
-          : display;
+        : display;
 
   return (
     <div
@@ -494,7 +490,7 @@ export function AssetDetailOverlay({
               <Button
                 className={ROW}
                 data-testid="media-detail-optimize"
-                onClick={() => setView("optimize")}
+                onClick={() => onEditImage?.(item, "optimise")}
               >
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Optimise</span>
                 <span className={ROW_CHEVRON}>{"›"}</span>
@@ -722,19 +718,7 @@ export function AssetDetailOverlay({
             </div>
           ) : null}
         </div>
-      ) : (
-        <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">
-          {/* No onClose: the ‹ back row is this screen's exit and board
-              1124:4562 draws no second one. */}
-          <OptimizationPanel
-            imageSrc={item.src}
-            onOptimized={async (src) => {
-              await onOptimized?.(src);
-              setView("hub");
-            }}
-          />
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
