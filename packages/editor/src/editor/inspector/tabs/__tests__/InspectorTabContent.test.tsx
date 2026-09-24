@@ -220,19 +220,19 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("container's Effects tab shows Effects + Animation + Interactions; Visibility lives on Settings", () => {
+  it("container's Effects tab shows Opacity · Shadow · Blur · Interactions (animation folded in, G2-157); Visibility lives on Settings", () => {
     /* Board 4428:142686 (Effects) draws OPACITY · SHADOW · BLUR ·
        INTERACTIONS; board 4428:141642 (Settings) opens with VISIBILITY. */
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Opacity section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Animation section/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Interactions section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
     unmount();
     renderTab({ tabId: "element", elementType: "container" });
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Effects section/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Opacity section/i })).not.toBeInTheDocument();
   });
 
   it("button shows Link (linkable)", () => {

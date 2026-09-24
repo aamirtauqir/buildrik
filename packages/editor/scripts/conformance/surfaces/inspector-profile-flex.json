@@ -127,12 +127,6 @@
       "nodeId": "2069:20337"
     },
     {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-flex",
-      "nodeId": "2069:20338"
-    },
-    {
       "name": "sechead-visibility",
       "testId": "inspector-sechead-visibility",
       "spec": "inspector-profile-flex",
