@@ -71,7 +71,8 @@
     "  slot so the row is still the board's 64.",
     "  \"# of #\", \"sara · client · home · #d\", \"round # of #\" — the live line is",
     "  several text nodes and the checker compares whole nodes. The strings are",
-    "  in `measured/review-panel-detached-present.json` under `rendered`."
+    "  in `measured/review-panel-detached-present.json` under `rendered`.",
+    "2026-09-24 (gates): 410fee584 took the progress bar, the \"Round N of M\" strip and \"Compare with approved\" out of the Review body (4418:115784; one status line, Compare rounds / Round history in the ⋯ menu 7071:79114); their targets are dropped."
   ],
   "url": "http://localhost:5051/e2e/probe/probe.html?case=review-panel-detached-present&siteId=probe-site",
   "viewport": {
@@ -97,36 +98,6 @@
       "testId": "panel-header-title",
       "spec": "review-panel-detached-present",
       "nodeId": "I208:651;16:7"
-    },
-    {
-      "name": "progress-block",
-      "testId": "review-progress",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:8"
-    },
-    {
-      "name": "progress-track",
-      "testId": "review-progress-track",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:9"
-    },
-    {
-      "name": "progress-count",
-      "testId": "review-progress-count",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:11"
-    },
-    {
-      "name": "sent-meta-block",
-      "testId": "review-sent-meta",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:12"
-    },
-    {
-      "name": "sent-line",
-      "testId": "review-sent-line",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:13"
     },
     {
       "name": "band",
@@ -169,30 +140,6 @@
       "testId": "review-comment-meta-2",
       "spec": "review-panel-detached-present",
       "nodeId": "I228:1017;17:39"
-    },
-    {
-      "name": "round-strip-label",
-      "testId": "review-rounds-toggle",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:46"
-    },
-    {
-      "name": "compare-block",
-      "testId": "review-compare-block",
-      "spec": "review-panel-detached-present",
-      "nodeId": "157:48"
-    },
-    {
-      "name": "compare-button",
-      "testId": "review-compare",
-      "spec": "review-panel-detached-present",
-      "nodeId": "229:1090"
-    },
-    {
-      "name": "compare-label",
-      "testId": "review-compare",
-      "spec": "review-panel-detached-present",
-      "nodeId": "I229:1090;9:31"
     },
     {
       "name": "primary-label",

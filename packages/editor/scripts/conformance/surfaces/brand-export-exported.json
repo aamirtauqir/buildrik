@@ -36,10 +36,6 @@
       "testId": "brand-format-download-css"
     },
     {
-      "action": "waitFor",
-      "testId": "brand-section-status-exported"
-    },
-    {
       "action": "hover",
       "testId": "panel-header-title"
     }
@@ -193,18 +189,6 @@
     {
       "name": "drop-zone",
       "testId": "import-drop-zone"
-    },
-    {
-      "name": "badge",
-      "testId": "brand-section-status-exported",
-      "spec": "brand-export-exported",
-      "nodeId": "333:2362"
-    },
-    {
-      "name": "badge-text",
-      "testId": "brand-section-status-exported",
-      "spec": "brand-export-exported",
-      "nodeId": "I333:2362;12:9"
     }
   ],
   "_note": [
@@ -232,6 +216,7 @@
     "306:2250 (Tailwind row, 48 vs a live 64 because its description takes a second",
     "line when the emitter drops dark variants — data), 306:2255 (Figma row, 60,",
     "where the board does not fit its own two-line description), the drop zone",
-    "(width 248 against the drawer's 279 content box) and 306:2232 itself."
+    "(width 248 against the drawer's 279 content box) and 306:2232 itself.",
+    "2026-09-24: the Exported status pill is gone (10cb835b7, outcomes are toasts); its wait step and badge targets dropped."
   ]
 }

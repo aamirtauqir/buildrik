@@ -25,19 +25,7 @@
     },
     {
       "action": "click",
-      "testId": "ds-mode-seg-pro"
-    },
-    {
-      "action": "click",
-      "testId": "brand-row-tokens"
-    },
-    {
-      "action": "waitFor",
-      "testId": "brand-kind-color"
-    },
-    {
-      "action": "click",
-      "testId": "brand-kind-color"
+      "testId": "brand-row-colours"
     },
     {
       "action": "waitFor",
@@ -199,6 +187,7 @@
     "  1700:6958  `✓ pass` in #057a55. `color-primary` carries one live lint issue",
     "             in this project, so the FAIL branch renders (#723b13). Both",
     "             branches now carry the anchor and both are 11px; whichever one the",
-    "             data produces is measured."
+    "             data produces is measured.",
+    "2026-09-24 re-pointed: Tokens -> colour kind drill-in was deleted (38f0c4926 kind drill-in list; f22ca69fb Brand nav); colour tokens are the Colours page, reached by brand-row-colours. The Beginner/Pro switch click is dropped: DSModeToggle is no longer rendered in Brand (f22ca69fb, no mode switch)."
   ]
 }

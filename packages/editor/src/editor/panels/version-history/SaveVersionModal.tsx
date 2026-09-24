@@ -9,7 +9,7 @@ import * as React from "react";
 import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 
 /** The board's two suggestions — the moments a named version protects. */
-export const VERSION_NAME_SUGGESTIONS = ["Before design updates", "Before template replacement"] as const;
+const VERSION_NAME_SUGGESTIONS = ["Before design updates", "Before template replacement"] as const;
 const MAX_NAME = 50;
 
 export interface SaveVersionModalProps {

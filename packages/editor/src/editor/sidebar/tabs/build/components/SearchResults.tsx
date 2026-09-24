@@ -136,7 +136,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </span>
           <span
             aria-hidden="true"
-            className="tw:ml-[4px] tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+            className="tw:ml-[4px] tw:w-7 tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
             data-testid={`insert-hit-grip-${hit.key}`}
           >
             ⠿
