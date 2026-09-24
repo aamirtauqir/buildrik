@@ -37,12 +37,6 @@ interface CanvasEmptyCTAProps {
   onAddBlock: () => void;
   onDescribe: () => void;
   onStartBlank: () => void;
-  /**
-   * Board 807:6558 — after Start blank. The page is still empty, so the
-   * invitation stays; it becomes the next instruction and drops its cards and
-   * buttons, because the Insert drawer it just opened is where the next act is.
-   */
-  started?: boolean;
   /** The part of the frame on screen (useVisibleFrameSpan). The frame can be
    *  wider than its viewport, and a CTA centred on the frame hid "Start blank"
    *  under the inspector. Absent → the whole frame. */
@@ -75,7 +69,6 @@ export function CanvasEmptyCTA({
   onAddBlock,
   onDescribe,
   onStartBlank,
-  started,
   span,
   scale = 1,
 }: CanvasEmptyCTAProps): React.ReactElement {
@@ -88,12 +81,7 @@ export function CanvasEmptyCTA({
       data-testid="canvas-empty-cta"
       style={ctaBoxStyle(span, scale)}
     >
-      {started ? (
-        <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
-          Drop an element from the Insert panel, or drag a section.
-        </p>
-      ) : (
-        <>
+      <>
           <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
             This page is empty
           </p>
@@ -142,8 +130,7 @@ export function CanvasEmptyCTA({
               Start blank
             </Button>
           </div>
-        </>
-      )}
+      </>
     </div>
   );
 }

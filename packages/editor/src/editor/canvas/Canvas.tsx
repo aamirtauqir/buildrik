@@ -656,7 +656,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     );
 
     const size = DEVICE_SIZES[device];
-    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly);
+    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
        edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
@@ -721,7 +721,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
-            data-empty-cta={isCanvasEmpty && !readOnly ? "true" : undefined}
+            data-empty-cta={isCanvasEmpty && !readOnly && !startedBlank ? "true" : undefined}
             style={contentStyles}
             dangerouslySetInnerHTML={canvasInnerHtml}
           />
@@ -734,15 +734,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              door as well as a wrong one. The container placeholder next to it
              was already suppressed; this larger one was missed.
 
-             Start blank goes to board 807:6558: the Insert drawer opens, and
-             the sentence becomes the next instruction. It used to only set a
+             Start blank: the Insert drawer opens and the prompt goes — the
+             v3 flow lands on the editor page (the 807:6558 sentence it used to
+             leave behind is on the archived page). It used to only set a
              flag that hid the whole CTA, so the one button a first-time user
              pressed left them on an empty canvas with no drawer and nothing to
              do. `ui:switch-tab` is the seam StudioPanels already listens on,
              and it opens the panel when it is closed. */}
-          {isCanvasEmpty && !readOnly && (
+          {isCanvasEmpty && !readOnly && !startedBlank && (
             <CanvasEmptyCTA
-              started={startedBlank}
               span={emptyCtaSpan}
               scale={scale}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}

@@ -237,6 +237,9 @@ export interface MenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButto
   selected?: boolean;
   /** Destructive action — red, and never the resting tab stop by accident. */
   danger?: boolean;
+  /** One-of-many choice (a device, a zoom level): role menuitemradio, and
+   *  `selected` marks the current one. */
+  radio?: boolean;
 }
 
 const MENU_ITEM_BASE =
@@ -244,7 +247,7 @@ const MENU_ITEM_BASE =
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-left " +
   "tw:focus-visible:outline-none tw:focus-visible:bg-blue-50";
 
-export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
+export function MenuItem({ icon, kbd, selected, danger, radio, disabled, className, children, ...rest }: MenuItemProps) {
   const stateClass = disabled
     ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-[var(--bk-gray-300)]"
     : danger
@@ -254,7 +257,7 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
   return (
     <button
       type="button"
-      role={selected === undefined ? "menuitem" : "menuitemcheckbox"}
+      role={radio ? "menuitemradio" : selected === undefined ? "menuitem" : "menuitemcheckbox"}
       aria-checked={selected === undefined ? undefined : selected}
       className={[MENU_ITEM_BASE, stateClass, className].filter(Boolean).join(" ")}
       disabled={disabled}

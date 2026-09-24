@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { SearchBar } from "../../shared/SearchBar";
@@ -40,9 +40,10 @@ export interface BuildTabProps {
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({
-  composer, onBlockClick, isExpanded, onExpandToggle, onHelpClick, onClose,
+  composer, onBlockClick, onHelpClick, onClose,
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const callout = useCallout();
   const isSearching = tab.searchQuery.trim().length > 0;
 
@@ -158,12 +159,43 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           subtitle is not on the board), EXPAND before CLOSE — 16:6's first
           action is the corner-brackets expand (founder-confirmed 2026-08-06;
           the component description's "Pin" text is stale). */}
+      {/* Board 4428:140817: `Add · ⋯ · ✕` — no expand; the ⋯ holds Paste
+          HTML… (7063:78846), which was a pinned row above the tips. */}
       <PanelFrame.Header
         title="Add"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
+        actions={
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label="Add options"
+            trigger={
+              <IconButton
+                label="Add options"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                data-testid="add-panel-menu"
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label="Add options">
+              <MenuItem
+                data-testid="insert-paste-html"
+                onClick={() => {
+                  setMenuOpen(false);
+                  void pasteHtml();
+                }}
+              >
+                Paste HTML…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
       />
 
       <div className="bld-content">
@@ -250,8 +282,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
         {/* Board 138:53: the pinned bottom stays up DURING search too. */}
         <div className="bld-panel-bottom">
-          {/* Board 1069:5011 — pinned above the tips band, no icon slot. */}
-          <Row label={"⌥  Paste HTML…"} noIcon pinned testId="insert-paste-html" onClick={() => void pasteHtml()} />
           <TipsFooter
             tipIdx={tab.tipIdx}
             onPrev={tab.tipPrev}

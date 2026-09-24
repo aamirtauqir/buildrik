@@ -84,13 +84,15 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 });
 
-describe("BuildTab — ⌥ Paste HTML (board 233:1123)", () => {
+/* Paste HTML… moved into the panel ⋯ (board 7063:78846). */
+describe("BuildTab — ⋯ › Paste HTML… (board 7063:78846)", () => {
   it("reads the clipboard and sends content through onBlockClick", async () => {
     const onBlockClick = vi.fn();
     Object.assign(navigator, {
       clipboard: { readText: vi.fn().mockResolvedValue("<div><p>hi</p></div>") },
     });
     renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
     await waitFor(() => expect(onBlockClick).toHaveBeenCalledTimes(1));
     expect(onBlockClick.mock.calls[0][0]).toMatchObject({
@@ -105,6 +107,7 @@ describe("BuildTab — ⌥ Paste HTML (board 233:1123)", () => {
       clipboard: { readText: vi.fn().mockResolvedValue("   ") },
     });
     renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("add-panel-menu"));
     fireEvent.click(screen.getByTestId("insert-paste-html"));
     await waitFor(() => expect(screen.getByText(/Clipboard is empty/)).toBeTruthy());
     expect(onBlockClick).not.toHaveBeenCalled();
@@ -127,7 +130,7 @@ describe("BuildTab — search", () => {
     expect(screen.getAllByText("ELEMENTS").length).toBeGreaterThan(0);
     expect(screen.queryByText(/results? for/i)).toBeNull();
     // Board 138:53: the pinned bottom stays visible during search.
-    expect(screen.getByTestId("insert-paste-html")).toBeTruthy();
+    expect(screen.getByTestId("add-panel-menu")).toBeTruthy();
   });
 
   it("shows the no-results state for an unmatched query", async () => {

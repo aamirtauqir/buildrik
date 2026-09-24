@@ -135,3 +135,37 @@ describe("CanvasFooterToolbar — help button", () => {
     expect(screen.queryByRole("button", { name: /keyboard shortcuts/i })).toBeNull();
   });
 });
+
+/* Board 5930:44801 ends the View menu with "Breakpoint · Desktop ▸" and
+   "Zoom · 100% ▸"; they open 5930:44781 (Desktop · Tablet 768px · Mobile
+   375px) and 7048:78112 (Fit to screen · 50% · 75% · 100% · 150% · 200%). */
+describe("CanvasFooterToolbar — View › Breakpoint / Zoom (5930:44801)", () => {
+  it("shows the current breakpoint and zoom as submenu rows", () => {
+    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), zoom: 75 });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    expect(screen.getByTestId("canvas-view-breakpoint")).toHaveTextContent(/Breakpoint.*Desktop ▸/);
+    expect(screen.getByTestId("canvas-view-zoom")).toHaveTextContent(/Zoom.*75% ▸/);
+  });
+
+  it("Breakpoint ▸ lists the devices and picking one switches and closes", () => {
+    const onDeviceChange = vi.fn();
+    renderToolbar({ device: "desktop", onDeviceChange });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-breakpoint"));
+    expect(screen.getByRole("menuitemradio", { name: /Tablet/ })).toHaveTextContent("768px");
+    fireEvent.click(screen.getByRole("menuitemradio", { name: /Mobile/ }));
+    expect(onDeviceChange).toHaveBeenCalledWith("mobile");
+    expect(screen.queryByTestId("canvas-view-menu")).toBeNull();
+  });
+
+  it("Zoom ▸ offers Fit and the presets", () => {
+    const onFitToScreen = vi.fn();
+    const { onZoomChange } = renderToolbar({ onFitToScreen });
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-zoom"));
+    const labels = screen.getAllByRole("menuitemradio").map((e) => (e.textContent ?? "").replace("✓", ""));
+    expect(labels).toEqual(["Fit to screen", "50%", "75%", "100%", "150%", "200%"]);
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "150%" }));
+    expect(onZoomChange).toHaveBeenCalledWith(150);
+  });
+});
