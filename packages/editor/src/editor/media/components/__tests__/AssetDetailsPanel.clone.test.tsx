@@ -214,10 +214,12 @@ describe("Clone rail · versions inline", () => {
 });
 
 describe("Clone 3705:20396 · List · chef-intro.mp4 selected (the one checked row is the full rail)", () => {
-  it("Insert to canvas is the PRIMARY button; the rest stay outlined", () => {
+  it("Insert to canvas is the dark ink button (4418:58292); the rest stay outlined", () => {
     mount(byName("chef-intro.mp4"), { usageCount: 1 });
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-primary");
+    const insert = actions.getByRole("button", { name: "Insert to canvas" });
+    expect(insert).toHaveClass("mgr-btn-ink");
+    expect(insert).not.toHaveClass("mgr-btn-primary");
     expect(actions.getByRole("button", { name: "Rename" })).toHaveClass("mgr-btn");
   });
 

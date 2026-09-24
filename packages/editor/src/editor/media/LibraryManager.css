@@ -183,10 +183,8 @@
 
 .mgr-body {
   display: grid;
-  /* Clone 3695:20340 — 240 rail · grid · 378 details (the V1 board's 320
-     details column is displaced; the Clone's rail holds the two-up
-     Edit image | Rename row at full width). */
-  grid-template-columns: var(--bk-size-nav) 1fr 378px;
+  /* 4418:58292 (Editor v3 · IA) — rail · grid · 320 details. */
+  grid-template-columns: var(--bk-size-nav) 1fr 320px;
   min-height: 0;
   overflow: hidden;
 }
@@ -430,13 +428,14 @@
 /* Clone 3695:20340 — a bordered card: 1px border, 8 inset, thumb over name
    over usage. The V1 board's flat tile (no border, no inset) is displaced. */
 .mgr-asset {
+  /* 4418:58292 asset card — 1px gray-200, radius 12, 12 inset, 8 gap. */
   background: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  padding: var(--bk-space-8);
+  border-radius: var(--bk-radius-xl);
+  padding: var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--bk-space-8);
   position: relative;
   cursor: pointer;
   transition: box-shadow 0.12s;
@@ -444,17 +443,17 @@
 
 .mgr-asset:hover { box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
 
-/* 1161:53 — the ring is on the thumb. On the card it sat outside a 144 track
-   and clipped against its neighbour. */
-.mgr-asset.selected .mgr-asset-thumb {
-  border-color: var(--bk-accent);
+/* 4418:58292 — selection is a 2px accent ring on the CARD (no checkbox); the
+   inset drops by the extra pixel so the thumb does not move. */
+.mgr-asset.selected {
+  border: 2px solid var(--bk-accent);
+  padding: 11px;
 }
 
 .mgr-asset-thumb {
-  height: 124px;
+  height: 128px;
   position: relative;
   background: var(--bk-gray-200);
-  border: 1px solid transparent;
   border-radius: var(--bk-radius-lg);
   overflow: hidden;
   display: flex;
@@ -482,29 +481,16 @@
 }
 
 .mgr-asset-name {
-  /* Clone 3695:20340 — 12/500 ink; the V1 card's 11 ink-soft is displaced. */
-  font-size: var(--bk-text-12);
+  /* 4418:58292 — 13/20 regular ink. */
+  font-size: var(--bk-text-13);
+  line-height: 20px;
   color: var(--bk-ink);
-  font-weight: 500;
+  font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-
-.mgr-sel-check {
-  position: absolute;
-  right: 6px; bottom: 6px;
-  width: 18px; height: 18px;
-  border-radius: 4px;
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mgr-sel-check svg { width: 12px; height: 12px; }
 
 .mgr-sort-wrap {
   position: relative;
@@ -709,19 +695,20 @@
    filename · meta · ALT TEXT · VERSIONS · USED IN, with the actions stacked at
    the foot. The V1 rail's head band, tab strip and KV grid are displaced. */
 .mgr-det-body {
+  /* 4418:58292 col-details — 24 top, 20 sides, 12 gap. */
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-16);
+  padding: var(--bk-space-24) 20px var(--bk-space-16);
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-8);
+  gap: var(--bk-space-12);
 }
 
 .mgr-det-preview {
-  height: 158px;
+  height: 160px;
   flex-shrink: 0;
-  background: var(--bk-bg-subtle);
-  border-radius: var(--bk-radius-md);
+  background: var(--bk-gray-200);
+  border-radius: var(--bk-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -736,17 +723,20 @@
 }
 
 .mgr-det-filename {
-  font-size: var(--bk-text-12);
-  font-weight: 500;
-  color: var(--bk-ink);
+  /* 4418:58292 — filename and meta are both 13/20 gray-600. */
+  font-size: var(--bk-text-13);
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--bk-gray-600);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .mgr-det-meta {
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-muted);
+  font-size: var(--bk-text-13);
+  line-height: 20px;
+  color: var(--bk-gray-600);
 }
 
 .mgr-det-section {
@@ -817,6 +807,19 @@
   padding: 0 var(--bk-space-12);
   justify-content: center;
 }
+
+/* 4418:58292 act/Insert to canvas — ink fill, 40 tall, radius 8, 13 regular. */
+.mgr-det-actions .mgr-btn-ink {
+  height: 40px;
+  min-height: 0;
+  padding: 0 var(--bk-space-12);
+  border: 0;
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-ink);
+  color: var(--bk-accent-on);
+  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
+}
+.mgr-det-actions .mgr-btn-ink:hover { filter: brightness(1.25); }
 
 .mgr-det-actions-row .mgr-btn {
   flex: 1 1 0;
@@ -1014,15 +1017,6 @@
   font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-.mgr-use-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-success);
-  flex-shrink: 0;
-}
-.mgr-asset-use.unused { color: var(--bk-ink-muted); }
-.mgr-asset-use.unused .mgr-use-dot { background: var(--bk-border-medium, var(--bk-border)); }
 
 .mgr-count {
   font: 400 11px var(--bk-font-ui);

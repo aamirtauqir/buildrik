@@ -208,7 +208,7 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
       "Replace across site…",
       "Delete",
     ]);
-    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-primary");
+    expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-ink");
     fireEvent.click(actions.getByRole("button", { name: "Delete" }));
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });

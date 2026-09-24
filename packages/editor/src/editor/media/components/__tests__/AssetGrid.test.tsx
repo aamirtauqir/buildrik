@@ -309,7 +309,20 @@ describe("AssetGrid — badges + footer", () => {
       counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
     });
     mount(state, { usageMap: new Map() });
-    expect(screen.getByText("unused")).toBeInTheDocument();
+    expect(screen.getByText("Unused")).toBeInTheDocument();
+  });
+
+  it("4418:58292 — a selected card carries the ring, not a checkbox; ⋯ sits on every card at rest", () => {
+    const state = makeState({
+      libraryItems: [makeItem({ key: "a" }), makeItem({ key: "b", name: "b.png" })],
+      counts: { all: 2, img: 2, vid: 0, ico: 0, fnt: 0 },
+    });
+    const { container } = mount(state, { selectedAssetId: "a" });
+    expect(screen.getByTestId("mgr-asset-a")).toHaveClass("selected");
+    expect(container.querySelector(".mgr-sel-check")).toBeNull();
+    for (const k of ["a", "b"]) {
+      expect(screen.getByTestId(`mgr-asset-menu-${k}`).className).not.toMatch(/opacity-0/);
+    }
   });
 
   it("only the file KIND badges (▶ / ◆ / Aa) remain — provenance left the card", () => {
