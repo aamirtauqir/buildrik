@@ -36,6 +36,7 @@ import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
 import { MediaSourceRow } from "./sections/MediaSourceRow";
+import { TextContentRow } from "./sections/TextContentRow";
 import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
@@ -621,6 +622,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           {activeTab === "style" && (
             <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
           )}
+          {activeTab === "style" && <TextContentRow composer={composer} selectedElement={selectedElement} />}
           <InspectorErrorBoundary>
             <InspectorTabContent
               tabId={activeTab}

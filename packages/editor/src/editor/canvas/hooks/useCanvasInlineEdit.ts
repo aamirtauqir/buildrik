@@ -63,30 +63,23 @@ export function useCanvasInlineEdit({
     rect: null,
   });
 
-  // Handle double-click to start inline editing
-  const handleDoubleClick = React.useCallback(
-    (e: React.MouseEvent) => {
-      if (!composer) return;
-
-      const target = e.target as HTMLElement;
-      const editableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
-      if (!editableEl) return;
-
+  /** Start editing this canvas node if it is editable text; false if not. */
+  const beginEdit = React.useCallback(
+    (editableEl: HTMLElement): boolean => {
       const id = getElementId(editableEl);
-      if (!id) return;
+      if (!id) return false;
 
       const tagName = editableEl.tagName.toLowerCase();
-      if (!INLINE_EDITABLE_TAGS.includes(tagName)) return;
+      if (!INLINE_EDITABLE_TAGS.includes(tagName)) return false;
 
       // Check if element has nested aqb elements - can't edit containers
       const hasNestedElements = editableEl.querySelector("[data-buildrick-id]");
       if (hasNestedElements) {
         // Element contains children - don't enable editing on the parent
         // User should double-click directly on the text element
-        return;
+        return false;
       }
 
-      e.stopPropagation();
       const original = editableEl.innerHTML;
       const domRect = editableEl.getBoundingClientRect();
       const canvasRect = canvasRef.current?.getBoundingClientRect();
@@ -100,9 +93,34 @@ export function useCanvasInlineEdit({
           }
         : null;
       setEditing({ id, original, rect });
+      return true;
     },
-    [composer, canvasRef]
+    [canvasRef]
   );
+
+  // Handle double-click to start inline editing
+  const handleDoubleClick = React.useCallback(
+    (e: React.MouseEvent) => {
+      if (!composer) return;
+      const editableEl = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
+      if (editableEl && beginEdit(editableEl)) e.stopPropagation();
+    },
+    [composer, beginEdit]
+  );
+
+  /* G2-027: the inspector's "Edit text on canvas" (board 4418:107674 →
+     4418:126485) asks for the same edit a double-click starts. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onRequest = ({ elementId }: { elementId: string }) => {
+      const el = canvasRef.current?.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
+      if (el) beginEdit(el);
+    };
+    composer.on(EVENTS.UI_INLINE_EDIT_REQUEST, onRequest);
+    return () => {
+      composer.off(EVENTS.UI_INLINE_EDIT_REQUEST, onRequest);
+    };
+  }, [composer, canvasRef, beginEdit]);
 
   // Attach inline editing listeners when editing.id changes
   React.useEffect(() => {

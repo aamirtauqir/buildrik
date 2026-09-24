@@ -355,6 +355,8 @@ export const EVENTS = {
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
+  /** Start inline text editing on the canvas — payload { elementId } (G2-027). */
+  UI_INLINE_EDIT_REQUEST: "ui:inline-edit-request",
   /** Toggle the one keyboard sheet (StudioModals). `?` and ⌘/ flip the same
    *  state directly; this is the door for rows that are not a keystroke —
    *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
@@ -937,6 +939,7 @@ export interface EventPayloads {
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.BRAND_CHECKS_RUN]: void;
