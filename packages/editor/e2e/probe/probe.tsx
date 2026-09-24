@@ -2109,21 +2109,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   // ── Media drawer states (T6) — the 320 drawer the board specifies ─────────
   "media-drawer-grid": () => <div data-probe="media-drawer-grid" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">{mediaDrawer()}</div>,
-  /* Boards 303:1997 / 303:2032 — the drawer with a running media job naming
-     itself over the grid. Neither state is reachable here: the editing pill is
-     set when `onOpenImageEditor` fires (the modal lives in AquibraStudio), and
-     the optimizing pill is set inside an await around a real blob upload. The
-     pill is a prop, so the real panel is mounted with it. */
-  "media-status-editing": () => (
-    <div data-probe="media-status-editing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Image editor — crop · rotate · adjust" })}
-    </div>
-  ),
-  "media-status-optimizing": () => (
-    <div data-probe="media-status-optimizing" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-      {mediaDrawer({ statusPill: "Optimizing → WebP…" })}
-    </div>
-  ),
   // One card, so a conformance target for `Card / media` resolves to exactly
   // one element — measure.mjs refuses ambiguity, and rightly: whichever card
   // happened to be first would be measured silently.

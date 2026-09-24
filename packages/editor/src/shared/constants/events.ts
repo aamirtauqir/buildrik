@@ -946,7 +946,8 @@ export interface EventPayloads {
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
-  [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string } | null;
+  /** `query` pre-fills the field (a drawer re-announcing its live query). */
+  [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string; query?: string } | null;
   [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
   [EVENTS.UI_SEARCH_QUERY]: { query: string };
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;

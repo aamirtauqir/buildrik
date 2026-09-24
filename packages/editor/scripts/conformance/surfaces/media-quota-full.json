@@ -28,48 +28,6 @@
       "nodeId": "208:331"
     },
     {
-      "name": "search",
-      "testId": "media-search",
-      "spec": "media-quota-full",
-      "nodeId": "145:255"
-    },
-    {
-      "name": "folder-row",
-      "testId": "media-folder-row",
-      "spec": "media-quota-full",
-      "nodeId": "145:258"
-    },
-    {
-      "name": "type-chips",
-      "testId": "media-type-chips",
-      "spec": "media-quota-full",
-      "nodeId": "145:261"
-    },
-    {
-      "name": "chip-image",
-      "testId": "media-type-chip-img",
-      "spec": "media-quota-full",
-      "nodeId": "145:262"
-    },
-    {
-      "name": "chip-video",
-      "testId": "media-type-chip-vid",
-      "spec": "media-quota-full",
-      "nodeId": "145:265"
-    },
-    {
-      "name": "chip-svg",
-      "testId": "media-type-chip-ico",
-      "spec": "media-quota-full",
-      "nodeId": "145:268"
-    },
-    {
-      "name": "chip-icon",
-      "testId": "media-type-chip-fnt",
-      "spec": "media-quota-full",
-      "nodeId": "145:271"
-    },
-    {
       "name": "asset-grid",
       "testId": "media-grid",
       "spec": "media-quota-full",

@@ -3075,29 +3075,29 @@
     },
     {
       "nodeId": "303:1997",
-      "name": "S3.6 · media · editing",
+      "name": "S3.6 · media · editing — SUPERSEDED 2026-09-24 by the standard toast (G3-019)",
       "family": "S3 flows",
       "state": "media · editing",
       "width": 280,
       "height": 812,
-      "status": "active",
-      "authority": "board",
-      "recipe": "s3-flows-media-editing",
+      "status": "out-of-scope",
+      "authority": "superseded:4418-59771",
+      "recipe": null,
       "verifiedNote": "measured 2026-09-08 (recipe s3-flows-media-editing), previously driven: PROVENANCE, stated because it limits what this note can claim: the agent that wrote this recipe was killed by an infrastructure watchdog at its verification step and never filed a report, so there is no record of which properties drifted, who won a board-vs-code conflict, or what it chose not to conform. What IS verified is the measurement itself, re-run by the orchestrator after the crash: 9 targets, 33 compared, 33 pass, 0 fail, 0 targets missing. The recipe's own _note is the only account of its reasoning. Treat the adjudication as unreviewed and re-read the recipe before building on it.",
-      "verified": "drift-fixed"
+      "verified": "no"
     },
     {
       "nodeId": "303:2032",
-      "name": "S3.6 · media · optimizing",
+      "name": "S3.6 · media · optimizing — SUPERSEDED 2026-09-24 by the standard toast (G3-019)",
       "family": "S3 flows",
       "state": "media · optimizing",
       "width": 280,
       "height": 812,
-      "status": "active",
-      "authority": "board",
-      "recipe": "s3-flows-media-optimizing",
+      "status": "out-of-scope",
+      "authority": "superseded:4418-59771",
+      "recipe": null,
       "verifiedNote": "measured 2026-09-08 (recipe s3-flows-media-optimizing), previously driven: PROVENANCE, stated because it limits what this note can claim: the agent that wrote this recipe was killed by an infrastructure watchdog at its verification step and never filed a report, so there is no record of which properties drifted, who won a board-vs-code conflict, or what it chose not to conform. What IS verified is the measurement itself, re-run by the orchestrator after the crash: 9 targets, 40 compared, 40 pass, 0 fail, 0 targets missing. The recipe's own _note is the only account of its reasoning. Treat the adjudication as unreviewed and re-read the recipe before building on it.",
-      "verified": "drift-fixed"
+      "verified": "no"
     },
     {
       "nodeId": "302:2026",
