@@ -17,7 +17,6 @@ import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { MediaContextMenu } from "./components/MediaContextMenu";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
-import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
@@ -192,33 +191,25 @@ function MediaTabWithComposer({
     }
   }, [state, showToast]);
 
-  // §21 — context-menu trigger. Opens file picker; on upload-complete,
-  // sets replaceAcrossPair which mounts ReplaceAcrossDialog. Defined here
-  // (before early return) so React hook order stays stable.
+  /* Audit G3-027 / board 4418:59209 — Replace across site picks the
+     replacement from the library (the drawer's pick mode; ↑ Upload there
+     still takes a new file), then the dialog scopes it per page. */
+  const { closeDetail, setSelectionContext, setReplaceAcrossPair } = state;
   const handleReplaceAcross = React.useCallback((oldItem: LibraryItem) => {
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = oldItem.type === "vid" ? "video/*" : "image/*,.svg";
-    fileInput.onchange = () => {
-      const file = fileInput.files?.[0];
-      if (!file) return;
-      const onComplete = (payload: unknown) => {
-        const p = payload as { asset?: { src?: string }; fileName?: string };
-        composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
-        if (p?.asset?.src) {
-          state.setReplaceAcrossPair({
-            oldSrc: oldItem.src,
-            newSrc: p.asset.src,
-            oldLabel: oldItem.name,
-            newLabel: p.fileName ?? "New asset",
-          });
-        }
-      };
-      composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
-      state.upload([file]);
-    };
-    fileInput.click();
-  }, [composer, state]);
+    const oldLabel = oldItem.displayName ?? oldItem.name;
+    closeDetail();
+    setSelectionContext({
+      label: `Replace ${oldLabel}`,
+      allowedTypes: [oldItem.type === "vid" ? "video" : "image"],
+      onSelect: (asset) =>
+        setReplaceAcrossPair({
+          oldSrc: oldItem.src,
+          newSrc: asset.src,
+          oldLabel,
+          newLabel: displayNameFor(asset.name, asset.mimeType),
+        }),
+    });
+  }, [closeDetail, setSelectionContext, setReplaceAcrossPair]);
 
   /*
     Mounted by EVERY branch, not just the fullpage one. The detail overlay and

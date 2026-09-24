@@ -971,6 +971,9 @@ const ok = (...ids: string[]) => ids.map((elementId) => ({ elementId, previousSr
 const bad = (...ids: string[]) => ids.map((elementId) => ({ elementId, error: "locked" }));
 
 /** Rail → Replace across site… → the picker → menu-cover.png. */
+/** Replace across site's primary — "Replace N uses on M pages". */
+const commitReplace = () => fireEvent.click(screen.getByTestId("rx-commit"));
+
 const pickMenuCover = () => {
   fireEvent.click(screen.getByTestId("mgr-asset-hero"));
   fireEvent.click(screen.getByTestId("mgr-det-more"));
@@ -982,13 +985,14 @@ const pickMenuCover = () => {
 describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace across site…, from the library", () => {
   it("choosing the replacement closes the picker, shows Replacing image while the engine runs, then Replacement complete per page; Done closes it", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2", "e3"), failed: [], clean: true });
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2", "e3"), failed: [], clean: true });
     pickMenuCover();
     expect(screen.queryByText(/across 3 uses/)).toBeNull();
+    commitReplace();
     expect(screen.getByTestId("rx-result-title")).toHaveTextContent("Replacing image");
     expect(screen.getByTestId("rx-result-busy")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["home", "menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
     expect(screen.getByTestId("rx-result-note")).toHaveTextContent("Other elements are unchanged.");
@@ -1000,10 +1004,11 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
 
   it("a placement the engine could not update is named; Retry failed use runs the engine again and completes", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross)
+    vi.mocked(composer.mediaOps.replaceAcrossSelective)
       .mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false })
       .mockReturnValueOnce({ replaced: ok("e3"), failed: [], clean: true });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("2 updated · 1 failed");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated");
@@ -1016,17 +1021,18 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
       "Retrying Menu / Hero image only. The 2 successful updates will not be repeated.",
     );
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(2);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledTimes(2);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
   });
 
   it("a run the engine rolled back (it threw) is every placement failed, with Retry — never a busy card with no door", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockImplementationOnce(() => {
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockImplementationOnce(() => {
       throw new Error("transaction failed");
     });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("0 updated · 3 failed");
     expect(screen.getByTestId("rx-result-failed-0")).toHaveTextContent("Home / Hero: update could not be saved.");
@@ -1034,14 +1040,41 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
     expect(screen.getByTestId("rx-result-retry")).toBeInTheDocument();
   });
 
+  it("G3-027 · 6940:79709 — the pick opens Replace across site with each page ticked; unticking one scopes the run to the rest", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: [], clean: true });
+    pickMenuCover();
+    expect(screen.getByTestId("rx-title")).toHaveTextContent("Replace across site");
+    expect(screen.getByTestId("rx-dialog")).toHaveTextContent("hero-dark.jpg — 3 in total");
+    expect(screen.getByTestId("rx-page-home")).toBeChecked();
+    expect(screen.getByTestId("rx-page-menu")).toBeChecked();
+    expect(screen.getByTestId("rx-commit")).toHaveTextContent("Replace 3 uses on 2 pages");
+    fireEvent.click(screen.getByTestId("rx-page-menu"));
+    expect(screen.getByTestId("rx-commit")).toHaveTextContent("Replace 2 uses on 1 page");
+    expect(composer.mediaOps.replaceAcrossSelective).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("rx-commit"));
+    await screen.findByText("Replacement complete");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["home"]);
+    expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
+  });
+
+  it("Cancel on Replace across site runs nothing", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    pickMenuCover();
+    fireEvent.click(screen.getByTestId("rx-cancel"));
+    expect(screen.queryByTestId("rx-dialog")).toBeNull();
+    expect(composer.mediaOps.replaceAcrossSelective).not.toHaveBeenCalled();
+  });
+
   it("Close on the partial card leaves the engine's partial result standing", async () => {
     const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
-    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false });
+    vi.mocked(composer.mediaOps.replaceAcrossSelective).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false });
     pickMenuCover();
+    commitReplace();
     await screen.findByText("Some uses could not update");
     fireEvent.click(screen.getByTestId("rx-result-close"));
     expect(screen.queryByTestId("rx-result")).toBeNull();
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(1);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1133,7 +1166,9 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
       clean: true,
     };
   };
-  const composer = makeComposer(usages, { uploadFile: opts.uploadFile }, SITE, replaceAcross);
+  /* Replace across site lists pages from where the placements' src is now. */
+  const site = { ...SITE, findByMediaSrc: (src: string) => (src === placements.src ? [...PLACEMENTS.values()] : []) } as typeof SITE;
+  const composer = makeComposer(usages, { uploadFile: opts.uploadFile }, site, replaceAcross);
   const srcOf = (key: string) => family.find((i) => i.key === key)?.src;
   mocks.state.mediaState = makeMediaState({
     libraryItems: TEN.map((i) => (i.key === "hero" ? HERO : i)),
@@ -1349,9 +1384,10 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     fireEvent.click(rail().getByRole("menuitem", { name: "Replace across site…" }));
     const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
     fireEvent.click(within(picker).getByText("menu-cover.png"));
+    commitReplace();
     await screen.findByText("Replacement complete");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
-    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero-v2", "blob:menu");
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero", "blob:menu", ["p-home", "p-menu"]);
+    expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero-v2", "blob:menu", ["p-home", "p-menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(placements.src).toBe("blob:menu");
   });

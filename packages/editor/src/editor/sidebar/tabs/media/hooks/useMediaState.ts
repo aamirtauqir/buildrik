@@ -315,11 +315,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
       }
       const asset = composer.media.getAsset(key);
       if (!asset) return;
-      onSelect(asset);
       endAssetPick();
-      showToast(`${asset.name} applied ✓`, "success");
+      onSelect(asset);
     },
-    [composer, selectionContext, insertToCanvas, showToast],
+    [composer, selectionContext, insertToCanvas],
   );
 
   const copyUrl = useCallback(
