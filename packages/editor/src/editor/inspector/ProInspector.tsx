@@ -10,7 +10,6 @@ import { Link } from "lucide-react";
 import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
-import { BindingPopover } from "./components/BindingPopover";
 import { ScopeDropdown } from "./components/ScopeDropdown";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
@@ -383,11 +382,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           >
             ✦ AI
           </Button>
-          <BindingPopover
-            elementId={selectedElement?.id ?? null}
-            composer={composer ?? null}
-            onOpenCreateCollection={onOpenCreateCollection}
-          />
           {/* Board 160:105 — the header carries the fact, not just the way in.
               A bound element used to be indistinguishable from a loose one
               until someone opened the link popover. */}
@@ -614,6 +608,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               advancedState={advancedState}
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
+              onOpenCreateCollection={onOpenCreateCollection}
               devMode={devMode}
               tier={tier}
               showAll={showAll}

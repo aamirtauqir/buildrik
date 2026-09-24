@@ -78,6 +78,7 @@ export interface InspectorTabContentProps {
     c: IconConfig | undefined,
     s: (i: IconConfig) => void
   ) => void;
+  onOpenCreateCollection?: () => void;
   devMode: boolean;
   /** Beginner hides the registry's ADVANCED-tagged sections behind "Show all
    *  (N more)" (board 4428:141170); Pro shows everything (4428:141406). */
@@ -107,6 +108,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     advancedState,
     onOpenMediaLibrary,
     onOpenIconPicker,
+    onOpenCreateCollection,
     devMode,
     tier,
     showAll,
@@ -217,6 +219,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
               },
           onOpenMediaLibrary,
           onOpenIconPicker,
+          onOpenCreateCollection,
           devMode,
           tabId,
           tier: sectionTier,

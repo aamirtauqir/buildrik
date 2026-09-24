@@ -74,6 +74,7 @@ export type SectionId =
   | "corner-radius"
   // Element tab
   | "link"
+  | "content"
   | "element-properties"
   | "css-classes"
   | "all-css"
@@ -122,6 +123,8 @@ export interface SectionContext {
     current: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
+  /** Settings › CONTENT's "new collection" door (BindingPopover footer). */
+  onOpenCreateCollection?: () => void;
   devMode: boolean;
   tabId: TabId;
   /**

@@ -306,7 +306,7 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
 
   return (
     <Section
-      title="Element Properties"
+      title="Advanced"
       icon="Settings"
       defaultOpen
       isOpen={isOpen}

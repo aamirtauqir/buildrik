@@ -117,7 +117,8 @@ function openTabKeysForType(elementType: string): string[] {
   return getProfileFor(elementType)
     .order.filter((id) => {
       const tab = SECTION_REGISTRY[id]?.tab;
-      return Boolean(tab && tab !== "style");
+      /* ADVANCED (element properties) stays shut, as the board draws it. */
+      return Boolean(tab && tab !== "style") && id !== "element-properties";
     })
     .map((id) => `${elementType}:${id}`);
 }

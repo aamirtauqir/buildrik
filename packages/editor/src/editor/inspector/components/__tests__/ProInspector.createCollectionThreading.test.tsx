@@ -1,8 +1,9 @@
 /**
  * Threading regression for the Create Collection prop path.
  *
- * Guards: ProInspector forwards its `onOpenCreateCollection` prop into
- * BindingPopover. The BindingPopover unit test covers the downstream hop
+ * Guards: ProInspector forwards its `onOpenCreateCollection` prop into the
+ * tab content, which hands it to Settings › CONTENT's BindingPopover (the
+ * binding door moved there from the header — G2-144). The BindingPopover unit test covers the downstream hop
  * (its own click handler invokes the prop). This test covers the hop
  * above — a rename on either side, or accidentally dropping the prop
  * spread, would make the spy observed here fire with the wrong shape or
@@ -40,8 +41,12 @@ vi.mock("../MultiSelectToolbar", () => ({
 vi.mock("../InspectorErrorBoundary", () => ({
   InspectorErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
+const tabContentProps: Array<Record<string, unknown>> = [];
 vi.mock("../../tabs/InspectorTabContent", () => ({
-  InspectorTabContent: () => null,
+  InspectorTabContent: (props: Record<string, unknown>) => {
+    tabContentProps.push(props);
+    return null;
+  },
 }));
 vi.mock("../../sections/VariantSection", () => ({
   VariantSection: () => null,
@@ -95,9 +100,9 @@ function makeMinimalComposer() {
   } as any;
 }
 
-describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => {
-  it("passes the exact callback prop through to BindingPopover", () => {
-    bindingPopoverProps.length = 0;
+describe("ProInspector threads onOpenCreateCollection to the Settings tab content", () => {
+  it("passes the exact callback prop through to InspectorTabContent", () => {
+    tabContentProps.length = 0;
     const spy = vi.fn();
 
     renderWithToast(
@@ -109,8 +114,8 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
       />
     );
 
-    const received = bindingPopoverProps[0];
-    expect(received, "BindingPopover must mount").toBeTruthy();
+    const received = tabContentProps[0];
+    expect(received, "InspectorTabContent must mount").toBeTruthy();
     expect(received.onOpenCreateCollection).toBe(spy);
 
     // Simulate BindingPopover's footer click firing the received callback —
@@ -122,7 +127,7 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
   });
 
   it("renders cleanly when onOpenCreateCollection is omitted", () => {
-    bindingPopoverProps.length = 0;
+    tabContentProps.length = 0;
     renderWithToast(
       <ProInspector
         selectedElement={{ id: "el-1", type: "box", tagName: "div" }}
@@ -130,6 +135,8 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
         currentBreakpoint="desktop"
       />
     );
-    expect(bindingPopoverProps[0]?.onOpenCreateCollection).toBeUndefined();
+    expect(tabContentProps[0]?.onOpenCreateCollection).toBeUndefined();
+    // The header no longer mounts the popover (board 4428:141170).
+    expect(bindingPopoverProps).toHaveLength(0);
   });
 });
