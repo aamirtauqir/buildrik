@@ -30,6 +30,7 @@ import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { LAYER_NAME_KEY } from "@/editor/panels/layers/hooks/layersPersistence";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
+import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 // =============================================================================
 // TYPES
@@ -174,9 +175,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     label: "Generate a block with AI…",
     group: "Add",
     keywords: ["ai", "generate", "section", "block"],
-    /* The AI assistant plans and runs changes (decision #23); it is where a
-       generated block comes from. */
-    handler: run(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })),
+    /* Add › Generate a block (G2-117) — the screen the command names. */
+    handler: run(() => requestGenerateBlock(composer)),
   });
 
   // TOOLS
