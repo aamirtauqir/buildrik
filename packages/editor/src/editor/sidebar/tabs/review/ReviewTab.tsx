@@ -55,6 +55,7 @@ import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
 import { ReattachModal, reattachCandidates } from "./ReattachModal";
+import { RoundHistoryModal } from "./RoundHistoryModal";
 import { BackToActivityRow } from "../activity/BackToActivityRow";
 import { anchorSelector } from "@/editor/canvas/comments/commentAnchors";
 import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
@@ -110,6 +111,10 @@ const COMPOSER =
 /* Board 4418:115784's "Locate ›": accent text, no chrome, 12/18. */
 const LOCATE =
   "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline";
+/* Boards 4418:120052 / 120059 / 6879:67202: the confirm body is 13/20 ink and
+   its fact lines 12px ink — not the modal's 14px default, not muted. */
+const DIALOG_BODY = "tw:flex tw:flex-col tw:gap-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const DIALOG_LINE = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 /** "2d" / "3h" / "12m" — the boards' scale, which is shorter than relTime's. */
@@ -191,10 +196,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      `locateComment` (C2, #39). */
   const [walkCursor, setWalkCursor] = React.useState(0);
 
-  /* Previous rounds — board 157:169's buildable half. Lazy: fetched the first
-     time the strip is opened, because most sessions never look back. `null`
-     means not asked yet; an error keeps the strip usable with a retry line
-     (DF5 — a failed read must not impersonate "no history"). */
+  /* Round history — board 4418:172775's modal. Lazy: fetched the first time
+     it is opened, because most sessions never look back. `null` means not
+     asked yet; an error keeps the modal usable with a retry line (DF5 — a
+     failed read must not impersonate "no history"). */
   const [roundsOpen, setRoundsOpen] = React.useState(false);
   const [rounds, setRounds] = React.useState<RoundListRow[] | null>(null);
   const [roundsError, setRoundsError] = React.useState(false);
@@ -400,17 +405,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             Round history ›
           </MenuItem>
           {/* The re-send is a menu row, not a footer button: no 4418 Review
-              board draws a primary under the composer. A live round asks first
-              (4418:121372 → 4418:120052) — the re-send starts a new round and
-              kills the client's current link; a revoked round has no link
-              left to kill, so it sends. */}
+              board draws a primary under the composer. It always asks first —
+              4418:120052 for a live round (the re-send kills the client's
+              current link), 4418:120059 after a revoke. */}
           {onResend ? (
             <MenuItem
               disabled={resending}
               onClick={() => {
                 setRoundMenuOpen(false);
-                if (round.revoked) void doResend();
-                else setConfirmResend(true);
+                setConfirmResend(true);
               }}
               data-testid="review-menu-resend"
             >
@@ -844,17 +847,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         confirmLabel={hasClientLink ? "Revoke link" : "Withdraw request"}
         testId="review-revoke-confirm"
         message={
-          <div className="tw:flex tw:flex-col tw:gap-3">
+          <div className={DIALOG_BODY}>
             <span>
               {hasClientLink
                 ? `${round.reviewerName ?? "The reviewer"} will lose access immediately. Existing comments keep their current status. You can send a new link any time.`
                 : "The request stops waiting for a reply. Existing comments keep their current status. You can send it again any time."}
             </span>
-            <span className={META}>
+            <span className={DIALOG_LINE}>
               {hasClientLink ? "Current link" : "Current request"} · Round {round.roundNumber}
               {round.reviewerName ? ` · ${round.reviewerName}` : ""}
             </span>
-            <span className={META}>Revoking does not change the approval lock or any comment.</span>
+            <span className={DIALOG_LINE}>Revoking does not change the approval lock or any comment.</span>
           </div>
         }
       />
@@ -962,77 +965,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         )}
       </div>
 
-      {roundsOpen && (
-        <div className="tw:bg-[var(--bk-bg-subtle)] tw:flex tw:flex-col" data-testid="review-rounds-list">
-          {/* Board 1753:8422 — 12px lines on a 24 pitch, inset 12, which puts
-              each line at the board's 256. The rows are their own block so the
-              read-only note below can be the 32-tall block 157:219 draws. */}
-          <div
-            /* The colour is stated, not inherited. 1753:8422 says
-               `--color/ink-soft`; this block set only a size, so it took
-               whatever the host painted — #000000 in the probe, i.e. a black
-               that no board asks for and that nothing in the panel matches.
-               Same defect the Content panel's "Published" label carried. */
-            className="tw:flex tw:flex-col tw:px-3 tw:py-1 tw:text-[12px] tw:text-[color:var(--bk-ink-soft)]"
-            data-testid="review-rounds-rows"
-          >
-          {roundsError ? (
-            <span className={META}>
-              Couldn't load the history.{" "}
-              <Button color="light" size="xs" variant="link" className="tw:text-[12px]" onClick={() => void loadRounds()}>
-                Try again
-              </Button>
-            </span>
-          ) : rounds === null ? (
-            <span className={META}>Loading…</span>
-          ) : rounds.length <= 1 ? (
-            <span className={META}>This is the first round.</span>
-          ) : (
-            rounds
-              .filter((r) => r.id !== round.id)
-              .map((r) => (
-                <span key={r.id} className="tw:flex tw:h-6 tw:items-center tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid={`review-round-${r.roundNumber}`}>
-                  {/* Board 1753:8423-8429: "Round 6 · approved 3d ago" — the
-                      outcome then a RELATIVE age, which is the scale the rest of
-                      this panel uses ("Sent 2d ago · Sara"). It printed
-                      `toLocaleDateString()` and the reviewer's name, so one
-                      panel spoke in both "2d ago" and "9/5/2026", and repeated
-                      a name already on the line above.
-                      Outcome first, and outcome over revocation: a revoked link
-                      does not undo an approval. Every previous round printed
-                      "Revoked" while the DB said APPROVED or CHANGES_REQUESTED
-                      (measured 2026-09-02), which is why the revocation is a
-                      suffix and not the verb. */}
-                  Round {r.roundNumber} ·{" "}
-                  {r.status === "APPROVED"
-                    ? "approved"
-                    : r.status === "CHANGES_REQUESTED"
-                      ? "changes requested"
-                      : r.revoked
-                        ? "revoked"
-                        : "sent"}{" "}
-                  {shortAge(r.resolvedAt ?? r.createdAt)} ago
-                  {r.revoked && (r.status === "APPROVED" || r.status === "CHANGES_REQUESTED")
-                    ? " · link revoked"
-                    : ""}
-                </span>
-              ))
-          )}
-          </div>
-          {/* Board 157:219. The list is header lines and nothing else — no
-              endpoint returns an older round's comments (contracts §6.4:
-              comments carry no round id) — so saying so is the difference
-              between a deliberate limit and a list that looks broken. Only
-              once there IS an older round to be read-only about. */}
-          {rounds && rounds.length > 1 ? (
-            <div className="tw:flex tw:h-8 tw:flex-none tw:items-center tw:px-4" data-testid="review-rounds-note">
-              <span className={META} data-testid="review-rounds-note-text">
-                Older rounds are read-only.
-              </span>
-            </div>
-          ) : null}
-        </div>
-      )}
+      <RoundHistoryModal
+        open={roundsOpen}
+        onClose={() => setRoundsOpen(false)}
+        rounds={rounds}
+        error={roundsError}
+        onRetry={() => void loadRounds()}
+        current={round}
+        siteName={composer?.getProjectMetadata?.()?.name ?? "This site"}
+        onCompare={composer ? openCompare : undefined}
+        age={shortAge}
+      />
 
       <div className={COMPOSER}>
         <Textarea
@@ -1108,18 +1051,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         confirmLabel="Send new review"
         testId="review-resend-confirm"
         message={
-          <div className="tw:flex tw:flex-col tw:gap-3">
+          <div className={DIALOG_BODY}>
             <span>
-              Current draft snapshot. Existing comments keep their current statuses.
+              {composer?.getProjectMetadata?.()?.name ?? "This site"} · Current draft snapshot
+              <br />
+              Existing comments keep their current statuses.
               {hasClientLink
                 ? ` ${round.reviewerName ?? "Your reviewer"} receives a new link; the previous link stops working.`
                 : ""}
-              {openComments.length > 0
-                ? ` ${openComments.length} comment${openComments.length === 1 ? " is" : "s are"} still open.`
-                : ""}
             </span>
-            <span className={META}>Round {round.roundNumber + 1}</span>
-            <span className={META}>Sending starts the next review round.</span>
+            <span className={DIALOG_LINE}>Round {round.roundNumber + 1}</span>
+            <span className={DIALOG_LINE}>
+              {round.revoked
+                ? `The previous link was revoked. Sending creates a fresh link and starts Round ${round.roundNumber + 1}.`
+                : "Sending starts the next review round."}
+            </span>
           </div>
         }
       />

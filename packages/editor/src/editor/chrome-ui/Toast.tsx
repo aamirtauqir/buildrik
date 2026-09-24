@@ -316,7 +316,7 @@ function ToastItem({
         /* Lines=1: a 36px bar that hugs its text, pad 10/16, gap 16.
            Lines=2 (a title): the 420px card, pad 16, gap 8. */
         title
-          ? "tw:pointer-events-auto tw:flex tw:items-start tw:gap-3 tw:w-[420px] tw:max-w-full tw:p-4"
+          ? "tw:pointer-events-auto tw:relative tw:flex tw:items-start tw:gap-3 tw:w-[420px] tw:max-w-full tw:p-4"
           : "tw:pointer-events-auto tw:flex tw:items-center tw:gap-4 tw:min-h-9 tw:px-4 tw:py-1",
         "tw:box-border tw:rounded-lg tw:bg-[var(--bk-ink)] tw:text-white",
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:leading-5",
@@ -326,11 +326,13 @@ function ToastItem({
         <>
           {dot ? <span className="tw:pt-1.5">{dot}</span> : null}
           <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:min-w-0">
-            <span className="tw:text-sm tw:font-semibold">{title}</span>
+            {/* Board 6930:82841: a 13px title, and the ✕ sits in the title's
+                row only — the body runs the card's full width under it. */}
+            <span className="tw:pr-7 tw:text-[13px] tw:font-semibold">{title}</span>
             <span data-testid={`toast-body-${index}`} className="tw:whitespace-pre-line">{description}</span>
             {actionButton ? <div className="tw:flex tw:gap-2 tw:-ml-2">{actionButton}</div> : null}
           </div>
-          {closeButton}
+          <span className="tw:absolute tw:top-3.5 tw:right-3">{closeButton}</span>
         </>
       ) : (
         <>

@@ -266,7 +266,7 @@ describe("actions", () => {
     fireEvent.click(await screen.findByRole("menuitem", { name: "Re-send review link" }));
     expect(await screen.findByText(/^Send a new review to /)).toBeInTheDocument();
     expect(screen.getByText(/the previous link stops working/)).toBeInTheDocument();
-    expect(screen.getByText(/2 comments are still open/)).toBeInTheDocument();
+    expect(screen.getByText("Sending starts the next review round.")).toBeInTheDocument();
     expect(onResend).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalled());
@@ -415,21 +415,21 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
   });
 });
 
-describe("the previous-rounds history (board 157:169, the buildable half)", () => {
-  it("opens from the ⋯ menu and prints each earlier round as a header line", async () => {
+describe("the round history modal (board 4418:172775)", () => {
+  it("opens from the ⋯ menu, newest first, and compares the approved baseline with the current round", async () => {
     vi.mocked(fetchRounds).mockResolvedValueOnce([
-      { id: "rr-old", roundNumber: 1, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-20T10:00:00Z", createdAt: "2026-08-18T10:00:00Z" },
-      { id: "r1", roundNumber: 2, status: "PENDING", reviewerName: null, revoked: false, resolvedAt: null, createdAt: "2026-08-25T10:00:00Z" },
+      { id: "rr-1", roundNumber: 1, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-10T10:00:00Z", createdAt: "2026-08-08T10:00:00Z" },
+      { id: "rr-old", roundNumber: 2, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-20T10:00:00Z", createdAt: "2026-08-18T10:00:00Z" },
+      { id: "r1", roundNumber: 3, status: "PENDING", reviewerName: null, revoked: false, resolvedAt: null, createdAt: "2026-08-25T10:00:00Z" },
     ]);
     renderTab();
     fireEvent.click(await screen.findByTestId("review-round-menu"));
     fireEvent.click(await screen.findByTestId("review-menu-round-history"));
-    /* The current round is not its own history. The line is the board's
-       (1753:8423-8429): outcome then a RELATIVE age, not "Approved by <name>"
-       and a locale date — the name is already on the sent line above, and the
-       panel had been speaking in two time scales at once. */
-    expect(await screen.findByTestId("review-round-1")).toHaveTextContent(/approved \d+d ago/);
-    expect(screen.queryByTestId("review-round-2")).not.toBeInTheDocument();
+    expect(await screen.findByText("Review round history")).toBeInTheDocument();
+    expect(await screen.findByTestId("review-round-3")).toHaveTextContent("Round 3 · Current · Awaiting approval");
+    expect(screen.getByTestId("review-round-2")).toHaveTextContent(/Round 2 · Approved baseline.*approved \d+d ago/);
+    expect(screen.getByTestId("review-round-1")).toHaveTextContent(/Initial snapshot.*nothing to compare this against/);
+    expect(screen.getByRole("button", { name: "Return to current review" })).toBeInTheDocument();
   });
 
   it("a failed history read says so and offers a retry — it does not impersonate 'no history'", async () => {
