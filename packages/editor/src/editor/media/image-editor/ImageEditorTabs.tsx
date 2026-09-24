@@ -41,9 +41,10 @@ export interface TabProps {
   patch(changes: Partial<ImageDraft>): void;
 }
 
-const LABEL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink)]";
+/* 4418:149321 — field labels 13/400 ink-soft, the panel heading 16/600. */
+const LABEL = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink-soft)]";
 const HINT = "tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const HEADING = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
+const HEADING = "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]";
 /* 4418:149321 "Crop ratio" pills: 24 tall, full radius; the current one on
    the accent, the rest white on a hairline. */
 const RATIO_BASE = "tw:h-6 tw:min-h-0 tw:rounded-full tw:px-2.5 tw:py-0 tw:text-[length:var(--bk-text-11)] tw:font-medium";
