@@ -21,7 +21,22 @@ import { Button, TextInput } from "@/editor/chrome-ui";
 // TYPES
 // ============================================================================
 
-type ConstraintType = "fixed" | "fill" | "hug";
+export type ConstraintType = "fixed" | "fill" | "hug";
+
+/** Which of Fixed · Fill · Hug a width/height value is. Shared with the
+ *  LAYOUT section's Size row (board 4428:141170). */
+export function constraintTypeOf(value: string): ConstraintType {
+  if (value === "100%" || value === "-webkit-fill-available") return "fill";
+  if (value === "auto" || value === "fit-content" || value === "max-content") return "hug";
+  return "fixed";
+}
+
+/** The value a mode writes. Fixed keeps a fixed value already there. */
+export function valueForConstraint(type: ConstraintType, current: string): string {
+  if (type === "fill") return "100%";
+  if (type === "hug") return "fit-content";
+  return current && constraintTypeOf(current) === "fixed" ? current : "200px";
+}
 
 export interface ConstraintControlProps {
   label: string;
@@ -41,30 +56,10 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({
   onChange,
   fixedInput,
 }) => {
-  // Determine current constraint type based on CSS value
-  const getConstraintType = (): ConstraintType => {
-    if (value === "100%" || value === "-webkit-fill-available") return "fill";
-    if (value === "auto" || value === "fit-content" || value === "max-content") return "hug";
-    return "fixed";
-  };
-
-  const currentType = getConstraintType();
+  const currentType = constraintTypeOf(value);
   const isWidth = label.toLowerCase() === "width";
 
-  const handleConstraintChange = (type: ConstraintType) => {
-    switch (type) {
-      case "fixed":
-        // Set to a reasonable default or keep current numeric value
-        onChange(value && value !== "auto" && value !== "100%" ? value : "200px");
-        break;
-      case "fill":
-        onChange("100%");
-        break;
-      case "hug":
-        onChange("fit-content");
-        break;
-    }
-  };
+  const handleConstraintChange = (type: ConstraintType) => onChange(valueForConstraint(type, value));
 
   return (
     <div className="tw:mb-2.5">

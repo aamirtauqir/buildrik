@@ -153,6 +153,35 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
     );
   }
 
+  /* Board 4418:104577 — while nothing has come back yet (the plan call, or
+     the one step of an element-scoped run) the panel is "Thinking…" and a
+     Stop button: no run band, no step list, no auto-apply row. */
+  const thinking =
+    !error && (phase === "planning" || (phase === "running" && steps.length === 1 && steps[0].status === "running"));
+  if (thinking) {
+    return (
+      <div className="bd-ai-agent">
+        <p
+          data-testid="ai-thinking"
+          className="tw:m-0 tw:flex tw:h-14 tw:items-center tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+        >
+          Thinking…
+        </p>
+        <div className="tw:flex tw:h-14 tw:items-center tw:px-4">
+          <Button
+            type="button"
+            color="alternative"
+            aria-label="Stop run"
+            onClick={onStop}
+            className="tw:h-8 tw:w-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
+          >
+            Stop
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const gateStep = steps[currentIndex]?.status === "awaiting" ? steps[currentIndex] : null;
   const failedIndex = steps.findIndex((s) => s.status === "failed");
   const appliedCount = steps.filter((s) => s.status === "applied").length;
@@ -161,18 +190,6 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   return (
     <div className="bd-ai-agent">
       <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
-      {/* Board 170:29 / 4418:104577 — "Thinking…" while the plan is being
-          drawn up. It lived on the chat bubble until decision #23 retired the
-          chat; every prompt now waits here. */}
-      {phase === "planning" ? (
-        <p
-          data-testid="ai-thinking"
-          className="tw:m-0 tw:flex tw:h-14 tw:items-center tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
-        >
-          Thinking…
-        </p>
-      ) : null}
-
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
           <li
@@ -204,7 +221,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         ))}
       </ol>
 
-      {(phase === "running" || phase === "planning") && (
+      {phase === "running" && (
         <Button
           type="button"
           color="light"

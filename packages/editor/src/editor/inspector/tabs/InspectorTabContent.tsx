@@ -36,7 +36,7 @@ import type {
   MediaAssetType,
 } from "../../../shared/types/media";
 import type { CssContext, PropertyState } from "../config/cssContext";
-import { getProfileFor } from "../config/elementProfiles";
+import { getProfileFor, isAdvancedIn } from "../config/elementProfiles";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 import {
   SECTION_REGISTRY,
@@ -187,7 +187,9 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   // not by position: a section is advanced because the registry says so, not
   // because it happens to sit fourth in this profile.
   const hidden = tier === "beginner" && !showAll;
-  const renderIds = hidden ? visibleIds.filter((id) => SECTION_REGISTRY[id].tier !== "advanced") : visibleIds;
+  const profile = getProfileFor(selectedElement.type);
+  const isAdvanced = (id: SectionId) => isAdvancedIn(profile, id, SECTION_REGISTRY[id].tier);
+  const renderIds = hidden ? visibleIds.filter((id) => !isAdvanced(id)) : visibleIds;
   const hiddenCount = visibleIds.length - renderIds.length;
 
   // ── Phase 2: render visible sections with tier derived from visible index ──
@@ -246,7 +248,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           Show all ({hiddenCount} more)
         </Button>
       )}
-      {tier === "beginner" && showAll && visibleIds.some((id) => SECTION_REGISTRY[id].tier === "advanced") && (
+      {tier === "beginner" && showAll && visibleIds.some(isAdvanced) && (
         <Button
           color="light"
           size="xs"

@@ -186,23 +186,35 @@ describe("agent run", () => {
 });
 /* Decision #23: the chat bubble that carried "Thinking…" (board 170:29) is
    gone; the plan call is where every prompt now waits. */
-describe("agent run — Thinking band", () => {
-  it("shows while planning and not once the run has steps", () => {
-    const { rerender } = renderPlan({ phase: "planning", steps: [] });
+describe("agent run — Thinking (board 4418:104577)", () => {
+  const props = {
+    currentIndex: 0,
+    error: null,
+    autoApply: false,
+    onAutoApplyChange: vi.fn(),
+    onApprove: vi.fn(),
+    onSkip: vi.fn(),
+    onStop: vi.fn(),
+  };
+
+  it("while planning: the Thinking… band and a Stop button — no run band, no steps, no auto-apply", () => {
+    renderPlan({ phase: "planning", steps: [] });
     expect(screen.getByTestId("ai-thinking")).toHaveTextContent("Thinking…");
-    rerender(
-      <AgentPlan
-        phase="running"
-        steps={[step("One", "running")]}
-        currentIndex={0}
-        error={null}
-        autoApply={false}
-        onAutoApplyChange={vi.fn()}
-        onApprove={vi.fn()}
-        onSkip={vi.fn()}
-        onStop={vi.fn()}
-      />,
-    );
-    expect(screen.queryByTestId("ai-thinking")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stop run" })).toBeInTheDocument();
+    expect(screen.queryByTestId("ai-run-band")).toBeNull();
+    expect(screen.queryByText(/Auto-apply/)).toBeNull();
+  });
+
+  it("a one-step (element) run still waiting on its answer is thinking, not a RUNNING list", () => {
+    render(<AgentPlan phase="running" steps={[step("Make the hero warmer", "running")]} {...props} />);
+    expect(screen.getByTestId("ai-thinking")).toBeInTheDocument();
+    expect(screen.queryByTestId("ai-run-step-1")).toBeNull();
+  });
+
+  it("a multi-step run shows its steps", () => {
+    render(<AgentPlan phase="running" steps={[step("One", "running"), step("Two", "pending")]} {...props} />);
+    expect(screen.queryByTestId("ai-thinking")).toBeNull();
+    expect(screen.getByTestId("ai-run-step-1")).toBeInTheDocument();
   });
 });
+

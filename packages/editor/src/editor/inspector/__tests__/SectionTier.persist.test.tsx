@@ -95,18 +95,20 @@ describe("useInspectorTier — persisted per user", () => {
 });
 
 describe("ProInspector — strip, tier footer, no breakpoint pill", () => {
-  it("defaults to Beginner: Layout (ADVANCED) is behind Show all, Size is not", () => {
+  /* Board 4428:141170: a container's Beginner Style tab leads with LAYOUT
+     (Display + Size modes); the numeric SIZE section is behind Show all. */
+  it("defaults to Beginner: Layout shows, Size (advanced for containers) is behind Show all", () => {
     renderInspector();
     expect(screen.getByRole("tab", { name: "Beginner", selected: true })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Size section/i })).not.toBeInTheDocument();
     expect(screen.getByTestId("inspector-show-all")).toBeInTheDocument();
   });
 
   it("the footer switch to Pro reveals the ADVANCED sections and persists", () => {
     renderInspector();
     fireEvent.click(screen.getByRole("tab", { name: "Pro" }));
-    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
     expect(screen.queryByTestId("inspector-show-all")).not.toBeInTheDocument();
     expect(localStorage.getItem(STORAGE_KEY)).toBe("pro");
   });
@@ -120,13 +122,13 @@ describe("ProInspector — strip, tier footer, no breakpoint pill", () => {
       </ToastProvider>,
     );
     fireEvent.click(screen.getByTestId("inspector-show-all"));
-    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
     rerender(
       <ToastProvider>
         <ProInspector selectedElement={{ id: "b", type: "container" }} composer={composer as never} />
       </ToastProvider>,
     );
-    expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Size section/i })).not.toBeInTheDocument();
     expect(screen.getByTestId("inspector-show-all")).toBeInTheDocument();
   });
 
