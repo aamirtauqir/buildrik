@@ -199,12 +199,6 @@
       "nodeId": "1160:45"
     },
     {
-      "name": "row-trash",
-      "testId": "mgr-row-trash",
-      "spec": "media-fullpage-library",
-      "nodeId": "1160:52"
-    },
-    {
       "name": "toolbar",
       "testId": "mgr-subbar",
       "spec": "media-fullpage-library",

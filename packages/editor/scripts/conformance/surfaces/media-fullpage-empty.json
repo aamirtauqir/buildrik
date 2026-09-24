@@ -111,12 +111,6 @@
       "nodeId": "1162:4681"
     },
     {
-      "name": "row-trash",
-      "testId": "mgr-row-trash",
-      "spec": "media-fullpage-empty",
-      "nodeId": "1162:4693"
-    },
-    {
       "name": "col-grid",
       "testId": "mgr-grid-col",
       "spec": "media-fullpage-empty",
