@@ -262,7 +262,7 @@ export class Composer extends EventEmitter {
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
-    this.darkResolver = new DarkResolver(this);
+    this.darkResolver = new DarkResolver();
     this.colorMode = new ColorMode(this);
     this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
