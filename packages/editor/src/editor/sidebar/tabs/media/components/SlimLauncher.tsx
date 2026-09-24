@@ -626,6 +626,11 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 // While selecting, a click selects — inserting an asset the
                 // user is in the middle of choosing among would be a surprise.
                 onClick={props.selectionMode && props.onToggleSelect ? props.onToggleSelect : props.onInsert}
+                onHoverSelect={
+                  !props.selectionMode && props.onToggleSelection && props.onToggleSelect
+                    ? (key) => { props.onToggleSelection?.(); props.onToggleSelect?.(key); }
+                    : undefined
+                }
                 onDoubleClick={
                   props.onOpenDetail ? (key) => {
                     const hit = filtered.find((i) => i.key === key);

@@ -44,6 +44,9 @@ interface AssetCellProps {
   picked?: boolean;
   onDoubleClick?: (key: string) => void;
   onContextMenu?: (e: MouseEvent, key: string) => void;
+  /** Board 7084:78402 — hovering a card shows a check in the thumb's corner;
+   *  clicking it starts selection with this card chosen. */
+  onHoverSelect?: (key: string) => void;
 }
 
 /** Board `I218:686;218:6`. Only stock ever paints: nothing writes an
@@ -62,6 +65,7 @@ export function AssetCell({
   picked,
   onDoubleClick,
   onContextMenu,
+  onHoverSelect,
 }: AssetCellProps) {
   const badge = item.assetSource ? BADGE[item.assetSource] : undefined;
 
@@ -120,7 +124,7 @@ export function AssetCell({
         `med-asset-cell med-asset-cell--${item.type}`,
         isLocked && "med-asset-cell--locked",
         isSelected && "med-asset-cell--selected",
-        "tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-full tw:h-26 tw:p-0",
+        "tw:group tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-full tw:h-26 tw:p-0",
         "tw:border-0 tw:bg-transparent tw:enabled:hover:bg-transparent",
         "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         isSelected && "tw:[box-shadow:var(--bk-shadow-focus)]",
@@ -177,6 +181,19 @@ export function AssetCell({
             bottom-left, which since the 76-high thumb is the filename line,
             and printed over its first letters. */}
         {usageCount > 0 ? <UsagePips count={usageCount} /> : null}
+        {onHoverSelect && !selectable && !picked && !isLocked ? (
+          <span
+            role="checkbox"
+            aria-checked={false}
+            aria-label={`Select ${item.displayName ?? item.name}`}
+            className="tw:absolute tw:left-1.5 tw:top-1.5 tw:hidden tw:size-4 tw:items-center tw:justify-center tw:rounded-sm tw:bg-[var(--bk-accent)] tw:text-[length:var(--bk-text-11)] tw:text-white tw:group-hover:flex"
+            data-testid="media-card-hover-select"
+            onClick={(e) => { e.stopPropagation(); onHoverSelect(item.key); }}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            ✓
+          </span>
+        ) : null}
         {picked ? (
           <span
             className="tw:pointer-events-none tw:absolute tw:inset-0 tw:rounded-md tw:border-2 tw:border-[var(--bk-accent)]"
