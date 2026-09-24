@@ -42,6 +42,7 @@ import { findSurfaceToken, resolveSurface, shownValue } from "../../utils/contra
 import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
+import { BrandFontPopover } from "./BrandFontPopover";
 import { TokenReplaceModal } from "./TokenReplaceModal";
 import { TokenRenameDialog } from "./TokenRenameDialog";
 import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
@@ -195,11 +196,14 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
 
   // ─ Editors. The value line is read-only until its Change is pressed.
   const [editingLight, setEditingLight] = React.useState(false);
+  /* A font role's Change opens the board's picker (7318:81029) first. */
+  const [fontPopoverOpen, setFontPopoverOpen] = React.useState(false);
   const [editingDark, setEditingDark] = React.useState(false);
   const [darkInput, setDarkInput] = React.useState(token.darkValue ?? "");
   React.useEffect(() => {
     setDarkInput(token.darkValue ?? "");
     setEditingLight(false);
+    setFontPopoverOpen(false);
     setEditingDark(false);
     setUsageExpanded(false);
   }, [token.id, token.darkValue]);
@@ -371,17 +375,49 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <span className={`${VALUE} ${isColor ? "" : MONO}`} data-testid="brand-token-value-light">
           {displayValue(token.value)}
         </span>
-        <Button
-          type="button"
-          variant="secondary"
-          size="xs"
-          onClick={() => setEditingLight((v) => !v)}
-          aria-expanded={editingLight}
-          data-testid="brand-token-action-replace"
-          className={ACTION}
-        >
-          Change
-        </Button>
+        {token.type === "font-family" ? (
+          <BrandFontPopover
+            open={fontPopoverOpen}
+            onClose={() => setFontPopoverOpen(false)}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => (editingLight ? setEditingLight(false) : setFontPopoverOpen((v) => !v))}
+                aria-expanded={fontPopoverOpen || editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+            roleName={token.name}
+            value={token.value}
+            onPick={(family) => {
+              onValueChange?.(token.id, family);
+              setFontPopoverOpen(false);
+            }}
+            onAllFonts={() => {
+              setFontPopoverOpen(false);
+              setEditingLight(true);
+            }}
+            composer={composer}
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            onClick={() => setEditingLight((v) => !v)}
+            aria-expanded={editingLight}
+            data-testid="brand-token-action-replace"
+            className={ACTION}
+          >
+            Change
+          </Button>
+        )}
       </div>
       {editingLight && (
         <div className="tw:mb-2" data-testid="brand-token-light-editor">
@@ -587,6 +623,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         currentId={token.id}
         takenIds={(allTokens ?? []).map((t) => t.id).filter((id) => id !== token.id)}
         usage={usageCount}
+        siteName={composer?.getProjectMetadata?.()?.name}
         onCancel={() => setRenameOpen(false)}
         onRename={(newId) => {
           setRenameOpen(false);

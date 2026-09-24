@@ -35,9 +35,28 @@ describe("Rename token (G3-137)", () => {
     openRename(vi.fn());
     fireEvent.click(screen.getByTestId("brand-token-action-rename"));
     expect(prompt).not.toHaveBeenCalled();
-    expect(screen.getByTestId("brand-token-rename-current").textContent).toBe("color-primary");
-    expect(screen.getByTestId("brand-token-rename-note").textContent).toBe("3 references follow the new ID.");
+    expect(screen.getByTestId("brand-token-rename-current")).toHaveProperty("value", "color-primary");
+    expect(screen.getByTestId("brand-token-rename-note").textContent).toBe(
+      "3 elements reference this token. References update automatically — nothing on the site breaks.",
+    );
     prompt.mockRestore();
+  });
+
+  /* 4418:173685: breadcrumb + "Rename token ID" + ✕; Current ID read-only;
+     the format helper; the button names the action. */
+  it("draws the board's dialog: breadcrumb, title, ✕, read-only current ID, helper, Rename token", () => {
+    const onRename = vi.fn();
+    openRename(onRename);
+    fireEvent.click(screen.getByTestId("brand-token-action-rename"));
+    const dlg = screen.getByTestId("brand-token-rename");
+    expect(screen.getByTestId("brand-token-rename-crumb").textContent).toBe("Site brand › color-primary");
+    expect(screen.getByText("Rename token ID")).toBeTruthy();
+    expect((screen.getByTestId("brand-token-rename-current") as HTMLInputElement).readOnly).toBe(true);
+    expect(dlg.textContent).toContain("Lowercase, hyphen-separated. Must be unique in this site.");
+    expect(screen.getByTestId("brand-token-rename-confirm").textContent).toBe("Rename token");
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByTestId("brand-token-rename")).toBeNull();
+    expect(onRename).not.toHaveBeenCalled();
   });
 
   it("renames on confirm", () => {
