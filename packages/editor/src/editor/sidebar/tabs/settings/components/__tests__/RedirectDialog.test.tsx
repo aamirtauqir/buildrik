@@ -47,7 +47,7 @@ describe("Clone 4254:75736 · Add redirect — the frame's shape", () => {
   it("carries the title, the scope line and every field at the 640 table width, with Add redirect waiting for both paths", () => {
     mount();
     const dialog = screen.getByTestId("set-rd-dialog");
-    expect(dialog).toHaveClass("tw:w-[640px]");
+    expect(dialog).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
     expect(dialog).toHaveAttribute("aria-label", "Add redirect · Bella Cucina");
     expect(dialog).toHaveAttribute("data-mode", "add");
     expect(screen.getByTestId("set-rd-dialog-title")).toHaveTextContent("Add redirect");
