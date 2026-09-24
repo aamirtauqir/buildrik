@@ -208,12 +208,14 @@ describe("useComponentsState — delete confirm machine", () => {
     act(() => {
       result.current.handleDelete("c1");
     });
+    let toast: unknown = null;
     await act(async () => {
-      await result.current.confirmDeleteAction();
+      toast = await result.current.confirmDeleteAction();
     });
 
     expect(asMock(composer.components.deleteComponent)).toHaveBeenCalledWith("c1");
     expect(result.current.confirmDelete).toBeNull();
+    expect(toast).toMatchObject({ description: "Hero Section deleted", action: { label: "Undo" } });
     expect(result.current.selectedId).toBeNull();
   });
 

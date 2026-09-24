@@ -15,7 +15,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
 import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
-import { getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
+import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
 export interface UseBlockInsertionResult {
   handleBlockClick: (block: BlockData) => void;
@@ -168,10 +168,16 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           /* Decision #16 / board 4428:145642 — "Hero added" with Undo. The
              toast store keeps one transient, so ten fast inserts show one
              toast whose Undo is the last insert. */
+          /* Boards 4418:166733 / 4418:169389 name where an element landed
+             ("Heading added to Home › Hero › Content"); a section on the page
+             itself is just "Hero added" (4428:145642). */
+          const onPage = el?.getParent()?.getParent() == null;
           addToast({
             description: replaced
               ? `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`
-              : `${block.label} added`,
+              : onPage
+                ? `${block.label} added`
+                : `${block.label} added to ${elementLocation(composer, insertedId)}`,
             tone: "success",
             action: { label: "Undo", onClick: () => composer.history.undo() },
           });

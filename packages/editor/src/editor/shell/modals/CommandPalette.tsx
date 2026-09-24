@@ -27,7 +27,7 @@ import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
-import { LAYER_NAME_KEY } from "@/editor/panels/layers/hooks/layersPersistence";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";

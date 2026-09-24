@@ -162,9 +162,11 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
             zIndex: Z_LAYERS.dropFeedback,
           }}
         >
-          {/* Target highlight overlay - 2px solid border */}
+          {/* Target highlight — only when the drop goes INTO the target (or is
+              refused). An insert between elements (4428:139921) leaves the
+              neighbour unpainted: the line and its pill are the whole cue. */}
           {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
-          <div
+          {(dropPosition === "inside" || !isValidDrop) && <div
             className={`bd-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
             style={{
               position: "absolute",
@@ -182,7 +184,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
               zIndex: 1,
               pointerEvents: "none",
             }}
-          />
+          />}
 
           {/* Drop position indicator line - 2px solid */}
           {dropPosition && dropPosition !== "inside" && (
@@ -194,27 +196,28 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           )}
 
           {/* Animated drop slot preview - simple dashed outline */}
-          {dropSlotRect && isValidDrop && <DropSlotPreview slotRect={dropSlotRect} />}
+          {dropSlotRect && isValidDrop && dropPosition === "inside" && <DropSlotPreview slotRect={dropSlotRect} />}
 
-          {/* Destination label - for valid drops, shows where element will go */}
-          {isValidDrop && dropPosition && (
-            <DestinationLabel
-              targetRect={relativeRect}
-              targetName={targetName}
-              position={dropPosition}
-            />
+          {/* Destination: inside names the parent; between elements is the
+              board's "Drop here" pill on the line, naming the neighbour in its
+              tooltip (4428:139921). */}
+          {isValidDrop && dropPosition === "inside" && (
+            <DestinationLabel targetRect={relativeRect} targetName={targetName} position={dropPosition} />
+          )}
+          {isValidDrop && (dropPosition === "before" || dropPosition === "after") && (
+            <DropHerePill targetRect={relativeRect} targetName={targetName} position={dropPosition} />
           )}
 
           {/* Feedback badge - only for invalid drops, corner positioned */}
           {!isValidDrop && <DropFeedbackBadge targetRect={relativeRect} message={message} />}
 
           {/* Breadcrumb trail - shows element hierarchy during drag */}
-          {isValidDrop && dropTargetPath.length > 1 && (
+          {isValidDrop && dropPosition === "inside" && dropTargetPath.length > 1 && (
             <DropBreadcrumb path={dropTargetPath} targetRect={relativeRect} />
           )}
 
           {/* Depth badge - shows nesting level for deep drops */}
-          {isValidDrop && dropTargetPath.length > 2 && (
+          {isValidDrop && dropPosition === "inside" && dropTargetPath.length > 2 && (
             <DepthBadge depth={dropTargetPath.length} targetRect={relativeRect} />
           )}
         </div>
@@ -324,6 +327,27 @@ const DropFeedbackBadge: React.FC<DropFeedbackBadgeProps> = ({ targetRect, messa
     </div>
   );
 };
+
+/** "Drop here" — accent pill centred on the insertion line (4428:148651):
+ *  px 10, py 4, radius 8, 11/16 medium white. */
+const DropHerePill: React.FC<{
+  targetRect: { left: number; top: number; width: number; height: number };
+  targetName: string;
+  position: "before" | "after";
+}> = ({ targetRect, targetName, position }) => (
+  <div
+    data-testid="drop-here-pill"
+    title={`Insert ${position} ${targetName}`}
+    className="tw:absolute tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-lg tw:bg-[var(--bk-accent)] tw:px-2.5 tw:py-1 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent-on)] tw:whitespace-nowrap tw:pointer-events-none"
+    style={{
+      left: targetRect.left + targetRect.width / 2,
+      top: position === "before" ? targetRect.top : targetRect.top + targetRect.height,
+      zIndex: Z_LAYERS.dropDestinationLabel,
+    }}
+  >
+    Drop here
+  </div>
+);
 
 /** Destination label - Shows where element will be inserted for valid drops */
 interface DestinationLabelProps {

@@ -1,5 +1,5 @@
 // PURE FUNCTIONS ONLY — no React, no side effects, no imports from React
-import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
+import { elementTypeLabel } from "../../../../shared/constants/elementTypeLabels";
 import type { LayerItem } from "../types";
 
 /* Text-ish layers carry the first words of their own copy — see
@@ -94,5 +94,5 @@ export function getDisplayName(
   const custom = customNames.get(id);
   if (custom) return custom;
   if (preview) return preview;
-  return ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1);
+  return elementTypeLabel(type);
 }

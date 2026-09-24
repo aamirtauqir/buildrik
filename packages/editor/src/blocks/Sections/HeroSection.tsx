@@ -6,6 +6,7 @@
 export const heroBlockConfig = {
   id: "hero",
   label: "Hero",
+  description: "Full-width headline, subtitle and a button. Uses your Brand heading font and primary colour.",
   category: "Sections",
   elementType: "hero" as const,
   icon: "🦸",

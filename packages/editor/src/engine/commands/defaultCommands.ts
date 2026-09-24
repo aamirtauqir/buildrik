@@ -474,6 +474,14 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       run: () => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR),
     },
     {
+      /* Board 7063:78846: the Add panel's ⋯ › "Paste HTML…  ⌘⇧V". */
+      id: "paste-html",
+      label: "Paste HTML…",
+      group: "Edit",
+      shortcut: "ctrl+shift+v",
+      run: () => composer.emit(EVENTS.UI_PASTE_HTML_REQUESTED),
+    },
+    {
       id: "ui-open-ai",
       label: "Open AI assistant",
       group: "Panels",

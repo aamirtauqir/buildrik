@@ -594,6 +594,13 @@ button:hover > .bd-canvas-empty-cta__thumb {
   transition: box-shadow 150ms ease, outline 150ms ease;
 }
 
+/* Board 4428:139921: an insert BETWEEN elements paints only the line and its
+   "Drop here" pill — the neighbour the line sits against gets no ring. */
+[data-buildrick-id][data-drop-target="true"]:is([data-drop-position="before"], [data-drop-position="after"]) {
+  outline: none;
+  box-shadow: none;
+}
+
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"][data-has-children="true"]::after {
   content: '+';
   position: absolute;
@@ -612,6 +619,10 @@ button:hover > .bd-canvas-empty-cta__thumb {
   justify-content: center;
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
   pointer-events: none;
+}
+
+[data-buildrick-id][data-drop-target="true"]:is([data-drop-position="before"], [data-drop-position="after"])::after {
+  content: none;
 }
 
 @keyframes flashOnDrop {

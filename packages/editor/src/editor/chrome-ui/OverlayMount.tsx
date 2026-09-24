@@ -54,7 +54,7 @@ export function OverlayMount({
 
   return createPortal(
     <div
-      className={["tw:fixed tw:inset-0 tw:z-50 tw:bg-[var(--bk-alpha-ink-40)] tw:flex tw:justify-center", SCRIM_ALIGN_CLASS[align]]
+      className={["tw:fixed tw:inset-0 tw:z-50 tw:bg-[var(--bk-alpha-ink-50)] tw:flex tw:justify-center", SCRIM_ALIGN_CLASS[align]]
         .filter(Boolean)
         .join(" ")}
       data-testid="overlay-scrim"

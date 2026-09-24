@@ -20,10 +20,9 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";
-import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import { Button, ConfirmDialog, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
-import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
+import { elementLocation } from "@/editor/canvas/utils/elementInfo";
 
 interface VariantSectionProps {
   composer: Composer | null;
@@ -34,19 +33,6 @@ interface InstanceInfo {
   component: ComponentDefinition;
   instanceId: string;
   currentVariant: string | null;
-}
-
-/** "Home › Hero › Grid" — the page, then the instance's named ancestors. */
-function instancePath(composer: Composer, elementId: string): string {
-  const names: string[] = [];
-  let parent = composer.elements.getElement(elementId)?.getParent() ?? null;
-  while (parent?.getParent()) {
-    const type = parent.getType();
-    names.unshift(getLayerName(parent) ?? ELEMENT_TYPE_LABELS[type] ?? type);
-    parent = parent.getParent();
-  }
-  const page = composer.elements.getActivePage()?.name;
-  return [page, ...names].filter(Boolean).join(" › ");
 }
 
 const DOOR_ROW =
@@ -192,7 +178,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
         onClose={() => setConfirm(null)}
         onConfirm={() => void detach()}
         title={`Detach this ${component.name} instance?`}
-        message={`${instancePath(composer, instanceId)} · This instance becomes an independent container. Its content and appearance are kept; it will no longer follow updates to the ${component.name} master.`}
+        message={`${elementLocation(composer, instanceId)} · This instance becomes an independent container. Its content and appearance are kept; it will no longer follow updates to the ${component.name} master.`}
         confirmLabel="Detach instance"
         testId="instance-detach-confirm"
       />

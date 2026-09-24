@@ -48,6 +48,8 @@ function makeComposer(
       endTransaction: vi.fn(),
       components: {
         updateComponentMaster,
+        snapshotComponent: () => ({ component: { masterTree: { id: "old" } }, instances: [] }),
+        revertComponentMaster: vi.fn().mockResolvedValue({ updated: true, instancesSynced: 2, overridesDropped: 0 }),
         instantiateComponent: vi.fn(),
         getInstancesOfComponent: () => instances,
         isInstance: () => false,
@@ -94,10 +96,9 @@ describe("ComponentDetailScreen — Update component", () => {
     expect(updateComponentMaster).not.toHaveBeenCalled();
     // The dialog names what it costs before anything happens.
     expect(screen.getByText(/2 instance\(s\) will change/i)).toBeInTheDocument();
-    /* Measured live: one Cmd+Z after an update reverts the instance on the
-       canvas and leaves the component at the new version, because element
-       history holds the pages and not the component definition. */
-    expect(screen.getByText(/reverts the pages, not the component itself/i)).toBeInTheDocument();
+    /* ⌘Z alone reverts the pages, not the master — the dialog points at the
+       toast's Undo, which does restore it. */
+    expect(screen.getByText(/use Undo on the confirmation that follows/i)).toBeInTheDocument();
 
     fireEvent.click(confirmButton());
 
@@ -117,14 +118,19 @@ describe("ComponentDetailScreen — Update component", () => {
     await waitFor(() => expect(toastText()).toContain("3 overrides couldn't be re-applied"));
   });
 
-  it("confirms the fan-out on a clean update", async () => {
+  /* Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo". */
+  it("confirms the fan-out on a clean update, with an Undo that reverts the master", async () => {
     const { composer } = makeComposer();
     renderScreen(composer, "el-9");
 
     fireEvent.click(updateButton());
     fireEvent.click(confirmButton());
 
-    await waitFor(() => expect(toastText()).toContain("2 instances followed"));
+    await waitFor(() => expect(toastText()).toContain("CTA updated · 2 linked instances updated"));
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    const revert = (composer as unknown as { components: { revertComponentMaster: ReturnType<typeof vi.fn> } }).components
+      .revertComponentMaster;
+    await waitFor(() => expect(revert).toHaveBeenCalledWith("c1", { id: "old" }));
   });
 
   it("says so when the engine refuses", async () => {

@@ -22,6 +22,7 @@ import {
   MODAL_SUBTITLE_CLASS,
   MODAL_BODY_CLASS,
   MODAL_FOOT_CLASS,
+  MODAL_FOOT_DIVIDED_CLASS,
 } from "./Modal";
 
 export type ModalSize = "sm" | "prompt" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
@@ -182,10 +183,15 @@ export const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
   },
 );
 
-export const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  function ModalFooter({ className, children, ...rest }, ref) {
+export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Form dialogs: top rule + 16/24 padding (DS "Footer"). Confirms omit it. */
+  divided?: boolean;
+}
+
+export const ModalFooter = React.forwardRef<HTMLDivElement, ModalFooterProps>(
+  function ModalFooter({ divided, className, children, ...rest }, ref) {
     return (
-      <div ref={ref} className={[MODAL_FOOT_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+      <div ref={ref} className={[divided ? MODAL_FOOT_DIVIDED_CLASS : MODAL_FOOT_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </div>
     );

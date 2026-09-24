@@ -138,6 +138,12 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
       emit(EVENTS.COMPONENT_LIST_UPDATED, { componentId: id });
     }),
     instantiateComponent: vi.fn(async () => {}),
+    getInstancesOfComponent: vi.fn(() => []),
+    snapshotComponent: vi.fn((id: string) => {
+      const c = components.find((x) => x.id === id);
+      return c ? { component: { ...c }, instances: [] } : null;
+    }),
+    restoreDeletedComponent: vi.fn(async () => 0),
   };
 
   const selection = {
