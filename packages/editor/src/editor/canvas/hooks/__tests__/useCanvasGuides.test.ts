@@ -1,104 +1,97 @@
 /**
- * useCanvasGuides — add/remove/update/clear guides + localStorage persistence,
- * all gated behind the `enabled` flag.
+ * useCanvasGuides — ruler guides live in the project settings (G2-033), so
+ * they are saved with the site instead of in this browser's localStorage.
  *
  * @license BSD-3-Clause
  */
 
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
+import type { ProjectSettings } from "../../../../shared/types";
 import { useCanvasGuides } from "../useCanvasGuides";
 
-const STORAGE_KEY = "buildrick-guides";
+let settings: ProjectSettings;
+let handlers: Map<string, () => void>;
+let composer: {
+  getProjectSettings: () => ProjectSettings;
+  setProjectSettings: ReturnType<typeof vi.fn>;
+  on: (e: string, h: () => void) => void;
+  off: ReturnType<typeof vi.fn>;
+};
 
 beforeEach(() => {
+  vi.useFakeTimers();
   localStorage.clear();
+  settings = {};
+  handlers = new Map();
+  composer = {
+    getProjectSettings: () => settings,
+    setProjectSettings: vi.fn((next: ProjectSettings) => {
+      settings = next;
+    }),
+    on: (e, h) => handlers.set(e, h),
+    off: vi.fn(),
+  };
 });
 
-describe("useCanvasGuides — disabled", () => {
-  it("returns an empty guide list even after adds while disabled", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: false }));
-    act(() => result.current.addGuide("horizontal", 100));
-    // guides getter is `enabled ? guides : []`
-    expect(result.current.guides).toEqual([]);
-  });
-
-  it("does not persist to localStorage while disabled", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: false }));
-    act(() => result.current.addGuide("vertical", 50));
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
-  });
+afterEach(() => {
+  vi.useRealTimers();
 });
 
-describe("useCanvasGuides — enabled add/remove/update/clear", () => {
-  it("addGuide appends a guide with the given type/position and defaults", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
+const mount = (enabled = true) =>
+  renderHook(() => useCanvasGuides({ composer: composer as unknown as Composer, enabled }));
+
+describe("useCanvasGuides", () => {
+  it("reads the site's saved guides", () => {
+    settings = { canvasGuides: [{ id: "g1", type: "vertical", position: 40, locked: false, color: "#89b4fa" }] };
+    const { result } = mount();
+    expect(result.current.guides.map((g) => g.position)).toEqual([40]);
+  });
+
+  it("writes an added guide to the project settings once it rests, not to localStorage", () => {
+    const { result } = mount();
     act(() => result.current.addGuide("horizontal", 120));
-
     expect(result.current.guides).toHaveLength(1);
-    const guide = result.current.guides[0];
-    expect(guide.type).toBe("horizontal");
-    expect(guide.position).toBe(120);
-    expect(guide.locked).toBe(false);
-    expect(typeof guide.id).toBe("string");
-    expect(guide.id.length).toBeGreaterThan(0);
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(300));
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(settings.canvasGuides?.[0]).toMatchObject({ type: "horizontal", position: 120, locked: false });
+    expect(localStorage.length).toBe(0);
+  });
+
+  it("a drag (many updates) is one write with the final position", () => {
+    const { result } = mount();
+    act(() => result.current.addGuide("vertical", 30));
+    const id = result.current.guides[0].id;
+    for (const p of [40, 50, 60, 200]) act(() => result.current.updateGuide(id, p));
+    act(() => vi.advanceTimersByTime(300));
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(settings.canvasGuides?.map((g) => g.position)).toEqual([200]);
   });
 
   it("removeGuide drops only the matching id", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
+    const { result } = mount();
     act(() => result.current.addGuide("horizontal", 10));
     act(() => result.current.addGuide("vertical", 20));
-    const firstId = result.current.guides[0].id;
-
-    act(() => result.current.removeGuide(firstId));
-
-    expect(result.current.guides).toHaveLength(1);
-    expect(result.current.guides[0].position).toBe(20);
+    act(() => result.current.removeGuide(result.current.guides[0].id));
+    act(() => vi.advanceTimersByTime(300));
+    expect(settings.canvasGuides?.map((g) => g.position)).toEqual([20]);
   });
 
-  it("updateGuide changes position while preserving other fields", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
-    act(() => result.current.addGuide("vertical", 30));
-    const id = result.current.guides[0].id;
-
-    act(() => result.current.updateGuide(id, 200));
-
-    expect(result.current.guides[0].position).toBe(200);
-    expect(result.current.guides[0].type).toBe("vertical");
-    expect(result.current.guides[0].id).toBe(id);
+  it("a project load re-reads the guides without writing (opening a site is not an edit)", () => {
+    const { result } = mount();
+    settings = { canvasGuides: [{ id: "g2", type: "horizontal", position: 80, locked: false, color: "#89b4fa" }] };
+    act(() => handlers.get(EVENTS.PROJECT_LOADED)?.());
+    expect(result.current.guides.map((g) => g.id)).toEqual(["g2"]);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 
-  it("clearGuides empties the list", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
-    act(() => result.current.addGuide("horizontal", 10));
-    act(() => result.current.addGuide("vertical", 20));
-
-    act(() => result.current.clearGuides());
-
+  it("hides guides while rulers are off", () => {
+    settings = { canvasGuides: [{ id: "g1", type: "vertical", position: 40, locked: false, color: "#89b4fa" }] };
+    const { result } = mount(false);
     expect(result.current.guides).toEqual([]);
-  });
-});
-
-describe("useCanvasGuides — persistence", () => {
-  it("writes guides to localStorage when enabled", () => {
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
-    act(() => result.current.addGuide("horizontal", 77));
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-    expect(raw).not.toBeNull();
-    const parsed = JSON.parse(raw as string);
-    expect(parsed).toHaveLength(1);
-    expect(parsed[0].position).toBe(77);
-  });
-
-  it("hydrates existing guides from localStorage on mount", () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify([{ id: "g1", type: "vertical", position: 42, locked: false }])
-    );
-    const { result } = renderHook(() => useCanvasGuides({ enabled: true }));
-    expect(result.current.guides).toHaveLength(1);
-    expect(result.current.guides[0].id).toBe("g1");
-    expect(result.current.guides[0].position).toBe(42);
   });
 });

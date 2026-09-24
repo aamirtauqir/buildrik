@@ -242,6 +242,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /* The page crumb (G1-004) follows the active page: a switch, a load, a
      rename (PROJECT_CHANGED carries page:updated). */
   const [pageName, setPageName] = React.useState<string | null>(null);
+  /* Board 4418:100087: a drawer that owns search (Add) turns the shell field
+     into its search box; the ⌘K door comes back when it closes. */
+  const [searchCtx, setSearchCtx] = React.useState<{ placeholder: string } | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  React.useEffect(() => {
+    if (!composer) return;
+    const onCtx = (ctx: { placeholder: string } | null) => {
+      setSearchCtx(ctx);
+      setSearchQuery("");
+    };
+    composer.on(EVENTS.UI_SEARCH_CONTEXT, onCtx);
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_CONTEXT, onCtx);
+    };
+  }, [composer]);
+
   React.useEffect(() => {
     if (!composer) return;
     const read = () => setPageName(composer.elements?.getActivePage?.()?.name ?? null);
@@ -744,6 +760,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
         /* Board 4418:123573's shell search is the ⌘K door. */
         onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
+        contextSearch={
+          searchCtx && composer
+            ? {
+                placeholder: searchCtx.placeholder,
+                value: searchQuery,
+                onChange: (query) => {
+                  setSearchQuery(query);
+                  composer.emit(EVENTS.UI_SEARCH_QUERY, { query });
+                },
+              }
+            : null
+        }
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */

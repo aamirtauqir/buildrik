@@ -7,6 +7,7 @@
  */
 
 import { EVENTS, THRESHOLDS } from "../shared/constants";
+import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "../shared/constants/breakpoints";
 import type { DeviceType, DeviceConfig } from "../shared/types";
 import { clamp } from "../shared/utils/helpers";
 import type { Composer } from "./Composer";
@@ -21,12 +22,18 @@ export class Viewport {
   private container: HTMLElement | null = null;
   private frame: HTMLIFrameElement | null = null;
 
-  private devices: Record<DeviceType, DeviceConfig> = {
-    desktop: { name: "Desktop", width: 1280 },
-    tablet: { name: "Tablet", width: 768, height: 1024 },
-    mobile: { name: "Mobile", width: 375, height: 812 },
-    wide: { name: "Wide", width: 1920 },
-  };
+  /* From the one device table; Desktop's fill width is floored at the
+     desktop breakpoint, and a fill height stays unset. */
+  private devices = Object.fromEntries(
+    Object.entries(DEVICE_PREVIEW_SIZES).map(([id, s]) => [
+      id,
+      {
+        name: s.label,
+        width: s.width === "100%" ? BREAKPOINTS.desktop.minWidth : s.width,
+        height: s.height === "100%" ? undefined : s.height,
+      },
+    ])
+  ) as Record<DeviceType, DeviceConfig>;
 
   constructor(composer: Composer) {
     this.composer = composer;

@@ -14,10 +14,12 @@ export const Composer: React.FC<ComposerProps> = ({
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
 
+  /* The prompt stays in the field after sending (board 4418:106919: "Your
+     prompt is still here"). A run that finishes cleanly remounts this
+     component from AITab, which is what empties it. */
   const submit = () => {
     if (!trimmed) return;
     onSubmit(trimmed);
-    setText("");
   };
 
   /* Boards 170:7 / 170:36 / 170:48 / 171:74 draw the prompt block as 72 tall:

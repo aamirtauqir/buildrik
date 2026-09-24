@@ -47,12 +47,6 @@ export {
   type UseComposerSelectionResult,
 } from "./useComposerSelection";
 export {
-  useCanvasSelectionBox,
-  type UseCanvasSelectionBoxOptions,
-  type UseCanvasSelectionBoxReturn,
-  type SelectionRect,
-} from "./useCanvasSelectionBox";
-export {
   useSelectionRect,
   type UseSelectionRectOptions,
   type SelectionRect as SelectionRectType,

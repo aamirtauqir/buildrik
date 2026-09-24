@@ -99,6 +99,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       open={open}
       onClose={() => setOpen(false)}
       title="New page"
+      /* width/dialog-lg — board 6752:59256 draws this one at 640. */
+      width="lg"
       testId="new-page-modal"
       footer={
         <>

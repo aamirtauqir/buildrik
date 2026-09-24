@@ -44,6 +44,7 @@ describe("useSectionReorder", () => {
       getElement: ReturnType<typeof vi.fn>;
       moveElement: ReturnType<typeof vi.fn>;
     };
+    selection: { select: ReturnType<typeof vi.fn> };
     on: ReturnType<typeof vi.fn>;
     off: ReturnType<typeof vi.fn>;
     beginTransaction: ReturnType<typeof vi.fn>;
@@ -87,10 +88,13 @@ describe("useSectionReorder", () => {
         getElement: vi.fn((id: string) =>
           id === "root-1"
             ? { getChildren: () => sectionIds.map((sid) => ({ getId: () => sid })) }
-            : null
+            : sectionIds.includes(id)
+              ? { getId: () => id }
+              : null
         ),
-        moveElement: vi.fn(),
+        moveElement: vi.fn(() => true),
       },
+      selection: { select: vi.fn() },
       on: vi.fn((evt: string, h: () => void) => handlers.set(evt, h)),
       off: vi.fn(),
       beginTransaction: vi.fn(),
@@ -192,15 +196,18 @@ describe("useSectionReorder", () => {
       expect(result.current.dragState).toBeNull();
     });
 
-    it("completeDrag moves the section inside a reorder-section transaction (downward move adjusts index)", () => {
+    /* Live 2026-09-24: the hook subtracted one for a downward move and
+       ElementCRUD.moveElement subtracts one again for a same-parent move, so
+       "Hero ↓ one" landed where it started while the toast said "Moved down".
+       The hook hands the engine the pre-move slot. */
+    it("completeDrag moves the section inside a reorder-section transaction (pre-move slot, engine adjusts)", () => {
       const { result } = mountHook();
       act(() => result.current.startDrag("sec-a", 0));
       act(() => result.current.updateDrag(250)); // toIndex 3
       act(() => result.current.completeDrag());
 
       expect(composer.beginTransaction).toHaveBeenCalledWith("reorder-section");
-      // Moving down: removal shifts indices, so toIndex 3 → adjusted 2
-      expect(composer.elements.moveElement).toHaveBeenCalledWith("sec-a", "root-1", 2);
+      expect(composer.elements.moveElement).toHaveBeenCalledWith("sec-a", "root-1", 3);
       expect(composer.endTransaction).toHaveBeenCalled();
       expect(result.current.dragState).toBeNull();
     });
@@ -215,6 +222,42 @@ describe("useSectionReorder", () => {
       expect(addToast).toHaveBeenCalledWith(
         expect.objectContaining({ description: "Moved down", action: expect.objectContaining({ label: "Undo" }) }),
       );
+    });
+
+    it("the moved section stays selected, and the release click selects nothing else", () => {
+      const other = vi.fn();
+      document.body.addEventListener("click", other);
+      const { result } = mountHook();
+      act(() => result.current.startDrag("sec-a", 0));
+      act(() => result.current.updateDrag(250));
+      act(() => result.current.completeDrag());
+      expect(composer.selection.select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
+      expect(composer.selection.select.mock.calls[0][0].getId()).toBe("sec-a");
+      document.body.click();
+      expect(other).not.toHaveBeenCalled();
+      document.body.removeEventListener("click", other);
+    });
+
+    it("no toast when the engine refuses the move", () => {
+      composer.elements.moveElement.mockReturnValue(false);
+      const addToast = vi.fn();
+      const { result } = mountHook(true, addToast);
+      act(() => result.current.startDrag("sec-a", 0));
+      act(() => result.current.updateDrag(250));
+      act(() => result.current.completeDrag());
+      expect(addToast).not.toHaveBeenCalled();
+    });
+
+    it("recomputes boundaries when section markup lands with no element event (project load)", async () => {
+      sectionIds = [];
+      const { result } = mountHook();
+      expect(result.current.boundaries).toHaveLength(0);
+      sectionIds = ["sec-a", "sec-b", "sec-c", "sec-d"];
+      await act(async () => {
+        addSectionDom("sec-d", 300);
+        await Promise.resolve();
+      });
+      expect(result.current.boundaries).toHaveLength(4);
     });
 
     it("completeDrag does not move when target equals origin (same slot or slot+1)", () => {

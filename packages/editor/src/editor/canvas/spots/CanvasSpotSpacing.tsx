@@ -78,6 +78,20 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
               borderColor: color,
             }}
             onClick={() => handleIndicatorClick(indicator)}
+            /* G2-050: the strip lies over the element's own padding, so its
+               right-click is the element's — it used to swallow it and no
+               menu opened on a selected element's padding. */
+            onContextMenu={(e) => {
+              const target = document.querySelector(`[data-buildrick-id="${elementId}"]`);
+              if (!target) return;
+              e.preventDefault();
+              // Stop here: bubbling on, the canvas would read the strip as
+              // "no element" and close the menu the forward just opened.
+              e.stopPropagation();
+              target.dispatchEvent(
+                new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY, button: 2 })
+              );
+            }}
           >
             {indicator.position.width > 20 && indicator.position.height > 20 && (
               <div className="bd-spacing-indicator-label" style={{ backgroundColor: color }}>

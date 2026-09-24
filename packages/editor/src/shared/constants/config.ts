@@ -85,9 +85,8 @@ export { STORAGE_KEYS, type StorageKey } from "./storageKeys";
 export const THRESHOLDS = {
   // Zoom limits
   ZOOM_MIN: 10,
-  ZOOM_MAX: 500,
+  ZOOM_MAX: 400, // = ZOOM_LIMITS.max, board 817:4723 (10–400 %)
   ZOOM_DEFAULT: 100,
-  ZOOM_STEP: 10,
 
   // Drag thresholds
   DRAG_THRESHOLD: 5, // pixels before drag starts

@@ -35,7 +35,7 @@ interface Props {
   onSelectPage: (id: string) => void;
   onContextMenu: (id: string, x: number, y: number) => void;
   onRenameStart: (id: string) => void;
-  onRenameCommit: (id: string, name: string) => void;
+  onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onDrop: (pageId: string) => void;
   onPageRemove: (pageId: string) => void;
@@ -289,7 +289,7 @@ export const PageFolder: React.FC<Props> = ({
                 onSelect={() => onSelectPage(page.id)}
                 onToggleSelect={(e) => onToggleSelect(page.id, e)}
                 onRenameStart={() => onRenameStart(page.id)}
-                onRenameCommit={(name) => onRenameCommit(page.id, name)}
+                onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                 onRenameCancel={onRenameCancel}
                 onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
                 draggable

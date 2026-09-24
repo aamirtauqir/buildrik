@@ -14,6 +14,8 @@ import type { BlockData, ElementType } from "../../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
 import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
+import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
 export interface UseBlockInsertionResult {
   handleBlockClick: (block: BlockData) => void;
@@ -74,7 +76,15 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         let parentId = root.getId();
         let insertIndex: number | undefined = root.getChildCount();
 
-        if (selectedIds.length === 1) {
+        // "Replace with block…": the block goes where the marked element is.
+        const replaceId = takeReplaceTarget(composer);
+        const replaced = replaceId ? composer.elements.getElement(replaceId) : undefined;
+        const replacedParent = replaced?.getParent();
+
+        if (replaced && replacedParent) {
+          parentId = replacedParent.getId();
+          insertIndex = replacedParent.getChildIndex(replaced);
+        } else if (selectedIds.length === 1) {
           const selectedEl = composer.elements.getElement(selectedIds[0]);
           if (selectedEl) {
             let candidate: ReturnType<typeof composer.elements.getElement> = selectedEl;
@@ -115,6 +125,7 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         }
 
         const insertedId = insertBlock(composer, def, parentId, insertIndex);
+        if (insertedId && replaced) composer.elements.removeElement(replaced.getId());
         if (insertedId) {
           const el = composer.elements.getElement(insertedId);
           if (el) composer.selection.select(el);
@@ -156,7 +167,9 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
              toast store keeps one transient, so ten fast inserts show one
              toast whose Undo is the last insert. */
           addToast({
-            description: `${block.label} added`,
+            description: replaced
+              ? `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`
+              : `${block.label} added`,
             tone: "success",
             action: { label: "Undo", onClick: () => composer.history.undo() },
           });

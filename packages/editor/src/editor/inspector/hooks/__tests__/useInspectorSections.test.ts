@@ -50,6 +50,14 @@ describe("useInspectorSections — default seeding", () => {
     for (const k of nonStyle) expect(SECTION_REGISTRY[k.split(":")[1] as keyof typeof SECTION_REGISTRY].tab).not.toBe("style");
   });
 
+  /* ...except what those boards draw shut: ADVANCED on Settings, BLUR on Effects. */
+  it("leaves ADVANCED and BLUR collapsed", () => {
+    const { result } = mount("container");
+    expect(result.current.expandedSections.has("container:opacity")).toBe(true);
+    expect(result.current.expandedSections.has("container:blur")).toBe(false);
+    expect(result.current.expandedSections.has("container:element-properties")).toBe(false);
+  });
+
   /* Nothing set means nothing applies, and the footer says "0 of N sections
      apply". Opening a section anyway used to stick: the type was marked
      seeded on the render before its styles arrived, so the real ones never
