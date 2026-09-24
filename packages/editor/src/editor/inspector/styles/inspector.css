@@ -1162,9 +1162,3 @@ textarea.bdi-text {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
-/* G2-146 — ⌘K "Jump to property" lands on a row and tints it for a second. */
-[data-bk-reveal] {
-  background: var(--bk-alpha-accent-15);
-  border-radius: var(--bk-radius-sm);
-  transition: background-color 0.2s ease;
-}

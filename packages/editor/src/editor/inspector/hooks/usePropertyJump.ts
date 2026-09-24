@@ -48,6 +48,9 @@ function findPropertyRow(sectionEl: HTMLElement, property?: string): HTMLElement
   return sectionEl;
 }
 
+/* G2-146 — the landed row tints for a second. */
+const REVEAL_CLASSES = ["tw:bg-[var(--bk-alpha-accent-15)]", "tw:rounded-[var(--bk-radius-sm)]", "tw:transition-colors"];
+
 function revealRow(container: HTMLElement | null, section: SectionId, property?: string): void {
   const sectionEl = container?.querySelector<HTMLElement>(`#inspector-section-${section}`);
   if (!sectionEl) return;
@@ -57,7 +60,11 @@ function revealRow(container: HTMLElement | null, section: SectionId, property?:
   const control = row.querySelector<HTMLElement>(row === sectionEl ? CONTROL : FOCUSABLE) ?? row.querySelector<HTMLElement>(FOCUSABLE);
   control?.focus({ preventScroll: true });
   row.setAttribute("data-bk-reveal", "");
-  window.setTimeout(() => row.removeAttribute("data-bk-reveal"), REVEAL_MS);
+  row.classList.add(...REVEAL_CLASSES);
+  window.setTimeout(() => {
+    row.removeAttribute("data-bk-reveal");
+    row.classList.remove(...REVEAL_CLASSES);
+  }, REVEAL_MS);
 }
 
 export interface UsePropertyJumpOptions {
