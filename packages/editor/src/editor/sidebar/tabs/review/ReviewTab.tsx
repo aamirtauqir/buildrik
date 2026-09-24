@@ -54,12 +54,15 @@ import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
+import { ReattachModal, reattachCandidates } from "./ReattachModal";
+import { anchorSelector } from "@/editor/canvas/comments/commentAnchors";
 import { elementDeepLink } from "@/editor/shell/hooks/useDeepLink";
 import {
   fetchCurrentRound,
   fetchRounds,
   fetchReviewComments,
   postReply,
+  reattachReviewComment,
   resolveReviewComment,
   revokeReview,
   type CurrentRound,
@@ -157,6 +160,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [roundMenuOpen, setRoundMenuOpen] = React.useState(false);
   // Orphaned pins (element deleted) — announced by the canvas CommentLayer.
   const [detachedIds, setDetachedIds] = React.useState<ReadonlySet<string>>(new Set());
+  /* Board 4418:115766 — the comment being re-attached through the picker. */
+  const [reattaching, setReattaching] = React.useState<ReviewComment | null>(null);
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
@@ -599,6 +604,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       detachedNote={extra?.detachedNote}
       data-comment-row
       data-comment-id={c.id}
+      /* B3 flow: clicking the comment itself locates it, as Locate › does.
+         Clicks on the row's own buttons (Locate ›, Resolve, Copy link,
+         Reattach) are theirs, not the row's. */
+      onClick={
+        c.targetSelector && c.status !== "RESOLVED" && !extra?.detachedNote
+          ? (e: React.MouseEvent) => {
+              if ((e.target as HTMLElement).closest("button")) return;
+              locate(c);
+            }
+          : undefined
+      }
       /* Board 4418:115784: the trailing slot is Locate › alone (accent);
          Resolve sits on its own line under the row, Copy link beside it. */
       actions={
@@ -812,7 +828,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                     <Button
                       color="light"
                       size="xs"
-                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                      onClick={() => {
+                        /* The list is the comment's page, and the registry
+                           holds the active page only — so go there first. */
+                        const active = composer?.elements.getActivePage()?.id;
+                        if (composer && c.pageId && c.pageId !== active) composer.elements.setActivePage(c.pageId);
+                        setReattaching(c);
+                      }}
                       className={GHOST}
                     >
                       Reattach
@@ -962,6 +984,36 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </Button>
         </div>
       </div>
+
+      <ReattachModal
+        open={reattaching !== null}
+        body={reattaching?.body ?? ""}
+        pageName={reattaching ? pageName(reattaching.pageId) : null}
+        candidates={
+          reattaching && composer
+            ? reattachCandidates(
+                ((rootId) => (rootId ? composer.elements.getElement(rootId) : null))(
+                  composer.elements.getActivePage()?.root.id,
+                ),
+              )
+            : []
+        }
+        onClose={() => setReattaching(null)}
+        onReattach={async (elementId) => {
+          const c = reattaching;
+          if (!c) return;
+          try {
+            await reattachReviewComment(c.id, { targetSelector: anchorSelector(elementId), pageId: c.pageId });
+          } catch (err) {
+            addToast({ tone: "error", description: "Couldn't re-attach the comment. Try again." });
+            throw err;
+          }
+          addToast({ tone: "success", description: "Comment re-attached." });
+          composer?.emit("comments:reattached", { id: c.id });
+          composer?.emit("comments:refresh", {});
+        }}
+        onPickOnCanvas={reattaching ? () => composer?.emit("comments:reattach-start", { id: reattaching.id }) : undefined}
+      />
 
       {/* Board 4418:120052 — the re-send confirm is a modal (G1-058), from the
           footer's primary and the ⋯ menu alike. */}

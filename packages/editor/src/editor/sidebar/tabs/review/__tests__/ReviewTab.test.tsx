@@ -483,6 +483,20 @@ describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as
     expect(within(moved).queryByRole("button", { name: "Locate ›" })).toBeNull();
   });
 
+  it("clicking the comment body locates it too; its buttons stay its buttons", async () => {
+    fetchReviewComments.mockResolvedValue([
+      { ...COMMENTS[0], targetSelector: `[data-buildrick-id="el-hero"]`, pageId: "page-home" },
+    ]);
+    const composer = makeComposer();
+    renderTab({ composer });
+    const body = await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(body);
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+    const row = body.closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Resolve" }));
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
+  });
+
   it("an unanchored comment has no Locate ›", async () => {
     fetchReviewComments.mockResolvedValue([COMMENTS[0]]); // targetSelector: null
     renderTab({ composer: makeComposer() });
