@@ -1,16 +1,8 @@
 /**
- * MediaLibraryPanel — the picker. Clone 3397:18325 "Choose an image", its
- * Upload step (3685:19960 → 3685:20037), its From URL overlay (3397:18835 →
- * 3721:45102 / 3695:43876) and the selected state (3695:43921). One `it`
- * per prototype fact a DOM assertion can prove; the visual half is the shot
- * pair the live walk takes.
- *
- * Displaces V1 1164:4713 (four underline tabs incl. Optimize, a Grid/List
- * toggle, click-to-close single select, a per-card delete with its own
- * confirm, "Upload tab accepts image/video/audio · max 10 MB each"). The
- * optimizer's door is the library rail's Optimize (LibraryManager), the
- * delete's is the library; neither belongs mid-way through choosing an
- * image for an element.
+ * UploadAssetModal — "Upload an image", boards 4418:149160 → 4418:149235
+ * (Upload) and 4418:160887 (From URL). Audit G3-061: choosing an existing
+ * file is the drawer's pick mode (PickModePanel.test.tsx); this modal is what
+ * its `↑ Upload` / `From URL` links open, so it has no Library tab.
  *
  * useMediaManager is mocked so the panel is driven by a stub asset list.
  *
@@ -37,7 +29,7 @@ vi.mock("../../shell/hooks", () => ({
   useMediaManager: () => managerMock,
 }));
 
-import { MediaLibraryPanel } from "../MediaLibraryPanel";
+import { UploadAssetModal } from "../UploadAssetModal";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 function makeAsset(over: Partial<MediaAsset> = {}): MediaAsset {
@@ -65,14 +57,14 @@ const THREE = [
 function makeComposer(usages: Record<string, number> = { "blob:hero": 3, "blob:menu": 1 }) {
   return {
     mediaOps: { getUsages: (src: string) => ({ count: usages[src] ?? 0, elements: [] }) },
-  } as unknown as NonNullable<React.ComponentProps<typeof MediaLibraryPanel>["composer"]>;
+  } as unknown as NonNullable<React.ComponentProps<typeof UploadAssetModal>["composer"]>;
 }
 
-function mount(over: Partial<React.ComponentProps<typeof MediaLibraryPanel>> = {}) {
+function mount(over: Partial<React.ComponentProps<typeof UploadAssetModal>> = {}) {
   const props = {
-    isOpen: true,
+    open: true,
     onClose: vi.fn(),
-    onSelect: vi.fn(),
+    onUse: vi.fn(),
     allowedTypes: ["image" as const],
     forLabel: "Menu preview",
     composer: makeComposer(),
@@ -80,13 +72,13 @@ function mount(over: Partial<React.ComponentProps<typeof MediaLibraryPanel>> = {
   };
   const utils = render(
     <ToastProvider>
-      <MediaLibraryPanel {...props} />
+      <UploadAssetModal {...props} />
     </ToastProvider>,
   );
   return { ...utils, props };
 }
 
-const TAB_ID: Record<string, string> = { Library: "library", Upload: "upload", "From URL": "url" };
+const TAB_ID: Record<string, string> = { Upload: "upload", "From URL": "url" };
 const tab = (name: string) => screen.getByTestId(`picker-tab-${TAB_ID[name]}`);
 const use = () => screen.getByTestId("picker-use");
 const card = (id: string) => screen.getByTestId(`picker-card-${id}`);
@@ -110,105 +102,39 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("Clone 3397:18325 · Choose an image — the picker", () => {
-  it("titles itself, names the element and kind it is for, and offers Library · Upload · From URL with Library pressed", () => {
+describe("4418:149160 · Upload an image — the frame", () => {
+  it("titles itself Upload an image, names the element and kind, and offers Upload | From URL with Upload pressed", () => {
     mount();
-    expect(screen.getByRole("heading", { name: "Choose an image" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Upload an image" })).toBeInTheDocument();
     expect(screen.getByTestId("picker-for-label")).toHaveTextContent("For Menu preview · Image");
     const tabs = within(screen.getByTestId("picker-tabs")).getAllByRole("button");
-    expect(tabs.map((b) => b.textContent?.trim())).toEqual(["Library", "Upload", "From URL"]);
-    expect(tab("Library")).toHaveAttribute("aria-pressed", "true");
-    expect(tab("Upload")).toHaveAttribute("aria-pressed", "false");
-    expect(screen.queryByText("Optimize")).toBeNull();
-    expect(screen.queryByText("Grid")).toBeNull();
-    expect(screen.queryByText("List")).toBeNull();
+    expect(tabs.map((b) => b.textContent?.trim())).toEqual(["Upload", "From URL"]);
+    expect(tab("Upload")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByTestId("picker-tab-library")).toBeNull();
   });
 
-  it("says just the kind when nothing named the element", () => {
-    mount({ forLabel: undefined });
-    expect(screen.getByTestId("picker-for-label")).toHaveTextContent(/^Image$/);
-  });
-
-  it("labels the search 'Search library' over a 'Search images…' field that filters the cards", () => {
+  it("the hint names the code's accepted formats and limit, not a hand-written size", () => {
     mount();
-    expect(screen.getByTestId("picker-search-label")).toHaveTextContent("Search library");
-    const field = screen.getByPlaceholderText("Search images…");
-    fireEvent.change(field, { target: { value: "team" } });
-    expect(managerMock.getAssets).toHaveBeenLastCalledWith(expect.objectContaining({ search: "team" }));
+    expect(screen.getByTestId("picker-hint").textContent).toMatch(/PNG.*for this image field\.$/);
   });
 
-  it("draws each card as thumb · name · usage from the canvas — used ×3, used ×1, Unused", () => {
-    mount();
-    expect(card("hero").querySelector("img")).toHaveAttribute("src", "blob:hero");
-    expect(within(card("hero")).getByText("hero-dark.jpg")).toBeInTheDocument();
-    expect(screen.getByTestId("picker-card-usage-hero")).toHaveTextContent("used ×3");
-    expect(screen.getByTestId("picker-card-usage-menu")).toHaveTextContent("used ×1");
-    expect(screen.getByTestId("picker-card-usage-team")).toHaveTextContent("Unused");
-    expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
-  });
-
-  /* Clone 3695:45529 (Phase 6): a saved version is a row flagged with its
-     parent, reachable only through Asset versions — never a picker card. */
-  it("never offers a saved version as a card of its own", () => {
-    managerMock.assets = [...THREE, makeAsset({ id: "hero-v2", name: "hero-dark-v2.jpg", src: "blob:hero-v2", versionOf: "hero" })];
-    mount();
-    expect(screen.queryByTestId("picker-card-hero-v2")).toBeNull();
-    expect(card("hero")).toBeInTheDocument();
-  });
-
-  it("a card selects on click and stays open; Use selected image is disabled until one is selected (3695:43921)", () => {
-    const { props } = mount();
-    expect(use()).toHaveTextContent("Use selected image");
-    expect(use()).toBeDisabled();
-    fireEvent.click(card("team"));
-    expect(card("team")).toHaveAttribute("aria-pressed", "true");
-    expect(card("hero")).toHaveAttribute("aria-pressed", "false");
-    expect(props.onSelect).not.toHaveBeenCalled();
-    expect(props.onClose).not.toHaveBeenCalled();
-    expect(use()).toBeEnabled();
-    fireEvent.click(card("hero"));
-    expect(card("hero")).toHaveAttribute("aria-pressed", "true");
-    expect(card("team")).toHaveAttribute("aria-pressed", "false");
-  });
-
-  it("Use selected image hands the asset to the element and closes (3721:45178)", () => {
-    const { props } = mount();
-    fireEvent.click(card("hero"));
-    fireEvent.click(use());
-    expect(props.onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: "hero", src: "blob:hero" }));
-    expect(props.onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("the hint names the code's accepted formats and limit for the field's kind", () => {
-    mount();
-    expect(screen.getByTestId("picker-hint")).toHaveTextContent("JPG, PNG, GIF, WebP or AVIF · up to 10 MB for this image field.");
-    expect(screen.queryByText(/max 10 MB each/)).toBeNull();
-  });
-
-  it("a video field says video formats and the 100 MB limit, and searches videos", () => {
-    managerMock.assets = [makeAsset({ id: "chef", name: "chef-intro.mp4", type: "video", mimeType: "video/mp4", src: "blob:chef" })];
-    mount({ allowedTypes: ["video"], forLabel: "Intro clip" });
-    expect(screen.getByTestId("picker-for-label")).toHaveTextContent("For Intro clip · Video");
-    expect(screen.getByPlaceholderText("Search videos…")).toBeInTheDocument();
-    expect(screen.getByTestId("picker-hint")).toHaveTextContent("MP4, WebM, OGV or MOV · up to 100 MB for this video field.");
-    expect(use()).toHaveTextContent("Use selected video");
-    // The title names the kind — it said "Choose an image" over videos.
-    expect(screen.getByTestId("picker-title")).toHaveTextContent("Choose a video");
+  it("a video field is titled Upload a video and accepts only video", () => {
+    mount({ allowedTypes: ["video"] });
+    expect(screen.getByRole("heading", { name: "Upload a video" })).toBeInTheDocument();
+    expect(screen.getByTestId("picker-upload-input").getAttribute("accept")).not.toContain("image/");
   });
 
   it("Cancel closes without choosing", () => {
     const { props } = mount();
-    fireEvent.click(card("hero"));
     fireEvent.click(screen.getByTestId("picker-cancel"));
-    expect(props.onClose).toHaveBeenCalledTimes(1);
-    expect(props.onSelect).not.toHaveBeenCalled();
+    expect(props.onClose).toHaveBeenCalled();
+    expect(props.onUse).not.toHaveBeenCalled();
   });
 
-  it("with an empty library the grid says so and Use stays disabled", () => {
-    managerMock.assets = [];
-    mount();
-    expect(screen.getByTestId("picker-empty")).toHaveTextContent(/No images in your library yet/);
-    expect(use()).toBeDisabled();
+  it("opened by the From URL link, the import dialog is already up", () => {
+    mount({ pane: "url" });
+    expect(screen.getByRole("heading", { name: "Import image from URL" })).toBeInTheDocument();
+    expect(tab("From URL")).toHaveAttribute("aria-pressed", "true");
   });
 });
 
@@ -217,8 +143,6 @@ describe("Clone 3685:19960 / 3685:20037 · picker · Upload", () => {
 
   it("Upload shows a choose-file panel; a chosen file reads `<name> · Ready to upload` with Upload image as the primary", () => {
     mount();
-    fireEvent.click(tab("Upload"));
-    expect(tab("Upload")).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("picker-upload-choose")).toBeInTheDocument();
     expect(screen.queryByTestId("picker-use")).toBeNull();
     fireEvent.change(screen.getByTestId("picker-upload-input"), { target: { files: [file] } });
@@ -227,41 +151,41 @@ describe("Clone 3685:19960 / 3685:20037 · picker · Upload", () => {
     expect(screen.getByTestId("picker-upload-go")).toBeEnabled();
   });
 
-  it("Upload image lands the file, returns to Library with it selected, and the hint says so", async () => {
+  it("Upload image lands the file as the first card, selected, beside the two most recent — and Use hands it over (4418:149235)", async () => {
     const { props } = mount();
-    fireEvent.click(tab("Upload"));
     fireEvent.change(screen.getByTestId("picker-upload-input"), { target: { files: [file] } });
     fireEvent.click(screen.getByTestId("picker-upload-go"));
     await waitFor(() => expect(managerMock.uploadFile).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(tab("Library")).toHaveAttribute("aria-pressed", "true"));
-    expect(card("new-pasta-2-small.jpg")).toHaveAttribute("aria-pressed", "true");
+    await waitFor(() => expect(card("new-pasta-2-small.jpg")).toHaveAttribute("aria-pressed", "true"));
+    const cards = within(screen.getByTestId("picker-grid")).getAllByRole("button");
+    expect(cards).toHaveLength(3);
     expect(screen.getByTestId("picker-card-usage-new-pasta-2-small.jpg")).toHaveTextContent("Unused");
+    expect(screen.getByTestId("picker-card-usage-menu")).toHaveTextContent("used ×1");
     expect(screen.getByTestId("picker-hint")).toHaveTextContent(
       "Image added · pasta-2-small.jpg selected. Use it to update this image element.",
     );
     fireEvent.click(use());
-    expect(props.onSelect).toHaveBeenCalledWith(expect.objectContaining({ name: "pasta-2-small.jpg" }));
+    expect(props.onUse).toHaveBeenCalledWith(expect.objectContaining({ name: "pasta-2-small.jpg" }));
+    expect(props.onClose).toHaveBeenCalled();
   });
 
-  it("a refused upload reads the engine's reason in place and stays on Upload", async () => {
+  it("a refused upload reads the engine's reason in place and keeps the drop panel", async () => {
     managerMock.uploadFile.mockResolvedValueOnce({
       success: false,
       error: "Upload failed — file is 24 MB, limit is 10 MB",
       fileName: "pasta-2-small.jpg",
     });
     mount();
-    fireEvent.click(tab("Upload"));
     fireEvent.change(screen.getByTestId("picker-upload-input"), { target: { files: [file] } });
     fireEvent.click(screen.getByTestId("picker-upload-go"));
     await waitFor(() =>
       expect(screen.getByTestId("picker-upload-error")).toHaveTextContent("Upload failed — file is 24 MB, limit is 10 MB"),
     );
-    expect(tab("Upload")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByTestId("picker-grid")).toBeNull();
   });
 
   it("the file input accepts only the field's kinds", () => {
     mount();
-    fireEvent.click(tab("Upload"));
     const accept = screen.getByTestId("picker-upload-input").getAttribute("accept") ?? "";
     expect(accept).toContain("image/jpeg");
     expect(accept).not.toContain("video/");
@@ -273,11 +197,11 @@ describe("Clone 3397:18835 → 3721:45102 / 3695:43876 · picker · From URL", (
     mount();
     fireEvent.click(tab("From URL"));
     expect(screen.getByRole("heading", { name: "Import image from URL" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Choose an image" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Upload an image" })).toBeInTheDocument();
     expect(tab("From URL")).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("an imported image lands, the picker returns to Library with it selected, and the hint names it", async () => {
+  it("an imported image lands as the selected first card and the hint names it (4418:160887)", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["x"], { type: "image/jpeg" }) }),
@@ -290,7 +214,7 @@ describe("Clone 3397:18835 → 3721:45102 / 3695:43876 · picker · From URL", (
     const uploaded = managerMock.uploadFile.mock.calls[0][0];
     expect(uploaded.name).toBe("hero-imported.jpg");
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Import image from URL" })).toBeNull());
-    expect(tab("Library")).toHaveAttribute("aria-pressed", "true");
+    expect(tab("Upload")).toHaveAttribute("aria-pressed", "true");
     expect(card("new-hero-imported.jpg")).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("picker-hint")).toHaveTextContent(
       "Image added · hero-imported.jpg selected. Use it to update this image element.",

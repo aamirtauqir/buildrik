@@ -10,7 +10,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { useStudioModals } from "../useStudioModals";
-import type { MediaAsset, IconConfig } from "../../../../shared/types/media";
+import type { IconConfig } from "../../../../shared/types/media";
 
 describe("useStudioModals", () => {
   it("starts with every modal closed and no contexts", () => {
@@ -19,7 +19,6 @@ describe("useStudioModals", () => {
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
     expect(m.showShortcuts).toBe(false);
-    expect(m.showMediaLibrary).toBe(false);
     expect(m.showImageEditor).toBe(false);
     expect(m.showIconPicker).toBe(false);
     expect(m.showCollectionSetup).toBe(false);
@@ -27,7 +26,6 @@ describe("useStudioModals", () => {
     expect(m.showSaveAsComponent).toBe(false);
     expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
-    expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();
     expect(m.collectionSetupContext).toBeNull();
@@ -63,19 +61,6 @@ describe("useStudioModals", () => {
   });
 
   // Context-carrying modals -----------------------------------------------------
-  it("openMediaLibrary stores allowedTypes + onSelect; close clears context", () => {
-    const { result } = renderHook(() => useStudioModals());
-    const onSelect = vi.fn();
-    act(() => result.current.openMediaLibrary(["image"], onSelect));
-    expect(result.current.showMediaLibrary).toBe(true);
-    expect(result.current.mediaLibraryContext?.allowedTypes).toEqual(["image"]);
-    // the stored callback is the exact function the caller handed in
-    result.current.mediaLibraryContext?.onSelect({ id: "a" } as unknown as MediaAsset);
-    expect(onSelect).toHaveBeenCalledWith({ id: "a" });
-    act(() => result.current.closeMediaLibrary());
-    expect(result.current.mediaLibraryContext).toBeNull();
-  });
-
   it("openImageEditor stores imageSrc + onSave and the Clone options; close clears context", () => {
     const { result } = renderHook(() => useStudioModals());
     const onSave = vi.fn();
@@ -178,7 +163,6 @@ describe("useStudioModals", () => {
       result.current.openSaveTemplate();
       result.current.openExporter();
       result.current.setShowShortcuts(true);
-      result.current.openMediaLibrary(["image"], vi.fn());
       result.current.openImageEditor("src.png", vi.fn());
       result.current.openIconPicker(undefined, vi.fn());
       result.current.openCollectionSetup(vi.fn().mockResolvedValue(undefined));
@@ -195,7 +179,6 @@ describe("useStudioModals", () => {
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
     expect(m.showShortcuts).toBe(false);
-    expect(m.showMediaLibrary).toBe(false);
     expect(m.showImageEditor).toBe(false);
     expect(m.showIconPicker).toBe(false);
     expect(m.showCollectionSetup).toBe(false);
@@ -203,7 +186,6 @@ describe("useStudioModals", () => {
     expect(m.showSaveAsComponent).toBe(false);
     expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
-    expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();
     expect(m.collectionSetupContext).toBeNull();

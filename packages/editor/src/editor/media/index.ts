@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-export { MediaLibraryPanel } from "./MediaLibraryPanel";
-export type { MediaLibraryPanelProps } from "./MediaLibraryPanel";
+export { UploadAssetModal } from "./UploadAssetModal";
+export type { UploadAssetModalProps, UploadPane } from "./UploadAssetModal";
 
 export { ImageEditorModal, describeEdits } from "./ImageEditorModal";
 export type { ImageEditorModalProps, EditsSnapshot, ImageEditorTab } from "./ImageEditorModal";

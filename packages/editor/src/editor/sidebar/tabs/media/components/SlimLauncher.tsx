@@ -27,7 +27,6 @@ import { displayNameFor } from "../data/mediaUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { FailedUpload, LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
-import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import { ReplacementUploadModal } from "./ReplacementUploadModal";
@@ -113,8 +112,6 @@ interface SlimLauncherProps {
   onOpenStock(): void;
   onOpenLibrary?(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
-  selectionContext?: { elementId: string; label?: string } | null;
-  onCancelSelection?(): void;
 }
 
 /* Board 7077:79171's TYPE rows. SVG is the `ico` bucket, Icons the `fnt`
@@ -148,8 +145,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
     onSearchChange,
     onOpenStock,
     onClose,
-    selectionContext,
-    onCancelSelection,
   } = props;
 
   // The footer's Upload link drives UploadZone's file input rather than
@@ -216,12 +211,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
       className="sl-launcher tw:border tw:border-[var(--bk-gray-100)]"
       data-testid="media-panel"
     >
-      {selectionContext ? (
-        <SelectionContextBar
-          label={selectionContext.label}
-          onCancel={onCancelSelection ?? (() => {})}
-        />
-      ) : null}
       {/* Board 4418:59771 — "Assets · N", the ⋯ panel menu (7077:79223) and
           close. The expand brackets are gone (G3-002): they opened the same
           full-page library as "Manage assets ›" below while reading as

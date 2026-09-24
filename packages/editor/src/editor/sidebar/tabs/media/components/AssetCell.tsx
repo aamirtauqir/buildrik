@@ -39,6 +39,9 @@ interface AssetCellProps {
   isSelected?: boolean;
   /** Selection mode is on — the card shows its check state (board 145:300). */
   selectable?: boolean;
+  /** Pick mode (board 6764:59051): true on the chosen card — accent edge on the thumb and a
+   *  filled check in its top-right corner. */
+  picked?: boolean;
   onDoubleClick?: (key: string) => void;
   onContextMenu?: (e: MouseEvent, key: string) => void;
 }
@@ -56,6 +59,7 @@ export function AssetCell({
   isLocked = false,
   isSelected = false,
   selectable = false,
+  picked,
   onDoubleClick,
   onContextMenu,
 }: AssetCellProps) {
@@ -130,7 +134,7 @@ export function AssetCell({
       onDoubleClick={onDoubleClick ? handleDoubleClick : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}
       aria-label={`${item.name} asset`}
-      aria-pressed={selectable ? isSelected : undefined}
+      aria-pressed={selectable ? isSelected : picked}
       data-testid="media-card"
     >
       <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-full tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-muted)]">
@@ -170,6 +174,17 @@ export function AssetCell({
             data-testid="media-card-badge"
           >
             {badge}
+          </span>
+        ) : null}
+        {picked ? (
+          <span
+            className="tw:pointer-events-none tw:absolute tw:inset-0 tw:rounded tw:border-2 tw:border-[var(--bk-accent)]"
+            aria-hidden="true"
+            data-testid="media-card-picked"
+          >
+            <span className="tw:absolute tw:right-1 tw:top-1 tw:flex tw:size-4 tw:items-center tw:justify-center tw:rounded tw:bg-[var(--bk-accent)] tw:text-[length:var(--bk-text-11)] tw:text-white">
+              ✓
+            </span>
           </span>
         ) : null}
         {isLocked ? (

@@ -56,7 +56,7 @@ import { getAllIcons } from "@/shared/constants/icons";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
 import { ReplaceAcrossDialog } from "@/editor/sidebar/tabs/media/components/ReplaceAcrossDialog";
-import { MediaLibraryPanel } from "@/editor/media/MediaLibraryPanel";
+import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
@@ -498,7 +498,7 @@ function mgrHost(children: React.ReactNode) {
 /**
  * Media picker fixture (board 1164:4713).
  *
- * MediaLibraryPanel reads through `useMediaManager`, which is three
+ * UploadAssetModal reads through `useMediaManager`, which is three
  * `composer.media` calls and an event subscription — so the fixture answers
  * those and the panel mounts as it ships. The live picker cannot be measured
  * instead: it opens from an element that needs an asset, and a fresh demo
@@ -527,7 +527,7 @@ const PICKER_COMPOSER = {
     getAssets: () => PICKER_ASSETS,
     getAsset: (id: string) => PICKER_ASSETS.find((a) => a.id === id),
   },
-} as unknown as React.ComponentProps<typeof MediaLibraryPanel>["composer"];
+} as unknown as React.ComponentProps<typeof UploadAssetModal>["composer"];
 
 /**
  * Replace-across fixture (board 1164:4738 — the picker half).
@@ -2725,12 +2725,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-picker-modal": () => (
     <div data-probe="media-picker-modal">
       <ToastProvider>
-        <MediaLibraryPanel
-          isOpen
+        <UploadAssetModal
+          open
           onClose={() => {}}
-          onSelect={() => {}}
+          onUse={() => {}}
           composer={PICKER_COMPOSER}
-          forLabel="Hero · Image"
+          forLabel="Hero"
         />
       </ToastProvider>
     </div>
