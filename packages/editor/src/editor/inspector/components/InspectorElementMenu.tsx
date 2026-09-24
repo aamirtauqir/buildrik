@@ -18,7 +18,7 @@
  * @license BSD-3-Clause
  */
 
-import { Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, RotateCcw, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
@@ -37,6 +37,9 @@ export interface InspectorElementMenuProps {
   onPick?: () => void;
   onSelectParent?: () => void;
   onHideInspector?: () => void;
+  /** G2-146: open / close every section of this tab. */
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
 }
 
 interface MenuItem {
@@ -130,6 +133,8 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   onPick,
   onSelectParent,
   onHideInspector,
+  onExpandAll,
+  onCollapseAll,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { addToast } = useToast();
@@ -222,6 +227,12 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       : []),
     ...(onHideInspector
       ? [{ id: "hide-inspector", label: "Hide inspector", icon: <PanelRightClose size={14} aria-hidden="true" />, onClick: run(onHideInspector) }]
+      : []),
+    ...(onExpandAll
+      ? [{ id: "expand-all", label: "Expand all sections", icon: <ChevronsUpDown size={14} aria-hidden="true" />, onClick: run(onExpandAll) }]
+      : []),
+    ...(onCollapseAll
+      ? [{ id: "collapse-all", label: "Collapse all sections", icon: <ChevronsDownUp size={14} aria-hidden="true" />, onClick: run(onCollapseAll) }]
       : []),
   ];
 

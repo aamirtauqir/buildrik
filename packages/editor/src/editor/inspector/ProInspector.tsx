@@ -179,7 +179,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
 
-  const { expandedSections, toggleSection } = useInspectorSections({
+  const { expandedSections, toggleSection, expandAll, collapseAll } = useInspectorSections({
     selectedElement,
     composer,
     styles: styles_state,
@@ -409,6 +409,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               }}
               onSelectParent={() => composer?.selection.selectParent()}
               onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
+              onExpandAll={expandAll}
+              onCollapseAll={collapseAll}
             />
           )}
         </div>
