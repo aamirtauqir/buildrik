@@ -124,7 +124,7 @@ export interface SectionContext {
     current: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
-  /** Settings › CONTENT's "new collection" door (BindingPopover footer). */
+  /** Settings › CONTENT's "Create collection" door (no collections yet). */
   onOpenCreateCollection?: () => void;
   tabId: TabId;
   /**

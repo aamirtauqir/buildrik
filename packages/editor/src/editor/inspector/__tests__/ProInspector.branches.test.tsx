@@ -30,7 +30,6 @@ vi.mock("../components/InspectorErrorBoundary", () => ({
 vi.mock("../sections/VariantSection", () => ({ VariantSection: () => null }));
 vi.mock("../components/InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
 vi.mock("../components/DeleteConfirmModal", () => ({ DeleteConfirmModal: () => null }));
-vi.mock("../components/BindingPopover", () => ({ BindingPopover: () => null }));
 
 import { ProInspector } from "../ProInspector";
 import { ToastProvider } from "@/editor/chrome-ui";

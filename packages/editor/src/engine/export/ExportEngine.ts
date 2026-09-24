@@ -838,13 +838,13 @@ export class ExportEngine {
     // Export each page
     for (const page of pages) {
       let html = this.exportPageToHtml(page, css);
+      const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       // Apply CMS resolution if mode is not 'none'
       if (cmsOptions.mode !== "none") {
-        html = await this.cmsResolver.resolve(html, cmsOptions);
+        html = await this.cmsResolver.resolve(html, { ...cmsOptions, pageFile: fileName });
       }
 
-      const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       files.push({
         name: fileName,

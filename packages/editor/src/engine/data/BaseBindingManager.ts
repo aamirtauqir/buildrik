@@ -81,7 +81,13 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   /**
    * Bind (or replace) a binding for an element keyed by getBindingKey().
    */
-  bind(elementId: string, binding: T): void {
+  bind(elementId: string, binding: T, historyLabel?: string): void {
+    /* A person binding from the inspector passes a label: the change is then
+       one undo step. Bindings ARE in the history snapshot now
+       (Composer.exportProject writes cmsBindings, importProject restores them,
+       clearing first), so Undo restores the map and the text together. Loads
+       and history restores call bind() without a label and stay unrecorded. */
+    if (historyLabel) this.composer.history?.flushPending?.();
     const elementBindings = this.bindings.get(elementId) || [];
     const key = this.getBindingKey(binding);
     const existingIndex = elementBindings.findIndex((b) => this.getBindingKey(b) === key);
@@ -110,7 +116,8 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        and braces; the order still matters if a subclass ever writes without
        the wrapper. */
     void Promise.resolve(this.applyBinding(elementId, binding)).finally(() => {
-      this.composer.history?.noteUnrecordedAction?.("binding a field to content");
+      if (historyLabel) this.composer.history?.record?.(historyLabel);
+      else this.composer.history?.noteUnrecordedAction?.("binding a field to content");
     });
   }
 
@@ -135,10 +142,12 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   /**
    * Unbind everything for an element.
    */
-  unbindAll(elementId: string): void {
+  unbindAll(elementId: string, historyLabel?: string): void {
+    if (historyLabel) this.composer.history?.flushPending?.();
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
-    this.composer.history?.noteUnrecordedAction?.("unbinding a field");
+    if (historyLabel) this.composer.history?.record?.(historyLabel);
+    else this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }
 
   /**
