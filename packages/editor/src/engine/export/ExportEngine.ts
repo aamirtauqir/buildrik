@@ -151,6 +151,28 @@ export function resolveHomePageId(pages: PageData[]): string | undefined {
   return (pages.find((p) => p.isHome) ?? pages[0])?.id;
 }
 
+/**
+ * Each page's published file name: the home page is index.html, every other
+ * page `<slug>.html`, numbered when two slugs collide. The export writes
+ * these files, and a CMS collection's template page is bound by the same
+ * name (`pageTemplatePath`, matched against the publish payload's paths by
+ * `appendDynamicPagesToPublish`), so both read it from here.
+ */
+export function pageFileNames(pages: PageData[]): Map<string, string> {
+  const homeId = resolveHomePageId(pages);
+  const used = new Set<string>(["index.html"]);
+  return new Map(
+    pages.map((p, index) => {
+      if (p.id === homeId) return [p.id, "index.html"];
+      const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
+      let name = `${slug}.html`;
+      for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
+      used.add(name);
+      return [p.id, name];
+    }),
+  );
+}
+
 export class ExportEngine {
   private composer: Composer;
   private config: ExportConfig;
@@ -837,18 +859,7 @@ export class ExportEngine {
        deployed site answered 404 at its own root.
        The old rule also sent every slugless page to index.html, and two pages
        sharing a slug to the same file: one silently overwrote the other. */
-    const homeId = resolveHomePageId(pages);
-    const used = new Set<string>(["index.html"]);
-    this.pageHrefs = new Map(
-      pages.map((p, index) => {
-        if (p.id === homeId) return [p.id, "index.html"];
-        const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
-        let name = `${slug}.html`;
-        for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
-        used.add(name);
-        return [p.id, name];
-      }),
-    );
+    this.pageHrefs = pageFileNames(pages);
   }
 
   private resolveHref(href: string): string {

@@ -17,7 +17,8 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { DynamicPagesView, FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { DynamicPagesPane } from "./DynamicPagesPane";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
@@ -171,18 +172,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       />
     );
   } else if (ws.tab === "dynamic-pages") {
-    body = (
-      <DynamicPagesView
-        collection={collection}
-        records={panel.records}
-        onSave={async (pattern) => {
-          if (!composer) return;
-          /* Empty clears the binding rather than storing "" — a collection
-             with an empty pattern is one that generates nothing. */
-          await composer.cms.collections.updateCollection(collection.id, { pageSlugPattern: pattern || undefined });
-        }}
-      />
-    );
+    body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
   } else {
     body = null;
   }

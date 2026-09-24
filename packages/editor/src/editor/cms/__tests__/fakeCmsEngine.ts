@@ -35,6 +35,10 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
     elements: {
       getAllElements: () => elements,
       getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,
+      getAllPages: () => [
+        { id: "p-home", name: "Home", slug: "home", isHome: true },
+        { id: "p-item", name: "Menu item", slug: "menu-item" },
+      ],
     },
     selection: { select: vi.fn() },
     data: {
