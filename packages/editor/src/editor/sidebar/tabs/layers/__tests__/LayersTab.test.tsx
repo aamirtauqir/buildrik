@@ -97,6 +97,11 @@ describe("LayersTab — header ⋯ menu", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("4418:79546 — the count footer carries the ⓘ dim-scope explainer", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.getByLabelText("About dimmed layers")).toBeTruthy();
+  });
+
   it("the 700 wide view survives as a ⋯ row (no header button on the v3 board)", () => {
     const onExpandToggle = vi.fn();
     render(<LayersTab composer={null} isExpanded={false} onExpandToggle={onExpandToggle} />);

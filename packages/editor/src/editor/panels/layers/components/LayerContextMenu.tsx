@@ -64,7 +64,10 @@ export function LayerContextMenu({
   /* How many elements the rows below act on. */
   const count = inSelection && selectedCount >= 2 ? selectedCount : 1;
   const multi = count >= 2;
-  const suffix = multi ? ` · ${elementsLabel(count)}` : "";
+  /* 4418:79546 names the target on every row that acts on it ("Cut ·
+     Heading"); a selection reads "· 3 elements" (6881:71323). */
+  const name = nodeName.charAt(0).toUpperCase() + nodeName.slice(1);
+  const suffix = ` · ${multi ? elementsLabel(count) : name}`;
 
   return (
     <div
@@ -76,11 +79,10 @@ export function LayerContextMenu({
       role="menu"
       aria-label={multi ? `Actions for ${elementsLabel(count)}` : `Actions for ${nodeName}`}
     >
-      {/* Board 1082:4527 / 6881:71323: Cut · Copy · Paste | Copy link ·
-          Duplicate · Delete | Rename · Group. Plain 28h rows, no kbd hints,
-          no icons. Hide/Lock live on the row's own 👁🔒; reordering is drag.
-          "Move to page…" waits for real backing — a dead item is worse than a
-          missing one. */}
+      {/* Board 4418:79546 / 6881:71323: Cut · Copy · Paste | Duplicate ·
+          Delete | Rename · Group | Move to page… · Copy link. Plain 28h rows,
+          no kbd hints, no icons. Hide/Lock live on the row's own eye/lock;
+          reordering is drag. */}
       <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-cut"
         onClick={() => act("cut")}>
         Cut{suffix}
@@ -100,12 +102,6 @@ export function LayerContextMenu({
         Paste
       </Button>
       <div className="bdc-menu-sep" data-testid="layer-menu-sep" />
-      {/* Board 1082:4527 draws "Copy link" — a URL that reopens the editor with
-          this element selected. One element, always: a link cannot select three. */}
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy-link"
-        onClick={() => act("copyLink")}>
-        Copy link
-      </Button>
       <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-duplicate"
         onClick={() => act("duplicate")}>
         Duplicate{suffix}
@@ -123,7 +119,7 @@ export function LayerContextMenu({
         data-testid="layer-menu-rename"
         onClick={() => act("rename")}
       >
-        Rename
+        Rename{multi ? "" : suffix}
       </Button>
       <Button
         className="bdc-menu-item"
@@ -134,6 +130,17 @@ export function LayerContextMenu({
         onClick={() => act("group")}
       >
         Group{suffix}
+      </Button>
+      <div className="bdc-menu-sep" />
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-move-to-page"
+        onClick={() => act("moveToPage")}>
+        Move to page…{suffix}
+      </Button>
+      {/* A URL that reopens the editor with the CLICKED element selected —
+          one element even inside a selection: a link cannot select three. */}
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy-link"
+        onClick={() => act("copyLink")}>
+        Copy link · {name}
       </Button>
     </div>
   );

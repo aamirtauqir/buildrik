@@ -342,7 +342,7 @@
    ========================================================================== */
 
 .bdc-menu {
-  /* Board 1082:4564: 140w card, radius 8, 4px vertical padding only — items
+  /* Board 1082:4564: card, radius 8, 4px vertical padding only — items
      run full-bleed. The 180 here (and the comment claiming the board said so)
      was stale: re-extracted 2026-09-08 the frame is w-[140px], and the widest
      label, "Group selection", is ~103px at 13px + 24 of inset. `13px/normal`,
@@ -353,7 +353,9 @@
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
   padding: var(--bk-space-4) 0;
-  width: 140px;
+  /* v3 4418:79546: 224 wide — every row now names its target ("Move to
+     page… · Heading"), which the V1 140 frame wrapped onto two lines. */
+  width: 224px;
   font: 400 13px/normal var(--bk-font-ui);
 }
 
@@ -374,6 +376,9 @@
   cursor: pointer;
   width: 100%;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bdc-menu-item:hover { background: var(--bk-bg-subtle); }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }

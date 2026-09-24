@@ -43,11 +43,24 @@ describe("LayerContextMenu — 3 selected, clicked row inside", () => {
       ["layer-menu-duplicate", "Duplicate · 3 elements"],
       ["layer-menu-delete", "Delete · 3 elements"],
       ["layer-menu-group", "Group · 3 elements"],
+      ["layer-menu-move-to-page", "Move to page… · 3 elements"],
     ]) {
       expect(screen.getByTestId(id)).toHaveTextContent(text);
     }
     expect(screen.getByTestId("layer-menu-paste")).toHaveTextContent(/^Paste$/);
-    expect(screen.getByTestId("layer-menu-copy-link")).toHaveTextContent(/^Copy link$/);
+    // The link is the clicked row's, even inside a selection.
+    expect(screen.getByTestId("layer-menu-copy-link")).toHaveTextContent(/^Copy link · Heading$/);
+  });
+
+  it("4418:79546 order: Cut Copy Paste | Duplicate Delete | Rename Group | Move to page… Copy link", () => {
+    mount({ inSelection: false });
+    const rows = screen.getAllByRole("menuitem").map((b) => b.getAttribute("data-testid"));
+    expect(rows).toEqual([
+      "layer-menu-cut", "layer-menu-copy", "layer-menu-paste",
+      "layer-menu-duplicate", "layer-menu-delete",
+      "layer-menu-rename", "layer-menu-group",
+      "layer-menu-move-to-page", "layer-menu-copy-link",
+    ]);
   });
 
   it("Rename stands down (one layer at a time); Group is live", () => {
@@ -65,18 +78,19 @@ describe("LayerContextMenu — 3 selected, clicked row inside", () => {
 });
 
 describe("LayerContextMenu — clicked row outside the selection", () => {
-  it("is the single row's menu: no counts, Rename live, Group off", () => {
+  it("is the single row's menu: rows name the layer (4418:79546), Rename live, Group off", () => {
     mount({ inSelection: false });
     expect(screen.getByRole("menu", { name: "Actions for Heading" })).toBeTruthy();
-    expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut$/);
-    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete$/);
+    expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut · Heading$/);
+    expect(screen.getByTestId("layer-menu-delete")).toHaveTextContent(/^Delete · Heading$/);
+    expect(screen.getByTestId("layer-menu-move-to-page")).toHaveTextContent(/^Move to page… · Heading$/);
     expect(screen.getByTestId("layer-menu-rename")).not.toBeDisabled();
     expect(screen.getByTestId("layer-menu-group")).toBeDisabled();
   });
 
   it("one row selected reads the same way", () => {
     mount({ selectedCount: 1, inSelection: true });
-    expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut$/);
+    expect(screen.getByTestId("layer-menu-cut")).toHaveTextContent(/^Cut · Heading$/);
     expect(screen.getByTestId("layer-menu-group")).toBeDisabled();
   });
 });

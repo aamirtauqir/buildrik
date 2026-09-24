@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -70,6 +70,10 @@ export interface LayersTabProps {
 }
 
 const LAYERS_SEARCH_PLACEHOLDER = "Search layers…";
+const DIM_SCOPE_TIP =
+  "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
+/* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
+const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]";
 
 /* Escape closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
@@ -271,6 +275,18 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             {stats.selected >= 2
               ? `${stats.selected} selected of ${stats.total}`
               : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+          </span>
+          {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
+              dims the element for you; the published site still shows it. */}
+          <span className="tw:ml-auto tw:flex">
+            <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-[240px] tw:whitespace-normal">
+              <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </IconButton>
+            </Tooltip>
           </span>
         </div>
       )}

@@ -11,12 +11,13 @@ import { LayersEmptyState } from "./components/LayersEmptyState";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
 import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
+import { MoveToPageDialog } from "./components/MoveToPageDialog";
 import { LayersScrollThumb } from "./components/LayersScrollThumb";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
-import { getDisplayName } from "./data/layerUtils";
+import { findById as findLayer, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
@@ -321,7 +322,41 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [state, onLayerHover]);
 
   const requestDeleteSelection = React.useCallback(() => setDeleteSelectionOpen(true), []);
-  const handleContextAction = useLayerContextActions(state, { requestDeleteSelection });
+  /* "Move to page…" (4418:82847): the ids being moved, while the picker is open. */
+  const [moveIds, setMoveIds] = React.useState<string[] | null>(null);
+  const handleContextAction = useLayerContextActions(state, { requestDeleteSelection, requestMoveToPage: setMoveIds });
+  const activePage = composer?.elements.getActivePage?.();
+  const otherPages = React.useMemo(
+    () =>
+      moveIds
+        ? (composer?.elements.getAllPages?.() ?? []).filter((p) => p.id !== activePage?.id).map((p) => ({ id: p.id, name: p.name }))
+        : [],
+    [composer, moveIds, activePage?.id]
+  );
+  const moveSubject = React.useMemo(() => {
+    if (!moveIds) return "";
+    if (moveIds.length >= 2) return elementsLabel(moveIds.length);
+    /* The menu's own name for the row ("Heading"), so the title matches the
+       row that was clicked. */
+    const node = findLayer(state.layers, moveIds[0]);
+    const name = state.actionsHook.customNames.get(moveIds[0]) ?? node?.type ?? "element";
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }, [moveIds, state.layers, state.actionsHook.customNames]);
+  const confirmMoveToPage = React.useCallback(
+    (pageId: string) => {
+      if (!moveIds) return;
+      const target = otherPages.find((p) => p.id === pageId)?.name ?? "the page";
+      const subject = moveSubject;
+      setMoveIds(null);
+      if (!state.actionsHook.moveToPage(moveIds, pageId)) return;
+      state.selectionHook.clearSelection();
+      addToast({
+        description: `${subject} moved to ${target}`,
+        action: { label: "Undo", onClick: () => composer?.history.undo() },
+      });
+    },
+    [moveIds, otherPages, moveSubject, state.actionsHook, state.selectionHook, addToast, composer]
+  );
 
   /* The names the confirm reads out ("This removes Heading, Subtitle and
      Menu previews."), in tree order. */
@@ -414,6 +449,14 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
         tone="destructive"
         testId="layers-delete-selection"
+      />
+      <MoveToPageDialog
+        open={moveIds !== null}
+        subject={moveSubject}
+        fromPage={activePage?.name ?? "this page"}
+        pages={otherPages}
+        onMove={confirmMoveToPage}
+        onClose={() => setMoveIds(null)}
       />
       {/* Clean Tree View - Maximum space for content. Wrapped so
           LayersScrollThumb (board 1082:4835) can sit OUTSIDE the scrollable
