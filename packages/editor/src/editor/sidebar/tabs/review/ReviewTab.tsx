@@ -312,19 +312,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
      (G1-058/059). Compare / Round history have their own doors below.
-     "Copy review link" (B3) needs the round's token, which `currentRound`
+     "Open current review link" needs the round's token, which `currentRound`
      carries only while the client's link still opens — so the row is drawn
      only then (post-Oct-1 R4). */
   const liveToken = round?.token ?? null;
-  const copyReviewLink = async (token: string) => {
+  const openReviewLink = (token: string) => {
     setRoundMenuOpen(false);
-    try {
-      await navigator.clipboard.writeText(reviewLinkUrl(token));
-      setNotice("Review link copied");
-    } catch {
-      setNotice("Couldn't copy the review link.");
-    }
+    window.open(reviewLinkUrl(token), "_blank", "noopener,noreferrer");
   };
+
   const roundMenu =
     round && !round.revoked ? (
       <Popover
@@ -349,7 +345,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       >
         <Menu label="Review actions">
           {liveToken ? (
-            <MenuItem onClick={() => void copyReviewLink(liveToken)}>Copy review link</MenuItem>
+            <MenuItem onClick={() => openReviewLink(liveToken)}>Open current review link</MenuItem>
           ) : null}
           {onResend ? (
             <MenuItem
