@@ -5,15 +5,16 @@
  *
  * Key and Type are locked while something is bound to the field — the note
  * under USED BY says why. A key change moves every record's value with it
- * (CollectionManager.updateField). Per-type validation editing is G3-071
- * part 2; the rule is summarised here until then.
+ * (CollectionManager.updateField). VALIDATION edits the rules the type can
+ * carry — a number's range, text's length — which publish enforces; a
+ * reference also names its collection.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import { X } from "lucide-react";
 import type { Composer } from "@/engine";
-import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType, CMSFieldValidation } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, IconButton, Select, TextInput } from "@/editor/chrome-ui";
 import { cmsWorkspace } from "./cmsWorkspaceStore";
 import { FIELD_TYPES, FIELD_TYPE_LABEL } from "./fieldTypes";
@@ -35,20 +36,47 @@ const KEY_RE = /^[a-z][a-z0-9_-]*$/;
 /** The header glyph before the field name ("# Price"). */
 const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/" };
 
-function ruleSummary(v: CMSFieldValidation | undefined): string {
-  if (!v) return "None";
-  const parts: string[] = [];
-  if (v.min !== undefined) parts.push(`Min ${v.min}`);
-  if (v.max !== undefined) parts.push(`Max ${v.max}`);
-  if (v.minLength !== undefined) parts.push(`At least ${v.minLength} characters`);
-  if (v.maxLength !== undefined) parts.push(`At most ${v.maxLength} characters`);
-  if (v.pattern) parts.push(v.patternMessage || `Matches ${v.pattern}`);
-  return parts.length ? parts.join(" · ") : "None";
+/** The rules each type can carry (CMSFieldValidation, enforced on publish by
+ *  validateFieldValue): numbers take a range, text a length. */
+const RULES: Record<string, Array<{ key: "min" | "max" | "minLength" | "maxLength"; label: string }>> = {
+  number: [{ key: "min", label: "Min" }, { key: "max", label: "Max" }],
+  text: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
+  textarea: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
+  richtext: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
+  slug: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
+};
+
+/** One numeric rule, saved on blur / Enter; empty clears it. */
+function RuleInput({ id, value, onCommit }: { id: string; value: number | undefined; onCommit: (v: number | undefined) => void }) {
+  const [draft, setDraft] = React.useState(value === undefined ? "" : String(value));
+  React.useEffect(() => setDraft(value === undefined ? "" : String(value)), [value]);
+  const commit = () => {
+    const t = draft.trim();
+    const next = t === "" ? undefined : Number(t);
+    if (next !== undefined && Number.isNaN(next)) return setDraft(value === undefined ? "" : String(value));
+    if (next !== value) onCommit(next);
+  };
+  return (
+    <TextInput
+      id={id}
+      sizing="sm"
+      type="number"
+      className={CONTROL}
+      placeholder="None"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => e.key === "Enter" && commit()}
+      data-testid={id}
+    />
+  );
 }
 
 export interface FieldInspectorProps {
   composer: Composer | null;
   collection: CMSCollection;
+  /** Every collection — a reference field's target. */
+  collections: CMSCollection[];
   field: CMSField;
   records: CMSContentItem[];
   uses: FieldUse[];
@@ -57,7 +85,7 @@ export interface FieldInspectorProps {
   onOpenUse: (elementId: string) => void;
 }
 
-export function FieldInspector({ composer, collection, field, records, uses, onClose, onDeleteField, onOpenUse }: FieldInspectorProps) {
+export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse }: FieldInspectorProps) {
   const [name, setName] = React.useState(field.name);
   const [key, setKey] = React.useState(field.slug);
   const [deleting, setDeleting] = React.useState(false);
@@ -147,6 +175,25 @@ export function FieldInspector({ composer, collection, field, records, uses, onC
             data-testid="cms-fi-key"
           />
         </div>
+        {field.type === "reference" ? (
+          <div className={ROW}>
+            <label className={ROW_LABEL} htmlFor="cms-fi-collection">Collection</label>
+            <Select
+              id="cms-fi-collection"
+              sizing="sm"
+              className={CONTROL}
+              value={field.referenceCollection ?? ""}
+              disabled={bound}
+              onChange={(e) => update({ referenceCollection: e.target.value || undefined })}
+              data-testid="cms-fi-collection"
+            >
+              <option value="">Choose a collection…</option>
+              {collections.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </Select>
+          </div>
+        ) : null}
         {keyError ? (
           <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-key-error">
             {keyError}
@@ -161,10 +208,21 @@ export function FieldInspector({ composer, collection, field, records, uses, onC
         </div>
 
         <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Validation</h4>
-        <div className={ROW}>
-          <span className={ROW_LABEL}>Rule</span>
-          <p className={TEXT} data-testid="cms-fi-rule">{ruleSummary(field.validation)}</p>
-        </div>
+        {(RULES[field.type] ?? []).map((r) => (
+          <div key={r.key} className={ROW}>
+            <label className={ROW_LABEL} htmlFor={`cms-fi-rule-${r.key}`}>{r.label}</label>
+            <RuleInput
+              id={`cms-fi-rule-${r.key}`}
+              value={field.validation?.[r.key]}
+              onCommit={(v) => update({ validation: { ...field.validation, [r.key]: v } })}
+            />
+          </div>
+        ))}
+        {RULES[field.type] ? null : (
+          <p className={`${TEXT} tw:text-[var(--bk-ink-muted)]`} data-testid="cms-fi-rule-none">
+            {FIELD_TYPE_LABEL[field.type] ?? field.type} fields take no rules beyond Required.
+          </p>
+        )}
 
         <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Used by</h4>
         {bound ? (

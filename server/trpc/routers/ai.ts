@@ -21,7 +21,7 @@ import {
   releaseQuota,
   resolveModelForUser,
 } from "../../services/quota.service";
-import { modelSchema, DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
+import { modelSchema, DEFAULT_MODEL, aiQuotaSchema } from "@buildrik/shared/schemas/ai";
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 
@@ -270,8 +270,12 @@ export const aiRouter = router({
       }
     }),
 
-  getQuotaStatus: protectedProcedure.query(async ({ ctx }) => {
-    return checkQuota(ctx.session.user.id);
+  /* G2-129: the AI panel's "N of M today · resets …". Per-user, like the limit
+     it reports (any signed-in member; nothing site-scoped to gate on). Was
+     `getQuotaStatus` returning the same numbers plus `ok`, with no caller. */
+  quota: protectedProcedure.output(aiQuotaSchema).query(async ({ ctx }) => {
+    const { used, limit, resetsAt } = await checkQuota(ctx.session.user.id);
+    return { used, limit, resetsAt };
   }),
 
   streamPrompt: protectedProcedure
