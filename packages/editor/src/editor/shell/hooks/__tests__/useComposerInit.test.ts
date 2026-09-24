@@ -381,6 +381,10 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
     const runOrder = mockComposer.migration.run.mock.invocationCallOrder[0];
     const importOrder = mockComposer.importProject.mock.invocationCallOrder[0];
     expect(runOrder).toBeLessThan(importOrder);
+
+    // Walk A2: a migration that moved the version schedules the save that
+    // persists it — without it the modal ran on every open.
+    expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", { reason: "ds-migration" });
   });
 
   it("v=1 already-current project: no version bump, importProject gets unchanged data", async () => {
