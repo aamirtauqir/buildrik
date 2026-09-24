@@ -69,9 +69,10 @@ interface AssetDetailOverlayProps {
 const ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 tw:font-normal " +
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
-const ROW_CHEVRON = "tw:text-[13px] tw:text-[var(--bk-ink-muted)]";
-const ROW_COUNT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
+/* Board 4418:61698: the nav rows end in a 12px ink › in a 24 box, and
+   Versions' count is 11/400 ink beside it. */
+const ROW_CHEVRON = "tw:flex tw:w-6 tw:shrink-0 tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]";
+const ROW_COUNT = "tw:text-[11px] tw:font-normal tw:tabular-nums tw:text-[var(--bk-ink)]";
 /**
  * True when another modal dialog is VISIBLE above `el` — i.e. one this surface
  * opened. Escape belongs to the topmost layer, not to us.
@@ -96,7 +97,7 @@ function isCoveredByModal(el: HTMLElement): boolean {
 /* Button's `link` variant supplies the recipe; the row's own geometry
    (full-width 36h nav row) stays here. */
 const BACK_ROW =
-  "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left";
+  "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left tw:text-[14px] tw:font-normal tw:text-[var(--bk-ink)]";
 
 export function AssetDetailOverlay({
   item,
@@ -525,7 +526,7 @@ export function AssetDetailOverlay({
                     title={a.blocked}
                     onClick={() => a.fn?.(item)}
                   >
-                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
+                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[14px]">
                       <span aria-hidden="true" className="tw:flex tw:text-[var(--bk-ink-soft)]">{a.icon}</span>
                       <span className="tw:truncate">{a.label}</span>
                     </span>
