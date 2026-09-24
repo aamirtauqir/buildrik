@@ -257,6 +257,11 @@ describe("generateLabelFromEntry", () => {
 });
 
 describe("formatTransactionLabel", () => {
+  it("passes a sentence label through as written", () => {
+    expect(formatTransactionLabel("Added Heading")).toBe("Added Heading");
+    expect(formatTransactionLabel("Auto-fix contrast")).toBe("Auto-fix contrast");
+  });
+
   it("maps all known transaction labels", () => {
     const expectations: Array<[string, string]> = [
       ["apply-template", "Applied template"],

@@ -42,9 +42,10 @@ export const MODAL_FOOT_CLASS =
   "tw:[&_button]:rounded-lg tw:[&_button]:text-[13px] tw:[&_button]:font-medium";
 
 /** width/dialog-md 560 is the default; New page draws width/dialog-lg 640;
- *  Backup failed (4428:151964) draws width/dialog-sm 480; "wide" is the board
- *  token width/dialog-xl 960 (Permissions, 4418:133026) — named apart because
- *  "xl" here was already 720. */
+ *  the republish confirm family (4418:73440 / 73452 / 73462) and Backup failed
+ *  (4428:151964) draw width/dialog-sm 480; "wide" is the board token
+ *  width/dialog-xl 960 (Permissions, 4418:133026) — named apart because "xl"
+ *  here was already 720. */
 export type ModalWidth = "sm" | "md" | "lg" | "xl" | "wide";
 const WIDTH_CLASS: Record<ModalWidth, string> = {
   sm: "tw:w-[var(--bk-size-dialog-sm)]",

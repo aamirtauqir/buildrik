@@ -103,6 +103,17 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
   for (const [id, label, fn, keywords] of nav) {
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
+  /* The Permissions dialog's door for every role but a viewer (whose door is
+     the inspector notice) — and, for the owner, the way to delete the site
+     (5905:44701). "More", so it shows only once typed: 4418:141220's opening
+     list does not draw it. */
+  commands.push({
+    id: "nav-permissions",
+    label: "Permissions",
+    group: "More",
+    keywords: ["role", "access", "delete site"],
+    handler: run(() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)),
+  });
 
   if (!composer) return commands;
 

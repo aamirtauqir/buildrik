@@ -173,8 +173,10 @@ describe("PublishTab — board 784:4403 build log", () => {
     renderFailed(STEPS);
     await waitFor(() => expect(screen.getByText("Publish failed.")).toBeTruthy());
     fireEvent.click(screen.getByRole("button", { name: "View log" }));
-    fireEvent.click(screen.getByRole("button", { name: "Hide log" }));
-    expect(screen.queryByLabelText("Build log")).toBeNull();
+    // 4418:98003: the log is a dialog closed by "Back to publish".
+    expect(screen.getByTestId("publish-log")).toHaveTextContent(/Attempt failed at step \d+ of \d+\./);
+    fireEvent.click(screen.getByRole("button", { name: "Back to publish" }));
+    await waitFor(() => expect(screen.queryByLabelText("Build log")).toBeNull());
   });
 
   it("hides the link entirely when there are no steps", async () => {

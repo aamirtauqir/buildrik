@@ -37,7 +37,9 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
       }
 
       setIsInsertingBlock(true);
-      composer.beginTransaction("insert-block-sidebar");
+      /* The row names what was added ("Added Heading"), not "Added block" —
+         History › Session read "Added block · You" three times over. */
+      composer.beginTransaction(block.label ? `Added ${block.label}` : "insert-block-sidebar");
       try {
         const page = composer.elements.getActivePage();
         if (!page) {

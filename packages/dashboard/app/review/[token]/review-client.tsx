@@ -137,6 +137,9 @@ export function ReviewClient({ token }: { token: string }) {
      error outside them, still gets the global toast. */
   const comment = trpc.clientReview.comment.useMutation({ onError: HANDLED_IN_PAGE });
   const resolve = trpc.clientReview.resolve.useMutation({ onError: HANDLED_IN_PAGE });
+  /* F · "Request a new link" (4418:121971 → 122159): tells the agency; the
+     page then says so. A failure reads under the buttons, not as a toast. */
+  const requestLink = trpc.clientReview.requestNewLink.useMutation({ onError: HANDLED_IN_PAGE });
   // The client's own notes, so the page isn't write-only — they see what they
   // already said. Only fetched once identified (the router requires it).
   const comments = trpc.clientReview.comments.useQuery(
@@ -160,10 +163,15 @@ export function ReviewClient({ token }: { token: string }) {
 
   if (review.isLoading) {
     return (
-      <Shell agency="Loading" crumb={null} round={null}>
-        <Card>
-          <p className="text-[13px] text-[#6B7280]">Opening your review…</p>
-        </Card>
+      /* Boards 4418:122048 / 122085 / 122122: no card — one bold line on the
+         page, where the snapshot will land. The boards step through three
+         checks ("1 of 3"…); this page makes ONE request, so it names the
+         first check and does not count steps it cannot observe. The header
+         stays empty until the review says whose it is. */
+      <Shell agency="" crumb={null} round={null}>
+        <div className="mx-auto w-full max-w-[624px] flex-1 px-6 pt-[182px]" role="status" aria-live="polite">
+          <p className="text-[16px] font-semibold leading-6 text-[#111827]">Checking your access…</p>
+        </div>
       </Shell>
     );
   }
@@ -183,6 +191,11 @@ export function ReviewClient({ token }: { token: string }) {
       | undefined;
     const code = review.error.data?.code ?? "NOT_FOUND";
     const copy = DEAD_LINK_COPY[cause?.reason ?? ""] ?? DEAD_LINK_COPY[code] ?? DEAD_LINK_COPY.NOT_FOUND;
+    /* Only a link that resolved to a real round can be replaced — a malformed
+       one names no agency to ask. */
+    const canRequest = cause?.reason === "REVOKED" || cause?.reason === "EXPIRED";
+    const agencyName = cause?.agencyName ?? "your designer";
+    const requested = requestLink.isSuccess;
     return (
       <Shell
         agency={cause?.agencyName ?? "Buildrick"}
@@ -190,12 +203,36 @@ export function ReviewClient({ token }: { token: string }) {
         round={cause?.roundNumber ? `Round ${cause.roundNumber}` : null}
       >
         <Card>
-          <CardText title={copy.title} body={copy.body(cause?.agencyName ?? "your designer")} />
+          {requested ? (
+            <CardText
+              title="We asked for a new link"
+              body={`Your request went to ${agencyName} just now. They will email you a new review link${
+                cause?.roundNumber ? ` for Round ${cause.roundNumber}` : ""
+              }. Nothing you sent before was lost — your earlier notes are still with your designer.`}
+            />
+          ) : (
+            <CardText title={copy.title} body={copy.body(agencyName)} />
+          )}
           <div className="mt-4 flex gap-3">
             <Button variant="ghost" size="sm" className={`${TEXT_ACTION} ${COMPACT}`} onClick={() => void review.refetch()}>
               Try this link again
             </Button>
+            {canRequest && !requested ? (
+              <Button
+                size="sm"
+                className={COMPACT}
+                disabled={requestLink.isPending}
+                onClick={() => requestLink.mutate({ token })}
+              >
+                Request a new link
+              </Button>
+            ) : null}
           </div>
+          {requestLink.isError ? (
+            <p className="mt-2 text-[12px] text-[#C81E1E]" role="alert">
+              Couldn&apos;t send the request. Try again in a moment.
+            </p>
+          ) : null}
         </Card>
       </Shell>
     );

@@ -120,12 +120,14 @@ export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOp
       () =>
         addToast({
           title: "Link copied",
-          description: "The preview link is on your clipboard. Anyone with it can view this site.",
+          description: `The preview link is on your clipboard. Anyone with it can view the saved design of ${
+            pageName || "this site"
+          } — no editing access.`,
           tone: "success",
         }),
       () => addToast({ description: "Couldn't copy the link", tone: "error" }),
     );
-  }, [url, addToast]);
+  }, [url, addToast, pageName]);
 
   const page = pageName || "this page";
   const subtitle = [siteName, pageName, "current saved design"].filter(Boolean).join(" · ");

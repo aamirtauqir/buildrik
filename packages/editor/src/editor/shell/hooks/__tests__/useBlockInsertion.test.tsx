@@ -170,7 +170,8 @@ describe("useBlockInsertion", () => {
     const { result } = mountHook();
     act(() => result.current.handleBlockClick(heroBlock));
 
-    expect(composer.beginTransaction).toHaveBeenCalledWith("insert-block-sidebar");
+    /* The history row names the block (time-travel P0: "Added block · You" ×3). */
+    expect(composer.beginTransaction).toHaveBeenCalledWith(`Added ${heroBlock.label}`);
     expect(mocks.insertBlock).toHaveBeenCalledWith(
       composer,
       expect.objectContaining({ id: "hero" }),

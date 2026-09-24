@@ -377,6 +377,13 @@ export const EVENTS = {
    *  the site menu and a ⌘K command reach it through this instead. Handled
    *  in AquibraStudio, which owns the panel. */
   UI_OPEN_ISSUES: "ui:open-issues",
+  /** Open the Permissions dialog for the signed-in role (boards 4418:133026
+   *  viewer, 5905:44701 owner). The viewer notice opens its own; every other
+   *  role reaches it from ⌘K "Permissions". `PermissionsHost` listens. */
+  UI_OPEN_PERMISSIONS: "ui:open-permissions",
+  /** Toggle History time-travel (4418:74736). ⌃⇧T is bound globally by
+   *  `TimeTravelHost`, the only listener; History ⋯ › Time-Travel emits this. */
+  UI_TIME_TRAVEL_TOGGLE: "ui:time-travel-toggle",
   /** Open the one Compare (B8) on two sides. Every Compare door emits this;
    *  `CompareHost`, mounted by the shell, is the only listener. */
   UI_COMPARE_OPEN: "ui:compare-open",
@@ -945,6 +952,8 @@ export interface EventPayloads {
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.UI_OPEN_ISSUES]: void;
+  [EVENTS.UI_OPEN_PERMISSIONS]: void;
+  [EVENTS.UI_TIME_TRAVEL_TOGGLE]: void;
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
   /** `query` pre-fills the field (a drawer re-announcing its live query). */
   [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string; query?: string } | null;
