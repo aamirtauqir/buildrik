@@ -332,27 +332,27 @@ describe("actions", () => {
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
   });
 
-  /* B3 / post-Oct-1 R4: the live client link is copyable from the ⋯ menu —
-     only while `currentRound` carries its token (live, not revoked/expired). */
-  it("the ⋯ menu copies the live client review link", async () => {
-    const writeText = vi.fn(() => Promise.resolve());
-    Object.assign(navigator, { clipboard: { writeText } });
+  /* Board 7071:79114 / post-Oct-1 R4: "Open current review link" opens the
+     live client link — only while `currentRound` carries its token (live,
+     not revoked/expired). */
+  it("the ⋯ menu opens the current client review link", async () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
     fetchCurrentRound.mockResolvedValue({ ...ROUND, token: "tok_1" });
     renderTab();
     await screen.findByText(/hero photo is too dark/);
     fireEvent.click(screen.getByTestId("review-round-menu"));
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Copy review link" }));
-    await waitFor(() => expect(writeText).toHaveBeenCalledWith("https://app.test/review/tok_1"));
-    expect(await screen.findByText("Review link copied")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Open current review link" }));
+    expect(open).toHaveBeenCalledWith("https://app.test/review/tok_1", "_blank", "noopener,noreferrer");
+    open.mockRestore();
   });
 
-  it("offers no Copy review link when the round has no live token", async () => {
+  it("offers no Open current review link when the round has no live token", async () => {
     fetchCurrentRound.mockResolvedValue({ ...ROUND, token: null });
     renderTab();
     await screen.findByText(/hero photo is too dark/);
     fireEvent.click(screen.getByTestId("review-round-menu"));
     await screen.findByRole("menuitem", { name: "Revoke link" });
-    expect(screen.queryByRole("menuitem", { name: "Copy review link" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Open current review link" })).not.toBeInTheDocument();
   });
 
   it("the ⋯ menu's Re-send opens the same modal", async () => {
