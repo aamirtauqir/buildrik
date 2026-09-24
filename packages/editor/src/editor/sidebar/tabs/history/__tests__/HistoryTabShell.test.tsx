@@ -22,14 +22,14 @@ vi.mock("../../../../panels/VersionHistoryPanel", () => ({
 }));
 
 vi.mock("../components/ActivityView", () => ({
-  ActivityView: ({ onOpenTimeTravel }: { onOpenTimeTravel?: () => void }) => (
-    <div data-testid="activity-view">
-      <button data-testid="tt-trigger" onClick={() => onOpenTimeTravel?.()}>
-        open-tt
-      </button>
-    </div>
-  ),
+  ActivityView: () => <div data-testid="activity-view" />,
 }));
+
+/** Board 4418:73791: Time-Travel and search live behind the panel ⋯. */
+const openMenuItem = (name: RegExp | string) => {
+  fireEvent.click(screen.getByTestId("history-menu"));
+  fireEvent.click(screen.getByRole("menuitem", { name }));
+};
 
 vi.mock("../components/ActivityLogView", () => ({
   ActivityLogView: ({ onOpenRow }: { onOpenRow?: (k: "edit" | "comment" | "publish") => void }) => (
@@ -171,8 +171,10 @@ describe("HistoryTab shell", () => {
     expect(screen.queryByTestId("saves-panel")).toBeNull();
   });
 
-  it("renders prototype search-bar markup with a search-icon", () => {
+  it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {
     const { container } = renderTab();
+    expect(container.querySelector(".search-bar")).toBeNull();
+    openMenuItem(/^Search /);
     expect(container.querySelector(".search-bar")).toBeTruthy();
     expect(container.querySelector(".search-input")).toBeTruthy();
     expect(container.querySelector(".search-icon")).toBeTruthy();
@@ -209,11 +211,11 @@ describe("HistoryTab shell", () => {
     expect(screen.getByTestId("activity-view")).toBeInTheDocument();
   });
 
-  it("toggles the Time-Travel scrubber when the activity view requests it", () => {
+  it("opens the Time-Travel scrubber from the panel ⋯", () => {
     renderTab();
     showChanges();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
   });
 
@@ -234,8 +236,15 @@ describe("HistoryTab shell", () => {
     renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/ }));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
+  });
+
+  it("⋯ › Clear undo history… is there, and inert with nothing to undo", () => {
+    renderTab();
+    fireEvent.click(screen.getByTestId("history-menu"));
+    const item = screen.getByRole("menuitem", { name: /Clear undo history/ });
+    expect(item.hasAttribute("disabled") || item.getAttribute("aria-disabled") === "true").toBe(true);
   });
 });
 
@@ -358,7 +367,7 @@ describe("HistoryTab — board 163:113 preview band", () => {
 
   const openScrubber = () => {
     fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    openMenuItem(/^Time-Travel/);
   };
 
   it("says nothing until the scrubber reports what it is previewing", () => {

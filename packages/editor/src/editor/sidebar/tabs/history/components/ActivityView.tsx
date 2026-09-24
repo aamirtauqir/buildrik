@@ -24,7 +24,6 @@ import {
   groupByDate,
   type CollapsedChange,
 } from "../helpers";
-import { TimeTravelIcon } from "../icons";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
 const MAX_VISIBLE_CHANGES = 5;
@@ -114,23 +113,14 @@ const STYLE_SHOW_ALL_BTN: React.CSSProperties = {
 
 const STYLE_VIRTUAL_HOST: React.CSSProperties = { flex: 1, minHeight: 0 };
 
-interface ExtendedActivityViewProps extends ActivityViewProps {
-  /** Open the Time-Travel scrubber drawer */
-  onOpenTimeTravel?: () => void;
-  /** Clear all undo history (with confirm flow handled by parent) */
-  onClearHistory?: () => void;
-  /** Whether undo is currently available — disables Clear when false */
-  canClear?: boolean;
-}
-
-export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
+/* Board 4418:73791 draws the Session list with no header band: "Undo
+   History · Clear · Time-Travel" moved to the History panel's ⋯ (HistoryTab),
+   which owns the clear confirm. */
+export const ActivityView: React.FC<ActivityViewProps> = ({
   composer,
   searchQuery = "",
   error,
   onRetry,
-  onOpenTimeTravel,
-  onClearHistory,
-  canClear,
 }) => {
   const { historyStack, isLoading, canRedo } = useHistoryState(composer);
   const reducedMotion = useReducedMotion();
@@ -138,7 +128,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   const [expandedGroupId, setExpandedGroupId] = React.useState<string | null>(null);
   const [showAllIds, setShowAllIds] = React.useState<Set<string>>(new Set());
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
-  const [confirmingClear, setConfirmingClear] = React.useState(false);
   const [pendingRestoreId, setPendingRestoreId] = React.useState<string | null>(null);
 
   const scrollHostRef = React.useRef<HTMLDivElement | null>(null);
@@ -315,7 +304,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           e.preventDefault();
           setExpandedGroupId(null);
           setShowAllIds(new Set());
-          setConfirmingClear(false);
           break;
       }
     };
@@ -339,15 +327,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
       listRef.current.scrollToItem?.(rowIndex, "smart");
     }
   }, [focusedIndex, rows]);
-
-  const handleClearClick = React.useCallback(() => {
-    if (confirmingClear) {
-      onClearHistory?.();
-      setConfirmingClear(false);
-    } else {
-      setConfirmingClear(true);
-    }
-  }, [confirmingClear, onClearHistory]);
 
   // F4 — Timestamp click = smooth restore with opacity crossfade.
   const cancelPendingRestore = React.useCallback(() => {
@@ -474,56 +453,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
       clearCanvasAnim();
     };
   }, [cancelPendingRestore, clearCanvasAnim]);
-
-  const renderHeader = () => (
-    <div className="activity-header">
-      <span className="activity-header-label">Undo History</span>
-      <div style={{ display: "flex", gap: 6 }}>
-        {onClearHistory && (
-          confirmingClear ? (
-            <>
-              <Button
-                onClick={handleClearClick}
-                className="action-btn danger"
-                aria-label="Confirm clear history"
-              >
-                Clear all
-              </Button>
-              <Button
-                onClick={() => setConfirmingClear(false)}
-                className="action-btn"
-                aria-label="Cancel clear"
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={handleClearClick}
-              className="action-btn"
-              disabled={!canClear}
-              aria-label="Clear undo history"
-              title="Clear undo history"
-            >
-              Clear
-            </Button>
-          )
-        )}
-        {onOpenTimeTravel && (
-          <Button
-            type="button"
-            className="tt-btn"
-            onClick={onOpenTimeTravel}
-            aria-label="Open Time-Travel scrubber (Ctrl+Shift+T)"
-            title="Time-Travel (Ctrl+Shift+T)"
-          >
-            <TimeTravelIcon />
-            Time-Travel
-          </Button>
-        )}
-      </div>
-    </div>
-  );
 
   const renderKeyboardHints = () => (
     <div className="keyboard-hints" aria-hidden="true">
@@ -728,7 +657,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   if (error) {
     return (
       <div className="activity-view">
-        {renderHeader()}
         <div className="empty-state" role="alert">
           <div className="empty-icon" aria-hidden="true">⚠</div>
           <p className="empty-title">Failed to load activity</p>
@@ -745,7 +673,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   if (isLoading) {
     return (
       <div className="activity-view">
-        {renderHeader()}
         <div className="virtual-list">
           {[1, 2, 3].map((i) => (
             <div key={i} className="entry-row" aria-hidden="true">
@@ -769,7 +696,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   if (filteredHistory.length === 0) {
     return (
       <div className="activity-view">
-        {renderHeader()}
         <div className="empty-state">
           <div className="empty-icon" aria-hidden="true">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -796,7 +722,6 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
 
   return (
     <div className="activity-view">
-      {renderHeader()}
       <div
         ref={attachScrollHost}
         className="virtual-list"

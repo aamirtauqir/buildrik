@@ -23,7 +23,6 @@ import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const historySrc = readFileSync(join(HERE, "..", "HistoryTab.tsx"), "utf8");
-const activitySrc = readFileSync(join(HERE, "..", "components", "ActivityView.tsx"), "utf8");
 const commandsSrc = readFileSync(
   join(HERE, "..", "..", "..", "..", "..", "engine", "commands", "defaultCommands.ts"),
   "utf8",
@@ -35,11 +34,10 @@ const registryChords = [...commandsSrc.matchAll(/shortcut:\s*"([^"]+)"/g)].map((
 );
 
 describe("Time-Travel chord ownership", () => {
-  it("is printed on the button that opens the scrubber", () => {
-    // Guards the premise: if the label stops printing a chord, this whole
+  it("is printed on the ⋯ row that opens the scrubber", () => {
+    // Guards the premise: if the row stops printing a chord, this whole
     // contract is moot and the test should be revisited, not silently pass.
-    expect(activitySrc).toMatch(/aria-label="Open Time-Travel scrubber \(Ctrl\+Shift\+T\)"/);
-    expect(activitySrc).toMatch(/title="Time-Travel \(Ctrl\+Shift\+T\)"/);
+    expect(historySrc).toMatch(/kbd="⌃⇧T"/);
   });
 
   it("is handled by HistoryTab's own listener", () => {

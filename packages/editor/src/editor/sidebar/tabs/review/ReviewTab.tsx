@@ -973,13 +973,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Add an internal note…"
+          /* Board 4418:115784: the composer is a page comment — the page it
+             lands on is named under it. It stays team-only (the client's
+             review page lists only the client's own notes), so the board's
+             "Shared" is not claimed; designer note logged. */
+          placeholder={`Comment on ${pageName(activePage ?? null)}…`}
           rows={2}
           maxLength={2000}
         />
         {replyError && <span className={META}>Couldn't send that reply. Try again.</span>}
         <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
-          <span className={META}>Replies are internal notes on the thread.</span>
+          <span className={META} data-testid="review-composer-meta">Page comment · {pageName(activePage ?? null)} · team only</span>
           <Button
             size="xs"
             /* Board 4418:115784: Send is the blue primary — disabled is the

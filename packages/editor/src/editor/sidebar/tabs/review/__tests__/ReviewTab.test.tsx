@@ -223,10 +223,10 @@ describe("load states", () => {
 });
 
 describe("actions", () => {
-  it("posts an internal reply then reloads the thread", async () => {
+  it("posts a team-only page comment then reloads the thread", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);
-    fireEvent.change(screen.getByPlaceholderText(/internal note/i), { target: { value: "fixed the contrast" } });
+    fireEvent.change(screen.getByPlaceholderText(/^Comment on /), { target: { value: "fixed the contrast" } });
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
     await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "page-home"));
     await waitFor(() => expect(fetchReviewComments.mock.calls.length).toBeGreaterThan(1));
@@ -319,10 +319,11 @@ describe("actions", () => {
     expect(await screen.findByRole("button", { name: "Send new review" })).toBeInTheDocument();
   });
 
-  it("the note composer says it is internal (G1-056)", async () => {
-    renderTab();
+  it("the composer is the board's page comment, and still says it is team-only (G1-056)", async () => {
+    renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] } } });
     await screen.findByText(/hero photo is too dark/);
-    expect(screen.getByPlaceholderText("Add an internal note…")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Comment on Home…")).toBeInTheDocument();
+    expect(screen.getByTestId("review-composer-meta").textContent).toBe("Page comment · Home · team only");
   });
 
   /* The harness supplies onResend by default, which is exactly why nothing
