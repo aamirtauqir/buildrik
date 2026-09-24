@@ -185,6 +185,11 @@ export class VersionTimelineManager {
    * Set the current user ID for team attribution on versions.
    * Called by the shell when session becomes available.
    */
+  /** The signed-in user's id, so a list can say "You" (G1-075). */
+  getCurrentUserId(): string | null {
+    return this.currentUserId;
+  }
+
   setCurrentUserId(userId: string | null): void {
     this.currentUserId = userId;
   }

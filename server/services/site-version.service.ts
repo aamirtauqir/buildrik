@@ -34,11 +34,20 @@ export async function createSiteVersion(input: CreateSiteVersionInput): Promise<
 }
 
 export async function listSiteVersions(siteId: string) {
-  return prisma.siteVersion.findMany({
+  const rows = await prisma.siteVersion.findMany({
     where: { siteId },
     orderBy: { createdAt: "desc" },
     select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true },
   });
+  /* `createdBy` is a bare user id (no relation on SiteVersion), and the
+     editor's History author filter (G1-075, boards 7291:81049 / 6930:79873)
+     needs a name to show. One lookup for the distinct authors. */
+  const ids = [...new Set(rows.map((r) => r.createdBy).filter((id): id is string => !!id))];
+  const users = ids.length
+    ? await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, displayName: true, fullName: true, email: true } })
+    : [];
+  const nameOf = new Map(users.map((u) => [u.id, u.displayName || u.fullName || u.email]));
+  return rows.map((r) => ({ ...r, createdByName: r.createdBy ? nameOf.get(r.createdBy) ?? null : null }));
 }
 
 export async function getSiteVersion(siteId: string, versionId: string): Promise<unknown | null> {

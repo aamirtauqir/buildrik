@@ -50,6 +50,8 @@ import { ViewerRoleNotice } from "./ViewerRoleNotice";
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
 /** Panels that take the inspector's column instead of the left drawer. */
+/** What a VIEWER's rail opens: inspection surfaces only. */
+const VIEWER_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["layers", "assets"]);
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
 // ============================================================================
 // TYPES
@@ -226,6 +228,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
   const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
   const editorRole = useEditorRole();
+  /* A workspace VIEWER is always in view mode (dashboard redirect), and board
+     4418:126059 still draws the editor chrome for them: the rail, Layers, and
+     the role notice in the inspector column. View mode for anyone else stays
+     the bare canvas (founder call, 2026-08-23). */
+  const viewerChrome = readOnlyView && editorRole === "VIEWER";
   /* A root class, not a prop, because the surfaces that still leak editing
      chrome into view mode are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
@@ -246,8 +253,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     const root = document.documentElement;
     if (!readOnlyView) return;
     root.classList.add("bk-read-only-view");
-    return () => root.classList.remove("bk-read-only-view");
-  }, [readOnlyView]);
+    /* Keeps the rail track for a VIEWER (LayoutShell.css). */
+    if (viewerChrome) root.classList.add("bk-viewer-chrome");
+    return () => root.classList.remove("bk-read-only-view", "bk-viewer-chrome");
+  }, [readOnlyView, viewerChrome]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
   /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
@@ -339,11 +348,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && activeTabId === "content";
-  /* A workspace VIEWER is always in view mode, and board 4418:126059 keeps
-     the column for them: it holds the role notice. */
-  const viewerNotice = readOnlyView && editorRole === "VIEWER";
   const inspectorOpen =
-    viewerNotice || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
+    viewerChrome || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -477,13 +483,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   const handleRailTabChange = React.useCallback(
     (tab: GroupedTabId) => {
+      /* A viewer inspects: Layers, and Assets (view-only since B5). The other
+         rail doors lead to writing surfaces, so they say why instead. */
+      if (viewerChrome && !VIEWER_TABS.has(tab)) {
+        addToast({ description: "View only — adding, pages, CMS and brand edits need an Editor role." });
+        return;
+      }
       // Tab-only switcher. Drawer-toggle lives in LeftSidebar.handleBtnClick;
       // duplicating it here caused both setters to fire setIsLeftPanelOpen(v=>!v)
       // in the same batch, netting zero on different-tab clicks (2-click bug).
       onLeftPanelTabChange?.(tab);
     },
-    [onLeftPanelTabChange]
+    [onLeftPanelTabChange, viewerChrome, addToast]
   );
+
+  /* Board 4418:126059 opens a viewer on Layers. */
+  React.useEffect(() => {
+    if (!viewerChrome || VIEWER_TABS.has(activeTabId)) return;
+    onLeftPanelTabChange?.("layers");
+  }, [viewerChrome, activeTabId, onLeftPanelTabChange]);
 
   const handleFullPageClose = React.useCallback(() => {
     if (activeTabId === "assets" && mediaFullPage) {
@@ -539,7 +557,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            trim four header tools and leave every editing surface in place, so an
            owner opening "what my client sees" was shown the full editor.
            (Founder call, 2026-08-23.) */
-        drawerOpen={!readOnlyView && isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
+        drawerOpen={(!readOnlyView || viewerChrome) && isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
         drawerWidth={drawerWidth}
         fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}
         // Open whenever not fullpage — the no-selection state is a DRAWN
@@ -548,8 +566,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         inspectorOpen={inspectorOpen}
         style={styles.container}
       >
-        {/* Left Sidebar — merged rail + panel. Absent in view mode. */}
-        {readOnlyView ? null : (
+        {/* Left Sidebar — merged rail + panel. Absent in view mode, except for
+            a VIEWER (board 4418:126059). */}
+        {readOnlyView && !viewerChrome ? null : (
         <LayoutShell.Sidebar>
           <LeftSidebar
             composer={composer}
@@ -621,7 +640,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             for a workspace VIEWER, who is always in view mode and gets the
             role notice board 4418:126059 draws in this column. */}
         {readOnlyView ? (
-          viewerNotice ? (
+          viewerChrome ? (
             <LayoutShell.Inspector>
               <ViewerRoleNotice role="VIEWER" />
             </LayoutShell.Inspector>

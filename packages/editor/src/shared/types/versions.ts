@@ -43,6 +43,9 @@ export interface NamedVersion {
   aiSummary?: string | null;
   /** User ID of who created this version */
   userId?: string | null;
+  /** The author's display name, from the server's version list (G1-075).
+   *  Absent for a version made here and not yet listed — "You" covers it. */
+  authorName?: string | null;
 }
 
 // ============================================

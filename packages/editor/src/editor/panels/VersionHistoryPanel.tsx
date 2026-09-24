@@ -26,6 +26,7 @@ import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button, useToast } from "@/editor/chrome-ui";
 import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
+import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
@@ -250,12 +251,15 @@ export function VersionHistoryPanel({
     [expandedId, compareResults, compareVersions, versions]
   );
 
-  // Filter versions by search query
+  /* G1-075: Named / Auto-saves / author, then the search query. */
+  const [savesFilter, setSavesFilter] = React.useState<SavesFilterValue>(ALL_SAVES);
+  const currentUserId = composer?.versions?.getCurrentUserId?.() ?? null;
   const filteredVersions = React.useMemo(() => {
-    if (!searchQuery.trim()) return versions;
+    const kept = applySavesFilter(versions, savesFilter);
+    if (!searchQuery.trim()) return kept;
     const query = searchQuery.toLowerCase();
-    return versions.filter((v) => v.name.toLowerCase().includes(query));
-  }, [versions, searchQuery]);
+    return kept.filter((v) => v.name.toLowerCase().includes(query));
+  }, [versions, searchQuery, savesFilter]);
 
   /* Board 162:2 puts a change count on every row. It is derived, not stored:
      the undo stack is the same source the board's sibling view (Saves ·
@@ -387,6 +391,15 @@ export function VersionHistoryPanel({
             Past {pruned.kept}. Named versions were kept.
           </span>
         </div>
+      )}
+
+      {versions.length > 0 && (
+        <SavesFilter
+          versions={versions}
+          currentUserId={currentUserId}
+          value={savesFilter}
+          onChange={setSavesFilter}
+        />
       )}
 
       {/* Version List — virtualization + row rendering owned by VersionList.

@@ -4,6 +4,7 @@ const upsert = vi.fn();
 const findMany = vi.fn();
 const findUnique = vi.fn();
 const deleteMany = vi.fn();
+const userFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -13,6 +14,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...a: unknown[]) => findUnique(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
     },
+    user: { findMany: (...a: unknown[]) => userFindMany(...a) },
   },
 }));
 
@@ -23,7 +25,7 @@ import {
   deleteSiteVersion,
 } from "@server/services/site-version.service";
 
-beforeEach(() => [upsert, findMany, findUnique, deleteMany].forEach((m) => m.mockReset()));
+beforeEach(() => [upsert, findMany, findUnique, deleteMany, userFindMany].forEach((m) => m.mockReset()));
 
 describe("site-version.service", () => {
   it("createSiteVersion upserts on (siteId, versionId) carrying the payload", async () => {
@@ -84,6 +86,20 @@ describe("site-version.service", () => {
         select: { versionId: true, name: true, isAuto: true, createdBy: true, createdAt: true },
       })
     );
+  });
+
+  /* G1-075: the History author filter needs names; createdBy is a bare id. */
+  it("listSiteVersions names each author with one user lookup", async () => {
+    findMany.mockResolvedValueOnce([
+      { versionId: "v2", name: "B", isAuto: false, createdBy: "u1", createdAt: new Date() },
+      { versionId: "v1", name: "A", isAuto: true, createdBy: "u1", createdAt: new Date() },
+      { versionId: "v0", name: "Z", isAuto: true, createdBy: null, createdAt: new Date() },
+    ]);
+    userFindMany.mockResolvedValueOnce([{ id: "u1", displayName: null, fullName: "Sara", email: "sara@x.io" }]);
+    const rows = await listSiteVersions("s1");
+    expect(userFindMany).toHaveBeenCalledTimes(1);
+    expect(userFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: { in: ["u1"] } } }));
+    expect(rows.map((r) => r.createdByName)).toEqual(["Sara", "Sara", null]);
   });
 
   it("getSiteVersion returns the payload, null when missing", async () => {
