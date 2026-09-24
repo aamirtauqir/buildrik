@@ -175,6 +175,8 @@ export interface SectionEntry<P extends object = object> {
   adaptProps: (ctx: SectionContext) => P;
   /** Which strip tab renders this section (boards 4428:141170 / 141642 / 142686). */
   tab: TabId;
+  /** The section's heading — what ⌘K "Jump to property" prints (G2-146). */
+  title: string;
   /**
    * `"advanced"` tags a section the Beginner tier hides behind "Show all
    * (N more)" (board 4428:141170; decision #29). Untagged sections take the
@@ -235,6 +237,8 @@ export interface AnySectionEntry {
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   /** Strip tab this section belongs to — mirrors SectionEntry.tab. */
   tab: TabId;
+  /** Heading — mirrors SectionEntry.title. */
+  title: string;
   /** ADVANCED tag — mirrors SectionEntry.tier. */
   tier?: "advanced";
   advancedKey?: string;
@@ -269,6 +273,7 @@ export function defineSection<P extends object>(
     },
     shouldRender: entry.shouldRender,
     tab: entry.tab,
+    title: entry.title,
     tier: entry.tier,
     advancedKey: entry.advancedKey,
     advancedProps: entry.advancedProps,

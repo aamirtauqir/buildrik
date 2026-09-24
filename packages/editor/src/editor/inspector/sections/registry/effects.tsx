@@ -19,6 +19,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
      "Show all" instead of drawing the row). */
   opacity: defineSection({
     tab: "effects",
+    title: "Opacity",
     Component: OpacitySection,
     styleKeys: ["opacity"],
     adaptProps: adaptBaseStyleProps,
@@ -26,6 +27,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   shadow: defineSection({
     tab: "effects",
+    title: "Shadow",
     Component: ShadowSection,
     styleKeys: ["box-shadow"],
     adaptProps: adaptBaseStyleProps,
@@ -33,6 +35,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   blur: defineSection({
     tab: "effects",
+    title: "Blur",
     Component: BlurSection,
     styleKeys: ["filter"],
     adaptProps: adaptBaseStyleProps,
@@ -40,6 +43,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   effects: defineSection({
     tab: "effects",
+    title: "More effects",
     Component: EffectsSection,
     styleKeys: ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
@@ -47,6 +51,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   interactions: defineSection({
     tab: "effects",
+    title: "Interactions",
     Component: InteractionsSection,
     styleKeys: [],
     adaptProps: (ctx) => {
@@ -143,6 +148,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
 
   visibility: defineSection({
     tab: "element",
+    title: "Visibility",
     /* The THREE keys this section reads, and only those. It declared
        `display`, `visibility`, `opacity` and `pointer-events` — none of which
        VisibilitySection touches — and omitted the `--hide-<breakpoint>` custom

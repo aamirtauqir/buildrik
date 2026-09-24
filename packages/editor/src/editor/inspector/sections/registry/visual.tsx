@@ -12,6 +12,7 @@ import { BorderSection } from "../BorderSection";
 export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
   background: defineSection({
     tab: "style",
+    title: "Background",
     Component: BackgroundSection,
     advancedKey: "background",
     /* Extracted from this section's own advanced block, not from a registry
@@ -28,6 +29,7 @@ export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
 
   border: defineSection({
     tab: "style",
+    title: "Border",
     Component: BorderSection,
     advancedKey: "border",
     /* Extracted from this section's own advanced block, not from a registry

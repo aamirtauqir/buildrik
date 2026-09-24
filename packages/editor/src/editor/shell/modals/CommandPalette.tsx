@@ -58,7 +58,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Templates", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Properties", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -292,7 +292,9 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     commands.push({
       id: `cmd-${cmd.id}`,
       label,
-      group: cmd.group === "Pages" ? "Pages" : "More",
+      /* PROPERTIES: the inspector's "Jump to property" rows (G2-146), searched
+         only — not in the opening list. */
+      group: cmd.group === "Pages" || cmd.group === "Properties" ? cmd.group : "More",
       shortcut: cmd.shortcut,
       keywords: cmd.keywords,
       disabled: reason !== undefined,

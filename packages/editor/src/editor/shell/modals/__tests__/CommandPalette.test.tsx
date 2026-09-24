@@ -271,6 +271,27 @@ describe("CommandPalette — Pages band", () => {
   });
 });
 
+/* G2-146 (owner 2026-09-25): the inspector's "Jump to property" rows. */
+describe("CommandPalette — Properties band", () => {
+  const PROPERTY_ROWS: Reg[] = [
+    { id: "property-spacing-padding", label: "Padding · Style › Spacing", group: "Properties" },
+    { id: "property-opacity-section", label: "Opacity · Effects", group: "Properties" },
+  ];
+
+  it("stays out of the opening list", () => {
+    renderPalette(makeComposer({ registry: [...BOARD_REGISTRY, ...PROPERTY_ROWS] }));
+    expect(screen.queryByTestId("cmdk-band-properties")).toBeNull();
+  });
+
+  it("a typed property name finds its row under PROPERTIES, and runs it", () => {
+    const { composer } = renderPalette(makeComposer({ registry: [...BOARD_REGISTRY, ...PROPERTY_ROWS] }));
+    type("padding");
+    expect(screen.getByTestId("cmdk-band-properties")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Padding · Style › Spacing"));
+    expect(composer!.commands.run).toHaveBeenCalledWith("property-spacing-padding");
+  });
+});
+
 describe("CommandPalette — keys and a11y", () => {
   it("Enter runs the highlighted row; ArrowUp clamps; ArrowDown moves", () => {
     const { composer } = renderPalette();

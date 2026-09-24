@@ -13,6 +13,7 @@ import { TypographySection } from "../typography";
 export const TYPOGRAPHY_SECTIONS: Record<string, AnySectionEntry> = {
   typography: defineSection({
     tab: "style",
+    title: "Typography",
     Component: TypographySection,
     advancedKey: "typography",
     /* Extracted from this section's own advanced block, not from a registry

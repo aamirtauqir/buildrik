@@ -15,6 +15,7 @@ import { CollectionListSection } from "../CollectionListSection";
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
     tab: "element",
+    title: "Link",
     Component: LinkSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -33,6 +34,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   /* Board 4428:141642 — CONTENT (Static / From CMS). G2-144. */
   content: defineSection({
     tab: "element",
+    title: "Content",
     Component: ContentSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -50,6 +52,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
      lists it. */
   collection: defineSection({
     tab: "element",
+    title: "Collection",
     Component: CollectionListSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -63,6 +66,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
 
   "element-properties": defineSection({
     tab: "element",
+    title: "Advanced",
     Component: ElementPropertiesSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -81,6 +85,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
 
   "css-classes": defineSection({
     tab: "element",
+    title: "CSS classes",
     tier: "advanced",
     Component: CSSClassesSection,
     styleKeys: [],

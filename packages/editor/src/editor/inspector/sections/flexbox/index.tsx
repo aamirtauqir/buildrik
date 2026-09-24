@@ -91,7 +91,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
     <Section
       title="Flexbox"
       icon="AlignHorizontalSpaceBetween"
-      id="inspector-section-flexbox"
+      id="inspector-section-flex"
       isOpen={isOpen}
       onToggle={onToggle}
       preview={flexPreview}
