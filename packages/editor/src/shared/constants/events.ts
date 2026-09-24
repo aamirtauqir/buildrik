@@ -349,6 +349,10 @@ export const EVENTS = {
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
   /** A drawer asks the topbar field to search it — payload { placeholder } | null (board 4418:100087). */
   UI_SEARCH_CONTEXT: "ui:search-context",
+  /** A full-canvas view names itself in the topbar's page crumb — payload
+   *  { label } | null ("<site> › CMS" while the CMS workspace is open,
+   *  4428:140486); null gives the crumb back to the active page. */
+  UI_CRUMB_CONTEXT: "ui:crumb-context",
   /** The topbar field's query while a drawer owns it — payload { query }. */
   UI_SEARCH_QUERY: "ui:search-query",
   /** Start inline text editing on the canvas — payload { elementId } (G2-027). */
@@ -386,6 +390,11 @@ export const EVENTS = {
    *  is mounted before Settings is — a listener inside the tab would miss an
    *  emit fired in the same gesture as the tab switch. */
   UI_SETTINGS_OPEN: "ui:settings-open",
+  /** Open the CMS workspace on a collection's table, and with `recordId` its
+   *  record sheet (`CmsOpenRequest`, editor/cms/cmsWorkspaceStore). Handled
+   *  in StudioPanels for the same reason as UI_SETTINGS_OPEN: the workspace is
+   *  lazy and unmounted until rail CMS is active. */
+  UI_CMS_OPEN: "ui:cms-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
   UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
@@ -938,6 +947,7 @@ export interface EventPayloads {
   [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.UI_INLINE_EDIT_REQUEST]: { elementId: string };
   [EVENTS.UI_SEARCH_CONTEXT]: { placeholder: string } | null;
+  [EVENTS.UI_CRUMB_CONTEXT]: { label: string } | null;
   [EVENTS.UI_SEARCH_QUERY]: { query: string };
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };

@@ -17,9 +17,10 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { DynamicPagesPane } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
+import { FieldsTable } from "./FieldsTable";
+import { AddFieldDialog } from "./AddFieldDialog";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
@@ -76,6 +77,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   const ws = useCmsWorkspace();
   const collection = ws.collectionId ? panel.collections.find((c) => c.id === ws.collectionId) ?? null : null;
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [addingField, setAddingField] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
 
@@ -97,6 +99,16 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       setQuery("");
     };
   }, [composer, collectionName]);
+
+  /* 4428:140486 — while the workspace covers the canvas the topbar crumb
+     reads "<site> › CMS", not the page behind it. */
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.emit(EVENTS.UI_CRUMB_CONTEXT, { label: "CMS" });
+    return () => {
+      composer.emit(EVENTS.UI_CRUMB_CONTEXT, null);
+    };
+  }, [composer]);
 
   const importer = useImportRecords(composer, collection);
 
@@ -139,6 +151,10 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-record" onClick={() => cmsWorkspace.openRecord("new")}>
         + Add record
       </Button>
+    ) : ws.tab === "fields" ? (
+      <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-field" onClick={() => setAddingField(true)}>
+        + Add field
+      </Button>
     ) : null;
 
   let body: React.ReactNode;
@@ -165,13 +181,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       />
     );
   } else if (ws.tab === "fields") {
-    body = (
-      <FieldsView
-        collection={collection}
-        onAddField={(name, type, required) => panel.addField(collection.id, name, type, required)}
-        onDeleteField={(fieldId) => panel.deleteField(collection.id, fieldId)}
-      />
-    );
+    body = <FieldsTable composer={composer} collection={collection} onDeleteField={(fieldId) => panel.deleteField(collection.id, fieldId)} />;
   } else if (ws.tab === "dynamic-pages") {
     body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
   } else if (ws.tab === "settings") {
@@ -194,7 +204,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
         <header className={HEADER} data-testid="cms-ws-header">
           <h2 className={TITLE} data-testid="cms-ws-title">{collection.name}</h2>
-          <span className={META} data-testid="cms-ws-meta">· {plural(count, "record")}</span>
+          <span className={META} data-testid="cms-ws-meta">
+            · {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
+          </span>
           <span className="tw:flex-1" />
           {primary}
         </header>
@@ -244,6 +256,13 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
         {importer.status}
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
       </section>
+      {addingField ? (
+        <AddFieldDialog
+          collection={collection}
+          onClose={() => setAddingField(false)}
+          onAdd={(name, type, required) => panel.addField(collection.id, name, type, required)}
+        />
+      ) : null}
       {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
       {ws.recordId && (ws.recordId === "new" || sheetRecord) ? (
         <RecordSheet
