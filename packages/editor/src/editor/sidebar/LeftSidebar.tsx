@@ -472,7 +472,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onBlockClick={onBlockClick}
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
-                  onSwitchToAdd={() => safeTabChange("add")}
                   onSwitchToTemplates={() => safeTabChange("templates")}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}

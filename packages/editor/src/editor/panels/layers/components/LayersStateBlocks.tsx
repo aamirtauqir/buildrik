@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, Kbd, SkeletonBlock } from "@/editor/chrome-ui";
 
 /*
   Board `775:4130`. Seven rows on the tree's own row height (h-8), indent ladder
@@ -49,65 +49,80 @@ export const LayersLoadingSkeleton: React.FC = () => (
   </div>
 );
 
-/*
-  Board `781:4307`. "The page is fine — only this list failed." carries the
-  load: a failed tree read looks like the page lost its structure, and the
-  first thing someone thinks is that their work is gone. Same copy shape as
-  Media (453:3952) and Content (453:4013): error fact, harm scope, retry.
-*/
-export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
-  <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="layers-load-error" role="alert">
-    <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">Couldn&rsquo;t load the layer tree.</p>
-    <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">The page is fine &mdash; only this list failed.</p>
-    <Button
-      type="button"
-      color="light"
-      size="xs"
-      variant="link" className="tw:min-h-6 tw:self-start"
-      data-testid="layers-load-retry"
-      onClick={onRetry}
-    >
-      Try again
-    </Button>
+/* The empty-state glyph every v3 Layers state board draws (4418:83498,
+   4418:83911): a 24px window outline, muted. */
+const StateGlyph = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">
+    <rect x="4" y="5" width="16" height="14" rx="2" />
+    <path d="M4 9h16" />
+  </svg>
+);
+
+/** v3 4418:83498 / 4418:83911's block: glyph, "Nothing here yet", one line. */
+export const LayersStateMessage: React.FC<{ message: string; padTop: string; testId: string; children?: React.ReactNode }> = ({
+  message,
+  padTop,
+  testId,
+  children,
+}) => (
+  <div className={`tw:flex tw:flex-col tw:items-center tw:gap-2 tw:px-4 tw:text-center ${padTop}`} data-testid={testId} role="status">
+    <StateGlyph />
+    <p className="tw:m-0 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">Nothing here yet</p>
+    <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid={`${testId}-text`}>{message}</p>
+    {children}
   </div>
 );
 
 /*
-  Board `782:4260`. Quotes the query back ("Nothing matches 'hero'.") so the
-  user sees WHAT failed to match, and offers the one recovery that always
-  works. Distinct from LayersEmptyState on purpose: an empty page is a fact
-  about the document, a filtered-out tree is a fact about the search box.
+  v3 board 4418:83295: a 32px red-tint mark, "Couldn't load layers" 14/600,
+  "Try again to load this page's layer tree." 12/18 muted. The board draws no
+  button; "Try again" in that sentence is the retry — the tree's only way back.
 */
-/* Board 4418:83498 (v3, audit G2-059): "No layers match your search." and a
-   hand-off to ⌘K — "Search everywhere for “<query>”" — above Clear search. */
+export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+  <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:px-6 tw:pt-7 tw:text-center" data-testid="layers-load-error" role="alert">
+    <span className="tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-lg tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0zM12 9v4M12 17h.01" />
+      </svg>
+    </span>
+    <p className="tw:m-0 tw:text-[14px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Couldn&rsquo;t load layers</p>
+    <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+      <Button
+        type="button"
+        size="xs"
+        variant="link"
+        className="tw:inline tw:min-h-0 tw:p-0 tw:text-[12px] tw:leading-[18px]"
+        data-testid="layers-load-retry"
+        onClick={onRetry}
+      >
+        Try again
+      </Button>{" "}
+      to load this page&rsquo;s layer tree.
+    </p>
+  </div>
+);
+
+/* v3 board 4418:83498: the block above plus one outlined hand-off to ⌘K,
+   "Search everywhere for “carousel”  ⌘K". Clearing the query is the topbar
+   field's own ✕ / Escape. */
 export const LayersNoResults: React.FC<{
   search: string;
-  onClear: () => void;
   onSearchEverywhere?: (query: string) => void;
-}> = ({ search, onClear, onSearchEverywhere }) => (
-  <div className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pb-8 tw:pt-9 tw:text-[13px]" data-testid="layers-no-results" role="status">
-    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="layers-no-results-text">No layers match your search.</p>
+}> = ({ search, onSearchEverywhere }) => (
+  <LayersStateMessage message="No layers match your search." padTop="tw:pt-10" testId="layers-no-results">
     {onSearchEverywhere && (
       <Button
         type="button"
         color="light"
-        size="xs"
-        variant="link" className="tw:min-h-6 tw:self-start"
+        size="sm"
+        className="tw:-mt-1 tw:h-8 tw:w-full tw:justify-between tw:px-3 tw:text-[12px] tw:font-normal tw:focus:ring-0"
         data-testid="layers-search-everywhere"
+        aria-label={`Search everywhere for “${search}”`}
         onClick={() => onSearchEverywhere(search)}
       >
-        Search everywhere for &ldquo;{search}&rdquo;
+        <span className="tw:truncate">Search everywhere for &ldquo;{search}&rdquo;</span>
+        <Kbd>⌘K</Kbd>
       </Button>
     )}
-    <Button
-      type="button"
-      color="light"
-      size="xs"
-      variant="link" className="tw:min-h-6 tw:self-start"
-      data-testid="layers-clear-search"
-      onClick={onClear}
-    >
-      Clear search
-    </Button>
-  </div>
+  </LayersStateMessage>
 );

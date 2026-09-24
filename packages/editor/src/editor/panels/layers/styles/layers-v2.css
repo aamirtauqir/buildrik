@@ -312,32 +312,6 @@
 }
 
 /* ==========================================================================
-   Icon button (display-settings popover close)
-   ========================================================================== */
-
-/* Shared icon button primitive. Its other two owners — the selection banner
-   (deleted 2026-09-22, audit G2-068) and the toolbar's ⊞ ⊟ ⚙ (now the header
-   ⋯ menu, G2-058) — are gone. */
-.bdc-icon-btn {
-  display: inline-flex;
-  width: var(--bk-size-row-dense); height: var(--bk-size-row-dense); min-height: 0;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 5px;
-  color: var(--bk-ink-soft);
-  font: 400 13px/16px var(--bk-font-ui);
-  cursor: pointer;
-  padding: 0;
-}
-.bdc-icon-btn:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-
-
-/* ==========================================================================
    Context menu
    ========================================================================== */
 
@@ -395,64 +369,6 @@
   margin: 0;
 }
 
-
-/* ==========================================================================
-   Display settings popover
-   ========================================================================== */
-
-.bdc-popover {
-  position: absolute;
-  z-index: 1000;
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
-  padding: 10px var(--bk-space-12);
-  min-width: 220px;
-}
-
-.bdc-layers-settings .bdc-popover-h {
-  font: 600 var(--bk-text-11) var(--bk-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bk-ink-muted);
-  padding-bottom: 6px;
-}
-
-.bdc-layers-settings .bdc-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: var(--bk-space-4) 0;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-  cursor: pointer;
-}
-
-.bdc-switch {
-  appearance: none;
-  position: relative;
-  width: 18px;
-  height: 10px;
-  background: var(--bk-border);
-  border-radius: var(--bk-radius-full);
-  cursor: pointer;
-  transition: background 120ms;
-}
-.bdc-switch::after {
-  content: "";
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 8px;
-  height: 8px;
-  background: var(--bk-bg-card);
-  border-radius: var(--bk-radius-full);
-  transition: transform 120ms;
-}
-.bdc-switch:checked { background: var(--bk-accent); }
-.bdc-switch:checked::after { transform: translateX(8px); }
 
 /* ==========================================================================
    Empty state

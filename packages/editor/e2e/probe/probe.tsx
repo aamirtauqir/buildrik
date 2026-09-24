@@ -2198,7 +2198,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
-      <LayersNoResults search="hero" onClear={() => {}} />
+      <LayersNoResults search="hero" onSearchEverywhere={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no

@@ -35,11 +35,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   selectedElement,
   onLayerHover,
   canvasHoveredId,
-  onAddBlockClick,
   search,
   displaySettingsOpen,
   onDisplaySettingsToggle,
-  onSearchChange,
 }) => {
   const state = useLayersState({ composer, canvasHoveredId });
 
@@ -65,13 +63,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     };
   }, [composer, expandAll, collapseAll]);
 
-  // Emit stats to LayersTab
   const totalCount = state.treeHook.totalCount;
   const selectedCount = state.selectionHook.selectedIds.size;
-  React.useEffect(() => {
-    if (!composer) return;
-    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount });
-  }, [composer, totalCount, selectedCount]);
 
   // Auto-expand ancestors of matching layers during search
   const { getAncestorIdsForMatches, isSearching } = state.searchHook;
@@ -402,6 +395,14 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const treeFiltered = state.filterTree(state.layers);
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
 
+  /* Stats for LayersTab's count footer; `matches` while a filter is on
+     (4418:79355 "1 of 12 layers match “button”"). */
+  const matches = state.searchHook.isSearching ? matchCount : null;
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches });
+  }, [composer, totalCount, selectedCount, matches]);
+
   // Board 143:2 (Layers · filtered): search results render FLAT — only the
   // matching rows, no indentation, no chevrons, no ancestor context. The
   // filtered tree keeps ancestors so we walk it and keep just the matches.
@@ -421,7 +422,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 
   return (
-    <div className="bdc-layers-panel">
+    <div className="bdc-layers-panel tw:relative">
       {displaySettingsOpen && (
         <LayerDisplaySettings
           prefs={state.displayPrefs}
@@ -474,16 +475,19 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       <div
         ref={state.treeContainerRef}
         id="bd-layers-tree"
-        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
+        /* Filtered rows are flat (4418:79355): no chevron slot, the glyph
+           sits where depth 0's chevron would. */
+        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}${
+          state.searchHook.isSearching ? " tw:[&_.bdc-lr-chev]:hidden!" : ""
+        }`}
         role="tree"
         aria-label="Page structure"
       >
-        {state.layers.length === 0 && <LayersEmptyState onAddBlockClick={onAddBlockClick} />}
+        {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
           <LayersNoResults
             search={state.search}
-            onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
             onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
           />
         )}
