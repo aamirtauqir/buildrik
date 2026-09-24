@@ -130,7 +130,13 @@
   },
   "components-create-modal-canvas-save-as": {
     "skipped": 8,
-    "compared": 8
+    "compared": 8,
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
+    },
+    "nonTextPairs": {}
   },
   "pages-bulk-select": {
     "skipped": 0,
@@ -142,7 +148,13 @@
   },
   "components-create": {
     "skipped": 3,
-    "compared": 22
+    "compared": 22,
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
+    },
+    "nonTextPairs": {}
   },
   "templates-applying": {
     "skipped": 0,
@@ -615,12 +627,10 @@
     "nonTextPairs": {}
   },
   "s3-1-pick-mode": {
-    "contrastFailures": 4,
+    "contrastFailures": 1,
     "nonTextFailures": 0,
     "contrastPairs": {
-      "span.tw:shrink-0.tw:text-[length:var(--bk-text-11)] | › | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
-      "span | ← Parent | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
-      "span | → Child | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34
+      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
     },
     "nonTextPairs": {},
     "skipped": 4,
@@ -651,12 +661,10 @@
     "compared": 30
   },
   "s3-1-dragging": {
-    "contrastFailures": 4,
+    "contrastFailures": 1,
     "nonTextFailures": 0,
     "contrastPairs": {
-      "span.tw:shrink-0.tw:text-[length:var(--bk-text-11)] | › | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
-      "span | ← Parent | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
-      "span | → Child | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34
+      "p.tw:absolute.tw:right-0 | ⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ Mor | rgb(107, 114, 128) | rgb(17, 24, 39)": 3.67
     },
     "nonTextPairs": {},
     "skipped": 3,

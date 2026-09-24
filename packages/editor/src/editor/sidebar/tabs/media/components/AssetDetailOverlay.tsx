@@ -551,7 +551,7 @@ export function AssetDetailOverlay({
             <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
               now
             </span>
-            <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]">
+            <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]">
               current
             </span>
           </div>

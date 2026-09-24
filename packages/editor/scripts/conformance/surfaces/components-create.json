@@ -1,141 +1,147 @@
 {
- "surface": "components-create",
- "board": "Components · create (Figma 642:3112) @1440",
- "url": "http://localhost:5050/",
- "viewport": {
-  "width": 1440,
-  "height": 900
- },
- "steps": [
-  {
-   "action": "clickIfPresent",
-   "testId": "rail-coach-got-it"
+  "surface": "components-create",
+  "board": "Components \u00b7 create (Figma 642:3112) @1440",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
   },
-  {
-   "action": "waitFor",
-   "testId": "insert-el-Container"
-  },
-  {
-   "action": "click",
-   "testId": "insert-el-Container"
-  },
-  {
-   "action": "press",
-   "key": "Shift+A"
-  },
-  {
-   "action": "waitFor",
-   "testId": "comp-create"
-  },
-  {
-   "action": "click",
-   "testId": "comp-create"
-  },
-  {
-   "action": "waitFor",
-   "testId": "create-component-modal"
-  },
-  {
-   "action": "click",
-   "testId": "create-component-name"
-  },
-  {
-   "action": "press",
-   "key": "A"
-  },
-  {
-   "action": "wait",
-   "ms": 300
-  }
- ],
- "contrastScope": "body",
- "targets": [
-  {
-   "name": "topbar",
-   "testId": "topbar",
-   "spec": "components-create",
-   "nodeId": "682:5726"
-  },
-  {
-   "name": "scrim",
-   "testId": "overlay-scrim",
-   "spec": "components-create",
-   "nodeId": "642:3374"
-  },
-  {
-   "name": "modal-cancel",
-   "testId": "create-component-cancel",
-   "spec": "components-create",
-   "nodeId": "642:3397"
-  },
-  {
-   "name": "modal-submit",
-   "testId": "create-component-submit",
-   "spec": "components-create",
-   "nodeId": "642:3399"
-  },
-  {
-   "name": "modal",
-   "testId": "create-component-modal"
-  },
-  {
-   "name": "drawer",
-   "testId": "sidebar-panel"
-  },
-  {
-   "name": "canvas",
-   "testId": "canvas"
-  }
- ],
- "_note": [
-  "This board is the whole 1440 shell with the create-component modal over",
-  "it. `press` types one character into the Name field before the read: the",
-  "submit is disabled while the name is empty, and a disabled button is grey,",
-  "so measuring it unfilled would compare the board's accent fill against a",
-  "state the board is not drawing.",
-  "",
-  "THE MODAL HALF OF THIS BOARD IS NOT CONFORMED, and the reason is the",
-  "precedence rule rather than taste. 642:3375 draws a 440-wide dialog with:",
-  "  Name (one field)",
-  "  Scope        -> a Select reading 'This site'",
-  "  a checkbox   -> 'Replace 18 matching groups with instances'",
-  "Neither of the last two has anything behind it. ComponentManager",
-  "createComponent(name, elementId, options) takes description, category,",
-  "tags, variantProperties and prefillFromDs — there is no scope parameter,",
-  "components are already per-project, and nothing in the engine can find",
-  "'matching groups' to replace. Building both would be new behaviour, and",
-  "behaviour is decided by the CODE contract. boards.json already carries",
-  "this as 'drift-modal-structure-differs-wholesale'.",
-  "",
-  "The board also points AWAY from its own sketch: node 1170:4815 on this",
-  "frame is 'hotspot/state · Components · create-modal', linking to board",
-  "1170:4777 — which draws the modal the code actually ships, field for",
-  "field. A board that links out to another board for a state is not the",
-  "authority on that state.",
-  "",
-  "WHAT THE BOARD WON HERE (changed in code): the modal's footer buttons.",
-  "642:3397 and 642:3399 both draw 28h with a 12/6 inset and an 8px radius —",
-  "the design system's Button 9:102, the same geometry its instance carries",
-  "on 641:2597. The footer was capping height at 28 and leaving flowbite's",
-  "20/10 padding, so the buttons were the right height in the wrong shape.",
-  "MODAL_FOOT_CLASS now sets both, next to the h-7 that was already there.",
-  "",
-  "MEASURED BUT NOT JOINED:",
-  "  modal   642:3375 says 440 wide, radius 8. The shipped modal is 720",
-  "          (ModalContent size='lg') with radius 12 from MODAL_FRAME_BASE.",
-  "          The width follows the field set, and the field set is the code",
-  "          contract above; the radius belongs to chrome-ui's Modal, tuned",
-  "          against seven other modal boards.",
-  "  drawer  642:3152's --flowbite/gray/100 edge is real, but `.ls-panel`",
-  "          reports a four-value border-color (only the right edge is set),",
-  "          which normalises to a string no colour comparison can read. The",
-  "          instrument cannot answer, so it is not asked.",
-  "  canvas  642:3180 fills the canvas well --flowbite/gray/50 with a 32px",
-  "          bottom inset; live is --bk-bg-subtle at 20px all round. That is",
-  "          the canvas surface, drawn on every shell board in the family and",
-  "          owned by the shell recipe, not by this one — changing it here",
-  "          would move a surface twelve other boards also draw.",
-  "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"overlay-scrim\\\"]\", which resolved to a subtree holding none of the text under test — ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero.",
-  "COACH DISMISSAL ADDED 2026-09-08. This recipe passed until the S1 arc FIXED the onboarding credit bug: useComposerInit's bootstrap emitted page:created for a page the user never made, so the checklist started at 1/7 and `showCoach` — which requires completedCount === 0 — was false for every user who ever existed. With the credit corrected the coach finally renders, and it is a fixed 240x154 bubble at x72-312 / y152-306 that covers the Insert drawer's first six rows. `waitFor` on an Insert row still passes; the CLICK times out on an intercepted pointer. Dismissing it first is what a person does. That the coach covers the drawer at all is the live half of authority=open:first-run-drawer and is NOT fixed by this step."
- ]
+  "steps": [
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Container"
+    },
+    {
+      "action": "press",
+      "key": "Shift+A"
+    },
+    {
+      "action": "waitFor",
+      "testId": "comp-create"
+    },
+    {
+      "action": "click",
+      "testId": "comp-create"
+    },
+    {
+      "action": "waitFor",
+      "testId": "create-component-modal"
+    },
+    {
+      "action": "click",
+      "testId": "create-component-name"
+    },
+    {
+      "action": "press",
+      "key": "A"
+    },
+    {
+      "action": "wait",
+      "ms": 300
+    }
+  ],
+  "contrastScope": "body",
+  "targets": [
+    {
+      "name": "topbar",
+      "testId": "topbar",
+      "spec": "components-create",
+      "nodeId": "682:5726"
+    },
+    {
+      "name": "scrim",
+      "testId": "overlay-scrim",
+      "spec": "components-create",
+      "nodeId": "642:3374"
+    },
+    {
+      "name": "modal-cancel",
+      "testId": "create-component-cancel",
+      "spec": "components-create",
+      "nodeId": "642:3397"
+    },
+    {
+      "name": "modal-submit",
+      "testId": "create-component-submit",
+      "spec": "components-create",
+      "nodeId": "642:3399"
+    },
+    {
+      "name": "modal",
+      "testId": "create-component-modal"
+    },
+    {
+      "name": "drawer",
+      "testId": "sidebar-panel"
+    },
+    {
+      "name": "canvas",
+      "testId": "canvas"
+    }
+  ],
+  "_note": [
+    "This board is the whole 1440 shell with the create-component modal over",
+    "it. `press` types one character into the Name field before the read: the",
+    "submit is disabled while the name is empty, and a disabled button is grey,",
+    "so measuring it unfilled would compare the board's accent fill against a",
+    "state the board is not drawing.",
+    "",
+    "THE MODAL HALF OF THIS BOARD IS NOT CONFORMED, and the reason is the",
+    "precedence rule rather than taste. 642:3375 draws a 440-wide dialog with:",
+    "  Name (one field)",
+    "  Scope        -> a Select reading 'This site'",
+    "  a checkbox   -> 'Replace 18 matching groups with instances'",
+    "Neither of the last two has anything behind it. ComponentManager",
+    "createComponent(name, elementId, options) takes description, category,",
+    "tags, variantProperties and prefillFromDs \u2014 there is no scope parameter,",
+    "components are already per-project, and nothing in the engine can find",
+    "'matching groups' to replace. Building both would be new behaviour, and",
+    "behaviour is decided by the CODE contract. boards.json already carries",
+    "this as 'drift-modal-structure-differs-wholesale'.",
+    "",
+    "The board also points AWAY from its own sketch: node 1170:4815 on this",
+    "frame is 'hotspot/state \u00b7 Components \u00b7 create-modal', linking to board",
+    "1170:4777 \u2014 which draws the modal the code actually ships, field for",
+    "field. A board that links out to another board for a state is not the",
+    "authority on that state.",
+    "",
+    "WHAT THE BOARD WON HERE (changed in code): the modal's footer buttons.",
+    "642:3397 and 642:3399 both draw 28h with a 12/6 inset and an 8px radius \u2014",
+    "the design system's Button 9:102, the same geometry its instance carries",
+    "on 641:2597. The footer was capping height at 28 and leaving flowbite's",
+    "20/10 padding, so the buttons were the right height in the wrong shape.",
+    "MODAL_FOOT_CLASS now sets both, next to the h-7 that was already there.",
+    "",
+    "MEASURED BUT NOT JOINED:",
+    "  modal   642:3375 says 440 wide, radius 8. The shipped modal is 720",
+    "          (ModalContent size='lg') with radius 12 from MODAL_FRAME_BASE.",
+    "          The width follows the field set, and the field set is the code",
+    "          contract above; the radius belongs to chrome-ui's Modal, tuned",
+    "          against seven other modal boards.",
+    "  drawer  642:3152's --flowbite/gray/100 edge is real, but `.ls-panel`",
+    "          reports a four-value border-color (only the right edge is set),",
+    "          which normalises to a string no colour comparison can read. The",
+    "          instrument cannot answer, so it is not asked.",
+    "  canvas  642:3180 fills the canvas well --flowbite/gray/50 with a 32px",
+    "          bottom inset; live is --bk-bg-subtle at 20px all round. That is",
+    "          the canvas surface, drawn on every shell board in the family and",
+    "          owned by the shell recipe, not by this one \u2014 changing it here",
+    "          would move a surface twelve other boards also draw.",
+    "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"overlay-scrim\\\"]\", which resolved to a subtree holding none of the text under test \u2014 ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero.",
+    "COACH DISMISSAL ADDED 2026-09-08. This recipe passed until the S1 arc FIXED the onboarding credit bug: useComposerInit's bootstrap emitted page:created for a page the user never made, so the checklist started at 1/7 and `showCoach` \u2014 which requires completedCount === 0 \u2014 was false for every user who ever existed. With the credit corrected the coach finally renders, and it is a fixed 240x154 bubble at x72-312 / y152-306 that covers the Insert drawer's first six rows. `waitFor` on an Insert row still passes; the CLICK times out on an intercepted pointer. Dismissing it first is what a person does. That the coach covers the drawer at all is the live half of authority=open:first-run-drawer and is NOT fixed by this step.",
+    "",
+    "BASELINED CONTRAST PAIR (2026-09-25, a harness false positive, not a defect): the",
+    "selection toolbar's caption (7a5d5105d, board 5940:148012) is absolutely positioned",
+    "UNDER the dark pill, over the canvas. measure.mjs's effectiveBg walks DOM ancestors,",
+    "so it composites the caption on the pill's --bk-ink (3.67:1). On screen it sits on",
+    "the page, where gray-500 on white is 4.83:1."
+  ]
 }

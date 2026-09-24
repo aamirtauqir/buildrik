@@ -49,10 +49,11 @@ export const SET_CARD =
 
 /** The amber strip under the header — `Restoring a site version leaves this
  *  configuration unchanged.` — on Domains, Localization, Redirects, Headers:
- *  --bk-warning ink on the warning tint inside a yellow-100 hairline. */
+ *  --bk-warning-text on the warning tint inside a yellow-100 hairline
+ *  (--bk-warning as text there is 3.41:1, under WCAG AA). */
 export const SET_RESTORE_STRIP =
   "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
-  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning)]";
+  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning-text)]";
 
 /** Label-left rows at the 192 label column (the SEO screen's Indexing card
  *  set the shape; `Enable Google Analytics` wrapped at 144). `col-span-full`

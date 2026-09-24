@@ -95,7 +95,8 @@ const NOTICE_PRUNED =
 const NOTICE_RESTORING =
   `${NOTICE_BASE} tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
 const NOTICE_STRONG = "tw:font-normal tw:text-[12px] tw:leading-[18px]";
-const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* ink-soft, as RESTORE_CONFIRM_SUB: ink-muted on the accent tint is 4.49:1. */
+const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 export function VersionHistoryPanel({
   composer,
