@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { GridPattern } from "../styled";
 
 // ============================================================================
 // TYPES
@@ -19,7 +18,14 @@ interface GridOverlayProps {
 // ============================================================================
 
 export const GridOverlay: React.FC<GridOverlayProps> = ({ gridSize = 10 }) => {
-  return <GridPattern aria-hidden gridSize={gridSize} />;
+  return (
+    <div
+      aria-hidden
+      data-testid="canvas-grid-overlay"
+      className="bd-canvas-grid tw:absolute tw:inset-0 tw:pointer-events-none tw:z-10"
+      style={{ backgroundSize: `${gridSize}px ${gridSize}px` }}
+    />
+  );
 };
 
 export default GridOverlay;

@@ -78,8 +78,6 @@ export interface CanvasOverlayGroupProps {
   // Hover
   shouldShowHover: boolean;
   hoveredElementId: string | null;
-  /** Dev mode debug overlay flag — unused today but parent passes it. */
-  devMode?: boolean;
 
   // Drag & Resize
   isResizing: boolean;

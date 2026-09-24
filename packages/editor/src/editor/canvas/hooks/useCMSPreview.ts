@@ -7,6 +7,8 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
+import { EVENTS } from "@/shared/constants/events";
+import { RepeaterRenderer } from "@/engine/cms/RepeaterRenderer";
 
 interface UseCMSPreviewOptions {
   composer: Composer | null;
@@ -45,6 +47,10 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
+
+        /* Collection lists (G3-079) repeat their children per record before
+           field bindings resolve over the copies. */
+        await new RepeaterRenderer(composer).expandCollectionLists(doc, { canvas: true });
 
         // Find all elements with data-buildrick-id
         const elements = doc.querySelectorAll("[data-buildrick-id]");
@@ -122,10 +128,20 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
 
     composer.cms.collections.on("content:updated", handleContentChange);
     composer.cms.collections.on("content:created", handleContentChange);
+    composer.cms.collections.on("content:deleted", handleContentChange);
+    composer.cms.collections.on(EVENTS.CMS_STORE_REFRESHED, handleContentChange);
+    /* Binding a Collection list changes what renders without changing the
+       element HTML this hook is keyed on. */
+    composer.on(EVENTS.CMS_COLLECTION_BOUND, handleContentChange);
+    composer.on(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
 
     return () => {
       composer.cms.collections.off("content:updated", handleContentChange);
       composer.cms.collections.off("content:created", handleContentChange);
+      composer.cms.collections.off("content:deleted", handleContentChange);
+      composer.cms.collections.off(EVENTS.CMS_STORE_REFRESHED, handleContentChange);
+      composer.off(EVENTS.CMS_COLLECTION_BOUND, handleContentChange);
+      composer.off(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
     };
   }, [composer]);
 

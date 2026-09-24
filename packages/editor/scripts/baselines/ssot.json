@@ -16,9 +16,9 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
-        "line": 604,
+        "line": 588,
         "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:604, src/themes/design-system/a11y.css:60",
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:588, src/themes/design-system/a11y.css:60",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]
@@ -30,41 +30,6 @@
   {
     "category": "antiPatterns",
     "violations": [
-      {
-        "path": "src/editor/canvas/__tests__/testHarness.ts",
-        "line": 61,
-        "severity": "minor",
-        "message": "Dead export \"stubRect\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/canvas/__tests__/testHarness.ts",
-        "line": 87,
-        "severity": "minor",
-        "message": "Dead export \"makeCanvas\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/canvas/__tests__/testHarness.ts",
-        "line": 96,
-        "severity": "minor",
-        "message": "Dead export \"makeCanvasRef\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/canvas/__tests__/testHarness.ts",
-        "line": 103,
-        "severity": "minor",
-        "message": "Dead export \"makeDomElement\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/canvas/__tests__/testHarness.ts",
-        "line": 27,
-        "severity": "minor",
-        "message": "Dead export \"TestDataTransfer\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
       {
         "path": "src/shared/utils/nesting/typeChecks.ts",
         "line": 39,

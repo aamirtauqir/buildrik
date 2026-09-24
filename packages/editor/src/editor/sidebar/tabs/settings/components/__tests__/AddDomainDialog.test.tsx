@@ -39,7 +39,7 @@ describe("Clone 3737:43669 · Add a domain — the frame's shape", () => {
   it("carries the title, the scope line and every field, at the 640 table width, with Add domain waiting for a name", () => {
     mount();
     const dialog = screen.getByTestId("set-dom-dialog");
-    expect(dialog).toHaveClass("tw:w-[640px]");
+    expect(dialog).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
     expect(dialog).toHaveAttribute("aria-label", "Add a domain · Bella Cucina");
     expect(screen.getByTestId("set-dom-dialog-title")).toHaveTextContent("Add a domain");
     expect(screen.getByTestId("set-dom-dialog-scope")).toHaveTextContent("Bella Cucina · Domains");

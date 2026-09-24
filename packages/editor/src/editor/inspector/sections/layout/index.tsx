@@ -99,7 +99,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       onToggle={onToggle}
       preview={layoutPreview}
       tier={tier}
-      id="inspector-section-display"
+      id="inspector-section-layout"
     >
       {/* ═══════════════════════════════════════════════════════════════════
           ESSENTIALS - Always visible

@@ -3,8 +3,7 @@
  *
  * One consistent mock of the composer boundary (per canvas test spec):
  * every canvas test that needs a composer builds it here and overrides
- * only the branches it exercises. Also provides a DataTransfer polyfill
- * (jsdom has no DataTransfer constructor) and DOM fixture helpers.
+ * only the branches it exercises.
  *
  * NOT a test file — vitest only picks up *.test/spec.* names.
  *
@@ -13,103 +12,6 @@
 
 import { vi } from "vitest";
 import type { Composer } from "../../../engine";
-
-// =============================================================================
-// DataTransfer polyfill
-// =============================================================================
-
-/**
- * Minimal DataTransfer stand-in. jsdom never implemented the DataTransfer
- * constructor, and real browsers zero the store outside the synchronous drop
- * handler — tests that need to prove the "snapshot synchronously" invariant
- * can call `zeroOut()` to simulate the browser behavior.
- */
-export class TestDataTransfer {
-  private store = new Map<string, string>();
-  effectAllowed = "none";
-  dropEffect = "none";
-  files: File[] = [];
-  setDragImage = vi.fn();
-
-  setData(type: string, value: string): void {
-    this.store.set(type, value);
-  }
-
-  getData(type: string): string {
-    return this.store.get(type) ?? "";
-  }
-
-  clearData(type?: string): void {
-    if (type) this.store.delete(type);
-    else this.store.clear();
-  }
-
-  get types(): string[] {
-    return [...this.store.keys()];
-  }
-
-  /** Simulate the browser zeroing the store after the sync drop handler. */
-  zeroOut(): void {
-    this.store.clear();
-  }
-}
-
-// =============================================================================
-// DOM fixtures
-// =============================================================================
-
-export function stubRect(
-  left: number,
-  top: number,
-  width: number,
-  height: number,
-): DOMRect {
-  return {
-    left,
-    top,
-    width,
-    height,
-    right: left + width,
-    bottom: top + height,
-    x: left,
-    y: top,
-    toJSON: () => ({}),
-  } as DOMRect;
-}
-
-export interface MakeCanvasOptions {
-  /** Attach to document.body (default true) */
-  attach?: boolean;
-  rect?: DOMRect;
-}
-
-/** A canvas container div with a deterministic bounding rect. */
-export function makeCanvas(options: MakeCanvasOptions = {}): HTMLDivElement {
-  const { attach = true, rect = stubRect(0, 0, 1000, 800) } = options;
-  const div = document.createElement("div");
-  div.className = "buildrick-canvas";
-  div.getBoundingClientRect = () => rect;
-  if (attach) document.body.appendChild(div);
-  return div;
-}
-
-export function makeCanvasRef(
-  options: MakeCanvasOptions = {},
-): React.RefObject<HTMLDivElement | null> {
-  return { current: makeCanvas(options) };
-}
-
-/** DOM node carrying a data-buildrick-id, with a mocked bounding rect. */
-export function makeDomElement(
-  id: string,
-  rect: DOMRect = stubRect(0, 0, 100, 50),
-  tagName = "div",
-): HTMLElement {
-  const el = document.createElement(tagName);
-  el.setAttribute("data-buildrick-id", id);
-  el.getBoundingClientRect = () => rect;
-  return el;
-}
 
 // =============================================================================
 // Engine element stubs
