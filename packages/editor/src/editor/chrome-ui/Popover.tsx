@@ -50,6 +50,10 @@ export interface PopoverProps {
   className?: string;
   /** Anchor stretches to fill its flex/grid parent — for full-width triggers. */
   block?: boolean;
+  /** CSS selector of an ancestor column the panel should sit OUTSIDE of, to
+   *  its left, top-aligned with the trigger — the inspector's colour picker
+   *  opens beside the column, not over it (board 4428:142922). */
+  beside?: string;
 }
 
 /** Keep this much clear of every viewport edge when nudging back into view. */
@@ -57,7 +61,7 @@ const VIEWPORT_MARGIN = 8;
 
 const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block }: PopoverProps) {
+export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block, beside }: PopoverProps) {
   const wrap = React.useRef<HTMLSpanElement | null>(null);
   const panel = React.useRef<HTMLDivElement | null>(null);
 
@@ -77,18 +81,38 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
   React.useLayoutEffect(() => {
     const el = panel.current;
     if (!open || !el) return;
-    el.style.transform = "";
-    const r = el.getBoundingClientRect();
-    const vw = document.documentElement.clientWidth;
-    const vh = document.documentElement.clientHeight;
-    let dx = 0;
-    let dy = 0;
-    if (r.left < VIEWPORT_MARGIN) dx = VIEWPORT_MARGIN - r.left;
-    else if (r.right > vw - VIEWPORT_MARGIN) dx = Math.max(vw - VIEWPORT_MARGIN - r.right, VIEWPORT_MARGIN - r.left);
-    if (r.top < VIEWPORT_MARGIN) dy = VIEWPORT_MARGIN - r.top;
-    else if (r.bottom > vh - VIEWPORT_MARGIN) dy = Math.max(vh - VIEWPORT_MARGIN - r.bottom, VIEWPORT_MARGIN - r.top);
-    if (dx || dy) el.style.transform = `translate(${Math.round(dx)}px, ${Math.round(dy)}px)`;
-  }, [open, placement, children]);
+    const place = () => {
+      el.style.transform = "";
+      const r = el.getBoundingClientRect();
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+      let dx = 0;
+      let dy = 0;
+      const column = beside ? wrap.current?.closest(beside) : null;
+      if (column && wrap.current) {
+        /* Beside the column: right edge 9px clear of it, top on the trigger. */
+        dx = column.getBoundingClientRect().left - 9 - r.right;
+        dy = wrap.current.getBoundingClientRect().top - r.top;
+      }
+      const left = r.left + dx;
+      const right = r.right + dx;
+      const top = r.top + dy;
+      const bottom = r.bottom + dy;
+      if (left < VIEWPORT_MARGIN) dx += VIEWPORT_MARGIN - left;
+      else if (right > vw - VIEWPORT_MARGIN) dx += Math.max(vw - VIEWPORT_MARGIN - right, VIEWPORT_MARGIN - left);
+      if (top < VIEWPORT_MARGIN) dy += VIEWPORT_MARGIN - top;
+      else if (bottom > vh - VIEWPORT_MARGIN) dy += Math.max(vh - VIEWPORT_MARGIN - bottom, VIEWPORT_MARGIN - top);
+      el.style.transform = dx || dy ? `translate(${Math.round(dx)}px, ${Math.round(dy)}px)` : "";
+    };
+    place();
+    /* The panel's own content can grow after it opened (the fill picker's
+       "Edit Primary" step is 483 tall): re-place on every size change, or it
+       ran 105px off the bottom (4428:142968). */
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(place);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [open, placement, children, beside]);
 
   React.useEffect(() => {
     if (!open) return;

@@ -162,6 +162,8 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           onClose={() => setIsOpen(false)}
           label={`${label} color tokens`}
           block
+          /* Board 4428:142922: the picker opens beside the inspector column. */
+          beside=".layout-shell__inspector"
           trigger={
             /* The row is a container, not a control: it holds the hex field
                and one or two icon buttons, and wrapping those in
