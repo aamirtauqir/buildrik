@@ -103,12 +103,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   /* The scope stays locked while the run is live (board 4418:104454's 🔒)
      and is handed back when it ends. */
   const live = agent.phase === "planning" || agent.phase === "running";
-  /* A clean finish clears the prompt (remounts the composer); a failure
-     leaves it in place for Try again. */
+  /* The prompt stays in the field through every end state (boards
+     4418:105118 / 105261 / 105401 all draw it); leaving the run — Done or
+     Keep N changes — clears it by remounting the composer. */
   const [composerKey, setComposerKey] = React.useState(0);
-  React.useEffect(() => {
-    if (agent.phase === "done" && !agent.error) setComposerKey((k) => k + 1);
-  }, [agent.phase, agent.error]);
   React.useEffect(() => {
     if (agent.phase === "done") unlock();
     if (agent.phase !== "idle") setBriefing(false);
@@ -281,14 +279,21 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           steps={agent.steps}
           currentIndex={agent.currentIndex}
           error={agent.error}
-          autoApply={agent.autoApply}
-          onAutoApplyChange={agent.setAutoApply}
+          onEditStep={agent.editStep}
+          onRunPlan={agent.runPlan}
           onApprove={agent.approve}
           onSkip={agent.skip}
           onStop={agent.stop}
           stoppedByUser={agent.stoppedByUser}
-          onDismiss={agent.reset}
-          onRetry={lastPrompt.current ? retry : undefined}
+          onDismiss={() => {
+            agent.reset();
+            setComposerKey((k) => k + 1);
+          }}
+          /* Board 4418:105118: back to the prompt, which is still in the field. */
+          onEditPrompt={() => {
+            agent.reset();
+            promptRef.current?.querySelector("textarea")?.focus();
+          }}
           /* Each applied step is its own transaction, so taking the run back
              is exactly that many undos — and nothing has happened since the
              failure to undo by mistake. */

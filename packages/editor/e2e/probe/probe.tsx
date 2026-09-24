@@ -1502,9 +1502,9 @@ const agentPlan = (over: Partial<React.ComponentProps<typeof AgentPlan>>) => (
     steps={[]}
     currentIndex={-1}
     error={null}
-    autoApply={false}
-    onAutoApplyChange={() => {}}
     onApprove={() => {}}
+    onEditStep={() => {}}
+    onRunPlan={() => {}}
     onSkip={() => {}}
     onStop={() => {}}
     {...over}

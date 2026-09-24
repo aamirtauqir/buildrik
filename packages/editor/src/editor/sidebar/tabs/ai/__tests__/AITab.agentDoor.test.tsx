@@ -85,15 +85,15 @@ describe("AgentPlan — an ended run hands the panel back", () => {
         steps={[{ plan: { title: "Add a hero", instruction: "", scope: { kind: "page" as const } }, status: "applied" as const }]}
         currentIndex={-1}
         error={null}
-        autoApply={false}
-        onAutoApplyChange={vi.fn()}
         onApprove={vi.fn()}
+        onEditStep={vi.fn()}
+        onRunPlan={vi.fn()}
         onSkip={vi.fn()}
         onStop={vi.fn()}
         onDismiss={onDismiss}
       />,
     );
-    fireEvent.click(screen.getByText("Ask something else"));
+    fireEvent.click(screen.getByTestId("ai-run-done"));
     expect(onDismiss).toHaveBeenCalled();
   });
 
@@ -105,16 +105,16 @@ describe("AgentPlan — an ended run hands the panel back", () => {
         steps={[{ plan: { title: "Add a hero", instruction: "", scope: { kind: "page" as const } }, status: "applied" as const }]}
         currentIndex={-1}
         error={null}
-        autoApply={false}
-        onAutoApplyChange={vi.fn()}
         onApprove={vi.fn()}
+        onEditStep={vi.fn()}
+        onRunPlan={vi.fn()}
         onSkip={vi.fn()}
         onStop={vi.fn()}
         stoppedByUser
         onDismiss={onDismiss}
       />,
     );
-    fireEvent.click(screen.getByText("Ask something else"));
+    fireEvent.click(screen.getByTestId("ai-run-keep"));
     expect(onDismiss).toHaveBeenCalled();
   });
 });
