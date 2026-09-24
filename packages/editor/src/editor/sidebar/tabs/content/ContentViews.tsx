@@ -25,7 +25,6 @@ import {
   Menu,
   MenuItem,
   ListRow,
-  RecordRow,
   Row,
   SectionHeader,
   ROW_ICON_CLASS,
@@ -33,12 +32,10 @@ import {
   Select,
   Textarea,
   TextInput,
-  ToggleSwitch,
 } from "@/editor/chrome-ui";
-import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
-import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
+import { conditionSummary, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
@@ -86,8 +83,6 @@ const FIELD_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-mute
 /** Inputs sit in a padded wrapper rather than carrying their own margin, so
  *  the field keeps the TextInput/Select wrapper theme untouched. */
 const FIELD_WRAP = "tw:px-4";
-const TOGGLE_ROW = "tw:flex tw:h-8 tw:items-center tw:justify-between tw:px-4 tw:py-0";
-const TOGGLE_ROW_LABEL = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* Board 149:108 tints the save bar with the warning wash, not neutral grey —
    the bar exists to say something is unsaved, and grey says nothing. */
 const SAVEBAR =
@@ -105,15 +100,6 @@ const SAVEBAR =
    own 16, and 2px per line across a 44 bar is the difference between the
    words sitting on the board's baseline and 1px above it. */
 const SAVE_LINK = "tw:min-h-6 tw:text-[12px] tw:leading-[18px] tw:font-normal";
-const SAVEBAR_STATUS = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
-const SAVEBAR_DISCARD =
-  "tw:border-transparent tw:bg-transparent tw:text-[12px] tw:leading-[18px] " +
-  "tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
-/* 149:57 — the collection's meta strip. BOTH words are 12/18 there: the count
-   was 11px (SUB) and "+ Add" 13px (LINK_BTN), so a two-word row carried three
-   type sizes between it and the rows underneath. */
-const META_TEXT = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
-const META_ADD = "tw:text-[12px] tw:leading-[18px]";
 /** A note that belongs to the row above it, not to the panel's foot.
  *  151:61 — 11/16 on the panel's 16px gutters with 8 above and 8 below
  *  (151:60's frame is the text's own box plus those two insets). It was
@@ -180,6 +166,7 @@ export function RootView({
   sourcesCount,
   variablesCount,
   conditionsCount,
+  selectedCollectionId,
   onOpenCollection,
   onCreateCollection,
   onOpenSources,
@@ -191,6 +178,7 @@ export function RootView({
   sourcesCount: number;
   variablesCount: number;
   conditionsCount: number;
+  selectedCollectionId?: string | null;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
   onOpenSources: () => void;
@@ -254,6 +242,8 @@ export function RootView({
           label={c.name}
           count={recordCounts[c.id] ?? "—"}
           chevron
+          selected={c.id === selectedCollectionId}
+          aria-current={c.id === selectedCollectionId ? "true" : undefined}
           data-testid={`content-collection-${c.id}`}
           onClick={() => onOpenCollection(c.id)}
         />
@@ -276,259 +266,6 @@ export function RootView({
       <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
       <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
       <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
-    </div>
-  );
-}
-
-/* ── Collection (149:50) ─────────────────────────────────────────────────── */
-
-export function CollectionView({
-  collection,
-  records,
-  onBack,
-  onOpenRecord,
-  onAddRecord,
-  onOpenFields,
-  onOpenDynamicPages,
-}: {
-  collection: CMSCollection;
-  records: CMSContentItem[];
-  onBack: () => void;
-  onOpenRecord: (id: string) => void;
-  onAddRecord: () => void;
-  onOpenFields: () => void;
-  onOpenDynamicPages?: () => void;
-}) {
-  const display = collection.displayField ?? collection.fields[0]?.slug;
-  const recordName = (r: CMSContentItem): string => {
-    const v = display ? r.data[display] : undefined;
-    return typeof v === "string" && v.trim() ? v : `Record ${r.id.slice(-4)}`;
-  };
-  return (
-    <div className={CONTENT_BODY}>
-      <Crumb label={collection.name} onClick={onBack} />
-      {/* 149:57 — a 32-tall meta strip on the panel's own 16px gutters, both
-          lines 12/18. It was 12px gutters, a 11px left word and a 13px right
-          one, so nothing in the row shared a baseline with the rows below.
-          The board states the 12/18 on the STRIP, not only on its two words,
-          and the strip itself was inheriting the document's 16 — invisible
-          while both children override it, and wrong the moment anything else
-          lands in the row. */}
-      <div className="tw:flex tw:h-8 tw:justify-between tw:items-center tw:px-4 tw:text-[12px] tw:leading-[18px]" data-testid="content-collection-meta">
-        <span className={META_TEXT} data-testid="content-collection-count">
-          {records.length} record{records.length === 1 ? "" : "s"}
-        </span>
-        <Button className={`${LINK_BTN} ${META_ADD}`} data-testid="content-collection-add" onClick={onAddRecord}>
-          + Add
-        </Button>
-      </div>
-      <div className={SCROLL}>
-        {records.map((r) => (
-          <RecordRow
-            key={r.id}
-            data-record-row
-            data-testid={`content-record-${r.id}`}
-            label={recordName(r)}
-            published={r.status === "published"}
-            chevron
-            onClick={() => onOpenRecord(r.id)}
-          />
-        ))}
-        {records.length === 0 && <div className={`${SUB} tw:p-3`}>No records yet — add the first one.</div>}
-      </div>
-      <div className="tw:border-t tw:border-[var(--bk-gray-200)]">
-        <ListRow label="Fields" count={collection.fields.length} chevron data-testid="content-open-fields" onClick={onOpenFields} />
-        {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron data-testid="content-open-dynamic" onClick={onOpenDynamicPages} />}
-      </div>
-    </div>
-  );
-}
-
-/* ── Record (149:84) + unsaved (149:108) ─────────────────────────────────── */
-
-export function RecordView({
-  collection,
-  record,
-  onBack,
-  onSave,
-  onDelete,
-}: {
-  collection: CMSCollection;
-  record: CMSContentItem | null;
-  onBack: () => void;
-  onSave: (data: Record<string, unknown>, published: boolean) => Promise<void>;
-  onDelete?: () => void;
-}) {
-  const initial = React.useMemo(() => {
-    const base: Record<string, unknown> = {};
-    for (const f of collection.fields) base[f.slug] = record?.data[f.slug] ?? fieldDefault(f);
-    return base;
-  }, [collection, record]);
-  const [data, setData] = React.useState<Record<string, unknown>>(initial);
-  const [published, setPublished] = React.useState(record?.status === "published");
-  const [saving, setSaving] = React.useState(false);
-  /* Publishing runs the collection's own rules (CollectionManager). Until it
-     did, the "required" tag on the Fields screen was decoration and a record
-     could go live empty; now the failure has to land on the fields it names
-     rather than as a rejected promise nobody sees. */
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
-  React.useEffect(() => {
-    setData(initial);
-    setPublished(record?.status === "published");
-    setErrors({});
-  }, [initial, record]);
-
-  const dirty =
-    JSON.stringify(data) !== JSON.stringify(initial) || published !== (record?.status === "published");
-  /* The save bar already says "Unsaved changes" and offers Discard — the crumb
-     used to do the same thing without saying so, and typed values went with
-     it. Same ConfirmDialog this file already uses to guard a field delete. */
-  const [confirmLeave, setConfirmLeave] = React.useState(false);
-  /* Deleting one FIELD asks first; deleting the whole record did not, and CMS
-     records are not in the undo stack — measured: the row was gone at once and
-     ⌘Z did not bring it back. */
-  const [confirmDelete, setConfirmDelete] = React.useState(false);
-  const leave = () => (dirty ? setConfirmLeave(true) : onBack());
-  const display = collection.displayField ?? collection.fields[0]?.slug;
-  const title =
-    (record && typeof record.data[display ?? ""] === "string" && (record.data[display ?? ""] as string)) ||
-    (record ? `Record ${record.id.slice(-4)}` : "New record");
-
-  const setField = (slug: string, value: unknown) => setData((d) => ({ ...d, [slug]: value }));
-
-  return (
-    <div className={CONTENT_BODY}>
-      <Crumb label={title} onClick={leave} />
-      <div className={SCROLL}>
-        {collection.fields.map((f) => (
-          <div key={f.id}>
-            {f.type === "boolean" ? (
-              <div className={TOGGLE_ROW}>
-                <span className="tw:text-[13px]">{f.name}</span>
-                <ToggleSwitch
-                  checked={Boolean(data[f.slug])}
-                  aria-label={f.name}
-                  onChange={() => setField(f.slug, !data[f.slug])}
-                />
-                {errors[f.slug] && (
-                  <span className="tw:ml-2 tw:text-xs tw:text-[var(--bk-error)]" role="alert">
-                    {errors[f.slug]}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className={FIELD_LABEL} data-testid={`content-label-${f.slug}`}>{f.name}</div>
-                <div className={FIELD_WRAP}>
-                  {f.type === "textarea" || f.type === "richtext" ? (
-                    <Textarea
-                      /* Board 149:101 draws the textarea 56 tall, radius 6, on
-                         `--color/border-input`. `Textarea` is a SEPARATE
-                         flowbite component, so `BK_TEXT_INPUT_THEME` — which
-                         carries that geometry for every `TextInput` — does not
-                         reach it, and the size has to be stated here. `min-h-16`
-                         was 64. The `!` on the radius is the same reason it
-                         carries one in the input theme: flowbite's own
-                         `rounded-lg` is emitted unprefixed and a `tw:`-prefixed
-                         utility cannot be deduped against it, so source order
-                         decides without it. */
-                      className="tw:bg-white tw:min-h-14 tw:py-0 tw:rounded-md! tw:border-[var(--bk-border-input)] tw:resize-y"
-                      value={String(data[f.slug] ?? "")}
-                      onChange={(e) => setField(f.slug, e.target.value)}
-                      aria-label={f.name}
-                      data-testid={`content-field-${f.slug}`}
-                    />
-                  ) : (
-                    <TextInput
-                      type={f.type === "number" ? "number" : "text"}
-                      value={String(data[f.slug] ?? "")}
-                      onChange={(e) => setField(f.slug, f.type === "number" ? Number(e.target.value) : e.target.value)}
-                      aria-label={f.name}
-                      data-testid={`content-field-${f.slug}`}
-                    />
-                  )}
-                </div>
-                {errors[f.slug] && (
-                  <div className="tw:mx-3 tw:mt-1 tw:text-xs tw:text-[var(--bk-error)]" role="alert">
-                    {errors[f.slug]}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-        <div className={TOGGLE_ROW} data-testid="content-row-published">
-          {/* 149:128 is 13/20 in --bk-ink. It was inheriting: the demo host paints
-              body #0F172A and the dashboard host paints its own, so this label
-              was whatever the page around it happened to be. */}
-          <span className={TOGGLE_ROW_LABEL} data-testid="content-row-published-label">Published</span>
-          <ToggleSwitch checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
-        </div>
-        {record && onDelete && (
-          <Button
-            className={`${LINK_BTN} tw:mx-3 tw:my-2 tw:text-[var(--bk-error)] tw:hover:text-[var(--bk-error)]`}
-            onClick={() => setConfirmDelete(true)}
-          >
-            Delete record
-          </Button>
-        )}
-      </div>
-      <ConfirmDialog
-        open={confirmDelete}
-        onClose={() => setConfirmDelete(false)}
-        onConfirm={() => {
-          setConfirmDelete(false);
-          onDelete?.();
-        }}
-        title="Delete record?"
-        message={`"${title}" will be removed. This one can't be undone.`}
-        confirmLabel="Delete record"
-        tone="destructive"
-      />
-      <ConfirmDialog
-        open={confirmLeave}
-        onClose={() => setConfirmLeave(false)}
-        onConfirm={() => { setConfirmLeave(false); onBack(); }}
-        title="Discard changes?"
-        message="This record has unsaved changes. Going back throws them away."
-        confirmLabel="Discard"
-        tone="destructive"
-      />
-      {(dirty || !record) && (
-        <div className={SAVEBAR} role="region" aria-label="Unsaved changes" data-testid="content-savebar">
-          <span className={SAVEBAR_STATUS} data-testid="content-savebar-status">Unsaved changes</span>
-          <span className={SPACER} />
-          <Button
-            color="light"
-            size="xs"
-            className={SAVEBAR_DISCARD}
-            data-testid="content-savebar-discard"
-            onClick={() => { setData(initial); setPublished(record?.status === "published"); }}
-          >
-            Discard
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className={SAVE_LINK}
-            data-testid="content-savebar-save"
-            disabled={saving}
-            aria-busy={saving || undefined}
-            onClick={() => {
-              setSaving(true);
-              setErrors({});
-              void onSave(data, published)
-                .catch((e: unknown) => {
-                  if (e instanceof CMSValidationError) setErrors(e.errors);
-                  else throw e;
-                })
-                .finally(() => setSaving(false));
-            }}
-          >
-            {saving ? "Saving…" : "Save"}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
@@ -559,7 +296,7 @@ export function FieldsView({
   onDeleteField,
 }: {
   collection: CMSCollection;
-  onBack: () => void;
+  onBack?: () => void;
   onAddField: (name: string, type: string, required: boolean) => Promise<void>;
   onDeleteField: (fieldId: string) => Promise<void>;
 }) {
@@ -572,7 +309,7 @@ export function FieldsView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={`${collection.name} · fields`} onClick={onBack} />
+      {onBack ? <Crumb label={`${collection.name} · fields`} onClick={onBack} /> : null}
       <div className={SCROLL}>
         {collection.fields.map((f) => (
           <Row key={f.id} size="stack" data-field-row data-testid={`content-fieldrow-${f.id}`}>
@@ -705,7 +442,7 @@ export function DynamicPagesView({
 }: {
   collection: CMSCollection;
   records: CMSContentItem[];
-  onBack: () => void;
+  onBack?: () => void;
   onSave: (pattern: string) => Promise<void>;
 }) {
   const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
@@ -719,7 +456,7 @@ export function DynamicPagesView({
      records are not in the undo stack — measured: the row was gone at once and
      ⌘Z did not bring it back. */
   const [confirmDelete, setConfirmDelete] = React.useState(false);
-  const leave = () => (dirty ? setConfirmLeave(true) : onBack());
+  const leave = () => (dirty ? setConfirmLeave(true) : onBack?.());
   const publishedCount = records.filter((r) => r.status === "published").length;
   /* Two more conditions decide whether a page actually appears, and neither is
      the record count. Both were checked against the service, not guessed:
@@ -736,7 +473,7 @@ export function DynamicPagesView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} />
+      {onBack ? <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} /> : null}
       <div className={SCROLL}>
         <div className={FIELD_LABEL}>URL pattern</div>
         <div className={FIELD_WRAP}>
@@ -788,7 +525,7 @@ export function DynamicPagesView({
       <ConfirmDialog
         open={confirmLeave}
         onClose={() => setConfirmLeave(false)}
-        onConfirm={() => { setConfirmLeave(false); onBack(); }}
+        onConfirm={() => { setConfirmLeave(false); onBack?.(); }}
         title="Discard changes?"
         message="The page pattern has unsaved changes. Going back throws them away."
         confirmLabel="Discard"

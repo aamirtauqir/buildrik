@@ -42,7 +42,7 @@ export interface UseEditorEventListenersOptions {
   composer: Composer | null;
   modals: Pick<
     UseStudioModalsReturn,
-    "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords" | "openSaveTemplate" | "toggleShortcuts"
+    "openCreateComponent" | "openSaveAsComponent" | "openSaveTemplate" | "toggleShortcuts"
   >;
   state: EditorEventListenerStateSetters;
   /** Tracks whether the user has manually toggled spacing indicators
@@ -55,7 +55,7 @@ export function useEditorEventListeners({
   state,
 }: UseEditorEventListenersOptions): void {
   // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
-  const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate, toggleShortcuts } = modals;
+  const { openCreateComponent, openSaveAsComponent, openSaveTemplate, toggleShortcuts } = modals;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { elementId: string }) => {
@@ -85,15 +85,16 @@ export function useEditorEventListeners({
     };
   }, [composer, openSaveAsComponent]);
 
-  // 2c) CMS_MANAGE_RECORDS → open the records management modal.
+  // 2c) CMS_MANAGE_RECORDS (⌘K "Manage CMS records") → the CMS workspace,
+  // which replaced the Records modal (4428:143182).
   React.useEffect(() => {
     if (!composer) return;
-    const handle = () => openCMSRecords();
+    const handle = () => composer.emit("ui:switch-tab", { tab: "content" });
     composer.on(EVENTS.CMS_MANAGE_RECORDS, handle);
     return () => {
       composer.off(EVENTS.CMS_MANAGE_RECORDS, handle);
     };
-  }, [composer, openCMSRecords]);
+  }, [composer]);
 
   // 2d) TEMPLATE_SAVE_REQUESTED → open the "Save as Template" modal (the open
   // handler + modal existed but had no caller — users couldn't save templates).

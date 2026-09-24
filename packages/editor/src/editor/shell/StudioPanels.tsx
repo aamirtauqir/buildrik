@@ -45,6 +45,8 @@ import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 
+const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
+
 /** Panels that take the inspector's column instead of the left drawer. */
 const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history"]);
 // ============================================================================
@@ -84,7 +86,8 @@ export interface StudioPanelsProps {
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void
+    onSelect: (asset: MediaAsset) => void,
+    forLabel?: string,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -328,7 +331,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     getTabMode(activeTabId) === "fullpage" ||
     (activeTabId === "assets" && mediaFullPage);
 
-  const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown;
+  /* v3 IA (4428:140486): rail CMS keeps its drawer and REPLACES the canvas +
+     inspector with the CMS workspace. The canvas stays mounted underneath
+     (its iframe and engine state survive the round trip); the inspector
+     column closes so the workspace spans both. */
+  const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && activeTabId === "content";
+  const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen;
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -592,6 +600,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canRedo={canRedo}
             />
           </div>
+          {cmsWorkspaceOpen ? (
+            <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
+              <React.Suspense fallback={null}>
+                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} onOpenMediaLibrary={onOpenMediaLibrary} />
+              </React.Suspense>
+            </div>
+          ) : null}
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that

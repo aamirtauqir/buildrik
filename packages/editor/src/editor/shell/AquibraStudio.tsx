@@ -721,8 +721,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseProjectSettings={modals.closeProjectSettings}
         showCMSCollectionSetup={modals.showCMSCollectionSetup}
         onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
-        showCMSRecords={modals.showCMSRecords}
-        onCloseCMSRecords={modals.closeCMSRecords}
       />
 
       <ConflictModal

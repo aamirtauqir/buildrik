@@ -41,7 +41,7 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { CollectionView, FieldsView, RecordView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
@@ -62,7 +62,6 @@ import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { saveSiteVariables } from "@/editor/sidebar/tabs/content/contentPanelUtils";
-import { CMSRecordsModal } from "@/editor/shell/modals/CMSRecordsModal";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { Composer } from "@/engine/Composer";
@@ -1819,23 +1818,6 @@ const MENU_RECORDS = [
   { id: "rec-marinara", collectionId: "menu-items", status: "draft", data: { name: "Marinara" } },
 ];
 
-/* Board 149:84 draws the record form over THREE fields — Name, Price,
-   Description — where 151:2 draws the same collection's field list with eight.
-   Two boards, two sample collections; the record screen gets the collection its
-   own board draws so each label joins the node above the input it belongs to. */
-const RECORD_COLLECTION = [
-  {
-    id: "menu-items",
-    name: "Menu items",
-    slug: "menu-items",
-    displayField: "name",
-    fields: [
-      { id: "rf-name", name: "Name", slug: "name", type: "text", order: 0 },
-      { id: "rf-price", name: "Price", slug: "price", type: "text", order: 1 },
-      { id: "rf-description", name: "Description", slug: "description", type: "textarea", order: 2 },
-    ],
-  },
-];
 const TEAM_RECORDS = Array.from({ length: 6 }, (_, i) => ({
   id: `rec-team-${i}`,
   collectionId: "team",
@@ -2004,29 +1986,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   // to nothing while every gate stayed green — the probe silently measured
   // an empty page. e2e/ is typechecked now, and the coverage `S` used to give
   // is replaced by rendering the real converted views below.
-  "content-collection-rows": () => (
-    <div data-probe="content-collection-rows">
-      <CollectionView
-        collection={
-          {
-            id: "c1",
-            name: "Posts",
-            displayField: "title",
-            fields: [{ id: "f1", name: "Title", slug: "title", type: "text" }],
-          } as never
-        }
-        records={[
-          { id: "r0001", status: "published", data: { title: "Margherita" } } as never,
-          { id: "r0002", status: "draft", data: { title: "Marinara" } } as never,
-        ]}
-        onBack={() => {}}
-        onOpenRecord={() => {}}
-        onAddRecord={() => {}}
-        onOpenFields={() => {}}
-        onOpenDynamicPages={() => {}}
-      />
-    </div>
-  ),
   // The strike-through on a completed step used to be an inline
   // `textDecoration`, asserted in jsdom. It is a class now, and jsdom computes
   // "" for classes, so that assertion could no longer prove anything. This
@@ -2267,28 +2226,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   "content-panel-no-source": () => (
     <ContentPanelHost probe="content-panel-no-source" composer={contentComposer({ sources: [] })} />
   ),
-  /* Board 1170:4749 — the records TABLE, a second record editor reachable only
-     from ⌘⇧P. Mounted directly because the modal is shell-owned: its `isOpen`
-     comes from AquibraStudio, which no probe may stage. */
-  "content-records": () => (
-    <div data-probe="content-records">
-      <CMSRecordsModal
-        composer={contentComposer({ collections: RECORDS_COLLECTION, records: RECORDS_ITEMS })}
-        isOpen
-        onClose={() => {}}
-      />
-    </div>
-  ),
   /* Board 1170:4713 — the collection-setup wizard, drawn at its SECOND step.
-     Shell-owned like the records modal, so it is mounted directly and the
+     Shell-owned, so it is mounted directly and the
      recipe walks it to step 2 through the wizard's own Next button. */
   "content-collection-setup": () => (
     <div data-probe="content-collection-setup">
       <CMSCollectionSetupModal composer={contentComposer()} isOpen onClose={() => {}} />
     </div>
-  ),
-  "content-panel-record": () => (
-    <ContentPanelHost probe="content-panel-record" composer={contentComposer({ collections: RECORD_COLLECTION })} />
   ),
   "content-loading": () => (
     <div data-probe="content-loading">
@@ -2641,40 +2585,6 @@ const CASES: Record<string, () => React.ReactElement> = {
           currentPages={COMPARE_APPROVED}
           onBack={() => {}}
           onRefreshCurrent={() => {}}
-        />
-      </div>
-    </div>
-  ),
-  // ── Content · unsaved-record (board 149:108) ─────────────────────────────
-  // The save bar renders only while the form is dirty, and dirtiness is a
-  // diff against the record the panel was opened with. A record whose stored
-  // status is draft, mounted with the toggle already on, is dirty on arrival —
-  // the same comparison the product makes, not a flag the fixture set.
-  "content-unsaved-record": () => (
-    <div data-probe="content-unsaved-record">
-      <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
-        <RecordView
-          collection={
-            {
-              id: "c1",
-              name: "Menu",
-              displayField: "name",
-              fields: [
-                { id: "f1", name: "Name", slug: "name", type: "text" },
-                { id: "f2", name: "Price", slug: "price", type: "text" },
-                { id: "f3", name: "Description", slug: "description", type: "textarea" },
-              ],
-            } as never
-          }
-          record={
-            {
-              id: "r0001",
-              status: "draft",
-              data: { name: "Margherita", price: "$12", description: "Tomato, mozzarella, basil" },
-            } as never
-          }
-          onBack={() => {}}
-          onSave={async () => {}}
         />
       </div>
     </div>
