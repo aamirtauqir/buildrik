@@ -333,9 +333,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
       </div>
 
       <ImportCard onOutcome={onImportOutcome} />
-      </div>
-
-      <div className="tw:flex tw:flex-col tw:gap-2.5">
+      <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2.5">
         <div data-testid="export-stats" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {statsLine}
         </div>
@@ -352,10 +350,10 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         )}
       </div>
 
-      <div className={CARD}>
-        {/* The preview is not on the board — it is kept because reading the
-            output before taking it is real capability. It needs a subject of
-            its own now that the format rows carry no selection. */}
+      <div className={`${CARD} tw:mt-3`} data-testid="brand-io-preview">
+        {/* 4418:168885 draws the Preview inside the panel, under the import
+            drop zone: a "Preview" title, the "CSS variables ▾" switch and a
+            code sample. */}
         <div className="tw:mb-2 tw:flex tw:items-center tw:gap-2">
           <span className="tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)]">Preview</span>
           <Select
@@ -376,13 +374,8 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         <pre data-testid="export-preview" className={PREVIEW}>
           {preview}
         </pre>
-        {/* The single download button that used to sit here is gone: every
-            format row carries its own now (board 153:120), and two ways to
-            download the same thing is one more than the board draws. The
-            preview pane stays — the board omits it, and reading the output
-            before taking it is real capability, not decoration. */}
       </div>
-
+      </div>
     </div>
   );
 };

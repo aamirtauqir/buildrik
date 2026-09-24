@@ -4,8 +4,9 @@
  * The rule lives in the store, so every one of the call sites gets it without
  * changing: one transient at a time (newest wins, so Undo is always the last
  * action), persistent toasts pinned above it, 5 s default, Undo ≥ 8 s, the
- * viewport anchored to the canvas region, a context value that never changes
- * identity, and no ink surface anywhere.
+ * viewport anchored to the canvas region's bottom-left (board 5940:148012), a
+ * context value that never changes identity, and the dark bar of the toast
+ * catalogue 7574:194162 (owner ruling 2026-09-24 retired #25 for toasts).
  *
  * @license BSD-3-Clause
  */
@@ -162,29 +163,64 @@ describe("Toast policy — durations", () => {
 });
 
 describe("Toast policy — anchor and surface", () => {
-  it("offsets the viewport's right edge by --bk-inspector-w", () => {
+  /* Board 5940:148012: "Moved down · Undo" sits 16px in from the canvas
+     column's left and 16px above its toolbar. */
+  it("sits 16px inside the canvas column, 16px above its footer toolbar", () => {
+    const rect = (left: number, top: number, width: number, height: number) => () =>
+      ({ left, top, right: left + width, bottom: top + height, width, height, x: left, y: top, toJSON: () => ({}) });
+    const anchor = document.createElement("div");
+    anchor.setAttribute("data-bk-toast-anchor", "");
+    anchor.getBoundingClientRect = rect(340, 90, 800, 780);
+    const floor = document.createElement("div");
+    floor.setAttribute("data-bk-toast-floor", "");
+    floor.getBoundingClientRect = rect(340, 800, 800, 44);
+    anchor.appendChild(floor);
+    document.body.appendChild(anchor);
     mount();
     act(() => {
-      api.addToast({ description: "Saved" });
+      api.addToast({ description: "Moved down" });
     });
     const viewport = screen.getByTestId("toast-viewport");
-    expect(viewport.className).toContain("tw:right-[calc(16px_+_var(--bk-inspector-w,0px))]");
-    expect(viewport.className).not.toContain("tw:right-4");
+    expect(viewport.style.left).toBe("356px");
+    expect(viewport.style.bottom).toBe(`${window.innerHeight - 800 + 16}px`);
+    anchor.remove();
   });
 
   it.each(["neutral", "info", "success", "warning", "error"] as const)(
-    "%s renders on a tint with a hairline, never on ink (NO BLACK RULE)",
+    "%s renders on the catalogue's ink bar with white text",
     (tone) => {
       mount();
       act(() => {
         api.addToast({ description: `${tone} body`, tone });
       });
       const card = cards()[0];
-      expect(card.className).not.toContain("bg-[var(--bk-ink)]");
-      expect(card.className).toContain("tw:border-[var(--bk-border)]");
-      expect(card.className).toContain("tw:box-border");
+      expect(card.className).toContain("tw:bg-[var(--bk-ink)]");
+      expect(card.className).toContain("tw:text-white");
+      expect(card.className).toContain("tw:rounded-lg");
     },
   );
+
+  it("marks tone with an 8px dot — none for neutral/info, red for error", () => {
+    mount();
+    act(() => {
+      api.addToast({ description: "Saved" });
+    });
+    expect(cards()[0].querySelector('[data-testid="toast-tone"]')).toBeNull();
+    act(() => {
+      api.addToast({ description: "Couldn't start collaboration", tone: "error" });
+    });
+    const dot = cards()[0].querySelector<HTMLElement>('[data-testid="toast-tone"]');
+    expect(dot?.className).toContain("tw:bg-[var(--bk-error)]");
+  });
+
+  it("actions are on-dark link buttons (blue-300); every toast keeps its ✕", () => {
+    mount();
+    act(() => {
+      api.addToast({ description: "Moved down", action: { label: "Undo", onClick: () => {} } });
+    });
+    expect(screen.getByRole("button", { name: "Undo" }).className).toContain("tw:text-[var(--bk-blue-300)]");
+    expect(screen.getByRole("button", { name: "Dismiss notification" })).toBeTruthy();
+  });
 
   it("a toast without a title is a one-line bar; with a title, a two-line card", () => {
     mount();

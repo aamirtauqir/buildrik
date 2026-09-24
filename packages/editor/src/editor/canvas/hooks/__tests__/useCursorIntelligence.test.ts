@@ -2,7 +2,7 @@
  * useCursorIntelligence — cursor mode resolution.
  *
  * Pins the CURSOR_MAP priority chain: invalid-drop > clone (Ctrl/Cmd+drag) >
- * sibling (Shift+drag) > dragging > inspect (Alt/inspectorEnabled) > hover
+ * dragging > hierarchy (Alt) > hover
  * context (text/element/default), plus the style side effect on the canvas
  * element and the setContext/resetCursor escape hatches.
  */
@@ -141,7 +141,7 @@ describe("useCursorIntelligence — hover context", () => {
 // ---------------------------------------------------------------------------
 
 describe("useCursorIntelligence — modifiers and drag states", () => {
-  it("Alt held → zoom-in (inspect); released → back to default", () => {
+  it("Alt held → zoom-in (hierarchy); released → back to default", () => {
     const { result } = renderCursor();
 
     pressModifiers({ altKey: true });
@@ -153,9 +153,9 @@ describe("useCursorIntelligence — modifiers and drag states", () => {
     expect(result.current.cursorState.altHeld).toBe(false);
   });
 
-  it("inspectorEnabled forces zoom-in without any key held", () => {
-    const { result } = renderCursor({ inspectorEnabled: true });
-    expect(result.current.cursorState.cursor).toBe("zoom-in");
+  it("no key held → no zoom-in (inspector mode is gone, G2-005)", () => {
+    const { result } = renderCursor();
+    expect(result.current.cursorState.cursor).not.toBe("zoom-in");
   });
 
   it("dragging → grabbing", () => {
@@ -176,15 +176,15 @@ describe("useCursorIntelligence — modifiers and drag states", () => {
     expect(result.current.cursorState.cursor).toBe("copy");
   });
 
-  it("Shift+drag → crosshair (sibling mode)", () => {
+  it("Shift+drag keeps the grabbing cursor — no sibling-mode hint (G2-030)", () => {
     const { result } = renderCursor({ isDragging: true });
 
     pressModifiers({ shiftKey: true });
-    expect(result.current.cursorState.cursor).toBe("crosshair");
+    expect(result.current.cursorState.cursor).toBe("grabbing");
     expect(result.current.cursorState.shiftHeld).toBe(true);
   });
 
-  it("clone (Ctrl) outranks sibling (Shift) when both are held during drag", () => {
+  it("clone (Ctrl) still wins when Shift is also held during drag", () => {
     const { result } = renderCursor({ isDragging: true });
 
     pressModifiers({ ctrlKey: true, shiftKey: true });

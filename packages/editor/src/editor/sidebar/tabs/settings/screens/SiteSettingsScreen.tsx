@@ -18,7 +18,6 @@ import * as React from "react";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
-import { ToggleSwitch } from "@/editor/chrome-ui";
 import { SITE_LOCALES, localeLabel } from "../constants";
 import type { ScreenProps } from "../types";
 
@@ -112,14 +111,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   const [twitter, setTwitter] = React.useState(social.value.twitter);
   const [facebook, setFacebook] = React.useState(social.value.facebook);
   const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
-  /* Board 1172:4867's Project settings modal held these three and nothing
-     else did; the modal is superseded by this screen (its `Site settings`
-     door lands here), so its Author and Canvas grid live on — the author in
-     Site identity, the grid in its own card. They are the engine's, not the
-     Site row's: read once on mount, written on the flush. */
-  const [author, setAuthor] = React.useState(() => composer?.getProjectMetadata?.()?.author ?? "");
-  const [gridSize, setGridSize] = React.useState(() => composer?.getState?.().gridSize ?? 10);
-  const [snapToGrid, setSnapToGrid] = React.useState(() => composer?.getState?.().snapToGrid ?? false);
+  /* 4418:127313 draws Site Identity as name · favicon · language, and no
+     Canvas card: the Author field and the grid size / snap controls the old
+     Project settings modal carried are not on the board (owner parity order,
+     2026-09-24). Snap lives in the canvas View menu (⌘;). */
   /* null = no Site row read (the standalone demo), so nothing to check
      against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
   const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
@@ -166,8 +161,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   // composer.saveProject(). Pulls latest local state from refs so the
   // closure stays single — re-registering per keystroke would defeat the
   // fan-out reduction this whole refactor exists for.
-  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author, gridSize, snapToGrid });
-  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author, gridSize, snapToGrid };
+  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin });
+  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin };
   React.useEffect(() => {
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
@@ -193,12 +188,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
          after the mirror wrote `Site.name` (walked live 2026-09-14). */
       const name = s.siteName.trim();
       const meta = composer.getProjectMetadata?.();
-      const author = s.author.trim();
-      if ((name && name !== meta?.name) || author !== (meta?.author ?? "")) {
-        composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
+      if (name && name !== meta?.name) {
+        composer.updateProjectMetadata?.({ name });
       }
-      composer.setGridSize?.(s.gridSize);
-      composer.setSnapToGrid?.(s.snapToGrid);
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
@@ -280,15 +272,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             </div>
           )}
         </Field>
-        <Field label="Author" htmlFor="site-author">
-          <Input
-            id="site-author"
-            type="text"
-            value={author}
-            onChange={(e) => { setAuthor(e.target.value); identity.markDirty(); }}
-            placeholder="Who this site belongs to"
-          />
-        </Field>
       </Section>
 
       <Section title="Social Links">
@@ -321,40 +304,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         </Field>
       </Section>
 
-      <Section title="Canvas">
-        <Field label="Grid size" htmlFor="canvas-grid-size" hint="Pixels between snap points, 1–100.">
-          <Input
-            id="canvas-grid-size"
-            type="number"
-            min={1}
-            max={100}
-            value={gridSize}
-            onChange={(e) => {
-              const next = Number(e.target.value);
-              if (Number.isFinite(next)) setGridSize(Math.min(100, Math.max(1, Math.round(next))));
-              identity.markDirty();
-            }}
-          />
-        </Field>
-        <div className="tw:col-span-full tw:flex tw:items-center tw:gap-4">
-          <span
-            id="canvas-snap-label"
-            className="tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
-          >
-            Snap to grid
-          </span>
-          <ToggleSwitch
-            id="canvas-snap"
-            checked={snapToGrid}
-            onChange={(next) => {
-              setSnapToGrid(next);
-              identity.markDirty();
-            }}
-            aria-labelledby="canvas-snap-label"
-            sizing="sm"
-          />
-        </div>
-      </Section>
     </Screen>
   );
 };

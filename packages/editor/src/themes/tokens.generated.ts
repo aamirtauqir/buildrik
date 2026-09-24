@@ -95,6 +95,7 @@ export const radius = {
   "xl": 12,
   "2xl": 16,
   "full": 9999,
+  "card": 12,
 } as const;
 
 export const size = {
@@ -124,6 +125,10 @@ export const size = {
   "row-2line": 52,
   "menu-item": 30,
   "panel-footer": 44,
+  "dialog-sm": 480,
+  "dialog-md": 560,
+  "dialog-lg": 640,
+  "dialog-xl": 960,
 } as const;
 
 export const z = {

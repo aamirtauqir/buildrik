@@ -37,12 +37,6 @@
   scrollbar-color: var(--bk-border, var(--bk-border)) transparent;
 }
 
-/* Full-bleed: the TipsFooter strip (board 137:43) IS the bottom band — it
-   carries its own tint background, so no frame padding or border here. */
-.bld-panel-bottom {
-  flex-shrink: 0;
-}
-
 /* Board 137:8: the ⌘F hint is BARE Geist Mono 11/500 in ink-soft — no chip,
    no border, no background. */
 .bld-kbd-hint {

@@ -27,7 +27,7 @@
 
 import * as React from "react";
 import { ArrowUpRight, ChevronLeft, Search as SearchIcon } from "lucide-react";
-import { Button, IconButton } from "@/editor/chrome-ui";
+import { Button, IconButton, useToast } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -62,7 +62,6 @@ import {
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
-import { SettingsSavedDialog } from "./components/SettingsSavedDialog";
 import { SearchSettingsModal } from "./components/SearchSettingsModal";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
@@ -156,6 +155,7 @@ export const SettingsTab: React.FC<
 
   // The site name, read from the composer the way the topbar reads it.
   const [siteName, setSiteName] = React.useState("Untitled site");
+  const { addToast } = useToast();
   React.useEffect(() => {
     if (!composer) return;
     const read = () => setSiteName(composer.getProjectMetadata?.()?.name || "Untitled site");
@@ -193,7 +193,6 @@ export const SettingsTab: React.FC<
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
-  const [savedOpen, setSavedOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
@@ -359,7 +358,7 @@ export const SettingsTab: React.FC<
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || savedOpen || searchOpen) return;
+      if (guardOpen || searchOpen) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
@@ -368,7 +367,7 @@ export const SettingsTab: React.FC<
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, savedOpen, searchOpen, requestLeave]);
+  }, [guardOpen, searchOpen, requestLeave]);
 
   // ─── The guard ────────────────────────────────────────────────────────
 
@@ -405,7 +404,7 @@ export const SettingsTab: React.FC<
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
 
-  /* `then` runs after a save succeeds: the Saved dialog after the footer's
+  /* `then` runs after a save succeeds: the Saved toast after the footer's
      Save, the pending nav / exit after the guard's Save and continue. */
   const handleSave = React.useCallback((then?: () => void) => {
     if (saving) return;
@@ -420,7 +419,14 @@ export const SettingsTab: React.FC<
       setScreenIsDirty(false);
       screenIsDirtyRef.current = false;
       if (then) then();
-      else setSavedOpen(true);
+      /* 4418:165469 draws "Settings saved" as a toast (bottom-left, dark),
+         not a centred dialog: title, the site's line, "Return to settings". */
+      else
+        addToast({
+          title: "Settings saved",
+          description: `${siteName ? `${siteName} · ` : ""}Configuration saved. Your canvas content is unchanged.`,
+          action: { label: "Return to settings", onClick: () => {} },
+        });
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -463,7 +469,7 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, projectId]);
+  }, [composer, current, currentScreen, saving, projectId, addToast, siteName]);
 
   /* The guard's Save and continue (4418:165478): save, then finish whatever
      raised the guard. A failed save leaves the dialog down and the screen's
@@ -751,7 +757,6 @@ export const SettingsTab: React.FC<
         onSaveAndContinue={handleSaveAndContinue}
         saving={saving}
       />
-      <SettingsSavedDialog open={savedOpen} siteName={siteName} onReturn={() => setSavedOpen(false)} />
       <SearchSettingsModal
         open={searchOpen}
         siteName={siteName}

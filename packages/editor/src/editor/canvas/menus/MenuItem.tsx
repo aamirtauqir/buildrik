@@ -98,18 +98,24 @@ interface KeyboardHintProps {
   shortcut: string;
 }
 
-const KeyboardHint: React.FC<KeyboardHintProps> = ({ shortcut }) => {
-  // Convert shortcut text to display format
-  const displayShortcut = shortcut
-    .replace(/Cmd/g, isMac() ? "\u2318" : "Ctrl")
-    .replace(/Alt/g, isMac() ? "\u2325" : "Alt")
-    .replace(/Shift/g, isMac() ? "\u21E7" : "Shift")
-    .replace(/Del/g, isMac() ? "\u232B" : "Del")
+/** "Cmd+Alt+C" → "⌘⌥C" on a Mac, "Ctrl+Alt+C" elsewhere. The "+" is dropped
+ *  only on a Mac, where the glyphs separate themselves — Windows read
+ *  "CtrlAltC" (G2-050). */
+export function formatShortcutHint(shortcut: string, mac: boolean): string {
+  const shown = shortcut
+    .replace(/Cmd/g, mac ? "\u2318" : "Ctrl")
+    .replace(/Alt/g, mac ? "\u2325" : "Alt")
+    .replace(/Shift/g, mac ? "\u21E7" : "Shift")
+    .replace(/Del/g, mac ? "\u232B" : "Del")
     .replace(/Up/g, "\u2191")
     .replace(/Down/g, "\u2193")
     .replace(/Left/g, "\u2190")
-    .replace(/Right/g, "\u2192")
-    .replace(/\+/g, "");
+    .replace(/Right/g, "\u2192");
+  return mac ? shown.replace(/\+/g, "") : shown;
+}
+
+const KeyboardHint: React.FC<KeyboardHintProps> = ({ shortcut }) => {
+  const displayShortcut = formatShortcutHint(shortcut, isMac());
 
   return (
     <span

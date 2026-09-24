@@ -7,6 +7,7 @@
  */
 
 import type { AssetData } from "./asset";
+import type { CanvasGuide } from "./canvas";
 import type { ElementData } from "./element";
 import type { StyleData } from "./style";
 
@@ -310,6 +311,8 @@ export interface ProjectSettings {
   redirects?: {
     suggestFrom404s: boolean;
   };
+  /** Ruler guides placed on the canvas (G2-033) — saved with the site. */
+  canvasGuides?: CanvasGuide[];
 }
 
 /**

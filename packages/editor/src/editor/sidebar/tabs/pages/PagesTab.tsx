@@ -162,8 +162,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     closePageSettings();
   }, [closePageSettings]);
 
+  const [movedFrom, setMovedFrom] = React.useState<{ pageId: string; slug: string } | null>(null);
   const handleRenameCommit = React.useCallback(
-    (pageId: string, name: string) => {
+    (pageId: string, name: string, updateUrl?: boolean) => {
       const trimmed = name.trim();
       if (trimmed) {
         const exists = p.pages.some(
@@ -175,7 +176,14 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }
       }
       setNameError(null);
-      p.commitRename(pageId, name);
+      const before = p.pages.find((pg) => pg.id === pageId)?.slug;
+      p.commitRename(pageId, name, updateUrl);
+      /* Boards 6887:75724 / 75760 / 79128: "Update URL" lands in Page settings
+         with the redirect offer for the URL it just moved off. */
+      if (updateUrl && before) {
+        setMovedFrom({ pageId, slug: before });
+        p.openSettings(pageId);
+      }
     },
     [p]
   );
@@ -486,8 +494,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             page={settingsPage}
             allPages={p.pages}
             composer={composer}
-            onClose={closeSettings}
+            onClose={() => {
+              setMovedFrom(null);
+              closeSettings();
+            }}
             initialTab={doorTab}
+            previousSlug={movedFrom?.pageId === settingsPage.id ? movedFrom.slug : undefined}
           />
         </SettingsErrorBoundary>
       )}

@@ -77,10 +77,10 @@ describe("DeleteConfirmModal", () => {
     );
     const cancel = screen.getByRole("button", { name: "Cancel" });
     const confirm = screen.getByRole("button", { name: "Delete Card" });
-    // MODAL_FOOT_CLASS carries this exact utility pair — its presence on the
-    // shared parent is what caps every button inside it at 28.
+    // MODAL_FOOT_CLASS carries this utility — its presence on the shared
+    // parent is what sizes every button inside it to the dialog boards' 32.
     const footer = cancel.parentElement;
-    expect(footer?.className).toContain("tw:[&_button]:h-7");
+    expect(footer?.className).toContain("tw:[&_button]:h-8");
     expect(footer).toContainElement(confirm);
   });
 });

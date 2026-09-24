@@ -53,7 +53,8 @@ export function buildInsertGroups(mineCount: number | null): InsertGroup[] {
   return [
     { id: "elements", label: "ELEMENTS", count: elementRows.length, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
-    { id: "components", label: "COMPONENTS", count: componentRows.length, kind: "inline" },
-    { id: "mine", label: "MINE", count: mineCount, kind: "inline" },
+    /* Board 4428:140817 names them by where they come from. */
+    { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },
+    { id: "mine", label: "SAVED COMPONENTS", count: mineCount, kind: "inline" },
   ];
 }

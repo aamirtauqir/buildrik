@@ -40,9 +40,11 @@ interface Props {
   onClose: () => void;
   /** The tab a door asked for (`ui:pages-open-settings`); SEO otherwise. */
   initialTab?: DrawerTab;
+  /** The slug a rename's "Update URL" just moved the page off (G2-076). */
+  previousSlug?: string;
 }
 
-export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab }) => {
+export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
   const s = usePageSettings(composer, page, allPages);
 
   /* A door's tab (`ui:pages-open-settings`) lands on open and whenever a new
@@ -150,7 +152,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         <div className="bd-pg-drawer-body" data-testid="pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} composer={composer} />
+              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} />
             </div>
           )}
           {s.activeTab === "social" && (

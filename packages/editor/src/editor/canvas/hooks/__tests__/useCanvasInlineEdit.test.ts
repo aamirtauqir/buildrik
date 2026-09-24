@@ -8,6 +8,8 @@ import { useCanvasInlineEdit } from "../useCanvasInlineEdit";
 function makeMockComposer(): Composer {
   return {
     beginTransaction: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     endTransaction: vi.fn(),
     saveProject: vi.fn().mockResolvedValue(undefined),
     elements: {
@@ -152,6 +154,8 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     const setContent = vi.fn();
     const composer = {
       beginTransaction: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
       endTransaction: vi.fn(),
       /* The real composer is an emitter; a commit announces itself. */
       emit: vi.fn(),
@@ -220,5 +224,29 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     expect(setContent).not.toHaveBeenCalled();
 
     document.body.removeChild(toolbar);
+  });
+});
+
+/* G2-027: the inspector's "Edit text on canvas" starts the same edit. */
+describe("useCanvasInlineEdit — inspector request", () => {
+  it("UI_INLINE_EDIT_REQUEST for a text element starts editing it", async () => {
+    const { EVENTS } = await import("../../../../shared/constants/events");
+    const handlers = new Map<string, (p: { elementId: string }) => void>();
+    const composer = {
+      ...makeMockComposer(),
+      on: vi.fn((e: string, h: (p: { elementId: string }) => void) => handlers.set(e, h)),
+      off: vi.fn(),
+    } as unknown as Composer;
+    const canvas = document.createElement("div");
+    const h1 = document.createElement("h1");
+    h1.setAttribute("data-buildrick-id", "h-1");
+    h1.textContent = "Wood-fired pizza";
+    canvas.appendChild(h1);
+    document.body.appendChild(canvas);
+    const { result } = renderHook(() => useCanvasInlineEdit({ composer, canvasRef: { current: canvas } }));
+    act(() => handlers.get(EVENTS.UI_INLINE_EDIT_REQUEST)?.({ elementId: "h-1" }));
+    expect(result.current.editing.id).toBe("h-1");
+    expect(h1.contentEditable).toBe("true");
+    document.body.removeChild(canvas);
   });
 });

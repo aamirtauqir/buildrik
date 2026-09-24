@@ -1,5 +1,6 @@
 import * as React from "react";
-import { ConfirmDialog, PanelFrame, Button } from "@/editor/chrome-ui";
+import { X } from "lucide-react";
+import { ConfirmDialog, PanelFrame, Button, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { ScopeChip } from "./ScopeChip";
 import { EmptyThread } from "./EmptyThread";
@@ -16,6 +17,10 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 const STATE_BLOCK = "tw:flex tw:flex-col tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:p-4";
 const STATE_TITLE = "tw:m-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]";
 const STATE_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* Board 4418:106919's error block: a 12/18 error-red headline over an 11/16
+   muted body. */
+const ERROR_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]";
+const ERROR_BODY = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const STATE_LINK =
   "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
 import { DEFAULT_MODEL, type AIModel } from "./types";
@@ -79,6 +84,12 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   /* The scope stays locked while the run is live (board 4418:104454's 🔒)
      and is handed back when it ends. */
   const live = agent.phase === "planning" || agent.phase === "running";
+  /* A clean finish clears the prompt (remounts the composer); a failure
+     leaves it in place for Try again. */
+  const [composerKey, setComposerKey] = React.useState(0);
+  React.useEffect(() => {
+    if (agent.phase === "done" && !agent.error) setComposerKey((k) => k + 1);
+  }, [agent.phase, agent.error]);
   React.useEffect(() => {
     if (agent.phase === "done") unlock();
     if (agent.phase !== "idle") setBriefing(false);
@@ -139,6 +150,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             >
               ‹ Inspector
             </Button>
+            {/* Board 4418:106919: ✕ at the back row's right closes the panel. */}
+            <IconButton size="sm" label="Close AI" className="tw:ml-auto tw:mr-4 tw:text-[var(--bk-ink-muted)]" onClick={onClose}>
+              <X size={16} aria-hidden="true" />
+            </IconButton>
           </div>
           <div
             className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
@@ -160,7 +175,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           thread entirely. */}
       <ScopeChip scope={scope} status={status} />
       <div ref={promptRef}>
-        <PromptComposer onSubmit={submit} onStop={agent.stop} streaming={live} />
+        <PromptComposer key={composerKey} onSubmit={submit} onStop={agent.stop} streaming={live} />
       </div>
       {guard && scope.kind === "multi" ? (
         <p className={`${STATE_BODY} tw:px-4 tw:py-2`} role="status" data-testid="ai-multi-guard">
@@ -216,11 +231,12 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
            "other" error is the bucket for everything the two named states do
            not cover, and some carry the only useful detail there is. */
         <div className={`${STATE_BLOCK} tw:bg-[var(--bk-error-tint)]`} data-testid="ai-state-failed">
-          <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>The AI service didn&rsquo;t respond.</p>
-          <p className={STATE_BODY}>
-            Nothing changed. This is usually the model provider, not your site — try again in a moment.
+          <p className={ERROR_TITLE}>The AI service didn&rsquo;t respond.</p>
+          {/* No raw server line: "Stream failed" is a transport string, not
+              something the user can act on. The prompt stays in the composer. */}
+          <p className={ERROR_BODY}>
+            Nothing changed. Your prompt is still here; try again when the service is available.
           </p>
-          {agent.error ? <p className={STATE_BODY}>{agent.error}</p> : null}
           <Button color="light" size="xs" className={STATE_LINK} onClick={retry}>
             Try again
           </Button>

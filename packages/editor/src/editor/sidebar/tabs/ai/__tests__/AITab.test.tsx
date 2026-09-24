@@ -173,7 +173,7 @@ describe("AITab — scope + composer wiring", () => {
     expect(scope.assets).toHaveLength(1);
   });
 
-  it("surfaces a stream error where the user can see it, with the server's own detail", async () => {
+  it("surfaces a stream error where the user can see it", async () => {
     // Regression: onError set hook state but AITab never rendered it, so a
     // quota-exhausted (TOO_MANY_REQUESTS) or provider failure showed as a blank
     // assistant box. The error must be visible to the user.
@@ -195,7 +195,10 @@ describe("AITab — scope + composer wiring", () => {
       lastSubscribe.onError?.({ message: "Daily limit reached (10). Resets at 2026-06-04T00:00:00.000Z." });
     });
 
-    expect(screen.getByText(/Daily limit reached/i)).toBeInTheDocument();
+    // Board 4418:106919 (2026-09-24): the block is the board's sentence, not
+    // the server's raw line — but it is visible, which is the regression.
+    expect(screen.getByTestId("ai-state-failed")).toBeInTheDocument();
+    expect(screen.getByText(/didn.t respond/)).toBeInTheDocument();
   });
 
   /* Board 171:136 — a workspace with no API key gets its own state, with the
@@ -238,9 +241,24 @@ describe("AITab — scope + composer wiring", () => {
     });
 
     expect(screen.queryByText(/isn.t available on this workspace/)).not.toBeInTheDocument();
-    // Our headline plus the server's own line — not the not-configured state.
-    expect(screen.getByText(/didn.t respond/)).toBeInTheDocument();
-    expect(screen.getByText("Stream failed")).toBeInTheDocument();
+    // Board 4418:106919: the headline in error red at 12px, the muted 11px
+    // body, no raw server line ("Stream failed" is a debug string), and the
+    // typed prompt is still in the composer.
+    const title = screen.getByText(/didn.t respond/);
+    expect(title.className).toContain("tw:text-[var(--bk-error-text)]");
+    expect(title.className).toContain("tw:text-[12px]");
+    expect(screen.getByText(/Your prompt is still here/).className).toContain("tw:text-[11px]");
+    expect(screen.queryByText("Stream failed")).toBeNull();
+    expect(container.querySelector("textarea")!.value).toBe("make the hero warmer");
+  });
+
+  it("puts a ✕ on the back row that closes the panel (board 4418:106919)", () => {
+    const onClose = vi.fn();
+    renderWithToast(
+      <AITab composer={makeElementScopedComposer()} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={onClose} onBack={vi.fn()} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
+    expect(onClose).toHaveBeenCalled();
   });
 
   /* Board 171:105 — running out of credit is its own state too, and the one

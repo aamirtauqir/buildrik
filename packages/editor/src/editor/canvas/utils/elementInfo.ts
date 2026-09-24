@@ -233,7 +233,6 @@ export interface ElementInfo {
   friendlyName: string;
   parentName: string | null;
   hasLink: boolean;
-  hasCMSBinding: boolean;
 }
 
 /**
@@ -246,11 +245,6 @@ export function getElementInfo(element: HTMLElement): ElementInfo {
 
   // Check for link
   const hasLink = tagName === "a" || Boolean(element.closest("a"));
-
-  // Check for CMS binding (data attribute)
-  const hasCMSBinding =
-    element.hasAttribute("data-buildrick-cms-bound") ||
-    Boolean(element.querySelector("[data-buildrick-cms-bound]"));
 
   return {
     tagName,
@@ -269,6 +263,5 @@ export function getElementInfo(element: HTMLElement): ElementInfo {
     friendlyName: getFriendlyName(element),
     parentName: getParentName(element),
     hasLink,
-    hasCMSBinding,
   };
 }

@@ -13,7 +13,6 @@ import { ROTATION_HANDLE_OFFSET } from "../../../engine/canvas/constants";
 import type { HandlePosition } from "../../../engine/canvas/ResizeHandler";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { useCanvasResize } from "../hooks";
-import { AlignmentToolbar } from "../toolbars/AlignmentToolbar";
 import { SelectionHandles } from "./SelectionHandles";
 // import { useSelectionAnimation } from "../hooks/useSelectionAnimation";
 
@@ -545,21 +544,6 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           }}
         >
           {Math.round(width)} × {Math.round(height)}
-        </div>
-      )}
-
-      {/* Multi-select toolbar with alignment tools */}
-      {isMultiSelect && composer && (
-        <div
-          style={{
-            position: "absolute",
-            left: left + width / 2,
-            top: top - 48,
-            transform: "translateX(-50%)",
-            zIndex: Z_LAYERS.alignmentToolbar,
-          }}
-        >
-          <AlignmentToolbar composer={composer} selectedIds={selectedIds} />
         </div>
       )}
     </div>

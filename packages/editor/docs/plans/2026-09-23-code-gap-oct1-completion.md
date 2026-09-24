@@ -272,7 +272,8 @@ Items deliberately NOT in the Oct 1 scope. Each has an owner decision or a named
 | R2 | `activity.recent` tRPC procedure (B6 Activity tab has only the editor half) | Needs a dashboard change; the dashboard is out of scope (spec §Non-goals) | L1 B6 | Dashboard procedure. Until it exists the tab shows its "not in the editor yet" state |
 | R3 | Published-snapshot procedure (B8: compare a published version with the draft) | Published HTML never leaves the server | L1 B8 | Dashboard procedure |
 | R4 | Review token in `currentRound` (B3: a real client-link Copy) | Needs the dashboard | L1 B3 | Dashboard returns the token |
-| R5 | CMS Records as a table workspace + side sheet (`4428:143182`) instead of a modal | Full CMS workspace is Tier 3 scope | L3 B13 / owner "Figma wins" | Own item after Oct 1, unless L3 lands it as a small change |
+| R5 | ~~CMS Records as a table workspace + side sheet~~ | **Back in scope 2026-09-24** (owner: visually the same as Figma) and assigned to L3 | — | — |
+| R6 | **Built-in templates re-map to the site's Brand colours and fonts** (board text: templates "re-map to your Brand colours and fonts"; boards draw light thumbnails). Code applies each template's own colours. | Owner 2026-09-24: defer. Same token-binding problem as R1 | L3 Templates parity | Do together with R1: template HTML uses brand token refs, not literal colours |
 
 ## Visual parity — owner order 2026-09-24: "by Oct 1, visually the same as Figma"
 
@@ -306,3 +307,12 @@ Each day ends with one line per final item in `scratchpad/parity-daily-<date>.md
 Prototype rules (so the check is honest):
 - A reaction whose destination belongs to the dashboard, an archived board or pure sample data is recorded `n/a — <why>`, not DRIFT.
 - Navigation and screen order follow the prototype (visual/IA → board). What the data can do follows the code contract (Zod / service returns), per CLAUDE.md precedence. A conflict between the two goes to the owner and is never silently resolved.
+
+### Owner rulings 2026-09-24 (prototype vs earlier decisions)
+- Keep: the Publish confirm step (B4, board 7574:193972); #17 instant delete + Undo (confirm for N > 1 / masters); Saves auto-version instead of a Backups tab; B11 without breakpoint chips. The prototype's versions are scored `n/a — owner decision`.
+- Board wins: toasts, tooltips (the rail tooltip) and the selection toolbar are DARK as drawn. Decision #25's NO BLACK RULE is retired for these. Brand › Component styles lists site sections. Escape closes the Publish, Review, History and Layers drawers.
+- Deferred: R6, the template colour re-map.
+
+### Live walk moved earlier (owner, 2026-09-24: "don't wait for the 27th")
+The `/edit/:id` walk (Task 7) starts 24 Sep on the integration worktree: the dashboard runs on :3000 against the local dev DB, signed in as the seeded `qa@buildrik.local`, plus a local-only `qa-viewer@buildrik.local` VIEWER for B5. It covers first what only a real site can show (B2 save/⌘S, A2, B9 selection, B4 publish gate without Vercel, B1 real share link, B3 review round-trip, flags, B5 server-side rejection, reload persistence), then the hotspots the headless harness couldn't drive (row drags, empty-canvas clicks, Dark strategy menu, section-reorder grip). 27 Sep stays as the full re-walk on the final integration. Log: `scratchpad/walk/walk-log.md`.
+- Owner 2026-09-24: when board parity removes a capability that has no place on any board (spacing preset apply, grid size, site author), the capability comes BACK with the smallest possible visual deviation (a menu row or a collapsed section). Each case is logged in `scratchpad/designer-notes.md` so the designer can give it a place in Figma.
