@@ -74,24 +74,38 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(onToggleSelection).toHaveBeenCalledTimes(1);
   });
 
-  it("renders TypePills row", () => {
-    const { container } = render(<SlimLauncher {...baseProps()} />);
-    expect(container.querySelector(".med-type-pills")).toBeInTheDocument();
+  it("G3-005: one 'Filter' button (4418:59771) — no chips, no folder row", async () => {
+    const user = userEvent.setup();
+    render(<SlimLauncher {...baseProps()} counts={{ all: 5, img: 2, vid: 1, ico: 1, fnt: 1 }} />);
+    expect(screen.queryByTestId("media-type-chips")).toBeNull();
+    expect(screen.queryByTestId("media-folder-row")).toBeNull();
+    await user.click(screen.getByTestId("media-filter"));
+    // Board 7077:79171: TYPE · All · Images · Video · SVG · Icons, then FOLDER.
+    const rows = screen.getAllByRole("menuitemradio").map((r) => r.textContent);
+    expect(rows).toEqual(["✓All5", "Images2", "Video1", "SVG1", "Icons1"]);
+    expect(screen.getByText("Type")).toBeInTheDocument();
+    expect(screen.getByText("Folder")).toBeInTheDocument();
+    expect(screen.getByTestId("media-folder-scope")).toHaveTextContent("All");
   });
 
   // T8: the board moved Stock out of the header and into the footer beside
   // Upload (144:46), so the two ways of getting media in sit together. The
   // "+ Stock" button next to the filters is gone, not renamed.
-  it("offers Stock from the footer, beside Upload", () => {
-    render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-stock-action")).toBeInTheDocument();
-    expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
+  it("G3-020: Upload's caret opens ADD FROM · Stock photos · Icons · Fonts (7077:79204)", async () => {
+    const user = userEvent.setup();
+    render(<SlimLauncher {...baseProps()} onOpenIconPicker={vi.fn()} />);
+    expect(screen.getByTestId("media-upload-action")).toHaveTextContent("Upload");
+    expect(screen.queryByTestId("media-footer-links")).toBeNull();
+    expect(screen.queryByTestId("media-stock-action")).toBeNull();
+    await user.click(screen.getByTestId("media-add-from"));
+    expect(screen.getByText("Add from")).toBeInTheDocument();
+    expect(screen.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Stock photos", "Icons", "AaFonts"]);
   });
 
-  it("renders real search input (not ghost button)", () => {
+  it("no search box in the drawer — the topbar field searches (4418:59771)", () => {
     render(<SlimLauncher {...baseProps()} />);
-    // Placeholder is the board's own copy (144:9) — "Search", not "Search library…".
-    expect(screen.getByLabelText(/Search library/i)).toBeInTheDocument();
+    expect(screen.queryByTestId("media-search")).toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
   });
 
   it("renders 3-col asset grid (AssetGrid component) when libraryItems present", () => {
@@ -128,16 +142,15 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
   });
 
-  it("the footer door is 'Stock' (Clone 3437:36027) and the empty CTA says what pressing it does", () => {
+  it("the caret door is 'Stock photos' (7077:79204) and the empty CTA says what pressing it does", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Stock");
-    expect(screen.getByTestId("media-stock-action")).not.toHaveTextContent("Browse");
+    fireEvent.click(screen.getByTestId("media-add-from"));
+    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Stock photos");
     expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
   });
 
-  // Board 145:2 caption: the pills are a MULTI-select filter — a second pill
-  // widens the result instead of replacing it, and empty selection = all.
-  it("type pills multi-select: one pill narrows, a second widens, deselect-all restores", async () => {
+  // Board 7077:79171: TYPE is a one-of list (leading ✓ on the current row).
+  it("Filter TYPE is one-of: a row narrows, another replaces it, All restores", async () => {
     function Harness() {
       const [types, setTypes] = React.useState<ReadonlySet<MediaBucket>>(new Set());
       const items = [
@@ -171,19 +184,23 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     const { container } = render(<Harness />);
     const cells = () => container.querySelectorAll(".med-asset-cell").length;
     expect(cells()).toBe(3);
-    await user.click(screen.getByRole("button", { name: /^Video/i }));
+    await user.click(screen.getByTestId("media-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: /^Video/i }));
     expect(cells()).toBe(1);
-    await user.click(screen.getByRole("button", { name: /^Images/i }));
-    expect(cells()).toBe(2);
-    await user.click(screen.getByRole("button", { name: /^Video/i }));
-    await user.click(screen.getByRole("button", { name: /^Images/i }));
+    // One-of (7077:79171): Images REPLACES Video.
+    await user.click(screen.getByRole("menuitemradio", { name: /Images/i }));
+    expect(cells()).toBe(1);
+    expect(screen.getByRole("menuitemradio", { name: /Images/i })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("menuitemradio", { name: /Video/i })).toHaveAttribute("aria-checked", "false");
+    await user.click(screen.getByRole("menuitemradio", { name: /All/ }));
     expect(cells()).toBe(3);
   });
 
-  it("opens stock modal from the footer Stock link", async () => {
+  it("opens stock modal from the caret's Stock photos", async () => {
     const onOpenStock = vi.fn();
     const user = userEvent.setup();
     render(<SlimLauncher {...baseProps()} onOpenStock={onOpenStock} />);
+    await user.click(screen.getByTestId("media-add-from"));
     await user.click(screen.getByTestId("media-stock-action"));
     expect(onOpenStock).toHaveBeenCalledOnce();
   });
@@ -214,23 +231,22 @@ const MB = 1024 * 1024;
 
 /* Clone 3437:36027 (Build · Choose media) — the drawer baseline. */
 describe("Clone 3437:36027 · drawer baseline", () => {
-  it("the footer names the kinds and the code's own limits — not the board's 50 MB", () => {
+  it("Upload names the kinds and the code's own limits on its tooltip — not the board's 50 MB", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-footer-accepts")).toHaveTextContent(
+    expect(screen.getByTestId("media-upload-action")).toHaveAttribute(
+      "title",
       "Images, videos and fonts · up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
     );
-    // The Clone draws one line under the links; V1 2838:12023's second line is gone.
-    expect(screen.queryByTestId("media-footer-hint")).toBeNull();
+    expect(screen.queryByTestId("media-footer-accepts")).toBeNull();
   });
 
   /* The footer row is `↑ Upload · Stock · Icons · Aa Fonts`. The fourth door
      is Phase 5's (3686:42317): it opens the Site fonts dialog through the
      one composer event the dialog listens for, with no file to highlight. */
-  it("'Aa Fonts' closes the footer row and opens Site fonts through ui:site-fonts", () => {
+  it("Add from › Fonts opens Site fonts through ui:site-fonts", () => {
     const composer = mockComposer();
     render(<SlimLauncher {...baseProps()} composer={composer} onOpenIconPicker={vi.fn()} />);
-    const links = within(screen.getByTestId("media-footer-links"));
-    expect(links.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Upload", "Stock", "Icons", "Aa Fonts"]);
+    fireEvent.click(screen.getByTestId("media-add-from"));
     fireEvent.click(screen.getByTestId("media-fonts-action"));
     expect(composer.emit).toHaveBeenCalledWith("ui:site-fonts", {});
   });
@@ -241,8 +257,8 @@ describe("Clone 3437:36027 · drawer baseline", () => {
     render(<SlimLauncher {...baseProps()} onOpenLibrary={onOpenLibrary} />);
     const manage = screen.getByTestId("media-manage-assets");
     expect(manage).toHaveTextContent("Manage assets");
-    // Under the header, above the search — the later Clone frames (3584/3585) place it there.
-    expect(manage.compareDocumentPosition(screen.getByTestId("media-search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Under the header, above the Filter row (4418:59771).
+    expect(manage.compareDocumentPosition(screen.getByTestId("media-filter")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     await user.click(manage);
     expect(onOpenLibrary).toHaveBeenCalledTimes(1);
   });
@@ -305,8 +321,8 @@ describe("Clone 3585:23326 / 3585:23337 · replacement upload from the drawer", 
     const banner = await screen.findByTestId("media-replacement-banner");
     expect(within(banner).getByTestId("media-replacement-name")).toHaveTextContent("pasta-2-small.webp");
     expect(within(banner).getByTestId("media-replacement-meta")).toHaveTextContent("Uploaded · WEBP · 8 MB · In site library");
-    // Above the search, below Manage assets.
-    expect(banner.compareDocumentPosition(screen.getByTestId("media-search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Above the Filter row, below Manage assets.
+    expect(banner.compareDocumentPosition(screen.getByTestId("media-filter")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByTestId("media-manage-assets").compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // Manage in full library → the fullpage with this file selected.
     fireEvent.click(within(banner).getByTestId("media-replacement-manage"));
@@ -350,22 +366,24 @@ describe("SlimLauncher — filters that lead nowhere", () => {
     ...over,
   });
 
-  it("a pill at zero cannot be clicked, and says why", () => {
+  it("a type at zero cannot be clicked, and says why", async () => {
     // It offered a filter whose only possible result was "nothing here".
     render(<SlimLauncher {...withLibrary()} />);
+    await userEvent.setup().click(screen.getByTestId("media-filter"));
     const svg = screen.getByTestId("media-type-chip-ico");
     expect(svg).toBeDisabled();
-    expect(svg.getAttribute("title")).toMatch(/no svg files/i);
+    expect(svg.getAttribute("title")).toMatch(/no svg in this library/i);
     // The ones that would return something stay live.
     expect(screen.getByTestId("media-type-chip-img")).not.toBeDisabled();
   });
 
-  it("a pill at zero stays clickable while it is the ACTIVE filter", () => {
+  it("a type at zero stays clickable while it is the ACTIVE filter", async () => {
     // Deleting the last SVG while filtered to SVG must not remove the control
     // that clears the filter.
     render(
       <SlimLauncher {...withLibrary({ activeTypes: new Set<MediaBucket>(["ico"]) })} />,
     );
+    await userEvent.setup().click(screen.getByTestId("media-filter"));
     expect(screen.getByTestId("media-type-chip-ico")).not.toBeDisabled();
   });
 

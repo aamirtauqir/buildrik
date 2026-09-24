@@ -28,48 +28,6 @@
       "nodeId": "208:271"
     },
     {
-      "name": "search",
-      "testId": "media-search",
-      "spec": "media-drawer",
-      "nodeId": "144:7"
-    },
-    {
-      "name": "folder-row",
-      "testId": "media-folder-row",
-      "spec": "media-drawer",
-      "nodeId": "144:10"
-    },
-    {
-      "name": "type-chips",
-      "testId": "media-type-chips",
-      "spec": "media-drawer",
-      "nodeId": "144:13"
-    },
-    {
-      "name": "chip-image",
-      "testId": "media-type-chip-img",
-      "spec": "media-drawer",
-      "nodeId": "144:14"
-    },
-    {
-      "name": "chip-video",
-      "testId": "media-type-chip-vid",
-      "spec": "media-drawer",
-      "nodeId": "144:17"
-    },
-    {
-      "name": "chip-svg",
-      "testId": "media-type-chip-ico",
-      "spec": "media-drawer",
-      "nodeId": "144:20"
-    },
-    {
-      "name": "chip-icon",
-      "testId": "media-type-chip-fnt",
-      "spec": "media-drawer",
-      "nodeId": "144:23"
-    },
-    {
       "name": "asset-grid",
       "testId": "media-grid",
       "spec": "media-drawer",

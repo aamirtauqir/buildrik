@@ -466,13 +466,6 @@ export interface MediaStateResult {
 
 // --- Prop slices ---
 
-export interface TypePillsProps {
-  activeType: MediaTypeFilter;
-  counts: TypeCounts;
-  discMode: boolean;
-  onTypeChange(t: MediaTypeFilter): void;
-}
-
 export interface LibraryViewProps {
   items: LibraryItem[];
   uploadQueue: UploadProgress[];

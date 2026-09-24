@@ -249,9 +249,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   const [searchQuery, setSearchQuery] = React.useState("");
   React.useEffect(() => {
     if (!composer) return;
-    const onCtx = (ctx: { placeholder: string } | null) => {
+    const onCtx = (ctx: { placeholder: string; query?: string } | null) => {
       setSearchCtx(ctx);
-      setSearchQuery("");
+      setSearchQuery(ctx?.query ?? "");
     };
     composer.on(EVENTS.UI_SEARCH_CONTEXT, onCtx);
     return () => {

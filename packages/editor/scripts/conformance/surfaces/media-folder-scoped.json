@@ -3,23 +3,45 @@
   "board": "Media · folder-scoped (Figma 145:49)",
   "_note": "Probe: the drawer's folder list comes from the server, so a named scope needs a fixture. The waitFor is on `media-folder-scope` and the step then reads its label — a fixture that failed to apply `currentFolderId` would fall back to \"All\" and be measured as the media-drawer board instead of this one. NOT joined: 145:55 (inner search field, authority=open:input-fill) and 145:59 (the folder row's Select — a text-frame auto-width around a ☑ standing in for an icon).",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-folder-scoped",
-  "viewport": { "width": 280, "height": 812 },
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
   "steps": [
-    { "action": "waitFor", "testId": "media-folder-scope" },
-    { "action": "waitFor", "testId": "media-grid" }
+    {
+      "action": "waitFor",
+      "testId": "media-folder-scope"
+    },
+    {
+      "action": "waitFor",
+      "testId": "media-grid"
+    }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "panel",        "testId": "media-panel",         "spec": "media-folder-scoped", "nodeId": "145:49" },
-    { "name": "panel-header", "testId": "panel-header",        "spec": "media-folder-scoped", "nodeId": "208:291" },
-    { "name": "search",       "testId": "media-search",        "spec": "media-folder-scoped", "nodeId": "145:54" },
-    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-folder-scoped", "nodeId": "145:57" },
-    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-folder-scoped", "nodeId": "145:60" },
-    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-folder-scoped", "nodeId": "145:61" },
-    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-folder-scoped", "nodeId": "145:64" },
-    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-folder-scoped", "nodeId": "145:67" },
-    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-folder-scoped", "nodeId": "145:70" },
-    { "name": "asset-grid",   "testId": "media-grid",          "spec": "media-folder-scoped", "nodeId": "145:73" },
-    { "name": "footer",       "testId": "media-footer",        "spec": "media-folder-scoped", "nodeId": "145:93" }
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-folder-scoped",
+      "nodeId": "145:49"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-folder-scoped",
+      "nodeId": "208:291"
+    },
+    {
+      "name": "asset-grid",
+      "testId": "media-grid",
+      "spec": "media-folder-scoped",
+      "nodeId": "145:73"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-folder-scoped",
+      "nodeId": "145:93"
+    }
   ]
 }
