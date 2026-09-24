@@ -6,10 +6,10 @@
  */
 
 import * as React from "react";
-import { LayersStateMessage } from "./LayersStateBlocks";
+import { PanelStateMessage } from "@/editor/shared/PanelStates";
 
 export const LayersEmptyState: React.FC = () => (
-  <LayersStateMessage
+  <PanelStateMessage
     message="No layers yet. Add an element to start building this page."
     padTop="tw:pt-[30px]"
     testId="layers-empty"

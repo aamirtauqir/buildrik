@@ -68,7 +68,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
-import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
+import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
    loads the panel's stylesheet the way production does. */
 import "@/editor/sidebar/tabs/ai/AITab.css";
@@ -1136,6 +1136,7 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
+          onRetry={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -2283,7 +2284,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "pages-loading": () => (
     <div data-probe="pages-loading" style={{ width: 280, background: "#fff" }}>
-      <PagesLoadingSkeleton />
+      <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
     </div>
   ),
   "insert-disabled-row": () => (
@@ -3068,6 +3069,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
+        onRemoveFromFolder={() => {}}
       />
     </div>
   ),

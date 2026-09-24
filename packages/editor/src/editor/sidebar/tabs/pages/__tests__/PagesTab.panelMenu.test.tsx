@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 /**
  * PagesTab — the header ⋯ panel menu (board 7069:79383 + EP-11 Listings
- * row, audit G2-070) and the ⌘K keycap (board 4418:90494).
+ * row, audit G2-070), and the topbar field as the panel's filter
+ * (v3 4418:92256).
  *
  * Select pages… turns the row checkboxes on before anything is ticked;
- * Show structure / Listings swap the body view; Reload re-syncs; the keycap
- * asks the shell for THE palette. The Listings / Structure text links that
- * sat on the search band are gone.
+ * Show structure / Listings swap the body view; Reload re-syncs. The ⌘K
+ * keycap and the search band are gone — v3 4418:90494 draws neither; the
+ * topbar field reads "Search pages…" while the drawer is open.
  *
  * @license BSD-3-Clause
  */
@@ -74,11 +75,10 @@ describe("PagesTab — header ⋯ menu", () => {
     expect((composer.elements.getAllPages as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(before);
   });
 
-  it("the ⌘K keycap renders in the header and asks the shell for the one palette", () => {
+  it("hands the topbar field a Pages scope instead of drawing a keycap or search band", () => {
     const composer = mount();
-    const keycap = screen.getByTestId("pages-open-palette");
-    expect(keycap.closest('[data-testid="panel-header"]')).not.toBeNull();
-    fireEvent.click(keycap);
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {});
+    expect(screen.queryByTestId("pages-open-palette")).toBeNull();
+    expect(screen.queryByLabelText("Search pages")).toBeNull();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search pages…" });
   });
 });

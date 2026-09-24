@@ -12,7 +12,7 @@
      so density tweaks and footer-clearance edits stay coherent. */
   --pg-row-h: 32px;        /* board 140:2 — uniform; see PagesTab.rowHeight.test.ts */
   --pg-row-h-active: 32px;
-  --pg-icon-box: 22px;
+  --pg-icon-box: 24px;
   --pg-icon-glyph: 12px;
   --pg-footer-clearance: 120px;
 
@@ -25,69 +25,6 @@
 
 /* PanelShell.Header owns header chrome; no .bd-pg-header rules needed. */
 
-/* ─── SEARCH ──────────────────────────────────────────────────────────── */
-.bd-pg-search {
-  /* Board 140:8: 28h box on gray-50 with a border, radius 6. */
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-  height: 28px;
-  padding: 0 var(--bk-space-8);
-  background: var(--bk-gray-50);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-md);
-  transition: border-color 100ms;
-}
-.bd-pg-search:focus-within {
-  border-color: var(--bk-accent);
-}
-
-/* Board 140:7 band: the search box on one 36h row. */
-.bd-pg-search-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-}
-
-.bd-pg-listings-back {
-  flex-shrink: 0;
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  font: 400 12px/18px var(--bk-font-ui);
-  color: var(--bk-accent-text);
-  box-shadow: none;
-}
-
-/* Header ⌘K keycap (board 4418:90494): a 26×22 ghost button holding an
-   11px mono chip. */
-.bd-pg-kbd-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 26px;
-  height: 22px;
-  padding: 0;
-}
-.bd-pg-kbd {
-  font: 500 11px var(--bk-font-mono);
-  padding: 1px 5px;
-  border-radius: 3px;
-  border: 1px solid var(--bk-border);
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-muted);
-}
-.bd-pg-search input {
-  flex: 1;
-  background: transparent;
-  border: 0;
-  outline: 0;
-  font: 400 var(--bk-text-13) var(--bk-font-ui);
-  color: var(--bk-ink);
-}
-.bd-pg-search input::placeholder { color: var(--bk-ink-muted); }
-.bd-pg-search svg { width: 12px; height: 12px; color: var(--bk-ink-muted); flex-shrink: 0; }
-.bd-pg-search-wrap { padding: 0 var(--bk-space-12) var(--bk-space-8); }
 .bd-pg-selectall {
   display: flex;
   align-items: center;
@@ -132,7 +69,9 @@
 .bd-pg-list {
   flex: 1;
   overflow: auto;
-  padding: var(--bk-space-4) 6px var(--pg-footer-clearance);
+  /* v3 4418:90494: rows run the drawer's full 280, first one right under
+     the header. */
+  padding: 0 0 var(--pg-footer-clearance);
 }
 
 /* ─── ROW ─────────────────────────────────────────────────────────────── */
@@ -141,8 +80,10 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px var(--bk-space-8);
+  /* v3 4418:90494 row grid: 24 checkbox slot at 12, then 12 disclosure,
+     16 icon, label — 4 apart; pills end 16 in. */
+  gap: var(--bk-space-4);
+  padding: 0 var(--bk-space-16) 0 var(--bk-space-12);
   border-radius: 4px;
   cursor: pointer;
   user-select: none;
@@ -150,25 +91,13 @@
   transition: background 100ms;
   min-height: var(--pg-row-h);
 }
-.bd-pg-row:hover { background: rgba(15,23,42,0.04); color: var(--bk-ink); }
-.bd-pg-row.active {
-  background: var(--bk-accent-tint);
-  color: var(--bk-ink);
-  min-height: var(--pg-row-h-active);
-}
-.bd-pg-row.active::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
-  background: var(--bk-accent);
-  border-radius: 0 2px 2px 0;
-}
+/* v3 7069:79370 hover: gray-100 fill. The open page carries no tint or
+   bar (4418:90494 / 4418:165158 draw Home open and untinted) — the page tabs
+   and the crumb say which page is open; tint means SELECTED here. */
+.bd-pg-row:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
 
 /* ─── ROW VARIANTS ────────────────────────────────────────────────────── */
-.bd-pg-row.nested { padding-left: 22px; }
+.bd-pg-row.nested { padding-left: 28px; }
 .bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-ink-muted); }
 /* Board 141:78 tints every SELECTED row, not just its checkbox: the three
    rows the bulk bar is counting all sit on accent-tint. Without it the only
@@ -180,8 +109,11 @@
 
 /* ─── ROW INTERNALS ───────────────────────────────────────────────────── */
 .bd-pg-row-checkbox {
-  /* Board 140:12: 16px, radius 4, 1.5px gray-300 — on EVERY row. */
+  /* 16px, radius 4, 1.5px gray-300, centred in the row's 24px slot. v3
+     4418:90494 keeps the slot on every row but draws the box only in select
+     mode (4418:94471 / 7069:78984). */
   width: 16px; height: 16px;
+  margin: 0 var(--bk-space-4);
   border-radius: 4px;
   border: 1.5px solid var(--bk-gray-300);
   display: grid;
@@ -190,6 +122,7 @@
   background: var(--bk-bg-card);
   transition: 100ms;
 }
+.bd-pg-panel:not(.bulk-mode) .bd-pg-row-checkbox { visibility: hidden; }
 .bd-pg-row-checkbox svg { width: 10px; height: 10px; color: var(--bk-accent-on); opacity: 0; }
 .bd-pg-row.selected .bd-pg-row-checkbox svg { opacity: 1; }
 /* Folder-row checkbox states — board 140:11-12 + Checkbox 12:26 mixed rule. */
@@ -205,15 +138,33 @@
   background: var(--bk-accent-on);
 }
 
+/* v3 7069:79370: the ⠿ handle shows on hover at x20 of the row, over the
+   (hidden) checkbox slot — not in select mode, where the box is there. */
 .bd-pg-row-grip {
   display: none;
+  position: absolute;
+  left: var(--bk-space-20);
+  top: 50%;
+  transform: translateY(-50%);
   width: 10px;
-  color: var(--bk-ink-muted);
-  margin-right: -var(--bk-space-4);
+  color: var(--bk-gray-400);
   cursor: grab;
-  flex-shrink: 0;
 }
-.bd-pg-row:hover .bd-pg-row-grip { display: block; }
+.bd-pg-panel:not(.bulk-mode) .bd-pg-row:hover .bd-pg-row-grip { display: block; }
+/* The 12×16 disclosure slot — the folder's ▾ / ▸, empty on page rows. One
+   class deeper than IconButton's own size utilities. */
+.bd-pg-row .bd-pg-row-chev {
+  display: grid;
+  place-items: center;
+  width: 12px;
+  min-width: 12px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  flex-shrink: 0;
+  font: 400 11px/16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
 
 /* .bd-pg-row-disclosure + svg rule removed 2026-05-24 — zero JSX consumer.
    Folder expand/collapse uses a ChevronRight icon directly, not this
@@ -221,12 +172,13 @@
 
 .bd-pg-row-icon {
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
   color: var(--bk-ink-soft);
   display: grid;
   place-items: center;
 }
 .bd-pg-row-icon svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
-.bd-pg-row.active .bd-pg-row-icon { color: var(--bk-accent); }
 
 /* Rename input + its validation error. `.bd-pg-row-name` below has had a rule
    since the Pages arc; these two never did, so renaming a page showed a default
@@ -256,7 +208,9 @@
 }
 
 .bd-pg-row-name {
-  flex: 1;
+  /* Natural width; the spacer after it takes the slack. Sharing flex:1 with
+     that spacer halved the room and "Home" ellipsised beside its pill. */
+  flex: 0 1 auto;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -288,6 +242,8 @@
 /* Single overflow button — replaces per-row action strip (DESIGN.md anti-slop #12) */
 .bd-pg-row-overflow {
   width: var(--pg-icon-box); height: var(--pg-icon-box);
+  min-width: var(--pg-icon-box); min-height: 0;
+  padding: 0;
   display: none;
   place-items: center;
   border-radius: 4px;
@@ -346,14 +302,22 @@
 /* ─── FOLDER ──────────────────────────────────────────────────────────── */
 .bd-pg-folder { display: block; }
 .bd-pg-folder-children { padding-left: 0; }
+/* v3 4418:90494: "ⓘ" 12px gray-500, then "3 pages" 11/16 muted, both
+   straight after the folder name. */
+.bd-pg-folder-info {
+  display: inline-grid;
+  place-items: center;
+  width: 12px;
+  height: 16px;
+  flex-shrink: 0;
+  font: 400 12px/16px var(--bk-font-ui);
+  color: var(--bk-gray-500);
+  cursor: help;
+}
 .bd-pg-folder-count {
-  /* Board 140:16: bare Geist Mono 11 — no pill, no background. */
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
+  flex-shrink: 0;
   color: var(--bk-ink-muted);
-  font: 500 11px/16px var(--bk-font-mono);
-  font-variant-numeric: tabular-nums;
+  font: 400 11px/16px var(--bk-font-ui);
 }
 .bd-pg-folder-actions {
   display: none;
@@ -425,13 +389,24 @@
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 .bd-pg-footer {
+  /* v3 4418:90494: the legend (or a search's match count) over a 36-tall
+     band with a top rule, "+ Add page" 16 in. */
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  padding: 10px var(--bk-space-12) var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: linear-gradient(to top, var(--bk-bg-panel) 80%, transparent);
+  background: var(--bk-bg-panel);
+}
+.bd-pg-footer > :last-child {
+  height: 36px;
+  padding: 0 var(--bk-space-16);
+  border-top: 1px solid var(--bk-border);
+}
+.bd-pg-legend {
+  margin: 0;
+  padding: 0 var(--bk-space-16) var(--bk-space-8);
+  font: 400 11px/16px var(--bk-font-ui);
+  color: var(--bk-gray-500);
 }
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
@@ -689,28 +664,6 @@
   outline-offset: 2px;
 }
 
-/* Board 141:165 — centered load error. */
-.bd-pg-error {
-  /* Board 141:203 is a 132-tall full-width band on 24px gutters — `min-height`
-     rather than `height` so the copy can never be clipped at a narrower
-     drawer, which the board's own `overflow-clip` would do. */
-  display: flex;
-  flex-direction: column;
-  /* stretch, not center: board 141:204-206 give all three lines the block's
-     full 232px column and centre the TEXT inside it. Centring the flex items
-     shrank each one to its own text, so the retry's hit area was the width of
-     the words "Try again". */
-  align-items: stretch;
-  gap: var(--bk-space-8);
-  min-height: 132px;
-  padding: var(--bk-space-32) var(--bk-space-24) 0;
-  text-align: center;
-}
-/* Board 141:204 names error-text; 530588b4 missed it, grepping for red-700. */
-.bd-pg-error-title { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-error-text); }
-.bd-pg-error-desc { margin: 0; font: 400 12px/18px var(--bk-font-ui); color: var(--bk-ink-muted); }
-.bd-pg-error-retry,
-.bd-pg-nores-clear,
 .bd-pg-onepage-add {
   min-height: 20px; /* stated: the line box was all that held the hit floor */
   border: none;
@@ -721,43 +674,17 @@
   box-shadow: none;
 }
 
-/* Board 782:4257 — 36 / 24 / 32 on a 280 column, 10px gap, 13px type ON THE
-   BLOCK. It read "left at 16" and was 24/16/0 with an 8 gap, which is the
-   older draw; the 2026-09-08 export states all four insets.
-
-   The negative side margin is the same fix `.bd-pg-error` carries and for the
-   same reason: this block lives inside `.bd-pg-list`, whose 6px gutter it
-   inherited, so its 24px text column measured 220 against the board's 232.
-   Unlike the error block it cannot be hoisted to a sibling — it replaces the
-   list's CONTENT, not the list — so it reaches the panel edge from where it
-   is. `stretch`, not `flex-start`: 782:4258 and 782:4259 are both `w-full`,
-   and centring the flex items shrank "Clear search" to the width of its own
-   words. */
-.bd-pg-nores {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-  margin: 0 -6px;
-  padding: var(--bk-space-36) var(--bk-space-24) var(--bk-space-32);
-  font: 400 13px var(--bk-font-ui);
-}
-.bd-pg-nores p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
-
 /* Board 141:162 — the one-page note under the single row: a 120-tall band,
    13/20 type, its two lines at y32 and y60 on a 232px column (141:163 /
    141:164 are both w-232 inside a 280 panel = 24px gutters).
 
-   Same negative margin as `.bd-pg-nores` above: nested in `.bd-pg-list` this
-   measured a 220 column. `stretch` gives the "+ Add page" link the full 232
-   the board draws instead of the width of its own words — the same hit-area
-   defect `.bd-pg-error` had. */
+   `stretch` gives the "+ Add page" link the full 232 the board draws instead
+   of the width of its own words. */
 .bd-pg-onepage {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--bk-space-8);
-  margin: 0 -6px;
   min-height: 120px;
   padding: var(--bk-space-32) var(--bk-space-24) 0;
   font: 400 13px/20px var(--bk-font-ui);
@@ -804,6 +731,7 @@
    2026-09-08; size and line box unchanged. */
 .bd-pg-row-incontext {
   flex-shrink: 0;
-  font: 400 11px/16px var(--bk-font-ui);
+  /* v3 4418:92256: same 13/20 as the name it qualifies. */
+  font: 400 13px/20px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
