@@ -80,6 +80,8 @@ export interface MultiPageExportFile {
   content: string;
   /** File type */
   type: "html" | "css" | "js" | "xml" | "tsx" | "json";
+  /** For a page's HTML: the page it was written from. */
+  pageId?: string;
 }
 
 /**
@@ -826,6 +828,7 @@ export class ExportEngine {
         name: fileName,
         content: html,
         type: "html",
+        pageId: page.id,
       });
     }
 

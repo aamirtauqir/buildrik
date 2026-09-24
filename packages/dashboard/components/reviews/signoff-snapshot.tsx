@@ -11,7 +11,12 @@ import { Button } from "@/components/dashboard/primitives";
  * snapshot taken at send, never the live draft (contracts §1.6).
  */
 
-export type SnapshotPage = { path: string; html: string };
+/** `name` is the page's own name where the caller knows it (the /share draft
+ *  preview); a review snapshot carries only the path, so the label falls back
+ *  to one derived from it. */
+export type SnapshotPage = { path: string; html: string; name?: string };
+
+const labelOf = (page: SnapshotPage): string => page.name || pageLabel(page.path);
 
 /** "index.html" → "Home", "menu.html" → "Menu". */
 export function pageLabel(path: string): string {
@@ -38,7 +43,7 @@ export function PageCrumb({
   onPick: (index: number) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const current = pages[active] ? pageLabel(pages[active].path) : "Home";
+  const current = pages[active] ? labelOf(pages[active]) : "Home";
   if (pages.length < 2) return <span>{current}</span>;
   return (
     <span className="relative inline-flex">
@@ -73,7 +78,7 @@ export function PageCrumb({
                 i === active ? "tw:font-semibold tw:text-[#111827]" : "tw:font-normal tw:text-[#4B5563]"
               }`}
             >
-              {pageLabel(p.path)}
+              {labelOf(p)}
             </Button>
           ))}
         </span>

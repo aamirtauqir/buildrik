@@ -36,8 +36,12 @@ export function inlinePublishStylesheet(
   }));
 }
 
+async function exportPageFiles(composer: Composer) {
+  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true })).files;
+}
+
 export async function exportPublishPages(composer: Composer): Promise<PublishPage[]> {
-  const result = await new ExportEngine(composer).exportAllPages({ format: "html", minify: true });
+  const files = await exportPageFiles(composer);
   /* The multi-page export writes ONE styles.css and links it from every page,
      and the publish payload carries pages only (`pages: [{ path, html }]`), so
      that file never reached the deployment — the worker uploads the page HTML
@@ -47,7 +51,14 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
 
      Inlining it needs no new transport: schema, server and worker unchanged.
      Pages are capped at 2MB each and the stylesheet is a few KB. */
-  return inlinePublishStylesheet(result.files);
+  return inlinePublishStylesheet(files);
+}
+
+/** A rendered page plus the page it came from — its NAME for a page menu and
+ *  its SLUG for a `?page=` link (the /share preview). */
+export interface RenderedPage extends PublishPage {
+  name: string;
+  slug: string;
 }
 
 /**
@@ -70,7 +81,7 @@ export async function renderProjectPages(
    *  them the export cannot write their @font-face. A file that fails to load
    *  is left out, and the export drops its family from the stacks. */
   siteFonts: ReadonlyArray<{ filename: string; url: string }> = [],
-): Promise<PublishPage[]> {
+): Promise<RenderedPage[]> {
   const scratch = createComposer({
     container: document.createElement("div"),
     storage: { type: "none", autoSave: false },
@@ -79,7 +90,14 @@ export async function renderProjectPages(
   try {
     await Promise.all(siteFonts.map((f) => scratch.fonts.registerLibraryFont(f).catch(() => undefined)));
     scratch.importProject(snapshot);
-    return await exportPublishPages(scratch);
+    const files = await exportPageFiles(scratch);
+    const byId = new Map(snapshot.pages.map((p) => [p.id, p]));
+    const htmlFiles = files.filter((f) => f.name.endsWith(".html"));
+    // inlinePublishStylesheet keeps the html files' order, so index i is file i.
+    return inlinePublishStylesheet(files).map((page, i) => {
+      const source = byId.get(htmlFiles[i]?.pageId ?? "");
+      return { ...page, name: source?.name ?? page.path, slug: source?.slug ?? "" };
+    });
   } finally {
     scratch.destroy();
   }
