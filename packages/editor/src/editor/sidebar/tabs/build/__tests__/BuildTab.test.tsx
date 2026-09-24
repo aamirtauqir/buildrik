@@ -328,6 +328,24 @@ describe("BuildTab — search through the topbar field", () => {
     expect(await screen.findByTestId("paste-html-modal")).toBeTruthy();
   });
 
+  /* Board 4418:100890 (owner: the drag's visual state): holding an ELEMENTS
+     row announces it, and a note under the row says where it will land. */
+  it("dragging an element row: announces it, notes where it lands, clears on dragend", () => {
+    const { composer, emitted } = emitterComposer();
+    renderTab({ composer });
+    const row = screen.getByTestId("insert-el-Heading");
+    fireEvent.dragStart(row, { dataTransfer: { setData: vi.fn(), effectAllowed: "" } });
+    expect(emitted).toContainEqual(["ui:insert-drag", { label: "Heading" }]);
+    expect(screen.getByTestId("insert-drag-note").textContent).toBe("Drag it onto the canvas. Release to drop it, or Esc to cancel.");
+    act(() => composer!.emit("ui:insert-drag-target" as never, { path: "Home › Hero › Content", into: "Content", after: null } as never));
+    expect(screen.getByTestId("insert-drag-note").textContent).toBe(
+      "Place the element in Home › Hero › Content. Release to drop it, or Esc to cancel.",
+    );
+    act(() => { window.dispatchEvent(new Event("dragend")); });
+    expect(screen.queryByTestId("insert-drag-note")).toBeNull();
+    expect(emitted).toContainEqual(["ui:insert-drag", { label: null }]);
+  });
+
   it("a topbar query swaps the groups for the flat results (138:53) and the no-results state", async () => {
     const { composer } = emitterComposer();
     renderTab({ composer });
