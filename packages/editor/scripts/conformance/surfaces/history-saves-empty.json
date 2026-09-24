@@ -45,12 +45,6 @@
    "nodeId": "1657:7155"
   },
   {
-   "name": "filter-row",
-   "testId": "history-filter-row",
-   "spec": "history-saves-empty",
-   "nodeId": "1657:7157"
-  },
-  {
    "name": "search-bar",
    "testId": "history-search-bar",
    "spec": "history-saves-empty",
