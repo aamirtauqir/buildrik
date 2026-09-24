@@ -316,13 +316,16 @@ export class ElementManager {
   }
 
   /**
-   * Clone element data with new IDs
+   * Clone element data with new IDs. DEEP: `toJSON()` hands out the live
+   * element's own `attributes` object, so a spread clone shared it — setting
+   * the duplicate's href (or src, alt…) rewrote the original's too.
    */
   private cloneElementData(data: ElementData): ElementData {
+    const { children, ...own } = data;
     return {
-      ...data,
+      ...structuredClone(own),
       id: generateId("el"),
-      children: data.children?.map((c) => this.cloneElementData(c)),
+      children: children?.map((c) => this.cloneElementData(c)),
     };
   }
 
