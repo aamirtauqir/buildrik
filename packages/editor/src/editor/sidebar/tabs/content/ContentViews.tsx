@@ -29,7 +29,6 @@ import {
   ROW_ICON_CLASS,
   ROW_LABEL_CLASS,
   Select,
-  Textarea,
   TextInput,
 } from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
@@ -37,7 +36,7 @@ import type { ConditionExpression, ConditionOperator, DataSource } from "@/share
 import type { SiteVariable } from "@/shared/types/project";
 import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
+import { ConnectSourceDialog, RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
@@ -282,7 +281,6 @@ export function SourcesView({
   actions?: SourceRowActions;
 }) {
   const [adding, setAdding] = React.useState(false);
-  const [json, setJson] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
   const [renaming, setRenaming] = React.useState<DataSource | null>(null);
@@ -355,57 +353,23 @@ export function SourcesView({
         })}
         {/* Board 303:2067's pill words, which are the state's real name — the
             panel is not missing a list, there is nothing connected yet. */}
-        {sources.length === 0 && !adding && (
+        {sources.length === 0 && (
           <div className="tw:px-4 tw:py-2">
             <span className={`${STATUS_PILL} ${STATUS_PILL_IDLE}`} data-testid="content-no-source">
               No data source connected
             </span>
           </div>
         )}
-        {adding ? (
-          <div className={INLINE_FORM}>
-            <Textarea
-              className="tw:bg-white tw:min-h-24 tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-xs"
-              placeholder='{"products": [{"name": "…"}]}'
-              value={json}
-              onChange={(e) => setJson(e.target.value)}
-              aria-label="Source JSON"
-              autoFocus
-            />
-            {error && <div className={ERROR_TEXT} role="alert">{error}</div>}
-            <div className={FORM_ROW}>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!json.trim()}
-                onClick={() => {
-                  const err = onImportJson(json);
-                  if (err) setError(err);
-                  else {
-                    setAdding(false);
-                    setJson("");
-                    setError(null);
-                  }
-                }}
-              >
-                Add source
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-source" onClick={() => setAdding(true)}>
-              + Connect a source
-            </Button>
-            {/* Board 151:46 prints this under the link, in flow. Pinned to the
-                panel's foot with a rule above it, it read as a footer note on
-                a different subject — 600px below the thing it explains. */}
-            <div className={INLINE_HINT} data-testid="content-source-note">
-              A source feeds a collection. Edits sync one way — from the source in.
-            </div>
-          </>
-        )}
+        {adding ? <ConnectSourceDialog onClose={() => setAdding(false)} onImport={onImportJson} /> : null}
+        <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-source" onClick={() => setAdding(true)}>
+          + Connect a source
+        </Button>
+        {/* Board 151:46 prints this under the link, in flow. Pinned to the
+            panel's foot with a rule above it, it read as a footer note on
+            a different subject — 600px below the thing it explains. */}
+        <div className={INLINE_HINT} data-testid="content-source-note">
+          A source feeds a collection. Edits sync one way — from the source in.
+        </div>
       </div>
       {actions ? (
         <>
