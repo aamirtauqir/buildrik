@@ -21,6 +21,7 @@ const fetchReviewComments = vi.fn();
 const postReply = vi.fn();
 const resolveReviewComment = vi.fn();
 const revokeReview = vi.fn();
+const reattachReviewComment = vi.fn();
 
 vi.mock("../../../../../services/ReviewService", () => ({
   fetchRounds: vi.fn(() => Promise.resolve([])),
@@ -29,6 +30,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
   postReply: (...a: unknown[]) => postReply(...a),
   resolveReviewComment: (...a: unknown[]) => resolveReviewComment(...a),
   revokeReview: (...a: unknown[]) => revokeReview(...a),
+  reattachReviewComment: (...a: unknown[]) => reattachReviewComment(...a),
   fetchApprovedSnapshot: vi.fn(),
   /* RoleService reads currentSiteId, and the panel now asks for the role
      so a VIEWER gets the send control disabled with its reason — the
@@ -406,6 +408,33 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
     const row = band.closest("div[style]") as HTMLElement;
     expect(row.style.background).toContain("--bk-warning-tint");
     expect(row.style.color).toContain("--bk-warning-text");
+  });
+
+  it("board 4418:118661 — a comment re-attached here gets a band naming its element", async () => {
+    reattachReviewComment.mockResolvedValue(undefined);
+    const hours = {
+      getId: () => "el-hours",
+      getType: () => "text",
+      getContent: () => "Open 5pm",
+      getCustomData: (k: string) => (k === "layerName" ? "Hours" : null),
+      getChildren: () => [],
+    };
+    const root = { getId: () => "root", getType: () => "container", getContent: () => "", getCustomData: () => null, getChildren: () => [hours] };
+    const composer = {
+      ...makeComposer(["c1"]),
+      elements: {
+        getAllPages: () => [{ id: "page-home", name: "Home" }],
+        getActivePage: () => ({ id: "page-home", root: { id: "root" } }),
+        setActivePage: vi.fn(),
+        getElement: (id: string) => (id === "root" ? root : id === "el-hours" ? hours : null),
+      },
+    };
+    renderTab({ composer });
+    fireEvent.click(await screen.findByRole("button", { name: "Reattach comment" }));
+    fireEvent.click(await screen.findByRole("radio", { name: /Hours/ }));
+    fireEvent.click(screen.getByTestId("reattach-submit"));
+    await waitFor(() => expect(reattachReviewComment).toHaveBeenCalled());
+    expect(await screen.findByText("Open · Home / Hours")).toBeInTheDocument();
   });
 
   it("leaves the other bands neutral", async () => {
