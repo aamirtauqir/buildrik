@@ -94,7 +94,10 @@ export async function createPage(input: CreatePageInput) {
 
 export async function updatePage(input: UpdatePageInput) {
   const existing = await prisma.page.findUnique({ where: { id: input.pageId } });
-  if (!existing) throw new Error("NOT_FOUND");
+  // The router's role gate ran against input.siteId, so the page must BE on
+  // that site — or an EDITOR of site A could edit any page by id (audit
+  // 2026-09-24). A foreign page is reported as missing, not as forbidden.
+  if (!existing || existing.siteId !== input.siteId) throw new Error("NOT_FOUND");
 
   if (input.updatedAt && existing.updatedAt > input.updatedAt) {
     throw new Error("CONFLICT");
@@ -114,11 +117,12 @@ export async function updatePage(input: UpdatePageInput) {
 }
 
 export async function deletePage(input: DeletePageInput) {
+  // Same site-binding as updatePage: the role gate checked input.siteId.
+  const page = await prisma.page.findUnique({ where: { id: input.pageId } });
+  if (!page || page.siteId !== input.siteId) throw new Error("NOT_FOUND");
+
   const pageCount = await prisma.page.count({ where: { siteId: input.siteId } });
   if (pageCount <= 1) throw new Error("LAST_PAGE");
-
-  const page = await prisma.page.findUnique({ where: { id: input.pageId } });
-  if (!page) throw new Error("NOT_FOUND");
 
   await prisma.formBlock.deleteMany({ where: { pageId: input.pageId } });
   await prisma.page.delete({ where: { id: input.pageId } });

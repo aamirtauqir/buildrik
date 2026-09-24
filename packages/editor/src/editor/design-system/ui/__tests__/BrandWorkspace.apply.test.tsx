@@ -278,3 +278,22 @@ describe("BrandWorkspace — engine undo preserves unsaved edits", () => {
     });
   });
 });
+
+/* G3-124: the review listed colour / type / spacing only, so a radius (or any
+   of the other 11 kinds) edit showed "Review 0 staged changes" while the
+   footer said there was one. Every kind is listed now. */
+describe("BrandWorkspace — Review lists every kind (G3-124)", () => {
+  it("a radius edit appears in the review under Radius, and the title counts it", async () => {
+    const composer = makeFakeComposer();
+    const utils = await renderOnRadius(composer);
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    await waitFor(() => expect(utils.getByText("Unsaved brand changes")).toBeTruthy());
+    const bar = utils.container.querySelector('[data-screen-savebar="true"]')!;
+    const save = [...bar.querySelectorAll("button")].find((b) => (b.textContent || "").trim() === APPLY_CHANGES_LABEL)!;
+    fireEvent.click(save);
+    const modal = await utils.findByTestId("brand-review-modal");
+    expect(utils.getByTestId("brand-review-title").textContent).toBe("Review 1 staged change");
+    expect(modal.textContent).toContain("Radius Changes");
+    expect(modal.textContent).toMatch(/10px/);
+  });
+});

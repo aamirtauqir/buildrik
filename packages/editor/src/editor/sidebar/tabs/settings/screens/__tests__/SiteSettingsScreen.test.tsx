@@ -363,14 +363,22 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     expect(settings.seo.twitterHandle).toBe("@keepme");
   });
 
-  /* 4418:127313: Site Identity is name · favicon · language, Social Links
-     three fields — no Author, no Canvas card. */
-  it("draws only the board's fields: no Author, no Canvas card", async () => {
-    setup();
+  /* 4418:127313 draws no Canvas card. Author comes back (owner ruling
+     2026-09-24) in the empty cell beside Site Language, and reaches the
+     project metadata on the flush. */
+  it("Author sits in Site Identity and flushes to the project metadata; no Canvas card", async () => {
+    let flush: (() => void) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+      flush = h;
+    });
+    const { composer } = setup({ registerFlushHandler });
     await loaded();
-    expect(screen.queryByLabelText("Author")).toBeNull();
+    const ids = Array.from(document.querySelectorAll("#site-name, #favicon-url, #site-language, #site-author")).map((e) => e.id);
+    expect(ids).toEqual(["site-name", "favicon-url", "site-language", "site-author"]);
+    fireEvent.change(screen.getByLabelText("Author"), { target: { value: "Bella Cucina team" } });
+    act(() => flush!());
+    expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
     expect(screen.queryByRole("spinbutton", { name: /Grid size/ })).toBeNull();
-    expect(screen.queryByRole("switch", { name: "Snap to grid" })).toBeNull();
     expect(screen.queryByTestId("set-card-canvas")).toBeNull();
   });
 });

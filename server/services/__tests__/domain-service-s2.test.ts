@@ -164,6 +164,7 @@ describe("checkDomainDns — TXT", () => {
   function records(verified: boolean) {
     return {
       id: "dom1",
+      siteId: "s1",
       domain: "bellacucina.com",
       dnsRecords: [
         { id: "r-a", type: "A", host: "@", value: "76.76.21.21", verified },
@@ -180,7 +181,7 @@ describe("checkDomainDns — TXT", () => {
     const resolveCname = vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com."]);
     const resolveTxt = vi.spyOn(dnsPromises, "resolveTxt").mockResolvedValue([["brk-verify-", "abc"]]);
 
-    const result = await checkDomainDns("dom1");
+    const result = await checkDomainDns("dom1", "s1");
 
     expect(resolve4).toHaveBeenCalledWith("bellacucina.com");
     expect(resolveCname).toHaveBeenCalledWith("www.bellacucina.com");
@@ -196,10 +197,19 @@ describe("checkDomainDns — TXT", () => {
     vi.spyOn(dnsPromises, "resolveCname").mockResolvedValue(["cname.vercel-dns.com"]);
     vi.spyOn(dnsPromises, "resolveTxt").mockRejectedValue(Object.assign(new Error("ENODATA"), { code: "ENODATA" }));
 
-    const result = await checkDomainDns("dom1");
+    const result = await checkDomainDns("dom1", "s1");
 
     expect(db.dnsRecord.update).toHaveBeenCalledTimes(1);
     expect(db.dnsRecord.update).toHaveBeenCalledWith({ where: { id: "r-txt" }, data: { verified: false } });
     expect(result?.status).toBe("PENDING");
+  });
+
+  it("writes nothing for a domain that belongs to another site", async () => {
+    db.domain.findUnique.mockResolvedValue({ ...records(false), siteId: "other" });
+    db.dnsRecord.update.mockClear();
+    db.domain.update.mockClear();
+    await expect(checkDomainDns("dom1", "s1")).resolves.toBeNull();
+    expect(db.dnsRecord.update).not.toHaveBeenCalled();
+    expect(db.domain.update).not.toHaveBeenCalled();
   });
 });

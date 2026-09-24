@@ -27,7 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, CopyButton, IconButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
+import { Button, CopyButton, IconButton, Menu, MenuItem, Popover, Radio, Select, useToast } from "@/editor/chrome-ui";
 import { X } from "lucide-react";
 
 const TOKEN_KINDS_COUNT = 14;
@@ -136,18 +136,12 @@ function chipForFormat(format: ExportFormat, droppedCount: number): ChipSpec {
 }
 
 export interface ExportSectionProps {
-  /** Board 306:2232 puts an "Exported CSS" badge under the back row after an
-   *  export. The badge belongs to the screen frame, which this section sits
-   *  inside, so the outcome is reported upward rather than drawn here. */
-  onExported?(formatLabel: string): void;
-  /** Boards 306:2265 / 306:2298 — passed straight through to the ImportCard
-   *  that owns the outcome. */
-  onImportOutcome?(outcome: "imported" | "import-failed"): void;
   /** The panel's ✕ (4418:168885) — back to the workspace's landing page. */
   onClose?(): void;
 }
 
-export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImportOutcome, onClose }) => {
+export const ExportSection: React.FC<ExportSectionProps> = ({ onClose }) => {
+  const { addToast } = useToast();
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -165,6 +159,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
 
   const [format, setFormat] = React.useState<ExportFormat>("css");
   const [darkStrategy, setDarkStrategy] = React.useState<DarkStrategy>("media");
+  const [darkMenuOpen, setDarkMenuOpen] = React.useState(false);
 
   const allTokens: DesignToken[] = React.useMemo(
     () => [
@@ -238,29 +233,57 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
           which is where nobody chooses it before copying JSON. */}
-      {/* Board 153:120 draws this as a 32-tall row reading `Dark strategy ▾`
-          with its value to the right — a dropdown PILL, not a boxed form
-          control. The boxed `Select` measured 42 live, ten pixels over the
-          board and over `--bk-size-row`, because a bordered field sets the
-          row's height. `BK_SELECT_BARE_VALUE_THEME` is the sanctioned variant
-          for exactly this (SelectRow's dropdown pill), so the treatment comes
-          from the design system rather than from a hardcoded height. */}
+      {/* Board 153:120: a 32-tall row reading `Dark strategy ▾` with its value
+          to the right. */}
       <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2" data-testid="brand-export-dark-row">
-        {/* 14/20, the workspace row label (4418:168885). */}
-        <span data-testid="brand-export-dark-label" className="tw:w-40 tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]">Dark strategy <span aria-hidden="true" className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">▾</span></span>
-        <Select
-          theme={BK_SELECT_BARE_VALUE_THEME}
-          className="tw:flex-none"
-          value={darkStrategy}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDarkStrategy(e.target.value as DarkStrategy)}
-          aria-label="Dark mode strategy"
+        {/* 4418:168885's "Dark-strategy menu": the ▾ label IS the trigger
+            (it was dead text over a native <select> — walk FAIL). The value
+            sits at the label column's right, as drawn. */}
+        <Popover
+          open={darkMenuOpen}
+          onClose={() => setDarkMenuOpen(false)}
+          placement="bottom"
+          label="Dark strategy"
+          trigger={
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              onClick={() => setDarkMenuOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={darkMenuOpen}
+              data-testid="brand-export-dark-trigger"
+              className="tw:h-auto tw:min-h-0 tw:w-40 tw:flex-none tw:justify-start tw:gap-1 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
+            >
+              <span data-testid="brand-export-dark-label">Dark strategy</span>
+              <span aria-hidden="true" className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">▾</span>
+            </Button>
+          }
         >
-          {DARK_OPTIONS.map(({ id, label, detail }) => (
-            <option key={id} value={id} title={detail}>
-              {label}
-            </option>
-          ))}
-        </Select>
+          <Menu label="Dark strategy">
+            {DARK_OPTIONS.map(({ id, label, detail }) => (
+              <MenuItem
+                key={id}
+                radio
+                selected={darkStrategy === id}
+                title={detail}
+                onClick={() => {
+                  setDarkStrategy(id);
+                  setDarkMenuOpen(false);
+                }}
+                data-testid={`brand-export-dark-option-${id}`}
+              >
+                <span className="tw:flex tw:flex-col">
+                  <span>{label}</span>
+                  <span className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">{detail}</span>
+                </span>
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
+        <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-export-dark-value">
+          {DARK_OPTIONS.find((o) => o.id === darkStrategy)?.label}
+        </span>
       </div>
 
       <div className={BLOCK}>
@@ -319,7 +342,12 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                     onClick={(e) => {
                       e.preventDefault();
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
-                      onExported?.(label);
+                      /* G3-123 · 6881:71312: the outcome is a toast. */
+                      addToast({
+                        title: "Export ready",
+                        description: `${TOKEN_KINDS_COUNT} kinds · ${stats.tokensCount} tokens exported. Download ready.`,
+                        tone: "success",
+                      });
                     }}
                     variant="link" className="tw:font-normal tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-accent-text)]"
                   >
@@ -332,7 +360,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         </div>
       </div>
 
-      <ImportCard onOutcome={onImportOutcome} />
+      <ImportCard />
       <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2.5">
         <div data-testid="export-stats" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {statsLine}

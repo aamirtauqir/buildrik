@@ -133,9 +133,11 @@ const GHOST_BADGE =
    thumb, drawn while the card is hovered or anything in it has focus. The
    button is always in the tree (Tab reaches it, then it shows itself); only
    its opacity waits for the pointer. */
+/* 4418:58292 btn/more — on every card at rest: 24 square, 92% white over the
+   thumb, 1px border, radius 6, 16 glyph. */
 const CARD_MENU_BTN =
-  "tw:absolute tw:top-1.5 tw:right-1.5 tw:z-[1] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:shadow-[var(--bk-shadow-raised)] " +
-  "tw:opacity-0 tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 tw:enabled:hover:bg-[var(--bk-bg-card)]";
+  "tw:absolute tw:top-0.5 tw:right-0.5 tw:z-[1] tw:size-6 tw:min-h-0 tw:p-0 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] " +
+  "tw:bg-[color-mix(in_srgb,var(--bk-bg-card)_92%,transparent)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-card)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
@@ -635,7 +637,9 @@ export function AssetGrid({
           }
         >
           {visibleItems.map((item) => {
-            const isSelected = selectedAssetId === item.key;
+            /* 4418:156160 — in select mode every CHECKED card wears the ring;
+               otherwise the one file open in the rail does. */
+            const isSelected = state.selMode ? state.selectedKeys.has(item.key) : selectedAssetId === item.key;
             const thumbContent = thumbFor(item, viewMode);
 
             // Two drop targets read this drag: the canvas (src/type/name) and
@@ -670,10 +674,18 @@ export function AssetGrid({
               onAssetDragEnd();
             };
 
-            // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles.
+            /* Cmd/Ctrl-click checks one more file; entering select mode it
+               carries the file already open in the rail, so the second click
+               makes TWO, not one. Shift-click checks the range from the last
+               click (or the open file). In selMode a plain click toggles. */
             const onClick = (e: React.MouseEvent) => {
-              if (e.metaKey || e.ctrlKey) {
-                if (!state.selMode) state.toggleSelMode();
+              if (e.shiftKey) {
+                state.shiftSelect(item.key, selectedAssetId);
+              } else if (e.metaKey || e.ctrlKey) {
+                if (!state.selMode) {
+                  if (selectedAssetId && selectedAssetId !== item.key) state.enterSelectModeWith(selectedAssetId);
+                  else state.toggleSelMode();
+                }
                 state.toggleSelect(item.key);
               } else if (state.selMode) {
                 state.toggleSelect(item.key);
@@ -761,7 +773,7 @@ export function AssetGrid({
                       state.openCtxMenu(e, item, { x: box.left, y: box.bottom + 4 });
                     }}
                   >
-                    <MoreHorizontal size={14} />
+                    <MoreHorizontal size={16} />
                   </IconButton>
                   {/*
                     Board 1161:66/80/111 — the only badge on a card says what
@@ -775,30 +787,21 @@ export function AssetGrid({
                       {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "◆"}
                     </div>
                   )}
-                  {isSelected && (
-                    <div className="mgr-sel-check">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-                        <path d="M20 6 9 17l-5-5" />
-                      </svg>
-                    </div>
-                  )}
                 </div>
                 <div className="mgr-asset-meta" data-testid={`mgr-meta-${item.key}`}>
                   <div className="mgr-asset-name" data-testid={`mgr-name-${item.key}`}>{item.displayName ?? item.name}</div>
                   {/*
-                    Board 1161:55 — dot + "used ×3" / "unused". Dimensions and
-                    bytes moved to the details rail, which is where you go when
-                    you care; on the card the question is always "can I delete
-                    this?".
+                    4418:58292 meta — "used ×3" / "Unused", 11 muted, no dot.
+                    Dimensions and bytes live in the details rail; on the card
+                    the question is always "can I delete this?".
                   */}
                   <div
                     className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}
                     data-testid={`mgr-use-${item.key}`}
                   >
-                    <span className="mgr-use-dot" aria-hidden="true" />
                     {(usageMap.get(item.key) ?? 0) > 0
                       ? `used ×${usageMap.get(item.key)}`
-                      : "unused"}
+                      : "Unused"}
                   </div>
                 </div>
               </div>

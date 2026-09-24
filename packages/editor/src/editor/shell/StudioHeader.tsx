@@ -274,6 +274,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      a known-insufficient one does not. Same shape as PublishHistory.tsx:104,
      which already gates rollback this way two files over. */
   const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
+  /* A VIEWER is held in view mode by the /edit route (it redirects them to
+     ?view=readonly), so "Back to editing" would only bounce off that redirect. */
+  const canLeaveView = roleAtLeast(editorRole, "EDITOR") !== false;
   const viewMode = getEditorViewMode();
   // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known P1s)
   // and was the #1 reason the product read as "broken" in user testing. The flag
@@ -785,8 +788,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
-        onExit={viewMode.readOnlyView ? toggleReadOnlyView : exitToDashboard}
-        exitLabel={viewMode.readOnlyView ? "‹ Back to editing" : "‹ Exit"}
+        onExit={viewMode.readOnlyView && canLeaveView ? toggleReadOnlyView : exitToDashboard}
+        exitLabel={viewMode.readOnlyView && canLeaveView ? "‹ Back to editing" : "‹ Exit"}
         save={viewMode.readOnlyView ? undefined : save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
         /* The pill is a button wherever a click has a destination (B2). A
@@ -875,7 +878,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             siteName={siteName}
             pageName={pageName}
             readOnlyView={viewMode.readOnlyView}
-            onToggleReadOnlyView={toggleReadOnlyView}
+            onToggleReadOnlyView={canLeaveView ? toggleReadOnlyView : undefined}
           />
         }
       />

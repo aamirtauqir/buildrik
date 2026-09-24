@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { createPresignedUrl, confirmUpload, getUploadLimits } from "@/server/services/upload.service";
 import { presignSchema, confirmSchema } from "@buildrik/shared/schemas/upload";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { PermissionError } from "@/server/services/permission.service";
 
 export const uploadRouter = router({
   presign: protectedProcedure.input(presignSchema).mutation(async ({ ctx, input }) => {
@@ -12,6 +13,8 @@ export const uploadRouter = router({
     } catch (e: unknown) {
       if (e instanceof Error && e.message === "INVALID_FORMAT") throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid file format for this upload type." });
       if (e instanceof Error && e.message === "FILE_TOO_LARGE") throw new TRPCError({ code: "BAD_REQUEST", message: "File exceeds size limit." });
+      if (e instanceof Error && e.message === "SITE_REQUIRED") throw new TRPCError({ code: "BAD_REQUEST", message: "This upload type needs a siteId." });
+      if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
       throw e;
     }
   }),

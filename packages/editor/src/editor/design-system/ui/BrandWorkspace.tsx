@@ -47,11 +47,13 @@
 
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
-import { Button, Select, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
+import { DEFAULT_TOKENS } from "../constants";
+import type { SpacingPreset } from "../state/useSpacingTokens";
 import {
   useColorRegistry,
   useTypeRegistry,
@@ -94,7 +96,6 @@ import { BrandPreview } from "./BrandPreview";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { orderColourTokens } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
-import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
@@ -107,6 +108,8 @@ import { ClassesSection } from "./sections/ClassesSection";
 import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { takeBrandTokenRequest } from "./brandOpenRequest";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -182,6 +185,13 @@ const NAV_ROW_ON =
 const NAV_COUNT =
   "tw:flex-none tw:tabular-nums tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
+/* Spacing's ⋯ menu: the three presets on the 4px grid (useSpacingTokens). */
+const SPACING_PRESETS: [SpacingPreset, string][] = [
+  ["compact", "Compact · 2px"],
+  ["normal", "Normal · 4px"],
+  ["spacious", "Spacious · 6px"],
+];
+
 const PAGE_ACTION =
   "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
 
@@ -237,15 +247,16 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Brand checks page can never disagree. */
   const lintIssues = useDSLint(composer);
-  /* Board 306:2217 puts a "Warnings suppressed" pill on the root. Read here
-     rather than stored: `useDSLint` re-renders this component whenever
-     `lint:changed` fires, which is every suppress and unsuppress. */
+  /* Ignored (suppressed) checks, named in the Brand checks caption (G3-123:
+     no pill band). Read here rather than stored: `useDSLint` re-renders this
+     component whenever `lint:changed` fires, every suppress and unsuppress. */
   const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
   const [page, setPage] = React.useState<BrandPageId>(() =>
     initialPage && isPageId(initialPage) ? initialPage : LANDING
   );
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
+  const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [guardOpen, setGuardOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
@@ -333,13 +344,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     ready: brandLoaded,
   });
 
-  /* Cleared when the page changes: a badge saying "Exported CSS" on a page
-     the user walked back into later is stale news dressed as fresh. */
-  const [lastExport, setLastExport] = React.useState<string | null>(null);
-  const [importOutcome, setImportOutcome] = React.useState<"imported" | "import-failed" | null>(null);
-  React.useEffect(() => {
-    if (page !== "export") { setLastExport(null); setImportOutcome(null); }
-  }, [page]);
 
   const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
   const stylesDirty = useStylesSectionTotalDirty();
@@ -586,19 +590,36 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   };
 
   // ─ The door out (7315:80955 KEY_D: if draft → 7317:80979, else → canvas) ─
-  const requestLeave = React.useCallback(() => {
+  /* What runs once the workspace has closed — a Component styles row's hand-
+     off to Add › Blocks. Held across the guard; Keep editing drops it. */
+  const afterLeaveRef = React.useRef<(() => void) | null>(null);
+  const requestLeave = React.useCallback((then?: () => void) => {
+    afterLeaveRef.current = then ?? null;
     if (isDirtyRef.current) {
       setGuardOpen(true);
       return;
     }
     onClose?.();
+    then?.();
   }, [onClose]);
 
   const handleGuardDiscard = () => {
     setGuardOpen(false);
     handleDiscard();
     onClose?.();
+    afterLeaveRef.current?.();
+    afterLeaveRef.current = null;
   };
+
+  /* Component styles (7316:82755) lists the Add › Blocks sections; a row
+     leaves Brand for Add with BLOCKS open, where that section lives. */
+  const openSectionInAdd = React.useCallback(() => {
+    requestLeave(() => {
+      if (!composer) return;
+      composer.emit?.(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+      requestInsertGroup(composer, "blocks");
+    });
+  }, [requestLeave, composer]);
 
   // Escape is the same door, guarded the same way. The dialogs own their own
   // Escape while they are up; an input keeps its own.
@@ -687,6 +708,28 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const isMoreKind = (k: TokenKind | undefined): k is MoreKind =>
     MORE_KINDS.some((m) => m.kind === k);
   const tokenById = (id: string) => allTokens.find((t) => t.id === id);
+  /* A token's own page with its card open — Brand checks' Open, and the
+     inspector's bound chip (G3-156). */
+  const openToken = (tokenId: string) => {
+    const tok = tokenById(tokenId);
+    const k = tok ? kindOf(tok) : undefined;
+    const target: BrandPageId | null =
+      k === "color" ? "colours"
+      : k === "type" ? "fonts"
+      : k === "spacing" ? "spacing"
+      : isMoreKind(k) ? `kind-${k}`
+      : null;
+    if (target) openPage(target, tokenId);
+  };
+  /* The chip's request, taken once on mount; applied once its token has
+     loaded into a registry. */
+  const [requestedToken, setRequestedToken] = React.useState(() => takeBrandTokenRequest(composer));
+  React.useEffect(() => {
+    if (!requestedToken || !tokenById(requestedToken)) return;
+    openToken(requestedToken);
+    setRequestedToken(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedToken, allTokens]);
   const changeToken = (id: string, value: string, darkValue?: string) => {
     const tok = tokenById(id);
     if (!tok) return;
@@ -720,7 +763,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
-      case "brand-checks":     return brandChecksCaption(lintIssues);
+      case "brand-checks":     return brandChecksCaption(lintIssues, suppressedCount);
       case "starters":         return "Pick a starter, then apply it to the draft";
       case "spacing":          return `${spacing.tokens.length} tokens · presets + custom`;
       case "export":           return "Move the brand in and out";
@@ -813,6 +856,51 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
               + Add token
             </Button>
+            {page === "spacing" ? (
+              /* Owner ruling 2026-09-24: applying a whole preset comes back
+                 (removed in 91ab74b33 for parity) — in a menu, so the page
+                 still draws no chips (7576:197036). Both actions stage. */
+              <Popover
+                open={spacingMenuOpen}
+                onClose={() => setSpacingMenuOpen(false)}
+                placement="bottom-end"
+                label="Spacing actions"
+                trigger={
+                  <IconButton label="Spacing actions" onClick={() => setSpacingMenuOpen((v) => !v)} data-testid="brand-spacing-menu">
+                    ⋯
+                  </IconButton>
+                }
+              >
+                <Menu label="Spacing actions">
+                  <MenuLabel>Apply preset</MenuLabel>
+                  {SPACING_PRESETS.map(([p, label]) => (
+                    <MenuItem
+                      key={p}
+                      radio
+                      selected={spacing.activePreset === p}
+                      onClick={() => {
+                        spacing.applyPreset(p);
+                        setSpacingMenuOpen(false);
+                      }}
+                      data-testid={`spacing-preset-${p}`}
+                    >
+                      {label}
+                    </MenuItem>
+                  ))}
+                  <MenuSeparator />
+                  <MenuItem
+                    onClick={() => {
+                      spacing.stageDefaults(DEFAULT_TOKENS);
+                      setSpacingMenuOpen(false);
+                      addToast({ description: "Spacing reset to defaults — review and Save to keep it.", tone: "info" });
+                    }}
+                    data-testid="spacing-reset-defaults"
+                  >
+                    Reset to defaults
+                  </MenuItem>
+                </Menu>
+              </Popover>
+            ) : null}
             </div>
           );
         }
@@ -863,7 +951,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           />
         );
       case "component-styles":
-        return <ComponentsSection composer={composer} />;
+        return <ComponentsSection onOpenSection={openSectionInAdd} />;
       case "classes":
         return <ClassesSection composer={composer} />;
       case "presets":
@@ -883,17 +971,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               const fixed = composer?.designSystem?.computeAutoFix(tok.value, issue.autoFixHint);
               if (fixed && fixed !== tok.value) changeToken(tok.id, fixed);
             }}
-            onOpen={(tokenId) => {
-              const tok = tokenById(tokenId);
-              const k = tok ? kindOf(tok) : undefined;
-              const target: BrandPageId | null =
-                k === "color" ? "colours"
-                : k === "type" ? "fonts"
-                : k === "spacing" ? "spacing"
-                : isMoreKind(k) ? `kind-${k}`
-                : null;
-              if (target) openPage(target, tokenId);
-            }}
+            onOpen={openToken}
           />
         );
       case "starters":
@@ -905,7 +983,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           /* 4418:168885: a 760 panel centred in the main area — no page
              header, no preview column. Its ✕ goes back to Colours. */
           <div className="tw:mx-auto tw:w-full tw:max-w-[760px]">
-            <ExportSection onExported={setLastExport} onImportOutcome={setImportOutcome} onClose={() => openPage("colours")} />
+            <ExportSection onClose={() => openPage("colours")} />
           </div>
         );
       default: {
@@ -984,7 +1062,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             type="button"
             variant="link"
             className="tw:h-auto tw:min-h-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
-            onClick={requestLeave}
+            onClick={() => requestLeave()}
             data-testid="brand-back-link"
           >
             <ChevronLeft size={12} aria-hidden />
@@ -1063,28 +1141,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             />
           ) : (
             <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
-              {/* Board 306:2161 draws a status badge in the band under the back
-                  row. Its two siblings (bound / unbound) specify a state nothing
-                  can answer — elements carry no preset reference — so only this
-                  one ships. See SectionStatusBadge's note. */}
-              {page === "presets" && presetsStatus(stylesDirty > 0) && (
-                <SectionStatusBadge status="draft" />
-              )}
-              {/* Board 306:2232 — "Exported CSS" after a download. The Copy
-                  button carries its own feedback; Download had none at all. */}
-              {page === "export" && lastExport && (
-                <SectionStatusBadge status="exported" detail={lastExport} />
-              )}
-              {/* Boards 306:2265 / 4418:168885 — the import outcome, "⚠ Import
-                  failed" being the row the workspace board draws. The card shows
-                  its own error DETAIL inline; this says what state the page is in. */}
-              {page === "export" && !lastExport && importOutcome && (
-                <SectionStatusBadge status={importOutcome} />
-              )}
-              {page === "brand-checks" && suppressedCount > 0 ? (
-                <SectionStatusBadge status="warnings-suppressed" role="status" />
-              ) : null}
-
               {/* Parked STATE board `4418:49685` "Brand · empty": "No brand set."
                   with Browse starters · Import — the workspace's first-run state,
                   on the landing page, until the first Save. The sentence is the
@@ -1181,7 +1237,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       <BrandDiscardDialog
         open={guardOpen}
         count={totalDirty}
-        onKeepEditing={() => setGuardOpen(false)}
+        onKeepEditing={() => {
+          setGuardOpen(false);
+          afterLeaveRef.current = null;
+        }}
         onDiscard={handleGuardDiscard}
       />
 
@@ -1193,6 +1252,16 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           typeSavedTokens={type.savedTokens}
           spacingTokens={spacing.tokens}
           spacingSavedTokens={spacing.savedTokens}
+          otherSections={MORE_KINDS.map(({ kind, label }) => {
+            const reg = moreKindRegistry[kind];
+            return {
+              title: `${label} Changes`,
+              rows: reg.tokens
+                .map((t) => ({ t, saved: reg.savedTokens.find((x) => x.id === t.id) }))
+                .filter(({ t, saved }) => tokenDirty(t, saved))
+                .map(({ t, saved }) => ({ id: t.id, name: t.name, was: saved?.value ?? "new", now: t.value })),
+            };
+          })}
           onConfirm={handleApply}
           onClose={() => setShowReview(false)}
           /* Board 1172:4840's third door. The same discard the footer runs,

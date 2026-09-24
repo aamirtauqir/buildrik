@@ -316,6 +316,19 @@ describe("uploadFile — server mirror (Phase B2)", () => {
     expect(updated.length).toBeGreaterThanOrEqual(1);
   });
 
+  /* Walk 2026-09-24: placements made from the session Object URL kept it and
+     saved it. The server copy must replace it everywhere. */
+  it("on mirror success, announces blob → server URL so placements are re-pointed", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    const remaps = captureEvents(manager, MEDIA_EVENTS.LOCAL_URLS_REBUILT);
+    await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
+    const last = remaps.at(-1) as { remapped: Record<string, string> };
+    const [[from, to]] = Object.entries(last.remapped);
+    expect(from.startsWith("blob:")).toBe(true);
+    expect(to).toBe("https://cdn/x.png");
+  });
+
   it("marks the asset localOnly and queues a retry when the mirror fails", async () => {
     const remote = makeRemoteSync({ uploadAndCreate: vi.fn(async () => null) });
     const manager = new MediaManager(remote);

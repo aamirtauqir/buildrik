@@ -15,12 +15,11 @@
  *
  * @license BSD-3-Clause
  */
-import { createComposer, type Composer } from "@/engine";
-import type { NamedVersion } from "@/shared/types/versions";
+import type { Composer } from "@/engine";
 import type { CompareSource } from "@/shared/types/compare";
 import type { ComparePage } from "@/shared/utils/html";
 import { fetchApprovedSnapshot } from "@/services/ReviewService";
-import { exportPublishPages } from "./exportPublishPages";
+import { exportPublishPages, renderProjectPages } from "./exportPublishPages";
 
 export interface SourceOption {
   /** Stable key for the <select>; decodes back with `sourceFromKey`. */
@@ -108,33 +107,6 @@ export function sourceLabel(s: CompareSource, c: SourceCatalog): string {
 }
 
 /**
- * A saved version's pages, rendered in a scratch composer.
- *
- * The export path only runs against a live Composer, so the snapshot needs
- * one — but never THE live one: importing it there replaces the user's draft
- * (lane B's first cut did exactly that and never swapped back). Storage is
- * off, so the scratch instance cannot autosave over anything either.
- *
- * It does not wait for `whenReady()`: that is the media library's IndexedDB
- * load, which the export does not read (the engine's own export tests import
- * and export without it). Its late outcome is swallowed — the instance is
- * already destroyed by then.
- */
-export async function renderSavedVersionPages(version: NamedVersion): Promise<ComparePage[]> {
-  const scratch = createComposer({
-    container: document.createElement("div"),
-    storage: { type: "none", autoSave: false },
-  });
-  scratch.whenReady().catch(() => {});
-  try {
-    scratch.importProject(version.snapshot);
-    return await exportPublishPages(scratch);
-  } finally {
-    scratch.destroy();
-  }
-}
-
-/**
  * One side's pages. `null` = the source has no pages to show (an approval that
  * predates snapshot capture). Throws on transport failure so the host shows a
  * retryable error, never a fake-empty diff (DF5).
@@ -147,7 +119,7 @@ export async function loadSourcePages(composer: Composer, source: CompareSource)
       return exportPublishPages(composer);
     case "saved": {
       const version = composer.versions?.getVersions().find((v) => v.id === source.versionId);
-      return version ? renderSavedVersionPages(version) : null;
+      return version ? renderProjectPages(version.snapshot) : null;
     }
     case "published":
       throw new Error("A published version compares with another published version.");

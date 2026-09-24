@@ -242,11 +242,21 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).toBeInTheDocument();
   });
 
-  it("container does NOT show Link (not linkable)", () => {
+  /* Board 4428:141642 draws LINK on a Section; export wraps a linked
+     container in a box-less <a> (ExportEngine.blockLink.test). */
+  it("container shows Link, between Visibility and Content", () => {
     renderTab({ tabId: "element", elementType: "container" });
-    expect(
-      screen.queryByRole("button", { name: /Link section/i })
-    ).not.toBeInTheDocument();
+    const names = screen
+      .getAllByRole("button", { name: /(Visibility|Link|Content) section/i })
+      .map((b) => b.getAttribute("aria-label") ?? b.textContent ?? "");
+    const at = (re: RegExp) => names.findIndex((n) => re.test(n));
+    expect(at(/Link/i)).toBeGreaterThan(at(/Visibility/i));
+    expect(at(/Content/i)).toBeGreaterThan(at(/Link/i));
+  });
+
+  it("an image still does NOT show Link", () => {
+    renderTab({ tabId: "element", elementType: "image" });
+    expect(screen.queryByRole("button", { name: /Link section/i })).not.toBeInTheDocument();
   });
 
   /* G2-160: the dev-flag "All CSS" section is gone. */

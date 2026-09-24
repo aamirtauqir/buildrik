@@ -71,10 +71,12 @@ export function contrastFixFor(
 }
 
 /** "N issues · auto-fix available" — the page header's caption. */
-export function brandChecksCaption(issues: readonly LintIssue[]): string {
+export function brandChecksCaption(issues: readonly LintIssue[], ignored = 0): string {
   const n = issues.length;
   const base = `${n} issue${n === 1 ? "" : "s"}`;
-  return issues.some((i) => i.autoFixHint) ? `${base} · auto-fix available` : base;
+  const withFix = issues.some((i) => i.autoFixHint) ? `${base} · auto-fix available` : base;
+  /* G3-123: the "Warnings suppressed" pill became this suffix. */
+  return ignored > 0 ? `${withFix} · ${ignored} ignored` : withFix;
 }
 
 export const LintSection: React.FC<LintSectionProps> = ({ issues, onFix, onOpen }) => {

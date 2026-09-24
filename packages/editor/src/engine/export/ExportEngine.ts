@@ -33,6 +33,9 @@ import {
   minifyCSS,
   downloadFile,
   localeRedirectSnippet,
+  blockLinkPlan,
+  BLOCK_LINK_STYLE,
+  type LinkNodeView,
 } from "./ExportHelpers";
 import { devWarn } from "../../shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
@@ -149,6 +152,27 @@ function hideRulesFor(selector: string, styles: Record<string, string>): string[
  */
 export function resolveHomePageId(pages: PageData[]): string | undefined {
   return (pages.find((p) => p.isHome) ?? pages[0])?.id;
+}
+
+type LiveElement = NonNullable<ReturnType<Composer["elements"]["getElement"]>>;
+
+/** blockLinkPlan's view of a live Element (single-file writer). */
+function readLiveNode(el: LiveElement): LinkNodeView<LiveElement> {
+  const stored = el.getData?.().tagName;
+  return {
+    tag: stored && stored !== "div" ? stored : getDefaultTagName(el.getType?.() || "div"),
+    href: el.getAttributes?.()?.href,
+    children: el.getChildren?.() ?? [],
+  };
+}
+
+/** blockLinkPlan's view of a saved page node (publish writer). */
+function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
+  return {
+    tag: el.tagName && el.tagName !== "div" ? el.tagName : getDefaultTagName(el.type),
+    href: el.attributes?.href,
+    children: el.children ?? [],
+  };
 }
 
 export class ExportEngine {
@@ -369,12 +393,28 @@ export class ExportEngine {
        placeholder, name, required, download, and every aria- / data- attribute an
        element had. class and style come from their canonical fields above and
        below, so a raw attribute mirroring them would double-emit. */
+    // A linked section/container: the link goes on a wrapping <a> (see
+    // blockLinkPlan for the strategy and the nested-link rule).
+    const blockLink = blockLinkPlan(tag, attrs, children, readLiveNode);
+    const linkParts: string[] = [];
     for (const [key, value] of Object.entries(attrs)) {
       if (key === "class" || key === "style") continue;
       const out = key === "href" ? this.resolveHref(value) : value;
-      if (!isSafeAttrValue(key, out, tag)) continue;
+      const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
+      if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+      if (isLinkAttr) {
+        if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
+        continue;
+      }
       attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
+    // No wrapper when the href itself was refused as unsafe — an <a> without
+    // one would only restyle the section's cursor and focus order.
+    const openLink =
+      blockLink?.wrap && linkParts.some((p) => p.startsWith("href="))
+        ? `<a ${linkParts.join(" ")} style="${BLOCK_LINK_STYLE}">`
+        : "";
+    const closeLink = openLink ? "</a>" : "";
 
     // Build inline styles if configured
     if (config.cssStyle === "inline" && Object.keys(styles).length > 0) {
@@ -386,7 +426,7 @@ export class ExportEngine {
 
     // Self-closing tags
     if (["img", "input", "br", "hr"].includes(tag)) {
-      return `${indentStr}<${tag}${attrStr} />${newline}`;
+      return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}${newline}`;
     }
 
     // Build children content
@@ -400,7 +440,7 @@ export class ExportEngine {
       childContent = this.renderContent(content, contentFormat, type);
     }
 
-    return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>${newline}`;
+    return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}${newline}`;
   }
 
   /**
@@ -1082,6 +1122,11 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
       attrParts.push(`${key}="${escapeHTML(String(value))}"`);
     }
 
+    // A linked section/container: the link goes on a wrapping <a> (see
+    // blockLinkPlan for the strategy and the nested-link rule).
+    const blockLink = blockLinkPlan(tag, element.attributes ?? {}, children, readPageNode);
+    const linkParts: string[] = [];
+
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {
         // class/style/data-buildrick-id emitted above from their canonical
@@ -1091,10 +1136,22 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
         // is the writer the PUBLISH path uses, so resolving it only in the
         // live-Element writer above would have fixed nothing that ships.
         const out = key === "href" ? this.resolveHref(value) : value;
-        if (!isSafeAttrValue(key, out, tag)) continue;
+        const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
+        if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+        if (isLinkAttr) {
+          if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
+          continue;
+        }
         attrParts.push(`${key}="${escapeHTML(out)}"`);
       }
     }
+    // No wrapper when the href itself was refused as unsafe — an <a> without
+    // one would only restyle the section's cursor and focus order.
+    const openLink =
+      blockLink?.wrap && linkParts.some((p) => p.startsWith("href="))
+        ? `<a ${linkParts.join(" ")} style="${BLOCK_LINK_STYLE}">`
+        : "";
+    const closeLink = openLink ? "</a>" : "";
 
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
@@ -1109,7 +1166,7 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
 
     // Self-closing tags
     if (["img", "input", "br", "hr"].includes(tag)) {
-      return `${indentStr}<${tag}${attrStr} />\n`;
+      return `${indentStr}${openLink}<${tag}${attrStr} />${closeLink}\n`;
     }
 
     // Build children content
@@ -1123,7 +1180,7 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
       childContent = this.renderContent(content, contentFormat, element.type);
     }
 
-    return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>\n`;
+    return `${indentStr}${openLink}<${tag}${attrStr}>${childContent}</${tag}>${closeLink}\n`;
   }
 
   // ============================================================================

@@ -299,13 +299,14 @@ export const siteDetailRouter = router({
       .input(z.object({ id: z.string(), siteId: z.string() }))
       .mutation(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+          // It writes (DnsRecord.verified, Domain.status), so a VIEWER may not.
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const result = await checkDomainDns(input.id);
-        if (!result || result.siteId !== input.siteId) throw new TRPCError({ code: "NOT_FOUND" });
+        const result = await checkDomainDns(input.id, input.siteId);
+        if (!result) throw new TRPCError({ code: "NOT_FOUND" });
         return result;
       }),
 

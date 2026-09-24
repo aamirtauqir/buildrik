@@ -20,11 +20,13 @@ import { useToast } from "@/editor/chrome-ui";
 export interface LayerContextActionOptions {
   /** Delete asked for N ≥ 2 elements — open the confirm (board 6887:78291). */
   requestDeleteSelection: () => void;
+  /** "Move to page…" — open the page picker (board 4418:82847) for these ids. */
+  requestMoveToPage: (ids: string[]) => void;
 }
 
 export function useLayerContextActions(
   state: UseLayersStateReturn,
-  { requestDeleteSelection }: LayerContextActionOptions,
+  { requestDeleteSelection, requestMoveToPage }: LayerContextActionOptions,
 ) {
   const { composer, actionsHook, treeHook, selectionHook } = state;
   const { addToast } = useToast();
@@ -147,8 +149,11 @@ export function useLayerContextActions(
         case "moveToBottom":
           actionsHook.moveToBottom(nodeId, treeHook.layers);
           break;
+        case "moveToPage":
+          requestMoveToPage(multi ? [...selectionHook.selectedIds] : [nodeId]);
+          break;
       }
     },
-    [composer, actionsHook, treeHook, selectionHook, addToast, requestDeleteSelection]
+    [composer, actionsHook, treeHook, selectionHook, addToast, requestDeleteSelection, requestMoveToPage]
   );
 }

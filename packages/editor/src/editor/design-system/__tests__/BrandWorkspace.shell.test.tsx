@@ -157,7 +157,9 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
 });
 
 describe("BrandWorkspace › Import / export failed row (4418:168885)", () => {
-  it("a file that does not parse puts the page in its Import failed state", async () => {
+  /* G3-123: the board (4418:168885) draws no status pill; the outcome is a
+     toast and the card keeps the detail. */
+  it("a file that does not parse raises the Import failed toast, no pill", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     openPage(utils, "export");
@@ -166,10 +168,7 @@ describe("BrandWorkspace › Import / export failed row (4418:168885)", () => {
     fireEvent.change(utils.getByLabelText(/Paste JSON/i), { target: { value: "{not json" } });
     fireEvent.click(utils.getByText(/^Parse$/i));
 
-    const row = await utils.findByTestId("brand-section-status-import-failed");
-    expect(row.textContent).toContain("Import failed");
-    // Leaving the page clears the stale outcome.
-    openPage(utils, "colours");
+    expect(await utils.findByText("Import failed")).toBeTruthy();
     expect(utils.queryByTestId("brand-section-status-import-failed")).toBeNull();
   });
 });

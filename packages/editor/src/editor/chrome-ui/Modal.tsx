@@ -9,6 +9,7 @@
  */
 import React from "react";
 import { OverlayMount } from "./OverlayMount";
+import { IconButton } from "./Icon";
 
 export type ModalKind = "question" | "flow" | "form";
 
@@ -24,6 +25,8 @@ export const MODAL_FRAME_BASE_CLASS =
    (radius/card), a 20/30 semibold title, 14/20 ink body, and the action row
    right-aligned INSIDE the padding — no footer strip, no rule above it. */
 export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-6 tw:px-6 tw:pb-4";
+/* The head's ✕: 32 square, centred 36 in from the top-right corner. */
+const MODAL_CLOSE_CLASS = "tw:absolute tw:top-5 tw:right-5 tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
 export const MODAL_TITLE_CLASS =
   "tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
 export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]";
@@ -84,15 +87,17 @@ export interface ModalProps {
    * written conditionally.
    */
   testId?: string;
+  /** A ✕ at the head's right edge (6752:59256 New page draws one). */
+  closeButton?: boolean;
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId,
+  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton,
 }: ModalProps) {
   const titleId = React.useId();
   return (
     <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
-      <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]]].join(" ")} data-testid={testId}>
+      <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]], closeButton ? "tw:relative" : ""].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
             {title}
@@ -104,6 +109,15 @@ export function Modal({
           <div className={MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
             {footer}
           </div>
+        ) : null}
+        {/* Last in the DOM so the dialog's first focus lands on its field,
+            not on the ✕; placed top-right by position. */}
+        {closeButton ? (
+          <IconButton label="Close" onClick={onClose} className={MODAL_CLOSE_CLASS} data-testid={`modal-close-${testId ?? "modal"}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </IconButton>
         ) : null}
       </div>
     </OverlayMount>

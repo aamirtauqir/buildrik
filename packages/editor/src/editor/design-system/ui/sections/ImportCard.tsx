@@ -113,14 +113,7 @@ function detectFormat(raw: string, fileName: string | null): string {
   return "Unknown format";
 }
 
-export interface ImportCardProps {
-  /** Board 306:2265 / 306:2298 put an "Imported tokens" / "Import failed" badge
-   *  under the back row. The badge belongs to the screen frame this card sits
-   *  inside, so the outcome is reported upward rather than drawn here. */
-  onOutcome?(outcome: "imported" | "import-failed"): void;
-}
-
-export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
+export const ImportCard: React.FC = () => {
   const [parsed, setParsed] = React.useState<ParsedState | null>(null);
   const [showPaste, setShowPaste] = React.useState(false);
   const [pasteBuffer, setPasteBuffer] = React.useState("");
@@ -170,10 +163,9 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
     const parsedJson = parseImportJSON(raw);
     if (parsedJson.errors.length > 0) {
       setParseErrors(parsedJson.errors);
-      /* Board 306:2298. The card already showed the error detail inline; what
-         it had no way to say was that the SCREEN is in a failed state, which is
-         what the badge under the back row is for. */
-      onOutcome?.("import-failed");
+      /* G3-123: the outcome is a toast (no pill band); the card keeps the
+         error detail inline. */
+      addToast({ title: "Import failed", description: "Nothing was imported — the errors are listed in the card.", tone: "error" });
       setParsed(null);
       return;
     }
@@ -234,7 +226,6 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
         (stats.skipped.length ? ` · skipped ${stats.skipped.join(", ")}` : ""),
       tone: "success",
     });
-    onOutcome?.("imported");
     handleCancel();
   };
 

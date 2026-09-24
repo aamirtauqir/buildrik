@@ -58,6 +58,9 @@ const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
    flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
    quiet grey Clear selection is the same fill as the dialogs' Cancel. */
 const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
+/* 4418:58292 act/Insert to canvas — the rail's one filled action is INK, not
+   accent: 40 tall, radius 8, 13 regular white. */
+const RAIL_INSERT = "mgr-btn-ink tw:w-full tw:shrink-0 tw:justify-center";
 const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
 /* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
 const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
@@ -440,7 +443,7 @@ export function AssetDetailsPanel({
             3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
-            <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
+            <Button size="xs" className={RAIL_INSERT} onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
             </Button>
           )}

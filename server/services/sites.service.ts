@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -792,19 +792,24 @@ export async function getProjectData(siteId: string) {
   };
 }
 
-export async function userCanEditSite(
+/**
+ * How may this user open the editor for this site? "edit" = EDITOR/DESIGNER+;
+ * "view" = a VIEWER member, who gets the editor in read-only view mode (owner
+ * ruling 2026-09-24 — it used to 404 them); null = not a member / out of site
+ * scope, which the route turns into a 404. Every server write stays role-gated
+ * on its own; this only decides what the route renders.
+ */
+export async function getEditorAccess(
   userId: string,
   siteId: string,
-): Promise<boolean> {
-  // Edit access requires EDITOR (respects per-site role overrides). A VIEWER
-  // member must not load the editor. checkSiteRole throws on insufficient role.
+): Promise<"edit" | "view" | null> {
   try {
-    await checkSiteRole(prisma, userId, siteId, "EDITOR");
-    return true;
+    const role = await getEffectiveSiteRole(prisma, userId, siteId);
+    return role === "VIEWER" ? "view" : "edit";
   } catch (e) {
     // Deny on authorization failure; let real errors (DB, etc.) propagate so
     // an outage is not silently reported as "no access".
-    if (e instanceof PermissionError) return false;
+    if (e instanceof PermissionError) return null;
     throw e;
   }
 }

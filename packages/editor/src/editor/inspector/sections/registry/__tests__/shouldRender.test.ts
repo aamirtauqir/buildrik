@@ -30,7 +30,8 @@ describe("SECTION_REGISTRY — shouldRender gates", () => {
     const gate = SECTION_REGISTRY.link.shouldRender!;
     expect(gate(ctx({ selectedElement: { type: "link" } }))).toBe(true);
     expect(gate(ctx({ selectedElement: { type: "button" } }))).toBe(true);
-    expect(gate(ctx({ selectedElement: { type: "container" } }))).toBe(false);
+    expect(gate(ctx({ selectedElement: { type: "section" } }))).toBe(true); // board 4428:141642
+    expect(gate(ctx({ selectedElement: { type: "image" } }))).toBe(false);
   });
 
   it("typography renders only for text-like elements", () => {

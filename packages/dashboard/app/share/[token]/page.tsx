@@ -1,57 +1,40 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { prisma } from "@lib/prisma";
-import { shareDestination } from "@lib/share-destination";
+import {
+  getShareDraftRows,
+  recordShareView,
+  resolveShareLink,
+} from "@server/services/share-link.service";
 import { SharePasswordGate } from "./password-gate";
-import { ShareNotPublished } from "./not-published";
+import { DraftPreview } from "./draft-preview";
 
 export const dynamic = "force-dynamic";
 
-// Server component. The verify-password endpoint sets a `share_<token>` cookie
-// on success; this honors it so a returning visitor skips the prompt instead
-// of re-entering the password (the cookie was previously set but read by
-// nothing). Note: this gate guards the share *page* — a published site is also
-// reachable at its own URL, so a hard access boundary needs Vercel deployment
-// protection (publishedPassword), which is enforced separately at publish.
+// A share link is a private capability URL — never index it. (Also sent as an
+// X-Robots-Tag header for /share/* in next.config.mjs.)
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+/**
+ * /share/<token> renders the site's current SAVED draft — every live page,
+ * read-only, no editor chrome — which is what the Share modal promises
+ * ("current saved design"). It used to redirect to `site.publishedUrl` and show
+ * "isn't published yet" for everything else.
+ *
+ * Token states: missing / revoked / expired / deleted site → the gate's
+ * "no longer available" path; a password link without the signed unlock
+ * cookie (set by /api/share/<token>/verify-password) → the password gate.
+ */
 export default async function SharePage({
   params,
 }: {
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-
-  const link = await prisma.shareLink.findUnique({
-    where: { token },
-    include: { site: { select: { publishedUrl: true, slug: true, name: true } } },
-  });
-
-  if (!link || !link.isActive) {
-    return <SharePasswordGate />; // gate renders the "no longer available" path on submit
-  }
-  if (link.expiresAt && link.expiresAt < new Date()) {
-    return <SharePasswordGate />;
-  }
-
-  /* Nothing to send them to: the site has never been published, and no draft
-     renderer exists on the server. This used to redirect to `/<slug>`, which is
-     not a route — the visitor got a 404 with no idea whether the link was
-     broken, expired, or wrong. */
-  const destination = shareDestination(link.site);
-  if (!destination) {
-    return <ShareNotPublished siteName={link.site.name} />;
-  }
-
-  // No password → straight through (count handled by the verify route when
-  // used; here we just forward).
-  if (!link.passwordHash) {
-    redirect(destination);
-  }
-
-  // Password set: honor a prior successful verification cookie.
   const jar = await cookies();
-  if (jar.get(`share_${token}`)?.value === "1") {
-    redirect(destination);
-  }
+  const access = await resolveShareLink(token, jar.get(`share_${token}`)?.value);
 
-  return <SharePasswordGate />;
+  if (access.state !== "open") return <SharePasswordGate />;
+
+  const [rows] = await Promise.all([getShareDraftRows(access.siteId), recordShareView(access.linkId)]);
+  return <DraftPreview siteName={access.siteName} rows={rows} />;
 }

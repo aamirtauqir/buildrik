@@ -2,7 +2,8 @@
  * Unification spec §550 — EditPage auth/permission gates.
  * - no session → redirect /auth/login?next=/edit/<id>
  * - non-member → notFound()
- * - member → renders EditorClient with siteId
+ * - EDITOR+ → renders EditorClient with siteId
+ * - VIEWER → redirected into read-only view mode, then renders (2026-09-24)
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -36,7 +37,7 @@ vi.mock("@server/auth", () => ({
 }));
 
 vi.mock("@server/services/sites.service", () => ({
-  userCanEditSite: (...args: unknown[]) => canEditMock(...args),
+  getEditorAccess: (...args: unknown[]) => canEditMock(...args),
 }));
 
 vi.mock("@/components/editor-route/EditorClient", () => ({
@@ -72,7 +73,7 @@ describe("EditPage", () => {
 
   it("calls notFound() when user is not a workspace member", async () => {
     authMock.mockResolvedValueOnce({ user: { id: "user-1" } });
-    canEditMock.mockResolvedValueOnce(false);
+    canEditMock.mockResolvedValueOnce(null);
     await expect(
       EditPage({ params: Promise.resolve({ siteId: "abc" }) }),
     ).rejects.toMatchObject({ name: "NotFoundError" });
@@ -83,7 +84,7 @@ describe("EditPage", () => {
 
   it("renders EditorClient with siteId when authorized", async () => {
     authMock.mockResolvedValueOnce({ user: { id: "user-1" } });
-    canEditMock.mockResolvedValueOnce(true);
+    canEditMock.mockResolvedValueOnce("edit");
     const node: any = await EditPage({
       params: Promise.resolve({ siteId: "abc" }),
     });
@@ -92,5 +93,29 @@ describe("EditPage", () => {
     expect(node?.props?.siteId).toBe("abc");
     expect(redirectMock).not.toHaveBeenCalled();
     expect(notFoundMock).not.toHaveBeenCalled();
+  });
+
+  it("sends a VIEWER into read-only view mode, keeping other params", async () => {
+    authMock.mockResolvedValueOnce({ user: { id: "user-1" } });
+    canEditMock.mockResolvedValueOnce("view");
+    await expect(
+      EditPage({
+        params: Promise.resolve({ siteId: "abc" }),
+        searchParams: Promise.resolve({ page: "home" }),
+      }),
+    ).rejects.toMatchObject({ name: "RedirectError" });
+    expect(redirectMock).toHaveBeenCalledWith("/edit/abc?page=home&view=readonly");
+    expect(notFoundMock).not.toHaveBeenCalled();
+  });
+
+  it("renders the editor for a VIEWER already in read-only view mode", async () => {
+    authMock.mockResolvedValueOnce({ user: { id: "user-1" } });
+    canEditMock.mockResolvedValueOnce("view");
+    const node: any = await EditPage({
+      params: Promise.resolve({ siteId: "abc" }),
+      searchParams: Promise.resolve({ view: "readonly" }),
+    });
+    expect(node?.props?.siteId).toBe("abc");
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });

@@ -236,6 +236,17 @@ describe("MediaManager server mirror — tags ↔ userMetadata.tags (C3)", () =>
     expect(tags("nulled")).toEqual([]);
     expect(tags("wrong")).toEqual([]);
   });
+
+  it("importServerAssets carries the row's width/height — the details meta line reads them (4418:58292)", async () => {
+    const manager = makeManager(makeRemoteSync());
+    await manager.importServerAssets(
+      [{ ...row("sized"), width: 2400, height: 1600 }, { ...row("unsized"), width: null, height: null }],
+      [],
+    );
+    expect(manager.getAsset("sized")).toMatchObject({ width: 2400, height: 1600 });
+    expect(manager.getAsset("unsized")?.width).toBeUndefined();
+    expect(manager.getAsset("unsized")?.height).toBeUndefined();
+  });
 });
 
 /* Clone 3686:42317 (Assets · Site fonts, Phase 5): `Add font` turns an
