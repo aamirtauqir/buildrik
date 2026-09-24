@@ -8,9 +8,9 @@
  * The frame every state shares, top to bottom: the panel header (its ⋯ holds
  * Compare rounds and Round history, board 7071:79114), one status line
  * ("2 open · 1 resolved · Awaiting Sara", board 4418:115784), the thread, then
- * a fixed foot — the note composer and one primary button whose label IS the
- * state ("Re-send for review" · "Sending round 3…" · "Send a new link" ·
- * "Try again").
+ * a fixed foot — the note composer. The 4418 Review boards (116040–118896)
+ * draw no primary under it, so the re-send ("Re-send review link" · "Send a new
+ * link") is a ⋯ row and a re-send in flight reads under the status line.
  *
  * What the rebuild replaced: a status badge + open-count chip + Re-send +
  * overflow row, a "Show resolved" toggle, avatar-led rows, and page groups
@@ -105,7 +105,8 @@ const BAND =
 const BAND_COUNT =
   "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium";
 const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-2";
-const COMPOSER = "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
+const COMPOSER =
+  "tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
 /* Board 4418:115784's "Locate ›": accent text, no chrome, 12/18. */
 const LOCATE =
   "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline";
@@ -124,14 +125,24 @@ function shortAge(iso: string | Date): string {
   return `${Math.round(h / 24)}d`;
 }
 
-/** "3 open · 9 resolved · Awaiting Sara" — board 4418:115784's status line. */
-function statusLine(round: CurrentRound | null, open: number, resolved: number): string {
-  const counts = `${open} open · ${resolved} resolved`;
+/** "3 open · 9 resolved · Awaiting Sara" — board 4418:115784's status line.
+ *  The tail is where the round stands: "Round 3" once its link is revoked
+ *  (4418:116040), "Not sent yet" for a round no client link was minted for
+ *  (6879:66771), and a detached count slots in before it (4418:116906). */
+function statusLine(round: CurrentRound | null, open: number, resolved: number, detached = 0): string {
+  const counts = `${open} open · ${resolved} resolved${detached > 0 ? ` · ${detached} detached` : ""}`;
   if (!round) return counts;
   const st = round.status?.toLowerCase();
   const who = round.reviewerName ?? round.invitedEmail ?? "the reviewer";
-  const tail =
-    st === "changes_requested" ? "Changes requested" : st === "approved" ? "Approved" : `Awaiting ${who}`;
+  const tail = round.revoked
+    ? `Round ${round.roundNumber}`
+    : st === "changes_requested"
+      ? "Changes requested"
+      : st === "approved"
+        ? "Approved"
+        : round.invitedEmail === null
+          ? "Not sent yet"
+          : `Awaiting ${who}`;
   return `${counts} · ${tail}`;
 }
 
@@ -159,6 +170,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [draft, setDraft] = React.useState("");
   const [sending, setSending] = React.useState(false);
   const [replyError, setReplyError] = React.useState(false);
+  /* Board 4418:116264 — a failed resolve names the comment that is still
+     open and offers the retry in place. */
+  const [resolveFailed, setResolveFailed] = React.useState<ReviewComment | null>(null);
+  /* Boards 4418:117140–118407: a comment resolved in this panel stays where it
+     was, under a "RESOLVED · <page>" band, instead of jumping into the
+     collapsed group — the older ones sit under "Earlier resolved". */
+  const [sessionResolved, setSessionResolved] = React.useState<ReadonlySet<string>>(new Set());
   const [confirmRevoke, setConfirmRevoke] = React.useState(false);
   const [confirmResend, setConfirmResend] = React.useState(false);
   const [roundMenuOpen, setRoundMenuOpen] = React.useState(false);
@@ -271,11 +289,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   };
 
   const onResolve = async (c: ReviewComment) => {
+    const next = c.status === "RESOLVED" ? "OPEN" : "RESOLVED";
+    setResolveFailed(null);
     try {
-      await resolveReviewComment(c.id, c.status === "RESOLVED" ? "OPEN" : "RESOLVED");
+      await resolveReviewComment(c.id, next);
+      setSessionResolved((prev) => {
+        const s = new Set(prev);
+        if (next === "RESOLVED") s.add(c.id);
+        else s.delete(c.id);
+        return s;
+      });
       await reload();
     } catch {
-      setNotice("Couldn't update that comment. Try again.");
+      setResolveFailed(c);
     }
   };
 
@@ -333,7 +359,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      review link" needs the token the dashboard does not send (needs
      dashboard). Compare rounds and Round history live here, not in the body. */
   const roundMenu =
-    round && !round.revoked ? (
+    round ? (
       <Popover
         open={roundMenuOpen}
         onClose={() => setRoundMenuOpen(false)}
@@ -373,25 +399,39 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           >
             Round history ›
           </MenuItem>
+          {/* The re-send is a menu row, not a footer button: no 4418 Review
+              board draws a primary under the composer. A live round asks first
+              (4418:121372 → 4418:120052) — the re-send starts a new round and
+              kills the client's current link; a revoked round has no link
+              left to kill, so it sends. */}
           {onResend ? (
             <MenuItem
+              disabled={resending}
               onClick={() => {
                 setRoundMenuOpen(false);
-                setConfirmResend(true);
+                if (round.revoked) void doResend();
+                else setConfirmResend(true);
               }}
+              data-testid="review-menu-resend"
             >
-              Re-send review link
+              {round.revoked
+                ? round.invitedEmail !== null
+                  ? "Send a new link"
+                  : "Send for review again"
+                : "Re-send review link"}
             </MenuItem>
           ) : null}
-          <MenuItem
-            danger
-            onClick={() => {
-              setRoundMenuOpen(false);
-              setConfirmRevoke(true);
-            }}
-          >
-            {round.invitedEmail !== null ? "Revoke link" : "Withdraw request"}
-          </MenuItem>
+          {!round.revoked ? (
+            <MenuItem
+              danger
+              onClick={() => {
+                setRoundMenuOpen(false);
+                setConfirmRevoke(true);
+              }}
+            >
+              {round.invitedEmail !== null ? "Revoke link" : "Withdraw request"}
+            </MenuItem>
+          ) : null}
         </Menu>
       </Popover>
     ) : null;
@@ -472,20 +512,48 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const total = comments.length;
   const resolvedComments = comments.filter((c) => c.status === "RESOLVED");
   const openComments = comments.filter((c) => c.status !== "RESOLVED");
+  const detachedCount = openComments.filter((c) => detachedIds.has(c.id)).length;
 
   /* Board 4418:115784: one mono status line under the header — counts and
      where the round stands. No progress bar, no sent line. */
   const progress = (
-    <div className="tw:flex tw:min-h-7 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4" data-testid="review-status">
+    <div className="tw:flex tw:min-h-9 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4" data-testid="review-status">
       <span
         className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]"
         data-testid="review-status-line"
       >
-        {statusLine(round, openComments.length, resolvedComments.length)}
+        {/* Board 4418:116906 counts a detached comment once — "3 open · 2
+            detached", not five open. */}
+        {statusLine(round, openComments.length - detachedCount, resolvedComments.length, detachedCount)}
       </span>
-      {notice ? <span className={META}>{notice}</span> : null}
+      {resending && round ? (
+        <span className={META}>Sending round {round.roundNumber + 1}…</span>
+      ) : notice ? (
+        <span className={META}>{notice}</span>
+      ) : null}
     </div>
   );
+
+  /* Board 4418:116264 (its PROGRESS band is the retired bar, not rebuilt):
+     which comment is still open, and the retry beside it. */
+  const resolveFailedBlock = resolveFailed ? (
+    <div className="tw:flex tw:flex-col tw:items-start tw:gap-2 tw:px-4 tw:pb-3" role="alert" data-testid="review-resolve-failed">
+      <span className={META}>Could not update this comment. It is still open.</span>
+      <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+        {pageName(resolveFailed.pageId)} · {"“"}
+        {resolveFailed.body}
+        {"”"} is still open.
+      </span>
+      <span className="tw:flex tw:flex-col tw:items-start tw:gap-1">
+        <Button size="xs" onClick={() => void onResolve(resolveFailed)}>
+          Retry resolve
+        </Button>
+        <Button color="light" size="xs" className={GHOST} onClick={() => setResolveFailed(null)}>
+          Dismiss
+        </Button>
+      </span>
+    </div>
+  ) : null;
 
   if (state === "error") {
     return (
@@ -561,13 +629,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   }
 
   const detached = openComments.filter((c) => detachedIds.has(c.id));
-  const attached = openComments.filter((c) => !detachedIds.has(c.id));
+  const attached = comments.filter(
+    (c) => (c.status !== "RESOLVED" && !detachedIds.has(c.id)) || (c.status === "RESOLVED" && sessionResolved.has(c.id)),
+  );
+  const earlierResolved = resolvedComments.filter((c) => !sessionResolved.has(c.id));
 
   /* One id per row across the WHOLE list, in render order (detached, then the
      page groups, then resolved), so a probe or recipe can address the third row
      without knowing which group it fell into. */
   const rowIndex = new Map(
-    [...detached, ...attached, ...resolvedComments].map((c, i) => [c.id, i]),
+    [...detached, ...attached, ...earlierResolved].map((c, i) => [c.id, i]),
   );
 
   const groups: Group[] = [];
@@ -585,7 +656,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      row read the same as an open one. Falls back to the open-row meta when the
      resolver cannot be named (a comment resolved before this shipped). */
   const rowMeta = (c: ReviewComment) => {
-    if (c.status === "RESOLVED" && c.resolvedByName) {
+    if (c.status === "RESOLVED" && c.resolvedByName && !sessionResolved.has(c.id)) {
       return `resolved by ${c.resolvedByName} · ${shortAge(c.resolvedAt ?? c.createdAt)}`;
     }
     return `${pageName(c.pageId)} · ${shortAge(c.createdAt)}`;
@@ -599,7 +670,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   const row = (
     c: ReviewComment,
-    extra?: { detachedNote?: string; actions?: React.ReactNode },
+    extra?: { detachedNote?: string; footer?: React.ReactNode },
   ) => (
     <CommentRow
       key={c.id}
@@ -617,7 +688,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
          Clicks on the row's own buttons (Locate ›, Resolve, Copy link,
          Reattach) are theirs, not the row's. */
       onClick={
-        c.targetSelector && c.status !== "RESOLVED" && !extra?.detachedNote
+        c.targetSelector && (c.status !== "RESOLVED" || sessionResolved.has(c.id)) && !extra?.detachedNote
           ? (e: React.MouseEvent) => {
               if ((e.target as HTMLElement).closest("button")) return;
               locate(c);
@@ -627,15 +698,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       /* Board 4418:115784: the trailing slot is Locate › alone (accent);
          Resolve sits on its own line under the row, Copy link beside it. */
       actions={
-        extra?.actions ??
-        (c.targetSelector && c.status !== "RESOLVED" ? (
+        extra?.detachedNote
+          ? undefined
+          : (c.targetSelector && (c.status !== "RESOLVED" || sessionResolved.has(c.id)) ? (
           <Button color="light" size="xs" onClick={() => locate(c)} className={LOCATE} data-row-locate>
             Locate ›
           </Button>
         ) : undefined)
       }
       footer={
-        extra?.actions ? undefined : (
+        extra?.footer ?? (
           <>
             {resolveButton(c)}
             {/* Not on board 4418:115784, kept by the owner rule (never
@@ -667,13 +739,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Board 158:162 — the link is dead, the comments are not. */
   const revokedBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
-      <span className="tw:text-[14px] tw:text-[var(--bk-error)]">
+      <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error)]">
         {hasClientLink ? "This review link was revoked." : "This review request was withdrawn."}
       </span>
       <span className={META}>
         {hasClientLink
-          ? `${round.reviewerName ?? "The reviewer"} can no longer open it. Earlier comments are kept below.`
-          : "Nobody is waiting on it now. Earlier comments are kept below."}
+          ? `${round.reviewerName ?? "The reviewer"} can no longer open this link. All ${total} comment${total === 1 ? " is" : "s are"} kept, including ${openComments.length} open comment${openComments.length === 1 ? "" : "s"}.`
+          : `Nobody is waiting on it now. All ${total} comment${total === 1 ? " is" : "s are"} kept.`}
       </span>
     </div>
   );
@@ -682,9 +754,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const allResolvedBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
       <span className="tw:text-[13px] tw:text-[var(--bk-success-text)]">Everything is resolved.</span>
-      <span className={META}>
-        {resolvedComments.length} of {total} — ready to send round {round.roundNumber + 1}.
-      </span>
+      <span className={META}>All comments are resolved. Client approval is shown above.</span>
     </div>
   );
 
@@ -760,14 +830,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     </div>
   );
 
-  const primaryLabel = resending
-    ? `Sending round ${round.roundNumber + 1}…`
-    : round.revoked
-      ? hasClientLink
-        ? "Send a new link"
-        : "Send for review again"
-      : "Re-send for review";
-
   return (
     <div className={BODY} data-review-state={round.revoked ? "revoked" : "open"}>
       {header}
@@ -798,6 +860,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       />
 
       {progress}
+      {resolveFailedBlock}
 
       <div className={SCROLL}>
         {/* A CHANGES_REQUESTED round's own sentence is the banner above; its
@@ -832,7 +895,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             {detached.map((c) =>
               row(c, {
                 detachedNote: "element deleted",
-                actions: (
+                footer: (
                   <>
                     <Button
                       color="light"
@@ -846,7 +909,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                       }}
                       className={GHOST}
                     >
-                      Reattach
+                      Reattach comment
                     </Button>
                     {resolveButton(c)}
                   </>
@@ -861,8 +924,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <div className={BAND} data-testid={`review-band-${i}`}>
               {/* Board 156:2 marks where the open thread starts, then names
                   each page after it. */}
+              {/* Boards 4418:117140–118407: every group names its state
+                  and page — "OPEN · CONTACT", and "RESOLVED · CONTACT" once
+                  everything in it was resolved here. */}
               <span data-testid={`review-band-label-${i}`}>
-                {i === 0 ? `Open · ${g.label}` : g.label}
+                {g.comments.every((c) => c.status === "RESOLVED") ? "Resolved" : "Open"} · {g.label}
               </span>
               <span className={BAND_COUNT} data-testid={`review-band-count-${i}`}>
                 {g.comments.length}
@@ -872,26 +938,26 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </div>
         ))}
 
-        {resolvedComments.length > 0 && (
+        {earlierResolved.length > 0 && (
           <div data-resolved-group>
+            {/* Boards 4418:116040 / 117140: a white disclosure row with a
+                chevron and no count — the status line already carries it. */}
             <Button
               color="light"
-              className={BAND}
+              className={`${BAND} tw:h-9 tw:bg-transparent tw:border-b tw:border-[var(--bk-border)]`}
               aria-expanded={resolvedOpen}
+              aria-label={`${sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"} (${earlierResolved.length})`}
               onClick={() => setResolvedOpen((v) => !v)}
               data-testid="review-resolved-band"
             >
-              <span>Resolved</span>
-              <span className={`${BAND_COUNT} tw:flex tw:items-center tw:gap-1`}>
-                {resolvedComments.length}
-                {resolvedOpen ? (
-                  <ChevronDown size={12} aria-hidden="true" />
-                ) : (
-                  <ChevronRight size={12} aria-hidden="true" />
-                )}
-              </span>
+              <span>{sessionResolved.size > 0 ? "Earlier resolved" : "Resolved"}</span>
+              {resolvedOpen ? (
+                <ChevronDown size={12} aria-hidden="true" />
+              ) : (
+                <ChevronRight size={12} aria-hidden="true" />
+              )}
             </Button>
-            {resolvedOpen && resolvedComments.map((c) => row(c))}
+            {resolvedOpen && earlierResolved.map((c) => row(c))}
           </div>
         )}
       </div>
@@ -981,9 +1047,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           rows={2}
           maxLength={2000}
         />
-        {replyError && <span className={META}>Couldn't send that reply. Try again.</span>}
-        <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
-          <span className={META} data-testid="review-composer-meta">Page comment · {pageName(activePage ?? null)} · team only</span>
+        {replyError && (
+          <span className={META} role="alert">
+            Comment not sent. Your draft is still here.
+          </span>
+        )}
+        <span className={META} data-testid="review-composer-meta">Page comment · {pageName(activePage ?? null)} · team only</span>
+        <div className="tw:flex tw:items-center tw:justify-end tw:gap-2">
           <Button
             size="xs"
             /* Board 4418:115784: Send is the blue primary — disabled is the
@@ -993,7 +1063,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             onClick={() => void send()}
             aria-busy={sending || undefined}
           >
-            Send
+            {replyError ? "Retry send" : "Send"}
           </Button>
         </div>
       </div>
@@ -1053,24 +1123,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </div>
         }
       />
-        <div className="tw:px-3 tw:pb-3 tw:flex tw:flex-col tw:gap-2">
-          <Button
-            className="tw:w-full tw:justify-center"
-            data-testid="review-primary"
-            disabled={resending || !onResend}
-            title={!onResend ? "Re-send isn't available here" : undefined}
-            aria-busy={resending || undefined}
-            onClick={() => {
-              /* A live round always asks (4418:121372 → 4418:120052): the
-                 re-send starts a new round and kills the client's current
-                 link, open comments or not. A revoked round has no link left
-                 to kill, so it sends. */
-              if (!round.revoked) setConfirmResend(true);
-              else void doResend();
-            }}
-          >
-            {primaryLabel}
-          </Button>
+      {!round.revoked && !hasClientLink && (
+        <div className="tw:px-3 tw:pb-3 tw:flex tw:flex-col tw:gap-2 tw:bg-[var(--bk-bg-subtle)]">
           {/* D1-half-B: `SendForReview` — the only control in the product with a
               "Client email" field — rendered under `if (!round)` and nowhere
               else, so once ANY round existed there was no way to invite a
@@ -1078,8 +1132,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               the control back here. Reused rather than reimplemented: it
               already owns the snapshot render, the submit and the pill
               refresh. */}
-          {!round.revoked && !hasClientLink && (
-            <div className="tw:self-center">
+          <div className="tw:self-center">
               <SendForReview
                 composer={composer ?? null}
                 disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
@@ -1098,9 +1151,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 }}
                 idleLabel="Invite a client…"
               />
-            </div>
-          )}
+          </div>
         </div>
+      )}
     </div>
   );
 };

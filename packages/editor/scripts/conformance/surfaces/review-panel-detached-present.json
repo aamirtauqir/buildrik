@@ -140,12 +140,6 @@
       "testId": "review-comment-meta-2",
       "spec": "review-panel-detached-present",
       "nodeId": "I228:1017;17:39"
-    },
-    {
-      "name": "primary-label",
-      "testId": "review-primary",
-      "spec": "review-panel-detached-present",
-      "nodeId": "I229:1092;9:19"
     }
   ]
 }

@@ -117,12 +117,6 @@
       "testId": "review-rounds-note-text",
       "spec": "review-panel-older-round",
       "nodeId": "157:220"
-    },
-    {
-      "name": "primary-label",
-      "testId": "review-primary",
-      "spec": "review-panel-older-round",
-      "nodeId": "I229:1104;9:19"
     }
   ]
 }
