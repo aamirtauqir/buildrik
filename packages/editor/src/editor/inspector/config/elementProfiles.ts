@@ -91,10 +91,11 @@ const TEXT_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "link",
     "effects",
     "interactions",
+    // Settings order, boards 6883:75643 / 76283: VISIBILITY → LINK → CONTENT.
     "visibility",
+    "link",
     "content",
     "element-properties",
     "css-classes",
@@ -182,8 +183,9 @@ const BUTTON_PROFILE: ElementProfile = {
     "blur",
     "effects",
     "interactions",
-    "link",
+    // Settings order, board 6883:76283: VISIBILITY → LINK → CONTENT.
     "visibility",
+    "link",
     "content",
     "element-properties",
     "css-classes",
