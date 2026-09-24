@@ -35,6 +35,7 @@ function makeComposer() {
       getActivePage: vi.fn(() => ({ id: "page-1", name: "Home", root: { id: "root-1" } })),
       getAllPages: vi.fn(() => [{ id: "page-1", name: "Home" }]),
       createPage: vi.fn(() => ({ id: "page-new", name: "New" })),
+      addPageToNavigation: vi.fn(() => 1),
       setActivePage: vi.fn(),
       importHTMLToActivePage: vi.fn(),
       recordAppliedTemplate: vi.fn(),
@@ -121,6 +122,19 @@ describe("Templates — full-canvas view (decision #24)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
     await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).toHaveBeenCalledWith("Our menu");
+    expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
+  });
+
+  /* 6752:59256 "Add to site navigation" rides with the name and is applied
+     once the page exists. */
+  it("the carried 'Add to site navigation' links the created page into the navs", async () => {
+    const composer = makeComposer();
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" addToNavigation />);
+    const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
+    expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("page-new");
   });
 
   /* QA 2026-09-24: Escape did not close the view. From the catalogue it goes

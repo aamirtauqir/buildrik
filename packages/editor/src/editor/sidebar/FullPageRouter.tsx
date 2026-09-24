@@ -52,6 +52,7 @@ export interface FullPageRouterProps {
   onTemplatesSwitchTab?: (tab: string) => void;
   /** New-page modal → From template: the name Create page uses (#19). */
   templatesNewPageName?: string;
+  templatesAddToNavigation?: boolean;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -66,6 +67,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   settingsOpen,
   onTemplatesSwitchTab,
   templatesNewPageName,
+  templatesAddToNavigation,
 }) => {
   switch (activeTab) {
     /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
@@ -83,6 +85,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               onTemplateUsed={onSwitchToAdd}
               onSwitchTab={onTemplatesSwitchTab}
               newPageName={templatesNewPageName}
+              addToNavigation={templatesAddToNavigation}
               onClose={commonTabProps.onClose}
             />
           </div>

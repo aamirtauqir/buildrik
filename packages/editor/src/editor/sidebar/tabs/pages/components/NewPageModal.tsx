@@ -10,8 +10,10 @@
  * creates nothing until a template is chosen there — leaving the catalogue
  * must leave no blank page behind (QA 2026-09-24).
  *
- * The board's "Add to site navigation" checkbox is not drawn: the product has
- * no navigation-element contract to write to (audit G2-074).
+ * "Add to site navigation" (on by default, as drawn) writes through
+ * ElementManager.addPageToNavigation — every nav's link group takes a link to
+ * the new page. On From template the choice rides to the catalogue with the
+ * name and is applied when the page is actually created there.
  *
  * Every Add-page door emits UI_NEW_PAGE_REQUESTED; this is its one listener,
  * mounted once by StudioModals.
@@ -22,22 +24,25 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { BK_LABEL_CLASS, Button, Label, Modal, TextInput, useToast } from "@/editor/chrome-ui";
+import { Grid3x3, Square } from "lucide-react";
+import { BK_LABEL_CLASS, Button, Label, Modal, TextInput, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 type Source = "blank" | "template";
 
+/* 6752:59256 option card: ~124 tall, 16 inset, 20 glyph over a 13/600 title
+   and a 12 muted hint; picked = accent edge on the accent tint. */
 const CARD =
-  "tw:flex tw:h-auto tw:flex-1 tw:flex-col tw:items-start tw:gap-0.5 tw:rounded-lg tw:border tw:border-solid " +
-  "tw:px-3 tw:py-2.5 tw:text-left tw:font-normal";
+  "tw:flex tw:h-[124px] tw:flex-1 tw:flex-col tw:items-start tw:justify-start tw:gap-3 tw:rounded-lg tw:border tw:border-solid " +
+  "tw:p-4 tw:text-left tw:font-normal tw:text-[var(--bk-ink)]";
 const CARD_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:ring-1 tw:ring-[var(--bk-accent)]";
 const CARD_OFF = "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-
 export function NewPageModal({ composer }: { composer: Composer | null }) {
   const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
   const [source, setSource] = React.useState<Source>("template");
+  const [addToNav, setAddToNav] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -45,6 +50,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     const onRequest = () => {
       setName(getDefaultPageName(composer.elements.getAllPages()));
       setSource("template");
+      setAddToNav(true);
       setError(null);
       setOpen(true);
     };
@@ -64,7 +70,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (!composer || !trimmed) return;
     if (source === "template") {
       setOpen(false);
-      composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: trimmed });
+      composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: trimmed, addToNavigation: addToNav });
       return;
     }
     let pageId: string;
@@ -75,12 +81,13 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       setError("Couldn't add page right now. Try again.");
       return;
     }
+    if (addToNav) composer.elements.addPageToNavigation(pageId);
     composer.elements.setActivePage(pageId);
     setOpen(false);
     addToast({ title: "Page created", description: `‘${trimmed}’ is ready.`, tone: "success" });
   };
 
-  const card = (value: Source, title: string, hint: string) => (
+  const card = (value: Source, icon: React.ReactNode, title: string, hint: string) => (
     <Button
       color="light"
       role="radio"
@@ -89,8 +96,13 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       data-testid={`new-page-source-${value}`}
       onClick={() => setSource(value)}
     >
-      <span className="tw:block tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)]">{title}</span>
-      <span className="tw:block tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">{hint}</span>
+      <span className="tw:flex tw:flex-col tw:items-start tw:gap-3">
+        {icon}
+        <span className="tw:flex tw:flex-col tw:gap-1">
+          <span className="tw:block tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:text-[var(--bk-ink)]">{title}</span>
+          <span className="tw:block tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">{hint}</span>
+        </span>
+      </span>
     </Button>
   );
 
@@ -102,6 +114,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       /* width/dialog-lg — board 6752:59256 draws this one at 640. */
       width="lg"
       testId="new-page-modal"
+      closeButton
       footer={
         <>
           <Button color="light" size="xs" data-testid="new-page-cancel" onClick={() => setOpen(false)}>
@@ -114,7 +127,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       }
     >
       <form
-        className="tw:flex tw:flex-col tw:gap-3"
+        className="tw:flex tw:flex-col tw:gap-4"
         onSubmit={(e) => {
           e.preventDefault();
           create();
@@ -137,9 +150,22 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             }}
           />
         </div>
-        <div className="tw:flex tw:gap-2" role="radiogroup" aria-label="Start from">
-          {card("blank", "Blank", "Empty canvas")}
-          {card("template", "From template", `Pick from ${layoutCount} layouts`)}
+        <div className="tw:flex tw:gap-4" role="radiogroup" aria-label="Start from">
+          {card("blank", <Square size={20} strokeWidth={1.75} aria-hidden />, "Blank", "Empty canvas")}
+          {card("template", <Grid3x3 size={20} strokeWidth={1.75} aria-hidden />, "From template", `Pick from ${layoutCount} layouts`)}
+        </div>
+        <div className="tw:flex tw:items-center tw:gap-2">
+          <ToggleSwitch
+            id="new-page-add-to-nav"
+            checked={addToNav}
+            onChange={setAddToNav}
+            aria-labelledby="new-page-add-to-nav-label"
+            sizing="sm"
+            data-testid="new-page-add-to-nav"
+          />
+          <span id="new-page-add-to-nav-label" className="tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink)]">
+            Add to site navigation
+          </span>
         </div>
         {error ? (
           <p role="alert" className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error)]">
