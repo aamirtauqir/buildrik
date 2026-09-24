@@ -71,6 +71,9 @@ const CONTAINER_PROFILE: ElementProfile = {
     "animation",
     "effects",
     "visibility",
+    // Board 4428:141642: LINK sits between VISIBILITY and CONTENT. Rendered
+    // only for LINKABLE_TYPES (section registry gate).
+    "link",
     "content",
     "element-properties",
     "css-classes",
