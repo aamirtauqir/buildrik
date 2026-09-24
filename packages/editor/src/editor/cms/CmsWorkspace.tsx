@@ -292,6 +292,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
         <FieldInspector
           composer={composer}
           collection={collection}
+          collections={panel.collections}
           field={selectedField}
           records={panel.records}
           uses={usage.get(selectedField.slug) ?? []}

@@ -76,6 +76,7 @@ describe("FieldInspector", () => {
       <FieldInspector
         composer={e.composer as never}
         collection={MENU}
+        collections={[MENU]}
         field={field}
         records={[REC]}
         uses={fieldUsage(e.composer as never, MENU).get(field.slug) ?? []}
@@ -90,7 +91,10 @@ describe("FieldInspector", () => {
 
   it("edits name, key and required of an unbound field; summarises its rule", () => {
     const { updateField } = mount(1);
-    expect(screen.getByTestId("cms-fi-rule")).toHaveTextContent("Min 0");
+    expect(screen.getByTestId("cms-fi-rule-min")).toHaveValue(0);
+    fireEvent.change(screen.getByTestId("cms-fi-rule-max"), { target: { value: "99" } });
+    fireEvent.blur(screen.getByTestId("cms-fi-rule-max"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "f2", { validation: { min: 0, max: 99 } });
     fireEvent.change(screen.getByTestId("cms-fi-name"), { target: { value: "Cost" } });
     fireEvent.blur(screen.getByTestId("cms-fi-name"));
     expect(updateField).toHaveBeenCalledWith("col-1", "f2", { name: "Cost" });
@@ -101,6 +105,7 @@ describe("FieldInspector", () => {
     expect(updateField).toHaveBeenCalledWith("col-1", "f2", { slug: "cost" });
     fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
     expect(updateField).toHaveBeenCalledWith("col-1", "f2", { validation: { min: 0, required: true } });
+    expect(screen.queryByTestId("cms-fi-collection")).toBeNull();
   });
 
   it("locks key and type of a bound field, and refuses its delete (4418:165439)", () => {
@@ -129,5 +134,34 @@ describe("FieldInspector", () => {
     expect(screen.getByTestId("cms-field-delete")).toHaveTextContent("Price is a Number field on the Menu items collection.");
     fireEvent.click(screen.getByTestId("cms-field-delete-confirm"));
     await waitFor(() => expect(onDeleteField).toHaveBeenCalledWith("f2"));
+  });
+
+  it("gives each type its own rules: text a length, a reference its collection, an image none", () => {
+    const TEAM = { id: "col-2", name: "Team", slug: "team", fields: [] } as unknown as CMSCollection;
+    const fields = [
+      { id: "t", name: "Note", slug: "note", type: "text", order: 0 },
+      { id: "r", name: "Chef", slug: "chef", type: "reference", order: 1, referenceCollection: "col-2" },
+      { id: "i", name: "Photo", slug: "photo", type: "image", order: 2 },
+    ];
+    const col = { ...MENU, pageSlugPattern: undefined, fields } as unknown as CMSCollection;
+    const e = engine();
+    const updateField = (e.composer.cms.collections as unknown as { updateField: ReturnType<typeof vi.fn> }).updateField;
+    const show = (i: number) =>
+      render(
+        <FieldInspector composer={e.composer as never} collection={col} collections={[col, TEAM]} field={col.fields[i]} records={[]} uses={[]}
+          onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} />,
+      );
+    show(0);
+    fireEvent.change(screen.getByTestId("cms-fi-rule-maxLength"), { target: { value: "140" } });
+    fireEvent.blur(screen.getByTestId("cms-fi-rule-maxLength"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "t", { validation: { maxLength: 140 } });
+    cleanup();
+    show(1);
+    expect(screen.getByTestId("cms-fi-collection")).toHaveValue("col-2");
+    fireEvent.change(screen.getByTestId("cms-fi-collection"), { target: { value: "col-1" } });
+    expect(updateField).toHaveBeenCalledWith("col-1", "r", { referenceCollection: "col-1" });
+    cleanup();
+    show(2);
+    expect(screen.getByTestId("cms-fi-rule-none")).toHaveTextContent("Image fields take no rules beyond Required.");
   });
 });
