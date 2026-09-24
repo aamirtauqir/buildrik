@@ -89,7 +89,7 @@ export function PickModePanel({
     <PanelFrame className="tw:h-full tw:border tw:border-[var(--bk-gray-100)]" data-testid="media-pick-panel">
       <PanelFrame.Header title={`Choose ${noun}`} onClose={onCancel} closeLabel="Cancel choosing" />
       <p
-        className="tw:m-0 tw:-mt-1 tw:px-4 tw:pb-3 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+        className="tw:m-0 tw:h-7 tw:px-4 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-gray-500)]"
         data-testid="media-pick-for"
       >
         {/* A hosted pick's label already names its field ("Margherita · Photo",
@@ -97,13 +97,13 @@ export function PickModePanel({
         {label ? (request.host ? `For ${label}` : `For ${label} · ${kind}`) : kind}
       </p>
 
-      <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:pb-3">
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-2">
         <Button
           type="button"
           size="xs"
           color="light"
           aria-expanded={filterOpen}
-          className="tw:h-7 tw:self-start tw:gap-1 tw:px-2 tw:text-[length:var(--bk-text-12)] tw:font-normal tw:text-[var(--bk-ink)]"
+          className="tw:h-7 tw:self-start tw:rounded-sm tw:border-[var(--bk-border)] tw:px-2 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink)]"
           data-testid="media-pick-filter"
           onClick={() => setFilterOpen((o) => !o)}
         >
@@ -150,7 +150,7 @@ export function PickModePanel({
           </p>
         ) : (
           <div
-            className="tw:grid tw:grid-cols-2 tw:gap-4 tw:px-4 tw:py-1"
+            className="tw:grid tw:grid-cols-2 tw:gap-4 tw:px-4 tw:pt-3 tw:pb-1"
             role="listbox"
             aria-label={`Choose ${noun}`}
             data-testid="media-pick-grid"
@@ -168,13 +168,16 @@ export function PickModePanel({
         )}
       </PanelFrame.Body>
 
-      <div className="tw:flex tw:flex-col tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3" data-testid="media-pick-foot">
+      {/* Board 6764:59051: 12 over the links, 12 between, and the drawer's
+          32 bottom band under a 16 inset — the same foot line as the drawer's
+          Upload row. Buttons stay 32 (density decision), not the board's 40. */}
+      <div className="tw:flex tw:flex-col tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:pt-3 tw:pb-12" data-testid="media-pick-foot">
         <div className="tw:flex tw:items-center tw:gap-4">
           <Button
             type="button"
             size="xs"
             variant="link"
-            className="tw:gap-1 tw:p-0 tw:text-[length:var(--bk-text-12)]"
+            className="tw:h-5 tw:gap-1 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-medium"
             data-testid="media-pick-upload"
             onClick={() => setUpload("upload")}
           >
@@ -185,7 +188,7 @@ export function PickModePanel({
             type="button"
             size="xs"
             variant="link"
-            className="tw:p-0 tw:text-[length:var(--bk-text-12)]"
+            className="tw:h-5 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-medium"
             data-testid="media-pick-url"
             onClick={() => setUpload("url")}
           >
@@ -197,7 +200,7 @@ export function PickModePanel({
             type="button"
             size="sm"
             variant="ghost"
-            className="tw:w-20 tw:shrink-0 tw:text-[length:var(--bk-text-13)]"
+            className="tw:h-8 tw:w-21 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)]"
             data-testid="media-pick-cancel"
             onClick={onCancel}
           >
@@ -206,7 +209,7 @@ export function PickModePanel({
           <Button
             type="button"
             size="sm"
-            className="tw:flex-1 tw:whitespace-nowrap tw:text-[length:var(--bk-text-13)]"
+            className="tw:h-8 tw:flex-1 tw:whitespace-nowrap tw:text-[length:var(--bk-text-13)] tw:font-medium"
             disabled={!picked}
             data-testid="media-pick-use"
             onClick={() => picked && onUse(picked)}
