@@ -202,14 +202,15 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
     expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Used in 1 place");
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual([
+    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
       "Insert to canvas",
       "Rename",
-      "Replace across site…",
-      "Delete",
+      "More actions",
     ]);
     expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-ink");
-    fireEvent.click(actions.getByRole("button", { name: "Delete" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    expect(actions.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Replace across site…", "Delete"]);
+    fireEvent.click(actions.getByRole("menuitem", { name: "Delete" }));
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });
 
@@ -220,7 +221,11 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     const emit = vi.fn();
     await mountLibrary({ selMode: true, selectedKeys: new Set(["inter"]) }, {}, { emit });
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Manage font", "Rename", "Delete"]);
+    expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
+      "Manage font",
+      "Rename",
+      "More actions",
+    ]);
     fireEvent.click(actions.getByRole("button", { name: "Manage font" }));
     expect(emit).toHaveBeenCalledWith("ui:site-fonts", { assetId: "inter" });
   });
@@ -968,7 +973,8 @@ const bad = (...ids: string[]) => ids.map((elementId) => ({ elementId, error: "l
 /** Rail → Replace across site… → the picker → menu-cover.png. */
 const pickMenuCover = () => {
   fireEvent.click(screen.getByTestId("mgr-asset-hero"));
-  fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+  fireEvent.click(screen.getByTestId("mgr-det-more"));
+  fireEvent.click(rail().getByRole("menuitem", { name: "Replace across site…" }));
   const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
   fireEvent.click(within(picker).getByText("menu-cover.png"));
 };
@@ -1216,7 +1222,8 @@ describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Don
   it("Optimize opens the same editor on its Optimise tab — the standalone optimiser is gone", async () => {
     const { door } = await mountVersions();
     selectHero();
-    fireEvent.click(rail().getByRole("button", { name: "Optimize" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Optimize" }));
     await vi.waitFor(() => expect(door()).toBeDefined());
     expect(door()[2]).toEqual(expect.objectContaining({ fileName: "hero-dark.jpg", initialTab: "optimise" }));
     expect(screen.queryByText(/Optimize image/i)).toBeNull();
@@ -1338,7 +1345,8 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
   it("Replace across site… on a family whose placements sit on an applied version reaches that version's src", async () => {
     const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
     selectHero();
-    fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(rail().getByRole("menuitem", { name: "Replace across site…" }));
     const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
     fireEvent.click(within(picker).getByText("menu-cover.png"));
     await screen.findByText("Replacement complete");

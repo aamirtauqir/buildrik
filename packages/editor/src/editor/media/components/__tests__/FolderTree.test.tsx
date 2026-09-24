@@ -1,6 +1,6 @@
 /**
  * FolderTree — smart folders, nested folder nav, collapse/expand, the
- * New folder door, delete folders, tag filter chips, Trash stub (pinned).
+ * New folder door, delete folders, the Tags ▾ filter menu.
  *
  * @license BSD-3-Clause
  */
@@ -32,7 +32,6 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     folderCounts: new Map(),
     onNewFolder: vi.fn(),
     deleteFolder: vi.fn(async () => {}),
-    onTrashClick: vi.fn(),
     ...over,
   };
   const utils = render(<FolderTree {...props} />);
@@ -170,49 +169,49 @@ describe("FolderTree — user folders", () => {
   });
 });
 
-/* Clone 3721:43697 / 43902 / 44107 — a TAGS chip is a FILTER: it sets the
-   library's tag filter (never the search string, which V1 1160:44's chips
-   wrote), the active chip is pressed, and clicking another chip swaps. */
-describe("FolderTree — tags (Clone 3721:43697)", () => {
-  it("renders a Tags section when tags exist and clicking a chip sets the tag filter", () => {
-    /* Board 1160:44 makes tags PILLS, not rows with counts, so the count that
-       `libraryItems` was passed in for is gone and so is the prop. */
+/* Board 4418:58292 — the rail's foot is one "Tags ▾" row (it replaced the
+   chips of Clone 3721:43697 and the Trash stub). The row opens a menu of the
+   site's tags; a tag FILTERS (`tagFilter`, never the search string), the
+   current one is checked, and picking it again — or "Clear tag filter" —
+   clears it. */
+describe("FolderTree — Tags ▾ (4418:58292)", () => {
+  const openTags = () => fireEvent.click(screen.getByTestId("mgr-row-tags"));
+
+  it("draws the Tags row at the foot, with no chips and no Trash row", () => {
+    mount({ allTags: ["summer"] });
+    expect(screen.getByTestId("mgr-row-tags")).toHaveTextContent("Tags");
+    expect(screen.queryByTestId("mgr-tag-summer")).toBeNull();
+    expect(screen.queryByText("Trash")).toBeNull();
+  });
+
+  it("picking a tag from the menu sets the tag filter", () => {
     const { props } = mount({ allTags: ["summer"] });
-    expect(screen.getByText("Tags")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("summer"));
+    openTags();
+    fireEvent.click(screen.getByTestId("mgr-tag-summer"));
     expect(props.setTagFilter).toHaveBeenCalledWith("summer");
   });
 
-  it("the active chip is pressed and carries the active class; the others are not", () => {
+  it("the active tag is checked; the others are not; the row reads active", () => {
     mount({ allTags: ["food", "menu", "team"], tagFilter: "menu" });
-    const menu = screen.getByTestId("mgr-tag-menu");
-    expect(menu).toHaveAttribute("aria-pressed", "true");
-    expect(menu).toHaveClass("active");
-    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByTestId("mgr-tag-team")).not.toHaveClass("active");
+    expect(screen.getByTestId("mgr-row-tags")).toHaveAttribute("aria-current", "true");
+    openTags();
+    expect(screen.getByTestId("mgr-tag-menu")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-checked", "false");
   });
 
-  it("clicking the active chip again clears the filter", () => {
+  it("picking the active tag again, or Clear tag filter, clears it", () => {
     const { props } = mount({ allTags: ["menu"], tagFilter: "menu" });
+    openTags();
     fireEvent.click(screen.getByTestId("mgr-tag-menu"));
-    expect(props.setTagFilter).toHaveBeenCalledWith(null);
+    expect(props.setTagFilter).toHaveBeenLastCalledWith(null);
+    openTags();
+    fireEvent.click(screen.getByTestId("mgr-tag-clear"));
+    expect(props.setTagFilter).toHaveBeenLastCalledWith(null);
   });
 
-  it("hides the Tags section when no tags exist", () => {
+  it("with no tags the menu says where tags come from", () => {
     mount({ allTags: [] });
-    expect(screen.queryByText("Tags")).not.toBeInTheDocument();
-  });
-});
-
-describe("FolderTree — Trash (KNOWN stub, pinned)", () => {
-  it("Trash renders with a hardcoded 0 count and only fires the orchestrator callback", () => {
-    // Trash is not implemented — the row always shows 0 and the orchestrator
-    // wires onTrashClick to a "Trash coming soon" toast. Pinned as-is.
-    const { props } = mount();
-    const trash = screen.getByText("Trash");
-    fireEvent.click(trash);
-    expect(props.onTrashClick).toHaveBeenCalledTimes(1);
-    expect(props.setCurrentFolderId).not.toHaveBeenCalled();
-    expect(props.setSmartFolder).not.toHaveBeenCalled();
+    openTags();
+    expect(screen.getByText(/No tags yet/)).toBeInTheDocument();
   });
 });

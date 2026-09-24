@@ -140,7 +140,8 @@ describe("AssetDetailsPanel — replace-all picker", () => {
 
   it("Replace across site… is disabled at zero usage", () => {
     mount({ selectedItem: selected, usageCount: 0 });
-    expect(screen.getByRole("button", { name: "Replace across site…" })).toBeDisabled();
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    expect(screen.getByRole("menuitem", { name: "Replace across site…" })).toBeDisabled();
   });
 
   it("opens the picker listing only same-type candidates, excluding the asset itself", () => {
@@ -149,6 +150,7 @@ describe("AssetDetailsPanel — replace-all picker", () => {
       usageCount: 2,
       libraryItems: [selected, sameType, otherType],
     });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Replace across site…"));
     expect(screen.getByText(/Replace "hero.jpg" across 2 uses/)).toBeInTheDocument();
     expect(screen.getByText("alt.jpg")).toBeInTheDocument();
@@ -161,6 +163,7 @@ describe("AssetDetailsPanel — replace-all picker", () => {
       usageCount: 2,
       libraryItems: [selected, sameType],
     });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Replace across site…"));
     fireEvent.click(screen.getByText("alt.jpg"));
     expect(props.composer.mediaOps.replaceAcross).toHaveBeenCalledWith(
@@ -184,6 +187,7 @@ describe("AssetDetailsPanel — replace-all picker", () => {
       libraryItems: [selected, sameType],
       composer,
     });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Replace across site…"));
     fireEvent.click(screen.getByText("alt.jpg"));
     expect(props.addToast).toHaveBeenCalledWith(
@@ -193,6 +197,7 @@ describe("AssetDetailsPanel — replace-all picker", () => {
 
   it("shows the empty message when no same-type candidates exist", () => {
     mount({ selectedItem: selected, usageCount: 1, libraryItems: [selected, otherType] });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Replace across site…"));
     expect(screen.getByText(/No other images/)).toBeInTheDocument();
   });
@@ -215,6 +220,7 @@ describe("AssetDetailsPanel — action row", () => {
   it("non-images get Rename → onOpenRename", () => {
     const font = makeItem({ key: "f", name: "Inter.woff2", type: "fnt" });
     const { props } = mount({ selectedItem: font });
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Rename"));
     expect(props.onOpenRename).toHaveBeenCalledWith(font);
     expect(props.onEditImage).not.toHaveBeenCalled();
@@ -222,6 +228,7 @@ describe("AssetDetailsPanel — action row", () => {
 
   it("Delete requests deletion by key", () => {
     const { props } = mount();
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     fireEvent.click(screen.getByText("Delete"));
     expect(props.onRequestDelete).toHaveBeenCalledWith("asset-1");
   });

@@ -22,13 +22,14 @@ import {
   FolderOpen,
   Plus,
   Trash2,
+  Tag,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
 import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
-import { Button, Tooltip } from "@/editor/chrome-ui";
+import { Button, Tooltip, Popover, Menu, MenuItem, MenuLabel, MenuSeparator } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
    this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
    probe, a test, board 1205:4829's own measurement, which read every padding
@@ -47,14 +48,6 @@ export type SmartFolder = null | "recent" | "in-use" | "unused";
    The active chip (3721:43697) takes the toolbar's format-chip recipe —
    accent edge on the accent tint; the board's own pressed state is drawn at
    near-zero contrast and is not a colour anyone can read. */
-const TAG_CHIP =
-  "tw:h-auto tw:min-h-0 tw:px-2 tw:py-[3px] tw:rounded-full tw:border tw:font-normal " +
-  "tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
-const TAG_CHIP_REST =
-  `${TAG_CHIP} tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
-const TAG_CHIP_ACTIVE =
-  `${TAG_CHIP} active tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-[var(--bk-accent-tint)]`;
-
 export interface TypeCounts {
   all: number;
   img: number;
@@ -106,8 +99,9 @@ export interface FolderTreeProps {
   /** Every tag in the LIBRARY (Clone 3721:43697 lists `menu · team · food`
    *  whatever the scope) — the orchestrator reads `allLibraryItems`. */
   allTags: string[];
-  /** Clone 3721:43697 — the active chip; a chip is a FILTER, not a search
-   *  string. Clicking the active one clears it. */
+  /** The active tag — a FILTER, not a search string (Clone 3721:43697).
+   *  Picked from the rail's "Tags ▾" menu (4418:58292); picking it again
+   *  clears it. */
   tagFilter: string | null;
   setTagFilter(tag: string | null): void;
   /** Clone 3698:20337 — each folder row prints its own asset count. */
@@ -115,8 +109,6 @@ export interface FolderTreeProps {
   /** Clone 3700:20347 — `row/＋ New folder` opens the orchestrator's modal. */
   onNewFolder(): void;
   deleteFolder(id: string): Promise<void>;
-  /** Trash placeholder — orchestrator wires this to a toast. */
-  onTrashClick(): void;
   /**
    * Drag an asset from the grid onto a folder row to move it. Ported from
    * ExpandedMediaPanel when that surface was retired — the fullpage manager
@@ -251,11 +243,15 @@ export function FolderTree({
   folderCounts,
   onNewFolder,
   deleteFolder,
-  onTrashClick,
   onMoveAssetToFolder,
   assetDragActive = false,
 }: FolderTreeProps) {
   const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
+  const [tagsOpen, setTagsOpen] = React.useState(false);
+  const pickTag = (tag: string | null) => {
+    setTagFilter(tag);
+    setTagsOpen(false);
+  };
   /* Audit G3-064: viewers see New folder and each folder's trash disabled
      with the reason (board 6289:148485 pattern). */
   const write = useMediaWriteAccess();
@@ -454,43 +450,55 @@ export function FolderTree({
           </div>
         )}
 
-        {/* Tags section */}
-        {allTags.length > 0 && (
-          <>
-            <div className="mgr-tree-gap" data-testid="mgr-tree-gap-2" />
-            <div className="mgr-tree-section" data-testid="mgr-section-tags">Tags</div>
-            {/* 1160:44 — tags are PILLS on a 6 gap, not another column of
-                rows with counts. A tag is a filter you scan sideways; giving
-                it the same row shape as a folder said it was a place.
-                Clone 3721:43697 — a chip FILTERS (`tagFilter`), it does not
-                write the search string; the pressed one is the active tag,
-                another chip swaps it, the same chip again clears it. */}
-            <div className="mgr-tags" role="group" aria-label="Filter by tag" data-testid="mgr-tags">
-              {allTags.map((tag) => (
-                <Button
-                  key={`tag-${tag}`}
-                  variant="secondary"
-                  className={tagFilter === tag ? TAG_CHIP_ACTIVE : TAG_CHIP_REST}
-                  data-testid={`mgr-tag-${tag}`}
-                  aria-pressed={tagFilter === tag}
-                  onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                >
-                  {tag}
-                </Button>
-              ))}
-            </div>
-          </>
-        )}
-
-        <div className="mgr-tree-gap" data-testid="mgr-tree-gap-3" />
-        <TreeNode
-          icon={<Trash2 size={14} />}
-          label="Trash"
-          testId="mgr-row-trash"
-          count={0}
-          active={false}
-          onClick={onTrashClick}
-        />
+        {/* Board 4418:58292 — the rail ends in one "Tags ▾" row. It replaced
+            the TAGS chips (Clone 3721:43697; same filter, now in a menu) and
+            the Trash row, which was a "coming soon" toast with no trash
+            behind it (audit G3-041; asset delete is instant + Undo, #17). */}
+        <div className="mgr-tree-gap" data-testid="mgr-tree-gap-2" />
+        <div className="mgr-tags-anchor tw:flex tw:flex-col">
+          <Popover
+            open={tagsOpen}
+            onClose={() => setTagsOpen(false)}
+            placement="right"
+            label="Filter by tag"
+            block
+            trigger={
+              <TreeNode
+                icon={<Tag size={14} className="mgr-node-ico" />}
+                label={tagFilter ? `Tags · ${tagFilter} ▾` : "Tags ▾"}
+                testId="mgr-row-tags"
+                active={tagFilter !== null}
+                onClick={() => setTagsOpen((v) => !v)}
+              />
+            }
+          >
+            <Menu label="Filter by tag">
+              {allTags.length === 0 ? (
+                <MenuLabel>No tags yet — add them in an asset&rsquo;s details.</MenuLabel>
+              ) : (
+                allTags.map((tag) => (
+                  <MenuItem
+                    key={tag}
+                    radio
+                    selected={tagFilter === tag}
+                    data-testid={`mgr-tag-${tag}`}
+                    onClick={() => pickTag(tagFilter === tag ? null : tag)}
+                  >
+                    {tag}
+                  </MenuItem>
+                ))
+              )}
+              {tagFilter && (
+                <>
+                  <MenuSeparator />
+                  <MenuItem data-testid="mgr-tag-clear" onClick={() => pickTag(null)}>
+                    Clear tag filter
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Popover>
+        </div>
       </div>
     </div>
   );
