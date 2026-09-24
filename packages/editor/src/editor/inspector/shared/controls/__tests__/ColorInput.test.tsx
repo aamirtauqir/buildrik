@@ -72,20 +72,11 @@ describe("ColorInput — hex + keyword writes", () => {
   });
 });
 
-describe("ColorInput — visibility toggle", () => {
-  /* This used to pin a "%" readout beside the eye. It was never an alpha
-     channel — it printed 100% when shown and 0% when hidden, straight off the
-     same boolean the eye icon draws — and it cost 30px in a 181px control
-     track, which is why a six-digit hex arrived as "1a…". The readout is gone;
-     the toggle it was echoing is what the test watches now. If real alpha ever
-     lands it gets its own control and its own test. */
-  it("relabels between Hide and Show without touching the colour", () => {
-    const onChange = vi.fn();
-    renderColor("#ff0000", onChange);
-    expect(screen.queryByText("100%")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Hide color" }));
-    expect(screen.getByRole("button", { name: "Show color" })).toBeInTheDocument();
-    expect(onChange).not.toHaveBeenCalled();
+/* G3-156 (IN-98): the eye toggle flipped its icon and wrote nothing — gone. */
+describe("ColorInput — no eye toggle", () => {
+  it("draws no Hide / Show color button", () => {
+    renderColor("#ff0000", vi.fn());
+    expect(screen.queryByRole("button", { name: /Hide color|Show color/ })).not.toBeInTheDocument();
   });
 });
 

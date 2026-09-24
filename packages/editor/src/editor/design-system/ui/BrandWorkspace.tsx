@@ -109,6 +109,7 @@ import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { takeBrandTokenRequest } from "./brandOpenRequest";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -707,6 +708,28 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const isMoreKind = (k: TokenKind | undefined): k is MoreKind =>
     MORE_KINDS.some((m) => m.kind === k);
   const tokenById = (id: string) => allTokens.find((t) => t.id === id);
+  /* A token's own page with its card open — Brand checks' Open, and the
+     inspector's bound chip (G3-156). */
+  const openToken = (tokenId: string) => {
+    const tok = tokenById(tokenId);
+    const k = tok ? kindOf(tok) : undefined;
+    const target: BrandPageId | null =
+      k === "color" ? "colours"
+      : k === "type" ? "fonts"
+      : k === "spacing" ? "spacing"
+      : isMoreKind(k) ? `kind-${k}`
+      : null;
+    if (target) openPage(target, tokenId);
+  };
+  /* The chip's request, taken once on mount; applied once its token has
+     loaded into a registry. */
+  const [requestedToken, setRequestedToken] = React.useState(() => takeBrandTokenRequest(composer));
+  React.useEffect(() => {
+    if (!requestedToken || !tokenById(requestedToken)) return;
+    openToken(requestedToken);
+    setRequestedToken(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedToken, allTokens]);
   const changeToken = (id: string, value: string, darkValue?: string) => {
     const tok = tokenById(id);
     if (!tok) return;
@@ -948,17 +971,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               const fixed = composer?.designSystem?.computeAutoFix(tok.value, issue.autoFixHint);
               if (fixed && fixed !== tok.value) changeToken(tok.id, fixed);
             }}
-            onOpen={(tokenId) => {
-              const tok = tokenById(tokenId);
-              const k = tok ? kindOf(tok) : undefined;
-              const target: BrandPageId | null =
-                k === "color" ? "colours"
-                : k === "type" ? "fonts"
-                : k === "spacing" ? "spacing"
-                : isMoreKind(k) ? `kind-${k}`
-                : null;
-              if (target) openPage(target, tokenId);
-            }}
+            onOpen={openToken}
           />
         );
       case "starters":

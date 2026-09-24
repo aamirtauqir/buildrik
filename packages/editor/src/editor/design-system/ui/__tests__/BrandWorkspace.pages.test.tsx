@@ -12,6 +12,7 @@ import { AIAssistService } from "../../../../engine/designSystem/services/AIAssi
 import { EventEmitter } from "../../../../engine/EventEmitter";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { installDomShims, makeFakeComposer, openPage, renderOnRadius, renderWorkspace } from "./brandWorkspaceHarness";
+import { requestBrandToken } from "../brandOpenRequest";
 
 /* The AI entry is gated on the SAME flag that decides whether an AIClient is
    built at all (useComposerInit.ts:132). Default the mock ON so the entry
@@ -302,5 +303,20 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
     fireEvent.click(await utils.findByRole("button", { name: "Discard changes" }));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
+  });
+});
+
+/* G3-156: the inspector's bound chip opens Brand ON its token. */
+describe("BrandWorkspace — opens on a requested token", () => {
+  it("a pending chip request lands on the token's page with its card open", async () => {
+    const composer = makeFakeComposer();
+    requestBrandToken(composer, "radius-sm");
+    const utils = renderWorkspace(composer);
+    await waitFor(() => expect(utils.getByTestId("brand-page-title").textContent).toBe("Radius"));
+    expect(utils.container.querySelector('[data-token-row="radius-sm"]')?.getAttribute("aria-selected")).toBe("true");
+    // Read once: a second mount lands on the default page.
+    utils.unmount();
+    const again = renderWorkspace(composer);
+    expect(again.getByTestId("brand-page-title").textContent).toBe("Colours");
   });
 });

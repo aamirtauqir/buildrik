@@ -13,8 +13,8 @@ import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { TextField, Button, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
+import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
@@ -75,8 +75,9 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
     : null;
 
   const handleChipClick = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
-  }, [composer]);
+    /* G3-156: open Brand ON the token, not its landing page. */
+    if (composer && tokenId) requestBrandToken(composer, tokenId);
+  }, [composer, tokenId]);
 
   return (
     <>
@@ -100,8 +101,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
       />
       {tokenId ? (
         <DSBindingChip
-          state="token"
-          label={tokenId}
+            label={tokenId}
           onClick={composer ? handleChipClick : undefined}
         />
       ) : null}

@@ -6,15 +6,15 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
  * @license BSD-3-Clause
  */
 
-import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { TokenPickerPopover } from "../TokenPickerPopover";
 import { DSBindingChip } from "../../sections/DSBindingChip";
+import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import type { Composer } from "../../../../engine";
-import { EVENTS } from "../../../../shared/constants/events";
 
 // ============================================================================
 // HELPERS
@@ -44,14 +44,6 @@ const resolveVar = (cssVar: string): string => {
 // Hex without "#" prefix — matches mock's "FFFFFF" display
 const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
 
-// Opacity stub: real alpha channel support would require parsing rgba/hex8.
-// For now, hidden value reports 0% and visible reports 100%.
-/* `getPercent` lived here and returned "100%" when shown, "0%" when hidden —
-   from the eye toggle's own boolean, never from an alpha channel. It reported
-   the state of the control standing next to it, in 30px that the hex value
-   needed: at a 181px control track the field was left with 34, and a six-digit
-   hex arrived as "1a…". One bit does not need two controls. */
-
 // ============================================================================
 // COLOR INPUT
 // ============================================================================
@@ -74,7 +66,6 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   composer,
   placeholder,
 }) => {
-  const [hidden, setHidden] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
@@ -138,8 +129,9 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     : null;
 
   const handleChipClick = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
-  }, [composer]);
+    /* G3-156: open Brand ON the token, not its landing page. */
+    if (composer && tokenId) requestBrandToken(composer, tokenId);
+  }, [composer, tokenId]);
 
   /* ONLY when the value is bound. A chip carries the token's NAME, which the
      field cannot show; the off-ds chip carried a warning mark next to a hex the
@@ -151,7 +143,6 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   const chip =
     isBound && tokenId ? (
       <DSBindingChip
-        state="token"
         label={tokenId}
         onClick={composer ? handleChipClick : undefined}
       />
@@ -249,25 +240,6 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                     >
                       <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)" }} />
                     </Button>
-                  ) : null}
-                  {/* An opacity reading and a hide toggle for a colour that is
-                      not set say nothing, and they cost the field the width it
-                      needs — "Mixed" arrived as "Mi…" in the batch panel. */}
-                  {value ? (
-                    <>
-                      <Button
-                        type="button"
-                        className="bdi-eye"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setHidden((v) => !v);
-                        }}
-                        aria-label={hidden ? "Show color" : "Hide color"}
-                        title={hidden ? "Show color" : "Hide color"}
-                      >
-                        {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
-                      </Button>
-                    </>
                   ) : null}
                 </>
               )}
