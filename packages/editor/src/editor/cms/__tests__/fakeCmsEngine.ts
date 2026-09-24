@@ -35,6 +35,10 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
     elements: {
       getAllElements: () => elements,
       getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,
+      getAllPages: () => [
+        { id: "p-home", name: "Home", slug: "home", isHome: true },
+        { id: "p-item", name: "Menu item", slug: "menu-item" },
+      ],
     },
     selection: { select: vi.fn() },
     data: {
@@ -98,6 +102,11 @@ export function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSCo
            way it is in the engine — a spy that only records the call would pass
            even if the panel never re-read the collection. */
         updateCollection,
+        deleteCollection: vi.fn((id: string) => {
+          collections = collections.filter((c) => c.id !== id);
+          items = items.filter((i) => i.collectionId !== id);
+          return Promise.resolve(true);
+        }),
       },
     },
   };

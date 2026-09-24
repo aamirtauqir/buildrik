@@ -17,7 +17,9 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { DynamicPagesView, FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { FieldsView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { DynamicPagesPane } from "./DynamicPagesPane";
+import { CollectionSettingsPane } from "./CollectionSettingsPane";
 import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable } from "./RecordsTable";
 import { RecordSheet, type OpenMediaLibrary } from "./RecordSheet";
@@ -53,7 +55,7 @@ const TABS = [
 ] as const;
 
 /** The inspector-slot hint column (4428:140486 "Select a collection"). */
-export function HintColumn({ title, hint, testId }: { title: string; hint: string; testId: string }) {
+function HintColumn({ title, hint, testId }: { title: string; hint: string; testId: string }) {
   return (
     <aside
       className="tw:flex tw:w-[var(--bk-size-inspector)] tw:flex-none tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:border-l tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:text-center"
@@ -171,18 +173,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       />
     );
   } else if (ws.tab === "dynamic-pages") {
-    body = (
-      <DynamicPagesView
-        collection={collection}
-        records={panel.records}
-        onSave={async (pattern) => {
-          if (!composer) return;
-          /* Empty clears the binding rather than storing "" — a collection
-             with an empty pattern is one that generates nothing. */
-          await composer.cms.collections.updateCollection(collection.id, { pageSlugPattern: pattern || undefined });
-        }}
-      />
-    );
+    body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
+  } else if (ws.tab === "settings") {
+    body = <CollectionSettingsPane composer={composer} collection={collection} records={panel.records} />;
   } else {
     body = null;
   }
