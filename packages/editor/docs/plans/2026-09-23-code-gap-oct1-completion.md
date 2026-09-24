@@ -312,3 +312,6 @@ Prototype rules (so the check is honest):
 - Keep: the Publish confirm step (B4, board 7574:193972); #17 instant delete + Undo (confirm for N > 1 / masters); Saves auto-version instead of a Backups tab; B11 without breakpoint chips. The prototype's versions are scored `n/a — owner decision`.
 - Board wins: toasts, tooltips (the rail tooltip) and the selection toolbar are DARK as drawn. Decision #25's NO BLACK RULE is retired for these. Brand › Component styles lists site sections. Escape closes the Publish, Review, History and Layers drawers.
 - Deferred: R6, the template colour re-map.
+
+### Live walk moved earlier (owner, 2026-09-24: "don't wait for the 27th")
+The `/edit/:id` walk (Task 7) starts 24 Sep on the integration worktree: the dashboard runs on :3000 against the local dev DB, signed in as the seeded `qa@buildrik.local`, plus a local-only `qa-viewer@buildrik.local` VIEWER for B5. It covers first what only a real site can show (B2 save/⌘S, A2, B9 selection, B4 publish gate without Vercel, B1 real share link, B3 review round-trip, flags, B5 server-side rejection, reload persistence), then the hotspots the headless harness couldn't drive (row drags, empty-canvas clicks, Dark strategy menu, section-reorder grip). 27 Sep stays as the full re-walk on the final integration. Log: `scratchpad/walk/walk-log.md`.
