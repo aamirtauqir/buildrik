@@ -199,7 +199,7 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
       onUpload={async () => []}
       onRetryUpload={() => {}}
       onOpenDetail={() => {}}
-      onOpenIconPicker={() => {}}
+     
       onOpenStock={() => {}}
       onOpenLibrary={() => {}}
       onToggleSelection={() => {}}
@@ -2636,14 +2636,14 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   "media-fullpage-library": () => (
     <div data-probe="media-fullpage-library">
-      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />)}
+      {mgrHost(<LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />)}
     </div>
   ),
   "media-fullpage-drag-over": () => (
     <div data-probe="media-fullpage-drag-over">
       {mgrHost(
         <AutoDragOver>
-          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} onOpenIconPicker={() => {}} />
+          <LibraryManager composer={mgrComposer()} onClose={() => {}} onOpenImageEditor={() => {}} />
         </AutoDragOver>,
       )}
     </div>
