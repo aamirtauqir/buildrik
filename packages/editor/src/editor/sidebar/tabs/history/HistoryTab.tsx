@@ -7,7 +7,7 @@
  * Session is this editing session's undo stack; it was the "This session"
  * filter chip inside Saves until board 4418:73791 gave it its own tab (B8,
  * G1-068).
- * Time-Travel scrubber drawer renders at body level when active.
+ * Time-Travel lives in the shell (TimeTravelHost): the ⋯ row asks for it.
  *
  * @license BSD-3-Clause
  */
@@ -21,7 +21,6 @@ import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
-import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
 import { BackToActivityRow } from "../activity/BackToActivityRow";
@@ -55,25 +54,10 @@ const ClearXSvg = () => (
   </svg>
 );
 
-/* Board 163:113's preview band — accent tint, actions inline with the title. */
 const MATCH_BAND =
   "tw:flex tw:items-center tw:justify-between tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const MATCH_CLEAR =
   "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)]";
-const PREVIEW_BAND =
-  "tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-3 tw:bg-[var(--bk-accent-tint)] tw:px-4";
-const PREVIEW_TITLE = "tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
-/* The safety sentence, unchanged product copy, on its own row: the bar above
-   it is board 163:159's single 44-tall row and cannot hold a second line.
-   163:165 draws the same sentence but is a `note` block — an annotation, not a
-   spec — so the row here is a code decision, not conformance. */
-const PREVIEW_NOTE =
-  "tw:m-0 tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-/* Boards 229:1138 / 229:1140 — both actions are the dense 28 row (--size/row-dense),
-   inset 12 and 6, with the light one bordered `--bk-border`. flowbite's xs is
-   1px of block padding and a gray-300 edge, and only a same-property utility
-   beats either through twMerge. */
-const PREVIEW_ACTION = "tw:h-7 tw:px-3 tw:py-1.5 tw:border-[var(--bk-border)]";
 
 const HISTORY_EMPTY =
   "tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)] tw:text-[12px] " +
@@ -116,7 +100,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const { isLoading: savesLoading, loadError: savesLoadError } = useVersionHistory(composer);
   const savesSettled = !savesLoading && !savesLoadError;
   const storageKey = `buildrick-history-view${siteId ? `-${siteId}` : ""}`;
-  const { historyStack, canUndo, clear } = useHistoryState(composer);
+  const { canUndo, clear } = useHistoryState(composer);
 
   /* Stored preference, read once. The key predates M1 and every returning user
      has either "saves" or "changes" in it — "changes" is no longer a view, so
@@ -144,7 +128,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   /* Set when an Activity row opened Published or Session here; the back row
      shows until the user picks a tab themselves. */
   const [fromActivity, setFromActivity] = React.useState(fromActivityProp);
-  const [showScrubber, setShowScrubber] = React.useState(false);
   /* Board 4418:73791 draws no search field and no "Undo History · Clear ·
      Time-Travel" band. Both capabilities stay, behind the panel ⋯ (owner rule:
      parity never silently removes one; designer note logged). */
@@ -176,36 +159,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       // Ignore storage errors
     }
   }, [activeView, storageKey]);
-
-  // Ctrl+Shift+T toggles Time-Travel scrubber
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === "T" || e.key === "t")) {
-        e.preventDefault();
-        setShowScrubber((prev) => !prev);
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleScrubberRestore = React.useCallback(
-    (entryId: string) => {
-      composer?.history?.restoreEntry(entryId);
-      setShowScrubber(false);
-    },
-    [composer]
-  );
-
-  const handleScrubberExit = React.useCallback(() => {
-    setShowScrubber(false);
-  }, []);
-
-  /* Board 163:113 — while time-travel is on, the PANEL says so too. Without
-     it the Saves list looked entirely normal while the canvas showed a past
-     state, and the sentence that makes scrubbing safe to explore — nothing is
-     written until you restore — appeared nowhere at all. */
-  const [preview, setPreview] = React.useState<{ id: string; label: string } | null>(null);
 
   return (
     <PanelFrame className="bd-history-container" data-testid="history-panel">
@@ -247,7 +200,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 kbd="⌃⇧T"
                 onClick={() => {
                   setMenuOpen(false);
-                  setShowScrubber(true);
+                  /* The shell's TimeTravelHost owns it (4418:74736): the band
+                     sits on the canvas, not in this panel. */
+                  composer?.emit(EVENTS.UI_TIME_TRAVEL_TOGGLE, undefined);
                 }}
               >
                 Time-Travel
@@ -336,43 +291,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             changes filter, and the empty state alike. They sit here rather
             than inside either list for that reason: 163:64 has no list at all
             and still carries the note. */}
-        {showScrubber && preview && (
-          <>
-            <div className={PREVIEW_BAND} role="status" data-testid="history-tt-bar">
-              <span className={PREVIEW_TITLE} data-testid="history-tt-title">
-                Previewing {preview.label}
-              </span>
-              <div className="tw:flex tw:items-center tw:gap-2">
-                <Button
-                  color="light"
-                  size="xs"
-                  className={PREVIEW_ACTION}
-                  data-testid="history-tt-exit"
-                  onClick={handleScrubberExit}
-                >
-                  Exit (Esc)
-                </Button>
-                <Button
-                  size="xs"
-                  className={PREVIEW_ACTION}
-                  data-testid="history-tt-restore"
-                  onClick={() => handleScrubberRestore(preview.id)}
-                >
-                  Restore this version
-                </Button>
-              </div>
-            </div>
-            {/* Board 163:166 names the exit key in both places it appears —
-                the button and this sentence. Both were "Exit" alone, because
-                Escape did not exit: the drawer bound Ctrl+Shift+T and nothing
-                else, so the board's copy would have been a promise the code
-                did not keep. TimeTravelScrubber binds Escape now, so it is
-                printed because it holds. */}
-            <p className={PREVIEW_NOTE} data-testid="history-tt-note">
-              Nothing is written until Restore. Esc exits time-travel.
-            </p>
-          </>
-        )}
 
         {/* Board 4418:165744 — the result count and "Clear search" as a
             full-bleed band above the approval band. */}
@@ -488,15 +406,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         message="Every step in this session's undo history is removed. Your page stays as it is now."
         confirmLabel="Clear undo history"
       />
-      {showScrubber && (
-        <TimeTravelScrubber
-          composer={composer}
-          historyStack={historyStack}
-          onRestore={handleScrubberRestore}
-          onExit={handleScrubberExit}
-          onPreviewChange={setPreview}
-        />
-      )}
     </PanelFrame>
   );
 };

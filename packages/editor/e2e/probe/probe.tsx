@@ -2412,21 +2412,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       )}
     </div>
   ),
-  // The scrubber is opened by a button and reports the previewed entry back up
-  // to the panel, so the band the board draws only exists after that click —
-  // "partial-scrubber-opens-by-button" in boards.json. AutoOpen performs it.
-  "history-saves-time-travel": () => (
-    <div data-probe="history-saves-time-travel">
-      {historyHost(
-        withStoredView(
-          "saves",
-          <AutoOpen testid="history-time-travel">
-            <HistoryTab composer={historyStub({ stack: HISTORY_ENTRIES })} />
-          </AutoOpen>,
-        ),
-      )}
-    </div>
-  ),
   // Board 163:64 — the panel with no saved versions. `getVersions()` is empty
   // AND the read is settled, which is the pair that distinguishes this from
   // 1138:4573: the skeleton screen and the empty screen answer different

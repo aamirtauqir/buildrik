@@ -34,23 +34,6 @@ const openMenuItem = (name: RegExp | string) => {
   fireEvent.click(screen.getByRole("menuitem", { name }));
 };
 
-vi.mock("../components/TimeTravelScrubber", () => ({
-  TimeTravelScrubber: ({
-    onPreviewChange,
-  }: {
-    onPreviewChange?: (e: { id: string; label: string } | null) => void;
-  }) => (
-    <div data-testid="tt-scrubber">
-      SCRUBBER
-      <button
-        data-testid="tt-preview"
-        onClick={() => onPreviewChange?.({ id: "e1", label: "Auto-save" })}
-      >
-        preview
-      </button>
-    </div>
-  ),
-}));
 
 vi.mock("../components/MilestoneSuggestionBanner", () => ({
   MilestoneSuggestionBanner: () => <div data-testid="milestone-banner" />,
@@ -229,33 +212,20 @@ describe("HistoryTab shell", () => {
     expect(screen.getByTestId("activity-view")).toBeInTheDocument();
   });
 
-  it("opens the Time-Travel scrubber from the panel ⋯", () => {
-    renderTab();
+  /* The band lives on the canvas now (TimeTravelHost, 4418:74736); the ⋯ row
+     asks for it, from Session and Saves alike. */
+  it("⋯ › Time-Travel asks the shell for time-travel, from Session and Saves", () => {
+    const emit = vi.fn();
+    const composer = { on: vi.fn(), off: vi.fn(), emit } as never;
+    renderTab({ composer });
     showChanges();
-    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
     openMenuItem(/^Time-Travel/);
-    expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
-  });
-
-  it("toggles the Time-Travel scrubber via Ctrl+Shift+T", () => {
-    renderTab();
-    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.keyDown(document, { key: "T", ctrlKey: true, shiftKey: true });
-    expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
-    fireEvent.keyDown(document, { key: "T", ctrlKey: true, shiftKey: true });
-    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-  });
-
-  /* Board 163:113 is the Milestones list with time-travel active, but the
-     only door in used to live inside ActivityView's header — reachable only
-     after switching to "All changes". Milestones (the default view) had no
-     button at all, just the undiscoverable Ctrl+Shift+T chord. */
-  it("opens the Time-Travel scrubber from Saves, not just Session", () => {
-    renderTab({ initialView: "saves" });
-    expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
-    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+    expect(emit).toHaveBeenCalledWith("ui:time-travel-toggle", undefined);
+    cleanup();
+    emit.mockClear();
+    renderTab({ composer, initialView: "saves" });
     openMenuItem(/^Time-Travel/);
-    expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
+    expect(emit).toHaveBeenCalledWith("ui:time-travel-toggle", undefined);
   });
 
   it("⋯ › Clear undo history… is there, and inert with nothing to undo", () => {
@@ -369,50 +339,6 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
   it("frames the Published view with neither — it is not the Saves list", () => {
     renderTab({ composer: withCap, initialView: "published" });
     expect(note()).toBeNull();
-  });
-});
-
-/*
-  Board 163:113 — while time-travel is on, the PANEL says so too.
-
-  The scrubber is a canvas overlay, so the Saves list looked entirely normal
-  while the canvas showed a past state, and the sentence that makes scrubbing
-  safe to explore — nothing is written until you restore — appeared nowhere at
-  all.
-*/
-describe("HistoryTab — board 163:113 preview band", () => {
-  beforeEach(() => window.localStorage.clear());
-
-  const openScrubber = () => {
-    fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
-    openMenuItem(/^Time-Travel/);
-  };
-
-  it("says nothing until the scrubber reports what it is previewing", () => {
-    renderTab();
-    openScrubber();
-    expect(screen.queryByText(/^Previewing /)).toBeNull();
-  });
-
-  it("names the previewed entry and states that nothing is written", () => {
-    renderTab();
-    openScrubber();
-    fireEvent.click(screen.getByTestId("tt-preview"));
-
-    expect(screen.getByText("Previewing Auto-save")).toBeInTheDocument();
-    /* Board 163:166 names the exit key here and on the button. Both said only
-       "Exit" while Escape did nothing; the scrubber binds it now. */
-    expect(
-      screen.getByText("Nothing is written until Restore. Esc exits time-travel."),
-    ).toBeInTheDocument();
-  });
-
-  it("Exit leaves time-travel without restoring", () => {
-    renderTab();
-    openScrubber();
-    fireEvent.click(screen.getByTestId("tt-preview"));
-    fireEvent.click(screen.getByRole("button", { name: "Exit (Esc)" }));
-    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
   });
 });
 

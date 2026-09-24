@@ -47,6 +47,7 @@ import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { totalPendingMirrors } from "@/services/syncRetryQueue";
 import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
+import { TimeTravelHost } from "./TimeTravelHost";
 import "./header.css";
 
 /** Selected element minimal info */
@@ -869,6 +870,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
              their client's view still needs. */
           <>
           <PermissionsHost composer={composer ?? null} siteId={siteIdForMenu} siteName={siteName ?? "This site"} />
+          <TimeTravelHost composer={composer ?? null} />
           <SiteMenu
             onOpenSiteSettings={onOpenProjectSettings}
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code

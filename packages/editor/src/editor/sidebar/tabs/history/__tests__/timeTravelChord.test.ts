@@ -23,6 +23,8 @@ import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const historySrc = readFileSync(join(HERE, "..", "HistoryTab.tsx"), "utf8");
+/* The listener moved to the shell so the chord works with History closed. */
+const hostSrc = readFileSync(join(HERE, "..", "..", "..", "..", "shell", "TimeTravelHost.tsx"), "utf8");
 const commandsSrc = readFileSync(
   join(HERE, "..", "..", "..", "..", "..", "engine", "commands", "defaultCommands.ts"),
   "utf8",
@@ -40,9 +42,9 @@ describe("Time-Travel chord ownership", () => {
     expect(historySrc).toMatch(/kbd="⌃⇧T"/);
   });
 
-  it("is handled by HistoryTab's own listener", () => {
+  it("is handled by the shell's TimeTravelHost, globally", () => {
     // The listener guards ctrlKey + shiftKey and matches the letter T.
-    expect(historySrc).toMatch(/e\.ctrlKey\s*&&\s*e\.shiftKey\s*&&\s*\(e\.key === "T"/);
+    expect(hostSrc).toMatch(/e\.ctrlKey\s*&&\s*e\.shiftKey\s*&&\s*\(e\.key === "T"/);
   });
 
   it("is NOT also claimed by a registry command", () => {
