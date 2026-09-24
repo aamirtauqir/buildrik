@@ -201,9 +201,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   const updateField = (id: string, patch: Partial<FieldRow>) =>
     setFields((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
 
-  const handleCreate = async () => {
-    if (!canCreate) return;
-    if (clashes) {
+  /* `as` — 6887:72969: the clash's "Use <name> 2" creates under that name
+     at once, not just fill the field. */
+  const handleCreate = async (as?: string) => {
+    const finalName = (as ?? trimmed).trim();
+    if (!finalName) return;
+    if (as === undefined && clashes) {
       setClashShown(true);
       return;
     }
@@ -215,7 +218,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         // No fake success: the collection was NOT created — say so.
         throw new Error("Collections are unavailable in this editor session.");
       }
-      const collection = await collections.createCollection(trimmed, undefined, undefined);
+      const collection = await collections.createCollection(finalName, undefined, undefined);
       const named = fields.filter((f) => f.name.trim());
       for (const [order, field] of named.entries()) {
         await collections.addField(collection.id, {
@@ -227,7 +230,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       }
       // E7: persist the dynamic-page binding so publish generates a page per entry.
       if (genPages && collections.updateCollection) {
-        await collections.updateCollection(collection.id, { pageSlugPattern: slugPattern });
+        await collections.updateCollection(collection.id, { pageSlugPattern: `/${slugify(finalName) || "collection"}/{slug}` });
       }
       setSuccess(true);
       setTimeout(onClose, 1200);
@@ -242,7 +245,13 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     /* Board 183:16 — a filled modal does not close on a stray scrim click. */
     <ModalRoot
       open={isOpen}
-      onOpenChange={(next) => !next && onClose()}
+      /* 4418:88263: Escape on the clash notice goes back to the form (the
+         name stays for editing); a second Escape leaves. */
+      onOpenChange={(next) => {
+        if (next) return;
+        if (clashShown) setClashShown(false);
+        else onClose();
+      }}
       dirty={trimmed !== "" || fields.some((f) => f.name !== "title")}
     >
       <ModalContent size="form" data-testid="cms-setup-modal">
@@ -318,6 +327,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   className={`${GHOST} tw:size-6 tw:p-0 tw:flex-none tw:text-[var(--bk-error)]`}
                   onClick={() => removeField(field.id)}
                   title="Remove field"
+                  aria-label={`Remove field ${i + 1}`}
+                  data-testid={`cms-setup-remove-${i}`}
                 >
                   <Trash2 size={12} aria-hidden />
                 </Button>
@@ -367,7 +378,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 variant="link"
                 className={BOARD_LINK}
                 data-testid="cms-setup-clash-use"
-                onClick={() => editName(nextFreeName(trimmed, takenNames))}
+                onClick={() => {
+                  const next = nextFreeName(trimmed, takenNames);
+                  editName(next);
+                  void handleCreate(next);
+                }}
               >
                 Use {nextFreeName(trimmed, takenNames)}
               </Button>
@@ -386,7 +401,9 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <Button
               color="light"
               size="xs"
-              onClick={onClose}
+              /* With the clash notice up, Cancel answers the notice — back to
+                 the form — as Escape does (4418:88263). */
+              onClick={() => (clashShown ? setClashShown(false) : onClose())}
               disabled={creating}
               className={`${FOOT_BTN} ${FOOT_CANCEL}`}
               data-testid="cms-setup-cancel"

@@ -2,8 +2,21 @@
  * useFolders — sidebar folder management hook (flat model + localStorage).
  * @license BSD-3-Clause
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+
+/* These cases pin the local model; the server store is offline here (every
+   call answers null, as with no dashboard). Server sync: useFolders.server.test. */
+vi.mock("@/services/PageFolderService", () => ({
+  pageFolderRemote: {
+    list: vi.fn(async () => null),
+    create: vi.fn(async () => null),
+    update: vi.fn(async () => null),
+    remove: vi.fn(async () => null),
+    movePage: vi.fn(async () => null),
+  },
+}));
+
 import { useFolders } from "../useFolders";
 
 const livePages = new Set<string>(["p1", "p2", "p3"]);

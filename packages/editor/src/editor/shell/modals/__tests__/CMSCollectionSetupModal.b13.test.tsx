@@ -96,10 +96,38 @@ describe("CMSCollectionSetupModal — the board's single modal", () => {
     expect(clash).toHaveTextContent("Collection name already exists");
     expect(clash).toHaveTextContent("A collection named “menu items” already exists.");
     expect(collections.createCollection).not.toHaveBeenCalled();
+    // 6887:72969: "Use <name> 3" creates under that name at once.
     fireEvent.click(screen.getByTestId("cms-setup-clash-use"));
+    await waitFor(() => expect(collections.createCollection).toHaveBeenCalledWith("menu items 3", undefined, undefined));
     expect(screen.getByTestId("cms-setup-name")).toHaveValue("menu items 3");
     expect(screen.queryByTestId("cms-setup-clash")).toBeNull();
+  });
+
+  /* 4418:88263: Escape / Cancel on the clash answer the notice and return to
+     the New collection form; only a second one leaves. */
+  it("Escape and Cancel on the clash return to the form, not out of the modal", () => {
+    const onClose = vi.fn();
+    render(<CMSCollectionSetupModal isOpen onClose={onClose} composer={makeComposer(["Menu items"]).composer} />);
+    typeName("Menu items");
     create();
-    await waitFor(() => expect(collections.createCollection).toHaveBeenCalledWith("menu items 3", undefined, undefined));
+    expect(screen.getByTestId("cms-setup-clash")).toBeInTheDocument();
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
+    expect(screen.queryByTestId("cms-setup-clash")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId("cms-setup-name")).toHaveValue("Menu items");
+    create();
+    fireEvent.click(screen.getByTestId("cms-setup-cancel"));
+    expect(screen.queryByTestId("cms-setup-clash")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("cms-setup-cancel"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("every field row, a newly added one too, has a named remove control", () => {
+    render(<CMSCollectionSetupModal isOpen onClose={vi.fn()} composer={makeComposer().composer} />);
+    fireEvent.click(screen.getByTestId("cms-add-field"));
+    expect(screen.getByRole("button", { name: "Remove field 2" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("cms-setup-remove-1"));
+    expect(screen.getAllByPlaceholderText("field_name")).toHaveLength(1);
   });
 });
