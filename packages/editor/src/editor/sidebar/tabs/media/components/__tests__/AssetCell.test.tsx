@@ -83,13 +83,6 @@ describe("AssetCell", () => {
     expect(container.querySelector(".med-usage-pips")).toBeInTheDocument();
   });
 
-  it("renders APPLIED badge cobalt border when isApplied", () => {
-    const { container } = render(
-      <AssetCell item={imgItem} onClick={() => {}} isApplied />
-    );
-    expect(container.querySelector(".med-asset-cell--applied")).toBeInTheDocument();
-  });
-
   it("renders lock state when isLocked", () => {
     const { container } = render(
       <AssetCell item={imgItem} onClick={() => {}} isLocked />

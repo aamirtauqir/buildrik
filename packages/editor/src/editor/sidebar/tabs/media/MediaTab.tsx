@@ -15,7 +15,6 @@ import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { MediaContextMenu } from "./components/MediaContextMenu";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
@@ -290,7 +289,6 @@ function MediaTabWithComposer({
         storage={state.storage}
         uploadQueue={state.uploadQueue}
         usageMap={state.usageMap}
-        appliedAssetKey={undefined}
         onInsert={state.insertToCanvas}
         onToggleType={state.toggleType}
         onSearchChange={(q) => state.setLibrarySearch(q)}

@@ -49,7 +49,6 @@ interface SlimLauncherProps {
   storage: { used: number; total: number };
   uploadQueue: UploadProgress[];
   usageMap: Map<string, number>;
-  appliedAssetKey?: string;
   onInsert(key: string): void;
   onToggleType(type: MediaBucket): void;
   onSearchChange(query: string): void;
@@ -611,7 +610,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 key={item.key}
                 item={item}
                 usageCount={props.usageMap.get(item.key) ?? 0}
-                isApplied={props.appliedAssetKey === item.key}
                 isSelected={props.selectedKeys?.has(item.key) ?? false}
                 selectable={props.selectionMode}
                 // While selecting, a click selects — inserting an asset the
