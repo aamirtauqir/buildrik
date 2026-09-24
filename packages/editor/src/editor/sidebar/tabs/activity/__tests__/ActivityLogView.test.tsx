@@ -117,15 +117,14 @@ describe("ActivityLogView — state machine", () => {
     );
   });
 
-  /* The procedure does not exist yet (needs-dashboard): the tab says where
-     the log is, it does not sit blank or offer a Retry that cannot work. */
-  it("renders the unavailable state when activity.recent is absent (NOT_FOUND)", async () => {
-    fetchRecentActivity.mockRejectedValueOnce(new ActivityReadError("unavailable"));
+  /* `activity.recent` exists now (post-Oct-1 R2): the old "not in the editor
+     yet" state is gone, and nothing renders it. */
+  it("never renders the retired unavailable state", async () => {
+    fetchRecentActivity.mockResolvedValueOnce([]);
     renderView();
-    const box = await screen.findByTestId("activity-unavailable");
-    expect(box.textContent).toContain("Activity isn't in the editor yet");
-    expect(screen.queryByText("Retry")).toBeNull();
-    expect(screen.getByText("Open in dashboard")).toBeTruthy();
+    await screen.findByTestId("activity-empty");
+    expect(screen.queryByTestId("activity-unavailable")).toBeNull();
+    expect(screen.queryByText("Activity isn't in the editor yet")).toBeNull();
   });
 
   it("renders the no-site banner when siteId is null and skips the fetch entirely", () => {

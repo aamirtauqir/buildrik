@@ -67,6 +67,7 @@ import {
   reattachReviewComment,
   resolveReviewComment,
   revokeReview,
+  reviewLinkUrl,
   type CurrentRound,
   type RoundListRow,
   type ReviewComment,
@@ -367,9 +368,20 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     });
 
   /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
-     (G1-058/059). Only the rows this code can back are drawn: "Open current
-     review link" needs the token the dashboard does not send (needs
-     dashboard). Compare rounds and Round history live here, not in the body. */
+     (G1-058/059). Compare rounds and Round history live here, not in the
+     body. "Copy review link" (B3) needs the round's token, which
+     `currentRound` carries only while the client's link still opens — so the
+     row is drawn only then (post-Oct-1 R4). */
+  const liveToken = round?.token ?? null;
+  const copyReviewLink = async (token: string) => {
+    setRoundMenuOpen(false);
+    try {
+      await navigator.clipboard.writeText(reviewLinkUrl(token));
+      setNotice("Review link copied");
+    } catch {
+      setNotice("Couldn't copy the review link.");
+    }
+  };
   const roundMenu =
     round ? (
       <Popover
@@ -411,6 +423,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           >
             Round history ›
           </MenuItem>
+          {liveToken ? (
+            <MenuItem onClick={() => void copyReviewLink(liveToken)}>Copy review link</MenuItem>
+          ) : null}
           {/* The re-send is a menu row, not a footer button: no 4418 Review
               board draws a primary under the composer. It always asks first —
               4418:120052 for a live round (the re-send kills the client's

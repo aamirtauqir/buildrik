@@ -13,7 +13,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { Composer } from "@/engine";
 import type { NamedVersion } from "@/shared/types/versions";
-import { sourceLabel, sourceOptions } from "../compareSources";
+import { loadSourcePages, sourceLabel, sourceOptions } from "../compareSources";
 import { renderProjectPages } from "../exportPublishPages";
 
 /* jsdom has no canvas; MediaOptimizer asks for a 2d context at construction. */
@@ -93,3 +93,24 @@ describe("sourceLabel — a side names itself before the catalog has loaded", ()
 });
 
 vi.mock("@/services/ReviewService", () => ({ fetchApprovedSnapshot: vi.fn() }));
+
+const { fetchPublishedSnapshot } = vi.hoisted(() => ({ fetchPublishedSnapshot: vi.fn() }));
+vi.mock("@/services/PublishService", () => ({
+  fetchPublishedSnapshot: (...a: unknown[]) => fetchPublishedSnapshot(...a),
+}));
+
+describe("loadSourcePages — a published side (post-Oct-1 R3)", () => {
+  const composer = {} as never;
+  it("reads the version's shipped pages for this site", async () => {
+    fetchPublishedSnapshot.mockResolvedValueOnce([{ path: "index.html", html: "<h1>v5</h1>" }]);
+    const pages = await loadSourcePages(composer, { kind: "published", jobId: "j5", version: 5 }, "s1");
+    expect(fetchPublishedSnapshot).toHaveBeenCalledWith("s1", "j5");
+    expect(pages).toEqual([{ path: "index.html", html: "<h1>v5</h1>" }]);
+  });
+
+  it("with no site there is nothing to ask, so no pages", async () => {
+    fetchPublishedSnapshot.mockClear();
+    expect(await loadSourcePages(composer, { kind: "published", jobId: "j5", version: 5 }, null)).toBeNull();
+    expect(fetchPublishedSnapshot).not.toHaveBeenCalled();
+  });
+});

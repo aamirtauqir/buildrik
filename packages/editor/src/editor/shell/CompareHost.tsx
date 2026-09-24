@@ -8,9 +8,9 @@
  * comparison renders. Each side has a picker (approved · published · saved ·
  * current draft), so a door only chooses where Compare STARTS.
  *
- * Page-set sides render through `ApprovedCompareView` (split · overlay · list).
- * Two PUBLISHED sides render the server's page-by-page diff instead: published
- * HTML stays inside the service (see compareSources).
+ * Page-set sides render through `ApprovedCompareView` (split · overlay · list);
+ * a published side is a page set too (`sites.publishedSnapshot`). Two
+ * PUBLISHED sides render the server's page-by-page diff instead.
  *
  * Mounted once by the shell, full-canvas through chrome-ui's `OverlayMount`
  * (Gate 22). This is takeover shape 3 of 3 (see FullPageRouter.tsx's "THE
@@ -47,20 +47,6 @@ const SURFACE =
 const BAR_TITLE = "tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
 const FROM = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap";
 const CLOSE_BTN = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-muted)]";
-
-/** A published side pairs only with another published side. Picking one
- *  moves the other side to the nearest other published version; leaving
- *  published on one side moves the other back to a page-set source. */
-function pairWith(next: CompareSource, other: CompareSource, catalog: SourceCatalog): CompareSource {
-  if (next.kind === "published" && other.kind !== "published") {
-    const alt = catalog.published.find((p) => p.id !== next.jobId);
-    return alt ? { kind: "published", jobId: alt.id, version: alt.version } : other;
-  }
-  if (next.kind !== "published" && other.kind === "published") {
-    return next.kind === "current" && catalog.approvedAvailable ? { kind: "approved" } : { kind: "current" };
-  }
-  return other;
-}
 
 export const CompareHost: React.FC<{ composer: Composer | null; siteId: string | null }> = ({ composer, siteId }) => {
   const [request, setRequest] = React.useState<CompareRequest | null>(null);
@@ -114,14 +100,14 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
       if (!composer) return () => {};
       let cancelled = false;
       set({ status: "loading" });
-      loadSourcePages(composer, source)
+      loadSourcePages(composer, source, siteId)
         .then((pages) => !cancelled && set({ status: "ready", pages }))
         .catch(() => !cancelled && set({ status: "error" }));
       return () => {
         cancelled = true;
       };
     },
-    [composer],
+    [composer, siteId],
   );
 
   const publishedPair = left.kind === "published" && right.kind === "published";
@@ -163,20 +149,12 @@ export const CompareHost: React.FC<{ composer: Composer | null; siteId: string |
       ))}
     </Select>
   );
-  const pickLeft = (s: CompareSource) => {
-    setLeftSource(s);
-    setRightSource((r) => pairWith(s, r, catalog));
-  };
-  const pickRight = (s: CompareSource) => {
-    setRightSource(s);
-    setLeftSource((l) => pairWith(s, l, catalog));
-  };
   const sources = (
     <span className="tw:flex tw:items-center tw:gap-2" data-testid="compare-sources">
       <span className={FROM} data-testid="compare-opened-from">Opened from {request.from}</span>
-      {picker(left, pickLeft, "Compare from")}
+      {picker(left, setLeftSource, "Compare from")}
       <span aria-hidden="true" className={FROM}>→</span>
-      {picker(right, pickRight, "Compare to")}
+      {picker(right, setRightSource, "Compare to")}
     </span>
   );
 
