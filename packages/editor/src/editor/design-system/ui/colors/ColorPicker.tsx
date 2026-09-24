@@ -1,6 +1,9 @@
 /**
- * ColorPicker — self-contained HSB canvas color picker
- * Props: { initialHex, background, onChange, onCancel, onSave }
+ * ColorPicker — the ONE colour picker (G3-140), board 7318:80959: title,
+ * shade canvas, hue, alpha, "Hex [old] New [hex]" with the contrast ratio,
+ * WORKSPACE PALETTE (the brand's colours), and a Cancel / Apply foot. Brand's
+ * token card opens it in a popover; the inspector's Fill popover reuses it
+ * for a custom colour and, footless (`actions`), for Edit token (4428:142968).
  * No external state — fully controlled by parent via callbacks.
  * @license BSD-3-Clause
  */
@@ -23,6 +26,12 @@ export interface ColorPickerProps {
   onChange: (hex: string) => void;
   onCancel: () => void;
   onSave: (hex: string) => void;
+  /** The header line (7318:80959 names the token, "Primary"). */
+  title?: string;
+  /** WORKSPACE PALETTE — the brand's colours; a click takes the value. */
+  palette?: { id: string; name: string; value: string }[];
+  /** Replaces the Cancel / Apply foot (Edit token draws its own actions). */
+  actions?: (hex: string, valid: boolean) => React.ReactNode;
 }
 
 // ─── Canvas gradient helpers ──────────────────────────────────────────────────
@@ -95,6 +104,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   onChange,
   onCancel,
   onSave,
+  title,
+  palette = [],
+  actions,
 }) => {
   const [hsb, setHsb] = React.useState<ColorHSB>(() => hexToHsb(initialHex));
   const [hexInput, setHexInput] = React.useState(initialHex.toUpperCase());
@@ -242,106 +254,119 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   const showAlphaWarning = hsb.a < 0.8;
 
+  const takeHex = (hex: string) => {
+    const expanded = expandShorthand(hex.startsWith("#") ? hex : `#${hex}`);
+    if (!isValidHex(expanded)) return;
+    setHexError(false);
+    setExactHex(expanded.toUpperCase());
+    setHsb(hexToHsb(expanded));
+  };
+
+  const EYEBROW = "tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.06em] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+  const BAR = "tw:relative tw:h-2";
+  const BAR_CANVAS = "tw:block tw:h-2 tw:w-full tw:cursor-pointer tw:rounded-full";
+  const KNOB =
+    "tw:pointer-events-none tw:absolute tw:top-1/2 tw:size-3.5 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white tw:shadow-[var(--bk-shadow-sm)]";
+
   return (
-    <div className="buildrick-design-picker">
-      {/* SB Canvas */}
-      <div className="buildrick-design-picker__sb-wrap">
-        <canvas
-          ref={sbCanvasRef}
-          width={228}
-          height={128}
-          className="buildrick-design-picker__sb-canvas"
-          onPointerDown={handleSbDown}
-          onPointerMove={handleSbMove}
-          onPointerUp={handleSbUp}
-        />
-        <div className="buildrick-design-picker__crosshair" style={{ left: sbX, top: sbY }} aria-hidden />
-      </div>
-
-      {/* Hue slider */}
-      <div className="buildrick-design-picker__slider-wrap">
-        <canvas
-          ref={hueCanvasRef}
-          width={228}
-          height={12}
-          className="buildrick-design-picker__slider-canvas"
-          onPointerDown={handleHueDown}
-          onPointerMove={handleHueMove}
-          onPointerUp={handleHueUp}
-        />
-        <div className="buildrick-design-picker__knob" style={{ left: hueX }} aria-hidden />
-      </div>
-
-      {/* Alpha slider */}
-      {/* The % sits beside the bar, inside the picker — it was translated
-          past the bar's right edge and clipped by the token card (QA). */}
-      <div className="buildrick-design-picker__alpha-row">
-        <div className="buildrick-design-picker__slider-wrap">
-          <canvas
-            ref={alphaCanvasRef}
-            width={228}
-            height={12}
-            className="buildrick-design-picker__slider-canvas"
-            onPointerDown={handleAlphaDown}
-            onPointerMove={handleAlphaMove}
-            onPointerUp={handleAlphaUp}
-          />
-          <div className="buildrick-design-picker__knob" style={{ left: alphaX }} aria-hidden />
+    <div className="tw:flex tw:w-70 tw:flex-col" data-testid="color-picker">
+      {title ? (
+        <div className="tw:border-b tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="color-picker-title">
+          {title}
         </div>
-        <span className="buildrick-design-picker__alpha-label" data-testid="picker-alpha-label">{Math.round(hsb.a * 100)}%</span>
-      </div>
-
-      {/* Hex input row */}
-      <div className="buildrick-design-picker__hex-row">
-        <div
-          className="buildrick-design-picker__swatch-preview"
-          style={{ background: currentHex.slice(0, 7) }}
-        />
-        <div
-          className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
-        >
-          <span className="buildrick-design-picker__hash">#</span>
+      ) : null}
+      <div className="tw:flex tw:flex-col tw:gap-3 tw:p-4">
+        {/* Shade (saturation × brightness) */}
+        <div className="tw:relative">
+          <canvas
+            ref={sbCanvasRef}
+            width={248}
+            height={120}
+            className="tw:block tw:h-30 tw:w-full tw:cursor-crosshair tw:rounded"
+            onPointerDown={handleSbDown}
+            onPointerMove={handleSbMove}
+            onPointerUp={handleSbUp}
+            aria-label="Shade"
+          />
+          <div
+            className="tw:pointer-events-none tw:absolute tw:size-3 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-full tw:border-2 tw:border-white"
+            style={{ left: sbX, top: sbY }}
+            aria-hidden
+          />
+        </div>
+        {/* Hue */}
+        <div className={BAR}>
+          <canvas ref={hueCanvasRef} width={248} height={8} className={BAR_CANVAS} onPointerDown={handleHueDown} onPointerMove={handleHueMove} onPointerUp={handleHueUp} aria-label="Hue" />
+          <div className={KNOB} style={{ left: hueX, background: `hsl(${hsb.h},100%,50%)` }} aria-hidden />
+        </div>
+        {/* Alpha (not drawn on 7318:80959; the one picker keeps it — G3-140) */}
+        <div className="tw:flex tw:items-center tw:gap-2">
+          <div className={`${BAR} tw:flex-1`}>
+            <canvas ref={alphaCanvasRef} width={248} height={8} className={BAR_CANVAS} onPointerDown={handleAlphaDown} onPointerMove={handleAlphaMove} onPointerUp={handleAlphaUp} aria-label="Opacity" />
+            <div className={`${KNOB} tw:bg-white`} style={{ left: alphaX }} aria-hidden />
+          </div>
+          <span className="tw:w-9 tw:text-right tw:text-[length:var(--bk-text-11)] tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid="picker-alpha-label">
+            {Math.round(hsb.a * 100)}%
+          </span>
+        </div>
+        {/* Hex [old] New [hex] · contrast */}
+        <div className="tw:flex tw:items-center tw:gap-2 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">
+          <span>Hex</span>
+          <span className="tw:size-6 tw:flex-none tw:rounded tw:border tw:border-[var(--bk-border)]" style={{ background: currentHex.slice(0, 7) }} data-testid="color-picker-preview" aria-hidden />
+          <span>New</span>
           <TextField
             type="text"
-            value={hexInput.replace("#", "")}
+            value={hexInput}
             onChange={handleHexInput}
-            className="buildrick-design-picker__hex-input"
-            maxLength={8}
+            className="tw:min-w-0 tw:flex-1 tw:[font-family:var(--bk-font-mono)]"
+            maxLength={9}
             spellCheck={false}
             aria-label="Hex color value"
+            aria-invalid={hexError || undefined}
           />
+          <span className="tw:tabular-nums" title={`Contrast ratio: ${contrastRatio.toFixed(1)}:1`}>
+            {contrastRatio.toFixed(1)}:1
+          </span>
         </div>
-        <span
-          className="buildrick-design-picker__contrast-badge"
-          title={`Contrast ratio: ${contrastRatio.toFixed(1)}:1`}
-        >
-          {contrastRatio.toFixed(1)}:1
-        </span>
+        {hexError && (
+          <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]">Enter a valid hex like #3B82F6</div>
+        )}
+        {showAlphaWarning && (
+          <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-warning-text)]">
+            Background has transparency — contrast may not be accurate
+          </div>
+        )}
+        {palette.length > 0 ? (
+          <div className="tw:flex tw:flex-col tw:gap-2" data-testid="color-picker-palette">
+            <span className={EYEBROW}>Workspace palette</span>
+            <div className="tw:flex tw:flex-wrap tw:gap-2.5">
+              {palette.map((p) => (
+                <Button
+                  key={p.id}
+                  type="button"
+                  size="xs"
+                  className="tw:size-5.5 tw:min-h-0 tw:min-w-0 tw:rounded tw:border tw:border-[var(--bk-border)] tw:p-0"
+                  style={{ background: p.value }}
+                  onClick={() => takeHex(p.value)}
+                  aria-label={`Use ${p.name} ${p.value}`}
+                  title={`${p.name} · ${p.value}`}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {actions ? actions(currentHex, !hexError) : null}
       </div>
-
-      {hexError && (
-        <div className="buildrick-design-picker__hex-error">Enter a valid hex like #3B82F6</div>
-      )}
-
-      {showAlphaWarning && (
-        <div className="buildrick-design-picker__alpha-warning">
-          Background has transparency — contrast may not be accurate
+      {actions ? null : (
+        <div className="tw:flex tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-3">
+          <Button type="button" variant="secondary" size="xs" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="button" size="xs" onClick={() => onSave(currentHex)} disabled={!!hexError}>
+            Apply
+          </Button>
         </div>
       )}
-
-      {/* Action buttons */}
-      <div className="buildrick-design-picker__actions">
-        <Button color="light" onClick={onCancel} type="button" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-          Cancel
-        </Button>
-        <Button
-          onClick={() => onSave(currentHex)}
-          type="button"
-          disabled={!!hexError}
-        >
-          Set color
-        </Button>
-      </div>
     </div>
   );
 };

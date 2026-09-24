@@ -21,6 +21,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "brand",
     description: "Primary brand color",
+    darkValue: "#60A5FA",
   },
   {
     id: "color-secondary",
@@ -31,6 +32,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "brand",
     description: "Secondary brand color",
+    darkValue: "#94A3B8",
   },
   {
     id: "color-accent",
@@ -48,6 +50,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "brand",
     description: "Accent / highlight color",
+    darkValue: "#4ADE80",
   },
   {
     id: "color-background",
@@ -58,6 +61,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "surface",
     description: "Page background",
+    darkValue: "#0F172A",
   },
   {
     id: "color-text",
@@ -68,6 +72,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "surface",
     description: "Default text color",
+    darkValue: "#E2E8F0",
   },
   {
     id: "color-muted",
@@ -78,6 +83,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "surface",
     description: "Secondary / muted text",
+    darkValue: "#A1A1AA",
   },
   {
     id: "color-border",
@@ -88,6 +94,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "surface",
     description: "Default border color",
+    darkValue: "#3F3F46",
   },
   {
     id: "color-success",
@@ -101,6 +108,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "state",
     description: "Positive / success state",
+    darkValue: "#4ADE80",
   },
   {
     id: "color-warning",
@@ -130,6 +138,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     type: "color",
     group: "state",
     description: "Negative / error state",
+    darkValue: "#F87171",
   },
   // B5-wire (2026-05-17): primitive + semantic color seeds. Beginner mode
   // surfaces only the 4 semantics; Pro reveals primitives. Mirrors v4

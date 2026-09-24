@@ -98,6 +98,10 @@ export class Composer extends EventEmitter {
 
   // Project-wide settings (analytics, integrations)
   private projectSettings: ProjectSettings = {};
+  /* The DS project-migration version the loaded payload is at. Carried
+     through import → export so a save writes it back (Site.dsSchemaVersion);
+     dropped here, the migration re-ran on every open (walk A2, 2026-09-24). */
+  private dsSchemaVersion: number | undefined;
 
   // Project metadata (name, author, timestamps)
   private projectMetadata: import("../shared/types").ProjectMetadata = {
@@ -633,6 +637,8 @@ export class Composer extends EventEmitter {
       emitProjectChanged: false,
     });
 
+    this.dsSchemaVersion = data.dsSchemaVersion;
+
     // Import project metadata
     if (data.metadata) {
       this.projectMetadata = { ...this.projectMetadata, ...data.metadata };
@@ -675,6 +681,7 @@ export class Composer extends EventEmitter {
         updatedAt: new Date().toISOString(),
       },
       settings: this.projectSettings,
+      ...(this.dsSchemaVersion !== undefined ? { dsSchemaVersion: this.dsSchemaVersion } : {}),
       /* Without this the binding survives only the session that made it: the
          maps are in memory, and a reload republished the placeholder text.
          Guarded because HistoryManager snapshots from its own constructor

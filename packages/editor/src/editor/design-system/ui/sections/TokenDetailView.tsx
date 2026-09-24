@@ -42,6 +42,7 @@ import { findSurfaceToken, resolveSurface, shownValue } from "../../utils/contra
 import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
+import { BrandFontPopover } from "./BrandFontPopover";
 import { TokenReplaceModal } from "./TokenReplaceModal";
 import { TokenRenameDialog } from "./TokenRenameDialog";
 import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
@@ -195,11 +196,29 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
 
   // ─ Editors. The value line is read-only until its Change is pressed.
   const [editingLight, setEditingLight] = React.useState(false);
+  /* A font role's Change opens the board's picker (7318:81029) first. */
+  const [fontPopoverOpen, setFontPopoverOpen] = React.useState(false);
+  /* 7318:80959's WORKSPACE PALETTE: the other brand colours, one swatch per
+     distinct value, eight at most (the board draws seven). */
+  const workspacePalette = React.useMemo(() => {
+    const seen = new Set<string>();
+    return (allTokens ?? [])
+      .filter((t) => t.type === "color" && t.id !== token.id && !t.replacedBy)
+      .filter((t) => {
+        const v = t.value.toUpperCase();
+        if (seen.has(v)) return false;
+        seen.add(v);
+        return true;
+      })
+      .slice(0, 8)
+      .map((t) => ({ id: t.id, name: t.name, value: t.value }));
+  }, [allTokens, token.id]);
   const [editingDark, setEditingDark] = React.useState(false);
   const [darkInput, setDarkInput] = React.useState(token.darkValue ?? "");
   React.useEffect(() => {
     setDarkInput(token.darkValue ?? "");
     setEditingLight(false);
+    setFontPopoverOpen(false);
     setEditingDark(false);
     setUsageExpanded(false);
   }, [token.id, token.darkValue]);
@@ -371,33 +390,93 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <span className={`${VALUE} ${isColor ? "" : MONO}`} data-testid="brand-token-value-light">
           {displayValue(token.value)}
         </span>
-        <Button
-          type="button"
-          variant="secondary"
-          size="xs"
-          onClick={() => setEditingLight((v) => !v)}
-          aria-expanded={editingLight}
-          data-testid="brand-token-action-replace"
-          className={ACTION}
-        >
-          Change
-        </Button>
+        {token.type === "font-family" ? (
+          <BrandFontPopover
+            open={fontPopoverOpen}
+            onClose={() => setFontPopoverOpen(false)}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => (editingLight ? setEditingLight(false) : setFontPopoverOpen((v) => !v))}
+                aria-expanded={fontPopoverOpen || editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+            roleName={token.name}
+            value={token.value}
+            onPick={(family) => {
+              onValueChange?.(token.id, family);
+              setFontPopoverOpen(false);
+            }}
+            onAllFonts={() => {
+              setFontPopoverOpen(false);
+              setEditingLight(true);
+            }}
+            composer={composer}
+          />
+        ) : isColor ? (
+          /* 7318:80959 — the one colour picker, as a popover off Change. */
+          <Popover
+            open={editingLight}
+            onClose={() => setEditingLight(false)}
+            placement="bottom-end"
+            label={`${token.name} colour`}
+            trigger={
+              <Button
+                type="button"
+                variant="secondary"
+                size="xs"
+                onClick={() => setEditingLight((v) => !v)}
+                aria-expanded={editingLight}
+                aria-haspopup="dialog"
+                data-testid="brand-token-action-replace"
+                className={ACTION}
+              >
+                Change
+              </Button>
+            }
+          >
+            {/* -m-2 cancels the popover's own inset: the picker's header rule
+                and grey foot run edge to edge as on the board. */}
+            <div className="tw:-m-2 tw:overflow-hidden tw:rounded-lg" data-testid="brand-token-light-editor">
+              <ColorPicker
+                initialHex={token.value}
+                title={token.name}
+                palette={workspacePalette}
+                onChange={() => {
+                  /* live preview owned by picker; commit via onSave */
+                }}
+                onSave={(hex) => {
+                  onValueChange?.(token.id, hex);
+                  setEditingLight(false);
+                }}
+                onCancel={() => setEditingLight(false)}
+              />
+            </div>
+          </Popover>
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            onClick={() => setEditingLight((v) => !v)}
+            aria-expanded={editingLight}
+            data-testid="brand-token-action-replace"
+            className={ACTION}
+          >
+            Change
+          </Button>
+        )}
       </div>
-      {editingLight && (
+      {editingLight && !isColor && (
         <div className="tw:mb-2" data-testid="brand-token-light-editor">
-          {isColor ? (
-            <ColorPicker
-              initialHex={token.value}
-              onChange={() => {
-                /* live preview owned by picker; commit via onSave */
-              }}
-              onSave={(hex) => {
-                onValueChange?.(token.id, hex);
-                setEditingLight(false);
-              }}
-              onCancel={() => setEditingLight(false)}
-            />
-          ) : (
+          {(
             <>
               {/* Clone 3721:44821 — a font-family token is picked, not only
                   typed: presets, the ADDED site fonts, `Manage site fonts`.
@@ -587,6 +666,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         currentId={token.id}
         takenIds={(allTokens ?? []).map((t) => t.id).filter((id) => id !== token.id)}
         usage={usageCount}
+        siteName={composer?.getProjectMetadata?.()?.name}
         onCancel={() => setRenameOpen(false)}
         onRename={(newId) => {
           setRenameOpen(false);

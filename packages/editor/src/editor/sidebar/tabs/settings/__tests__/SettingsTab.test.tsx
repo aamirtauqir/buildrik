@@ -97,34 +97,6 @@ vi.mock("../components/UnsavedSettingsDialog", () => ({
     ) : null,
 }));
 
-vi.mock("../components/SearchSettingsModal", () => ({
-  SearchSettingsModal: ({
-    open,
-    onClose,
-    onOpen,
-  }: {
-    open: boolean;
-    onClose: () => void;
-    onOpen: (screen: string, field?: string) => void;
-  }) =>
-    open ? (
-      <div role="dialog" data-testid="set-search">
-        <button type="button" data-testid="set-search-row-0" onClick={() => onOpen("seo", "seo-meta-title")}>
-          SEO defaults
-        </button>
-        <button type="button" data-testid="set-search-row-1" onClick={() => onOpen("general", "site-name")}>
-          Site name
-        </button>
-        <button type="button" data-testid="set-search-row-2" onClick={() => onOpen("members")}>
-          Members
-        </button>
-        <button type="button" data-testid="set-search-cancel" onClick={onClose}>
-          Cancel
-        </button>
-      </div>
-    ) : null,
-}));
-
 /* A screen that exercises the shell's load-state and save-error contract
    without a server: SEO stands in. */
 const seoFlushes = vi.hoisted(() => [] as string[]);
@@ -655,24 +627,52 @@ describe("SettingsTab — the footer follows the screen's load", () => {
 
 // ─── Search ───────────────────────────────────────────────────────────────
 
-describe("SettingsTab — Search settings", () => {
-  it("opens from the Overview header; a result opens its screen and lands on the field", async () => {
+/* G3-097 · 6816:60270: search is an inline sidebar filter, not a modal —
+   the ⌕ opens a field under the site name, the nav narrows to matching rows
+   (a field's label matches its screen), and "Search everywhere" hands the
+   query to ⌘K. A row reached through a field still lands on that field. */
+describe("SettingsTab — Search settings (inline filter)", () => {
+  const field = () => screen.getByRole("searchbox", { name: "Search settings" }) as HTMLInputElement;
+  const navIds = () =>
+    Array.from(screen.getByRole("navigation", { name: "Settings sections" }).querySelectorAll("[data-testid^='set-nav-']")).map((e) =>
+      e.getAttribute("data-testid")!.slice("set-nav-".length),
+    );
+
+  it("the ⌕ opens a focused field; typing narrows the nav to matches, with their group label", () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-search-icon"));
+    expect(document.activeElement).toBe(field());
+    expect(navIds()).toContain("overview");
+    fireEvent.change(field(), { target: { value: "domain" } });
+    expect(navIds()).toEqual(["domains"]);
+    const nav = screen.getByRole("navigation", { name: "Settings sections" });
+    expect(within(nav).getByText("SEO & publishing", { exact: false })).toBeTruthy();
+    expect(within(nav).queryByText("Site setup", { exact: false })).toBeNull();
+    expect(screen.getByTestId("set-search-everywhere").textContent).toContain('"domain"');
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("a row matched by a field label opens its screen and lands on the field", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-search-open"));
-    expect(screen.getByTestId("set-search")).toBeTruthy();
-    fireEvent.click(screen.getByTestId("set-search-row-0"));
-    expect(screen.queryByTestId("set-search")).toBeNull();
+    fireEvent.change(field(), { target: { value: "meta title" } });
+    expect(navIds()).toEqual(["seo"]);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
     await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
     await act(async () => {
       await new Promise((r) => requestAnimationFrame(() => r(undefined)));
     });
     expect(document.activeElement).toBe(document.getElementById("seo-meta-title"));
+    // The filter stays while the screen is open (the board shows both).
+    expect(field().value).toBe("meta title");
   });
 
   it("a field whose control has no id lands on its Field anchor's control", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.click(screen.getByTestId("set-search-open"));
-    fireEvent.click(screen.getByTestId("set-search-row-1"));
+    fireEvent.click(screen.getByTestId("set-search-icon"));
+    fireEvent.change(field(), { target: { value: "site name" } });
+    fireEvent.click(screen.getByTestId("set-nav-general"));
     await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
     await act(async () => {
       await new Promise((r) => requestAnimationFrame(() => r(undefined)));
@@ -681,14 +681,34 @@ describe("SettingsTab — Search settings", () => {
     expect(document.activeElement).toBe(input);
   });
 
-  it("a dashboard section takes the same door as its sidebar row", () => {
-    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+  it("Search everywhere hands the query to the ⌘K palette", () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    fireEvent.click(screen.getByTestId("set-search-icon"));
+    fireEvent.change(field(), { target: { value: "domain" } });
+    fireEvent.click(screen.getByTestId("set-search-everywhere"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:toggle:command-palette", { query: "domain" });
+  });
+
+  it("no match says so; ✕ closes the field and brings the whole nav back", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.click(screen.getByTestId("set-search-open"));
-    fireEvent.click(screen.getByTestId("set-search-row-2"));
-    expect(open).toHaveBeenCalledWith(expect.stringContaining("/dashboard/settings/team"), "_blank", "noopener,noreferrer");
-    expect(headTitle()).toBe("Settings");
-    open.mockRestore();
+    fireEvent.click(screen.getByTestId("set-search-icon"));
+    fireEvent.change(field(), { target: { value: "zzqx" } });
+    expect(navIds()).toEqual([]);
+    expect(screen.getByTestId("set-search-empty").textContent).toContain("zzqx");
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(navIds()).toContain("general");
+    expect(screen.getByTestId("set-search-icon")).toBeTruthy();
+  });
+
+  it("Escape in the field closes the search, not Settings", () => {
+    const onClose = vi.fn();
+    renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId("set-search-icon"));
+    fireEvent.keyDown(field(), { key: "Escape" });
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
   });
 });
 

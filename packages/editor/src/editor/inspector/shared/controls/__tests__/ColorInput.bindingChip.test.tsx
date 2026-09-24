@@ -75,7 +75,7 @@ describe("ColorInput · DSBindingChip integration", () => {
     expect(chipButtons.length).toBe(0);
   });
 
-  it("clicking a token chip emits UI_OPEN_DESIGN_PANEL", () => {
+  it("clicking a token chip opens Brand ON that token (G3-156)", () => {
     render(
       <ColorInput
         label="Color"
@@ -86,7 +86,7 @@ describe("ColorInput · DSBindingChip integration", () => {
     );
     const chip = screen.getByRole("button", { name: /Jump to token color-primary/i });
     fireEvent.click(chip);
-    expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+    expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, { tokenId: "color-primary" });
   });
 
   it("renders no chip for a raw hex even without a composer", () => {
