@@ -548,7 +548,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        canvas — the 1024 desktop frame scaled to leave grey around it — not
        edge to edge under the drawer and inspector. Once the project has
        loaded, if the desktop frame is wider than its viewport, zoom to fit
-       its WIDTH with a 60px gutter each side. Only on load: after that the
+       its WIDTH with a 60 px gutter each side. Only on load: after that the
        zoom is the user's. */
     const didInitialFitRef = React.useRef(false);
     React.useEffect(() => {
