@@ -18,7 +18,7 @@
  * @license BSD-3-Clause
  */
 
-import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-react";
+import { Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
@@ -32,6 +32,11 @@ export interface InspectorElementMenuProps {
   selectedElementId: string;
   /** Called after the user confirms delete (triggers existing delete flow). */
   onRequestDelete: () => void;
+  /* Board 4428:141170's header is `[icon] Name · ✦ AI · ⋯` — the pick,
+     select-parent and hide-inspector icons it carried moved in here (G2-139). */
+  onPick?: () => void;
+  onSelectParent?: () => void;
+  onHideInspector?: () => void;
 }
 
 interface MenuItem {
@@ -122,6 +127,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   composer,
   selectedElementId,
   onRequestDelete,
+  onPick,
+  onSelectParent,
+  onHideInspector,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isTriggerHovered, setIsTriggerHovered] = React.useState(false);
@@ -183,7 +191,25 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  const run = (fn: () => void) => () => {
+    fn();
+    setIsOpen(false);
+  };
+  const hasParent = Boolean(composer?.elements.getElement(selectedElementId)?.getParent?.());
+  const navItems: MenuItem[] = [
+    ...(onPick
+      ? [{ id: "pick", label: "Pick on canvas", icon: <Crosshair size={14} aria-hidden="true" />, onClick: run(onPick) }]
+      : []),
+    ...(onSelectParent
+      ? [{ id: "select-parent", label: "Select parent", icon: <CornerLeftUp size={14} aria-hidden="true" />, onClick: run(onSelectParent), disabled: !hasParent }]
+      : []),
+    ...(onHideInspector
+      ? [{ id: "hide-inspector", label: "Hide inspector", icon: <PanelRightClose size={14} aria-hidden="true" />, onClick: run(onHideInspector) }]
+      : []),
+  ];
+
   const items: MenuItem[] = [
+    ...navItems,
     {
       id: "duplicate",
       label: "Duplicate",
@@ -221,6 +247,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
         onMouseEnter={() => setIsTriggerHovered(true)}
         onMouseLeave={() => setIsTriggerHovered(false)}
         aria-label="Element actions"
+        data-testid="inspector-element-menu"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         title="Element actions"
@@ -235,10 +262,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
         <div ref={menuRef} role="menu" style={styles.menu}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
-              {index === items.length - 1 && <div style={styles.divider} />}
+              {(index === items.length - 1 || (navItems.length > 0 && index === navItems.length)) && <div style={styles.divider} />}
               <Button
                 type="button"
                 role="menuitem"
+                data-testid={`inspector-menu-${item.id}`}
                 onClick={item.onClick}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}

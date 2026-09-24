@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { Crosshair, CornerLeftUp, Link, X } from "lucide-react";
+import { Link } from "lucide-react";
 import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
@@ -46,6 +46,13 @@ import "./styles/inspector.css";
 import { Button, Tabs } from "@/editor/chrome-ui";
 
 /** Footer switch, board 4428:141170 / 141406 — the two tiers by name. */
+/** Equal-width underline tabs (board 4428:141170), merged over chrome-ui's
+ *  pill tab via twMerge. */
+const INSPECTOR_TAB_CLASS =
+  "tw:flex-1 tw:h-9 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-medium tw:bg-transparent " +
+  "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
+  "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
+
 const TIER_TABS = [
   { id: "beginner", label: "Beginner" },
   { id: "pro", label: "Pro" },
@@ -343,8 +350,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return <InspectorEmptyState composer={composer} />;
   }
 
-  // Parent lookup drives the header's "select parent" affordance.
-  const selectedInstance = composer?.elements?.getElement(selectedElement.id) ?? null;
 
   return (
     <div className="bdi-panel" data-testid="inspector-panel">
@@ -364,31 +369,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <div className="bdi-n" data-testid="inspector-element-name">{elementLabel}</div>
         </div>
         <div className="bdi-eact">
-          <Button
-            type="button"
-            className={`bdi-icon-btn${pickActive ? " on" : ""}`}
-            title="Pick element on canvas"
-            aria-label="Pick element on canvas"
-            data-testid="inspector-pick"
-            aria-pressed={pickActive}
-            onClick={() => {
-              const next = !pickActive;
-              setPickActive(next);
-              composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
-            }}
-          >
-            <Crosshair size={12} aria-hidden="true" />
-          </Button>
-          <Button
-            type="button"
-            className="bdi-icon-btn"
-            title="Select parent"
-            aria-label="Select parent element"
-            disabled={!selectedInstance?.getParent()}
-            onClick={() => composer?.selection.selectParent()}
-          >
-            <CornerLeftUp size={12} aria-hidden="true" />
-          </Button>
           {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`
               deliberately (tabsConfig RAIL_FIGMA); the 2026-08-05 Figma arc put
               this chip on every inspector header instead, and it never shipped:
@@ -428,28 +408,38 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               composer={composer}
               selectedElementId={selectedElement.id}
               onRequestDelete={() => onDelete(selectedElement.id)}
+              onPick={() => {
+                const next = !pickActive;
+                setPickActive(next);
+                composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
+              }}
+              onSelectParent={() => composer?.selection.selectParent()}
+              onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
             />
           )}
-          {/* G2-037: the inspector's own way to give the canvas its 300px
-              back. The shell listens; ⌘K's `toggle-inspector` brings it
-              back (the footer word bar's Inspector toggle is gone). */}
-          <Button
-            type="button"
-            className="bdi-icon-btn"
-            title="Hide inspector"
-            aria-label="Hide inspector"
-            data-testid="inspector-hide"
-            onClick={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
-          >
-            <X size={12} aria-hidden="true" />
-          </Button>
         </div>
       </div>
-      {/* Pill row: `This ▾ · Base ▾` (scope · state). The breakpoint pill that
-          sat between them is gone (G2-142, §11/F6): the canvas status bar is
-          the one breakpoint selector, and what THIS breakpoint overrides is
-          still listed below, with its way back. */}
+      {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
+          The sections each tab holds are the registry's `tab` tags; the strip
+          only picks which set the body renders. */}
+      {!wholeSite && !agentRun.running && (
+        <Tabs
+          tabs={INSPECTOR_TABS}
+          value={activeTab}
+          onChange={(id) => setActiveTab(id as TabId)}
+          label="Inspector tabs"
+          data-testid="inspector-tab-strip"
+          /* Board 4428:141170: three equal tabs, 36 tall, the active one
+             underlined in the accent — not left-packed tinted pills. */
+          className="tw:h-9 tw:p-0 tw:gap-0 tw:border-b tw:border-[var(--bk-border)]"
+          tabClassName={INSPECTOR_TAB_CLASS}
+        />
+      )}
+      {/* Board 4428:141170: "Applies to [This element ▾]" sits UNDER the tab
+          strip (it was a pill row above it). The state pill stays on the row
+          — pseudo-state editing has no other door. */}
       <div className="bdi-bpr" data-testid="inspector-context-row">
+        <span className="bdi-bpr-label">Applies to</span>
         <ScopeDropdown
           composer={composer}
           selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
@@ -470,19 +460,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         />
       </div>
       <LockedBanner composer={composer} elementId={selectedElement.id} />
-      {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
-          The sections each tab holds are the registry's `tab` tags; the strip
-          only picks which set the body renders. */}
-      {!wholeSite && !agentRun.running && (
-        <Tabs
-          tabs={INSPECTOR_TABS}
-          value={activeTab}
-          onChange={(id) => setActiveTab(id as TabId)}
-          label="Inspector tabs"
-          data-testid="inspector-tab-strip"
-          className="tw:border-b tw:border-[var(--bk-border)]"
-        />
-      )}
+
       {/* Every banner below annotates THE CONTROLS BELOW IT — which scope a
           write lands on, which breakpoint it overrides, which instance it
           follows. The two takeovers (whole-site, and an AI run) replace those
@@ -650,18 +628,19 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           profile, however long the column above it runs. */}
       {!wholeSite && !agentRun.running && (
         <footer
-          className="tw:flex tw:items-center tw:justify-between tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-1.5"
+          /* Board 4428:141170: a 44-tall footer with the Beginner / Pro
+             segmented control at its left edge. */
+          className="tw:flex tw:items-center tw:h-[var(--bk-size-panel-footer)] tw:shrink-0 tw:border-t tw:border-[var(--bk-border)] tw:px-4"
           data-testid="inspector-footer"
         >
-          <span className="tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]">Controls</span>
           <Tabs
             tabs={TIER_TABS}
             value={tier}
             onChange={(id) => setTier(id === "pro" ? "pro" : "beginner")}
             label="Inspector tier"
             data-testid="inspector-tier-toggle"
-            className="tw:p-0"
-            tabClassName="tw:h-6 tw:px-2 tw:text-[11px]"
+            className="tw:p-0.5 tw:gap-0 tw:rounded-md tw:bg-[var(--bk-gray-100)]"
+            tabClassName="tw:h-6 tw:px-3 tw:text-[12px] tw:rounded tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)]"
           />
         </footer>
       )}

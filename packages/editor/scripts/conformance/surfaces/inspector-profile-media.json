@@ -115,10 +115,6 @@
       "nodeId": "2069:20378"
     },
     {
-      "name": "sections-apply",
-      "testId": "inspector-sections-apply"
-    },
-    {
       "name": "sechead-spacing",
       "testId": "inspector-sechead-spacing"
     },
