@@ -14,8 +14,11 @@ import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
 import { MediaSourceRow } from "../MediaSourceRow";
 
-function makeComposer(over: { src?: string; assets?: Array<{ id: string; name: string; mimeType: string; src: string }> } = {}) {
-  const el = { getAttribute: (n: string) => (n === "src" ? (over.src ?? "") : undefined) };
+function makeComposer(over: { src?: string; layerName?: string; assets?: Array<{ id: string; name: string; mimeType: string; src: string }> } = {}) {
+  const el = {
+    getAttribute: (n: string) => (n === "src" ? (over.src ?? "") : undefined),
+    getCustomData: (k: string) => (k === "layerName" ? over.layerName : undefined),
+  };
   const selectAssets = vi.fn();
   const emit = vi.fn();
   return {
@@ -53,7 +56,7 @@ describe("MediaSourceRow — Clone 3724:43815 / 44339 / 3721:45178", () => {
     expect(screen.getByTestId("inspector-source-label")).toHaveTextContent("Video source");
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("chef-intro.mp4");
     fireEvent.click(screen.getByRole("button", { name: "Manage video" }));
-    expect(onOpenMediaLibrary).toHaveBeenCalledWith(["video"], expect.any(Function));
+    expect(onOpenMediaLibrary).toHaveBeenCalledWith(["video"], expect.any(Function), undefined);
     const pick = onOpenMediaLibrary.mock.calls[0][1] as (a: { src: string }) => void;
     pick({ src: "blob:new" });
     expect(setAttribute).toHaveBeenCalledWith("src", "blob:new");
@@ -68,9 +71,11 @@ describe("MediaSourceRow — Clone 3724:43815 / 44339 / 3721:45178", () => {
     expect(screen.getByRole("button", { name: "Manage SVG" })).toBeInTheDocument();
   });
 
-  it("an image reads 'Image source' and Choose image opens the picker for the element's src", () => {
+  /* Board 6764:59051 — the picker says what it is choosing for: "For Menu
+     preview · Image", the element's layer name. */
+  it("an image reads 'Image source' and Choose image opens the picker for the element, named by its layer", () => {
     const onOpenMediaLibrary = vi.fn();
-    const { composer } = makeComposer({ src: "https://cdn/team-photo.jpg" });
+    const { composer } = makeComposer({ src: "https://cdn/team-photo.jpg", layerName: "Menu preview" });
     render(
       <MediaSourceRow composer={composer} selectedElement={{ id: "i1", type: "image" }} onOpenMediaLibrary={onOpenMediaLibrary} />,
     );
@@ -78,7 +83,7 @@ describe("MediaSourceRow — Clone 3724:43815 / 44339 / 3721:45178", () => {
     // Not in the library — the URL's own file name.
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("team-photo.jpg");
     fireEvent.click(screen.getByRole("button", { name: "Choose image" }));
-    expect(onOpenMediaLibrary).toHaveBeenCalledWith(["image"], expect.any(Function));
+    expect(onOpenMediaLibrary).toHaveBeenCalledWith(["image"], expect.any(Function), "Menu preview");
   });
 
   it("an empty source says so and still offers the door", () => {

@@ -23,6 +23,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { handleGenericAttributeChange, handleVideoSrcChange, runTxn } from "./elementProperties/handlers";
 
 const KINDS: Record<string, { label: string; door: string; picker: MediaAssetType | null }> = {
@@ -36,7 +37,7 @@ const KINDS: Record<string, { label: string; door: string; picker: MediaAssetTyp
 interface MediaSourceRowProps {
   composer: Composer | null | undefined;
   selectedElement: { id: string; type: string };
-  onOpenMediaLibrary?: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => void;
+  onOpenMediaLibrary?: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, forLabel?: string) => void;
 }
 
 /** The URL's own file name — for a source the library does not hold. */
@@ -77,7 +78,7 @@ export function MediaSourceRow({ composer, selectedElement, onOpenMediaLibrary }
         if (selectedElement.type === "video") runTxn(composer, "video-src-change", () => handleVideoSrcChange(target, chosen.src));
         else runTxn(composer, "media-source-change", () => handleGenericAttributeChange(target, "src", chosen.src));
         bump();
-      });
+      }, getLayerName(el));
       return;
     }
     composer.media.selectAssets(asset ? [asset.id] : []);
