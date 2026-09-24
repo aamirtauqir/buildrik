@@ -24,10 +24,12 @@ import {
   MODAL_FOOT_CLASS,
 } from "./Modal";
 
-export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
+export type ModalSize = "sm" | "prompt" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
 
 const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   sm: "tw:w-[360px]",
+  /* The publish gate prompts (4418:120066 / 5931:44782) are 520 wide. */
+  prompt: "tw:w-[520px]",
   /* width/dialog-md — the v3 dialog boards (7564:185450 and siblings) draw
      560; the 520 / 500 / 440 widths came from the archived page. */
   md: "tw:w-[var(--bk-size-dialog-md)]",
