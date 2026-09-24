@@ -56,6 +56,10 @@ const ClearXSvg = () => (
 );
 
 /* Board 163:113's preview band — accent tint, actions inline with the title. */
+const MATCH_BAND =
+  "tw:flex tw:items-center tw:justify-between tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const MATCH_CLEAR =
+  "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)]";
 const PREVIEW_BAND =
   "tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-3 tw:bg-[var(--bk-accent-tint)] tw:px-4";
 const PREVIEW_TITLE = "tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
@@ -145,6 +149,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
      Time-Travel" band. Both capabilities stay, behind the panel ⋯ (owner rule:
      parity never silently removes one; designer note logged). */
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [matchCount, setMatchCount] = React.useState<{ shown: number; total: number } | null>(null);
+  const handleMatchCount = React.useCallback((shown: number, total: number) => setMatchCount({ shown, total }), []);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [confirmClear, setConfirmClear] = React.useState(false);
 
@@ -296,7 +302,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             </span>
             <TextField
               className="search-input"
-              type="search"
+              type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={SEARCH_PLACEHOLDER[activeView]}
@@ -368,6 +374,26 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </>
         )}
 
+        {/* Board 4418:165744 — the result count and "Clear search" as a
+            full-bleed band above the approval band. */}
+        {activeView === "saves" && searchQuery.trim() && matchCount ? (
+          <div className={MATCH_BAND} role="status" data-testid="history-search-count">
+            <span>
+              {matchCount.shown} of {matchCount.total} match '{searchQuery.trim()}'
+            </span>
+            <Button
+              color="light"
+              size="xs"
+              className={MATCH_CLEAR}
+              onClick={() => {
+                setSearchQuery("");
+                setSearchOpen(false);
+              }}
+            >
+              Clear search
+            </Button>
+          </div>
+        ) : null}
         {(activeView === "session" || activeView === "saves") && savesSettled && (
           <SavesApproval composer={composer} />
         )}
@@ -401,7 +427,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 onEdit={editMilestone}
               />
             )}
-            <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
+            <VersionHistoryPanel
+              composer={composer}
+              searchQuery={searchQuery}
+              onMatchCount={handleMatchCount}
+            />
           </>
         )}
 

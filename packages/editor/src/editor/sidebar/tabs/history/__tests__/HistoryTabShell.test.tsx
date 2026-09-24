@@ -18,7 +18,10 @@ import * as React from "react";
 
 // Mock the heavy panels/hooks so this test focuses on shell behavior.
 vi.mock("../../../../panels/VersionHistoryPanel", () => ({
-  VersionHistoryPanel: () => <div data-testid="saves-panel">SAVES</div>,
+  VersionHistoryPanel: ({ onMatchCount }: { onMatchCount?: (shown: number, total: number) => void }) => {
+    React.useEffect(() => onMatchCount?.(1, 4), [onMatchCount]);
+    return <div data-testid="saves-panel">SAVES</div>;
+  },
 }));
 
 vi.mock("../components/ActivityView", () => ({
@@ -183,6 +186,16 @@ describe("HistoryTab shell", () => {
     expect(container.querySelector(".search-bar")).toBeTruthy();
     expect(container.querySelector(".search-input")).toBeTruthy();
     expect(container.querySelector(".search-icon")).toBeTruthy();
+  });
+
+  it("board 4418:165744 — a Saves search shows 'N of M match' with Clear search", () => {
+    const { container } = renderTab();
+    fireEvent.click(screen.getByRole("tab", { name: /Saves/ }));
+    openMenuItem(/^Search /);
+    fireEvent.change(container.querySelector(".search-input input, input.search-input")!, { target: { value: "milestone" } });
+    expect(screen.getByTestId("history-search-count")).toHaveTextContent("1 of 4 match 'milestone'");
+    fireEvent.click(screen.getByTestId("history-search-count").querySelector("button")!);
+    expect(screen.queryByTestId("history-search-count")).toBeNull();
   });
 
   it("hides the search bar on Published, which takes no query", () => {

@@ -99,9 +99,13 @@ const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 export function VersionHistoryPanel({
   composer,
   searchQuery = "",
+  onMatchCount,
 }: {
   composer: Composer | null;
   searchQuery?: string;
+  /** Board 4418:165744's "1 of 4 match" band is drawn by the tab, above the
+   *  approval band; the counts live here. */
+  onMatchCount?: (shown: number, total: number) => void;
 }) {
   const {
     versions,
@@ -259,6 +263,9 @@ export function VersionHistoryPanel({
     const query = searchQuery.toLowerCase();
     return kept.filter((v) => v.name.toLowerCase().includes(query));
   }, [versions, searchQuery, savesFilter]);
+  React.useEffect(() => {
+    onMatchCount?.(filteredVersions.length, versions.length);
+  }, [onMatchCount, filteredVersions.length, versions.length]);
 
   /* Board 162:2 puts a change count on every row. It is derived, not stored:
      the undo stack is the same source the board's sibling view (Saves ·
