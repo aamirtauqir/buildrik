@@ -37,6 +37,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -289,6 +290,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      the way it did (openLeftPanelToTab / ui:switch-tab); only where they
      render moved. ✕ closes the panel and the inspector returns. */
   const rightColumnTab = !readOnlyView && isLeftPanelOpen && RIGHT_COLUMN_TABS.has(activeTabId);
+  useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
 
   /* The site menu's Unpublish emits UI_UNPUBLISH_REQUEST in the same gesture
      that opens the Publish panel, before PublishTab has subscribed. This
