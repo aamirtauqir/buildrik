@@ -47,6 +47,10 @@ export interface ComponentDefinition {
    *  true, future engine arc may convert raw style values into token/preset
    *  bindings on save. UI today just records the user's intent. */
   prefillFromDs?: boolean;
+  /** Scope (board 6971:77663): absent/null = "This site"; a page id = "This
+   *  page" — listed and insertable only while that page is open, and never
+   *  part of the workspace library. */
+  pageId?: string | null;
 }
 
 // ============================================
