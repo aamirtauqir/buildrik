@@ -10,7 +10,7 @@
  * with Portfolio, and Page 1 came back as Portfolio.
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import { within, render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 /* Same boundary the other TemplatesTab suites stub: the panel calls useToast
@@ -72,6 +72,8 @@ describe("Templates — add as new page", () => {
     fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
     /* The card opens the preview (decision #24); Create page is the new-page route. */
     fireEvent.click(await screen.findByText("Create page"));
+    // 4418:54243 — the confirm first.
+    fireEvent.click(within(await screen.findByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
 
     await waitFor(() => expect(calls).toContain("import"), { timeout: 5000 });
 
