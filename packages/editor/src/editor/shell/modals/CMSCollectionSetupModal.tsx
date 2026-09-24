@@ -20,6 +20,7 @@
 
 import { Trash2, Check } from "lucide-react";
 import * as React from "react";
+import { EVENTS } from "@/shared/constants/events";
 import { Button, ModalBody, ModalContent, ModalRoot, ModalTitle, Select, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import { slugify } from "@shared/utils/helpers/string";
 import type { CMSFieldType } from "@/shared/types/cms";
@@ -110,9 +111,6 @@ const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[length:var(--bk-text-
 const BOARD_LINK = "tw:min-h-6 tw:text-[length:var(--bk-text-11)] tw:font-medium";
 const BOARD_BLOCK =
   "tw:flex tw:flex-col tw:gap-1.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-2";
-const SUCCESS_BANNER =
-  "tw:flex tw:items-center tw:gap-2.5 tw:px-3.5 tw:py-3 tw:bg-[var(--bk-success-tint)] " +
-  "tw:border tw:border-green-200 tw:rounded-lg tw:text-[var(--bk-success)] tw:text-[13px] tw:mt-3";
 const ERROR_BANNER =
   "tw:mt-2.5 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 " +
   "tw:rounded-lg tw:text-[var(--bk-error)] tw:text-xs";
@@ -145,7 +143,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   const [removed, setRemoved] = React.useState<{ row: FieldRow; index: number } | null>(null);
   const [genPages, setGenPages] = React.useState(false);
   const [creating, setCreating] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   /* Board 4418:88263 — set when Create met a name that already exists;
      cleared by any edit to the name. */
@@ -160,7 +157,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       setRemoved(null);
       setGenPages(false);
       setCreating(false);
-      setSuccess(false);
       setError(null);
       setClashShown(false);
     }, 300);
@@ -232,8 +228,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       if (genPages && collections.updateCollection) {
         await collections.updateCollection(collection.id, { pageSlugPattern: `/${slugify(finalName) || "collection"}/{slug}` });
       }
-      setSuccess(true);
-      setTimeout(onClose, 1200);
+      /* 6887:72969 / 4418:84646: a created collection opens in the CMS
+         workspace (L4's ui:cms-open), rather than leaving a success line
+         in a closing modal. */
+      onClose();
+      composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: collection.id });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create collection");
     } finally {
@@ -389,12 +388,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             </div>
           )}
           {error && <div className={ERROR_BANNER}>{error}</div>}
-          {success && (
-            <div className={SUCCESS_BANNER}>
-              <Check size={16} />
-              Collection &ldquo;{trimmed}&rdquo; created.
-            </div>
-          )}
           {/* 4418:84646 — the foot sits in the body: no rule above it, and
               buttons at the board's 32, not the modal foot's 28. */}
           <div className={FOOTER} data-testid="cms-setup-foot">
