@@ -319,7 +319,7 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
     fireEvent.click(screen.getByTestId("mgr-asset-menu"));
     fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
     expect(screen.getByTestId("mgr-create-folder")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "New folder" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mgr-create-folder-cancel"));
     expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
     expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
@@ -351,7 +351,7 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
     fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "products" } });
     fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
     expect(createFolder).not.toHaveBeenCalled();
-    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Folder name already exists" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mgr-create-folder-use"));
     expect(createFolder).toHaveBeenCalledWith("Products 2");
   });
