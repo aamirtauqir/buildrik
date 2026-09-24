@@ -62,7 +62,7 @@ export interface RecordsTableProps {
 type SortKey = { key: string; dir: "asc" | "desc" };
 
 /** The field whose value names a record. */
-export function displayFieldOf(collection: CMSCollection): CMSField | undefined {
+function displayFieldOf(collection: CMSCollection): CMSField | undefined {
   return collection.fields.find((f) => f.slug === collection.displayField) ?? collection.fields[0];
 }
 
@@ -74,7 +74,7 @@ export function recordTitle(collection: CMSCollection, record: CMSContentItem): 
 }
 
 /** A value as the table prints it. */
-export function cellText(field: CMSField, value: unknown): string {
+function cellText(field: CMSField, value: unknown): string {
   if (field.type === "boolean") return value ? "Yes" : "No";
   if (value === undefined || value === null) return "";
   if (Array.isArray(value)) return value.join(", ");

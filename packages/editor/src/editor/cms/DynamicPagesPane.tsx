@@ -18,20 +18,13 @@ import type { Composer } from "@/engine";
 import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
+import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
 
 export interface DynamicPagesPaneProps {
   composer: Composer | null;
   collection: CMSCollection;
   records: CMSContentItem[];
 }
-
-const LABEL = "tw:block tw:mb-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
-const CONTROL_W = "tw:w-[360px]";
-const CONTROL =
-  "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
-  "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
-const NOTE = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
-const WARN = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
 
 /** The publish service's slug rule (`applyPattern` in cms.service.ts), for
  *  the preview list only — the server resolves the real URLs. */
@@ -134,7 +127,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
   }
 
   return (
-    <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:px-5 tw:py-4" data-testid="cms-dynamic-pages">
+    <div className={PANE} data-testid="cms-dynamic-pages">
       <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
       <div className={CONTROL_W}>
         <label className={LABEL} htmlFor="cms-dp-pattern">URL pattern</label>
@@ -162,7 +155,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
       <div>{status}</div>
       {urls.length ? (
         <section className={CONTROL_W}>
-          <h3 className="tw:m-0 tw:mb-2 tw:text-[11px] tw:font-medium tw:uppercase tw:leading-4 tw:tracking-[0.88px] tw:text-[var(--bk-gray-500)]">
+          <h3 className={`${SECTION} tw:mb-2`}>
             Pages to generate · {urls.length}
           </h3>
           <ul className="tw:m-0 tw:list-none tw:rounded-[6px] tw:border tw:border-[var(--bk-border)] tw:p-0 tw:py-1" data-testid="cms-dp-list">
@@ -178,7 +171,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
       <div>
         <Button
           size="xs"
-          className="tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]"
+          className={ACTION}
           disabled={!(dirty || ready) || saving || unknown.length > 0}
           data-testid="cms-dp-save"
           onClick={() => void save()}
