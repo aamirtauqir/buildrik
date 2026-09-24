@@ -616,7 +616,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
-              showFooterToolbar={!readOnlyView}
+              showFooterToolbar={!readOnlyView || viewerChrome}
               readOnly={readOnlyView}
               composer={composer}
               device={device}

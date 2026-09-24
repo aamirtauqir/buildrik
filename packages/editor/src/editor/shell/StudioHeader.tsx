@@ -739,8 +739,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // the bar renders exactly what it receives. View mode is itself a preview,
   // so it gets Comments only.
   const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
+  /* A workspace VIEWER is always in view mode, and board 4418:126059 keeps
+     their topbar: Preview works, Publish is there but disabled with the role
+     it needs. An owner's own view mode stays the bare preview bar. */
+  const isViewer = viewMode.readOnlyView && editorRole === "VIEWER";
   const tools = viewMode.readOnlyView
-    ? { commentsPressed: commentsOn, onToggleComments: toggleComments }
+    ? {
+        commentsPressed: commentsOn,
+        onToggleComments: toggleComments,
+        ...(isViewer ? { onPreview: handlePreview, previewBusy: previewLoading } : {}),
+      }
     : {
         onPreview: handlePreview,
         previewBusy: previewLoading,
@@ -841,10 +849,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
            nothing waiting. The CTA is withheld there rather than showing a
            Publish that would do nothing; the live chip below carries the
            status that used to be implied by the button's presence. */
-        publish={viewMode.readOnlyView || !nextMove ? "hidden" : publish}
+        publish={isViewer ? "disabled" : viewMode.readOnlyView || !nextMove ? "hidden" : publish}
         publishBusy={publishLoading}
+        /* A viewer's reason is the lifecycle's own ("Viewers can't publish —
+           ask an editor"); in view mode it rides the disabled CTA. */
         publishBlockedReason={nextMove?.blockedReason ?? undefined}
-        ctaLabel={nextMove?.label}
+        ctaLabel={isViewer ? nextMove?.label ?? "Publish" : nextMove?.label}
         ctaHint={nextMove?.hint}
         onPublish={handleCtaClick}
         /* SendForReview used to render ONLY in view mode, from when

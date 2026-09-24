@@ -20,11 +20,9 @@ export {
 // Command constants
 export {
   COMMANDS,
-  SHORTCUTS,
   type CommandId,
   type CommandCategory,
   isValidCommand,
-  getShortcut,
 } from "./commands";
 
 // Configuration constants
@@ -35,12 +33,9 @@ export {
   THRESHOLDS,
   DEFAULTS,
   API,
-  FEATURES,
   type DataAttribute,
   type MimeType,
   type StorageKey,
-  type FeatureFlag,
-  isFeatureEnabled,
 } from "./config";
 
 // Canvas constants

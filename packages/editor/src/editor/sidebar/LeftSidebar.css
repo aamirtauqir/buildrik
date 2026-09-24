@@ -71,20 +71,6 @@
 }
 
 /* ─────────────────────────────────────────────
-   LOGO — 40px centered icon
-   ───────────────────────────────────────────── */
-.ls-logo {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--bk-accent);
-  margin-bottom: 2px;
-}
-
-/* ─────────────────────────────────────────────
    DIVIDER — 24px hairline between zones
    ───────────────────────────────────────────── */
 .ls-divider {
@@ -214,20 +200,6 @@
 .ls-btn--last:hover {
   background: var(--bk-bg-subtle);
   color: var(--bk-ink);
-}
-
-/* ─────────────────────────────────────────────
-   DIRTY DOT — orange indicator when tab has unsaved changes
-   ───────────────────────────────────────────── */
-.ls-btn__dirty-dot {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-warning, #F59E0B);
-  pointer-events: none;
 }
 
 /* ─────────────────────────────────────────────

@@ -7,7 +7,6 @@
  */
 
 // Re-export everything from split modules
-export { simulateColorBlindness, type ColorBlindnessType } from "./colorBlindness";
 export {
   getLuminance,
   getContrastRatio,

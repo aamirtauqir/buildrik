@@ -21,8 +21,6 @@ vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => fa
 
 vi.mock("../../../shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({
-    railMode: "figma",
-    fourToolRail: false,
     readOnlyView: false,
   })),
 }));
@@ -150,8 +148,6 @@ function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProp
 
 function setViewMode(partial: Partial<ReturnType<typeof getEditorViewMode>>) {
   vi.mocked(getEditorViewMode).mockReturnValue({
-    railMode: "figma",
-    fourToolRail: false,
     readOnlyView: false,
     ...partial,
   });
@@ -468,6 +464,27 @@ describe("StudioHeader", () => {
     /* Was: a viewer in view mode sees a disabled "Send for review". There is
        no send control in view mode at all now, for any role — the viewer
        gating that matters moved with the control, to the Review panel. */
+    /* Board 4418:126059: a viewer (always in view mode) keeps the topbar —
+       Preview works, Publish is drawn disabled with its reason. */
+    it("a viewer in view mode keeps Preview and a disabled Publish with its reason", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      setViewMode({ readOnlyView: true });
+      roleState.role = "VIEWER";
+      render(<StudioHeader {...makeProps()} />);
+      expect(screen.getByRole("button", { name: /Preview/ })).toBeInTheDocument();
+      const btn = screen.getByRole("button", { name: "Publish" });
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
+    });
+
+    it("an owner's own view mode stays the bare preview bar", () => {
+      setViewMode({ readOnlyView: true });
+      roleState.role = "OWNER";
+      render(<StudioHeader {...makeProps()} />);
+      expect(screen.queryByRole("button", { name: "Publish" })).toBeNull();
+    });
+
     it("a viewer in view mode is offered no send control at all", () => {
       setViewMode({ readOnlyView: true });
       roleState.role = "VIEWER";
