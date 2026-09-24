@@ -28,18 +28,18 @@ export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "confirm
 
 const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   sm: "tw:w-[360px]",
-  /* Board 1172:4840 (Brand review) draws its dialog at 520. */
-  md: "tw:w-[520px]",
-  /* 1170:4713 collection fields. */
-  fields: "tw:w-[500px]",
+  /* width/dialog-md — the v3 dialog boards (7564:185450 and siblings) draw
+     560; the 520 / 500 / 440 widths came from the archived page. */
+  md: "tw:w-[var(--bk-size-dialog-md)]",
+  fields: "tw:w-[var(--bk-size-dialog-md)]",
   /* 1170:4749 records table, 1164:4713 media picker. */
-  table: "tw:w-[640px]",
-  question: "tw:w-[440px]",
+  table: "tw:w-[var(--bk-size-dialog-lg)]",
+  question: "tw:w-[var(--bk-size-dialog-md)]",
   /* 7574:193972 (Publish · confirm, v3 IA) draws its dialog at 480. */
-  confirm: "tw:w-[480px]",
-  form: "tw:w-[560px]",
+  confirm: "tw:w-[var(--bk-size-dialog-sm)]",
+  form: "tw:w-[var(--bk-size-dialog-md)]",
   lg: "tw:w-[720px]",
-  xl: "tw:w-[960px]",
+  xl: "tw:w-[var(--bk-size-dialog-xl)]",
 };
 
 /** Lets ModalClose inherit the root's close without per-consumer wiring. */
@@ -95,18 +95,18 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   ModalTitle carries the padding the compound form has no header wrapper for.
 
   `Modal` (the all-in-one) puts its title inside MODAL_HEAD_CLASS, which is
-  where its pt-5/px-5/pb-3 comes from. The compound form has no such wrapper,
+  where its pt-6/px-6/pb-4 comes from. The compound form has no such wrapper,
   so its title had NO padding at all — measured live at x=0 while the body
   beside it was inset 20, which read as "eate Collection". And an unpadded
   title row is only 24px tall, so the body under it began at y=24, beneath the
   close button floating at y=12..44 — in the CMS collection modal the close put
   itself on top of the "Fields" step label.
 
-  pl-5 matches the body inset; pr-12 clears the 32px close at right-3. Left and
-  right are separate classes rather than `px-5 pr-12` because two classes on
+  pl-6 matches the body inset; pr-12 clears the 32px close at right-3. Left and
+  right are separate classes rather than `px-6 pr-12` because two classes on
   one property resolve by stylesheet order, not by writing order.
 */
-const MODAL_TITLE_HEAD_CLASS = "tw:pl-5 tw:pr-12 tw:pt-4 tw:pb-3";
+const MODAL_TITLE_HEAD_CLASS = "tw:pl-6 tw:pr-12 tw:pt-6 tw:pb-4";
 
 export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   /**
@@ -136,7 +136,7 @@ export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
 
   `MODAL_SUBTITLE_CLASS` is `text-xs text-gray-500` and nothing else. The
   all-in-one `Modal` is fine — it renders that class inside MODAL_HEAD_CLASS,
-  which brings the px-5. The compound part has no wrapper, so its subtitle sat
+  which brings the px-6. The compound part has no wrapper, so its subtitle sat
   at the modal's left edge while the padded title above it and the body below
   it were both inset 20px. Measured on board 1168:4732 at 1440x900: the title
   starts at x=520 and "These will ship to every visitor exactly as they are
@@ -147,7 +147,7 @@ export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   relied on. No pr-12 here — unlike the title, the description sits below the
   close button and does not need to clear it.
 */
-const MODAL_DESC_INSET_CLASS = "tw:px-5";
+const MODAL_DESC_INSET_CLASS = "tw:px-6";
 
 export interface ModalDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
   /** Set false when the caller already wraps it in its own padded header. */

@@ -27,7 +27,10 @@ describe("ConfirmFolderDeleteModal", () => {
     render(
       <ConfirmFolderDeleteModal payload={payload()} onConfirm={vi.fn()} onCancel={vi.fn()} />
     );
-    expect(screen.getByText('Delete "Heroes"?')).toBeInTheDocument();
+    // Board B1-12 (7564:185450): curly quotes, a body line, a BLUE Delete.
+    expect(screen.getByText("Delete “Heroes”?")).toBeInTheDocument();
+    expect(screen.getByText("The folder is empty. Deleting it does not touch any file in the library.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^delete$/i }).className).toContain("tw:bg-[var(--bk-accent)]");
     expect(screen.queryByText(/isn't empty/i)).not.toBeInTheDocument();
     // Move files… must NOT appear for empty folders — no files to move.
     expect(screen.queryByRole("button", { name: /move files/i })).not.toBeInTheDocument();
