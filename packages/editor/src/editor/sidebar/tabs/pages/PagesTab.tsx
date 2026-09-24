@@ -220,7 +220,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const handleReplaceLayout = React.useCallback(
     (pageId: string) => {
       p.selectPage(pageId);
-      composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, {});
+      /* 4428:149355: the catalogue opens in replace mode for that page. */
+      composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true });
     },
     [p, composer],
   );

@@ -116,7 +116,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
   /* #19 follow-up: the New-page modal's name reaches the catalogue's Create page. */
   it("Create page uses the name the New-page modal carried", async () => {
     const composer = makeComposer();
-    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" />);
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Our menu" }} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
@@ -129,7 +129,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
      once the page exists. */
   it("the carried 'Add to site navigation' links the created page into the navs", async () => {
     const composer = makeComposer();
-    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" addToNavigation />);
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Our menu", addToNavigation: true }} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));

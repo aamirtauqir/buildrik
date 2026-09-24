@@ -19,6 +19,7 @@ import {
   snapshotEdits,
   sourceFormatOf,
   statusLine,
+  previewInfo,
   validateResize,
 } from "../imageEdits";
 
@@ -153,5 +154,24 @@ describe("isDraftDirty + savingsPercent", () => {
     expect(savingsPercent(840_000, 492_000)).toBe(-41);
     expect(savingsPercent(100, 130)).toBe(30);
     expect(savingsPercent(0, 10)).toBeNull();
+  });
+});
+
+describe("previewInfo — 4418:149321's info block", () => {
+  it("reads Crop / Preset / Format and the tone lines, Original when the format is kept", () => {
+    expect(previewInfo(INITIAL_DRAFT, "webp")).toEqual([
+      "Crop: Free",
+      "Preset: None",
+      "Format: Original",
+      "Brightness: 0 · Contrast: 0",
+      "Saturation: 0 · Blur: 0",
+    ]);
+    expect(previewInfo({ ...INITIAL_DRAFT, aspect: "16:9", preset: "bw", brightness: 12 }, "jpeg")).toEqual([
+      "Crop: 16:9",
+      "Preset: B&W",
+      "Format: WebP",
+      "Brightness: 12 · Contrast: 0",
+      "Saturation: 0 · Blur: 0",
+    ]);
   });
 });

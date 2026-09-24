@@ -14,8 +14,7 @@
  */
 
 import * as React from "react";
-import { RotateCcw, RotateCw } from "lucide-react";
-import { Button, Slider, TextInput } from "@/editor/chrome-ui";
+import { Button, Select, Slider, TextInput } from "@/editor/chrome-ui";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { LIBRARY_MODAL_BTN_PRIMARY } from "../components/libraryModal";
 import {
@@ -25,9 +24,9 @@ import {
   FORMAT_CHIPS,
   PRESET_CHIPS,
   QUALITY_MIN,
-  ROTATION_RANGE,
+  ROTATION_OPTIONS,
   SCALE_CHIPS,
-  ZOOM_MAX,
+  ZOOM_OPTIONS,
   outputSize,
   savingsPercent,
   validateResize,
@@ -44,6 +43,12 @@ export interface TabProps {
 
 const LABEL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink)]";
 const HINT = "tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const HEADING = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
+/* 4418:149321 "Crop ratio" pills: 24 tall, full radius; the current one on
+   the accent, the rest white on a hairline. */
+const RATIO_BASE = "tw:h-6 tw:min-h-0 tw:rounded-full tw:px-2.5 tw:py-0 tw:text-[length:var(--bk-text-11)] tw:font-medium";
+const RATIO_ON = `${RATIO_BASE} tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]`;
+const RATIO_OFF = `${RATIO_BASE} tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 const MONO_VALUE =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
 
@@ -109,100 +114,104 @@ function SliderRow({
 
 // ── Crop ────────────────────────────────────────────────────────────────────
 
-/** ↺ / ↻ step by 90 and wrap so the slider's ±180 always has the angle. */
-const turn = (rotation: number, by: number) => {
-  const next = rotation + by;
-  if (next > ROTATION_RANGE) return next - 360;
-  if (next < -ROTATION_RANGE) return next + 360;
-  return next;
-};
+/** A dropdown row of 4418:149321's crop panel: label over a full-width select. */
+function SelectRow({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  options: ReadonlyArray<{ value: string; label: string }>;
+  onChange(v: string): void;
+}) {
+  return (
+    <label className="tw:flex tw:flex-col tw:gap-1.5" htmlFor={id}>
+      <span className={LABEL}>{label}</span>
+      <Select id={id} data-testid={id} sizing="sm" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </Select>
+    </label>
+  );
+}
+
+/** A value the list does not hold (a wheel zoom, an old draft's angle) is
+ *  still shown — the select never lies about the draft. */
+const withCurrent = (list: readonly number[], current: number) =>
+  list.includes(current) ? list : [current, ...list];
+
+/* 4418:149321 draws four ratio chips under the dropdowns; 3:2 stays in the
+   Aspect ratio list. */
+const RATIO_CHIPS = ASPECT_CHIPS.filter((a) => a.id !== "3:2");
 
 export function CropControls({ draft, patch }: TabProps) {
   return (
     <>
+      <h3 className={HEADING} data-testid="image-editor-crop-heading">
+        Crop image
+      </h3>
+      <SelectRow
+        id="image-editor-aspect-select"
+        label="Aspect ratio"
+        value={draft.aspect}
+        options={ASPECT_CHIPS.map((a) => ({ value: a.id, label: a.label }))}
+        onChange={(v) => patch({ aspect: v as ImageDraft["aspect"] })}
+      />
+      <SelectRow
+        id="image-editor-rotate-select"
+        label="Rotation"
+        value={String(draft.rotation)}
+        options={withCurrent(ROTATION_OPTIONS, draft.rotation).map((r) => ({ value: String(r), label: `${r}°` }))}
+        onChange={(v) => patch({ rotation: Number(v) })}
+      />
+      <div className="tw:flex tw:gap-2" role="group" aria-label="Flip">
+        <Chip
+          on={draft.flipH}
+          className="tw:flex-1"
+          data-testid="image-editor-flip-h"
+          onClick={() => patch({ flipH: !draft.flipH })}
+        >
+          Flip H
+        </Chip>
+        <Chip
+          on={draft.flipV}
+          className="tw:flex-1"
+          data-testid="image-editor-flip-v"
+          onClick={() => patch({ flipV: !draft.flipV })}
+        >
+          Flip V
+        </Chip>
+      </div>
+      <SelectRow
+        id="image-editor-zoom-select"
+        label="Zoom"
+        value={String(draft.zoom)}
+        options={withCurrent(ZOOM_OPTIONS, draft.zoom).map((z) => ({ value: String(z), label: `${Math.round(z * 100)}%` }))}
+        onChange={(v) => patch({ zoom: Number(v) })}
+      />
       <div className="tw:flex tw:flex-col tw:gap-2">
-        <span className={LABEL}>Aspect ratio</span>
-        <div className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-label="Aspect ratio">
-          {ASPECT_CHIPS.map((a) => (
-            <Chip
+        <span className={LABEL}>Crop ratio</span>
+        <div className="tw:flex tw:flex-wrap tw:gap-1.5" role="group" aria-label="Crop ratio">
+          {RATIO_CHIPS.map((a) => (
+            <Button
               key={a.id}
-              on={draft.aspect === a.id}
+              size="xs"
+              aria-pressed={draft.aspect === a.id}
+              className={draft.aspect === a.id ? RATIO_ON : RATIO_OFF}
               data-testid={`image-editor-aspect-${a.id.replace(":", "-")}`}
               onClick={() => patch({ aspect: a.id })}
             >
               {a.label}
-            </Chip>
+            </Button>
           ))}
         </div>
-      </div>
-      <SliderRow
-        id="image-editor-rotate"
-        label="Rotation"
-        value={draft.rotation}
-        display={`${draft.rotation}°`}
-        min={-ROTATION_RANGE}
-        max={ROTATION_RANGE}
-        onChange={(rotation) => patch({ rotation })}
-      />
-      <div className="tw:flex tw:gap-2">
-        <Button
-          size="xs"
-          variant="secondary"
-          className={`${CHIP_OFF} tw:flex-1 tw:gap-1.5`}
-          aria-label="Rotate left 90°"
-          data-testid="image-editor-rotate-ccw"
-          onClick={() => patch({ rotation: turn(draft.rotation, -90) })}
-        >
-          <RotateCcw size={14} aria-hidden="true" />
-          90°
-        </Button>
-        <Button
-          size="xs"
-          variant="secondary"
-          className={`${CHIP_OFF} tw:flex-1 tw:gap-1.5`}
-          aria-label="Rotate right 90°"
-          data-testid="image-editor-rotate-cw"
-          onClick={() => patch({ rotation: turn(draft.rotation, 90) })}
-        >
-          <RotateCw size={14} aria-hidden="true" />
-          90°
-        </Button>
-      </div>
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <span className={LABEL}>Flip</span>
-        <div className="tw:flex tw:gap-2" role="group" aria-label="Flip">
-          <Chip
-            on={draft.flipH}
-            className="tw:flex-1"
-            data-testid="image-editor-flip-h"
-            onClick={() => patch({ flipH: !draft.flipH })}
-          >
-            Horizontal
-          </Chip>
-          <Chip
-            on={draft.flipV}
-            className="tw:flex-1"
-            data-testid="image-editor-flip-v"
-            onClick={() => patch({ flipV: !draft.flipV })}
-          >
-            Vertical
-          </Chip>
-        </div>
-      </div>
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
-        <SliderRow
-          id="image-editor-zoom"
-          label="Zoom"
-          value={draft.zoom}
-          display={`${Math.round(draft.zoom * 100)}%`}
-          min={1}
-          max={ZOOM_MAX}
-          step={0.05}
-          onChange={(zoom) => patch({ zoom })}
-        />
-        <p className={HINT} data-testid="image-editor-zoom-hint">
-          Drag the image in the preview to reposition.
-        </p>
       </div>
     </>
   );

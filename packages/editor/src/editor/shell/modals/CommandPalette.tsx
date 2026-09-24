@@ -25,6 +25,8 @@ import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 // =============================================================================
 // TYPES
@@ -53,7 +55,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Pages", "Navigate", "Edit", "View", "Add", "Tools", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -189,7 +191,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       id: "templates-replace-layout",
       label: "Replace layout with template…",
       group: "Tools",
-      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})),
+      /* 4428:149355: the catalogue opens in replace mode for the active page. */
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })),
     },
     { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
     {
@@ -233,6 +236,19 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
         const siteId = getSiteIdFromUrl();
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
       }),
+    });
+  }
+
+  /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws
+     none); the owner kept the capability, so a template answers a query here
+     and opens on its preview. Searchable only, never in the opening list. */
+  for (const t of [...PAGE_TEMPLATES, ...getMyTemplates()]) {
+    commands.push({
+      id: `template-${t.id}`,
+      label: t.name,
+      group: "Templates",
+      keywords: ["template"],
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { previewId: t.id })),
     });
   }
 
@@ -307,8 +323,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
     if (cmd.disabled) return;
+    recordCommandRun(cmd.id.replace(/^recent-/, ""));
     cmd.handler();
   }, []);
+
+  /* RECENT (S3.14, restored off-board — the owner's "never silently remove a
+     capability"; 4418:141220 draws no strip, logged in the designer notes):
+     the last five rows you ran, above the board's bands, on the empty query
+     only. A copy of the live row, so its guard reflects this open. */
+  const recentCommands = React.useMemo(() => {
+    const byId = new Map(commands.map((c) => [c.id, c]));
+    return getRecentCommandIds().flatMap((id) => {
+      const cmd = byId.get(id);
+      if (!cmd) return [];
+      const isDoor = cmd.group === "Navigate" || cmd.group === "Pages";
+      return [{ ...cmd, id: `recent-${cmd.id}`, group: "Recent", shortcut: isDoor ? undefined : cmd.shortcut }];
+    });
+  }, [commands]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
@@ -317,11 +348,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return commands.filter((c) => OPENING_BANDS.has(c.group));
+    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
     return commands.filter((cmd) =>
       [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
-  }, [commands, query]);
+  }, [commands, recentCommands, query]);
 
   // A query that matches nothing is never a dead end: AI, or stock photos.
   const askAI = React.useCallback(() => {

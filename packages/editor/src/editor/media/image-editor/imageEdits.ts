@@ -54,8 +54,6 @@ export const SCALE_CHIPS = [25, 50, 75, 100] as const;
 /* Slider ranges. Zoom tops out at 200%: board 3707:20536 draws 150% at the
    middle of the track. Rotation is the full turn either way; ↺ / ↻ step it
    by 90 and wrap. */
-export const ZOOM_MAX = 2;
-export const ROTATION_RANGE = 180;
 export const ADJUST_RANGE = 100;
 export const BLUR_MAX = 20;
 export const QUALITY_MIN = 10;
@@ -177,6 +175,24 @@ export function statusLine(d: ImageDraft, crop: OutputSize): string {
   const out = outputSize(d, crop);
   return `${out.width} × ${out.height} · ${aspectLabel(d)} · ${formatLabel(d.format)}`;
 }
+
+/** 4418:149321's info block under the preview: `Crop: Free` · `Preset: None`
+ *  · `Format: Original` and the two tone lines. */
+export function previewInfo(d: ImageDraft, sourceFormat: OutputFormat | null): string[] {
+  return [
+    `Crop: ${aspectLabel(d)}`,
+    `Preset: ${PRESET_CHIPS.find((p) => p.id === d.preset)?.label ?? d.preset}`,
+    `Format: ${d.format === sourceFormat ? UNTOUCHED : formatLabel(d.format)}`,
+    `Brightness: ${d.brightness} · Contrast: ${d.contrast}`,
+    `Saturation: ${d.saturation} · Blur: ${d.blur}`,
+  ];
+}
+
+/** Rotation dropdown (4418:149321): quarter turns plus 15° steps, so the
+ *  quarter-turn buttons and most of the old ±180 slider live in one list. */
+export const ROTATION_OPTIONS: readonly number[] = [0, 15, 30, 45, 90, 180, -90, -45, -30, -15];
+/** Zoom dropdown (4418:149321); the preview's wheel/pinch still zooms finely. */
+export const ZOOM_OPTIONS: readonly number[] = [1, 1.25, 1.5, 1.75, 2];
 
 /**
  * The source file's format, so a save that keeps it prints "Format: Original".

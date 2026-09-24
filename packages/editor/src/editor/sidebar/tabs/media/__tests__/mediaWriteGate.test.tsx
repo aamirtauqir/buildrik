@@ -120,7 +120,7 @@ describe("FolderTree — view only", () => {
         counts={{ all: 0, img: 0, vid: 0, ico: 0, fnt: 0 }}
         smartFolder={null} setSmartFolder={vi.fn()} recentCount={0} inUseCount={0} unusedCount={0}
         allTags={[]} tagFilter={null} setTagFilter={vi.fn()} folderCounts={new Map()}
-        onNewFolder={onNewFolder} deleteFolder={deleteFolder} onTrashClick={vi.fn()}
+        onNewFolder={onNewFolder} deleteFolder={deleteFolder}
       />,
     );
     return { onNewFolder, deleteFolder };
@@ -210,6 +210,7 @@ describe("AssetDetailsPanel — view only", () => {
 
   it("Rename and Delete stay on show, aria-disabled, and run nothing", () => {
     const { onOpenRename, onRequestDelete } = mount();
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
     const rename = screen.getByTestId("mgr-det-rename");
     const del = screen.getByTestId("mgr-det-delete");
     expect(rename).toHaveAttribute("aria-disabled", "true");
@@ -223,7 +224,8 @@ describe("AssetDetailsPanel — view only", () => {
   it("an EDITOR's Rename opens the rename overlay", () => {
     role = "EDITOR";
     const { onOpenRename } = mount();
-    fireEvent.click(screen.getByRole("button", { name: "Rename" }));
+    fireEvent.click(screen.getByTestId("mgr-det-more"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Rename" }));
     expect(onOpenRename).toHaveBeenCalledTimes(1);
   });
 });

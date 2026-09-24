@@ -284,16 +284,6 @@
 
 .mgr-node.active .mgr-node-ico { color: var(--bk-accent); }
 
-/* 1160:44 / 1160:45 — tag chips: a pill row on a 6 gap. The chip itself is
-   `tw:` utilities on its Button (FolderTree.tsx), since a single-class rule
-   here never displaced flowbite's own height. */
-.mgr-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 0 var(--bk-space-8);
-}
-
 .mgr-node .mgr-node-name {
   flex: 1;
   overflow: hidden;
@@ -825,6 +815,12 @@
   flex: 1 1 0;
   width: auto;
 }
+/* 4418:58292 — the ⋯ beside Edit image is a square of the row's height. */
+.mgr-det-actions-row .mgr-btn-more {
+  flex: none;
+  width: var(--bk-size-row);
+  padding: 0;
+}
 
 .mgr-det-actions .mgr-btn:disabled {
   color: var(--bk-ink-disabled);
@@ -1190,3 +1186,39 @@
   cursor: pointer;
   flex-shrink: 0;
 }
+
+/* 4418:58292 ALT TEXT, written: a grey box (8 inset, radius 6) holding the
+   text and a row of "✨ AI" (accent tint pill) + Regenerate (accent link). */
+.mgr-alt-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--bk-space-8);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-bg-subtle);
+}
+.mgr-alt-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--bk-accent-subtle);
+  font: 500 var(--bk-text-11)/14px var(--bk-font-ui);
+  color: var(--bk-accent-text);
+}
+.mgr-alt-box .mgr-alt-regenerate {
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: 400 var(--bk-text-11)/14px var(--bk-font-ui);
+  color: var(--bk-accent-text);
+}
+.mgr-alt-box .mgr-alt-regenerate:hover { text-decoration: underline; background: transparent; }
+
+/* 4418:58292 — the "Tags ▾" row fills the rail like every other row. */
+.mgr-tags-anchor .mgr-node { flex: 1; }

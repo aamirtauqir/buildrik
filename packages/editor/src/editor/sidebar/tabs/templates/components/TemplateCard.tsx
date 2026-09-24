@@ -8,6 +8,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 import { getSectionCount, type TemplateItem } from "../templatesData";
 
 export interface TemplateCardProps {
@@ -16,6 +17,10 @@ export interface TemplateCardProps {
   isSelected?: boolean;
   /** Most-recently applied to the current page — the APPLIED badge. */
   isApplied?: boolean;
+  /** Replace mode (4428:149355): the card's button acts instead of previewing
+   *  — "Use for <page>" → the replace confirm. The card body still previews. */
+  useLabel?: string;
+  onUse?: (id: string) => void;
 }
 
 /** The thumbnail frame is 226 wide on the board; the page renders at 1200. */
@@ -26,6 +31,8 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   onClick,
   isSelected = false,
   isApplied = false,
+  useLabel,
+  onUse,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -76,9 +83,22 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           </span>
         </div>
       </div>
-      <span className="tpl-card-cta" aria-hidden="true">
-        Preview template →
-      </span>
+      {onUse && useLabel ? (
+        <Button
+          className="tpl-card-cta tpl-card-cta--use"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            onUse(template.id);
+          }}
+          onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+        >
+          {useLabel}
+        </Button>
+      ) : (
+        <span className="tpl-card-cta" aria-hidden="true">
+          Preview template →
+        </span>
+      )}
     </div>
   );
 };
