@@ -240,8 +240,6 @@ export {
   // Accessibility
   getLuminance,
   getContrastRatio,
-  // Color blindness simulation
-  simulateColorBlindness,
   // Gradient parsing
   parseGradient,
   serializeGradient,

@@ -8,6 +8,14 @@ import type { CMSContentItem } from "../../shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding } from "./CMSBindingManager";
 
+/** Canvas keeps the template editable: record 0 renders INTO the real
+ *  children (ids intact, so selection and overlays still find them), later
+ *  records are clones marked `data-cms-repeater-clone`, and a list with no
+ *  records keeps its template. Export renders every record and drops it. */
+export interface CollectionListExpandOptions {
+  canvas?: boolean;
+}
+
 interface RepeaterContext {
   item: CMSContentItem;
   index: number;
@@ -77,6 +85,72 @@ export class RepeaterRenderer {
   }
 
   /**
+   * Expand every Collection list (a `repeat: "children"` binding) in `doc`.
+   * Returns false, having touched nothing, when there is none — so a page
+   * without one serializes exactly as before.
+   */
+  async expandCollectionLists(doc: Document, options: CollectionListExpandOptions = {}): Promise<boolean> {
+    const bindings = this.composer.cms?.bindings;
+    if (!bindings || !this.composer.cms.collections) return false;
+    const lists = bindings.getAllCollectionBindings().filter((b) => b.repeat === "children");
+    if (lists.length === 0) return false;
+    const byId = new Map(lists.map((b) => [b.elementId, b]));
+    const targets = Array.from(doc.querySelectorAll("[data-buildrick-id]")).filter((el) =>
+      byId.has(el.getAttribute("data-buildrick-id")!),
+    ) as HTMLElement[];
+    await Promise.all(
+      targets.map((el) => this.expandChildren(el, byId.get(el.getAttribute("data-buildrick-id")!)!, options)),
+    );
+    return targets.length > 0;
+  }
+
+  private async expandChildren(
+    listEl: HTMLElement,
+    binding: CMSCollectionBinding,
+    { canvas = false }: CollectionListExpandOptions,
+  ): Promise<void> {
+    /* The canvas shows drafts too — the author is building the list before
+       publishing its records; export ships only what the binding's status allows. */
+    const { items } = await this.composer.cms.collections.queryContent({
+      collectionId: binding.collectionId,
+      status: canvas || binding.status === "all" ? undefined : binding.status,
+      limit: binding.limit,
+    });
+    const templates = Array.from(listEl.children) as HTMLElement[];
+    const pristine = templates.map((t) => t.cloneNode(true) as HTMLElement);
+    items.forEach((item, index) => {
+      const context: RepeaterContext = {
+        item,
+        index,
+        total: items.length,
+        isFirst: index === 0,
+        isLast: index === items.length - 1,
+      };
+      const intoTemplate = canvas && index === 0;
+      const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
+      for (const node of nodes) {
+        this.applyContext(node, context, binding, null);
+        if (intoTemplate) continue;
+        if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
+        else this.clearUnresolved(node, binding.itemVar || "item");
+        listEl.appendChild(node);
+      }
+    });
+    if (!canvas) templates.forEach((t) => t.remove());
+  }
+
+  /** A published page never shows `{{item.x}}` for a field the record does
+   *  not have — the canvas keeps it visible so the author can re-aim it. */
+  private clearUnresolved(el: HTMLElement, itemVar: string): void {
+    const pattern = new RegExp(`\\{\\{\\s*${itemVar}\\.[\\w-]+\\s*\\}\\}`, "g");
+    const walker = (el.ownerDocument ?? document).createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.textContent && pattern.test(node.textContent)) node.textContent = node.textContent.replace(pattern, "");
+      pattern.lastIndex = 0;
+    }
+  }
+
+  /**
    * Expand a single repeater element
    */
   private async expandRepeater(
@@ -118,7 +192,7 @@ export class RepeaterRenderer {
 
       // Clone the template element
       const clonedEl = templateEl.cloneNode(true) as HTMLElement;
-      this.applyContext(clonedEl, context, binding, originalId!);
+      this.applyContext(clonedEl, context, binding, `${originalId}-${index}`);
 
       // Add repeater metadata
       clonedEl.setAttribute("data-cms-repeater-item", String(index));
@@ -174,15 +248,15 @@ export class RepeaterRenderer {
     el: HTMLElement,
     context: RepeaterContext,
     binding: CMSCollectionBinding,
-    originalId: string
+    /** The clone root's new id, or null to keep every id (Collection list
+     *  copies share their template's ids — the breakpoint CSS selects on them). */
+    cloneId: string | null
   ): void {
     const { item, index } = context;
     const itemVar = binding.itemVar || "item";
     const indexVar = binding.indexVar || "index";
 
-    // Generate unique ID for this clone
-    const cloneId = `${originalId}-${index}`;
-    el.setAttribute("data-buildrick-id", cloneId);
+    if (cloneId) el.setAttribute("data-buildrick-id", cloneId);
 
     // Process text content in all child elements
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);

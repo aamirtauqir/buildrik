@@ -66,8 +66,8 @@ const CONTAINER_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "interactions",
     "effects",
+    "interactions",
     "visibility",
     // Board 4428:141642: LINK sits between VISIBILITY and CONTENT. Rendered
     // only for LINKABLE_TYPES (section registry gate).
@@ -92,8 +92,8 @@ const TEXT_PROFILE: ElementProfile = {
     "shadow",
     "blur",
     "link",
-    "interactions",
     "effects",
+    "interactions",
     "visibility",
     "content",
     "element-properties",
@@ -113,8 +113,8 @@ const FLEX_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "interactions",
     "effects",
+    "interactions",
     "visibility",
     "content",
     "element-properties",
@@ -136,8 +136,8 @@ const GRID_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "interactions",
     "effects",
+    "interactions",
     "visibility",
     "content",
     "element-properties",
@@ -159,8 +159,8 @@ const MEDIA_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "interactions",
     "effects",
+    "interactions",
     "visibility",
     "content",
     "element-properties",
@@ -180,8 +180,8 @@ const BUTTON_PROFILE: ElementProfile = {
     "opacity",
     "shadow",
     "blur",
-    "interactions",
     "effects",
+    "interactions",
     "link",
     "visibility",
     "content",
@@ -282,6 +282,12 @@ const PROFILES: Record<string, ElementProfile> = {
   countdown: CONTAINER_PROFILE,
   "product-card": CONTAINER_PROFILE,
   "product-grid": CONTAINER_PROFILE,
+  /* G3-079: a container whose CONTENT is its collection — COLLECTION takes
+     the Static / From CMS row's place. */
+  "collection-list": {
+    ...CONTAINER_PROFILE,
+    order: CONTAINER_PROFILE.order.map((id) => (id === "content" ? "collection" : id)),
+  },
   "product-detail": CONTAINER_PROFILE,
 };
 

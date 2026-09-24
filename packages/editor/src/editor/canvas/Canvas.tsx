@@ -80,14 +80,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showBadges = false,
       showGuides = true,
       showGrid = false,
-      // Redesign P2 (sev 3): resting canvas must read as the rendered page, not a
-      // blueprint. Per-element dashed outlines stay OFF by default — the single
-      // ElementHoverOverlay (hover) + selection outline give the affordance, and
-      // X-ray mode (showXRay) is the opt-in for the full-structure view.
-      showOutlines = false,
       showRulers = false,
       showXRay = false,
-      devMode = false,
       showFooterToolbar = true,
       readOnly = false,
       onZoomChange,
@@ -754,7 +748,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             // refactor silently unhooks conformance.
             data-testid="canvas"
             data-device={device}
-            data-show-outlines={showOutlines ? "true" : undefined}
             data-xray-mode={showXRay ? "true" : undefined}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
@@ -831,7 +824,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}
-            devMode={devMode}
             isDragOver={isDragOver}
             dropTargetId={dropTargetId}
             dropPosition={dropPosition}

@@ -7,6 +7,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants";
+import { inPageScope } from "@/engine/components/ComponentManager";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { takePendingMaster } from "./openMasterRequest";
 
@@ -93,7 +94,9 @@ export function useComponentsState({
 
     const loadComponents = () => {
       try {
-        const allComponents = composer.components?.getAllComponents() ?? [];
+        // G2-118: masters in scope on the open page (site-wide + "This page").
+        const pageId = composer.elements.getActivePage()?.id;
+        const allComponents = (composer.components?.getAllComponents() ?? []).filter((c) => inPageScope(c, pageId));
         setComponents(allComponents);
         setIsLoaded(true);
         setError(null);
@@ -106,9 +109,11 @@ export function useComponentsState({
 
     const handleUpdate = () => loadComponents();
     composer.on(EVENTS.COMPONENT_LIST_UPDATED, handleUpdate);
+    composer.on(EVENTS.PAGE_CHANGED, handleUpdate);
 
     return () => {
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, handleUpdate);
+      composer.off(EVENTS.PAGE_CHANGED, handleUpdate);
     };
   }, [composer]);
 

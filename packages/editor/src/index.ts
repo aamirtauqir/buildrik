@@ -51,7 +51,6 @@ export type {
   StorageConfig,
   ProjectConfig,
   CanvasConfig,
-  ThemeConfig,
   PluginConfig,
   ProjectData,
   PageData,

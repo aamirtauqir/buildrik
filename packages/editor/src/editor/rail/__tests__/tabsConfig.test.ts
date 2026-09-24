@@ -3,7 +3,6 @@ import {
   GROUPED_TABS_CONFIG,
   getTabMode,
   getTabConfig,
-  getTabsByZone,
 } from "../tabsConfig";
 // ONE width for every panel (founder-approved 2026-07-24). These assertions
 // used to hardcode 280, which is how the superseded two-width rule survived
@@ -42,33 +41,6 @@ describe("tabsConfig helpers", () => {
 
     it("returns undefined for invalid tab", () => {
       expect(getTabConfig("nonexistent" as any)).toBeUndefined();
-    });
-  });
-
-  describe("getTabsByZone", () => {
-    it("returns creation zone tabs", () => {
-      const tabs = getTabsByZone("creation");
-      const ids = tabs.map((t) => t.id);
-      expect(ids).toContain("add");
-      expect(ids).toContain("templates");
-      expect(ids).toContain("assets");
-      // 2026-05-22 D2: Components moved from STRUCTURE → CREATION zone
-      // (library/insert surface, matches Add + Templates mental class).
-      expect(ids).toContain("components");
-    });
-
-    it("returns structure zone tabs", () => {
-      const tabs = getTabsByZone("structure");
-      const ids = tabs.map((t) => t.id);
-      expect(ids).toContain("layers");
-      expect(ids).toContain("pages");
-    });
-
-    it("returns config zone tabs", () => {
-      const tabs = getTabsByZone("config");
-      const ids = tabs.map((t) => t.id);
-      expect(ids).toContain("settings");
-      expect(ids).toContain("history");
     });
   });
 

@@ -34,9 +34,6 @@ const ALLOWED = [
   // A phone/tablet bezel is drawn dark on purpose; the highlight sits on the
   // frame, not on the panel behind it.
   "canvas/DeviceFramePreview.tsx",
-  // The multi-select badge is painted in the accent and labelled `onPrimary`.
-  // Its clear button is the standard lighter spot on a coloured chip.
-  "canvas/styled/SelectionStyles.ts",
   // Not chrome — the raw HTML of the dark marketing templates a CUSTOMER
   // inserts. Their palette is the template's, and this test has no say in it.
   "sidebar/tabs/templates/templatesData.ts",

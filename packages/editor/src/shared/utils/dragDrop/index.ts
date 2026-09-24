@@ -44,7 +44,6 @@ export type {
   DropZone,
   DropZoneRegistry,
   // Keyboard types
-  KeyboardDragConfig,
   // Ghost options
   DragGhostOptions,
   AutoScrollConfig,
@@ -153,12 +152,6 @@ export {
 // =============================================================================
 
 export { startAutoScroll, stopAutoScroll } from "./autoScroll";
-
-// =============================================================================
-// KEYBOARD SUPPORT
-// =============================================================================
-
-export { handleKeyboardDrag } from "./keyboardSupport";
 
 // =============================================================================
 // DROP ZONES

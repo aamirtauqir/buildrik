@@ -25,8 +25,6 @@ vi.mock("../../export", () => ({
     isOpen ? <div data-testid="modal-export" /> : null,
 }));
 vi.mock("../../media", () => ({
-  MediaLibraryPanel: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-media-library" /> : null,
   ImageEditorModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-image-editor" /> : null,
   IconPickerModal: ({ isOpen }: { isOpen: boolean }) =>
@@ -74,10 +72,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onCloseExporter: vi.fn(),
     showShortcuts: false,
     onCloseShortcuts: vi.fn(),
-    showMediaLibrary: false,
-    onCloseMediaLibrary: vi.fn(),
-    onSelectMedia: vi.fn(),
-    mediaLibraryContext: null,
     showImageEditor: false,
     onCloseImageEditor: vi.fn(),
     imageEditorContext: null,
@@ -113,7 +107,6 @@ const ALL_MARKERS = [
   "modal-save-template",
   "modal-export",
   "modal-shortcuts",
-  "modal-media-library",
   "modal-image-editor",
   "modal-icon-picker",
   "modal-collection-setup",
@@ -149,7 +142,6 @@ describe("StudioModals — mounting contract", () => {
     ["showSaveTemplate", "modal-save-template"],
     ["showExporter", "modal-export"],
     ["showShortcuts", "modal-shortcuts"],
-    ["showMediaLibrary", "modal-media-library"],
     ["showCollectionSetup", "modal-collection-setup"],
     ["showCreateComponent", "modal-create-component"],
     ["showCMSCollectionSetup", "modal-cms-setup"],

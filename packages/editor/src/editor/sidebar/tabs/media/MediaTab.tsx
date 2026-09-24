@@ -8,23 +8,17 @@
 import * as React from "react";
 import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
 import type { EditsSnapshot } from "@shared/types/media";
-import { PanelFrame, useToast, Button } from "@/editor/chrome-ui";
-import { Upload, Plus } from "lucide-react";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@shared/constants/events";
 import type { Composer } from "../../../../engine/Composer";
-import { ROW_LG } from "@shared/constants/layout";
-import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { MediaContextMenu } from "./components/MediaContextMenu";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
-import { MEDIA_EVENTS } from "@/shared/constants/media";
-import { TypePills } from "./components/TypePills";
-import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
-import { SelectionContextBar } from "./components/SelectionContextBar";
+import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
@@ -57,7 +51,7 @@ export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
       <PanelFrame className="med-tab">
-        <PanelFrame.Header title="Assets" {...props} />
+        <PanelFrame.Header title="Assets" onClose={props.onClose} />
         <PanelFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
         </PanelFrame.Body>
@@ -73,36 +67,54 @@ function MediaTabWithComposer({
   onOpenImageEditor,
   onOpenLibrary,
   initialStockQuery,
-}: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
+  isOpen = true,
+}: Omit<MediaTabProps, "composer"> & { composer: Composer; isOpen?: boolean }) {
   const state = useMediaState(composer);
+
+  /* Board 4418:59771: the drawer draws no search box — the topbar field reads
+     "Search all N assets…" while Assets is open and drives the library search.
+     The context carries the current query, so re-announcing (the count moved,
+     or the search was set from here — Clear search, a selection request's
+     prefill) shows the drawer's real query instead of wiping the field. */
+  const assetTotal = state.serverPage?.total ?? state.libraryItems.length;
+  const setLibrarySearchRef = React.useRef(state.setLibrarySearch);
+  setLibrarySearchRef.current = state.setLibrarySearch;
+  const fromTopbarRef = React.useRef("");
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onQuery = ({ query }: { query: string }) => {
+      fromTopbarRef.current = query;
+      setLibrarySearchRef.current(query);
+    };
+    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
+      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
+    };
+  }, [composer, isOpen]);
+  const announcedRef = React.useRef<{ total: number; query: string } | null>(null);
+  React.useEffect(() => {
+    if (!isOpen) {
+      announcedRef.current = null;
+      return;
+    }
+    const query = state.librarySearch;
+    const last = announcedRef.current;
+    const unchanged = last && last.total === assetTotal;
+    announcedRef.current = { total: assetTotal, query };
+    if (unchanged && (last.query === query || fromTopbarRef.current === query)) return;
+    fromTopbarRef.current = query;
+    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: `Search all ${assetTotal} assets…`, query });
+  }, [composer, isOpen, assetTotal, state.librarySearch]);
   const { addToast } = useToast();
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
-  /*
-    Boards 303:1997 / 303:2032 draw a status pill over the grid while a
-    long-running media job is happening: "Image editor — crop · rotate ·
-    adjust" while the editor is open, "Optimizing → WebP…" while an optimised
-    copy is being written. Both spans are owned here.
+  /* G3-019: the long-running media jobs report through the standard dark
+     toast, not a status pill over the grid. The image editor needs no
+     "editor open" notice — its modal is the notice, and it draws its own
+     saved / failed state; the optimise job shows a persistent "Optimizing → WebP…" toast
+     that the outcome replaces. */
+  const { removeToast } = useToast();
 
-    The editor pill has no close signal to hang off: the modal's open state
-    lives in AquibraStudio, which this tab cannot reach. It clears on save
-    completion, and on the first pointerdown back in the drawer — while the
-    editor is open the drawer is inert, so that gesture only happens after the
-    user has left the modal.
-  */
-  const [statusPill, setStatusPill] = React.useState<string | null>(null);
-
-  /*
-    Board 1159:4593 draws ONE manager. The 560 "expanded" panel was a second
-    one with its own grid, folder rail and toolbar; it is gone, so every
-    expand signal (the header brackets, the upload auto-expand) opens the
-    fullpage manager instead. Drag-to-folder lived only in that panel and was
-    ported into FolderTree first — see FolderTree.drop.test.tsx.
-  */
-  React.useEffect(() => {
-    if (!state.panelExpanded || !onOpenLibrary) return;
-    state.setPanelExpanded(false);
-    onOpenLibrary();
-  }, [state.panelExpanded, state, onOpenLibrary]);
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(initialStockQuery !== undefined);
   const { discSearchAll } = state;
   React.useEffect(() => {
@@ -123,28 +135,23 @@ function MediaTabWithComposer({
     (item: LibraryItem) => {
       if (!onOpenImageEditor) return;
       const parentKey = item.versionOf ?? item.key;
-      setStatusPill("Image editor — crop · rotate · adjust");
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
-        try {
-          const res = await fetch(editedSrc);
-          const blob = await res.blob();
-          const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
-          const stem = item.name.replace(/\.[^/.]+$/, "");
-          const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
-          const result = await composer.media.uploadFile(file, {
-            ...(item.folderId ? { folderId: item.folderId } : {}),
-            versionOf: parentKey,
-            ...(edits ? { edits } : {}),
+        const res = await fetch(editedSrc);
+        const blob = await res.blob();
+        const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
+        const stem = item.name.replace(/\.[^/.]+$/, "");
+        const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
+        const result = await composer.media.uploadFile(file, {
+          ...(item.folderId ? { folderId: item.folderId } : {}),
+          versionOf: parentKey,
+          ...(edits ? { edits } : {}),
+        });
+        if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
+        const saved = result.asset;
+        if (item.assetId && saved.serverId && !saved.localOnly) {
+          createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+            /* History is a convenience; the version itself has landed. */
           });
-          if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
-          const saved = result.asset;
-          if (item.assetId && saved.serverId && !saved.localOnly) {
-            createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
-              /* History is a convenience; the version itself has landed. */
-            });
-          }
-        } finally {
-          setStatusPill(null);
         }
       };
       onOpenImageEditor(item.src, onSave, {
@@ -164,7 +171,7 @@ function MediaTabWithComposer({
   const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
     const item = state.detailItem;
     if (!item) return;
-    setStatusPill("Optimizing → WebP…");
+    const progressId = addToast({ description: "Optimizing → WebP…", tone: "info", duration: Infinity });
     try {
       const res = await fetch(optimizedSrc);
       const blob = await res.blob();
@@ -188,37 +195,29 @@ function MediaTabWithComposer({
       console.error("Failed to save optimized image:", err);
       showToast("Could not save optimized image", "error");
     } finally {
-      setStatusPill(null);
+      removeToast(progressId);
     }
-  }, [state, showToast]);
+  }, [state, showToast, addToast, removeToast]);
 
-  // §21 — context-menu trigger. Opens file picker; on upload-complete,
-  // sets replaceAcrossPair which mounts ReplaceAcrossDialog. Defined here
-  // (before early return) so React hook order stays stable.
+  /* Audit G3-027 / board 4418:59209 — Replace across site picks the
+     replacement from the library (the drawer's pick mode; ↑ Upload there
+     still takes a new file), then the dialog scopes it per page. */
+  const { closeDetail, setSelectionContext, setReplaceAcrossPair } = state;
   const handleReplaceAcross = React.useCallback((oldItem: LibraryItem) => {
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = oldItem.type === "vid" ? "video/*" : "image/*,.svg";
-    fileInput.onchange = () => {
-      const file = fileInput.files?.[0];
-      if (!file) return;
-      const onComplete = (payload: unknown) => {
-        const p = payload as { asset?: { src?: string }; fileName?: string };
-        composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
-        if (p?.asset?.src) {
-          state.setReplaceAcrossPair({
-            oldSrc: oldItem.src,
-            newSrc: p.asset.src,
-            oldLabel: oldItem.name,
-            newLabel: p.fileName ?? "New asset",
-          });
-        }
-      };
-      composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
-      state.upload([file]);
-    };
-    fileInput.click();
-  }, [composer, state]);
+    const oldLabel = oldItem.displayName ?? oldItem.name;
+    closeDetail();
+    setSelectionContext({
+      label: `Replace ${oldLabel}`,
+      allowedTypes: [oldItem.type === "vid" ? "video" : "image"],
+      onSelect: (asset) =>
+        setReplaceAcrossPair({
+          oldSrc: oldItem.src,
+          newSrc: asset.src,
+          oldLabel,
+          newLabel: displayNameFor(asset.name, asset.mimeType),
+        }),
+    });
+  }, [closeDetail, setSelectionContext, setReplaceAcrossPair]);
 
   /*
     Mounted by EVERY branch, not just the fullpage one. The detail overlay and
@@ -279,6 +278,26 @@ function MediaTabWithComposer({
      Same shape as the publish opener that spent itself on
      `onVercelPublish ?? onOpenPublish`. The live manager is `editor/media/
      LibraryManager`, which the Media family walk verified against its boards. */
+  /* Boards 6764:59051 / 6881:91481 — while something is choosing a file,
+     the drawer IS the picker (audit G3-008 / G3-061). */
+  if (state.selectionContext) {
+    return (
+      <>
+        <PickModePanel
+          composer={composer}
+          request={state.selectionContext}
+          items={state.libraryItems}
+          usageMap={state.usageMap}
+          searchQuery={state.librarySearch}
+          onSearchChange={(q) => state.setLibrarySearch(q)}
+          onUse={state.applyPick}
+          onCancel={() => state.setSelectionContext(null)}
+        />
+        {sharedOverlays}
+      </>
+    );
+  }
+
   return (
     <>
       <SlimLauncher
@@ -290,13 +309,9 @@ function MediaTabWithComposer({
         storage={state.storage}
         uploadQueue={state.uploadQueue}
         usageMap={state.usageMap}
-        appliedAssetKey={undefined}
         onInsert={state.insertToCanvas}
         onToggleType={state.toggleType}
         onSearchChange={(q) => state.setLibrarySearch(q)}
-        onExpand={() => state.setPanelExpanded(true)}
-        statusPill={statusPill}
-        onDismissStatusPill={() => setStatusPill(null)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
         failedUploads={state.failedUploads}
@@ -343,8 +358,6 @@ function MediaTabWithComposer({
         onClose={onClose}
         onOpenDetail={state.openDetail}
         onOpenIconPicker={() => setIconBrowserOpen(true)}
-        selectionContext={state.selectionContext}
-        onCancelSelection={() => state.setSelectionContext(null)}
       />
       {stockBrowserOpen && (
         <StockBrowserOverlay

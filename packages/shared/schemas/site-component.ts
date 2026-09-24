@@ -16,6 +16,9 @@ export const upsertSiteComponentSchema = z.object({
   /** Full engine ComponentDefinition. */
   payload: z.record(z.unknown()),
   createdBy: z.string().nullable().optional(),
+  /** Scope (board 6971:77663): omitted/null = "This site"; a page id of this
+   *  site = "This page". */
+  pageId: z.string().nullable().optional(),
 });
 
 export const listSiteComponentsSchema = z.object({ siteId: z.string() });
@@ -28,6 +31,11 @@ export const renameWorkspaceComponentSchema = z.object({
   componentId: z.string(),
   name: z.string().min(1).max(200),
 });
+
+/** FROM LIBRARY (board 4418:99857) — the workspace's shared masters, seen
+ *  from one site. */
+export const componentLibrarySchema = z.object({ siteId: z.string() });
+export const libraryComponentSchema = z.object({ siteId: z.string(), componentId: z.string() });
 
 export type UpsertSiteComponentInput = z.infer<typeof upsertSiteComponentSchema>;
 export type ListSiteComponentsInput = z.infer<typeof listSiteComponentsSchema>;

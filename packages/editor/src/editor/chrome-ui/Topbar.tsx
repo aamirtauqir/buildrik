@@ -412,7 +412,8 @@ export function Topbar({
               aria-busy={publishBusy || undefined}
               onClick={() => {}}
               size="xs"
-              className={PUBLISH_BTN_CLASS}
+              /* Boards 4418:123573 / 4418:126059 draw a blocked Publish at 40%. */
+              className={`${PUBLISH_BTN_CLASS} tw:opacity-40`}
             >
               {ctaLabel ?? PUBLISH_LABEL[publish]}
             </Button>

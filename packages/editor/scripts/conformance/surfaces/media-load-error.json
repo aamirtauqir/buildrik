@@ -3,22 +3,41 @@
   "board": "Media · load-error (Figma 453:3931)",
   "_note": "Reachable only when storage refuses to open, which no click can produce — the probe injects it. The waitFor is on `media-load-error` because SlimLauncher has four zero-ish states in that slot and only one of them is this board. NOT joined: 453:3934, the inner 28h search field (chrome-ui TextInput, boards.json authority=open:input-fill); 453:3938 the folder row's `☑ Select`, and 453:3953/3954/3955, all text-frame auto-widths. The block's own two rows sat 13px low until 2026-09-08 — the UA <p> margin, which chrome-reset.css does not cover — and the harness could not see it because only the band's height was joined; the band is now built to the board's 44/74 offsets as well.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-load-error",
-  "viewport": { "width": 280, "height": 812 },
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
   "steps": [
-    { "action": "waitFor", "testId": "media-load-error" }
+    {
+      "action": "waitFor",
+      "testId": "media-load-error"
+    }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "panel",        "testId": "media-panel",          "spec": "media-load-error", "nodeId": "453:3931" },
-    { "name": "panel-header", "testId": "panel-header",         "spec": "media-load-error", "nodeId": "453:3932" },
-    { "name": "search",       "testId": "media-search",         "spec": "media-load-error", "nodeId": "453:3933" },
-    { "name": "folder-row",   "testId": "media-folder-row",     "spec": "media-load-error", "nodeId": "453:3936" },
-    { "name": "type-chips",   "testId": "media-type-chips",     "spec": "media-load-error", "nodeId": "453:3939" },
-    { "name": "chip-image",   "testId": "media-type-chip-img",  "spec": "media-load-error", "nodeId": "453:3940" },
-    { "name": "chip-video",   "testId": "media-type-chip-vid",  "spec": "media-load-error", "nodeId": "453:3943" },
-    { "name": "chip-svg",     "testId": "media-type-chip-ico",  "spec": "media-load-error", "nodeId": "453:3946" },
-    { "name": "chip-icon",    "testId": "media-type-chip-fnt",  "spec": "media-load-error", "nodeId": "453:3949" },
-    { "name": "error-block",  "testId": "media-load-error",     "spec": "media-load-error", "nodeId": "453:3952" },
-    { "name": "footer",       "testId": "media-footer",         "spec": "media-load-error", "nodeId": "453:3957" }
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-load-error",
+      "nodeId": "453:3931"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-load-error",
+      "nodeId": "453:3932"
+    },
+    {
+      "name": "error-block",
+      "testId": "media-load-error",
+      "spec": "media-load-error",
+      "nodeId": "453:3952"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-load-error",
+      "nodeId": "453:3957"
+    }
   ]
 }

@@ -27,7 +27,7 @@ function makeComposer(createComponent = vi.fn().mockResolvedValue({ id: "c1", na
   return {
     composer: {
       components: { createComponent, adoptInstances },
-      elements: { getElement: () => el, getActivePage: () => ({ name: "Home" }) },
+      elements: { getElement: () => el, getActivePage: () => ({ id: "page-home", name: "Home" }) },
     } as never,
     createComponent,
     adoptInstances,
@@ -76,7 +76,7 @@ describe("CreateComponentModal — board 4418:142143", () => {
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "  Hero card " } });
     fireEvent.click(screen.getByRole("button", { name: "Create component" }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true });
+    expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true, pageId: null });
     expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1"]);
   });
 
@@ -99,5 +99,17 @@ describe("CreateComponentModal — board 4418:142143", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create component" }));
     await waitFor(() => expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })));
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  /* Popover 6971:77663: This site / This page. */
+  it("Scope offers This site and This page; This page scopes the master to the open page", async () => {
+    const { composer, createComponent } = makeComposer();
+    const { onClose } = renderModal(composer);
+    const scope = screen.getByLabelText("Scope") as HTMLSelectElement;
+    expect([...scope.options].map((o) => o.textContent)).toEqual(["This site", "This page"]);
+    fireEvent.change(scope, { target: { value: "page" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createComponent).toHaveBeenCalledWith("Hero", "el-1", { prefillFromDs: true, pageId: "page-home" });
   });
 });

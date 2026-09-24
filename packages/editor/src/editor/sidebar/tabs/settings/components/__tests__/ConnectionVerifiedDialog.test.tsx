@@ -28,7 +28,7 @@ describe("Clone 4256:26844 · Connection verified", () => {
     expect(screen.getByTestId("set-an-verified-note")).toHaveTextContent(
       "Last checked just now · Data usually appears within 30 minutes of the first visit.",
     );
-    expect(screen.getByTestId("set-an-verified")).toHaveClass("tw:w-[640px]");
+    expect(screen.getByTestId("set-an-verified")).toHaveClass("tw:w-[var(--bk-size-dialog-lg)]");
   });
 
   it("says the id is verified with nothing arrived yet when the count is zero", () => {

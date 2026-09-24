@@ -14,6 +14,9 @@ import { Button } from "@/editor/chrome-ui";
 export interface AddInteractionPanelProps {
   onAdd: (trigger: InteractionTrigger) => void;
   onClose: () => void;
+  /** The element's CSS animation (G2-157 folded its section into this list).
+   *  Present only while the element has none — one animation per element. */
+  onAddAnimation?: () => void;
 }
 
 // ============================================================================
@@ -117,7 +120,7 @@ const TriggerGroup: React.FC<TriggerGroupProps> = ({ groupName, triggers, onAdd 
 // COMPONENT
 // ============================================================================
 
-export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd, onClose }) => (
+export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd, onClose, onAddAnimation }) => (
   <div style={styles.container}>
     <div style={styles.header}>
       <span style={styles.title}>Choose Trigger</span>
@@ -129,6 +132,17 @@ export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd,
     {Object.entries(TRIGGER_GROUPS).map(([groupName, triggers]) => (
       <TriggerGroup key={groupName} groupName={groupName} triggers={triggers} onAdd={onAdd} />
     ))}
+
+    {onAddAnimation ? (
+      <div style={styles.groupContainer}>
+        <div style={styles.groupLabel}>CSS Animation</div>
+        <div style={styles.triggerGrid}>
+          <Button onClick={onAddAnimation} style={styles.triggerButton}>
+            <span>Entrance animation…</span>
+          </Button>
+        </div>
+      </div>
+    ) : null}
   </div>
 );
 

@@ -17,7 +17,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/shared/utils/featureFlags", () => ({ isFeatureEnabled: vi.fn(() => false) }));
 vi.mock("../../../shared/utils/editorViewMode", () => ({
-  getEditorViewMode: vi.fn(() => ({ railMode: "figma", fourToolRail: false, density: "full", readOnlyView: false })),
+  getEditorViewMode: vi.fn(() => ({ readOnlyView: false })),
 }));
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),

@@ -59,7 +59,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Templates", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Properties", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Records", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -292,7 +292,9 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     commands.push({
       id: `cmd-${cmd.id}`,
       label,
-      group: cmd.group === "Pages" ? "Pages" : "More",
+      /* PROPERTIES: the inspector's "Jump to property" rows (G2-146), searched
+         only — not in the opening list. */
+      group: cmd.group === "Pages" || cmd.group === "Properties" ? cmd.group : "More",
       shortcut: cmd.shortcut,
       keywords: cmd.keywords,
       disabled: reason !== undefined,
@@ -347,6 +349,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     [composer],
   );
 
+  /* RECORDS — CMS records answer by their display field and open in the
+     CMS workspace on that record (ui:cms-open, L4's table + side sheet).
+     The store loads per collection, asynchronously, so the rows arrive a
+     moment after the palette opens; searchable only. */
+  const [recordCommands, setRecordCommands] = React.useState<PaletteCommand[]>([]);
+  React.useEffect(() => {
+    const store = composer?.cms?.collections;
+    if (!store) return;
+    let live = true;
+    const collections = store.getAllCollections();
+    void Promise.all(
+      collections.map(async (col) => {
+        const items = await store.getContentItems(col.id).catch(() => []);
+        return items.map((item): PaletteCommand => {
+          const shown = item.data[col.displayField ?? ""] ?? Object.values(item.data).find((v) => typeof v === "string");
+          return {
+            id: `record-${item.id}`,
+            label: `${typeof shown === "string" && shown ? shown : "Untitled record"} · ${col.name}`,
+            group: "Records",
+            keywords: ["record", "cms", col.name],
+            handler: () => {
+              composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: col.id, recordId: item.id });
+              onClose();
+            },
+          };
+        });
+      }),
+    ).then((lists) => {
+      if (live) setRecordCommands(lists.flat());
+    });
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composer]);
+
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
     if (cmd.disabled) return;
     recordCommandRun(cmd.id.replace(/^recent-/, ""));
@@ -375,10 +413,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
     if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
-    return commands.filter((cmd) =>
+    return [...commands, ...recordCommands].filter((cmd) =>
       [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
-  }, [commands, recentCommands, query]);
+  }, [commands, recordCommands, recentCommands, query]);
 
   // A query that matches nothing is never a dead end: AI, or stock photos.
   const askAI = React.useCallback(() => {

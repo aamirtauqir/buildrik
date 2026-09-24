@@ -12,8 +12,9 @@
  *
  * The board's three fields are the whole form. Description, category, tags,
  * variant presets and the "Pre-fill from DS styles" toggle are gone (the
- * pre-fill keeps its default, ON). Scope has one option because components
- * are stored per site. "Matching" is an identical copy of the selection on
+ * pre-fill keeps its default, ON). Scope is This site / This page (popover
+ * 6971:77663): a page-scoped master is stored with the active page's id and
+ * offered only on that page (ComponentManager.getComponentsForPage). "Matching" is an identical copy of the selection on
  * this page (engine/components/matchingGroups) — the only kind that becomes
  * an instance with nothing on screen changing; the registry holds the active
  * page only, which is why the sentence says page, not site.
@@ -54,10 +55,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   const element = isOpen && composer && elementId ? composer.elements.getElement(elementId) : null;
   const type = element?.getType() ?? "element";
   const defaultName = (element && getLayerName(element)) || titleCase(type);
-  const pageName = composer?.elements.getActivePage()?.name ?? "";
+  const activePage = composer?.elements.getActivePage();
+  const pageName = activePage?.name ?? "";
 
   const [name, setName] = React.useState("");
   const [convertMatching, setConvertMatching] = React.useState(false);
+  const [scope, setScope] = React.useState<"site" | "page">("site");
   const [isCreating, setIsCreating] = React.useState(false);
 
   const matches = React.useMemo(
@@ -70,6 +73,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
     else {
       setName("");
       setConvertMatching(false);
+      setScope("site");
     }
   }, [isOpen, defaultName]);
 
@@ -77,7 +81,10 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
     if (!composer || !elementId || !name.trim()) return;
     setIsCreating(true);
     try {
-      const component = await composer.components.createComponent(name.trim(), elementId, { prefillFromDs: true });
+      const component = await composer.components.createComponent(name.trim(), elementId, {
+        prefillFromDs: true,
+        pageId: scope === "page" ? activePage?.id ?? null : null,
+      });
       if (!component) {
         addToast({ description: "Couldn't create the component", tone: "error" });
         return;
@@ -135,8 +142,16 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             <label htmlFor="create-component-scope" className={LABEL}>
               Scope
             </label>
-            <Select id="create-component-scope" sizing="sm" value="site" onChange={() => {}} className="tw:w-[240px]">
+            <Select
+              id="create-component-scope"
+              sizing="sm"
+              value={scope}
+              onChange={(e) => setScope(e.target.value === "page" ? "page" : "site")}
+              className="tw:w-[240px]"
+              data-testid="create-component-scope"
+            >
               <option value="site">This site</option>
+              {activePage ? <option value="page">This page</option> : null}
             </Select>
           </div>
           {matches.length > 0 ? (

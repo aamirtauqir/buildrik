@@ -87,7 +87,6 @@ export interface StudioPanelsProps {
   showRulers?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
-  devMode?: boolean;
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -188,7 +187,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showGrid = false,
   showRulers = false,
   showXRay = false,
-  devMode = false,
   onOverlayChange,
   onAIRequest,
   onOpenMediaLibrary,
@@ -616,7 +614,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
-              showFooterToolbar={!readOnlyView}
+              showFooterToolbar={!readOnlyView || viewerChrome}
               readOnly={readOnlyView}
               composer={composer}
               device={device}
@@ -627,7 +625,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
-              devMode={devMode}
               onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}

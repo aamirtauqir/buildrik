@@ -23,7 +23,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { Button, Checkbox } from "@/editor/chrome-ui";
-import { ReplaceResultModal, replacingLabel, resultIds } from "@/editor/media/components/ReplaceResultModal";
+import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "@/editor/media/components/ReplaceResultModal";
 /* `.med-rx-*` lives in MediaTab.css, which only MediaTab imported — so this
    dialog drew as unstyled block flow anywhere it was mounted without its
    panel. Same defect board 1205:4829 found on FolderTree, same fix: the
@@ -33,6 +33,10 @@ import "../MediaTab.css";
 interface ReplaceAcrossDialogProps {
   composer: Composer;
   oldSrc: string;
+  /** Every src that counts as the old asset — the library passes the file's
+   *  whole version family, so a placement sitting on v2 is replaced too.
+   *  Defaults to `[oldSrc]`. */
+  sources?: string[];
   newSrc: string;
   /** Human-readable labels for the two assets (name, filename, etc.). */
   oldLabel?: string;
@@ -53,19 +57,38 @@ type DialogState =
   | { phase: "committing"; pageIds: string[]; targets: string[] }
   | { phase: "result"; pageIds: string[]; replaced: string[]; failed: string[] };
 
-function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
-  const byPage = composer.mediaOps.getUsagesByPage(oldSrc);
+function buildPageRows(composer: Composer, sources: string[]): PageRow[] {
   const allPages = composer.elements.getAllPages?.() ?? [];
   const nameById = new Map(allPages.map((p) => [p.id, p.name ?? p.id]));
-  const rows: PageRow[] = [];
-  for (const [pageId, elements] of byPage) {
-    rows.push({
-      id: pageId,
-      name: nameById.get(pageId) ?? pageId,
-      elementIds: elements.map((el) => el.getId()),
-    });
+  const rows = new Map<string, PageRow>();
+  for (const src of sources) {
+    for (const [pageId, elements] of composer.mediaOps.getUsagesByPage(src)) {
+      const row = rows.get(pageId) ?? { id: pageId, name: nameById.get(pageId) ?? pageId, elementIds: [] };
+      row.elementIds.push(...elements.map((el) => el.getId()));
+      rows.set(pageId, row);
+    }
   }
-  return rows;
+  return [...rows.values()];
+}
+
+/* One selective run per source, merged. A throw is the engine's rollback of
+   that source's run — nothing changed, so its placements on the checked
+   pages are failed ones the result card can offer to retry. */
+function replaceOnPages(composer: Composer, sources: string[], newSrc: string, pageIds: string[]): ReplaceOutcome {
+  const outcome: ReplaceOutcome = { replaced: [], failed: [] };
+  const scope = new Set(pageIds);
+  for (const src of sources) {
+    try {
+      const result = resultIds(composer.mediaOps.replaceAcrossSelective(src, newSrc, pageIds));
+      outcome.replaced.push(...result.replaced);
+      outcome.failed.push(...result.failed);
+    } catch {
+      for (const [pageId, elements] of composer.mediaOps.getUsagesByPage(src)) {
+        if (scope.has(pageId)) outcome.failed.push(...elements.map((el) => el.getId()));
+      }
+    }
+  }
+  return outcome;
 }
 
 /*
@@ -74,15 +97,14 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   stylesheet — but a chrome-ui Button's geometry is exactly what the caller
   className is for, per chrome-ui/__tests__/className-precedence.test.tsx.
 */
-/* Boards 1164:4748 / 1164:4750 — the confirm buttons HUG on a 12/8 pad at 11px
-   rather than sitting on a fixed 32 row at 13px. The fixed height is the
-   reason the board's 8 vertical pad measured 0: a set height and a padding
-   are not the same property, so nothing conflicted and nothing won. */
+/* Board 6940:79709 (dialog/footer 7401:1228) — Button md: 32 high, 16 inset,
+   8 radius, 13/20 medium; Cancel is white on a border in gray-700. It
+   supersedes 1164:4748's 11px hugging pair. */
 const RX_BTN =
-  "tw:px-[var(--bk-space-12)] tw:py-2 tw:border " +
-  "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-md)] " +
-  "tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] " +
-  "tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
+  "tw:h-8 tw:px-[var(--bk-space-16)] tw:py-1.5 tw:border " +
+  "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-lg)] " +
+  "tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-gray-700)] tw:text-[13px] tw:leading-5 " +
+  "tw:font-medium tw:[font-family:var(--bk-font-ui)] " +
   "tw:cursor-pointer tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:cursor-not-allowed " +
   "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
@@ -95,13 +117,15 @@ const RX_BTN_PRIMARY =
 export function ReplaceAcrossDialog({
   composer,
   oldSrc,
+  sources: sourcesProp,
   newSrc,
   oldLabel,
   newLabel,
   onClose,
 }: ReplaceAcrossDialogProps) {
+  const sources = React.useMemo(() => sourcesProp ?? [oldSrc], [sourcesProp, oldSrc]);
   const [state, setState] = React.useState<DialogState>(() => {
-    const pages = buildPageRows(composer, oldSrc);
+    const pages = buildPageRows(composer, sources);
     return {
       phase: "preview",
       pages,
@@ -146,14 +170,11 @@ export function ReplaceAcrossDialog({
     const pageIds = checked.map((p) => p.id);
     const targets = checked.flatMap((p) => p.elementIds);
     setState({ phase: "committing", pageIds, targets });
-    /* A microtask later, so the busy card paints before the synchronous run.
-       A throw is the engine's rollback — nothing changed, so every target is
-       a failed placement the card can offer to retry. */
+    /* A microtask later, so the busy card paints before the synchronous run. */
     Promise.resolve()
-      .then(() => resultIds(composer.mediaOps.replaceAcrossSelective(oldSrc, newSrc, pageIds)))
-      .catch(() => ({ replaced: [], failed: targets }))
+      .then(() => replaceOnPages(composer, sources, newSrc, pageIds))
       .then((result) => setState({ phase: "result", pageIds, ...result }));
-  }, [composer, oldSrc, newSrc, state]);
+  }, [composer, sources, newSrc, state]);
 
   if (state.phase !== "preview") {
     const { pageIds } = state;
@@ -165,7 +186,7 @@ export function ReplaceAcrossDialog({
         replaced={state.phase === "result" ? state.replaced : []}
         failed={state.phase === "result" ? state.failed : []}
         busy={state.phase === "committing" ? { label: replacingLabel(composer, state.targets) } : undefined}
-        onRetry={async () => resultIds(composer.mediaOps.replaceAcrossSelective(oldSrc, newSrc, pageIds))}
+        onRetry={async () => replaceOnPages(composer, sources, newSrc, pageIds)}
         onDone={onClose}
       />
     );
@@ -186,22 +207,25 @@ export function ReplaceAcrossDialog({
         </h2>
 
         <p className="med-rx-body">
-          Every place that uses {oldLabel ? <strong>{oldLabel}</strong> : "this asset"}
+          Every place that uses {oldLabel ?? "this asset"}
           {" "}— {totalUses} in total — will switch to the image you pick. This can be
           undone.
         </p>
         <div className="med-rx-preview" data-testid="rx-swap">
           <div className="med-rx-preview__before">
-            <img src={oldSrc} alt="" data-testid="rx-thumb-before" />
-            <span>Before</span>
+            <img src={oldSrc} alt={`Before: ${oldLabel ?? "current asset"}`} data-testid="rx-thumb-before" />
           </div>
           <div className="med-rx-preview__arrow" aria-hidden="true" data-testid="rx-swap-arrow">
             →
           </div>
           <div className="med-rx-preview__after">
-            <img src={newSrc} alt="" data-testid="rx-thumb-after" />
-            <span>After</span>
+            <img src={newSrc} alt={`After: ${newLabel ?? "replacement"}`} data-testid="rx-thumb-after" />
           </div>
+          {newLabel ? (
+            <span className="med-rx-preview__name" data-testid="rx-new-name">
+              {newLabel}
+            </span>
+          ) : null}
         </div>
         {state.pages.length === 0 ? (
           <p className="med-rx-body med-rx-body--empty">

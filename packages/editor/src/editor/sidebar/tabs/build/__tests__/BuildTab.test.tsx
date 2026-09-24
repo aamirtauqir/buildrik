@@ -120,6 +120,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
       composer: {
         on: vi.fn(), off: vi.fn(), emit,
         components: { getAllComponents: () => saved },
+        elements: { getActivePage: () => ({ id: "page-home" }) },
       } as unknown as NonNullable<BuildTabProps["composer"]>,
     };
   };
