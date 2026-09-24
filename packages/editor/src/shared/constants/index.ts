@@ -20,11 +20,9 @@ export {
 // Command constants
 export {
   COMMANDS,
-  SHORTCUTS,
   type CommandId,
   type CommandCategory,
   isValidCommand,
-  getShortcut,
 } from "./commands";
 
 // Configuration constants
