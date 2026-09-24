@@ -30,10 +30,9 @@ describe("chrome-ui barrel — pure flowbite-react re-exports are identity-equal
     "Checkbox",
     "Radio",
     "ToggleSwitch",
-    /* `Tooltip` left this list on 2026-08-27. flowbite's default is
-       `style="dark"` — `bg-gray-900`, which DESIGN.md's NO BLACK RULE bans by
-       name for this control — so the barrel now exports a local component that
-       flips the default and sets the text colour. It is not a themed wrapper
+    /* `Tooltip` left this list on 2026-08-27: the barrel exports a local
+       component that sets the board's bubble size (4433:46540) on flowbite's
+       dark default. It is not a themed wrapper
        (it merges no theme; a caller theme never receives flowbite's `tw:`
        prefix and so cannot win), which is why the closed 2-wrapper set is
        still exactly TextInput + Select. */
