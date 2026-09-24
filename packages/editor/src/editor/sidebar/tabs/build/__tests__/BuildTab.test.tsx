@@ -310,6 +310,24 @@ describe("BuildTab — search through the topbar field", () => {
     expect(emitted[emitted.length - 1]).toEqual(["ui:search-context", null]);
   });
 
+  /* Board 7063:78846: "Paste HTML…  ⌘⇧V". The chord reaches an open panel
+     by event, and a panel that mounts after it by the held request. */
+  it("⌘⇧V opens Paste HTML — live, or on mount after the request", async () => {
+    Object.assign(navigator, { clipboard: { readText: vi.fn().mockResolvedValue("") } });
+    const { composer } = emitterComposer();
+    const first = renderTab({ composer });
+    fireEvent.click(screen.getByTestId("add-panel-menu"));
+    expect(screen.getByTestId("insert-paste-html").textContent).toContain("⌘⇧V");
+    act(() => composer!.emit("ui:insert-open-paste-html" as never, {} as never));
+    expect(await screen.findByTestId("paste-html-modal")).toBeTruthy();
+    first.unmount();
+
+    const { requestPasteHtml } = await import("../insertGroupRequest");
+    requestPasteHtml(composer as never);
+    renderTab({ composer });
+    expect(await screen.findByTestId("paste-html-modal")).toBeTruthy();
+  });
+
   it("a topbar query swaps the groups for the flat results (138:53) and the no-results state", async () => {
     const { composer } = emitterComposer();
     renderTab({ composer });

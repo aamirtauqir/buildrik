@@ -23,7 +23,7 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { takePendingGenerate, takePendingInsertGroup } from "./insertGroupRequest";
+import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -174,7 +174,18 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
   // clipboard) and Insert sends the text down the SAME BlockData insert path
   // everything else uses — insertBlock owns the XSS boundary.
-  const [pasteOpen, setPasteOpen] = React.useState(false);
+  const [pasteOpen, setPasteOpen] = React.useState(() => (composer ? takePendingPasteHtml(composer) : false));
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => {
+      takePendingPasteHtml(composer);
+      setPasteOpen(true);
+    };
+    composer.on(EVENTS.UI_INSERT_OPEN_PASTE_HTML, open);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_OPEN_PASTE_HTML, open);
+    };
+  }, [composer]);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -271,6 +282,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           >
             <Menu label="Add options">
               <MenuItem
+                kbd="⌘⇧V"
                 data-testid="insert-paste-html"
                 onClick={() => {
                   setMenuOpen(false);

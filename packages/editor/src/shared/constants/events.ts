@@ -334,6 +334,10 @@ export const EVENTS = {
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
   /** Add opens on its "Generate a block" screen (G2-117). */
   UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
+  /** ⌘⇧V (board 7063:78846): the shell routes it to Add's Paste HTML dialog. */
+  UI_PASTE_HTML_REQUESTED: "ui:paste-html-requested",
+  /** Add opens its Paste HTML dialog (held until the panel mounts). */
+  UI_INSERT_OPEN_PASTE_HTML: "ui:insert-open-paste-html",
   /** "Edit master ›" on an instance: the Components panel opens that
    *  master's screen. Payload `{ componentId }`. */
   UI_COMPONENTS_OPEN_MASTER: "ui:components-open-master",
