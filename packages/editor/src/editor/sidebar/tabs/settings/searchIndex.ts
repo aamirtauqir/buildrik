@@ -87,6 +87,7 @@ const SECTIONS: SectionDef[] = [
       ["Site name", "Site Identity", "site-name"],
       ["Favicon URL", "Site Identity", "favicon-url"],
       ["Site Language", "Site Identity", "site-language"],
+      ["Author", "Site Identity", "site-author"],
       ["Twitter", "Social Links", "social-twitter"],
       ["Facebook", "Social Links", "social-facebook"],
       ["LinkedIn", "Social Links", "social-linkedin"],
