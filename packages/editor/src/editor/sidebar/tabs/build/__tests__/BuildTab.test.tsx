@@ -143,6 +143,35 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   });
 });
 
+/* G2-115 — board 4418:103353: ★ FAVOURITES sits in the drawer (it lived only
+   in the Element Picker modal). Recently inserted elements get a RECENT group
+   (the modal's other list, kept; designer-notes). */
+describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
+  it("starring an element row adds a ★ FAVOURITES group above ELEMENTS, opened", () => {
+    renderTab();
+    expect(screen.queryByTestId("insert-group-favourites")).toBeNull();
+    fireEvent.click(screen.getByTestId("insert-el-fav-Heading"));
+    const groups = [...document.querySelectorAll('[data-testid^="insert-group-"]')].map((g) => g.getAttribute("data-testid"));
+    expect(groups[0]).toBe("insert-group-favourites");
+    expect(screen.getByTestId("insert-group-favourites").textContent).toContain("★ FAVOURITES");
+    expect(screen.getByTestId("insert-group-favourites")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("insert-fav-Heading")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("insert-el-fav-Heading"));
+    expect(screen.queryByTestId("insert-group-favourites")).toBeNull();
+  });
+
+  it("an inserted element shows up under RECENT", () => {
+    const onBlockClick = vi.fn();
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-el-Heading"));
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("insert-group-recent")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("insert-group-recent"));
+    fireEvent.click(screen.getByTestId("insert-recent-Heading"));
+    expect(onBlockClick).toHaveBeenCalledTimes(2);
+  });
+});
+
 /* Paste HTML… moved into the panel ⋯ (board 7063:78846) and opens the
    modal (6887:78320, G2-112) instead of inserting the clipboard blind. */
 describe("BuildTab — ⋯ › Paste HTML… (boards 7063:78846 → 6887:78320)", () => {

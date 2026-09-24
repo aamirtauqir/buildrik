@@ -15,6 +15,7 @@ import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
+import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
@@ -80,6 +81,8 @@ export type ToggleFavFn = (name: string) => void;
 export interface UseBuildTabReturn {
   // State
   favs: Set<string>;
+  /** Recently inserted element names, newest first (G2-115). */
+  recents: string[];
   openCats: Set<string>;
   searchQuery: string;
   favOpen: boolean;
@@ -129,6 +132,14 @@ export function useBuildTab(
     ls.getBool(STORAGE_KEYS.BUILD_FAVS_INFORMED)
   );
   const [favOpen, setFavOpen] = React.useState(false);
+  const [recents, setRecents] = React.useState<string[]>(() => [...ls.getSet(STORAGE_KEYS.BUILD_RECENT)]);
+  const noteRecent = React.useCallback((name: string) => {
+    setRecents((prev) => {
+      const next = [name, ...prev.filter((n) => n !== name)].slice(0, MAX_RECENT);
+      ls.saveSet(STORAGE_KEYS.BUILD_RECENT, new Set(next));
+      return next;
+    });
+  }, []);
 
   // Persist favs
   React.useEffect(() => {
@@ -172,7 +183,8 @@ export function useBuildTab(
 
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
     setBlockPayload(e, { id: el.blockId, label: el.name, category: el.catId });
-  }, []);
+    noteRecent(el.name);
+  }, [noteRecent]);
 
   const handleBlockDragStart: BlockDragStartFn = React.useCallback((e, block) => {
     setBlockPayload(e, { id: block.id, label: block.label, category: block.category });
@@ -188,8 +200,9 @@ export function useBuildTab(
         }
       }
       onBlockClick?.({ id: el.blockId, label: el.name, category: el.catId });
+      noteRecent(el.name);
     },
-    [onBlockClick]
+    [onBlockClick, noteRecent]
   );
 
   const setSearchQuery = React.useCallback(
@@ -224,6 +237,7 @@ export function useBuildTab(
 
   return {
     favs,
+    recents,
     openCats,
     searchQuery,
     favOpen,
