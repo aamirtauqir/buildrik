@@ -163,10 +163,15 @@ export function ReviewClient({ token }: { token: string }) {
 
   if (review.isLoading) {
     return (
-      <Shell agency="Loading" crumb={null} round={null}>
-        <Card>
-          <p className="text-[13px] text-[#6B7280]">Opening your review…</p>
-        </Card>
+      /* Boards 4418:122048 / 122085 / 122122: no card — one bold line on the
+         page, where the snapshot will land. The boards step through three
+         checks ("1 of 3"…); this page makes ONE request, so it names the
+         first check and does not count steps it cannot observe. The header
+         stays empty until the review says whose it is. */
+      <Shell agency="" crumb={null} round={null}>
+        <div className="mx-auto w-full max-w-[624px] flex-1 px-6 pt-[182px]" role="status" aria-live="polite">
+          <p className="text-[16px] font-semibold leading-6 text-[#111827]">Checking your access…</p>
+        </div>
       </Shell>
     );
   }
