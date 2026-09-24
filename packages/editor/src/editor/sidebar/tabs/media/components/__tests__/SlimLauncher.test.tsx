@@ -83,8 +83,8 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     // Board 7077:79171: TYPE · All · Images · Video · SVG · Icons, then FOLDER.
     const rows = screen.getAllByRole("menuitemradio").map((r) => r.textContent);
     expect(rows).toEqual(["✓All5", "Images2", "Video1", "SVG1", "Icons1"]);
-    expect(screen.getByText("Type")).toBeInTheDocument();
-    expect(screen.getByText("Folder")).toBeInTheDocument();
+    expect(screen.getByText("TYPE")).toBeInTheDocument();
+    expect(screen.getByText("FOLDER")).toBeInTheDocument();
     expect(screen.getByTestId("media-folder-scope")).toHaveTextContent("All");
   });
 
@@ -98,7 +98,7 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(screen.queryByTestId("media-footer-links")).toBeNull();
     expect(screen.queryByTestId("media-stock-action")).toBeNull();
     await user.click(screen.getByTestId("media-add-from"));
-    expect(screen.getByText("Add from")).toBeInTheDocument();
+    expect(screen.getByText("ADD FROM")).toBeInTheDocument();
     expect(screen.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Stock photos", "Icons", "AaFonts"]);
   });
 
