@@ -62,7 +62,12 @@ export const CheckIcon: React.FC<{ status: CheckStatus }> = ({ status }) => (
    sentence in `title` and in the row's accessible name. */
 export const CHECK_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-7";
 export const CHECK_LABEL = "tw:flex-none tw:whitespace-nowrap tw:text-[13px] tw:text-[var(--bk-ink)]";
-export const CHECK_DETAIL = "tw:flex-1 tw:min-w-0 tw:truncate tw:text-right tw:text-[12px] tw:text-[var(--bk-ink-muted)]";
+/** Board 4418:97118 tints the detail by severity — red for a blocker, amber
+ *  for advice — rather than one muted grey. */
+export function checkDetailClass(status: "fail" | "warning"): string {
+  const tone = status === "fail" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-warning-text)]";
+  return `tw:flex-1 tw:min-w-0 tw:truncate tw:text-right tw:text-[12px] ${tone}`;
+}
 
 const LEGEND = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
@@ -122,7 +127,7 @@ export const PrePublishChecks: React.FC<PrePublishChecksProps> = ({
             <span className={CHECK_LABEL}>{c.label}</span>
             {c.status !== "pass" && (
               <>
-                <span className={CHECK_DETAIL} title={c.detail}>
+                <span className={checkDetailClass(c.status === "fail" ? "fail" : "warning")} title={c.detail}>
                   {c.detail}
                 </span>
                 {renderFix(c.label)}

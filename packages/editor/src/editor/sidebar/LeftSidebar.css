@@ -62,6 +62,9 @@
 .ls-rail--figma .ls-zone {
   gap: 4px;
 }
+.ls-rail--figma .ls-btn--labeled {
+  gap: 4px; /* board 4418:123573: 4 between glyph and label */
+}
 .ls-rail--figma .ls-btn__label {
   font-weight: 400;
   color: var(--bk-ink-muted);

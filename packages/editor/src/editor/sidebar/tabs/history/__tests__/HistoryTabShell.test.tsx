@@ -134,7 +134,7 @@ describe("HistoryTab shell", () => {
   /* Board 4418:73791 draws Session · Saves · Published (Backups has no
      service); Activity is B6's. "This session" was a filter chip inside Saves
      and is the Session tab now — the chip is gone. */
-  it("renders Session · Saves · Published · Activity, Saves selected by default", () => {
+  it("renders Session · Saves · Published · Activity, Session selected by default (4418:73791)", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
     expect(tabs).toHaveLength(4);
@@ -142,7 +142,7 @@ describe("HistoryTab shell", () => {
     expect(tabs[1]).toHaveTextContent(/Saves/);
     expect(tabs[2]).toHaveTextContent(/Published/);
     expect(tabs[3]).toHaveTextContent(/Activity/);
-    expect(tabs[1].getAttribute("aria-selected")).toBe("true");
+    expect(tabs[0].getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByRole("button", { name: "This session" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Saved versions" })).toBeNull();
   });
@@ -156,7 +156,7 @@ describe("HistoryTab shell", () => {
   });
 
   it("Saves lists saved versions; the Session tab lists this session's changes", () => {
-    renderTab();
+    renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("activity-view")).toBeNull();
     showChanges();
@@ -224,7 +224,7 @@ describe("HistoryTab shell", () => {
      after switching to "All changes". Milestones (the default view) had no
      button at all, just the undiscoverable Ctrl+Shift+T chord. */
   it("opens the Time-Travel scrubber from Saves, not just Session", () => {
-    renderTab();
+    renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/ }));
@@ -314,7 +314,7 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
   const note = () => screen.queryByText(/versions kept\. Auto-saves prune oldest first/);
 
   it("frames the list once it has settled", () => {
-    renderTab({ composer: withCap });
+    renderTab({ composer: withCap, initialView: "saves" });
     expect(note()).toBeInTheDocument();
   });
 

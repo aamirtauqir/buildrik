@@ -144,19 +144,20 @@ export interface StudioHeaderProps {
  * requested, success-tint for Approved, neutral otherwise.
  *
  * "Not sent" is drawn only where a send is the site's next act — an
- * approval workspace. Elsewhere a round that was never opened is not a
- * status, and the chip stays away as it always did.
+ * approval workspace. Elsewhere, with no round, the control is still there:
+ * board 4418:123573 draws a permanent Review door ("Review ›"), so the
+ * no-round state is that door without a count (owner flag 2026-09-24).
  */
 function reviewChip(
   status: ReviewStatus,
   openCount: number | null,
-): Omit<ReviewPill, "onClick"> | null {
+): Omit<ReviewPill, "onClick"> {
   const who = status.reviewerName;
   switch (status.state) {
     case "none":
       return status.reviewsEnabled && status.editsRequireApproval
         ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
-        : null;
+        : { label: "Review", tone: "neutral", title: "Open Review" };
     case "pending":
       return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
     case "opened-not-acted":
@@ -733,14 +734,23 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onToggleComments: toggleComments,
       };
 
-  const pill = reviewChip(reviewStatus, openCommentCount);
-  const review: ReviewPill | null = pill
-    ? {
-        ...pill,
-        // F3: every review state opens the same door — the Review panel.
-        onClick: onOpenReview,
-      }
-    : null;
+  const copyLiveUrl = React.useCallback(() => {
+    if (!publishedUrl) return;
+    // navigator.clipboard is absent on insecure origins, and writeText can be
+    // refused. Either way the user hears about it rather than pressing again.
+    const done = navigator.clipboard?.writeText(publishedUrl);
+    if (!done) {
+      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
+      return;
+    }
+    void done.then(
+      () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
+      () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
+    );
+  }, [publishedUrl, addToast]);
+
+  // F3: every review state opens the same door — the Review panel.
+  const review: ReviewPill = { ...reviewChip(reviewStatus, openCommentCount), onClick: onOpenReview };
 
   return (
     <div className="bk-header" ref={headerRef}>
@@ -857,6 +867,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   }
             }
             publishedUrl={publishedUrl}
+            onCopyLiveUrl={copyLiveUrl}
+            onReplayOnboarding={
+              viewMode.readOnlyView || !composer ? undefined : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
+            }
             siteId={siteIdForMenu}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={toggleReadOnlyView}

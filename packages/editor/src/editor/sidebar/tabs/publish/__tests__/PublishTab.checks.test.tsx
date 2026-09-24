@@ -234,6 +234,16 @@ describe("PublishTab — fix affordances match severity and ownership", () => {
     fireEvent.click(row.querySelector("button") as HTMLElement);
     expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "pages" });
   });
+
+  it("routes a Settings warning to its exact pane (SEO › SEO, Domain › Domains)", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    const emit = vi.fn();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText("Domain connected")).toBeTruthy());
+    const row = screen.getByText("Domain connected").parentElement as HTMLElement;
+    fireEvent.click(row.querySelector("button") as HTMLElement);
+    expect(emit).toHaveBeenCalledWith("ui:settings-open", { screen: "domains" });
+  });
 });
 
 describe("PublishTab — a failed load never reads as passing (DF5)", () => {
