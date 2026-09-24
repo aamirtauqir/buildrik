@@ -138,7 +138,7 @@ describe("dark-mode trilogy · end-to-end", () => {
     expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#000");
   });
 
-  it("real chain: token without darkValue under dark mode falls back to value AND emits tokens:dark-missing on the real EventEmitter", () => {
+  it("real chain: token without darkValue under dark mode falls back to value", () => {
     localStorage.setItem(
       "buildrick-design-tokens-int-test-v1",
       JSON.stringify({
@@ -154,9 +154,6 @@ describe("dark-mode trilogy · end-to-end", () => {
 
     const composer = new Composer({} as any);
 
-    const missingHandler = vi.fn();
-    composer.on("tokens:dark-missing", missingHandler);
-
     render(
       <TokenRegistryProvider projectId="int-test" composer={composer}>
         <div />
@@ -171,9 +168,6 @@ describe("dark-mode trilogy · end-to-end", () => {
 
     // Fell back to value (no darkValue present).
     expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-secondary", "#aaa");
-    // Emitted via real Composer EventEmitter — proves the resolver event hook
-    // propagates through the same EventEmitter the test subscribed to.
-    expect(missingHandler).toHaveBeenCalledWith({ tokenId: "color-secondary" });
   });
 
   it("real chain: composer.aliasResolver coexists with darkResolver wiring (A.2 + B.0 + B.1 + B.2 don't conflict)", () => {

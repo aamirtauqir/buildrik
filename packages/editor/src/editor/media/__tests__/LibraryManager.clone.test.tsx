@@ -74,7 +74,7 @@ async function mountLibrary(
   const onClose = vi.fn();
   const composer = makeComposer(usages, media, elements);
   const utils = render(
-    <LibraryManager composer={composer} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
+    <LibraryManager composer={composer} onClose={onClose} onOpenImageEditor={vi.fn()} />
   );
   return { ...utils, onClose, composer };
 }
@@ -560,7 +560,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
     await screen.findByTestId("mgr-det-move-result");
     mocks.state.mediaState = { ...mocks.state.mediaState, selectedKeys: new Set(["hero"]) };
     const { LibraryManager } = await import("../LibraryManager");
-    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
     expect(screen.queryByTestId("mgr-det-move-result")).toBeNull();
     expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
   });
@@ -572,7 +572,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
     await screen.findByTestId("mgr-det-move-result");
     mocks.state.mediaState = { ...mocks.state.mediaState, currentFolderId: "f1" };
     const { LibraryManager } = await import("../LibraryManager");
-    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+    rerender(<LibraryManager composer={makeComposer()} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
     expect(screen.queryByTestId("mgr-det-move-result")).toBeNull();
     expect(rail().getByRole("heading", { name: "2 assets selected" })).toBeInTheDocument();
   });
@@ -847,7 +847,7 @@ async function mountWithUpload(over: Partial<MediaStateResult>, uploadFile: Retu
   composer.media.uploadFile = uploadFile as unknown as typeof composer.media.uploadFile;
   mocks.state.mediaState = makeMediaState({ libraryItems: TEN, counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 }, ...over });
   const { LibraryManager } = await import("../LibraryManager");
-  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} />);
   return { composer };
 }
 
@@ -1180,7 +1180,7 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
   });
   const { LibraryManager } = await import("../LibraryManager");
   const onOpenImageEditor = vi.fn();
-  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={onOpenImageEditor} onOpenIconPicker={vi.fn()} />);
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={onOpenImageEditor} />);
   const door = () => onOpenImageEditor.mock.calls.at(-1) as EditorDoor;
   return { composer, onOpenImageEditor, door, placements };
 }

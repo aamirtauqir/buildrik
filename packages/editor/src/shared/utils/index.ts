@@ -308,8 +308,6 @@ export {
   clearQueue,
   isAIError,
   getErrorMessage,
-  CONTENT_TYPES,
-  TONES,
   PROMPT_TEMPLATES,
   type AIRequestOptions,
   type ContentRequest,

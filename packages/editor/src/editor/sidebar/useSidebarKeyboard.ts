@@ -13,7 +13,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
  * Registers global keyboard shortcuts for tab switching.
  * Skips when user is typing in inputs/textareas/contenteditable.
  */
-export function useSidebarKeyboard(onTabChange: (tab: GroupedTabId) => void): void {
+export function useSidebarKeyboard(onTabChange: (tab: GroupedTabId) => void, onAssistant?: () => void): void {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -30,6 +30,14 @@ export function useSidebarKeyboard(onTabChange: (tab: GroupedTabId) => void): vo
 
       const key = e.key.toUpperCase();
       const isShift = e.shiftKey;
+
+      /* I opens AI — in the inspector column, its one home (G2-127); it is
+         not a drawer tab any more, so it is not in the registry. */
+      if (key === "I" && !isShift && onAssistant) {
+        e.preventDefault();
+        onAssistant();
+        return;
+      }
 
       for (const tab of GROUPED_TABS_CONFIG) {
         if (!tab.shortcut) continue;
@@ -50,5 +58,5 @@ export function useSidebarKeyboard(onTabChange: (tab: GroupedTabId) => void): vo
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onTabChange]);
+  }, [onTabChange, onAssistant]);
 }

@@ -44,12 +44,25 @@ describe("ai router", () => {
     resolveModelForUser.mockResolvedValue("gpt-4o-mini");
   });
 
-  it("getQuotaStatus returns current quota", async () => {
-    checkQuota.mockResolvedValueOnce({ ok: true, used: 3, limit: 200, resetsAt: new Date() });
+  /* G2-129: the panel counter reads the SAME check the daily limit enforces. */
+  it("quota returns { used, limit, resetsAt } from the enforcing check, for the caller", async () => {
+    const resetsAt = new Date("2026-09-25T00:00:00Z");
+    checkQuota.mockResolvedValueOnce({ ok: true, used: 3, limit: 200, resetsAt });
     const caller = aiRouter.createCaller(callerCtx);
-    const result = await caller.getQuotaStatus();
-    expect(result.used).toBe(3);
-    expect(result.limit).toBe(200);
+    await expect(caller.quota()).resolves.toEqual({ used: 3, limit: 200, resetsAt });
+    expect(checkQuota).toHaveBeenCalledWith(callerCtx.session.user.id);
+  });
+
+  it("quota passes an unlimited plan through as limit -1", async () => {
+    checkQuota.mockResolvedValueOnce({ ok: true, used: 41, limit: -1, resetsAt: new Date() });
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(caller.quota()).resolves.toMatchObject({ used: 41, limit: -1 });
+  });
+
+  it("quota at the limit still reads (the counter shows 'N of N')", async () => {
+    checkQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(caller.quota()).resolves.toMatchObject({ used: 10, limit: 10 });
   });
 
   it("content endpoint reserves quota and refuses when exhausted (G5)", async () => {

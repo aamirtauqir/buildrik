@@ -16,12 +16,15 @@ import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
+import { RenameAssetModal } from "@/editor/media/components/RenameAssetModal";
+import { useMediaWriteAccess } from "./hooks/useMediaWriteAccess";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
 import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
+import { regenerateAltText } from "../../../../services/AltTextService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
@@ -108,12 +111,16 @@ function MediaTabWithComposer({
   }, [composer, isOpen, assetTotal, state.librarySearch]);
   const { addToast } = useToast();
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
-  /* G3-019: the long-running media jobs report through the standard dark
-     toast, not a status pill over the grid. The image editor needs no
-     "editor open" notice — its modal is the notice, and it draws its own
-     saved / failed state; the optimise job shows a persistent "Optimizing → WebP…" toast
-     that the outcome replaces. */
-  const { removeToast } = useToast();
+  const write = useMediaWriteAccess();
+  /* G3-021: the hub's Rename… opens the library's own rename modal. */
+  const [renameTarget, setRenameTarget] = React.useState<LibraryItem | null>(null);
+  /* A deleted asset takes its open hub with it (the delete lands after the
+     confirm; a cancelled confirm leaves the hub where it was). */
+  const detailKey = state.detailItem?.key;
+  const detailGone = detailKey != null && !state.libraryItems.some((i) => i.key === detailKey);
+  React.useEffect(() => {
+    if (detailGone) state.closeDetail();
+  }, [detailGone, state]);
 
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(initialStockQuery !== undefined);
   const { discSearchAll } = state;
@@ -132,7 +139,7 @@ function MediaTabWithComposer({
      second card once the stem heuristic went. Done opens the fullpage library
      on the parent, where Asset versions lives. */
   const handleEditImage = React.useCallback(
-    (item: LibraryItem) => {
+    (item: LibraryItem, initialTab?: "optimise") => {
       if (!onOpenImageEditor) return;
       const parentKey = item.versionOf ?? item.key;
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
@@ -156,6 +163,7 @@ function MediaTabWithComposer({
       };
       onOpenImageEditor(item.src, onSave, {
         fileName: item.displayName ?? item.name,
+        ...(initialTab ? { initialTab } : {}),
         onDone: () => {
           composer.media.selectAssets([parentKey]);
           onOpenLibrary?.();
@@ -165,39 +173,6 @@ function MediaTabWithComposer({
     [onOpenImageEditor, composer, onOpenLibrary]
   );
 
-  // §18 — Optimize is now a tab inside the §15 detail drawer. handleOptimized
-  // is passed to the drawer as onOptimized; OptimizationPanel inside the tab
-  // calls it with the new data-URL, which we upload as a versioned copy.
-  const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
-    const item = state.detailItem;
-    if (!item) return;
-    const progressId = addToast({ description: "Optimizing → WebP…", tone: "info", duration: Infinity });
-    try {
-      const res = await fetch(optimizedSrc);
-      const blob = await res.blob();
-      const timestamp = new Date().getTime();
-      const cleanName = item.name.replace(/(_v\d+)?$/, "");
-      const ext = blob.type.split("/")[1] || "webp";
-      const fileName = `${cleanName}_opt_v${timestamp % 10000}`;
-      const file = new File([blob], `${fileName}.${ext}`, { type: blob.type });
-      await state.upload([file]);
-      showToast(`Optimized ${item.name} ✓`, "success");
-      // Record a server-side restore point of the pre-optimize asset.
-      if (item.assetId) {
-        createAssetVersion({
-          assetId: item.assetId,
-          url: item.src,
-          bytes: item.size,
-          edits: { via: "optimize", newFile: fileName },
-        }).catch(() => {});
-      }
-    } catch (err) {
-      console.error("Failed to save optimized image:", err);
-      showToast("Could not save optimized image", "error");
-    } finally {
-      removeToast(progressId);
-    }
-  }, [state, showToast, addToast, removeToast]);
 
   /* Audit G3-027 / board 4418:59209 — Replace across site picks the
      replacement from the library (the drawer's pick mode; ↑ Upload there
@@ -239,13 +214,31 @@ function MediaTabWithComposer({
       )}
       {state.detailItem && (
         <AssetDetailOverlay
-          item={state.detailItem}
+          /* The live row, so a rename from the hub shows at once. */
+          item={state.libraryItems.find((i) => i.key === state.detailItem?.key) ?? state.detailItem}
           onUpdate={state.updateItem}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
           composer={composer}
-          onOptimized={handleOptimized}
           onReplaceAcross={handleReplaceAcross}
+          /* A local-only file has no server row for the model to read. */
+          onGenerateAltText={(it) =>
+            it.assetId ? regenerateAltText(composer.media, it.key, it.assetId) : Promise.resolve(null)
+          }
+          onInsert={(it) => state.insertToCanvas(it.key)}
+          onRename={setRenameTarget}
+          onCopyUrl={state.copyUrl}
+          onDownload={(it) => composer.media.downloadAssets([{ src: it.src, name: it.displayName ?? it.name }])}
+          onDelete={(it) => state.requestDelete(it.key)}
+          viewOnly={write.canWrite ? undefined : { rename: write.reason("rename"), delete: write.reason("delete") }}
+        />
+      )}
+      {renameTarget && (
+        <RenameAssetModal
+          item={renameTarget}
+          libraryItems={state.libraryItems}
+          onRename={state.renameItem}
+          onClose={() => setRenameTarget(null)}
         />
       )}
       {/*

@@ -107,7 +107,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               composer={composer}
               onClose={commonTabProps.onClose}
               onOpenImageEditor={commonTabProps.onOpenImageEditor}
-              onOpenIconPicker={commonTabProps.onOpenIconPicker}
             />
           </div>
         </Portal>

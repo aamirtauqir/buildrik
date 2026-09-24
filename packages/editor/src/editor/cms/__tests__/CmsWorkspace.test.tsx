@@ -198,6 +198,7 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     expect(await screen.findByText("Published?")).toBeInTheDocument();
     expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent(`· ${MENU.fields.length} field`);
     fireEvent.click(screen.getByTestId("cms-ws-add-field"));
+    fireEvent.click(screen.getByTestId("cms-add-field-type-text"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Photo URL" } });
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() =>

@@ -72,7 +72,6 @@ async function mount(state: MediaStateResult, usages: Record<string, number> = {
       composer={makeComposer(usages)}
       onClose={vi.fn()}
       onOpenImageEditor={vi.fn()}
-      onOpenIconPicker={vi.fn()}
     />
   );
 }

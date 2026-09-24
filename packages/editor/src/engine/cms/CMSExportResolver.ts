@@ -13,6 +13,11 @@ export type TemplateSyntax = "handlebars" | "liquid";
 export interface CMSExportOptions {
   mode: CMSExportMode;
   syntax?: TemplateSyntax;
+  /** The published file name of the page being resolved (pageFileNames).
+   *  On a collection's template page (pageTemplatePath), a binding to "the
+   *  record on this page" is written as the publish worker's {fieldSlug}
+   *  token, which it fills once per record. */
+  pageFile?: string;
 }
 
 /**
@@ -49,7 +54,7 @@ export class CMSExportResolver {
     }
 
     if (options.mode === "static") {
-      return this.resolveStatic(html);
+      return this.resolveStatic(html, options.pageFile);
     }
 
     if (options.mode === "template") {
@@ -62,7 +67,7 @@ export class CMSExportResolver {
   /**
    * Resolve with actual CMS content values (static mode)
    */
-  private async resolveStatic(html: string): Promise<string> {
+  private async resolveStatic(html: string, pageFile?: string): Promise<string> {
     /* Optional all the way down. Now that resolution is the DEFAULT rather than
        an opt-in flag, every export runs through here — including composers
        built without a CMS manager at all, where `composer.cms.bindings` threw
@@ -86,6 +91,11 @@ export class CMSExportResolver {
 
       const bindings = this.composer.cms.bindings.getBindings(elementId);
       bindings.forEach((binding) => {
+        const onPageRecord = !binding.itemId || binding.itemId === "context";
+        if (onPageRecord && pageFile && this.composer.cms.collections?.getCollection?.(binding.collectionId)?.pageTemplatePath === pageFile) {
+          this.applyValue(el as HTMLElement, binding.property, `{${binding.fieldSlug}}`);
+          return;
+        }
         const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {
           if (!value) return;
           this.applyValue(el as HTMLElement, binding.property, value);

@@ -128,10 +128,23 @@
   padding: 0 var(--bk-space-8);
 }
 
-.bd-ai-composer-send {
+/* The field's bottom-right corner: the quota counter (G2-129) then the send
+   button, side by side. */
+.bd-ai-composer-foot {
   position: absolute;
   right: var(--bk-space-4);
   bottom: var(--bk-space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+}
+
+.bd-ai-composer-quota {
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+
+.bd-ai-composer-send {
   width: 26px;
   height: 22px;
   border-radius: var(--bk-radius-sm);

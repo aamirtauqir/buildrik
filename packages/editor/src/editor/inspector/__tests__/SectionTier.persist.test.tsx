@@ -24,7 +24,6 @@ vi.mock("../components/InspectorErrorBoundary", () => ({
 }));
 vi.mock("../sections/VariantSection", () => ({ VariantSection: () => null }));
 vi.mock("../components/InspectorElementMenu", () => ({ InspectorElementMenu: () => null }));
-vi.mock("../components/BindingPopover", () => ({ BindingPopover: () => null }));
 
 import { ProInspector } from "../ProInspector";
 import { useInspectorTier } from "../hooks/useInspectorTier";
