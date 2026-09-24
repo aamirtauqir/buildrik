@@ -464,7 +464,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         onClose={() => setDeleteSelectionOpen(false)}
         onConfirm={confirmDeleteSelection}
         title={`Delete ${elementsLabel(selectedCount)}?`}
-        message={`This removes ${listNames(selectedNames)}.`}
+        message={`This removes ${listNames(selectedNames)} (and anything nested inside them) from ${activePage?.name ?? "this page"}. You can undo from the toast.`}
         confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
         tone="destructive"
         testId="layers-delete-selection"
