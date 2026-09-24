@@ -11,9 +11,9 @@
  * with the dashboard modal's default name. The URL is `/share/<token>`, the
  * route the dashboard serves; a site id is not a token.
  *
- * Copy is the board's (visual precedence): "current saved design". NOTE the
- * code contract — `/share/<token>` renders the PUBLISHED site — disagrees;
- * logged for the designer (scratchpad/designer-notes.md).
+ * Copy is the board's (visual precedence): "current saved design" — which is
+ * what `/share/<token>` renders since 2026-09-24 (the saved draft through the
+ * publish exporter; it used to redirect to the published site).
  *
  * Password and expiry stay in the dashboard's modal — the board carries
  * neither.

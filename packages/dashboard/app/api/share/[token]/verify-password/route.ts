@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import { checkRateLimit } from "@server/services/rate-limiter";
-import { shareDestination } from "@lib/share-destination";
-
-/** The link is fine; the site behind it has never been published. */
-const NOT_PUBLISHED = "This site isn't published yet, so there's nothing to open.";
+import { shareUnlockProof } from "@server/services/share-link.service";
 
 const VERIFY_MAX_ATTEMPTS = 5;
 const VERIFY_WINDOW_MS = 60_000;
@@ -40,10 +37,10 @@ export async function POST(
 
   const link = await prisma.shareLink.findUnique({
     where: { token },
-    include: { site: { select: { publishedUrl: true, slug: true } } },
+    include: { site: { select: { deletedAt: true } } },
   });
 
-  if (!link || !link.isActive) {
+  if (!link || !link.isActive || link.site.deletedAt) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
 
@@ -51,16 +48,10 @@ export async function POST(
     return NextResponse.json({ error: "Link expired" }, { status: 410 });
   }
 
+  /* The share page itself shows the draft (and counts the view) for a link
+     with no password; there is nothing to verify here. */
   if (!link.passwordHash) {
-    // Count the visit for password-less links too (was only counted after a
-    // password check, so open links always reported zero views).
-    await prisma.shareLink.update({
-      where: { id: link.id },
-      data: { viewCount: { increment: 1 } },
-    });
-    const redirectUrl = shareDestination(link.site);
-    if (!redirectUrl) return NextResponse.json({ error: NOT_PUBLISHED }, { status: 409 });
-    return NextResponse.json({ redirectUrl });
+    return NextResponse.json({ redirectUrl: `/share/${encodeURIComponent(token)}` });
   }
 
   const bcrypt = await import("bcryptjs");
@@ -70,18 +61,12 @@ export async function POST(
     return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
   }
 
-  await prisma.shareLink.update({
-    where: { id: link.id },
-    data: { viewCount: { increment: 1 } },
-  });
-
-  /* Same dead end the page had: `/<slug>` is not a route, so an unpublished
-     site sent the visitor to a 404 right after they typed the password. */
-  const redirectUrl = shareDestination(link.site);
-  if (!redirectUrl) return NextResponse.json({ error: NOT_PUBLISHED }, { status: 409 });
+  /* Back to the share page, which now renders the saved draft once it sees
+     the signed unlock cookie (it counts the view there). */
+  const redirectUrl = `/share/${encodeURIComponent(token)}`;
 
   const res = NextResponse.json({ redirectUrl });
-  res.cookies.set(`share_${token}`, "1", {
+  res.cookies.set(`share_${token}`, shareUnlockProof(token), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

@@ -13,7 +13,8 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { Composer } from "@/engine";
 import type { NamedVersion } from "@/shared/types/versions";
-import { renderSavedVersionPages, sourceLabel, sourceOptions } from "../compareSources";
+import { sourceLabel, sourceOptions } from "../compareSources";
+import { renderProjectPages } from "../exportPublishPages";
 
 /* jsdom has no canvas; MediaOptimizer asks for a 2d context at construction. */
 beforeAll(() => {
@@ -32,7 +33,7 @@ function composerWithHeading(text: string): Composer {
   return c;
 }
 
-describe("renderSavedVersionPages", () => {
+describe("renderProjectPages", () => {
   it("renders the saved snapshot and leaves the live project as it was", async () => {
     const saved = composerWithHeading("Saved headline");
     const version = { id: "v1", name: "Before launch", snapshot: saved.exportProject() } as NamedVersion;
@@ -40,7 +41,7 @@ describe("renderSavedVersionPages", () => {
     const live = composerWithHeading("Live headline");
     const before = JSON.stringify(live.exportProject().pages);
 
-    const pages = await renderSavedVersionPages(version);
+    const pages = await renderProjectPages(version.snapshot);
 
     expect(pages.map((p) => p.html).join("\n")).toContain("Saved headline");
     expect(JSON.stringify(live.exportProject().pages)).toBe(before);

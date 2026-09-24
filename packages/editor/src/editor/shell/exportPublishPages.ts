@@ -1,5 +1,6 @@
-import type { Composer } from "@/engine";
+import { createComposer, type Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
+import type { ProjectData } from "@/shared/types/project";
 
 /** A page ready to publish: a path + its rendered HTML. Matches the server's
  *  publishPageSchema ({ path, html }). */
@@ -47,4 +48,31 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
      Inlining it needs no new transport: schema, server and worker unchanged.
      Pages are capped at 2MB each and the stylesheet is a few KB. */
   return inlinePublishStylesheet(result.files);
+}
+
+/**
+ * A project that is NOT the open one, rendered to its publish pages in a
+ * scratch composer: a saved version in Compare, and the `/share/<token>` draft
+ * preview (which has no editor at all). Never THE live composer — importing
+ * there replaces the user's draft (lane B's first cut did exactly that and
+ * never swapped back). Storage is off, so the scratch instance cannot autosave
+ * over anything either.
+ *
+ * It does not wait for `whenReady()`: that is the media library's IndexedDB
+ * load, which the export does not read (the engine's own export tests import
+ * and export without it). Its late outcome is swallowed — the instance is
+ * already destroyed by then.
+ */
+export async function renderProjectPages(snapshot: ProjectData): Promise<PublishPage[]> {
+  const scratch = createComposer({
+    container: document.createElement("div"),
+    storage: { type: "none", autoSave: false },
+  });
+  scratch.whenReady().catch(() => {});
+  try {
+    scratch.importProject(snapshot);
+    return await exportPublishPages(scratch);
+  } finally {
+    scratch.destroy();
+  }
 }
