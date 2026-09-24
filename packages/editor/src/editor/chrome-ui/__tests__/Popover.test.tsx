@@ -37,6 +37,15 @@ describe("Popover", () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
+  /* The Asset library closes on Escape; with its ⋯ open the first Escape must
+     only close the menu. The popover marks the Escape it spends. */
+  it("marks the Escape it spends defaultPrevented, so a host view stays open", () => {
+    render(<Harness onClose={() => {}} />);
+    const ev = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    document.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+  });
+
   /* QA (integration 5e0d47902, a11y): Enter on the Layers ⋯ opens the menu
      and focuses its first item; Escape closed it and left focus on <body>.
      WAI-ARIA menu button: Escape returns focus to the trigger. */

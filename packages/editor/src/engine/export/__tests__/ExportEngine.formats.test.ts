@@ -563,12 +563,13 @@ describe("ExportEngine.generateZip", () => {
     const html = await zip.file("index.html")!.async("string");
     expect(html).toContain('src="assets/asset-1.png"');
     expect(html).not.toContain("cdn.example.com");
-    // The archive is now built by the same pipeline Publish uses, and this page
-    // is a bare image with no styles — so there is no stylesheet, and nothing
-    // links one. The pair is what matters: a styles.css link with no file is a
-    // 404 on the customer's site.
-    expect(zip.file("styles.css")).toBeNull();
-    expect(html).not.toContain('href="styles.css"');
+    // The archive is built by the same pipeline Publish uses. Even a bare
+    // image page ships the reset (it carries the base body font — without it
+    // a published page rendered in the browser's default serif), so there is
+    // always a stylesheet — and the pair is what matters: the file exists AND
+    // the page links it. A link with no file is a 404 on the customer's site.
+    expect(zip.file("styles.css")).toBeTruthy();
+    expect(html).toContain('href="styles.css"');
   });
 
   it("produces just index.html + styles.css when there are no assets", async () => {

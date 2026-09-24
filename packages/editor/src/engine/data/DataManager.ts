@@ -107,6 +107,36 @@ export class DataManager extends EventEmitter {
   }
 
   /**
+   * Rename a data source. Bindings address a source by id, so only the
+   * label changes.
+   */
+  renameSource(id: string, name: string): void {
+    const source = this.sources.get(id);
+    if (!source) {
+      throw new Error(`Data source "${id}" not found`);
+    }
+
+    source.name = name;
+    this.emit(EVENTS.DATA_SOURCE_UPDATED, { id, data: source.data });
+  }
+
+  /**
+   * Re-sync a source from its own provider (`getData`). Returns false for a
+   * static source — imported JSON has nothing to pull from, so the caller
+   * supplies the new data through `updateSourceData` instead.
+   */
+  async refreshSource(id: string): Promise<boolean> {
+    const source = this.sources.get(id);
+    if (!source) {
+      throw new Error(`Data source "${id}" not found`);
+    }
+    if (!source.getData) return false;
+
+    this.updateSourceData(id, await source.getData());
+    return true;
+  }
+
+  /**
    * Resolve a data binding to its actual value
    */
   async resolve(binding: DataBinding, context?: DataContext): Promise<DataResolverResult> {

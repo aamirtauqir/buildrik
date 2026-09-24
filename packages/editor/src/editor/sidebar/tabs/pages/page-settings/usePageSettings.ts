@@ -11,6 +11,7 @@
 
 import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
@@ -253,7 +254,12 @@ export function usePageSettings(
         allowFollow,
         customHead,
       });
-      addToast({ description: "Page settings saved", tone: "success" });
+      /* 6887:73801 — the saved toast carries its way on: Manage pages. */
+      addToast({
+        description: "Page settings saved",
+        tone: "success",
+        action: { label: "Manage pages", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" }) },
+      });
       return true;
     } catch {
       /* The dialog stays open with the edits; Done is the retry (#20). */

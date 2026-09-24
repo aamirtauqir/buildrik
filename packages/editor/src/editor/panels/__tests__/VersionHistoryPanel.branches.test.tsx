@@ -108,6 +108,9 @@ function makeComposer(): Composer {
     off: () => {},
     versions: {
       captureVisualSnapshot: () => "data:image/jpeg;base64,fake",
+      /* The "+ Save a version" footer (SaveVersionFooter) saves through the
+         engine directly — the Session tab has no version list to borrow. */
+      createVersion: (name: string, description?: string) => mocks.createVersion(name, description),
     },
   } as unknown as Composer;
 }
@@ -273,6 +276,31 @@ describe("VersionHistoryPanel — restore branches", () => {
 
     expect(await screen.findByText(/^Restored to /)).toBeTruthy();
     expect(mocks.restoreVersion).toHaveBeenCalledWith("v1");
+  });
+
+  /* G1-071 — the restore saved the open work first; its toast offers
+     "Undo restore", which restores that safety save. */
+  it("the restore toast's Undo restore restores the safety save", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const handlers = new Map<string, (p: unknown) => void>();
+    const composer = {
+      ...makeComposer(),
+      on: (ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn),
+      off: () => {},
+    } as unknown as Composer;
+    mocks.restoreVersion.mockImplementation(async (id: string) => {
+      if (id === "v1") handlers.get("version:restored")?.({ version: { id }, safetyVersionId: "safety-1" });
+    });
+    const Panel = await loadPanel();
+    render(<Panel composer={composer} />);
+
+    fireEvent.click(screen.getByLabelText('Restore "Save A"'));
+    await screen.findByText(/Restore “Save A”\?/);
+    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Undo restore" }));
+    await waitFor(() => expect(mocks.restoreVersion).toHaveBeenLastCalledWith("safety-1"));
+    expect(await screen.findByText("Restore undone")).toBeTruthy();
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "surface": "brand-starters",
-  "board": "Brand \u00b7 starters (Figma 152:137)",
+  "board": "Brand · starters (Figma 152:137)",
   "url": "http://localhost:5050/",
   "viewport": {
     "width": 1440,
@@ -33,7 +33,7 @@
     },
     {
       "action": "waitFor",
-      "testId": "starter-grid"
+      "testId": "starter-list"
     },
     {
       "action": "hover",
@@ -67,24 +67,14 @@
       "nodeId": "152:143"
     },
     {
-      "name": "warning",
-      "testId": "brand-starters-warning",
-      "spec": "brand-starters",
-      "nodeId": "152:144"
-    },
-    {
-      "name": "warning-text",
-      "testId": "brand-starters-warning-text"
-    },
-    {
       "name": "gallery",
-      "testId": "starter-grid",
+      "testId": "starter-list",
       "spec": "brand-starters",
       "nodeId": "152:146"
     },
     {
       "name": "card-cobalt-default",
-      "testId": "starter-card-cobalt-default",
+      "testId": "starter-row-cobalt-default",
       "spec": "brand-starters",
       "nodeId": "152:148"
     },
@@ -95,12 +85,8 @@
       "nodeId": "152:150"
     },
     {
-      "name": "thumb-cobalt-default",
-      "testId": "starter-thumb-cobalt-default"
-    },
-    {
       "name": "card-stripe-blue",
-      "testId": "starter-card-stripe-blue",
+      "testId": "starter-row-stripe-blue",
       "spec": "brand-starters",
       "nodeId": "152:151"
     },
@@ -111,12 +97,8 @@
       "nodeId": "152:153"
     },
     {
-      "name": "thumb-stripe-blue",
-      "testId": "starter-thumb-stripe-blue"
-    },
-    {
       "name": "card-notion-warm",
-      "testId": "starter-card-notion-warm",
+      "testId": "starter-row-notion-warm",
       "spec": "brand-starters",
       "nodeId": "152:155"
     },
@@ -127,12 +109,8 @@
       "nodeId": "152:157"
     },
     {
-      "name": "thumb-notion-warm",
-      "testId": "starter-thumb-notion-warm"
-    },
-    {
       "name": "card-apple-minimal",
-      "testId": "starter-card-apple-minimal",
+      "testId": "starter-row-apple-minimal",
       "spec": "brand-starters",
       "nodeId": "152:158"
     },
@@ -143,12 +121,8 @@
       "nodeId": "152:160"
     },
     {
-      "name": "thumb-apple-minimal",
-      "testId": "starter-thumb-apple-minimal"
-    },
-    {
       "name": "card-linear-dark",
-      "testId": "starter-card-linear-dark",
+      "testId": "starter-row-linear-dark",
       "spec": "brand-starters",
       "nodeId": "152:162"
     },
@@ -159,12 +133,8 @@
       "nodeId": "152:164"
     },
     {
-      "name": "thumb-linear-dark",
-      "testId": "starter-thumb-linear-dark"
-    },
-    {
       "name": "card-vercel-mono",
-      "testId": "starter-card-vercel-mono",
+      "testId": "starter-row-vercel-mono",
       "spec": "brand-starters",
       "nodeId": "152:165"
     },
@@ -173,10 +143,6 @@
       "testId": "starter-name-vercel-mono",
       "spec": "brand-starters",
       "nodeId": "152:167"
-    },
-    {
-      "name": "thumb-vercel-mono",
-      "testId": "starter-thumb-vercel-mono"
     }
   ],
   "_note": [
@@ -185,22 +151,22 @@
     "",
     "VERIFIED, not asserted: the row opens, the destination is this board, a",
     "starter APPLIES, and the tokens change. surfaces/brand-dirty.json is the other",
-    "half of that walk \u2014 `starter-card-stripe-blue` was clicked live and the panel",
+    "half of that walk — `starter-card-stripe-blue` was clicked live and the panel",
     "came back dirty, which is what `useApplyStarter` -> `stageTokens` is supposed",
     "to do. What it also does is documented there and is a real defect: in Beginner",
     "mode the applied starter empties the Brand preview, because no starter token",
     "carries `semanticKind` and Beginner filters on exactly that.",
     "",
     "WHAT THE BOARD WON:",
-    "  the warning's WORDS. It shipped as one line \u2014 \"Applying a starter overwrites",
-    "  your tokens.\" \u2014 against the board's four-clause paragraph (152:145), and the",
+    "  the warning's WORDS. It shipped as one line — \"Applying a starter overwrites",
+    "  your tokens.\" — against the board's four-clause paragraph (152:145), and the",
     "  short version got the frightening part backwards: it reads as immediate and",
     "  irreversible, and applying is neither. Every clause of the board's sentence",
     "  is true of `useApplyStarter`: `stageTokens` writes the CSS custom properties",
     "  on `documentElement` at once (the canvas preview), clears `undoStack` and",
     "  `redoStack` (per-token undo), touches only the colour, spacing and type",
     "  registries (the other eleven kinds keep their values), and persists nothing",
-    "  until the Review modal \u2014 the confirm that names every staged edit \u2014 reaches",
+    "  until the Review modal — the confirm that names every staged edit — reaches",
     "  `setProjectSettings`. Checked clause by clause before adopting it; copy that",
     "  describes behaviour has to be true or the board does not get to win.",
     "  warning block   a full-bleed 12/8 strip -> the board's rounded-8 callout on",
@@ -213,7 +179,7 @@
     "  caption         12/18 (152:150). The line was inherited from flowbite's",
     "                  `text-sm` on the Button, which is 20 and only right at 14px.",
     "",
-    "NOT CONFORMED \u2014 the thumb FILL (152:149 and its five siblings):",
+    "NOT CONFORMED — the thumb FILL (152:149 and its five siblings):",
     "  the board fills all six thumbs a flat `--color/bg-subtle`. That is a",
     "  placeholder, not a decision: six identical grey rectangles would leave the",
     "  gallery with nothing to tell Stripe Blue from Linear Dark but the caption",
@@ -221,30 +187,31 @@
     "  paints each starter's own `color-primary` -> `color-background`, which is",
     "  the card's only differentiator. Board sample data is never conformed to",
     "  literally (founder, 2026-08-06) and a placeholder fill for content is that.",
-    "  The six thumb nodes are therefore SKIPPED \u2014 their height and radius ARE",
+    "  The six thumb nodes are therefore SKIPPED — their height and radius ARE",
     "  conformed in code, they just cannot be joined without the fill coming with",
     "  them. Founder can overrule; it is one line in StarterGrid.tsx.",
     "",
     "NOT JOINED:",
-    "  152:145, the warning paragraph \u2014 `width: 248px` against a measured 247. The",
+    "  152:145, the warning paragraph — `width: 248px` against a measured 247. The",
     "  panel is `--bk-size-drawer` 280 and `.ls-panel` spends 1px of it on",
     "  `border-right`, so the content box is 279 and a 16/16 inset leaves 247. The",
     "  board draws its own 1px frame border and then measures 248 = 280 - 32 inside",
     "  it, which is the board ignoring its own edge. Pinning the paragraph to a",
     "  literal 248 would break the widened drawer (`--drawer-w` is 560 for Media,",
-    "  700 expanded), so the shape \u2014 16 in from both sides \u2014 is what the code",
+    "  700 expanded), so the shape — 16 in from both sides — is what the code",
     "  satisfies. Its colour, 11px size and 16px line all match and are visible in",
     "  measured/brand-starters.json.",
-    "  152:147 / 152:154 / 152:161, the three `row` frames \u2014 the gallery is a CSS",
+    "  152:147 / 152:154 / 152:161, the three `row` frames — the gallery is a CSS",
     "  grid, so there is no per-row element to anchor. Their only property is",
     "  `gap: 16`, which the grid states once and 152:146 measures.",
-    "  152:137 itself \u2014 the drawer's edge, see brand-lint-warnings.json.",
+    "  152:137 itself — the drawer's edge, see brand-lint-warnings.json.",
     "",
     "HEADER TITLE REVERSED TO THE BOARD: the panel header now reads `Brand` at",
-    "every depth, not `Brand \u203a <Section>`. Six destination frames state the title",
+    "every depth, not `Brand › <Section>`. Six destination frames state the title",
     "text and all six say `Brand`; check-board-copy.mjs reported it on all six at",
     "once. This undoes a deliberate 2026-09-04 change whose argument is kept in",
-    "DesignSystemTab.tsx \u2014 the boards answer `where am I` one row lower, in the",
-    "36px Back row they all draw."
+    "DesignSystemTab.tsx — the boards answer `where am I` one row lower, in the",
+    "36px Back row they all draw.",
+    "2026-09-24 re-pointed (05ee928dc, Starters is one card of rows; the row stages it): starter-grid -> starter-list, starter-card-<id> -> starter-row-<id>; thumbnails and the warning callout were removed (targets dropped)."
   ]
 }

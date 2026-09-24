@@ -121,23 +121,6 @@ export function SaveIcon() {
   );
 }
 
-export function TimeTravelIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 14 14"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <circle cx="7" cy="7" r="5" />
-      <path d="M7 4v3l2 1" />
-      <path d="M5 9.5l-1.5 1.5L5 12.5" />
-    </svg>
-  );
-}
-
 export function CompareIcon() {
   return (
     <svg

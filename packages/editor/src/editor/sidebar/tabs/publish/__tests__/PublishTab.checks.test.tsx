@@ -111,14 +111,25 @@ beforeEach(() => {
 });
 
 describe("PublishTab — renders the server's readiness contract", () => {
-  it("renders every row the server returned, and only those", async () => {
+  it("renders the server's rows, except Favicon (spec B4 draws none)", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
-    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages", "Favicon"]) {
+    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
+    expect(screen.queryByText("Favicon")).toBeNull();
+  });
+
+  /* Re-walk 2026-09-24: "Publish to production" stayed clickable for a minute
+     of "Checking readiness…". Never publishable in an unknown state. */
+  it("keeps the primary disabled, with its reason, while the checks are pending", async () => {
+    fetchPrePublishChecks.mockReturnValue(new Promise(() => {}));
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
+    const cta = (await screen.findByTestId("publish-cta")) as HTMLButtonElement;
+    expect(cta.disabled).toBe(true);
+    expect(screen.getByTestId("publish-cta-reason").textContent).toBe("Checking readiness…");
   });
 
   it("passes the site id straight through to the server call", async () => {

@@ -46,7 +46,7 @@ describe("minimized pill", () => {
     const pill = screen.getByRole("button", {
       name: "Get started — 3 of 7 complete. Click to expand.",
     });
-    expect(pill).toHaveTextContent("3/7 done");
+    expect(pill).toHaveTextContent("3/7");
 
     fireEvent.click(pill);
     expect(props.onRestore).toHaveBeenCalledTimes(1);
@@ -69,13 +69,13 @@ describe("minimized pill", () => {
     expect(props.onRestore).toHaveBeenCalledTimes(2);
   });
 
-  it("shows 'All done!' when every step is complete", () => {
+  it("shows 'Done' when every step is complete", () => {
     render(
       <OnboardingChecklist
         {...makeProps({ isMinimized: true, completedCount: 7, steps: stepsWithCompleted(7) })}
       />
     );
-    expect(screen.getByRole("button")).toHaveTextContent("All done!");
+    expect(screen.getByRole("button")).toHaveTextContent("Done");
   });
 });
 

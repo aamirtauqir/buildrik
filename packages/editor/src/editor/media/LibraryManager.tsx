@@ -156,7 +156,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   // Keyboard shortcuts
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      /* An open ⋯ / Tags ▾ menu spends its Escape closing itself (chrome-ui
+         Popover marks it defaultPrevented): the first Escape closes the
+         menu, not the whole library. */
+      if (e.key === "Escape" && !e.defaultPrevented) onClose();
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         searchRef.current?.focus();
@@ -936,9 +939,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             const { assetCount, subFolderCount } = state.inspectFolder(folderId);
             setFolderConfirm({ folderId, folderName, assetCount, subFolderCount });
           }}
-          onTrashClick={() =>
-            addToast({ description: "Trash coming soon", tone: "info" })
-          }
           onMoveAssetToFolder={handleDropOnFolder}
           assetDragActive={assetDrag !== null}
         />
@@ -1020,7 +1020,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             });
           }}
           onRegenerateAltText={async (key) => {
-            const result = await generateAltTextRemote(key);
+            // Regenerate is an explicit ask to REPLACE the current text.
+            const result = await generateAltTextRemote(key, { force: true });
             if (!result) return null;
             if (result.skipped) return result;
             await composer.media.updateAsset(key, {

@@ -13,17 +13,18 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, TextField } from "@/editor/chrome-ui";
+import { PanelFrame, Button, ConfirmDialog, Menu, MenuItem, Popover, TextField } from "@/editor/chrome-ui";
+import { MoreHorizontal } from "lucide-react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
-import { ActivityLogView } from "./components/ActivityLogView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
-import { TimeTravelIcon } from "./icons";
 import type { HistoryView, HistoryTabProps } from "./types";
+import { BackToActivityRow } from "../activity/BackToActivityRow";
 import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
@@ -33,7 +34,6 @@ const VIEW_LABEL: Record<HistoryView, string> = {
   session: "Session",
   saves: "Saves",
   published: "Published",
-  activity: "Activity",
 };
 
 const SEARCH_PLACEHOLDER: Record<"session" | "saves", string> = {
@@ -71,7 +71,6 @@ const PREVIEW_NOTE =
    beats either through twMerge. */
 const PREVIEW_ACTION = "tw:h-7 tw:px-3 tw:py-1.5 tw:border-[var(--bk-border)]";
 
-const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
 const HISTORY_EMPTY =
   "tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)] tw:text-[12px] " +
   "tw:text-[var(--bk-ink-muted)] tw:text-center";
@@ -80,6 +79,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
   initialView,
+  fromActivity: fromActivityProp = false,
   rollbackJob = null,
   onRollbackStarted,
   isExpanded,
@@ -130,13 +130,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
     if (initialView) return initialView; // deep link wins for this mount
     if (stored === "published") return "published";
-    if (stored === "activity") return "activity";
+    /* "activity" was a fourth tab until Activity became its own panel
+       (owner, 2026-09-25); a stored one falls through to Session. */
     if (stored === "saves") return "saves";
     return "session"; // board 4418:73791 opens on Session
   });
 
   const [searchQuery, setSearchQuery] = React.useState("");
+  /* Set when an Activity row opened Published or Session here; the back row
+     shows until the user picks a tab themselves. */
+  const [fromActivity, setFromActivity] = React.useState(fromActivityProp);
   const [showScrubber, setShowScrubber] = React.useState(false);
+  /* Board 4418:73791 draws no search field and no "Undo History · Clear ·
+     Time-Travel" band. Both capabilities stay, behind the panel ⋯ (owner rule:
+     parity never silently removes one; designer note logged). */
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [confirmClear, setConfirmClear] = React.useState(false);
 
   const {
     suggestion: milestoneSuggestion,
@@ -195,6 +205,60 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     <PanelFrame className="bd-history-container" data-testid="history-panel">
       <PanelFrame.Header
         title="History"
+        actions={
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label="History actions"
+            trigger={
+              <Button
+                color="light"
+                size="xs"
+                className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+                aria-label="History actions"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((v) => !v)}
+                data-testid="history-menu"
+              >
+                <MoreHorizontal size={14} aria-hidden="true" />
+              </Button>
+            }
+          >
+            <Menu label="History actions">
+              {activeView === "session" || activeView === "saves" ? (
+                <MenuItem
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setSearchOpen(true);
+                  }}
+                >
+                  Search {activeView === "session" ? "changes" : "saves"}
+                </MenuItem>
+              ) : null}
+              <MenuItem
+                kbd="⌃⇧T"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowScrubber(true);
+                }}
+              >
+                Time-Travel
+              </MenuItem>
+              <MenuItem
+                danger
+                disabled={!canUndo}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setConfirmClear(true);
+                }}
+              >
+                Clear undo history…
+              </MenuItem>
+            </Menu>
+          </Popover>
+        }
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
@@ -202,7 +266,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
-        {(["session", "saves", "published", "activity"] as const).map((view) => (
+        {(["session", "saves", "published"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -210,40 +274,22 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             aria-selected={activeView === view}
             className={`view-tab${activeView === view ? " active" : ""}`}
             data-testid={`history-view-tab-${view}`}
-            onClick={() => setActiveView(view)}
+            onClick={() => {
+              setActiveView(view);
+              setFromActivity(false);
+            }}
           >
             {VIEW_LABEL[view]}
           </Button>
         ))}
       </div>
+      {fromActivity ? (
+        <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "activity" })} />
+      ) : null}
       {/* Session/Saves chrome. Published renders its own list and takes no
           search query, so showing a dead search field over it would be a lie. */}
-      {(activeView === "session" || activeView === "saves") && (
+      {(activeView === "session" || activeView === "saves") && (searchOpen || searchQuery) && (
         <>
-          {activeView === "saves" && (
-            <div className={FILTER_ROW} data-testid="history-filter-row">
-              {/* Board 163:113 is the Saves list WITH time-travel active; this
-                  is its door (plus Ctrl+Shift+T). Session has its own, in
-                  ActivityView's header. */}
-              <Button
-                type="button"
-                /* `tw:h-6` is load-bearing: flowbite's Button ships h-10 and
-                   `.tt-btn`'s padding cannot beat it (height:auto loses to a
-                   height utility), so this control was 40 tall in a row board
-                   1657:7157 draws at 32 — it set the row's height single-
-                   handedly. A same-property utility is the only thing twMerge
-                   drops flowbite's for. */
-                className="tt-btn tw:h-6 tw:min-h-0 tw:shrink tw:ml-auto"
-                data-testid="history-time-travel"
-                onClick={() => setShowScrubber(true)}
-                aria-label="Open Time-Travel scrubber (Ctrl+Shift+T)"
-                title="Time-Travel (Ctrl+Shift+T)"
-              >
-                <TimeTravelIcon />
-                Time-Travel
-              </Button>
-            </div>
-          )}
           <div className="search-bar" data-testid="history-search-bar">
             <span className="search-icon" aria-hidden="true">
               <SearchIconSvg />
@@ -256,12 +302,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               placeholder={SEARCH_PLACEHOLDER[activeView]}
               aria-label={SEARCH_PLACEHOLDER[activeView]}
               data-testid="history-search-input"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && !searchQuery) setSearchOpen(false);
+              }}
             />
             {searchQuery && (
               <Button
                 type="button"
                 className="search-clear visible"
-                onClick={() => setSearchQuery("")}
+                onClick={() => {
+                  setSearchQuery("");
+                  setSearchOpen(false);
+                }}
                 aria-label="Clear search"
               >
                 <ClearXSvg />
@@ -334,9 +387,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           <ActivityView
             composer={composer}
             searchQuery={searchQuery}
-            onOpenTimeTravel={() => setShowScrubber(true)}
-            onClearHistory={clear}
-            canClear={canUndo}
           />
         )}
 
@@ -371,6 +421,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                   from: "History",
                 })
               }
+              onCompareWithCurrent={(row) =>
+                composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                  left: { kind: "published", jobId: row.id, version: row.version },
+                  right: { kind: "current" },
+                  from: "History",
+                })
+              }
+              siteName={composer?.getProjectMetadata?.()?.name}
             />
           ) : (
             /* No SITE, which is a different fact from no versions —
@@ -379,19 +437,27 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
 
-        {activeView === "activity" && (
-          /* Site-scoped activity log (B6). The list owns its own chrome
-             (filter chips + role=status region) — Saves' approval band /
-             prune note are Saves-only. */
-          <ActivityLogView siteId={siteId ?? null} />
-        )}
         </div>
 
         {(activeView === "session" || activeView === "saves") && savesSettled && (
           <SavesPruneNote composer={composer} view={activeView} />
         )}
+        {/* Saves draws this footer inside its own list; Session (4418:73791)
+            draws the same one under its rows. */}
+        {activeView === "session" && <SaveVersionFooter composer={composer} />}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
+      <ConfirmDialog
+        open={confirmClear}
+        onClose={() => setConfirmClear(false)}
+        onConfirm={() => {
+          clear();
+          setConfirmClear(false);
+        }}
+        title="Clear undo history?"
+        message="Every step in this session's undo history is removed. Your page stays as it is now."
+        confirmLabel="Clear undo history"
+      />
       {showScrubber && (
         <TimeTravelScrubber
           composer={composer}

@@ -5,10 +5,9 @@
  */
 
 import * as React from "react";
-import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
 import type { PropertyConfig } from "./config";
-import { Button, Checkbox } from "@/editor/chrome-ui";
+import { Checkbox } from "@/editor/chrome-ui";
 const styles = {
   checkboxRow: {
     display: "flex",
@@ -38,24 +37,6 @@ const styles = {
     lineHeight: 1.45,
     color: "var(--bk-warning-ink, var(--bk-ink-muted))",
   } as React.CSSProperties,
-  srcRow: {
-    display: "flex",
-    gap: 8,
-    alignItems: "flex-end",
-    marginBottom: 12,
-  } as React.CSSProperties,
-  browseButton: {
-    padding: "8px 12px",
-    background: "var(--bk-accent-tint)",
-    border: "1px solid var(--bk-alpha-accent-30)",
-    borderRadius: 6,
-    color: "var(--bk-accent)",
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-    whiteSpace: "nowrap" as const,
-    marginBottom: 12,
-  } as React.CSSProperties,
 };
 
 // ============================================================================
@@ -67,10 +48,6 @@ export interface PropertyFieldProps {
   value: string;
   onChange: (id: string, value: string) => void;
   selectedElement: { id: string; type: string };
-  onOpenMediaLibrary?: (
-    allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void
-  ) => void;
 }
 
 // ============================================================================
@@ -93,7 +70,6 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
   value,
   onChange,
   selectedElement,
-  onOpenMediaLibrary,
 }) => {
   // SELECT FIELD
   if (prop.type === "select") {
@@ -135,39 +111,6 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
         placeholder={prop.placeholder}
         textarea
       />
-    );
-  }
-
-  // IMAGE/VIDEO SRC WITH BROWSE BUTTON
-  if (
-    prop.id === "src" &&
-    (selectedElement.type === "image" || selectedElement.type === "video") &&
-    onOpenMediaLibrary
-  ) {
-    const mediaType: MediaAssetType = selectedElement.type === "video" ? "video" : "image";
-
-    return (
-      <div style={styles.srcRow}>
-        <div style={{ flex: 1 }}>
-          <InputRow
-            label={prop.label}
-            value={value}
-            onChange={(v) => onChange(prop.id, v)}
-            placeholder={prop.placeholder}
-          />
-        </div>
-        <Button
-          onClick={() =>
-            onOpenMediaLibrary([mediaType], (asset) => {
-              onChange("src", asset.src);
-            })
-          }
-          style={styles.browseButton}
-          title="Browse media library"
-        >
-          Browse
-        </Button>
-      </div>
     );
   }
 

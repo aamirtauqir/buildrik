@@ -79,11 +79,22 @@ export async function mirrorVersionDelete(versionId: string): Promise<void> {
   );
 }
 
+/** How many missing server versions one open pulls down, newest first. */
+export const HYDRATE_LIMIT = 20;
+/** Payload reads per request — concurrent queries share one batched call. */
+const HYDRATE_CHUNK = 10;
+
 /**
  * Cross-device load: pull server versions into the local IndexedDB cache on
  * editor open. ADDITIVE — only versionIds not already local are written, so a
  * local unsynced version is never clobbered. They surface on the next version-
  * list read. Best-effort; never throws.
+ *
+ * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
+ * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
+ * competing with the project load. Now the newest HYDRATE_LIMIT missing
+ * versions (the list comes back newest-first), fetched concurrently in
+ * chunks so tRPC batches each chunk into one request.
  */
 export async function hydrateVersionsFromServer(): Promise<number> {
   const siteId = currentSiteId();
@@ -92,29 +103,45 @@ export async function hydrateVersionsFromServer(): Promise<number> {
   try {
     const remote = await client().siteVersions.list.query({ siteId });
     if (!remote.length) return 0;
-    const localIds = new Set((await loadVersions(siteId)).map((v) => v.id));
-    for (const r of remote) {
-      if (localIds.has(r.versionId)) continue;
-      const payload = await client().siteVersions.get.query({ siteId, versionId: r.versionId });
-      if (!payload) continue;
-      /* Force projectId to this site so loadVersions(siteId) finds it regardless
-         of what the originating device stored.
+    const local = await loadVersions(siteId);
+    const localIds = new Set(local.map((v) => v.id));
+    /* Backfill author names onto versions already cached (G1-075): the list
+       carries them; a version hydrated before it did has only the id. */
+    const nameById = new Map(remote.map((r) => [r.versionId, r.createdByName ?? null]));
+    for (const v of local) {
+      const name = nameById.get(v.id);
+      if (name && !v.authorName) await saveVersion({ ...v, authorName: name });
+    }
+    const missing = remote.filter((r) => !localIds.has(r.versionId)).slice(0, HYDRATE_LIMIT);
+    for (let i = 0; i < missing.length; i += HYDRATE_CHUNK) {
+      const chunk = missing.slice(i, i + HYDRATE_CHUNK);
+      const payloads = await Promise.all(
+        chunk.map((r) => client().siteVersions.get.query({ siteId, versionId: r.versionId })),
+      );
+      for (let k = 0; k < chunk.length; k++) {
+        const payload = payloads[k];
+        const r = chunk[k];
+        if (!payload) continue;
+        /* Force projectId to this site so loadVersions(siteId) finds it regardless
+           of what the originating device stored.
 
-         `userId` comes off the LIST ROW, not the payload. The payload is
-         whatever the originating client sent, and until 2026-08-25 that was
-         always null — nothing ever called `setCurrentUserId`. The server does
-         not trust it either way: `site-version.ts:30` stamps `createdBy` from
-         the session and says so ("never trust a client-supplied createdBy —
-         attribution spoofing in version history"). So the authoritative author
-         was on the server the whole time and simply never read back; the editor
-         has no other reference to `createdBy` anywhere. Taking it here is what
-         gives a version made on someone else's machine an author at all. */
-      await saveVersion({
-        ...(payload as NamedVersion),
-        projectId: siteId,
-        userId: r.createdBy ?? null,
-      });
-      added++;
+           `userId` comes off the LIST ROW, not the payload. The payload is
+           whatever the originating client sent, and until 2026-08-25 that was
+           always null — nothing ever called `setCurrentUserId`. The server does
+           not trust it either way: `site-version.ts:30` stamps `createdBy` from
+           the session and says so ("never trust a client-supplied createdBy —
+           attribution spoofing in version history"). So the authoritative author
+           was on the server the whole time and simply never read back; the editor
+           has no other reference to `createdBy` anywhere. Taking it here is what
+           gives a version made on someone else's machine an author at all. */
+        await saveVersion({
+          ...(payload as NamedVersion),
+          projectId: siteId,
+          userId: r.createdBy ?? null,
+          authorName: r.createdByName ?? null,
+        });
+        added++;
+      }
     }
   } catch (e) {
     // eslint-disable-next-line no-console

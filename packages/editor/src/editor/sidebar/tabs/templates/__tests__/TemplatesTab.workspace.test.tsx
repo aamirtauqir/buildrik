@@ -98,6 +98,9 @@ describe("Templates — full-canvas view (decision #24)", () => {
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    // 4418:54243 — Create page asks first; nothing is created before the confirm.
+    expect(composer.elements.createPage).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
     await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).toHaveBeenCalledWith(t.name);
     expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-new");
@@ -116,10 +119,13 @@ describe("Templates — full-canvas view (decision #24)", () => {
   /* #19 follow-up: the New-page modal's name reaches the catalogue's Create page. */
   it("Create page uses the name the New-page modal carried", async () => {
     const composer = makeComposer();
-    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" />);
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Our menu" }} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    // 4418:54243 — Create page asks first; nothing is created before the confirm.
+    expect(composer.elements.createPage).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
     await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.createPage).toHaveBeenCalledWith("Our menu");
     expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
@@ -129,10 +135,13 @@ describe("Templates — full-canvas view (decision #24)", () => {
      once the page exists. */
   it("the carried 'Add to site navigation' links the created page into the navs", async () => {
     const composer = makeComposer();
-    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" addToNavigation />);
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Our menu", addToNavigation: true }} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    // 4418:54243 — Create page asks first; nothing is created before the confirm.
+    expect(composer.elements.createPage).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
     await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled(), { timeout: 5000 });
     expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("page-new");
   });
@@ -165,5 +174,35 @@ describe("Templates — full-canvas view (decision #24)", () => {
     const toast = addToast.mock.calls.filter((c) => c[0].title === "Home replaced").at(-1)![0];
     toast.action.onClick();
     expect(composer.history.undo).toHaveBeenCalledTimes(1);
+  });
+
+  /* 4418:54243: Escape on the Create page confirm closes the confirm only —
+     the preview under it stays. */
+  it("Escape on the Create page confirm closes it and keeps the preview", () => {
+    render(<TemplatesTab composer={makeComposer() as never} onClose={vi.fn()} />);
+    const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    expect(screen.getByTestId("tpl-create-confirm")).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("tpl-create-confirm")).toBeNull();
+    expect(screen.getByTestId("tpl-ws-preview")).toBeInTheDocument();
+  });
+
+  /* Walked live: the apply called onTemplateUsed (→ Add) for a new page too,
+     which unmounted the view before "Page created" could show. */
+  it("Create page ends on Page created; the view is left only from its Done", async () => {
+    const composer = makeComposer();
+    const onTemplateUsed = vi.fn();
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} onTemplateUsed={onTemplateUsed} />);
+    const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
+    await waitFor(() => expect(screen.getByTestId("tpl-create-success")).toBeInTheDocument(), { timeout: 5000 });
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    expect(onTemplateUsed).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(onTemplateUsed).toHaveBeenCalledTimes(1);
   });
 });

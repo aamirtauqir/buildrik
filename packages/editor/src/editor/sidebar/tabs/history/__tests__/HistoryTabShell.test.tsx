@@ -1,8 +1,8 @@
 /**
  * HistoryTab shell tests — verifies the chrome after M1 + M2:
- *   - View switcher: Session / Saves / Published / Activity
+ *   - View switcher: Session / Saves / Published (Activity is its own panel)
  *   - Helper text under each tab
- *   - Session · Saves · Published · Activity tabs (board 4418:73791, B8)
+ *   - Session · Saves · Published tabs (board 4418:73791, B8)
  *   - Search bar is Saves-only (Published takes no query)
  *   - `initialView` deep link lands on Published
  *   - Time-Travel scrubber toggles via Ctrl+Shift+T
@@ -22,14 +22,14 @@ vi.mock("../../../../panels/VersionHistoryPanel", () => ({
 }));
 
 vi.mock("../components/ActivityView", () => ({
-  ActivityView: ({ onOpenTimeTravel }: { onOpenTimeTravel?: () => void }) => (
-    <div data-testid="activity-view">
-      <button data-testid="tt-trigger" onClick={() => onOpenTimeTravel?.()}>
-        open-tt
-      </button>
-    </div>
-  ),
+  ActivityView: () => <div data-testid="activity-view" />,
 }));
+
+/** Board 4418:73791: Time-Travel and search live behind the panel ⋯. */
+const openMenuItem = (name: RegExp | string) => {
+  fireEvent.click(screen.getByTestId("history-menu"));
+  fireEvent.click(screen.getByRole("menuitem", { name }));
+};
 
 vi.mock("../components/TimeTravelScrubber", () => ({
   TimeTravelScrubber: ({
@@ -103,6 +103,8 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
 }));
 
 import { HistoryTab } from "../HistoryTab";
+import { EVENTS } from "@/shared/constants/events";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 vi.mock("../../../../shell/PublishHistory", () => ({
   PublishHistory: ({ siteId }: { siteId: string }) => (
@@ -112,6 +114,7 @@ vi.mock("../../../../shell/PublishHistory", () => ({
 
 const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {}) =>
   render(
+    <ToastProvider>
     <HistoryTab
       composer={null}
       isExpanded={false}
@@ -120,6 +123,7 @@ const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {})
       onClose={() => {}}
       {...props}
     />
+    </ToastProvider>
   );
 
 /** Saves is the default view; this session's changes are the Session tab. */
@@ -132,16 +136,15 @@ describe("HistoryTab shell", () => {
   afterEach(cleanup);
 
   /* Board 4418:73791 draws Session · Saves · Published (Backups has no
-     service); Activity is B6's. "This session" was a filter chip inside Saves
+     service); Activity is its own panel (owner, 2026-09-25). "This session" was a filter chip inside Saves
      and is the Session tab now — the chip is gone. */
-  it("renders Session · Saves · Published · Activity, Session selected by default (4418:73791)", () => {
+  it("renders Session · Saves · Published, Session selected by default (4418:73791)", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(4);
+    expect(tabs).toHaveLength(3);
     expect(tabs[0]).toHaveTextContent(/Session/);
     expect(tabs[1]).toHaveTextContent(/Saves/);
     expect(tabs[2]).toHaveTextContent(/Published/);
-    expect(tabs[3]).toHaveTextContent(/Activity/);
     expect(tabs[0].getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByRole("button", { name: "This session" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Saved versions" })).toBeNull();
@@ -164,8 +167,19 @@ describe("HistoryTab shell", () => {
     expect(screen.queryByTestId("saves-panel")).toBeNull();
   });
 
-  it("renders prototype search-bar markup with a search-icon", () => {
+  /* 4418:73791 ends the Session tab with the same "+ Save a version" footer
+     Saves carries — it was only on Saves. */
+  it("Session carries the + Save a version footer", () => {
+    renderTab();
+    expect(screen.getByTestId("saves-save-version")).toHaveTextContent("+ Save a version");
+    fireEvent.click(screen.getByTestId("saves-save-version"));
+    expect(screen.getByRole("dialog")).toHaveTextContent("Save a version");
+  });
+
+  it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {
     const { container } = renderTab();
+    expect(container.querySelector(".search-bar")).toBeNull();
+    openMenuItem(/^Search /);
     expect(container.querySelector(".search-bar")).toBeTruthy();
     expect(container.querySelector(".search-input")).toBeTruthy();
     expect(container.querySelector(".search-icon")).toBeTruthy();
@@ -202,11 +216,11 @@ describe("HistoryTab shell", () => {
     expect(screen.getByTestId("activity-view")).toBeInTheDocument();
   });
 
-  it("toggles the Time-Travel scrubber when the activity view requests it", () => {
+  it("opens the Time-Travel scrubber from the panel ⋯", () => {
     renderTab();
     showChanges();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
   });
 
@@ -227,8 +241,15 @@ describe("HistoryTab shell", () => {
     renderTab({ initialView: "saves" });
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/ }));
+    openMenuItem(/^Time-Travel/);
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
+  });
+
+  it("⋯ › Clear undo history… is there, and inert with nothing to undo", () => {
+    renderTab();
+    fireEvent.click(screen.getByTestId("history-menu"));
+    const item = screen.getByRole("menuitem", { name: /Clear undo history/ });
+    expect(item.hasAttribute("disabled") || item.getAttribute("aria-disabled") === "true").toBe(true);
   });
 });
 
@@ -351,7 +372,7 @@ describe("HistoryTab — board 163:113 preview band", () => {
 
   const openScrubber = () => {
     fireEvent.click(screen.getByRole("tab", { name: /Session/ }));
-    fireEvent.click(screen.getByTestId("tt-trigger"));
+    openMenuItem(/^Time-Travel/);
   };
 
   it("says nothing until the scrubber reports what it is previewing", () => {
@@ -379,5 +400,23 @@ describe("HistoryTab — board 163:113 preview band", () => {
     fireEvent.click(screen.getByTestId("tt-preview"));
     fireEvent.click(screen.getByRole("button", { name: "Exit (Esc)" }));
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+  });
+});
+
+describe("HistoryTab — opened by an Activity row, with the way back", () => {
+  it("draws ‹ Activity, which reopens the Activity panel", () => {
+    const emit = vi.fn();
+    renderTab({ initialView: "published", fromActivity: true, composer: { emit, on: () => {}, off: () => {} } as never });
+    expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "activity" });
+  });
+
+  it("draws no back row when opened any other way, and a stored 'activity' view lands on Session", () => {
+    window.localStorage.setItem("buildrick-history-view", "activity");
+    renderTab();
+    expect(screen.queryByTestId("back-to-activity")).toBeNull();
+    expect(screen.getByTestId("history-view-tab-session").getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByTestId("history-view-tab-activity")).toBeNull();
   });
 });

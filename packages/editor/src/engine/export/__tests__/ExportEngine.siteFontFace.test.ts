@@ -206,6 +206,43 @@ describe("a font that never reached the server", () => {
     expect(files.find((f) => f.name === "styles.css")?.content ?? "").not.toContain("@font-face");
     expect(devWarn).toHaveBeenCalled();
   });
+
+  /* A page must not NAME a font it never loads: the family is dropped from
+     the stacks, which then say what the visitor gets. */
+  it("is not named by the page either — the stack falls to what IS loaded", async () => {
+    const engine = new ExportEngine(await site({ ...usesInter, fontUrl: "blob:http://localhost:3000/9f1c" }));
+    const { files } = await engine.exportAllPages({ format: "html" });
+    const css = files.find((f) => f.name === "styles.css")?.content ?? "";
+    expect(css).not.toMatch(/Inter Var/i);
+    expect(css).toMatch(/\.buildrick-h\s*\{[^}]*font-family:\s*sans-serif/);
+    expect(engine.generateHTML()).not.toMatch(/Inter Var/i);
+  });
+});
+
+/* Found 2026-09-24 on the /share draft preview, which renders the publish
+   export: headings came out in the browser's default SERIF. The publish
+   stylesheet never carried the reset, so a page with no Brand body font had
+   no base family at all, and nothing asked any provider for one. */
+describe("the published page always has a loaded base font", () => {
+  it("styles.css sets the base body family, and every page's head loads it", async () => {
+    const { files } = await new ExportEngine(await site()).exportAllPages({ format: "html" });
+    const css = files.find((f) => f.name === "styles.css")?.content ?? "";
+    expect(css).toMatch(/body\s*\{[^}]*font-family:\s*Inter,\s*sans-serif/);
+    for (const page of files.filter((f) => f.name.endsWith(".html"))) {
+      expect(page.content).toContain('href="styles.css"');
+      expect(page.content).toMatch(/fonts\.googleapis\.com\/css2\?family=Inter[:&]/);
+    }
+  });
+
+  it("the Brand body font still wins over the reset, and is the one loaded", async () => {
+    const { files } = await new ExportEngine(
+      await site({ tokens: [{ id: "font-body", value: "Poppins" }] }),
+    ).exportAllPages({ format: "html" });
+    const css = files.find((f) => f.name === "styles.css")?.content ?? "";
+    expect(css.lastIndexOf("font-family:Poppins")).toBeGreaterThan(css.indexOf("font-family:Inter"));
+    const home = files.find((f) => f.name === "index.html")!.content;
+    expect(home).toMatch(/family=Poppins/);
+  });
 });
 
 describe("the ZIP bundles the face's file like any other asset", () => {

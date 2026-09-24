@@ -123,12 +123,6 @@
       "nodeId": "2069:20353"
     },
     {
-      "name": "sechead-corner-radius",
-      "testId": "inspector-sechead-corner-radius",
-      "spec": "inspector-profile-grid",
-      "nodeId": "2069:20354"
-    },
-    {
       "name": "sechead-effects",
       "testId": "inspector-sechead-effects",
       "spec": "inspector-profile-grid",
@@ -139,12 +133,6 @@
       "testId": "inspector-sechead-interactions",
       "spec": "inspector-profile-grid",
       "nodeId": "2069:20356"
-    },
-    {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-grid",
-      "nodeId": "2069:20357"
     },
     {
       "name": "sechead-visibility",

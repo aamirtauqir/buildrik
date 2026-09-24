@@ -25,6 +25,11 @@ import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
+import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
+import { LAYER_NAME_KEY } from "@/editor/panels/layers/hooks/layersPersistence";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
+import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 
 // =============================================================================
 // TYPES
@@ -53,7 +58,7 @@ export interface CommandPaletteProps {
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
  *  leads; MORE holds everything searchable that the opening list leaves out. */
-const BAND_ORDER = ["Pages", "Navigate", "Edit", "View", "Add", "Tools", "More"];
+const BAND_ORDER = ["Recent", "Pages", "Navigate", "Edit", "View", "Add", "Tools", "Layers", "Assets", "Templates", "More"];
 /** Bands the opening (empty-query) list shows — the board's curated set. */
 const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tools"]);
 
@@ -82,8 +87,13 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     ["publish", "Open Publish", () => openPanel("publish")],
     ["ai", "Open AI assistant", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })],
     ["templates", "Browse Templates", () => openPanel("templates")],
+    /* C4 #19: one of the New-page doors, from anywhere — the same event every
+       door emits. */
+    ["new-page", "New page", () => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), ["page", "create", "add page"]],
+    /* 4428:149355: the catalogue opens in replace mode for the active page. */
+    ["replace-layout", "Replace layout with template…", () => composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })],
     ["review", "Open Review", () => openPanel("review")],
-    ["activity", "Open Activity", () => openPanel("history", "activity")],
+    ["activity", "Open Activity", () => openPanel("activity")],
     ["issues", "Open Issues", () => composer?.emit(EVENTS.UI_OPEN_ISSUES, undefined), ["problems", "errors", "warnings", "checks"]],
     ["settings", "Open Site settings", () => openPanel("settings")],
     ["components", "Open Components", () => openPanel("components")],
@@ -169,28 +179,10 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     handler: run(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })),
   });
 
-  /* C4 #19: ⌘K is one of the New-page doors, from anywhere — not only while
-     the Pages panel has its rows registered. Same event every door emits.
-     MORE, so it answers a query without adding a row the board's resting
-     list does not draw. */
-  commands.push({
-    id: "add-new-page",
-    label: "New page",
-    group: "More",
-    keywords: ["page", "create", "add page"],
-    handler: run(() => composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {})),
-  });
-
   // TOOLS
   fromRegistry("cms-records", "Tools");
   fromRegistry("save-template", "Tools");
   commands.push(
-    {
-      id: "templates-replace-layout",
-      label: "Replace layout with template…",
-      group: "Tools",
-      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})),
-    },
     { id: "tools-history", label: "Open History", group: "Tools", handler: run(() => openPanel("history")) },
     {
       id: "tools-stock",
@@ -232,6 +224,56 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       handler: run(() => {
         const siteId = getSiteIdFromUrl();
         if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
+      }),
+    });
+  }
+
+  /* TEMPLATES — the catalogue's own search went with 4418:54134 (it draws
+     none); the owner kept the capability, so a template answers a query here
+     and opens on its preview. Searchable only, never in the opening list. */
+  for (const t of [...PAGE_TEMPLATES, ...getMyTemplates()]) {
+    commands.push({
+      id: `template-${t.id}`,
+      label: t.name,
+      group: "Templates",
+      keywords: ["template"],
+      handler: run(() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { previewId: t.id })),
+    });
+  }
+
+  /* LAYERS / ASSETS — the placeholder promises "pages, layers, assets":
+     a layer on this page answers by its Layers name (custom name, else its
+     first words, else its type) and the row selects it; an asset answers by
+     name and opens the Asset library on it. Searchable only. */
+  const page = composer.elements.getActivePage?.();
+  const root = page ? composer.elements.getElement?.(page.root.id) : null;
+  for (const el of root?.getDescendants?.() ?? []) {
+    const custom = el.getCustomData?.(LAYER_NAME_KEY);
+    const name =
+      (typeof custom === "string" && custom) ||
+      getLayerPreview(el) ||
+      ELEMENT_TYPE_LABELS[el.getType()] ||
+      el.getType();
+    commands.push({
+      id: `layer-${el.getId()}`,
+      label: name,
+      group: "Layers",
+      keywords: ["layer", el.getType()],
+      handler: run(() => {
+        composer.selection.select(el);
+        openPanel("layers");
+      }),
+    });
+  }
+  for (const asset of composer.media?.getAssets?.() ?? []) {
+    commands.push({
+      id: `asset-${asset.id}`,
+      label: asset.name,
+      group: "Assets",
+      keywords: ["asset", "image", "file"],
+      handler: run(() => {
+        composer.media.selectAssets([asset.id]);
+        composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true });
       }),
     });
   }
@@ -307,8 +349,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
     if (cmd.disabled) return;
+    recordCommandRun(cmd.id.replace(/^recent-/, ""));
     cmd.handler();
   }, []);
+
+  /* RECENT (S3.14, restored off-board — the owner's "never silently remove a
+     capability"; 4418:141220 draws no strip, logged in the designer notes):
+     the last five rows you ran, above the board's bands, on the empty query
+     only. A copy of the live row, so its guard reflects this open. */
+  const recentCommands = React.useMemo(() => {
+    const byId = new Map(commands.map((c) => [c.id, c]));
+    return getRecentCommandIds().flatMap((id) => {
+      const cmd = byId.get(id);
+      if (!cmd) return [];
+      const isDoor = cmd.group === "Navigate" || cmd.group === "Pages";
+      return [{ ...cmd, id: `recent-${cmd.id}`, group: "Recent", shortcut: isDoor ? undefined : cmd.shortcut }];
+    });
+  }, [commands]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
@@ -317,11 +374,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return commands.filter((c) => OPENING_BANDS.has(c.group));
+    if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
     return commands.filter((cmd) =>
       [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
-  }, [commands, query]);
+  }, [commands, recentCommands, query]);
 
   // A query that matches nothing is never a dead end: AI, or stock photos.
   const askAI = React.useCallback(() => {
@@ -400,11 +457,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         onKeyDown={handleKeyDown}
         className="tw:fixed tw:top-12 tw:left-1/2 tw:flex tw:max-h-[800px] tw:w-160 tw:max-w-[calc(100vw-32px)] tw:-translate-x-1/2 tw:flex-col tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
-        {/* Input row — 16/12 inset, ⌕ at 15px, the field at 12px, the scope chip. */}
+        {/* Input row — 16/12 inset, ⌕ at 16 (the board's 15 snapped to --bk-text-16), the field at 12px, the scope chip. */}
         <div data-testid="cmdk-query" className="tw:flex tw:flex-none tw:items-center tw:gap-2 tw:px-4 tw:py-3">
           {/* The input row is the card's focus: the caret is the indicator, and
               the board draws no ring around the field. */}
-          <span aria-hidden="true" className="tw:flex-none tw:text-[15px] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
+          <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-16)] tw:font-medium tw:leading-none tw:text-[var(--bk-gray-500)]">
             ⌕
           </span>
           <TextInput
@@ -427,6 +484,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             style={{ outline: "none" }}
             className="tw:flex-1 tw:[&_input]:h-[18px] tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:p-0 tw:[&_input]:text-[12px] tw:[&_input]:leading-[18px] tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:shadow-none tw:[&_input]:ring-0 tw:[&_input]:focus:ring-0 tw:[&_input]:placeholder:text-[var(--bk-ink-muted)]"
           />
+          {query && (
+            <Button
+              variant="ghost"
+              aria-label="Clear search"
+              data-testid="cmdk-clear"
+              className="tw:h-5 tw:min-h-0 tw:w-5 tw:flex-none tw:rounded tw:border-0 tw:p-0 tw:text-[12px] tw:leading-none tw:text-[var(--bk-ink-muted)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+            >
+              ✕
+            </Button>
+          )}
           <span
             data-testid="cmdk-scope"
             className="tw:flex-none tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:py-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"

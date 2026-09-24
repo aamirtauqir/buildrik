@@ -101,6 +101,9 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
        that is somewhere else entirely is left where it is. */
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      /* This Escape is spent closing the panel: a host that closes on Escape
+         (the Asset library) checks defaultPrevented and stays open. */
+      e.preventDefault();
       const focusInside = !!panel.current?.contains(document.activeElement);
       onClose();
       if (!focusInside) return;

@@ -11,8 +11,8 @@
  *   - `_shared.tsx`      — types, defineSection, adaptBaseStyleProps
  *   - `layout.tsx`       — layout, size, spacing, flex, grid
  *   - `typography.tsx`   — typography
- *   - `visual.tsx`       — background, border, corner-radius
- *   - `element.tsx`      — link, element-properties, css-classes, all-css
+ *   - `visual.tsx`       — background, border (incl. corner radius)
+ *   - `element.tsx`      — link, content, element-properties, css-classes
  *   - `effects.tsx`      — effects, animation, interactions, visibility
  *
  * Maps every section id to a typed entry that bundles the component, a

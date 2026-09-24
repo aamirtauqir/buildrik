@@ -49,58 +49,18 @@
       "testId": "site-menu-site-settings"
     },
     {
-      "name": "item-version-history",
-      "testId": "site-menu-version-history"
-    },
-    {
-      "name": "item-publish-history",
-      "testId": "site-menu-publish-history"
-    },
-    {
       "name": "item-export-code",
       "testId": "site-menu-export-code"
-    },
-    {
-      "name": "item-templates",
-      "testId": "site-menu-templates"
-    },
-    {
-      "name": "item-components",
-      "testId": "site-menu-components"
     },
     {
       "name": "item-shortcuts",
       "testId": "site-menu-shortcuts"
     },
     {
-      "name": "label-version-history",
-      "testId": "site-menu-version-history",
-      "spec": "shell-site-menu",
-      "nodeId": "642:3670"
-    },
-    {
-      "name": "label-publish-history",
-      "testId": "site-menu-publish-history",
-      "spec": "shell-site-menu",
-      "nodeId": "642:3674"
-    },
-    {
       "name": "label-export-code",
       "testId": "site-menu-export-code",
       "spec": "shell-site-menu",
       "nodeId": "642:3677"
-    },
-    {
-      "name": "label-templates",
-      "testId": "site-menu-templates",
-      "spec": "shell-site-menu",
-      "nodeId": "642:3681"
-    },
-    {
-      "name": "label-components",
-      "testId": "site-menu-components",
-      "spec": "shell-site-menu",
-      "nodeId": "642:3685"
     },
     {
       "name": "label-shortcuts",
@@ -155,6 +115,7 @@
     "started as well. SiteMenu.tsx's own comments cite 642:3401 for several of",
     "those additions, so the board is the older shape rather than a contradiction.",
     "Structure is the thing this harness explicitly cannot see (README §What this",
-    "harness cannot see); recorded here so it is not mistaken for coverage."
+    "harness cannot see); recorded here so it is not mistaken for coverage.",
+    "2026-09-24 (gates): Version history / Publish history / Templates / Components targets dropped — 0cee7653e rebuilt the site menu to 4418:126034 without those rows."
   ]
 }

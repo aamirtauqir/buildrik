@@ -167,9 +167,6 @@ export interface UseStudioModalsReturn {
   showCMSCollectionSetup: boolean;
   openCMSCollectionSetup: () => void;
   closeCMSCollectionSetup: () => void;
-  showCMSRecords: boolean;
-  openCMSRecords: () => void;
-  closeCMSRecords: () => void;
 
   // Command Palette modal
 

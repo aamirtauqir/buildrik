@@ -14,7 +14,8 @@
  * Vercel check, so the panel could read all-green while the server
  * hard-refused. The server's six today: Vercel connected · Pages ready · SEO
  * configured · Domain connected · Empty pages · Favicon
- * (`server/services/publish.service.ts`). Whatever it sends is what renders.
+ * (`server/services/publish.service.ts`); PublishTab drops Favicon, which
+ * spec B4 does not draw. Whatever else it sends is what renders.
  *
  * @license BSD-3-Clause
  */

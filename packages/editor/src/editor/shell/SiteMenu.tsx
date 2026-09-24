@@ -134,11 +134,15 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
       >
         <Menu label="Site menu" data-testid="site-menu">
           {readOnlyView ? (
-            onToggleReadOnlyView ? (
-              <MenuGroup>
+            <MenuGroup>
+              {onToggleReadOnlyView ? (
                 <MenuItem onClick={run(onToggleReadOnlyView)}>Exit view mode</MenuItem>
-              </MenuGroup>
-            ) : null
+              ) : (
+                /* A VIEWER is held in view mode (StudioHeader passes no toggle);
+                   an empty popover read as broken, so say why instead. */
+                <MenuLabel>View only — ask an editor to make changes</MenuLabel>
+              )}
+            </MenuGroup>
           ) : (
             <>
               <MenuGroup>

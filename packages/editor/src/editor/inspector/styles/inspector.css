@@ -94,8 +94,6 @@
 .bdi-ehdr .bdi-eic {
   width: 16px;
   height: 16px;
-  border-radius: 0;
-  background: transparent;
   color: var(--bk-ink-soft);
   display: inline-flex;
   align-items: center;
@@ -137,8 +135,9 @@
      height/min-height: these are flowbite Buttons and their own min-height is
      40px, so padding alone could not reach the boards' 28px strip.
      nowrap: at 12px in a 300px panel the three pills wrapped to two lines. */
-  background: var(--bk-bg-subtle);
-  border-bottom: 1px solid var(--bk-border);
+  /* Board 4428:141170 (v3): a plain white row under the tabs, no rule. */
+  background: var(--bk-bg-panel);
+  border-bottom: none;
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   /* Boards 32:7 and 642:3255: 32h, x16, gap 8. Live was 5px/10px with gap 6,
@@ -171,20 +170,10 @@
   cursor: pointer;
   white-space: nowrap;
 }
-.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] { background: var(--bk-bg-card); }
-/* Board 4428:141170: "Applies to" is a plain row under the tabs — white, no
-   rule, the label in muted 11 and the scope pill bordered. */
-.bdi-bpr {
-  background: var(--bk-bg-panel);
-  border-bottom: none;
-}
-.bdi-bpr .bdi-bpr-label {
-  font: 400 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}
-.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] {
-  border: 1px solid var(--bk-border);
-}
+/* v3: the scope pill is bordered. */
+.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] { background: var(--bk-bg-card); border: 1px solid var(--bk-border); }
+/* v3: the label at 400 (size, face and muted ink come from .bdi-bpr). */
+.bdi-bpr .bdi-bpr-label { font-weight: 400; }
 /* ── Body ─────────────────────────────────────────────── */
 .bdi-body {
   padding: 0;
@@ -376,26 +365,22 @@
   align-items: center;
   height: var(--bk-size-row-dense);
   width: 100%;
-  background: var(--bk-gray-50);
+  /* v3 (board 4428:141170): a white field with a 1px --bk-border-input edge,
+     radius 6 — replacing the V1 board's gray-50/gray-100 frame. */
+  background: var(--bk-bg-card);
   /* A RESTING EDGE, not a transparent placeholder revealed on hover. Every
      control frame on boards 807:8342/8412/8475/8521/8567/8614 is drawn
      `bg-[--flowbite/gray/50] border-[--flowbite/gray/100]` — the field has an
      outline before you touch it. Transparent-until-hover meant a column of
      values with no boxes around them, and the hover state then read as the
      field APPEARING. */
-  border: 1px solid var(--bk-gray-100);
-  border-radius: 4px;
+  border: 1px solid var(--bk-border-input);
+  border-radius: 6px;
   overflow: hidden;
   transition: background 120ms, border-color 120ms, box-shadow 120ms;
   position: relative;
-  /* v3 (board 4428:141170): a white field with a 1px --bk-border-input edge,
-     radius 6 — the gray-50/gray-100 frame above is the V1 board's. */
-  background: var(--bk-bg-card);
-  border-color: var(--bk-border-input);
-  border-radius: 6px;
 }
 .bdi-fld:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
   border-color: var(--bk-border);
 }
 .bdi-fld:focus-within {

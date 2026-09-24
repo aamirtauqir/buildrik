@@ -91,12 +91,6 @@
       "nodeId": "2069:20374"
     },
     {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-media",
-      "nodeId": "2069:20375"
-    },
-    {
       "name": "sechead-visibility",
       "testId": "inspector-sechead-visibility",
       "spec": "inspector-profile-media",
@@ -117,10 +111,6 @@
     {
       "name": "sechead-spacing",
       "testId": "inspector-sechead-spacing"
-    },
-    {
-      "name": "sechead-corner-radius",
-      "testId": "inspector-sechead-corner-radius"
     }
   ],
   "_note": [

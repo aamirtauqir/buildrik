@@ -87,8 +87,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
         {createdUrl ? (
           <>
             <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
-              Anyone with this link can open the site&rsquo;s published page. Until the site is
-              published, the link says so rather than showing the draft.
+              Anyone with this link can view the site&rsquo;s current saved design, read-only.
+              Editing and publishing access are not included.
             </p>
             <div className="mt-4 flex items-center gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
               <span className="flex-1 truncate text-body font-mono" style={{ color: "var(--color-text-primary)" }}>{createdUrl}</span>
@@ -101,8 +101,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
         ) : (
           <>
             <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
-              A private link to this site for clients or teammates. It opens the published site —
-              there is no server-side render of the draft — and can carry a password and an expiry.
+              A private link to this site for clients or teammates. It shows the current saved
+              design — published or not — and can carry a password and an expiry.
             </p>
 
             <div className="mt-4 space-y-3">

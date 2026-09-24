@@ -247,9 +247,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     >
       <ModalContent size="form" data-testid="cms-setup-modal">
         <ModalTitle>
-          {/* 4418:84646 sets the title at 18; the size rides on a span because
-              a className font-size on the h2 ties MODAL_TITLE_CLASS's 14. */}
-          <span className="tw:text-[18px]" data-testid="cms-setup-title">
+          {/* 4418:84646 sets the title at 18, off the 7-step scale; it snaps to
+              --bk-text-16 (the design-debt ramp rule). The size rides on a span
+              because a className font-size on the h2 ties MODAL_TITLE_CLASS's 14. */}
+          <span className="tw:text-[length:var(--bk-text-16)]" data-testid="cms-setup-title">
             {trimmed ? `Fields for ${trimmed}` : "New collection"}
           </span>
         </ModalTitle>

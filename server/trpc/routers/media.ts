@@ -19,6 +19,7 @@ import {
   updateAsset,
 } from "@/server/services/media.service";
 import { applyAltTextToAsset } from "@/server/services/alt-text.service";
+import { PermissionError } from "@/server/services/permission.service";
 import { z } from "zod";
 import { searchStockPhotos, searchStockVideos, StockError } from "@/server/services/stock.service";
 import {
@@ -38,6 +39,16 @@ import {
   restoreAssetVersionSchema,
   updateAssetSchema,
 } from "@buildrik/shared/schemas/media";
+
+/**
+ * Every media write is role-gated in the service (`assertMediaWrite`): a
+ * VIEWER on the row's site gets PermissionError, which reaches the client as
+ * FORBIDDEN instead of a generic 500.
+ */
+function rethrowPermission(e: unknown): never {
+  if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+  throw e;
+}
 
 /**
  * Carry the stock failure's REASON to the client, which only ever sees the tRPC
@@ -94,7 +105,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "PARENT_NOT_FOUND") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Parent folder not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -107,7 +118,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Folder not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -126,7 +137,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "CYCLE") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot move folder into itself." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -143,7 +154,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Folder not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -179,7 +190,7 @@ export const mediaRouter = router({
             message: "Asset URL is already owned by another user.",
           });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -195,7 +206,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "FOLDER_NOT_FOUND") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Folder not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -208,7 +219,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -224,7 +235,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "FOLDER_NOT_FOUND") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Folder not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -239,7 +250,7 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -260,7 +271,7 @@ export const mediaRouter = router({
             message: "Asset version URL is already owned by another user.",
           });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -280,7 +291,7 @@ export const mediaRouter = router({
             message: "Asset version URL is owned by another user; cannot restore.",
           });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 
@@ -296,7 +307,7 @@ export const mediaRouter = router({
     .input(generateAltTextSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        return await applyAltTextToAsset(ctx.session.user.id, input.assetId);
+        return await applyAltTextToAsset(ctx.session.user.id, input.assetId, { force: input.force });
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ASSET_NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
@@ -307,7 +318,7 @@ export const mediaRouter = router({
             message: "Alt text generation is only available for images.",
           });
         }
-        throw e;
+        rethrowPermission(e);
       }
     }),
 

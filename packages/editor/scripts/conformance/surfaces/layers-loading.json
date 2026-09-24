@@ -41,7 +41,8 @@
   "",
   "The footer reads '0 layers' during load against the board's '12 layers'.",
   "Sample data; the SHAPE is the contract, and the shape is a footer that is",
-  "present while the tree is coming."
+  "present while the tree is coming.",
+  "2026-09-24 (gates): layers-toolbar / layers-search targets dropped — 3c20244e6 removed the drawer search band; the filter is the topbar field."
  ],
  "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-loading",
  "viewport": {
@@ -67,12 +68,6 @@
    "testId": "panel-header-title",
    "spec": "layers-loading",
    "nodeId": "I775:4131;16:7"
-  },
-  {
-   "name": "toolbar",
-   "testId": "layers-toolbar",
-   "spec": "layers-loading",
-   "nodeId": "776:4089"
   },
   {
    "name": "count-footer",

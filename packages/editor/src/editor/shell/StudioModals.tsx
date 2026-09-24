@@ -18,7 +18,6 @@ import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
-import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
 import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 
@@ -92,8 +91,6 @@ export interface StudioModalsProps {
   // CMS Collection Setup modal (WS-14a)
   showCMSCollectionSetup: boolean;
   onCloseCMSCollectionSetup: () => void;
-  showCMSRecords: boolean;
-  onCloseCMSRecords: () => void;
 
   // Command Palette
 }
@@ -134,8 +131,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseProjectSettings,
   showCMSCollectionSetup,
   onCloseCMSCollectionSetup,
-  showCMSRecords,
-  onCloseCMSRecords,
 }) => {
   /* Board 1172:4867's Project settings modal (General · Canvas · SEO) is
      superseded by the Clone's full-screen Settings (3397:32915 — its General
@@ -268,13 +263,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       <CMSCollectionSetupModal
         isOpen={showCMSCollectionSetup}
         onClose={onCloseCMSCollectionSetup}
-        composer={composer}
-      />
-
-      {/* CMS Records management */}
-      <CMSRecordsModal
-        isOpen={showCMSRecords}
-        onClose={onCloseCMSRecords}
         composer={composer}
       />
     </>

@@ -148,6 +148,42 @@ describe("CommentLayer", () => {
     expect(screen.getByText("was pinned to a deleted element")).toBeInTheDocument();
   });
 
+  /* 2026-09-25 (L5 + L1, scratch-ver): two comments whose elements really
+     were deleted opened "2 comments lost their element" on EVERY load. The
+     modal is an announcement — once per orphan, remembered per site across
+     reloads. The Detached group (comments:orphans) still hears every scan. */
+  it("announces an orphan once — a reload does not reopen the modal", async () => {
+    window.localStorage.clear();
+    comments.push(
+      openComment({ id: "dead", targetSelector: anchorSelector("deleted-el") }),
+      openComment({ id: "ok", targetSelector: anchorSelector("el-1") }),
+    );
+    const first = makeComposer();
+    const view = mount(first);
+    expect(await screen.findByText("A comment lost its element")).toBeInTheDocument();
+    view.unmount();
+
+    const second = makeComposer();
+    mount(second);
+    await waitFor(() =>
+      expect(second.emit).toHaveBeenCalledWith("comments:orphans", { ids: ["dead"] }),
+    );
+    expect(screen.queryByTestId("orphan-modal")).toBeNull();
+  });
+
+  it("a comment that re-anchors and is orphaned again is announced again", async () => {
+    window.localStorage.clear();
+    window.localStorage.setItem("buildrick-orphans-announced-site-1", JSON.stringify(["dead", "gone-now"]));
+    comments.push(openComment({ id: "dead", targetSelector: anchorSelector("el-1") }));
+    const composer = makeComposer();
+    mount(composer);
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: [] }),
+    );
+    // "dead" is anchored now, so it is forgotten; so is an id no longer listed.
+    expect(JSON.parse(window.localStorage.getItem("buildrick-orphans-announced-site-1") ?? "[]")).toEqual([]);
+  });
+
   /* QA 2026-09-24 (HIGH): switching to a page raced the orphan scan — the
      PREVIOUS page was still rendered, the new page's anchors read as deleted,
      and live comments moved to Detached. The scan waits for the active

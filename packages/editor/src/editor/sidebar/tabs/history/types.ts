@@ -20,7 +20,7 @@ import type { Composer } from "../../../../engine";
  * `backups` is drawn in Figma but deliberately absent — 7 `[design-ahead]`
  * boards with no backing service.
  */
-export type HistoryView = "session" | "saves" | "published" | "activity";
+export type HistoryView = "session" | "saves" | "published";
 
 export interface HistoryTabProps {
   /** Composer instance */
@@ -31,6 +31,9 @@ export interface HistoryTabProps {
    *  Wins over the stored preference for one mount, so the ⋯ menu's "Publish
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
+  /** Opened by an Activity row (Activity is its own panel): draws
+   *  "‹ Activity" under the header until the user picks a tab. */
+  fromActivity?: boolean;
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
   rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;
@@ -44,13 +47,6 @@ export interface HistoryTabProps {
   onHelpClick?: () => void;
   /** Close panel callback */
   onClose?: () => void;
-}
-
-export interface ActivityLogViewProps {
-  /** Site the rows are scoped to — comes from `TabRouter`'s resolved projectId
-   *  or the URL fallback. Null = opened without a project; the view renders
-   *  a banner and not a query. */
-  siteId: string | null;
 }
 
 export interface ActivityViewProps {

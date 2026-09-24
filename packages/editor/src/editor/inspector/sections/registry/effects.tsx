@@ -1,5 +1,5 @@
 /**
- * Effects-tab section registry: effects, animation, interactions,
+ * Effects-tab section registry: opacity, shadow, blur, effects, interactions
  * visibility. Edits motion + dynamic behavior + final paint effects.
  *
  * @license BSD-3-Clause
@@ -8,7 +8,6 @@
 import { adaptBaseStyleProps, defineSection, type AnySectionEntry } from "./_shared";
 import { EffectsSection } from "../EffectsSection";
 import { BlurSection, OpacitySection, ShadowSection } from "../EffectsBasicSections";
-import { AnimationSection } from "../AnimationSection";
 import { InteractionsSection, type Interaction } from "../interactions";
 import { VisibilitySection } from "../VisibilitySection";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
@@ -43,65 +42,6 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
     Component: EffectsSection,
     styleKeys: ["box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
-  }),
-
-  animation: defineSection({
-    tab: "effects",
-    tier: "advanced",
-    Component: AnimationSection,
-    styleKeys: [],
-    adaptProps: (ctx) => {
-      // Pull the live animation config from the element each render. This
-      // is the same pattern the old EffectsTab used — reads via composer
-      // directly because animations aren't in the styles map.
-      const getAnimation = () => {
-        if (!ctx.composer) return null;
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el?.getAnimation) {
-          if (IS_DEV_BUILD) console.warn(`[Inspector] getAnimation not implemented on element ${ctx.selectedElement.id}`);
-          return null;
-        }
-        return el.getAnimation() ?? null;
-      };
-      const handleAnimationChange = (
-        animation: import("../../../../shared/types/animations").AnimationConfig | null
-      ) => {
-        if (!ctx.composer) return;
-        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        if (!el) return;
-        ctx.composer.beginTransaction?.("animation-change");
-        try {
-          if (animation) {
-            if (!el.setAnimation && IS_DEV_BUILD) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
-            el.setAnimation?.(animation);
-          } else {
-            if (!el.clearAnimation && IS_DEV_BUILD) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
-            el.clearAnimation?.();
-          }
-        } finally {
-          ctx.composer.endTransaction?.();
-        }
-      };
-      const handleAnimationPreview = () => {
-        const domEl = document.querySelector(
-          `[data-buildrick-id="${ctx.selectedElement.id}"]`
-        ) as HTMLElement | null;
-        if (!domEl) return;
-        const animation = domEl.style.animation;
-        domEl.style.animation = "none";
-        // Force a reflow so the restart actually fires.
-        void domEl.offsetHeight;
-        domEl.style.animation = animation;
-      };
-      return {
-        animation: getAnimation(),
-        onAnimationChange: handleAnimationChange,
-        onPreview: handleAnimationPreview,
-        isOpen: ctx.isOpen,
-        onToggle: ctx.onToggle,
-        tier: ctx.tier,
-      };
-    },
   }),
 
   interactions: defineSection({
@@ -143,9 +83,53 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
           domEl.style.animation = `bd-anim-${anim.preset} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
         }
       };
+      /* G2-157 (option A): the element's CSS animation is a row of this list
+         — the adapters the Animation section used move here unchanged. */
+      const getAnimation = () => {
+        if (!ctx.composer) return null;
+        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
+        if (!el?.getAnimation) {
+          if (IS_DEV_BUILD) console.warn(`[Inspector] getAnimation not implemented on element ${ctx.selectedElement.id}`);
+          return null;
+        }
+        return el.getAnimation() ?? null;
+      };
+      const handleAnimationChange = (
+        animation: import("../../../../shared/types/animations").AnimationConfig | null
+      ) => {
+        if (!ctx.composer) return;
+        const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
+        if (!el) return;
+        ctx.composer.beginTransaction?.("animation-change");
+        try {
+          if (animation) {
+            if (!el.setAnimation && IS_DEV_BUILD) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
+            el.setAnimation?.(animation);
+          } else {
+            if (!el.clearAnimation && IS_DEV_BUILD) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
+            el.clearAnimation?.();
+          }
+        } finally {
+          ctx.composer.endTransaction?.();
+        }
+      };
+      const handleAnimationPreview = () => {
+        const domEl = document.querySelector(
+          `[data-buildrick-id="${ctx.selectedElement.id}"]`
+        ) as HTMLElement | null;
+        if (!domEl) return;
+        const animation = domEl.style.animation;
+        domEl.style.animation = "none";
+        // Force a reflow so the restart actually fires.
+        void domEl.offsetHeight;
+        domEl.style.animation = animation;
+      };
       return {
         interactions: getInteractions(),
         onInteractionsChange: handleInteractionsChange,
+        animation: getAnimation(),
+        onAnimationChange: handleAnimationChange,
+        onAnimationPreview: handleAnimationPreview,
         composer: ctx.composer,
         elementId: ctx.selectedElement.id,
         onPreview: handleInteractionPreview,

@@ -123,12 +123,6 @@
       "nodeId": "2067:20306"
     },
     {
-      "name": "sechead-animation",
-      "testId": "inspector-sechead-animation",
-      "spec": "inspector-profile-button",
-      "nodeId": "2067:20307"
-    },
-    {
       "name": "sechead-link",
       "testId": "inspector-sechead-link",
       "spec": "inspector-profile-button",
