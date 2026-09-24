@@ -19,7 +19,7 @@ export interface PasteHtmlModalProps {
 }
 
 /** What the sanitiser will drop, said the way the board says it. */
-export function sanitiseNote(html: string): string | null {
+function sanitiseNote(html: string): string | null {
   const scripts = (html.match(/<script\b/gi) ?? []).length;
   const handlers = (html.match(/\son[a-z]+\s*=/gi) ?? []).length;
   const parts: string[] = [];
