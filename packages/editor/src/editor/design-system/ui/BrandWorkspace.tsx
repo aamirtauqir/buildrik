@@ -52,7 +52,6 @@ import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { DEFAULT_TOKENS } from "../constants";
 import {
   useColorRegistry,
   useTypeRegistry,
@@ -570,11 +569,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     });
   };
 
-  // C3 fix: factory-reset spacing (stages defaults for Review/Apply, not discardAll).
-  const handleResetSpacingToDefaults = () => {
-    spacing.stageDefaults(DEFAULT_TOKENS);
-    addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
-  };
 
   /* "+ Add token" (7318:81125): the kind is the page's. Only kinds with an
      add path offer it — colour, spacing and the eleven generic kinds. */
@@ -817,7 +811,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   const tokenPageProps = {
     onAddTokenClick: () => setShowAddToken(true),
-    onResetSpacingToDefaults: handleResetSpacingToDefaults,
     composer,
     selectedTokenId,
     onSelectToken: setSelectedTokenId,
