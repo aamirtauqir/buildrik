@@ -100,6 +100,16 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
     };
   }, [composer, collectionName]);
 
+  /* 4428:140486 — while the workspace covers the canvas the topbar crumb
+     reads "<site> › CMS", not the page behind it. */
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.emit(EVENTS.UI_CRUMB_CONTEXT, { label: "CMS" });
+    return () => {
+      composer.emit(EVENTS.UI_CRUMB_CONTEXT, null);
+    };
+  }, [composer]);
+
   const importer = useImportRecords(composer, collection);
 
   if (!collection) {

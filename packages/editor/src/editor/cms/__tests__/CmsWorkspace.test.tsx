@@ -48,6 +48,17 @@ afterEach(() => {
 });
 
 describe("CmsWorkspace · root (4428:140486)", () => {
+  it("names itself in the topbar crumb while open, and gives it back on close (4428:140486)", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    const crumbs: unknown[] = [];
+    composer.on(EVENTS.UI_CRUMB_CONTEXT, (c) => crumbs.push(c));
+    const { unmount } = render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    await screen.findByTestId("cms-workspace");
+    expect(crumbs).toEqual([{ label: "CMS" }]);
+    unmount();
+    expect(crumbs).toEqual([{ label: "CMS" }, null]);
+  });
+
   it("names the site, counts collections and records, and offers + New collection", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     const onCreate = vi.fn();

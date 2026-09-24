@@ -39,8 +39,6 @@ import {
 
 export interface ContentTabProps {
   composer: Composer | null;
-  isExpanded?: boolean;
-  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Opens the CMS collection setup (shell-owned modal) — the data-first create
@@ -75,8 +73,6 @@ function SkeletonRow({ width, testId }: { width: string; testId: string }) {
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
   hydrationStatus,
-  isExpanded,
-  onExpandToggle,
   onHelpClick,
   onClose,
   onCreateCollection,
@@ -270,8 +266,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       <PanelHeader
         // v3 IA Q4 — the panel is the CMS; the rail says so, the header agrees.
         title="CMS"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
+        /* No expand toggle (4428:140486 draws none): the records live in the
+           full-canvas workspace now, so a wider drawer only squeezed it. */
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

@@ -36,3 +36,14 @@ describe("StudioPanels — the two open requests wait here for a lazy panel", ()
     expect(src).toMatch(/if \(activeTabId !== "settings"\) setSettingsOpen\(null\);\s*if \(activeTabId !== "pages"\) setPagesOpen\(null\);/);
   });
 });
+
+describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () => {
+  it("listens and unsubscribes", () => {
+    expect(src).toContain("composer.on(EVENTS.UI_CMS_OPEN, openCms)");
+    expect(src).toContain("composer.off(EVENTS.UI_CMS_OPEN, openCms)");
+  });
+
+  it("writes the request to the workspace store, then switches to rail CMS", () => {
+    expect(src).toMatch(/cmsWorkspace\.openRequest\(data\);\s*onLeftPanelTabChange\?\.\("content"\)/);
+  });
+});
