@@ -45,6 +45,9 @@ export interface SpacingTokensState {
 
 export interface SpacingTokensActions {
   updateToken: (id: string, value: string) => void;
+  /** Append a token the site adds (Brand's "+ Add token"). Staged: it is
+   *  unsaved until Apply, like every other edit. */
+  addToken: (token: DesignToken) => void;
   applyPreset: (preset: SpacingPreset) => void;
   markSaved: () => void;
   discardAll: () => void;
@@ -118,10 +121,19 @@ export function useSpacingTokens(
     [setTokens, setUndoStack, setRedoStack]
   );
 
+  const addToken = useCallback(
+    (token: DesignToken) => {
+      setTokens((prev) => (prev.some((t) => t.id === token.id) ? prev : [...prev, token]));
+      setActivePreset(null);
+    },
+    [setTokens],
+  );
+
   return {
     tokens: base.tokens,
     savedTokens: base.savedTokens,
     isDirty: base.isDirty,
+    addToken,
     activePreset,
     savedPreset,
     updateToken,

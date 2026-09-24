@@ -29,7 +29,7 @@ describe("Section — the card", () => {
     const title = screen.getByTestId("set-card-title-site-identity");
     expect(title.textContent).toBe("Site identity");
     expect(title.className).toContain("tw:font-semibold");
-    expect(title.className).toContain("var(--bk-text-14)");
+    expect(title.className).toContain("var(--bk-text-16)");
     expect(screen.getByText("Name, favicon, language.")).toBeTruthy();
     const grid = screen.getByTestId("wide").parentElement as HTMLElement;
     expect(grid.className).toContain("tw:grid-cols-2");
@@ -59,7 +59,7 @@ describe("Section — the card", () => {
 });
 
 describe("Field", () => {
-  it("labels its control at 13 and can span the row", () => {
+  it("labels its control at 12 and can span the row", () => {
     render(
       <>
         <Field label="Meta title" htmlFor="seo-meta-title">
@@ -72,7 +72,7 @@ describe("Field", () => {
     );
     const label = screen.getByTestId("set-field-label-meta-title");
     expect(label.getAttribute("for")).toBe("seo-meta-title");
-    expect(label.className).toContain("var(--bk-text-13)");
+    expect(label.className).toContain("var(--bk-text-12)");
     expect(screen.getByTestId("set-field-meta-title").className).not.toContain("tw:col-span-full");
     expect(screen.getByTestId("set-field-head-scripts").className).toContain("tw:col-span-full");
   });
@@ -102,7 +102,7 @@ describe("controls — density 32", () => {
     expect(input.className).toContain("tw:aria-invalid:focus:border-[var(--bk-error)]");
   });
 
-  it("Select is 32 tall on the radius-md, border-input box", () => {
+  it("Select is 32 tall on the radius-md, gray-50 field in the border hairline", () => {
     render(
       <Select data-testid="sel">
         <option>English</option>
@@ -112,11 +112,9 @@ describe("controls — density 32", () => {
     expect(select.className).toContain("tw:h-8");
     expect(select.className).toContain("tw:py-0");
     expect(select.className).toContain("tw:rounded-[var(--bk-radius-md)]");
-    expect(select.className).toContain("tw:border-[var(--bk-border-input)]");
-    // The base theme's white fill survives the per-leaf merge (measured live:
-    // without restating it the select came up gray-50).
-    expect(select.className).toContain("tw:bg-white");
-    expect(select.className).not.toContain("bg-gray-50");
+    // 4418:127313: Settings fields are gray-50 inside the --bk-border hairline.
+    expect(select.className).toContain("tw:border-[var(--bk-border)]");
+    expect(select.className).toContain("tw:bg-[var(--bk-gray-50)]");
     expect(select.className).not.toContain("rounded-lg");
   });
 

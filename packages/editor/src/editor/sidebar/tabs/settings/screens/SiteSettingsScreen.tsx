@@ -207,7 +207,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <LoadCard
-          title="Site identity"
+          title="Site Identity"
           line="Site name, favicon, language and social profiles."
           state={load.state}
           errorLine="Couldn't load your site settings. Check your connection, then try again."
@@ -237,7 +237,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     <Screen>
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
-      <Section title="Site identity">
+      <Section title="Site Identity">
         <Field label="Site name" htmlFor="site-name">
           <Input
             id="site-name"
@@ -291,7 +291,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         </Field>
       </Section>
 
-      <Section title="Social links">
+      <Section title="Social Links">
         <Field label="Twitter" htmlFor="social-twitter">
           <Input
             id="social-twitter"

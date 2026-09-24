@@ -31,3 +31,12 @@ describe("mergeProjectTokens", () => {
     expect(merged).toEqual(DEFAULT_TOKENS);
   });
 });
+
+describe("mergeProjectTokens — added tokens", () => {
+  it("keeps a token the site added (not in the seed) across the reload merge", () => {
+    const pink = { id: "color-brand-pink", name: "Brand Pink", value: "#E74694", category: "colors", cssVar: "--buildrick-design-color-brand-pink", type: "color", group: "brand" } as DesignToken;
+    const merged = mergeProjectTokens([pink]);
+    expect(merged.find((t) => t.id === "color-brand-pink")?.value).toBe("#E74694");
+    expect(merged).toHaveLength(DEFAULT_TOKENS.length + 1);
+  });
+});

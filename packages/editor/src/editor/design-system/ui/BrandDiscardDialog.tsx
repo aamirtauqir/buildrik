@@ -25,28 +25,43 @@ export interface BrandDiscardDialogProps {
   onDiscard(): void;
 }
 
+/* 7317:80979's two buttons are 32 tall (the Modal footer's default is 28;
+   the footer's descendant rule outranks a plain utility, hence `!`). */
+const BTN = "tw:h-8! tw:px-3!";
+
 export function BrandDiscardDialog({ open, count, onKeepEditing, onDiscard }: BrandDiscardDialogProps) {
-  const edits = count === 1 ? "1 brand edit has" : `${count} brand edits have`;
+  /* The safe answer takes focus. The Modal focuses its first control, which
+     in the board's order is the danger one — so Enter would discard. */
+  const keepRef = React.useRef<HTMLButtonElement | null>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => keepRef.current?.focus(), 0);
+    return () => window.clearTimeout(id);
+  }, [open]);
+  const what = count === 1 ? "brand edit has" : `${count} brand edits have`;
   return (
     <Modal
       open={open}
       onClose={onKeepEditing}
       title="Discard brand changes?"
-      kind="question"
+      /* 560 wide (7317:80979) — the Modal's "form" width; "question" is 440. */
+      kind="form"
       testId="brand-discard"
       footer={
         <>
-          <Button size="xs" variant="secondary" autoFocus onClick={onKeepEditing} data-testid="brand-discard-keep">
-            Keep editing
-          </Button>
-          <Button size="xs" variant="danger" onClick={onDiscard} data-testid="brand-discard-confirm">
+          {/* The board's order: the danger action first, the safe one last
+              and primary — it keeps focus, and Escape / the scrim answer it. */}
+          <Button size="xs" variant="danger" onClick={onDiscard} className={BTN} data-testid="brand-discard-confirm">
             Discard changes
+          </Button>
+          <Button ref={keepRef} size="xs" onClick={onKeepEditing} className={BTN} data-testid="brand-discard-keep">
+            Keep editing
           </Button>
         </>
       }
     >
       <p className="tw:m-0" data-testid="brand-discard-body">
-        Your {edits} not been saved. Discard {count === 1 ? "it" : "them"} and go back to the canvas?
+        Your {what} not been saved. Discard {count === 1 ? "it" : "them"} and leave Brand, or keep editing.
       </p>
     </Modal>
   );

@@ -45,6 +45,17 @@ async function importViaPaste(utils: ReturnType<typeof renderWorkspace>, payload
 }
 
 describe("BrandWorkspace › Import / export", () => {
+  it("4418:168885: a panel with its own title and ✕ — no page header, no preview column", async () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    openPage(utils, "export");
+    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
+    expect(card.contains(utils.getByTestId("brand-page-title"))).toBe(true);
+    expect(utils.queryByTestId("brand-preview-column")).toBeNull();
+    expect(utils.getByTestId("import-drop-zone").textContent).toContain("Drop tokens.json — JSON only");
+    fireEvent.click(utils.getByTestId("brand-io-close"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
+  });
+
   it("4418:168885: Dark strategy, EXPORT and IMPORT share one panel, above the preview", async () => {
     const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "export");

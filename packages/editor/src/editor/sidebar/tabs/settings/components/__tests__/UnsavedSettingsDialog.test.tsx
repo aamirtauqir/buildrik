@@ -1,5 +1,5 @@
 /**
- * UnsavedSettingsDialog — Clone 3737:43639 "Unsaved settings" (640): the
+ * UnsavedSettingsDialog — board 4418:165478 "Unsaved settings" (560): the
  * guard on every door out of a dirty settings screen. One `it` per
  * prototype fact a DOM assertion can prove; the visual half is the live
  * walk's shot pair.
@@ -14,28 +14,34 @@ import * as React from "react";
 import { UnsavedSettingsDialog } from "../UnsavedSettingsDialog";
 
 function mount(over: Partial<React.ComponentProps<typeof UnsavedSettingsDialog>> = {}) {
-  const props = { open: true, siteName: "Bella Cucina", onKeepEditing: vi.fn(), onDiscard: vi.fn(), ...over };
+  const props = { open: true, siteName: "Bella Cucina", onKeepEditing: vi.fn(), onDiscard: vi.fn(), onSaveAndContinue: vi.fn(), ...over };
   render(<UnsavedSettingsDialog {...props} />);
   return props;
 }
 
-describe("Clone 3737:43639 · Unsaved settings", () => {
-  it("carries the frame's title and body, at the 640 table width", () => {
+describe("4418:165478 · Unsaved settings", () => {
+  it("carries the board's title and body, at 560", () => {
     mount();
     expect(screen.getByTestId("set-unsaved-title")).toHaveTextContent("Unsaved settings");
     expect(screen.getByTestId("set-unsaved-body")).toHaveTextContent(
-      "These settings have not been saved. Keep editing to finish them, or discard the pending edits and return to the canvas.",
+      "These settings have not been saved. Save them and continue, keep editing, or discard the pending edits.",
     );
-    expect(screen.getByTestId("set-unsaved")).toHaveClass("tw:w-[640px]");
+    expect(screen.getByTestId("set-unsaved")).toHaveClass("tw:w-[560px]");
     expect(screen.getByTestId("set-unsaved")).toHaveAttribute("aria-label", "Unsaved settings · Bella Cucina");
   });
 
-  it("Keep editing is the secondary and takes focus; Discard and return to canvas is the danger action", () => {
+  it("Discard changes · Keep editing · Save and continue, in that order; Keep editing takes focus", () => {
     const props = mount();
     const keep = screen.getByTestId("set-unsaved-keep");
     const discard = screen.getByTestId("set-unsaved-discard");
+    const save = screen.getByTestId("set-unsaved-save");
+    expect([...screen.getByTestId("set-unsaved-foot").querySelectorAll("button")].map((b) => b.textContent)).toEqual([
+      "Discard changes", "Keep editing", "Save and continue",
+    ]);
     expect(keep).toHaveTextContent("Keep editing");
-    expect(discard).toHaveTextContent("Discard and return to canvas");
+    expect(discard).toHaveTextContent("Discard changes");
+    fireEvent.click(save);
+    expect(props.onSaveAndContinue).toHaveBeenCalledTimes(1);
     expect(document.activeElement).toBe(keep);
     /* 32 high, in the library modal's shape: flowbite's xs (h-8) on both. */
     expect(keep).toHaveClass("tw:h-8");

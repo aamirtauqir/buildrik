@@ -289,27 +289,39 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       <div className="tw:flex tw:items-center tw:gap-3" data-testid="brand-token-detail-header">
         {previewTile(token)}
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-          <span
-            className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
-            data-testid="brand-token-detail-name"
-          >
-            {token.friendlyName ?? token.name}
-          </span>
-          {/* Pro prints the id (the anchor the conformance spec measures),
-              Beginner the description — two literal elements, so the anchor
-              check can see the testid rather than a ternary. */}
+          {/* 7315:80955: Pro titles the card with the id ("color-primary") and
+              puts the name under it ("Blue 700"); Beginner, which hides ids,
+              titles it with the name over the description. */}
           {isPro ? (
-            <span
-              className={`tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] ${MONO}`}
-              data-testid="brand-token-detail-id"
-            >
-              {token.id}
-            </span>
-          ) : subtitle ? (
-            <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-              {subtitle}
-            </span>
-          ) : null}
+            <>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+                data-testid="brand-token-detail-id"
+              >
+                {token.id}
+              </span>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                data-testid="brand-token-detail-name"
+              >
+                {token.friendlyName ?? token.name}
+              </span>
+            </>
+          ) : (
+            <>
+              <span
+                className="tw:truncate tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+                data-testid="brand-token-detail-name"
+              >
+                {token.friendlyName ?? token.name}
+              </span>
+              {subtitle ? (
+                <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {subtitle}
+                </span>
+              ) : null}
+            </>
+          )}
         </div>
         <div data-testid="brand-token-actions">
           <Popover
