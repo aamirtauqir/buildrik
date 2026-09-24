@@ -563,12 +563,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
-    const {
-      handleSelectParent,
-      handleSelectAncestor,
-      handleToolbarDuplicate,
-      handleToolbarDelete,
-    } = useCanvasToolbarActions({ composer, selectedId, addToast, select });
+    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer, selectedId, addToast });
 
     // Expose ref methods
     React.useImperativeHandle(ref, () => ({
@@ -791,8 +786,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             setIsResizing={setIsResizing}
             showSpacing={showSpacing}
             spacingIndicators={spacingIndicators}
-            onSelectParent={handleSelectParent}
-            onSelectAncestor={handleSelectAncestor}
             onDuplicate={handleToolbarDuplicate}
             onDelete={handleToolbarDelete}
             onOpenElementMenu={(elementId, point) => setContextMenu({ x: point.x, y: point.y, elementId })}

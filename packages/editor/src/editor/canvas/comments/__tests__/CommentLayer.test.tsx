@@ -143,7 +143,7 @@ describe("CommentLayer", () => {
     );
     expect(await screen.findByText("A comment lost its element")).toBeInTheDocument();
     // Board 184:56: 560-wide (`form`), not the 720 (`lg`) it shipped with.
-    expect(document.querySelector(".tw\\:w-\\[560px\\]")).toBeInTheDocument();
+    expect(document.querySelector(".tw\\:w-\\[var\\(--bk-size-dialog-md\\)\\]")).toBeInTheDocument();
     // No captured label for this session — the generic fallback, not a lie.
     expect(screen.getByText("was pinned to a deleted element")).toBeInTheDocument();
   });

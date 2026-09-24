@@ -41,7 +41,14 @@ export interface UnifiedSelectionToolbarProps {
 /** Inset from the element's top-right corner (board 5936:44788). */
 const INSET = 8;
 
-const PILL = "tw:flex tw:items-center tw:gap-1 tw:p-1 tw:rounded-lg tw:bg-[var(--bk-ink)]";
+const PILL = "tw:relative tw:flex tw:items-center tw:gap-1 tw:p-1 tw:rounded-lg tw:bg-[var(--bk-ink)]";
+/* Board 5940:148012: 11/16 medium gray-500, 4px under the pill. The board
+   runs it rightward from the pill's left edge, past the element; here the
+   page frame clips anything past its edge, so it ends at the pill's right
+   edge instead and runs leftward over the element. */
+const CAPTION =
+  "tw:absolute tw:right-0 tw:top-9 tw:m-0 tw:whitespace-pre tw:text-[11px] tw:leading-4 tw:font-medium " +
+  "tw:text-[var(--bk-gray-500)] tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 /* On-ink IconButton: white glyph, a white-10% hover instead of the light
    chrome's grey. */
 const ON_INK = "tw:text-white tw:hover:bg-white/10 tw:hover:text-white";
@@ -134,6 +141,11 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
       >
         <MoreHorizontal size={14} aria-hidden="true" />
       </IconButton>
+      {/* The board's caption under the pill: what each glyph does and its key.
+          Absolute, so the pill (not the caption) sets the anchor. */}
+      <p aria-hidden="true" data-testid="selection-toolbar-caption" className={CAPTION}>
+        {"⧉ Duplicate ⌘D  ·  🗑 Delete ⌫  ·  ⋯ More"}
+      </p>
     </div>
   );
 };
