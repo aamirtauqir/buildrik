@@ -2079,7 +2079,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onZoomChange={() => {}}
         onUndo={() => {}}
         onRedo={() => {}}
-        onHelpClick={() => {}}
       />
     </div>
   ),
@@ -2092,7 +2091,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onZoomChange={() => {}}
         onUndo={() => {}}
         onRedo={() => {}}
-        onHelpClick={() => {}}
       />
     </div>
   ),

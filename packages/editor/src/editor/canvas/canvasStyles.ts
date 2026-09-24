@@ -137,11 +137,16 @@ export function getMarqueeStyles(marquee: {
   };
 }
 
+/* Board 5936:44788 / 4428:44164: the bar is inset 16 from the canvas's
+   sides and sits 56 above its bottom edge (768 x 44 at x16 y744 of 800). */
 export const footerToolbarContainerStyles: React.CSSProperties = {
   position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
+  bottom: "calc(var(--bk-space-48) + var(--bk-space-8))",
+  left: "var(--bk-space-16)",
+  right: "var(--bk-space-16)",
+  display: "flex",
+  alignItems: "center",
+  gap: "var(--bk-space-8)",
   zIndex: Z_LAYERS.floatingToolbar,
   pointerEvents: "auto",
 };

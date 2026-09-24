@@ -121,18 +121,13 @@ describe("CanvasFooterToolbar — the View menu (board 5930:44801)", () => {
   });
 });
 
-describe("CanvasFooterToolbar — help button", () => {
-  it("renders the help button and fires onHelpClick when wired", () => {
-    const onHelpClick = vi.fn();
-    renderToolbar({ onHelpClick });
-    const help = screen.getByRole("button", { name: /keyboard shortcuts/i });
-    fireEvent.click(help);
-    expect(onHelpClick).toHaveBeenCalledTimes(1);
-  });
-
-  it("omits the help button when onHelpClick is not provided", () => {
-    renderToolbar();
+/* Board 5936:44788: ↶ ↷ · View ▾ · 100% ▾ · readout — no W/D/T/M, no ?. */
+describe("CanvasFooterToolbar — the bar (5936:44788)", () => {
+  it("draws no breakpoint buttons and no help button; the readout sits at the right", () => {
+    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), readout: "Section · Hero · 680 × 250" });
+    expect(screen.queryByTestId("breakpoint-switcher")).toBeNull();
     expect(screen.queryByRole("button", { name: /keyboard shortcuts/i })).toBeNull();
+    expect(screen.getByTestId("canvas-bar-readout").textContent).toBe("Section · Hero · 680 × 250");
   });
 });
 
@@ -207,5 +202,42 @@ describe("CanvasFooterToolbar — Custom width and the 100% ▾ zoom", () => {
     fireEvent.click(screen.getByTestId("canvas-zoom-trigger"));
     fireEvent.click(screen.getByTestId("canvas-zoom-fit"));
     expect(onFitToScreen).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* Owner 2026-09-24: the grid-size setting left Settings › General; View ▸ Grid
+   carries it (Show grid · Size 4/8/16 · Custom). */
+describe("CanvasFooterToolbar — View ▸ Grid", () => {
+  const openGrid = (props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>>) => {
+    const r = renderToolbar(props);
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-grid"));
+    return r;
+  };
+
+  it("Grid opens Show grid + sizes with the current one checked", () => {
+    openGrid({ gridSize: 8, onGridSizeChange: vi.fn() });
+    expect(screen.getByTestId("canvas-grid-show")).toBeTruthy();
+    expect(screen.getByTestId("canvas-grid-size-8").getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("Show grid toggles the overlay; a size sets the spacing", () => {
+    const onGridSizeChange = vi.fn();
+    const { onOverlayChange } = openGrid({ gridSize: 8, onGridSizeChange });
+    fireEvent.click(screen.getByTestId("canvas-grid-size-16"));
+    expect(onGridSizeChange).toHaveBeenCalledWith(16);
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-grid"));
+    fireEvent.click(screen.getByTestId("canvas-grid-show"));
+    expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
+  });
+
+  it("Custom takes 1–100 on Enter", () => {
+    const onGridSizeChange = vi.fn();
+    openGrid({ gridSize: 8, onGridSizeChange });
+    const input = screen.getByLabelText("Custom grid size in px");
+    fireEvent.change(input, { target: { value: "12" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onGridSizeChange).toHaveBeenCalledWith(12);
   });
 });

@@ -18,7 +18,6 @@ export interface CanvasProps {
   showBadges?: boolean;
   showGuides?: boolean;
   showGrid?: boolean;
-  gridSize?: number;
   showOutlines?: boolean;
   showRulers?: boolean;
   showXRay?: boolean;

@@ -533,6 +533,15 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       group: "View",
       run: (c) => c.setDevice("mobile"),
     },
+    /* The canvas bar dropped its W/D/T/M buttons for View ▸ Breakpoint
+       (board 5936:44788), whose list is Desktop · Tablet · Mobile; Wide stays
+       reachable here. */
+    {
+      id: "device-wide",
+      label: "Wide view",
+      group: "View",
+      run: (c) => c.setDevice("wide"),
+    },
 
     // ============================================
     // Insert & Tools — merged from the canvas ⌘⇧P palette (2026-09-22)

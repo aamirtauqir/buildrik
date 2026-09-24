@@ -57,6 +57,7 @@ import {
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { keyframesStyleSheet } from "@/shared/constants/animationKeyframes";
 import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
+import { useSelectionReadout } from "./hooks/useSelectionReadout";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
 import { CommentLayer } from "./comments/CommentLayer";
@@ -79,7 +80,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showBadges = false,
       showGuides = true,
       showGrid = false,
-      gridSize = 10,
       // Redesign P2 (sev 3): resting canvas must read as the rendered page, not a
       // blueprint. Per-element dashed outlines stay OFF by default — the single
       // ElementHoverOverlay (hover) + selection outline give the affordance, and
@@ -173,6 +173,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     });
 
     // Indicators and canvas size
+    const selectedForReadout = React.useMemo(() => {
+      const el = selectedId && composer ? composer.elements.getElement(selectedId) : null;
+      return el ? { id: selectedId as string, type: el.getType?.() ?? "element" } : null;
+    }, [composer, selectedId]);
+    const { label: readoutLabel, dims: readoutDims } = useSelectionReadout(composer, selectedForReadout);
+
     const { spacingIndicators } = useCanvasIndicators({
       composer,
       selectedId,
@@ -396,6 +402,18 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
     }, [composer, zoom]);
 
+    /* The grid spacing is the composer's setting (View ▸ Grid ▸ Size). */
+    const [gridSize, setGridSize] = React.useState(() => composer?.getState().gridSize ?? 10);
+    React.useEffect(() => {
+      if (!composer) return;
+      setGridSize(composer.getState().gridSize);
+      const onGrid = ({ gridSize: next }: { gridSize: number }) => setGridSize(next);
+      composer.on(EVENTS.GRID_CHANGED, onGrid);
+      return () => {
+        composer.off(EVENTS.GRID_CHANGED, onGrid);
+      };
+    }, [composer]);
+
     /* G2-034: one Grid switch. Snapping (nudge, resize) follows the Grid
        overlay; the separate snap setting and its ⌘K row are gone. */
     React.useEffect(() => {
@@ -419,14 +437,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         composer.off(EVENTS.ZOOM_IN, zoomIn);
         composer.off(EVENTS.ZOOM_OUT, zoomOut);
       };
-    }, [composer]);
-
-    /* The canvas palette (⌘⇧P) and the canvas-mounted cheat sheet (`?`) are
-       gone — one palette (shell ⌘K, ⌘⇧P aliases it) and one sheet
-       (StudioModals) since 2026-09-22. The footer help button opens the
-       sheet through its event door. */
-    const openCheatSheet = React.useCallback(() => {
-      composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {});
     }, [composer]);
 
     // Emit hover events for LayersPanel sync
@@ -848,7 +858,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
-              onHelpClick={openCheatSheet}
+              gridSize={gridSize}
+              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
+              readout={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
               device={device}
               onDeviceChange={
                 onDeviceChange
