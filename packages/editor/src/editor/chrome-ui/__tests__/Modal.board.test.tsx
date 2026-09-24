@@ -59,6 +59,15 @@ describe("Modal — board frame", () => {
     expect(foot.className).toContain("tw:[&_button]:h-8");
   });
 
+  /* Every dialog board draws the scrim as color/bg-overlay,
+     rgba(17,24,39,0.5) (e.g. 4418:142143) — the --bk-alpha-ink-50 token. */
+  it("dims the page with the board's 50% ink scrim", () => {
+    render(<Modal open onClose={() => {}} title="Delete?" testId="m" />);
+    const scrim = screen.getByTestId("overlay-scrim");
+    expect(scrim.className).toContain("tw:bg-[var(--bk-alpha-ink-50)]");
+    expect(scrim.className).not.toContain("alpha-ink-40");
+  });
+
   it("takes the 640 width for the New page dialog", () => {
     render(<Modal open onClose={() => {}} title="New page" testId="m" width="lg" />);
     expect(frame().className).toContain("tw:w-[var(--bk-size-dialog-lg)]");
