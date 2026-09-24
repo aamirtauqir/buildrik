@@ -9,7 +9,7 @@ import { defineSection, type AnySectionEntry } from "./_shared";
 import { AllCSSSection } from "../AllCSSSection";
 import { CSSClassesSection } from "../CSSClassesSection";
 import { ElementPropertiesSection } from "../elementProperties";
-import { LinkSection } from "../LinkSection";
+import { LINKABLE_TYPES, LinkSection } from "../LinkSection";
 import { ContentSection } from "../ContentSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
@@ -27,8 +27,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
     // Only renders for linkable element types. LinkSection has its own
     // isLinkable check too, but gating at the registry level keeps the
     // element tab clean for everything else.
-    shouldRender: (ctx) =>
-      ["link", "button", "cta"].includes(ctx.selectedElement.type),
+    shouldRender: (ctx) => LINKABLE_TYPES.has(ctx.selectedElement.type),
   }),
 
   /* Board 4428:141642 — CONTENT (Static / From CMS). G2-144. */

@@ -36,7 +36,7 @@ const linkTypeSelect = (container: HTMLElement) =>
 
 describe("LinkSection — gating", () => {
   it("renders nothing for non-linkable element types", () => {
-    const { container } = renderLink({ type: "container" });
+    const { container } = renderLink({ type: "image" });
     expect(container.firstChild).toBeNull();
   });
 });

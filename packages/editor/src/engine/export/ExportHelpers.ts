@@ -374,3 +374,73 @@ export function downloadHTML(html: string, filename = "export.html"): void {
 export function downloadCSS(css: string, filename = "styles.css"): void {
   downloadFile(css, filename, "text/css");
 }
+
+// ─── Linked containers ─────────────────────────────────────────────────────
+
+/** Tags for which `href` is their own, valid attribute. */
+const HREF_TAGS = new Set(["a", "area", "link", "base"]);
+/** The link's attributes: on a linked container they belong to the <a>, not
+ *  to the <section>/<div> that holds them in the element data. */
+const BLOCK_LINK_ATTRS = new Set(["href", "target", "rel"]);
+/** Interactive content, which the HTML content model forbids inside an <a>. */
+const INTERACTIVE_TAGS = new Set([
+  "a", "button", "input", "select", "textarea", "label", "form",
+  "iframe", "embed", "object", "details", "audio", "video",
+]);
+
+/** How a writer reads one of its nodes — the live-Element writer and the
+ *  publish writer walk different shapes. */
+export interface LinkNodeView<T> {
+  tag: string;
+  href: unknown;
+  children: readonly T[];
+}
+
+function hasInteractiveDescendant<T>(children: readonly T[], read: (node: T) => LinkNodeView<T>): boolean {
+  return children.some((child) => {
+    const view = read(child);
+    const linked = typeof view.href === "string" && view.href !== "";
+    return INTERACTIVE_TAGS.has(view.tag) || linked || hasInteractiveDescendant(view.children, read);
+  });
+}
+
+/**
+ * A container (section, div, card…) with a LINK set in the inspector.
+ * `href` on a <section> does nothing, and that is what export used to write.
+ *
+ * Strategy, both writers:
+ *  - The element keeps its own tag, classes and attributes; `href`, `target`
+ *    and `rel` move onto an <a> that WRAPS it, styled
+ *    `display:contents; color:inherit; text-decoration:inherit` so the
+ *    wrapper generates no box — the section stays the flex/grid item it was,
+ *    every block-level style still lands on it, and its text is not recoloured
+ *    or underlined by the UA's link styles. Clicks anywhere inside reach the
+ *    <a> through the DOM, which is what follows the link.
+ *  - Nested links: an <a> may not contain interactive content (another link,
+ *    a button, a form control…). If the container holds any — including a
+ *    linked container further down — its OWN link is dropped and the inner
+ *    ones win: the innermost link is the one a visitor can actually aim at, and
+ *    `<a>` inside `<a>` is invalid HTML that browsers repair by splitting the
+ *    outer link apart. The link attributes are dropped from the element either
+ *    way, since on a non-link tag they are invalid.
+ *
+ * Returns `null` when the element is not a linked container (an <a> itself,
+ * or no href) — the writer then emits it unchanged. Otherwise `wrap` is true
+ * only when the wrapper is valid here.
+ */
+export function blockLinkPlan<T>(
+  tag: string,
+  attrs: Record<string, string>,
+  children: readonly T[],
+  read: (node: T) => LinkNodeView<T>,
+): { wrap: boolean; isLinkAttr: (key: string) => boolean } | null {
+  if (HREF_TAGS.has(tag) || typeof attrs.href !== "string" || attrs.href === "") return null;
+  return {
+    wrap: !hasInteractiveDescendant(children, read),
+    isLinkAttr: (key) => BLOCK_LINK_ATTRS.has(key),
+  };
+}
+
+/** Inline so the wrapper holds without a stylesheet (a single-file export
+ *  with inline CSS has none). */
+export const BLOCK_LINK_STYLE = "display:contents;color:inherit;text-decoration:inherit";

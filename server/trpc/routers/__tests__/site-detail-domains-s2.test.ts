@@ -16,6 +16,7 @@ const checkAvailabilityMock = vi.fn();
 const updateDomainMock = vi.fn();
 const recordForSiteMock = vi.fn();
 const domainFindUnique = vi.fn();
+const checkDnsMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -37,7 +38,7 @@ vi.mock("@/server/services/permission.service", () => ({
   },
 }));
 vi.mock("@/server/services/domain.service", () => ({
-  checkDomainDns: vi.fn(),
+  checkDomainDns: (...a: unknown[]) => checkDnsMock(...a),
   listDomains: vi.fn(),
   connectDomain: (...a: unknown[]) => connectDomainMock(...a),
   removeDomain: vi.fn(),
@@ -59,7 +60,7 @@ function caller() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, connectDomainMock, checkAvailabilityMock, updateDomainMock, recordForSiteMock, domainFindUnique].forEach((m) =>
+  [checkSiteRoleMock, checkDnsMock, connectDomainMock, checkAvailabilityMock, updateDomainMock, recordForSiteMock, domainFindUnique].forEach((m) =>
     m.mockReset(),
   );
   recordForSiteMock.mockResolvedValue(undefined);
@@ -130,5 +131,23 @@ describe("siteDetail.domains.update", () => {
     checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN"));
     await expect(caller().domains.update({ id: "dom1", forceHttps: true })).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(updateDomainMock).not.toHaveBeenCalled();
+  });
+});
+
+/* `check` rewrites DnsRecord.verified + Domain.status — a write, so VIEWER is
+   refused and the service is never reached (audit 2026-09-24). */
+describe("siteDetail.domains.check", () => {
+  it("VIEWER → FORBIDDEN, service untouched", async () => {
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "Insufficient permissions"));
+    await expect(caller().domains.check({ id: "dom1", siteId: "s1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(checkDnsMock).not.toHaveBeenCalled();
+  });
+
+  it("EDITOR → runs the check bound to the gated site", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    checkDnsMock.mockResolvedValueOnce({ id: "dom1", siteId: "s1", status: "VERIFIED" });
+    await expect(caller().domains.check({ id: "dom1", siteId: "s1" })).resolves.toMatchObject({ status: "VERIFIED" });
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(prisma, "u_1", "s1", "EDITOR");
+    expect(checkDnsMock).toHaveBeenCalledWith("dom1", "s1");
   });
 });

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { UPLOAD_LIMITS, type PresignInput } from "@buildrik/shared/schemas/upload";
+import { checkSiteRole, checkWorkspaceRole } from "@/server/services/permission.service";
 
 const TTL_MS = 10 * 60 * 1000;
 
@@ -19,12 +20,45 @@ export function validateUpload(context: string, fileType: string, sizeMB?: numbe
   if (sizeMB !== undefined && sizeMB > limits.maxSizeMB) throw new Error("FILE_TOO_LARGE");
 }
 
+/** Contexts whose blob lands at a FIXED per-site path the live site serves. */
+const SITE_ASSET_CONTEXTS = new Set(["favicon", "touch_icon", "og_image"]);
+
+/**
+ * The PUT that follows a presign writes with `allowOverwrite: true` to a
+ * stable path (`sites/<id>/favicon.png`, `workspaces/<id>/icon.png`,
+ * `media/<ws>/<name>`), so the presign IS the write authorisation. It used to
+ * check nothing: any signed-in account could overwrite any site's favicon or
+ * OG image by naming its siteId (audit 2026-09-24). Site assets need ADMIN —
+ * the same tier as `siteDetail.settings.update`, which stores them — and a
+ * siteId, since without one they landed on a shared `sites/global/` path.
+ * Workspace icon needs workspace ADMIN; workspace media needs EDITOR. Avatar
+ * and ticket paths are keyed by the caller's own userId. Throws
+ * PermissionError, or Error("SITE_REQUIRED").
+ */
+async function assertUploadRole(
+  context: string,
+  siteId: string | undefined,
+  userId: string,
+  wsId: string,
+): Promise<void> {
+  if (SITE_ASSET_CONTEXTS.has(context)) {
+    if (!siteId) throw new Error("SITE_REQUIRED");
+    await checkSiteRole(prisma, userId, siteId, "ADMIN");
+  } else if (context === "workspace_icon") {
+    await checkWorkspaceRole(prisma, userId, wsId, "ADMIN");
+  } else if (context === "site_media") {
+    if (siteId) await checkSiteRole(prisma, userId, siteId, "EDITOR");
+    else await checkWorkspaceRole(prisma, userId, wsId, "EDITOR");
+  }
+}
+
 export async function createPresignedUrl(
   input: Pick<PresignInput, "fileName" | "fileType" | "context" | "siteId">,
   userId: string,
   wsId: string,
 ): Promise<{ fileId: string; uploadUrl: string }> {
   validateUpload(input.context, input.fileType);
+  await assertUploadRole(input.context, input.siteId, userId, wsId);
 
   const fileId = crypto.randomUUID();
 

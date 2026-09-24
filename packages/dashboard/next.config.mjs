@@ -109,6 +109,17 @@ const nextConfig = {
         ],
       },
       {
+        /* Share links are capability URLs for a private draft: never indexed,
+           and the token in the URL must not leak as a Referer from anything
+           the previewed page links to. Listed after the catch-all so this
+           Referrer-Policy wins. */
+        source: "/share/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+      {
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: process.env.EDITOR_ORIGIN || "http://localhost:5050" },

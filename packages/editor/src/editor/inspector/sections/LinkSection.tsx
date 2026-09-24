@@ -54,6 +54,17 @@ const TARGET_OPTIONS = [
   { value: "_blank", label: "New Tab" },
 ];
 
+/**
+ * Element types the Link section edits. Containers joined 2026-09-24 (board
+ * 4428:141642 draws LINK on a Section): export wraps a linked container in a
+ * box-less <a> and drops the link when the container holds its own
+ * interactive content (ExportHelpers.blockLinkPlan).
+ */
+export const LINKABLE_TYPES: ReadonlySet<string> = new Set([
+  "link", "button", "a", "cta",
+  "container", "section", "card",
+]);
+
 export const LinkSection: React.FC<LinkSectionProps> = ({
   selectedElement,
   composer,
@@ -74,8 +85,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [phoneError, setPhoneError] = React.useState(false);
   const [anchorError, setAnchorError] = React.useState(false);
 
-  // Only show for link/button elements
-  const isLinkable = ["link", "button", "a", "cta"].includes(selectedElement.type);
+  const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
 
   // Load pages from composer
   React.useEffect(() => {
