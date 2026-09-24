@@ -61,24 +61,32 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const panelBottomRef = React.useRef<HTMLDivElement>(null);
   const isSearching = tab.searchQuery.trim().length > 0;
 
-  // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
-  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() => {
-    const asked = composer ? takePendingInsertGroup(composer) : undefined;
-    return new Set<InsertGroupId>(asked ? ["elements", asked] : ["elements"]);
-  });
-  // Context menu "Replace with block…" (v3 IA Q8) opens this panel AND asks
-  // for BLOCKS; without this the door lands on ELEMENTS and the user scrolls.
+  // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸). A door that
+  // asks for a group ("Replace with block…", Brand › Component styles) opens
+  // that group ALONE and scrolls it into view — with ELEMENTS' 53 rows open
+  // above it, the asked-for group sat off-screen.
+  const [asked] = React.useState(() => (composer ? takePendingInsertGroup(composer) : undefined));
+  const [scrollTarget, setScrollTarget] = React.useState<InsertGroupId | null>(asked ?? null);
+  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() => new Set([asked ?? "elements"]));
   React.useEffect(() => {
     if (!composer) return;
     const open = ({ group }: { group: InsertGroupId }) => {
       takePendingInsertGroup(composer);
-      setOpenGroups((prev) => (prev.has(group) ? prev : new Set(prev).add(group)));
+      setOpenGroups(new Set([group]));
+      setScrollTarget(group);
     };
     composer.on(EVENTS.UI_INSERT_OPEN_GROUP, open);
     return () => {
       composer.off(EVENTS.UI_INSERT_OPEN_GROUP, open);
     };
   }, [composer]);
+  React.useEffect(() => {
+    if (!scrollTarget) return;
+    document
+      .querySelector(`[data-testid="insert-section-${scrollTarget}"]`)
+      ?.scrollIntoView({ block: "start" });
+    setScrollTarget(null);
+  }, [scrollTarget]);
   const { addToast } = useToast();
 
 
