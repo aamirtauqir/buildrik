@@ -10,7 +10,9 @@ import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PageFolder } from "@buildrik/shared/schemas/pages";
 
-const client = () => getBuildrikClient(DASHBOARD_URL).pages.folders;
+/* Full `pages.folders.<proc>` chains, not a cached `.folders` handle: the
+   tRPC orphan gate finds callers by that dotted path. */
+const api = () => getBuildrikClient(DASHBOARD_URL);
 
 async function orNull<T>(run: () => Promise<T>): Promise<T | null> {
   try {
@@ -21,12 +23,12 @@ async function orNull<T>(run: () => Promise<T>): Promise<T | null> {
 }
 
 export const pageFolderRemote = {
-  list: (siteId: string): Promise<PageFolder[] | null> => orNull(() => client().list.query({ siteId })),
+  list: (siteId: string): Promise<PageFolder[] | null> => orNull(() => api().pages.folders.list.query({ siteId })),
   create: (siteId: string, name: string): Promise<PageFolder | null> =>
-    orNull(() => client().create.mutate({ siteId, name })),
+    orNull(() => api().pages.folders.create.mutate({ siteId, name })),
   update: (folderId: string, patch: { name?: string; collapsed?: boolean }): Promise<PageFolder | null> =>
-    orNull(() => client().update.mutate({ folderId, ...patch })),
-  remove: (folderId: string): Promise<{ success: true } | null> => orNull(() => client().delete.mutate({ folderId })),
+    orNull(() => api().pages.folders.update.mutate({ folderId, ...patch })),
+  remove: (folderId: string): Promise<{ success: true } | null> => orNull(() => api().pages.folders.delete.mutate({ folderId })),
   movePage: (siteId: string, pageId: string, folderId: string | null): Promise<PageFolder[] | null> =>
-    orNull(() => client().movePage.mutate({ siteId, pageId, folderId })),
+    orNull(() => api().pages.folders.movePage.mutate({ siteId, pageId, folderId })),
 };
