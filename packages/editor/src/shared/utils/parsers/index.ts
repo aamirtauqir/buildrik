@@ -142,7 +142,6 @@ export {
 // =============================================================================
 
 export {
-  simulateColorBlindness,
   getLuminance,
   getContrastRatio,
   meetsContrastAA,
@@ -155,7 +154,6 @@ export {
   colorsEqual,
   isLightColor,
   isDarkColor,
-  type ColorBlindnessType,
 } from "./colorAccessibility";
 
 // =============================================================================
