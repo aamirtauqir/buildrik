@@ -232,7 +232,7 @@ describe("PublishTab — board 784:4326, just published", () => {
     );
 
     await waitFor(() => expect(screen.getByText("Published to production.")).toBeTruthy());
-    expect(screen.getByText(/v15 · live/)).toBeTruthy();
+    expect(screen.getByText(/LIVE · v15/)).toBeTruthy(); // 4418:97787
     expect((screen.getByText("View live site") as HTMLAnchorElement).href).toContain("bellacucina.com");
     expect(screen.getByText("Compare v14 → v15")).toBeTruthy();
     // Nothing pending — the button has nothing to send.
@@ -328,10 +328,8 @@ describe("PublishTab — board 784:4403, failed", () => {
     expect(screen.getByText("Try again")).toBeTruthy();
     // Same as publishing/live: the "what would go out" sections step aside.
     expect(screen.queryByText("Changes in this session")).toBeNull();
-    // The CTA stays live — a failed publish is retryable.
-    expect(
-      (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
-    ).toBe(false);
+    // 4418:97355: the foot offers one way back; retry is "Try again" above.
+    expect(screen.getByTestId("publish-back")).toHaveTextContent("Back to Publish");
   });
 
   it("does not double the reassurance when the server already said it", async () => {
