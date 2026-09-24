@@ -1,6 +1,6 @@
 /**
  * GoogleFontsService tests — link-tag construction (fonts.googleapis.com/css2),
- * preconnect export markup, and the static 25-font fallback catalog (the
+ * preconnect export markup, and the static 26-font fallback catalog (the
  * service never fetches; POPULAR_FONTS is the offline-safe source).
  */
 import { describe, it, expect, beforeEach } from "vitest";
@@ -21,9 +21,9 @@ describe("GoogleFontsService singleton + catalog", () => {
     expect(GoogleFontsService.getInstance()).toBe(GoogleFontsService.getInstance());
   });
 
-  it("ships the 25-font fallback catalog (no API key, no fetch)", () => {
+  it("ships the 26-font fallback catalog (25 + the DS mono default, Geist Mono) (no API key, no fetch)", () => {
     const fonts = svc().getFonts();
-    expect(fonts).toHaveLength(25);
+    expect(fonts).toHaveLength(26);
     const families = fonts.map((f) => f.family);
     expect(families).toContain("Inter");
     expect(families).toContain("Playfair Display");
@@ -33,7 +33,7 @@ describe("GoogleFontsService singleton + catalog", () => {
   it("getFonts returns a copy — mutating it does not corrupt the catalog", () => {
     const fonts = svc().getFonts();
     fonts.pop();
-    expect(svc().getFonts()).toHaveLength(25);
+    expect(svc().getFonts()).toHaveLength(26);
   });
 
   it("searches by family name and by category, case-insensitively", () => {
@@ -44,7 +44,7 @@ describe("GoogleFontsService singleton + catalog", () => {
   });
 
   it("empty query returns the full catalog", () => {
-    expect(svc().searchFonts("   ")).toHaveLength(25);
+    expect(svc().searchFonts("   ")).toHaveLength(26);
   });
 
   it("getFontsByCategory partitions the catalog", () => {
