@@ -56,8 +56,12 @@ const mount = () =>
   );
 
 describe("AITab — CREATE opens Add › Generate a block (board 4418:104313)", () => {
+  /* CREATE sits on the page-scope idle panel (4418:104313); an element scope
+     shows its scope note instead (4418:104454). */
   it("the idle panel's CREATE row asks Add for its Generate screen", () => {
-    const composer = makeComposer() as unknown as { emit: ReturnType<typeof vi.fn> };
+    const composer = { ...(makeComposer() as object), selection: { getAllSelected: () => [], select: vi.fn() } } as unknown as {
+      emit: ReturnType<typeof vi.fn>;
+    };
     render(
       <AITab composer={composer as never} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
