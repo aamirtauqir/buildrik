@@ -830,6 +830,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             publishedUrl={publishedUrl}
             siteId={siteIdForMenu}
+            siteName={siteName}
+            pageName={pageName}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={toggleReadOnlyView}
           />

@@ -45,6 +45,9 @@ export interface SiteMenuProps {
   onOpenShortcuts?: () => void;
   /** The site the share link is minted for. */
   siteId?: string | null;
+  /** Named in the share dialog's title/subtitle (board 4418:165739). */
+  siteName?: string | null;
+  pageName?: string | null;
   /** Collaboration is flag-gated. Absent while the flag is off (the row is
    *  drawn PLANNED, disabled) and while a session is already running. */
   onStartCollaboration?: () => void;
@@ -84,6 +87,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onToggleReadOnlyView,
   onOpenShortcuts,
   siteId,
+  siteName,
+  pageName,
   onStartCollaboration,
   collabEnabled = false,
   onUnpublish,
@@ -208,7 +213,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           )}
         </Menu>
       </Popover>
-      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} /> : null}
+      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} /> : null}
     </>
   );
 };

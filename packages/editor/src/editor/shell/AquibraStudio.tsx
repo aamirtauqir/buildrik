@@ -792,6 +792,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         html={previewHtml}
         onDone={() => setPreviewHtml(null)}
         siteId={getSiteIdFromUrl()}
+        siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
+        pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
       />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
       <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />

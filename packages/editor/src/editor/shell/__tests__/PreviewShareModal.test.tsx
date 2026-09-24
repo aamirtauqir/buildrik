@@ -45,7 +45,7 @@ afterEach(() => {
 const renderModal = (onOpenChange = vi.fn()) =>
   render(
     <ToastProvider>
-      <PreviewShareModal open onOpenChange={onOpenChange} siteId="site-abc" />
+      <PreviewShareModal open onOpenChange={onOpenChange} siteId="site-abc" siteName="Bella Cucina" pageName="Home" />
     </ToastProvider>,
   );
 
@@ -101,6 +101,30 @@ describe("PreviewShareModal", () => {
     await screen.findByTestId("preview-share-link");
     fireEvent.click(screen.getByRole("button", { name: /open preview link in a new tab/i }));
     expect(open).toHaveBeenCalledWith(expect.stringMatching(/\/share\/tok-open$/), "_blank", "noopener,noreferrer");
+  });
+
+  /* Board 4418:165739. */
+  it("names the page, says what it shares, and closes with Done — no ✕", async () => {
+    const onOpenChange = vi.fn();
+    list.mockResolvedValue([link("tok")]);
+    renderModal(onOpenChange);
+    await screen.findByTestId("preview-share-link");
+    expect(screen.getByText("Share preview of Home")).toBeInTheDocument();
+    expect(screen.getByText("Bella Cucina · Home · current saved design")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /close share dialog/i })).toBeNull();
+    const done = screen.getByRole("button", { name: "Done" });
+    expect(done.className).toContain("tw:bg-[var(--bk-accent)]");
+    fireEvent.click(done);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("puts Open ↗ inside the grey link field and Copy link in the footer", async () => {
+    list.mockResolvedValue([link("tok")]);
+    renderModal();
+    const row = await screen.findByTestId("preview-share-field");
+    expect(row).toContainElement(screen.getByRole("button", { name: /open preview link in a new tab/i }));
+    expect(row.className).toContain("tw:bg-[var(--bk-gray-50)]");
+    expect(screen.getByTestId("preview-share-link").className).not.toContain("font-mono");
   });
 
   it("renders no raw form controls (Gate 24) — the link row is a <code>", async () => {
