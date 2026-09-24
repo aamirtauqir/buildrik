@@ -129,6 +129,9 @@ function makeComposer(): Composer {
     off: () => {},
     versions: {
       captureVisualSnapshot: () => "data:image/jpeg;base64,fake",
+      /* The "+ Save a version" footer (SaveVersionFooter) saves through the
+         engine directly — the Session tab has no version list to borrow. */
+      createVersion: (name: string, description?: string) => mocks.createVersion(name, description),
     },
   } as unknown as Composer;
 }

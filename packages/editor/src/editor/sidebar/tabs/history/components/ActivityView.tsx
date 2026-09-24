@@ -1,11 +1,9 @@
 /**
  * ActivityView — Undo/redo activity timeline
  * Pixel-aligned with the History Tab prototype:
- *   activity-header (label + Time-Travel button)
- *   virtual-list with sticky date-group-header (virtualized via react-window)
- *   entry-row → entry-row-main → entry-label / entry-meta / entry-badge
+ *   virtual-list of 44-tall rows (virtualized via react-window) — board
+ *   4418:73791: "label · author" left, the time in mono right (a restore)
  *   diff-preview with diff-item rows (operation icon + property + change-type badge)
- *   keyboard-hints footer
  *
  * @license BSD-3-Clause
  */
@@ -18,12 +16,7 @@ import { Kbd, Button, ConfirmDialog } from "@/editor/chrome-ui";
 import { VariableSizeList } from "react-window";
 import { useHistoryState } from "../../../../../shared/hooks/useHistoryState";
 import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
-import {
-  collapseIdenticalChanges,
-  formatRelativeTime,
-  groupByDate,
-  type CollapsedChange,
-} from "../helpers";
+import { collapseIdenticalChanges, type CollapsedChange } from "../helpers";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
 const MAX_VISIBLE_CHANGES = 5;
@@ -34,7 +27,6 @@ const MAX_VISIBLE_CHANGES = 5;
 const ROW_H_COLLAPSED = 44;
 const ROW_H_CHANGE = 24;
 const ROW_H_SHOW_ALL_BTN = 32;
-const ROW_H_DATE_HEADER = 28;
 
 const OP_ICON: Record<string, string> = {
   add: "+",
@@ -47,23 +39,11 @@ const OP_ICON: Record<string, string> = {
 const CANVAS_ID = "editor-canvas";
 const CROSSFADE_MS = 300;
 
-type Row =
-  | { kind: "date-header"; label: string; key: string }
-  | {
-      kind: "entry";
-      entry: HistoryDisplayEntry;
-      globalIndex: number;
-      isCurrent: boolean;
-    };
 
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function getInitial(userId: string): string {
-  const trimmed = userId.trim();
-  return trimmed.length > 0 ? trimmed.charAt(0).toUpperCase() : "?";
-}
 
 // Inline style objects hoisted so RowRenderer stays compact + stable identity.
 const STYLE_TIME_BTN: React.CSSProperties = {
@@ -76,27 +56,6 @@ const STYLE_TIME_BTN: React.CSSProperties = {
   cursor: "pointer",
   display: "inline-flex",
   alignItems: "center",
-};
-
-const STYLE_USER_CHIP: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 16,
-  height: 16,
-  borderRadius: "var(--bk-radius-full)",
-  background: "var(--bk-accent-tint)",
-  color: "var(--bk-accent)",
-  fontSize: 11,
-  fontWeight: 600,
-  lineHeight: 1,
-};
-
-const STYLE_RELATIVE_TIME: React.CSSProperties = {
-  fontSize: 11,
-  lineHeight: "16px",
-  color: "var(--bk-ink-muted)",
-  whiteSpace: "nowrap",
 };
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
@@ -127,7 +86,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   const [expandedGroupId, setExpandedGroupId] = React.useState<string | null>(null);
   const [showAllIds, setShowAllIds] = React.useState<Set<string>>(new Set());
-  const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
+  /* -1 = nothing focused until j/k or the pointer picks a row: the board's
+     first row is drawn unhighlighted. */
+  const [focusedIndex, setFocusedIndex] = React.useState<number>(-1);
   const [pendingRestoreId, setPendingRestoreId] = React.useState<string | null>(null);
 
   const scrollHostRef = React.useRef<HTMLDivElement | null>(null);
@@ -153,27 +114,11 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     );
   }, [historyStack, searchQuery]);
 
-  const dateGroups = React.useMemo(() => groupByDate(filteredHistory), [filteredHistory]);
-  const allEntries = React.useMemo(() => dateGroups.flatMap((g) => g.items), [dateGroups]);
-
-  // Flatten dateGroups into a single row stream: date-header rows + entry rows.
-  const rows = React.useMemo<Row[]>(() => {
-    const out: Row[] = [];
-    let globalIndex = 0;
-    for (const group of dateGroups) {
-      out.push({ kind: "date-header", label: group.label, key: `h:${group.label}` });
-      for (const entry of group.items) {
-        out.push({
-          kind: "entry",
-          entry,
-          globalIndex,
-          isCurrent: globalIndex === 0,
-        });
-        globalIndex += 1;
-      }
-    }
-    return out;
-  }, [dateGroups]);
+  /* Board 4418:73791 draws the session as one run of rows, newest first — no
+     Today / Yesterday bands (a session rarely spans a day, and the time on
+     every row already says when). One row per entry, so the entry index IS
+     the row index. */
+  const allEntries = filteredHistory;
 
   // Per-entry collapsed change groups. Memoized so expand toggles don't recompute.
   const collapsedByEntry = React.useMemo(() => {
@@ -203,10 +148,8 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   // F1 — Row sizing based on kind + expansion state + show-all state.
   const getItemSize = React.useCallback(
     (index: number): number => {
-      const row = rows[index];
-      if (!row) return ROW_H_COLLAPSED;
-      if (row.kind === "date-header") return ROW_H_DATE_HEADER;
-      const { entry } = row;
+      const entry = allEntries[index];
+      if (!entry) return ROW_H_COLLAPSED;
       if (expandedGroupId !== entry.id || entry.changes.length === 0) {
         return ROW_H_COLLAPSED;
       }
@@ -224,13 +167,13 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         (hasMore ? ROW_H_SHOW_ALL_BTN : 0)
       );
     },
-    [rows, expandedGroupId, showAllIds, collapsedByEntry]
+    [allEntries, expandedGroupId, showAllIds, collapsedByEntry]
   );
 
   // Reset virtual-list size caches whenever any row's size might have changed.
   React.useEffect(() => {
     listRef.current?.resetAfterIndex?.(0, true);
-  }, [rows, expandedGroupId, showAllIds, collapsedByEntry]);
+  }, [allEntries, expandedGroupId, showAllIds, collapsedByEntry]);
 
   /* F1 — Measure the scroll host, via a CALLBACK ref rather than a mount-time
      effect. The effect ran once, on mount, when this component was still
@@ -314,19 +257,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   // Scroll focused entry into view via react-window's scrollToItem.
   React.useEffect(() => {
-    if (!listRef.current || rows.length === 0) return;
-    let rowIndex = -1;
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-      if (r.kind === "entry" && r.globalIndex === focusedIndex) {
-        rowIndex = i;
-        break;
-      }
-    }
-    if (rowIndex >= 0) {
-      listRef.current.scrollToItem?.(rowIndex, "smart");
-    }
-  }, [focusedIndex, rows]);
+    if (!listRef.current || focusedIndex < 0) return;
+    listRef.current.scrollToItem?.(focusedIndex, "smart");
+  }, [focusedIndex, allEntries]);
 
   // F4 — Timestamp click = smooth restore with opacity crossfade.
   const cancelPendingRestore = React.useCallback(() => {
@@ -454,44 +387,15 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     };
   }, [cancelPendingRestore, clearCanvasAnim]);
 
-  const renderKeyboardHints = () => (
-    <div className="keyboard-hints" aria-hidden="true">
-      <span className="kbd-hint">
-        <Kbd>j</Kbd>
-        <Kbd>k</Kbd>
-        navigate
-      </span>
-      <span className="kbd-hint">
-        <Kbd>Enter</Kbd>
-        expand
-      </span>
-      <span className="kbd-hint">
-        <Kbd>g</Kbd>
-        <Kbd>G</Kbd>
-        start/end
-      </span>
-    </div>
-  );
-
   // F1 — Row renderer handed to VariableSizeList.
   const RowRenderer = React.useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
-      const row = rows[index];
-      if (!row) return null;
-
-      if (row.kind === "date-header") {
-        return (
-          <div style={style} className="hist-date-group">
-            <div className="date-group-header">{row.label}</div>
-          </div>
-        );
-      }
-
-      const { entry, globalIndex, isCurrent } = row;
+      const entry = allEntries[index];
+      if (!entry) return null;
+      const globalIndex = index;
       const isExpanded = expandedGroupId === entry.id;
       const hasChanges = entry.changes.length > 0;
       const isFocused = focusedIndex === globalIndex;
-      const isCheckpoint = entry.type === "checkpoint";
       const showAll = showAllIds.has(entry.id);
       const collapsed = collapsedByEntry.get(entry.id) ?? [];
       const visibleCollapsed = showAll
@@ -499,19 +403,23 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         : collapsed.slice(0, MAX_VISIBLE_CHANGES);
       const hasMore = collapsed.length > MAX_VISIBLE_CHANGES;
       const timeLabel = formatTime(entry.timestamp);
-      const hasUser = !!(entry.userId && entry.userId.trim().length > 0);
+      /* The undo stack is this browser's session, and HistoryManager stamps
+         every entry with the signed-in user — so a stamped entry is always the
+         viewer's own. `userId` is an account id (a cuid), never a name: it was
+         drawn as its first letter in a chip, i.e. a meaningless "C". Board
+         4418:73791's "label · author" reads "· You" here. */
+      const author = entry.userId?.trim() ? "You" : null;
 
       const rowClass = [
         "entry-row",
         isFocused && "focused",
-        isCurrent && "current",
         isExpanded && "expanded",
       ]
         .filter(Boolean)
         .join(" ");
 
-      const entryAriaLabel = hasUser
-        ? `Change by ${entry.userId} at ${timeLabel}: ${entry.label}`
+      const entryAriaLabel = author
+        ? `Your change at ${timeLabel}: ${entry.label}`
         : `${entry.label} at ${timeLabel}`;
 
       return (
@@ -528,68 +436,27 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             onMouseEnter={() => setFocusedIndex(globalIndex)}
           >
             <div className="entry-row-main">
-              <div>
-                <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
-                  {entry.label}
-                </div>
-                <div className="entry-meta">
-                  <Button
-                    type="button"
-                    /* flowbite's Button is 40 tall and a plain class cannot
-                       reach it — only a same-property `tw:` utility survives
-                       twMerge (CLAUDE.md §Chrome). Left at 40 it set the whole
-                       meta line's height and board 163:48's 44 row measured
-                       68. */
-                    className="entry-time-btn tw:h-4 tw:min-h-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      requestRestore(entry.id);
-                    }}
-                    aria-label={`Restore the project to ${timeLabel}`}
-                    title={`Restore the project to ${timeLabel} — discards every later change`}
-                    style={STYLE_TIME_BTN}
-                  >
-                    <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
-                      {timeLabel}
-                    </span>
-                  </Button>
-                  <span style={STYLE_RELATIVE_TIME}>
-                    {formatRelativeTime(entry.timestamp)}
-                  </span>
-                  {hasUser && (
-                    <span
-                      title={entry.userId ?? undefined}
-                      aria-hidden="true"
-                      style={STYLE_USER_CHIP}
-                    >
-                      {getInitial(entry.userId!)}
-                    </span>
-                  )}
-                  {isCurrent && (
-                    <span className="entry-badge current-badge">Current</span>
-                  )}
-                  {isCheckpoint && !isCurrent && (
-                    <span className="entry-badge checkpoint">Checkpoint</span>
-                  )}
-                  {hasChanges && (
-                    <span className="entry-badge grouped">
-                      {collapsed.length} change
-                      {collapsed.length !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                </div>
+              <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
+                {author ? `${entry.label} · ${author}` : entry.label}
               </div>
-              {hasChanges && (
-                <svg
-                  className={`expand-icon${isExpanded ? " open" : ""}`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              )}
+              <Button
+                type="button"
+                /* flowbite's Button is 40 tall and a plain class cannot
+                   reach it — only a same-property `tw:` utility survives
+                   twMerge (CLAUDE.md §Chrome). */
+                className="entry-time-btn tw:h-4 tw:min-h-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requestRestore(entry.id);
+                }}
+                aria-label={`Restore the project to ${timeLabel}`}
+                title={`Restore the project to ${timeLabel} — discards every later change`}
+                style={STYLE_TIME_BTN}
+              >
+                <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
+                  {timeLabel}
+                </span>
+              </Button>
             </div>
 
             {isExpanded && hasChanges && (
@@ -643,7 +510,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       );
     },
     [
-      rows,
+      allEntries,
       expandedGroupId,
       focusedIndex,
       showAllIds,
@@ -688,7 +555,6 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             </div>
           ))}
         </div>
-        {renderKeyboardHints()}
       </div>
     );
   }
@@ -715,7 +581,6 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             )}
           </p>
         </div>
-        {renderKeyboardHints()}
       </div>
     );
   }
@@ -733,19 +598,15 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             ref={listRef}
             height={measuredHeight}
             width="100%"
-            itemCount={rows.length}
+            itemCount={allEntries.length}
             itemSize={getItemSize}
             overscanCount={5}
-            itemKey={(index: number) => {
-              const r = rows[index];
-              return r ? (r.kind === "date-header" ? r.key : r.entry.id) : index;
-            }}
+            itemKey={(index: number) => allEntries[index]?.id ?? index}
           >
             {RowRenderer}
           </VariableSizeList>
         )}
       </div>
-      {renderKeyboardHints()}
       {renderRestoreConfirm()}
     </div>
   );

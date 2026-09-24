@@ -103,11 +103,21 @@ export interface NotificationPanelProps {
   onNavigate?: (url: string) => void;
   /** F5 — a failed mark-all must say so, not silently do nothing. */
   addToast?: (input: ToastInput) => string;
+  /** "View all activity ›" — board 4418:140492 lands on the Activity panel
+   *  (4418:140587). Without it the link falls back to the dashboard's
+   *  notifications page, as it did before that panel existed. */
+  onOpenActivity?: () => void;
 }
 
 type LoadState = "loading" | "ready" | "error";
 
-export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, onRead, onNavigate, addToast }) => {
+export const NotificationPanel: React.FC<NotificationPanelProps> = ({
+  onClose,
+  onRead,
+  onNavigate,
+  addToast,
+  onOpenActivity,
+}) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<EditorNotification[]>([]);
   const panelRef = React.useRef<HTMLDivElement | null>(null);
@@ -170,6 +180,11 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
 
   /** The full grouped list, reached the same way a row's own jump is. */
   const seeAll = () => {
+    if (onOpenActivity) {
+      onOpenActivity();
+      onClose();
+      return;
+    }
     const url = "/dashboard/notifications";
     if (onNavigate) onNavigate(url);
     else window.location.href = `${DASHBOARD_URL}${url}`;

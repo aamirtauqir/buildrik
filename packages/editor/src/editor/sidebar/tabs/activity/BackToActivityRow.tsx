@@ -8,6 +8,11 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 
+/** The sub-screen an Activity row opens Review / History with
+ *  (`from-activity`, `from-activity:published`, `from-activity:session`);
+ *  TabRouter reads it back to draw this row. */
+export const FROM_ACTIVITY = "from-activity";
+
 export const BackToActivityRow: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <div className="tw:flex tw:h-8 tw:flex-none tw:items-center tw:border-b tw:border-[var(--bk-border)] tw:px-3" data-testid="back-to-activity">
     <Button

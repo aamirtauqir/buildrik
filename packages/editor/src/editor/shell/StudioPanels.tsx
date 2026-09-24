@@ -48,7 +48,7 @@ import { getEditorViewMode } from "@shared/utils/editorViewMode";
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
 /** Panels that take the inspector's column instead of the left drawer. */
-const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history"]);
+const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history", "activity"]);
 // ============================================================================
 // TYPES
 // ============================================================================

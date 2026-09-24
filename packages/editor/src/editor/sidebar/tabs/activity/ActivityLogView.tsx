@@ -1,10 +1,10 @@
 /**
- * ActivityLogView — site-scoped activity log (B6, code-gap plan).
+ * ActivityLogView — site-scoped activity log (B6, code-gap plan), the body of
+ * the Activity panel (board 4418:140587; its own panel since the owner's
+ * 2026-09-25 ruling — it was a fourth tab inside History).
  *
  * Reads rows from the dashboard via ActivityService; renders them as a
- * list with a 4-filter chip row (All · Edits · Comments · Publish). The
- * SAME shape as the dashboard Activity log the Sidebar SiteMenu deep-links
- * into today — the editor mirror keeps the same vocabulary.
+ * list with a 4-filter chip row (All · Edits · Comments · Publish).
  *
  * State machine:
  *   loading   on mount + filter change
@@ -30,7 +30,6 @@
  */
 import * as React from "react";
 import { Button, EmptyState, SkeletonListItem } from "@/editor/chrome-ui";
-import type { ActivityLogViewProps } from "../types";
 import {
   ActivityReadError,
   fetchRecentActivity,
@@ -38,6 +37,15 @@ import {
   type ActivityFilter,
 } from "@/services/ActivityService";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+
+export interface ActivityLogViewProps {
+  /** Site the rows are scoped to. Null = opened without a project; the view
+   *  renders a banner and not a query. */
+  siteId: string | null;
+  /** A row opens its subject in the editor — comments in Review, publishes
+   *  in History › Published, edits in History › Session. */
+  onOpenRow?: (kind: "edit" | "comment" | "publish") => void;
+}
 
 type LoadState = "loading" | "ready" | "empty" | "error" | "permission" | "unavailable";
 
@@ -50,23 +58,18 @@ const FILTER_LABEL: Record<ActivityFilter, string> = {
   publish: "Publish",
 };
 
-/* Reuse HistoryTab's chip style verbatim — chips live in one form across
-   History, not two forms that drift. The same `tw:` strings live in
-   HistoryTab.tsx; mirror them here rather than extracting, since the
-   Saves filter chips and the Activity filter chips are siblings living
-   in the same header band visually. (Plan-follower note: M1 chips vs
-   B6 chips share intent — chip over a list, accent on active.) */
-const FILTER_ROW =
-  "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
+/* Board 4418:140587: the body is inset 16 with 12 between blocks; the chips
+   are 24-tall, 4px-radius, 11/16 medium — gray-100 fill + border at rest,
+   the accent filled when active. */
+const BODY = "tw:flex tw:flex-1 tw:min-h-0 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:p-4";
+const FILTER_ROW = "tw:flex tw:gap-1";
 const FILTER_CHIP =
-  "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
-  "tw:h-6 tw:leading-4 tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
-  "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-full " +
-  "tw:cursor-pointer tw:[transition:color_150ms_ease-out,background-color_150ms_ease-out,border-color_150ms_ease-out] " +
-  "tw:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
+  "tw:h-6 tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] " +
+  "tw:bg-[var(--bk-gray-100)] tw:px-2 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-medium " +
+  "tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)] tw:focus:ring-0 " +
   "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
 const FILTER_CHIP_ACTIVE =
-  "tw:font-medium tw:text-[var(--bk-accent-on)] tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]";
+  "tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:hover:bg-[var(--bk-accent)] tw:hover:text-[var(--bk-accent-on)]";
 
 const ROW_KIND_LABEL: Record<ActivityEntry["kind"], string> = {
   edit: "Edit",
@@ -80,20 +83,19 @@ const OPEN_IN: Record<ActivityEntry["kind"], string> = {
   comment: "open in Review",
   publish: "open in Published",
 };
-/* The row's clickable body: ghost, left-aligned, the row's own two lines. */
+/* Board 4418:140587's row: 12 above and below, the subject 14/20 over
+   "who · when" 12/18, both ink, with an accent › at the right. No card. */
 const ROW_OPEN =
-  "tw:h-auto tw:w-full tw:flex-col tw:items-stretch tw:gap-[var(--bk-space-2)] tw:border-transparent tw:bg-transparent " +
-  "tw:p-0 tw:text-left tw:font-normal tw:hover:bg-transparent tw:disabled:opacity-100";
-
-const LIST_CLASS = "tw:flex tw:flex-col tw:gap-[var(--bk-space-4)] tw:px-[var(--bk-space-12)]";
-const ROW_CLASS =
-  "tw:flex tw:flex-col tw:gap-[var(--bk-space-2)] tw:rounded-md tw:border tw:border-[var(--bk-border)] " +
-  "tw:px-3 tw:py-2 tw:bg-transparent";
-const ROW_META =
-  "tw:flex tw:items-center tw:gap-[var(--bk-space-4)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
-const ROW_SUMMARY = "tw:text-[13px] tw:text-[var(--bk-ink)] tw:m-0 tw:whitespace-pre-wrap";
+  "tw:relative tw:h-auto tw:w-full tw:flex-col tw:items-stretch tw:gap-1.5 tw:rounded-none tw:border-0 " +
+  "tw:bg-transparent tw:py-3 tw:pl-0 tw:pr-10 tw:text-left tw:font-normal tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:focus:ring-0 tw:focus-visible:shadow-[var(--bk-shadow-focus)] tw:disabled:opacity-100";
+const ROW_TITLE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)] tw:whitespace-pre-wrap";
+const ROW_META = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
+const ROW_CHEVRON =
+  "tw:absolute tw:left-[234px] tw:top-[22px] tw:text-[16px] tw:leading-none tw:font-medium tw:text-[var(--bk-accent)]";
 const ROW_DEEP_LINK =
   "tw:text-[12px] tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline tw:self-start";
+const STATE_BOX = "tw:py-4";
 
 /** A row's `actionUrl` is written for the dashboard — often relative
  *  ("?page=page-1") — so it resolves against the site's dashboard page, never
@@ -158,7 +160,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         role="status"
         aria-live="polite"
         data-testid="activity-no-site"
-        className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]"
+        className="tw:p-4"
       >
         <EmptyState
           title="No site selected"
@@ -169,7 +171,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
   }
 
   return (
-    <>
+    <div className={BODY}>
       <div className={FILTER_ROW} role="group" aria-label="Activity filter">
         {FILTER_LIST.map((f) => (
           <Button
@@ -189,10 +191,10 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         aria-live="polite"
         data-testid="activity-list"
         data-state={state}
-        className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col tw:pb-[var(--bk-space-16)]"
+        className="tw:flex tw:flex-col"
       >
         {state === "loading" && (
-          <div className={LIST_CLASS} data-testid="activity-loading">
+          <div className="tw:flex tw:flex-col tw:gap-1" data-testid="activity-loading">
             <SkeletonListItem />
             <SkeletonListItem />
             <SkeletonListItem />
@@ -200,7 +202,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         )}
 
         {state === "empty" && (
-          <div className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]" data-testid="activity-empty">
+          <div className={STATE_BOX} data-testid="activity-empty">
             <EmptyState
               title="Nothing here yet"
               body={
@@ -213,7 +215,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         )}
 
         {state === "error" && (
-          <div className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]" data-testid="activity-error">
+          <div className={STATE_BOX} data-testid="activity-error">
             <EmptyState
               title="Couldn't load activity"
               body="Something went wrong on our side. Retry, or reopen Activity in a moment."
@@ -228,7 +230,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
 
         {(state === "permission" || state === "unavailable") && (
           <div
-            className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]"
+            className={STATE_BOX}
             data-testid={`activity-${state}`}
           >
             <EmptyState
@@ -252,9 +254,9 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
         )}
 
         {state === "ready" && (
-          <ul className={LIST_CLASS} data-testid="activity-rows">
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0" data-testid="activity-rows">
             {rows.map((r) => (
-              <li key={r.id} className={ROW_CLASS} data-kind={r.kind}>
+              <li key={r.id} className="tw:flex tw:flex-col" data-kind={r.kind}>
                 <Button
                   color="light"
                   size="xs"
@@ -264,16 +266,16 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
                   className={ROW_OPEN}
                   data-testid="activity-row-open"
                 >
-                <div className={ROW_META}>
-                  <span data-testid="activity-kind">{ROW_KIND_LABEL[r.kind]}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{r.actorName ?? "Unknown"}</span>
-                  <span aria-hidden="true">·</span>
-                  <time dateTime={typeof r.createdAt === "string" ? r.createdAt : r.createdAt.toISOString()}>
-                    {formatDate(r.createdAt)}
-                  </time>
-                </div>
-                <p className={ROW_SUMMARY}>{r.summary}</p>
+                  <p className={ROW_TITLE} data-testid="activity-row-title">{r.summary}</p>
+                  <span className={ROW_META} data-testid="activity-row-meta">
+                    {r.actorName ?? "Unknown"} ·{" "}
+                    <time dateTime={typeof r.createdAt === "string" ? r.createdAt : r.createdAt.toISOString()}>
+                      {formatWhen(r.createdAt)}
+                    </time>
+                  </span>
+                  <span className={ROW_CHEVRON} aria-hidden="true">
+                    ›
+                  </span>
                 </Button>
                 {r.actionUrl && (
                   <a
@@ -291,19 +293,22 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId, onOpen
           </ul>
         )}
       </section>
-    </>
+    </div>
   );
 };
 
-function formatDate(input: string | Date): string {
+/** Board 4418:140587 stamps rows "Today 14:32" / "Yesterday 17:30"; older
+ *  rows carry their date. */
+function formatWhen(input: string | Date): string {
   const d = typeof input === "string" ? new Date(input) : input;
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  const time = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false });
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if (day === today) return `Today ${time}`;
+  if (day === today - 86_400_000) return `Yesterday ${time}`;
+  return `${d.toLocaleDateString(undefined, { day: "numeric", month: "short" })}, ${time}`;
 }
 
 export default ActivityLogView;

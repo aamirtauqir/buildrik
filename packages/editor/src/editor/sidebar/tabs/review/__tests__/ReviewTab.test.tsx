@@ -533,12 +533,12 @@ describe("B3 — per-row Locate › (G1-030) and Copy link (G1-031), laid out as
   });
 });
 
-describe("ReviewTab — opened from History › Activity", () => {
-  it("draws ‹ Activity, which goes back to the Activity view", async () => {
+describe("ReviewTab — opened from the Activity panel", () => {
+  it("draws ‹ Activity, which goes back to the Activity panel", async () => {
     const emit = vi.fn();
     renderTab({ fromActivity: true, composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
     fireEvent.click(await screen.findByRole("button", { name: "‹ Activity" }));
-    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "history", screen: "activity" });
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "activity" });
   });
 
   it("no back row when opened any other way", async () => {

@@ -18,13 +18,13 @@ import { MoreHorizontal } from "lucide-react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { SaveVersionFooter } from "../../../panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
-import { ActivityLogView } from "./components/ActivityLogView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
-import { BackToActivityRow } from "./components/BackToActivityRow";
+import { BackToActivityRow } from "../activity/BackToActivityRow";
 import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
@@ -34,7 +34,6 @@ const VIEW_LABEL: Record<HistoryView, string> = {
   session: "Session",
   saves: "Saves",
   published: "Published",
-  activity: "Activity",
 };
 
 const SEARCH_PLACEHOLDER: Record<"session" | "saves", string> = {
@@ -80,6 +79,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
   initialView,
+  fromActivity: fromActivityProp = false,
   rollbackJob = null,
   onRollbackStarted,
   isExpanded,
@@ -130,7 +130,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
     if (initialView) return initialView; // deep link wins for this mount
     if (stored === "published") return "published";
-    if (stored === "activity") return "activity";
+    /* "activity" was a fourth tab until Activity became its own panel
+       (owner, 2026-09-25); a stored one falls through to Session. */
     if (stored === "saves") return "saves";
     return "session"; // board 4418:73791 opens on Session
   });
@@ -138,7 +139,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const [searchQuery, setSearchQuery] = React.useState("");
   /* Set when an Activity row opened Published or Session here; the back row
      shows until the user picks a tab themselves. */
-  const [fromActivity, setFromActivity] = React.useState(false);
+  const [fromActivity, setFromActivity] = React.useState(fromActivityProp);
   const [showScrubber, setShowScrubber] = React.useState(false);
   /* Board 4418:73791 draws no search field and no "Undo History · Clear ·
      Time-Travel" band. Both capabilities stay, behind the panel ⋯ (owner rule:
@@ -265,7 +266,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
-        {(["session", "saves", "published", "activity"] as const).map((view) => (
+        {(["session", "saves", "published"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -282,13 +283,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </Button>
         ))}
       </div>
-      {fromActivity && activeView !== "activity" ? (
-        <BackToActivityRow
-          onBack={() => {
-            setActiveView("activity");
-            setFromActivity(false);
-          }}
-        />
+      {fromActivity ? (
+        <BackToActivityRow onBack={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "activity" })} />
       ) : null}
       {/* Session/Saves chrome. Published renders its own list and takes no
           search query, so showing a dead search field over it would be a lie. */}
@@ -441,27 +437,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
 
-        {activeView === "activity" && (
-          /* Site-scoped activity log (B6). The list owns its own chrome
-             (filter chips + role=status region) — Saves' approval band /
-             prune note are Saves-only. */
-          <ActivityLogView
-            siteId={siteId ?? null}
-            onOpenRow={(kind) => {
-              if (kind === "comment") {
-                composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "review", screen: "from-activity" });
-                return;
-              }
-              setActiveView(kind === "publish" ? "published" : "session");
-              setFromActivity(true);
-            }}
-          />
-        )}
         </div>
 
         {(activeView === "session" || activeView === "saves") && savesSettled && (
           <SavesPruneNote composer={composer} view={activeView} />
         )}
+        {/* Saves draws this footer inside its own list; Session (4418:73791)
+            draws the same one under its rows. */}
+        {activeView === "session" && <SaveVersionFooter composer={composer} />}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       <ConfirmDialog
