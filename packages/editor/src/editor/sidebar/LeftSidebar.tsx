@@ -16,8 +16,6 @@ import type { GroupedTabId, GroupedTabConfig, TabZone, RailTool } from "../rail/
 import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailGroups } from "../rail/tabsConfig";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
-import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
@@ -80,16 +78,10 @@ export interface LeftSidebarProps {
   /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
   pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
-  publishJob?: UsePublishJobResult;
-  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
-  nextMove?: NextMove | null;
-  onRequestPublish?: () => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
   onCreateCollection?: () => void;
-  /** P0 review loop: full re-send, forwarded to ReviewTab. */
-  onResendReview?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
@@ -378,12 +370,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onSettingsDirtyChange,
   pagesOpen,
   projectId,
-  publishJob,
-  nextMove,
-  onRequestPublish,
   onOpenLibrary,
   onCreateCollection,
-  onResendReview,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -408,30 +396,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     open: boolean;
     pendingTab: GroupedTabId | null;
   }>({ open: false, pendingTab: null });
-
-
-  /* Site menu › Unpublish, same trap as the one above and caught the same way
-     — live, on the first cold click. StudioHeader opens the Publish panel and
-     then emits UI_UNPUBLISH_REQUEST synchronously; PublishTab subscribes in an
-     effect that has not run yet, so on a cold open the event was dropped and
-     the confirm appeared only on the SECOND click. This component is mounted
-     whenever the editor is not in view mode, so its listener is alive at emit
-     time. It latches the intent and hands it down as a prop; PublishTab
-     consumes it once and reports back, so a cancelled confirm cannot re-open
-     on the next visit. Cleared on leaving the tab for the same reason. */
-  const [unpublishIntent, setUnpublishIntent] = React.useState(false);
-  React.useEffect(() => {
-    if (!composer) return;
-    const latch = () => setUnpublishIntent(true);
-    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, latch);
-    return () => {
-      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, latch);
-    };
-  }, [composer]);
-  React.useEffect(() => {
-    if (activeTab !== "publish") setUnpublishIntent(false);
-  }, [activeTab]);
-  const consumeUnpublishIntent = React.useCallback(() => setUnpublishIntent(false), []);
 
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
@@ -606,7 +570,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {/* Rail */}
       <nav
         ref={navRef}
-        className="ls-rail"
+        className={`ls-rail${railMode === "figma" ? " ls-rail--figma" : ""}`}
         // Conformance anchor — see themes/fonts.css era note in Topbar.tsx.
         // `.ls-rail` happens to be stable today, but recipes select on testids
         // uniformly so a class rename can never silently unhook measurement.
@@ -616,11 +580,16 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         aria-orientation="vertical"
         onKeyDown={handleKeyDown}
       >
-        <div className="ls-logo">
-          <Layers size={28} />
-        </div>
-
-        <div className="ls-divider" />
+        {/* Board 4418:123573: the rail starts with its first item — no logo
+            mark, no divider (the dev rails keep theirs). */}
+        {railMode !== "figma" && (
+          <>
+            <div className="ls-logo">
+              <Layers size={28} />
+            </div>
+            <div className="ls-divider" />
+          </>
+        )}
 
         {railMode === "e3" ? (
           <FourToolRail
@@ -712,18 +681,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
                   onSwitchToTemplates={() => safeTabChange("templates")}
-                  unpublishIntent={unpublishIntent}
-                  onUnpublishIntentConsumed={consumeUnpublishIntent}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
-                  publishJob={publishJob}
-                  nextMove={nextMove}
-                  onRequestPublish={onRequestPublish}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}
                   onCreateCollection={onCreateCollection}
-                  onResendReview={onResendReview}
                 />
               </React.Suspense>
             </div>

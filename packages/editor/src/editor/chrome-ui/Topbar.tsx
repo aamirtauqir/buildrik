@@ -40,7 +40,8 @@ import { Presence, type PresenceProps } from "./Presence";
    VERTICAL the boards also declare is nominal — 10 + a 20 line + 10 is 40 and
    the same node fixes its height at 32 — so it is carried as a box-model value
    the explicit height overrides, which is what Figma is doing too. */
-const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 tw:font-medium";
+/* Board 4418:123573 (v3 IA): Publish at 13/500. */
+const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -56,9 +57,22 @@ const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 
 
    Scoped to this button on purpose: the shared ghost class is used widely, and re-inking
    every ghost button in the editor is not what the topbar board says. */
+/* Board 4418:123573 (v3 IA): Exit is 13/500 in gray-700. */
 const EXIT_BTN_CLASS =
-  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[12px] tw:font-normal " +
-  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[13px] tw:font-medium " +
+  "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+
+/* Board 4418:123573: the shell search, 320×36, placeholder + ⌘K. It is the
+   ⌘K door — a button drawn as a field (the palette owns the typing). */
+const SEARCH_CLASS =
+  "tw:flex tw:flex-none tw:items-center tw:gap-2 tw:h-9 tw:w-[320px] tw:px-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] " +
+  "tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-text tw:hover:border-[var(--bk-gray-400)] " +
+  "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const SEARCH_KBD =
+  "tw:ml-auto tw:rounded tw:border tw:border-[var(--bk-border)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* Board 4418:123573: Preview is a 76×32 bordered TEXT button, not an eye. */
+const PREVIEW_BTN_CLASS =
+  "tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -102,6 +116,9 @@ export interface TopbarProps {
   /** The site crumb's click — board 4418:126034's hotspot/crumb-site opens
    *  the Pages panel (4418:90494). Omit and the site name is plain text. */
   onOpenPages?: () => void;
+  /** The page crumb's click — hotspot/crumb-page lands on the base shell
+   *  (4418:123573: drawer closed). Omit and the page is plain text. */
+  onPageCrumb?: () => void;
   onExit?: () => void;
   /**
    * What the leftmost control says and does. In view mode it leaves the MODE,
@@ -125,6 +142,8 @@ export interface TopbarProps {
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments. */
   tools?: TopbarTools | null;
+  /** The shell search field (⌘K). Omit and no field is drawn. */
+  onOpenSearch?: () => void;
   presence?: PresenceProps | null;
   unreadCount?: number;
   onOpenNotifications?: () => void;
@@ -157,6 +176,10 @@ const CRUMB_CLASS =
   "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
   "tw:font-medium tw:text-[var(--bk-accent)] tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
+const PAGE_CRUMB_CLASS =
+  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-ink)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
@@ -166,11 +189,10 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, pageName, onOpenPages, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
+  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, action, menu,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu, onOpenSearch,
 }: TopbarProps) {
-  const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments));
   return (
     <header
       // Conformance anchor. The bar wears only utility classes, so any selector
@@ -200,10 +222,11 @@ export function Topbar({
           the site's own name read at the size of the controls around it and
           the whole bar re-laid itself when the name changed length. */}
       {/* The breadcrumb (C5 G1-004): the site in accent opens the Pages
-          panel; the page is where you are, in ink, not a link. Same fixed
-          200 column the site name held. */}
+          panel; the page crumb returns to the base shell. Board 4418:123573
+          puts the shell search at x356, so the crumb column is 267 (it was
+          681:26's 200). */}
       <span
-        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[200px] tw:shrink tw:min-w-0 tw:whitespace-nowrap"
+        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[267px] tw:shrink tw:min-w-0 tw:whitespace-nowrap"
         data-testid="topbar-site-name"
       >
         {onOpenPages ? (
@@ -225,14 +248,28 @@ export function Topbar({
         {pageName ? (
           <>
             <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]">›</span>
-            <span
-              aria-current="page"
-              className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
-              title={pageName}
-              data-testid="topbar-crumb-page"
-            >
-              {pageName}
-            </span>
+            {onPageCrumb ? (
+              <Button
+                color="light"
+                size="xs"
+                onClick={onPageCrumb}
+                aria-current="page"
+                className={PAGE_CRUMB_CLASS}
+                title={pageName}
+                data-testid="topbar-crumb-page"
+              >
+                {pageName}
+              </Button>
+            ) : (
+              <span
+                aria-current="page"
+                className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
+                title={pageName}
+                data-testid="topbar-crumb-page"
+              >
+                {pageName}
+              </span>
+            )}
           </>
         ) : null}
       </span>
@@ -240,6 +277,14 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
+      {onOpenSearch ? (
+        <button type="button" className={SEARCH_CLASS} onClick={onOpenSearch} data-testid="topbar-search">
+          <SearchGlyph />
+          <span className="tw:truncate">Search pages, layers, assets…</span>
+          <kbd className={SEARCH_KBD}>⌘K</kbd>
+        </button>
+      ) : null}
+
       {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
 
 
@@ -247,28 +292,16 @@ export function Topbar({
         <ReviewBadge {...review} />
       ) : null}
 
+      {/* Board 4418:123573: the comments toggle sits with the review chip. */}
+      {tools?.onToggleComments ? (
+        <IconButton label="Comments" pressed={Boolean(tools.commentsPressed)} onClick={tools.onToggleComments}>
+          <CommentIcon />
+        </IconButton>
+      ) : null}
+
 
       <span className="tw:flex-1" />
 
-      {hasTools && tools ? (
-        <span className="tw:inline-flex tw:items-center tw:gap-0.5 tw:pr-2 tw:mr-1 tw:border-r tw:border-[var(--bk-gray-200)]">
-          {tools.onPreview ? (
-            <IconButton
-              label="Quick preview"
-              onClick={tools.previewBusy ? undefined : tools.onPreview}
-              disabled={tools.previewBusy}
-              aria-busy={tools.previewBusy || undefined}
-            >
-              {tools.previewBusy ? <SpinnerIcon /> : <EyeIcon />}
-            </IconButton>
-          ) : null}
-          {tools.onToggleComments ? (
-            <IconButton label="Comments" pressed={Boolean(tools.commentsPressed)} onClick={tools.onToggleComments}>
-              <CommentIcon />
-            </IconButton>
-          ) : null}
-        </span>
-      ) : null}
 
       {presence ? <Presence {...presence} /> : null}
 
@@ -280,12 +313,30 @@ export function Topbar({
           <BellIcon />
         </IconButton>
         {unreadCount > 0 ? (
+          /* Board 4418:123573: a count badge, not a dot. */
           <span
-            className="tw:absolute tw:top-1 tw:right-0.5 tw:w-2 tw:h-2 tw:rounded-full tw:bg-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
+            className="tw:absolute tw:-top-0.5 tw:-right-1 tw:flex tw:min-w-5 tw:h-5 tw:items-center tw:justify-center tw:rounded-full tw:px-1 tw:bg-[var(--bk-accent)] tw:text-[11px] tw:font-medium tw:leading-none tw:text-white tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
             aria-hidden="true"
-          />
+            data-testid="topbar-unread-badge"
+          >
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
         ) : null}
       </span>
+
+      {tools?.onPreview ? (
+        <Button
+          color="light"
+          size="xs"
+          onClick={tools.previewBusy ? undefined : tools.onPreview}
+          disabled={tools.previewBusy}
+          aria-busy={tools.previewBusy || undefined}
+          className={PREVIEW_BTN_CLASS}
+          data-testid="topbar-preview"
+        >
+          {tools.previewBusy ? <SpinnerIcon /> : "Preview"}
+        </Button>
+      ) : null}
 
       {action ?? (
         publish === "hidden" ? null :
@@ -393,14 +444,15 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
 
 /* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
    Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
-function EyeIcon() {
+function SearchGlyph() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-      <circle cx="12" cy="12" r="3" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
 }
+
 function CommentIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

@@ -295,6 +295,13 @@ export function getEditorPlanTier(): EditorPlanTier {
   return _editorPlanTier;
 }
 
+/** Duplicate a site (`sites.duplicate`, EDITOR). Throws the server's message
+ *  on refusal — e.g. the plan's site limit — so the caller can say it. */
+export async function duplicateSite(siteId: string): Promise<{ id: string; name: string }> {
+  const copy = await getClient().sites.duplicate.mutate({ id: siteId });
+  return { id: copy.id, name: copy.name };
+}
+
 export async function loadProject(siteId: string): Promise<ProjectData> {
   try {
     const client = getClient();

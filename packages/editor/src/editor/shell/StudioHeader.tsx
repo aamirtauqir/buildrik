@@ -31,7 +31,7 @@ import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
-import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
+import { duplicateSite, getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
 import type { ReviewStatus } from "../../services/ReviewService";
 import { useRefetchOnFocus } from "../../shared/hooks";
 import { formatRelativeTime } from "../../shared/utils/relativeTime";
@@ -83,27 +83,21 @@ export interface StudioHeaderProps {
   onSetPreviewLoading: (loading: boolean) => void;
   onSetExportLoading: (loading: boolean) => void;
 
-  /** ✨ Ask AI — opens the AITab rail panel (single consolidated AI surface). */
-  onShowAI: () => void;
   onShowExporter: () => void;
 
   // Global settings menu handlers
   onOpenProjectSettings?: () => void;
-  onOpenDesignSystem?: () => void;
   onOpenPublish?: () => void;
-  onOpenPlugins?: () => void;
   onOpenHistory?: () => void;
   onOpenIssues?: () => void;
   /** Open Keyboard Shortcuts panel (site menu · `?`) */
   onOpenShortcuts?: () => void;
-  /** Site menu destinations from Figma 642:3664. */
-  onOpenPublishHistory?: () => void;
   /** The site crumb's door — the Pages panel (C5 G1-004). */
   onOpenPages?: () => void;
+  /** The page crumb — back to the base shell, drawer closed (4418:123573). */
+  onCloseDrawer?: () => void;
   /** History · Activity (B6) — the site menu's "Activity log" stays in the editor. */
   onOpenActivity?: () => void;
-  onOpenTemplates?: () => void;
-  onOpenComponents?: () => void;
   /** F3 — the review pill is a door, not a label: opens the Review panel. */
   onOpenReview?: () => void;
   /** B2 — the save pill in its `conflict` state re-opens the recovery
@@ -222,20 +216,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   issues = [],
   onSetPreviewLoading,
   onSetExportLoading,
-  onShowAI,
   onShowExporter,
   onOpenProjectSettings,
-  onOpenDesignSystem,
   onOpenPublish,
-  onOpenPlugins,
   onOpenHistory,
   onOpenIssues,
   onOpenShortcuts,
-  onOpenPublishHistory,
   onOpenActivity,
   onOpenPages,
-  onOpenTemplates,
-  onOpenComponents,
+  onCloseDrawer,
   onOpenReview,
   onOpenConflict,
   onSave,
@@ -544,20 +533,31 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     [guardNavigation],
   );
 
-  const copyLiveUrl = React.useCallback(() => {
-    if (!publishedUrl) return;
-    // navigator.clipboard is absent on insecure origins, and writeText can be
-    // refused. Either way the user hears about it rather than pressing again.
-    const done = navigator.clipboard?.writeText(publishedUrl);
-    if (!done) {
-      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
-      return;
-    }
-    void done.then(
-      () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
-      () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
+
+  /* Board 4418:126034 "Duplicate site" — the dashboard's own duplicate
+     (`sites.duplicate`), reported here: the copy opens from the toast. */
+  const siteIdForMenu = getSiteIdFromUrl();
+  const duplicateThisSite = React.useCallback(() => {
+    if (!siteIdForMenu) return;
+    void duplicateSite(siteIdForMenu).then(
+      (copy) =>
+        addToast({
+          tone: "success",
+          title: "Site duplicated",
+          description: copy.name,
+          action: {
+            label: "Open",
+            onClick: () => window.open(`${DASHBOARD_URL}/edit/${copy.id}`, "_blank", "noopener,noreferrer"),
+          },
+        }),
+      (err: unknown) =>
+        addToast({
+          tone: "error",
+          title: "Couldn't duplicate this site",
+          description: err instanceof Error && err.message ? err.message : "Try again in a moment.",
+        }),
     );
-  }, [publishedUrl, addToast]);
+  }, [siteIdForMenu, addToast]);
 
   const startCollab = React.useCallback(() => {
     const siteId = getSiteIdFromUrl();
@@ -732,6 +732,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         siteName={siteName}
         pageName={pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
+        onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
+        /* Board 4418:123573's shell search is the ⌘K door. */
+        onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
@@ -793,50 +796,31 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
              the toggle back out, which is the one thing an owner previewing
              their client's view still needs. */
           <SiteMenu
-            onOpenSiteSettings={viewMode.readOnlyView ? undefined : onOpenProjectSettings}
-            onOpenHistory={viewMode.readOnlyView ? undefined : onOpenHistory}
-            /* The pill (below) opens the same panel, but `REVIEW_PILL.none` is
-               null — revoke a round without sending a new one and the pill is
-               gone, and with it the only way back into Review. This row does
-               not depend on the state it navigates to. */
-            onOpenReview={viewMode.readOnlyView ? undefined : onOpenReview}
-            onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
-            onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
+            onOpenSiteSettings={onOpenProjectSettings}
+            /* Board 1172:4825 is a MODAL — format chips, a preview, a code
+               view, options — and `handleExport` opens it; the immediate zip
+               is the modal's own ZIP button. */
+            onExportCode={handleExport}
+            onDuplicateSite={siteIdForMenu ? duplicateThisSite : undefined}
             /* C3: the Issues chip left the bar; this row and ⌘K's "Show
                issues" are the panel's doors, and the count rides in the title. */
-            onOpenIssues={viewMode.readOnlyView ? undefined : onOpenIssues}
-            onOpenActivity={viewMode.readOnlyView ? undefined : onOpenActivity}
+            onOpenIssues={onOpenIssues}
             issuesTitle={formatIssueSummary(errorCount, warnCount)}
+            onOpenActivity={onOpenActivity}
+            onOpenCommandPalette={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
+            onOpenShortcuts={onOpenShortcuts}
+            onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
+            collabEnabled={collabOn}
             onUnpublish={
-              viewMode.readOnlyView || !publishedUrl || !canUnpublish
+              !publishedUrl || !canUnpublish
                 ? undefined
                 : () => {
                     onOpenPublish?.();
                     composer?.emit(EVENTS.UI_UNPUBLISH_REQUEST, undefined);
                   }
             }
-            /* Board 1172:4825 is a MODAL — format chips, a preview, a code
-               view, options. `handleExport` opens it. This row used to fire
-               `onExportHTML`, which downloads a zip on the spot: the one
-               screen for CHOOSING a format was skipped by the only control
-               that mentions exporting. The row opens the modal; the immediate
-               zip is what the modal's own ZIP button does. */
-            onExportCode={viewMode.readOnlyView ? undefined : handleExport}
-            onOpenTemplates={viewMode.readOnlyView ? undefined : onOpenTemplates}
-            onOpenComponents={viewMode.readOnlyView ? undefined : onOpenComponents}
-            onOpenShortcuts={viewMode.readOnlyView ? undefined : onOpenShortcuts}
-            onReplayOnboarding={
-              viewMode.readOnlyView || !composer
-                ? undefined
-                : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
-            }
-            onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
-            onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
-            onOpenDesignSystem={viewMode.readOnlyView ? undefined : onOpenDesignSystem}
-            onOpenPlugins={viewMode.readOnlyView ? undefined : onOpenPlugins}
             publishedUrl={publishedUrl}
-            onCopyLiveUrl={copyLiveUrl}
-            siteId={getSiteIdFromUrl()}
+            siteId={siteIdForMenu}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={toggleReadOnlyView}
           />

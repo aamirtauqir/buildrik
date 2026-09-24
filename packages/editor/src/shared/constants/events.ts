@@ -147,8 +147,6 @@ export const EVENTS = {
   VERSION_LOAD_FAILED: "version:load-failed",
   VERSION_PRUNED: "version:pruned",
   VERSION_DELETED: "version:deleted",
-  VERSION_EXPORTED: "version:exported",
-  VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
   /* Removed 2026-08-14, all five dead on arrival:
        VERSION_LOAD_ERROR   — a second name for VERSION_LOAD_FAILED (6 uses);
@@ -886,8 +884,6 @@ export interface EventPayloads {
   [EVENTS.VERSION_LOAD_FAILED]: Record<string, never>;
   [EVENTS.VERSION_PRUNED]: { removed: number; kept: number };
   [EVENTS.VERSION_DELETED]: import("../types/versions").VersionDeletedPayload;
-  [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
-  [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_LIST_UPDATED]: { versions: import("../types/versions").NamedVersion[] };
 
   // Component Events (AQUI-027)

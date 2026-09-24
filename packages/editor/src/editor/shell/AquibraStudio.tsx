@@ -572,18 +572,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
-          onShowAI={() => composer.emit("ui:switch-tab", { tab: "ai" })}
           onShowExporter={modals.openExporter}
           onOpenProjectSettings={modals.openProjectSettings}
-          onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
-          onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPages={() => state.openLeftPanelToTab("pages")}
-          onOpenPublishHistory={() => state.openLeftPanelToTab("history", "published")}
+          onCloseDrawer={() => state.setIsLeftPanelOpen(false)}
           onOpenActivity={() => state.openLeftPanelToTab("history", "activity")}
-          onOpenTemplates={() => state.openLeftPanelToTab("templates")}
-          onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}

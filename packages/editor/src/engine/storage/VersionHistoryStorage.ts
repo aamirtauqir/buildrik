@@ -9,7 +9,6 @@
 import type {
   NamedVersion,
   StoredVersion,
-  VersionHistoryExport,
 } from "../../shared/types/versions";
 
 // ============================================
@@ -174,34 +173,6 @@ export async function deleteVersion(versionId: string): Promise<void> {
   });
 }
 
-/**
- * Delete all versions for a project
- */
-export async function deleteAllVersions(projectId: string = "default"): Promise<void> {
-  const db = await openDatabase();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const index = store.index("projectId");
-    const request = index.getAllKeys(projectId);
-
-    request.onsuccess = () => {
-      const keys = request.result;
-      keys.forEach((key) => store.delete(key));
-    };
-
-    tx.oncomplete = () => {
-      db.close();
-      resolve();
-    };
-    tx.onerror = () => {
-      db.close();
-      reject(tx.error);
-    };
-  });
-}
-
 // ============================================
 // Version Pruning
 // ============================================
@@ -257,80 +228,6 @@ export async function pruneVersions(
       reject(tx.error);
     };
   });
-}
-
-// ============================================
-// Export / Import
-// ============================================
-
-/**
- * Export all versions for a project as a JSON file
- */
-export async function exportVersions(projectId: string = "default"): Promise<VersionHistoryExport> {
-  const versions = await loadVersions(projectId);
-
-  return {
-    version: "1.0.0",
-    projectId,
-    exportedAt: new Date().toISOString(),
-    versions,
-  };
-}
-
-/**
- * Import versions from an export file
- * Optionally clears existing versions first
- */
-export async function importVersions(
-  data: VersionHistoryExport,
-  clearExisting: boolean = false
-): Promise<number> {
-  if (clearExisting) {
-    await deleteAllVersions(data.projectId);
-  }
-
-  const db = await openDatabase();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-
-    data.versions.forEach((version) => {
-      const storedVersion: StoredVersion = {
-        id: version.id,
-        projectId: data.projectId,
-        data: { ...version, projectId: data.projectId },
-        updatedAt: Date.now(),
-      };
-      store.put(storedVersion);
-    });
-
-    tx.oncomplete = () => {
-      db.close();
-      resolve(data.versions.length);
-    };
-    tx.onerror = () => {
-      db.close();
-      reject(tx.error);
-    };
-  });
-}
-
-/**
- * Download versions as a JSON file
- */
-export function downloadVersionsFile(data: VersionHistoryExport, filename?: string): void {
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename || `versions-${data.projectId}-${Date.now()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 // ============================================

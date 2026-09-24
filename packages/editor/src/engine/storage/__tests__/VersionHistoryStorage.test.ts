@@ -15,11 +15,7 @@ import {
   loadVersion,
   loadVersions,
   deleteVersion,
-  deleteAllVersions,
   pruneVersions,
-  exportVersions,
-  importVersions,
-  downloadVersionsFile,
   isStorageAvailable,
   getStorageStats,
 } from "../VersionHistoryStorage";
@@ -175,7 +171,7 @@ describe("VersionHistoryStorage", () => {
   // delete
   // ============================================
 
-  describe("deleteVersion / deleteAllVersions", () => {
+  describe("deleteVersion", () => {
     it("deleteVersion removes only the targeted version", async () => {
       await seedVersions(3, "p1");
 
@@ -191,16 +187,6 @@ describe("VersionHistoryStorage", () => {
       expect(await loadVersions("p1")).toHaveLength(1);
     });
 
-    it("deleteAllVersions wipes one project and leaves others intact", async () => {
-      await seedVersions(3, "proj-a");
-      const other = makeVersion({ id: "keep-me", projectId: "proj-b" });
-      await saveVersion(other);
-
-      await deleteAllVersions("proj-a");
-
-      expect(await loadVersions("proj-a")).toEqual([]);
-      expect((await loadVersions("proj-b")).map((v) => v.id)).toEqual(["keep-me"]);
-    });
   });
 
   // ============================================
@@ -329,127 +315,6 @@ describe("VersionHistoryStorage", () => {
 
   // ============================================
   // Export / Import
-  // ============================================
-
-  describe("exportVersions / importVersions", () => {
-    it("exports the schema-versioned envelope with all project versions newest-first", async () => {
-      await seedVersions(3, "p1");
-
-      const exported = await exportVersions("p1");
-
-      expect(exported.version).toBe("1.0.0");
-      expect(exported.projectId).toBe("p1");
-      expect(new Date(exported.exportedAt).getTime()).not.toBeNaN();
-      expect(exported.versions.map((v) => v.id)).toEqual(["v-2", "v-1", "v-0"]);
-    });
-
-    it("imports versions under the export's projectId, rewriting each version's projectId", async () => {
-      const count = await importVersions({
-        version: "1.0.0",
-        projectId: "target-proj",
-        exportedAt: new Date().toISOString(),
-        versions: [
-          makeVersion({ id: "im-1", createdAt: 100, projectId: "source-proj" }),
-          makeVersion({ id: "im-2", createdAt: 200, projectId: "source-proj" }),
-        ],
-      });
-
-      expect(count).toBe(2);
-      expect(await loadVersions("source-proj")).toEqual([]);
-      const imported = await loadVersions("target-proj");
-      expect(imported.map((v) => v.id)).toEqual(["im-2", "im-1"]);
-      expect(imported.every((v) => v.projectId === "target-proj")).toBe(true);
-    });
-
-    it("merges with existing versions by default", async () => {
-      await seedVersions(2, "p1");
-
-      await importVersions({
-        version: "1.0.0",
-        projectId: "p1",
-        exportedAt: new Date().toISOString(),
-        versions: [makeVersion({ id: "im-1", createdAt: 5_000 })],
-      });
-
-      expect((await loadVersions("p1")).map((v) => v.id)).toEqual(["im-1", "v-1", "v-0"]);
-    });
-
-    it("clearExisting=true wipes the project's versions before importing", async () => {
-      await seedVersions(2, "p1");
-
-      await importVersions(
-        {
-          version: "1.0.0",
-          projectId: "p1",
-          exportedAt: new Date().toISOString(),
-          versions: [makeVersion({ id: "im-only", createdAt: 5_000 })],
-        },
-        true
-      );
-
-      expect((await loadVersions("p1")).map((v) => v.id)).toEqual(["im-only"]);
-    });
-  });
-
-  // ============================================
-  // downloadVersionsFile
-  // ============================================
-
-  describe("downloadVersionsFile", () => {
-    function makeExport() {
-      return {
-        version: "1.0.0" as const,
-        projectId: "dl-proj",
-        exportedAt: new Date().toISOString(),
-        versions: [makeVersion({ id: "dl-1" })],
-      };
-    }
-
-    it("clicks a temporary blob-URL anchor and revokes the URL afterwards", () => {
-      const createObjectURL = vi.fn((_blob: Blob) => "blob:fake-url");
-      const revokeObjectURL = vi.fn();
-      vi.stubGlobal("URL", { createObjectURL, revokeObjectURL });
-
-      let clicked: HTMLAnchorElement | null = null;
-      let inBodyAtClick = false;
-      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
-        this: HTMLAnchorElement
-      ) {
-        clicked = this;
-        inBodyAtClick = document.body.contains(this);
-      });
-
-      downloadVersionsFile(makeExport(), "my-versions.json");
-
-      expect(createObjectURL).toHaveBeenCalledTimes(1);
-      const blob = createObjectURL.mock.calls[0][0];
-      expect(blob.type).toBe("application/json");
-
-      expect(clicked!.href).toContain("blob:fake-url");
-      expect(clicked!.download).toBe("my-versions.json");
-      expect(inBodyAtClick).toBe(true);
-      // Anchor removed and URL revoked after the click.
-      expect(document.body.contains(clicked!)).toBe(false);
-      expect(revokeObjectURL).toHaveBeenCalledWith("blob:fake-url");
-    });
-
-    it("defaults the filename to versions-<projectId>-<timestamp>.json", () => {
-      vi.stubGlobal("URL", { createObjectURL: vi.fn(() => "blob:x"), revokeObjectURL: vi.fn() });
-      let downloadName = "";
-      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
-        this: HTMLAnchorElement
-      ) {
-        downloadName = this.download;
-      });
-
-      downloadVersionsFile(makeExport());
-
-      expect(downloadName).toMatch(/^versions-dl-proj-\d+\.json$/);
-    });
-  });
-
-  // ============================================
-  // Utilities
   // ============================================
 
   describe("utilities", () => {

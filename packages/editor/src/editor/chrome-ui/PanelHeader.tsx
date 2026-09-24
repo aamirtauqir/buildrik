@@ -97,15 +97,23 @@ export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** See PanelHeaderActionsProps.closeLabel. */
   closeLabel?: string;
   /** `drawer` = molecule 16:6 (44h, 11px label). `panel` = the 360-wide
-   *  right-hand panels (48h, `ui/14 · panel title`). */
-  size?: "drawer" | "panel";
+   *  right-hand panels (48h, `ui/14 · panel title`). `column` = a panel
+   *  hosted in the inspector column (44h, 13/500 ink — boards 4418:97118 /
+   *  4418:115784 / 4418:73791). Omitted: the nearest PanelHeaderSize
+   *  provider decides, else `drawer`. */
+  size?: "drawer" | "panel" | "column";
 }
+
+/** Lets a HOST choose the header size of every panel it mounts — the shell
+ *  mounts Publish, Review and History in the inspector column, and those
+ *  panels should not each learn where they are rendered. */
+export const PanelHeaderSize = React.createContext<"drawer" | "panel" | "column">("drawer");
 
 /* Each size supplies BOTH its height and its type. They are listed whole
    rather than diffed because a Tailwind utility on a plain element does not
    merge — two `tw:h-*` classes would both compile and source order, not
    intent, would pick the winner. */
-const SIZE_CLASS: Record<"drawer" | "panel", string> = {
+const SIZE_CLASS: Record<"drawer" | "panel" | "column", string> = {
   /* `leading-4` is the missing half of the T3 measurement below: every board
      that draws this bar gives its title 11px on a 16px line box
      (`I208:171;16:7`, `I781:4490;16:7`, `I1138:13414;16:7`), and the class
@@ -115,9 +123,13 @@ const SIZE_CLASS: Record<"drawer" | "panel", string> = {
     "tw:h-11 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)]",
   panel:
     "tw:h-12 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
+  column:
+    "tw:h-11 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]",
 };
 
-export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size = "drawer", className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size: sizeProp, className, ...rest }: PanelHeaderProps) {
+  const hosted = React.useContext(PanelHeaderSize);
+  const size = sizeProp ?? hosted;
   return (
     <div
       className={[

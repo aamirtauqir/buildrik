@@ -124,7 +124,6 @@ function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProp
     selectedElement: null,
     onSetPreviewLoading: vi.fn(),
     onSetExportLoading: vi.fn(),
-    onShowAI: vi.fn(),
     onShowExporter: vi.fn(),
     onSave: vi.fn(async () => "saved" as const),
     addToast: vi.fn(() => "id"),
@@ -179,12 +178,10 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("button", { name: "Site menu" })).toBeTruthy();
     });
 
-    // The Figma component has nine children: exit, name, save, review, spacer,
-    // presence, notifications, publish, menu. The first build of this container
-    // pushed the deleted shell topbar's Preview / Comment / Colour-mode buttons
-    // back into it through an `extra` slot; that slot is gone and these assert
-    // it stays gone.
-    it.each(["Preview", "Comment mode", "Color mode", "Ask AI", "Collaborate"])(
+    // The shell topbar on board 4418:123573 draws Preview (a text button, from
+    // the tools cluster); the deleted shell topbar's Comment-mode / Colour-mode
+    // / Ask AI / Collaborate buttons stay gone.
+    it.each(["Comment mode", "Color mode", "Ask AI", "Collaborate"])(
       "does not carry %s — not in the design",
       (name) => {
         render(<StudioHeader {...makeProps()} />);
@@ -219,14 +216,18 @@ describe("StudioHeader", () => {
 
     /* C5 G1-004 (boards 4418:126034 / :90494 / :123573): "Site › Page" —
        the site crumb opens the Pages panel; the page crumb is where you are. */
-    it("the breadcrumb: site opens Pages, page is the current crumb", () => {
+    it("the breadcrumb: site opens Pages, page is the current crumb and closes the drawer", () => {
       const onOpenPages = vi.fn();
+      const onCloseDrawer = vi.fn();
       const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
-      render(<StudioHeader {...makeProps({ onOpenPages, composer: composer as never })} />);
+      render(<StudioHeader {...makeProps({ onOpenPages, onCloseDrawer, composer: composer as never })} />);
       expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
       expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
       fireEvent.click(screen.getByTestId("topbar-crumb-site"));
       expect(onOpenPages).toHaveBeenCalled();
+      expect(onCloseDrawer).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("topbar-crumb-page"));
+      expect(onCloseDrawer).toHaveBeenCalled();
     });
 
     /* B6 / G1-019: the activity log opens in the editor (History ·
@@ -573,50 +574,34 @@ describe("StudioHeader", () => {
     const menuProps = {
       onOpenProjectSettings: vi.fn(),
       onOpenHistory: vi.fn(),
-      onOpenPublishHistory: vi.fn(),
       onExportHTML: vi.fn(),
-      onOpenTemplates: vi.fn(),
-      onOpenComponents: vi.fn(),
       onOpenShortcuts: vi.fn(),
       onOpenIssues: vi.fn(),
     };
 
     // Topbar redesign §3 (D8/D9, eng D8) — five named groups, no "More" dump,
     // no Exit row, "Enter view mode" naming.
-    it("opens with the regrouped items in plan order", () => {
+    /* Board 4418:126034 (C5 G1-016): the rows and groups are the board's;
+       SiteMenu.board.test pins the full list. Here: the container wires the
+       doors it owns. */
+    it("wires the board's rows the header owns", () => {
       render(<StudioHeader {...makeProps(menuProps)} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(labels).toEqual([
-        // F6/T9: jsdom's navigator.platform is not macOS, so both hints show the
-        // chord that actually works there (the handler takes ctrl OR meta).
         "Site settingsCtrl ,",
-        "Version historyCtrl H",
-        /* C3: Issues came into the menu when its topbar chip left the bar. */
+        "Export site…",
         "Issues",
-        "Publish history",
-        "Export code",
-        "Templates",
-        "Components⇧A",
         "Enter view mode",
-        "Invite teammates",
-        "Account settings",
-        /* Prints ⌘/ now: "?" opens the canvas cheat sheet, a different screen
-           from the one this row opens. */
         "Keyboard shortcutsCtrl /",
+        "Start collaborationPlanned",
+        "Invite teammates ↗",
+        "Account settings ↗",
       ]);
-    });
-
-    it("groups carry their plan names — the 'More' dump is gone (regression D8)", () => {
-      render(<StudioHeader {...makeProps(menuProps)} />);
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByText("Site")).toBeTruthy();
-      expect(screen.getByText("Build")).toBeTruthy();
-      expect(screen.getByText("Share")).toBeTruthy();
-      expect(screen.getByText("Workspace")).toBeTruthy();
-      expect(screen.queryByText("More")).toBeNull();
+      expect(screen.getByText("This site")).toBeTruthy();
+      expect(screen.getByText("Leaves the editor")).toBeTruthy();
       // D8: Exit lives ONLY on the bar's ‹ Exit — no menu duplicate.
-      expect(screen.queryByRole("menuitem", { name: /Exit/ })).toBeNull();
+      expect(screen.queryByRole("menuitem", { name: /^Exit/ })).toBeNull();
     });
 
     it.each(["Enter view mode", "Invite teammates", "Account settings"])(
@@ -638,7 +623,7 @@ describe("StudioHeader", () => {
         getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
       } as unknown as StudioHeaderProps["composer"];
       render(<StudioHeader {...makeProps({ ...menuProps, composer })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       // F7-B2: the emit runs a tick later so the loading state can paint.
       await waitFor(() => expect(emit).toHaveBeenCalledWith("ui:toggle:preview", {}));
     });
@@ -678,13 +663,14 @@ describe("StudioHeader", () => {
     it("offers the live URL only once the site has one", () => {
       render(<StudioHeader {...makeProps()} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.queryByRole("menuitem", { name: "View live site" })).toBeNull();
+      expect(screen.queryByRole("menuitem", { name: /View live site/ })).toBeNull();
       cleanup();
 
       render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByRole("menuitem", { name: "View live site" })).toBeTruthy();
-      expect(screen.getByRole("menuitem", { name: "Copy live URL" })).toBeTruthy();
+      expect(screen.getByRole("menuitem", { name: "View live site ↗" })).toBeTruthy();
+      // Board 4418:126034 has no "Copy live URL".
+      expect(screen.queryByRole("menuitem", { name: "Copy live URL" })).toBeNull();
     });
 
     /* SH-A-11: Unpublish is ADMIN on the server (sites.ts:425) and the row was
@@ -716,11 +702,11 @@ describe("StudioHeader", () => {
     });
 
     it("fires a handler and closes", () => {
-      const onOpenHistory = vi.fn();
-      render(<StudioHeader {...makeProps({ onOpenHistory })} />);
+      const onOpenProjectSettings = vi.fn();
+      render(<StudioHeader {...makeProps({ onOpenProjectSettings })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /Version history/ }));
-      expect(onOpenHistory).toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("menuitem", { name: /Site settings/ }));
+      expect(onOpenProjectSettings).toHaveBeenCalled();
       expect(screen.queryByRole("menu")).toBeNull();
     });
   });
@@ -1168,7 +1154,7 @@ describe("F7 perf pair", () => {
           {...makeProps({ composer: asComposer(composer), onSetPreviewLoading })}
         />,
       );
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
       expect(emitSpy).not.toHaveBeenCalledWith("ui:toggle:preview", {});
       act(() => {

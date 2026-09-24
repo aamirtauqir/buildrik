@@ -104,16 +104,15 @@ describe("PageTabBar", () => {
     expect(screen.getByRole("tab", { name: "About" })).toBeInTheDocument();
   });
 
-  /* Board 435:2348: the active tab's white surface reaches the bar's own
-     bottom edge — the row wraps its bottom padding into a per-tab margin
-     instead, so only the (invisible) resting tabs carry the 4px gap. */
-  it("keeps the active tab flush with the bar bottom (board 435:2348)", () => {
+  /* Board 4418:123573 (parity V1 #5): the active page is a gray-100 chip,
+     resting pages are plain text — no browser-tab surface, no ⌂ glyph. */
+  it("marks the active page as a chip, with no home glyph", () => {
     const { composer } = makeComposer(TWO_PAGES);
     renderBar(composer);
-    const row = screen.getByRole("tablist").parentElement;
-    expect(row?.className).not.toMatch(/tw:pb-1\b/);
-    expect(screen.getByRole("tab", { name: "Home, Homepage" }).className).not.toMatch(/tw:mb-1\b/);
-    expect(screen.getByRole("tab", { name: "About" }).className).toMatch(/tw:mb-1\b/);
+    const active = screen.getByRole("tab", { name: /^Home/ });
+    expect(active.className).toContain("tw:bg-[var(--bk-gray-100)]");
+    expect(screen.getByRole("tab", { name: /^About/ }).className).toContain("tw:bg-transparent");
+    expect(screen.queryByTestId("page-tab-home-p-1")).toBeNull();
   });
 
   it("renders nothing without a composer", () => {
@@ -170,14 +169,12 @@ describe("PageTabBar", () => {
     });
   });
 
-  /* Decision #19: "+" opens the New-page modal like every Add-page door; it
-     no longer creates a page by itself. */
-  it("'+' asks for the New-page modal and creates nothing", () => {
-    const { composer, elements } = makeComposer(TWO_PAGES);
+  /* Board 4418:123573 draws no "+" on the strip; Add page is the Pages
+     panel's door (decision #19). */
+  it("draws no add button", () => {
+    const { composer } = makeComposer(TWO_PAGES);
     renderBar(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Add new page" }));
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
-    expect(elements.createPage).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: "Add new page" })).toBeNull();
   });
 
 });
@@ -185,8 +182,8 @@ describe("PageTabBar", () => {
 /* The bar mounts against an empty project and the pages arrive after: the
    project load emits PROJECT_LOADED, which this component did not listen for,
    so a plain page load produced NO tab bar at all — it appeared only once some
-   unrelated edit happened to fire PROJECT_CHANGED. Board 435:2348 draws the
-   bar at the canvas foot on every load. */
+   unrelated edit happened to fire PROJECT_CHANGED. The board draws the bar
+   on every load. */
 describe("PageTabBar — pages that arrive after mount", () => {
   it("renders once the project finishes loading", async () => {
     const { composer, loadPages } = makeComposer([]);
