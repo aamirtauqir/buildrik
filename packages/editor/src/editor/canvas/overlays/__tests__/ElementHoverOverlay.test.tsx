@@ -25,7 +25,6 @@ vi.mock("../../utils/elementInfo", () => ({
     friendlyName: "Container",
     parentName: null,
     hasLink: false,
-    hasCMSBinding: false,
   }),
 }));
 

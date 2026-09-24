@@ -8,11 +8,13 @@
  */
 
 import { describe, it, expect } from "vitest";
+import type { Composer } from "../../../engine";
+import { Viewport } from "../../../engine/Viewport";
 import { DEVICE_SIZES } from "../Canvas.types";
 
 describe("DEVICE_SIZES", () => {
   it("contains an entry for every breakpoint the switcher can select", () => {
-    for (const device of ["wide", "desktop", "tablet", "mobile"]) {
+    for (const device of ["wide", "desktop", "tablet", "mobile"] as const) {
       expect(DEVICE_SIZES[device], `missing DEVICE_SIZES["${device}"]`).toBeDefined();
       expect(DEVICE_SIZES[device].width).toBeTruthy();
       expect(DEVICE_SIZES[device].height).toBeTruthy();
@@ -28,6 +30,17 @@ describe("DEVICE_SIZES", () => {
     expect(DEVICE_SIZES.tablet).toEqual({ width: "768px", height: "1024px" });
     expect(DEVICE_SIZES.mobile).toEqual({ width: "375px", height: "812px" });
     // Decision #26: the Watch device is gone.
-    expect(DEVICE_SIZES.watch).toBeUndefined();
+    expect((DEVICE_SIZES as Record<string, unknown>).watch).toBeUndefined();
+  });
+});
+
+/* G2-013: the canvas frame and the engine viewport read one device table. */
+describe("the engine viewport reads the same device table", () => {
+  it("has the same widths", () => {
+    const devices = new Viewport({ emit: () => {} } as unknown as Composer).getDevices();
+    expect(devices.tablet).toMatchObject({ width: 768, height: 1024 });
+    expect(devices.mobile).toMatchObject({ width: 375, height: 812 });
+    expect(devices.desktop).toMatchObject({ width: 1024 });
+    expect(devices.wide.width).toBe(1920);
   });
 });

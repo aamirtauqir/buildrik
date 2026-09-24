@@ -58,6 +58,17 @@ export interface UseSectionReorderResult {
   setHoveredBoundary: (id: string | null) => void;
 }
 
+const sameBoundaries = (a: SectionBoundary[], b: SectionBoundary[]) =>
+  a.length === b.length &&
+  a.every(
+    (x, i) =>
+      x.sectionId === b[i].sectionId &&
+      x.index === b[i].index &&
+      x.rect.top === b[i].rect.top &&
+      x.rect.left === b[i].rect.left &&
+      x.rect.width === b[i].rect.width
+  );
+
 // ─── Hook ───────────────────────────────────────────────────────────────────
 
 export function useSectionReorder({
@@ -114,7 +125,7 @@ export function useSectionReorder({
       });
     });
 
-    setBoundaries(newBoundaries);
+    setBoundaries((prev) => (sameBoundaries(prev, newBoundaries) ? prev : newBoundaries));
   }, [composer, canvasRef, enabled]);
 
   // Recompute on content changes
@@ -144,6 +155,28 @@ export function useSectionReorder({
       composer.off(EVENTS.CANVAS_FORCE_SYNC, handler);
     };
   }, [composer, enabled, computeBoundaries]);
+
+  /* A loaded project or a page switch renders its sections with no element
+     event (the import fires before this hook subscribes, and the markup lands
+     after), which left a freshly opened page with no handles at all. Watching
+     the canvas markup covers every way sections appear. */
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!enabled || !canvas || typeof MutationObserver === "undefined") return;
+    let frame = 0;
+    const observer = new MutationObserver(() => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        computeBoundaries();
+      });
+    });
+    observer.observe(canvas, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [canvasRef, enabled, computeBoundaries]);
 
   // Also recompute on window resize / scroll
   React.useEffect(() => {
@@ -206,14 +239,23 @@ export function useSectionReorder({
         return;
       }
 
-      // Adjust index: if moving down, account for removal of the element
-      const adjustedIndex = toIndex > fromIndex ? toIndex - 1 : toIndex;
-
+      // toIndex is a slot in the pre-move list; moveElement itself shifts a
+      // same-parent downward move by one, so it takes the slot unadjusted.
       composer.beginTransaction("reorder-section");
       try {
-        composer.elements.moveElement(sectionId, page.root.id, adjustedIndex);
+        const moved = composer.elements.moveElement(sectionId, page.root.id, toIndex);
         composer.endTransaction();
-        addToastRef.current?.({
+        if (moved) {
+          /* Board 5940:148012: the moved section stays selected. The pointer
+             is released over a different section, and the click that follows
+             would select that one instead — swallow it. */
+          const swallowClick = (e: MouseEvent) => e.stopPropagation();
+          window.addEventListener("click", swallowClick, { capture: true, once: true });
+          setTimeout(() => window.removeEventListener("click", swallowClick, true), 0);
+          const movedEl = composer.elements.getElement(sectionId);
+          if (movedEl) composer.selection.select(movedEl);
+        }
+        if (moved) addToastRef.current?.({
           description: toIndex > fromIndex ? "Moved down" : "Moved up",
           action: { label: "Undo", onClick: () => composer.history.undo() },
         });

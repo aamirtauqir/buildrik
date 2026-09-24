@@ -552,44 +552,10 @@ describe("StyleEngine.getRulesForSelector", () => {
   });
 });
 
-describe("StyleEngine.setDeviceRule — DIVERGENT media queries (audit B9 drift)", () => {
-  // setDeviceRule hardcodes tablet=(max-width: 991px) / mobile=(max-width: 575px)
-  // while the breakpoint SSOT (shared/constants/breakpoints.ts) defines
-  // tablet=(max-width: 1023px) / mobile=(max-width: 767px). These tests assert
-  // the CURRENT divergent behavior as-is per audit B9 — do not "fix" the
-  // numbers here without reconciling the drift in source first.
-  let engine: StyleEngine;
-
-  beforeEach(() => {
-    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
-    engine = new StyleEngine(makeComposerHarness().composer);
-  });
-
-  afterEach(() => {
-    engine.destroy();
-    vi.useRealTimers();
-  });
-
-  it("tablet device rule uses (max-width: 991px)", () => {
-    const style = engine.setDeviceRule(".a", { color: "red" }, "tablet");
-    expect(style.mediaQuery).toBe("(max-width: 991px)");
-    expect(engine.getRule(".a", "(max-width: 991px)")).toBe(style);
-  });
-
-  it("mobile device rule uses (max-width: 575px)", () => {
-    const style = engine.setDeviceRule(".a", { color: "red" }, "mobile");
-    expect(style.mediaQuery).toBe("(max-width: 575px)");
-    expect(engine.getRule(".a", "(max-width: 575px)")).toBe(style);
-  });
-
-  it("device rules are invisible to breakpoint-SSOT lookups (the B9 drift)", () => {
-    engine.setDeviceRule(".a", { color: "red" }, "tablet");
-    engine.setDeviceRule(".a", { color: "blue" }, "mobile");
-
-    // SSOT queries (1023/767) find nothing where setDeviceRule wrote (991/575)
-    expect(engine.getRule(".a", getBreakpointQuery("tablet") ?? undefined)).toBeUndefined();
-    expect(engine.getRule(".a", getBreakpointQuery("mobile") ?? undefined)).toBeUndefined();
-  });
+/* G2-013: setDeviceRule wrote 991/575 media queries the breakpoint SSOT
+   (1023/767) never reads. It had no caller; it is gone, not reconciled. */
+it("StyleEngine has no second device media-query table (991/575)", () => {
+  expect("setDeviceRule" in StyleEngine.prototype).toBe(false);
 });
 
 describe("StyleEngine breakpoint styles", () => {

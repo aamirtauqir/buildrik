@@ -22,6 +22,8 @@ interface Props {
   page: PageItem;
   /** The redirect offer's door into Settings › Redirects goes through the composer. */
   composer: Composer | null;
+  /** Opened by a rename's "Update URL" (G2-076): the offer measures from here. */
+  previousSlug?: string;
 }
 
 /** The public path a page answers on. The home page is `/` whatever its slug
@@ -58,7 +60,7 @@ const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
 const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
 
-export const SeoTab: React.FC<Props> = ({ s, page, composer }) => {
+export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug }) => {
   const domain = s.domain ?? "yoursite.com";
   const range = titleRange(s.seoTitle);
   const [aiBusy, setAiBusy] = React.useState(false);
@@ -70,14 +72,20 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer }) => {
      at every 500ms pause, and a slug typed in two pauses would otherwise offer
      a redirect from the half-typed one. A new page id resets the baseline
      (adjust-state-during-render — no effect tick with a stale baseline). */
-  const [opened, setOpened] = React.useState({ id: page.id, slug: page.slug });
-  if (opened.id !== page.id) setOpened({ id: page.id, slug: page.slug });
+  const [opened, setOpened] = React.useState({ id: page.id, slug: previousSlug ?? page.slug });
+  if (opened.id !== page.id) setOpened({ id: page.id, slug: previousSlug ?? page.slug });
   const [answeredChange, setAnsweredChange] = React.useState<string | null>(null);
 
   const from = publicPath(page, opened.slug);
   const to = publicPath(page, page.slug);
   const change = opened.slug && page.slug && from !== to ? `${from} → ${to}` : null;
   const redirectOffer = change !== null && change !== answeredChange;
+  /* Opened by "Update URL": the offer is why the sheet opened, so bring it
+     into view (it sits under the slug field, below the fold). */
+  const offerRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (previousSlug) offerRef.current?.scrollIntoView?.({ block: "nearest" });
+  }, [previousSlug]);
 
   /* One emit: StudioPanels hears it (this panel is about to be unmounted
      under the Settings fullpage), switches the tab and hands the draft down. */
@@ -369,6 +377,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer }) => {
             for it — a further change is a new offer. */}
         {redirectOffer && (
           <div
+            ref={offerRef}
             role="status"
             data-testid="page-seo-redirect-offer"
             className={`tw:mt-1 tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-2.5 ${CARD} ${UI}`}

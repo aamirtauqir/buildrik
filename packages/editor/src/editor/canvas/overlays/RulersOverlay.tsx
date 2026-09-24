@@ -93,7 +93,8 @@ const HorizontalRuler: React.FC<{
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
+      // Guides are placed in overlay coordinates; the ruler starts RULER_SIZE in.
+      const x = e.clientX - rect.left + RULER_SIZE;
       onCreateGuide(x / scale);
     },
     [scale, onCreateGuide]
@@ -115,6 +116,9 @@ const HorizontalRuler: React.FC<{
         height: RULER_SIZE,
         cursor: "pointer",
         zIndex: Z_LAYERS.rulers,
+        /* The overlay group is pointer-events:none; without this a ruler click
+           fell through to the page and no guide could ever be placed. */
+        pointerEvents: "auto",
       }}
       onClick={handleClick}
       onMouseMove={handleMouseMove}
@@ -188,7 +192,7 @@ const VerticalRuler: React.FC<{
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      const y = e.clientY - rect.top;
+      const y = e.clientY - rect.top + RULER_SIZE;
       onCreateGuide(y / scale);
     },
     [scale, onCreateGuide]
@@ -210,6 +214,9 @@ const VerticalRuler: React.FC<{
         height: height - RULER_SIZE,
         cursor: "pointer",
         zIndex: Z_LAYERS.rulers,
+        /* The overlay group is pointer-events:none; without this a ruler click
+           fell through to the page and no guide could ever be placed. */
+        pointerEvents: "auto",
       }}
       onClick={handleClick}
       onMouseMove={handleMouseMove}
@@ -226,13 +233,16 @@ export const RulersOverlay: React.FC<RulersOverlayProps> = ({
   canvasSize,
   onCreateGuide,
 }) => {
+  /* The top ruler measures x, so a click on it places a VERTICAL guide at
+     that x; the left ruler places a horizontal one. They were crossed: a
+     top-ruler click at x=200 drew a horizontal line 200px down. */
   const handleHorizontalGuide = React.useCallback(
-    (position: number) => onCreateGuide("horizontal", position),
+    (position: number) => onCreateGuide("vertical", position),
     [onCreateGuide]
   );
 
   const handleVerticalGuide = React.useCallback(
-    (position: number) => onCreateGuide("vertical", position),
+    (position: number) => onCreateGuide("horizontal", position),
     [onCreateGuide]
   );
 

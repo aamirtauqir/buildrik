@@ -5,6 +5,7 @@
  */
 
 import type React from "react";
+import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "./breakpoints";
 
 // ============================================
 // DESIGN TOKENS - SINGLE SOURCE OF TRUTH
@@ -266,7 +267,6 @@ export const Z_LAYERS = {
   selectionBadge: 1002,
   pointerBadge: 1003,
   badge: 1004,
-  alignmentToolbar: 1050,
 
   // Drop feedback layers (2000-2999)
   dropFeedback: 2000,
@@ -343,9 +343,9 @@ export const SIZES = {
 // ============================================
 
 export const DEVICE_PRESETS = [
-  { id: "desktop", name: "Desktop", width: 1920, icon: "🖥️" },
-  { id: "tablet", name: "Tablet", width: 768, icon: "📱" },
-  { id: "mobile", name: "Mobile", width: 375, icon: "📲" },
+  { id: "desktop", name: "Desktop", width: BREAKPOINTS.desktop.minWidth, icon: "🖥️" },
+  { id: "tablet", name: "Tablet", width: DEVICE_PREVIEW_SIZES.tablet.width, icon: "📱" },
+  { id: "mobile", name: "Mobile", width: DEVICE_PREVIEW_SIZES.mobile.width, icon: "📲" },
 ] as const;
 
 // ============================================
@@ -358,6 +358,14 @@ export const DEVICE_PRESETS = [
    clamp (THRESHOLDS.ZOOM_MAX) was never the limit, this array was. 10 stays
    as the floor: it is the min-zoom state and the disabled bound for Zoom out. */
 export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 150, 200, 400] as const;
+
+/* G2-016: the one zoom step rule. ⌘=/⌘-, the flyout's + and −, the ⌘K
+   commands and the ZOOM_IN/OUT events all move to the next preset — they
+   used to disagree (presets vs ±10: 100% → 150 by key, 110 by palette). */
+export const stepZoom = (zoom: number, direction: 1 | -1): number =>
+  direction > 0
+    ? (ZOOM_PRESETS.find((p) => p > zoom) ?? ZOOM_PRESETS[ZOOM_PRESETS.length - 1])
+    : ([...ZOOM_PRESETS].reverse().find((p) => p < zoom) ?? ZOOM_PRESETS[0]);
 
 export const ZOOM_LIMITS = {
   min: 10,

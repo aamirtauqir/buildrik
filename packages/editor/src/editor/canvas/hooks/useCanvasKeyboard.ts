@@ -64,6 +64,7 @@ export function useCanvasKeyboard({
   onOpenContextMenu,
   addToast,
 }: UseCanvasKeyboardOptions): UseCanvasKeyboardResult {
+  const refusedNudgeFor = React.useRef<string | null>(null);
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       if (!composer || editingId) return;
@@ -244,6 +245,17 @@ export function useCanvasKeyboard({
       const page = composer.elements.getActivePage();
       const isRoot = page?.root?.id === selectedId;
       const { prev, next, parent, firstChild } = getNavigationTargets(element);
+      /* G2-047: only a positioned element nudges. An in-flow one says so, once
+         per element — holding the key would otherwise stack a toast per repeat. */
+      const nudge = (dx: number, dy: number) => {
+        if (moveElementPosition(composer, selectedId, dx, dy)) return;
+        if (refusedNudgeFor.current === selectedId) return;
+        refusedNudgeFor.current = selectedId;
+        addToast?.({
+          description: "This element sits in the page flow. Set Position to move it with the arrow keys.",
+          tone: "info",
+        });
+      };
 
       switch (e.key) {
         case "Escape":
@@ -255,9 +267,9 @@ export function useCanvasKeyboard({
         case "ArrowUp":
           e.preventDefault();
           if ((e.metaKey || e.ctrlKey) && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 0, -1);
+            nudge(0, -1);
           } else if (e.shiftKey && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 0, -10);
+            nudge(0, -10);
           } else if (e.altKey && !isRoot) {
             reorderElement(element, composer, selectedId, "up");
           } else if (prev) {
@@ -268,9 +280,9 @@ export function useCanvasKeyboard({
         case "ArrowDown":
           e.preventDefault();
           if ((e.metaKey || e.ctrlKey) && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 0, 1);
+            nudge(0, 1);
           } else if (e.shiftKey && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 0, 10);
+            nudge(0, 10);
           } else if (e.altKey && !isRoot) {
             reorderElement(element, composer, selectedId, "down");
           } else if (next) {
@@ -281,9 +293,9 @@ export function useCanvasKeyboard({
         case "ArrowLeft":
           e.preventDefault();
           if ((e.metaKey || e.ctrlKey) && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, -1, 0);
+            nudge(-1, 0);
           } else if (e.shiftKey && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, -10, 0);
+            nudge(-10, 0);
           } else if (parent) {
             select(parent);
           }
@@ -292,9 +304,9 @@ export function useCanvasKeyboard({
         case "ArrowRight":
           e.preventDefault();
           if ((e.metaKey || e.ctrlKey) && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 1, 0);
+            nudge(1, 0);
           } else if (e.shiftKey && !e.altKey && !isRoot) {
-            moveElementPosition(composer, selectedId, 10, 0);
+            nudge(10, 0);
           } else if (firstChild) {
             select(firstChild);
           }

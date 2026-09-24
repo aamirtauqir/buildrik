@@ -13,7 +13,9 @@ import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { THRESHOLDS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
+import { getBreakpointForWidth } from "../../shared/constants/breakpoints";
+import type { DeviceType } from "../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
@@ -29,7 +31,6 @@ import {
   contentStyles,
   footerToolbarContainerStyles,
 } from "./canvasStyles";
-import { useInspectorMode } from "./controls/InspectorToggle";
 import {
   useCanvasDragDrop,
   useCanvasInlineEdit,
@@ -56,6 +57,7 @@ import {
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { keyframesStyleSheet } from "@/shared/constants/animationKeyframes";
 import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
+import { useSelectionReadout } from "./hooks/useSelectionReadout";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
 import { CommentLayer } from "./comments/CommentLayer";
@@ -78,7 +80,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showBadges = false,
       showGuides = true,
       showGrid = false,
-      gridSize = 10,
       // Redesign P2 (sev 3): resting canvas must read as the rendered page, not a
       // blueprint. Per-element dashed outlines stay OFF by default — the single
       // ElementHoverOverlay (hover) + selection outline give the affordance, and
@@ -172,7 +173,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     });
 
     // Indicators and canvas size
-    const { spacingIndicators, guides } = useCanvasIndicators({
+    const selectedForReadout = React.useMemo(() => {
+      const el = selectedId && composer ? composer.elements.getElement(selectedId) : null;
+      return el ? { id: selectedId as string, type: el.getType?.() ?? "element" } : null;
+    }, [composer, selectedId]);
+    const { label: readoutLabel, dims: readoutDims } = useSelectionReadout(composer, selectedForReadout);
+
+    const { spacingIndicators } = useCanvasIndicators({
       composer,
       selectedId,
       showSpacing,
@@ -273,7 +280,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       addGuide,
       removeGuide,
       updateGuide,
-    } = useCanvasGuides({ enabled: showRulers });
+    } = useCanvasGuides({ composer, enabled: showRulers });
 
     // Hover, marquee, keyboard
     const { hoveredElementId, shouldShowHover, handleCanvasMouseMove, handleCanvasMouseLeave } =
@@ -286,15 +293,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         isResizing,
       });
 
-    // Inspector mode (persistent toggle)
-    const { isInspectorEnabled } = useInspectorMode();
-
     // Cursor intelligence - tracks modifier keys for smart hover display
     const { cursorState } = useCursorIntelligence({
       canvasRef,
       isDragging: Boolean(draggingElementId),
       isInvalidDrop: !isValidDrop && isDragOver,
-      inspectorEnabled: isInspectorEnabled,
     });
 
     // Live global custom CSS (Settings → Advanced) injected into the canvas.
@@ -399,31 +402,41 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
     }, [composer, zoom]);
 
-    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
-       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
-       command you could find, read and run, and nothing moved. Steps by
-       THRESHOLDS.ZOOM_STEP on the same percent scale ZoomControls uses. */
+    /* The grid spacing is the composer's setting (View ▸ Grid ▸ Size). */
+    const [gridSize, setGridSize] = React.useState(() => composer?.getState().gridSize ?? 10);
     React.useEffect(() => {
       if (!composer) return;
-      const step = (delta: number) => () => {
-        composer.setZoom(composer.getState().zoom + delta);
+      setGridSize(composer.getState().gridSize);
+      const onGrid = ({ gridSize: next }: { gridSize: number }) => setGridSize(next);
+      composer.on(EVENTS.GRID_CHANGED, onGrid);
+      return () => {
+        composer.off(EVENTS.GRID_CHANGED, onGrid);
       };
-      const zoomIn = step(THRESHOLDS.ZOOM_STEP);
-      const zoomOut = step(-THRESHOLDS.ZOOM_STEP);
+    }, [composer]);
+
+    /* G2-034: one Grid switch. Snapping (nudge, resize) follows the Grid
+       overlay; the separate snap setting and its ⌘K row are gone. */
+    React.useEffect(() => {
+      composer?.setSnapToGrid(showGrid);
+    }, [composer, showGrid]);
+
+    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
+       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
+       command you could find, read and run, and nothing moved. Steps to the
+       next preset, like ⌘=/⌘- (stepZoom, G2-016). */
+    React.useEffect(() => {
+      if (!composer) return;
+      const step = (direction: 1 | -1) => () => {
+        composer.setZoom(stepZoom(composer.getState().zoom, direction));
+      };
+      const zoomIn = step(1);
+      const zoomOut = step(-1);
       composer.on(EVENTS.ZOOM_IN, zoomIn);
       composer.on(EVENTS.ZOOM_OUT, zoomOut);
       return () => {
         composer.off(EVENTS.ZOOM_IN, zoomIn);
         composer.off(EVENTS.ZOOM_OUT, zoomOut);
       };
-    }, [composer]);
-
-    /* The canvas palette (⌘⇧P) and the canvas-mounted cheat sheet (`?`) are
-       gone — one palette (shell ⌘K, ⌘⇧P aliases it) and one sheet
-       (StudioModals) since 2026-09-22. The footer help button opens the
-       sheet through its event door. */
-    const openCheatSheet = React.useCallback(() => {
-      composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {});
     }, [composer]);
 
     // Emit hover events for LayersPanel sync
@@ -545,7 +558,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        canvas — the 1024 desktop frame scaled to leave grey around it — not
        edge to edge under the drawer and inspector. Once the project has
        loaded, if the desktop frame is wider than its viewport, zoom to fit
-       its WIDTH with a 60px gutter each side. Only on load: after that the
+       its WIDTH with a 60 px gutter each side. Only on load: after that the
        zoom is the user's. */
     const didInitialFitRef = React.useRef(false);
     React.useEffect(() => {
@@ -655,7 +668,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [composer, select, closeContextMenu, setContextMenu]
     );
 
-    const size = DEVICE_SIZES[device];
+    /* G2-014: "Custom width…" previews at a width of the user's choosing, in
+       the breakpoint that width falls in; any other device pick drops it. */
+    const [customWidth, setCustomWidth] = React.useState<{ width: number; device: DeviceType } | null>(null);
+    const activeCustomWidth = customWidth?.device === device ? customWidth.width : null;
+    const size = activeCustomWidth
+      ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
+      : DEVICE_SIZES[device];
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
@@ -783,7 +802,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             updateGuide={updateGuide}
             removeGuide={removeGuide}
             showGuides={showGuides}
-            guides={guides}
             snapLines={snapLines}
             selectedId={selectedId}
             selectedIds={selectedIds}
@@ -799,7 +817,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}
-            isInspectorEnabled={isInspectorEnabled}
             devMode={devMode}
             isDragOver={isDragOver}
             dropTargetId={dropTargetId}
@@ -844,9 +861,28 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
-              onHelpClick={openCheatSheet}
+              gridSize={gridSize}
+              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
+              readout={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
               device={device}
-              onDeviceChange={onDeviceChange}
+              onDeviceChange={
+                onDeviceChange
+                  ? (d) => {
+                      setCustomWidth(null);
+                      onDeviceChange(d);
+                    }
+                  : undefined
+              }
+              customWidth={activeCustomWidth}
+              onCustomWidth={
+                onDeviceChange
+                  ? (width) => {
+                      const bp = getBreakpointForWidth(width);
+                      if (bp !== device) onDeviceChange(bp);
+                      setCustomWidth({ width, device: bp });
+                    }
+                  : undefined
+              }
               canUndo={canUndo}
               canRedo={canRedo}
               onUndo={composer ? () => composer.history.undo() : undefined}
