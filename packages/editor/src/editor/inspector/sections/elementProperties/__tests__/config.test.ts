@@ -25,6 +25,10 @@ describe("getPropertiesForType", () => {
     }
   });
 
+  it("image has no Image URL row — MediaSourceRow owns its source (G2-145)", () => {
+    expect(getPropertiesForType("image").some((p) => p.id === "src")).toBe(false);
+  });
+
   it("falls back to just the default fields for an unknown type", () => {
     const props = getPropertiesForType("totally-unknown-xyz");
     expect(props.map((p) => p.id)).toEqual(
