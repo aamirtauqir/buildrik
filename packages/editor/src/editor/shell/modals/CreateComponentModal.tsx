@@ -164,7 +164,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             </label>
           ) : null}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter divided>
           <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating}>
             Cancel
           </Button>

@@ -64,6 +64,8 @@ describe("CreateComponentModal — board 4418:142143", () => {
       expect(screen.queryByText(new RegExp(gone, "i"))).toBeNull();
     }
     expect(screen.getByRole("button", { name: "Create component" })).toBeInTheDocument();
+    // Board footer 7431:145583: top rule, 16px vertical padding.
+    expect(screen.getByTestId("create-component-cancel").parentElement?.className).toContain("tw:border-t");
   });
 
   it("offers the convert box only when identical groups exist, with their count", () => {

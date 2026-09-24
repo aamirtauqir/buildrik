@@ -8,7 +8,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
-import { ConfirmDialog, Modal, ModalRoot, ModalContent } from "../index";
+import { ConfirmDialog, Modal, ModalRoot, ModalContent, ModalFooter } from "../index";
 
 const frame = () => screen.getByRole("dialog").querySelector<HTMLElement>("[data-testid=m]")!;
 
@@ -35,6 +35,27 @@ describe("Modal — board frame", () => {
     expect(foot.className).toContain("tw:px-6");
     expect(foot.className).toContain("tw:pb-6");
     expect(foot.className).not.toContain("tw:border-t");
+    expect(foot.className).toContain("tw:[&_button]:h-8");
+  });
+
+  /* Form dialogs draw the DS "Footer" (7431:145583 on 4418:142143): a top rule
+     and 16/24 padding. Confirms draw bare "Dialog actions" (7564:185450,
+     4428:151964) — the default stays borderless. */
+  it("a divided footer draws the form dialogs' top rule and 16px padding", () => {
+    render(
+      <ModalRoot open onClose={() => {}}>
+        <ModalContent size="question" data-testid="m">
+          <ModalFooter divided data-testid="f">
+            <button type="button">Save</button>
+          </ModalFooter>
+        </ModalContent>
+      </ModalRoot>,
+    );
+    const foot = screen.getByTestId("f");
+    expect(foot.className).toContain("tw:border-t");
+    expect(foot.className).toContain("tw:border-[var(--bk-border)]");
+    expect(foot.className).toContain("tw:py-4");
+    expect(foot.className).not.toContain("tw:pb-6");
     expect(foot.className).toContain("tw:[&_button]:h-8");
   });
 
