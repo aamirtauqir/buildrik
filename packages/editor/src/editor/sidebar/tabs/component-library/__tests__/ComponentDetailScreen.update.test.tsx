@@ -69,7 +69,7 @@ const renderScreen = (composer: never, selectedElementId: string | null) =>
     </ToastProvider>,
   );
 
-const updateButton = () => screen.getByRole("button", { name: /^update$/i });
+const updateButton = () => screen.getByRole("button", { name: /^update from selection…$/i });
 /* The trigger and the confirm must not share a name — they did, and the test
    could not tell them apart, which means neither could a screen-reader user. */
 const confirmButton = () => screen.getByRole("button", { name: /^update component$/i });

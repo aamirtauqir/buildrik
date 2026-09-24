@@ -2380,14 +2380,12 @@ const CASES: Record<string, () => React.ReactElement> = {
     <div data-probe="components-detach-confirm">
       {drillHost(
         <DSModeProvider initialMode="pro">
-          <AutoOpen testid="component-detach">
+          <AutoOpen testid="component-detach-all">
             <ComponentDetailScreen
               component={DETACH_COMPONENT}
               composer={DETACH_COMPOSER}
               onBack={() => {}}
-              isInstanceSelected
               selectedElementId="el-1"
-              onDetachInstance={() => {}}
             />
           </AutoOpen>
         </DSModeProvider>,

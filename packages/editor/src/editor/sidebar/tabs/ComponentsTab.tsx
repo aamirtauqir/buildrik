@@ -109,11 +109,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         component={state.detailComponent}
         composer={composer}
         onBack={state.handleBackFromDetail}
+        onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
-        isInstanceSelected={state.isDetailInstanceSelected}
         selectedElementId={state.canvasSelection[0] ?? null}
-        onDetachInstance={state.handleDetachInstance}
       />
     );
   }

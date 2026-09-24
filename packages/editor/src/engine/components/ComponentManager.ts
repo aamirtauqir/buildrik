@@ -237,7 +237,7 @@ export class ComponentManager {
 
   async updateComponentMetadata(
     id: string,
-    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags">>
+    updates: Partial<Pick<ComponentDefinition, "name" | "description" | "category" | "tags" | "thumbnail">>
   ): Promise<boolean> {
     const component = this.components.get(id);
     if (!component) return false;

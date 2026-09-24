@@ -233,21 +233,6 @@ export function useComponentsState({
     setDetailComponent(null);
   }, []);
 
-  // Check if selected canvas element is an instance of the detail component
-  const isDetailInstanceSelected = React.useMemo(() => {
-    if (!detailComponent || !composer || canvasSelection.length === 0) return false;
-    const currentSelectedId = canvasSelection[0];
-    const instance = composer.components?.getInstanceByElementId(currentSelectedId);
-    return instance?.componentId === detailComponent.id;
-  }, [detailComponent, composer, canvasSelection]);
-
-  // Detach instance action
-  const handleDetachInstance = React.useCallback(() => {
-    if (!composer || canvasSelection.length === 0) return;
-    const currentSelectedId = canvasSelection[0];
-    composer.components?.detachInstance?.(currentSelectedId);
-  }, [composer, canvasSelection]);
-
   // Derived state
   const canCreateComponent = canvasSelection.length > 0;
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
@@ -279,8 +264,6 @@ export function useComponentsState({
     handleBackFromDetail,
     handleDetailInsert,
     handleDetailDelete,
-    isDetailInstanceSelected,
-    handleDetachInstance,
     // Dialog state (replaces native dialogs)
     confirmDelete,
     setConfirmDelete,

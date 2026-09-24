@@ -1,17 +1,20 @@
 /**
- * ComponentDetailScreen - Detail view for a component
- * Shows large preview, info, actions, and variants
- * Based on Components_Detail_Wireframe.svg
+ * ComponentDetailScreen — "Manage saved master", board 4418:142876 (G2-122).
+ *
+ * Back row · panel header · the master scope block (name, linked-instance
+ * sentence, Insert / Update from selection… / Detach all / Delete master) ·
+ * master preview · STRUCTURE (the master's top-level parts) · USED ON (pages
+ * with instances, click to open) · "‹ All saved components".
+ * The name renames inline (G2-124 — the old Rename modal had no caller).
  * @license BSD-3-Clause
  */
 
-import { Copy, Trash2, Unlink, RefreshCw } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, useToast, Button } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
-import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
-import { DrillInHeader } from "../../shared/DrillInHeader";
+import type { ComponentDefinition } from "../../../../shared/types/components";
+import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
+import { captureComponentThumbnail } from "./captureComponentThumbnail";
 // ============================================
 // Types
 // ============================================
@@ -31,38 +34,15 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
-  /** Whether an instance of this component is selected on canvas */
-  isInstanceSelected?: boolean;
   /** The element currently selected on canvas — what "Update component" promotes. */
   selectedElementId?: string | null;
-  /** Callback to detach instance */
-  onDetachInstance?: () => void;
-  /** Callback to swap component */
 }
 
-/* This screen shipped as raw unstyled HTML — every wrapper was a bare `<div>`
-   with no className, so the four action buttons stacked flush at a 0px gap
-   (measured y=247/287/327/367, each 40 tall) at four different widths, and the
-   `<img>` carried an empty attribute slot where a class had been stripped.
-   Delete was marked `className="danger"`, which is not a class this codebase
-   has — Tailwind is `tw:`-prefixed here — so the destructive action rendered
-   identically to its neighbours. Restyled with `tw:` utilities and `--bk-*`
-   tokens, matching the other drill-in panels.
-
-   Board 641:2599 also draws a PROPERTIES section (per-binding rows) and a
-   USED ON section (per-page instance counts). Neither exists in this component
-   at all — that is unbuilt feature work, recorded on the census, not styling. */
-const PREVIEW =
-  "tw:h-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2 tw:flex tw:items-center tw:justify-center tw:overflow-hidden";
-const INFO_ROW = "tw:flex tw:items-baseline tw:gap-2 tw:text-[12px]";
-const INFO_KEY = "tw:w-[76px] tw:flex-none tw:text-[var(--bk-ink-muted)]";
-const INFO_VAL = "tw:flex-1 tw:min-w-0 tw:text-[var(--bk-ink)] tw:break-words";
-const SECTION = "tw:flex tw:flex-col tw:gap-2 tw:pt-3 tw:border-t tw:border-[var(--bk-border)]";
-const SECTION_TITLE =
-  "tw:m-0 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
-/* px-0 so flowbite's own px-5 cannot squeeze the icon+label out of a narrow
-   grid cell — the same collapse that made the canvas toolbar icons invisible. */
-const ACTION_BTN = "tw:w-full tw:px-0 tw:gap-1.5 tw:justify-center";
+const SECTION_HEADER =
+  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.88px] tw:text-[var(--bk-ink-muted)]";
+const LIST_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:rounded tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const ROW_META = "tw:ml-auto tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap";
+const BTN_28 = "tw:w-full tw:h-7 tw:px-3 tw:py-1 tw:rounded-md tw:text-[13px] tw:font-medium tw:focus:ring-0";
 
 // ============================================
 // Component
@@ -91,20 +71,10 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
-  isInstanceSelected = false,
   selectedElementId = null,
-  onDetachInstance,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
   const { addToast } = useToast();
-
-  // Spec H: "Detach (Pro mode only)" — Detach UI hidden in beginner mode.
-  // Hook is optional (null-safe) because ComponentDetailScreen may render
-  // outside a DSModeProvider in some screens (e.g. component-library
-  // standalone). Default-to-beginner when provider is absent.
-  const dsMode = useDSModeOptional();
-  /* The DS density mode, not a billing tier — see the Instance Actions note. */
-  const isProMode = dsMode?.mode === "pro";
 
   // Delete confirmation dialog state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
@@ -113,35 +83,10 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // overrides, so it is never one click.
   const [showUpdateConfirm, setShowUpdateConfirm] = React.useState(false);
 
-  // Detach confirmation state — the master's name, which is the only thing
-  // board 1170:4792's confirm names. Non-null means the dialog is open.
-  const [pendingDetach, setPendingDetach] = React.useState<string | null>(null);
 
-  // State for variant selection (for preview)
-  const [selectedVariantValues, setSelectedVariantValues] = React.useState<Record<string, string>>(
-    () => {
-      // Initialize with default values
-      const defaults: Record<string, string> = {};
-      component.variantProperties?.forEach((prop) => {
-        defaults[prop.name] = prop.defaultValue;
-      });
-      return defaults;
-    }
-  );
-
-  // Get display type from category or default
-  const displayType = component.category || "UI component";
-
-  // Format tags for display
-  const displayTags = component.tags?.join(" \u2022 ") || "No tags";
-
-  // Handle variant value change
-  const handleVariantChange = (propertyName: string, value: string) => {
-    setSelectedVariantValues((prev) => ({
-      ...prev,
-      [propertyName]: value,
-    }));
-  };
+  const [showDetachAll, setShowDetachAll] = React.useState(false);
+  const [renaming, setRenaming] = React.useState(false);
+  const [draftName, setDraftName] = React.useState(component.name);
 
   // Handle insert action
   const handleInsert = async () => {
@@ -216,6 +161,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       return;
     }
 
+    void captureComponentThumbnail(composer, component.id, selectedElementId);
+
     const followed =
       instancesSynced > 0
         ? `${instancesSynced} instance${instancesSynced === 1 ? "" : "s"} followed`
@@ -261,157 +208,195 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Instance count for delete message
   const instanceCount = composer?.components?.getInstancesOfComponent?.(component.id)?.length ?? 0;
 
-  // Handle detach instance — confirm first. With no composer or nothing
-  // selected there is no instance to name, so the confirm has nothing to say
-  // and the detach goes straight through, as it always has.
-  const handleDetach = () => {
-    if (!composer) {
-      onDetachInstance?.();
-      return;
-    }
-    if (!composer.selection?.getSelectedIds()?.[0]) {
-      onDetachInstance?.();
-      return;
-    }
-    setPendingDetach(component.name);
+  // Instances by page — USED ON (click opens the page).
+  const instances = composer?.components?.getInstancesOfComponent?.(component.id) ?? [];
+  const pages = composer?.elements.getAllPages?.() ?? [];
+  const usedOn = pages
+    .map((page) => ({
+      page,
+      count: instances.filter((inst) => {
+        let el = composer?.elements.getElement(inst.elementId) ?? null;
+        while (el?.getParent()) el = el.getParent();
+        return el?.getId() === page.root?.id;
+      }).length,
+    }))
+    .filter((row) => row.count > 0);
+  const structure = component.masterTree?.children ?? [];
+  const siteName = composer?.getProjectMetadata?.()?.name || "this site";
+
+  const confirmDetachAll = () => {
+    setShowDetachAll(false);
+    if (!composer) return;
+    for (const inst of instances) void composer.components.detachInstance(inst.elementId);
+    addToast({ description: `Detached ${instances.length} instance${instances.length === 1 ? "" : "s"} of "${component.name}".`, tone: "success", duration: 4000 });
   };
 
-  const confirmDetach = () => {
-    setPendingDetach(null);
-    onDetachInstance?.();
+  const commitRename = async () => {
+    setRenaming(false);
+    const name = draftName.trim();
+    if (!composer || !name || name === component.name) {
+      setDraftName(component.name);
+      return;
+    }
+    const ok = await composer.components.updateComponent(component.id, { name });
+    if (!ok) addToast({ description: "Couldn't rename this component.", tone: "error", duration: 4000 });
   };
 
   return (
-    <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0">
-      {/* Header with breadcrumb */}
-      <DrillInHeader
-        title={component.name}
-        parentName="Components"
-        onBack={onBack}
-      />
-      {/* Scrollable content */}
-      <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col tw:gap-4 tw:px-4 tw:py-3">
-        {/* Large Preview */}
-        <div className={PREVIEW}>
-          {component.thumbnail ? (
-            <img
-              src={component.thumbnail}
-              alt={component.name}
-              className="tw:max-h-full tw:max-w-full tw:object-contain"
-            />
-          ) : (
-            <div className="tw:flex tw:items-center tw:justify-center tw:h-full">
-              <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No Preview</span>
-            </div>
-          )}
-        </div>
-
-        {/* Info Section */}
-        <div className="tw:flex tw:flex-col tw:gap-1.5">
-          <div className={INFO_ROW}>
-            <span className={INFO_KEY}>Type</span>
-            <span className={INFO_VAL}>{displayType}</span>
-          </div>
-          <div className={INFO_ROW}>
-            <span className={INFO_KEY}>Tags</span>
-            <span className={INFO_VAL}>{displayTags}</span>
-          </div>
-          {component.description && (
-            <div className={INFO_ROW}>
-              <span className={INFO_KEY}>Description</span>
-              <span className={INFO_VAL}>{component.description}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Primary Action */}
-        <Button size="sm" onClick={handleInsert} className="tw:w-full">
-          Insert Component
-        </Button>
-
-        {/* Secondary Actions — one row, equal widths, so they read as peers. */}
-        <div className="tw:grid tw:grid-cols-3 tw:gap-2">
-          <Button
-            size="xs"
-            color="light"
-            onClick={handleDuplicate}
-            title="Duplicate component"
-            className={ACTION_BTN}
-          >
-            <Copy size={14} />
-            <span>Duplicate</span>
-          </Button>
-          <Button
-            size="xs"
-            color="light"
-            onClick={() => setShowUpdateConfirm(true)}
-            disabled={!selectedElementId}
-            title={
-              selectedElementId
-                ? "Replace this component with the element selected on canvas"
-                : "Select an element on the canvas to update this component from"
-            }
-            className={ACTION_BTN}
-          >
-            <RefreshCw size={14} />
-            <span>Update</span>
-          </Button>
-          {/* `className="danger"` used to sit here. There is no such class in
-              this codebase — Tailwind is `tw:`-prefixed — so Delete rendered
-              identically to its two neighbours, with nothing marking it
-              destructive. */}
-          <Button
-            size="xs"
-            color="failure"
-            onClick={handleDelete}
-            title="Delete component"
-            className={ACTION_BTN}
-          >
-            <Trash2 size={14} />
-            <span>Delete</span>
-          </Button>
-        </div>
-
-        {/* Instance Actions (shown when an instance is selected on canvas).
-            Detach shows in the design system's PRO MODE — the Beginner/Pro
-            density toggle a user flips freely (`DSModeContext`), not the
-            billing plan. This comment said "Pro-only", which reads like a paid
-            gate; nothing here checks a plan. The "Swap component" action was
-            removed — it had no completion path (no engine swap API), so it
-            only toasted and never swapped. */}
-        {isInstanceSelected && isProMode && (
-          <div className={SECTION}>
-            <h4 className={SECTION_TITLE}>Instance Actions</h4>
-            <Button
-              size="xs"
-              color="light"
-              onClick={handleDetach}
-              title="Detach this instance from the component"
-              data-testid="component-detach"
-              className={ACTION_BTN}
-            >
-              <Unlink size={14} />
-              <span>Detach instance</span>
-            </Button>
-          </div>
-        )}
-
-        {/* Variants Section */}
-        {component.variantProperties && component.variantProperties.length > 0 && (
-          <div className={SECTION}>
-            <h4 className={SECTION_TITLE}>Variants</h4>
-            {component.variantProperties.map((prop) => (
-              <VariantPicker
-                key={prop.name}
-                property={prop}
-                selectedValue={selectedVariantValues[prop.name] || prop.defaultValue}
-                onChange={(value) => handleVariantChange(prop.name, value)}
-              />
-            ))}
-          </div>
+    <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="component-master">
+      <Button
+        color="light"
+        onClick={onBack}
+        data-testid="component-back-row"
+        className="tw:h-9 tw:w-full tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
+      >
+        ‹&nbsp;&nbsp;Saved components
+      </Button>
+      <div className="tw:flex tw:items-center tw:gap-2 tw:h-11 tw:px-4 tw:shrink-0">
+        <span className="tw:flex-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Components</span>
+        {onClose && (
+          <IconButton label="Close" size="sm" onClick={onClose}>
+            ✕
+          </IconButton>
         )}
       </div>
-      {/* Delete confirmation dialog */}
+
+      <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col">
+        {/* Master component scope — 4418:142876 */}
+        <div className="tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:py-2">
+          {renaming ? (
+            <TextInput
+              autoFocus
+              sizing="sm"
+              aria-label="Component name"
+              data-testid="component-rename-input"
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onBlur={() => void commitRename()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void commitRename();
+                if (e.key === "Escape") { setDraftName(component.name); setRenaming(false); }
+              }}
+              className="tw:w-full"
+            />
+          ) : (
+            <p className="tw:m-0 tw:w-full tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]">
+              Master component ·{" "}
+              <span
+                role="button"
+                tabIndex={0}
+                title="Rename"
+                data-testid="component-name"
+                className="tw:cursor-text tw:rounded-sm hover:tw:bg-[var(--bk-bg-subtle)]"
+                onClick={() => setRenaming(true)}
+                onKeyDown={(e) => { if (e.key === "Enter") setRenaming(true); }}
+              >
+                {component.name}
+              </span>
+            </p>
+          )}
+          <p className="tw:m-0 tw:w-full tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="component-linked">
+            {instanceCount} linked instance{instanceCount === 1 ? "" : "s"} on {siteName}. Updating this master affects those instances. Inserting adds one instance.
+          </p>
+          <Button
+            color="light"
+            onClick={handleInsert}
+            data-testid="component-insert"
+            className="tw:h-7 tw:border-0 tw:bg-transparent tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent)] tw:focus:ring-0"
+          >
+            Insert from saved components
+          </Button>
+          <Button
+            onClick={() => setShowUpdateConfirm(true)}
+            disabled={!selectedElementId}
+            title={selectedElementId ? undefined : "Select an element on the canvas to update this master from"}
+            data-testid="component-update"
+            className={BTN_28}
+          >
+            Update from selection…
+          </Button>
+          <Button
+            color="light"
+            onClick={() => setShowDetachAll(true)}
+            disabled={instanceCount === 0}
+            data-testid="component-detach-all"
+            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
+          >
+            Detach all
+          </Button>
+          <Button
+            color="light"
+            onClick={handleDuplicate}
+            data-testid="component-duplicate"
+            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
+          >
+            Duplicate master
+          </Button>
+          <Button color="red" onClick={handleDelete} data-testid="component-delete" className={BTN_28}>
+            Delete {component.name} master
+          </Button>
+        </div>
+
+        {/* Master preview */}
+        <div className="tw:relative tw:h-[140px] tw:shrink-0 tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)]" data-testid="component-preview">
+          <p className="tw:absolute tw:left-[11px] tw:top-[7px] tw:m-0 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-gray-500)]">
+            Master preview · {component.name}
+          </p>
+          <div className="tw:absolute tw:left-[11px] tw:top-[25px] tw:h-[100px] tw:w-[256px] tw:overflow-hidden tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:flex tw:items-center tw:justify-center">
+            {component.thumbnail ? (
+              <img src={component.thumbnail} alt={component.name} className="tw:max-h-full tw:max-w-full tw:object-contain" />
+            ) : (
+              <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No preview yet</span>
+            )}
+          </div>
+        </div>
+
+        <div className={SECTION_HEADER} data-testid="component-structure-header">
+          <span className="tw:flex-1">STRUCTURE</span>
+          <span className="tw:font-[family-name:var(--bk-font-mono)]">{structure.length}</span>
+        </div>
+        {structure.map((child, i) => {
+          const layerName = typeof child.data?.layerName === "string" ? child.data.layerName : undefined;
+          const bound = child.dataBindings && Object.keys(child.dataBindings).length > 0;
+          return (
+            <div key={child.id ?? i} className={LIST_ROW} data-testid="component-structure-row">
+              <span className="tw:truncate">{layerName ?? ELEMENT_TYPE_LABELS[child.type] ?? child.type}</span>
+              <span className={ROW_META}>{child.type}{bound ? " · CMS bound" : ""}</span>
+            </div>
+          );
+        })}
+
+        <div className={SECTION_HEADER} data-testid="component-usedon-header">
+          <span className="tw:flex-1">USED ON</span>
+          <span className="tw:font-[family-name:var(--bk-font-mono)]">{usedOn.length}</span>
+        </div>
+        {usedOn.map(({ page, count }) => (
+          <div
+            key={page.id}
+            role="button"
+            tabIndex={0}
+            className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
+            data-testid={`component-usedon-${page.id}`}
+            onClick={() => composer?.elements.setActivePage(page.id)}
+            onKeyDown={(e) => { if (e.key === "Enter") composer?.elements.setActivePage(page.id); }}
+          >
+            <span className="tw:truncate">{page.name}</span>
+            <span className={ROW_META}>{count} instance{count === 1 ? "" : "s"}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2">
+        <Button
+          color="light"
+          onClick={onBack}
+          data-testid="component-all-saved"
+          className="tw:h-7 tw:flex-1 tw:rounded-md tw:border-[var(--bk-border)] tw:bg-white tw:text-[13px] tw:font-medium tw:focus:ring-0"
+        >
+          ‹&nbsp;&nbsp;All saved components
+        </Button>
+      </div>
+
       <ConfirmDialog
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
@@ -422,8 +407,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         confirmLabel="Delete"
         tone="destructive"
       />
-      {/* Update-from-selection confirmation. It names the cost: instances change,
-          and overrides pointing at elements the new master drops are lost. */}
       <ConfirmDialog
         open={showUpdateConfirm}
         onClose={() => setShowUpdateConfirm(false)}
@@ -433,8 +416,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           /* The undo caveat is measured, not assumed: with history primed, one
              Cmd+Z after an update reverted the instance on the canvas and left
              the component at the new version — element history holds the pages,
-             not the component definition. Saying "can't be undone" flatly would
-             be wrong too, because the canvas DOES revert. */
+             not the component definition. */
           (instanceCount > 0
             ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
             : `Replace "${component.name}" with the element selected on the canvas? `) +
@@ -443,70 +425,15 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         confirmLabel="Update component"
         tone="destructive"
       />
-      {/* Board 1170:4792 — the confirm says what detaching costs THIS copy and
-          what it leaves alone, in one sentence. It replaces four glyph bullets
-          ("resolved bindings will be snapshotted", "becomes free-form") that
-          spoke about masters and bindings to someone who had clicked Detach.
-          Not destructive: the board draws an accent button, and undo restores
-          the link. */}
       <ConfirmDialog
-        open={pendingDetach !== null}
-        testId="component-detach-confirm"
-        onClose={() => setPendingDetach(null)}
-        onConfirm={confirmDetach}
-        title="Detach from component?"
-        message={`This copy stops receiving updates from "${pendingDetach ?? ""}". The component itself is untouched.`}
-        confirmLabel="Detach"
+        open={showDetachAll}
+        testId="component-detach-all-confirm"
+        onClose={() => setShowDetachAll(false)}
+        onConfirm={confirmDetachAll}
+        title={`Detach all ${instanceCount} instance${instanceCount === 1 ? "" : "s"} of ${component.name}?`}
+        message={`They become independent elements and keep their content and appearance; they will no longer follow updates to the ${component.name} master.`}
+        confirmLabel="Detach all"
       />
-    </div>
-  );
-};
-
-// ============================================
-// Variant Picker Sub-component
-// ============================================
-
-interface VariantPickerProps {
-  property: VariantProperty;
-  selectedValue: string;
-  onChange: (value: string) => void;
-}
-
-/*
-  Variant chips. These had no rule at all, so they rendered as full flowbite
-  Buttons — h-10, centred, medium weight — in a row that wants chips, and
-  `.active` marked nothing. Fixed as `tw:` utilities rather than a CSS rule:
-  chrome-ui/__tests__/className-precedence.test.tsx is the contract that a
-  caller's utilities both survive the merge and evict flowbite's conflicting
-  ones. Shape matches ElementsTab's filter pills at 22px instead of 24px.
-*/
-const VARIANT_PILL =
-  "tw:inline-flex tw:items-center tw:h-[22px] tw:px-[var(--bk-space-8)] " +
-  "tw:rounded-full tw:border tw:border-[var(--bk-border)] tw:bg-transparent " +
-  "tw:text-[var(--bk-ink-soft)] tw:text-[12px] tw:font-normal " +
-  "tw:[font-family:var(--bk-font-ui)] tw:cursor-pointer " +
-  "tw:enabled:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
-  "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
-
-const VARIANT_PILL_ACTIVE =
-  "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] " +
-  "tw:text-[var(--bk-accent-on)] tw:font-medium";
-
-const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, onChange }) => {
-  return (
-    <div>
-      <span>{property.name}:</span>
-      <div>
-        {property.values.map((value) => (
-          <Button
-            key={value}
-            className={`${VARIANT_PILL} ${selectedValue === value ? VARIANT_PILL_ACTIVE : ""}`}
-            onClick={() => onChange(value)}
-          >
-            {value}
-          </Button>
-        ))}
-      </div>
     </div>
   );
 };
