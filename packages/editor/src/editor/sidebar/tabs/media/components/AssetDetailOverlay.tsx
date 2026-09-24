@@ -62,6 +62,8 @@ interface AssetDetailOverlayProps {
   onCopyUrl?(item: LibraryItem): void;
   onDownload?(item: LibraryItem): void;
   onDelete?(item: LibraryItem): void;
+  /** Board 4418:61698's header expand — this asset, selected, in the full library. */
+  onExpand?(item: LibraryItem): void;
   /** A viewer's reasons — Rename / Delete stay visible, disabled, titled. */
   viewOnly?: { rename?: string; delete?: string };
 }
@@ -112,6 +114,7 @@ export function AssetDetailOverlay({
   onCopyUrl,
   onDownload,
   onDelete,
+  onExpand,
   viewOnly,
 }: AssetDetailOverlayProps) {
   const [view, setView] = useState<View>("hub");
@@ -342,7 +345,7 @@ export function AssetDetailOverlay({
       {/* The drill-in draws the shared panel header itself — the overlay
           covers the drawer, and the board keeps Media's 44h header on every
           drill-in screen. */}
-      <PanelFrame.Header title="Assets" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={onExpand ? () => onExpand(item) : undefined} />
 
       {/* Back row — ‹ pops one level, exactly like ESC. */}
       <Button
