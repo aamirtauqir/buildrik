@@ -93,12 +93,12 @@ describe("CommandPalette — board 4418:141220 structure", () => {
     renderPalette();
     expect(labels()).toEqual([
       "Open Pages", "Open Add", "Open Layers", "Open Assets", "Open Asset library", "Open CMS", "Open Brand",
-      "Open Publish", "Open AI assistant", "Browse Templates", "Open Review", "Open Activity", "Open Issues",
+      "Open Publish", "Open AI assistant", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
       "Open Site settings", "Open Components", "Keyboard shortcuts",
       "Undo", "Duplicate · Select an element first", "Replace selected media · Select an element first",
       "Zoom to 50%", "Preview Home page",
       "Add text", "Add container", "Generate a block with AI…",
-      "Manage CMS records", "Save page as template", "Replace layout with template…", "Open History",
+      "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
   });
@@ -187,11 +187,11 @@ describe("CommandPalette — search", () => {
     expect(bands()).toEqual(["Navigate", "Edit", "View", "Add", "Tools"]);
   });
 
-  it("C4 #19: \"New page\" answers from anywhere (no Pages rows registered) and asks for the New-page modal", () => {
+  it("C4 #19: \"New page\" sits in NAVIGATE (4418:141220), answers from anywhere, and asks for the New-page modal", () => {
     const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY }));
-    expect(labels()).not.toContain("New page");
+    expect(labels()).toContain("New page");
     type("new page");
-    fireEvent.click(screen.getByTestId("cmdk-row-add-new-page"));
+    fireEvent.click(screen.getByTestId("cmdk-row-nav-new-page"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
   });
 
