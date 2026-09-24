@@ -97,14 +97,15 @@ function renderTier(tier: "beginner" | "pro", showAll = false, onShowAllChange =
 }
 
 describe("InspectorTabContent — Beginner / Pro tier", () => {
-  // Container profile, Style tab: layout (ADVANCED), size, spacing,
-  // background, border, corner-radius (ADVANCED); flex, grid and typography
-  // hide themselves on a plain non-text container.
+  // Container profile, Style tab: layout, size (advanced for containers),
+  // spacing, background, border (with corner radius since G2-154); flex, grid
+  // and typography hide themselves on a plain non-text container.
   it("Pro renders the whole column, no Show-all row", () => {
     renderTier("pro");
     expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Spacing section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Corner radius section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Border section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Corner radius section/i })).not.toBeInTheDocument();
     expect(screen.queryByTestId("inspector-show-all")).not.toBeInTheDocument();
     expect(screen.queryByTestId("inspector-show-less")).not.toBeInTheDocument();
   });
@@ -117,8 +118,7 @@ describe("InspectorTabContent — Beginner / Pro tier", () => {
     expect(screen.getByRole("button", { name: /Spacing section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Border section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Size section/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Corner radius section/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId("inspector-show-all").textContent).toBe("Show all (2 more)");
+    expect(screen.getByTestId("inspector-show-all").textContent).toBe("Show all (1 more)");
   });
 
   it("Show all asks the panel to reveal; revealed, the row reads 'N of N groups · Show less'", () => {
@@ -130,7 +130,7 @@ describe("InspectorTabContent — Beginner / Pro tier", () => {
 
     renderTier("beginner", true, onShowAllChange);
     expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
-    expect(screen.getByTestId("inspector-show-less").textContent).toBe("6 of 6 groups · Show less ▴");
+    expect(screen.getByTestId("inspector-show-less").textContent).toBe("5 of 5 groups · Show less ▴");
     fireEvent.click(screen.getByTestId("inspector-show-less"));
     expect(onShowAllChange).toHaveBeenLastCalledWith(false);
   });

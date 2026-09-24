@@ -1,15 +1,7 @@
 /**
- * Feature flags for the schema-driven inspector rollout.
- *
- * Default path is the existing hand-written section components. Flipping a
- * flag opts that section into the schema pipeline — useful for internal
- * parity testing before the hand-written version is deleted.
- *
- * Flags are read once at module load. Toggle via:
- *   localStorage.setItem("buildrick:schema-border", "1");
- *   // reload
- *
- * Unset (empty, "0", missing localStorage) → false → hand-written path.
+ * Inspector localStorage flags, read once at module load. Unset (empty, "0",
+ * missing localStorage) → false. (The schema-border flag and the schema
+ * pipeline it switched to went with G2-154.)
  *
  * @license BSD-3-Clause
  */
@@ -23,8 +15,6 @@ function read(key: string): boolean {
     return false;
   }
 }
-
-export const USE_SCHEMA_BORDER = read("buildrick:schema-border");
 
 /**
  * Dev-mode inspector: unlocks the "All CSS" section (raw property editor)

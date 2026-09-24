@@ -71,7 +71,6 @@ export type SectionId =
   | "typography"
   | "background"
   | "border"
-  | "corner-radius"
   // Element tab
   | "link"
   | "content"
