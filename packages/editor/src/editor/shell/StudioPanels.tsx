@@ -26,6 +26,7 @@ import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { TabRouter } from "../sidebar/TabRouter";
+import { requestAssetPick, useRailTab } from "../sidebar/tabs/media/data/assetPick";
 import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
@@ -301,6 +302,15 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
+  /* A CMS field's image pick opens in the Assets drawer but keeps the CMS
+     workspace (and the record being edited) open beside it. */
+  const railTab = useRailTab(activeTabId);
+  const pickForCms = React.useCallback(
+    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, label?: string) => {
+      if (composer) requestAssetPick(composer, { allowedTypes, onSelect, label, host: "content" });
+    },
+    [composer],
+  );
   /* Boards 4418:97118 / 4418:115784 / 4418:73791: Publish, Review and
      History are not drawer panels — each REPLACES the inspector in the right
      column (300), with the left drawer closed. Every door still opens them
@@ -346,7 +356,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      inspector with the CMS workspace. The canvas stays mounted underneath
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
-  const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && activeTabId === "content";
+  const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
   const inspectorOpen =
     viewerChrome || (!readOnlyView && !effectiveFullPageMode && inspectorShown && !cmsWorkspaceOpen);
 
@@ -637,7 +647,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           {cmsWorkspaceOpen ? (
             <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
               <React.Suspense fallback={null}>
-                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} onOpenMediaLibrary={onOpenMediaLibrary} />
+                <CmsWorkspace composer={composer} onCreateCollection={onOpenCreateCollection} onOpenMediaLibrary={pickForCms} />
               </React.Suspense>
             </div>
           ) : null}
