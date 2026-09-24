@@ -41,8 +41,9 @@ export interface IssuesPanelProps {
    * pretending the issue is gone.
    */
   onFix?: (issue: Issue) => Promise<string | null>;
-  /** Route to the Brand panel, where the offending token actually lives. */
-  onOpenBrand?: () => void;
+  /** Route to the Brand panel, where the offending token actually lives —
+   *  on that token when the issue names one. */
+  onOpenBrand?: (tokenId?: string) => void;
   /** Suppress this token's issues for the session. */
   onIgnore?: (tokenId: string) => void;
 }
@@ -225,7 +226,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 would change every site using them.
               </div>
               <div className="tw:flex tw:gap-2 tw:mt-2">
-                <Button color="light" size="xs" className={GHOST} onClick={() => { setFailed(null); onOpenBrand?.(); }}>
+                <Button color="light" size="xs" className={GHOST} onClick={() => { setFailed(null); onOpenBrand?.(failed.tokenId); }}>
                   Open Brand
                 </Button>
                 <Button
