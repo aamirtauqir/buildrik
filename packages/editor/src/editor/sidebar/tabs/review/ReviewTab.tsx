@@ -709,8 +709,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </Button>
         ) : undefined)
       }
+      /* Board 4418:116040: a revoked round's rows carry no Resolve / Copy
+         link line (interim owner default, 2026-09-24). */
       footer={
-        extra?.footer ?? (
+        extra?.footer ?? (round.revoked ? undefined : (
           <>
             {resolveButton(c)}
             {/* Not on board 4418:115784, kept by the owner rule (never
@@ -726,7 +728,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               Copy link
             </Button>
           </>
-        )
+        ))
       }
     />
   );

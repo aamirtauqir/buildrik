@@ -185,6 +185,9 @@ describe("load states", () => {
     expect(await screen.findByRole("menuitem", { name: "Send a new link" })).toBeInTheDocument();
     // Revoking twice is not a thing.
     expect(screen.queryByRole("menuitem", { name: "Revoke link" })).not.toBeInTheDocument();
+    // …and its rows carry no Resolve / Copy link line.
+    expect(screen.queryByRole("button", { name: /^Resolve$/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Copy link" })).not.toBeInTheDocument();
   });
 
   /* Two kinds of round reach this panel and the boards only draw one. A round
