@@ -52,7 +52,6 @@ import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { DEFAULT_TOKENS } from "../constants";
 import {
   useColorRegistry,
   useTypeRegistry,
@@ -93,6 +92,7 @@ import { ReviewModal } from "./modals/ReviewModal";
 import { BrandDiscardDialog } from "./BrandDiscardDialog";
 import { BrandPreview } from "./BrandPreview";
 import { BrandLivePreview } from "./BrandLivePreview";
+import { orderColourTokens } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
 import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
@@ -159,7 +159,8 @@ function isPageId(value: string): value is BrandPageId {
 
 function pageLabel(id: BrandPageId): string {
   return NAV.find((n) => n.id === id)?.label
-    ?? (MORE_KINDS.some((k) => `kind-${k.kind}` === id) ? "Tokens" : id);
+    ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
+    ?? id;
 }
 
 // ─── Row chrome (7315:80955: 32-tall rows on a 2px rhythm, 14px, accent tint when on) ──
@@ -570,11 +571,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     });
   };
 
-  // C3 fix: factory-reset spacing (stages defaults for Review/Apply, not discardAll).
-  const handleResetSpacingToDefaults = () => {
-    spacing.stageDefaults(DEFAULT_TOKENS);
-    addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
-  };
 
   /* "+ Add token" (7318:81125): the kind is the page's. Only kinds with an
      add path offer it — colour, spacing and the eleven generic kinds. */
@@ -661,9 +657,24 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     allRegistries.map((r) => r.tokens),
   );
   const selectedToken = selectedTokenId ? allTokens.find((t) => t.id === selectedTokenId) : undefined;
+
+
   const moreKindRegistry: Record<MoreKind, TokensForKindRegistry> = {
     radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery,
   };
+
+  /* 7315:80955 / 7576:197036 draw the page with a token selected and its
+     card open. A token page with nothing selected (landing, a page change)
+     selects its first row. */
+  const firstRowId = (() => {
+    if (page === "colours") return orderColourTokens(visibleColors)[0]?.id;
+    if (page === "spacing") return spacing.tokens[0]?.id;
+    if (page.startsWith("kind-")) return moreKindRegistry[page.slice(5) as MoreKind]?.tokens[0]?.id;
+    return undefined;
+  })();
+  React.useEffect(() => {
+    if (!selectedTokenId && firstRowId) setSelectedTokenId(firstRowId);
+  }, [selectedTokenId, firstRowId]);
 
   /* Dispatch to whichever registry owns the token. Only the colour registry
      stores a dark variant; type and spacing expose no delete or rename, so
@@ -724,7 +735,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const pageAction = (() => {
     switch (page) {
       case "colours":
-      case "spacing":
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
             + Add token
@@ -779,9 +789,11 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             Run checks
           </Button>
         );
+      case "spacing":
       default:
-        if (page.startsWith("kind-")) {
-          /* "Tokens · <kind>": the kind is the page's own switch. */
+        if (page === "spacing" || page.startsWith("kind-")) {
+          /* Spacing (7576:197036) is the "Tokens · <kind>" pattern; its
+             header switches kind — the one entry to the eleven others. */
           return (
             <div className="tw:flex tw:items-center tw:gap-2">
             <Select
@@ -791,6 +803,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               onChange={(e) => openPage(e.target.value as BrandPageId)}
               data-testid="brand-kind-switch"
             >
+              <option value="spacing">Spacing</option>
               {MORE_KINDS.map((k) => (
                 <option key={k.kind} value={`kind-${k.kind}`}>
                   {k.label}
@@ -817,7 +830,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   const tokenPageProps = {
     onAddTokenClick: () => setShowAddToken(true),
-    onResetSpacingToDefaults: handleResetSpacingToDefaults,
     composer,
     selectedTokenId,
     onSelectToken: setSelectedTokenId,
@@ -906,7 +918,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /** `slot` names the row when its target moves (the Other tokens row lands
    *  on whichever kind is open). */
   const navRow = (id: BrandPageId, label: string, dirtyHere: boolean, count?: number, slot: string = id) => {
-    const active = page === id;
+    /* The eleven other kinds are reached from Spacing's kind switch, so the
+       Spacing row stays current on their pages. */
+    const active = page === id || (id === "spacing" && page.startsWith("kind-"));
     return (
       <Button
         key={slot}
@@ -997,23 +1011,12 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             const dirtyHere =
               (n.id === "colours" && kindDirty(color)) ||
               (n.id === "fonts" && kindDirty(type)) ||
-              (n.id === "spacing" && kindDirty(spacing)) ||
+              (n.id === "spacing" && (kindDirty(spacing) || MORE_KINDS.some((k) => kindDirty(moreKindRegistry[k.kind])))) ||
               (n.id === "presets" && stylesDirty > 0);
             return (
               <React.Fragment key={n.id}>
                 {navRow(n.id, n.label, dirtyHere, navCount(n.id))}
-                {/* The other token kinds (G3-130's "Tokens · <kind>" pattern,
-                    which the Spacing board draws). No board draws an entry
-                    to them, so it is ONE row in the nav's own style; the
-                    page's header switches kind. */}
-                {n.id === "spacing" &&
-                  navRow(
-                    page.startsWith("kind-") ? page : "kind-radius",
-                    "Other tokens",
-                    MORE_KINDS.some((k) => kindDirty(moreKindRegistry[k.kind])),
-                    undefined,
-                    "tokens",
-                  )}
+
               </React.Fragment>
             );
           })}

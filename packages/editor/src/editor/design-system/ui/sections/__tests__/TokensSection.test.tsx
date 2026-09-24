@@ -51,28 +51,12 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
 });
 
 describe("TokensSection — the Spacing page (7576:197036)", () => {
-  it("lists the presets above a TOKEN · VALUE · PRESET · USED table", () => {
-    const { getByTestId, getAllByRole } = render(wrap(<TokensSection openKind="spacing" />, "pro"));
-    expect(getByTestId("spacing-preset-compact").textContent).toBe("Compact · 2px");
-    expect(getByTestId("spacing-preset-normal")).toBeTruthy();
-    expect(getByTestId("spacing-preset-spacious")).toBeTruthy();
+  it("draws the TOKEN · VALUE · PRESET · USED table and no preset control (not drawn)", () => {
+    const { getAllByRole, container, queryByTestId, getByTestId } = render(wrap(<TokensSection openKind="spacing" />, "pro"));
     expect(getAllByRole("columnheader").map((h) => h.textContent).filter(Boolean)).toEqual(["Token", "Value", "Preset", "Used"]);
-  });
-
-  it("applying a preset restages the scale and names it in the PRESET column", () => {
-    const { getByTestId, container } = render(wrap(<TokensSection openKind="spacing" />, "pro"));
-    fireEvent.click(getByTestId("spacing-preset-spacious"));
-    expect(getByTestId("spacing-preset-spacious").getAttribute("aria-pressed")).toBe("true");
+    expect(queryByTestId("spacing-presets")).toBeNull();
     const first = tokenIds(container)[0];
-    expect(getByTestId(`brand-token-preset-${first}`).textContent).toBe("Spacious");
-    expect(getByTestId("brand-token-value-space-1").textContent).toBe("6px");
-  });
-
-  it("Reset defaults calls the workspace's stager", () => {
-    const onReset = vi.fn();
-    const { getByTestId } = render(wrap(<TokensSection openKind="spacing" onResetSpacingToDefaults={onReset} />, "pro"));
-    fireEvent.click(getByTestId("spacing-reset-defaults"));
-    expect(onReset).toHaveBeenCalledTimes(1);
+    expect(getByTestId(`brand-token-preset-${first}`).textContent).toBe("Normal");
   });
 });
 
