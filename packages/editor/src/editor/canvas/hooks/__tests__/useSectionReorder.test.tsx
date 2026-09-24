@@ -190,6 +190,22 @@ describe("useSectionReorder", () => {
       expect(result.current.dragState?.toIndex).toBe(3);
     });
 
+    /* Walk at /edit/:id: layout moved after the boundaries were measured
+       (zoom-fit on load, images arriving) with no element event, so the
+       handles sat 100px off their sections and a drag resolved against the
+       stale tops. A drag measures the sections again. */
+    it("a drag measures the live layout, not the tops captured earlier", () => {
+      const { result } = mountHook();
+      const [a, b, c] = Array.from(canvas.querySelectorAll("section")) as HTMLElement[];
+      stubRect(a, { top: 0, left: 0, width: 800, height: 400 });
+      stubRect(b, { top: 400, left: 0, width: 800, height: 400 });
+      stubRect(c, { top: 800, left: 0, width: 800, height: 400 });
+      act(() => result.current.startDrag("sec-a", 0));
+      expect(result.current.boundaries.map((x) => x.rect.top)).toEqual([0, 400, 800]);
+      act(() => result.current.updateDrag(500));
+      expect(result.current.dragState?.toIndex).toBe(2);
+    });
+
     it("updateDrag is a no-op before startDrag", () => {
       const { result } = mountHook();
       act(() => result.current.updateDrag(150));

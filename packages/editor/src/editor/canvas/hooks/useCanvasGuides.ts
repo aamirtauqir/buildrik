@@ -85,7 +85,8 @@ export function useCanvasGuides({ composer, enabled }: UseCanvasGuidesOptions): 
         type,
         position,
         locked: false,
-        color: "#89b4fa",
+        // No colour: GuidesOverlay draws the one accent (#89b4fa was a
+        // leftover dark-theme blue).
       };
       devLogger.guides("add", { type, position, id: newGuide.id });
       commit((prev) => [...prev, newGuide]);
