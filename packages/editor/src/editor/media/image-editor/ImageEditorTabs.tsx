@@ -407,36 +407,43 @@ export function OptimiseControls({ draft, patch, originalBytes, estimatedBytes }
   const smaller = savings !== null && savings < 0;
   return (
     <>
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <span className={LABEL}>Format</span>
-        <div className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-label="Format">
-          {FORMAT_CHIPS.map((f) => (
-            <Chip
-              key={f.id}
-              on={draft.format === f.id}
-              data-testid={`image-editor-format-${f.id}`}
-              onClick={() => patch({ format: f.id })}
-            >
-              {f.label}
-            </Chip>
-          ))}
-        </div>
-      </div>
-      <SliderRow
-        id="image-editor-quality"
-        label="Quality"
-        value={draft.quality}
-        display={String(draft.quality)}
-        min={QUALITY_MIN}
-        max={100}
-        onChange={(quality) => patch({ quality })}
+      {/* 4418:149547 — "Optimise image", Format and Quality as fields, then
+          the two size lines and the note, unboxed. */}
+      <h3 className={HEADING} data-testid="image-editor-optimise-heading">
+        Optimise image
+      </h3>
+      <SelectRow
+        id="image-editor-format"
+        label="Format"
+        value={draft.format}
+        options={FORMAT_CHIPS.map((f) => ({ value: f.id, label: f.label }))}
+        onChange={(v) => {
+          const f = FORMAT_CHIPS.find((c) => c.id === v);
+          if (f) patch({ format: f.id });
+        }}
       />
-      <div
-        className="tw:flex tw:flex-col tw:gap-1 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-2.5"
-        data-testid="image-editor-estimate"
-      >
+      <div className="tw:flex tw:flex-col tw:gap-1.5">
+        <label className={LABEL} htmlFor="image-editor-quality">
+          Quality
+        </label>
+        <TextInput
+          id="image-editor-quality"
+          type="number"
+          min={QUALITY_MIN}
+          max={100}
+          inputMode="numeric"
+          className={INPUT_CLASS}
+          value={draft.quality}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const n = Number(e.target.value);
+            if (Number.isFinite(n)) patch({ quality: Math.min(100, Math.max(QUALITY_MIN, Math.round(n))) });
+          }}
+          data-testid="image-editor-quality"
+        />
+      </div>
+      <div className="tw:flex tw:flex-col tw:gap-3" data-testid="image-editor-estimate">
         <span
-          className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+          className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
           data-testid="image-editor-estimate-original"
         >
           Original · {originalBytes > 0 ? formatBytes(originalBytes) : "—"}
@@ -444,7 +451,7 @@ export function OptimiseControls({ draft, patch, originalBytes, estimatedBytes }
         {/* Success green means "this saved you something"; a wash or a bigger
             file is not a success and must not read as one. */}
         <span
-          className={`tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:tabular-nums ${
+          className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:tabular-nums ${
             smaller ? "tw:text-[var(--bk-success-text)]" : "tw:text-[var(--bk-ink-soft)]"
           }`}
           data-smaller={smaller ? "true" : undefined}
@@ -457,7 +464,7 @@ export function OptimiseControls({ draft, patch, originalBytes, estimatedBytes }
         </span>
       </div>
       <p className={HINT} data-testid="image-editor-estimate-note">
-        File size is an estimate until the version is saved.
+        WebP, JPEG and PNG are supported. File size is an estimate until the version is saved.
       </p>
     </>
   );
