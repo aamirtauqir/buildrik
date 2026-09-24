@@ -198,6 +198,35 @@ export class ComponentManager {
     return component;
   }
 
+  /**
+   * Make existing elements instances of `componentId` (board 4418:142143:
+   * "Creating a master converts this Hero into its first instance", and the
+   * opt-in "Also convert N matching groups"). Callers pass elements whose
+   * tree already equals the master (see matchingGroups), so no overrides
+   * are recorded and nothing on the canvas moves.
+   */
+  adoptInstances(componentId: string, elementIds: readonly string[]): number {
+    const component = this.components.get(componentId);
+    if (!component) return 0;
+    let adopted = 0;
+    for (const elementId of elementIds) {
+      const element = this.composer.elements.getElement(elementId);
+      if (!element || this.instances.has(elementId)) continue;
+      const instance: ComponentInstance = {
+        elementId,
+        componentId,
+        overrides: [],
+        syncedVersion: component.version,
+        isDetached: false,
+      };
+      this.instances.set(elementId, instance);
+      element.setData("componentInstance", instance);
+      adopted++;
+    }
+    if (adopted > 0) this.composer.markDirty();
+    return adopted;
+  }
+
   getComponent(id: string): ComponentDefinition | undefined {
     return this.components.get(id);
   }
