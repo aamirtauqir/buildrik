@@ -64,8 +64,8 @@ describe("BrandWorkspace › Import / export", () => {
     expect(card.contains(utils.getByTestId("brand-export-head"))).toBe(true);
     expect(card.contains(utils.getByTestId("brand-import-head"))).toBe(true);
     const preview = utils.getByTestId("export-preview");
-    expect(card.contains(preview)).toBe(false);
-    // IMPORT comes before the preview in reading order.
+    // 4418:168885: the Preview sits inside the panel, after IMPORT.
+    expect(card.contains(preview)).toBe(true);
     expect(utils.getByTestId("brand-import-head").compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
