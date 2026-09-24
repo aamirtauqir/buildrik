@@ -24,7 +24,8 @@ import {
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button, TextField, useToast } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
+import { SaveVersionModal } from "./version-history/SaveVersionModal";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
@@ -117,8 +118,6 @@ export function VersionHistoryPanel({
 
   // Save form state
   const [showSaveForm, setShowSaveForm] = React.useState(false);
-  const [newVersionName, setNewVersionName] = React.useState("");
-  const [isSaving, setIsSaving] = React.useState(false);
 
   // Restore / delete confirmation + in-flight state
   const [restoreConfirmId, setRestoreConfirmId] = React.useState<string | null>(null);
@@ -175,28 +174,15 @@ export function VersionHistoryPanel({
     }
   }, [composer]);
 
-  // Handle create version
-  const handleCreateVersion = async () => {
-    const name = newVersionName.trim();
-    if (!name) return;
-    setIsSaving(true);
+  // Save a version (board 4418:165661) — the modal owns the name; a failure
+  // rejects so the modal stays open with it.
+  const handleCreateVersion = async (name: string) => {
     try {
       await createVersion(name, "");
-      setNewVersionName("");
-      setShowSaveForm(false);
       pushToast(`Saved '${name}'`, "success");
-    } catch {
+    } catch (err) {
       pushToast("Save failed", "error");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleSaveFormKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleCreateVersion();
-    if (e.key === "Escape") {
-      setShowSaveForm(false);
-      setNewVersionName("");
+      throw err;
     }
   };
 
@@ -434,68 +420,30 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-      {/* Save Version FAB / inline form — fixed at bottom-right of saves-view */}
+      {/* "+ Save a version" opens the modal (board 4418:165661). */}
       <div className="fab-container" data-testid="saves-footer">
-        {showSaveForm ? (
-          <div className="save-form open">
-            <div className="form-row">
-              <div className="form-field" style={{ flex: 1 }}>
-                <label className="form-label" htmlFor="bd-save-name">
-                  Version name *
-                </label>
-                <TextField
-                  id="bd-save-name"
-                  type="text"
-                  value={newVersionName}
-                  onChange={(e) => setNewVersionName(e.target.value)}
-                  onKeyDown={handleSaveFormKeyDown}
-                  placeholder="e.g. Homepage redesign"
-                  className="form-input"
-                  autoFocus
-                  maxLength={50}
-                />
-                <span className="form-hint">{newVersionName.length}/50</span>
-              </div>
-            </div>
-            <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
-              <Button
-                type="button"
-                onClick={() => {
-                  setShowSaveForm(false);
-                  setNewVersionName("");
-                }}
-                className="cancel-btn"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleCreateVersion}
-                className="save-btn"
-                disabled={!newVersionName.trim() || isSaving}
-              >
-                {isSaving ? "Saving..." : "Save Version"}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          /* Board 162:2 writes this as a labelled link at the foot of the
-             panel — "+ Save a version". It was a floating "+" circle with the
-             label only in a tooltip, so the one action that creates a NAMED
-             version (the kind the prune rule promises never to remove)
-             announced itself as an unlabelled dot. */
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            onClick={() => setShowSaveForm(true)}
-            data-testid="saves-save-version"
-            className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
-          >
-            + Save a version
-          </Button>
-        )}
+        {/* Board 162:2 writes this as a labelled link at the foot of the
+            panel — "+ Save a version". It was a floating "+" circle with the
+            label only in a tooltip, so the one action that creates a NAMED
+            version (the kind the prune rule promises never to remove)
+            announced itself as an unlabelled dot. */}
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          onClick={() => setShowSaveForm(true)}
+          data-testid="saves-save-version"
+          className="tw:h-8 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)]"
+        >
+          + Save a version
+        </Button>
       </div>
+      <SaveVersionModal
+        open={showSaveForm}
+        siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}
+        onClose={() => setShowSaveForm(false)}
+        onSave={handleCreateVersion}
+      />
     </div>
   );
 }

@@ -12,8 +12,12 @@
  * The panel doors that used to live here (Version history, Review, Publish
  * panel, Publish history, Templates, Components, Brand) are not on the board:
  * each keeps its own door — rail, topbar CTA/chip, save pill, ⌘K and its
- * chord. Plugins, Ask AI, Site health, Copy live URL and Getting started are
- * not on the board either.
+ * chord. Plugins and Ask AI are gone (owner, G1-020 / G1-025).
+ *
+ * Three rows are NOT on the board and stay anyway (owner rule 2026-09-24:
+ * parity never silently removes a capability; each is logged in the
+ * designer notes): Getting started (the only way to replay the tour),
+ * Copy live URL, and Site health ↗ (the dashboard's health score).
  *
  * In view mode the menu keeps only the way back out — the mode is for looking
  * at the draft, not for administering the site from it.
@@ -55,6 +59,10 @@ export interface SiteMenuProps {
   onUnpublish?: () => void;
   /** Live URL once the site has been published. */
   publishedUrl?: string | null;
+  /** Replays the onboarding tour — off-board, kept (see the header). */
+  onReplayOnboarding?: () => void;
+  /** Copies the live URL — off-board, kept (see the header). */
+  onCopyLiveUrl?: () => void;
 }
 
 function openDashboard(path: string) {
@@ -73,6 +81,8 @@ const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
 const PLANNED = "tw:ml-auto tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
 
 export const SiteMenu: React.FC<SiteMenuProps> = ({
+  onReplayOnboarding,
+  onCopyLiveUrl,
   onOpenSiteSettings,
   onExportCode,
   onDuplicateSite,
@@ -171,6 +181,16 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                     Share preview link
                   </MenuItem>
                 ) : null}
+                {publishedUrl && onCopyLiveUrl ? (
+                  <MenuItem onClick={run(onCopyLiveUrl)} data-testid="site-menu-copy-live-url">
+                    Copy live URL
+                  </MenuItem>
+                ) : null}
+                {onReplayOnboarding ? (
+                  <MenuItem onClick={run(onReplayOnboarding)} data-testid="site-menu-getting-started">
+                    Getting started
+                  </MenuItem>
+                ) : null}
               </MenuGroup>
 
               <MenuGroup>
@@ -199,6 +219,14 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 {publishedUrl ? (
                   <MenuItem onClick={run(() => window.open(publishedUrl, "_blank", "noopener,noreferrer"))}>
                     View live site ↗
+                  </MenuItem>
+                ) : null}
+                {siteId ? (
+                  <MenuItem
+                    onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}
+                    data-testid="site-menu-site-health"
+                  >
+                    Site health ↗
                   </MenuItem>
                 ) : null}
                 <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates ↗</MenuItem>

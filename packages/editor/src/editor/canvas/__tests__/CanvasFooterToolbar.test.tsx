@@ -4,9 +4,8 @@
  * device edit group is covered separately in
  * CanvasFooterToolbar.editgroup.test.tsx.)
  *
- * The zoom controls that used to be pinned here now live in StudioFooter —
- * board 817:4723 puts them in the footer's bottom-right corner — so their
- * tests moved to StudioFooter.zoom.test.tsx with them.
+ * The zoom menu ("100% ▾") and the selection readout live here again (the
+ * status footer that briefly held them is gone).
  *
  * @license BSD-3-Clause
  */

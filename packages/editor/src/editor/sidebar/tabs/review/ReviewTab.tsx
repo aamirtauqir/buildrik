@@ -5,11 +5,12 @@
  * re-send-confirm · 158:57 re-sending · 158:105 revoke-confirm · 158:162
  * revoked · 158:213 review-closed · 453:3974 load-error · 1138:4527 loading).
  *
- * The frame every state shares, top to bottom: the panel header, a progress
- * bar with "resolved of total", who it was sent to and when, the thread, then
- * a fixed foot — the round line, Compare, and one primary button whose label
- * IS the state ("Re-send for review" · "Sending round 3…" · "Send a new link"
- * · "Try again").
+ * The frame every state shares, top to bottom: the panel header (its ⋯ holds
+ * Compare rounds and Round history, board 7071:79114), one status line
+ * ("2 open · 1 resolved · Awaiting Sara", board 4418:115784), the thread, then
+ * a fixed foot — the note composer and one primary button whose label IS the
+ * state ("Re-send for review" · "Sending round 3…" · "Send a new link" ·
+ * "Try again").
  *
  * What the rebuild replaced: a status badge + open-count chip + Re-send +
  * overflow row, a "Show resolved" toggle, avatar-led rows, and page groups
@@ -98,9 +99,6 @@ const BAND =
 const BAND_COUNT =
   "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium";
 const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-2";
-const ROUND_STRIP =
-  "tw:flex tw:items-center tw:justify-center tw:h-8 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 const COMPOSER = "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
 /* Board 4418:115784's "Locate ›": accent text, no chrome, 12/18. */
 const LOCATE =
@@ -120,11 +118,15 @@ function shortAge(iso: string | Date): string {
   return `${Math.round(h / 24)}d`;
 }
 
-/** "Sent 2d ago · Sara" — board 156:2's subtitle. */
-function sentLine(round: CurrentRound): string {
-  const age = shortAge(round.createdAt);
-  const who = round.reviewerName ?? round.invitedEmail;
-  return `Sent ${age === "just now" ? "just now" : `${age} ago`}${who ? ` · ${who}` : ""}`;
+/** "3 open · 9 resolved · Awaiting Sara" — board 4418:115784's status line. */
+function statusLine(round: CurrentRound | null, open: number, resolved: number): string {
+  const counts = `${open} open · ${resolved} resolved`;
+  if (!round) return counts;
+  const st = round.status?.toLowerCase();
+  const who = round.reviewerName ?? round.invitedEmail ?? "the reviewer";
+  const tail =
+    st === "changes_requested" ? "Changes requested" : st === "approved" ? "Approved" : `Awaiting ${who}`;
+  return `${counts} · ${tail}`;
 }
 
 interface Group {
@@ -309,10 +311,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   };
 
+  /* The one Compare (B8): the shell's CompareHost renders it full-canvas. */
+  const openCompare = () =>
+    composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+      left: { kind: "approved" },
+      right: { kind: "current" },
+      from: "Review",
+    });
+
   /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
      (G1-058/059). Only the rows this code can back are drawn: "Open current
      review link" needs the token the dashboard does not send (needs
-     dashboard), and Compare / Round history have their own doors below. */
+     dashboard). Compare rounds and Round history live here, not in the body. */
   const roundMenu =
     round && !round.revoked ? (
       <Popover
@@ -336,6 +346,24 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         }
       >
         <Menu label="Review actions">
+          <MenuItem
+            disabled={!composer}
+            onClick={() => {
+              setRoundMenuOpen(false);
+              openCompare();
+            }}
+          >
+            Compare rounds
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setRoundMenuOpen(false);
+              toggleRounds();
+            }}
+            data-testid="review-menu-round-history"
+          >
+            Round history ›
+          </MenuItem>
           {onResend ? (
             <MenuItem
               onClick={() => {
@@ -430,96 +458,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const total = comments.length;
   const resolvedComments = comments.filter((c) => c.status === "RESOLVED");
   const openComments = comments.filter((c) => c.status !== "RESOLVED");
-  const pct = total === 0 ? 0 : Math.round((resolvedComments.length / total) * 100);
 
-  /* The progress row and the sent line are the frame — every board carries
-     them, including the error one. The BAR itself only renders once there is
-     something to measure: "0 of 0" over an empty thread was a gauge with no
-     quantity (designer walk 2026-08-28). The sent line stays either way. */
+  /* Board 4418:115784: one mono status line under the header — counts and
+     where the round stands. No progress bar, no sent line. */
   const progress = (
-    <>
-      {total > 0 && (
-        /* Board 157:8 — a 44-tall block, the 140 track at x16 and the mono
-           count at x170. The track is FIXED, not flex-1: the count is mono and
-           tabular precisely so it does not move as the numbers change, which a
-           flexible track would undo. */
-        <div
-          className="tw:flex tw:h-11 tw:w-full tw:flex-none tw:items-center tw:gap-[14px] tw:px-4"
-          data-testid="review-progress"
-        >
-          <span
-            className="tw:h-1.5 tw:w-[140px] tw:flex-none tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:overflow-hidden"
-            role="progressbar"
-            aria-valuenow={resolvedComments.length}
-            aria-valuemin={0}
-            aria-valuemax={total}
-            aria-label="Comments resolved"
-            data-testid="review-progress-track"
-          >
-            <span
-              className="tw:block tw:h-full tw:rounded-[4px] tw:bg-[var(--bk-success)]"
-              style={{ width: `${pct}%` }}
-              data-testid="review-progress-fill"
-            />
-          </span>
-          <span
-            className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink)]"
-            data-testid="review-progress-count"
-          >
-            {resolvedComments.length} of {total}
-          </span>
-        </div>
-      )}
-      {/* Board 157:12 — a 28-tall block of its own, so the sent line keeps its
-          place whether or not there is a bar above it. */}
-      {round || notice ? (
-        <div
-          className="tw:flex tw:h-7 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4"
-          data-testid="review-sent-meta"
-        >
-          {round ? (
-            <span className={META} data-testid="review-sent-line">
-              {sentLine(round)}
-            </span>
-          ) : null}
-          {notice ? <span className={META}>{notice}</span> : null}
-        </div>
-      ) : null}
-    </>
-  );
-
-  const compareButton = (
-    <Button
-      color="light"
-      size="xs"
-      /* A door of the one Compare (B8) — the shell's CompareHost renders it
-         full-canvas; this panel no longer hosts a second copy. */
-      onClick={() =>
-        composer?.emit(EVENTS.UI_COMPARE_OPEN, {
-          left: { kind: "approved" },
-          right: { kind: "current" },
-          from: "Review",
-        })
-      }
-      disabled={!composer}
-      title={!composer ? "Compare isn't available here" : undefined}
-      /* Board 229:1090: `--size/row-dense` (28) with 12/6 padding and an 8
-         radius — the dense secondary, not the 40-tall default a bare
-         `<Button>` renders. `tw:h-7` and not `tw:min-h-7`: on a flowbite
-         component only a SAME-property utility survives twMerge. */
-      /* --color/border and gray-700, not flowbite `light`'s gray-300 border and
-         gray-900 label — the same call-site override DrawerGallery's
-         `tpl-browse-all` carries for board 1138:13422. See the report:
-         the secondary Button has now been corrected at the call site six
-         times, which is a theme's job, not a call site's. */
-      className={
-        "tw:h-7 tw:w-full tw:justify-center tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:leading-[18px] " +
-        "tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]"
-      }
-      data-testid="review-compare"
-    >
-      Compare with approved
-    </Button>
+    <div className="tw:flex tw:min-h-7 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4" data-testid="review-status">
+      <span
+        className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]"
+        data-testid="review-status-line"
+      >
+        {statusLine(round, openComments.length, resolvedComments.length)}
+      </span>
+      {notice ? <span className={META}>{notice}</span> : null}
+    </div>
   );
 
   if (state === "error") {
@@ -539,7 +490,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </div>
         </div>
         <div className={FOOT}>
-          {compareButton}
           <Button onClick={() => void load()} className="tw:w-full tw:justify-center">
             Try again
           </Button>
@@ -650,9 +600,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       data-comment-row
       data-comment-id={c.id}
       /* Board 4418:115784: the trailing slot is Locate › alone (accent);
-         Resolve sits on its own line under the row. Copy link (B3) rides
-         beside it rather than a per-row ⋯ that squeezed the comment to a
-         few characters in the 280 drawer. */
+         Resolve sits on its own line under the row, Copy link beside it. */
       actions={
         extra?.actions ??
         (c.targetSelector && c.status !== "RESOLVED" ? (
@@ -665,6 +613,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         extra?.actions ? undefined : (
           <>
             {resolveButton(c)}
+            {/* Not on board 4418:115784, kept by the owner rule (never
+                silently remove a capability): the only door to a comment's
+                deep link. Logged in designer-notes.md. */}
             <Button
               color="light"
               size="xs"
@@ -914,21 +865,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         )}
       </div>
 
-      {/* The strip opens the history now (reviews.rounds, 2026-08-28). What it
-          still does NOT do is open an older round's COMMENTS — those carry no
-          round id by design (contracts §6.4, comments outlive rounds), so the
-          history is header lines, which is everything the data can honestly
-          say. */}
-      <Button
-        color="light"
-        className={`${ROUND_STRIP} tw:w-full tw:rounded-none tw:border-0 tw:cursor-pointer`}
-        aria-expanded={roundsOpen}
-        data-testid="review-rounds-toggle"
-        onClick={toggleRounds}
-      >
-        Round {round.roundNumber} of {round.totalRounds}
-        {round.totalRounds > 1 ? (roundsOpen ? " ▾" : " ▸") : ""}
-      </Button>
       {roundsOpen && (
         <div className="tw:bg-[var(--bk-bg-subtle)] tw:flex tw:flex-col" data-testid="review-rounds-list">
           {/* Board 1753:8422 — 12px lines on a 24 pitch, inset 12, which puts
@@ -1013,16 +949,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {replyError && <span className={META}>Couldn't send that reply. Try again.</span>}
         <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
           <span className={META}>Replies are internal notes on the thread.</span>
-          <Button size="xs" disabled={!draft.trim() || sending} onClick={() => void send()} aria-busy={sending || undefined}>
+          <Button
+            size="xs"
+            /* Board 4418:115784: Send is the blue primary — disabled is the
+               same blue, dimmed, not the grey the theme gives. */
+            className="tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-[var(--bk-accent-on)] tw:disabled:opacity-50"
+            disabled={!draft.trim() || sending}
+            onClick={() => void send()}
+            aria-busy={sending || undefined}
+          >
             Send
           </Button>
         </div>
-      </div>
-
-      {/* Board 157:48: 40 tall, the 28 button inset 16 — and no top rule; the
-          tinted round strip above it is the separation. */}
-      <div className="tw:flex tw:h-10 tw:w-full tw:flex-none tw:items-center tw:px-4" data-testid="review-compare-block">
-        {compareButton}
       </div>
 
       {/* Board 4418:120052 — the re-send confirm is a modal (G1-058), from the
