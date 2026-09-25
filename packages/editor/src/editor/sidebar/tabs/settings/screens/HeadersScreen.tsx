@@ -74,29 +74,27 @@ interface HeadersRow {
   permissionsPolicy?: string | null;
 }
 
-/* Label-left rows at the 192 label column (the SEO screen's Indexing card set
+/* Label-left rows at the 180 label column (the SEO screen's Indexing card set
    the shape). `stem` is the label's slug — the `set-field-*` anchors the S7
-   probes target. A row with a 32 control centres its label; the CSP well is
-   top-aligned, its label on the well's first line (the Custom code cards). */
+   probes target. Every label centres on its control — the CSP well too
+   (4418:128374, a 520 well that grows with its content). */
 const Row: React.FC<{
   stem: string;
   label: string;
   htmlFor?: string;
-  align?: "center" | "top";
   children: React.ReactNode;
-}> = ({ stem, label, htmlFor, align = "center", children }) => {
-  const labelClass = align === "top" ? `${SET_ROW_LABEL} tw:pt-2` : SET_ROW_LABEL;
+}> = ({ stem, label, htmlFor, children }) => {
   return (
     <div
-      className={`tw:col-span-full tw:flex tw:min-h-8 tw:gap-4 ${align === "top" ? "tw:items-start" : "tw:items-center"}`}
+      className="tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-4"
       data-testid={`set-field-${stem}`}
     >
       {htmlFor ? (
-        <label htmlFor={htmlFor} className={labelClass} data-testid={`set-field-label-${stem}`}>
+        <label htmlFor={htmlFor} className={SET_ROW_LABEL} data-testid={`set-field-label-${stem}`}>
           {label}
         </label>
       ) : (
-        <span id={`${stem}-label`} className={labelClass} data-testid={`set-field-label-${stem}`}>
+        <span id={`${stem}-label`} className={SET_ROW_LABEL} data-testid={`set-field-label-${stem}`}>
           {label}
         </span>
       )}
@@ -207,8 +205,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       </div>
 
       <Section title="Content Security Policy">
-        <Row stem="csp-header-value" label="CSP header value" htmlFor="set-hd-csp" align="top">
-          <div className={CONTROL}>
+        <Row stem="csp-header-value" label="CSP header value" htmlFor="set-hd-csp">
+          <div className="tw:w-130 tw:shrink-0">
             <Textarea
               id="set-hd-csp"
               value={csp}
@@ -217,9 +215,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
                 setDirty(true);
               }}
               placeholder="default-src 'self'"
-              rows={3}
               spellCheck={false}
-              className="tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5"
+              className="tw:min-h-9 tw:resize-y tw:border-[var(--bk-border-medium)] tw:px-3 tw:py-2.5 tw:[field-sizing:content] tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
               data-testid="set-hd-csp"
             />
           </div>
@@ -280,7 +277,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               setDirty(true);
             }}
             aria-labelledby="enable-hsts-label"
-            sizing="sm"
+            sizing="md"
             data-testid="set-hd-hsts-enable"
           />
         </Row>

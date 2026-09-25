@@ -127,7 +127,7 @@ describe("OverviewScreen — the frame", () => {
     expect(screen.queryByTestId("set-ov-attention")).toBeNull();
   });
 
-  it("lays the five groups out in the frame's order with a row per section and its summary", async () => {
+  it("lays the five groups out in 4418:128917's two columns with a row per section and its summary", async () => {
     query.mockResolvedValue(full);
     const onOpenScreen = vi.fn();
     render(<OverviewScreen projectId="site-1" onOpenScreen={onOpenScreen} />);
@@ -135,10 +135,11 @@ describe("OverviewScreen — the frame", () => {
     const groups = Array.from(document.querySelectorAll('[data-testid^="set-ov-group-"]')).map((el) =>
       el.getAttribute("data-testid"),
     );
+    // Left column: Site setup, SEO & publishing; right: Visitors, Advanced, Workspace.
     expect(groups).toEqual([
       "set-ov-group-site-setup",
-      "set-ov-group-visitors",
       "set-ov-group-seo-publishing",
+      "set-ov-group-visitors",
       "set-ov-group-advanced",
       "set-ov-group-workspace",
     ]);

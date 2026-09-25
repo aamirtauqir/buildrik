@@ -11,7 +11,7 @@
  *   Guard: every door and every nav click while dirty raises Unsaved
  *     settings; Keep editing keeps; Discard rolls composer back and finishes
  *     the intent (out, or the clicked screen).
- *   Save: success → Settings saved; failure → `Changes not saved` + `Retry
+ *   Save: success → Settings saved; failure → `Not saved` + `Retry
  *     save` + the screen's `saveError`; retry → saved.
  *   Load: the screen's `onLoadStateChange` drives the footer and disables Save.
  *   Search: a result opens its screen and lands on its field.
@@ -279,18 +279,17 @@ describe("SettingsTab — the shell", () => {
     expect(screen.getByTestId("set-nav-general").querySelector("[data-locked]")).toBeNull();
   });
 
-  it("lands on the Overview: its header, the Search field, and a Done footer that is Back to canvas", () => {
+  it("lands on the Overview (4418:128917): a bare title, no subtitle, no header search and no footer", () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
-    expect(headTitle()).toBe("Settings");
-    expect(screen.getByTestId("set-head-sub").textContent).toBe(
-      "Bella Cucina · everything on this page is scoped to this project.",
-    );
-    expect(screen.getByTestId("set-search-open")).toBeTruthy();
+    expect(headTitle()).toBe("Settings overview");
+    expect(screen.queryByTestId("set-head-sub")).toBeNull();
+    expect(screen.queryByTestId("set-search-open")).toBeNull();
     expect(screen.getByTestId("fake-overview")).toBeTruthy();
-    expect(footStatus()).toBe("Pick a section to edit its settings");
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
-    fireEvent.click(screen.getByTestId("set-ov-done"));
+    // Back to canvas is the way out.
+    fireEvent.click(screen.getByTestId("set-back"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -343,7 +342,7 @@ describe("SettingsTab — the shell", () => {
     localStorage.clear(); // the nav position persists per project
     renderS(<SettingsTab composer={asComposer(makeComposer())} initialScreen="not-a-screen" />);
     await new Promise((r) => setTimeout(r, 30));
-    expect(headTitle()).toBe("Settings");
+    expect(headTitle()).toBe("Settings overview");
   });
 });
 
@@ -355,7 +354,7 @@ describe("SettingsTab — doors", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} onOpenDesignTab={onOpenDesignTab} />);
     fireEvent.click(screen.getByTestId("set-nav-branding"));
     expect(onOpenDesignTab).toHaveBeenCalledTimes(1);
-    expect(headTitle()).toBe("Settings");
+    expect(headTitle()).toBe("Settings overview");
   });
 
   it("Export opens the exporter and leaves Settings", () => {
@@ -367,7 +366,7 @@ describe("SettingsTab — doors", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("Back to canvas, Cancel and Escape all leave a clean screen", async () => {
+  it("Back to canvas and Escape both leave a clean screen", async () => {
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
     fireEvent.click(screen.getByTestId("set-nav-general"));
@@ -375,8 +374,8 @@ describe("SettingsTab — doors", () => {
     fireEvent.click(screen.getByTestId("set-back"));
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(2);
-    // A clean screen has no footer, so no Cancel (4418:127313).
-    expect(screen.queryByTestId("set-foot-cancel")).toBeNull();
+    // A clean screen has no footer, so no Discard (4418:127313).
+    expect(screen.queryByTestId("set-foot-discard")).toBeNull();
     // An input keeps its own Escape.
     const input = await screen.findByLabelText("Site name");
     fireEvent.keyDown(input, { key: "Escape" });
@@ -400,13 +399,28 @@ describe("SettingsTab — Unsaved settings", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("Discard rolls composer back to the mount-time snapshot and returns to the canvas", async () => {
+  it("the footer's Discard (4418:127966 save bar) rolls back in place and stays on the screen", async () => {
     const composer = makeComposer();
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
     await openGeneralAndEdit();
     const snapshot = composer.getProjectSettings();
-    fireEvent.click(screen.getByTestId("set-foot-cancel"));
+    fireEvent.click(screen.getByTestId("set-foot-discard"));
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    expect(composer.setProjectSettings.mock.calls[0][0]).toEqual(snapshot);
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(headTitle()).toBe("Site setup / General");
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
+  });
+
+  it("the guard's Discard rolls composer back to the mount-time snapshot and returns to the canvas", async () => {
+    const composer = makeComposer();
+    const onClose = vi.fn();
+    renderS(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
+    await openGeneralAndEdit();
+    const snapshot = composer.getProjectSettings();
+    fireEvent.click(screen.getByTestId("set-back"));
     fireEvent.click(screen.getByTestId("set-unsaved-discard"));
     expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
     const arg = composer.setProjectSettings.mock.calls[0][0];
@@ -490,7 +504,7 @@ describe("SettingsTab — Save changes", () => {
     expect(screen.getByText("Return to settings")).toBeTruthy();
   });
 
-  it("a failed save: `Changes not saved`, `Retry save`, the screen's banner — and the retry saves", async () => {
+  it("a failed save: `Not saved`, `Retry save`, the screen's banner — and the retry saves", async () => {
     let attempt = 0;
     const composer = makeComposer(() => (attempt++ === 0 ? Promise.reject(new Error("503")) : Promise.resolve()));
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -500,7 +514,7 @@ describe("SettingsTab — Save changes", () => {
     fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
     await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Changes not saved"));
+    await waitFor(() => expect(footStatus()).toBe("Not saved"));
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Retry save");
     expect(screen.getByTestId("set-save-error").textContent).toBe(
@@ -553,7 +567,7 @@ describe("SettingsTab — Save changes with a site id goes through the sync prov
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Changes not saved"));
+    await waitFor(() => expect(footStatus()).toBe("Not saved"));
     expect(screen.getByTestId("set-save-error").textContent).toBe(
       "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
     );
@@ -594,13 +608,13 @@ describe("SettingsTab — a screen's own header action, and screens whose action
     await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
   });
 
-  it("Domains (3397:32206) has no Cancel / Save — `Actions apply immediately · nothing to save here` and Done", async () => {
+  it("Domains (4418:127680) has no footer — `Saves immediately` sits beside the header's action", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-domains"));
     await waitFor(() => expect(headTitle()).toBe("SEO & publishing / Domains"));
-    expect(footStatus()).toBe("Actions apply immediately · nothing to save here");
+    expect(screen.getByTestId("set-head-immediate")).toHaveTextContent("Saves immediately");
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
-    expect(screen.getByTestId("set-foot-done")).toHaveTextContent("Done");
   });
 });
 
@@ -655,7 +669,7 @@ describe("SettingsTab — Search settings (inline filter)", () => {
 
   it("a row matched by a field label opens its screen and lands on the field", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.click(screen.getByTestId("set-search-open"));
+    fireEvent.click(screen.getByTestId("set-search-icon"));
     fireEvent.change(field(), { target: { value: "meta title" } });
     expect(navIds()).toEqual(["seo"]);
     fireEvent.click(screen.getByTestId("set-nav-seo"));

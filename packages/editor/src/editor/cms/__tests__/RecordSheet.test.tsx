@@ -80,7 +80,7 @@ describe("RecordSheet", () => {
       ),
     );
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
-    expect(await screen.findByText("Record saved")).toBeInTheDocument();
+    expect(await screen.findByText("Record saved · Menu items")).toBeInTheDocument();
   });
 
   it("+ Add record opens a blank sheet and creates the record", async () => {

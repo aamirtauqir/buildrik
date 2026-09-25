@@ -168,7 +168,7 @@ describe("LocalizationScreen — the frame's strip and two cards", () => {
     setup();
     await loaded();
     expect(screen.getByTestId("set-loc-row-status-en")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
-    expect(screen.getByTestId("set-loc-row-status-fr")).toHaveClass("tw:bg-[var(--bk-warning-tint)]");
+    expect(screen.getByTestId("set-loc-row-status-fr")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
     expect(screen.getByTestId("set-loc-row-status-ar")).toHaveClass("tw:bg-[var(--bk-bg-subtle)]");
   });
 
@@ -360,7 +360,7 @@ describe("LocalizationScreen — the header's Add locale and the dialogs", () =>
     const add = await screen.findByTestId("set-loc-add");
     expect(within(screen.getByTestId("header-slot")).getByTestId("set-loc-add")).toBe(add);
     expect(add).toHaveTextContent("Add locale");
-    expect(add).toHaveClass("tw:h-8");
+    expect(add).toHaveClass("tw:h-9");
     fireEvent.click(add);
     expect(screen.getByTestId("set-loc-dialog")).toBeInTheDocument();
     expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Localization");

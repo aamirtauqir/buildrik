@@ -9,10 +9,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BorderSection } from "../BorderSection";
 
+/* The per-corner box lives behind More settings while the corners agree
+   (board 7056:79008 draws one "Radius" row); these open it. */
 function renderRadius(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
   const utils = render(
-    <BorderSection styles={styles} onChange={onChange} isOpen={isOpen} />
+    <BorderSection styles={styles} onChange={onChange} isOpen={isOpen} advancedExpanded />
   );
   return { onChange, ...utils };
 }
@@ -29,6 +31,23 @@ describe("Border › corner radius — value rendering", () => {
     renderRadius({ "border-top-left-radius": "12px" });
     expect(screen.getByRole("textbox", { name: "tl corner" })).toHaveValue("12");
     expect(screen.getByRole("textbox", { name: "br corner" })).toHaveValue("");
+  });
+});
+
+describe("Border › compact radius (7056:79008)", () => {
+  it("one Radius field while the corners agree; it writes the shorthand", () => {
+    const onChange = vi.fn();
+    render(<BorderSection styles={{ "border-radius": "8px" }} onChange={onChange} isOpen />);
+    expect(screen.queryByRole("textbox", { name: "tl corner" })).toBeNull();
+    const field = screen.getAllByRole("textbox")[0] as HTMLInputElement;
+    expect(field.value).toBe("8");
+    fireEvent.change(field, { target: { value: "12" } });
+    expect(onChange).toHaveBeenCalledWith("border-radius", "12px");
+  });
+
+  it("corners that differ bring the per-corner box back", () => {
+    render(<BorderSection styles={{ "border-top-left-radius": "12px" }} onChange={vi.fn()} isOpen />);
+    expect(screen.getByRole("textbox", { name: "tl corner" })).toHaveValue("12");
   });
 });
 

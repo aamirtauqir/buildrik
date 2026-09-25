@@ -24,7 +24,7 @@ describe("Section — the card", () => {
     );
     const card = screen.getByTestId("set-card-site-identity");
     expect(card.tagName).toBe("SECTION");
-    expect(card.className).toContain("tw:rounded-[var(--bk-radius-lg)]");
+    expect(card.className).toContain("tw:rounded-[var(--bk-radius-card)]");
     expect(card.className).toContain("tw:p-6");
     const title = screen.getByTestId("set-card-title-site-identity");
     expect(title.textContent).toBe("Site identity");
@@ -59,7 +59,7 @@ describe("Section — the card", () => {
 });
 
 describe("Field", () => {
-  it("labels its control at 12 and can span the row", () => {
+  it("labels its control at 11 (4418:128657) and can span the row", () => {
     render(
       <>
         <Field label="Meta title" htmlFor="seo-meta-title">
@@ -72,7 +72,7 @@ describe("Field", () => {
     );
     const label = screen.getByTestId("set-field-label-meta-title");
     expect(label.getAttribute("for")).toBe("seo-meta-title");
-    expect(label.className).toContain("var(--bk-text-12)");
+    expect(label.className).toContain("var(--bk-text-11)");
     expect(screen.getByTestId("set-field-meta-title").className).not.toContain("tw:col-span-full");
     expect(screen.getByTestId("set-field-head-scripts").className).toContain("tw:col-span-full");
   });
@@ -102,7 +102,7 @@ describe("controls — density 32", () => {
     expect(input.className).toContain("tw:aria-invalid:focus:border-[var(--bk-error)]");
   });
 
-  it("Select is 32 tall on the radius-md, gray-50 field in the border hairline", () => {
+  it("Select is 32 tall on the radius-md, white on the border-input hairline", () => {
     render(
       <Select data-testid="sel">
         <option>English</option>
@@ -112,9 +112,8 @@ describe("controls — density 32", () => {
     expect(select.className).toContain("tw:h-8");
     expect(select.className).toContain("tw:py-0");
     expect(select.className).toContain("tw:rounded-[var(--bk-radius-md)]");
-    // 4418:127313: Settings fields are gray-50 inside the --bk-border hairline.
-    expect(select.className).toContain("tw:border-[var(--bk-border)]");
-    expect(select.className).toContain("tw:bg-[var(--bk-gray-50)]");
+    // 4418:127966 / 4418:128657: selects are NOT filled — white, like chrome-ui's base.
+    expect(select.className).not.toContain("tw:bg-[var(--bk-gray-50)]");
     expect(select.className).not.toContain("rounded-lg");
   });
 

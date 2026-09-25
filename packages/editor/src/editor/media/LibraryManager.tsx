@@ -1035,6 +1035,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
         onSearch={state.discSearchAll}
+        orientation={state.discOrientation}
+        color={state.discColor}
+        onSetOrientation={state.setDiscOrientation}
+        onSetColor={state.setDiscColor}
         onLoadMore={state.loadMoreDisc}
         onSave={async (type, item) => {
           const saved = await state.saveToLibrary(type, item);

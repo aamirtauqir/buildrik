@@ -647,7 +647,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 tone: notLoaded ? "warning" : "error",
                 ...(notLoaded && !gone
                   ? { action: { label: "Reload", onClick: () => window.location.reload() } }
-                  : {}),
+                  : !gone
+                    ? /* Board 7574:194162: a failed save offers "Retry now" —
+                         it schedules the same autosave again. */
+                      { action: { label: "Retry now", onClick: handler } }
+                    : {}),
               });
             }
           });

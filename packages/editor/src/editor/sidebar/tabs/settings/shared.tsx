@@ -39,28 +39,71 @@ export const SET_BTN =
   "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium " +
   "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
+/** The pane header's action (4418:127966 "Add locale", 4418:127680 "Add
+ *  domain"): 36 tall, at least 140 wide, 14/500 on radius-lg. The xs Button
+ *  supplies the rest; twMerge replaces height, padding and type. */
+export const SET_HEAD_BTN =
+  "tw:h-9 tw:min-w-35 tw:shrink-0 tw:rounded-[var(--bk-radius-lg)] tw:px-3.5 tw:text-[length:var(--bk-text-14)] tw:font-medium " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
 /** 11px uppercase card eyebrow — the LoadCard's title and the Overview's group titles. */
 export const SET_EYEBROW =
   "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
 
 /** The card box itself, shared by Section, LoadCard and the Overview's cards. */
 export const SET_CARD =
-  "tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]";
+  "tw:rounded-[var(--bk-radius-card)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]";
 
 /** The amber strip under the header — `Restoring a site version leaves this
  *  configuration unchanged.` — on Domains, Localization, Redirects, Headers:
  *  --bk-warning-text on the warning tint inside a yellow-100 hairline
  *  (--bk-warning as text there is 3.41:1, under WCAG AA). */
 export const SET_RESTORE_STRIP =
-  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
-  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning-text)]";
+  // --bk-warning-text kept, not --bk-warning: plain --bk-warning on the tint
+  // is 3.41:1, under WCAG AA (see comment above) — the incoming v3 sizing
+  // (min-h-13/py-2/leading-18) is layout-only and doesn't touch that.
+  "tw:min-h-13 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
+  "tw:px-3 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
 
-/** Label-left rows at the 192 label column (the SEO screen's Indexing card
+/** Label-left rows at the 180 label column (4418:127966 / 4418:128657) (the SEO screen's Indexing card
  *  set the shape; `Enable Google Analytics` wrapped at 144). `col-span-full`
  *  keeps each on its own line in the Section's grid. */
 export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
 export const SET_ROW_LABEL =
-  "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+  "tw:w-45 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tables and status pills — one shape for every Settings table (Locales,
+// Redirects, DNS records, Integrations, Submissions, Deliveries).
+// 4418:127966 / 4418:128227: an eyebrow header on a hairline, then rows 20
+// apart (the card's gap) — a 32 text row pitches 52, a 28-button row 60.
+// Columns are fixed widths per table with 12 between them.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const SET_TABLE =
+  "tw:w-full tw:border-collapse tw:table-fixed tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+export const SET_TH =
+  "tw:border-b tw:border-[var(--bk-border)] tw:pb-1 tw:pr-3 tw:text-left tw:align-bottom tw:text-[length:var(--bk-text-11)] " +
+  "tw:font-medium tw:uppercase tw:leading-4 tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)]";
+export const SET_TD = "tw:pb-1.5 tw:pr-3 tw:pt-[26px] tw:align-middle";
+
+export type PillTone = "success" | "warning" | "error" | "neutral";
+const PILL_TONES: Record<PillTone, string> = {
+  success: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
+  warning: "tw:border-[var(--bk-warning)] tw:bg-[var(--bk-yellow-100)] tw:text-[var(--bk-warning-text)]",
+  error: "tw:border-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-red-800)]",
+  neutral: "tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]",
+};
+/** The boards' status badge: 22 tall, fully round, a toned hairline, 11/500 caps. */
+export const pillClass = (tone: PillTone) =>
+  "tw:inline-flex tw:h-5.5 tw:w-fit tw:items-center tw:whitespace-nowrap tw:rounded-full tw:border tw:px-2 tw:py-0 " +
+  `tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 ${PILL_TONES[tone]}`;
+
+/** Row actions in a table (`Edit`, `Manage`, `Connect`): 28 tall, white on a hairline. */
+export const SET_ROW_BTN =
+  "tw:h-7 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 " +
+  "tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
@@ -90,7 +133,7 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
   const cardId = stem ? `set-card-${stem}` : undefined;
   const cardTitleId = `set-card-title-${stem}`;
   return (
-    <section className={`${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`} data-testid={cardId}>
+    <section className={`${SET_CARD} tw:flex tw:flex-col tw:gap-5 tw:p-6`} data-testid={cardId}>
       {title || desc ? (
         <div className="tw:flex tw:flex-col tw:gap-1">
           {title ? (
@@ -108,7 +151,7 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
       ) : null}
       {/* 3397:32011 — fields sit two to a row; anything that is not a Field
           (a table, a code well, a button row) takes the whole row. */}
-      <div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:[&>*:not([data-set-field])]:col-span-full">
+      <div className="tw:grid tw:grid-cols-2 tw:gap-6 tw:[&>*:not([data-set-field])]:col-span-full">
         {children}
       </div>
     </section>
@@ -141,12 +184,12 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
   const stem = slug(anchor ?? String(label));
   return (
     <div
-      className={`tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5${span === "full" ? " tw:col-span-full" : ""}`}
+      className={`tw:flex tw:min-w-0 tw:flex-col tw:gap-1${span === "full" ? " tw:col-span-full" : ""}`}
       data-set-field=""
       data-testid={`set-field-${stem}`}
     >
       <label
-        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]"
+        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
         htmlFor={htmlFor}
         data-testid={`set-field-label-${stem}`}
       >
@@ -168,8 +211,8 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
 // can't deliver. chrome-ui's default theme already draws the 32-tall,
 // radius-md, --bk-border-input box the Clone wants.
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
-/* 4418:127313 fills Settings fields `--bk-gray-50` inside a `--bk-border`
-   hairline (the chrome-ui default is a white box on --bk-border-input). The
+/* 4418:127313 / 4418:128657 fill Settings fields `--bk-gray-50` inside a
+   `--bk-border-medium` hairline (the chrome-ui default is a white box on --bk-border-input). The
    wrapper merges this over BK_TEXT_INPUT_THEME per leaf; the invalid and
    focus states are restated because `colors.gray` is replaced whole. */
 const SETTINGS_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
@@ -177,7 +220,7 @@ const SETTINGS_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
     input: {
       colors: {
         gray:
-          "tw:bg-[var(--bk-gray-50)] tw:rounded-md! tw:border-[var(--bk-border)] tw:focus:border-primary-700 tw:focus:ring-primary-700 " +
+          "tw:bg-[var(--bk-gray-50)] tw:rounded-md! tw:border-[var(--bk-border-medium)] tw:focus:border-primary-700 tw:focus:ring-primary-700 " +
           "tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)] tw:aria-invalid:focus:ring-[var(--bk-error)]",
       },
     },
@@ -195,14 +238,12 @@ Input.displayName = "Input";
    wrapper merges this over BK_SELECT_BASE_THEME per LEAF, so `colors.gray`
    restates the base's white fill and focus pair — measured: without them the
    select came up on flowbite's gray-50. */
+/* Selects are NOT filled like text fields: 4418:127966 / 4418:128657 draw them
+   white on --bk-border-input, which is BK_SELECT_BASE_THEME's own colour —
+   so only the size and radius are restated here. */
 const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {
-      colors: {
-        gray:
-          "tw:bg-[var(--bk-gray-50)] tw:border-[var(--bk-border)] tw:text-[var(--bk-ink)] " +
-          "tw:focus:border-primary-700 tw:focus:ring-primary-700",
-      },
       sizes: {
         md: "tw:h-8 tw:py-0 tw:pl-3 tw:text-[length:var(--bk-text-13)]",
       },
@@ -375,8 +416,8 @@ export const SCREEN_SUCCESS =
 
 /** Neutral explanatory box. */
 export const SCREEN_INFO =
-  "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-ink)]";
+  "tw:min-h-13 tw:px-3 tw:py-2 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
 
 /** Accent-edged "saved, not live yet" banner. */
 export const SCREEN_NOTICE =

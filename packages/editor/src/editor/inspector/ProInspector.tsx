@@ -602,7 +602,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
               onOpenCreateCollection={onOpenCreateCollection}
-              tier={tier}
+              /* Boards 4428:141642 / 142686: Settings and Effects draw every
+                 group (ADVANCED collapsed) — the Beginner fold and its footer
+                 belong to Style (4428:141170). */
+              tier={activeTab === "style" ? tier : "pro"}
               showAll={showAll}
               onShowAllChange={setShowAll}
             />
@@ -613,7 +616,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       {/* Board 4428:141170's footer — Beginner / Pro, remembered per user
           (decision #29). Below the scroll so it is reachable on every
           profile, however long the column above it runs. */}
-      {!wholeSite && !agentRun.running && (
+      {!wholeSite && !agentRun.running && activeTab === "style" && (
         <footer
           /* Board 4428:141170: a 44-tall footer with the Beginner / Pro
              segmented control at its left edge. */

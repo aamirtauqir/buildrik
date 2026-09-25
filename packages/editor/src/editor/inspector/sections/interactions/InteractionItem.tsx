@@ -1,11 +1,10 @@
 /**
  * Interaction Item Component
- * Collapsible item displaying a single interaction with expand/collapse editor
+ * One interaction as a flat row; opening it drills into its edit screen
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { InteractionEditor } from "./InteractionEditor";
 import { ANIMATION_PRESETS, type Interaction, getTriggerInfo } from "./types";
 
 // ============================================================================
@@ -14,12 +13,8 @@ import { ANIMATION_PRESETS, type Interaction, getTriggerInfo } from "./types";
 
 export interface InteractionItemProps {
   interaction: Interaction;
-  isEditing: boolean;
-  onToggleEdit: () => void;
-  onUpdate: (id: string, updates: Partial<Interaction>) => void;
-  onRemove: (id: string) => void;
-  onToggleEnabled: (id: string) => void;
-  onPreview?: (interaction: Interaction) => void;
+  /** Opens the interaction's edit screen (the section drills in). */
+  onOpen: () => void;
 }
 
 // ============================================================================
@@ -37,15 +32,7 @@ const ROW =
 // COMPONENT
 // ============================================================================
 
-export const InteractionItem: React.FC<InteractionItemProps> = ({
-  interaction,
-  isEditing,
-  onToggleEdit,
-  onUpdate,
-  onRemove,
-  onToggleEnabled,
-  onPreview,
-}) => {
+export const InteractionItem: React.FC<InteractionItemProps> = ({ interaction, onOpen }) => {
   const triggerInfo = getTriggerInfo(interaction.trigger);
   const presetLabel =
     ANIMATION_PRESETS.find((p) => p.value === interaction.animation.preset)?.label ?? interaction.animation.preset;
@@ -55,37 +42,21 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({
       <div
         role="button"
         tabIndex={0}
-        aria-expanded={isEditing}
         className={ROW}
-        onClick={onToggleEdit}
+        onClick={onOpen}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onToggleEdit();
+            onOpen();
           }
         }}
       >
         <span className="tw:flex-1 tw:min-w-0 tw:truncate">{triggerInfo.label}</span>
         <span className="tw:text-[var(--bk-ink-muted)] tw:truncate">{presetLabel}</span>
-        <span
-          aria-hidden="true"
-          className="tw:text-[var(--bk-ink-muted)] tw:inline-block tw:transition-transform"
-          style={{ transform: isEditing ? "rotate(90deg)" : "none" }}
-        >
+        <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">
           ›
         </span>
       </div>
-
-      {/* Expanded Editor */}
-      {isEditing && (
-        <InteractionEditor
-          interaction={interaction}
-          onUpdate={onUpdate}
-          onRemove={onRemove}
-          onToggleEnabled={onToggleEnabled}
-          onPreview={onPreview}
-        />
-      )}
     </div>
   );
 };

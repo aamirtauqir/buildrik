@@ -31,28 +31,33 @@ function makeCtx(overrides: Partial<{ element: ElementStub; isRoot: boolean; sel
   };
 }
 
-describe("getContextMenuActions — structure", () => {
-  it("returns the 4 main groups for a normal container element", () => {
+describe("getContextMenuActions — structure (board 4428:43928)", () => {
+  it("orders the rows as the board groups them", () => {
     const actions = getContextMenuActions(makeCtx());
-    const mainIds = actions.filter((a) => a.group === "main").map((a) => a.id);
-    expect(mainIds).toEqual(["edit-group", "insert-group", "layout-group", "style-group"]);
+    expect(actions.map((a) => a.id)).toEqual([
+      "duplicate",
+      "delete",
+      "layout-group",
+      "style-group",
+      "structure-group",
+      "lock-element",
+      "add-interaction",
+    ]);
+    expect(actions.map((a) => a.group)).toEqual(["top", "top", "sub", "sub", "sub", "state", "tail"]);
+    expect(actions.find((a) => a.id === "layout-group")!.label).toBe("Arrange");
+    expect(actions.find((a) => a.id === "style-group")!.label).toBe("Style");
   });
 
-  it("every main group carries a non-empty submenu", () => {
-    const actions = getContextMenuActions(makeCtx());
-    for (const action of actions.filter((a) => a.group === "main")) {
-      expect(action.submenu, `${action.id} submenu`).toBeDefined();
-      expect(action.submenu!.length).toBeGreaterThan(0);
-    }
+  it("Improve with AI leads when the shell passes an AI door", () => {
+    const actions = getContextMenuActions({ ...makeCtx(), openAI: () => {} });
+    expect(actions[0].id).toBe("improve-with-ai");
   });
 
-  it("appends standalone actions after the main groups", () => {
-    const actions = getContextMenuActions(makeCtx());
-    const standalone = actions.filter((a) => a.group === "standalone");
-    expect(standalone.length).toBeGreaterThan(0);
-    const firstStandaloneIndex = actions.findIndex((a) => a.group === "standalone");
-    const lastMainIndex = actions.map((a) => a.group).lastIndexOf("main");
-    expect(firstStandaloneIndex).toBeGreaterThan(lastMainIndex);
+  it("keeps every older row, under Structure", () => {
+    const structure = getContextMenuActions(makeCtx()).find((a) => a.id === "structure-group")!;
+    expect(structure.submenu!.map((a) => a.id)).toEqual(
+      expect.arrayContaining(["wrap-container", "copy", "cut", "paste", "replace-with-block", "save-as-component"]),
+    );
   });
 });
 

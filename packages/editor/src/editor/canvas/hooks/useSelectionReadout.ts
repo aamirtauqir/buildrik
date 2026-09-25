@@ -12,6 +12,7 @@ import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { useInsertDrag } from "../insertDrag";
 
 
 /**
@@ -95,6 +96,13 @@ export function useSelectionReadout(
   }, [composer]);
   const instance = selectedElement ? composer?.components?.getInstanceByElementId?.(selectedElement.id) : undefined;
   const master = instance ? composer?.components?.getComponent?.(instance.componentId) : undefined;
+
+  // Board 4418:100890: during an Add drag the bar says where the drop lands.
+  const insert = useInsertDrag(composer);
+  if (insert.label && insert.target) {
+    const { path, after } = insert.target;
+    return { label: `Inserting ${insert.label} → ${path}${after ? ` · after ${after}` : ""}`, dims: null };
+  }
 
   const label = projectLoading
     ? "Loading…"

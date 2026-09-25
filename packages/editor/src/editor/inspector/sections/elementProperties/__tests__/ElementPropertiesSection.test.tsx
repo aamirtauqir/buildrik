@@ -27,13 +27,18 @@ function setup(type: string, attrs: Record<string, string> = {}) {
 }
 
 describe("ElementPropertiesSection — config-driven rendering", () => {
-  it("renders image-specific fields plus the shared defaults", () => {
+  /* Board 7063:78923: "ID & class" row + the element's own fields in view;
+     the shared title / tab index and data-* attributes behind "Custom
+     attributes". */
+  it("renders image-specific fields, the ID & class row, and the rest behind Custom attributes", () => {
     setup("image", { alt: "cat" });
     expect(screen.getByPlaceholderText("Image description")).toHaveValue("cat");
-    // Default field "ID" always present.
-    expect(screen.getByPlaceholderText("element-id")).toBeInTheDocument();
-    // Custom data-attribute editor is always appended.
+    expect(screen.getByRole("textbox", { name: "Element ID" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Element classes" })).toBeInTheDocument();
+    expect(screen.queryByText("Custom Data Attributes")).toBeNull();
+    fireEvent.click(screen.getByTestId("advanced-custom-attributes"));
     expect(screen.getByText("Custom Data Attributes")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("0")).toBeInTheDocument();
   });
 
   it("renders a select for the Loading attribute", () => {

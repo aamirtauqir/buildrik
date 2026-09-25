@@ -300,7 +300,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
               markDirty();
             }}
             aria-labelledby="seo-allow-indexing-label"
-            sizing="sm"
+            sizing="md"
           />
         </div>
         <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
