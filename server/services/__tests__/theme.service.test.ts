@@ -3,6 +3,10 @@
  * the source site), the NO_THEME guard, and the core push contract: locked
  * sites skipped, unlocked sites get the theme + a bumped dsSchemaVersion, and a
  * single site failure never aborts the rest (partial-fail tolerant).
+ *
+ * A-3: the theme is the site's design TOKENS (`projectSettings.designTokens`),
+ * never `projectStyles` (the editor's per-element CSS rules, which push used to
+ * overwrite wholesale).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -80,8 +84,8 @@ describe("getSharedTheme", () => {
 
   it("returns styles + updatedAt when present", async () => {
     const at = new Date("2026-06-19T00:00:00Z");
-    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t" }], sharedThemeUpdatedAt: at });
-    await expect(getSharedTheme("w1")).resolves.toEqual({ styles: [{ id: "t" }], updatedAt: at });
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: at });
+    await expect(getSharedTheme("w1")).resolves.toEqual({ styles: { designTokens: [{ id: "t" }] }, updatedAt: at });
   });
 });
 
@@ -98,17 +102,23 @@ describe("captureSharedTheme", () => {
      captured yet" with Push disabled. A new user's first agency action reported
      success over a no-op. */
   it("refuses a source site with no styles, and writes nothing", async () => {
-    siteFindFirst.mockResolvedValueOnce({ projectStyles: null });
+    siteFindFirst.mockResolvedValueOnce({ projectSettings: null });
     await expect(captureSharedTheme("w1", "s1")).rejects.toBeInstanceOf(ThemeError);
     expect(wsUpdate).not.toHaveBeenCalled();
   });
 
-  it("writes the source site's projectStyles to the workspace shared theme", async () => {
-    siteFindFirst.mockResolvedValueOnce({ projectStyles: [{ id: "c", value: "#fff" }] });
+  it("writes the source site's design tokens (not its element styles) to the shared theme", async () => {
+    siteFindFirst.mockResolvedValueOnce({
+      projectSettings: { designTokens: [{ id: "c", value: "#fff" }], designPresets: [{ id: "p" }], seo: { metaTitle: "x" } },
+    });
     wsUpdate.mockResolvedValueOnce({});
     await captureSharedTheme("w1", "s1");
     expect(siteFindFirst.mock.calls[0][0].where).toEqual({ id: "s1", workspaceId: "w1" });
-    expect(wsUpdate.mock.calls[0][0].data.sharedTheme).toEqual([{ id: "c", value: "#fff" }]);
+    expect(siteFindFirst.mock.calls[0][0].select).toEqual({ projectSettings: true });
+    expect(wsUpdate.mock.calls[0][0].data.sharedTheme).toEqual({
+      designTokens: [{ id: "c", value: "#fff" }],
+      designPresets: [{ id: "p" }],
+    });
   });
 });
 
@@ -120,7 +130,7 @@ describe("pushSharedTheme", () => {
   });
 
   it("skips locked sites, pushes unlocked (bumping dsSchemaVersion), survives a single failure", async () => {
-    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t" }], sharedThemeUpdatedAt: new Date() });
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
     siteFindMany.mockResolvedValueOnce([
       { id: "locked", name: "Locked", themeLocked: true, dsSchemaVersion: 5 },
       { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2 },
@@ -143,8 +153,28 @@ describe("pushSharedTheme", () => {
     expect(siteUpdate.mock.calls[0][0].data.dsSchemaVersion).toBe(3);
   });
 
+  it("writes the tokens into projectSettings, keeps every other setting, never touches projectStyles", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t", v: "new" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 1, projectSettings: { designTokens: [{ id: "t", v: "old" }], seo: { metaTitle: "Keep" } } },
+    ]);
+    siteUpdate.mockResolvedValue({});
+    await pushSharedTheme("w1");
+    const data = siteUpdate.mock.calls[0][0].data;
+    expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" } });
+    expect("projectStyles" in data).toBe(false);
+    expect(data.lastEditedAt).toBeInstanceOf(Date); // an open editor gets SAVE_CONFLICT, not a silent overwrite
+  });
+
+  it("refuses a shared theme captured in the old projectStyles shape, writing nothing", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "rule", selector: "[data-buildrik-id=a]" }], sharedThemeUpdatedAt: new Date() });
+    await expect(pushSharedTheme("w1")).rejects.toMatchObject({ code: "NO_THEME" });
+    expect(siteFindMany).not.toHaveBeenCalled();
+    expect(siteUpdate).not.toHaveBeenCalled();
+  });
+
   it("scopes targets to the passed siteIds", async () => {
-    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t" }], sharedThemeUpdatedAt: new Date() });
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
     siteFindMany.mockResolvedValueOnce([]);
     await pushSharedTheme("w1", ["a", "b"]);
     expect(siteFindMany.mock.calls[0][0].where).toMatchObject({
@@ -164,10 +194,10 @@ describe("setSiteThemeLock", () => {
 
 describe("pushSharedTheme — D2 snapshot", () => {
   it("snapshots each unlocked site's current tokens before overwriting", async () => {
-    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t" }], sharedThemeUpdatedAt: new Date() });
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
     siteFindMany.mockResolvedValueOnce([
-      { id: "locked", name: "L", themeLocked: true, dsSchemaVersion: 5, projectStyles: [{ old: 1 }] },
-      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectStyles: [{ old: 2 }] },
+      { id: "locked", name: "L", themeLocked: true, dsSchemaVersion: 5, projectSettings: { designTokens: [{ old: 1 }] } },
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [{ old: 2 }] } },
     ]);
     siteUpdate.mockResolvedValue({});
     await pushSharedTheme("w1");
@@ -176,7 +206,7 @@ describe("pushSharedTheme — D2 snapshot", () => {
     expect(snapCreate.mock.calls[0][0].data).toMatchObject({
       siteId: "ok",
       workspaceId: "w1",
-      prevStyles: [{ old: 2 }],
+      prevStyles: { designTokens: [{ old: 2 }] },
       prevDsSchemaVersion: 2,
     });
   });
@@ -189,11 +219,11 @@ describe("previewSharedThemePush (D1)", () => {
   });
 
   it("flags willChange per site and marks locked sites skipped, writing nothing", async () => {
-    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t", v: "new" }], sharedThemeUpdatedAt: new Date() });
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t", v: "new" }] }, sharedThemeUpdatedAt: new Date() });
     siteFindMany.mockResolvedValueOnce([
-      { id: "same", name: "Same", themeLocked: false, projectStyles: [{ id: "t", v: "new" }] },
-      { id: "diff", name: "Diff", themeLocked: false, projectStyles: [{ id: "t", v: "old" }] },
-      { id: "lock", name: "Lock", themeLocked: true, projectStyles: [{ id: "t", v: "old" }] },
+      { id: "same", name: "Same", themeLocked: false, projectSettings: { designTokens: [{ id: "t", v: "new" }] } },
+      { id: "diff", name: "Diff", themeLocked: false, projectSettings: { designTokens: [{ id: "t", v: "old" }] } },
+      { id: "lock", name: "Lock", themeLocked: true, projectSettings: { designTokens: [{ id: "t", v: "old" }] } },
     ]);
     const res = await previewSharedThemePush("w1");
     expect(res).toEqual([
@@ -217,15 +247,30 @@ describe("rollbackSiteTheme (D2)", () => {
     await expect(rollbackSiteTheme("w1", "s1")).rejects.toMatchObject({ code: "NO_THEME" });
   });
 
-  it("restores prev tokens, bumps version, consumes the snapshot", async () => {
-    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4 });
-    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: [{ was: 1 }], createdAt: new Date("2026-06-20T00:00:00Z") });
+  it("restores prev tokens into projectSettings, bumps version, consumes the snapshot", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, projectSettings: { designTokens: [{ now: 1 }], seo: { metaTitle: "Keep" } } });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: { designTokens: [{ was: 1 }] }, createdAt: new Date("2026-06-20T00:00:00Z") });
     siteUpdate.mockResolvedValue({});
     snapDelete.mockResolvedValue({});
     const res = await rollbackSiteTheme("w1", "s1");
-    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ was: 1 }], dsSchemaVersion: 5 });
+    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({
+      projectSettings: { designTokens: [{ was: 1 }], seo: { metaTitle: "Keep" } },
+      dsSchemaVersion: 5,
+    });
     expect(snapDelete.mock.calls[0][0].where).toEqual({ id: "snap1" });
     expect(res.rolledBackTo).toBeInstanceOf(Date);
+  });
+});
+
+describe("rollbackSiteTheme — a snapshot from the old projectStyles push", () => {
+  it("restores the element rules that push overwrote", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, projectSettings: {} });
+    snapFindFirst.mockResolvedValueOnce({ id: "old", prevStyles: [{ selector: "[data-buildrik-id=a]" }], createdAt: new Date() });
+    siteUpdate.mockResolvedValue({});
+    snapDelete.mockResolvedValue({});
+    await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ selector: "[data-buildrik-id=a]" }] });
+    expect("projectSettings" in siteUpdate.mock.calls[0][0].data).toBe(false);
   });
 });
 
@@ -252,20 +297,31 @@ describe("workspace presets (D4)", () => {
   });
 
   it("saveWorkspacePreset upserts the site's tokens under the name", async () => {
-    siteFindFirst.mockResolvedValueOnce({ projectStyles: [{ id: "t", v: 1 }] });
+    siteFindFirst.mockResolvedValueOnce({ projectSettings: { designTokens: [{ id: "t", v: 1 }] } });
     presetUpsert.mockResolvedValueOnce({});
     const res = await saveWorkspacePreset("w1", "Brand A", "s1", "u1");
     expect(res).toEqual({ name: "Brand A" });
     expect(presetUpsert.mock.calls[0][0].where).toEqual({ workspaceId_name: { workspaceId: "w1", name: "Brand A" } });
-    expect(presetUpsert.mock.calls[0][0].create).toMatchObject({ workspaceId: "w1", name: "Brand A", createdBy: "u1" });
+    expect(presetUpsert.mock.calls[0][0].create).toMatchObject({
+      workspaceId: "w1",
+      name: "Brand A",
+      createdBy: "u1",
+      styles: { designTokens: [{ id: "t", v: 1 }] },
+    });
   });
 
   it("applyWorkspacePreset copies a preset's tokens into the shared theme", async () => {
-    presetFindFirst.mockResolvedValueOnce({ styles: [{ id: "t", v: 2 }] });
+    presetFindFirst.mockResolvedValueOnce({ styles: { designTokens: [{ id: "t", v: 2 }] } });
     wsUpdate.mockResolvedValueOnce({});
     await applyWorkspacePreset("w1", "p1");
     expect(presetFindFirst.mock.calls[0][0].where).toEqual({ id: "p1", workspaceId: "w1" });
-    expect(wsUpdate.mock.calls[0][0].data.sharedTheme).toEqual([{ id: "t", v: 2 }]);
+    expect(wsUpdate.mock.calls[0][0].data.sharedTheme).toEqual({ designTokens: [{ id: "t", v: 2 }] });
+  });
+
+  it("applyWorkspacePreset refuses a preset saved in the old projectStyles shape", async () => {
+    presetFindFirst.mockResolvedValueOnce({ styles: [{ selector: "[data-buildrik-id=a]" }] });
+    await expect(applyWorkspacePreset("w1", "old")).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    expect(wsUpdate).not.toHaveBeenCalled();
   });
 
   it("applyWorkspacePreset throws NOT_FOUND for a missing preset", async () => {
