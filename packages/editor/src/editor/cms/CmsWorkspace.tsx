@@ -134,15 +134,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
               </Button>
             ) : null}
           </header>
-          {panel.collections.length === 0 ? (
-            /* 6881:79324 — no collections: the invitation sits in the pane. */
-            <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-24 tw:text-center" data-testid="cms-ws-empty">
-              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">Create your first collection</p>
-              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">It opens here once created.</p>
-            </div>
-          ) : null}
         </section>
-        <HintColumn title="Select a collection" hint="Open a collection to see its details here." testId="cms-ws-hint" />
+        {/* 6881:79324 — with no collections the invitation takes the hint
+            column; the pane stays empty. */}
+        {panel.collections.length === 0 ? (
+          <HintColumn title="Create your first collection" hint="It opens here once created." testId="cms-ws-empty" />
+        ) : (
+          <HintColumn title="Select a collection" hint="Open a collection to see its details here." testId="cms-ws-hint" />
+        )}
       </div>
     );
   }
