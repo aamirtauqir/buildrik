@@ -13,6 +13,12 @@ import { useSaveCallback, type UseSaveCallbackOptions } from "../useSaveCallback
    the two have to be controllable apart. getSiteIdFromUrl stays real — the
    tests drive it by setting window.location, which is what the hook reads. */
 const svc = vi.hoisted(() => ({ saveProject: vi.fn().mockResolvedValue(undefined) }));
+const invalidateMyRole = vi.hoisted(() => vi.fn());
+vi.mock("@/services/RoleService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/RoleService")>()),
+  invalidateMyRole,
+}));
+
 vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/services/BuildrikSyncProvider")>();
   return { ...actual, saveProject: svc.saveProject };
@@ -370,8 +376,8 @@ describe("useSaveCallback — an expired session is not a retryable save failure
      why `unsavedRecovery`'s header says a reload otherwise seeds "Saved just
      now" over discarded work. A 401 lands in the same state and can still be
      saved once the user signs in, and it was the only such branch that kept
-     no copy. `missing` and `forbidden` stay uncovered on purpose: nothing can
-     ever be saved to those sites. */
+     no copy. `missing` stays uncovered on purpose: nothing can ever be saved
+     to a deleted site. (`forbidden` is covered since A15-9 — below.) */
   it.each(AUTH_ERRORS)("%s keeps the work for the reload, like a network failure does", async (raw) => {
     const url = new URL("http://localhost:3000/edit/site_auth");
     const original = window.location;
@@ -402,7 +408,10 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     }
   });
 
-  it("FORBIDDEN keeps nothing — a site you cannot save to has no work to restore", async () => {
+  /* A15-9: a mid-session demotion refused the edit. It existed only in this
+     tab; it is kept for the reload (a role can come back), and the cached
+     role that offered the edit is dropped so the next reader asks again. */
+  it("FORBIDDEN keeps the refused work and forgets the cached role", async () => {
     const url = new URL("http://localhost:3000/edit/site_forbidden");
     const original = window.location;
     Object.defineProperty(window, "location", { value: url, writable: true });
@@ -422,7 +431,9 @@ describe("useSaveCallback — an expired session is not a retryable save failure
         await result.current();
         await flushMicrotasks();
       });
-      expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).toBeNull();
+      expect(localStorage.getItem("bk-unsaved-v1-site_forbidden")).not.toBeNull();
+      expect(invalidateMyRole).toHaveBeenCalled();
+      localStorage.removeItem("bk-unsaved-v1-site_forbidden");
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }

@@ -33,6 +33,7 @@ import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError } from "./useSaveCallback";
+import { invalidateMyRole } from "@/services/RoleService";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -627,6 +628,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             if (isForbiddenSaveError(message)) {
+              /* A15-9: the refused edit existed only in this tab — keep it
+                 recoverable, exactly as the network branch does, and drop the
+                 cached role that let the chrome offer the edit at all. */
+              if (siteId) keepUnsaved(siteId, composer.exportProject());
+              invalidateMyRole();
               addToast({
                 title: "You don't have access to save this site",
                 description: "Your role changed, or the site isn't yours to edit. Ask the owner.",

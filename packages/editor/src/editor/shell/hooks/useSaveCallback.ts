@@ -28,6 +28,7 @@ import {
   SETTINGS_MIRROR_ERROR_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { invalidateMyRole } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
 
 export interface UseSaveCallbackOptions {
@@ -238,6 +239,12 @@ export function useSaveCallback({
            read as "Session expired" and sent the user to sign in — which would
            change nothing. Different truths, different surfaces. */
         if (isForbiddenSaveError(errorMessage)) {
+          /* A15-9: a mid-session demotion refuses edits that exist only in
+             this tab. Keep them recoverable (a reload offers them back, and
+             an owner can restore the role), and drop the cached role that
+             let the chrome offer the edit. */
+          if (siteId) keepUnsaved(siteId, composer.exportProject());
+          invalidateMyRole();
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           addToast({
             title: "You don't have access to save this site",
@@ -255,10 +262,10 @@ export function useSaveCallback({
              even says so, "they live in this tab" — and it was the ONE
              recoverable failure that kept nothing, so closing the tab (or the
              reload the user is nudged toward) lost the work a network blip
-             would have preserved. `missing` and `forbidden` are deliberately
-             NOT given this: nothing can ever be saved to those sites, and
-             offering a restore later would be the lie this module exists to
-             stop. */
+             would have preserved. `missing` is deliberately NOT given this:
+             nothing can ever be saved to a deleted site, and offering a
+             restore later would be the lie this module exists to stop.
+             `forbidden` IS (A15-9, above): a role can change back. */
           if (siteId) keepUnsaved(siteId, composer.exportProject());
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           if (onAuthExpired) {

@@ -36,6 +36,13 @@ export function fetchMyRole(): Promise<WorkspaceRole | null> {
   return cached;
 }
 
+/** Forget the cached role. The server just refused a write the cached role
+ *  allowed (A15-9) — the member was demoted mid-session — so the next reader
+ *  asks again instead of trusting the answer from page load. */
+export function invalidateMyRole(): void {
+  cached = null;
+}
+
 export function roleAtLeast(role: WorkspaceRole | null, min: WorkspaceRole): boolean | null {
   if (role == null) return null; // unknown — let the server decide
   return RANK[role] >= RANK[min];
