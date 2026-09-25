@@ -242,13 +242,23 @@ describe("Integrations Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   describe("listIntegrations", () => {
-    it("returns workspace integrations", async () => {
+    it("returns the full config for an ADMIN (revealFullConfig=true)", async () => {
       const { listIntegrations } = await import("@/server/services/integrations.service");
       vi.mocked(prisma.workspaceIntegration.findMany).mockResolvedValue([
-        { id: "int1", provider: "GOOGLE_ANALYTICS", config: { trackingId: "G-XXX" }, isActive: true },
+        { id: "int1", provider: "SLACK", config: { webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" }, isActive: true },
       ] as any);
-      const result = await listIntegrations("ws1");
-      expect(result).toHaveLength(1);
+      const result = await listIntegrations("ws1", true);
+      expect(result[0].config).toEqual({ webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" });
+    });
+
+    it("redacts secrets and full webhook path for a non-admin (S-10)", async () => {
+      const { listIntegrations } = await import("@/server/services/integrations.service");
+      vi.mocked(prisma.workspaceIntegration.findMany).mockResolvedValue([
+        { id: "int1", provider: "SLACK", config: { webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" }, isActive: true },
+      ] as any);
+      const result = await listIntegrations("ws1", false);
+      expect(result[0].config).not.toHaveProperty("apiKey");
+      expect(result[0].config.webhookUrl).toBe("https://hooks.slack.com/…");
     });
   });
 

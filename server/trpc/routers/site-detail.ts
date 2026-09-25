@@ -172,10 +172,20 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user!.id! },
-          include: { workspace: { select: { plan: true } } },
+        // Read the plan from the SITE's own workspace, not an arbitrary
+        // membership row for the caller — a caller who belongs to several
+        // workspaces could otherwise have their redirect limit computed
+        // against the wrong workspace's plan (S-10).
+        const site = await ctx.prisma.site.findUnique({
+          where: { id: input.siteId },
+          select: { workspaceId: true },
         });
+        const member = site
+          ? await ctx.prisma.workspaceMember.findFirst({
+              where: { userId: ctx.session.user!.id!, workspaceId: site.workspaceId, status: "ACTIVE" },
+              include: { workspace: { select: { plan: true } } },
+            })
+          : null;
         const planResult = z.enum(["FREE", "PRO", "BUSINESS"] as const).safeParse(member?.workspace?.plan ?? "FREE");
         const safePlan: PlanName = planResult.success ? planResult.data : "FREE";
         const { siteId, ...data } = input;
@@ -240,10 +250,16 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user!.id! },
-          include: { workspace: { select: { plan: true } } },
+        const site = await ctx.prisma.site.findUnique({
+          where: { id: input.siteId },
+          select: { workspaceId: true },
         });
+        const member = site
+          ? await ctx.prisma.workspaceMember.findFirst({
+              where: { userId: ctx.session.user!.id!, workspaceId: site.workspaceId, status: "ACTIVE" },
+              include: { workspace: { select: { plan: true } } },
+            })
+          : null;
         const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(member?.workspace?.plan ?? "FREE");
         const plan: PlanName = planResult.success ? planResult.data : "FREE";
         try {
@@ -426,7 +442,16 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return listShareLinks(input.siteId);
+        // Token is the bearer credential — reveal it only to someone who could
+        // also mint one (EDITOR+), not to every member who can merely view (S-10).
+        let revealToken = true;
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+        } catch (e) {
+          if (!(e instanceof PermissionError)) throw e;
+          revealToken = false;
+        }
+        return listShareLinks(input.siteId, revealToken);
       }),
 
     create: protectedProcedure

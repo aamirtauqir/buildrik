@@ -127,6 +127,17 @@ export const sitesRouter = router({
         throw e;
       }
       const workspaceId = await getWorkspaceId(ctx);
+      // duplicateSite lands the copy in the caller's CURRENT session workspace,
+      // which can differ from the source site's workspace (checkSiteRole above
+      // only proved EDITOR on the source). Require EDITOR on the destination
+      // workspace too, or a member with only a foreign site's role could
+      // duplicate into a workspace they have no standing in (S-10).
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session.user!.id!, workspaceId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await duplicateSite(input.id, workspaceId, ctx.session.user.id);
       } catch (e: unknown) {
@@ -491,7 +502,12 @@ export const sitesRouter = router({
          does not compile. Anyone who can open the site can see that a publish
          is scheduled — the same `assertSiteAccess` the site read and the
          pre-publish check already use. */
-      await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return getScheduledPublish(input.siteId);
     }),
 

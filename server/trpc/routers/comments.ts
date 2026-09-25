@@ -23,6 +23,12 @@ import {
   reattachCommentInput,
 } from "@buildrik/shared/schemas/comments";
 import { paginationInput } from "@buildrik/shared/schemas/pagination";
+import { checkRateLimit } from "@/server/services/rate-limiter";
+
+// Any member with site access can post — throttle per user per site so a
+// VIEWER can't script a comment flood (S-10).
+const CREATE_MAX = 30;
+const CREATE_WINDOW_MS = 60 * 1000;
 
 function translatePermission(e: unknown): never {
   if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
@@ -38,6 +44,14 @@ export const commentsRouter = router({
         await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
       } catch (e) {
         translatePermission(e);
+      }
+      const rl = await checkRateLimit(
+        `comments-create:${ctx.session.user.id}:${input.siteId}`,
+        CREATE_MAX,
+        CREATE_WINDOW_MS,
+      );
+      if (!rl.allowed) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many comments. Please slow down." });
       }
       return createComment(input.siteId, ctx.session.user.id, input);
     }),

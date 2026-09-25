@@ -2,11 +2,21 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
-export async function listShareLinks(siteId: string) {
-  return prisma.shareLink.findMany({
+// The link token IS the bearer credential for the draft it unlocks — a
+// VIEWER should not be able to read it off the list, only an EDITOR+ who
+// could also create one. passwordHash never leaves the server at all; a
+// boolean-ish placeholder preserves the UI's `passwordHash &&` truthiness
+// check without exposing the bcrypt hash (S-10).
+export async function listShareLinks(siteId: string, revealToken = false) {
+  const rows = await prisma.shareLink.findMany({
     where: { siteId, isActive: true },
     orderBy: { createdAt: "desc" },
   });
+  return rows.map((row) => ({
+    ...row,
+    token: revealToken ? row.token : null,
+    passwordHash: row.passwordHash ? "set" : null,
+  }));
 }
 
 export async function createShareLink(

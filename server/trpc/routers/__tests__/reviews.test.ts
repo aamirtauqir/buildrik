@@ -53,6 +53,10 @@ vi.mock("@/server/services/review.service", () => ({
   },
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+const checkRateLimitMock = vi.fn();
+vi.mock("@/server/services/rate-limiter", () => ({
+  checkRateLimit: (...a: unknown[]) => checkRateLimitMock(...a),
+}));
 
 import { reviewsRouter } from "@/server/trpc/routers/reviews";
 import { PermissionError } from "@/server/services/permission.service";
@@ -62,11 +66,12 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock, checkRateLimitMock].forEach((m) =>
     m.mockReset(),
   );
   // Default: agency layer ON, so the existing role-gate assertions still hold.
   isFeatureEnabledMock.mockResolvedValue(true);
+  checkRateLimitMock.mockResolvedValue({ allowed: true, remaining: 9, resetAt: Date.now() + 1000 });
 });
 
 describe("reviews router", () => {
@@ -85,6 +90,14 @@ describe("reviews router", () => {
     // 5 args since 389e2c39 added the optional clientEmail — omitted here, which
     // is the "submit without inviting anyone" path.
     expect(submitMock).toHaveBeenCalledWith("s1", "u_1", "ready", undefined, undefined, undefined);
+  });
+
+  it("submit is throttled per user per site (S-10) and never submits when exhausted", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    checkRateLimitMock.mockResolvedValueOnce({ allowed: false, remaining: 0, resetAt: Date.now() + 1000 });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.submit({ siteId: "s1", note: "ready" })).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+    expect(submitMock).not.toHaveBeenCalled();
   });
 
   it("list is Admin-gated and never queries if denied", async () => {

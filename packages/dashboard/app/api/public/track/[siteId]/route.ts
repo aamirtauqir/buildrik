@@ -41,6 +41,9 @@ export async function POST(
   const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
   const str = (v: unknown) => (typeof v === "string" ? v : undefined);
 
+  // recordPageView caps every string column server-side (analytics.service.ts
+  // `cap()`) before it reaches the DB — the unbounded write S-10 flagged here
+  // was already closed there; this route need not duplicate the cap.
   await recordPageView(siteId, {
     path: str(body.path) ?? "/",
     referrer: str(body.referrer) ?? req.headers.get("referer"),

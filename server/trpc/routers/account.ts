@@ -274,7 +274,16 @@ export const accountRouter = router({
   integrations: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
-      return listIntegrations(workspaceId);
+      // Full config (incl. secrets, full webhook URL) only for ADMIN+, who
+      // can also edit it — everyone else gets a redacted view (S-10).
+      let isAdmin = true;
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session!.user.id, workspaceId, "ADMIN");
+      } catch (e) {
+        if (!(e instanceof PermissionError)) throw e;
+        isAdmin = false;
+      }
+      return listIntegrations(workspaceId, isAdmin);
     }),
     add: protectedProcedure.input(addIntegrationSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId, plan } = await getWorkspaceCtx(ctx);

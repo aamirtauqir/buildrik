@@ -9,6 +9,7 @@ import {
   checkWorkspaceRole,
   PermissionError,
 } from "@/server/services/permission.service";
+import { checkRateLimit } from "@/server/services/rate-limiter";
 import {
   submitReview,
   listReviews,
@@ -30,6 +31,11 @@ import {
   revokeReviewInput,
 } from "@buildrik/shared/schemas/reviews";
 import { paginationInput } from "@buildrik/shared/schemas/pagination";
+
+// Submitting a review sends an invite email and mints a token — throttle
+// per user per site so it can't be used to spam a clientEmail (S-10).
+const SUBMIT_MAX = 10;
+const SUBMIT_WINDOW_MS = 60 * 60 * 1000;
 
 function translateReviewError(e: unknown): never {
   if (e instanceof ReviewError) throw new TRPCError({ code: e.code, message: e.message });
@@ -65,6 +71,14 @@ export const reviewsRouter = router({
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
+      }
+      const rl = await checkRateLimit(
+        `reviews-submit:${ctx.session.user.id}:${input.siteId}`,
+        SUBMIT_MAX,
+        SUBMIT_WINDOW_MS,
+      );
+      if (!rl.allowed) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many review submissions. Please try again later." });
       }
       return submitReview(
         input.siteId,

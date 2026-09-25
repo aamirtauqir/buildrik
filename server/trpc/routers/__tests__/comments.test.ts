@@ -50,6 +50,10 @@ vi.mock("@/server/services/comment.service", () => ({
   },
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+const checkRateLimitMock = vi.fn();
+vi.mock("@/server/services/rate-limiter", () => ({
+  checkRateLimit: (...a: unknown[]) => checkRateLimitMock(...a),
+}));
 
 import { commentsRouter } from "@/server/trpc/routers/comments";
 import { PermissionError } from "@/server/services/permission.service";
@@ -59,9 +63,10 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [assertAccessMock, checkSiteRoleMock, checkWorkspaceRoleMock, createMock, listMock, wsListMock, resolveMock].forEach(
+  [assertAccessMock, checkSiteRoleMock, checkWorkspaceRoleMock, createMock, listMock, wsListMock, resolveMock, checkRateLimitMock].forEach(
     (m) => m.mockReset(),
   );
+  checkRateLimitMock.mockResolvedValue({ allowed: true, remaining: 29, resetAt: Date.now() + 1000 });
 });
 
 describe("comments router", () => {
@@ -78,6 +83,14 @@ describe("comments router", () => {
     const caller = commentsRouter.createCaller(makeCtx() as never);
     await expect(caller.create({ siteId: "s1", body: "fix hero", x: 0.5, y: 0.5 })).resolves.toMatchObject({ id: "c1" });
     expect(createMock).toHaveBeenCalledWith("s1", "u_1", expect.objectContaining({ body: "fix hero" }));
+  });
+
+  it("create is throttled per user per site (S-10) and never creates when exhausted", async () => {
+    assertAccessMock.mockResolvedValueOnce(undefined);
+    checkRateLimitMock.mockResolvedValueOnce({ allowed: false, remaining: 0, resetAt: Date.now() + 1000 });
+    const caller = commentsRouter.createCaller(makeCtx() as never);
+    await expect(caller.create({ siteId: "s1", body: "hi", x: 0.5, y: 0.5 })).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+    expect(createMock).not.toHaveBeenCalled();
   });
 
   it("resolve requires EDITOR on the site; a viewer can't resolve", async () => {

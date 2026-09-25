@@ -164,13 +164,26 @@ describe("Site Detail Service", () => {
   });
 
   describe("Share Link Service", () => {
-    it("listShareLinks returns active links", async () => {
+    it("listShareLinks returns active links, token redacted by default (S-10)", async () => {
       const { listShareLinks } = await import("@/server/services/share-link.service");
       vi.mocked(prisma.shareLink.findMany).mockResolvedValue([
-        { id: "sl1", name: "Client Review", token: "abc123", viewCount: 5, isActive: true, createdAt: new Date() },
+        { id: "sl1", name: "Client Review", token: "abc123", passwordHash: "$2a$hash", viewCount: 5, isActive: true, createdAt: new Date() },
       ] as any);
       const result = await listShareLinks("s1");
       expect(result).toHaveLength(1);
+      expect(result[0].token).toBeNull();
+      // Truthy placeholder, never the real bcrypt hash.
+      expect(result[0].passwordHash).toBe("set");
+    });
+
+    it("listShareLinks reveals the token when revealToken=true", async () => {
+      const { listShareLinks } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.shareLink.findMany).mockResolvedValue([
+        { id: "sl1", name: "Client Review", token: "abc123", passwordHash: null, viewCount: 5, isActive: true, createdAt: new Date() },
+      ] as any);
+      const result = await listShareLinks("s1", true);
+      expect(result[0].token).toBe("abc123");
+      expect(result[0].passwordHash).toBeNull();
     });
 
     it("createShareLink generates token", async () => {
