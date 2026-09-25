@@ -63,6 +63,9 @@ function mount(selectedItem: LibraryItem, over: Partial<AssetDetailsPanelProps> 
     ...over,
   };
   const utils = render(<AssetDetailsPanel {...props} />);
+  /* 4418:58292 — TAGS / VERSIONS / USED IN sit behind "Details ▸"; these tests read them open. */
+  const details = utils.queryByTestId("mgr-det-details-toggle");
+  if (details) fireEvent.click(details);
   return { ...utils, props };
 }
 
@@ -82,13 +85,13 @@ describe("Clone 3695:20340 · Selected · menu-cover.png", () => {
   it("4418:58292: Insert to canvas · Edit image + ⋯, the ⋯ holding Rename · Replace across site… · Delete", () => {
     mount(byName("menu-cover.png"), { usageCount: 1 });
     expect(actionNames()).toEqual(["Insert to canvas", "Edit image", "More actions"]);
-    expect(moreNames()).toEqual(["Rename", "Replace across site…", "Delete"]);
+    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Delete…"]);
   });
 
   it("an image with an optimiser lists Optimize in the ⋯, and Delete is red", () => {
     mount(byName("menu-cover.png"), { usageCount: 1, onOptimizeImage: vi.fn() });
-    expect(moreNames()).toEqual(["Rename", "Replace across site…", "Optimize", "Delete"]);
-    expect(screen.getByRole("menuitem", { name: "Delete" }).className).toMatch(/red/);
+    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Optimize", "Delete…"]);
+    expect(screen.getByRole("menuitem", { name: "Delete…" }).className).toMatch(/red/);
   });
 
   it("prints the meta line as '<w> × <h> · <size> · PNG · added <Mon d>' when measured", () => {
@@ -130,7 +133,7 @@ describe("Clone 3696:20326 · Selected · chef-intro.mp4", () => {
   it("has Rename at full width and no Edit image", () => {
     mount(byName("chef-intro.mp4"), { usageCount: 1 });
     expect(actionNames()).toEqual(["Insert to canvas", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Replace across site…", "Delete"]);
+    expect(moreNames()).toEqual(["Replace across site…", "Delete…"]);
     expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
   });
 
@@ -145,7 +148,7 @@ describe("Clone 3696:20734 · Selected · logo-mark.svg", () => {
   it("keeps Insert to canvas and Edit image", () => {
     mount(byName("logo-mark.svg"), { usageCount: 5 });
     expect(actionNames()).toEqual(["Insert to canvas", "Edit image", "More actions"]);
-    expect(moreNames()).toEqual(["Rename", "Replace across site…", "Delete"]);
+    expect(moreNames()).toEqual(["Rename…", "Replace across site…", "Delete…"]);
     expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · SVG");
   });
 });
@@ -158,7 +161,7 @@ describe("Clone 3696:21550 · Selected · Inter-Var.woff2", () => {
   it("offers Manage font · Rename · Delete — no Insert, no Replace, no alt text", () => {
     mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
     expect(actionNames()).toEqual(["Manage font", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Delete"]);
+    expect(moreNames()).toEqual(["Delete…"]);
     expect(screen.queryByTestId("alt-text-section")).toBeNull();
   });
 
@@ -231,7 +234,7 @@ describe("Clone 3705:20396 · List · chef-intro.mp4 selected (the one checked r
   it("3705:21059 · a checked font offers Manage font · Rename · Delete", () => {
     mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
     expect(actionNames()).toEqual(["Manage font", "Rename", "More actions"]);
-    expect(moreNames()).toEqual(["Delete"]);
+    expect(moreNames()).toEqual(["Delete…"]);
   });
 });
 

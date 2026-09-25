@@ -111,15 +111,14 @@ beforeEach(() => {
 });
 
 describe("PublishTab — renders the server's readiness contract", () => {
-  it("renders the server's rows, except Favicon (spec B4 draws none)", async () => {
+  it("renders every server row, Favicon included (7051:78232)", async () => {
     fetchPrePublishChecks.mockResolvedValue(result());
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
-    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages"]) {
+    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages", "Favicon"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
-    expect(screen.queryByText("Favicon")).toBeNull();
   });
 
   /* Re-walk 2026-09-24: "Publish to production" stayed clickable for a minute

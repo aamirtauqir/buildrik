@@ -35,7 +35,7 @@ const parseValue = (val: string): { num: string; unit: string; isKeyword: boolea
     return { num: val, unit: "", isKeyword: true };
   }
   /* A token-bound side or corner shows its resolved number (the chip still
-     names the token) — not the raw `var(--buildrick-design-…)` (6894:74644). */
+     names the token) — not the raw site-token `var(…)` string (6894:74644). */
   if (isTokenVar(val)) {
     const r = resolveTokenVar(val).match(/^(-?[\d.]+)(.*)$/);
     if (r) return { num: r[1], unit: r[2] || "px", isKeyword: false };

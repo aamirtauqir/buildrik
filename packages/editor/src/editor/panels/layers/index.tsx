@@ -20,7 +20,7 @@ import { itemMatches } from "./hooks/useLayerSearch";
 import { findById as findLayer, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
-import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
@@ -35,11 +35,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   selectedElement,
   onLayerHover,
   canvasHoveredId,
-  onAddBlockClick,
   search,
   displaySettingsOpen,
   onDisplaySettingsToggle,
-  onSearchChange,
 }) => {
   const state = useLayersState({ composer, canvasHoveredId });
 
@@ -65,13 +63,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     };
   }, [composer, expandAll, collapseAll]);
 
-  // Emit stats to LayersTab
   const totalCount = state.treeHook.totalCount;
   const selectedCount = state.selectionHook.selectedIds.size;
-  React.useEffect(() => {
-    if (!composer) return;
-    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount });
-  }, [composer, totalCount, selectedCount]);
 
   // Auto-expand ancestors of matching layers during search
   const { getAncestorIdsForMatches, isSearching } = state.searchHook;
@@ -109,6 +102,15 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     setDropFeedback({ message, type: "error" });
   }, []);
 
+  /* The row's own name, for the refusal copy (4418:83699 names both layers). */
+  const nameOf = React.useCallback(
+    (id: string) => {
+      const item = findLayer(state.layers, id);
+      return item ? getDisplayName(id, item.type, state.actionsHook.customNames, item.preview) : "This layer";
+    },
+    [state.layers, state.actionsHook.customNames]
+  );
+
   // Handle layer drop for reordering
   const handleLayerDrop = React.useCallback(
     (sourceId: string, targetId: string, position: "before" | "after" | "inside") => {
@@ -138,11 +140,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         newParent = targetEl;
         const parentType = newParent.getType() as ElementType;
         if (!canHaveChildren(parentType)) {
-          showDropError(`${parentType} cannot contain children`);
+          showDropError(`${nameOf(targetId)} can’t contain ${nameOf(sourceId)}. Drop into a container instead.`);
           return;
         }
         if (!canNestElement(sourceType, parentType)) {
-          showDropError(`${sourceType} cannot be nested inside ${parentType}`);
+          showDropError(`${nameOf(sourceId)} can’t go inside ${nameOf(targetId)}. Drop into a container instead.`);
           return;
         }
         index = newParent.getChildCount();
@@ -158,7 +160,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
         const parentType = parent.getType() as ElementType;
         if (!canNestElement(sourceType, parentType)) {
-          showDropError(`${sourceType} cannot be placed in ${parentType}`);
+          showDropError(`${nameOf(sourceId)} can’t go inside ${nameOf(parent.getId())}. Drop into a container instead.`);
           return;
         }
 
@@ -184,7 +186,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       // Post-move selection reconciliation: force re-emit selection event
       setTimeout(() => composer.selection.reselect(), 0);
     },
-    [composer, state.lockedIds, showDropError]
+    [composer, state.lockedIds, showDropError, nameOf]
   );
 
   // Scroll to selected element helper
@@ -398,9 +400,24 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     });
   }, [composer, selectedCount, state.selectionHook, addToast]);
 
+  const dimmedSelection = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount > 1 || !state.hiddenIds.has(id)) return null;
+    const item = findLayer(state.layers, id);
+    return item ? { id, name: getDisplayName(id, item.type, state.actionsHook.customNames, item.preview) } : null;
+  }, [selectedElement?.id, selectedCount, state.hiddenIds, state.layers, state.actionsHook.customNames]);
+
   // Filter tree by search only (no category filters in Minimal Tree design)
   const treeFiltered = state.filterTree(state.layers);
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
+
+  /* Stats for LayersTab's count footer; `matches` while a filter is on
+     (4418:79355 "1 of 12 layers match “button”"). */
+  const matches = state.searchHook.isSearching ? matchCount : null;
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches });
+  }, [composer, totalCount, selectedCount, matches]);
 
   // Board 143:2 (Layers · filtered): search results render FLAT — only the
   // matching rows, no indentation, no chevrons, no ancestor context. The
@@ -421,7 +438,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 
   return (
-    <div className="bdc-layers-panel">
+    <div className="bdc-layers-panel tw:relative">
       {displaySettingsOpen && (
         <LayerDisplaySettings
           prefs={state.displayPrefs}
@@ -440,12 +457,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             ? "No layers match your search"
             : ""}
       </div>
-      {/* Drop feedback message (UX improvement - Phase 3) */}
-      {dropFeedback && (
-        <div className="bdc-layers-drop-alert" role="alert" aria-live="assertive">
-          {dropFeedback.message}
-        </div>
-      )}
       {/* The multi-select banner is gone (audit G2-068): the count line in
           the LayersTab footer and the selection's context menu carry it. */}
       <ConfirmDialog
@@ -453,7 +464,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         onClose={() => setDeleteSelectionOpen(false)}
         onConfirm={confirmDeleteSelection}
         title={`Delete ${elementsLabel(selectedCount)}?`}
-        message={`This removes ${listNames(selectedNames)}.`}
+        message={`This removes ${listNames(selectedNames)} (and anything nested inside them) from ${activePage?.name ?? "this page"}. You can undo from the toast.`}
         confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
         tone="destructive"
         testId="layers-delete-selection"
@@ -474,16 +485,19 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       <div
         ref={state.treeContainerRef}
         id="bd-layers-tree"
-        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
+        /* Filtered rows are flat (4418:79355): no chevron slot, the glyph
+           sits where depth 0's chevron would. */
+        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}${
+          state.searchHook.isSearching ? " tw:[&_.bdc-lr-chev]:hidden!" : ""
+        }`}
         role="tree"
         aria-label="Page structure"
       >
-        {state.layers.length === 0 && <LayersEmptyState onAddBlockClick={onAddBlockClick} />}
+        {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
           <LayersNoResults
             search={state.search}
-            onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
             onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
           />
         )}
@@ -523,6 +537,35 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             displayPrefs={state.displayPrefs}
           />
         ))}
+        {dropFeedback && (
+          /* v3 4418:83699: the refusal is a dark card under the rows. */
+          <div
+            className="tw:mx-1 tw:mt-1 tw:rounded-md tw:bg-[var(--bk-ink)] tw:px-3 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-on)]"
+            role="alert"
+            aria-live="assertive"
+            data-testid="layers-drop-alert"
+          >
+            {dropFeedback.message}
+          </div>
+        )}
+        {dimmedSelection && (
+          /* v3 4418:79800: the selected layer is dimmed — say what dimming
+             is (editor only) and where site hiding lives, with the way back. */
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:pt-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="layers-dimmed-note">
+            <p className="tw:m-0">{dimmedSelection.name} is dimmed in the editor. It still appears on the live site.</p>
+            <p className="tw:m-0">To hide on the site, use Inspector → Visibility.</p>
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className="tw:h-7 tw:px-4 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:focus:ring-0"
+              data-testid="layers-dimmed-show"
+              onClick={(e: React.MouseEvent) => state.toggleVisibility(dimmedSelection.id, e)}
+            >
+              Show normally in editor
+            </Button>
+          </div>
+        )}
       </div>
       <LayersScrollThumb containerRef={state.treeContainerRef} />
       </div>

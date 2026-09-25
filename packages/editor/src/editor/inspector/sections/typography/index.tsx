@@ -40,6 +40,9 @@ export interface TypographySectionProps {
   isMultiSelect?: boolean;
   /** Threaded so the colour chip can jump to the Design panel. */
   composer?: Composer | null;
+  /** A container's type, inherited by the text inside it (board 7056:78382):
+   *  Family + Size · line height; the rest behind More settings. */
+  inherited?: boolean;
 }
 
 // ============================================================================
@@ -57,6 +60,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   mixedKeys,
   isMultiSelect,
   composer,
+  inherited = false,
 }) => {
   // Handle font-family changes from FontPicker
   const handleFontChange = React.useCallback(
@@ -105,7 +109,14 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       </div>
 
       {/* Font Size, Weight, Line Height, Letter Spacing, Decoration, Style */}
-      <FontControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} composer={composer} />
+      <FontControls
+        styles={styles}
+        onChange={onChange}
+        mixedKeys={mixedKeys}
+        isMultiSelect={isMultiSelect}
+        composer={composer}
+        sizeOnly={inherited && !advancedExpanded}
+      />
 
       {/* ─── Advanced: Color, Alignment, Transform, White Space, Word Break ─── */}
       {advancedExpanded && <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />}
@@ -115,7 +126,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
-          advancedCount={5}
+          advancedCount={inherited ? 11 : 5}
         />
       )}
     </Section>

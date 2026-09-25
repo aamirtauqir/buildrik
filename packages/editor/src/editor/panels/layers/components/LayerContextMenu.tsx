@@ -35,6 +35,11 @@ interface LayerContextMenuProps {
 /** "3 elements" — the board's own suffix, singular never shown (N ≥ 2). */
 export const elementsLabel = (n: number) => `${n} elements`;
 
+/* Flowbite's focus ring drew a blue box round the first row every time the
+   menu opened (focus moves there for keyboard users); 4418:79546 draws the
+   rows plain. Keyboard focus keeps a visible cue — the hover fill. */
+const ITEM = "bdc-menu-item tw:focus:ring-0 tw:focus-visible:bg-[var(--bk-bg-subtle)]";
+
 export function LayerContextMenu({
   x,
   y,
@@ -83,16 +88,16 @@ export function LayerContextMenu({
           Delete | Rename · Group | Move to page… · Copy link. Plain 28h rows,
           no kbd hints, no icons. Hide/Lock live on the row's own eye/lock;
           reordering is drag. */}
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-cut"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-cut"
         onClick={() => act("cut")}>
         Cut{suffix}
       </Button>
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-copy"
         onClick={() => act("copy")}>
         Copy{suffix}
       </Button>
       <Button
-        className="bdc-menu-item"
+        className={ITEM}
         role="menuitem"
         disabled={!hasClipboard}
         title={hasClipboard ? undefined : "Copy or cut an element first"}
@@ -102,17 +107,17 @@ export function LayerContextMenu({
         Paste
       </Button>
       <div className="bdc-menu-sep" data-testid="layer-menu-sep" />
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-duplicate"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-duplicate"
         onClick={() => act("duplicate")}>
         Duplicate{suffix}
       </Button>
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-delete"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-delete"
         onClick={() => act("delete")}>
         Delete{suffix}
       </Button>
       <div className="bdc-menu-sep" />
       <Button
-        className="bdc-menu-item"
+        className={ITEM}
         role="menuitem"
         disabled={multi}
         title={multi ? "Rename one layer at a time" : undefined}
@@ -122,23 +127,21 @@ export function LayerContextMenu({
         Rename{multi ? "" : suffix}
       </Button>
       <Button
-        className="bdc-menu-item"
+        className={ITEM}
         role="menuitem"
-        disabled={!multi}
-        title={multi ? undefined : "Select 2 or more layers first"}
         data-testid="layer-menu-group"
         onClick={() => act("group")}
       >
         Group{suffix}
       </Button>
       <div className="bdc-menu-sep" />
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-move-to-page"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-move-to-page"
         onClick={() => act("moveToPage")}>
         Move to page…{suffix}
       </Button>
       {/* A URL that reopens the editor with the CLICKED element selected —
           one element even inside a selection: a link cannot select three. */}
-      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy-link"
+      <Button className={ITEM} role="menuitem" data-testid="layer-menu-copy-link"
         onClick={() => act("copyLink")}>
         Copy link · {name}
       </Button>

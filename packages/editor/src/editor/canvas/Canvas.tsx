@@ -585,7 +585,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
-    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer, selectedId, addToast });
+    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer });
 
     // Expose ref methods
     React.useImperativeHandle(ref, () => ({

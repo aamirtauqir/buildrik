@@ -47,7 +47,7 @@ const DEFAULTS: LayerDisplayPrefs = {
 describe("LayerDisplaySettings — the option rows", () => {
   it("offers exactly the board's four plus HTML tags, in that order; no element IDs", () => {
     render(<LayerDisplaySettings prefs={DEFAULTS} onChange={vi.fn()} onClose={vi.fn()} />);
-    const labels = screen.getAllByRole("checkbox").map((el) => el.getAttribute("aria-label"));
+    const labels = screen.getAllByRole("switch").map((el) => el.getAttribute("aria-label"));
     expect(labels).toEqual([
       "Show dimmed layers",
       "Show lock badges",
