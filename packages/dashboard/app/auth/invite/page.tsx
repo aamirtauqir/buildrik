@@ -66,7 +66,7 @@ function InviteContent() {
   // accepts on their behalf. It needs a hard navigation (fresh session cookie),
   // so the success screen is carried across in the URL rather than in state.
   const justAccepted = searchParams.get("accepted") === "1";
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const sessionEmail = session?.user?.email ?? "";
 
   const [view, setView] = useState<View | null>(justAccepted ? "accepted" : null);
@@ -76,7 +76,16 @@ function InviteContent() {
   const inviteUrl = `/auth/invite?token=${encodeURIComponent(token)}`;
 
   const acceptMutation = trpc.auth.acceptInvite.useMutation({
-    onSuccess: () => setView("accepted"),
+    // Without switching the session's active workspace, landing on
+    // /dashboard after accepting still showed whatever workspace the JWT
+    // already carried — the newly-joined workspace's sites only appeared
+    // after manually using the workspace switcher. auth.config.ts's jwt
+    // callback re-validates membership server-side on `trigger==="update"`,
+    // so this can't be used to switch into a workspace not just joined.
+    onSuccess: async (data) => {
+      await updateSession({ workspaceId: data.workspaceId });
+      setView("accepted");
+    },
     onError: (err) => {
       const code = err.data?.code;
       if (code === "CONFLICT") return setView("already-member");

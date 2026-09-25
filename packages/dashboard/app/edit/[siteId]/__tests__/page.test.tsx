@@ -63,6 +63,19 @@ describe("EditPage", () => {
     expect(canEditMock).not.toHaveBeenCalled();
   });
 
+  it("preserves query params (el/page) in the login redirect", async () => {
+    authMock.mockResolvedValueOnce(null);
+    await expect(
+      EditPage({
+        params: Promise.resolve({ siteId: "abc" }),
+        searchParams: Promise.resolve({ el: "node-1", page: "home" }),
+      }),
+    ).rejects.toMatchObject({ name: "RedirectError" });
+    expect(redirectMock).toHaveBeenCalledWith(
+      `/auth/login?next=/edit/abc${encodeURIComponent("?el=node-1&page=home")}`,
+    );
+  });
+
   it("URL-encodes siteId in the login redirect", async () => {
     authMock.mockResolvedValueOnce(null);
     await expect(

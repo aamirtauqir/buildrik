@@ -18,6 +18,7 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
@@ -107,6 +108,8 @@ export default function ProjectsPage() {
     name: string;
   } | null>(null);
 
+  const debouncedSearch = useDebouncedValue(search, 250);
+
   // Queries
   const sitesQuery = trpc.sites.list.useQuery({
     page,
@@ -119,7 +122,7 @@ export default function ProjectsPage() {
       | "traffic"
       | "pages"
       | "published",
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     // null is the "All sites" selection, which must not filter at all. Passing it
     // through reached the service as `where.folderId = null`, i.e. only sites with
     // NO folder — so any site inside a folder vanished from "All sites".

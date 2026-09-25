@@ -16,7 +16,20 @@ export default async function EditPage({
 
   const session = await auth();
   if (!session?.user?.id) {
-    redirect(`/auth/login?next=/edit/${encodeURIComponent(siteId)}`);
+    // Preserve the deep-link (?el=<id>&page=<slug>, etc.) through the login
+    // round trip — dropping it landed a signed-out visitor back at the bare
+    // editor with the element/page they were on lost. The query is folded
+    // into `next` as one encoded segment so it survives login's own parsing
+    // of `next` as a single value.
+    const query = (await searchParams) ?? {};
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(query)) {
+      if (typeof v === "string") qs.set(k, v);
+    }
+    const qsString = qs.toString();
+    redirect(
+      `/auth/login?next=/edit/${encodeURIComponent(siteId)}${qsString ? encodeURIComponent(`?${qsString}`) : ""}`,
+    );
   }
 
   const access = await getEditorAccess(session.user.id, siteId);

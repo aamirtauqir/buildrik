@@ -41,12 +41,12 @@ function MobileTabBar() {
   const agency = useAgencyEnabled();
   const items = MOBILE_ITEMS.filter((it) => !it.agencyOnly || agency);
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
+    <nav aria-label="Primary" className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
       {items.map((item) => {
         const active = isActiveRoute(pathname, item.href);
         const Icon = iconMap[item.icon];
         return (
-          <Link key={item.href} href={item.href} className={cn("flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors", active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]")}>
+          <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors", active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]")}>
             <Icon className="h-5 w-5" />
             {item.label}
           </Link>
@@ -102,7 +102,7 @@ export function Sidebar() {
           <WorkspaceSwitcher />
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3.5 py-3">
+        <nav aria-label="Primary" className="flex-1 overflow-y-auto px-3.5 py-3">
           {groups.map((group, gi) => (
             <div key={gi} className={gi > 0 ? "mt-3 border-t pt-3" : undefined} style={gi > 0 ? { borderColor: "var(--color-border-default)" } : undefined}>
               {group.label && (
@@ -117,7 +117,7 @@ export function Sidebar() {
                   const count = navCount[item.href];
                   return (
                     <li key={item.href}>
-                      <Link href={item.href} className={cn(
+                      <Link href={item.href} aria-current={active ? "page" : undefined} className={cn(
                         "flex h-[30px] items-center gap-[11px] rounded-md px-[9px] text-[13.5px] transition-colors",
                         active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-[520] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
                       )}>

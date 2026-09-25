@@ -1,5 +1,5 @@
 import type { SelectHTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@lib/utils";
 
@@ -37,37 +37,53 @@ export const SelectField = forwardRef<
   // fail without the Omit — `size="sm"` gave
   // `TS2322: Type 'string' is not assignable to type 'undefined'`, and only at
   // the first call site, never here.
-  Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & { wrapperClassName?: string; invalid?: boolean; size?: "md" | "sm"; children: ReactNode }
->(({ wrapperClassName, className, invalid, size = "md", children, ...props }, ref) => (
-  <div
-    className={cn(
-      "relative flex w-full items-center rounded-lg transition-shadow",
-      size === "sm" ? "h-9" : "h-[42px]",
-      invalid
-        ? "shadow-[inset_0_0_0_1px_var(--color-error)] focus-within:shadow-[inset_0_0_0_1px_var(--color-error),0_0_0_2px_rgba(224,36,36,0.25)]"
-        : "shadow-[inset_0_0_0_1px_var(--color-border-input)] focus-within:shadow-[inset_0_0_0_1px_var(--color-primary),0_0_0_2px_rgba(26,86,219,0.30)]",
-      props.disabled && "opacity-60",
-      wrapperClassName,
-    )}
-    style={{ backgroundColor: props.disabled ? "var(--color-bg-subtle)" : "var(--color-bg-surface)" }}
-  >
-    <select
-      ref={ref}
+  Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & { wrapperClassName?: string; invalid?: boolean; size?: "md" | "sm"; children: ReactNode; label?: ReactNode }
+>(({ wrapperClassName, className, invalid, size = "md", children, label, id, ...props }, ref) => {
+  const generatedId = useId();
+  const selectId = id ?? (label ? generatedId : undefined);
+  const field = (
+    <div
       className={cn(
-        "h-full w-full appearance-none bg-transparent outline-none",
-        size === "sm" ? "pl-2.5 pr-7 text-[12px]" : "pl-[13px] pr-9 text-[13.5px]",
-        className,
+        "relative flex w-full items-center rounded-lg transition-shadow",
+        size === "sm" ? "h-9" : "h-[42px]",
+        invalid
+          ? "shadow-[inset_0_0_0_1px_var(--color-error)] focus-within:shadow-[inset_0_0_0_1px_var(--color-error),0_0_0_2px_rgba(224,36,36,0.25)]"
+          : "shadow-[inset_0_0_0_1px_var(--color-border-input)] focus-within:shadow-[inset_0_0_0_1px_var(--color-primary),0_0_0_2px_rgba(26,86,219,0.30)]",
+        props.disabled && "opacity-60",
+        wrapperClassName,
       )}
-      style={{ color: "var(--color-text-primary)" }}
-      {...props}
+      style={{ backgroundColor: props.disabled ? "var(--color-bg-subtle)" : "var(--color-bg-surface)" }}
     >
-      {children}
-    </select>
-    <ChevronDown
-      className={cn("pointer-events-none absolute", size === "sm" ? "right-2 h-3.5 w-3.5" : "right-[11px] h-4 w-4")}
-      style={{ color: "var(--color-text-muted)" }}
-      aria-hidden
-    />
-  </div>
-));
+      <select
+        ref={ref}
+        id={selectId}
+        className={cn(
+          "h-full w-full appearance-none bg-transparent outline-none",
+          size === "sm" ? "pl-2.5 pr-7 text-[12px]" : "pl-[13px] pr-9 text-[13.5px]",
+          className,
+        )}
+        style={{ color: "var(--color-text-primary)" }}
+        {...props}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        className={cn("pointer-events-none absolute", size === "sm" ? "right-2 h-3.5 w-3.5" : "right-[11px] h-4 w-4")}
+        style={{ color: "var(--color-text-muted)" }}
+        aria-hidden
+      />
+    </div>
+  );
+
+  if (!label) return field;
+
+  return (
+    <div>
+      <label htmlFor={selectId} className="block text-body font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>
+        {label}
+      </label>
+      {field}
+    </div>
+  );
+});
 SelectField.displayName = "SelectField";

@@ -55,7 +55,18 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
 
   const handleDrawerUpdate = useCallback(
     (id: string, data: Partial<{ isRead: boolean; isSpam: boolean; isArchived: boolean }>) => {
-      updateMutation.mutate({ id, ...data });
+      const previous = drawerSubmission;
+      updateMutation.mutate(
+        { id, ...data },
+        {
+          // The toggle applies optimistically below — on a rejected mutation
+          // (e.g. a stale/deleted submission) revert the drawer to what the
+          // server last confirmed instead of leaving a lie on screen.
+          onError: () => {
+            if (previous && previous.id === id) setDrawerSubmission(previous);
+          },
+        },
+      );
       if (drawerSubmission && drawerSubmission.id === id) {
         setDrawerSubmission({ ...drawerSubmission, ...data });
       }

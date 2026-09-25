@@ -65,7 +65,7 @@ export function BulkActionBar({ selectedCount, archivedView = false, onAction, o
                 }
               }}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-              style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-secondary)" }}
+              style={{ color: isDestructive ? "var(--color-error)" : "var(--color-text-secondary)" }}
             >
               <Icon className="h-3.5 w-3.5" />{item.label}
               {isMove && <ChevronDown className="h-3 w-3" />}
@@ -94,7 +94,7 @@ export function BulkActionBar({ selectedCount, archivedView = false, onAction, o
           </div>
         );
       })}
-      <button onClick={onClear} className="ml-1 rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+      <button onClick={onClear} aria-label="Clear selection" className="ml-1 rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
     </div>
   );
 }

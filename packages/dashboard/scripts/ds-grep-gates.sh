@@ -145,25 +145,34 @@ fi
 pass "D6: @theme block present in globals.css"
 
 # ─────────────────────────────────────────────────────────────
-# Gate D7 — Zero-tolerance for hardcoded token-backed hex in tsx/ts chrome.
+# Gate D7 — Baseline ratchet on ANY hardcoded hex literal in tsx/ts chrome.
 # Every consumer must reference var(--color-*) (or Tailwind text-primary/bg-primary
 # style mapped class), never hardcoded hex. Codemod ran 2026-05-24:
 #   - 266 brand red (#E42313)            → var(--color-primary)
 #   - 1383 slate-neutral palette         → var(--color-text-*/border-*/bg-*)
 #   - 38 semantic (success/warning/info) → var(--color-success/warning/info)
-# Total drained: 1687 occurrences. Locked at 0 going forward.
+# Total drained: 1687 occurrences.
+#
+# B-13: the fixed allowlist above locked in only the PRE-2026-05 palette
+# (#E42313, #7A7A7A, ...). It never tracked the accent migration to
+# #1A56DB (root CLAUDE.md, 2026-07-30) or any other hex introduced since, so
+# raw hex like #1A56DB, #9CA3AF, #C81E1E (review-client.tsx:232) passed the
+# gate silently. Matches ANY #RGB/#RRGGBB/#RRGGBBAA literal now, as a
+# baseline ratchet (may only go DOWN from here, same shape as the editor's
+# Gate 16 hex-ratchet) rather than a hardcoded allowlist that drifts stale.
 # emails/ excepted (email clients have no CSS-var support).
-# globals.css excepted (canonical token definition site).
+# globals.css excepted (canonical token definition site; also not .tsx/.ts).
 # ─────────────────────────────────────────────────────────────
-D7_HEX_PATTERN="#(E42313|7A7A7A|0D0D0D|E8E8E8|F4F4F4|B0B0B0|FAFAFA|D4D4D4|22C55E|EA580C|7a7a7a|0d0d0d|e8e8e8|f4f4f4|b0b0b0|fafafa|d4d4d4|22c55e|ea580c)"
+D7_HEX_PATTERN="#[0-9A-Fa-f]{3,8}\b"
+D7_BASELINE=177
 D7_HITS=$(grep -rEn "$D7_HEX_PATTERN" packages/dashboard \
   --include="*.tsx" --include="*.ts" 2>/dev/null \
   | grep -v "/node_modules/" \
   | grep -v "/.next/" \
   | grep -v "/emails/" \
   | wc -l | tr -d ' ')
-if [ "$D7_HITS" -gt 0 ]; then
-  echo "GATE FAIL: D7 — $D7_HITS hardcoded token-backed hex in dashboard chrome tsx/ts (use var(--color-*) or token classes)"
+if [ "$D7_HITS" -gt "$D7_BASELINE" ]; then
+  echo "GATE FAIL: D7 — $D7_HITS hardcoded hex literal(s) in dashboard chrome tsx/ts, baseline is $D7_BASELINE (use var(--color-*) or token classes; the baseline may only go down)"
   grep -rEn "$D7_HEX_PATTERN" packages/dashboard \
     --include="*.tsx" --include="*.ts" 2>/dev/null \
     | grep -v "/node_modules/" \
@@ -172,7 +181,7 @@ if [ "$D7_HITS" -gt 0 ]; then
     | head -5
   exit 1
 fi
-pass "D7: no hardcoded token-backed hex in dashboard chrome tsx/ts (emails + globals.css exempt)"
+pass "D7: $D7_HITS hardcoded hex literal(s) in dashboard chrome tsx/ts (baseline $D7_BASELINE, emails + globals.css exempt)"
 
 echo
 echo "=== Dashboard DS gates: 7 passed ==="

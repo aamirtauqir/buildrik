@@ -288,10 +288,16 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
                       {selectMode && (
                         <input
                           type="checkbox"
-                          readOnly
                           checked={isSelected}
                           disabled={!selectable}
-                          className="pointer-events-none accent-[var(--color-primary)]"
+                          aria-label={`Select ${member.fullName}`}
+                          onChange={() => { if (selectable) toggleOne(member.id); }}
+                          // The row itself also toggles selection on click — stop
+                          // this click from bubbling there, or a direct checkbox
+                          // click toggles twice (once here, once via the row) and
+                          // net-cancels itself.
+                          onClick={(e) => e.stopPropagation()}
+                          className="accent-[var(--color-primary)]"
                         />
                       )}
                       {member.avatar ? (
