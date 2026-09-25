@@ -89,6 +89,51 @@ export const authConfig: NextAuthConfig = {
       // and no DB user.id set, instead of being refused. Gate on `account`
       // alone and refuse explicitly below when there's no trusted email.
       if (account) {
+        // IMPORTANT (controller ruling, fix round 3) — account-first: resolve
+        // identity by the PHYSICAL provider link before any email-based
+        // branching. The previous ordering decided create/clear/link by
+        // looking up `user.email` first and only checked for an existing
+        // provider link afterward (the ownership guard at the bottom) — so a
+        // user who changes which email their provider reports as verified
+        // between logins hit the "no existing row for this email" branch,
+        // created a SECOND, orphaned "verified" user + workspace for the new
+        // email, and only THEN got refused by the ownership guard. Every
+        // later login from that provider would keep hitting the orphan
+        // (never the original account, which password signup can no longer
+        // reclaim once EMAIL_EXISTS — permanent lockout from the account
+        // this really is).
+        //
+        // A provider_providerAccountId match now settles identity
+        // completely: sign in as whichever user that physical account is
+        // already linked to, ignoring whatever email the provider reports
+        // THIS time, with NO writes ("bump nothing else" — no lastLoginAt,
+        // no emailVerified, no credential clearing, no audit log). Setting
+        // `user.id` here is sufficient for the `jwt` callback below to
+        // resolve the LINKED user, not an email-matched one — verified by
+        // this file's own existing pattern (every branch below already
+        // relies on exactly this to attach a DB id to the session).
+        if (account.providerAccountId) {
+          const linkedAccount = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
+            },
+            select: { userId: true },
+          });
+          if (linkedAccount) {
+            user.id = linkedAccount.userId;
+            return true;
+          }
+        }
+
+        // No existing link for this provider identity — first-time login or
+        // first-time link. The ownership guard further down is now
+        // unreachable by construction (we just proved no Account row exists
+        // for this provider_providerAccountId), kept only as defense in
+        // depth against a race between this read and the eventual upsert.
+        //
         // Never link/log-in on an UNVERIFIED provider email — otherwise an
         // attacker who sets a victim's address as an unverified email on
         // their own provider account could take over the victim's Buildrick
@@ -190,17 +235,18 @@ export const authConfig: NextAuthConfig = {
             },
             select: { userId: true },
           });
-          // CRITICAL N1 (controller ruling, fix round 2): `update: { userId }`
-          // on a provider_providerAccountId conflict would silently REASSIGN
-          // an existing provider link from whichever user it currently
-          // belongs to onto `user.id` — a provider identity's ownership must
-          // be permanent once established, or a physical provider account
-          // (e.g. someone who changes which Buildrick-registered email their
-          // GitHub reports as verified over time) could jump an Account row
-          // between two different Buildrick users. Refuse instead of moving
-          // it; the earlier branches above have already decided which row
-          // this sign-in is allowed to reach, and this is a data-integrity
-          // guard on top of that, not a substitute for it.
+          // CRITICAL N1 (fix round 2) / IMPORTANT (fix round 3, controller
+          // rulings): `update: { userId }` on a provider_providerAccountId
+          // conflict would silently REASSIGN an existing provider link from
+          // whichever user it currently belongs to onto `user.id` — a
+          // provider identity's ownership must be permanent once
+          // established. The account-first lookup at the top of this
+          // callback already makes this branch unreachable in the normal
+          // case (we already proved no Account row exists for this
+          // provider_providerAccountId before doing any create/update/clear
+          // above) — this re-check is defense in depth against a
+          // TOCTOU race between that read and this upsert, not the primary
+          // guard anymore.
           if (linkedElsewhere && linkedElsewhere.userId !== user.id) {
             return "/auth/error/social-error?reason=provider-linked-elsewhere";
           }

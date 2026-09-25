@@ -116,6 +116,21 @@ export async function createTestInvite(
   });
 }
 
+export async function createTestAccount(
+  params: { userId: string; provider: string; providerAccountId: string } & Partial<Prisma.AccountUncheckedCreateInput>,
+) {
+  const { userId, provider, providerAccountId, ...overrides } = params;
+  return prisma.account.create({
+    data: {
+      userId,
+      provider,
+      providerAccountId,
+      type: "oauth",
+      ...overrides,
+    },
+  });
+}
+
 const MODEL_TO_TABLE = {
   user: "users",
   workspace: "workspaces",
@@ -124,6 +139,7 @@ const MODEL_TO_TABLE = {
   page: "pages",
   sitePermission: "site_permissions",
   invite: "invites",
+  account: "accounts",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

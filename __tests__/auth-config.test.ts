@@ -42,8 +42,10 @@ vi.mock("@/server/services/auth.service", () => ({
 
 import { authConfig } from "@/server/auth.config";
 import { prisma } from "@/lib/prisma";
+import { logAuditEvent } from "@/server/services/audit.service";
 
 const mockPrisma = vi.mocked(prisma);
+const mockLogAuditEvent = vi.mocked(logAuditEvent);
 
 describe("OAuth signIn callback", () => {
   beforeEach(() => {
@@ -378,9 +380,20 @@ describe("signIn callback — GitHub unverified email refused on both paths (CRI
   });
 
   it("link path: refuses linking into an existing row when GitHub gave no verified email", async () => {
-    // Even though a row for this address already exists (and is verified),
-    // the sign-in attempt itself carries no verified GitHub email — must
-    // never reach the existing-row lookup at all, let alone link.
+    // Minor (controller, fix round 3): mock an actual existing VERIFIED row
+    // that a real DB lookup-by-email would find — proving the refusal
+    // happens before the existing-row lookup even runs, not merely because
+    // the mock happened to be unset. If this branch were ever reached
+    // despite the unverified email, `user.findUnique` would return this row
+    // and the code could silently link into it.
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "existing-verified-id",
+      email: "b@x.example.com",
+      passwordHash: null,
+      emailVerified: new Date("2026-01-01"),
+      accounts: [],
+    } as any);
+
     const signInCallback = authConfig.callbacks!.signIn!;
     const result = await signInCallback({
       user: { id: "temp", email: undefined } as any,
@@ -390,7 +403,10 @@ describe("signIn callback — GitHub unverified email refused on both paths (CRI
     } as any);
 
     expect(result).toBe("/auth/error/social-error?reason=unverified-email");
+    // Never reached the existing-row lookup at all, let alone linked into it
+    // — despite the mock being ready to return a match.
     expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
   });
 
   it("a GitHub-verified email DOES proceed (positive control)", async () => {
@@ -411,52 +427,80 @@ describe("signIn callback — GitHub unverified email refused on both paths (CRI
   });
 });
 
-describe("signIn callback — Account provider-link ownership cannot be reassigned (CRITICAL N1)", () => {
+describe("signIn callback — account-first identity resolution (IMPORTANT, fix round 3)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("refuses when the provider_providerAccountId is already linked to a DIFFERENT user", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "user-b",
-      email: "shared@example.com",
-      passwordHash: null,
-      emailVerified: new Date("2026-01-01"),
-      accounts: [],
-    } as any);
+  // The scenario that motivated this ruling: user A linked GitHub with
+  // verified a@x, then changed their GitHub account's verified email to
+  // b@x. The OLD ordering (email-first) would look up `b@x`, find no row,
+  // and create a second "verified" user + workspace before ever checking
+  // the provider link — orphaning A's real account. Account-first settles
+  // identity from the physical provider link BEFORE any email lookup, so
+  // this can no longer happen.
+  it("an existing provider link signs in as the LINKED user — no email lookup, no user/workspace writes, even when the provider's email changed", async () => {
     mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-a" } as any);
 
     const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "temp", email: "b@x.example.com" } as any; // the NEW email the provider now reports
     const result = await signInCallback({
-      user: { id: "temp", email: "shared@example.com" } as any,
-      account: { provider: "google", type: "oauth", providerAccountId: "g-shared" } as any,
-      profile: { email: "shared@example.com", email_verified: true } as any,
+      user: userObj,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-a" } as any,
+      profile: { email: "b@x.example.com" } as any, // GitHub's own userinfo override already resolved this as verified
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("user-a"); // linked user, NOT an email-matched lookup
+    expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.user.update).not.toHaveBeenCalled();
+    expect(txUserCreate).not.toHaveBeenCalled();
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled(); // "bump nothing else"
+    expect(mockLogAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it("no existing provider link → proceeds through the normal verified-email create/link flow (unchanged)", async () => {
+    mockPrisma.account.findUnique.mockResolvedValue(null); // no link yet
+    mockPrisma.user.findUnique.mockResolvedValue(null); // no existing row for this email either
+    txUserCreate.mockResolvedValue({ id: "new-user", email: "fresh@example.com", fullName: "Fresh User" });
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "temp", email: "fresh@example.com", name: "Fresh User" } as any;
+    const result = await signInCallback({
+      user: userObj,
+      account: { provider: "google", type: "oauth", providerAccountId: "g-new" } as any,
+      profile: { email: "fresh@example.com", email_verified: true } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("new-user");
+    expect(txUserCreate).toHaveBeenCalled();
+    expect(mockPrisma.account.upsert).toHaveBeenCalled();
+  });
+
+  // Defense in depth: the ownership guard near the bottom of the callback is
+  // unreachable by construction in the normal case (the account-first check
+  // above already proved no link exists before any create/update runs) — but
+  // still fires if a race lands a conflicting link between that read and the
+  // final upsert.
+  it("TOCTOU defense: refuses if the provider link appears (owned by someone else) between the account-first check and the upsert", async () => {
+    mockPrisma.account.findUnique
+      .mockResolvedValueOnce(null) // account-first check: no link yet
+      .mockResolvedValueOnce({ userId: "user-a" } as any); // re-check just before upsert: now linked to someone else
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    txUserCreate.mockResolvedValue({ id: "user-b", email: "raced@example.com", fullName: "Raced User" });
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const result = await signInCallback({
+      user: { id: "temp", email: "raced@example.com", name: "Raced User" } as any,
+      account: { provider: "google", type: "oauth", providerAccountId: "g-race" } as any,
+      profile: { email: "raced@example.com", email_verified: true } as any,
       credentials: undefined as any,
     } as any);
 
     expect(result).toBe("/auth/error/social-error?reason=provider-linked-elsewhere");
     expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
-  });
-
-  it("proceeds normally when the provider link already belongs to the SAME user (re-login)", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "user-a",
-      email: "owner@example.com",
-      passwordHash: null,
-      emailVerified: new Date("2026-01-01"),
-      accounts: [{ provider: "google" }],
-    } as any);
-    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-a" } as any);
-
-    const signInCallback = authConfig.callbacks!.signIn!;
-    const result = await signInCallback({
-      user: { id: "temp", email: "owner@example.com" } as any,
-      account: { provider: "google", type: "oauth", providerAccountId: "g-owned" } as any,
-      profile: { email: "owner@example.com", email_verified: true } as any,
-      credentials: undefined as any,
-    } as any);
-
-    expect(result).toBe(true);
-    expect(mockPrisma.account.upsert).toHaveBeenCalled();
   });
 });
