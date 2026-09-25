@@ -47,7 +47,7 @@ export const publishInputSchema = z
      *  writer would ship the older copy over theirs; the server refuses with
      *  SAVE_CONFLICT when the site moved past this. Optional — callers that
      *  send no pages (cron, dashboard) are not checked. */
-    expectedLastEditedAt: z.string().datetime().nullable().optional(),
+    expectedLastEditedAt: z.string().datetime().nullish(),
   })
   .refine(
     (input) => {

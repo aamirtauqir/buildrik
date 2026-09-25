@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { editorSaveProjectSchema, saveProjectDataSchema } from "../sites";
+import { publishInputSchema } from "../publish";
 
 describe("saveProjectDataSchema", () => {
   it("accepts dsSchemaVersion as optional non-negative integer", () => {
@@ -54,5 +55,21 @@ describe("editorSaveProjectSchema — dsSchemaVersion", () => {
       projectData: { version: "1.0.0", pages: [], styles: [], assets: [], dsSchemaVersion: 3 },
     });
     expect(parsed.projectData.dsSchemaVersion).toBe(3);
+  });
+});
+
+/* Review M2: a malformed token reached `new Date(x)` in the service and came
+   back as a 500 (Invalid Date). It is an input error — refused at the schema. */
+describe("expectedLastEditedAt is validated as an ISO datetime", () => {
+  const base = { siteId: "s", projectData: { version: "1.0.0", pages: [], styles: [], assets: [] } };
+  it("accepts an ISO string, null and absence", () => {
+    expect(() => editorSaveProjectSchema.parse({ ...base, expectedLastEditedAt: "2026-09-26T10:00:00.000Z" })).not.toThrow();
+    expect(() => editorSaveProjectSchema.parse({ ...base, expectedLastEditedAt: null })).not.toThrow();
+    expect(() => editorSaveProjectSchema.parse(base)).not.toThrow();
+  });
+  it("refuses garbage (a 400, not a 500 from Invalid Date)", () => {
+    expect(() => editorSaveProjectSchema.parse({ ...base, expectedLastEditedAt: "yesterday" })).toThrow();
+    expect(() => publishInputSchema.parse({ siteId: "s", expectedLastEditedAt: "yesterday" })).toThrow();
+    expect(() => publishInputSchema.parse({ siteId: "s", expectedLastEditedAt: null })).not.toThrow();
   });
 });
