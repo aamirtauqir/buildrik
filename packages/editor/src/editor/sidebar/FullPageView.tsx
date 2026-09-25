@@ -1,7 +1,14 @@
 /**
- * FullPageView — Container for fullpage-mode tabs
- * Renders inside LayoutShell.FullPage slot.
- * Provides consistent header and close action across Templates, Settings, History.
+ * FullPageView — Container for fullpage-mode tabs (Templates, Assets,
+ * Settings, Design — FullPageRouter's cases; History is a right-column mode
+ * and never reaches here).
+ * Renders inside LayoutShell.FullPage slot: an error boundary + Suspense
+ * fallback around FullPageRouter. It does NOT provide a shared header or
+ * close action — each fullpage screen portals its own edge-to-edge surface
+ * with its own `‹ Back to canvas` and owns its own Escape/dialogs — this is
+ * takeover shape 1 of 3 (see the "THE THREE TAKEOVER SHAPES" contract at the
+ * top of FullPageRouter.tsx for the other two: the CMS canvas region and the
+ * Compare overlay).
  *
  * @license BSD-3-Clause
  */

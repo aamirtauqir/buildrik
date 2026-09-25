@@ -3,7 +3,8 @@
  * Manages left sidebar, canvas area, right inspector, and fullpage views.
  *
  * Panel mode: Rail + Drawer (variable width) + Canvas + Inspector
- * Fullpage mode: Rail + FullPage (Templates, Settings, History, Design)
+ * Fullpage mode: Rail + FullPage (Templates, Assets, Settings, Design — the
+ * FullPageRouter cases; History is a right-column mode, not fullpage)
  *
  * @license BSD-3-Clause
  */
@@ -659,6 +660,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canRedo={canRedo}
             />
           </div>
+          {/* FC-7 takeover shape 2 of 3 (see FullPageRouter.tsx's "THE THREE
+              TAKEOVER SHAPES" contract): an in-place region over the canvas,
+              NOT a Portal — the rail and drawer stay mounted and reachable
+              beside it. */}
           {cmsWorkspaceOpen ? (
             <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
               <React.Suspense fallback={null}>
@@ -721,7 +726,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area).
+        {/* FullPage View — Templates, Assets, Settings, Design (replaces canvas area).
             Mounted ONLY in fullpage mode. It used to render on every tab and
             rely on the slot's display:none, so the Media DRAWER kept a whole
             second LibraryManager (and its media state) mounted invisibly —

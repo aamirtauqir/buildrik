@@ -25,7 +25,8 @@ export interface LayoutShellProps {
   drawerOpen: boolean;
   /** Drawer width in pixels (200 or 280, per-tab) */
   drawerWidth?: number;
-  /** Whether a fullpage tab is active (Templates, Settings, History) */
+  /** Whether a fullpage tab is active (Templates, Assets, Settings, Design —
+   *  the FullPageRouter cases; History is a right-column mode, not fullpage) */
   fullPageMode?: boolean;
   /** Whether the inspector panel is visible */
   inspectorOpen?: boolean;

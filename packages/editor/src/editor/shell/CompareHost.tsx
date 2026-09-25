@@ -13,7 +13,10 @@
  * HTML stays inside the service (see compareSources).
  *
  * Mounted once by the shell, full-canvas through chrome-ui's `OverlayMount`
- * (Gate 22).
+ * (Gate 22). This is takeover shape 3 of 3 (see FullPageRouter.tsx's "THE
+ * THREE TAKEOVER SHAPES" contract) — an overlay rather than a Portal or an
+ * in-canvas region, because Compare has no tab id and no rail slot: it opens
+ * from three unrelated doors, not one destination.
  *
  * @license BSD-3-Clause
  */
