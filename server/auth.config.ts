@@ -83,16 +83,45 @@ export const authConfig: NextAuthConfig = {
         } else {
           const providerLinked = existing.accounts.some((a) => a.provider === account.provider);
           const isSelfLink = (await currentSessionUserId()) === existing.id;
-          // A fresh PUBLIC OAuth login (not the owner self-linking from Settings)
-          // into a password account whose provider isn't linked yet → do NOT
-          // silently link it; send them to use their password. This prevents
-          // login-method confusion + email-based account absorption.
-          if (existing.passwordHash && !providerLinked && !isSelfLink) {
-            return `/auth/oauth-conflict?email=${encodeURIComponent(user.email)}`;
+
+          if (!existing.emailVerified) {
+            // CRITICAL 2 (controller ruling, fix round 1) / S-5 anti-pre-
+            // account-hijack: OAuth already proved control of this email —
+            // Google asserts `email_verified`, Auth.js's GitHub provider only
+            // ever returns the primary verified email (checked above) — so
+            // this IS the real owner's first verification of a never-verified
+            // row. Same clearing as verifyMagicLink: an attacker who
+            // pre-registered this address with a known password must not
+            // keep access once the real owner signs in through their
+            // provider. No oauth-conflict redirect here — an unverified row
+            // was never provably the password-setter's in the first place.
+            await prisma.user.update({
+              where: { id: existing.id },
+              data: {
+                emailVerified: new Date(),
+                passwordHash: null,
+                twoFactorEnabled: false,
+                twoFactorSecret: null,
+                backupCodes: [],
+                sessionVersion: { increment: 1 },
+                lastLoginAt: new Date(),
+              },
+            });
+            user.id = existing.id;
+            await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
+          } else {
+            // A fresh PUBLIC OAuth login (not the owner self-linking from
+            // Settings) into an ALREADY-VERIFIED password account whose
+            // provider isn't linked yet → do NOT silently link it; send them
+            // to use their password. This prevents login-method confusion +
+            // email-based account absorption.
+            if (existing.passwordHash && !providerLinked && !isSelfLink) {
+              return `/auth/oauth-conflict?email=${encodeURIComponent(user.email)}`;
+            }
+            user.id = existing.id;
+            await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
+            await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
           }
-          user.id = existing.id;
-          await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
-          await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
         }
 
         // Record the provider link so Settings → Account can show + manage

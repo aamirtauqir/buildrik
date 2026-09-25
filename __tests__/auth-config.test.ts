@@ -81,6 +81,7 @@ describe("OAuth signIn callback", () => {
       id: "victim-id",
       email: "victim@example.com",
       passwordHash: "$2b$10$hash",
+      emailVerified: new Date("2026-01-01"), // already-verified row — the conflict guard only applies here
       accounts: [], // Google was never linked to this account
     } as any);
 
@@ -146,11 +147,12 @@ describe("OAuth signIn callback", () => {
   // The signIn callback reads `existing.accounts` (include: { accounts: … }) to
   // decide whether this provider is already linked. The mock returned a user
   // without it, so this test died on "Cannot read properties of undefined".
-  it("sets user.id to DB id when OAuth user already exists", async () => {
+  it("sets user.id to DB id when OAuth user already exists and is verified", async () => {
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "existing-db-id",
       email: "oauth@example.com",
       passwordHash: null,
+      emailVerified: new Date("2026-01-01"),
       accounts: [{ provider: "google" }],
     } as any);
 
@@ -169,6 +171,50 @@ describe("OAuth signIn callback", () => {
     expect(mockPrisma.user.create).not.toHaveBeenCalled();
     // Critical: user.id must be set to our DB id for jwt callback
     expect(userObj.id).toBe("existing-db-id");
+    // Already-verified row: only lastLoginAt bumps, no credential clearing.
+    expect(mockPrisma.user.update).toHaveBeenCalledWith({
+      where: { id: "existing-db-id" },
+      data: { lastLoginAt: expect.any(Date) },
+    });
+  });
+
+  // CRITICAL 2 (controller ruling, fix round 1): OAuth already proves control
+  // of the email (email_verified asserted above), so a never-verified row is
+  // the real owner's first verification — same anti-pre-account-hijack
+  // clearing as verifyMagicLink, and no oauth-conflict redirect (an
+  // unverified row was never provably the password-setter's).
+  it("clears passwordHash/2FA and bumps sessionVersion on first OAuth login into a never-verified row", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "hijacked-id",
+      email: "victim2@example.com",
+      passwordHash: "$2b$10$attacker-set-hash",
+      emailVerified: null,
+      accounts: [], // Google was never linked to this account
+    } as any);
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "provider-id", email: "victim2@example.com", name: "Victim" } as any;
+    const result = await signInCallback({
+      user: userObj,
+      account: { provider: "google", type: "oauth", providerAccountId: "g-9" } as any,
+      profile: { email: "victim2@example.com", email_verified: true } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("hijacked-id");
+    expect(mockPrisma.user.update).toHaveBeenCalledWith({
+      where: { id: "hijacked-id" },
+      data: {
+        emailVerified: expect.any(Date),
+        passwordHash: null,
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        backupCodes: [],
+        sessionVersion: { increment: 1 },
+        lastLoginAt: expect.any(Date),
+      },
+    });
   });
 
   // This asserted that a "credentials" account returns true. It cannot: there is
