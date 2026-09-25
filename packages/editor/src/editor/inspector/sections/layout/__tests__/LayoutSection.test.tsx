@@ -40,8 +40,13 @@ describe("LayoutSection — advanced disclosure", () => {
     expect(screen.queryByText("Visibility & Float")).not.toBeInTheDocument();
   });
 
-  it("reveals the Overflow + Visibility & Float groups when expanded", () => {
+  /* Board 7058:78647: expanded, the block is the Position row; Overflow and
+     Visibility & Float wait behind their own "Overflow & visibility" toggle. */
+  it("expanded shows Position; Overflow + Visibility & Float one click further", () => {
     renderLayout({ advancedExpanded: true, onAdvancedToggle: vi.fn() });
+    expect(screen.getByRole("combobox", { name: /Position/ })).toBeInTheDocument();
+    expect(screen.queryByText("Visibility & Float")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Overflow & visibility" }));
     expect(screen.getByText("Overflow")).toBeInTheDocument();
     expect(screen.getByText("Visibility & Float")).toBeInTheDocument();
   });
