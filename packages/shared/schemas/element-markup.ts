@@ -71,6 +71,33 @@ export function isDangerousUrl(value: string): boolean {
   return compact.startsWith("data:") && !compact.startsWith("data:image/");
 }
 
+const TARGET_REL = ["noopener", "noreferrer"];
+
+const TARGET_ATTR = /\starget\s*=/i;
+
+/**
+ * Give every element in sanitized markup that opens a browsing context
+ * (`target`) rel="noopener noreferrer", merged into any rel it already has, so
+ * the opened page gets no `window.opener` handle back to the app. Both sides'
+ * sanitizers keep `target`, and both finish through this.
+ *
+ * `parse` is the caller's DOMPurify with RETURN_DOM_FRAGMENT. Markup with no
+ * target is returned untouched: re-serialising it would rewrite text ("&" →
+ * "&amp;") in every stored node for nothing.
+ */
+export function withSafeTargets(clean: string, parse: (html: string) => DocumentFragment): string {
+  if (!TARGET_ATTR.test(clean)) return clean;
+  const fragment = parse(clean);
+  fragment.querySelectorAll("[target]").forEach((el) => {
+    const rel = new Set((el.getAttribute("rel") ?? "").split(/\s+/).filter(Boolean));
+    for (const token of TARGET_REL) rel.add(token);
+    el.setAttribute("rel", [...rel].join(" "));
+  });
+  const holder = fragment.ownerDocument.createElement("div");
+  holder.append(fragment);
+  return holder.innerHTML;
+}
+
 /**
  * The URLs a `srcset` value names ("a.jpg 1x, b.jpg 200w" → ["a.jpg", "b.jpg"]).
  * Only a trailing width/density descriptor is cut, not everything after the

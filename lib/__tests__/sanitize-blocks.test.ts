@@ -221,3 +221,22 @@ describe("URL schemes a browser would still run (S-1 review fix 2)", () => {
     }
   );
 });
+
+describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
+  it("adds it to rich-text content, merging an existing rel", () => {
+    const blocks = {
+      id: "r",
+      type: "text",
+      tagName: "p",
+      content: '<a href="/a" target="_blank">a</a><a href="/b" target="_blank" rel="nofollow">b</a><a href="/c">c</a>',
+    };
+    sanitizeBlocks(blocks);
+    expect(blocks.content).toContain('<a href="/a" target="_blank" rel="noopener noreferrer">a</a>');
+    expect(blocks.content).toContain('rel="nofollow noopener noreferrer"');
+    expect(blocks.content).toContain('<a href="/c">c</a>');
+  });
+
+  it("adds it to user-template html", () => {
+    expect(sanitizeTemplateHtml('<a href="/x" target="_blank">x</a>')).toContain('rel="noopener noreferrer"');
+  });
+});

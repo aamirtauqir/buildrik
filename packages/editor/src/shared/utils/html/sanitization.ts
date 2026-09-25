@@ -23,6 +23,7 @@ import {
   URL_ATTRIBUTES,
   isDangerousUrl,
   isValidAttributeName,
+  withSafeTargets,
   srcsetUrls,
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
@@ -150,7 +151,11 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
     config.ALLOWED_TAGS = Array.from(allowedTags);
   }
 
-  return DOMPurify.sanitize(html, config) as unknown as string;
+  // `target` is kept (EDITOR_ADD_ATTR), so every link that has it also gets
+  // rel="noopener noreferrer" — the same rule the server applies.
+  return withSafeTargets(DOMPurify.sanitize(html, config), (clean) =>
+    DOMPurify.sanitize(clean, { ...config, RETURN_DOM_FRAGMENT: true })
+  );
 }
 
 /**

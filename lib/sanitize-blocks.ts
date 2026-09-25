@@ -30,6 +30,7 @@ import {
   isAllowedElementTag,
   isDangerousUrl,
   isValidAttributeName,
+  withSafeTargets,
   srcsetUrls,
 } from "@buildrik/shared/schemas/element-markup";
 
@@ -44,9 +45,17 @@ export type SanitizeReason =
 
 export type OnSanitizeChange = (reason: SanitizeReason, detail: string) => void;
 
-/** As the editor's sanitizeHTML: DOMPurify drops `target` by default, which
- *  stripped "open in new tab" from every stored rich-text link. */
-const PURIFY_CONFIG = { ADD_ATTR: ["target"] };
+/**
+ * As the editor's sanitizeHTML: DOMPurify drops `target` by default, which
+ * stripped "open in new tab" from every stored rich-text link. It is kept, and
+ * every link that has it gets rel="noopener noreferrer".
+ */
+function purify(html: string): string {
+  const config = { ADD_ATTR: ["target"] };
+  return withSafeTargets(String(DOMPurify.sanitize(html, config)), (clean) =>
+    DOMPurify.sanitize(clean, { ...config, RETURN_DOM_FRAGMENT: true })
+  );
+}
 
 const EVENT_HANDLER_ATTR = /^on/i;
 function unsafeAttributeReason(name: string, value: string): SanitizeReason | null {
@@ -82,7 +91,7 @@ function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange
   }
 
   if (typeof node.content === "string" && node.content.length > 0) {
-    const clean = String(DOMPurify.sanitize(node.content, PURIFY_CONFIG));
+    const clean = purify(node.content);
     if (onChange && clean !== node.content) onChange("content", node.content.slice(0, 80));
     node.content = clean;
   }
@@ -141,5 +150,5 @@ export function sanitizeVersionPayload<T>(payload: T, onChange?: OnSanitizeChang
 
 /** A saved user template's exported page markup. */
 export function sanitizeTemplateHtml(html: string): string {
-  return String(DOMPurify.sanitize(html, PURIFY_CONFIG));
+  return purify(html);
 }

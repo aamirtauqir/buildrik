@@ -242,3 +242,11 @@ describe("URL schemes a browser would still run (S-1 review fix 2)", () => {
     }
   );
 });
+
+describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
+  it("sanitizeHTML adds it, merging an existing rel", () => {
+    const out = sanitizeHTML('<a href="/a" target="_blank">a</a><a href="/b" target="_blank" rel="nofollow">b</a>');
+    expect(out).toContain('<a href="/a" target="_blank" rel="noopener noreferrer">a</a>');
+    expect(out).toContain('rel="nofollow noopener noreferrer"');
+  });
+});
