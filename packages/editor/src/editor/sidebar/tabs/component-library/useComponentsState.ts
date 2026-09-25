@@ -7,10 +7,10 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants";
-import { inPageScope } from "@/engine/components/ComponentManager";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { takePendingMaster } from "./openMasterRequest";
 import { deleteComponentWithUndo } from "./ComponentDetailScreen";
+import { useComponentList } from "./useComponentList";
 import type { ToastInput } from "@/editor/chrome-ui";
 
 const MAX_COMPONENTS = 100;
@@ -41,9 +41,8 @@ export function useComponentsState({
   onExpandToggle,
   onHelpClick,
 }: UseComponentsStateParams) {
-  const [components, setComponents] = React.useState<ComponentDefinition[]>([]);
-  const [isLoaded, setIsLoaded] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
+  const { components, isLoaded, error, setError, library } = useComponentList(composer);
 
   // Use controlled selectedId if provided, otherwise internal state
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
@@ -87,35 +86,6 @@ export function useComponentsState({
       composer.off("selection:removed", handleSelectionChange);
       composer.off("selection:cleared", handleSelectionChange);
       composer.off("selection:multiple", handleSelectionChange);
-    };
-  }, [composer]);
-
-  // Load components and subscribe to updates
-  React.useEffect(() => {
-    if (!composer?.components) return;
-
-    const loadComponents = () => {
-      try {
-        // G2-118: masters in scope on the open page (site-wide + "This page").
-        const pageId = composer.elements.getActivePage()?.id;
-        const allComponents = (composer.components?.getAllComponents() ?? []).filter((c) => inPageScope(c, pageId));
-        setComponents(allComponents);
-        setIsLoaded(true);
-        setError(null);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load components");
-      }
-    };
-
-    loadComponents();
-
-    const handleUpdate = () => loadComponents();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, handleUpdate);
-    composer.on(EVENTS.PAGE_CHANGED, handleUpdate);
-
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, handleUpdate);
-      composer.off(EVENTS.PAGE_CHANGED, handleUpdate);
     };
   }, [composer]);
 
@@ -255,6 +225,9 @@ export function useComponentsState({
   return {
     // Components
     components,
+    // v3 FC-10: ComponentsTab reads its "which masters are library-linked"
+    // list from here instead of fetching it a second time in the same tree.
+    library,
     // Selection
     selectedId,
     setSelectedId,

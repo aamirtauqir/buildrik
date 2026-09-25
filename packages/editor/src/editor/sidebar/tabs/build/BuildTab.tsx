@@ -29,12 +29,8 @@ import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { inPageScope } from "@/engine/components/ComponentManager";
-import {
-  fetchComponentLibrary,
-  fetchLibraryComponent,
-  type LibraryComponentEntry,
-} from "@/services/componentSync";
+import { useComponentList } from "../component-library/useComponentList";
+import { fetchLibraryComponent } from "@/services/componentSync";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -51,32 +47,13 @@ export interface BuildTabProps {
 export const BuildTab: React.FC<BuildTabProps> = ({
   composer, onBlockClick, onHelpClick, onClose, isOpen = true,
 }) => {
-  // MINE (board 1069:4970): the user's own components, inline, and
-  // searched with the rest (G2-111). Same load +
-  // subscribe shape useComponentsState uses.
+  // MINE (board 1069:4970): the user's own components, inline, and searched
+  // with the rest (G2-111). v3 FC-10: load + subscribe lives once, in
+  // useComponentList — the same hook useComponentsState (Components tab) uses.
   /* G2-118: only masters in scope on the OPEN page (site-wide + "This page"
      ones for it), and not the library-linked ones — board 4418:99857 lists
      those under FROM LIBRARY instead. */
-  const [allMine, setAllMine] = React.useState<ComponentDefinition[]>([]);
-  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
-  React.useEffect(() => {
-    if (!composer?.components) return;
-    const load = () => {
-      const pageId = composer.elements.getActivePage()?.id;
-      setAllMine((composer.components?.getAllComponents() ?? []).filter((c) => inPageScope(c, pageId)));
-    };
-    const loadLibrary = () => void fetchComponentLibrary().then(setLibrary);
-    load();
-    loadLibrary();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
-    composer.on(EVENTS.PAGE_CHANGED, load);
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
-      composer.off(EVENTS.PAGE_CHANGED, load);
-    };
-  }, [composer]);
+  const { components: allMine, library } = useComponentList(composer);
   const mine = React.useMemo(() => {
     const linked = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
     return allMine.filter((c) => !linked.has(c.id));

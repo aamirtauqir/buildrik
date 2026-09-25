@@ -88,9 +88,13 @@ export interface PublishConfirmFactsProps {
   /** The site whose readiness to check. Without it the Target row can only
       assert a connection it has not looked for. */
   siteId?: string | null;
-  /** The blocking check's detail, or null when nothing blocks — same contract
-      as onPageCount: read here, enforced by the button. */
-  onBlocked?(reason: string | null): void;
+  /** Every FAILING check (server checklist, `runPrePublishChecks`), empty
+   *  when nothing blocks — same contract as onPageCount: read here, enforced
+   *  and rendered by the caller. v3 FC-8: the confirm modal used to read only
+   *  the FIRST failing check (`.find`), so a site with two blocking checks
+   *  showed one and hid the other; the Publish panel's own PrePublishChecks
+   *  list has always shown every row. Same server call, same list, both doors. */
+  onBlockingChecks?(checks: Array<{ label: string; detail: string }>): void;
   /** How many non-blocking checks warned. Same read-here-render-there
       contract as onBlocked, so both publish doors can say the same thing. */
   onWarnings?(count: number): void;
@@ -104,7 +108,7 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   rollbackTo = null,
   onPageCount,
   siteId,
-  onBlocked,
+  onBlockingChecks,
   onWarnings,
 }) => {
   const [pageCount, setPageCount] = React.useState<number | null>(null);
@@ -114,8 +118,9 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
      can deploy at all. The topbar path never asked it: the row asserted "your
      connected Vercel project", the button published, the job queued, and the
      deploy died at the last step on VERCEL_NOT_CONNECTED — which is the exact
-     failure that check exists to prevent (publish.service.ts:36). */
-  const [blocker, setBlocker] = React.useState<{ label: string; detail: string } | null>(null);
+     failure that check exists to prevent (publish.service.ts:36). Every
+     failing check, not just the first — v3 FC-8. */
+  const [blockers, setBlockers] = React.useState<Array<{ label: string; detail: string }>>([]);
 
   React.useEffect(() => {
     if (!active) return;
@@ -133,9 +138,11 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
       if (cancelled) return;
       /* A checks call that fails is not a pass: it leaves the row saying what
          it said before and the button alone, rather than inventing a verdict. */
-      const failed = checks?.checks.find((c) => c.status === "fail") ?? null;
-      setBlocker(failed ? { label: failed.label, detail: failed.detail } : null);
-      onBlocked?.(failed ? failed.detail : null);
+      const failed = (checks?.checks ?? [])
+        .filter((c) => c.status === "fail")
+        .map((c) => ({ label: c.label, detail: c.detail }));
+      setBlockers(failed);
+      onBlockingChecks?.(failed);
       /* Warnings do not block, which is exactly why they went missing: the
          topbar confirm asked only whether it was blocked. A user publishing
          from the fast path was never told the site had unresolved warnings
@@ -150,11 +157,11 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [active, composer, onPageCount, siteId, onBlocked]);
+  }, [active, composer, onPageCount, siteId, onBlockingChecks]);
 
   const target = publishedUrl
     ? `Production · ${publishedUrl.replace(/^https?:\/\//, "")}`
-    : blocker?.label === VERCEL_CHECK_LABEL
+    : blockers.some((b) => b.label === VERCEL_CHECK_LABEL)
       /* The row states the fact; the sentence that explains it belongs to the
          band under the rows, which has the width for it. Both carrying the
          same sentence printed it twice and ran it to the modal's edge. */

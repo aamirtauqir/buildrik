@@ -18,7 +18,6 @@ import { useComponentsState } from "./component-library/useComponentsState";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
-import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 export type { ComponentsTabProps };
 
 
@@ -66,16 +65,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   );
 
   // Which of this site's masters are shared from the workspace library.
-  const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
-  React.useEffect(() => {
-    if (!composer) return;
-    const load = () => void fetchComponentLibrary().then(setLibrary);
-    load();
-    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
-    return () => {
-      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
-    };
-  }, [composer]);
+  // v3 FC-10: read from useComponentsState (→ useComponentList) instead of
+  // fetching it a second time in the same mounted tree.
+  const { library } = state;
 
   const { pendingToast, setPendingToast } = state;
   React.useEffect(() => {
