@@ -17,7 +17,13 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
-import { SyncRetryQueue, type SyncRetryInfo, registerPendingSource } from "./syncRetryQueue";
+import {
+  SyncRetryQueue,
+  type SyncRetryInfo,
+  registerPendingSource,
+  recordServerStamp,
+  serverCopyWins,
+} from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -58,8 +64,10 @@ export function retryCmsSync(): Promise<void> {
 
 /**
  * Cross-device load (E7 / C-4, PD-36): pull server collections + entries into
- * the engine's IndexedDB on editor open. SERVER-FIRST BY `updatedAt`: a row is
- * written when it is missing locally or the server's copy is newer, and every
+ * the engine's IndexedDB on editor open. SERVER-FIRST, on the server's clock:
+ * a row is written when it is missing locally, or when the server confirmed
+ * this browser's copy (a stamp, see `serverCopyWins`), it has not changed
+ * locally since, and the server's updatedAt moved past the stamp; every
  * collection's entries are re-read — the old additive pass skipped any
  * collection already local, so another member's entry edits never arrived. A
  * row with a mirror still queued here (upsert or delete) is left alone: that
@@ -107,12 +115,6 @@ export async function retryCmsHydration(): Promise<void> {
   await hydrateCmsFromServer();
 }
 
-/** The server copy wins when the local one is missing, undated, or older. */
-function serverIsNewer(remote: Date | string, local: string | undefined): boolean {
-  if (!local) return true;
-  return new Date(remote).getTime() > new Date(local).getTime();
-}
-
 function hasQueuedMirror(kind: "collection" | "entry", id: string): boolean {
   return queue.isPending(`${kind}Upsert:${id}`) || queue.isPending(`${kind}Delete:${id}`);
 }
@@ -140,7 +142,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
     for (const rc of remote) {
       if (hasQueuedMirror("collection", rc.id)) continue;
       const localCollection = localCollections.get(rc.id);
-      if (!localCollection || serverIsNewer(rc.updatedAt, localCollection.updatedAt)) {
+      if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection)) {
         const collection: CMSCollection = {
           id: rc.id,
           /* Stamped with the site it came FROM. Hydration writes straight into
@@ -159,6 +161,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
           createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
         };
         await Storage.saveCollection(collection);
+        recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
       }
       const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
         id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
@@ -167,12 +170,13 @@ export async function hydrateCmsFromServer(): Promise<void> {
       for (const e of entries) {
         if (hasQueuedMirror("entry", e.id)) continue;
         const localEntry = localEntries.get(e.id);
-        if (localEntry && !serverIsNewer(e.updatedAt, localEntry.updatedAt)) continue;
+        if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry)) continue;
         await Storage.saveContentItem({
           id: e.id, collectionId: rc.id, data: e.data,
           status: e.status === "PUBLISHED" ? "published" : "draft",
           createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
         });
+        recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
       }
     }
     setHydrationStatus("ready");
@@ -202,7 +206,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
-      }),
+      }).then((row) => recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt)),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e)
   );
@@ -234,7 +238,7 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
-      }),
+      }).then((row) => recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt)),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e)
   );

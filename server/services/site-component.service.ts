@@ -12,7 +12,7 @@ import type { UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-com
 
 export async function upsertSiteComponent(
   input: UpsertSiteComponentInput
-): Promise<{ componentId: string }> {
+): Promise<{ componentId: string; updatedAt: Date }> {
   // "This page" scope must name a page of THIS site.
   const pageId = input.pageId ?? null;
   if (pageId) {
@@ -35,7 +35,8 @@ export async function upsertSiteComponent(
       pageId,
     },
   });
-  return { componentId: row.componentId };
+  // updatedAt: the editor stamps its local copy with the SERVER's clock (C-4).
+  return { componentId: row.componentId, updatedAt: row.updatedAt };
 }
 
 export async function listSiteComponents(siteId: string) {

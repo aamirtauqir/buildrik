@@ -46,6 +46,7 @@ import {
   retryCmsSync,
   getCmsSyncPendingCount,
 } from "../cmsSync";
+import { recordServerStamp } from "../syncRetryQueue";
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-123");
@@ -54,6 +55,9 @@ beforeEach(() => {
   );
   storageAvailable.mockReset().mockReturnValue(true);
   loadContentItems.mockReset().mockResolvedValue([]);
+  localStorage.removeItem("bk-sync-stamps-v1");
+  // The server answers an upsert with its row — updatedAt on ITS clock.
+  [colUpsert, entUpsert].forEach((m) => m.mockResolvedValue({ updatedAt: new Date(0) }));
 });
 
 describe("cmsSync", () => {
@@ -105,7 +109,7 @@ describe("cmsSync", () => {
   });
 
   it("maps optional collection fields to explicit nulls in the upsert payload", async () => {
-    colUpsert.mockResolvedValueOnce(undefined);
+    colUpsert.mockResolvedValueOnce({ updatedAt: new Date(0) });
     await syncCollectionUpsert({
       id: "c1", name: "Posts", slug: "posts", fields: [], createdAt: "", updatedAt: "",
     } as never);
@@ -130,9 +134,9 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
   const drain = async () => {
     // Flush any leftover queued ops from prior tests with succeeding mutates,
     // so each test starts from an empty queue (module-level shared state).
-    colUpsert.mockResolvedValue(undefined);
+    colUpsert.mockResolvedValue({ updatedAt: new Date(0) });
     colDelete.mockResolvedValue(undefined);
-    entUpsert.mockResolvedValue(undefined);
+    entUpsert.mockResolvedValue({ updatedAt: new Date(0) });
     entDelete.mockResolvedValue(undefined);
     await retryCmsSync();
   };
@@ -161,7 +165,7 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
     const events: number[] = [];
     const off = onCmsSyncError(({ pending }) => events.push(pending));
 
-    colUpsert.mockResolvedValue(undefined);
+    colUpsert.mockResolvedValue({ updatedAt: new Date(0) });
     await syncCollectionUpsert({
       id: "ok", name: "OK", slug: "ok", fields: [], createdAt: "", updatedAt: "",
     } as never);
@@ -293,61 +297,95 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
 });
 
 describe("hydrateCmsFromServer", () => {
-  /* C-4 / PD-36: server-first by updatedAt. The additive pass this replaced
-     skipped every collection already local — so a teammate's edit to an
-     entry in a collection this browser had seen never arrived. */
-  it("writes a missing collection, re-reads the entries of one already local, and skips an up-to-date one", async () => {
-    colListQuery.mockResolvedValueOnce([
-      { id: "srv-new", name: "Posts", slug: "posts", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
-      { id: "local-1", name: "Pages", slug: "pages", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
-    ]);
-    loadCollections.mockResolvedValueOnce([{ id: "local-1", updatedAt: new Date(0).toISOString() }]); // same age → not rewritten
+  /* C-4 / PD-36: server-first, decided on the SERVER's clock. The additive
+     pass this replaced skipped every collection already local — so a
+     teammate's edit to an entry in a collection this browser had seen never
+     arrived. A local row is overwritten only when the server confirmed it
+     (a stamp), it has not changed locally since, and the server's own
+     updatedAt moved past the stamp. */
+  const col = (id: string, updatedAt: number) => ({
+    id, name: id, slug: id, description: null, icon: null, displayField: null, fields: [],
+    createdAt: new Date(0), updatedAt: new Date(updatedAt),
+  });
+  const T = (ms: number) => new Date(ms).toISOString();
+
+  it("writes a missing collection, re-reads the entries of one already local", async () => {
+    colListQuery.mockResolvedValueOnce([col("srv-new", 0), col("local-1", 0)]);
+    loadCollections.mockResolvedValueOnce([{ id: "local-1", updatedAt: T(0) }]);
+    recordServerStamp("collection:local-1", T(0), T(0));
+    recordServerStamp("entry:e2", T(1000), T(1000));
     entListQuery
       .mockResolvedValueOnce([{ id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) }])
       .mockResolvedValueOnce([{ id: "e2", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(5000) }]);
     loadContentItems.mockImplementation(async (id: string) =>
-      id === "local-1" ? [{ id: "e2", data: { t: "stale" }, updatedAt: new Date(1000).toISOString() }] : [],
+      id === "local-1" ? [{ id: "e2", data: { t: "stale" }, updatedAt: T(1000) }] : [],
     );
     await hydrateCmsFromServer();
-    // only the non-local collection is written
+    // only the non-local collection is written (local-1 is unchanged on the server)
     expect(saveCollection).toHaveBeenCalledTimes(1);
-    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "srv-new", slug: "posts" });
+    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "srv-new", slug: "srv-new" });
     // its entry, with status mapped back to engine casing …
     expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e1", collectionId: "srv-new", status: "published" });
     // … AND the newer server copy of an entry in the already-local collection
     expect(saveContentItem.mock.calls[1][0]).toMatchObject({ id: "e2", collectionId: "local-1", data: { t: "server" } });
-    expect(entListQuery).toHaveBeenCalledTimes(2);
   });
 
-  it("a newer server collection overwrites the local one; an older one does not", async () => {
-    colListQuery.mockResolvedValueOnce([
-      { id: "newer", name: "Renamed on server", slug: "n", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(9000) },
-      { id: "older", name: "Old on server", slug: "o", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(1000) },
-    ]);
-    loadCollections.mockResolvedValueOnce([
-      { id: "newer", updatedAt: new Date(2000).toISOString() },
-      { id: "older", updatedAt: new Date(5000).toISOString() },
-    ]);
+  it("client clock AHEAD: a confirmed local copy stamped far in the future still takes the server's newer edit", async () => {
+    const future = T(Date.parse("2099-01-01T00:00:00Z"));
+    recordServerStamp("collection:c", T(1000), future); // confirmed at server t=1000; local clock way ahead
+    colListQuery.mockResolvedValueOnce([{ ...col("c", 2000), name: "Renamed by a teammate" }]);
+    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: future }]);
     entListQuery.mockResolvedValue([]);
     await hydrateCmsFromServer();
+    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "c", name: "Renamed by a teammate" });
+  });
+
+  it("client clock BEHIND: an unconfirmed local edit with an OLD timestamp is not overwritten", async () => {
+    recordServerStamp("collection:c", T(1000), T(10)); // confirmed copy had local t=10
+    colListQuery.mockResolvedValueOnce([col("c", 9000)]);
+    // edited locally since (t=20 on a clock far behind the server's) — not yet on the server
+    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(20) }]);
+    entListQuery.mockResolvedValue([]);
+    await hydrateCmsFromServer();
+    expect(saveCollection).not.toHaveBeenCalled();
+  });
+
+  it("a local row the server never confirmed (no stamp — e.g. its mirror failed before a reload) is kept", async () => {
+    colListQuery.mockResolvedValueOnce([col("c", 9000)]);
+    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(1) }]);
+    entListQuery.mockResolvedValue([]);
+    await hydrateCmsFromServer();
+    expect(saveCollection).not.toHaveBeenCalled();
+  });
+
+  it("a successful mirror stamps the row with the server's updatedAt", async () => {
+    colUpsert.mockResolvedValueOnce({ updatedAt: new Date(7000) });
+    await syncCollectionUpsert({ id: "m", name: "M", slug: "m", fields: [], createdAt: "", updatedAt: T(42) } as never);
+    // unchanged on the server since → keep; moved on → take it
+    colListQuery.mockResolvedValueOnce([col("m", 7000)]);
+    loadCollections.mockResolvedValueOnce([{ id: "m", updatedAt: T(42) }]);
+    entListQuery.mockResolvedValue([]);
+    await hydrateCmsFromServer();
+    expect(saveCollection).not.toHaveBeenCalled();
+    colListQuery.mockResolvedValueOnce([col("m", 8000)]);
+    loadCollections.mockResolvedValueOnce([{ id: "m", updatedAt: T(42) }]);
+    await hydrateCmsFromServer();
     expect(saveCollection).toHaveBeenCalledTimes(1);
-    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "newer", name: "Renamed on server" });
   });
 
   it("never overwrites an entry whose local change is still queued for the server", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     entUpsert.mockRejectedValueOnce(new Error("offline"));
-    await syncEntryUpsert({ id: "queued", collectionId: "c", data: { t: "mine" }, status: "draft", createdAt: "", updatedAt: "" } as never);
-    colListQuery.mockResolvedValueOnce([
-      { id: "c", name: "C", slug: "c", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
-    ]);
-    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: new Date(0).toISOString() }]);
+    await syncEntryUpsert({ id: "queued", collectionId: "c", data: { t: "mine" }, status: "draft", createdAt: "", updatedAt: T(0) } as never);
+    recordServerStamp("entry:queued", T(0), T(0));
+    colListQuery.mockResolvedValueOnce([col("c", 0)]);
+    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+    loadContentItems.mockResolvedValueOnce([{ id: "queued", updatedAt: T(0) }]);
     entListQuery.mockResolvedValueOnce([
       { id: "queued", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(99999) },
     ]);
     await hydrateCmsFromServer();
     expect(saveContentItem).not.toHaveBeenCalled();
-    entUpsert.mockResolvedValue({});
     await retryCmsSync();
     warn.mockRestore();
   });

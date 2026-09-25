@@ -147,3 +147,58 @@ export class SyncRetryQueue {
     }
   }
 }
+
+/* ── C-4: server stamps — reconcile on ONE clock ────────────────────────────
+   Hydration decides "is the server's copy newer than mine?". Comparing the
+   server's `updatedAt` with a local row's `updatedAt` mixes two clocks (the
+   local one is this browser's), and the retry queue above is in memory, so
+   after a reload it cannot say which local rows never reached the server.
+
+   A stamp records, per synced row, the SERVER's `updatedAt` the last time the
+   server confirmed this browser's copy, and the LOCAL `updatedAt` that copy
+   had then. It persists in localStorage so it survives the reload. Then:
+     - no local row          → take the server's
+     - no stamp              → never confirmed by the server: keep local
+     - local moved on since  → an unconfirmed local edit: keep local
+     - otherwise             → take the server's only if ITS clock moved on
+   Every comparison is server-vs-server or an equality on the local value. */
+const STAMP_STORAGE_KEY = "bk-sync-stamps-v1";
+
+interface ServerStamp {
+  server: string;
+  local: string;
+}
+
+function readStamps(): Record<string, ServerStamp> {
+  try {
+    const raw = localStorage.getItem(STAMP_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, ServerStamp>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Record that the server holds this browser's copy of `key` as of `server`. */
+export function recordServerStamp(key: string, server: Date | string, local: string | number): void {
+  try {
+    const stamps = readStamps();
+    stamps[key] = { server: new Date(server).toISOString(), local: String(local) };
+    localStorage.setItem(STAMP_STORAGE_KEY, JSON.stringify(stamps));
+  } catch {
+    // Private mode / quota: without a stamp the row simply stays local-first.
+  }
+}
+
+/** Whether hydration may overwrite the local copy of `key` with the server's. */
+export function serverCopyWins(
+  key: string,
+  serverUpdatedAt: Date | string,
+  localUpdatedAt: string | number | undefined,
+  hasLocal: boolean,
+): boolean {
+  if (!hasLocal) return true;
+  const stamp = readStamps()[key];
+  if (!stamp) return false;
+  if (String(localUpdatedAt) !== stamp.local) return false;
+  return new Date(serverUpdatedAt).getTime() > new Date(stamp.server).getTime();
+}

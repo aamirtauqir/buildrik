@@ -17,7 +17,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
-import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
+import { SyncRetryQueue, registerPendingSource, recordServerStamp, serverCopyWins } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -57,7 +57,7 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
         payload: component as unknown as Record<string, unknown>,
         // Scope (board 6971:77663): null = the whole site.
         pageId: component.pageId ?? null,
-      }),
+      }).then((row) => recordServerStamp(`component:${component.id}`, row.updatedAt, component.updatedAt)),
     // eslint-disable-next-line no-console
     (e) => console.warn("[component-sync] upsert mirror failed (kept locally)", e)
   );
@@ -97,9 +97,9 @@ function setHydrationStatus(next: ComponentHydrationStatus): void {
 
 /**
  * Cross-device load (C-4, PD-36): pull server components into the local
- * IndexedDB cache on editor open. SERVER-FIRST BY `updatedAt`: a master is
- * written when it is missing locally or the server's row is newer than the
- * local copy — the old additive pass skipped every id already local, so a
+ * IndexedDB cache on editor open. SERVER-FIRST, on the server's clock (stamps,
+ * see `serverCopyWins`): a master is written when it is missing locally or the
+ * server moved past the copy it last confirmed — the old additive pass skipped every id already local, so a
  * teammate's edit to a shared master never arrived. A master with a mirror
  * still queued here is left alone (the local change is the newer one).
  * Nothing local is deleted. Returns how many masters were written.
@@ -120,10 +120,11 @@ export async function hydrateComponentsFromServer(): Promise<number> {
       const key = r.componentId;
       if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) continue;
       const mine = local.get(key);
-      if (mine && new Date(r.updatedAt).getTime() <= mine.updatedAt) continue;
-      const payload = await client().siteComponents.get.query({ siteId, componentId: key });
+      if (!serverCopyWins(`component:${key}`, r.updatedAt, mine?.updatedAt, !!mine)) continue;
+      const payload = (await client().siteComponents.get.query({ siteId, componentId: key })) as ComponentDefinition | null;
       if (!payload) continue;
-      await saveComponent(payload as ComponentDefinition, siteId);
+      await saveComponent(payload, siteId);
+      recordServerStamp(`component:${key}`, r.updatedAt, payload.updatedAt);
       written++;
     }
     setHydrationStatus("ready");
