@@ -426,9 +426,13 @@ export async function verifyMagicLink(token: string) {
   await invalidateToken(token);
 
   // Set emailVerified if not already set. PD-5 anti-pre-account-hijack: the
-  // first verification of a never-verified row also clears any pre-set
-  // password/2FA and bumps sessionVersion — see the matching comment on
-  // verifyEmail (S-5).
+  // first verification of a never-verified row via magic link also clears any
+  // pre-set password/2FA and bumps sessionVersion. Controller ruling (fix
+  // round 1): verifyEmail does NOT do this — clicking your own signup's
+  // verification link is the legitimate owner using the password they just
+  // set, unlike a magic-link or OAuth first verification. See verifyEmail's
+  // own comment and the OAuth branch in auth.config.ts for the other two
+  // paths that DO clear (S-5).
   await prisma.$transaction(async (tx) => {
     const before = await tx.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
     if (before?.emailVerified) return;
