@@ -28,7 +28,15 @@ export const SaveFailedBanner: React.FC<{
   const [col, setCol] = React.useState<DOMRect | null>(null);
   React.useLayoutEffect(() => {
     const el = document.querySelector("[data-bk-toast-anchor]");
-    const update = () => setCol(el?.getBoundingClientRect() ?? null);
+    /* The canvas column collapses to 0 width in full-page views (Settings,
+       Preview, Brand) without unmounting — a zero-width rect must fall back
+       to the viewport-relative default below, or the banner renders in a
+       clamped near-0-width column (measured: 32×482, overlapping whatever
+       sits at x:0). */
+    const update = () => {
+      const rect = el?.getBoundingClientRect() ?? null;
+      setCol(rect && rect.width > 0 ? rect : null);
+    };
     update();
     window.addEventListener("resize", update);
     const ro = typeof ResizeObserver === "undefined" || !el ? null : new ResizeObserver(update);
