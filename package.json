@@ -15,6 +15,7 @@
     "email:dev": "email dev --dir emails",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:db": "vitest run --config vitest.db.config.ts",
     "audit:rules": "node scripts/audit/rule-drift-scan.mjs",
     "env:check": "node scripts/check-prod-env.mjs",
     "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev",

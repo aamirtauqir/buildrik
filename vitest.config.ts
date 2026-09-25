@@ -23,7 +23,10 @@ export default defineConfig({
       "packages/dashboard/app/**/*.test.{ts,tsx}",
       "packages/dashboard/components/**/*.test.{ts,tsx}",
     ],
-    exclude: ["**/node_modules/**", ".worktrees/**"],
+    // *.db.test.ts is the D-14a Postgres-backed tier (vitest.db.config.ts,
+    // `pnpm test:db`) — it needs a real DB via globalSetup, not this jsdom
+    // config's setupFiles/aliases, so it's excluded here.
+    exclude: ["**/node_modules/**", ".worktrees/**", "**/*.db.test.ts"],
   },
   resolve: {
     // ORDER MATTERS — vite alias resolution is first-match-wins. Specific

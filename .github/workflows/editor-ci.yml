@@ -29,6 +29,8 @@ on:
       - "lib/**"
       - "__tests__/**"
       - "vitest.config.ts"
+      - "vitest.db.config.ts"
+      - "prisma/**"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/editor-ci.yml"
@@ -42,6 +44,8 @@ on:
       - "lib/**"
       - "__tests__/**"
       - "vitest.config.ts"
+      - "vitest.db.config.ts"
+      - "prisma/**"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/editor-ci.yml"
@@ -186,6 +190,61 @@ jobs:
       # Includes server/, __tests__/, lib/, packages/shared/ test trees too.
       - name: Run repo-root tests
         run: npx vitest run --reporter=default
+
+  # D-14a: Postgres-backed test tier (`*.db.test.ts`, `pnpm test:db`).
+  # Own job — not a step in build-and-test — because it needs a real
+  # database service, not just the jsdom vitest run above. The service
+  # container's default database is unused; `__tests__/db/setup.ts`'s
+  # globalSetup creates `buildrik_test` itself (same as it does against a
+  # developer's local Postgres) and refuses to run against any host other
+  # than localhost/127.0.0.1 — the service is reachable at localhost from
+  # the job's steps, so that guard is satisfied here too.
+  db-tests:
+    name: db tests (Postgres tier)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: npx prisma generate --schema prisma/schema.prisma
+
+      - name: Run DB-backed tests
+        run: pnpm run test:db
 
   # Browser-based checks live in their OWN job (added 2026-08-03).
   #

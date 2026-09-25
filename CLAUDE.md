@@ -167,6 +167,7 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | Var | Purpose | Required? |
 |-----|---------|-----------|
 | `DATABASE_URL` | Postgres connection string. Also needed in `packages/dashboard/.env` (not `.env.local`) — Prisma CLI reads only `.env`. | Yes |
+| `DATABASE_URL_TEST` | Postgres connection string for the D-14a DB-backed test tier (`pnpm test:db`, `vitest.db.config.ts`). Optional — `__tests__/db/setup.ts`'s globalSetup derives `<DATABASE_URL's host>/buildrik_test` when unset. Must resolve to `localhost`/`127.0.0.1`; the setup refuses to run otherwise (guard against pointing the test tier at a real database — it runs `prisma migrate deploy` and `TRUNCATE ... CASCADE`). | No |
 | `NEXTAUTH_SECRET` | NextAuth session signing key. Also the source of the AES key for encrypted 2FA secrets (`auth.service.ts`), so rotating it invalidates those. | Yes |
 | `NEXTAUTH_URL` | Canonical origin NextAuth builds callback URLs against. | Yes in production |
 | `NEXT_PUBLIC_APP_URL` | The dashboard's own origin (`https://app.buildrick.io`). Used for draft share links (`/share/<token>`) and absolute links in email. **Baked at build time** — see the build-time note below. | Yes |
