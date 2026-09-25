@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelBackRow, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -21,6 +21,12 @@ import { EVENTS } from "@/shared/constants";
 import { fetchComponentLibrary, type LibraryComponentEntry } from "@/services/componentSync";
 export type { ComponentsTabProps };
 
+
+/** Masters created since this page loaded are badged New (board 4418:166980). */
+const isNew = (createdAt: number) => createdAt >= performance.timeOrigin;
+
+const SECTION_HEADER =
+  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
@@ -42,6 +48,22 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
+
+  // Board 4418:143126: the last Detach all, reported at the top of the list.
+  const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
+  React.useEffect(() => {
+    if (state.detailComponent) setDetached(null);
+  }, [state.detailComponent]);
+
+  /* Board 4418:142419: Components is reached from Add ("Manage components ›"),
+     and the drawer says so with a back row above its header. */
+  const backRow = composer && (
+    <PanelBackRow
+      label="Add"
+      data-testid="comp-back-row"
+      onClick={() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" })}
+    />
+  );
 
   // Which of this site's masters are shared from the workspace library.
   const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
@@ -68,6 +90,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (!composer?.components?.isAvailable()) {
     return (
       <PanelFrame>
+        {backRow}
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
@@ -92,6 +115,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (state.error) {
     return (
       <PanelFrame>
+        {backRow}
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
@@ -126,6 +150,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
+        onDetachedAll={(count) => {
+          const { id, name } = state.detailComponent!;
+          setDetached({ id, name, count });
+        }}
         selectedElementId={state.canvasSelection[0] ?? null}
       />
     );
@@ -158,7 +186,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       );
     }
     return (
-      <PanelFrame>
+      <PanelFrame className="tw:h-full">
+        {backRow}
         {state.isStandaloneMode && (
           <>
             <PanelFrame.Header
@@ -226,13 +255,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const linked = state.components.filter((c) => linkedIds.has(c.id));
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+    const justDetached = detached?.id === component.id && n === 0;
     return (
               <div
                 key={component.id}
                 role="button"
                 tabIndex={0}
                 draggable
-                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+                className={`tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none tw:hover:bg-[var(--bk-bg-subtle)]${justDetached ? " tw:opacity-40" : ""}`}
                 data-testid={`comp-row-${component.id}`}
                 onClick={() => state.handleViewDetail(component)}
                 onDragStart={(e) => state.handleDragStart(e, component)}
@@ -241,11 +271,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 }}
               >
                 <span
-                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  className="tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
                   data-testid={`comp-row-name-${component.id}`}
                 >
                   {component.name}
                 </span>
+                {isNew(component.createdAt) && (
+                  <span
+                    className="tw:flex tw:h-5 tw:shrink-0 tw:items-center tw:rounded tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent)]"
+                    data-testid={`comp-row-new-${component.id}`}
+                  >
+                    New
+                  </span>
+                )}
+                <span className="tw:flex-1" aria-hidden="true" />
                 {/* Board 641:2564 writes the count as "6 on this site", not
                     "6 instances". The number is sample data; the words are the
                     label, and copy on screen is decided by the board. */}
@@ -253,15 +292,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
                   data-testid={`comp-row-count-${component.id}`}
                 >
-                  {n} on this site{isLinked ? " · linked" : ""}
+                  {justDetached ? "0 linked instances" : `${n} on this site${isLinked ? " · linked" : ""}`}
                 </span>
-                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
               </div>
     );
   };
 
   return (
-    <PanelFrame data-testid="comp-panel">
+    <PanelFrame className="tw:h-full" data-testid="comp-panel">
+      {backRow}
       {state.isStandaloneMode && (
         <>
           <PanelFrame.Header
@@ -289,20 +328,29 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
         <div aria-live="polite">
           <span className="bd-sr-only">{state.components.length} components found</span>
-          <div
-            className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
-            data-testid="comp-section-header"
-          >
-            YOUR COMPONENTS
+          {detached && (
+            <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-3 tw:py-2 tw:text-[var(--bk-ink)]" role="status" data-testid="comp-detach-notice">
+              <p className="tw:m-0 tw:text-[14px] tw:leading-[normal]">
+                {detached.count} instance{detached.count === 1 ? "" : "s"} detached
+              </p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[normal]">
+                {detached.name} is still saved. Existing page content keeps its appearance.
+              </p>
+            </div>
+          )}
+          <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink)]" data-testid="comp-intro">
+            Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.
+          </p>
+          <div className={SECTION_HEADER} data-testid="comp-section-header">
+            <span className="tw:flex-1 tw:tracking-[0.88px]">YOUR COMPONENTS</span>
+            <span className="tw:[font-family:var(--bk-font-mono)]">{own.length}</span>
           </div>
           {own.map((component) => renderRow(component, false))}
           {linked.length > 0 && (
             <>
-              <div
-                className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
-                data-testid="comp-section-linked"
-              >
-                LINKED FROM LIBRARY
+              <div className={SECTION_HEADER} data-testid="comp-section-linked">
+                <span className="tw:flex-1 tw:tracking-[0.88px]">LINKED FROM LIBRARY</span>
+                <span className="tw:[font-family:var(--bk-font-mono)]">{linked.length}</span>
               </div>
               {linked.map((component) => renderRow(component, true))}
             </>
@@ -330,9 +378,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
-          const name = state.confirmDelete?.name;
-          state.confirmDeleteAction();
-          addToast({ description: `"${name}" deleted`, tone: "warning", duration: 4000 });
+          void state.confirmDeleteAction().then((toast) => toast && addToast(toast));
         }}
         {...componentDeleteCopy(
           state.confirmDelete?.name ?? "",

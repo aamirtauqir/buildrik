@@ -150,6 +150,39 @@ describe("Menu", () => {
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Delete" }));
   });
 
+  /* Board 5930:44781: the breakpoint list marks the current row with a
+     trailing grey ✓ on a tinted, medium-weight row; board 7048:78046: the
+     zoom list leads every row with a check slot. */
+  it("radio tick='trailing' tints the current row and ends it in a ✓", () => {
+    render(
+      <Menu label="Breakpoint">
+        <MenuItem radio tick="trailing" selected>Desktop</MenuItem>
+        <MenuItem radio tick="trailing" selected={false} kbd="768px">Tablet</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemradio", { name: /Desktop/ });
+    expect(on.className).toContain("tw:!bg-[var(--bk-gray-100)]");
+    expect(on.className).toContain("tw:font-medium");
+    expect(on.lastElementChild?.textContent).toBe("✓");
+    expect(on.firstElementChild?.textContent).toBe("Desktop");
+    expect(screen.getByRole("menuitemradio", { name: /Tablet/ }).textContent).toBe("Tablet768px");
+  });
+
+  it("radio tick='box' leads every row with a check slot", () => {
+    render(
+      <Menu label="Zoom">
+        <MenuItem radio tick="box" selected>100%</MenuItem>
+        <MenuItem radio tick="box" selected={false}>50%</MenuItem>
+      </Menu>,
+    );
+    const on = screen.getByRole("menuitemradio", { name: /100%/ });
+    expect((on.firstElementChild as HTMLElement).hasAttribute("data-check-slot")).toBe(true);
+    expect(on.firstElementChild?.textContent).toBe("✓");
+    const off = screen.getByRole("menuitemradio", { name: /50%/ }).firstElementChild as HTMLElement;
+    expect(off.hasAttribute("data-check-slot")).toBe(true);
+    expect(off.textContent).toBe("");
+  });
+
   /* Board 5930:44801: a checkable row ends in a 14px check slot (r3,
      gray-300 hairline) holding the ✓ — not a leading bare tick. */
   it("draws a trailing 14px check slot, ticked when selected", () => {
@@ -243,5 +276,34 @@ describe("Popover viewport clamp", () => {
     // further up than the top margin.
     const el = renderAt(400, 100, 700, 1400);
     expect(el.style.transform).toBe("translate(0px, -92px)");
+  });
+
+  /* Board 4428:142922: the inspector's colour picker sits beside the column. */
+  it("beside= places the panel left of that column, top-aligned with the trigger", () => {
+    const col = document.createElement("aside");
+    col.className = "col";
+    document.body.appendChild(col);
+    const rects: Record<string, Partial<DOMRect>> = {
+      col: { left: 1140, right: 1440, top: 56, bottom: 900 },
+    };
+    const orig = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function () {
+      const r = this.classList?.contains("col") ? rects.col : this.getAttribute?.("role") === "dialog"
+        ? { left: 1160, right: 1442, top: 530, bottom: 871, width: 282, height: 341 }
+        : { left: 1160, right: 1420, top: 490, bottom: 518, width: 260, height: 28 };
+      return { x: 0, y: 0, toJSON: () => ({}), ...r } as DOMRect;
+    };
+    try {
+      render(
+        <Popover open onClose={() => {}} trigger={<button>Fill</button>} label="Fill" beside=".col">
+          <div>tokens</div>
+        </Popover>,
+        { container: col },
+      );
+      expect(screen.getByRole("dialog").style.transform).toBe("translate(-311px, -40px)");
+    } finally {
+      Element.prototype.getBoundingClientRect = orig;
+      col.remove();
+    }
   });
 });

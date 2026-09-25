@@ -15,18 +15,12 @@ export interface LayersPanelProps {
   onLayerHover?: (elementId: string | null) => void;
   /** Currently hovered element ID from canvas (for bidirectional highlighting) */
   canvasHoveredId?: string | null;
-  /** Callback to add a block (when tree is empty) */
-  onAddBlockClick?: () => void;
   /** Controlled search value lifted to LayersTab (prototype panel-h shape). */
   search?: string;
   /** Lifted display-settings popover open state. */
   displaySettingsOpen?: boolean;
   /** Lifted display-settings popover toggle callback. */
   onDisplaySettingsToggle?: () => void;
-  /** Lifted search setter. When provided, internal clear-search controls
-   *  route through this instead of calling state.setSearch directly, so
-   *  LayersTab's controlled search input stays in sync. */
-  onSearchChange?: (value: string) => void;
 }
 
 /** Layer tree item data */

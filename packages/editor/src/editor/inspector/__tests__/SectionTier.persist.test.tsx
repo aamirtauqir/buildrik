@@ -142,9 +142,15 @@ describe("ProInspector — strip, tier footer, no breakpoint pill", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Settings" }));
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Size section/i })).not.toBeInTheDocument();
+    /* Settings draws every group (ADVANCED collapsed) and no Beginner/Pro
+       footer — 4428:141642; the fold and its footer are Style's. */
+    expect(screen.queryByTestId("inspector-show-all")).toBeNull();
+    expect(screen.queryByTestId("inspector-footer")).toBeNull();
     fireEvent.click(screen.getByRole("tab", { name: "Effects" }));
     expect(screen.getByRole("button", { name: /Opacity section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Style" }));
+    expect(screen.getByTestId("inspector-footer")).toBeInTheDocument();
   });
 
   it("the context row carries scope and state, no breakpoint pill", () => {

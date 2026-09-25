@@ -83,18 +83,21 @@ function getHitAreaStyle(top: number): React.CSSProperties {
   };
 }
 
-function getDropLineStyle(top: number): React.CSSProperties {
+/* Boards 4428:44400: the drop cue is the dragged section's own footprint —
+   an accent slot of its height at the landing spot, "↑ Hero moves here". */
+function getDropSlotStyle(top: number, height: number): React.CSSProperties {
   return {
     position: "absolute",
     left: 0,
     right: 0,
-    top: top - 1.5,
-    height: 3,
-    background: "var(--bk-accent-hover)",
-    borderRadius: 1.5,
+    top,
+    height,
+    background: "var(--bk-accent)",
+    color: "var(--bk-accent-on)",
+    font: "500 11px/16px var(--bk-font-ui)",
+    padding: "8px 12px",
+    boxSizing: "border-box",
     pointerEvents: "none",
-    boxShadow: "0 0 8px var(--bk-alpha-accent-30)",
-    transition: "top 0.15s ease",
   };
 }
 
@@ -154,28 +157,23 @@ export function SectionReorderHandles({
   // renders — otherwise React throws "Rendered more hooks than during the
   // previous render" the first time boundaries grow past the early-return
   // threshold (e.g. dropping the first section onto a blank canvas).
-  const dropLineTop = React.useMemo(() => {
+  const dropSlot = React.useMemo(() => {
     if (!dragState || boundaries.length === 0) return null;
-
-    const { toIndex } = dragState;
-    if (toIndex === 0) {
-      return boundaries[0].rect.top;
-    }
-    if (toIndex >= boundaries.length) {
-      // After last section: approximate bottom
-      const last = boundaries[boundaries.length - 1];
-      // Use the top + estimated height (we don't have full height, use a small offset)
-      return last.rect.top + 4;
-    }
-    return boundaries[toIndex].rect.top;
+    const { toIndex, fromIndex, sectionId } = dragState;
+    const dragged = boundaries.find((b) => b.sectionId === sectionId);
+    if (!dragged) return null;
+    const last = boundaries[boundaries.length - 1];
+    const top = toIndex >= boundaries.length ? last.rect.top + last.rect.height : boundaries[toIndex].rect.top;
+    return { top, height: dragged.rect.height, text: `${toIndex > fromIndex ? "↓" : "↑"} ${dragged.label} moves here` };
   }, [dragState, boundaries]);
 
   if (boundaries.length < 2) return null;
 
   return (
     <div style={containerStyle} aria-hidden>
-      {/* Grab handles at each section boundary (between sections, not above first) */}
-      {boundaries.slice(1).map((boundary) => {
+      {/* A grab handle on every section's top edge — the first one too
+          (board 4428:44400 drags Hero, the page's first section). */}
+      {boundaries.map((boundary) => {
         const isHovered = hoveredBoundary === boundary.sectionId;
         const isDragTarget =
           isDragging && dragState?.sectionId === boundary.sectionId;
@@ -212,9 +210,10 @@ export function SectionReorderHandles({
         );
       })}
 
-      {/* Drop indicator line */}
-      {isDragging && dropLineTop !== null && (
-        <div style={getDropLineStyle(dropLineTop)} />
+      {isDragging && dropSlot && (
+        <div style={getDropSlotStyle(dropSlot.top, dropSlot.height)} data-testid="section-drop-slot">
+          {dropSlot.text}
+        </div>
       )}
     </div>
   );

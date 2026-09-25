@@ -16,8 +16,8 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import {
-  LAYER_NAME_KEY,
   getLayerName,
   renameElement,
   loadSetFromStorage,
@@ -272,7 +272,8 @@ export function useLayerActions(
 
   const groupLayers = React.useCallback(
     (ids: string[], _layers: LayerItem[]) => {
-      if (!composer || ids.length < 2) return;
+      /* One element groups too — v3 4418:82409 "Wrapped Heading in a group". */
+      if (!composer || ids.length < 1) return;
       const firstEl = composer.elements.getElement(ids[0]);
       const parent = firstEl?.getParent?.();
       if (!parent) return;
@@ -287,6 +288,7 @@ export function useLayerActions(
         });
       }
       composer.endTransaction();
+      if (group) renameElement(composer, group.getId(), "Group");
     },
     [composer]
   );

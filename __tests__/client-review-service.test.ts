@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+vi.mock("@/server/services/notification.trigger", () => ({ notifyWorkspaceOwner: vi.fn() }));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     reviewRequest: { findUnique: vi.fn(), count: vi.fn(async () => 1) },
@@ -8,6 +10,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
+import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 /** A live, non-revoked, non-expired review whose reviewer has NOT identified. */
 function unidentifiedReview() {
@@ -105,5 +108,31 @@ describe("getReviewByToken — the client page leads with the AGENCY, not the si
     const result = await getReviewByToken("live-token");
 
     expect(result.agencyName).toBeNull();
+  });
+});
+
+describe("requestNewReviewLink — the dead-link page's one door", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("a revoked link notifies the workspace owner and returns only agency + round", async () => {
+    const { requestNewReviewLink } = await import("@/server/services/client-review.service");
+    vi.mocked(prisma.reviewRequest.findUnique).mockResolvedValue({
+      ...unidentifiedReview(),
+      revokedAt: new Date(),
+      invitedEmail: "sara@client.test",
+      reviewer: { name: "Sara" },
+    } as never);
+    const out = await requestNewReviewLink("tok");
+    expect(notifyWorkspaceOwner).toHaveBeenCalledWith("ws1", "REVIEW_LINK_REQUESTED", "Sara asked for a new review link for Site.", "/edit/site1");
+    expect(out).toEqual({ agencyName: "Pixel & Co", roundNumber: 1 });
+  });
+
+  it("a LIVE link has nothing to request — same answer as an unknown token, and nobody is notified", async () => {
+    const { requestNewReviewLink } = await import("@/server/services/client-review.service");
+    vi.mocked(prisma.reviewRequest.findUnique).mockResolvedValue(unidentifiedReview() as never);
+    await expect(requestNewReviewLink("tok")).rejects.toMatchObject({ code: "INVALID_TOKEN" });
+    vi.mocked(prisma.reviewRequest.findUnique).mockResolvedValue(null as never);
+    await expect(requestNewReviewLink("nope")).rejects.toMatchObject({ code: "INVALID_TOKEN" });
+    expect(notifyWorkspaceOwner).not.toHaveBeenCalled();
   });
 });

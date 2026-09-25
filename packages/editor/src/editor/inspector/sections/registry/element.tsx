@@ -11,6 +11,8 @@ import { ElementPropertiesSection } from "../elementProperties";
 import { LINKABLE_TYPES, LinkSection } from "../LinkSection";
 import { ContentSection } from "../ContentSection";
 import { CollectionListSection } from "../CollectionListSection";
+import { FormFieldsSection } from "../FormFieldsSection";
+import { SlidesSection } from "../SlidesSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
@@ -54,6 +56,36 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
     tab: "element",
     title: "Collection",
     Component: CollectionListSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
+  }),
+
+  /* Board 4428:141878 — a Form's FIELDS; only the form profile lists it. */
+  "form-fields": defineSection({
+    tab: "element",
+    title: "Fields",
+    Component: FormFieldsSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({
+      elementId: ctx.selectedElement.id,
+      composer: ctx.composer ?? null,
+      isOpen: ctx.isOpen,
+      onToggle: ctx.onToggle,
+      tier: ctx.tier,
+    }),
+  }),
+
+  /* Board 4428:142450 — a Slider's SLIDES; only the slider profile lists it. */
+  slides: defineSection({
+    tab: "element",
+    title: "Slides",
+    Component: SlidesSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
       elementId: ctx.selectedElement.id,

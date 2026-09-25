@@ -9,6 +9,14 @@
   "steps": [
     {
       "action": "waitFor",
+      "testId": "publish-row-menu-5"
+    },
+    {
+      "action": "click",
+      "testId": "publish-row-menu-5"
+    },
+    {
+      "action": "waitFor",
       "testId": "publish-republish-5"
     },
     {

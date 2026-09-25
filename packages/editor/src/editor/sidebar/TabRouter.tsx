@@ -70,7 +70,6 @@ export interface TabRouterProps {
   onBlockClick?: (data: BlockData) => void;
   onElementSelect?: (id: string) => void;
   canvasHoveredId?: string | null;
-  onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
   /** Site menu › Unpublish asked for the confirm before PublishTab existed.
    *  Same one-tab-at-a-time race as above; same answer — a prop the always-
@@ -120,7 +119,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onBlockClick,
   onElementSelect,
   canvasHoveredId,
-  onSwitchToAdd,
   onSwitchToTemplates,
   unpublishIntent,
   onUnpublishIntentConsumed,
@@ -147,7 +145,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           composer={composer}
           onElementSelect={onElementSelect}
           canvasHoveredId={canvasHoveredId}
-          onAddBlockClick={onSwitchToAdd}
           {...commonTabProps}
         />
       );

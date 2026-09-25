@@ -167,4 +167,17 @@ describe("InteractionsSection — the element animation row", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn(), animation: null, onAnimationChange: vi.fn() });
     expect(screen.queryByRole("button", { name: /On page load/ })).toBeNull();
   });
+
+  /* Boards 4428:142686 / 4418:109686: opening a row drills into its edit
+     screen; back returns to the list. */
+  it("opening an interaction drills in; back returns to the list", () => {
+    const hover = makeInteraction("hover");
+    renderOpen({ interactions: [hover, makeInteraction("click")], onInteractionsChange: vi.fn() });
+    fireEvent.click(screen.getByRole("button", { name: /On hover/ }));
+    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ On hover");
+    expect(screen.queryByRole("button", { name: /On click/ })).toBeNull();
+    expect(screen.queryByText("+ Add interaction")).toBeNull();
+    fireEvent.click(screen.getByTestId("interactions-back"));
+    expect(screen.getByRole("button", { name: /On click/ })).toBeInTheDocument();
+  });
 });

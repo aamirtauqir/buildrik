@@ -8,6 +8,7 @@ import type { BlockData, ElementType } from "../../shared/types";
 export const testimonialsSectionBlockConfig: BlockData & { elementType: ElementType } = {
   id: "testimonials-section",
   label: "Testimonials",
+  description: "Customer quotes with names, in a row of cards.",
   category: "Sections",
   elementType: "section",
   content:

@@ -66,13 +66,13 @@ export function FieldsTable({ collection, usage, selectedId, onSelect }: FieldsT
                 }
               }}
             >
-              <div role="cell" className={`${CELL} ${W_NAME} tw:text-[var(--bk-ink)]`}>{f.name}</div>
+              <div role="cell" className={`${CELL} ${W_NAME} tw:font-medium tw:text-[var(--bk-ink)]`}>{f.name}</div>
               <div role="cell" className={`${CELL_SOFT} ${W_TYPE}`} data-testid={`cms-field-type-${f.id}`}>
                 {FIELD_TYPE_LABEL[f.type] ?? f.type}
               </div>
               <div
                 role="cell"
-                className={`${CELL} ${W_REQ} ${f.validation?.required ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+                className={`${CELL} ${W_REQ} ${f.validation?.required ? "tw:font-medium tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)]"}`}
                 data-testid={`cms-field-req-${f.id}`}
               >
                 {f.validation?.required ? "Yes" : "No"}
@@ -80,6 +80,10 @@ export function FieldsTable({ collection, usage, selectedId, onSelect }: FieldsT
               <div role="cell" className={`${CELL_SOFT} ${W_USED}`} data-testid={`cms-field-used-${f.id}`}>
                 <span className="tw:truncate">{uses.map((u) => u.label).join(" · ")}</span>
               </div>
+              {/* 4428:147552 — every row ends in a › that opens the field. */}
+              <span className="tw:flex-none tw:-ml-2 tw:pr-1 tw:text-[13px] tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
+                ›
+              </span>
             </div>
           );
         })}
