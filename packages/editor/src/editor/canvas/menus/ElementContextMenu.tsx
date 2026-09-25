@@ -35,16 +35,8 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
 
   useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
-  // Flatten actions into ordered list for keyboard navigation
-  const mainItems = React.useMemo(() => actions.filter((a) => a.group === "main"), [actions]);
-  const standaloneItems = React.useMemo(
-    () => actions.filter((a) => a.group === "standalone"),
-    [actions]
-  );
-  const allItems = React.useMemo(
-    () => [...mainItems, ...standaloneItems],
-    [mainItems, standaloneItems]
-  );
+  // The registry already orders the rows; keyboard navigation walks them.
+  const allItems = actions;
 
   // Focus menu on mount for keyboard capture
   React.useEffect(() => {
@@ -172,48 +164,45 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
       aria-label="Element context menu"
       aria-activedescendant={allItems[focusedIndex]?.id}
     >
-      {/* Main items with submenus */}
-      {mainItems.map((action, index) => (
-        <SubmenuItem
-          key={action.id}
-          action={action}
-          context={context}
-          isActive={activeSubmenu === action.id}
-          isFocused={focusedIndex === index}
-          onActivate={() => handleSubmenuActivate(action.id)}
-          onDeactivate={handleSubmenuDeactivate}
-          onClose={onClose}
-        />
-      ))}
-
-      {/* Divider */}
-      {mainItems.length > 0 && standaloneItems.length > 0 && (
-        <div
-          style={{
-            height: 1,
-            background: CANVAS_COLORS.borderLight,
-            margin: "6px 0",
-          }}
-        />
-      )}
-
-      {/* Standalone items */}
-      {standaloneItems.map((action, index) => {
+      {/* Board 4428:43928: rows in registry order, a rule wherever the
+          group changes. */}
+      {allItems.map((action, index) => {
+        const rule =
+          index > 0 && allItems[index - 1].group !== action.group ? (
+            <div key={`rule-${action.id}`} role="separator" style={{ height: 1, background: CANVAS_COLORS.borderLight, margin: "6px 0" }} />
+          ) : null;
+        if (action.submenu) {
+          return (
+            <React.Fragment key={action.id}>
+              {rule}
+              <SubmenuItem
+                action={action}
+                context={context}
+                isActive={activeSubmenu === action.id}
+                isFocused={focusedIndex === index}
+                onActivate={() => handleSubmenuActivate(action.id)}
+                onDeactivate={handleSubmenuDeactivate}
+                onClose={onClose}
+              />
+            </React.Fragment>
+          );
+        }
         const enabled = action.isEnabled ? action.isEnabled(context) : true;
-        const globalIndex = mainItems.length + index;
         return (
-          <MenuItem
-            key={action.id}
-            action={action}
-            enabled={enabled}
-            isHighlighted={focusedIndex === globalIndex}
-            onClick={() => {
-              if (enabled && action.handler) {
-                action.handler(context);
-                onClose();
-              }
-            }}
-          />
+          <React.Fragment key={action.id}>
+            {rule}
+            <MenuItem
+              action={action}
+              enabled={enabled}
+              isHighlighted={focusedIndex === index}
+              onClick={() => {
+                if (enabled && action.handler) {
+                  action.handler(context);
+                  onClose();
+                }
+              }}
+            />
+          </React.Fragment>
         );
       })}
     </div>

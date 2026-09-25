@@ -285,7 +285,7 @@ function ToastItem({
   const persistent = isPersistent(toast);
   const dotClass = TONE_DOT_CLASS[tone];
   const dot = dotClass ? (
-    <span data-testid="toast-tone" aria-hidden="true" className={`tw:flex-none tw:size-2 tw:rounded-full ${dotClass}`} />
+    <span data-testid="toast-tone" aria-hidden="true" className={`tw:block tw:flex-none tw:size-2 tw:rounded-full ${dotClass}`} />
   ) : null;
   const actionButton = action ? (
     <Button color="alternative" size="xs" onClick={action.onClick} className={LINK_BTN_CLASS}>
