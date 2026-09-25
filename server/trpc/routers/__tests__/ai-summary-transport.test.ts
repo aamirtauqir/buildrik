@@ -26,8 +26,8 @@ vi.mock("@/server/services/quota.service", () => ({
 }));
 vi.mock("@/server/services/ai-adoption.service", () => ({ recordAiAdoption: vi.fn() }));
 
-import { router } from "../../trpc";
-import { aiRouter } from "../ai";
+import { router } from "@/server/trpc/trpc";
+import { aiRouter } from "@/server/trpc/routers/ai";
 
 const appRouter = router({ ai: aiRouter });
 const ctx = { session: { user: { id: "u1" } }, prisma: {}, bearer: null, headers: undefined } as never;

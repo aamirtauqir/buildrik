@@ -398,7 +398,7 @@ describe("saveProjectData — 61-conflict optimistic concurrency (A-2 CAS)", () 
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
       fn({ page: tx.txPage, site: tx.txSite, formBlock: tx.txFormBlock })
     );
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({ deletedAt: null } as any);
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ deletedAt: null } as never);
   });
 
   const loaded = new Date("2026-06-19T10:00:00.000Z");

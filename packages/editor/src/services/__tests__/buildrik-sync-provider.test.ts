@@ -45,6 +45,7 @@ vi.mock("../api-client", () => ({
   }),
 }));
 
+import type { ProjectData } from "@/shared/types/project";
 import {
   loadProject,
   saveProject,
@@ -574,6 +575,11 @@ describe("save-conflict parsing (61-conflict)", () => {
   });
 });
 
+/** A minimal project carrying only settings — typed, no cast. */
+function withSettings(settings: ProjectData["settings"]): ProjectData {
+  return { version: "1.0", pages: [], styles: [], assets: [], settings };
+}
+
 describe("saveProject dual-save routing (P0.2b)", () => {
   beforeEach(async () => {
     await loadedSite("s1");
@@ -611,10 +617,7 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     mocks.saveProjectMutate.mockImplementationOnce(
       () => new Promise((r) => (release = () => r({ success: true, savedAt: new Date() }))),
     );
-    const pending = saveProject("s1", {
-      version: "1.0", pages: [], styles: [], assets: [],
-      settings: { seo: { metaTitle: "After" } },
-    } as any);
+    const pending = saveProject("s1", withSettings({ seo: { metaTitle: "After" } }));
     await Promise.resolve();
     await Promise.resolve();
     expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
@@ -626,10 +629,7 @@ describe("saveProject dual-save routing (P0.2b)", () => {
   it("a conflict makes no settings call", async () => {
     mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
     await expect(
-      saveProject("s1", {
-        version: "1.0", pages: [], styles: [], assets: [],
-        settings: { seo: { metaTitle: "Behind copy" } },
-      } as any),
+      saveProject("s1", withSettings({ seo: { metaTitle: "Behind copy" } })),
     ).rejects.toThrow(SaveConflictError);
     expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
     setBaselineLastEditedAt(null);
@@ -665,10 +665,7 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     mocks.myRole.mockResolvedValueOnce("EDITOR");
     const heard = vi.fn();
     window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
-    const result = await saveProject("s1", {
-      version: "1.0", pages: [], styles: [], assets: [],
-      settings: { seo: { metaTitle: "Editor edit" } },
-    } as any);
+    const result = await saveProject("s1", withSettings({ seo: { metaTitle: "Editor edit" } }));
     window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
     expect(result.success).toBe(true);
     expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
