@@ -83,9 +83,12 @@ describe("GET /api/sse/publish/[jobId] (S-10)", () => {
   // it does no filtering of its own. This file mocks getPublishStatus, so
   // the route-level assertion above can only prove the route forwards
   // whatever the mock returns; it can't prove the real function is safe.
-  // That proof is __tests__/publish-service.test.ts's getPublishStatus
-  // describe block (controller review round 1, minor fix — strengthened
-  // there to use a row that HAS a log field, not one that already omits it).
+  // That proof is server/services/__tests__/publish.service.test.ts's
+  // "getPublishStatus — never leaks the raw-HTML `log` column" describe
+  // block, which asserts on the real Prisma `select` argument
+  // (`select.log` is undefined, `select.siteId`/`status`/`progress` are
+  // true) — an allowlist check, not a row shape check (a mocked Prisma
+  // client doesn't enforce projection either way).
 
   it("sends a Forbidden event, not the job, when assertSiteAccess denies (site-scoped + ACTIVE only, S-10)", async () => {
     getPublishStatusMock.mockResolvedValueOnce({
