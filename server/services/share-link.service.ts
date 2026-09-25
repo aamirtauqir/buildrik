@@ -10,16 +10,29 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 // the consuming UI, so nothing forced callers to stop treating it as the
 // real hash's presence-or-shape; a boolean field with its own name is
 // harder to misuse that way, and matches what the UI actually needs).
+//
+// SSOT for every response shape this file hands back for a ShareLink row.
+// Round 2 fixed this drop for createShareLink by hand-copying the same
+// destructure a second time; round 4 found a THIRD copy would have been
+// needed for revokeShareLink, which was still returning the raw Prisma
+// row (passwordHash included) straight to the client. One helper now, so
+// there's nothing left to forget to copy a fourth time.
+function redactShareLink<T extends { passwordHash: string | null }>(
+  row: T,
+): Omit<T, "passwordHash"> & { hasPassword: boolean } {
+  const { passwordHash, ...rest } = row;
+  return { ...rest, hasPassword: passwordHash != null };
+}
+
 export async function listShareLinks(siteId: string, revealToken = false) {
   const rows = await prisma.shareLink.findMany({
     where: { siteId, isActive: true },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map(({ passwordHash, ...row }) => ({
-    ...row,
-    token: revealToken ? row.token : null,
-    hasPassword: passwordHash != null,
-  }));
+  return rows.map((row) => {
+    const redacted = redactShareLink(row);
+    return { ...redacted, token: revealToken ? redacted.token : null };
+  });
 }
 
 // Workspace sharing-settings' `defaultExpiration` is a free-form string from
@@ -123,15 +136,19 @@ export async function createShareLink(
   // link, so the token is fine to return — but the bcrypt hash is not. Same
   // redacted shape listShareLinks already returns, so nothing downstream
   // treats "the row from create" differently from "a row from list".
-  const { passwordHash: _passwordHash, ...redacted } = row;
-  return { ...redacted, hasPassword: row.passwordHash != null };
+  return redactShareLink(row);
 }
 
 export async function revokeShareLink(id: string) {
-  return prisma.shareLink.update({
+  // S-10 (round 4): this used to return the raw prisma.shareLink.update
+  // row, passwordHash included, straight through site-detail.ts's revoke
+  // mutation — the router itself never had to look at it. Same redaction
+  // as list/create.
+  const row = await prisma.shareLink.update({
     where: { id },
     data: { isActive: false },
   });
+  return redactShareLink(row);
 }
 
 // ─── Visitor side: /share/<token> ──────────────────────────────────────────

@@ -215,6 +215,17 @@ describe("Site Detail Service", () => {
       expect(result).not.toHaveProperty("passwordHash");
       expect((result as any).hasPassword).toBe(true);
     });
+
+    it("revokeShareLink never returns the bcrypt hash — same redacted shape as list/create (S-10, round 4)", async () => {
+      const { revokeShareLink } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.shareLink.update).mockResolvedValue({
+        id: "sl4", name: "Password Link", token: "tok-4", passwordHash: "$2a$realhash", viewCount: 2, isActive: false,
+      } as any);
+      const result = await revokeShareLink("sl4");
+      expect(result).not.toHaveProperty("passwordHash");
+      expect((result as any).hasPassword).toBe(true);
+      expect(result.isActive).toBe(false);
+    });
   });
 
   describe("Analytics Service", () => {
