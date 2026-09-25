@@ -164,9 +164,16 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
           <div className="space-y-2">
             {shareLinks.map((link) => {
               // `token` is null when the server didn't reveal it to this
-              // caller (VIEWER — S-10). Copy/open/QR need the real link;
-              // Revoke only needs the row id, so it stays available either way.
+              // caller (VIEWER — S-10); Copy/Open/QR need the real link.
+              // `sharing.revoke` requires ADMIN on the server
+              // (site-detail.ts), so it's never available to a VIEWER
+              // either — a VIEWER never gets a token, so the same signal
+              // that hides Copy/Open/QR also hides Revoke here. (Round 2:
+              // an earlier comment claimed Revoke "only needs the row id,
+              // so it stays available either way," which was true of the
+              // client call but not of the server's authz check behind it.)
               const url = link.token ? shareUrl(link.token) : null;
+              const canRevoke = link.token !== null;
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">
@@ -186,7 +193,9 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                           <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
                         </>
                       )}
-                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke" aria-label="Revoke share link"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
+                      {canRevoke && (
+                        <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke" aria-label="Revoke share link"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
+                      )}
                     </div>
                   </div>
                   {url && showQr === link.id && (
