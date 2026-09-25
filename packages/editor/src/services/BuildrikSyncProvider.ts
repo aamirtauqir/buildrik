@@ -9,6 +9,7 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
+import { fetchMyRole, roleAtLeast } from "./RoleService";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
@@ -59,6 +60,12 @@ let _conflictPending = false;
 export function isSaveConflictPending(): boolean {
   return _conflictPending;
 }
+
+/* A-1 / PD-1: the Site-column values this editor last knew the server held —
+   captured at load, advanced after each successful mirror. The mirror sends
+   only what differs from it, so a dashboard edit to a field this editor never
+   touched is no longer overwritten with the load-time copy on every autosave. */
+let _baselineSiteColumns: SiteColumnSettings = {};
 
 /** Assets per `loadServerMedia` page. The drawer's "Load more" walks the rest.
  *  Not exported: nothing outside this module decides the page size, and an
@@ -129,8 +136,8 @@ function emitSaveConflict(serverLastEditedAt: string): void {
 /**
  * The pages saved and the site-column mirror beside them did not.
  *
- * These two ride in one batch, and `Promise.all` made either one failing read
- * as "Save failed — retry" for both. It happened for real: `ogImage: ""` is
+ * These two used to ride in one batch, and `Promise.all` made either one
+ * failing read as "Save failed — retry" for both. It happened for real: `ogImage: ""` is
  * not a URL, so every site without an OG image saved its pages under a red
  * banner. The page save is the one the status chip is about; a refused mirror
  * is its own, smaller sentence.
@@ -425,6 +432,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
     _conflictPending = false;
+    _baselineSiteColumns = extractSiteColumnPatch(data);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -456,12 +464,28 @@ export function saveProject(
   return run;
 }
 
+/** The mirrored fields whose value differs from what the server was last
+ *  known to hold. Compared as JSON so `socialLinks` (an object) diffs by value. */
+function diffSiteColumns(patch: SiteColumnSettings, baseline: SiteColumnSettings): SiteColumnSettings {
+  const diff: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(patch)) {
+    if (JSON.stringify(value) !== JSON.stringify(baseline[key as keyof SiteColumnSettings])) {
+      diff[key] = value;
+    }
+  }
+  return diff as SiteColumnSettings;
+}
+
 /**
  * P0.2b dual-save: routes Site-column fields to siteDetail.settings.update
  * (canonical for those fields server-side) and the rest of projectData to
  * sites.saveProject (page tree, element data, non-mirrored config).
  *
- * Both calls run in parallel. If only one half changes, the other is skipped.
+ * A-1 / PD-1 (dashboard owns Site columns): the mirror runs only AFTER the
+ * project save succeeded — a refused save (SAVE_CONFLICT) sends no settings at
+ * all — carries only the fields that changed since load, and is skipped for a
+ * member below ADMIN, whom `siteDetail.settings.update` refuses anyway (every
+ * EDITOR autosave used to raise a "settings mirror" error for it).
  */
 async function saveProjectNow(
   siteId: string,
@@ -484,27 +508,15 @@ async function saveProjectNow(
       return { ...page, root };
     }),
   };
-  const siteColumnPatch = extractSiteColumnPatch(persisted);
-  const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
-
-  // Both mutations start in the same tick so the httpBatchLink still batches
-  // them; they are AWAITED separately so one cannot speak for the other.
-  const primaryCall = client.sites.saveProject.mutate({
-    siteId,
-    projectData: persisted,
-    // 61-conflict: opt into behind-copy detection.
-    expectedLastEditedAt: _baselineLastEditedAt,
-  });
-  const settingsCall = hasSiteColumnChanges
-    ? client.siteDetail.settings.update
-        .mutate({ id: siteId, ...siteColumnPatch })
-        .then(() => null)
-        .catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
-    : null;
 
   let primaryResult: unknown;
   try {
-    primaryResult = await primaryCall;
+    primaryResult = await client.sites.saveProject.mutate({
+      siteId,
+      projectData: persisted,
+      // 61-conflict: opt into behind-copy detection.
+      expectedLastEditedAt: _baselineLastEditedAt,
+    });
   } catch (err) {
     // Translate the server's CONFLICT into a typed error the shell can catch to
     // show the conflict dialog (rather than a generic save-failed toast).
@@ -519,12 +531,21 @@ async function saveProjectNow(
     throw err;
   }
 
-  const mirrorError = settingsCall ? await settingsCall : null;
-  if (mirrorError) emitSettingsMirrorError(mirrorError);
-
   const result = primaryResult as { success: boolean; savedAt: Date };
   // Advance the baseline so the editor's own next save isn't seen as a conflict.
   _baselineLastEditedAt = new Date(result.savedAt).toISOString();
+
+  const changed = diffSiteColumns(extractSiteColumnPatch(persisted), _baselineSiteColumns);
+  if (Object.keys(changed).length > 0 && roleAtLeast(await fetchMyRole(), "ADMIN") !== false) {
+    /* Awaited on its own: a refused mirror is its own, smaller sentence — the
+       pages are already on the server and the chip is about them. */
+    try {
+      await client.siteDetail.settings.update.mutate({ id: siteId, ...changed });
+      _baselineSiteColumns = { ..._baselineSiteColumns, ...changed };
+    } catch (e) {
+      emitSettingsMirrorError(e instanceof Error ? e.message : String(e));
+    }
+  }
   return result;
 }
 

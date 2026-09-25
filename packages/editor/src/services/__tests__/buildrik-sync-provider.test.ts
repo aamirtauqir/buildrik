@@ -15,7 +15,13 @@ const mocks = {
   siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
   mediaListAssetsQuery: vi.fn(),
   mediaListFoldersQuery: vi.fn(),
+  myRole: vi.fn(() => Promise.resolve("ADMIN")),
 };
+
+vi.mock("../RoleService", async (orig) => ({
+  ...(await orig<typeof import("../RoleService")>()),
+  fetchMyRole: () => mocks.myRole(),
+}));
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
@@ -557,7 +563,7 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     mocks.siteDetailSettingsUpdateMutate.mockClear().mockResolvedValue({ success: true });
   });
 
-  it("routes Site-column fields to siteDetail.settings.update alongside the project save", async () => {
+  it("routes Site-column fields to siteDetail.settings.update after the project save", async () => {
     await saveProject("s1", {
       version: "1.0",
       pages: [],
@@ -577,6 +583,77 @@ describe("saveProject dual-save routing (P0.2b)", () => {
       bodyCode: "",
     });
     expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
+  });
+
+  /* A-1 / PD-1: the mirror is chained AFTER the project save — never in the
+     same tick — so a refused save cannot have already rewritten the columns. */
+  it("starts the settings call only once the project save has succeeded", async () => {
+    let release!: () => void;
+    mocks.saveProjectMutate.mockImplementationOnce(
+      () => new Promise((r) => (release = () => r({ success: true, savedAt: new Date() }))),
+    );
+    const pending = saveProject("s1", {
+      version: "1.0", pages: [], styles: [], assets: [],
+      settings: { seo: { metaTitle: "After" } },
+    } as any);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    release();
+    await pending;
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaTitle: "After" });
+  });
+
+  it("a conflict makes no settings call", async () => {
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(
+      saveProject("s1", {
+        version: "1.0", pages: [], styles: [], assets: [],
+        settings: { seo: { metaTitle: "Behind copy" } },
+      } as any),
+    ).rejects.toThrow(SaveConflictError);
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    setBaselineLastEditedAt(null);
+  });
+
+  /* A dashboard edit made while the editor is open used to be overwritten by
+     the editor's load-time copy on its next autosave. Only fields that differ
+     from what the server held at load go out. */
+  it("does not send a field the editor left untouched since load", async () => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T" });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      metaTitle: "Loaded title",
+      metaDescription: "Loaded desc",
+    });
+    const loaded = await loadProject("s1");
+
+    // The user edits only the description.
+    const edited = {
+      ...loaded,
+      settings: { ...loaded.settings, seo: { ...loaded.settings?.seo, metaDescription: "New desc" } },
+    };
+    await saveProject("s1", edited);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledTimes(1);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaDescription: "New desc" });
+
+    // Saved once, it is the new baseline: the next save carries nothing.
+    await saveProject("s1", edited);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the mirror for a member below ADMIN (the server refuses it anyway)", async () => {
+    mocks.myRole.mockResolvedValueOnce("EDITOR");
+    const heard = vi.fn();
+    window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
+    const result = await saveProject("s1", {
+      version: "1.0", pages: [], styles: [], assets: [],
+      settings: { seo: { metaTitle: "Editor edit" } },
+    } as any);
+    window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
+    expect(result.success).toBe(true);
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    expect(heard).not.toHaveBeenCalled();
   });
 
   /* An empty text field means "cleared", and the server's contract for cleared
