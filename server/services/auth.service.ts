@@ -190,21 +190,42 @@ export async function signup(fullName: string, email: string, password: string) 
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // CRITICAL 3 (controller ruling, fix round 1): the reclaimable check above
-  // reads outside any transaction, so two concurrent signups for the same
-  // still-unverified email could both pass it on stale reads, then race on
-  // delete-then-create — one hitting a P2002 (unique email) or P2025
-  // (already-deleted row) that used to bubble up as an unhandled 500. The
-  // reclaim delete and the create now share ONE transaction: the guarded
-  // `deleteMany` re-checks reclaimability (lastLoginAt/emailVerified still
-  // null) as part of the DELETE itself, which Postgres serializes on the row
-  // — a concurrent transaction's DELETE blocks until this one commits or
-  // rolls back, then finds 0 matching rows and fails the guard instead of
-  // silently deleting nothing and creating a duplicate-email row.
+  // CRITICAL 3 (controller ruling, fix round 1) + hardening (fix round 2):
+  // the reclaimable check above reads outside any transaction, purely as a
+  // fast-path (fail before spending a bcrypt hash on a signup that can't
+  // succeed) — it is NOT what makes this safe. Two concurrent signups for
+  // the same still-unverified email could both pass that outside read on
+  // stale data, then race on delete-then-create — one hitting a P2002
+  // (unique email) or P2025 (already-deleted row) that used to bubble up as
+  // an unhandled 500. The reclaim delete and the create now share ONE
+  // transaction, and the AUTHORITATIVE reclaimability check — including
+  // siteCount/otherMemberCount, not just lastLoginAt/emailVerified — runs
+  // again inside it, immediately before the delete:
+  //   1. Re-count sites/other-members inside the tx. This does not lean on
+  //      an unstated "every path that could make this row unreclaimable
+  //      also touches lastLoginAt/emailVerified" invariant — a workspace
+  //      could gain a site or a member through a path that never touches
+  //      either column, and the guarded deleteMany below wouldn't catch it.
+  //   2. The guarded `deleteMany` (lastLoginAt/emailVerified still null) as
+  //      the second layer: Postgres serializes concurrent DELETEs on the
+  //      same row, so a concurrent transaction's DELETE blocks until this
+  //      one commits or rolls back, then finds 0 matching rows and fails
+  //      the guard instead of silently deleting nothing and creating a
+  //      duplicate-email row.
   let user: Prisma.UserGetPayload<{ select: typeof SAFE_USER_SELECT }>;
   try {
     user = await prisma.$transaction(async (tx) => {
       if (existing) {
+        const [siteCountTx, otherMemberCountTx] = await Promise.all([
+          tx.site.count({ where: { workspace: { ownerId: existing.id } } }),
+          tx.workspaceMember.count({
+            where: { workspace: { ownerId: existing.id }, userId: { not: existing.id } },
+          }),
+        ]);
+        if (siteCountTx > 0 || otherMemberCountTx > 0) {
+          throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
+        }
+
         const deleted = await tx.user.deleteMany({
           where: { id: existing.id, lastLoginAt: null, emailVerified: null },
         });
