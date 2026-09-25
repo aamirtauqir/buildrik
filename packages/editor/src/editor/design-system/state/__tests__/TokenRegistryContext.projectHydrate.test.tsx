@@ -13,7 +13,7 @@ import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { TokenRegistryProvider, useColorRegistry } from "../TokenRegistryContext";
-import { DEFAULT_TOKENS } from "../../constants";
+import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 
 type Listener = (payload: unknown) => void;
 
