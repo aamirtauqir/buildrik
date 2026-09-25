@@ -132,4 +132,15 @@ describe("TimeTravelHost", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByTestId("tt-band")).toBeNull();
   });
+
+  it("leaves when the session stack changes under it — e.g. a restore from the History panel's own row", () => {
+    renderProjectPages.mockResolvedValue([{ path: "index.html", html: "<h1>then</h1>", name: "Home", slug: "" }]);
+    const c = makeComposer();
+    render(<TimeTravelHost composer={c as never} />);
+    chord();
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Previewing/);
+    c.fire(EVENTS.HISTORY_RECORDED);
+    expect(screen.queryByTestId("tt-band")).toBeNull();
+  });
 });

@@ -103,6 +103,23 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
     };
   }, [composer, active, open, exit]);
 
+  /* The band holds a SNAPSHOT of the session stack taken when it opened.
+     Any other change to that stack while it is open — a restore from the
+     History panel's own row (ActivityView), a keystroke edit, undo/redo, a
+     clear — leaves it previewing entries that no longer exist, with an
+     enabled Restore… that would target them. Flow-check B (2026-09-25) saw
+     exactly that: History-panel restore wrote "Restored to: …" underneath a
+     band still saying "nothing is written until you restore". So the band
+     leaves whenever the stack changes under it. Its own restore already
+     exits first, so this never fights it. */
+  React.useEffect(() => {
+    if (!composer || !active) return;
+    const leave = () => exit();
+    const events = [EVENTS.HISTORY_RECORDED, EVENTS.HISTORY_UNDO, EVENTS.HISTORY_REDO, EVENTS.HISTORY_CLEARED];
+    events.forEach((ev) => composer.on(ev, leave));
+    return () => events.forEach((ev) => composer.off(ev, leave));
+  }, [composer, active, exit]);
+
   const newest = entries.length - 1;
   const entry = entries[index] ?? null;
   const later = Math.max(0, newest - index);
