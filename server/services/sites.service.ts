@@ -257,18 +257,27 @@ export async function transferSite(
 
   const currentMember = await prisma.workspaceMember.findFirst({
     where: { userId: currentUserId, workspaceId: site.workspaceId },
+    select: { id: true, _count: { select: { sitePermissions: true } } },
   });
   const newOwnerMember = await prisma.workspaceMember.findFirst({
     where: { userId: newOwnerId, workspaceId: site.workspaceId },
   });
   if (!newOwnerMember) throw new Error("MEMBER_NOT_FOUND");
 
+  // A-10: only preserve a SitePermission row for the previous owner when
+  // they were ALREADY site-scoped (has other grants). Writing one
+  // unconditionally newly scoped a previously-unscoped ("all sites")
+  // creator down to just this one transferred site — resolveSiteScope
+  // treats any SitePermission row as proof of scoping. Keep an existing
+  // override on update instead of stomping it with "EDITOR" every transfer.
+  const preserveScope = currentMember && currentMember._count.sitePermissions > 0;
+
   await prisma.$transaction([
     prisma.site.update({
       where: { id: siteId },
       data: { createdBy: newOwnerId },
     }),
-    ...(currentMember
+    ...(preserveScope
       ? [
           prisma.sitePermission.upsert({
             where: {
@@ -280,7 +289,7 @@ export async function transferSite(
               roleOverride: "EDITOR",
               grantedBy: currentUserId,
             },
-            update: { roleOverride: "EDITOR" },
+            update: {},
           }),
         ]
       : []),
