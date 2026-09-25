@@ -153,23 +153,28 @@ export const reviewsRouter = router({
     .query(async ({ ctx, input }) => {
       const site = await ctx.prisma.site.findUnique({
         where: { id: input.siteId },
-        select: { workspaceId: true, workspace: { select: { editsRequireApproval: true } } },
+        select: { workspaceId: true },
       });
       if (!site) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
       if (!(await isFeatureEnabled(site.workspaceId, "agency_layer")))
         /* `reviewsEnabled: false` is the point: without it the editor cannot
            tell "reviews are off here" from "this site was never sent", and
            would offer Send for review as a door into a mutation that
-           hard-fails requireAgencyLayer. `editsRequireApproval` still reads
-           the SITE's real workspace setting (A-8) — the publish chip must
-           tell the truth about whether approval is required even while the
-           reviews UI itself stays hidden. */
+           hard-fails requireAgencyLayer. `editsRequireApproval` is the
+           EFFECTIVE value — `agencyLayerOn && rawEditsRequireApproval`
+           (PD-7/8, controller review round 1) — not the raw workspace
+           setting: with the layer off, reviews.submit can never produce an
+           APPROVED round, so startPublish's approval gate now skips
+           enforcement entirely in that state (publish.service.ts
+           startPublish). The layer being off collapses effective approval
+           to false regardless of the raw setting — showing the raw value
+           here told the truth about a switch that no longer does anything. */
         return {
           state: "none" as const,
           reviewerName: null,
           at: null,
           reviewsEnabled: false,
-          editsRequireApproval: site.workspace?.editsRequireApproval ?? false,
+          editsRequireApproval: false,
         };
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");

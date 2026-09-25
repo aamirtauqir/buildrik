@@ -191,13 +191,16 @@ describe("reviews router", () => {
     expect(checkSiteRoleMock).not.toHaveBeenCalled();
   });
 
-  it("status reads editsRequireApproval off the SITE's workspace even when agency_layer is off (A-8)", async () => {
-    siteFindUniqueMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", workspace: { editsRequireApproval: true } });
+  it("status returns the EFFECTIVE editsRequireApproval (layerOn && raw) — false when the layer is off, even if the raw setting is true (PD-7/8)", async () => {
+    siteFindUniqueMock.mockResolvedValueOnce({ workspaceId: "ws_site_2" });
     isFeatureEnabledMock.mockResolvedValueOnce(false);
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.status({ siteId: "s2" })).resolves.toMatchObject({
       reviewsEnabled: false,
-      editsRequireApproval: true, // was hard-coded false before the fix
+      // With the layer off, reviews.submit can never produce an APPROVED
+      // round, so startPublish's approval gate never enforces here either —
+      // the raw setting is no longer the answer to "is approval required".
+      editsRequireApproval: false,
     });
   });
 

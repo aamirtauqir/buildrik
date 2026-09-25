@@ -45,6 +45,14 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+// PD-7/8: startPublish's approval gate now also checks agency_layer. Default
+// true so the existing gate-ON tests (workspace.editsRequireApproval: false
+// by default above, so this is inert for most of them) keep their prior
+// behavior when a test flips editsRequireApproval to true.
+vi.mock("@server/services/feature-flag.service", () => ({
+  isFeatureEnabled: vi.fn().mockResolvedValue(true),
+}));
+
 // Sites deploy into the workspace's OWN Vercel account, so runPrePublishChecks
 // hard-fails without a connection and startPublish refuses to queue. Mocked at
 // the service boundary rather than at prisma so tests don't have to build a

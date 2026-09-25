@@ -5,6 +5,7 @@ import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock } from "@server/services/publish-approval";
+import { isFeatureEnabled } from "@server/services/feature-flag.service";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -274,7 +275,13 @@ export async function startPublish(
        approval and no error. The deploy 50 lines below already uses
        `site.workspaceId`; only the gate was reading the session value. */
     const gateWorkspaceId = site.workspaceId;
-    const [workspace, member] = await Promise.all([
+    // PD-7/8 (controller review round 1): reviews live behind `agency_layer` —
+    // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
+    // a workspace with editsRequireApproval=true but agency_layer=false has NO
+    // way to ever produce an APPROVED review. Enforcing the gate there deadlocks
+    // every non-owner publish forever. Only enforce approval when the layer is
+    // actually on for this site's workspace.
+    const [workspace, member, agencyLayerOn] = await Promise.all([
       prisma.workspace.findUnique({
         where: { id: gateWorkspaceId },
         select: { editsRequireApproval: true },
@@ -283,8 +290,9 @@ export async function startPublish(
         where: { userId_workspaceId: { userId, workspaceId: gateWorkspaceId } },
         select: { role: true },
       }),
+      isFeatureEnabled(gateWorkspaceId, "agency_layer"),
     ]);
-    if (workspace?.editsRequireApproval) {
+    if (workspace?.editsRequireApproval && agencyLayerOn) {
       /* `revokedAt: null` is load-bearing. Revoking a round is the only way out
          of a review nobody can resolve — the submitter is refused a self-resolve
          by design, so on a one-seat workspace a PENDING round is otherwise
