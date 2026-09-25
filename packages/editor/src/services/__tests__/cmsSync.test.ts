@@ -56,6 +56,7 @@ beforeEach(() => {
   storageAvailable.mockReset().mockReturnValue(true);
   loadContentItems.mockReset().mockResolvedValue([]);
   localStorage.removeItem("bk-sync-stamps-v1");
+  localStorage.removeItem("bk-sync-stamp-migrations-v1");
   // The server answers an upsert with its row — updatedAt on ITS clock.
   [colUpsert, entUpsert].forEach((m) => m.mockResolvedValue({ updatedAt: new Date(0) }));
 });
@@ -308,6 +309,82 @@ describe("hydrateCmsFromServer", () => {
     createdAt: new Date(0), updatedAt: new Date(updatedAt),
   });
   const T = (ms: number) => new Date(ms).toISOString();
+  /** This site's one-time pre-stamp pass already ran in this browser. */
+  const migrated = () => localStorage.setItem("bk-sync-stamp-migrations-v1", JSON.stringify(["cms:site-123"]));
+  const migrations = (): string[] => JSON.parse(localStorage.getItem("bk-sync-stamp-migrations-v1") ?? "[]");
+  const stamps = (): Record<string, { server: string; local: string }> =>
+    JSON.parse(localStorage.getItem("bk-sync-stamps-v1") ?? "{}");
+  const entry = (id: string, data: Record<string, unknown>, updatedAt: number) => ({
+    id, data, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(updatedAt),
+  });
+
+  /* Round 2 #3: rows hydrated or mirrored before stamps existed have none, and
+     one never edited again would never be mirrored → never stamped → hidden
+     from every teammate edit forever. */
+  describe("unstamped rows (C-4 round 2)", () => {
+    it("first hydrate for this site: the old updatedAt comparison runs ONCE — an older unstamped row takes the server's copy and is stamped", async () => {
+      colListQuery.mockResolvedValueOnce([col("c", 0)]);
+      loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+      recordServerStamp("collection:c", T(0), T(0));
+      loadContentItems.mockResolvedValueOnce([{ id: "old", data: { t: "stale" }, status: "draft", updatedAt: T(1000) }]);
+      entListQuery.mockResolvedValueOnce([entry("old", { t: "teammate" }, 5000)]);
+      await hydrateCmsFromServer();
+      expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "old", data: { t: "teammate" } });
+      expect(stamps()["entry:old"]).toBeDefined();
+      expect(migrations()).toContain("cms:site-123");
+    });
+
+    it("the one-time pass keeps a NEWER unstamped local row, unstamped (never confirmed, stays local)", async () => {
+      colListQuery.mockResolvedValueOnce([col("c", 0)]);
+      loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+      recordServerStamp("collection:c", T(0), T(0));
+      loadContentItems.mockResolvedValueOnce([{ id: "mine", data: { t: "mine" }, status: "draft", updatedAt: T(9000) }]);
+      entListQuery.mockResolvedValueOnce([entry("mine", { t: "server" }, 5000)]);
+      await hydrateCmsFromServer();
+      expect(saveContentItem).not.toHaveBeenCalled();
+      expect(stamps()["entry:mine"]).toBeUndefined();
+    });
+
+    it("after the pass, an unstamped row that differs from the server stays local", async () => {
+      migrated();
+      colListQuery.mockResolvedValueOnce([col("c", 0)]);
+      loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+      recordServerStamp("collection:c", T(0), T(0));
+      loadContentItems.mockResolvedValueOnce([{ id: "e", data: { t: "mine" }, status: "draft", updatedAt: T(1) }]);
+      entListQuery.mockResolvedValueOnce([entry("e", { t: "server" }, 5000)]);
+      await hydrateCmsFromServer();
+      expect(saveContentItem).not.toHaveBeenCalled();
+    });
+
+    it("an unstamped row whose content equals the server copy is adopted — a later teammate edit then arrives", async () => {
+      migrated();
+      colListQuery.mockResolvedValue([col("c", 0)]);
+      loadCollections.mockResolvedValue([{ id: "c", updatedAt: T(0) }]);
+      recordServerStamp("collection:c", T(0), T(0));
+      // Same content, both key orders; local clock says nothing useful.
+      loadContentItems.mockResolvedValue([{ id: "e", data: { a: 1, b: 2 }, status: "draft", updatedAt: T(1) }]);
+      entListQuery.mockResolvedValueOnce([entry("e", { b: 2, a: 1 }, 3000)]);
+      await hydrateCmsFromServer();
+      expect(saveContentItem).not.toHaveBeenCalled();
+      expect(stamps()["entry:e"]).toEqual({ server: T(3000), local: T(1) });
+      entListQuery.mockResolvedValueOnce([entry("e", { a: 1, b: 3 }, 4000)]);
+      await hydrateCmsFromServer();
+      expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e", data: { a: 1, b: 3 } });
+    });
+
+    it("an unstamped collection equal to the server's is adopted too", async () => {
+      migrated();
+      const server = { ...col("c", 3000), name: "Posts" };
+      colListQuery.mockResolvedValueOnce([server]);
+      loadCollections.mockResolvedValueOnce([
+        { id: "c", siteId: "site-123", name: "Posts", slug: "c", fields: [], createdAt: T(0), updatedAt: T(1) },
+      ]);
+      entListQuery.mockResolvedValue([]);
+      await hydrateCmsFromServer();
+      expect(saveCollection).not.toHaveBeenCalled();
+      expect(stamps()["collection:c"]).toEqual({ server: T(3000), local: T(1) });
+    });
+  });
 
   it("writes a missing collection, re-reads the entries of one already local", async () => {
     colListQuery.mockResolvedValueOnce([col("srv-new", 0), col("local-1", 0)]);
@@ -351,6 +428,7 @@ describe("hydrateCmsFromServer", () => {
   });
 
   it("a local row the server never confirmed (no stamp — e.g. its mirror failed before a reload) is kept", async () => {
+    migrated();
     colListQuery.mockResolvedValueOnce([col("c", 9000)]);
     loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(1) }]);
     entListQuery.mockResolvedValue([]);

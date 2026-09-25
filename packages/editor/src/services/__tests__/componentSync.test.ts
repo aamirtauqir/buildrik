@@ -50,6 +50,7 @@ beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   [upsert, del, list, get, loadComponents, saveComponent].forEach((m) => m.mockReset());
   localStorage.removeItem("bk-sync-stamps-v1");
+  localStorage.removeItem("bk-sync-stamp-migrations-v1");
   // The server answers an upsert with its row's updatedAt (C-4 stamps).
   upsert.mockResolvedValue({ componentId: "x", updatedAt: new Date(0) });
   // The retry queue is module-level shared state; flush anything a prior test
@@ -60,6 +61,48 @@ beforeEach(async () => {
 });
 
 const comp = (id: string, name = "Card") => ({ id, name }) as never;
+/** This site's one-time pre-stamp pass already ran in this browser. */
+const migrated = () => localStorage.setItem("bk-sync-stamp-migrations-v1", JSON.stringify(["component:site-123"]));
+const stamps = (): Record<string, { server: string; local: string }> =>
+  JSON.parse(localStorage.getItem("bk-sync-stamps-v1") ?? "{}");
+
+/* Round 2 #3: masters hydrated or mirrored before stamps existed have none. */
+describe("componentSync — unstamped masters (C-4 round 2)", () => {
+  it("first hydrate for this site: an older unstamped master takes the server's copy once (one get) and is stamped", async () => {
+    list.mockResolvedValueOnce([{ componentId: "old", updatedAt: new Date(9000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "old", name: "Stale", updatedAt: 1000 }]);
+    get.mockResolvedValueOnce({ id: "old", name: "Teammate's", updatedAt: 8000 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(1);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(saveComponent.mock.calls[0][0]).toMatchObject({ name: "Teammate's" });
+    expect(stamps()["component:old"]).toBeDefined();
+    expect(JSON.parse(localStorage.getItem("bk-sync-stamp-migrations-v1") ?? "[]")).toContain("component:site-123");
+  });
+
+  it("after the pass, an unstamped master equal to the server's is adopted (one get) — the next server edit arrives", async () => {
+    migrated();
+    const same = { id: "m", name: "Card", tree: { a: 1 }, updatedAt: 5 };
+    list.mockResolvedValueOnce([{ componentId: "m", updatedAt: new Date(3000) }]);
+    loadComponents.mockResolvedValue([same]);
+    get.mockResolvedValueOnce({ ...same });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(stamps()["component:m"]).toEqual({ server: new Date(3000).toISOString(), local: "5" });
+    list.mockResolvedValueOnce([{ componentId: "m", updatedAt: new Date(4000) }]);
+    get.mockResolvedValueOnce({ ...same, name: "Renamed", updatedAt: 6 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(1);
+  });
+
+  it("after the pass, an unstamped master that differs stays local and unstamped", async () => {
+    migrated();
+    list.mockResolvedValueOnce([{ componentId: "d", updatedAt: new Date(3000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "d", name: "Mine", updatedAt: 5 }]);
+    get.mockResolvedValueOnce({ id: "d", name: "Theirs", updatedAt: 9 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(saveComponent).not.toHaveBeenCalled();
+    expect(stamps()["component:d"]).toBeUndefined();
+  });
+});
 
 describe("componentSync", () => {
   it("mirrors an upsert to siteComponents.upsert with the URL siteId", async () => {
@@ -92,6 +135,7 @@ describe("componentSync", () => {
      pass skipped every id already local, so a teammate's edit to a shared
      master never arrived. */
   it("hydrate writes missing masters and server-moved confirmed ones; keeps unconfirmed and unchanged ones", async () => {
+    migrated();
     recordServerStamp("component:moved", new Date(1000), 50);   // confirmed, local unchanged (50), server moved to 9000
     recordServerStamp("component:same", new Date(1000), 60);    // confirmed, server unchanged
     recordServerStamp("component:edited", new Date(1000), 70);  // confirmed, then edited locally (71)

@@ -17,7 +17,16 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
-import { SyncRetryQueue, registerPendingSource, recordServerStamp, serverCopyWins } from "./syncRetryQueue";
+import {
+  SyncRetryQueue,
+  hasServerStamp,
+  markStampMigrationDone,
+  recordServerStamp,
+  registerPendingSource,
+  sameContent,
+  serverCopyWins,
+  stampMigrationDue,
+} from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -111,22 +120,36 @@ export async function hydrateComponentsFromServer(): Promise<number> {
   setHydrationStatus("loading");
   try {
     const remote = await client().siteComponents.list.query({ siteId });
+    const migrationScope = `component:${siteId}`;
+    const firstPass = stampMigrationDue(migrationScope);
     if (!remote.length) {
+      markStampMigrationDone(migrationScope);
       setHydrationStatus("ready");
       return 0;
     }
     const local = new Map((await loadComponents(siteId)).map((c) => [c.id, c]));
+    const fetchPayload = async (key: string) =>
+      (await client().siteComponents.get.query({ siteId, componentId: key })) as ComponentDefinition | null;
     for (const r of remote) {
       const key = r.componentId;
+      const stampKey = `component:${key}`;
       if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) continue;
       const mine = local.get(key);
-      if (!serverCopyWins(`component:${key}`, r.updatedAt, mine?.updatedAt, !!mine)) continue;
-      const payload = (await client().siteComponents.get.query({ siteId, componentId: key })) as ComponentDefinition | null;
+      if (!serverCopyWins(stampKey, r.updatedAt, mine?.updatedAt, !!mine, firstPass)) {
+        /* Unstamped and equal to the server's copy → adopt it (one get), so
+           the next server edit reaches this browser. */
+        if (mine && !hasServerStamp(stampKey) && sameContent(mine, await fetchPayload(key))) {
+          recordServerStamp(stampKey, r.updatedAt, mine.updatedAt);
+        }
+        continue;
+      }
+      const payload = await fetchPayload(key);
       if (!payload) continue;
       await saveComponent(payload, siteId);
-      recordServerStamp(`component:${key}`, r.updatedAt, payload.updatedAt);
+      recordServerStamp(stampKey, r.updatedAt, payload.updatedAt);
       written++;
     }
+    markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (e) {
     // eslint-disable-next-line no-console

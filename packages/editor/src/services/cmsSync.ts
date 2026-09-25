@@ -12,6 +12,7 @@
  *
  * @license BSD-3-Clause
  */
+import { omit } from "@shared/utils/helpers/object";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
@@ -21,8 +22,12 @@ import {
   SyncRetryQueue,
   type SyncRetryInfo,
   registerPendingSource,
+  hasServerStamp,
+  markStampMigrationDone,
   recordServerStamp,
+  sameContent,
   serverCopyWins,
+  stampMigrationDue,
 } from "./syncRetryQueue";
 
 function client() {
@@ -134,7 +139,10 @@ export async function hydrateCmsFromServer(): Promise<void> {
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
       pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
     }>;
+    const migrationScope = `cms:${siteId}`;
+    const firstPass = stampMigrationDue(migrationScope);
     if (!remote.length) {
+      markStampMigrationDone(migrationScope);
       setHydrationStatus("ready");
       return;
     }
@@ -142,26 +150,31 @@ export async function hydrateCmsFromServer(): Promise<void> {
     for (const rc of remote) {
       if (hasQueuedMirror("collection", rc.id)) continue;
       const localCollection = localCollections.get(rc.id);
-      if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection)) {
-        const collection: CMSCollection = {
-          id: rc.id,
-          /* Stamped with the site it came FROM. Hydration writes straight into
-             IndexedDB, past `CollectionManager`, so without this the rows would
-             land unscoped and keep showing on every other site in this browser —
-             the store is browser-global. (2026-08-24.) */
-          siteId,
-          name: rc.name, slug: rc.slug,
-          description: rc.description ?? undefined, icon: rc.icon ?? undefined,
-          displayField: rc.displayField ?? undefined,
-          fields: (rc.fields as CMSField[]) ?? [],
-          pageSlugPattern: rc.pageSlugPattern ?? undefined,
-          pageSeoTitle: rc.pageSeoTitle ?? undefined,
-          pageSeoDescription: rc.pageSeoDescription ?? undefined,
-          pageTemplatePath: rc.pageTemplatePath ?? undefined,
-          createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
-        };
+      const collection: CMSCollection = {
+        id: rc.id,
+        /* Stamped with the site it came FROM. Hydration writes straight into
+           IndexedDB, past `CollectionManager`, so without this the rows would
+           land unscoped and keep showing on every other site in this browser —
+           the store is browser-global. (2026-08-24.) */
+        siteId,
+        name: rc.name, slug: rc.slug,
+        description: rc.description ?? undefined, icon: rc.icon ?? undefined,
+        displayField: rc.displayField ?? undefined,
+        fields: (rc.fields as CMSField[]) ?? [],
+        pageSlugPattern: rc.pageSlugPattern ?? undefined,
+        pageSeoTitle: rc.pageSeoTitle ?? undefined,
+        pageSeoDescription: rc.pageSeoDescription ?? undefined,
+        pageTemplatePath: rc.pageTemplatePath ?? undefined,
+        createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
+      };
+      if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
         await Storage.saveCollection(collection);
         recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
+      } else if (
+        localCollection && !hasServerStamp(`collection:${rc.id}`) &&
+        sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
+      ) {
+        recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
       }
       const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
         id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
@@ -170,15 +183,24 @@ export async function hydrateCmsFromServer(): Promise<void> {
       for (const e of entries) {
         if (hasQueuedMirror("entry", e.id)) continue;
         const localEntry = localEntries.get(e.id);
-        if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry)) continue;
+        const status = e.status === "PUBLISHED" ? "published" : "draft";
+        if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
+          if (
+            localEntry && !hasServerStamp(`entry:${e.id}`) &&
+            localEntry.status === status && sameContent(localEntry.data, e.data)
+          ) {
+            recordServerStamp(`entry:${e.id}`, e.updatedAt, localEntry.updatedAt);
+          }
+          continue;
+        }
         await Storage.saveContentItem({
-          id: e.id, collectionId: rc.id, data: e.data,
-          status: e.status === "PUBLISHED" ? "published" : "draft",
+          id: e.id, collectionId: rc.id, data: e.data, status,
           createdAt: iso(e.createdAt), updatedAt: iso(e.updatedAt),
         });
         recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
       }
     }
+    markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (err) {
     // eslint-disable-next-line no-console
