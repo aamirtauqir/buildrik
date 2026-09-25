@@ -7,6 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
 
+// CRITICAL N1 fix round 4 (controller, merge-gate tsc): type the GitHub
+// `userinfo.request` override's parameter from @auth/core's own types
+// without importing `@auth/core` directly — it's a transitive dependency of
+// `next-auth`, not hoisted into this package's own node_modules under pnpm's
+// strict layout, so a direct `@auth/core/providers/oauth` import would be a
+// phantom-dependency risk. Deriving the type from the already-imported
+// `GitHub` provider factory's own parameter type reaches the exact same
+// `UserinfoEndpointHandler["request"]` type structurally, through a
+// dependency this file already declares.
+type GitHubUserinfoConfig = NonNullable<Parameters<typeof GitHub>[0]>["userinfo"];
+type GitHubUserinfoRequest = NonNullable<Extract<GitHubUserinfoConfig, { request?: unknown }>["request"]>;
+type GitHubUserinfoRequestContext = Parameters<GitHubUserinfoRequest>[0];
+
 /** userId of the currently-signed-in session (if any) — distinguishes an
  *  authenticated "Connect provider from Settings" from a fresh public login. */
 async function currentSessionUserId(): Promise<string | null> {
@@ -51,7 +64,7 @@ export const authConfig: NextAuthConfig = {
       // refuse the sign-in instead of trusting an unverified fallback.
       userinfo: {
         url: "https://api.github.com/user",
-        async request({ tokens }) {
+        async request({ tokens }: GitHubUserinfoRequestContext) {
           const headers = {
             Authorization: `Bearer ${tokens.access_token}`,
             "User-Agent": "authjs",
