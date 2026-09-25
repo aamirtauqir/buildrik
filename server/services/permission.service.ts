@@ -112,7 +112,14 @@ export async function getEffectiveSiteRole(
 
   // Enforce site scope AND read this site's role override in one step.
   const row = await resolveSiteScope(db, member, siteId);
-  return (row?.roleOverride ?? member.role) as UserRoleType;
+  if (!row) return member.role as UserRoleType;
+  // PD-6: roleOverride is a CAP, never an upgrade. Effective role is the
+  // lower-ranked of the member's workspace role and this site's override —
+  // a demotion takes effect immediately on every site. On a tie, keep the
+  // override so a DESIGNER/EDITOR label survives (same ROLE_RANK).
+  const override = row.roleOverride as UserRoleType;
+  const effective = ROLE_RANK[override] <= ROLE_RANK[member.role as UserRoleType] ? override : (member.role as UserRoleType);
+  return effective;
 }
 
 export async function checkSiteRole(
