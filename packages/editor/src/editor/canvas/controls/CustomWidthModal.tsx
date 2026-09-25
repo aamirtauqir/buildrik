@@ -39,6 +39,7 @@ export function CustomWidthModal({ open, initialWidth, onClose, onApply }: Custo
       open={open}
       onClose={onClose}
       title="Custom width"
+      width="sm"
       testId="custom-width-modal"
       footer={
         <>
@@ -57,17 +58,32 @@ export function CustomWidthModal({ open, initialWidth, onClose, onApply }: Custo
         error={valid || value === "" ? undefined : `Between ${CUSTOM_WIDTH_RANGE.min} and ${CUSTOM_WIDTH_RANGE.max} px`}
       >
         {(wiring) => (
-          <TextField
-            {...wiring}
-            inputMode="numeric"
-            value={value}
-            onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ""))}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") apply();
-            }}
-            autoFocus
-            data-testid="custom-width-input"
-          />
+          /* Board 5930:44824 reads "1024 px": the unit follows the digits
+             (tabular, so `ch` tracks them). */
+          <div className="tw:relative">
+            <TextField
+              {...wiring}
+              className="tw:tabular-nums"
+              inputMode="numeric"
+              value={value}
+              onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ""))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") apply();
+              }}
+              autoFocus
+              data-testid="custom-width-input"
+            />
+            {value ? (
+              <span
+                aria-hidden="true"
+                data-testid="custom-width-unit"
+                className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:-translate-y-1/2 tw:text-[13px] tw:text-[var(--bk-ink)]"
+                style={{ left: `calc(12px + ${value.length}ch + 4px)` }}
+              >
+                px
+              </span>
+            ) : null}
+          </div>
         )}
       </FormField>
     </Modal>

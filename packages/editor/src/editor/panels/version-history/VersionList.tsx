@@ -31,7 +31,8 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
+import { MoreHorizontal } from "lucide-react";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 
 interface ListChildComponentProps {
@@ -56,6 +57,9 @@ const ROW_HEIGHT = 64; // version row (48px) + 16px breathing room
 const OVERSCAN = 5;
 
 // ─── Date helpers ─────────────────────────────────────────────────────
+
+/* 6930:82577 draws the row menu's items at a 30 pitch (as SavesFilter). */
+const ROW_MENU_ITEM = "tw:h-[30px] tw:px-2.5";
 
 function getDateGroup(timestamp: number): string {
   const now = new Date();
@@ -110,6 +114,7 @@ interface VersionRowProps {
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
   onCompare: () => void;
+  onDetails: () => void;
   /** Changes this version captured since the previous one. Absent = not known. */
   changeCount?: number;
 }
@@ -123,11 +128,13 @@ export function VersionRow({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
+  onDetails,
   changeCount,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showPreview, setShowPreview] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [previewRect, setPreviewRect] = React.useState<DOMRect | null>(null);
 
   const relative = formatRelativeTime(version.createdAt);
@@ -204,30 +211,74 @@ export function VersionRow({
                 </Button>
               </>
             ) : (
-              <>
-                <Button
-                  onClick={onCompare}
-                  className="action-btn primary"
-                  aria-label={`Compare "${versionDisplayName(version)}"`}
-                >
-                  Compare
-                </Button>
-                <Button
-                  onClick={onRestore}
-                  className="action-btn"
-                  disabled={isRestoring}
-                  aria-label={`Restore "${versionDisplayName(version)}"`}
-                >
-                  {isRestoring ? "..." : "Restore"}
-                </Button>
-                <Button
-                  onClick={onDeleteRequest}
-                  className="action-btn danger"
-                  aria-label={`Delete "${versionDisplayName(version)}"`}
-                >
-                  ×
-                </Button>
-              </>
+              /* Board 6930:82577 — a save's actions live in its ⋯: Restore to
+                 draft… · Compare with current. Delete stays as a third item
+                 (parity never drops a capability). The board's "Name this
+                 version…" is not built: siteVersions has no rename endpoint. */
+              <Popover
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                placement="bottom-end"
+                label={`${versionDisplayName(version)} actions`}
+                trigger={
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="action-btn"
+                    aria-label={`${versionDisplayName(version)} actions`}
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
+                    onClick={() => setMenuOpen((v) => !v)}
+                  >
+                    <MoreHorizontal size={14} aria-hidden="true" />
+                  </Button>
+                }
+              >
+                <Menu label={`${versionDisplayName(version)} actions`}>
+                  {/* 6902:73326's door to the details overlay (4418:173587). */}
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDetails();
+                    }}
+                  >
+                    View details
+                  </MenuItem>
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
+                    disabled={isRestoring}
+                    aria-label={`Restore "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onRestore();
+                    }}
+                  >
+                    Restore to draft…
+                  </MenuItem>
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
+                    aria-label={`Compare "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onCompare();
+                    }}
+                  >
+                    Compare with current
+                  </MenuItem>
+                  <MenuItem
+                    className={ROW_MENU_ITEM}
+                    danger
+                    aria-label={`Delete "${versionDisplayName(version)}"`}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDeleteRequest();
+                    }}
+                  >
+                    Delete…
+                  </MenuItem>
+                </Menu>
+              </Popover>
             )}
           </div>
         </div>
@@ -257,6 +308,7 @@ export interface VersionListProps {
   onDeleteConfirm: (versionId: string) => void;
   onDeleteCancel: () => void;
   onCompare: (versionId: string) => void;
+  onDetails: (versionId: string) => void;
   /** version id -> changes captured. Ids absent mean "not known". */
   changeCounts?: Map<string, number>;
 }
@@ -271,6 +323,7 @@ export function VersionList({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
+  onDetails,
   changeCounts,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
@@ -340,6 +393,7 @@ export function VersionList({
             onDeleteConfirm={() => onDeleteConfirm(v.id)}
             onDeleteCancel={onDeleteCancel}
             onCompare={() => onCompare(v.id)}
+            onDetails={() => onDetails(v.id)}
             changeCount={changeCounts?.get(v.id)}
           />
         </div>
@@ -355,6 +409,7 @@ export function VersionList({
       onDeleteConfirm,
       onDeleteCancel,
       onCompare,
+      onDetails,
     ],
   );
 

@@ -92,7 +92,9 @@ export function PickModePanel({
         className="tw:m-0 tw:h-7 tw:px-4 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-gray-500)]"
         data-testid="media-pick-for"
       >
-        {label ? `For ${label} · ${kind}` : kind}
+        {/* A hosted pick's label already names its field ("Margherita · Photo",
+            6765:59890), so the kind would only repeat it. */}
+        {label ? (request.host ? `For ${label}` : `For ${label} · ${kind}`) : kind}
       </p>
 
       <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-2">

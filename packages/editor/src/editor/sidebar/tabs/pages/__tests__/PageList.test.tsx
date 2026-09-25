@@ -26,6 +26,7 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof PageList>> = {
     folders: noFolders,
     pageToFolder: new Map<string, string>(),
     selectedIds: new Set<string>(),
+    onRetry: vi.fn(),
     onAddPage: vi.fn(),
     onAddFolder: vi.fn(),
     onSelectPage: vi.fn(),
@@ -69,7 +70,7 @@ describe("PageList", () => {
   it("lets a load error win over the skeleton, so Retry stays reachable", () => {
     render(<PageList {...makeProps({ pages: [], loading: true, loadError: "Couldn't load your pages" })} />);
     expect(screen.queryByText("No pages yet")).not.toBeInTheDocument();
-    expect(screen.getByText(/Couldn.t load your pages\./)).toBeInTheDocument();
+    expect(screen.getByText("Couldn’t load pages")).toBeInTheDocument();
     expect(screen.getByText("Try again")).toBeInTheDocument();
   });
 
@@ -88,15 +89,26 @@ describe("PageList", () => {
     expect(container.querySelector(".bd-pg-list")).not.toBeNull();
   });
 
-  it("renders search-empty state when query has no matches", () => {
-    const { container } = render(
-      <PageList {...makeProps({})} />,
-    );
-    const search = container.querySelector(".bd-pg-search input") as HTMLInputElement;
-    fireEvent.change(search, { target: { value: "zzznomatch" } });
-    // Board 782:4212 copy — curly quotes, trailing period.
-    expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();
-    expect(screen.getByText('Clear search')).toBeInTheDocument();
+  /* v3 4418:95333: the query comes from the topbar field; nothing matching
+     is the shared state block with a hand-off to ⌘K. */
+  it("renders the no-results block with Search everywhere when the query matches nothing", () => {
+    const onSearchEverywhere = vi.fn();
+    render(<PageList {...makeProps({ search: "zzznomatch", onSearchEverywhere })} />);
+    expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
+    expect(screen.getByText("No pages match your search.")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("pages-search-everywhere"));
+    expect(onSearchEverywhere).toHaveBeenCalledWith("zzznomatch");
+    expect(screen.getByTestId("pages-legend")).toHaveTextContent("0 of 2 pages match “zzznomatch”");
+  });
+
+  it("puts the match count where the legend sits while searching (4418:92256)", () => {
+    render(<PageList {...makeProps({ search: "ab" })} />);
+    expect(screen.getByTestId("pages-legend")).toHaveTextContent("1 of 2 pages match “ab”");
+  });
+
+  it("draws the legend over the Add band when not searching (4418:90494)", () => {
+    render(<PageList {...makeProps()} />);
+    expect(screen.getByTestId("pages-legend")).toHaveTextContent(/homepage · ● unpublished changes/);
   });
 
   it("renders drop indicator placeholder with .bd-pg-drop-indicator", () => {
@@ -104,21 +116,17 @@ describe("PageList", () => {
     expect(container.querySelector(".bd-pg-drop-indicator")).not.toBeNull();
   });
 
-  /* Board 141:165 stacks the load error BETWEEN the search band (141:170) and
-     the Add-page footer (141:201). Lifting the error a level up — which is
-     where it used to live, in PagesTab — replaced the whole panel body and
-     took both of them off screen, leaving a dead end with no retry and no way
-     to add a page. This is the assertion that catches that lift happening
-     again; the copy check is deliberately alongside it, so a test that only
-     matched the headline cannot pass while the frame is gone. */
-  it("keeps the search band and the Add-page footer around the load error", () => {
-    const { container } = render(
-      <PageList {...makeProps({ loadError: "Couldn't load your pages", onRetry: vi.fn() })} />,
-    );
-    expect(screen.getByText(/Couldn\u2019t load your pages\./)).toBeInTheDocument();
-    expect(screen.getByText("Try again")).toBeInTheDocument();
-    expect(container.querySelector(".bd-pg-search")).not.toBeNull();
+  /* v3 4418:94910 keeps the Add-page footer under the load error. Lifting
+     the error a level up — where it used to live, in PagesTab — replaced the
+     whole panel body and left a dead end with no way to add a page. */
+  it("keeps the Add-page footer under the load error, and no legend", () => {
+    const onRetry = vi.fn();
+    render(<PageList {...makeProps({ loadError: "Couldn't load your pages", onRetry })} />);
+    expect(screen.getByText("Couldn’t load pages")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Try again"));
+    expect(onRetry).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: /add new page/i })).toBeInTheDocument();
+    expect(screen.queryByTestId("pages-legend")).toBeNull();
   });
 
   it("does not render legacy pg-list class names", () => {

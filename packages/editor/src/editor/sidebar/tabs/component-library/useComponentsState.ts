@@ -10,6 +10,8 @@ import { EVENTS } from "../../../../shared/constants";
 import { inPageScope } from "@/engine/components/ComponentManager";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { takePendingMaster } from "./openMasterRequest";
+import { deleteComponentWithUndo } from "./ComponentDetailScreen";
+import type { ToastInput } from "@/editor/chrome-ui";
 
 const MAX_COMPONENTS = 100;
 
@@ -169,16 +171,18 @@ export function useComponentsState({
   );
 
   // Actual delete after confirmation
-  const confirmDeleteAction = React.useCallback(async () => {
-    if (!composer || !confirmDelete) return;
+  // Returns the success toast (board 4418:142651, with Undo) for the caller to show.
+  const confirmDeleteAction = React.useCallback(async (): Promise<ToastInput | null> => {
+    if (!composer || !confirmDelete) return null;
+    let toast: ToastInput | null = null;
     try {
-      await composer.components.deleteComponent(confirmDelete.id);
+      toast = await deleteComponentWithUndo(composer, confirmDelete.id);
       setSelectedId(null);
-      // Success toast is owned by ComponentsTab's onConfirm — don't double it.
     } catch {
       setPendingToast({ message: "Couldn't delete component.", variant: "error" });
     }
     setConfirmDelete(null);
+    return toast;
   }, [composer, confirmDelete, setSelectedId]);
 
   // Duplicate a component — real deep-clone via the engine (was a fake

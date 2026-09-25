@@ -13,6 +13,7 @@ import {
   type MediaAssetRef,
 } from "./runPromptOnce";
 import { gatherTokens, gatherMediaAssets } from "./aiScopeContext";
+import { activePageElements } from "./useAIScope";
 import { trackAgentRun } from "@/services/ai/adoptionTracker";
 
 /**
@@ -55,6 +56,11 @@ export interface ElementTarget {
   id: string;
 }
 
+/** What a planned run may read and change: the active page (default), every
+ *  page, or a fixed set of elements (a multi-selection, "all sections like
+ *  this"). */
+export type RunPool = "page" | "site" | { ids: string[] };
+
 function errorKindOf(e: unknown): AiErrorKind {
   return e instanceof AiRunError ? e.kind : "other";
 }
@@ -76,7 +82,7 @@ interface UseAgentRunnerResult {
   runPlan: () => void;
   /** Plan and run a prompt. With an element target the plan is that one
    *  step — the server planner only reasons about pages. */
-  start: (prompt: string, target?: ElementTarget) => void;
+  start: (prompt: string, target?: ElementTarget, pool?: RunPool) => void;
   approve: () => void;
   skip: () => void;
   stop: () => void;
@@ -123,10 +129,23 @@ export function useAgentRunner(
     });
   }, [model]);
 
+  /* The planned run's pool, fixed at start: each step re-gathers it against
+     the live canvas. It read every loaded page's elements for a "page" run —
+     the registry spans all pages. */
+  const poolRef = React.useRef<RunPool>("page");
   const gatherElements = React.useCallback((): PageElementRef[] => {
     if (!composer) return [];
-    return composer.elements
-      .getAllElements()
+    const pool = poolRef.current;
+    const els =
+      pool === "site"
+        ? composer.elements.getAllElements()
+        : pool === "page"
+          ? (() => {
+              const onPage = activePageElements(composer);
+              return onPage.length > 0 ? onPage : composer.elements.getAllElements();
+            })()
+          : pool.ids.flatMap((id) => composer.elements.getElement(id) ?? []);
+    return els
       .map((el) => {
         const content = el.getContent?.();
         return {
@@ -234,8 +253,9 @@ export function useAgentRunner(
   generateStepRef.current = generateStep;
 
   const start = React.useCallback(
-    async (prompt: string, target?: ElementTarget) => {
+    async (prompt: string, target?: ElementTarget, pool: RunPool = "page") => {
       if (!composer) return;
+      poolRef.current = pool;
       cancelledRef.current = false;
       setStoppedByUser(false);
       runStartRef.current = Date.now();

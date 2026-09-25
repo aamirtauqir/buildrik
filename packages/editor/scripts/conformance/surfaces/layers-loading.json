@@ -76,16 +76,10 @@
    "nodeId": "776:4093"
   },
   {
-   "name": "skeleton-row",
-   "testId": "layers-sk-row",
+   "name": "skeleton-bar",
+   "testId": "layers-sk-bar",
    "spec": "layers-loading",
    "nodeId": "775:4220"
-  },
-  {
-   "name": "skeleton-icon",
-   "testId": "layers-sk-icon",
-   "spec": "layers-loading",
-   "nodeId": "775:4221"
   },
   {
    "name": "skeleton-bar",

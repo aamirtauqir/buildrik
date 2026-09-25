@@ -8,55 +8,25 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 
 interface UseCanvasToolbarActionsParams {
   composer: Composer | null;
-  selectedId: string | null;
-  addToast: (toast: ToastInput) => string;
 }
 
-export function useCanvasToolbarActions({
-  composer,
-  selectedId,
-  addToast,
-}: UseCanvasToolbarActionsParams) {
+export function useCanvasToolbarActions({ composer }: UseCanvasToolbarActionsParams) {
+  /* The toolbar's Duplicate and Delete ARE ⌘D and Delete: they run the same
+     commands, so the copy is selected (board 5940:147595 selects "Hero 2"),
+     decision #17's multi-delete confirm applies, and the toast is the one the
+     keyboard path already speaks (useClipboardToasts / useHistoryFeedback) —
+     the toolbar used to build its own, with different words. */
   const handleToolbarDuplicate = React.useCallback(() => {
-    if (!composer || !selectedId) return;
-    const created = composer.elements.duplicateElement?.(selectedId);
-    if (created) {
-      addToast({
-        description: "Element duplicated",
-        tone: "info",
-        duration: 2000,
-        action: { label: "Undo", onClick: () => composer.history.undo() },
-      });
-    }
-  }, [composer, selectedId, addToast]);
+    composer?.commands.run("duplicate");
+  }, [composer]);
 
   const handleToolbarDelete = React.useCallback(() => {
-    if (!composer || !selectedId) return;
-    const element = composer.elements.getElement(selectedId);
-    const elType = element?.getType?.() || "element";
-    const childCount = element?.getChildren?.()?.length || 0;
-    const elName = elType.charAt(0).toUpperCase() + elType.slice(1);
-
-    composer.beginTransaction("delete-element");
-    composer.elements.removeElement(selectedId);
-    composer.endTransaction();
-
-    const message =
-      childCount > 0
-        ? `${elName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
-        : `${elName} deleted`;
-    addToast({
-      description: message,
-      tone: "info",
-      duration: 5000,
-      action: { label: "Undo", onClick: () => composer.history.undo() },
-    });
-  }, [composer, selectedId, addToast]);
+    composer?.commands.run("delete");
+  }, [composer]);
 
   return {
     handleToolbarDuplicate,

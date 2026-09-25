@@ -1,9 +1,9 @@
 /**
- * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
+ * PageList — pages tree + bulk toolbar mount + footer + Add CTA.
  *
- * The load-error body lives here, not one level up: board 141:165 keeps the
- * search band (141:170) and the Add-page footer (141:201) either side of it,
- * and lifting the error out of this shell is what made both vanish.
+ * The filter is the topbar field (v3 4418:92256), owned by PagesTab and
+ * handed down as `search`. The load-error body lives here, not one level up:
+ * v3 4418:94910 keeps the Add-page footer under it.
  * Zero business logic. All state/actions received as props from usePages + useFolders.
  *
  * Class namespace: `.bd-pg-list` is the scroll container (CSS owns `overflow:auto`).
@@ -12,15 +12,14 @@
  */
 
 import * as React from "react";
-import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, IconButton, Button, TextInput } from "@/editor/chrome-ui";
+import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, Button } from "@/editor/chrome-ui";
+import { PanelLoadError, PanelLoadingSkeleton, PanelNoResults } from "@/editor/shared/PanelStates";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
-import { shouldFocusSearch } from "../utils/keyboardShortcuts";
 import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
-import { PagesLoadingSkeleton } from "./PagesStateBlocks";
 
 interface Props {
   pages: PageItem[];
@@ -31,13 +30,17 @@ interface Props {
   folders: FolderItem[];
   pageToFolder: Map<string, string>;
   selectedIds: Set<string>;
+  /** The topbar filter (v3 4418:92256) — empty when not searching. */
+  search?: string;
+  /** "Search everywhere" on the no-results block hands the query to ⌘K. */
+  onSearchEverywhere?: (query: string) => void;
   /** Pages with unsaved edits — board 140:21's dirty ●. */
   dirtyPages?: ReadonlySet<string>;
   /** Sync failed — board 141:203 replaces the tree, the frame stays. */
   loadError?: string | null;
   /** The project has not answered yet — an empty list is not an empty site. */
   loading?: boolean;
-  onRetry?: () => void;
+  onRetry: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
   onSelectPage: (id: string) => void;
@@ -68,6 +71,8 @@ export const PageList: React.FC<Props> = ({
   folders,
   pageToFolder,
   selectedIds,
+  search = "",
+  onSearchEverywhere,
   dirtyPages,
   loadError,
   loading,
@@ -108,20 +113,6 @@ export const PageList: React.FC<Props> = ({
     },
     [composer]
   );
-  const [search, setSearch] = React.useState("");
-  const searchRef = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (shouldFocusSearch(e)) {
-        e.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
-
   const visible = search
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : pages;
@@ -134,7 +125,10 @@ export const PageList: React.FC<Props> = ({
     return (
       <div className="bd-pg-list-shell">
         <div className="bd-pg-list">
-          <PagesLoadingSkeleton />
+          <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
+        </div>
+        <div className="bd-pg-footer" data-testid="pages-footer">
+          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
         </div>
       </div>
     );
@@ -173,25 +167,6 @@ export const PageList: React.FC<Props> = ({
 
   return (
     <div className="bd-pg-list-shell">
-      {/* Board 140:7: 36h band with a bare 28h search box (no magnifier,
-          no inline clear). Always visible - the old 5-page gate is gone. The
-          Listings / Structure links that sat on its right moved under the
-          header ⋯ menu (board 7069:79383, audit G2-070). */}
-      <div className="bd-pg-search-wrap" data-testid="pages-search-band">
-        <div className="bd-pg-search" data-testid="pages-search-box">
-          <TextInput
-            ref={searchRef}
-            type="text"
-            placeholder="Search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setSearch("");
-            }}
-            aria-label="Search pages"
-          />
-        </div>
-      </div>
       {showSelectAll && (
         <div
           className="bd-pg-selectall"
@@ -230,39 +205,24 @@ export const PageList: React.FC<Props> = ({
           so its 24px text column measured 220 against the board's 232, and it
           scrolled with a list that was not there. */}
       {loadError ? (
-        /* Board 141:203: centered — red fact, muted harm scope, accent retry. */
-        <div className="bd-pg-error" role="alert" aria-live="assertive" data-testid="pages-load-error">
-          <p className="bd-pg-error-title" data-testid="pages-load-error-title">
-            Couldn{"\u2019"}t load your pages.
-          </p>
-          <p className="bd-pg-error-desc" data-testid="pages-load-error-desc">
-            The site is fine {"\u2014"} this panel isn{"\u2019"}t.
-          </p>
-          <Button
-            color="light"
-            size="xs"
-            className="bd-pg-error-retry"
-            data-testid="pages-load-error-retry"
-            onClick={onRetry}
-          >
-            Try again
-          </Button>
-        </div>
+        <PanelLoadError
+          title="Couldn’t load pages"
+          rest="to load this site’s pages."
+          testId="pages-load-error"
+          retryTestId="pages-load-error-retry"
+          onRetry={onRetry}
+        />
       ) : (
       <div className="bd-pg-list">
         {visible.length === 0 && search ? (
-          <div className="bd-pg-nores" role="status" aria-live="polite" data-testid="pages-no-results">
-            <p data-testid="pages-no-results-text">Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
-            <Button
-              color="light"
-              size="xs"
-              className="bd-pg-nores-clear"
-              data-testid="pages-clear-search"
-              onClick={() => setSearch("")}
-            >
-              Clear search
-            </Button>
-          </div>
+          <PanelNoResults
+            search={search}
+            message="No pages match your search."
+            testId="pages-no-results"
+            everywhereTestId="pages-search-everywhere"
+            actionOffset="tw:mt-6"
+            onSearchEverywhere={onSearchEverywhere}
+          />
         ) : (
           <>
             {/* Only treeitems inside the tree. The one-page note below carries
@@ -270,7 +230,7 @@ export const PageList: React.FC<Props> = ({
                 tree's child — the scroll container, not the tree, is what those
                 blocks belong to. */}
             <div className="bd-pg-tree" role="tree" aria-label="Pages">
-            {!search && folders.map((folder) => {
+            {!search && folders.map((folder, index) => {
               const folderPages = folder.pageIds
                 .map((id) => pages.find((p) => p.id === id))
                 .filter((p): p is PageItem => !!p);
@@ -278,6 +238,7 @@ export const PageList: React.FC<Props> = ({
                 <PageFolder
                   key={folder.id}
                   folder={folder}
+                  explainFolders={index === 0}
                   pages={folderPages}
                   allPages={pages}
                   composer={composer}
@@ -296,7 +257,6 @@ export const PageList: React.FC<Props> = ({
                   onRenameCommit={onRenameCommit}
                   onRenameCancel={onRenameCancel}
                   onDrop={(pageId) => onMovePageToFolder(pageId, folder.id)}
-                  onPageRemove={onRemovePageFromFolder}
                 />
               );
             })}
@@ -373,6 +333,15 @@ export const PageList: React.FC<Props> = ({
           active the bottom band IS the bulk bar — otherwise "+  Add page". */}
       {selectedIds.size === 0 && (
         <div className="bd-pg-footer" data-testid="pages-footer">
+          {/* v3 4418:90494 legend over the Add band; a search puts its match
+              count there instead (4418:92256). */}
+          {!loadError && (
+            <p className="bd-pg-legend" data-testid="pages-legend">
+              {search
+                ? `${visible.length} of ${pages.length} pages match “${search}”`
+                : "⌂ homepage · ● unpublished changes · ⠿ drag to reorder · ⋯ page menu"}
+            </p>
+          )}
           <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
         </div>
       )}

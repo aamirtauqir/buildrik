@@ -33,7 +33,7 @@ describe("PublishHistory — details overlay (6881:70883)", () => {
         <PublishHistory siteId="s1" siteName="Bella Cucina" onCompareWithCurrent={onCompareWithCurrent} />
       </ToastProvider>,
     );
-    const row = (await screen.findByText("Version 5")).closest("[data-version-row]") as HTMLElement;
+    const row = (await screen.findByText(/^v5( · live)?$/)).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(row);
     expect(await screen.findByText("Published version")).toBeTruthy();
     expect(screen.getByText(/Inspect this deploy before republishing it\./)).toBeTruthy();

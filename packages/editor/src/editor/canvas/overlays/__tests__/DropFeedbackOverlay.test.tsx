@@ -176,3 +176,69 @@ describe("DropFeedbackOverlay — aria-live invalid drop announcements (A9 / WCA
     expect(liveDiv?.textContent).toBe("");
   });
 });
+
+/* Board 4428:139921: an insert between elements is the 2px accent line with
+   a centred "Drop here" pill — the element it lands next to is NOT filled,
+   and no "Insert after …" label or breadcrumb is drawn. */
+describe("DropFeedbackOverlay — before/after reads 'Drop here' (4428:139921)", () => {
+  const renderAt = (dropPosition: "before" | "after" | "inside") =>
+    render(
+      <DropFeedbackOverlay
+        isDragOver
+        dropTargetId="el-1"
+        dropPosition={dropPosition}
+        isValidDrop
+        invalidReason={null}
+        canvasRef={makeCanvasRef("el-1")}
+        dropTargetPath={[{ id: "a", name: "Section" }, { id: "el-1", name: "Container" }] as never}
+        dropSlotRect={{ x: 0, y: 0, width: 10, height: 10, isHorizontal: false } as never}
+      />,
+    );
+
+  it("after: line + centred pill, no fill, no label or breadcrumb", () => {
+    const { getByTestId, queryByText, container } = renderAt("after");
+    const pill = getByTestId("drop-here-pill");
+    expect(pill.textContent).toBe("Drop here");
+    expect(pill.getAttribute("title")).toBe("Insert after Container");
+    expect(pill.style.top).toBe("180px"); // on the line: 100 + 80
+    expect(queryByText(/Insert after/)).toBeNull();
+    expect(queryByText(/Drop inside/)).toBeNull();
+    expect(container.querySelector(".bd-drop-feedback-target")).toBeNull();
+    expect(container.querySelector(".bd-drop-slot-preview")).toBeNull();
+    expect(getByTestId("drop-insertion-line")).toBeTruthy();
+  });
+
+  it("inside keeps the target highlight and the breadcrumb", () => {
+    const { queryByTestId, container } = renderAt("inside");
+    expect(queryByTestId("drop-here-pill")).toBeNull();
+    expect(container.querySelector(".bd-drop-feedback-target")).toBeTruthy();
+  });
+});
+
+/* Board 4418:100890: an Add row held over a container — accent outline, the
+   "Drop into · Hero › Content" tag, the insertion line where it will land,
+   and the two chips under it. */
+describe("DropFeedbackOverlay — Add drag into a container (4418:100890)", () => {
+  it("draws the tag, line and chips instead of the move-drag box, label and breadcrumb", () => {
+    const { getByTestId, queryByText, container } = render(
+      <DropFeedbackOverlay
+        isDragOver
+        dropTargetId="el-1"
+        dropPosition="inside"
+        isValidDrop
+        invalidReason={null}
+        canvasRef={makeCanvasRef("el-1")}
+        dropTargetPath={[{ id: "a", name: "Section" }, { id: "el-1", name: "Container" }] as never}
+        dropSlotRect={{ x: 110, y: 150, width: 180, height: 20, isHorizontal: false } as never}
+        insert={{ label: "Heading", target: { path: "Home › Hero › Content", into: "Content", after: "Subtitle" } }}
+      />,
+    );
+    expect(getByTestId("insert-drop-tag").textContent).toBe("Drop into · Hero › Content");
+    expect(getByTestId("insert-drop-line").style.top).toBe("150px");
+    expect(getByTestId("insert-drop-chip").textContent).toBe("Heading — release to place inside Content");
+    expect(getByTestId("insert-drop-esc").textContent).toBe("Esc — cancel insert");
+    expect(queryByText(/Insert inside/)).toBeNull();
+    expect(queryByText(/Drop inside:/)).toBeNull();
+    expect(container.querySelector(".bd-drop-slot-preview")).toBeNull();
+  });
+});

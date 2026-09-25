@@ -3,6 +3,7 @@
  * Shared utilities for getting element names, types, and box model info
  * @license BSD-3-Clause
  */
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 
 // Text elements that support inline editing
 export const TEXT_ELEMENT_TAGS = new Set([
@@ -141,6 +142,9 @@ export function getFriendlyName(element: HTMLElement): string {
 export function getElementNameFromType(type: string, tagName?: string): string {
   const normalized = type.toLowerCase();
   if (TYPE_NAME_MAP[normalized]) return TYPE_NAME_MAP[normalized];
+  /* The element's own type label before its DOM tag — a collection list read
+     "Div" and an icon "Span" on the selection tag (L2-V3, 4428:151488). */
+  if (ELEMENT_TYPE_LABELS[normalized]) return ELEMENT_TYPE_LABELS[normalized];
   if (tagName) {
     const tagNormalized = tagName.toLowerCase();
     return TAG_NAME_MAP[tagNormalized] || tagName.charAt(0).toUpperCase() + tagName.slice(1);
@@ -265,3 +269,37 @@ export function getElementInfo(element: HTMLElement): ElementInfo {
     hasLink,
   };
 }
+
+/**
+ * Where an element lives, as the boards write it: "Home › Hero › Content" —
+ * the active page, then the element's ancestors under the page root, each by
+ * its layer name or type label. `includeSelf` adds the element itself.
+ */
+export function elementLocation(
+  composer: {
+    elements: {
+      getElement(id: string): LocatedElement | undefined;
+      getActivePage(): { name?: string } | undefined;
+    };
+  },
+  elementId: string,
+  includeSelf = false,
+): string {
+  const names: string[] = [];
+  const self = composer.elements.getElement(elementId);
+  let node = includeSelf ? self ?? null : self?.getParent() ?? null;
+  while (node?.getParent()) {
+    const layer = node.getCustomData?.("layerName");
+    names.unshift(typeof layer === "string" && layer ? layer : getElementNameFromType(node.getType()));
+    node = node.getParent();
+  }
+  const page = composer.elements.getActivePage()?.name;
+  return [page, ...names].filter(Boolean).join(" › ");
+}
+
+interface LocatedElement {
+  getParent(): LocatedElement | null;
+  getType(): string;
+  getCustomData?(key: string): unknown;
+}
+

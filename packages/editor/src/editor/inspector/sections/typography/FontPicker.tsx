@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { loadGoogleFont, type GoogleFont } from "../../../../services/GoogleFontsService";
 import { FontPickerPanel, namesFont } from "./FontPickerDropdown";
@@ -148,9 +149,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, compose
         style={{ fontFamily: value || "inherit" }}
       >
         <span>{currentFontName}</span>
-        <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
-          {showFontPicker ? "\u25B2" : "\u25BC"}
-        </span>
+        {/* The field chevron every other select in the column draws. */}
+        <ChevronDown size={12} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
       </Button>
       {/* Font Picker Dropdown */}
       {showFontPicker && (

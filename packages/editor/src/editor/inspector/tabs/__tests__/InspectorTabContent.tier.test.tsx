@@ -96,8 +96,9 @@ function renderTier(tier: "beginner" | "pro", showAll = false, onShowAllChange =
 
 describe("InspectorTabContent — Beginner / Pro tier", () => {
   // Container profile, Style tab: layout, size (advanced for containers),
-  // spacing, background, border (with corner radius since G2-154); flex, grid
-  // and typography hide themselves on a plain non-text container.
+  // spacing, typography (inherited type, 7056:78382), background, border (with
+  // corner radius since G2-154); flex and grid hide themselves on a plain
+  // container.
   it("Pro renders the whole column, no Show-all row", () => {
     renderTier("pro");
     expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
@@ -128,7 +129,7 @@ describe("InspectorTabContent — Beginner / Pro tier", () => {
 
     renderTier("beginner", true, onShowAllChange);
     expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
-    expect(screen.getByTestId("inspector-show-less").textContent).toBe("5 of 5 groups · Show less ▴");
+    expect(screen.getByTestId("inspector-show-less").textContent).toBe("6 of 6 groups · Show less ▴");
     fireEvent.click(screen.getByTestId("inspector-show-less"));
     expect(onShowAllChange).toHaveBeenLastCalledWith(false);
   });

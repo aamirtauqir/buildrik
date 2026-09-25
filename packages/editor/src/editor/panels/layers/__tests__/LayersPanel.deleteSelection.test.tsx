@@ -95,7 +95,7 @@ describe("LayersPanel — delete a multi-selection", () => {
 
     const dialog = screen.getByTestId("layers-delete-selection");
     expect(dialog).toHaveTextContent("Delete 3 elements?");
-    expect(dialog).toHaveTextContent("This removes Heading, Subtitle and Container.");
+    expect(dialog).toHaveTextContent(/This removes Heading, Subtitle and Container \(and anything nested inside them\) from .+\. You can undo from the toast\./);
     expect(screen.getByTestId("layers-delete-selection-confirm")).toHaveTextContent("Delete 3 elements");
     // nothing has gone yet
     expect(count(composer)).toBe(4);
