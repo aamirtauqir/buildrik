@@ -10,34 +10,28 @@
  * NotificationService). Filter narrowing is server-side — passing the chosen
  * filter does not filter client-side.
  *
- * The `activity.recent` tRPC procedure is the planned endpoint (code-gap
- * plan B6) and is not registered in the dashboard `AppRouter` yet
- * (needs-dashboard). The call is typed here by the shape the view needs,
- * and a failure is thrown as an `ActivityReadError` whose `reason` tells the
- * view which state to draw: `unavailable` (the procedure does not exist —
- * NOT_FOUND), `unauthorized` (signed out / no role), `failed` (anything
- * else, retryable). Never a fake-empty list.
+ * `activity.recent` (dashboard `server/trpc/routers/activity.ts`) is typed
+ * through `AppRouter`. A failure is thrown as an `ActivityReadError` whose
+ * `reason` tells the view which state to draw: `unauthorized` (signed out, no
+ * role, or the site is gone — NOT_FOUND; retrying will not fix any of them),
+ * `failed` (anything else, retryable). Never a fake-empty list.
  *
  * @license BSD-3-Clause
  */
 
+import type { SiteActivityFilter, SiteActivityKind, SiteActivityEntry } from "@buildrik/shared/schemas/activity";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 
-export type ActivityFilter = "all" | "edits" | "comments" | "publish";
+export type ActivityFilter = SiteActivityFilter;
 
-export type ActivityKind = "edit" | "comment" | "publish";
+export type ActivityKind = SiteActivityKind;
 
-export interface ActivityEntry {
-  id: string;
-  kind: ActivityKind;
-  actorName: string | null;
-  summary: string;
-  actionUrl: string | null;
+export type ActivityEntry = Omit<SiteActivityEntry, "createdAt"> & {
   createdAt: string | Date;
-}
+};
 
-export type ActivityReadFailure = "unavailable" | "unauthorized" | "failed";
+export type ActivityReadFailure = "unauthorized" | "failed";
 
 export class ActivityReadError extends Error {
   constructor(readonly reason: ActivityReadFailure) {
@@ -46,16 +40,9 @@ export class ActivityReadError extends Error {
   }
 }
 
-/** The planned procedure's shape — absent from `AppRouter` until the
- *  dashboard half lands, so the typed client cannot name it. */
-interface ActivityRecentClient {
-  activity: { recent: { query(input: { siteId: string; filter: ActivityFilter }): Promise<ActivityEntry[]> } };
-}
-
 function failureOf(err: unknown): ActivityReadFailure {
   const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
-  if (code === "NOT_FOUND") return "unavailable";
-  if (code === "UNAUTHORIZED" || code === "FORBIDDEN") return "unauthorized";
+  if (code === "UNAUTHORIZED" || code === "FORBIDDEN" || code === "NOT_FOUND") return "unauthorized";
   return "failed";
 }
 
@@ -65,10 +52,9 @@ export async function fetchRecentActivity(
   filter: ActivityFilter,
 ): Promise<ActivityEntry[]> {
   if (!siteId) return [];
-  const client = getBuildrikClient(DASHBOARD_URL) as unknown as ActivityRecentClient;
   let rows: ActivityEntry[];
   try {
-    rows = await client.activity.recent.query({ siteId, filter });
+    rows = await getBuildrikClient(DASHBOARD_URL).activity.recent.query({ siteId, filter });
   } catch (err) {
     throw new ActivityReadError(failureOf(err));
   }

@@ -144,7 +144,10 @@ export const reviewsRouter = router({
     }),
 
   // The editor Review panel's data source (P0). Flag off → null so the editor
-  // shows no panel; any EDITOR of the site may read their own round.
+  // shows no panel; any EDITOR of the site may read their own round. The
+  // round's `token` is a live client-review credential (A19-6/S-7) — only an
+  // ADMIN of the site gets it back; the service is told via `includeToken`
+  // and never selects the column at all for anyone else.
   currentRound: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
@@ -156,7 +159,14 @@ export const reviewsRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return getCurrentRound(input.siteId);
+      let includeToken = false;
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+        includeToken = true;
+      } catch (e) {
+        if (!(e instanceof PermissionError)) throw e;
+      }
+      return getCurrentRound(input.siteId, includeToken);
     }),
 
   // The Previous-rounds list (board 157:169's buildable half). Flag off → []

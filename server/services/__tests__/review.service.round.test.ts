@@ -39,9 +39,11 @@ describe("getCurrentRound", () => {
     expect(await getCurrentRound("s1")).toBeNull();
   });
 
-  it("maps a pending, opened round with counts + revision", async () => {
+  it("maps a pending, opened round with counts + revision, token withheld by default", async () => {
     const created = new Date("2026-07-20T10:00:00Z");
     const updated = new Date("2026-07-21T09:00:00Z");
+    // No `includeToken` arg → the base select, which never asks Prisma for
+    // `token`/`expiresAt` at all (A19-6/S-7 — see the includeToken tests below).
     rrFindFirst.mockResolvedValue({
       id: "r1",
       status: "PENDING",
@@ -68,22 +70,61 @@ describe("getCurrentRound", () => {
       roundNumber: 2,
       totalRounds: 2,
       openCommentCount: 3,
+      token: null,
     });
     // open-comment count is scoped to the site + OPEN
     expect(commentCount).toHaveBeenCalledWith({ where: { siteId: "s1", status: "OPEN" } });
+    // the default call never asks Prisma for the token column at all
+    expect(rrFindFirst.mock.calls[0][0].select).not.toHaveProperty("token");
+    expect(rrFindFirst.mock.calls[0][0].select).not.toHaveProperty("expiresAt");
   });
 
-  it("marks a revoked round", async () => {
+  it("marks a revoked round (includeToken: true)", async () => {
     rrFindFirst.mockResolvedValue({
       id: "r1", status: "PENDING", invitedEmail: null, reviewer: null,
       revokedAt: new Date(), resolvedAt: null,
       createdAt: new Date(), updatedAt: new Date(),
+      token: "tok_dead", expiresAt: null,
     });
     rrCount.mockResolvedValue(1);
     commentCount.mockResolvedValue(0);
-    const round = await getCurrentRound("s1");
+    const round = await getCurrentRound("s1", true);
     expect(round?.revoked).toBe(true);
     expect(round?.reviewerName).toBeNull();
+    // A revoked link must not be handed back for copying.
+    expect(round?.token).toBeNull();
+  });
+
+  /* B3 "Copy link" (post-Oct-1 R4): the token rides the round only while the
+     link still opens, and only when the router has confirmed the caller is
+     an ADMIN and asks with `includeToken: true`. */
+  const liveRound = (over: Record<string, unknown>) => ({
+    id: "r1", status: "PENDING", invitedEmail: "sara@client.com", reviewer: null,
+    revokedAt: null, resolvedAt: null, createdAt: new Date(), updatedAt: new Date(),
+    token: "tok_1", expiresAt: new Date(Date.now() + 60_000),
+    ...over,
+  });
+
+  it("returns the token of a live client link and selects it, for includeToken: true", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({}));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1", true))?.token).toBe("tok_1");
+    expect(rrFindFirst.mock.calls[0][0].select).toMatchObject({ token: true, expiresAt: true });
+  });
+
+  it("withholds an expired link's token", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({ expiresAt: new Date(Date.now() - 1) }));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1", true))?.token).toBeNull();
+  });
+
+  it("is null for an internal round that never invited a client", async () => {
+    rrFindFirst.mockResolvedValue(liveRound({ token: null, invitedEmail: null, expiresAt: null }));
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    expect((await getCurrentRound("s1", true))?.token).toBeNull();
   });
 });
 

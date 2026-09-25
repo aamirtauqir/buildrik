@@ -5,22 +5,25 @@ import {
   listNotifications, getUnreadCount, markAsRead, markAllAsRead, getRecentNotifications,
   listGroupedNotifications, deleteNotification, muteNotificationType,
 } from "@/server/services/notification.service";
-import { listNotificationsSchema } from "@buildrik/shared/schemas/notifications";
+import { listNotificationsSchema, notificationSiteScopeInput } from "@buildrik/shared/schemas/notifications";
 
 export const notificationsRouter = router({
   list: protectedProcedure.input(listNotificationsSchema).query(async ({ ctx, input }) => {
     return listNotifications(ctx.session.user.id, input);
   }),
-  unreadCount: protectedProcedure.query(async ({ ctx }) => {
-    return getUnreadCount(ctx.session.user.id);
+  // `siteId` (optional) narrows the three bell reads to one site — the editor's
+  // bell (decision 9). Rows are the caller's own either way (userId), so the
+  // filter cannot reach another user's data and needs no site-role check.
+  unreadCount: protectedProcedure.input(notificationSiteScopeInput).query(async ({ ctx, input }) => {
+    return getUnreadCount(ctx.session.user.id, input?.siteId);
   }),
   markRead: protectedProcedure
     .input(z.object({ notificationId: z.string(), read: z.boolean().optional().default(true) }))
     .mutation(async ({ ctx, input }) => {
       return markAsRead(input.notificationId, ctx.session.user.id, input.read);
     }),
-  markAllRead: protectedProcedure.mutation(async ({ ctx }) => {
-    return markAllAsRead(ctx.session.user.id);
+  markAllRead: protectedProcedure.input(notificationSiteScopeInput).mutation(async ({ ctx, input }) => {
+    return markAllAsRead(ctx.session.user.id, input?.siteId);
   }),
   delete: protectedProcedure
     .input(z.object({ notificationId: z.string() }))
@@ -38,8 +41,8 @@ export const notificationsRouter = router({
         throw e;
       }
     }),
-  recent: protectedProcedure.query(async ({ ctx }) => {
-    return getRecentNotifications(ctx.session.user.id);
+  recent: protectedProcedure.input(notificationSiteScopeInput).query(async ({ ctx, input }) => {
+    return getRecentNotifications(ctx.session.user.id, input?.siteId);
   }),
   listGrouped: protectedProcedure
     .input(z.object({ filter: z.enum(["all", "unread", "mentions"]).optional().default("all") }))

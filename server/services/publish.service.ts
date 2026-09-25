@@ -551,6 +551,36 @@ export async function getPublishDiff(siteId: string, fromJobId: string, toJobId:
 }
 
 /**
+ * The pages one published version shipped — a side of the editor's Compare
+ * (B8: a published version against the draft, a saved version or the
+ * approval). Page-by-page HTML, because Compare renders both sides.
+ *
+ * The exception to "HTML never leaves the service" (getPublishDiff /
+ * getPublishStatus / getPublishHistory keep it in): those are list/status
+ * payloads where HTML would be dead weight, while this is the one lazy read
+ * whose whole job is the content — and `jobId` can point at ANY COMPLETED
+ * publish job for the site, not only the current live one, so this can
+ * expose a superseded or since-unpublished version's HTML. It is not public
+ * by that fact alone; the router gates the call at EDITOR. Same shape and
+ * laziness as `getApprovedSnapshot`.
+ *
+ * Throws NOT_FOUND when the job is not a COMPLETED publish of this site; null
+ * when its payload was pruned past the retained window (a state, not an error).
+ */
+export async function getPublishedSnapshot(siteId: string, jobId: string): Promise<PublishPage[] | null> {
+  const job = await prisma.publishBuildJob.findFirst({
+    where: { id: jobId, siteId, status: "COMPLETED" },
+    select: { log: true },
+  });
+  if (!job) throw new Error("NOT_FOUND");
+  const pages = (job.log as RetainedPayload)?.pages;
+  if (!Array.isArray(pages)) return null;
+  return pages
+    .filter((p): p is { path: string; html: string } => typeof p?.path === "string" && typeof p.html === "string")
+    .map((p) => ({ path: p.path, html: p.html }));
+}
+
+/**
  * A site's published-version history (contract §5), newest first, capped at the
  * retained window. Reads `log` ONLY to derive `rollbackable`; the raw HTML
  * payload NEVER leaves the service (mirrors getPublishStatus's discipline).

@@ -260,6 +260,11 @@ export interface CurrentRound {
   roundNumber: number;
   totalRounds: number;
   openCommentCount: number;
+  /** The client link's token (`/review/<token>`) while that link still opens —
+   *  null when no client was invited, or the link is revoked or expired. The
+   *  sender already receives it from `submitReview`; this lets the Review panel
+   *  copy the live link later without a re-send (B3). */
+  token: string | null;
 }
 
 /**
@@ -307,22 +312,57 @@ export async function listRounds(siteId: string): Promise<RoundListRow[]> {
   }));
 }
 
-export async function getCurrentRound(siteId: string): Promise<CurrentRound | null> {
-  const r = await prisma.reviewRequest.findFirst({
-    where: { siteId },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      status: true,
-      invitedEmail: true,
-      reviewer: { select: { name: true } },
-      revokedAt: true,
-      resolvedAt: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+const CURRENT_ROUND_BASE_SELECT = {
+  id: true,
+  status: true,
+  invitedEmail: true,
+  reviewer: { select: { name: true } },
+  revokedAt: true,
+  resolvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+/**
+ * `includeToken` gates whether the live client-review link's token is even
+ * selected from the DB, not just whether it's returned — the caller (the
+ * router) passes it only once it has confirmed the requester is an ADMIN of
+ * the site (A19-6/S-7: this token must never reach a non-admin EDITOR).
+ */
+export async function getCurrentRound(siteId: string, includeToken = false): Promise<CurrentRound | null> {
+  let r: {
+    id: string;
+    status: string;
+    invitedEmail: string | null;
+    reviewer: { name: string | null } | null;
+    revokedAt: Date | null;
+    resolvedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  let token: string | null = null;
+
+  if (includeToken) {
+    const row = await prisma.reviewRequest.findFirst({
+      where: { siteId },
+      orderBy: { createdAt: "desc" },
+      select: { ...CURRENT_ROUND_BASE_SELECT, token: true, expiresAt: true },
+    });
+    r = row;
+    if (row) {
+      const linkLive =
+        row.token !== null && row.revokedAt === null && (row.expiresAt === null || row.expiresAt > new Date());
+      token = linkLive ? row.token : null;
+    }
+  } else {
+    r = await prisma.reviewRequest.findFirst({
+      where: { siteId },
+      orderBy: { createdAt: "desc" },
+      select: CURRENT_ROUND_BASE_SELECT,
+    });
+  }
   if (!r) return null;
+
   const [totalRounds, openCommentCount] = await Promise.all([
     prisma.reviewRequest.count({ where: { siteId } }),
     prisma.comment.count({ where: { siteId, status: "OPEN" } }),
@@ -339,6 +379,7 @@ export async function getCurrentRound(siteId: string): Promise<CurrentRound | nu
     roundNumber: totalRounds,
     totalRounds,
     openCommentCount,
+    token,
   };
 }
 

@@ -178,6 +178,7 @@ export async function POST(
         "SITE_PUBLISHED",
         `Site "${completedSite.name}" is live at ${publicUrl}`,
         `/dashboard/sites/${job.siteId}`,
+        job.siteId,
       ).catch(() => {});
 
       await recordActivity({
@@ -233,6 +234,7 @@ export async function POST(
         "SITE_PUBLISH_FAILED",
         `Site "${failedSite.name}" didn't publish: ${message}`,
         `/dashboard/sites/${job.siteId}`,
+        job.siteId,
       ).catch(() => {});
 
       await recordActivity({

@@ -12,6 +12,7 @@ const submitMock = vi.fn();
 const listMock = vi.fn();
 const resolveMock = vi.fn();
 const isFeatureEnabledMock = vi.fn();
+const getCurrentRoundMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -42,6 +43,7 @@ vi.mock("@/server/services/review.service", () => ({
   submitReview: (...a: unknown[]) => submitMock(...a),
   listReviews: (...a: unknown[]) => listMock(...a),
   resolveReview: (...a: unknown[]) => resolveMock(...a),
+  getCurrentRound: (...a: unknown[]) => getCurrentRoundMock(...a),
   ReviewError: class ReviewError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -60,7 +62,7 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock].forEach((m) =>
     m.mockReset(),
   );
   // Default: agency layer ON, so the existing role-gate assertions still hold.
@@ -100,6 +102,37 @@ describe("reviews router", () => {
     expect(resolveMock).toHaveBeenCalledWith("ws_1", "r1", "APPROVED", "u_1");
   });
 
+  /* currentRound carries the live client-link token (post-Oct-1 R4), but the
+     token is a live client-review credential — re-opens A19-6/S-7 if handed
+     to a non-admin. Only an ADMIN gets it back; any EDITOR still gets the
+     round itself, with token forced null. */
+  it("currentRound returns token to an ADMIN", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // ADMIN probe passes
+    getCurrentRoundMock.mockResolvedValueOnce({ id: "r1", token: "tok_1" });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).resolves.toMatchObject({ token: "tok_1" });
+    expect(checkSiteRoleMock).toHaveBeenNthCalledWith(1, expect.anything(), "u_1", "s1", "EDITOR");
+    expect(checkSiteRoleMock).toHaveBeenNthCalledWith(2, expect.anything(), "u_1", "s1", "ADMIN");
+    expect(getCurrentRoundMock).toHaveBeenCalledWith("s1", true);
+  });
+
+  it("currentRound returns the round with token null to an EDITOR who is not an ADMIN", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN")); // ADMIN probe fails
+    getCurrentRoundMock.mockResolvedValueOnce({ id: "r1", token: null });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).resolves.toMatchObject({ token: null });
+    expect(getCurrentRoundMock).toHaveBeenCalledWith("s1", false);
+  });
+
+  it("currentRound is FORBIDDEN below EDITOR and never reads the round", async () => {
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs EDITOR"));
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(getCurrentRoundMock).not.toHaveBeenCalled();
+  });
+
   // IRON RULE (IA v2 E1): with agency_layer off, mutations deny and the list
   // collapses to empty — no procedure reaches the service.
   describe("agency_layer gate", () => {
@@ -117,6 +150,12 @@ describe("reviews router", () => {
       await expect(caller.list()).resolves.toEqual({ items: [], nextCursor: null });
       expect(checkWorkspaceRoleMock).not.toHaveBeenCalled();
       expect(listMock).not.toHaveBeenCalled();
+    });
+
+    it("currentRound is null and never reads the round (so no token leaks)", async () => {
+      const caller = reviewsRouter.createCaller(makeCtx() as never);
+      await expect(caller.currentRound({ siteId: "s1" })).resolves.toBeNull();
+      expect(getCurrentRoundMock).not.toHaveBeenCalled();
     });
 
     it("resolve is denied and never resolves", async () => {
