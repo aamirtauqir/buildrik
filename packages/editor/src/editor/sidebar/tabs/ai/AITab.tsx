@@ -30,7 +30,7 @@ const NOTICE_TITLE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]
 
 /** The quota gate's sentence carries its reset as ISO ("Resets at
  *  2026-08-16T00:00:00.000Z."); board 4418:106671 reads it as a time. */
-export function readableQuotaMessage(message: string | null): string {
+function readableQuotaMessage(message: string | null): string {
   if (!message) return "";
   return message.replace(/Resets at (\d{4}-\d{2}-\d{2}T[\d:.]+Z)/, (_m, iso: string) => {
     const at = new Date(iso);

@@ -157,13 +157,23 @@ describe("useEditorShortcuts", () => {
     expect(openSiteSettings).not.toHaveBeenCalled();
   });
 
-  it("Ctrl+H opens version history, Shift+A opens components", () => {
+  it("Ctrl+H opens version history", () => {
     const openLeftPanelToTab = vi.fn();
     mount({ openLeftPanelToTab });
     dispatchKey({ key: "h", ctrlKey: true });
     expect(openLeftPanelToTab).toHaveBeenCalledWith("history");
+  });
+
+  // FB-1: Shift+A used to be bound here too, racing GROUPED_TABS_CONFIG's own
+  // "⇧A" binding in useSidebarKeyboard.ts for the same "components"
+  // destination — two listeners, one chord. useSidebarKeyboard.ts is the one
+  // table now (useSidebarKeyboard.ai.test.ts covers ⇧A there); this hook
+  // must stay silent on it.
+  it("Shift+A is not bound here — useSidebarKeyboard.ts owns it", () => {
+    const openLeftPanelToTab = vi.fn();
+    mount({ openLeftPanelToTab });
     dispatchKey({ key: "A", shiftKey: true });
-    expect(openLeftPanelToTab).toHaveBeenCalledWith("components");
+    expect(openLeftPanelToTab).not.toHaveBeenCalled();
   });
 
   // MODALS ---------------------------------------------------------------------

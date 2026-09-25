@@ -384,8 +384,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     modals,
     saveProject,
     openLeftPanelToTab: state.openLeftPanelToTab,
-    // T9: same handler the site menu's "Site settings" row uses.
-    openSiteSettings: modals.openProjectSettings,
+    /* FC-11: same door the site menu's "Site settings" row uses — both go
+       straight to the Settings tab now, the way S and ⌘K already did. This
+       used to round-trip through a `showProjectSettings` flag that
+       StudioModals immediately converted back into this same call and
+       cleared — a modal that never rendered a modal. */
+    openSiteSettings: () => state.openLeftPanelToTab("settings"),
   });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
@@ -527,6 +531,50 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return <StudioSkeleton />;
   }
 
+  /* FB-8: Issues used to float as an absolute 360px overlay on top of the
+     inspector (z-45). It is now a real right-column mode — StudioPanels
+     swaps it in for ProInspector the same way it swaps in the AI drill-in.
+     Built here (not in StudioPanels) because it needs `requestBrandToken`
+     and `composer.designSystem`, both already in scope on this component. */
+  const issuesPanel = issuesOpen ? (
+    <IssuesPanel
+      issues={state.issues}
+      activePageId={activePageId}
+      onClose={() => setIssuesOpen(false)}
+      onBack={() => setIssuesOpen(false)}
+      /* B9 / SH-63 — a row click lands on the canvas: the element the
+         issue names, else the first element that uses its token (the
+         engine's usage tracker knows), else the Brand panel where the
+         token lives. Never a dead click. */
+      onSelectElement={(issue) => {
+        const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
+        const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
+        const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
+        setIssuesOpen(false);
+        if (target) composer.selection.select(target);
+        /* Brand ON the issue's token — it landed on the first colour
+           row (walk B9: color-primary opened color-action). */
+        else if (issue.tokenId) requestBrandToken(composer, issue.tokenId);
+        else composer.emit("ui:switch-tab", { tab: "design" });
+      }}
+      // applyAutoFix already wraps the rewrite in one transaction, which
+      // is what lets the panel promise a single undo step. It returns
+      // null when it will not touch the token — the panel shows that as
+      // fix-failed instead of silently doing nothing.
+      onFix={async (issue) =>
+        issue.tokenId && issue.autoFixHint
+          ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
+          : null
+      }
+      onOpenBrand={(tokenId) => {
+        setIssuesOpen(false);
+        if (tokenId) requestBrandToken(composer, tokenId);
+        else composer.emit("ui:switch-tab", { tab: "design" });
+      }}
+      onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
+    />
+  ) : null;
+
   return (
     <div
       className={`tw:flex tw:flex-col tw:gap-0 bd-studio ${className}`}
@@ -568,7 +616,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
           onShowExporter={modals.openExporter}
-          onOpenProjectSettings={modals.openProjectSettings}
+          onOpenProjectSettings={() => state.openLeftPanelToTab("settings")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPages={() => state.openLeftPanelToTab("pages")}
@@ -630,6 +678,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
+        /* FA-1: the canvas context menu's "Improve with AI" (right-click →
+           el already selected, see Canvas.tsx handleContextMenu) opens the
+           SAME right-column AI thread as every other AI door — same event,
+           same panel, no second engine. Without this prop the menu item
+           hides itself (useCanvasContextMenu only shows it when set). */
+        onAIRequest={() => composer.emit("ui:switch-tab", { tab: "ai" })}
         onResendReview={resendReview}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
@@ -640,61 +694,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            facts confirm — two gates for one board (B3-10). */
         nextMove={nextMove}
         onRequestPublish={requestPublish}
+        issuesOpen={issuesOpen}
+        issuesPanel={issuesPanel}
+        onCloseIssues={() => setIssuesOpen(false)}
+        // FB-4: closes Review's ⌘K row, "R" shortcut and panel render when
+        // the server's agency review layer is off — the topbar pill stays
+        // visible either way (owner decision).
+        reviewsEnabled={reviewStatus.reviewsEnabled}
       />
 
-      {/* P3: Issues panel. Board 4418:147641 puts it in the inspector column —
-          300 wide, ending where the column ends, not over the status footer. */}
-      {issuesOpen && (
-        <div
-          data-testid="issues-column"
-          style={{
-            position: "absolute",
-            top: "var(--bk-size-topbar)",
-            right: 0,
-            bottom: "var(--bk-size-footer)",
-            width: "var(--bk-size-inspector)",
-            zIndex: 45,
-            background: "var(--bk-bg-panel)",
-            borderLeft: "1px solid var(--bk-border)",
-          }}
-        >
-          <IssuesPanel
-            issues={state.issues}
-            activePageId={activePageId}
-            onClose={() => setIssuesOpen(false)}
-            /* B9 / SH-63 — a row click lands on the canvas: the element the
-               issue names, else the first element that uses its token (the
-               engine's usage tracker knows), else the Brand panel where the
-               token lives. Never a dead click. */
-            onSelectElement={(issue) => {
-              const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
-              const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
-              const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
-              setIssuesOpen(false);
-              if (target) composer.selection.select(target);
-              /* Brand ON the issue's token — it landed on the first colour
-                 row (walk B9: color-primary opened color-action). */
-              else if (issue.tokenId) requestBrandToken(composer, issue.tokenId);
-              else composer.emit("ui:switch-tab", { tab: "design" });
-            }}
-            // applyAutoFix already wraps the rewrite in one transaction, which
-            // is what lets the panel promise a single undo step. It returns
-            // null when it will not touch the token — the panel shows that as
-            // fix-failed instead of silently doing nothing.
-            onFix={async (issue) =>
-              issue.tokenId && issue.autoFixHint
-                ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
-                : null
-            }
-            onOpenBrand={(tokenId) => {
-              setIssuesOpen(false);
-              if (tokenId) requestBrandToken(composer, tokenId);
-              else composer.emit("ui:switch-tab", { tab: "design" });
-            }}
-            onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
-          />
-        </div>
-      )}
       {/* Tour overlay removed — onboarding handled by orchestrator */}
 
       <StudioModals
@@ -721,8 +729,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showSaveAsComponent={modals.showSaveAsComponent}
         onCloseSaveAsComponent={modals.closeSaveAsComponent}
         saveAsComponentContext={modals.saveAsComponentContext}
-        showProjectSettings={modals.showProjectSettings}
-        onCloseProjectSettings={modals.closeProjectSettings}
         showCMSCollectionSetup={modals.showCMSCollectionSetup}
         onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
       />

@@ -52,9 +52,6 @@ const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const ActivityTab = React.lazy(() => import("./tabs/activity/ActivityTab").then((m) => ({ default: m.ActivityTab })));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
-const AITab = React.lazy(() =>
-  import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
-);
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -101,6 +98,11 @@ export interface TabRouterProps {
   /** P4.2 Content tab: opens the shell CMS collection-setup modal (data-first
    *  create, no element selection). Absent → the Content create button hides. */
   onCreateCollection?: () => void;
+  /** FB-4: the agency review layer's server flag. `null`/`false`/absent
+   *  renders nothing for the "review" tab id — no client feature flag gates
+   *  it today, so a workspace without the layer must not be able to reach
+   *  the panel at all once every door is closed. */
+  reviewsEnabled?: boolean | null;
   /** Deep-link sub-tab for the active panel — `openLeftPanelToTab(tab, subTab)`.
    *
    *  This chain existed but stopped one component short: `StudioPanels` took
@@ -132,6 +134,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onOpenIconPicker,
   onResendReview,
   onCreateCollection,
+  reviewsEnabled,
   activeSubTab,
   pagesOpen,
 }) => {
@@ -230,6 +233,10 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "review":
+      /* FB-4: no client gate existed — the panel rendered regardless of the
+         server's agency_layer flag. The topbar Review pill stays visible
+         either way (owner decision); this only closes the panel door. */
+      if (!reviewsEnabled) return null;
       return (
         <ReviewTab
           {...commonTabProps}

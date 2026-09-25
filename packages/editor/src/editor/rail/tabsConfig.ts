@@ -277,8 +277,12 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 // reachable off-rail (verified entry points, so nothing is stranded):
 //   ai         → contextual: canvas selection ✨ + ⌘K command palette
 //   templates  → Pages panel "From template" (new-page flow) + ⌘K + shortcut T
-//   components → shortcut ⇧A + ⌘K ("Open Components panel"); folds into
-//                Brand · components per the design in a later phase
+//   components → shortcut ⇧A + ⌘K ("Open Components"); reached from inside
+//                Add too — the Mine group's "Manage components ›" row
+//                (G2-107) opens this same panel. v3 Q4 puts Components
+//                under Add, not Brand — an earlier version of this comment
+//                said "folds into Brand · components", which the v3 IA
+//                (2026-09-14) never asked for.
 //   settings   → topbar ⋯ site menu ("Site settings")
 //   publish    → topbar Publish button
 //   history    → topbar ⋯ site menu ("Version history")

@@ -18,13 +18,18 @@
  */
 
 import * as React from "react";
-import { CheckCircle2 } from "lucide-react";
-import { PanelHeader, Button, EmptyState, Progress, Row } from "@/editor/chrome-ui";
+import { CheckCircle2, X } from "lucide-react";
+import { PanelHeader, Button, IconButton, EmptyState, Progress, Row } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
   issues: Issue[];
   onClose: () => void;
+  /** FB-8: rendered in the inspector column, same mechanism as the AI
+   *  drill-in (`AITab`'s `onBack`) — the way out is back to the inspector,
+   *  not a panel close. When present, replaces the plain `PanelHeader` with
+   *  the same "‹ Inspector" back row. */
+  onBack?: () => void;
   /**
    * The page the user is looking at (topbar plan T10). Enables the
    * "This page / All pages" scope filter — which only renders when at least
@@ -117,6 +122,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   issues,
   onClose,
+  onBack,
   activePageId = null,
   onSelectElement,
   onFix,
@@ -154,7 +160,38 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
 
   return (
     <div className={BODY}>
-      <PanelHeader title="Issues" onClose={onClose} size="panel" />
+      {onBack ? (
+        /* Mirrors AITab's back row (170:2/170:29/171:67): a 36-tall "‹
+           Inspector" row with the rule under it, a plain title row below. */
+        <div className="tw:flex tw:shrink-0 tw:flex-col">
+          <div
+            className="tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]"
+            data-testid="issues-back-row"
+          >
+            <Button
+              color="light"
+              size="xs"
+              className="tw:h-full tw:border-transparent tw:bg-transparent tw:px-4 tw:py-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+              onClick={onBack}
+              aria-label="Back to Inspector"
+              data-testid="issues-back-label"
+            >
+              ‹ Inspector
+            </Button>
+            <IconButton size="sm" label="Close Issues" className="tw:ml-auto tw:mr-4 tw:text-[var(--bk-ink-muted)]" onClick={onClose}>
+              <X size={16} aria-hidden="true" />
+            </IconButton>
+          </div>
+          <div
+            className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+            data-testid="issues-header"
+          >
+            Issues
+          </div>
+        </div>
+      ) : (
+        <PanelHeader title="Issues" onClose={onClose} size="panel" />
+      )}
 
       {issues.length === 0 ? (
         /* Board 164:35: two lines under the header — the verdict in green, and

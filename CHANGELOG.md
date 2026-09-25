@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawers, inspector, canvas, CMS, media, publish and settings. Tracked row by row in `packages/editor/docs/plans/2026-09-23-c5-ledger.md`.
 
 ### Added
-- Activity panel, page folders (personal + shared), draft share links (`/share/<token>`), viewer read-only editor, container links.
+- Activity panel, personal page folders (per user; pages themselves stay shared), draft share links (`/share/<token>`), viewer read-only editor, container links.
 - Publish confirm step, AI generate-a-block composer with daily quota, ⌘K "Jump to property", Pages / Records / Templates bands in ⌘K.
 - CMS workspace (fields, Configure dialogs, open-on-record), asset details rail, stock assets modal.
 

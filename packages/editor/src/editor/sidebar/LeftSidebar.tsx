@@ -96,6 +96,8 @@ export interface LeftSidebarProps {
     currentIcon: import("../../shared/types/media").IconConfig | undefined,
     onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
   ) => void;
+  /** FB-4: see `TabRouter.reviewsEnabled` — also closes the "R" shortcut. */
+  reviewsEnabled?: boolean | null;
 }
 
 // ============================================
@@ -234,6 +236,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onCreateCollection,
   onOpenImageEditor,
   onOpenIconPicker,
+  reviewsEnabled,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const railTab = useRailTab(activeTab);
@@ -338,7 +341,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
   // Global keyboard shortcuts (A, T, Z, etc.)
   const openAssistant = React.useCallback(() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }), [composer]);
-  useSidebarKeyboard(safeTabChange, openAssistant);
+  /* FB-4: "R" is Review's letter in GROUPED_TABS_CONFIG — closed the same
+     way as its ⌘K row and its panel render when the server flag is off. */
+  const disabledTabs = React.useMemo<ReadonlySet<GroupedTabId>>(
+    () => (reviewsEnabled ? new Set() : new Set<GroupedTabId>(["review"])),
+    [reviewsEnabled],
+  );
+  useSidebarKeyboard(safeTabChange, openAssistant, disabledTabs);
 
   const { addToast } = useToast();
 
@@ -481,6 +490,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}
                   onCreateCollection={onCreateCollection}
+                  reviewsEnabled={reviewsEnabled}
                 />
               </React.Suspense>
               )}

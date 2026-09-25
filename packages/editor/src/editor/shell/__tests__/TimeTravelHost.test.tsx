@@ -93,6 +93,32 @@ describe("TimeTravelHost", () => {
     expect(screen.queryByTestId("tt-band")).toBeNull();
   });
 
+  it("restoring with 2+ prior session edits exits Time-Travel immediately — no stale 'Previewing' band (flow-check DEF-history-restore-stale-banner)", async () => {
+    renderProjectPages.mockResolvedValue([]);
+    const c = makeComposer();
+    render(<TimeTravelHost composer={c as never} />);
+    chord();
+    // 3 prior edits in this session (newest = index 2) — the ledger's repro
+    // needed >=2 prior edits; a single-edit session reset correctly even
+    // before this fix.
+    expect(screen.getByTestId("tt-band")).toHaveAttribute("data-count", "3");
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    fireEvent.click(screen.getByTestId("tt-restore"));
+    fireEvent.click(screen.getByTestId("tt-confirm-restore"));
+
+    // The band and confirm must be gone RIGHT AWAY, not just once the
+    // checkpoint/restore promises settle — this is what the stale banner
+    // bug got wrong (the band kept saying "nothing is written until you
+    // restore" and Restore… stayed enabled after the write had landed).
+    expect(screen.queryByTestId("tt-band")).toBeNull();
+    expect(screen.queryByTestId("tt-confirm")).toBeNull();
+
+    await waitFor(() => expect(c.history.restoreEntry).toHaveBeenCalledWith("e2"));
+    expect(c.versions.autoCheckpoint).toHaveBeenCalled();
+    // Still gone after the async work resolves.
+    expect(screen.queryByTestId("tt-band")).toBeNull();
+  });
+
   it("Esc closes the confirm first, then time-travel", () => {
     renderProjectPages.mockResolvedValue([]);
     const c = makeComposer();
@@ -104,6 +130,17 @@ describe("TimeTravelHost", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByTestId("tt-confirm")).toBeNull();
     fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("tt-band")).toBeNull();
+  });
+
+  it("leaves when the session stack changes under it — e.g. a restore from the History panel's own row", () => {
+    renderProjectPages.mockResolvedValue([{ path: "index.html", html: "<h1>then</h1>", name: "Home", slug: "" }]);
+    const c = makeComposer();
+    render(<TimeTravelHost composer={c as never} />);
+    chord();
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Previewing/);
+    c.fire(EVENTS.HISTORY_RECORDED);
     expect(screen.queryByTestId("tt-band")).toBeNull();
   });
 });

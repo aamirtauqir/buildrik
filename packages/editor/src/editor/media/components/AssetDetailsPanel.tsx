@@ -22,7 +22,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
+import { versionLabel, collectUsageByPage } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
   IconButton,
@@ -92,6 +92,22 @@ function shortDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+/** FC-6: a family can have more than one placed source (an original still on
+ *  one page, a saved version applied on another) — `collectUsageByPage` only
+ *  traces one src at a time, so this folds several of its results into one
+ *  page-ordered list, first-seen order, hits concatenated per page. */
+function mergeUsageByPage(lists: ReturnType<typeof collectUsageByPage>[]): ReturnType<typeof collectUsageByPage> {
+  const byPage = new Map<string, { pageId: string; pageName: string; hits: (typeof lists)[number][number]["hits"] }>();
+  for (const list of lists) {
+    for (const pg of list) {
+      const existing = byPage.get(pg.pageId);
+      if (existing) existing.hits = [...existing.hits, ...pg.hits];
+      else byPage.set(pg.pageId, { pageId: pg.pageId, pageName: pg.pageName, hits: pg.hits });
+    }
+  }
+  return [...byPage.values()];
+}
+
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
@@ -136,9 +152,6 @@ export interface AssetDetailsPanelProps {
   /** Placements across the whole family — the rail's USED IN follows the
    *  placements, whichever version they carry. */
   usageCount: number;
-  /** Page names the asset is placed on — the USED IN line names them
-   *  ("1 place — Menu preview"). Empty when the pages cannot be traced. */
-  usedIn: string[];
   /** All library items (for the replace-all picker). */
   libraryItems: LibraryItem[];
   /** A VERSIONS row opens Asset versions for this file (3695:45529). */
@@ -195,6 +208,15 @@ export interface AssetDetailsPanelProps {
    * when it does.
    */
   onManageFont?(item: LibraryItem): void;
+  /**
+   * FC-6: "Used in" used to be a joined string here ("2 places — Menu
+   * preview, Footer") while the drawer's overlay (AssetDetailOverlay.tsx)
+   * drew the same usage as a navigable, per-page row list with a "Jump ›"
+   * per hit. Passing this makes the full library's row list navigable too,
+   * the same way: selects the element (and its page) on the canvas
+   * underneath. Omitted, rows render without a Jump action.
+   */
+  onJumpToElement?(pageId: string, elementId: string): void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -206,7 +228,6 @@ export function AssetDetailsPanel({
   dimmed = false,
   versions,
   usageCount,
-  usedIn,
   libraryItems,
   onOpenVersions,
   onInsert,
@@ -223,6 +244,7 @@ export function AssetDetailsPanel({
   onRegenerateAltText,
   onUpdateTags,
   onManageFont,
+  onJumpToElement,
 }: AssetDetailsPanelProps) {
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
@@ -382,12 +404,15 @@ export function AssetDetailsPanel({
   const detailsSummary = `${versionCount} ${versionCount === 1 ? "version" : "versions"} · ${
     usageCount === 0 ? "not used yet" : `used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`
   }`;
-  const usedLine =
-    usageCount === 0
-      ? "Not used on this site"
-      : usedIn.length > 0
-        ? `${usageCount} ${usageCount === 1 ? "place" : "places"} — ${usedIn.join(", ")}`
-        : `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`;
+  /* FC-6: was a joined string ("2 places — Menu preview, Footer"); now the
+     same grouped, navigable row list the drawer's overlay draws
+     (AssetDetailOverlay.tsx), built from the same `collectUsageByPage` util
+     — one source for "what uses this asset", not two shapes of it.
+     Traced over `replaceSources`, not just `selectedItem.src`: USED IN
+     follows the placements to whichever family member is actually applied
+     (the original's own src can carry nothing once a saved version replaces
+     it on the site). */
+  const usagePages = mergeUsageByPage(replaceSources.map((src) => collectUsageByPage(composer, src)));
 
   return (
     <>
@@ -480,7 +505,55 @@ export function AssetDetailsPanel({
           {detailsOpen && (
             <section className="mgr-det-section" data-testid="mgr-det-used">
               <h4 className="mgr-det-label">Used in</h4>
-              <p className="mgr-det-used-line">{usedLine}</p>
+              {usagePages.length === 0 ? (
+                <p className="mgr-det-used-line">
+                  {usageCount === 0
+                    ? "Not used on this site"
+                    : /* The engine's placement count and the live page trace can
+                         diverge (a placement the trace can't reach) — count
+                         still says something rather than a false "not used". */
+                      `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`}
+                </p>
+              ) : (
+                <div data-testid="mgr-det-used-rows" role="list" aria-label="Pages using this asset">
+                  {usagePages.map((pg) => (
+                    <React.Fragment key={pg.pageId}>
+                      <div
+                        className="tw:flex tw:h-6 tw:items-center tw:justify-between tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                        data-testid={`mgr-det-used-page-${pg.pageId}`}
+                      >
+                        <span className="tw:truncate">{pg.pageName}</span>
+                        <span className="tw:font-medium tw:tabular-nums">{pg.hits.length}</span>
+                      </div>
+                      {pg.hits.map((hit) => (
+                        <div
+                          key={hit.elementId}
+                          className="tw:flex tw:h-8 tw:items-center tw:gap-2"
+                          data-testid={`mgr-det-used-row-${hit.elementId}`}
+                          role="listitem"
+                        >
+                          <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                            {hit.label}
+                          </span>
+                          {onJumpToElement ? (
+                            <Button
+                              type="button"
+                              color="light"
+                              size="xs"
+                              variant="link"
+                              className="tw:min-h-6 tw:shrink-0 tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                              data-testid={`mgr-det-jump-${hit.elementId}`}
+                              onClick={() => onJumpToElement(pg.pageId, hit.elementId)}
+                            >
+                              Jump {"›"}
+                            </Button>
+                          ) : null}
+                        </div>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </section>
           )}
 

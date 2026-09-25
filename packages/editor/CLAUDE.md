@@ -74,6 +74,12 @@ went silent while the inspector body diverged wholesale from its board. A
 probe result is never accepted as visual verification. (Founder call,
 2026-08-06, after exactly that failure.)
 
+Client sign-off is not an editor board: it is the dashboard's `/review/<token>`
+page — a server route needing a live server and a real token, out of reach of
+this harness (same class as the activity log). `boards.json`'s `807:8723`
+("reviewer-view · external-reviewer") is marked superseded on that basis, not
+measured (FC-12).
+
 Traps already hit: `.layout-shell__*` classes reused inside `.bd-studio` (flex
 host) lose their grid-area sizing — set explicit heights. `AquibraStudio.tsx`
 mid-edit in the founder's tree → never stage it from an agent session.

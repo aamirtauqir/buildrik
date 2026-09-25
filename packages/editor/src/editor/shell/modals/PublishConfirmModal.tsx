@@ -52,8 +52,11 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
   const [submitting, setSubmitting] = React.useState(false);
   /* A blocking pre-publish check means the server will refuse this deploy.
      The panel path has always shown that up front; this one used to publish
-     anyway and let the job die after it had queued. */
-  const [blocked, setBlocked] = React.useState<string | null>(null);
+     anyway and let the job die after it had queued. v3 FC-8: every failing
+     check renders here now, not just the first — the Publish panel's own
+     PrePublishChecks list has always shown every row, from the same server
+     call (`fetchPrePublishChecks`, read once in PublishConfirmFacts). */
+  const [blockers, setBlockers] = React.useState<Array<{ label: string; detail: string }>>([]);
   /* The exporter's count, reported by the facts component: a publish with
      nothing in it must not be offered. */
   const [pageCount, setPageCount] = React.useState<number | null>(null);
@@ -100,7 +103,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
             isPublished={isPublished}
             onPageCount={setPageCount}
             siteId={siteId}
-            onBlocked={setBlocked}
+            onBlockingChecks={setBlockers}
             onWarnings={setWarnCount}
           />
         </div>
@@ -116,17 +119,25 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
             so the fast path published a site with unresolved warnings and said
             so nowhere. Suppressed when blocked, where the blocker is the
             thing to read. */}
-        {!blocked && warnCount > 0 && (
+        {blockers.length === 0 && warnCount > 0 && (
           <p className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]">
             {warningsLine(warnCount)}
           </p>
         )}
 
-        {blocked && (
-          <p className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)]" role="alert">
-            {blocked}
+        {/* v3 FC-8: every failing server check, not just the first — the
+            Publish panel's PrePublishChecks list has always shown every row
+            from this same fetchPrePublishChecks call; this door used to read
+            only `.find(status === "fail")` and hide the rest. */}
+        {blockers.map((b) => (
+          <p
+            key={b.label}
+            className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)]"
+            role="alert"
+          >
+            <span className="tw:font-medium">{b.label}:</span> <span>{b.detail}</span>
           </p>
-        )}
+        ))}
         </ModalBody>
 
         <ModalFooter>
@@ -135,7 +146,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
           </Button>
           <Button
             size="xs"
-            disabled={submitting || pageCount === 0 || blocked !== null}
+            disabled={submitting || pageCount === 0 || blockers.length > 0}
             onClick={() => {
               setSubmitting(true);
               void Promise.resolve(onConfirm()).finally(() => setSubmitting(false));

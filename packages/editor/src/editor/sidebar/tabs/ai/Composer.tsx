@@ -49,6 +49,15 @@ export const Composer: React.FC<ComposerProps> = ({
               e.preventDefault();
               submit();
             }
+            /* FA-1 escape rule: the FIRST Escape here just blurs the field
+               (useColumnPanelEscape's isTyping guard ignores an Escape whose
+               target is this textarea, so the panel does not close under a
+               user still composing). Escape from an unfocused field is a
+               second press and reaches that window listener, which returns
+               to the Inspector. */
+            if (e.key === "Escape") {
+              e.currentTarget.blur();
+            }
           }}
           rows={2}
         />

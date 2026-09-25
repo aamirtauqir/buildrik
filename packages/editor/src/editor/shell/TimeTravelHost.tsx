@@ -103,6 +103,23 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
     };
   }, [composer, active, open, exit]);
 
+  /* The band holds a SNAPSHOT of the session stack taken when it opened.
+     Any other change to that stack while it is open — a restore from the
+     History panel's own row (ActivityView), a keystroke edit, undo/redo, a
+     clear — leaves it previewing entries that no longer exist, with an
+     enabled Restore… that would target them. Flow-check B (2026-09-25) saw
+     exactly that: History-panel restore wrote "Restored to: …" underneath a
+     band still saying "nothing is written until you restore". So the band
+     leaves whenever the stack changes under it. Its own restore already
+     exits first, so this never fights it. */
+  React.useEffect(() => {
+    if (!composer || !active) return;
+    const leave = () => exit();
+    const events = [EVENTS.HISTORY_RECORDED, EVENTS.HISTORY_UNDO, EVENTS.HISTORY_REDO, EVENTS.HISTORY_CLEARED];
+    events.forEach((ev) => composer.on(ev, leave));
+    return () => events.forEach((ev) => composer.off(ev, leave));
+  }, [composer, active, exit]);
+
   const newest = entries.length - 1;
   const entry = entries[index] ?? null;
   const later = Math.max(0, newest - index);
@@ -159,10 +176,21 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
 
   const restore = React.useCallback(async () => {
     if (!composer || !entry) return;
-    /* The board's promise: "Your current work is saved as a version first." */
-    await composer.versions?.autoCheckpoint?.("Before restoring").catch(() => null);
-    composer.history?.restoreEntry?.(entry.id);
+    const targetId = entry.id;
+    /* Exit Time-Travel the moment a restore is confirmed, before the
+       checkpoint/restore work below even runs. The band's own copy
+       ("nothing is written until you restore") stops being true the instant
+       the user confirms — leaving the host mounted until the async work
+       resolved left the stale "Previewing …" band and an enabled Restore…
+       sitting over a write that had already landed (reproduced whenever the
+       session had 2+ prior entries; the extra render pass between the
+       confirm click and the checkpoint/restore promises settling was enough
+       for `entries`/`index` to be read again against a stack that had
+       already changed shape under it). Exiting first means there is no
+       window where a completed write is still described as pending. */
     exit();
+    await composer.versions?.autoCheckpoint?.("Before restoring").catch(() => null);
+    composer.history?.restoreEntry?.(targetId);
   }, [composer, entry, exit]);
 
   React.useEffect(() => {
