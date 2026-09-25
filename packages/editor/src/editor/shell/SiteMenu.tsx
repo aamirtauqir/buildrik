@@ -26,7 +26,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, SiteMenuIcon } from "@/editor/chrome-ui";
+import { ConfirmDialog, IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, SiteMenuIcon } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PreviewShareModal } from "./PreviewShareModal";
 
@@ -106,6 +106,11 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
 }) => {
   const [open, setOpen] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
+  /* Board 4418:127239 "Duplicate site?" — the request used to fire the
+     instant the row was clicked (DEF-shell-duplicate-no-confirm). The error
+     handling ("Site limit reached") stays exactly where it was, in the
+     container's toast; this only gates the request behind a confirm. */
+  const [duplicateConfirmOpen, setDuplicateConfirmOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
     setOpen(false);
     fn?.();
@@ -163,7 +168,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                   </MenuItem>
                 ) : null}
                 {onDuplicateSite ? (
-                  <MenuItem onClick={run(onDuplicateSite)} data-testid="site-menu-duplicate">
+                  <MenuItem onClick={run(() => setDuplicateConfirmOpen(true))} data-testid="site-menu-duplicate">
                     Duplicate site
                   </MenuItem>
                 ) : null}
@@ -251,6 +256,20 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         </Menu>
       </Popover>
       {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} /> : null}
+      {onDuplicateSite ? (
+        <ConfirmDialog
+          open={duplicateConfirmOpen}
+          onClose={() => setDuplicateConfirmOpen(false)}
+          onConfirm={() => {
+            setDuplicateConfirmOpen(false);
+            onDuplicateSite();
+          }}
+          title="Duplicate site?"
+          message="This makes a full copy of the site, including every page. The copy opens in a new tab once it's ready."
+          confirmLabel="Duplicate site"
+          testId="duplicate-site-confirm"
+        />
+      ) : null}
     </>
   );
 };
