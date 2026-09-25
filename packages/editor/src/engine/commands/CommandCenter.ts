@@ -204,6 +204,22 @@ export class CommandCenter {
     // A read-only composer runs no command that changes the document.
     if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
 
+    // Carve-out 0: the inspector's "Pick on canvas" owns a bare Escape while
+    // it's armed. Canvas.tsx's own listener cancels the pick; this shortcut
+    // is capture-phase on `window` and registered before that listener ever
+    // mounts, so without this guard "deselect" always won the race and
+    // cleared the selection out from under the cancelled pick — the user
+    // meant only to bail out of picking, not lose what was selected before
+    // it. DOM query, not an import — engine/ must not depend on editor/,
+    // same contract as the modal carve-out below.
+    if (
+      commandId === "deselect" &&
+      typeof document !== "undefined" &&
+      document.querySelector('[data-bk-pick="true"]')
+    ) {
+      return false;
+    }
+
     if (e.metaKey || e.ctrlKey) {
       // Carve-out 1: the clipboard/undo/select chords belong to the caret.
       // ⌘A, ⌘X, ⌘C, ⌘V, ⌘Z all exist as canvas commands AND as the text
