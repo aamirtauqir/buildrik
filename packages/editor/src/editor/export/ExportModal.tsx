@@ -11,7 +11,7 @@ import { resolvePageTitle } from "../../engine/export/SEOInjector";
 import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
-import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural, useToast } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural } from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
@@ -53,14 +53,44 @@ const FOOT_PRIMARY =
 // MAIN COMPONENT
 // ============================================================================
 
+/** Board 4418:97069 → 175116 Preparing → 165727 Ready / 165733 Failed: the
+ *  download's outcome used to be a toast only (C5 G3-113), which the board
+ *  draws as three states of the modal itself. `idle` is the export picker;
+ *  the other three replace it while a download is in flight or just
+ *  finished — the download mechanics underneath are unchanged. */
+type DownloadPhase = "idle" | "preparing" | "ready" | "failed";
+
+/** Board 165727: the ready state clears itself back to the picker — a
+ *  result that never goes away would be one more thing to dismiss. */
+const READY_AUTO_CLEAR_MS = 1600;
+
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, composer }) => {
-  /* C5 G3-113: the export's outcome was invisible — a download started (or
-     silently did not). Ready and failed are toasts, as the boards turn
-     4418:165727 / 165733 into. */
-  const { addToast } = useToast();
-  const ready = (file: string) => addToast({ description: `Export ready — ${file} downloaded`, tone: "success" });
-  const failed = (error: unknown) =>
-    addToast({ description: `Export failed — ${error instanceof Error ? error.message : "try again"}`, tone: "error" });
+  const [downloadPhase, setDownloadPhase] = React.useState<DownloadPhase>("idle");
+  const [downloadedFile, setDownloadedFile] = React.useState("");
+  const [downloadError, setDownloadError] = React.useState("");
+  /* What "Try again" on the Failed panel replays — set at the top of every
+     download handler, read only from the retry button. */
+  const retryRef = React.useRef<() => void>(() => {});
+
+  const ready = (file: string) => {
+    setDownloadedFile(file);
+    setDownloadPhase("ready");
+  };
+  const failed = (error: unknown) => {
+    setDownloadError(error instanceof Error && error.message ? error.message : "Try again in a moment.");
+    setDownloadPhase("failed");
+  };
+
+  React.useEffect(() => {
+    if (!isOpen) setDownloadPhase("idle");
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    if (downloadPhase !== "ready") return;
+    const t = window.setTimeout(() => setDownloadPhase("idle"), READY_AUTO_CLEAR_MS);
+    return () => window.clearTimeout(t);
+  }, [downloadPhase]);
+
   const [activeTab, setActiveTab] = React.useState<ExportTab>("preview");
   const [previewDevice, setPreviewDevice] = React.useState<PreviewDevice>("desktop");
   const [config, setConfig] = React.useState<ExportConfig>(DEFAULT_EXPORT_CONFIG);
@@ -122,18 +152,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 
   const handleDownloadHTML = () => {
     if (!result?.html) return;
+    retryRef.current = handleDownloadHTML;
     downloadFile(result.html, "index.html", "text/html");
     ready("index.html");
   };
 
   const handleDownloadCSS = () => {
     if (!result?.css) return;
+    retryRef.current = handleDownloadCSS;
     downloadFile(result.css, "styles.css", "text/css");
     ready("styles.css");
   };
 
   const handleDownloadAll = () => {
     if (!result?.html) return;
+    retryRef.current = handleDownloadAll;
     const fullHTML =
       config.cssStyle === "embedded"
         ? result.html
@@ -148,7 +181,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 
   const handleDownloadZip = async () => {
     if (!composer) return;
+    retryRef.current = () => void handleDownloadZip();
     setZipLoading(true);
+    setDownloadPhase("preparing");
     try {
       const engine = new ExportEngine(composer, config);
       const zipBlob = await engine.generateZip(config);
@@ -171,7 +206,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 
   const handleDownloadReact = async () => {
     if (!composer) return;
+    retryRef.current = () => void handleDownloadReact();
     setZipLoading(true);
+    setDownloadPhase("preparing");
     try {
       const reactExporter = new ReactExporter(composer);
       const zipBlob = await reactExporter.exportZip();
@@ -249,75 +286,81 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           </svg>
         </ModalClose>
         <ModalBody>
-        {formatBlurb[config.format] && (
-          <ModalDescription>{formatBlurb[config.format]}</ModalDescription>
-        )}
-        {/* Format grid — always visible at top */}
-        <div style={{ marginBottom: 20 }}>
-          <FormatGrid
-            selectedFormat={config.format}
-            onFormatChange={(fmt) => handleConfigChange({ format: fmt })}
-          />
-        </div>
+        {downloadPhase !== "idle" ? (
+          <DownloadStatusPanel phase={downloadPhase} file={downloadedFile} error={downloadError} />
+        ) : (
+          <>
+            {formatBlurb[config.format] && (
+              <ModalDescription>{formatBlurb[config.format]}</ModalDescription>
+            )}
+            {/* Format grid — always visible at top */}
+            <div style={{ marginBottom: 20 }}>
+              <FormatGrid
+                selectedFormat={config.format}
+                onFormatChange={(fmt) => handleConfigChange({ format: fmt })}
+              />
+            </div>
 
-        {/* Tabs */}
-        <div style={{ marginBottom: 16 }}>
-          <Tabs
-            tabs={[
-              { id: "preview", label: "Preview" },
-              { id: "code", label: "Code" },
-              { id: "options", label: "Options" },
-            ]}
-            value={activeTab}
-            onChange={(tab) => setActiveTab(tab as ExportTab)}
-          />
-        </div>
+            {/* Tabs */}
+            <div style={{ marginBottom: 16 }}>
+              <Tabs
+                tabs={[
+                  { id: "preview", label: "Preview" },
+                  { id: "code", label: "Code" },
+                  { id: "options", label: "Options" },
+                ]}
+                value={activeTab}
+                onChange={(tab) => setActiveTab(tab as ExportTab)}
+              />
+            </div>
 
-        {/* Content */}
-        <div style={{ minHeight: 300 }}>
-          {loading ? (
-            <LoadingState />
-          ) : result?.error ? (
-            <ErrorState error={result.error} />
-          ) : (
-            <>
-              {activeTab === "preview" && result?.html && (
-                <PreviewTab
-                  html={result.html}
-                  previewDevice={previewDevice}
-                  onDeviceChange={setPreviewDevice}
-                />
+            {/* Content */}
+            <div style={{ minHeight: 300 }}>
+              {loading ? (
+                <LoadingState />
+              ) : result?.error ? (
+                <ErrorState error={result.error} />
+              ) : (
+                <>
+                  {activeTab === "preview" && result?.html && (
+                    <PreviewTab
+                      html={result.html}
+                      previewDevice={previewDevice}
+                      onDeviceChange={setPreviewDevice}
+                    />
+                  )}
+                  {activeTab === "preview" && config.format === "react" && result?.files && (
+                    <NoPreviewMessage format="React" />
+                  )}
+                  {activeTab === "code" && result?.html && (
+                    <CodePreview html={result.html} cssCode={result.css || ""} showLineNumbers />
+                  )}
+                  {activeTab === "code" && config.format === "react" && result?.files && (
+                    <ReactCodePreview files={result.files} />
+                  )}
+                  {activeTab === "options" && (
+                    <OptionsPanel config={config} onChange={handleConfigChange} />
+                  )}
+                </>
               )}
-              {activeTab === "preview" && config.format === "react" && result?.files && (
-                <NoPreviewMessage format="React" />
-              )}
-              {activeTab === "code" && result?.html && (
-                <CodePreview html={result.html} cssCode={result.css || ""} showLineNumbers />
-              )}
-              {activeTab === "code" && config.format === "react" && result?.files && (
-                <ReactCodePreview files={result.files} />
-              )}
-              {activeTab === "options" && (
-                <OptionsPanel config={config} onChange={handleConfigChange} />
-              )}
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* Stats row */}
-        {result?.stats && config.format !== "react" && (
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--bk-ink-muted)",
-              marginTop: 16,
-              marginBottom: 4,
-            }}
-          >
-            {/* `plural` because a one-element export read "1 elements". */}
-            {plural(result.stats.elementCount, "element")} · {formatBytes(result.stats.htmlSize)} HTML
-            {result.stats.cssSize > 0 && ` · ${formatBytes(result.stats.cssSize)} CSS`}
-          </div>
+            {/* Stats row */}
+            {result?.stats && config.format !== "react" && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--bk-ink-muted)",
+                  marginTop: 16,
+                  marginBottom: 4,
+                }}
+              >
+                {/* `plural` because a one-element export read "1 elements". */}
+                {plural(result.stats.elementCount, "element")} · {formatBytes(result.stats.htmlSize)} HTML
+                {result.stats.cssSize > 0 && ` · ${formatBytes(result.stats.cssSize)} CSS`}
+              </div>
+            )}
+          </>
         )}
 
         {/* Board 1172:4838 — ONE right-aligned foot, gap 8: Cancel, then the
@@ -327,8 +370,44 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             single file the primary does, under a different name. It survives
             only where it does something the primary cannot — an external
             stylesheet alongside the page — which is also the only state the
-            board's foot has room for. */}
+            board's foot has room for.
+
+            Boards 175116/165727/165733: while a download's outcome is on
+            screen, the foot swaps to that outcome's own action — Failed gets
+            "Try again" next to a way back to the picker, Ready and Preparing
+            just get "Done"/nothing to click yet. */}
         <div className={FOOT} data-testid="export-foot">
+          {downloadPhase === "failed" ? (
+            <>
+              <Button
+                color="light"
+                size="xs"
+                className={FOOT_SECONDARY}
+                data-testid="export-back-to-picker"
+                onClick={() => setDownloadPhase("idle")}
+              >
+                Back
+              </Button>
+              <Button
+                size="xs"
+                className={FOOT_PRIMARY}
+                data-testid="export-retry"
+                onClick={() => retryRef.current()}
+              >
+                Try again
+              </Button>
+            </>
+          ) : downloadPhase === "ready" ? (
+            <Button size="xs" className={FOOT_PRIMARY} data-testid="export-done" onClick={() => setDownloadPhase("idle")}>
+              Done
+            </Button>
+          ) : downloadPhase === "preparing" ? (
+            <Button size="xs" className={FOOT_PRIMARY} disabled aria-busy>
+              <Spinner size="sm" />
+              Preparing…
+            </Button>
+          ) : (
+        <>
           <Button
             color="light"
             size="xs"
@@ -375,6 +454,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               exportLabel
             )}
           </Button>
+        </>
+          )}
         </div>
         </ModalBody>
       </ModalContent>
@@ -395,6 +476,58 @@ const LoadingState: React.FC = () => (
     <span style={{ color: "var(--bk-ink-muted)" }}>Generating export...</span>
   </div>
 );
+
+/** Boards 4418:175116 (Preparing) / 165727 (Ready) / 165733 (Failed) — what
+ *  the modal shows in place of the format picker while a download is in
+ *  flight or has just settled. */
+const DownloadStatusPanel: React.FC<{
+  phase: Exclude<DownloadPhase, "idle">;
+  file: string;
+  error: string;
+}> = ({ phase, file, error }) => {
+  if (phase === "preparing") {
+    return (
+      <div
+        role="status"
+        data-testid="export-status-preparing"
+        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+        style={{ height: 300 }}
+      >
+        <Spinner size="lg" />
+        <span style={{ color: "var(--bk-ink-muted)" }}>Preparing your export…</span>
+      </div>
+    );
+  }
+  if (phase === "ready") {
+    return (
+      <div
+        role="status"
+        data-testid="export-status-ready"
+        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+        style={{ height: 300 }}
+      >
+        <span
+          aria-hidden="true"
+          className="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-[var(--bk-success-text)] tw:text-white tw:text-[16px] tw:font-semibold"
+        >
+          ✓
+        </span>
+        <span style={{ color: "var(--bk-ink)" }}>Export ready — {file} downloaded</span>
+      </div>
+    );
+  }
+  return (
+    <div
+      role="alert"
+      data-testid="export-status-failed"
+      className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+      style={{ height: 300, color: "var(--bk-error)" }}
+    >
+      <span style={{ fontSize: 24 }}>Error</span>
+      <span>Export failed — {error}</span>
+    </div>
+  );
+};
 
 const ErrorState: React.FC<{ error: string }> = ({ error }) => (
   <div

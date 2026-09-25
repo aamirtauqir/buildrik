@@ -96,4 +96,28 @@ describe("PreviewOverlay", () => {
     fireEvent.click(screen.getByTestId("preview-share-button"));
     expect(await screen.findByTestId("preview-share-modal")).toHaveTextContent("Share preview");
   });
+
+  /* DEF-shell-share-dialog-hidden-under-preview: Escape used to close the
+     preview (and the modal with it, since the modal is its child) in one
+     keystroke — the preview's `window`-capture handler ran before the
+     modal's own `document`-capture trap. Escape must close only the topmost
+     dialog; the preview stays until a second Escape. */
+  it("Escape with the Share modal open closes only the modal, not the preview", async () => {
+    const onDone = vi.fn();
+    render(
+      <ToastProvider>
+        <PreviewOverlay html="<p>x</p>" onDone={onDone} siteId="site-abc" />
+      </ToastProvider>
+    );
+    fireEvent.click(screen.getByTestId("preview-share-button"));
+    expect(await screen.findByTestId("preview-share-modal")).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onDone).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("preview-share-modal")).toBeNull();
+    expect(screen.getByTestId("preview-overlay")).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
 });

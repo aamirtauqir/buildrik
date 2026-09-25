@@ -91,12 +91,42 @@ describe("SiteMenu — board 4418:126034", () => {
   });
 
   it("rows fire their handler and close the menu", () => {
+    const onOpenSiteSettings = vi.fn();
+    render(<SiteMenu onOpenSiteSettings={onOpenSiteSettings} />);
+    openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: /^Site settings/ }));
+    expect(onOpenSiteSettings).toHaveBeenCalled();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  /* DEF-shell-duplicate-no-confirm / board 4418:127239 "Duplicate site?" —
+     the row used to fire the request the instant it was clicked. It now
+     closes the menu and opens a confirm; the site-duplicating call
+     (`onDuplicateSite`) only fires once that confirm is accepted. */
+  it("Duplicate site closes the menu and asks for confirmation before duplicating", () => {
     const onDuplicateSite = vi.fn();
     render(<SiteMenu onDuplicateSite={onDuplicateSite} />);
     openMenu();
     fireEvent.click(screen.getByRole("menuitem", { name: "Duplicate site" }));
-    expect(onDuplicateSite).toHaveBeenCalled();
     expect(screen.queryByRole("menu")).toBeNull();
+    expect(onDuplicateSite).not.toHaveBeenCalled();
+
+    expect(screen.getByTestId("duplicate-site-confirm")).toBeInTheDocument();
+    expect(screen.getByText("Duplicate site?")).toBeTruthy();
+
+    fireEvent.click(screen.getByTestId("duplicate-site-confirm-confirm"));
+    expect(onDuplicateSite).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("duplicate-site-confirm")).toBeNull();
+  });
+
+  it("Duplicate site — Cancel dismisses the confirm without duplicating", () => {
+    const onDuplicateSite = vi.fn();
+    render(<SiteMenu onDuplicateSite={onDuplicateSite} />);
+    openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Duplicate site" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onDuplicateSite).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("duplicate-site-confirm")).toBeNull();
   });
 
   it("view mode keeps only the way back out", () => {
