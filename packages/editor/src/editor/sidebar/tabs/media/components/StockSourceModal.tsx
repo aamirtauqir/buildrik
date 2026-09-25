@@ -34,7 +34,7 @@
 
 import * as React from "react";
 import { Search, X } from "lucide-react";
-import { Button, IconButton, ModalBody, ModalContent, ModalRoot, TextInput } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, ModalBody, ModalContent, ModalRoot, Popover, TextInput } from "@/editor/chrome-ui";
 import type { DiscColor, DiscOrientation, StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
 import {
   LIBRARY_MODAL_BODY,
@@ -43,10 +43,128 @@ import {
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
-import { COLORS, FAILURE_COPY, FilterDropdown, ORIENTATIONS, TYPES } from "./StockBrowserOverlay";
 
 export type StockKind = "img" | "vid";
 export type StockItem = StockPhoto | StockVideo;
+
+/**
+ * Each failure gets its own sentence because each has a different next step,
+ * and none of them is "try a different search term" — which is the only thing
+ * the old shared "No photos found for …" copy could ever suggest.
+ *
+ * `retryable` gates the Try again button: re-running the query cannot conjure
+ * an API key, so offering it on a configuration fault just wastes the click.
+ *
+ * FC-6: the only stock surface now (drawer's `StockBrowserOverlay` deleted —
+ * this failure copy was ported over verbatim, L8's fix in `56fb0ec76`).
+ */
+export const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
+  "not-configured": {
+    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
+    retryable: false,
+  },
+  unauthorized: {
+    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
+    retryable: false,
+  },
+  "request-failed": {
+    message: "Couldn't reach the stock library.",
+    retryable: true,
+  },
+};
+
+export const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
+  { id: "all", label: "Any" },
+  { id: "landscape", label: "Landscape" },
+  { id: "portrait", label: "Portrait" },
+  { id: "squarish", label: "Square" },
+];
+
+export const COLORS: Array<{ id: DiscColor; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "black_and_white", label: "B&W" },
+  { id: "black", label: "Black" },
+  { id: "white", label: "White" },
+  { id: "red", label: "Red" },
+  { id: "orange", label: "Orange" },
+  { id: "yellow", label: "Yellow" },
+  { id: "green", label: "Green" },
+  { id: "teal", label: "Teal" },
+  { id: "blue", label: "Blue" },
+];
+
+export const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
+  { id: "img", label: "Photo" },
+  { id: "vid", label: "Video" },
+];
+
+const DROPDOWN =
+  "tw:h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
+  "tw:bg-white tw:px-1.5 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
+
+export function FilterDropdown<T extends string>({
+  label,
+  value,
+  options,
+  onPick,
+  testId,
+}: {
+  label: string;
+  value: T;
+  options: Array<{ id: T; label: string }>;
+  onPick(id: T): void;
+  testId: string;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const current = options.find((o) => o.id === value);
+  // Board 147:59 closes every control on the FILTER name ("Orientation ▾",
+  // "Colour ▾", "Type ▾") — value state reads from the menu checkmark and,
+  // for Type, from the back row's "Stock photos/videos".
+  const shown = current && current.id !== "all" && label !== "Type" ? current.label : label;
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      placement="bottom"
+      label={label}
+      trigger={
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          className={DROPDOWN}
+          aria-expanded={open}
+          data-testid={testId}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className="tw:truncate">{shown}</span>
+          <span aria-hidden="true" className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">{"▾"}</span>
+        </Button>
+      }
+    >
+      {/* Board 6998:77880: 224 wide, rows 30, the current row 13/500 with a
+          trailing ✓ (not the leading radio tick). */}
+      <Menu label={label} className="tw:w-[206px] tw:[&_[role^=menuitem]]:h-[30px] tw:[&_[role=menuitemradio]>span:first-child]:hidden">
+        {options.map((o) => (
+          <MenuItem
+            key={o.id}
+            radio
+            selected={o.id === value}
+            onClick={() => {
+              setOpen(false);
+              onPick(o.id);
+            }}
+          >
+            <span className="tw:flex tw:w-full tw:items-center">
+              <span className={o.id === value ? "tw:font-medium" : undefined}>{o.label}</span>
+              {o.id === value ? <span aria-hidden="true" className="tw:ml-auto tw:text-[11px]">✓</span> : null}
+            </span>
+          </MenuItem>
+        ))}
+      </Menu>
+    </Popover>
+  );
+}
 
 interface StockSourceModalProps {
   open: boolean;
