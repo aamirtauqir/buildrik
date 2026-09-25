@@ -107,6 +107,24 @@ describe("useClipboardToasts", () => {
     unmount();
     expect(count(EVENTS.CLIPBOARD_COPY)).toBe(0);
   });
+
+  // Round-1 controller review, MINOR 4: LOCKED_ELEMENTS_SKIPPED (delete, cut,
+  // nudge — A-5) had no listener anywhere, so a locked element quietly
+  // staying put looked identical to nothing having happened at all.
+  it("toasts when locked elements were skipped, and unsubscribes on unmount", () => {
+    const { composer, fire, count } = fakeComposer();
+    const addToast = vi.fn();
+    const { unmount } = renderHook(() => useClipboardToasts(composer, addToast));
+    expect(count(EVENTS.LOCKED_ELEMENTS_SKIPPED)).toBe(1);
+
+    fire(EVENTS.LOCKED_ELEMENTS_SKIPPED);
+
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ description: "Locked elements were skipped" }),
+    );
+    unmount();
+    expect(count(EVENTS.LOCKED_ELEMENTS_SKIPPED)).toBe(0);
+  });
 });
 
 const read = (p: string) =>
