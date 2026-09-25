@@ -66,6 +66,9 @@ export async function handleInvoicePaymentFailed(invoiceData: InvoiceParent): Pr
       userId: workspace.ownerId,
       type: "PAYMENT_FAILED",
       message: "Your payment failed. Please update your payment method to avoid service interruption.",
+      // A-20: every account/billing notification needs a destination — this
+      // one had none, so the bell row was unclickable.
+      actionUrl: "/dashboard/settings/billing",
     },
   });
 

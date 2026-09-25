@@ -30,6 +30,7 @@ export async function changePassword(userId: string, currentPassword: string, ne
     type: "SECURITY_PASSWORD_CHANGED",
     message: "Your password was changed",
     priority: "high",
+    actionUrl: "/dashboard/settings/security",
   }).catch(() => {});
 }
 
@@ -51,6 +52,7 @@ export async function setPassword(userId: string, newPassword: string) {
     type: "SECURITY_PASSWORD_CHANGED",
     message: "A password was added to your account",
     priority: "high",
+    actionUrl: "/dashboard/settings/security",
   }).catch(() => {});
 
   return { success: true };
@@ -380,6 +382,7 @@ export async function confirm2FA(userId: string, code: string) {
     type: "SECURITY_2FA_CHANGED",
     message: "Two-factor authentication was enabled on your account",
     priority: "high",
+    actionUrl: "/dashboard/settings/security",
   }).catch(() => {});
 
   return { success: true };
@@ -417,6 +420,7 @@ export async function disable2FA(userId: string, password: string, code?: string
     type: "SECURITY_2FA_CHANGED",
     message: "Two-factor authentication was disabled on your account",
     priority: "high",
+    actionUrl: "/dashboard/settings/security",
   }).catch(() => {});
 
   return { success: true };
