@@ -18,7 +18,7 @@
  */
 
 import { EVENTS, THRESHOLDS } from "../shared/constants";
-import type { ProjectData } from "../shared/types";
+import type { ProjectData, ProjectSettings } from "../shared/types";
 import { deepClone } from "../shared/utils/helpers";
 import type { OTOperation } from "./collaboration/OTTypes";
 import type { Composer } from "./Composer";
@@ -340,7 +340,7 @@ export class HistoryManager {
       // Clone before import — importProject mutates its input (see
       // restoreSnapshot). Cache the clean copy so the next diff is correct.
       const clean = deepClone(newState);
-      this.composer.importProject(newState);
+      this.importScoped(newState);
       this.currentStateCache = clean;
     } finally {
       this.isRestoringFromHistory = false;
@@ -374,8 +374,39 @@ export class HistoryManager {
 
   // ─── Snapshot helpers ───────────────────────────────────────────────────────
 
+  /* PD-12 / A-4: undo scope = the element tree + the design tokens, nothing
+     else. exportProject also carries project metadata (the name, and a fresh
+     `updatedAt` on every call) and every setting — SEO, site password, custom
+     code, integrations. Snapshotting those made ⌘Z after a saved SEO edit put
+     the old title back (and the Site-column mirror then shipped it), and made
+     a rename undoable by the next canvas undo. They are left out of every
+     snapshot, and restoring re-reads them from the live project. */
   private captureSnapshot(): ProjectData {
-    return deepClone(this.composer.exportProject());
+    const project = deepClone(this.composer.exportProject());
+    delete project.metadata;
+    const settings = project.settings ?? {};
+    project.settings = {
+      designTokens: settings.designTokens,
+      designTokensSchemaVersion: settings.designTokensSchemaVersion,
+      designPresets: settings.designPresets,
+    };
+    return project;
+  }
+
+  /** Import a history-scoped state: its tokens replace the live ones (even
+   *  when absent — undoing the first token edit removes it), every other
+   *  setting and all metadata stay as they are now. */
+  private importScoped(state: ProjectData): void {
+    const live: ProjectSettings = this.composer.exportProject().settings ?? {};
+    this.composer.importProject({
+      ...state,
+      settings: {
+        ...live,
+        designTokens: state.settings?.designTokens,
+        designTokensSchemaVersion: state.settings?.designTokensSchemaVersion,
+        designPresets: state.settings?.designPresets,
+      },
+    });
   }
 
   private getCurrentState(): ProjectData {
@@ -428,7 +459,7 @@ export class HistoryManager {
       // children arrays gutted, and the next redo/record diffs against that
       // empty base and silently drops elements (P0 QA 2026-06-09).
       const clean = deepClone(snapshot);
-      this.composer.importProject(snapshot);
+      this.importScoped(snapshot);
       this.currentStateCache = clean;
     } finally {
       this.isRestoringFromHistory = false;
