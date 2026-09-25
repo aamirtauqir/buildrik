@@ -60,9 +60,11 @@ export async function acceptTransfer(token: string, acceptingUserId: string) {
 
   const acceptingUser = await prisma.user.findUnique({
     where: { id: acceptingUserId },
-    select: { email: true },
+    select: { email: true, emailVerified: true },
   });
   if (!acceptingUser) throw new Error("USER_NOT_FOUND");
+  // S-5/PD-5: read verification status from the DB, not the session.
+  if (!acceptingUser.emailVerified) throw new Error("EMAIL_NOT_VERIFIED");
   if (acceptingUser.email.toLowerCase() !== transfer.toEmail.toLowerCase()) {
     throw new Error("EMAIL_MISMATCH");
   }

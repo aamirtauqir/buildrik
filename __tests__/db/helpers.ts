@@ -98,6 +98,24 @@ export async function createTestSitePermission(
   });
 }
 
+export async function createTestInvite(
+  params: { workspaceId: string; invitedBy: string } & Partial<Prisma.InviteUncheckedCreateInput>,
+) {
+  const { workspaceId, invitedBy, ...overrides } = params;
+  return prisma.invite.create({
+    data: {
+      workspaceId,
+      invitedBy,
+      email: `invitee-${randomUUID()}@test.buildrik.local`,
+      role: "EDITOR",
+      token: randomUUID(),
+      status: "PENDING",
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      ...overrides,
+    },
+  });
+}
+
 const MODEL_TO_TABLE = {
   user: "users",
   workspace: "workspaces",
@@ -105,6 +123,7 @@ const MODEL_TO_TABLE = {
   site: "sites",
   page: "pages",
   sitePermission: "site_permissions",
+  invite: "invites",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

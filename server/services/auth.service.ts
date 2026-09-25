@@ -152,7 +152,7 @@ export async function login(email: string, password: string) {
 export async function signup(fullName: string, email: string, password: string) {
   const existing = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, emailVerified: true },
+    select: { id: true, emailVerified: true, lastLoginAt: true },
   });
 
   // A VERIFIED account owns this address — refuse.
@@ -160,17 +160,31 @@ export async function signup(fullName: string, email: string, password: string) 
     throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
   }
 
-  // An UNVERIFIED row is an unclaimed registration, not an owner. Refusing it
-  // permanently squatted the address: a typo at signup ("jordn@…") left a row
-  // that blocked that address forever — and if the typo happened to be someone
-  // else's real address, that person could never register. It also made
-  // /auth/change-email (which re-runs signup) strand an orphan user + workspace
-  // every time someone corrected a typo.
-  //
-  // Reclaiming it is safe: whoever signs up still has to prove control of the
-  // inbox before the account does anything, and a stale verify link for the
-  // discarded row is invalidated with it.
+  // An UNVERIFIED row is an unclaimed registration, not an owner — but only
+  // when it is genuinely unused. Reclaiming unconditionally (S-5) let a
+  // signup delete an account that its real owner was already actively using:
+  // sign up an address, never verify it, keep working (creating sites,
+  // inviting teammates) — a second "signup" with that email wiped all of it.
+  // `lastLoginAt` is set only by login() and OAuth, never by signup, so a
+  // non-null value proves this row has been used as a real account, not left
+  // as an abandoned/typo'd registration. Owning a site or having another
+  // workspace member is the same signal for accounts that never logged in
+  // through this exact path (e.g. created via invite acceptance elsewhere).
+  // Reclaiming it is otherwise safe: whoever signs up still has to prove
+  // control of the inbox before the account does anything, and a stale
+  // verify link for the discarded row is invalidated with it. The cascade
+  // never reaches beyond the one empty workspace this check confirms.
   if (existing) {
+    const [siteCount, otherMemberCount] = await Promise.all([
+      prisma.site.count({ where: { workspace: { ownerId: existing.id } } }),
+      prisma.workspaceMember.count({
+        where: { workspace: { ownerId: existing.id }, userId: { not: existing.id } },
+      }),
+    ]);
+    const reclaimable = existing.lastLoginAt === null && siteCount === 0 && otherMemberCount === 0;
+    if (!reclaimable) {
+      throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
+    }
     await prisma.$transaction(async (tx) => {
       // Workspace.ownerId is a plain column, not a cascading FK — delete the
       // workspaces first or they outlive the user with a dead owner.
@@ -241,10 +255,29 @@ export async function verifyEmail(token: string) {
   }
 
   await invalidateToken(token);
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: { emailVerified: new Date() },
-    select: SAFE_USER_SELECT,
+  const user = await prisma.$transaction(async (tx) => {
+    const before = await tx.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
+    return tx.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: new Date(),
+        // PD-5 anti-pre-account-hijack: a first-ever verification clears any
+        // password/2FA set before the real owner controlled the inbox — the
+        // only way to tell "self-verifying your own signup" from "verifying
+        // an account someone else pre-seeded with a password" apart is that
+        // neither can be trusted, so both pay this cost. See S-5.
+        ...(before?.emailVerified
+          ? {}
+          : {
+              passwordHash: null,
+              twoFactorEnabled: false,
+              twoFactorSecret: null,
+              backupCodes: [],
+              sessionVersion: { increment: 1 },
+            }),
+      },
+      select: SAFE_USER_SELECT,
+    });
   });
 
   await logAuditEvent("EMAIL_VERIFIED", "success", { userId });
@@ -344,10 +377,24 @@ export async function verifyMagicLink(token: string) {
 
   await invalidateToken(token);
 
-  // Set emailVerified if not already set
-  await prisma.user.updateMany({
-    where: { id: userId, emailVerified: null },
-    data: { emailVerified: new Date() },
+  // Set emailVerified if not already set. PD-5 anti-pre-account-hijack: the
+  // first verification of a never-verified row also clears any pre-set
+  // password/2FA and bumps sessionVersion — see the matching comment on
+  // verifyEmail (S-5).
+  await prisma.$transaction(async (tx) => {
+    const before = await tx.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
+    if (before?.emailVerified) return;
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: new Date(),
+        passwordHash: null,
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        backupCodes: [],
+        sessionVersion: { increment: 1 },
+      },
+    });
   });
 
   // Check if 2FA is enabled
