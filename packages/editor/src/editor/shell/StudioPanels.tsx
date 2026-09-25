@@ -512,6 +512,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            an invisible AI that one Escape also closed). */
         onCloseIssues?.();
         setAiInInspector(true);
+        /* A-14: inspectorOpen is `inspectorShown && !effectiveFullPageMode &&
+           ...` — a user who had collapsed the inspector (its own ✕) got
+           aiInInspector=true with nothing rendering it: AITab mounted into a
+           zero-width column. Every ⌘J/✦-AI door means "show me the AI chat",
+           so force the column open the same way the inspector's own toggle
+           persists it, overriding the collapsed preference on this explicit
+           open. */
+        setInspectorShown(true);
+        try {
+          localStorage.setItem("buildrick-inspector-shown", "true");
+        } catch {
+          /* private mode */
+        }
         return;
       }
       onLeftPanelTabChange?.(data.tab);

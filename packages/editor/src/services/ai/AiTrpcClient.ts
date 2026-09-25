@@ -197,15 +197,6 @@ class AiTrpcClient {
     );
   }
 
-  async generateLayout(
-    input: { prompt: string; sectionType?: string },
-    options: AIRequestOptions = {}
-  ): Promise<AIResponse<{ html: string; css?: string }>> {
-    return this.execute("ai.layout", input, options, () =>
-      trpc().ai.layout.mutate(input)
-    );
-  }
-
   getRateLimitCount(): number {
     return this.rateLimiter.getRequestCount();
   }
