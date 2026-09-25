@@ -154,8 +154,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     const handler = (e: KeyboardEvent) => {
       /* An open ⋯ / Tags ▾ menu spends its Escape closing itself (chrome-ui
          Popover marks it defaultPrevented): the first Escape closes the
-         menu, not the whole library. */
-      if (e.key === "Escape" && !e.defaultPrevented) onClose();
+         menu, not the whole library. A text field (the search input) owns
+         its own Escape too — closing the whole library out from under a
+         user clearing their search was A04-15. */
+      const target = e.target as HTMLElement | null;
+      const inTextField = !!target?.closest?.("input, textarea, select, [contenteditable='true']");
+      if (e.key === "Escape" && !e.defaultPrevented && !inTextField) onClose();
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         searchRef.current?.focus();

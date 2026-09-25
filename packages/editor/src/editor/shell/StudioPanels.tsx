@@ -416,6 +416,14 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     }
   }, [activeTabId, mediaFullPage]);
 
+  /* A-6: a full-page surface hides the canvas selection but does not clear
+     it — the command guard now refuses shortcuts on that surface, but the
+     selection itself should not sit stale (highlighted on a canvas the user
+     cannot see) while a full page is open. */
+  React.useEffect(() => {
+    if (effectiveFullPageMode) composer?.selection.clear();
+  }, [effectiveFullPageMode, composer]);
+
   // Listen for panel open events from composer
   React.useEffect(() => {
     if (!composer) return;

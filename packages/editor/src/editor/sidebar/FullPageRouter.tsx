@@ -119,6 +119,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           <div
             className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
             data-testid="tpl-host"
+            data-bk-surface="fullpage"
           >
             <TemplatesTab
               composer={composer}
@@ -142,7 +143,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
     case "assets":
       return composer ? (
         <Portal>
-          <div className="mgr-host" data-testid="mgr-host">
+          <div className="mgr-host" data-testid="mgr-host" data-bk-surface="fullpage">
             <LibraryManager
               composer={composer}
               onClose={commonTabProps.onClose}
@@ -164,6 +165,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           <div
             className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
             data-testid="set-host"
+            data-bk-surface="fullpage"
           >
             <SettingsTab
               initialScreen={activeSubTab}

@@ -64,16 +64,19 @@ vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({
 
 // ─── Mount helper ────────────────────────────────────────────────────────────
 
-async function mount(state: MediaStateResult, usages: Record<string, number> = {}) {
+async function mount(state: MediaStateResult, usages: Record<string, number> = {}, onClose = vi.fn()) {
   mocks.state.mediaState = state;
   const { LibraryManager } = await import("../LibraryManager");
-  return render(
-    <LibraryManager
-      composer={makeComposer(usages)}
-      onClose={vi.fn()}
-      onOpenImageEditor={vi.fn()}
-    />
-  );
+  return {
+    ...render(
+      <LibraryManager
+        composer={makeComposer(usages)}
+        onClose={onClose}
+        onOpenImageEditor={vi.fn()}
+      />
+    ),
+    onClose,
+  };
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -156,5 +159,22 @@ describe("LibraryManager — D5 baseline", () => {
     fireEvent.click(screen.getByRole("button", { name: "Move files…" }));
     expect(screen.getByTestId("mgr-move-title")).toHaveTextContent("Move 1 asset");
     expect(screen.getByTestId("mgr-move-body")).toHaveTextContent("Products");
+  });
+
+  /* A04-15: the library's own window keydown Escape handler closed the whole
+     library out from under a user typing a search query and pressing Escape
+     to clear it (a text field owns its own Escape, same contract as the
+     canvas command guard). */
+  it("does not close the library on Escape while typing in the search field", async () => {
+    const { onClose } = await mount(makeMediaState({ libraryItems: [] }));
+    const search = screen.getByTestId("mgr-search-input");
+    fireEvent.keyDown(search, { key: "Escape" });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("closes the library on Escape from outside a text field", async () => {
+    const { onClose } = await mount(makeMediaState({ libraryItems: [] }));
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onClose).toHaveBeenCalled();
   });
 });

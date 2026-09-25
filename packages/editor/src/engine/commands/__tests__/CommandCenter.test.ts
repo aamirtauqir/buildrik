@@ -343,6 +343,53 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     expect(composer.saveProject).toHaveBeenCalled();
   });
+
+  /* A04-1: FullPageRouter's three hosts (Templates, Asset library, Settings)
+     are plain divs with no role/aria-modal, so the modal carve-out above never
+     fired for them — Delete on an asset card ran the canvas `delete` command
+     on the hidden selection. Each host now carries data-bk-surface="fullpage";
+     while one is mounted, only the universal "save" chord reaches the engine. */
+  describe("full-page surface guard (data-bk-surface)", () => {
+    it("refuses a bare shortcut while a full-page surface is mounted", () => {
+      const { composer } = makeCenter();
+      const host = document.createElement("div");
+      host.setAttribute("data-bk-surface", "fullpage");
+      document.body.appendChild(host);
+
+      document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+
+      expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
+      host.remove();
+    });
+
+    it("still runs ⌘S while a full-page surface is mounted", () => {
+      const { composer } = makeCenter();
+      const host = document.createElement("div");
+      host.setAttribute("data-bk-surface", "fullpage");
+      document.body.appendChild(host);
+
+      document.body.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }),
+      );
+
+      expect(composer.saveProject).toHaveBeenCalled();
+      host.remove();
+    });
+
+    it("still lets typing reach a text field inside a full-page surface", () => {
+      const { composer } = makeCenter();
+      const host = document.createElement("div");
+      host.setAttribute("data-bk-surface", "fullpage");
+      const input = document.createElement("input");
+      host.appendChild(input);
+      document.body.appendChild(host);
+
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+
+      expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
+      host.remove();
+    });
+  });
 });
 
 describe("destroy", () => {
