@@ -384,8 +384,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     modals,
     saveProject,
     openLeftPanelToTab: state.openLeftPanelToTab,
-    // T9: same handler the site menu's "Site settings" row uses.
-    openSiteSettings: modals.openProjectSettings,
+    /* FC-11: same door the site menu's "Site settings" row uses — both go
+       straight to the Settings tab now, the way S and ⌘K already did. This
+       used to round-trip through a `showProjectSettings` flag that
+       StudioModals immediately converted back into this same call and
+       cleared — a modal that never rendered a modal. */
+    openSiteSettings: () => state.openLeftPanelToTab("settings"),
   });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
@@ -612,7 +616,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
           onShowExporter={modals.openExporter}
-          onOpenProjectSettings={modals.openProjectSettings}
+          onOpenProjectSettings={() => state.openLeftPanelToTab("settings")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPages={() => state.openLeftPanelToTab("pages")}
@@ -715,8 +719,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showSaveAsComponent={modals.showSaveAsComponent}
         onCloseSaveAsComponent={modals.closeSaveAsComponent}
         saveAsComponentContext={modals.saveAsComponentContext}
-        showProjectSettings={modals.showProjectSettings}
-        onCloseProjectSettings={modals.closeProjectSettings}
         showCMSCollectionSetup={modals.showCMSCollectionSetup}
         onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
       />

@@ -16,7 +16,6 @@ import { ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
 import { KeyboardLegend } from "../canvas/controls/KeyboardLegend";
 import { useToast } from "@/editor/chrome-ui";
-import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
 import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
@@ -76,9 +75,6 @@ export interface StudioModalsProps {
     selectionIds: readonly string[];
     extractedBindings: Map<string, string>;
   } | null;
-  // Project Settings
-  showProjectSettings: boolean;
-  onCloseProjectSettings: () => void;
 
   // CMS Collection Setup modal (WS-14a)
   showCMSCollectionSetup: boolean;
@@ -115,22 +111,17 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   showSaveAsComponent,
   onCloseSaveAsComponent,
   saveAsComponentContext,
-  showProjectSettings,
-  onCloseProjectSettings,
   showCMSCollectionSetup,
   onCloseCMSCollectionSetup,
 }) => {
-  /* Board 1172:4867's Project settings modal (General · Canvas · SEO) is
-     superseded by the Clone's full-screen Settings (3397:32915 — its General
-     carries the site name, author and the canvas grid). The shell's two doors
-     to the modal — the site menu's `Site settings` row and ⌃, — are wired in
-     AquibraStudio to `openProjectSettings`, so the flag is the seam: it opens
-     the Settings tab and clears itself. */
-  React.useEffect(() => {
-    if (!showProjectSettings) return;
-    composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "settings" });
-    onCloseProjectSettings();
-  }, [showProjectSettings, composer, onCloseProjectSettings]);
+  /* FC-11: Board 1172:4867's Project settings modal (General · Canvas · SEO)
+     is superseded by the Clone's full-screen Settings (3397:32915 — its
+     General carries the site name, author and the canvas grid). The shell's
+     two doors to it — the site menu's `Site settings` row and ⌃, — call
+     `state.openLeftPanelToTab("settings")` directly in AquibraStudio now,
+     the same route S and ⌘K already used. This used to go through a
+     `showProjectSettings` flag here that did nothing but immediately emit
+     that same tab-switch and clear itself — a modal prop with no modal. */
 
   const { addToast } = useToast();
 
