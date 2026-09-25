@@ -32,10 +32,20 @@ export interface UnsavedWork {
   at: string;
 }
 
+/* Sites whose kept copy the user threw away in this page (conflict → Reload
+   latest / Save a backup). The reload is not instant: a debounced autosave
+   still inside its conflict hold can fire between the choice and the unload
+   and would keep the behind copy again — which the reload then offers back,
+   and Restore would save over the teammate's work with the fresh token. The
+   page is going away, so this never needs clearing. */
+const discarded = new Set<string>();
+
 /** Keep a snapshot the server refused. Best-effort: a full state is large and
  *  can exceed quota, and failing to keep it must never break the editor the
- *  user is still holding the work in. */
+ *  user is still holding the work in. A no-op once the user discarded this
+ *  site's copy (`discardUnsaved`). */
 export function keepUnsaved(siteId: string, project: ProjectData): void {
+  if (discarded.has(siteId)) return;
   try {
     localStorage.setItem(keyFor(siteId), JSON.stringify({ project, at: new Date().toISOString() }));
   } catch {
@@ -63,4 +73,11 @@ export function clearUnsaved(siteId: string): void {
   } catch {
     /* nothing to do — a stale record only ever causes an offer, never a write */
   }
+}
+
+/** The user chose to throw this site's local copy away: remove the kept
+ *  record, and refuse to keep another for the rest of this page's life. */
+export function discardUnsaved(siteId: string): void {
+  discarded.add(siteId);
+  clearUnsaved(siteId);
 }

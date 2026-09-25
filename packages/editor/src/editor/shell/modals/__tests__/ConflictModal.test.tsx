@@ -14,10 +14,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { ConflictModal, type ConflictModalProps } from "../ConflictModal";
+import type { ProjectData } from "@shared/types";
+
+const EMPTY_PROJECT: ProjectData = { version: "1", pages: [], styles: [], assets: [] };
 
 function makeProps(over: Partial<ConflictModalProps> = {}): ConflictModalProps {
   return {
     open: true,
+    siteId: "s1",
     onReload: vi.fn(),
     onSaveBackup: vi.fn(),
     onOverwrite: vi.fn(),
@@ -166,5 +170,53 @@ describe("ConflictModal", () => {
     expect(dialog.getAttribute("aria-modal")).toBe("true");
     expect(dialog).not.toBe(screen.getByTestId("overlay-scrim"));
     expect(dialog.getAttribute("aria-labelledby")).toBe(screen.getByTestId("conflict-title").id);
+  });
+
+  /* Round 2 #1: the conflict hold keeps the held edit in `bk-unsaved-v1-*` so a
+     reload can offer it back. Choosing Reload (or Backup, which downloads it)
+     is the user discarding that behind copy — if the record survived, the
+     reload would say "Some work never reached the server" and Restore would
+     import the stale project and autosave it over the teammate's with the
+     FRESH token. */
+  describe("resolving by reload discards the kept behind copy", () => {
+    const KEY = "bk-unsaved-v1-s1";
+    const kept = () => JSON.stringify({ project: { pages: [] }, at: "2026-09-26T00:00:00.000Z" });
+    beforeEach(() => localStorage.setItem(KEY, kept()));
+    afterEach(() => localStorage.clear());
+
+    it("'Reload latest' clears the site's unsaved record before reloading", () => {
+      let atReload: string | null = "not called";
+      const onReload = vi.fn(() => { atReload = localStorage.getItem(KEY); });
+      render(<ConflictModal {...makeProps({ onReload })} />);
+      fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
+      expect(onReload).toHaveBeenCalledTimes(1);
+      expect(atReload).toBeNull();
+    });
+
+    it("'Save a backup' clears it too — the copy went to a file", () => {
+      const onSaveBackup = vi.fn();
+      render(<ConflictModal {...makeProps({ onSaveBackup })} />);
+      fireEvent.click(screen.getByRole("button", { name: "Save a backup" }));
+      expect(onSaveBackup).toHaveBeenCalledTimes(1);
+      expect(localStorage.getItem(KEY)).toBeNull();
+    });
+
+    it("'Overwrite' keeps it — the local copy is the one being saved", () => {
+      render(<ConflictModal {...makeProps()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Overwrite…" }));
+      fireEvent.click(screen.getByRole("button", { name: "Yes, overwrite" }));
+      expect(localStorage.getItem(KEY)).toBe(kept());
+    });
+
+    it("an autosave hold that fires after the choice cannot write it back", async () => {
+      const { keepUnsaved, readUnsaved } = await import("@/services/unsavedRecovery");
+      render(<ConflictModal {...makeProps()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
+      keepUnsaved("s1", EMPTY_PROJECT);
+      expect(readUnsaved("s1")).toBeNull();
+      // Another site's work is untouched by this site's discard.
+      keepUnsaved("s2", EMPTY_PROJECT);
+      expect(readUnsaved("s2")).not.toBeNull();
+    });
   });
 });

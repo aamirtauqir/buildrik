@@ -736,6 +736,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <ConflictModal
         open={!!conflict?.open}
+        siteId={getSiteIdFromUrl()}
         onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
         onReload={() => window.location.reload()}
         onSaveBackup={() => {

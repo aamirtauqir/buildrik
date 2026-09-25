@@ -16,6 +16,12 @@
  * this dialog is the only thing standing between the user and a lost edit, and
  * the "Conflict" pill re-opens it after an explicit Escape anyway.
  *
+ * Reload and Backup both discard the behind copy the conflict hold kept in
+ * `bk-unsaved-v1-<site>` (`discardUnsaved`). Left in place, the reload would
+ * offer "Restore my edits" right after the user chose to drop them, and
+ * Restore would autosave the stale project over the teammate's work with the
+ * fresh token. Overwrite keeps it — that copy is the one being saved.
+ *
  * @license BSD-3-Clause
  */
 
@@ -28,9 +34,12 @@ import {
   ModalTitle,
   OverlayMount,
 } from "@/editor/chrome-ui";
+import { discardUnsaved } from "@/services/unsavedRecovery";
 
 export interface ConflictModalProps {
   open: boolean;
+  /** The site whose kept behind copy Reload / Backup discard; null = none (demo). */
+  siteId: string | null;
   onReload: () => void;
   onSaveBackup: () => void;
   onOverwrite: () => void;
@@ -39,8 +48,12 @@ export interface ConflictModalProps {
 
 const TITLE_ID = "conflict-modal-title";
 
-export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClose }: ConflictModalProps) {
+export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrite, onClose }: ConflictModalProps) {
   const [confirmOverwrite, setConfirmOverwrite] = React.useState(false);
+  const discardThen = (resolve: () => void) => () => {
+    if (siteId) discardUnsaved(siteId);
+    resolve();
+  };
   React.useEffect(() => { if (!open) setConfirmOverwrite(false); }, [open]);
 
   return (
@@ -59,8 +72,8 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
           )}
         </ModalBody>
         <ModalFooter data-testid="conflict-actions">
-          <Button onClick={onReload}>Reload latest</Button>
-          <Button color="light" onClick={onSaveBackup}>Save a backup</Button>
+          <Button onClick={discardThen(onReload)}>Reload latest</Button>
+          <Button color="light" onClick={discardThen(onSaveBackup)}>Save a backup</Button>
           {confirmOverwrite ? (
             <Button color="red" onClick={onOverwrite}>Yes, overwrite</Button>
           ) : (
