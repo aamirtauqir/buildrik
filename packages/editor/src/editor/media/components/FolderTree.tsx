@@ -393,7 +393,17 @@ export function FolderTree({
         />
 
         <div className="mgr-tree-gap" data-testid="mgr-tree-gap-1" />
-        <div className="mgr-tree-section" data-testid="mgr-section-folders">Folders</div>
+        {/* FC-4 (fix-all 2026-09-25): media folders are per-user (no shared-folder
+            model exists), so the section is labelled "My folders" — same reasoning
+            as the Pages folder tooltip (`PageFolder.tsx` `FOLDERS_TIP`) — so nobody
+            reads a plain "Folders" head as a team-shared space. */}
+        <div
+          className="mgr-tree-section"
+          data-testid="mgr-section-folders"
+          title="My folders · Only you see these"
+        >
+          My folders
+        </div>
 
         {/* All assets */}
         <TreeNode
