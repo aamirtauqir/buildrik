@@ -3,8 +3,9 @@
  * element's CSS animation (AnimationConfig, rendered as an inline
  * `animation:` style and exported as CSS keyframes) is one row of the
  * Interactions list, labelled by ITS OWN trigger ("On page load · Fade In ›").
- * Opening it edits the same config the old Animation section did; Remove
- * clears it. Nothing about the data or the export changes.
+ * Opening it drills into its edit screen (the same config the old Animation
+ * section edited); Remove clears it. Nothing about the data or the export
+ * changes.
  *
  * @license BSD-3-Clause
  */
@@ -20,6 +21,8 @@ const TRIGGER_LABEL: Record<AnimationTrigger, string> = {
   click: "On click",
 };
 
+export const animationTriggerLabel = (a: AnimationConfig) => TRIGGER_LABEL[a.trigger] ?? a.trigger;
+
 /** "fadeInUp" → "Fade In Up" — the preset names the editor lists. */
 function presetLabel(type: string): string {
   const spaced = type.replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -33,54 +36,52 @@ const ROW =
 
 export interface ElementAnimationRowProps {
   animation: AnimationConfig;
-  onChange: (animation: AnimationConfig | null) => void;
-  onPreview?: () => void;
-  /** Open on mount — a just-created animation lands in its editor. */
-  defaultOpen?: boolean;
+  /** Opens the animation's edit screen (the section drills in). */
+  onOpen: () => void;
 }
 
-export function ElementAnimationRow({ animation, onChange, onPreview, defaultOpen = false }: ElementAnimationRowProps) {
-  const [open, setOpen] = React.useState(defaultOpen);
-  const toggle = () => setOpen((v) => !v);
+export function ElementAnimationRow({ animation, onOpen }: ElementAnimationRowProps) {
   return (
-    <div data-testid="element-animation-row">
-      <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={open}
-        className={ROW}
-        onClick={toggle}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggle();
-          }
-        }}
+    <div
+      role="button"
+      tabIndex={0}
+      data-testid="element-animation-row"
+      className={ROW}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+    >
+      <span className="tw:flex-1 tw:min-w-0 tw:truncate">{animationTriggerLabel(animation)}</span>
+      <span className="tw:text-[var(--bk-ink-muted)] tw:truncate">{presetLabel(animation.type)}</span>
+      <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">›</span>
+    </div>
+  );
+}
+
+export interface ElementAnimationEditorProps {
+  animation: AnimationConfig;
+  onChange: (animation: AnimationConfig | null) => void;
+  onPreview?: () => void;
+}
+
+/** The animation's edit screen body — the old inline expansion. */
+export function ElementAnimationEditor({ animation, onChange, onPreview }: ElementAnimationEditorProps) {
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-2">
+      <AnimationEditor animation={animation} onChange={onChange} onPreview={onPreview} />
+      <Button
+        type="button"
+        color="alternative"
+        size="xs"
+        className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-error)] tw:hover:bg-transparent tw:hover:underline"
+        onClick={() => onChange(null)}
       >
-        <span className="tw:flex-1 tw:min-w-0 tw:truncate">{TRIGGER_LABEL[animation.trigger] ?? animation.trigger}</span>
-        <span className="tw:text-[var(--bk-ink-muted)] tw:truncate">{presetLabel(animation.type)}</span>
-        <span
-          aria-hidden="true"
-          className="tw:text-[var(--bk-ink-muted)] tw:inline-block tw:transition-transform"
-          style={{ transform: open ? "rotate(90deg)" : "none" }}
-        >
-          ›
-        </span>
-      </div>
-      {open ? (
-        <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-2">
-          <AnimationEditor animation={animation} onChange={onChange} onPreview={onPreview} />
-          <Button
-            type="button"
-            color="alternative"
-            size="xs"
-            className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-error)] tw:hover:bg-transparent tw:hover:underline"
-            onClick={() => onChange(null)}
-          >
-            Remove animation
-          </Button>
-        </div>
-      ) : null}
+        Remove animation
+      </Button>
     </div>
   );
 }

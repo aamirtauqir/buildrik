@@ -13,7 +13,7 @@ import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
-  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_BTN_GHOST, LIBRARY_MODAL_BTN_SECONDARY,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "./libraryModal";
@@ -37,7 +37,7 @@ export function MoveFailedModal({ open, onClose, onRetry }: MoveFailedModalProps
           </p>
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-move-failed-foot">
-          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="mgr-move-failed-cancel" onClick={onClose}>
+          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="mgr-move-failed-cancel" onClick={onClose}>
             Cancel
           </Button>
           <Button size="xs" className={LIBRARY_MODAL_BTN_PRIMARY} data-testid="mgr-move-failed-retry" autoFocus onClick={onRetry}>

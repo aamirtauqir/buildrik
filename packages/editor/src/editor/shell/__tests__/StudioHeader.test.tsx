@@ -845,14 +845,20 @@ describe("F1 dirty-exit guard", () => {
     expect(screen.queryByRole("button", { name: "Save & leave" })).toBeNull();
   });
 
-  it("Save & leave: error outcome keeps the dialog open with the error", async () => {
+  /* 4418:125678: a failed save-and-leave stays in the editor and says so on
+     the canvas; the retry there still leaves once the save lands. */
+  it("Save & leave: error outcome stays in the editor with the save-failed card; its retry leaves", async () => {
     const assign = stubLocation();
-    const onSave = vi.fn(async () => "error" as const);
+    const onSave = vi.fn(async () => "error" as "error" | "saved");
     render(<StudioHeader {...makeProps({ isDirty: true, onSave })} />);
     fireEvent.click(exitBtn());
     fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
-    await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/Save failed/));
+    const card = await screen.findByTestId("save-failed-banner");
+    expect(card.textContent).toMatch(/Couldn't save .*You have not left the editor\./);
     expect(assign).not.toHaveBeenCalled();
+    onSave.mockResolvedValue("saved");
+    fireEvent.click(screen.getByRole("button", { name: "Retry save & leave" }));
+    await waitFor(() => expect(assign).toHaveBeenCalled());
   });
 
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {

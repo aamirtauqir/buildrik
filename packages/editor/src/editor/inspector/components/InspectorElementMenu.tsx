@@ -18,10 +18,11 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Package, RotateCcw, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
+import { requestSaveAsComponent } from "@/editor/canvas/menus/actions/standaloneActions";
 import { Button, useToast } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -213,6 +214,15 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     setIsOpen(false);
   };
 
+  /* 4418:142143 / 6918:73322: the element ⋯ menu is missing "Save as
+     component" — the canvas ⋯ and the inspector ⋯ open the same dialog via
+     the shared `requestSaveAsComponent` helper (standaloneActions.ts). */
+  const handleSaveAsComponent = () => {
+    if (!composer) return;
+    requestSaveAsComponent(composer, selectedElementId);
+    setIsOpen(false);
+  };
+
   const run = (fn: () => void) => () => {
     fn();
     setIsOpen(false);
@@ -262,6 +272,12 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       label: "Reset all styles",
       icon: <RotateCcw size={14} aria-hidden="true" />,
       onClick: handleResetStyles,
+    },
+    {
+      id: "save-as-component",
+      label: "Save as component",
+      icon: <Package size={14} aria-hidden="true" />,
+      onClick: handleSaveAsComponent,
     },
     {
       id: "delete",

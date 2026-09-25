@@ -11,9 +11,12 @@ import { describe, expect, it } from "vitest";
 import { PanelHeader, PanelHeaderSize } from "../PanelHeader";
 
 describe("PanelHeader size from its host", () => {
-  it("defaults to the drawer header", () => {
+  it("defaults to the drawer header — 44/14 ink (v3 boards)", () => {
     render(<PanelHeader title="Publish" />);
-    expect(screen.getByTestId("panel-header").className).toContain("tw:text-[length:var(--bk-text-11)]");
+    const cls = screen.getByTestId("panel-header").className;
+    expect(cls).toContain("tw:h-11");
+    expect(cls).toContain("tw:text-[length:var(--bk-text-14)]");
+    expect(cls).toContain("tw:text-[var(--bk-ink)]");
   });
   it("a column host gives the 44/13 ink header", () => {
     render(

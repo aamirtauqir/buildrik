@@ -21,7 +21,7 @@ import { validateHtml, type HtmlValidationResult } from "@/shared/utils/validate
 import { validateCss, type CssValidationResult } from "@/shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
-import { LoadCard, SaveErrorBanner, Screen, Section, Textarea } from "../shared";
+import { LoadCard, SET_ROW_LABEL, SaveErrorBanner, Screen, Section, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 
 const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
@@ -96,14 +96,13 @@ const CodeCard: React.FC<{
   children?: React.ReactNode;
 }> = ({ title, anchor, side, id, label, value, placeholder, describedBy, onChange, children }) => (
   <Section title={title} anchor={anchor}>
-    <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
-      <label
-        htmlFor={id}
-        className="tw:w-48 tw:shrink-0 tw:pt-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
-      >
-        {side}
-      </label>
-      <div className="tw:min-w-0 tw:flex-1">
+    {/* 4418:128108: the side label at the 180 column, centred on a 520 code
+        well that grows with its content; feedback sits under the well. */}
+    <div className="tw:col-span-full tw:flex tw:flex-col tw:gap-1">
+      <div className="tw:flex tw:items-center tw:gap-4">
+        <label htmlFor={id} className={SET_ROW_LABEL}>
+          {side}
+        </label>
         <Textarea
           id={id}
           value={value}
@@ -112,10 +111,10 @@ const CodeCard: React.FC<{
           aria-describedby={describedBy}
           placeholder={placeholder}
           spellCheck={false}
-          className="tw:min-h-[120px] tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5"
+          className="tw:w-130 tw:min-h-9 tw:resize-y tw:border-[var(--bk-border-medium)] tw:px-3 tw:py-2.5 tw:[field-sizing:content] tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
         />
-        {children}
       </div>
+      {children ? <div className="tw:pl-49">{children}</div> : null}
     </div>
   </Section>
 );

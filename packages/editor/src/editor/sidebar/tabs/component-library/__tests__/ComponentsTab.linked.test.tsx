@@ -40,7 +40,7 @@ describe("ComponentsTab — YOUR COMPONENTS / LINKED FROM LIBRARY", () => {
       </ToastProvider>,
     );
     const section = await screen.findByTestId("comp-section-linked");
-    expect(section.textContent).toBe("LINKED FROM LIBRARY");
+    expect(section.textContent).toBe("LINKED FROM LIBRARY1");
     expect(screen.getByTestId("comp-row-hdr")).toBeTruthy();
     expect(within(screen.getByTestId("comp-row-btn")).getByTestId("comp-row-count-btn").textContent).toBe("24 on this site · linked");
     expect(screen.getByTestId("comp-row-count-hdr").textContent).not.toMatch(/linked/);

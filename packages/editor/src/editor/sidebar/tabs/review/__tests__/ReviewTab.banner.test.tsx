@@ -90,6 +90,12 @@ const mount = (composer: unknown = makeComposer(), props: Record<string, unknown
     </ToastProvider>,
   );
 
+/** The re-send lives in the panel ⋯ menu (4418 Review boards draw no footer primary). */
+async function openResend(name: string | RegExp = "Re-send review link") {
+  fireEvent.click(await screen.findByTestId("review-round-menu"));
+  fireEvent.click(await screen.findByRole("menuitem", { name }));
+}
+
 describe("the banner — when the board's band exists", () => {
   it("shows the count and the walk; Re-send is the panel's own", async () => {
     fetchCurrentRound.mockResolvedValue(round());
@@ -98,7 +104,10 @@ describe("the banner — when the board's band exists", () => {
     expect(await screen.findByTestId("review-banner")).toBeTruthy();
     expect(screen.getByTestId("review-banner-line").textContent).toBe("3 open");
     expect(screen.getByRole("button", { name: "Next ›" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Re-send for review" })).toBeTruthy();
+    /* No 4418 Review board draws a footer primary: the re-send is the
+       panel ⋯ menu's row. */
+    await openResend();
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeTruthy();
   });
 
   it("walks only the OPEN comments — resolved ones are not stepped through", async () => {
@@ -223,7 +232,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
-    fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test"));
   });
@@ -233,7 +242,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchCurrentRound.mockResolvedValue(round({ invitedEmail: null, openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
-    fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined));
   });
@@ -244,9 +253,9 @@ describe("Re-send from the panel carries the round's client forward", () => {
     fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
     fetchReviewComments.mockResolvedValue([]);
     mount(makeComposer(), { onResend });
-    fireEvent.click(await screen.findByRole("button", { name: "Re-send for review" }));
+    await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
-    expect(await screen.findByRole("button", { name: /Sending round 2…/ })).toBeTruthy();
+    expect(await screen.findByText(/Sending round 2…/)).toBeTruthy();
     release();
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalledTimes(2));
   });

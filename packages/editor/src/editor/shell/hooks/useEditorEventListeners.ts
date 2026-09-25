@@ -26,6 +26,7 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import type { UseStudioModalsReturn } from "./useStudioModals";
+import { requestPasteHtml } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 // Subset of useStudioState setters we touch — keeps the dep list tight.
 export interface EditorEventListenerStateSetters {
@@ -66,6 +67,17 @@ export function useEditorEventListeners({
       composer.off(EVENTS.COMPONENT_CREATE_REQUESTED, handle);
     };
   }, [composer, openCreateComponent]);
+
+  // 2a) ⌘⇧V (board 7063:78846) → Add's Paste HTML dialog, held until the
+  // panel mounts if Add is not the open tab.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => requestPasteHtml(composer);
+    composer.on(EVENTS.UI_PASTE_HTML_REQUESTED, handle);
+    return () => {
+      composer.off(EVENTS.UI_PASTE_HTML_REQUESTED, handle);
+    };
+  }, [composer]);
 
   // 2b) COMPONENT_SAVE_AS_REQUESTED (T12) → open the binding-aware save-as modal.
   React.useEffect(() => {

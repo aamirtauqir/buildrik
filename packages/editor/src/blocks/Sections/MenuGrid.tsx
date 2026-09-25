@@ -8,6 +8,7 @@ import type { BlockData, ElementType } from "../../shared/types";
 export const menuGridBlockConfig: BlockData & { elementType: ElementType } = {
   id: "menu-grid",
   label: "Menu grid",
+  description: "A grid of dishes or products, each with an image, a name and a price.",
   category: "Sections",
   elementType: "section",
   content:

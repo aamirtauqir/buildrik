@@ -156,6 +156,12 @@ afterEach(() => {
 
 // ─── Save form branches ───────────────────────────────────────────────
 
+
+/* Board 6930:82577: a save's actions live in its row ⋯. */
+function openSaveMenu(name: string) {
+  fireEvent.click(screen.getByRole("button", { name: `${name} actions` }));
+}
+
 describe("VersionHistoryPanel — save form branches", () => {
   it("Escape closes the form and clears the pending name", async () => {
     const Panel = await loadPanel();
@@ -229,7 +235,9 @@ describe("VersionHistoryPanel — save form branches", () => {
     fireEvent.change(input, { target: { value: "Milestone 2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save version" }));
 
-    expect(await screen.findByText("Saved 'Milestone 2'")).toBeTruthy();
+    // Board 4418:165677 — a titled "Version saved" card naming the version.
+    expect(await screen.findByText("Version saved")).toBeTruthy();
+    expect(screen.getByText(/^Milestone 2\s+Your current draft is saved as a named milestone/)).toBeTruthy();
     expect(mocks.createVersion).toHaveBeenCalledWith("Milestone 2", "");
     expect(screen.queryByLabelText("Version name")).toBeNull();
   });
@@ -243,11 +251,12 @@ describe("VersionHistoryPanel — restore branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Save A");
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
+    await screen.findByText("Restore “Save A” to the draft?");
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(screen.queryByText(/Restore “Save A”\?/)).toBeNull();
+    expect(screen.queryByText("Restore “Save A” to the draft?")).toBeNull();
     expect(mocks.restoreVersion).not.toHaveBeenCalled();
   });
 
@@ -257,9 +266,10 @@ describe("VersionHistoryPanel — restore branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Save A");
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     expect(await screen.findByText("Restore failed")).toBeTruthy();
   });
@@ -270,9 +280,10 @@ describe("VersionHistoryPanel — restore branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Save A");
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     expect(await screen.findByText(/^Restored to /)).toBeTruthy();
     expect(mocks.restoreVersion).toHaveBeenCalledWith("v1");
@@ -294,9 +305,10 @@ describe("VersionHistoryPanel — restore branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={composer} />);
 
+    openSaveMenu("Save A");
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore “Save A”\?/);
-    fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
+    await screen.findByText("Restore “Save A” to the draft?");
+    fireEvent.click(screen.getByRole("button", { name: "Restore draft" }));
 
     fireEvent.click(await screen.findByRole("button", { name: "Undo restore" }));
     await waitFor(() => expect(mocks.restoreVersion).toHaveBeenLastCalledWith("safety-1"));
@@ -312,12 +324,14 @@ describe("VersionHistoryPanel — delete branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Keep me");
     fireEvent.click(screen.getByLabelText('Delete "Keep me"'));
     await screen.findByLabelText("Confirm delete");
     fireEvent.click(screen.getByLabelText("Cancel"));
 
     expect(screen.queryByLabelText("Confirm delete")).toBeNull();
     // Normal row actions are back.
+    openSaveMenu("Keep me");
     expect(screen.getByLabelText('Compare "Keep me"')).toBeTruthy();
     expect(mocks.deleteVersion).not.toHaveBeenCalled();
   });
@@ -328,6 +342,7 @@ describe("VersionHistoryPanel — delete branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Sticky");
     fireEvent.click(screen.getByLabelText('Delete "Sticky"'));
     fireEvent.click(await screen.findByLabelText("Confirm delete"));
 
@@ -340,6 +355,7 @@ describe("VersionHistoryPanel — delete branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Old draft");
     fireEvent.click(screen.getByLabelText('Delete "Old draft"'));
     fireEvent.click(await screen.findByLabelText("Confirm delete"));
 
@@ -356,9 +372,11 @@ describe("VersionHistoryPanel — delete branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Delete "Older"'));
     fireEvent.click(await screen.findByLabelText("Confirm delete"));
 
@@ -381,10 +399,12 @@ describe("VersionHistoryPanel — compare branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
     await waitFor(() => expect(mocks.compareVersions).toHaveBeenCalledTimes(1));
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await waitFor(() => {
       expect(screen.queryByRole("tablist", { name: "Compare mode" })).toBeNull();
@@ -402,12 +422,15 @@ describe("VersionHistoryPanel — compare branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     // Expand → collapse → expand.
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await waitFor(() => expect(mocks.compareVersions).toHaveBeenCalledTimes(1));
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await waitFor(() => {
       expect(screen.queryByRole("tablist", { name: "Compare mode" })).toBeNull();
     });
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
@@ -422,6 +445,7 @@ describe("VersionHistoryPanel — compare branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Latest");
     fireEvent.click(screen.getByLabelText('Compare "Latest"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
@@ -443,6 +467,7 @@ describe("VersionHistoryPanel — compare branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
@@ -466,6 +491,7 @@ describe("VersionHistoryPanel — compare branches", () => {
     // version itself has no visualSnapshot either → hasVisual = false.
     render(<Panel composer={makeSnapshotlessComposer()} />);
 
+    openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Compare "Older"'));
     await screen.findByRole("tablist", { name: "Compare mode" });
 
@@ -485,28 +511,29 @@ describe("VersionHistoryPanel — compare branches", () => {
   that makes the action safe to take: restoring does not discard the current
   work, it saves it first.
 */
-describe("VersionHistoryPanel — board 163:167 restore confirm", () => {
+describe("VersionHistoryPanel — board 4418:74511 restore confirm", () => {
   it("says the current work survives", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    expect(await screen.findByText(/Restore “Save A”\?/)).toBeInTheDocument();
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByLabelText('Restore "Save A"'));
+    expect(await screen.findByText("Restore “Save A” to the draft?")).toBeInTheDocument();
     expect(
       screen.getByText("Your current work is saved first — nothing is lost."),
     ).toBeInTheDocument();
   });
 
-  it("sits above the list, not under it", async () => {
+  it("board 4418:74511 — is a modal naming what a restore leaves alone", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
     const Panel = await loadPanel();
-    const { container } = render(<Panel composer={makeComposer()} />);
+    render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    const confirm = await screen.findByRole("alertdialog");
-    const list = container.querySelector(".version-list, [class*=version-list]") ?? container.lastElementChild;
-    expect(confirm.compareDocumentPosition(list!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByLabelText('Restore "Save A"'));
+    expect(await screen.findByTestId("history-restore-confirm")).toBeInTheDocument();
+    expect(screen.getByText(/stay unchanged\.$/)).toBeInTheDocument();
   });
 
   it("puts Cancel before Restore, per the board", async () => {
@@ -515,9 +542,25 @@ describe("VersionHistoryPanel — board 163:167 restore confirm", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
-    const dialog = await screen.findByRole("alertdialog");
-    const labels = [...dialog.querySelectorAll("button")].map((b) => b.textContent?.trim());
-    expect(labels).toEqual(["Cancel", "Restore"]);
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByLabelText('Restore "Save A"'));
+    const foot = await screen.findByTestId("modal-foot-history-restore-confirm");
+    const labels = [...foot.querySelectorAll("button")].map((b) => b.textContent?.trim());
+    expect(labels).toEqual(["Cancel", "Restore draft"]);
+  });
+});
+
+describe("VersionHistoryPanel — board 4418:173587 saved version details", () => {
+  it("opens from the row ⋯ and leads to restore", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    openSaveMenu("Save A");
+    fireEvent.click(screen.getByRole("menuitem", { name: "View details" }));
+    expect(await screen.findByTestId("history-save-details")).toBeInTheDocument();
+    expect(screen.getByText("Inspect this save before restoring it. Your live site stays unchanged.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Restore this save…" }));
+    expect(await screen.findByText("Restore “Save A” to the draft?")).toBeInTheDocument();
   });
 });

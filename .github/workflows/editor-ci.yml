@@ -56,7 +56,9 @@ jobs:
     runs-on: ubuntu-latest
     # 15 → 25 on 2026-09-25: ~10,700 tests now (7,758 when set); the editor
     # suite alone took 12m and the root suite was cancelled at the cap.
-    timeout-minutes: 25
+    # 25 → 45 the same day: editor tests 12m + repo-root tests >10m (the root
+    # config re-runs the editor suite) still hit 25.
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -275,6 +277,13 @@ jobs:
       # cannot grow. Same idiom as check-styling-ratchet.mjs.
       - name: Figma conformance
         working-directory: packages/editor
+        # WARN-ONLY until 2026-09-30 (owner call, 2026-09-25). The v3 parity
+        # rebuild renamed or removed testIds that 82 of 187 recipes still wait
+        # for (e.g. brand-row-tokens, cmdk-band-suggested). This step never ran
+        # to completion on main (lint failed first), so it has no green state
+        # to protect yet. The recipes are being re-pointed during parity; set
+        # this back to blocking (delete the next line) on the 09-30 gates day.
+        continue-on-error: true
         run: |
           set -euo pipefail
           npx vite --port 5050 --strictPort > /tmp/vite-conformance.log 2>&1 &

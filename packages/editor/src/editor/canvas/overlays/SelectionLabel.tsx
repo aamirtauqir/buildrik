@@ -27,7 +27,8 @@ export interface SelectionLabelProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
-const TAG_CLASS =
+/** The canvas's accent tag (selection tag, Add-drag "Drop into" tag). */
+export const CANVAS_TAG_CLASS =
   "tw:flex tw:items-center tw:h-5 tw:px-1.5 tw:whitespace-nowrap tw:bg-[var(--bk-accent)] " +
   "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-on)] tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 
@@ -71,7 +72,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elemen
   return (
     <div
       data-testid="canvas-selection-tag"
-      className={TAG_CLASS}
+      className={CANVAS_TAG_CLASS}
       style={{ position: "absolute", left: pos.left - 2, top: pos.top - 24, zIndex: Z_INDEX.floatingToolbar }}
     >
       {name}

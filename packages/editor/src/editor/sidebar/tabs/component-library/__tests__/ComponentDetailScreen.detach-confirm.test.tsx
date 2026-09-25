@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { ComponentDetailScreen } from "../ComponentDetailScreen";
@@ -89,6 +89,23 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     expect(screen.getByText("Detach all 3 instances of Menu card?")).toBeTruthy();
     fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
     expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]);
+  });
+
+  /* Board 4418:143126: the list reports it ("18 instances detached"), so the
+     screen hands the count up and goes back instead of toasting. */
+  it("Detach all hands the count to onDetachedAll and goes back", async () => {
+    const { composer } = makeComposer();
+    const onDetachedAll = vi.fn();
+    const onBack = vi.fn();
+    render(
+      <ToastProvider>
+        <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} onDetachedAll={onDetachedAll} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByTestId("component-detach-all"));
+    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
+    await waitFor(() => expect(onDetachedAll).toHaveBeenCalledWith(3));
+    expect(onBack).toHaveBeenCalled();
   });
 
   it("STRUCTURE lists the master's parts; USED ON the pages with instances, which open on click", () => {

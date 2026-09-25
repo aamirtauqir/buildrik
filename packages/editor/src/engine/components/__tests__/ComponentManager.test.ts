@@ -370,3 +370,92 @@ describe("ComponentManager config", () => {
     expect(mgr.isInstance(iid)).toBe(false);
   });
 });
+
+/* Board 4418:143371 — "Menu card updated · 18 linked instances updated ·
+   Undo". The update toast read "Element pasted" instead: instantiate and sync
+   mount the instance through pasteElement, which announced a clipboard paste. */
+describe("ComponentManager — instance mounts are not clipboard pastes", () => {
+  it("neither instantiate nor a master update emits CLIPBOARD_PASTE", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    composer.emit.mockClear();
+
+    await mgr.instantiateComponent(comp.id, page.root.id);
+    card.addClass("v2");
+    await mgr.updateComponentMaster(comp.id, card.getId());
+
+    expect(emitsOf(composer, EVENTS.CLIPBOARD_PASTE)).toHaveLength(0);
+  });
+});
+
+/* The Undo on "… updated · Undo" (4418:143371) and "… deleted · N instances
+   detached · Undo" (4418:142651). Element history holds pages, not component
+   definitions, so the engine restores those itself from a snapshot. */
+describe("ComponentManager — snapshot / restore for toast Undo", () => {
+  it("revertComponentMaster puts the old master back and re-syncs instances", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    await mgr.instantiateComponent(comp.id, page.root.id);
+    const before = mgr.snapshotComponent(comp.id)!;
+
+    card.addClass("v2");
+    await mgr.updateComponentMaster(comp.id, card.getId());
+    expect(comp.masterTree.classes).toContain("v2");
+
+    const outcome = await mgr.revertComponentMaster(comp.id, before.component.masterTree);
+    expect(outcome).toEqual({ updated: true, instancesSynced: 1, overridesDropped: 0 });
+    expect(comp.masterTree.classes).not.toContain("v2");
+    const [instance] = mgr.getInstancesOfComponent(comp.id);
+    expect(manager.getElement(instance.elementId)!.hasClass("v2")).toBe(false);
+  });
+
+  it("restoreDeletedComponent re-registers the master and relinks its instances", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const i1 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const i2 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+
+    await mgr.deleteComponent(comp.id);
+    expect(mgr.isInstance(i1)).toBe(false);
+    saveComponent.mockClear();
+
+    expect(await mgr.restoreDeletedComponent(snap)).toBe(2);
+    expect(mgr.getComponent(comp.id)?.name).toBe("Card");
+    expect(saveComponent).toHaveBeenCalledTimes(1);
+    expect(mgr.isInstance(i1)).toBe(true);
+    expect(mgr.isInstance(i2)).toBe(true);
+    expect(manager.getElement(i1)!.getData().data?.componentInstance).toMatchObject({ componentId: comp.id, isDetached: false });
+  });
+
+  it("a snapshot is a copy — detaching does not mark its instance records detached", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    await mgr.instantiateComponent(comp.id, page.root.id);
+    const snap = mgr.snapshotComponent(comp.id)!;
+    await mgr.deleteComponent(comp.id);
+    expect(snap.instances.every((i) => !i.isDetached)).toBe(true);
+    expect(mgr.snapshotComponent("ghost")).toBeNull();
+  });
+});
+
+/* Board 4418:166980: the element a master is made from becomes its first
+   instance, and the canvas bar re-reads as "Component instance · Hero" — it
+   needs an event to hear that on. */
+describe("ComponentManager.adoptInstances", () => {
+  it("links the element and announces COMPONENT_INSTANTIATED", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    composer.emit.mockClear();
+    expect(mgr.adoptInstances(comp.id, [card.getId()])).toBe(1);
+    expect(mgr.isInstance(card.getId())).toBe(true);
+    const ev = emitsOf(composer, EVENTS.COMPONENT_INSTANTIATED);
+    expect(ev).toHaveLength(1);
+    expect(ev[0][1]).toMatchObject({ component: comp, parentId: page.root.id, instance: { elementId: card.getId() } });
+  });
+});

@@ -1,8 +1,9 @@
 /**
  * The Asset library's modal shape — Clone "Dialog overlays · scrimmed"
  * (3708:20650, 3701:20385, 3701:20353, 3701:20400, 3701:20394), at the
- * founder's density-32: title 16/600 ink, body 13 ink-soft, 32px buttons in
- * an 8 gap, left-aligned as every one of those frames draws them.
+ * founder's density-32 (32px buttons in an 8 gap). The v3 boards redraw the
+ * frame to the dialog standard: 24 inset, 20/30 title, right-aligned actions
+ * with a text-only Cancel (Move keeps its grey, left Cancel — 4418:149891).
  *
  * Class strings, not a component: chrome-ui's `Modal` is the primitive and
  * stays it — these only carry the numbers the Clone changes (its title is 16
@@ -19,13 +20,15 @@
  * @license BSD-3-Clause
  */
 
+/* v3 (4418:157583 / 156160 / 155920 / 149891): the dialog standard — 24
+   inset, a 20/30 semibold title, actions right-aligned inside the padding. */
 export const LIBRARY_MODAL_TITLE =
-  "tw:m-0 tw:px-4 tw:pt-4 tw:pb-2 tw:text-[length:var(--bk-text-16)] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]";
+  "tw:m-0 tw:px-6 tw:pt-6 tw:pb-4 tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
 
-/** Sits inside `ModalBody`, which already sets 13 / ink-soft / px-4 pb-4. */
+/** Sits inside `ModalBody`, which already sets 14 / ink / px-6 pb-4. */
 export const LIBRARY_MODAL_BODY = "tw:m-0 tw:leading-5";
 
-export const LIBRARY_MODAL_FOOT = "tw:flex tw:items-center tw:gap-2 tw:px-4 tw:pb-4";
+export const LIBRARY_MODAL_FOOT = "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:px-6 tw:pb-6";
 
 const BTN =
   "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium " +
@@ -37,6 +40,10 @@ export const LIBRARY_MODAL_BTN_PRIMARY = BTN;
 /** The Clone's quiet grey fill, no border — flowbite `light` is white with a border. */
 export const LIBRARY_MODAL_BTN_SECONDARY =
   `${BTN} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
+
+/** v3 Cancel — text only, no fill, no border (4418:157583). */
+export const LIBRARY_MODAL_BTN_GHOST =
+  `${BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 /** flowbite `light` as it comes — the Clone's white bordered button beside a
  *  grey Done or a blue primary (3720:43316 View versions, 3695:43903 Close). */

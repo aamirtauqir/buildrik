@@ -44,8 +44,8 @@ import { estimateSize, loadImage } from "@/engine/media/MediaOptimizerHelpers";
 import { DiscardEditsModal } from "./components/DiscardEditsModal";
 import { SaveFailedModal } from "./components/SaveFailedModal";
 import {
+  LIBRARY_MODAL_BTN_OUTLINE,
   LIBRARY_MODAL_BTN_PRIMARY,
-  LIBRARY_MODAL_BTN_SECONDARY,
 } from "./components/libraryModal";
 import {
   ASPECT_CHIPS,
@@ -102,8 +102,9 @@ const ESTIMATE_DEBOUNCE_MS = 300;
 const FRAME =
   "tw:z-[60] tw:flex tw:h-[740px] tw:max-h-[calc(100vh-2rem)] tw:w-[960px] tw:max-w-[calc(100vw-2rem)] tw:flex-col " +
   "tw:overflow-hidden tw:rounded-xl tw:bg-[var(--bk-bg-elevated)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)]";
-const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]";
-const SUBTITLE = "tw:m-0 tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
+/* 4418:149321 — "Edit image" 20/30 over a 14/20 ink-soft file line. */
+const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
+const SUBTITLE = "tw:m-0 tw:mt-1 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 /* The tab chips: 32 high, equal width, the selected one on the accent TINT
    (3397:39917 `Crop`, 3695:43319 `Adjust`), the rest on the quiet grey —
    over chrome-ui's Tabs, whose roving tabindex puts the SELECTED tab in the
@@ -111,7 +112,7 @@ const SUBTITLE = "tw:m-0 tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-[
    (walked live 2026-09-14). Tabs tints the selected chip itself. */
 /* 4418:149321: the selected tab is a SOLID accent pill with white text. */
 const TAB_CHIP =
-  "tw:w-28 tw:px-0 tw:font-medium tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-200)] " +
+  "tw:h-9 tw:w-28 tw:px-0 tw:font-medium tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-gray-200)] " +
   "tw:aria-selected:bg-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-on)] tw:aria-selected:hover:bg-[var(--bk-accent-hover)]";
 /* 4418:149321: the preview sits on a flat gray-200 plate (no card edge, no
    dashed well), with the info lines under the image. */
@@ -299,7 +300,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
         {/* Body */}
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:gap-6 tw:bg-[var(--bk-bg-subtle)] tw:px-6 tw:py-6">
-          <section className={`${PREVIEW_CARD} ${saved ? "tw:flex-1" : "tw:w-[510px] tw:shrink-0"}`} aria-label="Preview">
+          <section className={`${PREVIEW_CARD} ${"tw:flex-1"}`} aria-label="Preview">
             <div className={WELL} data-testid="image-editor-well">
               {saved ? (
                 <img src={saved.dataUrl} alt="Saved version" className="tw:size-full tw:object-contain" />
@@ -401,7 +402,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               </ul>
             </aside>
           ) : (
-            <aside className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto" data-testid="image-editor-controls">
+            <aside className="tw:flex tw:min-h-0 tw:w-[280px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto" data-testid="image-editor-controls">
               {tab === "crop" && <CropControls draft={draft} patch={patch} />}
               {tab === "adjust" && <AdjustControls draft={draft} patch={patch} />}
               {tab === "resize" && <ResizeControls draft={draft} patch={patch} crop={crop} intrinsic={intrinsic} />}
@@ -454,7 +455,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               <Button
                 size="xs"
                 variant="secondary"
-                className={LIBRARY_MODAL_BTN_SECONDARY}
+                className={LIBRARY_MODAL_BTN_OUTLINE}
                 data-testid="image-editor-cancel"
                 onClick={requestCancel}
               >

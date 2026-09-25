@@ -4,12 +4,11 @@
  */
 
 import * as React from "react";
-import { HelpTooltip, Button, TextInput } from "@/editor/chrome-ui";
-import { InputRow } from "../../shared/controls";
+import { TextInput } from "@/editor/chrome-ui";
+import { InputRow, SelectRow } from "../../shared/controls";
 import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
-import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL, cardBtnClass } from "./classes";
-import { PositionPreview } from "./previews";
+import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL } from "./classes";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -28,13 +27,17 @@ export interface PositionControlsProps {
 // POSITION OPTIONS
 // ============================================================================
 
+/* Board 7058:78647: "Position [Static ▾]" — one select, not five tiles. */
 const POSITION_OPTIONS = [
-  { value: "static", label: "Auto", tooltip: "Default — follows normal flow" },
-  { value: "relative", label: "Rel", tooltip: "Offset relative to its normal position" },
-  { value: "absolute", label: "Abs", tooltip: "Positioned relative to nearest parent" },
-  { value: "fixed", label: "Fixed", tooltip: "Pinned to the viewport — stays on scroll" },
-  { value: "sticky", label: "Sticky", tooltip: "Sticks to edge when you scroll past it" },
-] as const;
+  { value: "static", label: "Static" },
+  { value: "relative", label: "Relative" },
+  { value: "absolute", label: "Absolute" },
+  { value: "fixed", label: "Fixed" },
+  { value: "sticky", label: "Sticky" },
+];
+
+const POSITION_HELP =
+  "Static: normal flow. Relative: offset from normal position. Absolute: positioned relative to nearest positioned parent. Fixed: stays in viewport. Sticky: sticks when scrolling past.";
 
 // ============================================================================
 // CLASSES
@@ -59,35 +62,15 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
 
   return (
     <>
-      {/* Section label with help tooltip */}
-      <div className={CLUSTER_CAPTION}>
+      <div className="tw:relative">
         {mixedKeys?.has("position") && <MixedValueBadge compact />}
-        Position
-        <HelpTooltip
-          content="Static: normal flow. Relative: offset from normal position. Absolute: positioned relative to nearest positioned parent. Fixed: stays in viewport. Sticky: sticks when scrolling past."
-          position="right"
+        <SelectRow
+          label="Position"
+          value={styles.position || "static"}
+          onChange={(v) => onChange("position", v)}
+          options={POSITION_OPTIONS}
+          helperText={POSITION_HELP}
         />
-      </div>
-      {/* Position mode buttons */}
-      <div
-        role="group"
-        aria-label="Position type"
-        className="tw:grid tw:grid-cols-5 tw:gap-[3px] tw:mb-2"
-      >
-        {POSITION_OPTIONS.map((option) => (
-          <Button
-            key={option.value}
-            size="xs"
-            className={`${cardBtnClass(styles.position === option.value)} tw:min-h-[30px] tw:px-[3px] tw:py-1`}
-            onClick={() => onChange("position", option.value)}
-            title={option.tooltip}
-            aria-pressed={styles.position === option.value}
-            aria-label={option.tooltip}
-          >
-            <PositionPreview type={option.value} />
-            <span className="tw:text-[length:var(--bk-text-11)]">{option.label}</span>
-          </Button>
-        ))}
       </div>
       {/* Position offset controls */}
       {hasPosition && (

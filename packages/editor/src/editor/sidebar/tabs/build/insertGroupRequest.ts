@@ -63,3 +63,19 @@ export function takePendingGenerate(composer: Composer): boolean {
   pendingGenerate.delete(composer);
   return asked;
 }
+
+/* ⌘⇧V (board 7063:78846): Add opens its Paste HTML dialog. Held until the
+   panel mounts, like Generate. */
+const pendingPasteHtml = new WeakSet<Composer>();
+
+export function requestPasteHtml(composer: Composer): void {
+  pendingPasteHtml.add(composer);
+  composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+  composer.emit(EVENTS.UI_INSERT_OPEN_PASTE_HTML, {});
+}
+
+export function takePendingPasteHtml(composer: Composer): boolean {
+  const asked = pendingPasteHtml.has(composer);
+  pendingPasteHtml.delete(composer);
+  return asked;
+}

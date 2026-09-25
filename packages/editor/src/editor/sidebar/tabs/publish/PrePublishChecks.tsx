@@ -67,8 +67,13 @@ export const CHECK_LABEL = "tw:flex-none tw:whitespace-nowrap tw:text-[13px] tw:
  *  for advice — rather than one muted grey. */
 export function checkDetailClass(status: "fail" | "warning"): string {
   const tone = status === "fail" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-warning-text)]";
-  return `tw:flex-1 tw:min-w-0 tw:truncate tw:text-right tw:text-[12px] ${tone}`;
+  return `tw:flex-1 tw:min-w-0 tw:truncate tw:text-right tw:text-[11px] ${tone}`;
 }
+
+/** 4418:97118 sets a row's door ("Fix ›", "Open ›", "Connect") at 11px
+ *  accent, the same size as the detail it follows. */
+export const CHECK_DOOR =
+  "tw:flex-none tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[11px] tw:text-[var(--bk-accent)]";
 
 const LEGEND = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 

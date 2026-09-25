@@ -12,6 +12,7 @@ export interface NavbarBlockConfig extends BlockData {
 export const navbarBlockConfig: NavbarBlockConfig = {
   id: "navbar",
   label: "Navbar",
+  description: "Top navigation: your site name on the left, page links on the right.",
   category: "Sections",
   elementType: "navbar",
   content:

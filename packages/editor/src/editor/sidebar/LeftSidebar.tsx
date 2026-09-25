@@ -20,6 +20,7 @@ import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
+import { useRailTab } from "./tabs/media/data/assetPick";
 import { useSidebarKeyboard } from "./useSidebarKeyboard";
 import {
   Plus,
@@ -235,6 +236,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onOpenIconPicker,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
+  const railTab = useRailTab(activeTab);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
@@ -412,7 +414,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       >
         {/* Board 4418:123573: the rail starts with its first item — no logo
             mark, no divider. */}
-        <FigmaRail activeTab={activeTab} drawerOpen={drawerOpen} onBtnClick={handleBtnClick} />
+        <FigmaRail activeTab={railTab} drawerOpen={drawerOpen} onBtnClick={handleBtnClick} />
 
         <div className="ls-spacer" />
 

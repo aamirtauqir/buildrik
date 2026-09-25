@@ -14,6 +14,7 @@ import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
+import { LAYER_NAME_KEY, nextCopyName } from "../../../shared/constants/elementTypeLabels";
 
 /**
  * Manages element CRUD operations
@@ -235,6 +236,11 @@ export class ElementCRUD {
 
     // Add after original in parent
     const parent = original.getParent();
+    const name = original.getCustomData(LAYER_NAME_KEY);
+    if (typeof name === "string" && name) {
+      const siblings = (parent?.getChildren() ?? []).map((el) => el.getCustomData(LAYER_NAME_KEY)).filter((n): n is string => typeof n === "string");
+      clone.setData(LAYER_NAME_KEY, nextCopyName(name, siblings));
+    }
     if (parent) {
       const place = resolvePlacement(clone, parent, parent.getChildIndex(original) + 1);
       if (place) place.parent.addChild(clone, place.index);
@@ -257,9 +263,11 @@ export class ElementCRUD {
   }
 
   /**
-   * Paste element from clipboard data
+   * Paste element from clipboard data. `announce: false` mounts the tree
+   * without CLIPBOARD_PASTE — component instances are placed through here,
+   * and their toast is the component's, not "Element pasted".
    */
-  pasteElement(data: ElementData, target: Element, index?: number): Element | null {
+  pasteElement(data: ElementData, target: Element, index?: number, announce = true): Element | null {
     if (!data) return null;
 
     // Clone with new IDs
@@ -273,7 +281,9 @@ export class ElementCRUD {
     const place = resolvePlacement(newElement, target, index) ?? { parent: target, index };
     place.parent.addChild(newElement, place.index);
 
-    this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target: place.parent, index: place.index });
+    if (announce) {
+      this.ctx.composer.emit(EVENTS.CLIPBOARD_PASTE, { element: newElement, target: place.parent, index: place.index });
+    }
     this.ctx.composer.markDirty();
 
     return newElement;

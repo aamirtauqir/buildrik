@@ -75,6 +75,8 @@ export type SectionId =
   | "link"
   | "content"
   | "collection"
+  | "form-fields"
+  | "slides"
   | "element-properties"
   | "css-classes"
   // Effects tab

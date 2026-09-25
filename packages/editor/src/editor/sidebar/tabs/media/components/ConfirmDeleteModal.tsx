@@ -28,7 +28,7 @@ import { ModalBody, ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_DANGER,
-  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_BTN_GHOST,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
@@ -93,14 +93,14 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel, onReplaceInst
         </ModalBody>
 
         <div className={LIBRARY_MODAL_FOOT} data-testid="media-delete-foot">
-          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="media-delete-cancel" onClick={onCancel}>
+          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="media-delete-cancel" onClick={onCancel}>
             Cancel
           </Button>
           {replaceKey !== null && (
             <Button
               size="xs"
               variant="secondary"
-              className={LIBRARY_MODAL_BTN_SECONDARY}
+              className={LIBRARY_MODAL_BTN_GHOST}
               data-testid="media-delete-replace"
               onClick={() => onReplaceInstead?.(replaceKey)}
             >

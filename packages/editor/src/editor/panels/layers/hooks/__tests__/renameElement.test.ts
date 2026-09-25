@@ -7,7 +7,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { EVENTS } from "@/shared/constants/events";
-import { renameElement, LAYER_NAME_KEY } from "../layersPersistence";
+import { renameElement } from "../layersPersistence";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 
 function setup() {
   const setData = vi.fn();

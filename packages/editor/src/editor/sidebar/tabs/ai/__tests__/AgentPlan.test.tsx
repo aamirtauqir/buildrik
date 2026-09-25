@@ -73,7 +73,11 @@ describe("agent run", () => {
     expect(screen.getByText(/Replaces the hero image\. Approve it, or skip it/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Skip step" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply step" })).toBeInTheDocument();
-    expect(screen.getByText("The run waits rather than guessing.")).toBeInTheDocument();
+    // Board 4418:104976: the note under the card says what has landed.
+    expect(screen.getByTestId("ai-gate-note").textContent).toBe("1 change applied. Step 2 waits for your approval.");
+    // The waiting row reads "Needs approval"; a live run names every row.
+    expect(screen.getByTestId("ai-run-word-2").textContent).toBe("Needs approval");
+    expect(screen.getByTestId("ai-run-word-1").textContent).toBe("Done");
   });
 
   /* Board 171:67 closes on a note block, i.e. a designer annotation rather
@@ -81,7 +85,8 @@ describe("agent run", () => {
      approved step applies in its own transaction, so a run of three is three
      undo entries. A finished run offers no Undo all — that button belongs to
      the two states where the run did not finish cleanly. */
-  /* Board 4418:105401 — what changed, Undo all · Done, and the note. */
+  /* Boards 4418:105401 / 106400 — what changed and what was skipped, Undo
+     all · Done, and the note. */
   it("a finished run lists what changed, with Undo all and Done", () => {
     const onUndoAll = vi.fn();
     const onDismiss = vi.fn();
@@ -96,10 +101,11 @@ describe("agent run", () => {
       onUndoAll,
       onDismiss,
     });
-    expect(screen.getByText("Done · 2 of 3")).toBeInTheDocument();
+    expect(screen.getByText("Done · 2 applied / 1 skipped")).toBeInTheDocument();
     const card = screen.getByTestId("ai-run-applied");
-    expect(card.textContent).toContain("2 changes applied");
+    expect(card.textContent).toContain("2 applied · 1 skipped");
     expect(card.textContent).toContain("Headline → Wood-fired");
+    expect(card.textContent).toContain("Swap the photo → unchanged (skipped)");
     expect(screen.getByText(/Each approved step was applied/)).toBeInTheDocument();
     expect(screen.getByTestId("ai-run-step-1").textContent).not.toContain("Done");
     fireEvent.click(screen.getByTestId("ai-run-undo-all"));
@@ -222,5 +228,43 @@ describe("agent run — Thinking (board 4418:104577)", () => {
     expect(screen.queryByTestId("ai-thinking")).toBeNull();
     expect(screen.getByTestId("ai-run-step-1")).toBeInTheDocument();
   });
-});
 
+  /* Board 4418:105548 — after Undo all: the undone band, what was restored,
+     Done only, and the note naming the target. */
+  it("an undone run says so, with Done only", () => {
+    const withRows = (t: string, field: string): RunStep => ({
+      ...step(t, "applied"),
+      edit: { target: "x", summary: "", rows: [{ field, from: "", to: "x" }], applyOps: { preview: {}, commit: {} } },
+    });
+    renderPlan({
+      phase: "done",
+      currentIndex: -1,
+      undone: true,
+      target: "Hero",
+      steps: [withRows("Rewrite the headline", "Headline"), withRows("Warm the tint", "Background")],
+      onUndoAll: vi.fn(),
+      onDismiss: vi.fn(),
+    });
+    expect(screen.getByText("Undone · 2 of 2")).toBeInTheDocument();
+    const card = screen.getByTestId("ai-run-undone");
+    expect(card.textContent).toContain("All changes undone");
+    expect(card.textContent).toContain("Headline → restored");
+    expect(screen.queryByTestId("ai-run-undo-all")).toBeNull();
+    expect(screen.getByTestId("ai-run-done")).toBeInTheDocument();
+    expect(screen.getByText("Hero is back to its state before this run.")).toBeInTheDocument();
+  });
+
+  /* Board 4418:104837 — a live run names every row and Stop is the 120-wide
+     outline button. */
+  it("a running run names each row's state", () => {
+    renderPlan({
+      phase: "running",
+      currentIndex: 1,
+      steps: [step("Rewrite the headline", "applied"), step("Warm the tint", "running"), step("Taller hero", "pending")],
+    });
+    expect(screen.getByTestId("ai-run-word-1").textContent).toBe("Done");
+    expect(screen.getByTestId("ai-run-word-2").textContent).toBe("Running");
+    expect(screen.getByTestId("ai-run-word-3").textContent).toBe("Pending");
+    expect(screen.getByRole("button", { name: "Stop run" }).className).toContain("tw:w-[120px]");
+  });
+});

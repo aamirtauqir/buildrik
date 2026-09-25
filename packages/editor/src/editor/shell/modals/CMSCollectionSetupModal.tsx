@@ -21,7 +21,7 @@
 import { Trash2, Check } from "lucide-react";
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
-import { Button, ModalBody, ModalContent, ModalRoot, ModalTitle, Select, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Select, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import { slugify } from "@shared/utils/helpers/string";
 import type { CMSFieldType } from "@/shared/types/cms";
 import type { Composer } from "../../../engine";
@@ -175,6 +175,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     [isOpen, composer],
   );
   const clashes = takenNames.has(trimmed.toLowerCase());
+  const siteName = composer?.getProjectMetadata?.()?.name || "this site";
   const slugPattern = `/${slugify(trimmed) || "collection"}/{slug}`;
 
   const editName = (value: string) => {
@@ -253,12 +254,40 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       }}
       dirty={trimmed !== "" || fields.some((f) => f.name !== "title")}
     >
+      {clashShown ? (
+        /* 4418:88263 — the clash is its own dialog in place of the form, two
+           text buttons. Cancel (and Escape) go back to the form with the name
+           kept for editing; "Use <name> 2" creates under the free name. */
+        <ModalContent size="form" data-testid="cms-setup-clash" srTitle="Collection name already exists">
+          <ModalTitle>Collection name already exists</ModalTitle>
+          <ModalBody>
+            <p className="tw:m-0" role="alert">
+              A collection named “{trimmed}” already exists in {siteName}. Existing collections and their records are
+              unchanged. Choose a unique name.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => setClashShown(false)} data-testid="cms-setup-clash-cancel">
+              Cancel
+            </Button>
+            <Button
+              variant="ghost"
+              data-testid="cms-setup-clash-use"
+              onClick={() => {
+                const next = nextFreeName(trimmed, takenNames);
+                editName(next);
+                void handleCreate(next);
+              }}
+            >
+              Use {nextFreeName(trimmed, takenNames)}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      ) : (
       <ModalContent size="form" data-testid="cms-setup-modal">
         <ModalTitle>
-          {/* 4418:84646 sets the title at 18, off the 7-step scale; it snaps to
-              --bk-text-16 (the design-debt ramp rule). The size rides on a span
-              because a className font-size on the h2 ties MODAL_TITLE_CLASS's 14. */}
-          <span className="tw:text-[length:var(--bk-text-16)]" data-testid="cms-setup-title">
+          {/* 4418:84646 — the dialog title face (20/30), as every v3 dialog. */}
+          <span data-testid="cms-setup-title">
             {trimmed ? `Fields for ${trimmed}` : "New collection"}
           </span>
         </ModalTitle>
@@ -287,7 +316,9 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             </label>
             <TextInput
               id="cms-collection-name"
-              className="tw:w-full tw:[&_input]:bg-[var(--bk-bg-subtle)]"
+              /* 4418:84646 — a 32 grey field, 12px value. */
+              sizing="sm"
+              className="tw:w-full tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:text-[12px] tw:[&_input]:bg-[var(--bk-bg-subtle)]"
               data-testid="cms-setup-name"
               type="text"
               placeholder="Menu items"
@@ -366,27 +397,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             )}
           </div>
 
-          {clashShown && (
-            <div role="alert" className={ERROR_BANNER} data-testid="cms-setup-clash">
-              <p className="tw:m-0 tw:font-semibold">Collection name already exists</p>
-              <p className="tw:mt-1 tw:mb-2">A collection named “{trimmed}” already exists.</p>
-              <Button
-                type="button"
-                color="light"
-                size="xs"
-                variant="link"
-                className={BOARD_LINK}
-                data-testid="cms-setup-clash-use"
-                onClick={() => {
-                  const next = nextFreeName(trimmed, takenNames);
-                  editName(next);
-                  void handleCreate(next);
-                }}
-              >
-                Use {nextFreeName(trimmed, takenNames)}
-              </Button>
-            </div>
-          )}
           {error && <div className={ERROR_BANNER}>{error}</div>}
           {/* 4418:84646 — the foot sits in the body: no rule above it, and
               buttons at the board's 32, not the modal foot's 28. */}
@@ -394,9 +404,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <Button
               color="light"
               size="xs"
-              /* With the clash notice up, Cancel answers the notice — back to
-                 the form — as Escape does (4418:88263). */
-              onClick={() => (clashShown ? setClashShown(false) : onClose())}
+              onClick={onClose}
               disabled={creating}
               className={`${FOOT_BTN} ${FOOT_CANCEL}`}
               data-testid="cms-setup-cancel"
@@ -416,6 +424,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
         </ModalBody>
       </ModalContent>
+      )}
     </ModalRoot>
   );
 };

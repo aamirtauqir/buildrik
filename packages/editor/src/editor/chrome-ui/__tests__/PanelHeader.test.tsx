@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PanelHeader, PanelHeaderActions } from "../index";
+import { PanelBackRow, PanelHeader, PanelHeaderActions } from "../index";
 
 describe("PanelHeader", () => {
   it("is a heading so the panel has an outline", () => {
@@ -30,5 +30,21 @@ describe("PanelHeaderActions", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.click(pin);
     expect(onExpandToggle).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* The 36px "‹ Add" / "‹ Saved components" row above a drilled-in panel's
+   header (boards 4418:142419, 4418:142876, 5946:51667). Three screens drew it
+   from three copies of one class string. */
+describe("PanelBackRow", () => {
+  it("renders ‹ label as a 36px bottom-ruled button and calls onClick", () => {
+    const onClick = vi.fn();
+    render(<PanelBackRow label="Add" onClick={onClick} data-testid="back" />);
+    const btn = screen.getByTestId("back");
+    expect(btn.textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
+    expect(btn.className).toContain("tw:h-9");
+    expect(btn.className).toContain("tw:border-b");
+    fireEvent.click(btn);
+    expect(onClick).toHaveBeenCalledOnce();
   });
 });

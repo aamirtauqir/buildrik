@@ -116,6 +116,12 @@ export function formatTransactionLabel(label: string): string {
     return labelMap[label];
   }
 
+  /* Already a sentence ("Added Heading", "Auto-fix contrast") — a caller that
+     names its change is not re-cased into "Added heading". */
+  if (/^[A-Z].*\s/.test(label)) {
+    return label;
+  }
+
   return label
     .split(/[-_]/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())

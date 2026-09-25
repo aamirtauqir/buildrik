@@ -62,10 +62,10 @@ const FILTER_LABEL: Record<ActivityFilter, string> = {
    are 24-tall, 4px-radius, 11/16 medium — gray-100 fill + border at rest,
    the accent filled when active. */
 const BODY = "tw:flex tw:flex-1 tw:min-h-0 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:p-4";
-const FILTER_ROW = "tw:flex tw:gap-1";
+const FILTER_ROW = "tw:flex tw:gap-1.5";
 const FILTER_CHIP =
   "tw:h-6 tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] " +
-  "tw:bg-[var(--bk-gray-100)] tw:px-2 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-medium " +
+  "tw:bg-[var(--bk-gray-100)] tw:px-[11px] tw:py-0 tw:text-[11px] tw:leading-4 tw:font-medium " +
   "tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)] tw:focus:ring-0 " +
   "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
 const FILTER_CHIP_ACTIVE =
@@ -83,11 +83,11 @@ const OPEN_IN: Record<ActivityEntry["kind"], string> = {
   comment: "open in Review",
   publish: "open in Published",
 };
-/* Board 4418:140587's row: 12 above and below, the subject 14/20 over
+/* Board 4418:140587's row: an 80 pitch (12 above, 24 below), the subject 14/20 over
    "who · when" 12/18, both ink, with an accent › at the right. No card. */
 const ROW_OPEN =
   "tw:relative tw:h-auto tw:w-full tw:flex-col tw:items-stretch tw:gap-1.5 tw:rounded-none tw:border-0 " +
-  "tw:bg-transparent tw:py-3 tw:pl-0 tw:pr-10 tw:text-left tw:font-normal tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:bg-transparent tw:pt-3 tw:pb-6 tw:pl-0 tw:pr-10 tw:text-left tw:font-normal tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus-visible:shadow-[var(--bk-shadow-focus)] tw:disabled:opacity-100";
 const ROW_TITLE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)] tw:whitespace-pre-wrap";
 const ROW_META = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";

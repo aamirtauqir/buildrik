@@ -1,3 +1,4 @@
+import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
 import { Popover, Button, Select } from "@/editor/chrome-ui";
 /**
  * Size Section - Width, Height, Min/Max dimensions
@@ -20,17 +21,10 @@ import {
   CONTROL_SELECT_WRAP,
   SECTION_PREVIEW,
 } from "../shared/controls/controlClasses";
-import { getCssVariable } from "@/shared/utils/getCssVariable";
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
-
-const resolveVar = (cssVar: string): string => {
-  const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
-  return getCssVariable(varName);
-};
 
 // ============================================================================
 // CHAIN BUTTON
@@ -63,7 +57,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
     return (
       <Button
         type="button"
-        onClick={() => onChange(resolveVar(value))}
+        onClick={() => onChange(resolveTokenVar(value))}
         aria-label={`Unlink ${property} spacing token`}
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         className={CHAIN_BOUND}

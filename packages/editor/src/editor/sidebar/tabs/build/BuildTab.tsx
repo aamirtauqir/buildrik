@@ -15,7 +15,7 @@
 
 import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { useBuildTab } from "./hooks/useBuildTab";
@@ -23,7 +23,8 @@ import { FirstUseTip } from "./components/FirstUseTip";
 import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
-import { takePendingGenerate, takePendingInsertGroup } from "./insertGroupRequest";
+import { useInsertDrag } from "@/editor/canvas/insertDrag";
+import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
@@ -127,6 +128,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     };
   }, [composer]);
   const { addToast } = useToast();
+  const insertDrag = useInsertDrag(composer);
 
 
   const groups = React.useMemo(
@@ -174,7 +176,18 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
   // clipboard) and Insert sends the text down the SAME BlockData insert path
   // everything else uses — insertBlock owns the XSS boundary.
-  const [pasteOpen, setPasteOpen] = React.useState(false);
+  const [pasteOpen, setPasteOpen] = React.useState(() => (composer ? takePendingPasteHtml(composer) : false));
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => {
+      takePendingPasteHtml(composer);
+      setPasteOpen(true);
+    };
+    composer.on(EVENTS.UI_INSERT_OPEN_PASTE_HTML, open);
+    return () => {
+      composer.off(EVENTS.UI_INSERT_OPEN_PASTE_HTML, open);
+    };
+  }, [composer]);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
     setOpenGroups((prev) => {
@@ -271,6 +284,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           >
             <Menu label="Add options">
               <MenuItem
+                kbd="⌘⇧V"
                 data-testid="insert-paste-html"
                 onClick={() => {
                   setMenuOpen(false);
@@ -306,9 +320,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 elements use — BlockDefinition extends BlockData. */}
             {groups.map((g) => (
               <React.Fragment key={g.id}>
-              {/* Board 4418:103353: "✦  Generate a block with AI…" sits
-                  right above BLOCKS (G2-117). */}
-              {g.id === "blocks" && composer && (
+              {/* Boards 4418:100299 / 102121: "✦  Generate a block with AI…"
+                  follows the open ELEMENTS rows, right above BLOCKS; with
+                  ELEMENTS collapsed (6887:79760) it is not drawn (G2-117). */}
+              {g.id === "blocks" && composer && openGroups.has("elements") && (
                 <div
                   role="button"
                   tabIndex={0}
@@ -345,12 +360,25 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onDragStart={tab.handleDragStart}
                 onBlockDragStart={tab.handleBlockDragStart}
                 onElClick={tab.handleElClick}
+                insertPath={insertDrag.target?.path ?? null}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}
                 onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
               </React.Fragment>
             ))}
+            {/* Boards 6887:79760 / 4418:102121: "Page templates ›" closes the
+                list — whole-page layouts live in Templates. */}
+            {composer && (
+              <Button
+                color="light"
+                data-testid="insert-page-templates"
+                onClick={() => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "templates" })}
+                className="tw:mt-2 tw:h-7 tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)] tw:focus:ring-0"
+              >
+                Page templates ›
+              </Button>
+            )}
           </div>
         )}
 

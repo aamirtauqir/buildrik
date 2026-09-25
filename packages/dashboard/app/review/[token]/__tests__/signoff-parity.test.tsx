@@ -10,6 +10,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 
 const reviewQuery = vi.fn();
+const requestLinkMutate = vi.fn();
+let requestLinkState = { isSuccess: false, isPending: false, isError: false };
+const requestLinkMutation = () => ({ mutate: requestLinkMutate, ...requestLinkState });
 
 vi.mock("@lib/trpc/client", () => ({
   trpc: {
@@ -20,6 +23,7 @@ vi.mock("@lib/trpc/client", () => ({
       identify: { useMutation: () => ({ mutate: vi.fn() }) },
       comment: { useMutation: () => ({ mutate: vi.fn(), isPending: false, error: null }) },
       resolve: { useMutation: () => ({ mutate: vi.fn(), isPending: false, error: null }) },
+      requestNewLink: { useMutation: () => requestLinkMutation() },
     },
   },
 }));
@@ -140,5 +144,29 @@ describe("F · revoked (4418:121971)", () => {
     expect(screen.getByText(/Ask Ali's Studio for a new one/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Try this link again" }));
     expect(refetch).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Request a new link" }));
+    expect(requestLinkMutate).toHaveBeenCalledWith({ token: "t" });
+  });
+
+  it("4418:122159 — once asked, says so and drops the request button", () => {
+    requestLinkState = { isSuccess: true, isPending: false, isError: false };
+    reviewQuery.mockReturnValue({
+      isLoading: false,
+      data: undefined,
+      refetch: vi.fn(),
+      error: { data: { code: "FORBIDDEN", cause: { reason: "REVOKED", agencyName: "Ali's Studio", roundNumber: 3 } } },
+    });
+    render(<ReviewClient token="t" />);
+    expect(screen.getByText("We asked for a new link")).toBeTruthy();
+    expect(screen.getByText(/Your request went to Ali's Studio just now.*for Round 3/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Request a new link" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Try this link again" })).toBeTruthy();
+    requestLinkState = { isSuccess: false, isPending: false, isError: false };
+  });
+
+  it("a malformed link has no agency to ask — no request button", () => {
+    reviewQuery.mockReturnValue({ isLoading: false, data: undefined, refetch: vi.fn(), error: { data: { code: "NOT_FOUND" } } });
+    render(<ReviewClient token="t" />);
+    expect(screen.queryByRole("button", { name: "Request a new link" })).toBeNull();
   });
 });

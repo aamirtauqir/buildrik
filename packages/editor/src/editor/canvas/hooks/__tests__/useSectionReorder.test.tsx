@@ -87,7 +87,7 @@ describe("useSectionReorder", () => {
         getActivePage: vi.fn(() => ({ root: { id: "root-1" } })),
         getElement: vi.fn((id: string) =>
           id === "root-1"
-            ? { getChildren: () => sectionIds.map((sid) => ({ getId: () => sid })) }
+            ? { getChildren: () => sectionIds.map((sid) => ({ getId: () => sid, getType: () => "section", getCustomData: () => undefined })) }
             : sectionIds.includes(id)
               ? { getId: () => id }
               : null
@@ -124,9 +124,9 @@ describe("useSectionReorder", () => {
     it("computes one boundary per top-level section with canvas-relative rects", () => {
       const { result } = mountHook();
       expect(result.current.boundaries).toEqual([
-        { sectionId: "sec-a", index: 0, rect: { top: 0, left: 0, width: 800 } },
-        { sectionId: "sec-b", index: 1, rect: { top: 100, left: 0, width: 800 } },
-        { sectionId: "sec-c", index: 2, rect: { top: 200, left: 0, width: 800 } },
+        { sectionId: "sec-a", index: 0, label: "Section", rect: { top: 0, left: 0, width: 800, height: 100 } },
+        { sectionId: "sec-b", index: 1, label: "Section", rect: { top: 100, left: 0, width: 800, height: 100 } },
+        { sectionId: "sec-c", index: 2, label: "Section", rect: { top: 200, left: 0, width: 800, height: 100 } },
       ]);
     });
 

@@ -80,7 +80,7 @@ describe("RecordSheet", () => {
       ),
     );
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
-    expect(await screen.findByText("Record saved")).toBeInTheDocument();
+    expect(await screen.findByText("Record saved · Menu items")).toBeInTheDocument();
   });
 
   it("+ Add record opens a blank sheet and creates the record", async () => {
@@ -171,5 +171,43 @@ describe("RecordSheet", () => {
     React.act(() => pick({ src: "https://cdn.example/menu-01.jpg" }));
     expect(await screen.findByText("menu-01.jpg")).toBeInTheDocument();
     expect(screen.getByTestId("cms-sheet-save")).toBeEnabled();
+  });
+});
+
+describe("RecordSheet · Preview ▸ (7116:76427)", () => {
+  it("opens a read-only card from the form's current values, with the saved status", async () => {
+    mount();
+    await openRow();
+    expect(screen.queryByTestId("cms-record-preview")).toBeNull();
+    fireEvent.click(screen.getByTestId("cms-sheet-preview"));
+    const card = screen.getByTestId("cms-record-preview-card");
+    expect(card).toHaveTextContent("Margherita");
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$15" } });
+    expect(card).toHaveTextContent("$15");
+    expect(screen.getByTestId("cms-record-preview-status")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("cms-sheet-preview"));
+    expect(screen.queryByTestId("cms-record-preview")).toBeNull();
+  });
+});
+
+describe("RecordSheet · new record (6749:59940)", () => {
+  it("says what Save needs, keeps Save off until the name is in, and fills the slug from the name", async () => {
+    const withSlug = {
+      ...MENU,
+      fields: [...MENU.fields, { id: "f9", name: "Slug", slug: "slug", type: "text", order: 9 }],
+    } as CMSCollection;
+    mount({ collection: withSlug, items: [] });
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
+    await screen.findByTestId("cms-sheet");
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("New record · nothing saved yet");
+    expect(screen.getByTestId("cms-sheet-new-hint")).toHaveTextContent("Enter a Name before saving.");
+    expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+    expect(screen.getByLabelText("Slug")).toHaveAttribute("placeholder", "auto from name");
+    fireEvent.change(screen.getByLabelText("Name *"), { target: { value: "Seasonal Pizza" } });
+    expect(screen.getByLabelText("Slug")).toHaveValue("seasonal-pizza");
+    expect(screen.getByTestId("cms-sheet-save")).not.toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Slug"), { target: { value: "special" } });
+    fireEvent.change(screen.getByLabelText("Name *"), { target: { value: "Seasonal Pizza 2" } });
+    expect(screen.getByLabelText("Slug")).toHaveValue("special");
   });
 });

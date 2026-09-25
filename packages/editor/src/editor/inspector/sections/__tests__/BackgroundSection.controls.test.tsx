@@ -12,10 +12,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BackgroundSection } from "../BackgroundSection";
 
+/* The Color / Gradient / Image choice sits behind More settings for a colour
+   background (board 7056:78695); these open it unless a case says otherwise. */
 function renderBg(props: Partial<React.ComponentProps<typeof BackgroundSection>> = {}) {
   const onChange = vi.fn();
   const utils = render(
-    <BackgroundSection styles={{}} onChange={onChange} isOpen={true} {...props} />
+    <BackgroundSection styles={{}} onChange={onChange} isOpen={true} advancedExpanded {...props} />
   );
   return { onChange, ...utils };
 }
@@ -108,6 +110,7 @@ describe("BackgroundSection — advanced image disclosure", () => {
     renderBg({
       styles: { "background-image": "url('https://a/b.png')" },
       onAdvancedToggle,
+      advancedExpanded: false,
     });
     expect(screen.queryByText("Repeat")).not.toBeInTheDocument();
     const toggle = screen.getByRole("button", { name: "More settings" });
@@ -127,5 +130,11 @@ describe("BackgroundSection — advanced image disclosure", () => {
     ) as HTMLSelectElement;
     fireEvent.change(sizeSelect, { target: { value: "cover" } });
     expect(onChange).toHaveBeenCalledWith("background-size", "cover");
+  });
+
+  it("board 7056:78695: a colour background opens as the Fill row, the type choice behind More settings", () => {
+    renderBg({ advancedExpanded: false, onAdvancedToggle: vi.fn() });
+    expect(screen.queryByRole("button", { name: /gradient/i })).toBeNull();
+    expect(screen.getByRole("button", { name: "More settings" })).toBeInTheDocument();
   });
 });

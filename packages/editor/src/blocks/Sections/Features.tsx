@@ -6,6 +6,7 @@
 export const featuresBlockConfig = {
   id: "features",
   label: "Features",
+  description: "Three features in columns, each with an icon, a title and a line of text.",
   category: "Sections",
   elementType: "features" as const,
   icon: "✨",

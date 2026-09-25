@@ -43,17 +43,18 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         justifyContent: "space-between",
         gap: 8,
         width: "100%",
-        /* 6/12 and 11px in `--color/ink-soft` — 1176:4868 / 4869 and their
-           twenty siblings on board 1176:4866. It shipped `8px 10px` at 13px in
-           full ink, which made every row of a twelve-row menu four pixels
-           taller and a size louder than the board draws it. */
-        padding: "6px 12px",
+        /* Board 4428:43928 (the v3 ⋯ More menu): 13px ink rows on a 30 pitch.
+           The archived 1176:4866 drew 11px ink-soft. */
+        padding: "0 12px",
+        height: 30,
+        minHeight: 30,
         /* `--color/bg-selected` (1176:4872), not the accent at 15% alpha. The
            two are close and not the same, and the board names a token. */
         background: (isHovered || isHighlighted) && enabled ? "var(--bk-accent-tint)" : "transparent",
         border: "none",
-        color: enabled ? CANVAS_COLORS.textSecondary : CANVAS_COLORS.textMuted,
-        fontSize: 11,
+        color: enabled ? "var(--bk-ink)" : CANVAS_COLORS.textMuted,
+        fontSize: 13,
+        fontWeight: 400,
         cursor: enabled ? "pointer" : "not-allowed",
         /* 0: the board's rows are full-bleed 200-wide highlights inside a menu
            whose own padding is vertical only, so a rounded row inside a
@@ -69,7 +70,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       aria-expanded={hasSubmenu ? isHighlighted : undefined}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <MenuIcon name={action.icon} />
+        {/* 4428:43928 draws text rows; only the AI row keeps its ✦ mark. */}
+        {action.icon === "sparkles" ? <MenuIcon name={action.icon} /> : null}
         <span>{action.label}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

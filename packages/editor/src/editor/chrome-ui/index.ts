@@ -82,9 +82,11 @@ export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
 export { UpgradeModal, openUpgrade, type UpgradeModalProps } from "./UpgradeModal";
 export {
+  PanelBackRow,
   PanelHeader,
   PanelHeaderActions,
   PanelHeaderSize,
+  type PanelBackRowProps,
   type PanelHeaderProps,
   type PanelHeaderActionsProps,
 } from "./PanelHeader";

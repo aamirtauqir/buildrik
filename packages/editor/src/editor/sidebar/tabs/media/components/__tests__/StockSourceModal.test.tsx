@@ -60,6 +60,10 @@ function mount(over: Partial<React.ComponentProps<typeof StockSourceModal>> = {}
     searchQuery: "",
     searchFailed: null,
     onSearch: vi.fn(),
+    orientation: "all",
+    color: "all",
+    onSetOrientation: vi.fn(),
+    onSetColor: vi.fn(),
     onLoadMore: vi.fn(),
     onSave: vi.fn(() => Promise.resolve()),
     ...over,
@@ -84,33 +88,45 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     );
     expect(screen.getByTestId("stock-search")).toBeInTheDocument();
     expect(screen.getByTestId("stock-cancel")).toHaveTextContent("Cancel");
-    expect(save()).toHaveTextContent("Save to library");
+    // v3 6840:62903 — at rest there is nothing to save: Cancel alone.
+    expect(screen.queryByTestId("stock-save")).toBeNull();
+    expect(screen.getByTestId("stock-idle")).toHaveTextContent("Search millions of free photos");
     expect(screen.queryByText(/^Insert/)).toBeNull();
     expect(screen.queryByText("Add from Stock")).toBeNull();
     expect(screen.queryByText("Use")).toBeNull();
   });
 
-  it("keeps the code's sources behind a compact switch — Photos · Videos (G3-036: no Icons) — with Photos pressed", () => {
+  const pickType = (label: "Photo" | "Video") => {
+    fireEvent.click(screen.getByTestId("stock-filter-type"));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: label }));
+  };
+
+  /* v3 4418:154195 — Type ▾ replaces the Photos | Videos switch; G3-036
+     keeps Icons out of it. */
+  it("Type ▾ holds the code's sources — Photo · Video (G3-036: no Icons) — with Photo current", () => {
     mount();
-    const sw = screen.getByTestId("stock-source-switch");
-    const names = within(sw).getAllByRole("button").map((b) => b.textContent?.trim());
-    expect(names).toEqual(["Photos", "Videos"]);
+    fireEvent.click(screen.getByTestId("stock-filter-type"));
+    const names = screen.getAllByRole("menuitemradio").map((b) => b.textContent?.replace(/✓/g, "").trim());
+    expect(names).toEqual(["Photo", "Video"]);
+    expect(screen.getByRole("menuitemradio", { name: /Photo/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.queryByTestId("stock-browse-icons")).toBeNull();
-    expect(within(sw).getByRole("button", { name: "Photos" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(sw).getByRole("button", { name: "Videos" })).toHaveAttribute("aria-pressed", "false");
-    /* Fonts have no file to save (MediaManager.getFonts is four stub
-       families with no previewUrl); the inspector's Font picker is their
-       door, which is what the old Use button's toast already said. */
     expect(screen.queryByRole("button", { name: "Fonts" })).toBeNull();
   });
 
-  it("draws no orientation group, colour dots, provider pills or quota strip — none fit under the search on one row", () => {
-    mount({ searchQuery: "restaurant interior", photos: [photo()] });
-    expect(screen.queryByTitle("Landscape")).toBeNull();
-    expect(screen.queryByTitle("Red")).toBeNull();
-    expect(screen.queryByRole("radiogroup")).toBeNull();
+  it("draws Orientation ▾ · Colour ▾ · Type ▾ under the search and hands a pick up (4418:154195 / 6998:77880)", () => {
+    const onSetOrientation = vi.fn();
+    const onSetColor = vi.fn();
+    mount({ searchQuery: "restaurant interior", photos: [photo()], onSetOrientation, onSetColor });
+    const row = screen.getByTestId("stock-filter-row");
+    expect(within(row).getAllByRole("button").map((b) => b.textContent?.replace("▾", "").trim())).toEqual(["Orientation", "Colour", "Type"]);
+    fireEvent.click(screen.getByTestId("stock-filter-orientation"));
+    expect(screen.getAllByRole("menuitemradio").map((b) => b.textContent?.replace(/✓/g, "").trim())).toEqual(["Any", "Landscape", "Portrait", "Square"]);
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Landscape" }));
+    expect(onSetOrientation).toHaveBeenCalledWith("landscape");
+    fireEvent.click(screen.getByTestId("stock-filter-colour"));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Red" }));
+    expect(onSetColor).toHaveBeenCalledWith("red");
     expect(screen.queryByTestId("stock-quota-strip")).toBeNull();
-    expect(screen.queryByText("Any")).toBeNull();
   });
 
   it("types into the search and hands the query up", async () => {
@@ -174,10 +190,10 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     expect(screen.getByTestId("stock-tile-attribution")).toHaveTextContent("Ansel Adams · Unsplash");
   });
 
-  it("Videos: the switch shows the video results with the same card shape, and Save hands up `vid`", () => {
+  it("Video: Type shows the video results with the same card shape, and Save hands up `vid`", () => {
     const onSave = vi.fn(() => Promise.resolve());
     mount({ searchQuery: "kitchen", videos: [video()], onSave });
-    fireEvent.click(screen.getByRole("button", { name: "Videos" }));
+    pickType("Video");
     const card = screen.getByTestId("stock-card-v1");
     expect(within(card).getByTestId("stock-tile-attribution")).toHaveTextContent("Filmmaker · Pexels");
     fireEvent.click(card);
@@ -189,7 +205,7 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     mount({ searchQuery: "kitchen", photos: [photo()], videos: [video()] });
     fireEvent.click(screen.getByTestId("stock-card-p1"));
     expect(save()).toBeEnabled();
-    fireEvent.click(screen.getByRole("button", { name: "Videos" }));
+    pickType("Video");
     expect(save()).toBeDisabled();
   });
 

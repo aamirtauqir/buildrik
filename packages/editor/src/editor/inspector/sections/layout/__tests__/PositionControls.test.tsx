@@ -25,17 +25,18 @@ describe("PositionControls — mode selection", () => {
     expect(screen.queryByPlaceholderText("top")).not.toBeInTheDocument();
   });
 
-  it("clicking a position button writes position", () => {
+  /* Board 7058:78647: "Position [Static ▾]" — one select. */
+  it("choosing a position writes position", () => {
     const { onChange } = renderPos();
-    fireEvent.click(screen.getByRole("button", { name: /Positioned relative to nearest parent/ }));
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    expect(select.value).toBe("static");
+    fireEvent.change(select, { target: { value: "absolute" } });
     expect(onChange).toHaveBeenCalledWith("position", "absolute");
   });
 
-  it("marks the active position button aria-pressed", () => {
+  it("the select shows the current position", () => {
     renderPos({ styles: { position: "fixed" } });
-    expect(
-      screen.getByRole("button", { name: /Pinned to the viewport/ })
-    ).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("fixed");
   });
 
   it("reveals offset + z-index controls once position is non-static", () => {

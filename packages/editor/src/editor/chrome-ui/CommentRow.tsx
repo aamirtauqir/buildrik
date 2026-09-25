@@ -117,7 +117,10 @@ export function CommentRow({
             whole comment reachable, since the row is now the only place the
             panel shows it. */}
         <span
-          className="tw:h-5 tw:w-full tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+          /* Board 4418:117393: a resolved comment's quote dims to muted ink. */
+          className={`tw:h-5 tw:w-full tw:truncate tw:text-[13px] tw:leading-5 ${
+            resolved ? "tw:text-[var(--bk-ink-muted)]" : "tw:text-[var(--bk-ink)]"
+          }`}
           title={body}
           data-testid={`review-comment-body-${index}`}
         >
@@ -136,7 +139,7 @@ export function CommentRow({
         <span className={META} data-testid={`review-comment-meta-${index}`}>
           {author} · {authorKind === "client" ? "client" : "you"}
           {meta ? ` · ${meta}` : ""}
-          {resolved ? " · resolved" : ""}
+          {resolved ? " · Resolved" : ""}
         </span>
         {footer ? <span className="tw:flex tw:items-center tw:gap-3 tw:pt-1">{footer}</span> : null}
       </span>

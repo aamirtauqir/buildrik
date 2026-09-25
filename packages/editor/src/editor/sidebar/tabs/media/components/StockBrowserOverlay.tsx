@@ -38,14 +38,14 @@ interface StockBrowserOverlayProps {
   onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
 }
 
-const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
-  { id: "all", label: "All" },
+export const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
+  { id: "all", label: "Any" },
   { id: "landscape", label: "Landscape" },
   { id: "portrait", label: "Portrait" },
   { id: "squarish", label: "Square" },
 ];
 
-const COLORS: Array<{ id: DiscColor; label: string }> = [
+export const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "all", label: "All" },
   { id: "black_and_white", label: "B&W" },
   { id: "black", label: "Black" },
@@ -58,9 +58,9 @@ const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "blue", label: "Blue" },
 ];
 
-const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
-  { id: "img", label: "Photos" },
-  { id: "vid", label: "Videos" },
+export const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
+  { id: "img", label: "Photo" },
+  { id: "vid", label: "Video" },
 ];
 
 /** Caption: infinite scroll hands over to an explicit Load more after 3. */
@@ -70,7 +70,7 @@ const DROPDOWN =
   "tw:h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:bg-white tw:px-1.5 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 
-function FilterDropdown<T extends string>({
+export function FilterDropdown<T extends string>({
   label,
   value,
   options,
@@ -110,17 +110,23 @@ function FilterDropdown<T extends string>({
         </Button>
       }
     >
-      <Menu label={label}>
+      {/* Board 6998:77880: 224 wide, rows 30, the current row 13/500 with a
+          trailing ✓ (not the leading radio tick). */}
+      <Menu label={label} className="tw:w-[206px] tw:[&_[role^=menuitem]]:h-[30px] tw:[&_[role=menuitemradio]>span:first-child]:hidden">
         {options.map((o) => (
           <MenuItem
             key={o.id}
+            radio
             selected={o.id === value}
             onClick={() => {
               setOpen(false);
               onPick(o.id);
             }}
           >
-            {o.label}
+            <span className="tw:flex tw:w-full tw:items-center">
+              <span className={o.id === value ? "tw:font-medium" : undefined}>{o.label}</span>
+              {o.id === value ? <span aria-hidden="true" className="tw:ml-auto tw:text-[11px]">✓</span> : null}
+            </span>
           </MenuItem>
         ))}
       </Menu>

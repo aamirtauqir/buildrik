@@ -3,10 +3,17 @@
 // Claude models that the server could never call. One source now.
 export { DEFAULT_MODEL, type AIModel } from "@buildrik/shared/schemas/ai";
 
+/** What a run may touch. `element` is one element (a one-step run); every
+ *  other kind is a planned run over a pool of elements — the selection
+ *  (`multi`), the elements of the selected one's type on this page
+ *  (`similar`, board 6891:73760), the page, or every page (`site`, 6891:73974).
+ *  `name` is what the run's copy calls the element ("restores Hero"). */
 export type AIScope =
-  | { kind: "element"; id: string; label: string }
+  | { kind: "element"; id: string; label: string; name: string }
+  | { kind: "multi"; ids: string[] }
+  | { kind: "similar"; ids: string[]; noun: string }
   | { kind: "page" }
-  | { kind: "multi"; count: number };
+  | { kind: "site"; pages: number };
 
 export type AIScopeStatus = "idle" | "locked";
 

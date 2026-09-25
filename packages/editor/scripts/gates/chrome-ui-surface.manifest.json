@@ -111,6 +111,8 @@
     "PanelHeaderActions": "local",
     "PanelHeaderSize": "local",
     "PanelHeaderActionsProps": "local",
+    "PanelBackRow": "local",
+    "PanelBackRowProps": "local",
     "PanelHeaderProps": "local",
     "PanelWidth": "local",
     "Popover": "local",

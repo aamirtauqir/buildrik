@@ -15,7 +15,7 @@ import { TextField, Button, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
-import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
+import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "../tokenBindingDetection";
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
 // ============================================================================
@@ -33,6 +33,12 @@ const parseValue = (val: string): { num: string; unit: string; isKeyword: boolea
   if (!val) return { num: "", unit: "", isKeyword: false };
   if (val === "auto" || val === "inherit" || val === "initial") {
     return { num: val, unit: "", isKeyword: true };
+  }
+  /* A token-bound side or corner shows its resolved number (the chip still
+     names the token) — not the raw site-token `var(…)` string (6894:74644). */
+  if (isTokenVar(val)) {
+    const r = resolveTokenVar(val).match(/^(-?[\d.]+)(.*)$/);
+    if (r) return { num: r[1], unit: r[2] || "px", isKeyword: false };
   }
   const m = val.match(/^(-?[\d.]+)(.*)$/);
   return m ? { num: m[1], unit: m[2] || "px", isKeyword: false } : { num: val, unit: "", isKeyword: false };

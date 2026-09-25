@@ -12,6 +12,7 @@ export interface FooterBlockConfig extends BlockData {
 export const footerBlockConfig: FooterBlockConfig = {
   id: "footer",
   label: "Footer",
+  description: "Site footer with your name, links and the small print.",
   category: "Sections",
   elementType: "footer",
   content:

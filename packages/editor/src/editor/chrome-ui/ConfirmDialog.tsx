@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Modal } from "./Modal";
+import { Modal, type ModalWidth } from "./Modal";
 import { Button } from "flowbite-react";
 
 export interface ConfirmDialogProps {
@@ -58,6 +58,10 @@ export interface ConfirmDialogProps {
    * Absent, the dialog behaves as it always did and the caller closes it.
    */
   success?: { title: string; message: string };
+  /** Forwarded to Modal — the board's width when it is not the 560 default. */
+  width?: ModalWidth;
+  /** Forwarded to Modal — a ✕ at the head's right edge, where the board draws one. */
+  closeButton?: boolean;
 }
 
 /** Long enough to read "3 pages deleted.", short enough not to be a step. */
@@ -78,7 +82,7 @@ const SUCCESS_MESSAGE = "tw:m-0 tw:mt-4 tw:text-[13px] tw:leading-5 tw:text-[var
 const SUCCESS_CLOSING = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, testId, success,
+  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, testId, success, width, closeButton,
 }: ConfirmDialogProps) {
   const [done, setDone] = React.useState(false);
 
@@ -106,6 +110,8 @@ export function ConfirmDialog({
         title={success.title}
         testId={testId}
         kind="question"
+        width={width}
+        closeButton={closeButton}
         dismissOnScrimClick={false}
       >
         <div className={SUCCESS_BODY} role="status">
@@ -132,6 +138,8 @@ export function ConfirmDialog({
       title={title}
       testId={testId}
       kind="question"
+      width={width}
+      closeButton={closeButton}
       dismissOnScrimClick={tone === "default"}
       footer={
         <>

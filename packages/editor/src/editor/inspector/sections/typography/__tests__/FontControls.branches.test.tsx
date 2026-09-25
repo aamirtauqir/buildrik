@@ -24,12 +24,21 @@ function editRow(labelText: string, value: string) {
 describe("FontControls — remaining unit rows", () => {
   /* Board 807:8342 pairs it with Size, so it has no label of its own — the
      second field in the row is line height. */
-  it("editing the paired second field writes line-height", () => {
+  /* 7079:79176: line height is unitless — "1.5 × line", not 1.5px. */
+  it("editing the paired second field writes a unitless line-height", () => {
     const { onChange } = renderFont();
     const pair = screen.getByRole("group", { name: "Size and line height" });
     const inputs = pair.querySelectorAll("input");
     fireEvent.change(inputs[inputs.length - 1] as HTMLInputElement, { target: { value: "1.5" } });
-    expect(onChange).toHaveBeenCalledWith("line-height", "1.5px");
+    expect(onChange).toHaveBeenCalledWith("line-height", "1.5");
+  });
+
+  it("a px line-height keeps its unit", () => {
+    const { onChange } = renderFont({ "line-height": "24px" });
+    const pair = screen.getByRole("group", { name: "Size and line height" });
+    const inputs = pair.querySelectorAll("input");
+    fireEvent.change(inputs[inputs.length - 1] as HTMLInputElement, { target: { value: "28" } });
+    expect(onChange).toHaveBeenCalledWith("line-height", "28px");
   });
 
   it("editing letter-spacing writes letter-spacing", () => {

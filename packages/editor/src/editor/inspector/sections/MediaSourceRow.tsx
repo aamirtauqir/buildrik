@@ -18,6 +18,8 @@
  * @license BSD-3-Clause
  */
 
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine/Composer";
@@ -36,7 +38,7 @@ const KINDS: Record<string, { label: string; door: string; picker: MediaAssetTyp
 interface MediaSourceRowProps {
   composer: Composer | null | undefined;
   selectedElement: { id: string; type: string };
-  onOpenMediaLibrary?: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => void;
+  onOpenMediaLibrary?: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, forLabel?: string) => void;
 }
 
 /** The URL's own file name — for a source the library does not hold. */
@@ -70,6 +72,9 @@ export function MediaSourceRow({ composer, selectedElement, onOpenMediaLibrary }
 
   const open = () => {
     if (kind.picker && onOpenMediaLibrary) {
+      /* Board 6764:59051 — pick mode reads "For <element> · Image": the
+         layer's own name, else its type label. */
+      const forLabel = getLayerName(el) ?? ELEMENT_TYPE_LABELS[selectedElement.type] ?? selectedElement.type;
       onOpenMediaLibrary([kind.picker], (chosen) => {
         const target = composer.elements.getElement(selectedElement.id);
         if (!target) return;
@@ -77,7 +82,7 @@ export function MediaSourceRow({ composer, selectedElement, onOpenMediaLibrary }
         if (selectedElement.type === "video") runTxn(composer, "video-src-change", () => handleVideoSrcChange(target, chosen.src));
         else runTxn(composer, "media-source-change", () => handleGenericAttributeChange(target, "src", chosen.src));
         bump();
-      });
+      }, forLabel);
       return;
     }
     composer.media.selectAssets(asset ? [asset.id] : []);

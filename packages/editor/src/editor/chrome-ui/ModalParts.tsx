@@ -22,12 +22,15 @@ import {
   MODAL_SUBTITLE_CLASS,
   MODAL_BODY_CLASS,
   MODAL_FOOT_CLASS,
+  MODAL_FOOT_DIVIDED_CLASS,
 } from "./Modal";
 
-export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
+export type ModalSize = "sm" | "prompt" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
 
 const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   sm: "tw:w-[360px]",
+  /* The publish gate prompts (4418:120066 / 5931:44782) are 520 wide. */
+  prompt: "tw:w-[520px]",
   /* width/dialog-md — the v3 dialog boards (7564:185450 and siblings) draw
      560; the 520 / 500 / 440 widths came from the archived page. */
   md: "tw:w-[var(--bk-size-dialog-md)]",
@@ -180,10 +183,15 @@ export const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
   },
 );
 
-export const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  function ModalFooter({ className, children, ...rest }, ref) {
+export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Form dialogs: top rule + 16/24 padding (DS "Footer"). Confirms omit it. */
+  divided?: boolean;
+}
+
+export const ModalFooter = React.forwardRef<HTMLDivElement, ModalFooterProps>(
+  function ModalFooter({ divided, className, children, ...rest }, ref) {
     return (
-      <div ref={ref} className={[MODAL_FOOT_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+      <div ref={ref} className={[divided ? MODAL_FOOT_DIVIDED_CLASS : MODAL_FOOT_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </div>
     );

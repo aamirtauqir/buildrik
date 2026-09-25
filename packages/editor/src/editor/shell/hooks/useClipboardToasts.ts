@@ -17,13 +17,10 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
-interface ToastInput {
-  description: string;
-  tone?: "info" | "success" | "warning" | "error";
-  duration?: number;
-}
 
 export function useClipboardToasts(
   composer: Composer | null | undefined,
@@ -68,8 +65,25 @@ export function useClipboardToasts(
       }, 0);
     };
 
-    const duplicated = () =>
-      addToast({ description: "Element duplicated", tone: "success", duration: 2000 });
+    /* Board 5940:147595: "Section duplicated · Undo". The duplicate command
+       clones every selected element in one transaction, one event per clone —
+       speak once per burst, naming a lone copy by its type. */
+    let dupes: string[] = [];
+    let dupeBurst: ReturnType<typeof setTimeout> | null = null;
+    const duplicated = (e?: { clone?: { getType?: () => string } }) => {
+      dupes.push(e?.clone?.getType?.() ?? "");
+      if (dupeBurst) return;
+      dupeBurst = setTimeout(() => {
+        const [only] = dupes;
+        addToast({
+          description:
+            dupes.length > 1 ? `${dupes.length} elements duplicated` : `${only ? elementTypeLabel(only) : "Element"} duplicated`,
+          action: { label: "Undo", onClick: () => composer.history.undo() },
+        });
+        dupes = [];
+        dupeBurst = null;
+      }, 0);
+    };
 
     composer.on(EVENTS.CLIPBOARD_COPY, copied);
     composer.on(EVENTS.CLIPBOARD_CUT, cut);
@@ -77,6 +91,7 @@ export function useClipboardToasts(
     composer.on(EVENTS.ELEMENT_DUPLICATED, duplicated);
     return () => {
       if (burst) clearTimeout(burst);
+      if (dupeBurst) clearTimeout(dupeBurst);
       composer.off(EVENTS.CLIPBOARD_COPY, copied);
       composer.off(EVENTS.CLIPBOARD_CUT, cut);
       composer.off(EVENTS.CLIPBOARD_PASTE, pasted);

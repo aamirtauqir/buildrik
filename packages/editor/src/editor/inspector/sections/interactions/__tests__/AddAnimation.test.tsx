@@ -50,7 +50,7 @@ describe("Interactions — creating a CSS animation", () => {
     expect(screen.queryByRole("button", { name: /Entrance animation/ })).toBeNull();
   });
 
-  it("add → the row appears labelled by its trigger, editor open; export has the keyframes", async () => {
+  it("add → its edit screen opens; back shows the row labelled by its trigger; export has the keyframes", async () => {
     const composer = project();
     const el = composer.elements.getElement("a1")!;
     const onAnimationChange = (a: AnimationConfig | null) => (a ? el.setAnimation(a) : el.clearAnimation());
@@ -60,10 +60,11 @@ describe("Interactions — creating a CSS animation", () => {
     );
     openAdd();
     act(() => { fireEvent.click(screen.getByRole("button", { name: /Entrance animation/ })); });
-    const row = screen.getByRole("button", { name: /On page load/ });
-    expect(row).toHaveTextContent("Fade In");
-    expect(row).toHaveAttribute("aria-expanded", "true");
+    /* Lands on its edit screen: "‹ On page load" + the editor. */
+    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ On page load");
     expect(screen.getByRole("button", { name: "Remove animation" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("interactions-back"));
+    expect(screen.getByRole("button", { name: /On page load/ })).toHaveTextContent("Fade In");
 
     const files = (await new ExportEngine(composer).exportAllPages({ format: "html" })).files;
     expect(files.find((f) => f.name === "styles.css")?.content).toContain("@keyframes bd-anim-fadeIn");

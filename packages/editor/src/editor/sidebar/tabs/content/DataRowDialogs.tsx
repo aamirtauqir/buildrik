@@ -1,7 +1,7 @@
 /**
  * The Data lists' row dialogs — Sources and Variables ⋯ (6930:80567:
- * Rename · Re-sync · Delete…). Delete uses chrome-ui's ConfirmDialog; the two
- * below are the ones that take input.
+ * Rename · Re-sync · Delete…). Delete uses chrome-ui's ConfirmDialog; the
+ * ones below take input, plus "+ Connect a source" (6881:86167).
  *
  * @license BSD-3-Clause
  */
@@ -147,6 +147,66 @@ export function ResyncJsonDialog({
       />
       {error ? (
         <p className={ERROR} role="alert" data-testid="content-source-resync-error">
+          {error}
+        </p>
+      ) : null}
+    </Modal>
+  );
+}
+
+/** 6881:86167 — "+ Connect a source" asks in a dialog, not inline in the
+ *  drawer. The board offers Google Sheets; the only connector that exists is a
+ *  JSON paste, so the body says that and the primary adds it. */
+export function ConnectSourceDialog({
+  onClose,
+  onImport,
+}: {
+  onClose: () => void;
+  /** Adds the source; an error sentence when the JSON cannot be used. */
+  onImport: (json: string) => string | null;
+}) {
+  const [json, setJson] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const add = () => {
+    const err = onImport(json);
+    if (err) setError(err);
+    else onClose();
+  };
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Connect a source"
+      kind="form"
+      dirty={json.trim() !== ""}
+      testId="content-source-connect"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} data-testid="content-source-connect-cancel">
+            Cancel
+          </Button>
+          <Button disabled={!json.trim()} onClick={add} data-testid="content-source-connect-add">
+            Add source
+          </Button>
+        </>
+      }
+    >
+      <p className="tw:m-0 tw:mb-3">
+        Paste the data as JSON — each list becomes records a collection can use. Edits sync one way, from the source in.
+      </p>
+      <Textarea
+        className="tw:min-h-32 tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-xs"
+        placeholder='{"products": [{"name": "…"}]}'
+        value={json}
+        onChange={(e) => {
+          setJson(e.target.value);
+          setError(null);
+        }}
+        aria-label="Source JSON"
+        autoFocus
+      />
+      {error ? (
+        <p className={ERROR} role="alert">
           {error}
         </p>
       ) : null}

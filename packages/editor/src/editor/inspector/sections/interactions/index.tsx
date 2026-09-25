@@ -8,7 +8,9 @@ import * as React from "react";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
-import { ElementAnimationRow } from "./ElementAnimationRow";
+import { ElementAnimationRow, ElementAnimationEditor, animationTriggerLabel } from "./ElementAnimationRow";
+import { InteractionEditor } from "./InteractionEditor";
+import { getTriggerInfo } from "./types";
 import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
@@ -54,11 +56,12 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const [showAddPanel, setShowAddPanel] = React.useState(false);
   const [live, setLive] = React.useState<Interaction[] | null>(null);
   const [liveAnimation, setLiveAnimation] = React.useState<AnimationConfig | null | undefined>(undefined);
-  const [animationJustAdded, setAnimationJustAdded] = React.useState(false);
+  /* The animation's edit screen is open (drill-in, like an interaction's). */
+  const [animationOpen, setAnimationOpen] = React.useState(false);
   React.useEffect(() => {
     setLive(null);
     setLiveAnimation(undefined);
-    setAnimationJustAdded(false);
+    setAnimationOpen(false);
     if (!composer || !elementId) return;
     /* Re-read on any element update: cheap, and the payload is an Element
        (getId(), no id field), so it is not filtered on. */
@@ -79,7 +82,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const addAnimation = () => {
     onAnimationChange?.({ ...DEFAULT_ANIMATION });
     setShowAddPanel(false);
-    setAnimationJustAdded(true);
+    setAnimationOpen(true);
   };
   const [editingId, setEditingId] = React.useState<string | null>(null);
 
@@ -115,10 +118,24 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     );
   };
 
-  // Toggle editing state
-  const handleToggleEdit = (id: string) => {
-    setEditingId(editingId === id ? null : id);
-  };
+  /* Boards 4428:142686 / 4418:109686: the list is flat rows; opening one
+     drills into its edit screen ("‹ On hover" back row + its controls), and
+     back returns to the list. The editor used to expand inline under the row
+     and push the rest of the tab below the fold. */
+  const editing = interactions.find((i) => i.id === editingId) ?? null;
+  const editingAnimation = animationOpen && animation && onAnimationChange ? animation : null;
+  const back = (label: string, onBack: () => void) => (
+    <Button
+      type="button"
+      color="alternative"
+      size="xs"
+      data-testid="interactions-back"
+      onClick={onBack}
+      className="tw:self-start tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
+    >
+      ‹ {label}
+    </Button>
+  );
 
   return (
     <Section
@@ -131,43 +148,55 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       id="inspector-section-interactions"
     >
       <div style={styles.container}>
-        {animation && onAnimationChange ? (
-          <ElementAnimationRow
-            animation={animation}
-            onChange={onAnimationChange}
-            onPreview={onAnimationPreview}
-            defaultOpen={animationJustAdded}
-          />
-        ) : null}
-        {/* Existing Interactions */}
-        {interactions.map((interaction) => (
-          <InteractionItem
-            key={interaction.id}
-            interaction={interaction}
-            isEditing={editingId === interaction.id}
-            onToggleEdit={() => handleToggleEdit(interaction.id)}
-            onUpdate={updateInteraction}
-            onRemove={removeInteraction}
-            onToggleEnabled={toggleEnabled}
-            onPreview={onPreview}
-          />
-        ))}
-
-        {!showAddPanel ? (
-          <Button
-            onClick={() => setShowAddPanel(true)}
-            color="alternative"
-            size="xs"
-            className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
-          >
-            + Add interaction
-          </Button>
+        {editing ? (
+          <>
+            {back(getTriggerInfo(editing.trigger).label, () => setEditingId(null))}
+            <InteractionEditor
+              interaction={editing}
+              onUpdate={updateInteraction}
+              onRemove={removeInteraction}
+              onToggleEnabled={toggleEnabled}
+              onPreview={onPreview}
+            />
+          </>
+        ) : editingAnimation && onAnimationChange ? (
+          <>
+            {back(animationTriggerLabel(editingAnimation), () => setAnimationOpen(false))}
+            <ElementAnimationEditor
+              animation={editingAnimation}
+              onChange={(next) => {
+                onAnimationChange(next);
+                if (!next) setAnimationOpen(false);
+              }}
+              onPreview={onAnimationPreview}
+            />
+          </>
         ) : (
-          <AddInteractionPanel
-            onAdd={addInteraction}
-            onClose={() => setShowAddPanel(false)}
-            onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
-          />
+          <>
+            {animation && onAnimationChange ? (
+              <ElementAnimationRow animation={animation} onOpen={() => setAnimationOpen(true)} />
+            ) : null}
+            {interactions.map((interaction) => (
+              <InteractionItem key={interaction.id} interaction={interaction} onOpen={() => setEditingId(interaction.id)} />
+            ))}
+
+            {!showAddPanel ? (
+              <Button
+                onClick={() => setShowAddPanel(true)}
+                color="alternative"
+                size="xs"
+                className="tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
+              >
+                + Add interaction
+              </Button>
+            ) : (
+              <AddInteractionPanel
+                onAdd={addInteraction}
+                onClose={() => setShowAddPanel(false)}
+                onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
+              />
+            )}
+          </>
         )}
       </div>
     </Section>

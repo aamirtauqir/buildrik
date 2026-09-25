@@ -17,6 +17,7 @@ import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MAX_RECENT } from "@/shared/constants/ui";
 import { EVENTS } from "@/shared/constants/events";
+import { announceInsertDrag } from "@/editor/canvas/insertDrag";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
 
@@ -181,14 +182,27 @@ export function useBuildTab(
     ls.saveBool(STORAGE_KEYS.BUILD_FAVS_INFORMED, true);
   }, []);
 
+  /* Board 4418:100890: the held row is announced for the canvas cue, the
+     footer readout and the drawer note; dragend (drop or Esc) ends it. */
+  const announceDrag = React.useCallback(
+    (label: string) => {
+      if (!composer) return;
+      announceInsertDrag(composer, label);
+      window.addEventListener("dragend", () => announceInsertDrag(composer, null), { once: true });
+    },
+    [composer],
+  );
+
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
     setBlockPayload(e, { id: el.blockId, label: el.name, category: el.catId });
     noteRecent(el.name);
-  }, [noteRecent]);
+    announceDrag(el.name);
+  }, [noteRecent, announceDrag]);
 
   const handleBlockDragStart: BlockDragStartFn = React.useCallback((e, block) => {
     setBlockPayload(e, { id: block.id, label: block.label, category: block.category });
-  }, []);
+    announceDrag(block.label);
+  }, [announceDrag]);
 
   const handleElClick: ElClickFn = React.useCallback(
     (el) => {

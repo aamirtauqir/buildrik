@@ -143,11 +143,11 @@ describe("DomainsScreen — 3397:32206, the strips and one card pair per domain"
     expect(row0).toHaveTextContent("A");
     expect(row0).toHaveTextContent("@");
     expect(row0).toHaveTextContent("76.76.21.21");
-    /* flowbite's Badge wraps its text in a span; the pill is the element carrying the tone. */
+    /* The pill is the element carrying the tone. */
     expect(within(row0).getByText("VERIFIED").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-success-tint)]");
     const row2 = screen.getByTestId("set-dom-dns-row-dom1-2");
     expect(row2).toHaveTextContent("_buildrick");
-    expect(within(row2).getByText("PENDING").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-warning-tint)]");
+    expect(within(row2).getByText("PENDING").closest("[data-status]")).toHaveClass("tw:bg-[var(--bk-yellow-100)]");
     expect(screen.getByTestId("set-dom-check-dom1")).toHaveTextContent("Check DNS");
     expect(d.list.query).toHaveBeenCalledWith({ siteId: "s1" });
   });

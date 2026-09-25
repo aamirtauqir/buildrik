@@ -1163,11 +1163,11 @@
       "state": "Saves · time-travel",
       "width": 360,
       "height": 776,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
-      "recipe": "history-saves-time-travel",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe history-saves-time-travel): 21 properties. BOARD won. The recipe opens the scrubber by clicking the Time-Travel button — precondition visible, not hidden in a fixture. Preview title 12/18, note 11/16, band actions to the board's 12/6 inset and --bk-border edge (flowbite xs was 1px/gray-300). The board labels the exit 'Exit (Esc)' and repeats it in the note; Escape did NOTHING (only Ctrl+Shift+T), so the scrubber now binds it — the copy is printed because it holds. OPEN, not this board's subject: .tt-drawer is still dark-theme residue rgba(20,20,31,.97); ink-muted and accent on it read 3.53 and 2.76.",
-      "verified": "drift-fixed"
+      "recipe": null,
+      "verifiedNote": "RETIRED 2026-09-25 (L1-V3, time-travel P0): v3 draws time-travel as a band on the CANVAS column (4418:74736 / 76095 / 76323); the History panel's 163:113 preview band and the bottom scrubber drawer are gone (TimeTravelHost).",
+      "verified": "unreachable"
     },
     {
       "nodeId": "433:2348",
@@ -8378,6 +8378,6 @@
       "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
     }
   ],
-  "coveredFloor": 187,
+  "coveredFloor": 186,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

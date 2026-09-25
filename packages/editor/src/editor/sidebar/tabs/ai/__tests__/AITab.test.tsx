@@ -76,7 +76,7 @@ describe("AITab — scope + composer wiring", () => {
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
     rerender(<AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
-    expect(container.querySelector(".bd-ai-scope-lock")).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="ai-scope"] [aria-label*="locked"], [data-testid="ai-scope"][aria-label*="locked"]')).toBeInTheDocument();
   });
 
   /* Decision #23 (E-8): plan / run is the only conversation model. An
@@ -293,14 +293,15 @@ describe("AITab — scope + composer wiring", () => {
   });
 });
 
-describe("AITab — decision #23 guard", () => {
-  it("multi-select gets the one-element guard and no run starts", () => {
+describe("AITab — multi-selection scope (board 6881:69981)", () => {
+  it("a multi-selection plans a run over the selected elements", () => {
     lastSubscribe.input = undefined;
     const a = { getId: () => "a", getType: () => "heading", getAttribute: () => undefined };
     const b = { getId: () => "b", getType: () => "text", getAttribute: () => undefined };
+    const byId: Record<string, unknown> = { a, b };
     const composer = {
       selection: { getAllSelected: () => [a, b] },
-      elements: {},
+      elements: { getElement: (id: string) => byId[id], getAllPages: () => [] },
       on: () => {},
       off: () => {},
       emit: () => {},
@@ -308,11 +309,14 @@ describe("AITab — decision #23 guard", () => {
     const { container } = renderWithToast(
       <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
+    expect(screen.getByTestId("ai-scope-note")).toHaveTextContent("This run targets the 2 selected elements only.");
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "make them blue" } });
     fireEvent.keyDown(ta, { key: "Enter" });
-    expect(screen.getByTestId("ai-multi-guard")).toHaveTextContent(/one element at a time/);
-    expect(lastSubscribe.input).toBeUndefined();
+    const input = lastSubscribe.input as { intent?: string; scope?: unknown } | undefined;
+    expect(input?.intent).toBe("plan");
+    const scope = input?.scope as { kind: string; elements: Array<{ id: string }> };
+    expect(scope.kind).toBe("page");
+    expect(scope.elements.map((e) => e.id)).toEqual(["a", "b"]);
   });
 });
-

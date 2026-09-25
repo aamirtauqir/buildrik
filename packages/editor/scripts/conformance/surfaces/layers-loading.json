@@ -80,6 +80,12 @@
    "name": "skeleton-bar",
    "testId": "layers-sk-bar",
    "spec": "layers-loading",
+   "nodeId": "775:4220"
+  },
+  {
+   "name": "skeleton-bar",
+   "testId": "layers-sk-bar",
+   "spec": "layers-loading",
    "nodeId": "775:4222"
   }
  ]

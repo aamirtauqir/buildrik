@@ -21,14 +21,15 @@ function renderBorder(props: Partial<React.ComponentProps<typeof BorderSection>>
 describe("BorderSection — basic controls", () => {
   it("shows the current border-width and writes edits with unit", () => {
     const { onChange, container } = renderBorder({ styles: { "border-width": "2px" } });
-    const widthInput = container.querySelector(".bdi-fld input") as HTMLInputElement;
+    /* The first field is the compact Radius row; Width follows it. */
+    const widthInput = container.querySelectorAll(".bdi-fld input")[1] as HTMLInputElement;
     expect(widthInput).toHaveValue("2");
     fireEvent.change(widthInput, { target: { value: "4" } });
     expect(onChange).toHaveBeenCalledWith("border-width", "4px");
   });
 
   it("changing the Style select writes border-style", () => {
-    const { onChange, container } = renderBorder();
+    const { onChange, container } = renderBorder({ advancedExpanded: true });
     const styleSelect = Array.from(container.querySelectorAll("select")).find((s) =>
       Array.from(s.options).some((o) => o.value === "dashed")
     ) as HTMLSelectElement;
@@ -37,8 +38,8 @@ describe("BorderSection — basic controls", () => {
   });
 
   it("typing a hex into the Color input writes border-color", () => {
-    const { onChange } = renderBorder();
-    const hexInput = screen.getByRole("textbox", { name: "Color value" });
+    const { onChange } = renderBorder({ advancedExpanded: true });
+    const hexInput = screen.getAllByRole("textbox", { name: "Color value" })[0];
     fireEvent.change(hexInput, { target: { value: "333333" } });
     expect(onChange).toHaveBeenCalledWith("border-color", "#333333");
   });
@@ -52,12 +53,22 @@ describe("BorderSection — basic controls", () => {
 });
 
 describe("BorderSection — advanced disclosure", () => {
-  it("hides individual sides + outline until advancedExpanded; badge shows 8", () => {
+  /* Board 7056:79008: a border-less element opens BORDER as one row, "Radius";
+     the stroke and per-corner radii join the advanced block (11). With a
+     border set, width/style/colour stay in view and the badge counts 8. */
+  it("with no border: only Radius shows; stroke + sides + outline behind More settings (11)", () => {
     renderBorder({ onAdvancedToggle: vi.fn() });
+    expect(screen.getByText("Radius")).toBeInTheDocument();
+    expect(screen.queryByText("Width")).not.toBeInTheDocument();
     expect(screen.queryByText("Individual Borders")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "More settings" })).toHaveTextContent("11");
+  });
+
+  it("with a border set: width/style/colour stay in view; badge 8", () => {
+    renderBorder({ onAdvancedToggle: vi.fn(), styles: { "border-width": "1px", "border-style": "solid" } });
+    expect(screen.getByText("Width")).toBeInTheDocument();
     expect(screen.queryByText("Outline")).not.toBeInTheDocument();
-    const toggle = screen.getByRole("button", { name: "More settings" });
-    expect(toggle).toHaveTextContent("8");
+    expect(screen.getByRole("button", { name: "More settings" })).toHaveTextContent("8");
   });
 
   it("individual side edit writes the border-<side> longhand", () => {

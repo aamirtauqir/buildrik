@@ -20,11 +20,12 @@ import { FIELD_TYPES, FIELD_TYPE_LABEL } from "./fieldTypes";
 
 const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
 const ROW_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
-/* 4418:164225 / :164230 — body copy is 13/20 ink, the dialog's own text size. */
-const NOTE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+/* 4418:164225 / :164230 — body copy is 14/20 ink, the dialog's own text size
+   (measured: "Existing records keep empty values until edited." is 315px). */
+const NOTE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const TYPE_ROW =
-  "tw:h-11 tw:w-full tw:justify-start tw:rounded-[6px] tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-normal " +
-  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0";
+  "tw:h-11 tw:w-full tw:justify-start tw:rounded-[6px] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[13px] tw:font-medium " +
+  "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0";
 
 const slugify = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const KEY_RE = /^[a-z][a-z0-9_-]*$/;
@@ -96,10 +97,12 @@ export function AddFieldDialog({
         testId="cms-add-field-clash"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setClash(null)} data-testid="cms-add-field-clash-cancel">
+            {/* 4418:164225 — two text buttons, no primary. */}
+            <Button variant="ghost" onClick={() => setClash(null)} data-testid="cms-add-field-clash-cancel">
               Cancel
             </Button>
             <Button
+              variant="ghost"
               onClick={() => {
                 setKey(suggestion);
                 setClash(null);
@@ -122,15 +125,16 @@ export function AddFieldDialog({
         open
         onClose={onClose}
         title={`Add field · ${collection.name}`}
-        subtitle="Choose the type of content this field will store."
         kind="form"
         testId="cms-add-field"
         footer={
-          <Button variant="secondary" onClick={onClose} data-testid="cms-add-field-cancel">
+          <Button variant="ghost" onClick={onClose} data-testid="cms-add-field-cancel">
             Cancel
           </Button>
         }
       >
+        {/* 4418:164208 draws the prompt as body copy (14 ink), not a muted subtitle. */}
+        <p className="tw:m-0 tw:mb-2">Choose the type of content this field will store.</p>
         <div className="tw:flex tw:flex-col" data-testid="cms-add-field-types">
           {FIELD_TYPES.map((t) => (
             <Button key={t} color="light" size="xs" className={TYPE_ROW} onClick={() => setType(t as CMSFieldType)} data-testid={`cms-add-field-type-${t}`}>
@@ -147,16 +151,16 @@ export function AddFieldDialog({
       open
       onClose={onClose}
       title={`Configure ${label} field`}
-      subtitle={`${collection.name} / ${label} field`}
       kind="form"
       dirty={nextName !== ""}
       testId="cms-add-field"
       footer={
         <>
-          <Button variant="secondary" className="tw:mr-auto" onClick={() => setType(null)} data-testid="cms-add-field-back">
+          {/* 4418:164230 — both ways out are text buttons, right-aligned beside Save. */}
+          <Button variant="ghost" onClick={() => setType(null)} data-testid="cms-add-field-back">
             Back to field types
           </Button>
-          <Button variant="secondary" onClick={onClose} data-testid="cms-add-field-cancel">
+          <Button variant="ghost" onClick={onClose} data-testid="cms-add-field-cancel">
             Cancel
           </Button>
           <Button disabled={!nextName || !nextKey || Boolean(keyError) || busy} onClick={() => void save()} data-testid="cms-add-field-save">
@@ -166,6 +170,7 @@ export function AddFieldDialog({
       }
     >
       <div className="tw:flex tw:flex-col tw:gap-2">
+        <p className="tw:m-0">{`${collection.name} / ${label} field`}</p>
         <div className={ROW}>
           <label className={ROW_LABEL} htmlFor="cms-add-field-name">Name</label>
           <TextInput

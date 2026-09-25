@@ -26,7 +26,7 @@ import { namePages } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
-  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_BTN_GHOST, LIBRARY_MODAL_BTN_SECONDARY,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "./libraryModal";
@@ -81,7 +81,7 @@ export function ApplyVersionModal({ open, name, uses, pages, applying, onClose, 
           </p>
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="apply-version-foot">
-          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} onClick={onClose} data-testid="apply-version-cancel">
+          <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} onClick={onClose} data-testid="apply-version-cancel">
             Cancel
           </Button>
           <Button

@@ -31,7 +31,21 @@ import { Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
-import { LoadCard, SET_BTN, SET_RESTORE_STRIP, SET_ROW, SET_ROW_LABEL, SaveErrorBanner, Screen, Section } from "../shared";
+import {
+  LoadCard,
+  SET_BTN,
+  SET_HEAD_BTN,
+  SET_RESTORE_STRIP,
+  SET_ROW,
+  SET_ROW_BTN,
+  SET_ROW_LABEL,
+  SET_TABLE,
+  SET_TD,
+  SET_TH,
+  SaveErrorBanner,
+  Screen,
+  Section,
+} from "../shared";
 import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
@@ -78,14 +92,6 @@ interface RepairCard extends RedirectRepair {
 }
 
 // ─── Chrome ──────────────────────────────────────────────────────────────────
-
-const TABLE = "tw:w-full tw:border-collapse tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const TH =
-  "tw:h-7 tw:border-b tw:border-[var(--bk-border)] tw:pr-4 tw:text-[length:var(--bk-text-11)] tw:font-medium " +
-  "tw:uppercase tw:leading-4 tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
-/* 40-high rows: the 32 Edit button plus 4 of air each side. */
-const TD = "tw:h-10 tw:pr-4 tw:align-middle";
-const TD_PATH = `${TD} tw:max-w-0 tw:truncate`;
 
 const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 const MUTED = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -192,7 +198,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
       return;
     }
     registerHeaderAction(
-      <Button type="button" size="xs" className={`${SET_BTN} tw:shrink-0`} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
+      <Button type="button" size="xs" className={SET_HEAD_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
         Add redirect
       </Button>,
     );
@@ -324,19 +330,19 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
             </Button>
           </div>
         ) : (
-          <table className={TABLE} id="rd-rules" aria-label="Redirects" data-testid="set-rd-table">
+          <table className={SET_TABLE} id="rd-rules" aria-label="Redirects" data-testid="set-rd-table">
             <thead>
               <tr>
-                <th scope="col" className={`${TH} tw:w-[24%]`}>
+                <th scope="col" className={`${SET_TH} tw:w-58`}>
                   From path
                 </th>
-                <th scope="col" className={TH}>
+                <th scope="col" className={`${SET_TH} tw:w-98`}>
                   To URL
                 </th>
-                <th scope="col" className={`${TH} tw:w-16`}>
+                <th scope="col" className={`${SET_TH} tw:w-23`}>
                   Type
                 </th>
-                <th scope="col" className={`${TH} tw:w-20 tw:pr-0`}>
+                <th scope="col" className={`${SET_TH} tw:pr-0`}>
                   <span className="tw:sr-only">Actions</span>
                 </th>
               </tr>
@@ -344,19 +350,19 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id} data-testid={`set-rd-row-${row.id}`}>
-                  <td className={`${TD_PATH} tw:font-medium`} title={row.fromPath}>
+                  <td className={`${SET_TD} tw:truncate`} title={row.fromPath}>
                     {row.fromPath}
                   </td>
-                  <td className={`${TD_PATH} tw:text-[var(--bk-ink-soft)]`} title={row.toUrl}>
+                  <td className={`${SET_TD} tw:truncate tw:text-[var(--bk-ink-soft)]`} title={row.toUrl}>
                     {row.toUrl}
                   </td>
-                  <td className={`${TD} tw:text-[var(--bk-ink-soft)]`}>{row.type}</td>
-                  <td className={`${TD} tw:pr-0`}>
+                  <td className={`${SET_TD} tw:text-[var(--bk-ink-soft)]`}>{row.type}</td>
+                  <td className={`${SET_TD} tw:pr-0`}>
                     <Button
                       type="button"
                       size="xs"
                       variant="secondary"
-                      className={SET_BTN}
+                      className={SET_ROW_BTN}
                       onClick={() => setDialog({ mode: "edit", row })}
                       aria-label={`Edit redirect from ${row.fromPath}`}
                       data-testid={`set-rd-edit-${row.id}`}
@@ -381,7 +387,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
             checked={suggest}
             onChange={setSuggest}
             aria-labelledby="rd-suggest-from-404s-label"
-            sizing="sm"
+            sizing="md"
             data-testid="set-rd-suggest-toggle"
           />
         </div>

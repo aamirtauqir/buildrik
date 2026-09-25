@@ -61,7 +61,12 @@ afterEach(() => {
 /* G1-052: the action is ON the row. Every test that used to walk the picker
    (board 184:2) now clicks the row's own button — the change is the v3 IA's,
    not a regression. */
+/* Board 6881:71292: the row's actions live in its ⋯. */
+async function openRowMenu(version: number) {
+  fireEvent.click(await screen.findByTestId(`publish-row-menu-${version}`));
+}
 async function pickVersion(version: number) {
+  await openRowMenu(version);
   fireEvent.click(await screen.findByTestId(`publish-republish-${version}`));
 }
 const CONFIRM_BUTTON = /^Republish v\d+$/;
@@ -72,7 +77,8 @@ describe("P6 republish role gating", () => {
   it("EDITOR sees republish disabled with the ask-an-admin reason", async () => {
     roleState.role = "EDITOR";
     renderIt();
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3 · live$/)).toBeInTheDocument();
+    await openRowMenu(2);
     const entry = screen.getByTestId("publish-republish-2");
     /* Decision #19: aria-disabled + tooltip, never `disabled` — the control
        stays focusable so the reason is reachable by keyboard (QA 2026-09-24). */
@@ -87,7 +93,8 @@ describe("P6 republish role gating", () => {
   it("ADMIN keeps republish enabled on rollbackable versions", async () => {
     roleState.role = "ADMIN";
     renderIt();
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3 · live$/)).toBeInTheDocument();
+    await openRowMenu(2);
     const entry = screen.getByTestId("publish-republish-2");
     expect(entry).toBeEnabled();
     expect(entry).not.toHaveAttribute("aria-disabled");
@@ -97,10 +104,10 @@ describe("P6 republish role gating", () => {
 describe("load states", () => {
   it("lists versions with a live badge on the latest and a ↩ marker on a rollback", async () => {
     renderIt();
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3 · live$/)).toBeInTheDocument();
     // /live/i now matches the banner AND the row chip — board 949:4474 says
     // both. Assert the row's chip specifically.
-    expect(screen.getByText("Live")).toBeInTheDocument(); // latest is the live one
+    expect(screen.getByText("v3 · live")).toBeInTheDocument(); // latest is the live one (4418:74024)
     expect(screen.getByText(/from v1/i)).toBeInTheDocument(); // v2 was a rollback
   });
 
@@ -111,7 +118,7 @@ describe("load states", () => {
     expect(screen.queryByText(/no published versions/i)).not.toBeInTheDocument();
     fetchPublishHistory.mockResolvedValue(ROWS);
     fireEvent.click(screen.getByRole("button", { name: /retry/i }));
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3 · live$/)).toBeInTheDocument();
   });
 
   it("shows an empty state when nothing has been published", async () => {
@@ -125,13 +132,15 @@ describe("republish", () => {
   it("the live version carries no Republish — its chip says why", async () => {
     // Republishing what is already serving is a deploy that changes nothing.
     renderIt();
-    await screen.findByText(/Version 3/i);
+    await screen.findByText(/^v3 · live$/);
+    await openRowMenu(3);
     expect(screen.queryByTestId("publish-republish-3")).toBeNull();
-    expect(screen.getByText("Live")).toBeInTheDocument();
+    expect(screen.getByText("v3 · live")).toBeInTheDocument();
   });
 
   it("a version whose snapshot is gone is disabled with the reason", async () => {
     renderIt();
+    await openRowMenu(1);
     const pruned = await screen.findByTestId("publish-republish-1");
     expect(pruned).toHaveAttribute("aria-disabled", "true");
     expect(pruned).not.toBeDisabled();
@@ -208,8 +217,8 @@ describe("republish", () => {
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "publishing", progress: 40 }} />);
-    expect(await screen.findByText(/Republishing…/i)).toBeInTheDocument();
-    expect(screen.getByText(/Publishing v2 as v4/i)).toBeInTheDocument();
+    expect(await screen.findByText("Republishing v2 as v4…")).toBeInTheDocument();
+    expect(screen.getByTestId("publish-rollback-caption")).toHaveTextContent("Publishing v2 as v4");
   });
 
   it("board 184:45 — the job completing says what is live and that the old version survives", async () => {
@@ -222,9 +231,9 @@ describe("republish", () => {
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "published", progress: 100 }} />);
 
-    expect(await screen.findByText("Republished")).toBeInTheDocument();
+    expect(await screen.findByText("Version republished")).toBeInTheDocument();
     expect(screen.getByText(/v4 is live — a re-publish of v2/i)).toBeInTheDocument();
-    expect(screen.getByText(/v3 is still in your history/i)).toBeInTheDocument();
+    expect(screen.getByText("v3 remains in History. Live v4 names v2 as its source.")).toBeInTheDocument();
   });
 
   it("a job that fails mid-publish reaches the failure modal too, not just a start-time throw", async () => {
@@ -273,9 +282,9 @@ describe("board 949:4474 — the banner and the closing rule", () => {
        network blip vouch for a site nobody checked. */
     fetchSitePublishState.mockRejectedValueOnce(new Error("offline"));
     renderIt();
-    expect(await screen.findByText(/^v3$/)).toBeInTheDocument();
+    // The banner and the row both read a bare "v3".
+    expect(await screen.findAllByText(/^v3$/)).toHaveLength(2);
     expect(screen.queryByText(/LIVE · v3/)).not.toBeInTheDocument();
-    expect(screen.getByText(/Version 3/i)).toBeInTheDocument();
   });
 
   it("hides the banner when the site is known not to be serving", async () => {
@@ -285,7 +294,7 @@ describe("board 949:4474 — the banner and the closing rule", () => {
        takes the banner away. */
     fetchSitePublishState.mockResolvedValueOnce({ publishedUrl: null });
     renderIt();
-    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3$/)).toBeInTheDocument();
     expect(screen.queryByText(/LIVE/)).not.toBeInTheDocument();
   });
 
@@ -307,7 +316,7 @@ describe("board 949:4474 — the banner and the closing rule", () => {
 describe("board 184:24 — the republish confirm names the versions", () => {
   const openConfirm = async () => {
     renderIt();
-    expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v2$/)).toBeInTheDocument();
     await pickVersion(2);
   };
 
@@ -324,12 +333,12 @@ describe("board 184:24 — the republish confirm names the versions", () => {
     ).toBeInTheDocument();
   });
 
-  it("carries the board's info block about the list only growing", async () => {
+  it("carries board 4418:73440's info block — the live version stays in history", async () => {
     await openConfirm();
     // Not a repeat of the sentence above it: that one is about the live
     // version, this one is about the LIST — which is what makes a rollback
     // safe to try at all.
-    expect(await screen.findByText("The publish list only ever grows.")).toBeInTheDocument();
+    expect(await screen.findByText("Your current published version remains in history.")).toBeInTheDocument();
     expect(screen.getByText("v4 will name v2 as its source.")).toBeInTheDocument();
   });
 
@@ -355,7 +364,7 @@ describe("board 184:24 — the republish confirm names the versions", () => {
 */
 describe("rollback outcome follows the JOB, not the site's standing state", () => {
   const start = async () => {
-    expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^v2$/)).toBeInTheDocument();
     await pickVersion(2);
     fireEvent.click(await screen.findByRole("button", { name: "Republish v2" }));
   };
@@ -367,7 +376,7 @@ describe("rollback outcome follows the JOB, not the site's standing state", () =
     await start();
 
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
-    expect(screen.queryByText("Republished")).toBeNull();
+    expect(screen.queryByText("Version republished")).toBeNull();
   });
 
   it("hands the server's job id up so the shell can poll it", async () => {
@@ -384,7 +393,7 @@ describe("rollback outcome follows the JOB, not the site's standing state", () =
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "published", progress: 100 }} />);
-    expect(await screen.findByText("Republished")).toBeInTheDocument();
+    expect(await screen.findByText("Version republished")).toBeInTheDocument();
   });
 });
 
@@ -393,8 +402,10 @@ describe("rollback outcome follows the JOB, not the site's standing state", () =
 describe("the row is the entry — no picker under the list", () => {
   it("offers Republish on every non-live row and nothing under the list", async () => {
     renderIt();
-    await screen.findByText(/Version 2/i);
+    await screen.findByText(/^v2$/);
+    await openRowMenu(2);
     expect(screen.getByTestId("publish-republish-2")).toBeInTheDocument();
+    await openRowMenu(1);
     expect(screen.getByTestId("publish-republish-1")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Roll back to a published version/ })).toBeNull();
     expect(screen.queryByRole("radio")).toBeNull();
@@ -414,23 +425,27 @@ describe("Compare — a door of the one Compare (B8)", () => {
      each row but the oldest hands the host the version before it and itself. */
   it("offers Compare on every row except the oldest, which has nothing before it", async () => {
     renderIt({ onCompare: vi.fn() });
-    await screen.findByText(/Version 3/i);
-    expect(screen.getByRole("button", { name: "Compare v2 to v3" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Compare v1 to v2" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Compare v0/ })).toBeNull();
+    await screen.findByText(/^v3 · live$/);
+    await openRowMenu(3);
+    expect(screen.getByRole("menuitem", { name: "Compare v2 to v3" })).toBeInTheDocument();
+    await openRowMenu(2);
+    expect(screen.getByRole("menuitem", { name: "Compare v1 to v2" })).toBeInTheDocument();
+    await openRowMenu(1);
+    expect(screen.queryByRole("menuitem", { name: /^Compare v/ })).toBeNull();
   });
 
   it("hands the host exactly those two versions", async () => {
     const onCompare = vi.fn();
     renderIt({ onCompare });
-    await screen.findByText(/Version 3/i);
-    fireEvent.click(screen.getByRole("button", { name: "Compare v2 to v3" }));
+    await screen.findByText(/^v3 · live$/);
+    await openRowMenu(3);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Compare v2 to v3" }));
     expect(onCompare).toHaveBeenCalledWith({ id: "j2", version: 2 }, { id: "j3", version: 3 });
   });
 
   it("offers no Compare where no host is wired", async () => {
     renderIt();
-    await screen.findByText(/Version 3/i);
-    expect(screen.queryByRole("button", { name: /^Compare v/ })).toBeNull();
+    await openRowMenu(3);
+    expect(screen.queryByRole("menuitem", { name: /^Compare v/ })).toBeNull();
   });
 });

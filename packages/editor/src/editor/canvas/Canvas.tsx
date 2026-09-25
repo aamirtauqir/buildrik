@@ -566,11 +566,26 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (!fw || fw <= vw) return;
       composer.setZoom(Math.max(10, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100)));
     }, [projectLoading, composer, device]);
+    /* Boards 4418:126653 / 4428:140088 draw Tablet and Mobile at their real
+       width — 768 / 375 at 100% — not at the desktop fit (61%), where the
+       mobile page shrank to 229px. Switching breakpoint re-fits: 100% when
+       the frame fits, else its width with the gutter. */
+    const lastDeviceRef = React.useRef(device);
+    React.useEffect(() => {
+      if (lastDeviceRef.current === device || !composer) return;
+      lastDeviceRef.current = device;
+      const frame = frameRef.current;
+      const viewport = scrollRef.current;
+      const fw = frame?.offsetWidth;
+      const vw = viewport?.clientWidth;
+      if (!fw || !vw) return;
+      composer.setZoom(Math.max(10, Math.min(100, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100))));
+    }, [composer, device]);
 
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
-    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer, selectedId, addToast });
+    const { handleToolbarDuplicate, handleToolbarDelete } = useCanvasToolbarActions({ composer });
 
     // Expose ref methods
     React.useImperativeHandle(ref, () => ({
@@ -678,6 +693,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const size = activeCustomWidth
       ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
       : DEVICE_SIZES[device];
+    const showWidthLabel = device !== "desktop" || activeCustomWidth !== null;
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
@@ -698,6 +714,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       >
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
+        {/* A column only when the width label is drawn under the page; on
+            desktop the wrapper is layout-transparent. */}
+        <div className={showWidthLabel ? "tw:flex tw:shrink-0 tw:flex-col tw:items-center" : "tw:contents"}>
         <div
           onDragOver={readOnly ? undefined : handleDragOver}
           onDragLeave={readOnly ? undefined : handleDragLeave}
@@ -846,6 +865,16 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
           {/* S5 shell state 6 — comment pins + click-to-pin + orphan recovery */}
           <CommentLayer composer={composer} canvasRef={canvasRef} />
+        </div>
+        {/* Boards 4418:126653 / 4428:140088: the preview width under the page. */}
+        {showWidthLabel ? (
+          <div
+            className="tw:pt-2 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="canvas-width-label"
+          >
+            {activeCustomWidth ?? parseInt(String(DEVICE_SIZES[device].width), 10)}px
+          </div>
+        ) : null}
         </div>
         </DeviceFramePreview>
         </div>

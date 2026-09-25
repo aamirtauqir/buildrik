@@ -15,6 +15,7 @@
  */
 
 import { EVENTS } from "@/shared/constants/events";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 
 const STORAGE_PREFIX = "buildrick-layers";
 
@@ -54,8 +55,6 @@ export function loadSetFromStorage(
   return new Set();
 }
 
-/** The element-data key that holds a layer's custom name. */
-export const LAYER_NAME_KEY = "layerName";
 
 /** A layer's custom name, or undefined — read from the element's own data. */
 export function getLayerName(el: { getCustomData(key: string): unknown } | null | undefined): string | undefined {

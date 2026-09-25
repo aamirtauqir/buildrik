@@ -34,10 +34,13 @@ describe("SECTION_REGISTRY — shouldRender gates", () => {
     expect(gate(ctx({ selectedElement: { type: "image" } }))).toBe(false);
   });
 
-  it("typography renders only for text-like elements", () => {
+  /* Board 7056:78382: a Section carries TYPOGRAPHY too — the type its text
+     inherits. Images and other leaves still do not. */
+  it("typography renders for text-like elements and containers", () => {
     const gate = SECTION_REGISTRY.typography.shouldRender!;
     expect(gate(ctx({ cssContext: { inspectorContext: { isTextLike: true } } }))).toBe(true);
-    expect(gate(ctx({ cssContext: { inspectorContext: { isTextLike: false } } }))).toBe(false);
+    expect(gate(ctx({ selectedElement: { type: "section" }, cssContext: { inspectorContext: { isTextLike: false } } }))).toBe(true);
+    expect(gate(ctx({ selectedElement: { type: "image" }, cssContext: { inspectorContext: { isTextLike: false } } }))).toBe(false);
   });
 
   it("universal sections (css-classes) declare no gate", () => {

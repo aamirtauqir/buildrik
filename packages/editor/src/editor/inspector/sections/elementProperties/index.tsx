@@ -23,7 +23,7 @@ import {
   getCurrentIconConfig,
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
-import { Button } from "@/editor/chrome-ui";
+import { Button, TextInput } from "@/editor/chrome-ui";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,
@@ -122,6 +122,65 @@ const IconPickerButton: React.FC<IconPickerButtonProps> = ({
 // MAIN COMPONENT
 // ============================================================================
 
+/** The shared attributes every element carries (config `default`); ID moves
+ *  to the "ID & class" row, title and tab index behind "Custom attributes". */
+const SHARED_PROPS = new Set(["id", "title", "tabindex"]);
+
+const MONO_FIELD =
+  "tw:[&_input]:[font-family:var(--bk-font-mono)] tw:[&_input]:text-[length:var(--bk-text-12)] tw:flex-1 tw:min-w-0";
+
+/** "ID & class [#hero] [.section]" — the element id and its classes as one
+ *  space-separated field (the CSS CLASSES section keeps the chip editor). */
+function IdClassRow({
+  elementId,
+  composer,
+  id,
+  onIdChange,
+}: {
+  elementId: string;
+  composer: Composer | null | undefined;
+  id: string;
+  onIdChange: (value: string) => void;
+}) {
+  const el = composer?.elements.getElement(elementId);
+  const classes = el?.getClasses?.().join(" ") ?? "";
+  const [classDraft, setClassDraft] = React.useState(classes);
+  React.useEffect(() => setClassDraft(classes), [classes]);
+  const commitClasses = () => {
+    if (!composer || !el) return;
+    const next = classDraft.split(/\s+/).map((c) => c.replace(/^\./, "")).filter(Boolean);
+    if (next.join(" ") === classes) return;
+    runTxn(composer, "element-classes-change", () => el.setClasses(next));
+  };
+  return (
+    <div className="bdi-row-ctrl" data-testid="advanced-id-class">
+      <label className="bdi-lb">ID &amp; class</label>
+      <div className="bdi-row-content tw:flex tw:gap-2">
+        <TextInput
+          sizing="sm"
+          className={MONO_FIELD}
+          aria-label="Element ID"
+          placeholder="#id"
+          value={id}
+          onChange={(e) => onIdChange(e.target.value.replace(/^#/, ""))}
+        />
+        <TextInput
+          sizing="sm"
+          className={MONO_FIELD}
+          aria-label="Element classes"
+          placeholder=".class"
+          value={classDraft}
+          onChange={(e) => setClassDraft(e.target.value)}
+          onBlur={commitClasses}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commitClasses();
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> = ({
   selectedElement,
   composer,
@@ -131,6 +190,7 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   onOpenIconPicker,
 }) => {
   const [attrs, setAttrs] = React.useState<Record<string, string>>({});
+  const [showCustom, setShowCustom] = React.useState(false);
 
   // Get properties for this element type
   const properties = React.useMemo(
@@ -308,21 +368,54 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
         />
       )}
 
-      {properties.map((prop) => (
-        <PropertyField
-          key={prop.id}
-          prop={prop}
-          value={attrs[prop.id] || ""}
-          onChange={handleChange}
-          selectedElement={selectedElement}
-        />
-      ))}
+      {/* Board 7063:78923: ADVANCED opens as "ID & class [#id] [.class]" and a
+          "Custom attributes" link. The element's own fields (alt, href,
+          placeholder …) stay in view; the shared ones (title, tab index) and
+          data-* attributes sit behind the link. */}
+      <IdClassRow elementId={selectedElement.id} composer={composer} id={attrs.id || ""} onIdChange={(v) => handleChange("id", v)} />
 
-      {/* Data Attributes */}
-      <div style={styles.dataAttributesSection}>
-        <div style={styles.sectionTitle}>Custom Data Attributes</div>
-        <DataAttributeEditor elementId={selectedElement.id} composer={composer} />
-      </div>
+      {properties
+        .filter((prop) => !SHARED_PROPS.has(prop.id))
+        .map((prop) => (
+          <PropertyField
+            key={prop.id}
+            prop={prop}
+            value={attrs[prop.id] || ""}
+            onChange={handleChange}
+            selectedElement={selectedElement}
+          />
+        ))}
+
+      {!showCustom ? (
+        <Button
+          type="button"
+          color="alternative"
+          size="xs"
+          data-testid="advanced-custom-attributes"
+          onClick={() => setShowCustom(true)}
+          className="tw:self-start tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-12)] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:hover:bg-transparent tw:hover:text-[var(--bk-ink)]"
+        >
+          Custom attributes
+        </Button>
+      ) : (
+        <>
+          {properties
+            .filter((prop) => SHARED_PROPS.has(prop.id) && prop.id !== "id")
+            .map((prop) => (
+              <PropertyField
+                key={prop.id}
+                prop={prop}
+                value={attrs[prop.id] || ""}
+                onChange={handleChange}
+                selectedElement={selectedElement}
+              />
+            ))}
+          <div style={styles.dataAttributesSection}>
+            <div style={styles.sectionTitle}>Custom Data Attributes</div>
+            <DataAttributeEditor elementId={selectedElement.id} composer={composer} />
+          </div>
+        </>
+      )}
     </Section>
   );
 };

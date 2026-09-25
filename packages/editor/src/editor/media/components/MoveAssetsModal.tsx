@@ -84,7 +84,8 @@ export function MoveAssetsModal({ open, items, folders, onClose, onMove }: MoveA
             ))}
           </div>
         </ModalBody>
-        <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-move-foot">
+        {/* 4418:149891 — this one keeps its grey Cancel at the left, under the folder list. */}
+        <div className={LIBRARY_MODAL_FOOT.replace("tw:justify-end", "tw:justify-start")} data-testid="mgr-move-foot">
           <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} data-testid="mgr-move-cancel" onClick={onClose}>
             Cancel
           </Button>

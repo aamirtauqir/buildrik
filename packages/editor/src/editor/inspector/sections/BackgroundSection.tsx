@@ -99,7 +99,10 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       tier={tier}
       id="inspector-section-background"
     >
-      {/* Background Type Selector — segmented */}
+      {/* Background Type Selector — segmented. Board 7056:78695 opens a
+          colour background as the one Fill row; the Color / Gradient / Image
+          choice waits behind More settings until a gradient or image is set. */}
+      {(bgType !== "color" || advancedExpanded) && (
       <div className="bdi-seg tw:mb-1.5">
         {(["color", "gradient", "image"] as const).map((type) => (
           <Button
@@ -113,6 +116,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           </Button>
         ))}
       </div>
+      )}
       {/* Color Background */}
       {bgType === "color" && (
         <div className="tw:relative">
@@ -124,6 +128,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             composer={composer}
           />
         </div>
+      )}
+      {bgType === "color" && onAdvancedToggle && (
+        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={2} />
       )}
       {/* Gradient Background */}
       {bgType === "gradient" && (

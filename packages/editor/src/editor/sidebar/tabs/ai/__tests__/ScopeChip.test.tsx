@@ -1,37 +1,50 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ScopeChip } from "../ScopeChip";
+import type { AIScope } from "../types";
+
+const hero: AIScope = { kind: "element", id: "el-1", label: "Hero section", name: "Hero" };
 
 describe("ScopeChip", () => {
   /* Board 170:2 words it "Scope: Hero section" — the word the boards use for
      what a run is allowed to touch. */
   it("leads with the word Scope, then the target", () => {
-    render(<ScopeChip scope={{ kind: "element", label: "Hero", id: "el-1" }} status="idle" />);
+    render(<ScopeChip scope={hero} status="idle" />);
     expect(screen.getByText(/^Scope:/)).toBeInTheDocument();
+    expect(screen.getByText("Hero section")).toBeInTheDocument();
   });
 
-  it("renders the element label for element scope", () => {
-    render(<ScopeChip scope={{ kind: "element", id: "el-1", label: "Hero" }} status="idle" />);
-    expect(screen.getByText("Hero")).toBeInTheDocument();
+  it.each<[AIScope, string]>([
+    [{ kind: "page" }, "Page"],
+    [{ kind: "multi", ids: ["a", "b", "c"] }, "3 selected elements"],
+    [{ kind: "similar", ids: ["a", "b", "c", "d"], noun: "sections" }, "All sections like this (4)"],
+    [{ kind: "site", pages: 3 }, "Whole site (3 pages)"],
+  ])("%#: names the scope as the boards do", (scope, text) => {
+    render(<ScopeChip scope={scope} status="idle" />);
+    expect(screen.getByText(text)).toBeInTheDocument();
   });
 
-  it("renders 'Whole page' for page scope", () => {
-    render(<ScopeChip scope={{ kind: "page" }} status="idle" />);
-    expect(screen.getByText(/Whole page/i)).toBeInTheDocument();
-  });
-
-  it("renders multi-count for multi scope", () => {
-    render(<ScopeChip scope={{ kind: "multi", count: 3 }} status="idle" />);
-    expect(screen.getByText(/3 selected/i)).toBeInTheDocument();
-  });
-
-  it("shows lock indicator when status='locked'", () => {
-    render(<ScopeChip scope={{ kind: "element", id: "el-1", label: "Hero" }} status="locked" />);
+  /* No board draws a lock glyph; the locked state is still announced. */
+  it("says the scope is locked while a run is live, without a glyph", () => {
+    render(<ScopeChip scope={hero} status="locked" />);
     expect(screen.getByLabelText(/scope locked/i)).toBeInTheDocument();
+    expect(screen.queryByText("🔒")).toBeNull();
   });
 
-  it("hides lock indicator when status='idle'", () => {
-    render(<ScopeChip scope={{ kind: "element", id: "el-1", label: "Hero" }} status="idle" />);
-    expect(screen.queryByLabelText(/scope locked/i)).not.toBeInTheDocument();
+  it("offers the wider scopes and reports the choice (boards 6891:73760 / 73974)", () => {
+    const onChoose = vi.fn();
+    const similar: AIScope = { kind: "similar", ids: ["a", "b"], noun: "sections" };
+    render(
+      <ScopeChip scope={hero} status="idle" options={() => [hero, similar, { kind: "page" }, { kind: "site", pages: 3 }]} onChoose={onChoose} />,
+    );
+    fireEvent.click(screen.getByTestId("ai-scope-trigger"));
+    expect(screen.getByTestId("ai-scope-option-site")).toHaveTextContent("Whole site (3 pages)");
+    fireEvent.click(screen.getByTestId("ai-scope-option-similar"));
+    expect(onChoose).toHaveBeenCalledWith(similar);
+  });
+
+  it("cannot be changed while locked", () => {
+    render(<ScopeChip scope={hero} status="locked" options={() => [hero]} onChoose={vi.fn()} />);
+    expect(screen.getByTestId("ai-scope-trigger")).toBeDisabled();
   });
 });

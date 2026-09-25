@@ -66,6 +66,13 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   } as const;
   const handleRadius = (corner: keyof typeof CORNER_PROP, value: string) =>
     onChange(radiusLinked ? "border-radius" : CORNER_PROP[corner], value);
+  /* Corners that differ (or were unlinked) keep the per-corner box in view. */
+  const radiusSplit = !radiusLinked || new Set([radii.tl, radii.tr, radii.br, radii.bl]).size > 1;
+  const hasStroke = Boolean(
+    (styles["border-width"] && parseFloat(styles["border-width"]) > 0) ||
+      (styles["border-style"] && styles["border-style"] !== "none") ||
+      styles["border"],
+  );
 
   // Preview: width + style, shown as indicator pill
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
@@ -78,6 +85,33 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
   return (
     <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
+      {/* Board 7056:79008: the open BORDER is one row, "Radius 8 px". The
+          stroke (width · style · colour) and per-corner radii sit behind
+          More settings until the element has a border or split corners. */}
+      {radiusSplit ? (
+        <div style={{ position: "relative" }}>
+          <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
+          <CornerRadiusInput
+            values={radii}
+            onChange={handleRadius}
+            linked={radiusLinked}
+            onLinkToggle={() => setRadiusLinked(!radiusLinked)}
+          />
+        </div>
+      ) : (
+        <div style={{ position: "relative" }}>
+          <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} />
+          <InputWithUnit
+            label="Radius"
+            value={radii.tl}
+            onChange={(v) => onChange("border-radius", v)}
+            units={["px", "%", "em", "rem"]}
+          />
+        </div>
+      )}
+
+      {(hasStroke || advancedExpanded) && (
+        <>
       {/* Border Width */}
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />
@@ -121,16 +155,19 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
         />
       </div>
 
-      {/* Corner radius — its own section until G2-154 folded it in. */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
-        <CornerRadiusInput
-          values={radii}
-          onChange={handleRadius}
-          linked={radiusLinked}
-          onLinkToggle={() => setRadiusLinked(!radiusLinked)}
-        />
-      </div>
+        </>
+      )}
+
+      {advancedExpanded && !radiusSplit && (
+        <div style={{ position: "relative" }}>
+          <CornerRadiusInput
+            values={radii}
+            onChange={handleRadius}
+            linked={radiusLinked}
+            onLinkToggle={() => setRadiusLinked(!radiusLinked)}
+          />
+        </div>
+      )}
 
       {/* ─── Advanced: Individual Borders + Outline (behind More settings) ─── */}
       {advancedExpanded && (
@@ -222,7 +259,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
-          advancedCount={8}
+          advancedCount={hasStroke ? 8 : 11}
         />
       )}
     </Section>

@@ -17,7 +17,9 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button, Textarea } from "@/editor/chrome-ui";
+import { Button, PanelBackRow, Textarea, useToast } from "@/editor/chrome-ui";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { WORKSPACE_LINKS } from "../../settings/constants";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { applyAiEdit } from "../../ai/applySetStyle";
@@ -73,13 +75,26 @@ const EXAMPLES = [
   "An FAQ accordion with common questions",
 ] as const;
 
-const ERROR_COPY: Record<AiErrorKind, string> = {
-  "not-configured": "AI drafting isn't configured yet. Connect a provider in Settings › AI.",
-  quota: "You've used today's AI generations. Try again tomorrow.",
-  other: "Couldn't generate that block. Try again, or describe it differently.",
+/* The three failure cards (6881:76122 no provider · 6881:75906 out of credit
+   · 6881:76336 service error). Each says nothing changed and offers a way on. */
+const ERROR_TITLE: Record<AiErrorKind, string> = {
+  "not-configured": "AI isn't available on this workspace.",
+  quota: "AI is out of credit.",
+  other: "The AI service didn't respond.",
 };
 
-type Phase = { kind: "idle" } | { kind: "thinking" } | { kind: "inserted"; edit: ServerEdit } | { kind: "error"; message: string };
+const errorBody = (kind: AiErrorKind, limit: number | null): string =>
+  kind === "not-configured"
+    ? "No AI provider is configured for this deployment. Ask your workspace owner to arrange setup with the deployment administrator. Nothing has changed on your site."
+    : kind === "quota"
+      ? `Nothing was changed. Daily limit reached${limit !== null && limit >= 0 ? ` (${limit})` : ""}. Resets at midnight UTC.`
+      : "Nothing changed. Your request timed out. Your prompt is still here; try again when the service is available.";
+
+const LINK = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline";
+const LINK_BTN =
+  "tw:h-auto tw:self-start tw:border-0 tw:bg-transparent tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline tw:focus:ring-0";
+
+type Phase = { kind: "idle" } | { kind: "thinking" } | { kind: "inserted"; edit: ServerEdit } | { kind: "error"; error: AiErrorKind };
 
 interface Props {
   composer: Composer;
@@ -98,17 +113,39 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
   const quota = useAiQuota(phase.kind);
   const quotaLabel = quota && quotaLeftLabel(quota, phase.kind === "idle" ? "generations" : undefined);
 
+  const { addToast } = useToast();
+  const rootChildIds = () => {
+    const rootId = composer.elements.getActivePage()?.root?.id;
+    const root = rootId ? composer.elements.getElement(rootId) : null;
+    return root?.getChildren().map((c) => c.getId()) ?? [];
+  };
+
   const run = async () => {
     const id = ++runId.current;
     setPhase({ kind: "thinking" });
+    const before = new Set(rootChildIds());
     try {
       const edit = await generate(composer, text.trim(), target);
       if (id !== runId.current) return;
-      setPhase(edit && edit.rows.length > 0 ? { kind: "inserted", edit } : { kind: "error", message: ERROR_COPY.other });
+      if (!edit || edit.rows.length === 0) {
+        setPhase({ kind: "error", error: "other" });
+        return;
+      }
+      // Board 6881:74045: the new section is what's selected afterwards.
+      const added = rootChildIds().find((c) => !before.has(c));
+      const addedEl = added ? composer.elements.getElement(added) : null;
+      if (addedEl) composer.selection.select(addedEl);
+      setPhase({ kind: "inserted", edit });
     } catch (e) {
       if (id !== runId.current) return;
-      setPhase({ kind: "error", message: ERROR_COPY[e instanceof AiRunError ? e.kind : "other"] });
+      setPhase({ kind: "error", error: e instanceof AiRunError ? e.kind : "other" });
     }
+  };
+
+  // Done (6881:74045): back to Add, and the insert stays one Undo away.
+  const done = () => {
+    addToast({ description: "Block added", action: { label: "Undo", onClick: () => composer.history.undo() } });
+    onBack();
   };
 
   // Stop: the result of the run in flight is ignored.
@@ -126,14 +163,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="generate-block">
-      <Button
-        color="light"
-        onClick={onBack}
-        data-testid="generate-back"
-        className="tw:h-9 tw:w-full tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
-      >
-        ‹&nbsp;&nbsp;Add
-      </Button>
+      <PanelBackRow label="Add" onClick={onBack} data-testid="generate-back" />
       <div className="tw:flex tw:items-center tw:h-11 tw:px-4 tw:shrink-0 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
         Generate a block
       </div>
@@ -146,6 +176,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
       </div>
 
       <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col">
+        {!(phase.kind === "error" && phase.error === "not-configured") && (
         <div className="tw:px-4 tw:py-2">
           <Textarea
             aria-label="Describe the block"
@@ -166,6 +197,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
             </div>
           )}
         </div>
+        )}
 
         {phase.kind === "idle" && (
           <>
@@ -227,7 +259,7 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
               <Button color="light" data-testid="generate-undo" onClick={undo} className="tw:h-8 tw:flex-1 tw:bg-white tw:text-[13px] tw:focus:ring-0">
                 Undo
               </Button>
-              <Button data-testid="generate-done" onClick={onBack} className="tw:h-8 tw:flex-1 tw:text-[13px] tw:focus:ring-0">
+              <Button data-testid="generate-done" onClick={done} className="tw:h-8 tw:flex-1 tw:text-[13px] tw:focus:ring-0">
                 Done
               </Button>
             </div>
@@ -235,10 +267,49 @@ export const GenerateBlockScreen: React.FC<Props> = ({ composer, onBack, generat
         )}
 
         {phase.kind === "error" && (
-          <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3" role="alert" data-testid="generate-error">
-            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]">{phase.message}</span>
-            <Button color="light" onClick={() => setPhase({ kind: "idle" })} className="tw:h-8 tw:w-[120px] tw:text-[13px] tw:focus:ring-0">
-              Try again
+          <div
+            role="alert"
+            data-testid="generate-error"
+            className={`tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3 ${
+              phase.error === "quota"
+                ? "tw:bg-[var(--bk-warning-tint)]"
+                : phase.error === "other"
+                  ? "tw:bg-[var(--bk-error-tint)]"
+                  : "tw:bg-[var(--bk-bg-subtle)]"
+            }`}
+          >
+            {phase.error === "not-configured" && (
+              <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">Your prompt: {text.trim()}</span>
+            )}
+            <span
+              className={
+                phase.error === "not-configured"
+                  ? "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  : "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
+              }
+            >
+              {ERROR_TITLE[phase.error]}
+            </span>
+            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+              {errorBody(phase.error, quota?.limit ?? null)}
+            </span>
+            {phase.error === "quota" && (
+              <a className={LINK} href={`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`} target="_blank" rel="noopener noreferrer">
+                Workspace billing ↗
+              </a>
+            )}
+            {phase.error === "not-configured" && (
+              <a className={LINK} href={`${DASHBOARD_URL}${WORKSPACE_LINKS.members}`} target="_blank" rel="noopener noreferrer">
+                View workspace owner ↗
+              </a>
+            )}
+            {phase.error === "other" && (
+              <Button color="light" className={LINK_BTN} onClick={() => void run()}>
+                Try again
+              </Button>
+            )}
+            <Button color="light" className={LINK_BTN} onClick={onBack}>
+              Continue by hand in Add
             </Button>
           </div>
         )}

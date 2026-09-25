@@ -303,6 +303,13 @@ export async function duplicateSite(siteId: string): Promise<{ id: string; name:
   return { id: copy.id, name: copy.name };
 }
 
+/** Delete a site (`sites.delete`, OWNER). The server checks the site's own
+ *  name as the confirmation, so the caller passes it once the user has typed
+ *  DELETE. Throws the server's message on refusal. */
+export async function deleteSite(siteId: string, siteName: string): Promise<void> {
+  await getClient().sites.delete.mutate({ id: siteId, confirmName: siteName });
+}
+
 /**
  * The dashboard's rows → the editor's ProjectData. Pure: no client, no module
  * state. `loadProject` feeds it the three tRPC reads; the `/share/<token>`

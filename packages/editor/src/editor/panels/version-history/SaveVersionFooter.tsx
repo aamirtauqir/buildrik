@@ -16,13 +16,20 @@ import { SaveVersionModal } from "./SaveVersionModal";
 
 export const SaveVersionFooter: React.FC<{ composer: Composer | null }> = ({ composer }) => {
   const [open, setOpen] = React.useState(false);
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   /* A failure rejects so the modal stays open with it. */
   const save = async (name: string) => {
     try {
       await composer?.versions?.createVersion(name, "");
-      addToast({ description: `Saved '${name}'`, tone: "success" });
+      /* Board 4418:165677 — a titled card: the name, then where it went,
+         closed by "Done". */
+      const id = addToast({
+        title: "Version saved",
+        description: `${name}\nYour current draft is saved as a named milestone. It is available in Saved versions.`,
+        tone: "success",
+        action: { label: "Done", onClick: () => removeToast(id) },
+      });
     } catch (err) {
       addToast({ description: "Save failed", tone: "error" });
       throw err;

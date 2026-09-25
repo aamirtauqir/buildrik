@@ -121,6 +121,15 @@ describe("useEditorEventListeners", () => {
     vi.useRealTimers();
   });
 
+  /* ⌘⇧V (board 7063:78846): the chord's event opens Add on its Paste HTML
+     dialog, whether or not Add is the open tab. */
+  it("UI_PASTE_HTML_REQUESTED switches to Add and asks for the Paste HTML dialog", () => {
+    mount(opts);
+    act(() => opts.composer._fire(EVENTS.UI_PASTE_HTML_REQUESTED));
+    expect(opts.composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+    expect(opts.composer.emit).toHaveBeenCalledWith(EVENTS.UI_INSERT_OPEN_PASTE_HTML, {});
+  });
+
   // 1) COMPONENT_CREATE_REQUESTED ---------------------------------------------
   describe("COMPONENT_CREATE_REQUESTED → modals.openCreateComponent", () => {
     it("opens create-component modal with payload elementId", () => {

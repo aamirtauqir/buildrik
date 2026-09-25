@@ -24,7 +24,7 @@
  */
 
 import * as React from "react";
-import { Badge, Button, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
@@ -33,6 +33,12 @@ import {
   LoadCard,
   SCREEN_INFO,
   SET_BTN,
+  SET_HEAD_BTN,
+  SET_TABLE,
+  SET_TD,
+  SET_TH,
+  pillClass,
+  type PillTone,
   SET_CARD,
   SET_EYEBROW,
   SET_RESTORE_STRIP,
@@ -82,45 +88,17 @@ const nth = (stem: string, i: number) => (i === 0 ? stem : `${stem}-${i}`);
 
 // ─── Status pill ─────────────────────────────────────────────────────────────
 
-const PILL =
-  "tw:inline-flex tw:h-5 tw:w-fit tw:items-center tw:rounded-full tw:border tw:px-2 tw:py-0 " +
-  "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:font-semibold tw:uppercase tw:tracking-[0.04em]";
-const PILL_TONE: Record<string, { color: string; className: string }> = {
-  VERIFIED: {
-    color: "success",
-    className: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
-  },
-  PENDING: {
-    color: "warning",
-    className: "tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
-  },
-  FAILED: {
-    color: "failure",
-    className: "tw:border-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
-  },
-};
-const PILL_OTHER = {
-  color: "gray",
-  className: "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]",
-};
+const PILL_TONE: Record<string, PillTone> = { VERIFIED: "success", PENDING: "warning", FAILED: "error" };
 
 const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ status, ...rest }) => {
-  const tone = PILL_TONE[status] ?? PILL_OTHER;
   return (
-    <Badge color={tone.color} className={`${PILL} ${tone.className}`} data-status={status} {...rest}>
+    <span className={pillClass(PILL_TONE[status] ?? "neutral")} data-status={status} {...rest}>
       {status}
-    </Badge>
+    </span>
   );
 };
 
 // ─── Row chrome ──────────────────────────────────────────────────────────────
-
-const TABLE = "tw:w-full tw:border-collapse tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const TH =
-  "tw:h-7 tw:border-b tw:border-[var(--bk-border)] tw:pr-4 tw:text-[length:var(--bk-text-11)] tw:font-medium " +
-  "tw:uppercase tw:leading-4 tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
-const TD = "tw:h-8 tw:pr-4 tw:align-middle";
-const TD_VALUE = `${TD} tw:max-w-0 tw:truncate tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)]`;
 
 const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
@@ -189,7 +167,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
       <Button
         type="button"
         size="xs"
-        className={`${SET_BTN} tw:shrink-0`}
+        className={SET_HEAD_BTN}
         disabled={!canManage}
         title={canManage ? undefined : ADMIN_REASON}
         onClick={() => setAddOpen(true)}
@@ -350,7 +328,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                   disabled={!canManage || isBusy("https", row.id)}
                   title={canManage ? undefined : ADMIN_REASON}
                   aria-labelledby={`${nth("dom-force-https", i)}-label`}
-                  sizing="sm"
+                  sizing="md"
                   data-testid={`set-dom-https-${row.id}`}
                 />
               </div>
@@ -373,19 +351,19 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
 
           <div data-testid={`set-dom-dns-${row.id}`}>
             <Section title="DNS records" anchor={nth("dns-records", i)}>
-              <table className={TABLE} id={nth("dom-dns-records", i)} aria-label={`DNS records for ${row.domain}`}>
+              <table className={SET_TABLE} id={nth("dom-dns-records", i)} aria-label={`DNS records for ${row.domain}`}>
                 <thead>
                   <tr>
-                    <th scope="col" className={`${TH} tw:w-16`}>
+                    <th scope="col" className={`${SET_TH} tw:w-14`}>
                       Type
                     </th>
-                    <th scope="col" className={`${TH} tw:w-32`}>
+                    <th scope="col" className={`${SET_TH} tw:w-26`}>
                       Name
                     </th>
-                    <th scope="col" className={TH}>
+                    <th scope="col" className={`${SET_TH} tw:w-62`}>
                       Value
                     </th>
-                    <th scope="col" className={`${TH} tw:w-28 tw:pr-0`}>
+                    <th scope="col" className={`${SET_TH} tw:pr-0`}>
                       Status
                     </th>
                   </tr>
@@ -393,19 +371,19 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                 <tbody>
                   {row.dnsRecords.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className={`${TD} tw:text-[var(--bk-ink-muted)]`}>
+                      <td colSpan={4} className={`${SET_TD} tw:text-[var(--bk-ink-muted)]`}>
                         No DNS records for this domain.
                       </td>
                     </tr>
                   ) : (
                     row.dnsRecords.map((rec, j) => (
                       <tr key={`${rec.type}-${rec.host}-${j}`} data-testid={`set-dom-dns-row-${row.id}-${j}`}>
-                        <td className={`${TD} tw:font-medium`}>{rec.type}</td>
-                        <td className={TD}>{rec.host}</td>
-                        <td className={TD_VALUE} title={rec.value}>
+                        <td className={SET_TD}>{rec.type}</td>
+                        <td className={`${SET_TD} tw:truncate`}>{rec.host}</td>
+                        <td className={`${SET_TD} tw:truncate tw:text-[var(--bk-ink-soft)]`} title={rec.value}>
                           {rec.value}
                         </td>
-                        <td className={`${TD} tw:pr-0`}>
+                        <td className={`${SET_TD} tw:pr-0`}>
                           <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
                         </td>
                       </tr>

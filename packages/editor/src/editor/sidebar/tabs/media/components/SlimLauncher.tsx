@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, SkeletonBlock, Tooltip } from "@/editor/chrome-ui";
+import { PanelFrame, Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, SkeletonBlock, Tooltip } from "@/editor/chrome-ui";
 import { Upload, Cloud, Shapes, Folder, ChevronDown, ChevronRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
@@ -135,6 +135,19 @@ function FilterRowLabel({ label, count }: { label: string; count?: number }) {
   );
 }
 
+/* Boards 7077:79171 / 7077:79204 / 7077:79223: the drawer's menus are 224
+   wide (206 of menu inside the popover's 8 + 1), rows 30, and their section
+   heads are plain 13/500 ink — not the 11px spaced caps of MenuLabel. */
+const DRAWER_MENU = "tw:w-[206px] tw:[&_[role^=menuitem]]:h-[30px]";
+
+function DrawerMenuHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="tw:flex tw:h-[30px] tw:items-center tw:px-2 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
+      {children}
+    </div>
+  );
+}
+
 export function SlimLauncher(props: SlimLauncherProps) {
   const [bulkMoveOpen, setBulkMoveOpen] = React.useState(false);
   const {
@@ -237,7 +250,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               </IconButton>
             }
           >
-            <Menu label="Assets options">
+            <Menu label="Assets options" className={DRAWER_MENU}>
               <MenuItem
                 data-testid="media-select-mode"
                 onClick={() => {
@@ -260,7 +273,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             size="xs"
             variant="secondary"
-            className="tw:h-10 tw:w-full tw:gap-1 tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]"
+            className="tw:h-10 tw:w-full tw:gap-1 tw:rounded-lg tw:border-transparent tw:bg-[var(--bk-gray-50)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]"
             data-testid="media-manage-assets"
             onClick={() => props.onOpenLibrary?.()}
           >
@@ -346,7 +359,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           FOLDER (scope + change…). It replaces the four type chips and the
           folder row (G3-005). TYPE is one-of, as drawn (a leading ✓ on the
           current row): picking a type replaces the filter, All clears it. */}
-      <div className="tw:flex tw:h-10 tw:items-center tw:px-4" data-testid="media-filter-row">
+      <div className="tw:flex tw:h-11 tw:items-center tw:px-4" data-testid="media-filter-row">
         <Popover
           open={filterOpen}
           onClose={() => { setFilterOpen(false); setFolderMenuOpen(false); }}
@@ -357,22 +370,22 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className="tw:h-7 tw:gap-1 tw:px-2 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]"
+              className="tw:h-7 tw:rounded-sm tw:border-[var(--bk-border)] tw:px-2 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink)]"
               aria-haspopup="menu"
               aria-expanded={filterOpen}
               aria-label={activeTypes.size || props.currentFolderId ? "Filter (active)" : "Filter"}
               data-testid="media-filter"
               onClick={() => setFilterOpen((v) => !v)}
             >
-              <span className="tw:flex tw:items-center tw:gap-1">
+              <span className="tw:flex tw:items-center">
                 Filter
                 <ChevronDown size={12} aria-hidden="true" />
               </span>
             </Button>
           }
         >
-          <Menu label="Filter" className="tw:w-[228px]">
-            <MenuLabel>Type</MenuLabel>
+          <Menu label="Filter" className={DRAWER_MENU}>
+            <DrawerMenuHeading>TYPE</DrawerMenuHeading>
             <MenuItem
               radio
               selected={activeTypes.size === 0}
@@ -406,7 +419,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               );
             })}
             <MenuSeparator />
-            <MenuLabel>Folder</MenuLabel>
+            <DrawerMenuHeading>FOLDER</DrawerMenuHeading>
             <MenuItem
               data-testid="media-folder-scope"
               aria-expanded={folderMenuOpen}
@@ -613,6 +626,11 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 // While selecting, a click selects — inserting an asset the
                 // user is in the middle of choosing among would be a surprise.
                 onClick={props.selectionMode && props.onToggleSelect ? props.onToggleSelect : props.onInsert}
+                onHoverSelect={
+                  !props.selectionMode && props.onToggleSelection && props.onToggleSelect
+                    ? (key) => { props.onToggleSelection?.(); props.onToggleSelect?.(key); }
+                    : undefined
+                }
                 onDoubleClick={
                   props.onOpenDetail ? (key) => {
                     const hit = filtered.find((i) => i.key === key);
@@ -791,12 +809,20 @@ export function SlimLauncher(props: SlimLauncherProps) {
           className={`tw:flex tw:items-center tw:gap-1 tw:px-4 tw:pt-2 tw:pb-10 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
         >
+            {/* Board 7077:79219 — the limits are a dark tooltip above Upload,
+                flush with its left edge (was a native title). */}
+            <Tooltip
+              content={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
+              placement="top-start"
+              arrow={false}
+              className="tw:rounded-sm tw:text-[11px] tw:font-normal tw:leading-4"
+              theme={{ target: "tw:min-w-0 tw:flex-1" }}
+            >
             <Button
               type="button"
               size="xs"
-              className={`tw:h-7 tw:min-w-0 tw:flex-1 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
+              className={`tw:h-7 tw:w-full tw:min-w-0 tw:gap-1.5 tw:rounded-md tw:border-0 tw:bg-[var(--bk-gray-900)] tw:text-[13px] tw:font-medium tw:text-white tw:enabled:hover:bg-[var(--bk-gray-800)] ${write.canWrite ? "" : "tw:opacity-55"}`}
               data-testid="media-upload-action"
-              title={write.canWrite ? `Images, videos and fonts · ${MEDIA_SIZE_LIMITS_LABEL}` : write.reason("upload")}
               aria-disabled={write.canWrite ? undefined : "true"}
               disabled={write.canWrite && props.storage.used >= props.storage.total}
               onClick={write.canWrite ? () => uploadInputRef.current?.click() : undefined}
@@ -806,6 +832,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 Upload
               </span>
             </Button>
+            </Tooltip>
           <Popover
             open={addFromOpen}
             onClose={() => setAddFromOpen(false)}
@@ -824,8 +851,8 @@ export function SlimLauncher(props: SlimLauncherProps) {
               </IconButton>
             }
           >
-            <Menu label="Add from" className="tw:w-[228px]">
-              <MenuLabel>Add from</MenuLabel>
+            <Menu label="Add from" className={DRAWER_MENU}>
+              <DrawerMenuHeading>ADD FROM</DrawerMenuHeading>
               <MenuItem
                 icon={<Cloud size={13} aria-hidden="true" />}
                 data-testid="media-stock-action"

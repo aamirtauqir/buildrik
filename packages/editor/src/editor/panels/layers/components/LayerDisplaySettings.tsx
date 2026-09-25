@@ -1,6 +1,6 @@
 /**
  * LayerDisplaySettings — v3 board 4418:84113's popover: the drawer's full
- * width under the header, "Display" (14/600 muted), then one 28px row per
+ * width under the header, "Display" (14/600 muted), then one 28-pixel row per
  * option — a 44×24 switch, then its 13px label. No close button; outside
  * click or Escape closes it. The fifth row, HTML tags, is owner decision 18.
  *

@@ -10,6 +10,8 @@ import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -18,8 +20,10 @@ export interface SectionBoundary {
   sectionId: string;
   /** Section index within the root's children */
   index: number;
+  /** The section's name as Layers shows it — the drop slot's "↑ {label} moves here". */
+  label: string;
   /** Bounding rect relative to the canvas */
-  rect: { top: number; left: number; width: number };
+  rect: { top: number; left: number; width: number; height: number };
 }
 
 export interface SectionDragState {
@@ -66,7 +70,9 @@ const sameBoundaries = (a: SectionBoundary[], b: SectionBoundary[]) =>
       x.index === b[i].index &&
       x.rect.top === b[i].rect.top &&
       x.rect.left === b[i].rect.left &&
-      x.rect.width === b[i].rect.width
+      x.rect.width === b[i].rect.width &&
+      x.rect.height === b[i].rect.height &&
+      x.label === b[i].label
   );
 
 // ─── Hook ───────────────────────────────────────────────────────────────────
@@ -117,10 +123,12 @@ export function useSectionReorder({
       newBoundaries.push({
         sectionId: id,
         index,
+        label: getLayerName(child) ?? elementTypeLabel(child.getType()),
         rect: {
           top: (elRect.top - canvasRect.top) / zs,
           left: (elRect.left - canvasRect.left) / zs,
           width: elRect.width / zs,
+          height: elRect.height / zs,
         },
       });
     });

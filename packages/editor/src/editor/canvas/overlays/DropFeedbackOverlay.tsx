@@ -11,6 +11,8 @@ import { Z_LAYERS } from "../../../shared/constants/canvas";
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
 import type { DropSlotRect, BreadcrumbItem } from "../hooks/useDragSession";
 import { getFriendlyName } from "../utils/elementInfo";
+import type { InsertDragTarget } from "../insertDrag";
+import { CANVAS_TAG_CLASS } from "./SelectionLabel";
 
 // Re-export for convenience (types come from useDragSession)
 export type { InvalidDropReason, DropSlotRect, BreadcrumbItem };
@@ -45,6 +47,8 @@ export interface DropFeedbackOverlayProps {
   dropSlotRect?: DropSlotRect | null;
   /** Breadcrumb path (kept for API compatibility but not rendered) */
   dropTargetPath?: BreadcrumbItem[];
+  /** An Add-drawer drag (board 4418:100890): what is held and where it lands. */
+  insert?: { label: string; target: InsertDragTarget | null } | null;
 }
 
 /** Professional color palette - using CSS variables from Canvas.css */
@@ -82,6 +86,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
   canvasRef,
   dropSlotRect,
   dropTargetPath = [],
+  insert = null,
 }) => {
   const [targetRect, setTargetRect] = React.useState<DOMRect | null>(null);
   const [canvasRect, setCanvasRect] = React.useState<DOMRect | null>(null);
@@ -137,6 +142,8 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
     ? (canvasRef.current?.querySelector(`[data-buildrick-id="${dropTargetId}"]`) as HTMLElement | null)
     : null;
   const targetName = getElementName(targetElement);
+  // Board 4418:100890: an Add row held over a container draws its own cue.
+  const insertInto = Boolean(insert && insert.target && isValidDrop && dropPosition === "inside");
 
   return (
     <>
@@ -162,9 +169,14 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
             zIndex: Z_LAYERS.dropFeedback,
           }}
         >
-          {/* Target highlight overlay - 2px solid border */}
+          {/* Target highlight — only when the drop goes INTO the target (or is
+              refused). An insert between elements (4428:139921) leaves the
+              neighbour unpainted: the line and its pill are the whole cue. */}
           {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
-          <div
+          {insertInto && relativeRect && insert?.target && (
+            <InsertIntoCue rect={relativeRect} slot={dropSlotRect ?? null} label={insert.label} target={insert.target} />
+          )}
+          {!insertInto && (dropPosition === "inside" || !isValidDrop) && <div
             className={`bd-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
             style={{
               position: "absolute",
@@ -182,7 +194,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
               zIndex: 1,
               pointerEvents: "none",
             }}
-          />
+          />}
 
           {/* Drop position indicator line - 2px solid */}
           {dropPosition && dropPosition !== "inside" && (
@@ -194,27 +206,28 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           )}
 
           {/* Animated drop slot preview - simple dashed outline */}
-          {dropSlotRect && isValidDrop && <DropSlotPreview slotRect={dropSlotRect} />}
+          {dropSlotRect && isValidDrop && dropPosition === "inside" && !insertInto && <DropSlotPreview slotRect={dropSlotRect} />}
 
-          {/* Destination label - for valid drops, shows where element will go */}
-          {isValidDrop && dropPosition && (
-            <DestinationLabel
-              targetRect={relativeRect}
-              targetName={targetName}
-              position={dropPosition}
-            />
+          {/* Destination: inside names the parent; between elements is the
+              board's "Drop here" pill on the line, naming the neighbour in its
+              tooltip (4428:139921). */}
+          {isValidDrop && dropPosition === "inside" && !insertInto && (
+            <DestinationLabel targetRect={relativeRect} targetName={targetName} position={dropPosition} />
+          )}
+          {isValidDrop && (dropPosition === "before" || dropPosition === "after") && (
+            <DropHerePill targetRect={relativeRect} targetName={targetName} position={dropPosition} />
           )}
 
           {/* Feedback badge - only for invalid drops, corner positioned */}
           {!isValidDrop && <DropFeedbackBadge targetRect={relativeRect} message={message} />}
 
           {/* Breadcrumb trail - shows element hierarchy during drag */}
-          {isValidDrop && dropTargetPath.length > 1 && (
+          {isValidDrop && dropPosition === "inside" && !insertInto && dropTargetPath.length > 1 && (
             <DropBreadcrumb path={dropTargetPath} targetRect={relativeRect} />
           )}
 
           {/* Depth badge - shows nesting level for deep drops */}
-          {isValidDrop && dropTargetPath.length > 2 && (
+          {isValidDrop && dropPosition === "inside" && !insertInto && dropTargetPath.length > 2 && (
             <DepthBadge depth={dropTargetPath.length} targetRect={relativeRect} />
           )}
         </div>
@@ -324,6 +337,68 @@ const DropFeedbackBadge: React.FC<DropFeedbackBadgeProps> = ({ targetRect, messa
     </div>
   );
 };
+
+/** Board 4418:100890 — an Add row over a container: accent outline, the
+ *  "Drop into · Hero › Content" tag above it, the 2px line where the element
+ *  will land, and under it "{El} — release to place inside {Container}" +
+ *  a neutral "Esc — cancel insert". */
+const InsertIntoCue: React.FC<{
+  rect: { left: number; top: number; width: number; height: number };
+  slot: DropSlotRect | null;
+  label: string;
+  target: InsertDragTarget;
+}> = ({ rect, slot, label, target }) => {
+  const crumb = target.path.split(" › ").slice(1).join(" › ") || target.into;
+  const line = slot
+    ? { left: slot.x, top: slot.y, width: slot.width }
+    : { left: rect.left + 16, top: rect.top + rect.height - 16, width: rect.width - 32 };
+  const CHIP = "tw:flex tw:items-center tw:h-6 tw:px-2 tw:rounded tw:text-[11px] tw:leading-4 tw:font-medium tw:whitespace-nowrap";
+  return (
+    <>
+      <div
+        className="tw:absolute tw:pointer-events-none tw:border-2 tw:border-[var(--bk-accent)] tw:box-border"
+        style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height, zIndex: Z_LAYERS.dropFeedback }}
+      />
+      <div data-testid="insert-drop-tag" className={`${CANVAS_TAG_CLASS} tw:absolute`} style={{ left: rect.left - 2, top: rect.top - 20, zIndex: Z_LAYERS.dropDestinationLabel }}>
+        Drop into · {crumb}
+      </div>
+      <div
+        data-testid="insert-drop-line"
+        className="tw:absolute tw:pointer-events-none tw:h-0.5 tw:bg-[var(--bk-accent)]"
+        style={{ left: line.left, top: line.top, width: line.width, zIndex: Z_LAYERS.dropPositionLine }}
+      />
+      <div className="tw:absolute tw:flex tw:gap-2 tw:pointer-events-none" style={{ left: line.left, top: line.top + 12, zIndex: Z_LAYERS.dropDestinationLabel }}>
+        <span data-testid="insert-drop-chip" className={`${CHIP} tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)]`}>
+          {label} — release to place inside {target.into}
+        </span>
+        <span data-testid="insert-drop-esc" className={`${CHIP} tw:bg-white tw:border tw:border-[var(--bk-border)] tw:text-[var(--bk-ink)]`}>
+          Esc — cancel insert
+        </span>
+      </div>
+    </>
+  );
+};
+
+/** "Drop here" — accent pill centred on the insertion line (4428:148651):
+ *  px 10, py 4, radius 8, 11/16 medium white. */
+const DropHerePill: React.FC<{
+  targetRect: { left: number; top: number; width: number; height: number };
+  targetName: string;
+  position: "before" | "after";
+}> = ({ targetRect, targetName, position }) => (
+  <div
+    data-testid="drop-here-pill"
+    title={`Insert ${position} ${targetName}`}
+    className="tw:absolute tw:-translate-x-1/2 tw:-translate-y-1/2 tw:rounded-lg tw:bg-[var(--bk-accent)] tw:px-2.5 tw:py-1 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent-on)] tw:whitespace-nowrap tw:pointer-events-none"
+    style={{
+      left: targetRect.left + targetRect.width / 2,
+      top: position === "before" ? targetRect.top : targetRect.top + targetRect.height,
+      zIndex: Z_LAYERS.dropDestinationLabel,
+    }}
+  >
+    Drop here
+  </div>
+);
 
 /** Destination label - Shows where element will be inserted for valid drops */
 interface DestinationLabelProps {

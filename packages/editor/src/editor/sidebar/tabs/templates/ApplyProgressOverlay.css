@@ -12,7 +12,7 @@
   position: fixed;
   inset: 0;
   /* The scrim every other overlay uses (OverlayMount). */
-  background: var(--bk-alpha-ink-40);
+  background: var(--bk-alpha-ink-50);
   display: flex;
   align-items: center;
   justify-content: center;

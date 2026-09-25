@@ -46,6 +46,9 @@ import { CommandPalette } from "./modals/CommandPalette";
 import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { totalPendingMirrors } from "@/services/syncRetryQueue";
 import { SiteMenu } from "./SiteMenu";
+import { PermissionsHost } from "./PermissionsHost";
+import { TimeTravelHost } from "./TimeTravelHost";
+import { SaveFailedBanner } from "./SaveFailedBanner";
 import "./header.css";
 
 /** Selected element minimal info */
@@ -506,13 +509,30 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       // The save did NOT durably land — switch to the honest dialog.
       setExitDialog({ kind: "risky", nav: exitDialog.nav });
     } else {
-      setExitDialog({
-        kind: "dirty",
-        error: "Save failed — your changes may be lost if you leave.",
-        nav: exitDialog.nav,
-      });
+      /* 4418:125678: a failed save-and-leave keeps you in the editor, says so
+         on the canvas, and offers the retry that still leaves. */
+      setLeaveAfterSave(() => exitDialog.nav);
+      setExitDialog(null);
     }
   }, [exitDialog, onSave, bypassAndNavigate]);
+
+  /* ── Save failed (4418:124938 / 125678) — the red card on the canvas. ── */
+  const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
+  const [saveBannerDismissed, setSaveBannerDismissed] = React.useState(false);
+  const [retrying, setRetrying] = React.useState(false);
+  React.useEffect(() => {
+    if (saveStatus !== "error") setSaveBannerDismissed(false);
+  }, [saveStatus]);
+  const retrySave = React.useCallback(async () => {
+    setRetrying(true);
+    const outcome = await onSave();
+    setRetrying(false);
+    if (outcome === "saved" && leaveAfterSave) {
+      const nav = leaveAfterSave;
+      setLeaveAfterSave(null);
+      bypassAndNavigate(nav);
+    }
+  }, [onSave, leaveAfterSave, bypassAndNavigate]);
 
   const leaveAnyway = React.useCallback(() => {
     if (!exitDialog) return;
@@ -866,6 +886,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           /* Every build door is withheld in view mode; the menu keeps only
              the toggle back out, which is the one thing an owner previewing
              their client's view still needs. */
+          <>
+          <PermissionsHost composer={composer ?? null} siteId={siteIdForMenu} siteName={siteName ?? "This site"} />
+          <TimeTravelHost composer={composer ?? null} />
           <SiteMenu
             onOpenSiteSettings={onOpenProjectSettings}
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
@@ -901,6 +924,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={canLeaveView ? toggleReadOnlyView : undefined}
           />
+          </>
         }
       />
 
@@ -917,6 +941,19 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       ) : null}
 
       {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} initialQuery={cmdQuery} /> : null}
+
+      {(saveStatus === "error" && !saveBannerDismissed) || leaveAfterSave ? (
+        <SaveFailedBanner
+          where={[siteName, crumbCtx ?? pageName].filter(Boolean).join(" · ")}
+          leaving={leaveAfterSave !== null}
+          busy={retrying}
+          onRetry={() => void retrySave()}
+          onKeepEditing={() => {
+            setLeaveAfterSave(null);
+            setSaveBannerDismissed(true);
+          }}
+        />
+      ) : null}
 
       {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
           dialog B ("risky": offline/conflict, a save here would be a lie). */}

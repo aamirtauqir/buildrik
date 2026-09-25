@@ -2,6 +2,7 @@
   "surface": "review-panel-older-round",
   "board": "Review panel · older-round (Figma 157:169)",
   "_note": [
+    "SUPERSEDED 2026-09-24 (L1-V3): round history is the 4418:172775 modal now; the strip's rows block and read-only note are gone, so their targets are dropped and the recipe waits on the modal's list.",
     "The second half of the chassis pair. 157:169 repeats 157:2's frame exactly",
     "— same header, same 44 progress block, same 28 sent line, same 40 Compare",
     "block, same dense secondary — so where the two agree they settle the panel.",
@@ -77,7 +78,7 @@
     },
     {
       "action": "waitFor",
-      "testId": "review-rounds-note"
+      "testId": "review-rounds-list"
     }
   ],
   "contrastScope": "[data-probe]",
@@ -95,34 +96,10 @@
       "nodeId": "I208:681;16:7"
     },
     {
-      "name": "rounds-rows",
-      "testId": "review-rounds-rows",
-      "spec": "review-panel-older-round",
-      "nodeId": "1753:8422"
-    },
-    {
       "name": "rounds-row",
       "testId": "review-round-6",
       "spec": "review-panel-older-round",
       "nodeId": "1753:8423"
-    },
-    {
-      "name": "rounds-note-block",
-      "testId": "review-rounds-note",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:219"
-    },
-    {
-      "name": "rounds-note-text",
-      "testId": "review-rounds-note-text",
-      "spec": "review-panel-older-round",
-      "nodeId": "157:220"
-    },
-    {
-      "name": "primary-label",
-      "testId": "review-primary",
-      "spec": "review-panel-older-round",
-      "nodeId": "I229:1104;9:19"
     }
   ]
 }

@@ -19,7 +19,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import type { NextMove } from "@/editor/shell/lifecycle";
-import { CheckIcon, CHECK_ROW, CHECK_LABEL, checkDetailClass } from "./PrePublishChecks";
+import { CheckIcon, CHECK_DOOR, CHECK_ROW, CHECK_LABEL, checkDetailClass } from "./PrePublishChecks";
 
 const LINK =
   "tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
@@ -72,7 +72,7 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
       <span className={checkDetailClass(blocks ? "fail" : "warning")} data-testid="publish-check-approval-detail">
         {nextMove.gate === "unchecked" ? "Couldn't check" : blocks ? "Blocks publish" : "Advisory"}
       </span>
-      <Button color="light" size="xs" className={LINK} onClick={() => openDoor(composer, nextMove.gate)}>
+      <Button color="light" size="xs" className={CHECK_DOOR} onClick={() => openDoor(composer, nextMove.gate)}>
         {nextMove.gate === "unchecked" ? "Retry ›" : "Open ›"}
       </Button>
     </div>
@@ -80,8 +80,9 @@ export const ApprovalCheckRow: React.FC<PublishGateProps> = ({ nextMove, compose
 };
 
 /**
- * The line under the footer CTA: the reason and the door. Board B3-10 draws
- * "Waiting on Sara · Open Review ›" beside a disabled "Publish to production".
+ * The reason and the door, stacked beside the footer CTA. Boards B3-10 /
+ * 4418:97118 draw "Waiting on Sara" over "Open Review ›" to the right of a
+ * disabled "Publish to production".
  */
 export const PublishGateBanner: React.FC<PublishGateProps> = ({ nextMove, composer }) => {
   if (!speaks(nextMove)) return null;
@@ -89,14 +90,16 @@ export const PublishGateBanner: React.FC<PublishGateProps> = ({ nextMove, compos
     nextMove.gate === "waiting" || nextMove.gate === "changes-requested" || nextMove.gate === "unchecked";
   return (
     <div
-      className="tw:flex tw:items-start tw:justify-between tw:gap-3"
+      className="tw:flex tw:min-w-0 tw:flex-col tw:items-start tw:gap-0.5"
       role={blocks ? "status" : undefined}
       data-testid="publish-gate-banner"
       data-gate={nextMove.gate}
     >
       <p
+        /* 4418:97118 prints the reason muted beside the CTA; the check row
+           above already carries the red. An advisory keeps its amber. */
         className={`tw:m-0 tw:min-w-0 tw:text-[11px] tw:leading-[1.4] ${
-          blocks ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-warning-text)]"
+          blocks ? "tw:text-[var(--bk-ink-muted)]" : "tw:text-[var(--bk-warning-text)]"
         }`}
         data-testid="publish-gate-reason"
       >
@@ -105,7 +108,7 @@ export const PublishGateBanner: React.FC<PublishGateProps> = ({ nextMove, compos
       <Button
         color="light"
         size="xs"
-        className={`${LINK} tw:text-[12px]`}
+        className={`${LINK} tw:h-auto tw:text-[12px]`}
         onClick={() => openDoor(composer, nextMove.gate)}
         data-testid="publish-gate-door"
       >

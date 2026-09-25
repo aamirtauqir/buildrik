@@ -6,7 +6,7 @@
 
 import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
-import type { ContextAction } from "../contextMenuRegistry";
+import type { ActionContext, ContextAction } from "../contextMenuRegistry";
 import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 /** Element types a block can stand in for — the section-shaped ones. */
@@ -16,6 +16,19 @@ const SECTION_TYPES = new Set([
 ]);
 /** Element types the CMS can feed a field into. */
 const BINDABLE_TYPES = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
+
+/** Save the selection (or `element` alone) as a component — the canvas ⋯ and
+ *  the inspector ⋯ open the same dialog. Bindings are extracted up-front so
+ *  the modal can count the DS pre-fills without re-walking the tree. */
+export function requestSaveAsComponent(composer: ActionContext["composer"], elementId: string): void {
+  const selectedIds = composer.selection?.getSelectedIds?.() ?? [];
+  const selectionIds = selectedIds.length > 0 ? selectedIds : [elementId];
+  const extractedBindings = composer.designSystem.tokenBindingResolver.resolveForElements(
+    selectionIds,
+    composer.elements.getAllElements(),
+  );
+  composer.emit(EVENTS.COMPONENT_SAVE_AS_REQUESTED, { selectionIds, extractedBindings });
+}
 
 export const standaloneActions: ContextAction[] = [
   // ── v3 IA (docs/plans/2026-09-14-editor-v3-ia.md Q8): the features a designer
@@ -75,22 +88,8 @@ export const standaloneActions: ContextAction[] = [
     icon: "package",
     group: "standalone",
     isVisible: ({ isRoot }) => !isRoot,
-    handler: ({ composer, element }) => {
-      // Selection-aware: include all multi-selected ids when present, fall
-      // back to the right-clicked element. Bindings are extracted up-front
-      // so the modal can render the "Pre-fill bindings from DS" hint with
-      // an accurate count without re-walking the element tree.
-      const selectedIds = composer.selection?.getSelectedIds?.() ?? [];
-      const selectionIds = selectedIds.length > 0 ? selectedIds : [element.getId()];
-      const extractedBindings = composer.designSystem.tokenBindingResolver.resolveForElements(
-        selectionIds,
-        composer.elements.getAllElements(),
-      );
-      composer.emit(EVENTS.COMPONENT_SAVE_AS_REQUESTED, {
-        selectionIds,
-        extractedBindings,
-      });
-    },
+    // Selection-aware: all multi-selected ids when present, else this element.
+    handler: ({ composer, element }) => requestSaveAsComponent(composer, element.getId()),
   },
   // ── Group / Ungroup ──────────────────────────────────────────────────────────
   {

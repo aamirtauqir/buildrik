@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 /**
  * Client sign-off — the token-authenticated half of the review loop, and the
@@ -308,4 +309,45 @@ export async function resolveReviewByToken(
     select: { id: true, status: true, resolvedAt: true, siteId: true },
   });
   return resolved;
+}
+
+/**
+ * "Request a new link" — the dead-link page's primary (boards 4418:121971 →
+ * 4418:122159). Tells the workspace owner that the client holding a revoked
+ * or expired link wants a fresh one.
+ *
+ * The ONE function in this file that takes a DEAD token, and on purpose:
+ * a dead link is exactly what the client holds. It still honours the file's
+ * invariant — the token is the only input, so nobody can name another site —
+ * and it grants nothing: no data comes back beyond what the dead-link page
+ * already shows (agency, round), and the only effect is one in-app
+ * notification to the owner. A live link has nothing to request
+ * (INVALID_TOKEN, same as a token that never existed).
+ */
+export async function requestNewReviewLink(token: string) {
+  const review = await prisma.reviewRequest.findUnique({
+    where: { token },
+    select: {
+      siteId: true,
+      createdAt: true,
+      revokedAt: true,
+      expiresAt: true,
+      invitedEmail: true,
+      reviewer: { select: { name: true } },
+      site: { select: { name: true, workspaceId: true, workspace: { select: { name: true } } } },
+    },
+  });
+  const dead = review && (review.revokedAt || (review.expiresAt && review.expiresAt < new Date()));
+  if (!review || !dead) throw new ClientReviewError("INVALID_TOKEN", "This review link is not valid.");
+  const who = review.reviewer?.name ?? review.invitedEmail ?? "Your client";
+  await notifyWorkspaceOwner(
+    review.site.workspaceId,
+    "REVIEW_LINK_REQUESTED",
+    `${who} asked for a new review link for ${review.site.name}.`,
+    `/edit/${review.siteId}`,
+  );
+  return {
+    agencyName: review.site.workspace?.name ?? null,
+    roundNumber: await roundNumberOf(review.siteId, review.createdAt),
+  };
 }

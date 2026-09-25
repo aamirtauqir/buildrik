@@ -52,7 +52,7 @@ const FILL_STEP = "tw:bg-[var(--bk-accent)]";
 const FILL_DONE = "tw:bg-[var(--bk-success-text)]";
 
 const SCRIM =
-  "tw:fixed tw:inset-0 tw:cursor-pointer tw:bg-[var(--bk-alpha-ink-40)] tw:[z-index:10000]";
+  "tw:fixed tw:inset-0 tw:cursor-pointer tw:bg-[var(--bk-alpha-ink-50)] tw:[z-index:10000]";
 const CARD =
   "tw:fixed tw:top-1/2 tw:left-1/2 tw:-translate-x-1/2 tw:-translate-y-1/2 tw:[z-index:10001] " +
   "tw:w-[380px] tw:max-w-[calc(100vw-48px)] tw:overflow-hidden tw:flex tw:flex-col " +

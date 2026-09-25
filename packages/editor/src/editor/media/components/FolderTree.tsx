@@ -412,9 +412,9 @@ export function FolderTree({
         />
 
         {/* User folders (nested tree) */}
-        {/* Board 1205:4849 / 1205:4853 draw user folders inset 16, one level
-            under `🏠 All assets` — they hang off it, they are not its peers. */}
-        {renderFolderTree(null, 1)}
+        {/* 4418:58292 draws the top-level folders flush with `🏠 All assets`
+            (displacing 1205:4849's 16 inset); a nested folder still steps in. */}
+        {renderFolderTree(null, 0)}
 
         {/* Clone 3700:20347 — `row/＋ New folder` is a row IN the list, right
             after the last folder, and it opens the Create folder OVERLAY. It

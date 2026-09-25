@@ -312,7 +312,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               aria-labelledby="enable-google-analytics-label"
-              sizing="sm"
+              sizing="md"
               data-testid="set-an-ga-enable"
             />
           </div>
@@ -386,7 +386,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               aria-labelledby="enable-google-tag-manager-label"
-              sizing="sm"
+              sizing="md"
               data-testid="set-an-gtm-enable"
             />
           </div>
@@ -426,7 +426,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               aria-labelledby="enable-meta-pixel-label"
-              sizing="sm"
+              sizing="md"
               data-testid="set-an-pixel-enable"
             />
           </div>
@@ -466,7 +466,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               aria-labelledby="enable-microsoft-clarity-label"
-              sizing="sm"
+              sizing="md"
               data-testid="set-an-clarity-enable"
             />
           </div>

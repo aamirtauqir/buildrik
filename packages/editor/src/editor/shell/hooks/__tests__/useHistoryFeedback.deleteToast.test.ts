@@ -23,7 +23,7 @@ import { useHistoryFeedback } from "../useHistoryFeedback";
 
 type Handler = (...a: unknown[]) => void;
 
-function makeComposer(selected: string[], elements: Record<string, { type: string; children: number }>) {
+function makeComposer(selected: string[], elements: Record<string, { type: string; children: number; layerName?: string }>) {
   const handlers: Record<string, Handler[]> = {};
   const live = new Set(Object.keys(elements));
   return {
@@ -38,7 +38,11 @@ function makeComposer(selected: string[], elements: Record<string, { type: strin
       getElement: (id: string) => {
         const e = elements[id];
         return e && live.has(id)
-          ? { getType: () => e.type, getChildren: () => Array(e.children).fill(null) }
+          ? {
+              getType: () => e.type,
+              getChildren: () => Array(e.children).fill(null),
+              getCustomData: (k: string) => (k === "layerName" ? e.layerName : undefined),
+            }
           : null;
       },
     },
@@ -66,14 +70,16 @@ describe("a keyboard delete announces itself", () => {
     expect(toasts[0].action?.label).toBe("Undo");
   });
 
-  it("counts the children it took with it — the toolbar's wording", () => {
-    const toasts = run(makeComposer(["a"], { a: { type: "container", children: 3 } }));
-    expect(toasts[0].description).toBe("Container (3 children) deleted");
+  /* Board 5905:139383: "Hero deleted · Undo" — the layer's name, no child
+     count (the old "(1 child)" wording is gone with the toolbar's own toast). */
+  it("names a named layer by its name, with no child count", () => {
+    const toasts = run(makeComposer(["a"], { a: { type: "section", children: 1, layerName: "Hero" } }));
+    expect(toasts[0].description).toBe("Hero deleted");
   });
 
-  it("says child, not children, for one", () => {
-    const toasts = run(makeComposer(["a"], { a: { type: "container", children: 1 } }));
-    expect(toasts[0].description).toBe("Container (1 child) deleted");
+  it("an unnamed layer reads its type label, children or not", () => {
+    const toasts = run(makeComposer(["a"], { a: { type: "container", children: 3 } }));
+    expect(toasts[0].description).toBe("Container deleted");
   });
 
   it("counts a multi-selection instead of naming one of them", () => {

@@ -150,3 +150,21 @@ describe("AssetCell — click vs double-click", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
+
+/* Board 7084:78402 — hovering a card shows a check in the thumb's corner;
+   clicking it starts selection with that card, and never inserts. */
+describe("AssetCell — hover select (7084:78402)", () => {
+  it("the corner check selects the card without inserting it", () => {
+    const onClick = vi.fn();
+    const onHoverSelect = vi.fn();
+    render(<AssetCell item={imgItem} onClick={onClick} onHoverSelect={onHoverSelect} />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select hero.jpg" }));
+    expect(onHoverSelect).toHaveBeenCalledWith("img1");
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("is not offered while already selecting", () => {
+    render(<AssetCell item={imgItem} onClick={vi.fn()} onHoverSelect={vi.fn()} selectable />);
+    expect(screen.queryByTestId("media-card-hover-select")).toBeNull();
+  });
+});

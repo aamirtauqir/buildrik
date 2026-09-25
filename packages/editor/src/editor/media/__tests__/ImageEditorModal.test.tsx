@@ -130,7 +130,7 @@ describe("Clone 3397:39917 · Edit image — head, tabs, preview, foot", () => {
   it("opens on the tab the host asks for (the library's Optimize door), with the focus ring on THAT tab", () => {
     mount({ initialTab: "optimise" });
     expect(tab("optimise")).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByTestId("image-editor-format-webp")).toBeInTheDocument();
+    expect(screen.getByTestId("image-editor-format")).toBeInTheDocument();
     /* Walked live 2026-09-14: the trap focused the first button — Crop —
        while Optimise was selected. Roving tabindex + the trap skipping -1. */
     expect(tab("optimise")).toHaveFocus();
@@ -171,12 +171,12 @@ describe("Clone 3397:39917 · Edit image — head, tabs, preview, foot", () => {
     fireEvent.click(tab("adjust"));
     fireEvent.click(screen.getByTestId("image-editor-preset-vibrant"));
     fireEvent.click(tab("optimise"));
-    fireEvent.click(screen.getByTestId("image-editor-format-png"));
+    fireEvent.change(screen.getByTestId("image-editor-format"), { target: { value: "png" } });
     expect(status()).toHaveTextContent("1600 × 1200 · 1:1 · PNG");
     fireEvent.click(screen.getByTestId("image-editor-reset"));
     expect(status()).toHaveTextContent("1600 × 1200 · Free · WebP");
     expect(screen.getByTestId("cropper").style.filter).toBe("none");
-    expect(screen.getByTestId("image-editor-format-webp")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("image-editor-format")).toHaveValue("webp");
   });
 });
 
@@ -384,18 +384,18 @@ describe("Clone 3695:43403 · Resize", () => {
 });
 
 describe("Clone 3695:43480 · Optimise", () => {
-  it("Format chips WebP · JPEG · PNG feed the status and the save; Quality reads 85", () => {
+  it("4418:149547 — Format (WebP · JPEG · PNG) and Quality are fields that feed the status and the save; Quality reads 85", () => {
     mount();
     fireEvent.click(tab("optimise"));
-    const chips = ["webp", "jpeg", "png"].map((id) => screen.getByTestId(`image-editor-format-${id}`));
-    expect(chips.map((c) => c.textContent)).toEqual(["WebP", "JPEG", "PNG"]);
-    expect(chips[0]).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("image-editor-quality-value")).toHaveTextContent("85");
-    fireEvent.click(chips[1]);
-    expect(chips[1]).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("image-editor-optimise-heading")).toHaveTextContent("Optimise image");
+    const format = screen.getByTestId("image-editor-format") as HTMLSelectElement;
+    expect([...format.options].map((o) => o.textContent)).toEqual(["WebP", "JPEG", "PNG"]);
+    expect(format).toHaveValue("webp");
+    expect(screen.getByTestId("image-editor-quality")).toHaveValue(85);
+    fireEvent.change(format, { target: { value: "jpeg" } });
     expect(status()).toHaveTextContent("1600 × 1200 · Free · JPEG");
-    fireEvent.change(slider("image-editor-quality"), { target: { value: "60" } });
-    expect(screen.getByTestId("image-editor-quality-value")).toHaveTextContent("60");
+    fireEvent.change(screen.getByTestId("image-editor-quality"), { target: { value: "60" } });
+    expect(screen.getByTestId("image-editor-quality")).toHaveValue(60);
   });
 
   it("the box reads Original · <size> and Estimated · <size> (<-N%>), green when smaller, with the note", async () => {
@@ -407,15 +407,15 @@ describe("Clone 3695:43480 · Optimise", () => {
     );
     expect(screen.getByTestId("image-editor-estimate-result")).toHaveAttribute("data-smaller", "true");
     expect(screen.getByTestId("image-editor-estimate-note")).toHaveTextContent(
-      "File size is an estimate until the version is saved.",
+      "WebP, JPEG and PNG are supported. File size is an estimate until the version is saved.",
     );
   });
 
   it("the estimate encodes at the chosen format and quality", async () => {
     mount();
     fireEvent.click(tab("optimise"));
-    fireEvent.click(screen.getByTestId("image-editor-format-jpeg"));
-    fireEvent.change(slider("image-editor-quality"), { target: { value: "40" } });
+    fireEvent.change(screen.getByTestId("image-editor-format"), { target: { value: "jpeg" } });
+    fireEvent.change(screen.getByTestId("image-editor-quality"), { target: { value: "40" } });
     await waitFor(() => {
       const calls = (HTMLCanvasElement.prototype.toDataURL as unknown as ReturnType<typeof vi.fn>).mock.calls;
       expect(calls.at(-1)).toEqual(["image/jpeg", 0.4]);

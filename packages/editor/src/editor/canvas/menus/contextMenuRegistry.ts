@@ -1,7 +1,8 @@
 import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 /**
  * Context Menu Registry
- * Simplified context menu with 4 main groups and nested submenus
+ * The element menu (right-click and the toolbar's ⋯ More): ordered groups,
+ * a rule between each, submenus for Arrange / Style / Structure
  * @license BSD-3-Clause
  */
 
@@ -43,36 +44,40 @@ export type ContextAction = {
   handler?: (ctx: ActionContext) => void;
 };
 
-// Main menu items (top-level with submenus)
-const mainMenuItems: ContextAction[] = [
+const pick = (list: ContextAction[], id: string, group: string): ContextAction[] =>
+  list.filter((a) => a.id === id).map((a) => ({ ...a, group }));
+const pickStandalone = (id: string, group: string) => pick(standaloneActions, id, group);
+
+/* Board 4428:43928 (Canvas · selected · ⋯ More): four groups split by rules —
+   ✦ Improve with AI · Duplicate · Delete | Arrange › Style › Structure › |
+   Lock · Group · Bind to CMS field… | Add interaction. The old menu was
+   Edit › Insert › Layout › Quick Style › then a flat tail. Nothing is
+   dropped: Copy / Cut / Paste, Wrap / Unwrap, Replace with block… and Save
+   as component sit under Structure; Ungroup / Unlock take their pair's slot. */
+const menuItems: ContextAction[] = [
+  ...pickStandalone("improve-with-ai", "top"),
+  ...pick(editSubmenu, "duplicate", "top"),
+  ...pick(editSubmenu, "delete", "top"),
+  { id: "layout-group", label: "Arrange", icon: "layout", group: "sub", submenu: layoutSubmenu },
+  { id: "style-group", label: "Style", icon: "palette", group: "sub", submenu: quickStyleSubmenu },
   {
-    id: "edit-group",
-    label: "Edit",
-    icon: "edit",
-    group: "main",
-    submenu: editSubmenu,
+    id: "structure-group",
+    label: "Structure",
+    icon: "box",
+    group: "sub",
+    submenu: [
+      ...insertSubmenu,
+      ...editSubmenu.filter((a) => a.id === "copy" || a.id === "cut" || a.id === "paste"),
+      ...pickStandalone("replace-with-block", "Structure"),
+      ...pickStandalone("save-as-component", "Structure"),
+    ],
   },
-  {
-    id: "insert-group",
-    label: "Insert",
-    icon: "plus",
-    group: "main",
-    submenu: insertSubmenu,
-  },
-  {
-    id: "layout-group",
-    label: "Layout",
-    icon: "layout",
-    group: "main",
-    submenu: layoutSubmenu,
-  },
-  {
-    id: "style-group",
-    label: "Quick Style",
-    icon: "palette",
-    group: "main",
-    submenu: quickStyleSubmenu,
-  },
+  ...pickStandalone("lock-element", "state"),
+  ...pickStandalone("unlock-element", "state"),
+  ...pickStandalone("group-elements", "state"),
+  ...pickStandalone("ungroup-elements", "state"),
+  ...pickStandalone("bind-to-cms", "state"),
+  ...pickStandalone("add-interaction", "tail"),
 ];
 
 export const getContextMenuActions = (ctx: ActionContext): ContextAction[] => {
@@ -99,8 +104,6 @@ export const getContextMenuActions = (ctx: ActionContext): ContextAction[] => {
       .filter(Boolean) as ContextAction[]; // Remove nulls
   };
 
-  return [...filterActions(mainMenuItems), ...filterActions(standaloneActions)];
+  return filterActions(menuItems);
 };
 
-// Re-export submenu groups for potential direct access
-export { editSubmenu, insertSubmenu, layoutSubmenu, quickStyleSubmenu };

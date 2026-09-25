@@ -2,6 +2,8 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { ConfirmDialog, PanelFrame, Button, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
+import type { AIScope } from "./types";
+import type { RunPool } from "./hooks/useAgentRunner";
 import { ScopeChip } from "./ScopeChip";
 import { EmptyThread } from "./EmptyThread";
 import { AgentPlan } from "./AgentPlan";
@@ -15,8 +17,6 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
    out. Utilities rather than a stylesheet: this panel's CSS file is on the
    styling ratchet, and new chrome belongs inline (DS SSOT §3). */
 const STATE_BLOCK = "tw:flex tw:flex-col tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:p-4";
-const STATE_TITLE = "tw:m-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]";
-const STATE_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* Board 4418:106919's error block: a 12/18 error-red headline over an 11/16
    muted body. */
 const ERROR_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]";
@@ -40,8 +40,13 @@ export function readableQuotaMessage(message: string | null): string {
   });
 }
 
+/* Bare 12px accent links on a ~30 pitch (4418:106671 / 106919); they were
+   32-tall buttons on a 40 pitch. */
 const STATE_LINK =
-  "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
+  "tw:h-[22px] tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)] tw:focus:ring-0";
+/* The scoped-run note under "Plan changes" (6881:63246 …, 11/16 muted). */
+const SCOPE_NOTE = "tw:m-0 tw:px-4 tw:pb-3 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const CONFIRM_SUFFIX = " Changes to page settings or publishing need a separate confirmation.";
 import { DEFAULT_MODEL, type AIModel } from "./types";
 import "./AITab.css";
 import { useAiQuota, quotaLeftLabel } from "./hooks/useAiQuota";
@@ -58,11 +63,46 @@ export interface AITabProps {
   onBack?: () => void;
 }
 
-/** Board 4418:107268's guard — one element at a time until batch scope exists. */
-const MULTI_GUARD = "AI editing supports one element at a time in v1 — select a single element.";
+/** What a scope's run copy calls it: "Hero", "the 3 selected elements". */
+function scopeTarget(scope: AIScope): string {
+  switch (scope.kind) {
+    case "element":
+      return scope.name;
+    case "multi":
+      return `the ${scope.ids.length} selected elements`;
+    case "similar":
+      return `the ${scope.ids.length} ${scope.noun}`;
+    case "site":
+      return "the site";
+    default:
+      return "the page";
+  }
+}
+
+/** Boards 4418:104454 / 6881:63246 / 69981 / 6891:73760 / 73974 — what a
+ *  scoped run may touch, said before it runs. */
+function scopeNote(scope: AIScope): string {
+  switch (scope.kind) {
+    case "element":
+      return `This run targets ${scope.name}${scope.name.startsWith("the ") ? " only" : ""}.${CONFIRM_SUFFIX}`;
+    case "multi":
+      return `This run targets the ${scope.ids.length} selected elements only.${CONFIRM_SUFFIX}`;
+    case "similar":
+      return `This run targets the ${scope.ids.length} ${scope.noun} like this one.${CONFIRM_SUFFIX}`;
+    case "site":
+      return `This run can change all ${scope.pages} pages.${CONFIRM_SUFFIX}`;
+    default:
+      return "";
+  }
+}
+
+/** Board 6881:71076 / 4418:106547 — after Edit prompt the panel says what the
+ *  failed run left behind and how scoped runs behave. */
+const RESIDUE_NOTE =
+  "Scoped runs edit only the selection — but page settings (title, description, slug) and a publish request are not element edits and can still come back. Clearing the selection widens the scope to the page.";
 
 export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, onBack }) => {
-  const { scope, status, lock, unlock } = useAIScope(composer);
+  const { scope: liveScope, status, lock, unlock, options, choose } = useAIScope(composer);
   // Not state: the server owns model choice (`resolveModelForUser` gates it by
   // plan and ignores a client hint it doesn't allow). The picker that used to
   // set this offered four models, three of which the server could never call —
@@ -74,30 +114,36 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
      its proposed-change card and ↻ Regenerate are gone; every prompt goes to
      the runner. Board 171:2's Retry re-runs the same brief, so the panel
      remembers it — the runner does not keep the prompt. */
-  const lastPrompt = React.useRef<{ text: string; target?: { id: string } } | null>(null);
-  const [guard, setGuard] = React.useState(false);
+  const lastPrompt = React.useRef<{ text: string; scope: AIScope } | null>(null);
   const promptRef = React.useRef<HTMLDivElement>(null);
+  /* The scope a run was started with. The band keeps naming it until the run
+     is left (4418:105548 still reads "Hero section" after Undo all, although
+     undo drops the selection). */
+  const [runScope, setRunScope] = React.useState<AIScope | null>(null);
+  /* Board 4418:105548 — Undo all took the run back. */
+  const [undone, setUndone] = React.useState(false);
+  /* Board 4418:106547 — what a failed run left, shown after Edit prompt. */
+  const [residue, setResidue] = React.useState<string | null>(null);
 
   const run = React.useCallback(
-    (text: string, target?: { id: string }) => {
-      lastPrompt.current = { text, target };
+    (text: string, target: AIScope) => {
+      lastPrompt.current = { text, scope: target };
+      setRunScope(target);
+      setUndone(false);
+      setResidue(null);
       lock();
-      agent.start(text, target);
+      /* An element prompt is a one-step run on it; every wider scope is a
+         planned run over its pool (a multi-selection too — it used to be
+         refused, "one element at a time in v1"). */
+      const pool: RunPool =
+        target.kind === "site" ? "site" : target.kind === "multi" || target.kind === "similar" ? { ids: target.ids } : "page";
+      agent.start(text, target.kind === "element" ? { id: target.id } : undefined, pool);
     },
     [agent, lock],
   );
 
-  const submit = React.useCallback(
-    (text: string) => {
-      if (scope.kind === "multi") {
-        setGuard(true);
-        return;
-      }
-      setGuard(false);
-      run(text, scope.kind === "element" ? { id: scope.id } : undefined);
-    },
-    [scope, run],
-  );
+  const submit = React.useCallback((text: string) => run(text, liveScope), [liveScope, run]);
+  const scope = agent.phase !== "idle" && runScope ? runScope : liveScope;
 
   /* The scope stays locked while the run is live (board 4418:104454's 🔒)
      and is handed back when it ends. */
@@ -111,6 +157,14 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   React.useEffect(() => {
     if (agent.phase === "done") unlock();
   }, [agent.phase, unlock]);
+
+  /* Leave the run: clear it and empty the field. */
+  const leaveRun = () => {
+    agent.reset();
+    setRunScope(null);
+    setUndone(false);
+    setComposerKey((k) => k + 1);
+  };
 
   /* The three panel states replace the run only while nothing from it has
      landed — a run that failed after applying steps keeps AgentPlan, whose
@@ -137,7 +191,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   const retry = () => {
     const again = lastPrompt.current;
     agent.reset();
-    if (again) run(again.text, again.target);
+    if (again) run(again.text, again.scope);
   };
 
   return (
@@ -190,7 +244,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           title, with whatever the run is doing below them — the composer used
           to sit at the bottom, chat-style, under states that had replaced the
           thread entirely. */}
-      <ScopeChip scope={scope} status={status} />
+      <ScopeChip scope={scope} status={status} options={options} onChoose={choose} />
       {/* Board 4418:106796 draws no composer: nothing here will run. */}
       {failedKind === "not-configured" ? null : (
         <div ref={promptRef}>
@@ -198,15 +252,11 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             key={composerKey}
             onSubmit={submit}
             streaming={live}
+            showPlan={agent.phase === "idle" && !failedKind}
             quotaLabel={(quota && quotaLeftLabel(quota)) || undefined}
           />
         </div>
       )}
-      {guard && scope.kind === "multi" ? (
-        <p className={`${STATE_BODY} tw:px-4 tw:py-2`} role="status" data-testid="ai-multi-guard">
-          {MULTI_GUARD}
-        </p>
-      ) : null}
 
       {/* Boards 171:136 and 171:105 — "no key" and "no credit" are states,
           not error lines. The server already tells them apart
@@ -268,6 +318,15 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           </Button>
           {continueByHand}
         </div>
+      ) : agent.phase === "idle" && residue ? (
+        <div data-testid="ai-residue">
+          <p className={SCOPE_NOTE}>{RESIDUE_NOTE}</p>
+          <p className="tw:m-0 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">{residue}</p>
+        </div>
+      ) : agent.phase === "idle" && scope.kind !== "page" ? (
+        <p className={SCOPE_NOTE} data-testid="ai-scope-note">
+          {scopeNote(scope)}
+        </p>
       ) : agent.phase === "idle" ? (
         <div className="bd-ai-thread">
           <EmptyThread
@@ -287,23 +346,39 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           onSkip={agent.skip}
           onStop={agent.stop}
           stoppedByUser={agent.stoppedByUser}
+          undone={undone}
+          target={scopeTarget(scope)}
+          /* Boards 4418:105695 / 105930 / 106165: Done hands straight back to
+             the inspector (in the inspector column); Keep N changes stays. */
           onDismiss={() => {
-            agent.reset();
-            setComposerKey((k) => k + 1);
+            const finishedClean = !agent.error && !agent.stoppedByUser;
+            leaveRun();
+            if (finishedClean && onBack) onBack();
           }}
-          /* Board 4418:105118: back to the prompt, which is still in the field. */
+          /* Boards 4418:105118 → 106547: back to the prompt, which is still in
+             the field, with what the failed run left behind. */
           onEditPrompt={() => {
+            const applied = agent.steps.filter((s) => s.status === "applied").length;
+            setResidue(
+              applied > 0
+                ? `${applied} ${applied === 1 ? "change is" : "changes are"} already applied. Change your request to target what the last run could not change.`
+                : "Nothing was applied. Change your request and plan again.",
+            );
             agent.reset();
             promptRef.current?.querySelector("textarea")?.focus();
           }}
           /* Each applied step is its own transaction, so taking the run back
              is exactly that many undos — and nothing has happened since the
-             failure to undo by mistake. */
+             failure to undo by mistake. Undo drops the selection; the run's
+             element is picked again, as 4418:105548 keeps it selected. */
           onUndoAll={
             composer
               ? () => {
                   const applied = agent.steps.filter((s) => s.status === "applied").length;
                   for (let i = 0; i < applied; i++) composer.history.undo();
+                  setUndone(true);
+                  const target = runScope?.kind === "element" ? composer.elements.getElement(runScope.id) : undefined;
+                  if (target) composer.selection.select(target);
                 }
               : undefined
           }

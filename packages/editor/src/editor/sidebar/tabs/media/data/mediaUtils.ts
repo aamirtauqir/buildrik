@@ -6,6 +6,7 @@
 
 import type { MediaAsset } from "../../../../../shared/types/media";
 import type { LibraryItem, MediaTypeFilter, VersionEntry } from "./mediaTypes";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 
 /** Format bytes to human-readable string e.g. "1.2 MB" */
 export function fmtSize(bytes: number): string {
@@ -208,8 +209,12 @@ export function collectUsageByPage(
         getId(): string;
         getType(): string;
         getAttribute(name: string): string | undefined;
+        getCustomData?(key: string): unknown;
       };
-      const label = el.getAttribute("data-name") ?? el.getType();
+      /* The name Layers shows (v3 4418:63087 "hero", "gallery"), then the
+         legacy data-name attribute, then the element's type. */
+      const layerName = el.getCustomData ? getLayerName({ getCustomData: (k) => el.getCustomData?.(k) }) : undefined;
+      const label = layerName ?? el.getAttribute("data-name") ?? el.getType();
       return { elementId: el.getId(), label, crumb: `${pageName} \u203a ${label}` };
     });
     if (hits.length) out.push({ pageId, pageName, hits });

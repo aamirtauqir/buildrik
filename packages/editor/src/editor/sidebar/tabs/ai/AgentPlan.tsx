@@ -1,5 +1,4 @@
 import * as React from "react";
-import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
@@ -16,12 +15,19 @@ const BAND =
    board's leading. */
 const STEP_ROW =
   "tw:flex tw:h-10 tw:items-center tw:gap-2 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
-const PANEL = "tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3";
-const PANEL_TITLE = "tw:m-0 tw:text-[13px] tw:font-medium";
-const PANEL_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-const PANEL_ACTIONS = "tw:flex tw:justify-between tw:gap-2";
-/** Bare accent text, the same shape the chat states use for their one link. */
-const DISMISS_LINK = "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
+const PANEL = "tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-3";
+/* The run boards set every card in 11/16 under a 12/18 title (4418:105118,
+   105261, 105401, 104976); it was 13 over 12/20. */
+const PANEL_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px]";
+const PANEL_BODY = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* A diff line in a result card: 11px on a 20 pitch (4418:105401 / 106400). */
+const DIFF_ROW = "tw:m-0 tw:text-[11px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const PANEL_ACTIONS = "tw:flex tw:justify-between tw:gap-2 tw:pt-1";
+/** Bare 12px accent text (4418:105261's "Undo all · Keep 1 change"). */
+const DISMISS_LINK =
+  "tw:h-4 tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent)] tw:focus:ring-0";
+/** The note under a card (4418:105401 "Each approved step was applied…"). */
+const FOOTNOTE = "tw:m-0 tw:px-4 tw:py-3 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /**
  * The agent run — boards 170:41 (planning), 170:70 (running), 170:97
@@ -68,14 +74,20 @@ export interface AgentPlanProps {
   onEditPrompt?: () => void;
   /** "Keep N changes" / "Done": leave what applied and hand the panel back. */
   onDismiss?: () => void;
+  /** Board 4418:105548 — Undo all has taken the run back. */
+  undone?: boolean;
+  /** What the run's copy calls its scope: "Hero", "the selected heading",
+   *  "the page" (4418:105401 "3 changes applied to Hero"). */
+  target?: string;
 }
 
 /** Board glyphs: ✓ done, ▲ failed, ○ pending, ⊘ skipped. Never colour alone —
- *  a finished run also names each row's state. */
+ *  a live or unfinished run also names each row's state. */
 const STEP_GLYPH: Record<RunStep["status"], string> = {
   pending: "○",
   running: "●",
-  awaiting: "●",
+  /* 4418:104976: a step waiting on you is not running — an open ring. */
+  awaiting: "○",
   applied: "✓",
   skipped: "⊘",
   nochange: "⊘",
@@ -84,6 +96,8 @@ const STEP_GLYPH: Record<RunStep["status"], string> = {
 
 const STEP_WORD: Partial<Record<RunStep["status"], string>> = {
   applied: "Done",
+  running: "Running",
+  awaiting: "Needs approval",
   pending: "Pending",
   skipped: "Skipped",
   nochange: "No change",
@@ -93,10 +107,19 @@ const STEP_WORD: Partial<Record<RunStep["status"], string>> = {
 const STEP_COLOR: Record<RunStep["status"], string> = {
   pending: "var(--bk-ink-disabled)",
   running: "var(--bk-accent)",
-  awaiting: "var(--bk-accent)",
+  awaiting: "var(--bk-ink-disabled)",
   applied: "var(--bk-success)",
   skipped: "var(--bk-ink-muted)",
   nochange: "var(--bk-ink-muted)",
+  failed: "var(--bk-error)",
+};
+
+/** The row word's colour: Done green, Running accent, Needs approval amber,
+ *  Failed red, the rest muted (4418:104837 / 104976 / 105118). */
+const WORD_COLOR: Partial<Record<RunStep["status"], string>> = {
+  applied: "var(--bk-success)",
+  running: "var(--bk-accent)",
+  awaiting: "var(--bk-warning-text)",
   failed: "var(--bk-error)",
 };
 
@@ -105,20 +128,33 @@ function bandLabel(
   steps: RunStep[],
   currentIndex: number,
   stoppedByUser?: boolean,
+  undone?: boolean,
 ): string {
   const total = steps.length;
   const doneCount = steps.filter((s) => s.status === "applied").length;
+  const skippedCount = steps.filter((s) => s.status === "skipped").length;
   const failedAt = steps.findIndex((s) => s.status === "failed");
+  /* 4418:105548 "UNDONE · 3 OF 3". */
+  if (undone) return `Undone · ${doneCount} of ${total}`;
   if (failedAt >= 0) return `Stopped at step ${failedAt + 1}`;
   if (stoppedByUser) return "Stopped by you";
   if (phase === "planning" || phase === "review") return "Planning";
   if (steps[currentIndex]?.status === "awaiting") return `Paused at step ${currentIndex + 1}`;
   if (phase === "running") return `Running · ${Math.min(currentIndex + 1, total)} of ${total}`;
+  /* 4418:106400 "DONE · 2 APPLIED / 1 SKIPPED". */
+  if (phase === "done" && skippedCount > 0) return `Done · ${doneCount} applied / ${skippedCount} skipped`;
   if (phase === "done") return `Done · ${doneCount} of ${total}`;
   return "";
 }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+const capitalize = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+/** "restores the original Hero" for a named target, "restores the page as it
+ *  was before this run" otherwise (4418:105261). */
+const restores = (target: string) =>
+  target.startsWith("the ") ? `restores ${target} as it was before this run` : `restores the original ${target}`;
 
 /** "Step 1 is applied." / "Steps 1 and 3 are applied." / "Nothing was applied." */
 function appliedSentence(steps: RunStep[]): string {
@@ -135,6 +171,10 @@ function notRunSentence(steps: RunStep[]): string {
   if (nums.length === 1) return ` Step ${nums[0]} did not run.`;
   return ` Steps ${nums.slice(0, -1).join(", ")} and ${nums.at(-1)} did not run.`;
 }
+
+/* 4418:104577 / 104837: Stop is a 120×32 outline button on the 16 gutter. */
+const STOP_BTN =
+  "tw:h-8 tw:w-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0";
 
 const OUTLINE_BTN =
   "tw:h-8 tw:whitespace-nowrap tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0";
@@ -154,6 +194,8 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   onUndoAll,
   onEditPrompt,
   onDismiss,
+  undone,
+  target = "the page",
 }) => {
   const [editing, setEditing] = React.useState(false);
 
@@ -185,7 +227,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
             color="alternative"
             aria-label="Stop run"
             onClick={onStop}
-            className="tw:h-8 tw:w-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
+            className={STOP_BTN}
           >
             Stop
           </Button>
@@ -197,12 +239,17 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   const gateStep = steps[currentIndex]?.status === "awaiting" ? steps[currentIndex] : null;
   const failedIndex = steps.findIndex((s) => s.status === "failed");
   const appliedCount = steps.filter((s) => s.status === "applied").length;
+  const skippedSteps = steps.filter((s) => s.status === "skipped");
   const review = phase === "review";
   const finished = phase === "done";
+  /* Row words: a live run names every row (4418:104837), a stopped or failed
+     one too (105118 / 105261); a clean finish and an undone run do not. */
+  const showWords = !undone && (phase === "running" || (finished && (!!error || !!stoppedByUser)));
+  const scoped = target.startsWith("the ") ? "" : ` to ${target}`;
 
   return (
     <div className="bd-ai-agent">
-      <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
+      <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser, undone)}</div>
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
           <li
@@ -237,12 +284,11 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
             ) : (
               <span className="tw:flex-1" data-testid={`ai-run-title-${i + 1}`}>{s.plan.title}</span>
             )}
-            {/* Stopped / failed runs name each row's state (105118, 105261);
-                a clean finish does not (105401). */}
-            {finished && (error || stoppedByUser) && STEP_WORD[s.status] ? (
+            {showWords && STEP_WORD[s.status] ? (
               <span
-                className="tw:text-[11px]"
-                style={{ color: s.status === "applied" || s.status === "failed" ? STEP_COLOR[s.status] : "var(--bk-ink-muted)" }}
+                className="tw:text-[11px] tw:leading-4"
+                style={{ color: WORD_COLOR[s.status] ?? "var(--bk-ink-muted)" }}
+                data-testid={`ai-run-word-${i + 1}`}
               >
                 {STEP_WORD[s.status]}
               </span>
@@ -278,43 +324,52 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         </div>
       )}
 
-      {phase === "running" && (
-        <Button
-          type="button"
-          color="light"
-          className="tw:mx-4 tw:mb-3 tw:self-start"
-          aria-label="Stop run"
-          onClick={onStop}
-        >
-          Stop
-        </Button>
+      {/* 4418:104976: a run paused on a step shows the step's card, not Stop. */}
+      {phase === "running" && !gateStep && (
+        <div className="tw:flex tw:px-4 tw:pt-2 tw:pb-3">
+          <Button type="button" color="alternative" aria-label="Stop run" onClick={onStop} className={STOP_BTN}>
+            Stop
+          </Button>
+        </div>
       )}
 
-      {/* Board 170:97 — the run stops and says what it is about to do. */}
+      {/* Boards 170:97 / 4418:104976 — the run stops and says what it is
+          about to do; the note under the card says what has landed so far. */}
       {gateStep ? (
-        <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alertdialog" aria-label="Step needs approval">
-          <p className={`${PANEL_TITLE} tw:text-[var(--bk-warning-text)]`}>
-            Step {currentIndex + 1}: {gateStep.plan.title}
-          </p>
-          <p className={PANEL_BODY}>
-            {gateStep.plan.instruction} Approve it, or skip it and keep the rest.
-          </p>
-          {gateStep.edit ? <DiffRows edit={{ ...gateStep.edit, state: "pending" }} /> : null}
-          <div className={PANEL_ACTIONS}>
-            <Button type="button" color="light" aria-label="Skip step" onClick={onSkip}>
-              Skip
-            </Button>
-            <Button type="button" aria-label="Apply step" onClick={onApprove}>
-              Approve
-            </Button>
+        <>
+          <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alertdialog" aria-label="Step needs approval">
+            <p className={`${PANEL_TITLE} tw:text-[var(--bk-warning-text)]`}>
+              Step {currentIndex + 1}: {gateStep.plan.title}
+            </p>
+            <p className={PANEL_BODY}>
+              {gateStep.plan.instruction} Approve it, or skip it and keep the rest.
+            </p>
+            {/* The proposed change itself — the board states it in prose; the
+                rows are what the server actually proposes. */}
+            {(gateStep.edit?.rows ?? []).map((r, i) => (
+              <p key={i} className={DIFF_ROW} data-testid="ai-gate-diff-row">
+                {r.field} → {r.to}
+              </p>
+            ))}
+            <div className={PANEL_ACTIONS}>
+              <Button type="button" color="light" aria-label="Skip step" onClick={onSkip} className={`${OUTLINE_BTN} tw:h-7 tw:w-20`}>
+                Skip
+              </Button>
+              <Button type="button" aria-label="Apply step" onClick={onApprove} className={`${PRIMARY_BTN} tw:h-7 tw:w-24`}>
+                Approve
+              </Button>
+            </div>
           </div>
-          <p className={PANEL_BODY}>The run waits rather than guessing.</p>
-        </div>
+          <p className={FOOTNOTE} data-testid="ai-gate-note">
+            {appliedCount > 0 ? `${plural(appliedCount, "change")} applied${scoped}. ` : ""}
+            Step {currentIndex + 1} waits for your approval.
+          </p>
+        </>
       ) : null}
 
       {/* Board 4418:105118 — which step failed, what survived it, and the
           three ways on: Undo all · Keep N changes · Edit prompt. */}
-      {error ? (
+      {undone ? null : error ? (
         <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="ai-run-failed">
           <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]">
             {failedIndex >= 0 ? `Step ${failedIndex + 1} failed — ${error}` : error}
@@ -346,58 +401,92 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
           and both ways on are offered as links. */}
       {finished && !error && stoppedByUser ? (
         <div className={`${PANEL} tw:bg-[var(--bk-bg-subtle)]`} data-testid="ai-run-stopped">
-          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
+          <p className={`${PANEL_TITLE} tw:text-[var(--bk-ink)]`}>
             Stopped after step {steps.reduce((n, s, i) => (s.status === "applied" || s.status === "nochange" ? i + 1 : n), 0)}.
           </p>
           <p className={PANEL_BODY}>
             {appliedSentence(steps)}
             {notRunSentence(steps)}
-            {appliedCount > 0 ? " Undo all restores the page as it was before this run." : ""}
+            {appliedCount > 0 ? ` Undo all ${restores(target)}.` : ""}
           </p>
-          <div className="tw:flex tw:gap-4">
+          <div className="tw:flex tw:gap-4 tw:pt-1">
             {onUndoAll && appliedCount > 0 ? (
-              <Button type="button" color="light" data-testid="ai-run-undo-all" className={DISMISS_LINK} onClick={onUndoAll}>
+              <Button type="button" color="light" size="xs" data-testid="ai-run-undo-all" className={DISMISS_LINK} onClick={onUndoAll}>
                 Undo all
               </Button>
             ) : null}
             {onDismiss ? (
-              <Button type="button" color="light" data-testid="ai-run-keep" className={DISMISS_LINK} onClick={onDismiss}>
+              <Button type="button" color="light" size="xs" data-testid="ai-run-keep" className={DISMISS_LINK} onClick={onDismiss}>
                 {appliedCount > 0 ? `Keep ${plural(appliedCount, "change")}` : "Ask something else"}
               </Button>
             ) : null}
           </div>
         </div>
-      ) : finished && !error ? (
+      ) : finished && !error && undone ? (
         <>
-          {/* Board 4418:105401 — what changed, Undo all · Done. */}
-          <div className={`${PANEL} tw:bg-[var(--bk-success-tint)]`} data-testid="ai-run-applied">
-            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-success-text)]">
-              {plural(appliedCount, "change")} applied
-            </p>
+          {/* Board 4418:105548 — the run is taken back: what was restored,
+              and Done. */}
+          <div className={`${PANEL} tw:bg-[var(--bk-success-tint)]`} data-testid="ai-run-undone">
+            <p className={`${PANEL_TITLE} tw:text-[var(--bk-success-text)]`}>All changes undone</p>
             {steps
               .filter((s) => s.status === "applied")
-              .flatMap((s) => s.edit?.rows ?? [])
+              .flatMap((s) => s.edit?.rows ?? [{ field: s.plan.title, from: "", to: "" }])
               .slice(0, 6)
               .map((r, i) => (
-                <p key={i} className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-                  {r.field} → {r.to}
+                <p key={i} className={DIFF_ROW}>
+                  {r.field} → restored
                 </p>
               ))}
-            <div className={PANEL_ACTIONS}>
-              {onUndoAll && appliedCount > 0 ? (
-                <Button type="button" color="light" data-testid="ai-run-undo-all" onClick={onUndoAll} className={`${OUTLINE_BTN} tw:w-[96px]`}>
-                  Undo all
-                </Button>
-              ) : <span />}
+            <div className="tw:flex tw:justify-end tw:pt-1">
               {onDismiss ? (
-                <Button type="button" data-testid="ai-run-done" onClick={onDismiss} className={`${PRIMARY_BTN} tw:w-[96px]`}>
+                <Button type="button" data-testid="ai-run-done" onClick={onDismiss} className={`${PRIMARY_BTN} tw:h-7 tw:w-24`}>
                   Done
                 </Button>
               ) : null}
             </div>
           </div>
-          <p className={`${PANEL_BODY} tw:px-4 tw:py-2`}>
-            Each approved step was applied. Undo all restores the page to its state before this run.
+          <p className={FOOTNOTE}>{capitalize(target)} is back to its state before this run.</p>
+        </>
+      ) : finished && !error ? (
+        <>
+          {/* Boards 4418:105401 / 106400 — what changed (and what was
+              skipped), Undo all · Done. */}
+          <div className={`${PANEL} tw:bg-[var(--bk-success-tint)]`} data-testid="ai-run-applied">
+            <p className={`${PANEL_TITLE} tw:text-[var(--bk-success-text)]`}>
+              {skippedSteps.length > 0
+                ? `${appliedCount} applied · ${skippedSteps.length} skipped`
+                : `${plural(appliedCount, "change")} applied${scoped}`}
+            </p>
+            {[
+              ...steps
+                .filter((s) => s.status === "applied")
+                .flatMap((s) => s.edit?.rows ?? [])
+                .map((r) => `${r.field} → ${r.to}`),
+              ...skippedSteps.flatMap((s) =>
+                (s.edit?.rows ?? [{ field: s.plan.title }]).map((r) => `${r.field} → unchanged (skipped)`),
+              ),
+            ]
+              .slice(0, 6)
+              .map((line, i) => (
+                <p key={i} className={DIFF_ROW}>
+                  {line}
+                </p>
+              ))}
+            <div className={PANEL_ACTIONS}>
+              {onUndoAll && appliedCount > 0 ? (
+                <Button type="button" color="light" data-testid="ai-run-undo-all" onClick={onUndoAll} className={`${OUTLINE_BTN} tw:h-7 tw:w-24`}>
+                  Undo all
+                </Button>
+              ) : <span />}
+              {onDismiss ? (
+                <Button type="button" data-testid="ai-run-done" onClick={onDismiss} className={`${PRIMARY_BTN} tw:h-7 tw:w-24`}>
+                  Done
+                </Button>
+              ) : null}
+            </div>
+          </div>
+          <p className={FOOTNOTE}>
+            Each approved step was applied. Undo all restores {target} to its state before this run.
           </p>
         </>
       ) : null}
