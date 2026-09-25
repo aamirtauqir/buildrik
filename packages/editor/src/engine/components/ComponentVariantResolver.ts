@@ -9,6 +9,7 @@
 import type { ComponentDefinition, ComponentInstance } from "../../shared/types/components";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
+import { usableOverrides } from "./ComponentInstance";
 
 // ============================================
 // Instance Lookup
@@ -170,7 +171,7 @@ export function getOverridesForElement(
     const elementPath = getElementPathWithinInstance(composer, elementId, instance);
     const stylePrefix = `#/${elementPath}${elementPath ? "/" : ""}style/`;
 
-    for (const op of instance.overrides) {
+    for (const op of usableOverrides(instance.overrides)) {
       if (op.path.startsWith(stylePrefix)) {
         const property = op.path.split("/").pop();
         if (property) {

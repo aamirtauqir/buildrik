@@ -23,7 +23,7 @@ import type {
 import { deepClone } from "../../shared/utils/helpers";
 import { sanitizeElementTreeContent } from "../../shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
-import { ComponentInstanceUtils } from "./ComponentInstance";
+import { ComponentInstanceUtils, usableOverrides } from "./ComponentInstance";
 import {
   type InstanceMaps,
   instantiateComponent,
@@ -180,7 +180,12 @@ export class ComponentManager {
       if (instance && instance.componentId && !instance.isDetached) {
         // Re-key on the live element id (ids are stable across import, but be
         // defensive) and keep the persisted overrides/variant selection.
-        this.instances.set(el.getId(), { ...instance, elementId: el.getId() });
+        // Overrides are unchecked JSON from the stored project: keep only ops.
+        this.instances.set(el.getId(), {
+          ...instance,
+          elementId: el.getId(),
+          overrides: usableOverrides(instance.overrides),
+        });
       }
     }
   }

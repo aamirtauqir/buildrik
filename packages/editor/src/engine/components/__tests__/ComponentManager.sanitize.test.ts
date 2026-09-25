@@ -152,3 +152,59 @@ describe("instance overrides are sanitized where they are applied (S-1 review ro
     expect(html).not.toMatch(/onerror|onmouseover|srcdoc|script:/i);
   });
 });
+
+describe("malformed overrides and failing syncs leave the instance in place (S-1 review round 3)", () => {
+  const master = (id: string): ComponentDefinition => ({
+    id,
+    name: "Card",
+    masterTree: {
+      id: "m", type: "container", tagName: "div",
+      children: [{ id: "t", type: "text", tagName: "p", content: "Hi", children: [] }],
+    } as never,
+    createdAt: 1,
+    updatedAt: 1,
+    version: 2,
+  });
+
+  async function placed(id: string) {
+    stored.splice(0, stored.length);
+    const stack = makeStack();
+    await stack.mgr.adoptLibraryComponent(master(id));
+    const elementId = (await stack.mgr.instantiateComponent(id, stack.page.root.id))!;
+    return { ...stack, elementId };
+  }
+
+  it("skips override entries that are not ops, in styles and on sync", async () => {
+    const { manager, mgr, elementId } = await placed("mal-1");
+    manager.getElement(elementId)!.setData("componentInstance", {
+      elementId, componentId: "mal-1", syncedVersion: 1, isDetached: false,
+      overrides: [null, "x", { path: 5 }, { op: "replace" }, { op: "replace", path: "#/children[0]/content/content", value: "Kept" }],
+    });
+    mgr.rehydrateInstances();
+    expect(() => mgr.getOverridesForElement(elementId)).not.toThrow();
+    expect(await mgr.syncInstance(elementId)).toBe(true);
+    expect(manager.toHTML()).toContain("Kept");
+  });
+
+  it("a non-array overrides value is treated as none", async () => {
+    const { manager, mgr, elementId } = await placed("mal-2");
+    manager.getElement(elementId)!.setData("componentInstance", {
+      elementId, componentId: "mal-2", syncedVersion: 1, isDetached: false, overrides: "nope",
+    });
+    mgr.rehydrateInstances();
+    expect(await mgr.syncInstance(elementId)).toBe(true);
+    expect(manager.toHTML()).toContain("Hi");
+  });
+
+  it("a sync that cannot build the new tree leaves the old instance on the canvas", async () => {
+    const { manager, mgr, elementId } = await placed("mal-3");
+    const before = manager.toHTML();
+    // A nested node the clone cannot walk (the root-only master check lets it through).
+    const tree = mgr.getComponent("mal-3")!.masterTree as unknown as { children: Array<{ children: unknown }> };
+    tree.children[0].children = "oops";
+    Object.assign(mgr.getComponent("mal-3")!, { version: 3 });
+    expect(await mgr.syncInstance(elementId)).toBe(false);
+    expect(manager.getElement(elementId)).toBeDefined();
+    expect(manager.toHTML()).toBe(before);
+  });
+});

@@ -34,6 +34,19 @@ import type { Patch } from "../utils/JsonPatch";
 // (master edited without reorder/insert). Reorder/insert survival is F1b
 // (stable slotKey) and out of scope here.
 
+/**
+ * The entries of a stored overrides value that are ops at all — an object
+ * with a string `path`. Stored instances are unchecked JSON; a null entry or
+ * a numeric path threw in every reader (getStyles runs one per element).
+ */
+export function usableOverrides(value: unknown): Patch {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (op): op is Patch[number] =>
+      typeof op === "object" && op !== null && "path" in op && typeof op.path === "string"
+  );
+}
+
 /** Parse a canonical `#/<elementPath>/<type>/<property>` override path. */
 function parseCanonicalOverridePath(
   path: string
@@ -107,8 +120,8 @@ function applyOverrideToNode(
  * Re-apply an instance's stored overrides onto a (freshly cloned) element tree,
  * in place. Returns how many applied vs. dropped (orphaned — the master element
  * the override targeted no longer exists at that position). Dropping is surfaced,
- * never silent (F1a #2). This is the SSOT override-application path used by both
- * sync (re-clone) and detach.
+ * never silent (F1a #2). This is the SSOT override-application path; sync
+ * (re-clone) is its caller — detach and reset apply no overrides.
  */
 export function applyOverridesToTree(
   tree: ElementData,
@@ -121,7 +134,7 @@ export function applyOverridesToTree(
      later master update re-reports the same lost edit — a warning that cries
      wolf is worse than the silence it replaced. */
   const kept: Patch = [];
-  for (const op of overrides) {
+  for (const op of usableOverrides(overrides)) {
     const parsed = parseCanonicalOverridePath(op.path);
     if (!parsed) {
       dropped++;

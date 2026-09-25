@@ -96,11 +96,23 @@ function sanitizeAttributeMap(attrs: unknown, onChange?: OnSanitizeChange): void
  * attribute override (or one with a non-string value) removed.
  */
 function sanitizeInstanceOverrides(data: unknown, onChange?: OnSanitizeChange): void {
-  const overrides = asRecord(asRecord(data)?.componentInstance)?.overrides;
-  if (!Array.isArray(overrides)) return;
+  const instance = asRecord(asRecord(data)?.componentInstance);
+  if (!instance || instance.overrides === undefined) return;
+  // An entry that is not an op (or a list that is not a list) threw in every
+  // editor reader, so it is removed rather than skipped.
+  if (!Array.isArray(instance.overrides)) {
+    onChange?.("override", "overrides is not a list");
+    instance.overrides = [];
+    return;
+  }
+  const overrides: unknown[] = instance.overrides;
   for (let i = overrides.length - 1; i >= 0; i--) {
     const op = asRecord(overrides[i]);
-    if (!op || typeof op.path !== "string") continue;
+    if (!op || typeof op.path !== "string") {
+      onChange?.("override", "not an op");
+      overrides.splice(i, 1);
+      continue;
+    }
     const parts = op.path.split("/");
     const property = parts[parts.length - 1] ?? "";
     const type = parts[parts.length - 2];

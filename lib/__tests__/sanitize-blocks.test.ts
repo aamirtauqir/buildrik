@@ -310,3 +310,14 @@ describe("style declarations (S-1 review round 3)", () => {
     expect(reasons.filter((r) => r === "style")).toHaveLength(5);
   });
 });
+
+describe("malformed override entries (S-1 review round 3)", () => {
+  it("removes entries that are not ops and resets a non-array list", () => {
+    const good = { op: "replace", path: "#/style/color", value: "red" };
+    const a = { id: "a", type: "container", data: { componentInstance: { overrides: [null, "x", { path: 5 }, { op: "replace" }, good] } } };
+    const b = { id: "b", type: "container", data: { componentInstance: { overrides: "nope" } } };
+    sanitizeBlocks([a, b]);
+    expect(a.data.componentInstance.overrides).toEqual([good]);
+    expect(b.data.componentInstance.overrides).toEqual([]);
+  });
+});
