@@ -1,15 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
-import type { UserRoleType } from "@/lib/constants/enums";
+import { ROLE_RANK, type UserRoleType } from "@/lib/constants/enums";
 import type { PlanName } from "@/lib/constants/plan-limits";
-
-const ROLE_RANK: Record<UserRoleType, number> = {
-  VIEWER: 0,
-  EDITOR: 1,
-  // a5-invite: Designer has the same site-edit access as a Content editor.
-  DESIGNER: 1,
-  ADMIN: 2,
-  OWNER: 3,
-};
 
 export class PermissionError extends Error {
   constructor(public code: "NOT_FOUND" | "FORBIDDEN", message?: string) {

@@ -15,6 +15,12 @@ interface AccessTabProps {
   onRevokeLink: (id: string) => void;
   maxExpiryDays: number;
   allowPasswords: boolean;
+  // sharing.revoke requires ADMIN on the server (checkSiteRole in
+  // site-detail.ts) — the caller's real effective role (sites.myRole),
+  // not a proxy off `token` presence. `token !== null` only tells VIEWER
+  // apart from EDITOR+; EDITOR/DESIGNER get a token but are still below
+  // ADMIN and would still be refused (controller review round 3).
+  canRevoke: boolean;
 }
 
 function simpleQrMatrix(input: string, size: number): boolean[][] {
@@ -89,7 +95,7 @@ function QrCodeCanvas({ url }: { url: string }) {
   return <canvas ref={canvasRef} width={size} height={size} className="rounded" />;
 }
 
-export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDays, allowPasswords }: AccessTabProps) {
+export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDays, allowPasswords, canRevoke }: AccessTabProps) {
   const [showCreate, setShowCreate] = useState(false);
   const [linkName, setLinkName] = useState("");
   const [linkPw, setLinkPw] = useState("");
@@ -165,15 +171,14 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
             {shareLinks.map((link) => {
               // `token` is null when the server didn't reveal it to this
               // caller (VIEWER — S-10); Copy/Open/QR need the real link.
-              // `sharing.revoke` requires ADMIN on the server
-              // (site-detail.ts), so it's never available to a VIEWER
-              // either — a VIEWER never gets a token, so the same signal
-              // that hides Copy/Open/QR also hides Revoke here. (Round 2:
-              // an earlier comment claimed Revoke "only needs the row id,
-              // so it stays available either way," which was true of the
-              // client call but not of the server's authz check behind it.)
+              // Revoke is gated on the `canRevoke` prop (the caller's real
+              // effective site role >= ADMIN, per sites.myRole), not on
+              // token presence — `sharing.revoke` requires ADMIN, one rank
+              // above the EDITOR/DESIGNER gate that reveals the token, so
+              // an EDITOR/DESIGNER would still see a token but still be
+              // refused by the server (round 2's token-based proxy missed
+              // exactly this; controller review round 3).
               const url = link.token ? shareUrl(link.token) : null;
-              const canRevoke = link.token !== null;
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">

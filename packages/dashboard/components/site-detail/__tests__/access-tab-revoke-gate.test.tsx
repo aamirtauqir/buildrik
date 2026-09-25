@@ -1,11 +1,13 @@
 /**
  * `sharing.revoke` requires ADMIN on the server (site-detail.ts's
- * `checkSiteRole(..., "ADMIN")`) — a VIEWER can never revoke a share link.
- * A VIEWER also never gets a real `token` back from `sharing.list`
- * (S-10's revealToken gate is EDITOR+), so `token === null` is the same
- * "this caller is a VIEWER" signal the row already uses to hide Copy/
- * Open/QR. Revoke must hide on that same signal instead of always
- * rendering and failing FORBIDDEN on click (controller review round 2).
+ * `checkSiteRole(..., "ADMIN")`) — VIEWER, EDITOR and DESIGNER are all
+ * refused. Round 2 hid Revoke on `token !== null`, which only distinguishes
+ * VIEWER (never gets a token — S-10's revealToken gate is EDITOR+) from
+ * EDITOR+ — an EDITOR/DESIGNER still got a token and still saw a
+ * working-looking Revoke button that would 403 on click. Revoke is now
+ * gated on the `canRevoke` prop, which the page derives from the caller's
+ * real effective site role (`sites.myRole`) against the same ADMIN rank
+ * the server enforces (controller review round 3).
  *
  * @license BSD-3-Clause
  */
@@ -23,31 +25,36 @@ const baseLink = {
   createdAt: new Date("2026-09-20"),
 };
 
-describe("AccessTab — Revoke gated on the same signal as Copy/Open/QR", () => {
-  it("hides Revoke when token is null (VIEWER — server refuses revoke below ADMIN)", () => {
-    render(
-      <AccessTab
-        shareLinks={[{ ...baseLink, token: null }]}
-        onCreateLink={vi.fn()}
-        onRevokeLink={vi.fn()}
-        maxExpiryDays={30}
-        allowPasswords={true}
-      />,
-    );
+function renderTab(canRevoke: boolean, token: string | null) {
+  return render(
+    <AccessTab
+      shareLinks={[{ ...baseLink, token }]}
+      onCreateLink={vi.fn()}
+      onRevokeLink={vi.fn()}
+      maxExpiryDays={30}
+      allowPasswords={true}
+      canRevoke={canRevoke}
+    />,
+  );
+}
+
+describe("AccessTab — Revoke gated on canRevoke (the caller's real site role), not on token presence", () => {
+  it("hides Revoke for a VIEWER (canRevoke=false, no token)", () => {
+    renderTab(false, null);
     expect(screen.queryByLabelText("Revoke share link")).toBeNull();
     expect(screen.queryByLabelText("Copy share link")).toBeNull();
   });
 
-  it("shows Revoke when token is present (EDITOR+)", () => {
-    render(
-      <AccessTab
-        shareLinks={[{ ...baseLink, token: "tok-abc" }]}
-        onCreateLink={vi.fn()}
-        onRevokeLink={vi.fn()}
-        maxExpiryDays={30}
-        allowPasswords={true}
-      />,
-    );
+  it("hides Revoke for an EDITOR/DESIGNER even though they have a token — the round-2 gap", () => {
+    renderTab(false, "tok-editor");
+    expect(screen.queryByLabelText("Revoke share link")).toBeNull();
+    // Copy/Open/QR are unaffected by canRevoke — an EDITOR still has a
+    // real token and those still work.
+    expect(screen.getByLabelText("Copy share link")).toBeTruthy();
+  });
+
+  it("shows Revoke for an ADMIN+ (canRevoke=true)", () => {
+    renderTab(true, "tok-admin");
     expect(screen.getByLabelText("Revoke share link")).toBeTruthy();
     expect(screen.getByLabelText("Copy share link")).toBeTruthy();
   });
