@@ -1,7 +1,7 @@
 /**
  * ConflictModal.test.tsx — the single-writer save-conflict resolver overlay.
  * Covers open/closed rendering, the 3 resolution actions (reload / backup /
- * two-step overwrite), and backdrop dismissal.
+ * two-step overwrite), and the overlay contract (no scrim dismiss, focus trap).
  *
  * Note on the backup-download mechanic: ConflictModal itself only fires the
  * `onSaveBackup` callback — the Blob/URL.createObjectURL/anchor-click download
@@ -136,12 +136,35 @@ describe("ConflictModal", () => {
     expect(screen.getByRole("button", { name: "Overwrite…" })).toBeInTheDocument();
   });
 
-  it("clicking the backdrop closes; clicking inside the card does not", () => {
+  /* B-7 / A13-10: a stray scrim click used to throw the dialog away — the one
+     surface between the user and a lost edit. It stays; Escape (an explicit
+     choice) still closes it, and the Conflict pill re-opens it. */
+  it("a scrim click does NOT dismiss; Escape does", () => {
     const props = makeProps();
     render(<ConflictModal {...props} />);
-    fireEvent.click(screen.getByText(/Your copy is behind/));
+    fireEvent.mouseDown(screen.getByTestId("overlay-scrim"));
+    fireEvent.click(screen.getByTestId("overlay-scrim"));
     expect(props.onClose).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("dialog"));
+    fireEvent.keyDown(document, { key: "Escape" });
     expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves focus into the dialog, onto the least destructive action, and keeps Tab inside", () => {
+    render(<ConflictModal {...makeProps()} />);
+    const dialog = screen.getByRole("dialog", { name: "This site changed somewhere else" });
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Reload latest" }));
+    const last = screen.getByRole("button", { name: "Overwrite…" });
+    last.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Reload latest" }));
+  });
+
+  it("the role=dialog node itself carries the name, not the scrim", () => {
+    render(<ConflictModal {...makeProps()} />);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog).not.toBe(screen.getByTestId("overlay-scrim"));
+    expect(dialog.getAttribute("aria-labelledby")).toBe(screen.getByTestId("conflict-title").id);
   });
 });
