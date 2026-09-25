@@ -38,6 +38,9 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   getEditorPlanTier: () => "starter",
 }));
 
+const role = vi.hoisted(() => ({ value: null as string | null }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useEditorRole: () => role.value }));
+
 vi.mock("../hooks/useSettingsScreen", () => ({
   useSettingsScreen: vi.fn(
     (
@@ -781,5 +784,32 @@ describe("SettingsTab — a screen mounted with the shell keeps its handlers", (
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await waitFor(() => expect(composer.saveProject).toHaveBeenCalled());
     expect(seoFlushes).toEqual(["flushed"]);
+  });
+});
+
+/* M7 (PD-1): Site columns belong to the dashboard and the editor mirrors them
+   only for an ADMIN. Below ADMIN, an edit on these screens would save into the
+   project and never reach the site — silently reverting. The screen is
+   read-only instead, and says why. */
+describe("SettingsTab — site-column screens below ADMIN", () => {
+  afterEach(() => {
+    role.value = null;
+  });
+
+  it("an EDITOR sees SEO read-only with the reason, and no Save", () => {
+    role.value = "EDITOR";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    expect(screen.getByTestId("set-admin-only").textContent).toBe("Only admins can change site settings");
+    expect((screen.getByLabelText("Meta title") as HTMLInputElement).matches(":disabled")).toBe(true);
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+  });
+
+  it("an ADMIN (or an unknown role) edits as before", () => {
+    role.value = "ADMIN";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
+    expect((screen.getByLabelText("Meta title") as HTMLInputElement).matches(":disabled")).toBe(false);
   });
 });

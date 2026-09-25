@@ -69,6 +69,14 @@ import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERRO
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
+import { roleAtLeast } from "@/services/RoleService";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+
+/* PD-1 (M7): these screens edit Site columns, which the dashboard owns and the
+   editor mirrors only for an ADMIN. Below ADMIN an edit here would save into
+   the project and never reach the site — so the screen is read-only and says
+   why, instead of accepting an edit that silently does not stick. */
+const SITE_COLUMN_SCREENS: ReadonlySet<SettingsNavId> = new Set(["general", "seo", "custom-code"]);
 import "./settings.css";
 
 // ─── Module-scope data ───────────────────────────────────────────────────────
@@ -501,12 +509,34 @@ export const SettingsTab: React.FC<
   // ─── Pane content ─────────────────────────────────────────────────────
 
   const locked = !isOverview && isScreenLocked(currentScreen, effectivePlan);
+  const editorRole = useEditorRole();
+  const siteColumnsReadOnly =
+    SITE_COLUMN_SCREENS.has(currentScreen as SettingsNavId) && roleAtLeast(editorRole, "ADMIN") === false;
 
   const renderScreen = (): React.ReactNode => {
     if (isOverview) return <OverviewScreen projectId={projectId} onOpenScreen={requestNav} />;
     if (locked) {
       return <LockedScreen variant={SCREEN_PLAN_REQUIREMENTS[currentScreen]} {...LOCKED_COPY[currentScreen]} onUpgrade={openBilling} />;
     }
+    const screen = renderEditableScreen();
+    if (!siteColumnsReadOnly) return screen;
+    return (
+      <>
+        <p
+          className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+          data-testid="set-admin-only"
+        >
+          Only admins can change site settings
+        </p>
+        {/* A disabled fieldset disables every control inside it natively. */}
+        <fieldset disabled className="tw:m-0 tw:min-w-0 tw:border-0 tw:p-0" data-testid="set-readonly">
+          {screen}
+        </fieldset>
+      </>
+    );
+  };
+
+  const renderEditableScreen = (): React.ReactNode => {
     const common = {
       composer,
       projectId,
@@ -806,7 +836,7 @@ export const SettingsTab: React.FC<
         {/* The Overview (4418:128917) and the immediate screens (4418:127680)
             draw no footer either — nothing there waits to be saved, and Back to
             canvas is the way out. */}
-        {locked || isOverview || immediate || footStatus.text === "All changes saved" ? null : (
+        {locked || isOverview || immediate || siteColumnsReadOnly || footStatus.text === "All changes saved" ? null : (
         <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
           <Button
             type="button"
