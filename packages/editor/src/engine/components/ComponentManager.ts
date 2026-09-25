@@ -21,6 +21,7 @@ import type {
   OverrideType,
 } from "../../shared/types/components";
 import { deepClone } from "../../shared/utils/helpers";
+import { sanitizeElementTreeContent } from "../../shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
 import { ComponentInstanceUtils } from "./ComponentInstance";
 import {
@@ -137,6 +138,9 @@ export class ComponentManager {
 
     this.components.clear();
     componentList.forEach((comp) => {
+      // A master reaches the canvas by instancing, never via importProject,
+      // so it gets importProject's ingest sanitizing here.
+      sanitizeElementTreeContent(comp.masterTree);
       this.components.set(comp.id, comp);
     });
 
@@ -266,6 +270,9 @@ export class ComponentManager {
     const existing = this.components.get(definition.id);
     if (existing) return existing;
     const component: ComponentDefinition = { ...deepClone(definition), pageId: null };
+    // Workspace-shared, and rows stored before the server sanitized masters
+    // were never cleaned: the same ingest boundary as importProject.
+    sanitizeElementTreeContent(component.masterTree);
     await saveComponent(component, this.projectId);
     this.components.set(component.id, component);
     this.composer.emit(EVENTS.COMPONENT_CREATED, { component });
