@@ -435,7 +435,11 @@ export async function cancelPublish(jobId: string) {
  *  the HTML-at-rest; the most-recent (the live version) is always retained. */
 const PUBLISH_HISTORY_RETAINED = 20;
 
-export async function completePublish(jobId: string, publicUrl: string) {
+export async function completePublish(
+  jobId: string,
+  publicUrl: string,
+  extra?: { progress?: number; steps?: Prisma.InputJsonValue },
+) {
   const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
   if (!job) throw new Error("JOB_NOT_FOUND");
 
@@ -444,7 +448,15 @@ export async function completePublish(jobId: string, publicUrl: string) {
       where: { id: jobId },
       // P1: KEEP the log payload (was `log: Prisma.DbNull`) so this version can
       // be rolled back later. Storage is bounded by the prune below.
-      data: { status: "COMPLETED", completedAt: new Date() },
+      data: {
+        status: "COMPLETED",
+        completedAt: new Date(),
+        // D-1: the worker's inline write also carried progress:100 and the
+        // final steps array so the SSE/poll progress UI reaches 100% — carry
+        // them through here now that the worker calls this instead.
+        ...(extra?.progress !== undefined ? { progress: extra.progress } : {}),
+        ...(extra?.steps !== undefined ? { steps: extra.steps } : {}),
+      },
     }),
     prisma.site.update({
       where: { id: job.siteId },

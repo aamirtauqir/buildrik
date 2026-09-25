@@ -9,7 +9,7 @@ import { planFormWiring } from "@lib/publish-forms";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
-import { runVercelDeploy } from "@server/services/publish.service";
+import { runVercelDeploy, completePublish } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
 import { checkWorkerAuth } from "@/lib/cron-auth";
@@ -132,29 +132,12 @@ export async function POST(
       ? await runVercelDeployJob(jobId, job.siteId, job.workspaceId, pages)
       : await runSimulation(jobId, job.siteId);
 
-    await prisma.$transaction([
-      prisma.publishBuildJob.update({
-        where: { id: jobId },
-        data: {
-          status: "COMPLETED",
-          progress: 100,
-          completedAt: new Date(),
-          steps: buildSteps(STEPS.length),
-          // Clear `log` (raw page HTML payload). See publish.service.ts
-          // for the data-at-rest rationale; same treatment in every
-          // terminal-state update.
-          log: Prisma.DbNull,
-        },
-      }),
-      prisma.site.update({
-        where: { id: job.siteId },
-        data: {
-          status: "PUBLISHED",
-          publishedUrl: publicUrl,
-          lastPublishedAt: new Date(),
-        },
-      }),
-    ]);
+    // D-1: the worker was the only live COMPLETED writer, and it duplicated
+    // (and diverged from) completePublish's own transaction — including
+    // nulling `log` here, which made every real publish NOT_ROLLBACKABLE
+    // despite the service and the UI already shipping rollback (PD-41: keep
+    // the payload, bounded by completePublish's own 20-version prune).
+    await completePublish(jobId, publicUrl, { progress: 100, steps: buildSteps(STEPS.length) });
 
     // P6 workspace webhook — best-effort, never blocks the publish result.
     void deliverWebhook(job.workspaceId, "site.publish", {
