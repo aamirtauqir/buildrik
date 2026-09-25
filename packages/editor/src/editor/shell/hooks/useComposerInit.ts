@@ -18,11 +18,13 @@ import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/ty
 import { importMigratedProject } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
+  isSaveConflictPending,
   loadCurrentUserId,
   loadProject,
   loadServerMedia,
   saveProject,
   SaveConflictError,
+  SAVE_CONFLICT_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
@@ -32,6 +34,7 @@ import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError } from "./useSaveCallback";
+import { invalidateMyRole } from "@/services/RoleService";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -503,6 +506,18 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       changeSeq += 1;
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        /* A-2 / PD-11: a refused save is waiting on the user's choice. Sending
+           again would carry the same stale token and be refused again, so the
+           edit stays dirty under the "Conflict" pill until the dialog resolves
+           it (Overwrite clears the hold and saves; Reload re-loads). */
+        if (siteId && isSaveConflictPending()) {
+          /* Held, not sent — so this edit exists only in the tab. Keep it for
+             the reload, the same as an offline edit. */
+          keepUnsaved(siteId, composer.exportProject());
+          setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+          setIsDirty(true);
+          return;
+        }
         const seqAtSend = changeSeq;
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
 
@@ -618,6 +633,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             if (isForbiddenSaveError(message)) {
+              /* A15-9: the refused edit existed only in this tab — keep it
+                 recoverable, exactly as the network branch does, and drop the
+                 cached role that let the chrome offer the edit at all. */
+              if (siteId) keepUnsaved(siteId, composer.exportProject());
+              invalidateMyRole();
               addToast({
                 title: "You don't have access to save this site",
                 description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
@@ -662,11 +682,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // never project:changed), so without these listeners an undo or a
     // "Restore version" was never auto-saved — the change was lost on reload
     // while the server kept the pre-undo state.
+    /* Every conflict — from a save OR a publish (C-3) — puts the chip in the
+       conflict state. Only the save paths set it before, so a publish-raised
+       conflict held autosave with no pill, no Publish blocker and no sign
+       anything was wrong. */
+    const onConflict = () =>
+      setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+    if (typeof window !== "undefined") window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     composer.on("project:changed", handler);
     composer.on("history:undo", handler);
     composer.on("history:redo", handler);
     composer.on("version:restored", handler);
     return () => {
+      if (typeof window !== "undefined") window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
       composer.off("project:changed", handler);
       composer.off("history:undo", handler);
       composer.off("history:redo", handler);

@@ -15,7 +15,13 @@ const mocks = {
   siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
   mediaListAssetsQuery: vi.fn(),
   mediaListFoldersQuery: vi.fn(),
+  myRole: vi.fn(() => Promise.resolve("ADMIN")),
 };
+
+vi.mock("../RoleService", async (orig) => ({
+  ...(await orig<typeof import("../RoleService")>()),
+  fetchMyRole: () => mocks.myRole(),
+}));
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
@@ -39,6 +45,7 @@ vi.mock("../api-client", () => ({
   }),
 }));
 
+import type { ProjectData } from "@/shared/types/project";
 import {
   loadProject,
   saveProject,
@@ -50,6 +57,7 @@ import {
   SaveConflictError,
   ProjectNotLoadedError,
   SAVE_CONFLICT_EVENT,
+  isSaveConflictPending,
 } from "../BuildrikSyncProvider";
 
 /* saveProject refuses a site whose project never loaded — the guard that stops
@@ -479,6 +487,83 @@ describe("save-conflict parsing (61-conflict)", () => {
     expect(mocks.saveProjectMutate.mock.calls[1][0]).toMatchObject({ expectedLastEditedAt: "2026-07-02T00:00:00.000Z" });
   });
 
+  /* Review Focus 2 (A-2): the server CAS refuses any token that is not the
+     row's current lastEditedAt. Five edits fired while a slow save is still
+     travelling must each leave with the token the previous save returned —
+     zero self-conflicts with nobody else on the site. The mock server below
+     IS that CAS: it compares, advances, and answers slowly. */
+  it("5 rapid saves against a slow CAS server produce 0 self-conflicts", async () => {
+    vi.useFakeTimers();
+    try {
+      let serverLastEditedAt = "2026-06-30T12:00:00.000Z";
+      mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T", lastEditedAt: serverLastEditedAt });
+      mocks.pagesListQuery.mockResolvedValue([]);
+      await loadProject("s1");
+      let tick = 0;
+      mocks.saveProjectMutate.mockImplementation(
+        ({ expectedLastEditedAt }: { expectedLastEditedAt: string | null }) =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              if (expectedLastEditedAt !== serverLastEditedAt) {
+                reject(new Error(`SAVE_CONFLICT:${serverLastEditedAt}`));
+                return;
+              }
+              tick += 1;
+              const savedAt = new Date(Date.parse("2026-07-01T00:00:00.000Z") + tick * 1000);
+              serverLastEditedAt = savedAt.toISOString();
+              resolve({ success: true, savedAt });
+            }, 800);
+          }),
+      );
+
+      const saves = Array.from({ length: 5 }, () => saveProject("s1", PROJECT));
+      const settled = Promise.allSettled(saves);
+      await vi.advanceTimersByTimeAsync(5 * 800 + 10);
+      const results = await settled;
+
+      expect(results.filter((r) => r.status === "rejected")).toHaveLength(0);
+      expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(5);
+      expect(isSaveConflictPending()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a refused save holds autosave until the user resolves it", async () => {
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    expect(isSaveConflictPending()).toBe(true);
+
+    // "Overwrite" adopts the server token — the hold lifts with it.
+    setBaselineLastEditedAt("2026-07-01T10:00:00.000Z");
+    expect(isSaveConflictPending()).toBe(false);
+
+    // A fresh load ("Reload latest") lifts it too.
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T11:00:00.000Z"));
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    await loadedSite("s1");
+    expect(isSaveConflictPending()).toBe(false);
+  });
+
+  /* Review M1: a save queued behind a refused one carried the same stale
+     token and was sent anyway — refused again, one more round trip. */
+  it("a save queued behind a refused one is not sent; after Overwrite it goes out", async () => {
+    let refuse!: (e: Error) => void;
+    mocks.saveProjectMutate.mockImplementationOnce(() => new Promise((_, rej) => (refuse = rej)));
+    const first = saveProject("s1", PROJECT);
+    const queued = saveProject("s1", PROJECT);
+    await Promise.resolve();
+    refuse(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(first).rejects.toThrow(SaveConflictError);
+    await expect(queued).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
+
+    setBaselineLastEditedAt("2026-07-01T10:00:00.000Z");
+    mocks.saveProjectMutate.mockResolvedValueOnce({ success: true, savedAt: new Date() });
+    await saveProject("s1", PROJECT);
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(2);
+  });
+
   it("setBaselineLastEditedAt forces the token (the 'Overwrite' escape hatch)", async () => {
     setBaselineLastEditedAt("2026-07-05T09:00:00.000Z");
     mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
@@ -490,6 +575,11 @@ describe("save-conflict parsing (61-conflict)", () => {
   });
 });
 
+/** A minimal project carrying only settings — typed, no cast. */
+function withSettings(settings: ProjectData["settings"]): ProjectData {
+  return { version: "1.0", pages: [], styles: [], assets: [], settings };
+}
+
 describe("saveProject dual-save routing (P0.2b)", () => {
   beforeEach(async () => {
     await loadedSite("s1");
@@ -498,7 +588,7 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     mocks.siteDetailSettingsUpdateMutate.mockClear().mockResolvedValue({ success: true });
   });
 
-  it("routes Site-column fields to siteDetail.settings.update alongside the project save", async () => {
+  it("routes Site-column fields to siteDetail.settings.update after the project save", async () => {
     await saveProject("s1", {
       version: "1.0",
       pages: [],
@@ -518,6 +608,68 @@ describe("saveProject dual-save routing (P0.2b)", () => {
       bodyCode: "",
     });
     expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
+  });
+
+  /* A-1 / PD-1: the mirror is chained AFTER the project save — never in the
+     same tick — so a refused save cannot have already rewritten the columns. */
+  it("starts the settings call only once the project save has succeeded", async () => {
+    let release!: () => void;
+    mocks.saveProjectMutate.mockImplementationOnce(
+      () => new Promise((r) => (release = () => r({ success: true, savedAt: new Date() }))),
+    );
+    const pending = saveProject("s1", withSettings({ seo: { metaTitle: "After" } }));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    release();
+    await pending;
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaTitle: "After" });
+  });
+
+  it("a conflict makes no settings call", async () => {
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(
+      saveProject("s1", withSettings({ seo: { metaTitle: "Behind copy" } })),
+    ).rejects.toThrow(SaveConflictError);
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    setBaselineLastEditedAt(null);
+  });
+
+  /* A dashboard edit made while the editor is open used to be overwritten by
+     the editor's load-time copy on its next autosave. Only fields that differ
+     from what the server held at load go out. */
+  it("does not send a field the editor left untouched since load", async () => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T" });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      metaTitle: "Loaded title",
+      metaDescription: "Loaded desc",
+    });
+    const loaded = await loadProject("s1");
+
+    // The user edits only the description.
+    const edited = {
+      ...loaded,
+      settings: { ...loaded.settings, seo: { ...loaded.settings?.seo, metaDescription: "New desc" } },
+    };
+    await saveProject("s1", edited);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledTimes(1);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", metaDescription: "New desc" });
+
+    // Saved once, it is the new baseline: the next save carries nothing.
+    await saveProject("s1", edited);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the mirror for a member below ADMIN (the server refuses it anyway)", async () => {
+    mocks.myRole.mockResolvedValueOnce("EDITOR");
+    const heard = vi.fn();
+    window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
+    const result = await saveProject("s1", withSettings({ seo: { metaTitle: "Editor edit" } }));
+    window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, heard);
+    expect(result.success).toBe(true);
+    expect(mocks.siteDetailSettingsUpdateMutate).not.toHaveBeenCalled();
+    expect(heard).not.toHaveBeenCalled();
   });
 
   /* An empty text field means "cleared", and the server's contract for cleared

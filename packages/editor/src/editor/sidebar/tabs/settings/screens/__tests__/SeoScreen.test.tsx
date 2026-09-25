@@ -25,6 +25,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { SeoScreen, robotsPreview, sitemapOrigin } from "../SeoScreen";
+import { SiteColumnsLockedContext } from "../../shared";
 
 const getMock = api.siteDetail.settings.get.query;
 const domainsMock = api.siteDetail.domains.list.query;
@@ -60,6 +61,8 @@ function setup(opts: {
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
   settings?: Record<string, unknown>;
+  /** M7: the viewer's known role is below ADMIN. */
+  siteColumnsLocked?: boolean;
   publishedUrl?: string | null;
 } = {}) {
   const composer = createMockComposer({
@@ -75,6 +78,11 @@ function setup(opts: {
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
     />,
+    {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <SiteColumnsLockedContext.Provider value={opts.siteColumnsLocked ?? false}>{children}</SiteColumnsLockedContext.Provider>
+      ),
+    },
   );
   return { composer, ...utils };
 }
@@ -332,5 +340,27 @@ describe("SeoScreen — the fields say what the server will accept", () => {
     expect(screen.queryByRole("alert")).toBeNull();
     fireEvent.change(metaDescription(), { target: { value: "y".repeat(161) } });
     expect(screen.getByRole("alert")).toHaveTextContent(/under 160 characters/);
+  });
+});
+
+/* M7 round 2: below ADMIN only the Site-column fields lock. */
+describe("SeoScreen — Site-column fields below ADMIN", () => {
+  it("locks meta title / description / OG image / indexing with the reason; the Twitter handle stays editable", async () => {
+    setup({ siteColumnsLocked: true });
+    await loaded();
+    expect(metaTitle().matches(":disabled")).toBe(true);
+    expect(metaDescription().matches(":disabled")).toBe(true);
+    expect(ogImage().matches(":disabled")).toBe(true);
+    expect(indexing().matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only").length).toBeGreaterThan(0);
+    expect(twitterHandle().matches(":disabled")).toBe(false);
+  });
+
+  it("unlocked, every field edits", async () => {
+    setup();
+    await loaded();
+    expect(metaTitle().matches(":disabled")).toBe(false);
+    expect(indexing().matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
   });
 });

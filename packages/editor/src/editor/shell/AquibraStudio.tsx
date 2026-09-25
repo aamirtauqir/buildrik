@@ -412,6 +412,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     lastPublishedAt: publishJob.lastPublishedAt,
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
+    saveConflict: state.saveState.status === "conflict",
   });
 
   /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────
@@ -720,6 +721,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <ConflictModal
         open={!!conflict?.open}
+        siteId={getSiteIdFromUrl()}
         onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
         onReload={() => window.location.reload()}
         onSaveBackup={() => {

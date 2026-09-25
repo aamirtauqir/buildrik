@@ -16,6 +16,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../constants/events";
+import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
 
 export interface MilestoneSuggestion {
   suggestedName: string;
@@ -177,23 +178,22 @@ export function useAutoMilestone(
            model told the site has pages and nothing on them. */
         const elementCount = composer.elements.getAllElements().length;
 
-        const response = await fetch("/api/trpc/ai.milestoneSuggest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ recentChanges, pageStructure: { pageCount, elementCount } }),
-        });
-
-        if (!response.ok) throw new Error("AI unavailable");
-
-        const data = await response.json();
+        /* No retries: a suggestion nobody asked for is not worth a second
+           credit-spending call. */
+        const { data } = await aiTrpcClient.suggestMilestone(
+          { recentChanges, pageStructure: { pageCount, elementCount } },
+          { retries: 0 },
+        );
         setSuggestion({
-          suggestedName: data.result?.data?.suggestedName ?? "Update",
-          reasoning: data.result?.data?.reasoning ?? "",
+          suggestedName: data.suggestedName || "Update",
+          reasoning: data.reasoning ?? "",
           trigger,
         });
         setLastSuggestionTime(Date.now());
-      } catch {
-        // Silently fail — milestone suggestions are best-effort
+      } catch (err) {
+        // Best-effort — but said, not swallowed: a dead transport hid here
+        // for months behind `catch {}`.
+        console.warn("[useAutoMilestone] milestone suggestion failed:", err);
       } finally {
         setIsLoading(false);
       }

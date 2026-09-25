@@ -1,6 +1,9 @@
 /**
- * useAISummary — cached short-circuit, 60s per-version rate limit, fetch
- * success/failure branches, and the cooldown-seconds accessor.
+ * useAISummary — cached short-circuit, 60s per-version rate limit, the
+ * `aiTrpcClient.summarize` success/failure branches, and the cooldown-seconds
+ * accessor. (The hook used to hand-roll a plain-JSON fetch the superjson
+ * router always refused; the transport itself is proven in
+ * services/ai/__tests__/AiTrpcClient.wire.test.ts.)
  *
  * Fake timers control both Date.now (rate-limit math) and the deferred
  * cooldown-tick setTimeout so no real 60s timer leaks between tests.
@@ -10,6 +13,9 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+const summarize = vi.hoisted(() => vi.fn());
+vi.mock("@/services/ai/AiTrpcClient", () => ({ aiTrpcClient: { summarize } }));
+
 import { useAISummary } from "../useAISummary";
 import type { NamedVersion, CompareResult } from "../../../../shared/types/versions";
 
@@ -20,13 +26,13 @@ function version(id: string, extra: Partial<NamedVersion> = {}): NamedVersion {
   return { id, name: `Version ${id}`, ...extra } as unknown as NamedVersion;
 }
 
-function mockFetchOnce(value: unknown) {
-  const fetchMock = vi.fn().mockResolvedValue(value);
-  (globalThis as unknown as { fetch: typeof fetch }).fetch = fetchMock as unknown as typeof fetch;
-  return fetchMock;
+function summaryResolves(summary: string) {
+  summarize.mockResolvedValueOnce({ data: { summary }, cached: false, duration: 1 });
+  return summarize;
 }
 
 beforeEach(() => {
+  summarize.mockReset();
   vi.useFakeTimers();
   vi.setSystemTime(BASE);
 });
@@ -38,7 +44,6 @@ afterEach(() => {
 
 describe("useAISummary — cached short-circuit", () => {
   it("surfaces the cached summary without fetching or rate-limiting", async () => {
-    const fetchMock = mockFetchOnce({ ok: true, json: async () => ({}) });
     const updateAiSummary = vi.fn().mockResolvedValue(undefined);
     const versions = [version("v1", { aiSummary: "already summarized" })];
 
@@ -55,18 +60,15 @@ describe("useAISummary — cached short-circuit", () => {
       result: "already summarized",
       error: null,
     });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(summarize).not.toHaveBeenCalled();
     // Cached path never records a timestamp → no cooldown incurred.
     expect(result.current.getCooldownSeconds("v1")).toBe(0);
   });
 });
 
-describe("useAISummary — fetch branches", () => {
+describe("useAISummary — summarize branches", () => {
   it("stores the summary and persists it on a successful response", async () => {
-    mockFetchOnce({
-      ok: true,
-      json: async () => ({ result: { data: { summary: "Concise diff summary" } } }),
-    });
+    summaryResolves("Concise diff summary");
     const updateAiSummary = vi.fn().mockResolvedValue(undefined);
     const versions = [version("v1")];
 
@@ -78,6 +80,7 @@ describe("useAISummary — fetch branches", () => {
       await result.current.handleGetAiSummary("v1");
     });
 
+    expect(summarize).toHaveBeenCalledWith({ versionName: "Version v1", changes: compare });
     expect(updateAiSummary).toHaveBeenCalledWith("v1", "Concise diff summary");
     expect(result.current.aiSummaryStates.v1).toMatchObject({
       loading: false,
@@ -86,8 +89,7 @@ describe("useAISummary — fetch branches", () => {
     });
   });
 
-  it("errors when compare data has not loaded yet (no fetch)", async () => {
-    const fetchMock = mockFetchOnce({ ok: true, json: async () => ({}) });
+  it("errors when compare data has not loaded yet (no request)", async () => {
     const versions = [version("v1")];
 
     const { result } = renderHook(() =>
@@ -98,12 +100,12 @@ describe("useAISummary — fetch branches", () => {
       await result.current.handleGetAiSummary("v1");
     });
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(summarize).not.toHaveBeenCalled();
     expect(result.current.aiSummaryStates.v1.error).toBe("Compare data not loaded yet");
   });
 
-  it("errors when the response is not ok", async () => {
-    mockFetchOnce({ ok: false, json: async () => ({}) });
+  it("errors when the request is refused", async () => {
+    summarize.mockRejectedValueOnce(new Error("INTERNAL_SERVER_ERROR"));
     const versions = [version("v1")];
 
     const { result } = renderHook(() =>
@@ -117,8 +119,24 @@ describe("useAISummary — fetch branches", () => {
     expect(result.current.aiSummaryStates.v1.error).toBe("AI summary unavailable");
   });
 
+  /* versionName is `.min(1)` on the server — "" was a 400 before any model
+     call. An unnamed version is summarised as "Untitled". */
+  it("sends a name the server accepts for an unnamed version", async () => {
+    summaryResolves("ok");
+    const versions = [version("v1", { name: "" })];
+
+    const { result } = renderHook(() =>
+      useAISummary({ versions, compareResults: { v1: compare }, updateAiSummary: vi.fn().mockResolvedValue(undefined) })
+    );
+    await act(async () => {
+      await result.current.handleGetAiSummary("v1");
+    });
+
+    expect(summarize).toHaveBeenCalledWith(expect.objectContaining({ versionName: "Untitled" }));
+  });
+
   it("errors when the response summary is empty", async () => {
-    mockFetchOnce({ ok: true, json: async () => ({ result: { data: { summary: "" } } }) });
+    summaryResolves("");
     const versions = [version("v1")];
 
     const { result } = renderHook(() =>
@@ -135,10 +153,7 @@ describe("useAISummary — fetch branches", () => {
 
 describe("useAISummary — rate limiting", () => {
   it("blocks a second request within the 60s window", async () => {
-    mockFetchOnce({
-      ok: true,
-      json: async () => ({ result: { data: { summary: "first" } } }),
-    });
+    summaryResolves("first");
     const versions = [version("v1")];
 
     const { result } = renderHook(() =>
@@ -157,10 +172,7 @@ describe("useAISummary — rate limiting", () => {
   });
 
   it("getCooldownSeconds counts down from 60 as time passes", async () => {
-    mockFetchOnce({
-      ok: true,
-      json: async () => ({ result: { data: { summary: "x" } } }),
-    });
+    summaryResolves("x");
     const versions = [version("v1")];
 
     const { result } = renderHook(() =>

@@ -38,7 +38,7 @@ vi.mock("@/server/services/permission.service", () => ({
 vi.mock("@/server/services/sites.service", () => ({
   listSites: vi.fn(), getSite: vi.fn(), renameSite: vi.fn(), archiveSite: vi.fn(),
   unarchiveSite: vi.fn(), deleteSite: vi.fn(), bulkAction: vi.fn(),
-  checkSlugAvailability: vi.fn(), transferSite: vi.fn(), saveProjectData: vi.fn(),
+  checkSlugAvailability: vi.fn(), transferSite: vi.fn(),
   saveProjectFromEditor: vi.fn(), getProjectData: vi.fn(),
   createSite: (...a: unknown[]) => createSiteMock(...a),
   duplicateSite: (...a: unknown[]) => duplicateSiteMock(...a),
@@ -69,7 +69,7 @@ vi.mock("@buildrik/shared/schemas/sites", () => {
   const any = z.any();
   return {
     listSitesSchema: any, createSiteSchema: any, bulkActionSchema: any,
-    transferSiteSchema: any, checkSlugSchema: any, saveProjectDataSchema: any,
+    transferSiteSchema: any, checkSlugSchema: any,
     getProjectDataSchema: any, editorSaveProjectSchema: any,
   };
 });

@@ -2192,7 +2192,7 @@ const CASES: Record<string, () => React.ReactElement> = {
      callbacks it takes. */
   "shell-state-11-saving-conflict": () => (
     <div data-probe="shell-state-11-saving-conflict">
-      <ConflictModal open onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
     </div>
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.

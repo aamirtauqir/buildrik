@@ -50,7 +50,7 @@ async function requireAdmin(
 
 function translateThemeError(e: unknown): never {
   if (e instanceof ThemeError) {
-    const code = e.code === "NOT_FOUND" ? "NOT_FOUND" : "BAD_REQUEST";
+    const code = e.code === "NOT_FOUND" ? "NOT_FOUND" : e.code === "CONFLICT" ? "CONFLICT" : "BAD_REQUEST";
     throw new TRPCError({ code, message: e.message });
   }
   throw e;

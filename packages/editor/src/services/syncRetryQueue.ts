@@ -16,6 +16,8 @@
  * @license BSD-3-Clause
  */
 
+import { deepEqual } from "@shared/utils/helpers/objectDeep";
+
 export interface SyncRetryInfo {
   /** Number of changes still queued (not yet mirrored to the server). */
   pending: number;
@@ -73,6 +75,13 @@ export class SyncRetryQueue {
   /** How many changes are queued for retry (not yet on the server). */
   pendingCount(): number {
     return this.queue.size;
+  }
+
+  /** Whether a mirror for `key` is waiting to reach the server. Hydration
+   *  reads it so a newer server copy never overwrites a local change that
+   *  simply has not landed yet (C-4). */
+  isPending(key: string): boolean {
+    return this.queue.has(key);
   }
 
   /**
@@ -138,5 +147,120 @@ export class SyncRetryQueue {
     for (const replay of Array.from(this.queue.values())) {
       await replay();
     }
+  }
+}
+
+/* ── C-4: server stamps — reconcile on ONE clock ────────────────────────────
+   Hydration decides "is the server's copy newer than mine?". Comparing the
+   server's `updatedAt` with a local row's `updatedAt` mixes two clocks (the
+   local one is this browser's), and the retry queue above is in memory, so
+   after a reload it cannot say which local rows never reached the server.
+
+   A stamp records, per synced row, the SERVER's `updatedAt` the last time the
+   server confirmed this browser's copy, and the LOCAL `updatedAt` that copy
+   had then. It persists in localStorage so it survives the reload. Then:
+     - no local row          → take the server's
+     - no stamp              → never confirmed by the server: keep local
+     - local moved on since  → an unconfirmed local edit: keep local
+     - otherwise             → take the server's only if ITS clock moved on
+   Every comparison is server-vs-server or an equality on the local value. */
+const STAMP_STORAGE_KEY = "bk-sync-stamps-v1";
+
+interface ServerStamp {
+  server: string;
+  local: string;
+}
+
+function readStamps(): Record<string, ServerStamp> {
+  try {
+    const raw = localStorage.getItem(STAMP_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, ServerStamp>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Record that the server holds this browser's copy of `key` as of `server`. */
+export function recordServerStamp(key: string, server: Date | string, local: string | number): void {
+  try {
+    const stamps = readStamps();
+    stamps[key] = { server: new Date(server).toISOString(), local: String(local) };
+    localStorage.setItem(STAMP_STORAGE_KEY, JSON.stringify(stamps));
+  } catch {
+    // Private mode / quota: without a stamp the row simply stays local-first.
+  }
+}
+
+/** Whether the server has ever confirmed this browser's copy of `key`. */
+export function hasServerStamp(key: string): boolean {
+  return key in readStamps();
+}
+
+/**
+ * Whether hydration may overwrite the local copy of `key` with the server's.
+ * `firstPass` is the one-time pre-stamp pass (see `stampMigrationDue`): rows
+ * written before stamps existed have none, and without this a row never edited
+ * locally again would never be mirrored, never stamped, and hide every
+ * teammate edit forever. On that pass only, an unstamped row falls back to the
+ * old two-clock comparison, once; after it, no stamp means "never confirmed,
+ * stays local".
+ */
+export function serverCopyWins(
+  key: string,
+  serverUpdatedAt: Date | string,
+  localUpdatedAt: string | number | undefined,
+  hasLocal: boolean,
+  firstPass: boolean,
+): boolean {
+  if (!hasLocal) return true;
+  const stamp = readStamps()[key];
+  if (!stamp) {
+    return firstPass && new Date(serverUpdatedAt).getTime() > new Date(localUpdatedAt ?? NaN).getTime();
+  }
+  if (String(localUpdatedAt) !== stamp.local) return false;
+  return new Date(serverUpdatedAt).getTime() > new Date(stamp.server).getTime();
+}
+
+/**
+ * Same content, as the server stores it: a JSON round trip drops `undefined`
+ * fields (IndexedDB keeps them, the server's JSON does not) and `deepEqual`
+ * ignores key order (Postgres jsonb reorders keys). An unstamped local row
+ * equal to the server's copy is ADOPTED — stamped — so the next server edit
+ * reaches it, instead of it staying local-first forever.
+ */
+export function sameContent(a: unknown, b: unknown): boolean {
+  return deepEqual(JSON.parse(JSON.stringify(a ?? null)), JSON.parse(JSON.stringify(b ?? null)));
+}
+
+/* The one-time pre-stamp pass is tracked per `<domain>:<siteId>` (e.g.
+   "cms:site-1"), not by the stamp map's absence: the CMS and component
+   hydrates run side by side and the first stamp either writes would end the
+   pass for the other, and the stamp map is browser-wide while a hydrate only
+   sees the current site's rows. It is marked done only after a hydrate got
+   through, so a failed one runs the pass again next time. */
+const MIGRATION_STORAGE_KEY = "bk-sync-stamp-migrations-v1";
+
+function readMigrations(): string[] {
+  try {
+    const raw = localStorage.getItem(MIGRATION_STORAGE_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Whether `scope`'s one-time pre-stamp pass has yet to run in this browser. */
+export function stampMigrationDue(scope: string): boolean {
+  return !readMigrations().includes(scope);
+}
+
+export function markStampMigrationDone(scope: string): void {
+  try {
+    const done = readMigrations();
+    if (done.includes(scope)) return;
+    localStorage.setItem(MIGRATION_STORAGE_KEY, JSON.stringify([...done, scope]));
+  } catch {
+    // Storage unavailable: the pass simply runs again on the next hydrate.
   }
 }

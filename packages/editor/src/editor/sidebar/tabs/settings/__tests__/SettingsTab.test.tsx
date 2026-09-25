@@ -38,6 +38,9 @@ vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   getEditorPlanTier: () => "starter",
 }));
 
+const role = vi.hoisted(() => ({ value: null as string | null }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useEditorRole: () => role.value }));
+
 vi.mock("../hooks/useSettingsScreen", () => ({
   useSettingsScreen: vi.fn(
     (
@@ -781,5 +784,48 @@ describe("SettingsTab — a screen mounted with the shell keeps its handlers", (
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await waitFor(() => expect(composer.saveProject).toHaveBeenCalled());
     expect(seoFlushes).toEqual(["flushed"]);
+  });
+});
+
+/* M7 (PD-1), narrowed in review round 2: only the fields the sync provider
+   mirrors to Site columns (SITE_COLUMN_FIELDS) are the dashboard's. Below
+   ADMIN those are read-only and say why; everything else on the screen —
+   Author, Twitter handle, Global CSS — is project data the EDITOR could always
+   change, and still can, with the Save footer to save it. */
+describe("SettingsTab — Site-column fields below ADMIN", () => {
+  afterEach(() => {
+    role.value = null;
+  });
+
+  it("an EDITOR on General: Site name is read-only with the reason; Author edits and saves", async () => {
+    role.value = "EDITOR";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only")[0].textContent).toBe("Only admins can change this");
+    const author = screen.getByLabelText("Author") as HTMLInputElement;
+    expect(author.matches(":disabled")).toBe(false);
+    fireEvent.change(author, { target: { value: "Sam" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+    expect(screen.getByTestId("set-foot-save")).toBeTruthy();
+  });
+
+  it("an ADMIN edits every field", async () => {
+    role.value = "ADMIN";
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
+  });
+
+  it("an unknown role (demo, lookup failed) stays editable — the server decides", async () => {
+    role.value = null;
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
   });
 });

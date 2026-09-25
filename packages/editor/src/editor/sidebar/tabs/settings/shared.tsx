@@ -7,7 +7,10 @@
  *   <Section title desc>      — the CARD: white on a --bk-border hairline, radius-lg,
  *                               24 padding, title 14/600, a two-column field grid
  *   <Field label hint span>   — label 13 over a 32 control; `span="full"` for a
- *                               code well or anything else that wants the row
+ *                               code well or anything else that wants the row;
+ *                               `siteColumn` locks it below ADMIN (SiteColumnGate)
+ *   <SiteColumnGate field>    — read-only + "Only admins can change this" for a
+ *                               Site-column control, when SiteColumnsLockedContext says so
  *   <Input> <Textarea> <Select>
  *   <SwitchRow>               — toggle row with title/desc + switch
  *   <LoadCard>                — the loading / load-error card (3953:26363, 3953:26503)
@@ -28,6 +31,7 @@ import {
   Textarea as ChromeTextarea,
   TextInput as ChromeTextInput,
 } from "@/editor/chrome-ui";
+import type { SiteColumnField } from "@/services/BuildrikSyncProvider";
 /** Conformance anchor stem: a card/field is identified by its own title. */
 const slug = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -159,6 +163,48 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Site-column lock (M7 / PD-1)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * True when the viewer's KNOWN role is below ADMIN (SettingsTab provides it;
+ * an unknown role stays false — the server decides). Site columns are the
+ * dashboard's and the editor mirrors them only for an ADMIN, so below ADMIN an
+ * edit to one would save into the project and never reach the site.
+ */
+export const SiteColumnsLockedContext = React.createContext(false);
+
+/**
+ * Wraps the control that edits one Site column (`field` must be one of
+ * SITE_COLUMN_FIELDS). Locked, it renders the control inside a disabled
+ * fieldset — which disables every native control in it — with the reason
+ * under it. Everything else on the screen stays editable.
+ */
+export const SiteColumnGate: React.FC<{ field: SiteColumnField; className?: string; children: React.ReactNode }> = ({
+  field,
+  className,
+  children,
+}) => {
+  const locked = React.useContext(SiteColumnsLockedContext);
+  if (!locked) return <>{children}</>;
+  return (
+    <fieldset
+      disabled
+      data-site-column={field}
+      className={`tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-1 tw:border-0 tw:p-0${className ? ` ${className}` : ""}`}
+    >
+      {children}
+      <span
+        className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+        data-testid="set-admin-only"
+      >
+        Only admins can change this
+      </span>
+    </fieldset>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Field
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -177,10 +223,12 @@ interface FieldProps {
   anchor?: string;
   /** `full` spans both grid columns — a code well, a long textarea. */
   span?: "half" | "full";
+  /** The Site column this field edits — locked below ADMIN (SiteColumnGate). */
+  siteColumn?: SiteColumnField;
   children: React.ReactNode;
 }
 
-export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span = "half", children }) => {
+export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span = "half", siteColumn, children }) => {
   const stem = slug(anchor ?? String(label));
   return (
     <div
@@ -196,7 +244,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
         <span>{label}</span>
         {hint ? <span className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">{hint}</span> : null}
       </label>
-      {children}
+      {siteColumn ? <SiteColumnGate field={siteColumn}>{children}</SiteColumnGate> : children}
     </div>
   );
 };

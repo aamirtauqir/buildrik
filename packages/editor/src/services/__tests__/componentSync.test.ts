@@ -37,16 +37,22 @@ import {
   mirrorComponentUpsert,
   mirrorComponentDelete,
   hydrateComponentsFromServer,
+  getComponentHydrationStatus,
   onComponentSyncError,
   retryComponentSync,
   getComponentSyncPendingCount,
   fetchComponentLibrary,
   fetchLibraryComponent,
 } from "../componentSync";
+import { recordServerStamp } from "../syncRetryQueue";
 
 beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   [upsert, del, list, get, loadComponents, saveComponent].forEach((m) => m.mockReset());
+  localStorage.removeItem("bk-sync-stamps-v1");
+  localStorage.removeItem("bk-sync-stamp-migrations-v1");
+  // The server answers an upsert with its row's updatedAt (C-4 stamps).
+  upsert.mockResolvedValue({ componentId: "x", updatedAt: new Date(0) });
   // The retry queue is module-level shared state; flush anything a prior test
   // left queued (reset mocks now resolve) so each test starts from empty, then
   // clear the call history the flush incurred so per-test counts start at 0.
@@ -55,6 +61,77 @@ beforeEach(async () => {
 });
 
 const comp = (id: string, name = "Card") => ({ id, name }) as never;
+/** This site's one-time pre-stamp pass already ran in this browser. */
+const migrated = () => localStorage.setItem("bk-sync-stamp-migrations-v1", JSON.stringify(["component:site-123"]));
+const stamps = (): Record<string, { server: string; local: string }> =>
+  JSON.parse(localStorage.getItem("bk-sync-stamps-v1") ?? "{}");
+
+/* Round 2 #3: masters hydrated or mirrored before stamps existed have none. */
+describe("componentSync — a mirror answered without a row", () => {
+  it("is a success, not a queued failure, and records no stamp", async () => {
+    const onErr = vi.fn();
+    const off = onComponentSyncError(onErr);
+    upsert.mockResolvedValueOnce(undefined);
+    await mirrorComponentUpsert(comp("nr"));
+    expect(onErr).not.toHaveBeenCalled();
+    expect(getComponentSyncPendingCount()).toBe(0);
+    expect(localStorage.getItem("bk-sync-stamps-v1")).toBeNull();
+    off();
+  });
+});
+
+describe("componentSync — unstamped masters (C-4 round 2)", () => {
+  it("first hydrate for this site: an older unstamped master takes the server's copy once (one get) and is stamped", async () => {
+    list.mockResolvedValueOnce([{ componentId: "old", updatedAt: new Date(9000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "old", name: "Stale", updatedAt: 1000 }]);
+    get.mockResolvedValueOnce({ id: "old", name: "Teammate's", updatedAt: 8000 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(1);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(saveComponent.mock.calls[0][0]).toMatchObject({ name: "Teammate's" });
+    expect(stamps()["component:old"]).toBeDefined();
+    expect(JSON.parse(localStorage.getItem("bk-sync-stamp-migrations-v1") ?? "[]")).toContain("component:site-123");
+  });
+
+  it("after the pass, an unstamped master equal to the server's is adopted (one get) — the next server edit arrives", async () => {
+    migrated();
+    const same = { id: "m", name: "Card", tree: { a: 1 }, updatedAt: 5 };
+    list.mockResolvedValueOnce([{ componentId: "m", updatedAt: new Date(3000) }]);
+    loadComponents.mockResolvedValue([same]);
+    get.mockResolvedValueOnce({ ...same });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(stamps()["component:m"]).toEqual({ server: new Date(3000).toISOString(), local: "5" });
+    list.mockResolvedValueOnce([{ componentId: "m", updatedAt: new Date(4000) }]);
+    get.mockResolvedValueOnce({ ...same, name: "Renamed", updatedAt: 6 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(1);
+  });
+
+  it("a master skipped for a queued mirror leaves the scope due, so the pass re-runs", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("offline"));
+    await mirrorComponentUpsert({ id: "q", name: "Mine", updatedAt: 1 } as never);
+    list.mockResolvedValueOnce([{ componentId: "q", updatedAt: new Date(9000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "q", name: "Mine", updatedAt: 1 }]);
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    const marks = () => JSON.parse(localStorage.getItem("bk-sync-stamp-migrations-v1") ?? "[]");
+    expect(marks()).not.toContain("component:site-123");
+    await retryComponentSync();
+    list.mockResolvedValueOnce([]);
+    await hydrateComponentsFromServer();
+    expect(marks()).toContain("component:site-123");
+    warn.mockRestore();
+  });
+
+  it("after the pass, an unstamped master that differs stays local and unstamped", async () => {
+    migrated();
+    list.mockResolvedValueOnce([{ componentId: "d", updatedAt: new Date(3000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "d", name: "Mine", updatedAt: 5 }]);
+    get.mockResolvedValueOnce({ id: "d", name: "Theirs", updatedAt: 9 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(saveComponent).not.toHaveBeenCalled();
+    expect(stamps()["component:d"]).toBeUndefined();
+  });
+});
 
 describe("componentSync", () => {
   it("mirrors an upsert to siteComponents.upsert with the URL siteId", async () => {
@@ -83,15 +160,52 @@ describe("componentSync", () => {
     off();
   });
 
-  it("hydrate writes server components not already local, skipping existing ids", async () => {
-    list.mockResolvedValueOnce([{ componentId: "srv1" }, { componentId: "local1" }]);
-    loadComponents.mockResolvedValueOnce([{ id: "local1" }]); // already local → skip
-    get.mockResolvedValueOnce({ id: "srv1", name: "Server one" });
-    await hydrateComponentsFromServer();
-    expect(get).toHaveBeenCalledTimes(1);
-    expect(saveComponent).toHaveBeenCalledTimes(1);
-    expect(saveComponent.mock.calls[0][0]).toMatchObject({ id: "srv1" });
+  /* C-4 / PD-36: server-first on the SERVER's clock (stamps) — the additive
+     pass skipped every id already local, so a teammate's edit to a shared
+     master never arrived. */
+  it("hydrate writes missing masters and server-moved confirmed ones; keeps unconfirmed and unchanged ones", async () => {
+    migrated();
+    recordServerStamp("component:moved", new Date(1000), 50);   // confirmed, local unchanged (50), server moved to 9000
+    recordServerStamp("component:same", new Date(1000), 60);    // confirmed, server unchanged
+    recordServerStamp("component:edited", new Date(1000), 70);  // confirmed, then edited locally (71)
+    list.mockResolvedValueOnce([
+      { componentId: "srv1", updatedAt: new Date(1000) },
+      { componentId: "moved", updatedAt: new Date(9000) },
+      { componentId: "same", updatedAt: new Date(1000) },
+      { componentId: "edited", updatedAt: new Date(9000) },
+      { componentId: "never", updatedAt: new Date(9000) },     // local, no stamp
+    ]);
+    loadComponents.mockResolvedValueOnce([
+      { id: "moved", updatedAt: 50 },
+      { id: "same", updatedAt: 60 },
+      { id: "edited", updatedAt: 71 },
+      { id: "never", updatedAt: 1 },
+    ]);
+    get
+      .mockResolvedValueOnce({ id: "srv1", name: "Server one", updatedAt: 5 })
+      .mockResolvedValueOnce({ id: "moved", name: "Edited on server", updatedAt: 6 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(2);
+    expect(saveComponent.mock.calls.map((c) => c[0].id)).toEqual(["srv1", "moved"]);
     expect(saveComponent.mock.calls[0][1]).toBe("site-123"); // projectId
+    expect(getComponentHydrationStatus()).toBe("ready");
+  });
+
+  it("client clock ahead or behind does not matter — only the stamp does", async () => {
+    upsert.mockResolvedValueOnce({ componentId: "c", updatedAt: new Date(1000) });
+    // local clock far AHEAD of the server's
+    await mirrorComponentUpsert({ id: "c", name: "Card", updatedAt: Date.parse("2099-01-01") } as never);
+    list.mockResolvedValueOnce([{ componentId: "c", updatedAt: new Date(2000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "c", updatedAt: Date.parse("2099-01-01") }]);
+    get.mockResolvedValueOnce({ id: "c", updatedAt: 1 });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(1);
+  });
+
+  it("a failed hydrate says so through the status", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    list.mockRejectedValueOnce(new Error("offline"));
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(getComponentHydrationStatus()).toBe("error");
+    warn.mockRestore();
   });
 
   it("no-ops when not on an /edit/<siteId> URL", async () => {

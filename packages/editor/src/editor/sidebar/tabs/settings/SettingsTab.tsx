@@ -47,6 +47,7 @@ import {
   SET_BTN,
   SET_HEAD_BTN,
   SET_EYEBROW,
+  SiteColumnsLockedContext,
   SiteSettingsScreen,
   LockedScreen,
   LOCKED_COPY,
@@ -69,6 +70,9 @@ import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERRO
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { roleAtLeast } from "@/services/RoleService";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+
 import "./settings.css";
 
 // ─── Module-scope data ───────────────────────────────────────────────────────
@@ -501,12 +505,24 @@ export const SettingsTab: React.FC<
   // ─── Pane content ─────────────────────────────────────────────────────
 
   const locked = !isOverview && isScreenLocked(currentScreen, effectivePlan);
+  const editorRole = useEditorRole();
+  /* PD-1 (M7): Site columns are the dashboard's, mirrored from the editor only
+     for an ADMIN. Below ADMIN (a KNOWN role — unknown stays editable, the
+     server decides) the fields that edit them are read-only and say why; the
+     rest of each screen is project data and stays editable. */
+  const siteColumnsLocked = roleAtLeast(editorRole, "ADMIN") === false;
 
   const renderScreen = (): React.ReactNode => {
     if (isOverview) return <OverviewScreen projectId={projectId} onOpenScreen={requestNav} />;
     if (locked) {
       return <LockedScreen variant={SCREEN_PLAN_REQUIREMENTS[currentScreen]} {...LOCKED_COPY[currentScreen]} onUpgrade={openBilling} />;
     }
+    return (
+      <SiteColumnsLockedContext.Provider value={siteColumnsLocked}>{renderEditableScreen()}</SiteColumnsLockedContext.Provider>
+    );
+  };
+
+  const renderEditableScreen = (): React.ReactNode => {
     const common = {
       composer,
       projectId,

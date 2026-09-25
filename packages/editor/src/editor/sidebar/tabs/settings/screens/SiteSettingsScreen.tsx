@@ -233,7 +233,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
       <Section title="Site Identity">
-        <Field label="Site name" htmlFor="site-name">
+        <Field label="Site name" htmlFor="site-name" siteColumn="seo.siteName">
           <Input
             id="site-name"
             type="text"
@@ -247,7 +247,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             </div>
           )}
         </Field>
-        <Field label="Favicon URL" htmlFor="favicon-url">
+        <Field label="Favicon URL" htmlFor="favicon-url" siteColumn="seo.favicon">
           <Input
             id="favicon-url"
             type="text"
@@ -256,7 +256,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             placeholder="https://example.com/favicon.ico"
           />
         </Field>
-        <Field label="Site Language" htmlFor="site-language">
+        <Field label="Site Language" htmlFor="site-language" siteColumn="seo.language">
           <Select
             id="site-language"
             value={language}
@@ -287,7 +287,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       </Section>
 
       <Section title="Social Links">
-        <Field label="Twitter" htmlFor="social-twitter">
+        <Field label="Twitter" htmlFor="social-twitter" siteColumn="seo.socialLinks">
           <Input
             id="social-twitter"
             type="url"
@@ -296,7 +296,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             placeholder="https://twitter.com/…"
           />
         </Field>
-        <Field label="Facebook" htmlFor="social-facebook">
+        <Field label="Facebook" htmlFor="social-facebook" siteColumn="seo.socialLinks">
           <Input
             id="social-facebook"
             type="url"
@@ -305,7 +305,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             placeholder="https://facebook.com/…"
           />
         </Field>
-        <Field label="LinkedIn" htmlFor="social-linkedin">
+        <Field label="LinkedIn" htmlFor="social-linkedin" siteColumn="seo.socialLinks">
           <Input
             id="social-linkedin"
             type="url"

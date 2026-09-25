@@ -88,9 +88,9 @@ describe("saveProjectData · dsSchemaVersion write", () => {
         },
         formBlock: { deleteMany: vi.fn() },
         site: {
-          update: vi.fn(async (args: any) => {
+          updateMany: vi.fn(async (args: any) => {
             capturedSiteUpdate = args;
-            return {};
+            return { count: 1 };
           }),
         },
       };
@@ -121,9 +121,9 @@ describe("saveProjectData · dsSchemaVersion write", () => {
         },
         formBlock: { deleteMany: vi.fn() },
         site: {
-          update: vi.fn(async (args: any) => {
+          updateMany: vi.fn(async (args: any) => {
             capturedSiteUpdate = args;
-            return {};
+            return { count: 1 };
           }),
         },
       };

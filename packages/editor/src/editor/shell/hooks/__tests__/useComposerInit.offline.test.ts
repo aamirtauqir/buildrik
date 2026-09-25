@@ -54,8 +54,15 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.reject(new Error("Failed to fetch"))),
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
   SaveConflictError: class extends Error {},
 }));
+
+const invalidateMyRole = vi.hoisted(() => vi.fn());
+vi.mock("@/services/RoleService", () => ({ invalidateMyRole }));
+
+import { saveProject as syncSaveProject } from "@/services/BuildrikSyncProvider";
 
 function params(): UseComposerInitParams {
   return {
@@ -126,5 +133,22 @@ describe("autosave while offline", () => {
       toasts.find((t) => t.title === "Couldn't reach the server — not saved")?.description,
     ).toMatch(/try saving again/);
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
+  });
+});
+
+/* A15-9: a role revoked mid-session refuses the autosave. The edit existed
+   only in this tab — it is kept for the reload like a network failure's, and
+   the cached role that offered the edit is dropped. */
+describe("autosave refused with FORBIDDEN", () => {
+  it("keeps the refused work recoverable and forgets the cached role", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("FORBIDDEN"));
+    const p = params();
+    const toasts = await runAutosave(p);
+
+    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+    expect(invalidateMyRole).toHaveBeenCalledTimes(1);
+    localStorage.removeItem("bk-unsaved-v1-site-1");
   });
 });

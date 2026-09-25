@@ -188,7 +188,7 @@ export const editorSaveProjectSchema = z.object({
   // lastEditedAt it loaded (or last saved). If it no longer matches the server's,
   // the copy is behind — the server rejects with CONFLICT instead of clobbering.
   // Omitted (older callers / first save) = no check, so this is non-regressive.
-  expectedLastEditedAt: z.string().nullish(),
+  expectedLastEditedAt: z.string().datetime().nullish(),
   projectData: z.object({
     version: z.string(),
     pages: z.array(

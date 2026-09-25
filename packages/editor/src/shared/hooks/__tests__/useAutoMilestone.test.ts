@@ -7,6 +7,9 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
+const suggestMilestone = vi.hoisted(() => vi.fn());
+vi.mock("@/services/ai/AiTrpcClient", () => ({ aiTrpcClient: { suggestMilestone } }));
+
 import { useAutoMilestone } from "../useAutoMilestone";
 import { EVENTS } from "../../constants/events";
 import type { Composer } from "../../../engine";
@@ -54,21 +57,20 @@ function createMockComposer() {
 
 const asComposer = (m: ReturnType<typeof createMockComposer>) => m as unknown as Composer;
 
-function stubSuggestFetch(suggestedName = "Milestone A", reasoning = "big change") {
-  const fetchMock = vi.fn().mockResolvedValue({
-    ok: true,
-    json: async () => ({ result: { data: { suggestedName, reasoning } } }),
-  });
-  vi.stubGlobal("fetch", fetchMock);
-  return fetchMock;
+/* The hook's return value is AiTrpcClient's AIResponse — the parsed data,
+   not the `{ result: { data } }` HTTP envelope the old mock invented (and
+   that the superjson router never sent). */
+function stubSuggest(suggestedName = "Milestone A", reasoning = "big change") {
+  suggestMilestone.mockResolvedValue({ data: { suggestedName, reasoning }, cached: false, duration: 1 });
+  return suggestMilestone;
 }
 
 beforeEach(() => {
-  vi.unstubAllGlobals();
+  suggestMilestone.mockReset();
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("useAutoMilestone — availability", () => {
@@ -88,16 +90,16 @@ describe("useAutoMilestone — availability", () => {
 
 describe("useAutoMilestone — triggers", () => {
   it("ELEMENT_DELETED requests a suggestion (trigger element_deleted)", async () => {
-    const fetchMock = stubSuggestFetch("Removed old hero");
+    const suggestMock = stubSuggest("Removed old hero");
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "el-1" }));
 
     await waitFor(() => expect(result.current.suggestion).not.toBeNull());
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/trpc/ai.milestoneSuggest",
-      expect.objectContaining({ method: "POST" })
+    expect(suggestMilestone).toHaveBeenCalledWith(
+      { recentChanges: [], pageStructure: { pageCount: 0, elementCount: 0 } },
+      { retries: 0 },
     );
     expect(result.current.suggestion).toEqual({
       suggestedName: "Removed old hero",
@@ -109,7 +111,7 @@ describe("useAutoMilestone — triggers", () => {
   /* The engine has no bare PAGE_CREATED — a new page arrives as
      PROJECT_CHANGED { type: "page:created" }, so this trigger never fired. */
   it("a created page requests a suggestion (trigger page_added)", async () => {
-    stubSuggestFetch("Added pricing page");
+    stubSuggest("Added pricing page");
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
@@ -119,32 +121,32 @@ describe("useAutoMilestone — triggers", () => {
   });
 
   it("ignores PROJECT_CHANGED for anything that is not a page create", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
     await act(async () => composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:activated" }));
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(suggestMock).not.toHaveBeenCalled();
     expect(result.current.suggestion).toBeNull();
   });
 
 
   it("enforces the 30s cooldown between suggestions", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
     await waitFor(() => expect(result.current.suggestion).not.toBeNull());
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(suggestMock).toHaveBeenCalledTimes(1);
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
-    expect(fetchMock).toHaveBeenCalledTimes(1); // suppressed by cooldown
+    expect(suggestMock).toHaveBeenCalledTimes(1); // suppressed by cooldown
   });
 
   it("fires checkpoint_threshold after 10 consecutive 'Auto:' records", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
@@ -153,15 +155,15 @@ describe("useAutoMilestone — triggers", () => {
         composer.emit(EVENTS.HISTORY_RECORDED, { label: `Auto: checkpoint ${i}` });
       }
     });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(suggestMock).not.toHaveBeenCalled();
 
     await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, { label: "Auto: checkpoint 9" }));
     await waitFor(() => expect(result.current.suggestion?.trigger).toBe("checkpoint_threshold"));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(suggestMock).toHaveBeenCalledTimes(1);
   });
 
   it("a manual (non-Auto) record resets the checkpoint counter", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     renderHook(() => useAutoMilestone(asComposer(composer)));
 
@@ -175,11 +177,11 @@ describe("useAutoMilestone — triggers", () => {
       }
     });
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(suggestMock).not.toHaveBeenCalled();
   });
 
   it("fires mass_change when a patch flips >=50% of the fallback schema", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     // 8 distinct properties >= 15 * 0.5 (fallback schema size)
     composer.history.getHistoryStack.mockReturnValue([
@@ -199,11 +201,11 @@ describe("useAutoMilestone — triggers", () => {
 
     await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, { label: "Restyle card" }));
     await waitFor(() => expect(result.current.suggestion?.trigger).toBe("mass_change"));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(suggestMock).toHaveBeenCalledTimes(1);
   });
 
   it("small patches do NOT fire mass_change", async () => {
-    const fetchMock = stubSuggestFetch();
+    const suggestMock = stubSuggest();
     const composer = createMockComposer();
     composer.history.getHistoryStack.mockReturnValue([
       {
@@ -217,23 +219,28 @@ describe("useAutoMilestone — triggers", () => {
 
     renderHook(() => useAutoMilestone(asComposer(composer)));
     await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, { label: "Tweak color" }));
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(suggestMock).not.toHaveBeenCalled();
   });
 
-  it("fails silently when the AI endpoint errors", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+  it("stays quiet in the UI but warns in the console when the AI call fails", async () => {
+    suggestMilestone.mockRejectedValue(new Error("INTERNAL_SERVER_ERROR"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.suggestion).toBeNull();
+    expect(warn).toHaveBeenCalledWith(
+      "[useAutoMilestone] milestone suggestion failed:",
+      expect.any(Error),
+    );
   });
 });
 
 describe("useAutoMilestone — suggestion actions", () => {
   async function withSuggestion() {
-    stubSuggestFetch("Suggested name");
+    stubSuggest("Suggested name");
     const composer = createMockComposer();
     const rendered = renderHook(() => useAutoMilestone(asComposer(composer)));
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "x" }));

@@ -42,6 +42,12 @@ export const publishInputSchema = z
      *  was approved) and chose to publish anyway (contracts §1.5). Without it, a
      *  stale approval blocks the publish with APPROVAL_STALE. */
     acknowledgeStale: z.boolean().optional(),
+    /** C-3: the `lastEditedAt` the publishing tab last loaded or saved. The
+     *  tab publishes its IN-MEMORY pages, so a tab that fell behind another
+     *  writer would ship the older copy over theirs; the server refuses with
+     *  SAVE_CONFLICT when the site moved past this. Optional — callers that
+     *  send no pages (cron, dashboard) are not checked. */
+    expectedLastEditedAt: z.string().datetime().nullish(),
   })
   .refine(
     (input) => {

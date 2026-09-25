@@ -17,6 +17,8 @@ import * as React from "react";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
 import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
+import { mergeProjectTokens } from "./projectTokens";
+import { EVENTS } from "@/shared/constants/events";
 import { useColorTokens } from "./useColorTokens";
 import type { ColorTokensState, ColorTokensActions } from "./useColorTokens";
 import { useSpacingTokens } from "./useSpacingTokens";
@@ -102,6 +104,8 @@ export interface TokenRegistryProviderProps {
     off: (evt: string, cb: (payload: unknown) => void) => void;
     colorMode: { resolved: () => "light" | "dark" };
     darkResolver: { resolve: (token: DesignToken, resolved: "light" | "dark") => string };
+    /** D-4: the registries hydrate from the project's own tokens on load. */
+    getProjectSettings?: () => { designTokens?: unknown[]; designTokensSchemaVersion?: number };
   };
   children: React.ReactNode;
 }
@@ -266,7 +270,60 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
     { Context: RegistryConfigContext     as React.Context<unknown>, value: config          },
   ];
 
-  return <>{composeProviders(providers, children)}</>;
+  return (
+    <>
+      {composeProviders(
+        providers,
+        <>
+          <ProjectTokensHydrator composer={composer} />
+          {children}
+        </>,
+      )}
+    </>
+  );
+};
+
+/**
+ * D-4: fill the registries from `projectSettings.designTokens` when the project
+ * loads — not when the Brand panel first opens. The provider seeds from a
+ * localStorage cache (DEFAULT_TOKENS on a cold browser), and the only
+ * project → registry hydration lived in BrandWorkspace, so the shell-wide DS
+ * linter (useDSLint reads these registries) counted issues against the DEFAULT
+ * brand until someone clicked Brand. The project wins over the cache on load.
+ *
+ * PROJECT_LOADED only, never SETTINGS_CHANGE: Brand stages edits in these same
+ * registries, and a reset on every settings change would wipe them. For the
+ * same reason a load that lands while Brand holds staged edits is skipped —
+ * Brand's own loadFromComposer owns that case.
+ */
+const ProjectTokensHydrator: React.FC<{ composer: TokenRegistryProviderProps["composer"] }> = ({
+  composer,
+}) => {
+  const resetAllKinds = useResetAllKinds();
+  const color = useColorRegistry();
+  const type = useTypeRegistry();
+  const spacing = useSpacingRegistry();
+  const staged = React.useRef(false);
+  staged.current = color.isDirty || type.isDirty || spacing.isDirty;
+
+  React.useEffect(() => {
+    if (!composer?.getProjectSettings) return;
+    const hydrate = () => {
+      if (staged.current) return;
+      const settings = composer.getProjectSettings?.();
+      /* An empty list is a state too: undoing a site's first token edit
+         imports a project with no designTokens, and returning early here left
+         the undone value standing in the registries. No saved tokens = the
+         seed, which is what mergeProjectTokens([]) yields. */
+      const incoming = (settings?.designTokens ?? []) as DesignToken[];
+      resetAllKinds(mergeProjectTokens(incoming, settings?.designTokensSchemaVersion));
+    };
+    hydrate();
+    composer.on(EVENTS.PROJECT_LOADED, hydrate);
+    return () => composer.off(EVENTS.PROJECT_LOADED, hydrate);
+  }, [composer, resetAllKinds]);
+
+  return null;
 };
 
 /**

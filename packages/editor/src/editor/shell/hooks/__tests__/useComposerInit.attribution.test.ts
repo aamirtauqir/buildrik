@@ -68,6 +68,8 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   loadCurrentUserId: vi.fn(() => Promise.resolve("user-77")),
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
   SaveConflictError: class extends Error {},
 }));
 

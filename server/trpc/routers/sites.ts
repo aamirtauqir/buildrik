@@ -14,7 +14,6 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
-  saveProjectData,
   saveProjectFromEditor,
   getProjectData,
 } from "@/server/services/sites.service";
@@ -42,7 +41,6 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
-  saveProjectDataSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
@@ -364,8 +362,13 @@ export const sitesRouter = router({
           ctx.session.user.id,
           input.pages,
           input.acknowledgeStale,
+          { expectedLastEditedAt: input.expectedLastEditedAt },
         );
       } catch (e: unknown) {
+        // C-3: the tab's copy is behind the server's — same CONFLICT (and the
+        // same `SAVE_CONFLICT:<iso>` message) the save path returns.
+        if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))
+          throw new TRPCError({ code: "CONFLICT", message: e.message });
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
           throw new TRPCError({
             code: "CONFLICT",
@@ -630,31 +633,6 @@ export const sitesRouter = router({
         description: `Rolled back from version ${input.jobId}`,
       });
       return result;
-    }),
-
-  saveProjectData: protectedProcedure
-    .input(saveProjectDataSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
-      } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-        throw e;
-      }
-      try {
-        return await saveProjectData(input);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
-          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
-        // Same refusal as the editor save above — this door writes through the
-        // same boundary, so it must report the same thing.
-        if (e instanceof Error && e.message === "EMPTY_SNAPSHOT")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "This save carried no pages, so it was not applied. Reload the site before editing.",
-          });
-        throw e;
-      }
     }),
 
   getProjectData: protectedProcedure

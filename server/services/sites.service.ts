@@ -622,28 +622,60 @@ export async function bulkAction(
  * load-bearing for P2 + P9 (template version pinning + applied-template badge).
  */
 export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
-  const site = await prisma.site.findUnique({ where: { id: input.siteId } });
+  const site = await prisma.site.findUnique({
+    where: { id: input.siteId },
+    select: { deletedAt: true },
+  });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-  // 61-conflict: optimistic concurrency. When the caller supplies the
-  // lastEditedAt it loaded and it no longer matches the row, another writer
-  // saved in between — reject rather than clobber. The server value is appended
-  // so the client can fetch + reload it. Skipped when expectedLastEditedAt is
-  // omitted (non-regressive) or when the site has never been edited.
-  if (expectedLastEditedAt && site.lastEditedAt) {
-    const current = site.lastEditedAt.toISOString();
-    if (current !== expectedLastEditedAt) {
-      throw new Error(`SAVE_CONFLICT:${current}`);
-    }
-  }
-
   const savedAt = new Date();
+  // Delete pages not in incoming set (only when caller supplies position
+  // for every page — that's how we infer the editor sent a full project
+  // snapshot, not a partial blocks update).
+  const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
 
   await prisma.$transaction(async (tx) => {
-    // Delete pages not in incoming set (only when caller supplies position
-    // for every page — that's how we infer the editor sent a full project
-    // snapshot, not a partial blocks update).
-    const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
+    /* 61-conflict / A-2: optimistic concurrency as a compare-and-swap, FIRST in
+       the transaction. The `lastEditedAt` match is part of the UPDATE's WHERE,
+       so a concurrent save holding the same token blocks on the row lock,
+       re-evaluates the WHERE against the winner's committed row, matches 0
+       rows and lands here — and every page write below rolls back with it. A
+       read-then-compare before the transaction (what this was) let both pass.
+       The server value is appended so the client can fetch + reload it. The
+       check is skipped when expectedLastEditedAt is omitted (non-regressive). */
+    const claimed = await tx.site.updateMany({
+      where: {
+        id: input.siteId,
+        deletedAt: null,
+        ...(expectedLastEditedAt ? { lastEditedAt: new Date(expectedLastEditedAt) } : {}),
+      },
+      data: {
+        projectStyles:
+          input.styles === undefined
+            ? undefined
+            : ((input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectAssets:
+          input.assets === undefined
+            ? undefined
+            : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectSettings:
+          input.settings === undefined
+            ? undefined
+            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        dsSchemaVersion: input.dsSchemaVersion,
+        lastEditedAt: savedAt,
+        ...(isFullSnapshot ? { pages: input.pages.length } : {}),
+      },
+    });
+    if (claimed.count === 0) {
+      const current = await tx.site.findUnique({
+        where: { id: input.siteId },
+        select: { lastEditedAt: true, deletedAt: true },
+      });
+      if (!current || current.deletedAt) throw new Error("SITE_NOT_FOUND");
+      throw new Error(`SAVE_CONFLICT:${current.lastEditedAt.toISOString()}`);
+    }
+
     if (isFullSnapshot) {
       const existingPages = await tx.page.findMany({
         where: { siteId: input.siteId },
@@ -750,28 +782,6 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         });
       }
     }
-
-    // Site-level project artifacts.
-    await tx.site.update({
-      where: { id: input.siteId },
-      data: {
-        projectStyles:
-          input.styles === undefined
-            ? undefined
-            : ((input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        projectAssets:
-          input.assets === undefined
-            ? undefined
-            : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        projectSettings:
-          input.settings === undefined
-            ? undefined
-            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        dsSchemaVersion: input.dsSchemaVersion,
-        lastEditedAt: savedAt,
-        ...(isFullSnapshot ? { pages: input.pages.length } : {}),
-      },
-    });
   });
 
   return { success: true, savedAt };
