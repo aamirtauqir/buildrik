@@ -79,4 +79,13 @@ describe("LintState — how many tokens are hiding their warnings", () => {
     s.unsuppress("color-accent");
     expect(s.suppressedCount()).toBe(0);
   });
+
+  it("suppressedIds lists the token ids, not just the count — the Issues panel restore row needs the ids", () => {
+    const s = new LintState();
+    s.suppress("color-accent");
+    s.suppress("color-success");
+    expect(s.suppressedIds().sort()).toEqual(["color-accent", "color-success"]);
+    s.unsuppress("color-accent");
+    expect(s.suppressedIds()).toEqual(["color-success"]);
+  });
 });

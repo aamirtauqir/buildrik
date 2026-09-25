@@ -56,7 +56,20 @@ describe("IssuesPanel", () => {
 
   it("shows a clean state when there are zero issues", () => {
     renderPanel({ issues: [] });
-    expect(screen.getByText(/no issues/i)).toBeInTheDocument();
+    expect(screen.getByText(/no brand issues/i)).toBeInTheDocument();
+  });
+
+  it("renders an Ignored (n) row per suppressed token, and Restore calls onUnignore", () => {
+    const onUnignore = vi.fn();
+    renderPanel({ suppressedTokenIds: ["color.accent", "color.border"], onUnignore });
+    expect(screen.getByTestId("issues-ignored-row")).toHaveTextContent("Ignored (2)");
+    fireEvent.click(screen.getByTestId("issue-restore-color.accent"));
+    expect(onUnignore).toHaveBeenCalledWith("color.accent");
+  });
+
+  it("renders no Ignored row when nothing is suppressed", () => {
+    renderPanel();
+    expect(screen.queryByTestId("issues-ignored-row")).toBeNull();
   });
 
   it("hands the clicked issue to the locate handler (B9 / SH-63)", () => {

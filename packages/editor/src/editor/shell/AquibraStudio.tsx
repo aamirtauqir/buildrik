@@ -556,6 +556,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         else composer.emit("ui:switch-tab", { tab: "design" });
       }}
       onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
+      onUnignore={(tokenId) => composer.designSystem.lintState.unsuppress(tokenId)}
+      suppressedTokenIds={composer.designSystem.lintState.suppressedIds()}
       scanState={issuesFeed.scanState}
       onRescan={issuesFeed.rescan}
     />

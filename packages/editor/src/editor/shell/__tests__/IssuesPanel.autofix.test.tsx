@@ -84,14 +84,14 @@ describe("Issues · fix-failed", () => {
     expect(onOpenBrand).toHaveBeenCalledWith("color.accent");
   });
 
-  it("Ignore once suppresses that token and dismisses the band", async () => {
+  it("Ignore for this token suppresses that token and dismisses the band", async () => {
     const onIgnore = vi.fn();
     renderPanel({ onFix: vi.fn().mockResolvedValue(null), onIgnore });
 
     fireEvent.click(screen.getByRole("button", { name: /Fix/ }));
     expect(await screen.findByText(/Couldn't fix this automatically/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Ignore once" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ignore for this token" }));
     expect(onIgnore).toHaveBeenCalledWith("color.accent");
     await waitFor(() =>
       expect(screen.queryByText(/Couldn't fix this automatically/)).not.toBeInTheDocument(),
