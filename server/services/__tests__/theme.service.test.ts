@@ -34,7 +34,10 @@ vi.mock("@/lib/prisma", () => ({
       typeof arg === "function"
         ? (arg as (tx: unknown) => Promise<unknown>)({
             site: { updateMany: (...a: unknown[]) => siteUpdateMany(...a) },
-            siteThemeSnapshot: { create: (...a: unknown[]) => snapCreate(...a) },
+            siteThemeSnapshot: {
+              create: (...a: unknown[]) => snapCreate(...a),
+              delete: (...a: unknown[]) => snapDelete(...a),
+            },
           })
         : Promise.all(arg as Promise<unknown>[]),
     workspace: {
@@ -270,17 +273,34 @@ describe("rollbackSiteTheme (D2)", () => {
   });
 
   it("restores prev tokens into projectSettings, bumps version, consumes the snapshot", async () => {
-    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, projectSettings: { designTokens: [{ now: 1 }], seo: { metaTitle: "Keep" } } });
+    siteFindFirst.mockResolvedValueOnce({
+      id: "s1", dsSchemaVersion: 4, lastEditedAt: new Date("2026-06-01T00:00:00Z"),
+      projectSettings: { designTokens: [{ now: 1 }], seo: { metaTitle: "Keep" } },
+    });
     snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: { designTokens: [{ was: 1 }] }, createdAt: new Date("2026-06-20T00:00:00Z") });
-    siteUpdate.mockResolvedValue({});
+    siteUpdateMany.mockResolvedValue({ count: 1 });
     snapDelete.mockResolvedValue({});
     const res = await rollbackSiteTheme("w1", "s1");
-    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({
+    // CAS on the lastEditedAt read (round 2), like push.
+    expect(siteUpdateMany.mock.calls[0][0].where).toEqual({ id: "s1", lastEditedAt: new Date("2026-06-01T00:00:00Z") });
+    expect(siteUpdateMany.mock.calls[0][0].data).toMatchObject({
       projectSettings: { designTokens: [{ was: 1 }], seo: { metaTitle: "Keep" } },
       dsSchemaVersion: 5,
     });
     expect(snapDelete.mock.calls[0][0].where).toEqual({ id: "snap1" });
     expect(res.rolledBackTo).toBeInstanceOf(Date);
+  });
+
+  /* Round 2: rollback merged into the projectSettings it read and wrote it
+     back blind — an editor save landing in between was silently reverted.
+     Now a CAS like push; a lost race fails clearly and keeps the snapshot. */
+  it("a site edited since the read is not overwritten — CONFLICT, snapshot kept", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, lastEditedAt: new Date(1), projectSettings: {} });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: { designTokens: [] }, createdAt: new Date() });
+    siteUpdateMany.mockResolvedValueOnce({ count: 0 });
+    await expect(rollbackSiteTheme("w1", "s1")).rejects.toMatchObject({ code: "CONFLICT" });
+    expect(snapDelete).not.toHaveBeenCalled();
+    expect(siteUpdate).not.toHaveBeenCalled();
   });
 });
 
@@ -288,11 +308,11 @@ describe("rollbackSiteTheme — a snapshot from the old projectStyles push", () 
   it("restores the element rules that push overwrote", async () => {
     siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4, projectSettings: {} });
     snapFindFirst.mockResolvedValueOnce({ id: "old", prevStyles: [{ selector: "[data-buildrik-id=a]" }], createdAt: new Date() });
-    siteUpdate.mockResolvedValue({});
+    siteUpdateMany.mockResolvedValue({ count: 1 });
     snapDelete.mockResolvedValue({});
     await rollbackSiteTheme("w1", "s1");
-    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ selector: "[data-buildrik-id=a]" }] });
-    expect("projectSettings" in siteUpdate.mock.calls[0][0].data).toBe(false);
+    expect(siteUpdateMany.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ selector: "[data-buildrik-id=a]" }] });
+    expect("projectSettings" in siteUpdateMany.mock.calls[0][0].data).toBe(false);
   });
 });
 
@@ -303,10 +323,10 @@ describe("rollbackSiteTheme — presets (review M3)", () => {
       projectSettings: { designTokens: [{ pushed: 1 }], designPresets: [{ pushed: "preset" }], seo: { metaTitle: "Keep" } },
     });
     snapFindFirst.mockResolvedValueOnce({ id: "snap", prevStyles: { designTokens: [{ was: 1 }] }, createdAt: new Date() });
-    siteUpdate.mockResolvedValue({});
+    siteUpdateMany.mockResolvedValue({ count: 1 });
     snapDelete.mockResolvedValue({});
     await rollbackSiteTheme("w1", "s1");
-    expect(siteUpdate.mock.calls[0][0].data.projectSettings).toEqual({
+    expect(siteUpdateMany.mock.calls[0][0].data.projectSettings).toEqual({
       designTokens: [{ was: 1 }],
       seo: { metaTitle: "Keep" },
     });

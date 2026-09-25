@@ -87,7 +87,7 @@ async function requireTokenTheme(workspaceId: string): Promise<TokenTheme> {
 
 export class ThemeError extends Error {
   constructor(
-    public code: "NOT_FOUND" | "NO_THEME" | "BAD_REQUEST",
+    public code: "NOT_FOUND" | "NO_THEME" | "BAD_REQUEST" | "CONFLICT",
     message: string,
   ) {
     super(message);
@@ -325,7 +325,7 @@ export async function rollbackSiteTheme(
 ): Promise<{ rolledBackTo: Date }> {
   const site = await prisma.site.findFirst({
     where: { id: siteId, workspaceId },
-    select: { id: true, dsSchemaVersion: true, projectSettings: true },
+    select: { id: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true },
   });
   if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
 
@@ -339,9 +339,12 @@ export async function rollbackSiteTheme(
      projectStyles push holds the element rules that push overwrote, so
      restoring them there is still the right undo. */
   const prevTokens = readTokenTheme(snap.prevStyles);
-  await prisma.$transaction([
-    prisma.site.update({
-      where: { id: siteId },
+  /* CAS on the lastEditedAt read above, like push: projectSettings is merged
+     from that read, so an editor save landing in between would be silently
+     reverted by a blind write. A lost race refuses and keeps the snapshot. */
+  await prisma.$transaction(async (tx) => {
+    const claimed = await tx.site.updateMany({
+      where: { id: siteId, lastEditedAt: site.lastEditedAt },
       data: {
         ...(prevTokens
           ? { projectSettings: restoreTokens(site.projectSettings, prevTokens) }
@@ -352,9 +355,12 @@ export async function rollbackSiteTheme(
         dsSchemaVersion: site.dsSchemaVersion + 1,
         lastEditedAt: new Date(),
       },
-    }),
-    prisma.siteThemeSnapshot.delete({ where: { id: snap.id } }),
-  ]);
+    });
+    if (claimed.count === 0) {
+      throw new ThemeError("CONFLICT", "This site changed while rolling back — nothing was changed. Try again.");
+    }
+    await tx.siteThemeSnapshot.delete({ where: { id: snap.id } });
+  });
   return { rolledBackTo: snap.createdAt };
 }
 
