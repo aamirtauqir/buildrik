@@ -52,6 +52,7 @@ import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
+import { useIssuesFeed } from "./hooks/useIssuesFeed";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
@@ -325,31 +326,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, [composer]);
 
   // The Issues panel had a state slot but no producer, so it rendered "No
-  // issues" no matter how many the DS linter had found. Bridge the one real
-  // source we have (designSystem.lintState) into it, and keep it live — the
-  // linter re-runs on token edits and emits 'lint:changed'.
-  const setIssues = state.setIssues;
-  React.useEffect(() => {
-    const lint = composer?.designSystem?.lintState;
-    if (!lint) return;
-    const sync = () => {
-      setIssues(
-        lint.getAllVisibleIssues().map(({ tokenId, issue }) => ({
-          id: `${tokenId}:${issue.type}`,
-          type: issue.severity === "error" ? ("error" as const) : ("warning" as const),
-          message: issue.message,
-          tokenId,
-          autoFixHint: issue.autoFixHint,
-          location: `Brand › ${tokenId}`,
-        })),
-      );
-    };
-    sync();
-    lint.on("lint:changed", sync);
-    return () => {
-      lint.off("lint:changed", sync);
-    };
-  }, [composer, setIssues]);
+  // issues" no matter how many the DS linter had found. `useIssuesFeed`
+  // bridges DS-lint (designSystem.lintState) live, and — B-15 / A02-9's
+  // decision-free fix — folds in the page-content scanner (missing alt,
+  // broken links) and the SAME pre-publish check list the Publish panel
+  // renders verbatim, so Issues and Publish stop disagreeing about what's
+  // wrong with the site.
+  const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues);
 
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
@@ -572,6 +555,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         else composer.emit("ui:switch-tab", { tab: "design" });
       }}
       onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
+      scanState={issuesFeed.scanState}
+      onRescan={issuesFeed.rescan}
     />
   ) : null;
 

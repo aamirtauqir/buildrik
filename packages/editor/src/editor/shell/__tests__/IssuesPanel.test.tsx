@@ -100,6 +100,28 @@ describe("IssuesPanel", () => {
   });
 });
 
+// ── x3: content-scan states ──────────────────────────────────────────────
+describe("IssuesPanel — content-scan states", () => {
+  it("shows nothing extra when scanState is idle (default)", () => {
+    renderPanel();
+    expect(screen.queryByTestId("issues-scan-banner")).not.toBeInTheDocument();
+  });
+
+  it("shows a scanning banner", () => {
+    renderPanel({ scanState: "scanning" });
+    expect(screen.getByTestId("issues-scan-banner")).toHaveTextContent(/scanning/i);
+  });
+
+  it("shows a scan-failed banner with Try again, which calls onRescan", () => {
+    const onRescan = vi.fn();
+    renderPanel({ scanState: "error", onRescan });
+    const banner = screen.getByTestId("issues-scan-banner");
+    expect(banner).toHaveTextContent(/scan failed/i);
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(onRescan).toHaveBeenCalledTimes(1);
+  });
+});
+
 /* QA (integration 5e0d47902): the lint's long messages ("Color token
    "color-primary" missing darkValue. Will fall back…") wrapped to three lines
    inside the fixed 56-tall row (board 164:28), pushing the location line
