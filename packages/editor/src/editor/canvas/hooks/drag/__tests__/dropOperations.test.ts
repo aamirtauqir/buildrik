@@ -66,6 +66,7 @@ import {
   handleMultiElementDrop,
   handleTemplateDrop,
   type DropContext,
+  type DropPayloads,
 } from "../dropOperations";
 
 // =============================================================================
@@ -1213,5 +1214,108 @@ describe("handleTemplateDrop", () => {
       type: "INSERT_FAILED",
       message: "Failed to insert template",
     });
+  });
+});
+
+// =============================================================================
+// Pre-snapshotted payloads — D-5: DataTransfer zeroes out after a microtask,
+// so a handler that reads e.dataTransfer.getData(...) itself (rather than
+// the dispatcher's pre-snapshot) sees "" once an earlier handler in the
+// chain has awaited. Every handler must prefer `payloads` when given one.
+// =============================================================================
+
+describe("handlers honor pre-snapshotted payloads over a zeroed DataTransfer", () => {
+  // Simulates the real-browser failure mode: dataTransfer.getData always
+  // returns "" (as it does after the microtask boundary), but the caller
+  // still has the synchronously-read payloads from before the await.
+  function makeZeroedDragEvent(): React.DragEvent {
+    return {
+      dataTransfer: { getData: () => "", types: [] },
+      target: document.createElement("div"),
+      clientX: 0,
+      clientY: 0,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    } as unknown as React.DragEvent;
+  }
+
+  it("handleMultiElementDrop still handles the drop from payloads.multiData", () => {
+    const root = makeStubElement({ id: "r1", getChildren: () => [] });
+    const movingEl = makeStubElement({ id: "el1", getParent: () => null });
+    const composer = makeStubComposer({
+      activePage: { id: "p1", root: { id: "r1" } },
+      elements: new Map([["r1", root], ["el1", movingEl]]),
+    });
+    const ctx = makeDropContext(composer);
+    const payloads: DropPayloads = {
+      multiData: JSON.stringify({ elements: [{ elementId: "el1", originalIndex: 0 }] }),
+      elementData: "",
+      componentId: "",
+      templateData: "",
+      blockData: "",
+    };
+
+    expect(handleMultiElementDrop(makeZeroedDragEvent(), ctx, payloads)).toBe(true);
+    expect(composer.elements.moveElement).toHaveBeenCalledWith("el1", "r1", expect.any(Number));
+  });
+
+  it("handleComponentDrop still handles the drop from payloads.componentId", async () => {
+    const composer = makeStubComposer({ hasComponents: true });
+    const ctx = makeDropContext(composer);
+    const payloads: DropPayloads = {
+      multiData: "",
+      elementData: "",
+      componentId: "comp-1",
+      templateData: "",
+      blockData: "",
+    };
+
+    await expect(handleComponentDrop(makeZeroedDragEvent(), ctx, payloads)).resolves.toBe(true);
+    expect(composer.components?.instantiateComponent).toHaveBeenCalledWith("comp-1", expect.anything());
+  });
+
+  it("handleTemplateDrop still handles the drop from payloads.templateData", () => {
+    const composer = makeStubComposer({ activePage: { id: "p1", root: { id: "r1" } } });
+    const ctx = makeDropContext(composer);
+    const payloads: DropPayloads = {
+      multiData: "",
+      elementData: "",
+      componentId: "",
+      templateData: JSON.stringify({ html: "<div/>" }),
+      blockData: "",
+    };
+
+    expect(handleTemplateDrop(makeZeroedDragEvent(), ctx, payloads)).toBe(true);
+    expect(composer.elements.insertHTMLToElement).toHaveBeenCalled();
+  });
+
+  it("handleBlockDrop still handles the drop from payloads.blockData and returns its own success", () => {
+    const composer = makeStubComposer({ activePage: { id: "p1", root: { id: "r1" } } });
+    vi.mocked(getBlockById).mockReturnValue({ id: "heading", label: "Heading", elementType: "heading" } as never);
+    const ctx = makeDropContext(composer);
+    const payloads: DropPayloads = {
+      multiData: "",
+      elementData: "",
+      componentId: "",
+      templateData: "",
+      blockData: JSON.stringify({ id: "heading" }),
+    };
+
+    expect(handleBlockDrop(makeZeroedDragEvent(), ctx, payloads)).toBe(true);
+  });
+
+  it("handleBlockDrop returns false (not true) when the block payload is unusable", () => {
+    const composer = makeStubComposer({ activePage: { id: "p1", root: { id: "r1" } } });
+    const ctx = makeDropContext(composer);
+    const payloads: DropPayloads = {
+      multiData: "",
+      elementData: "",
+      componentId: "",
+      templateData: "",
+      blockData: "",
+    };
+
+    // No blockData anywhere (payload nor DataTransfer) — genuinely not a block drop.
+    expect(handleBlockDrop(makeZeroedDragEvent(), ctx, payloads)).toBe(false);
   });
 });
