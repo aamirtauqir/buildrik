@@ -199,6 +199,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      located" block tops the column: the comment, an edit door for the
      element it is on, and the way back to the list. */
   const [located, setLocated] = React.useState<{ comment: ReviewComment; name: string } | null>(null);
+  /* Board 4418:118661: a comment re-attached here gets its own band naming
+     the element it now sits on — "OPEN · HOME / HOURS". */
+  const [reattachedTo, setReattachedTo] = React.useState<Readonly<Record<string, string>>>({});
 
   /* Round history — board 4418:172775's modal. Lazy: fetched the first time
      it is opened, because most sessions never look back. `null` means not
@@ -659,10 +662,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   const groups: Group[] = [];
   for (const c of attached) {
-    const key = c.pageId ?? "__none__";
+    const onto = reattachedTo[c.id];
+    const key = `${c.pageId ?? "__none__"}${onto ? `/${onto}` : ""}`;
     const existing = groups.find((g) => g.key === key);
     if (existing) existing.comments.push(c);
-    else groups.push({ key, label: pageName(c.pageId), comments: [c] });
+    else groups.push({ key, label: onto ? `${pageName(c.pageId)} / ${onto}` : pageName(c.pageId), comments: [c] });
   }
 
   /* Board 157:157 gives a RESOLVED row a different second line from an open
@@ -1073,6 +1077,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             throw err;
           }
           addToast({ tone: "success", description: "Comment re-attached." });
+          const el = composer?.elements.getElement(elementId);
+          const layer = el?.getCustomData?.("layerName");
+          const onto = typeof layer === "string" && layer ? layer : el?.getType?.();
+          if (onto) setReattachedTo((prev) => ({ ...prev, [c.id]: onto }));
+          /* It has an anchor again — out of the Detached group now, not when
+             the canvas next re-announces its orphans. */
+          setDetachedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(c.id);
+            return next;
+          });
           composer?.emit("comments:reattached", { id: c.id });
           composer?.emit("comments:refresh", {});
         }}
