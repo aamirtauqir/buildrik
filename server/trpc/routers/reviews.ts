@@ -80,7 +80,7 @@ export const reviewsRouter = router({
       if (!rl.allowed) {
         throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many review submissions. Please try again later." });
       }
-      return submitReview(
+      const result = await submitReview(
         input.siteId,
         ctx.session.user.id,
         input.note,
@@ -88,6 +88,18 @@ export const reviewsRouter = router({
         input.clientEmail,
         input.snapshotPages,
       );
+      // S-7: the token is the bearer credential for the client review link.
+      // Mirrors currentRound's includeToken gate — only ADMIN+ gets it back;
+      // an EDITOR (who can invite a client but shouldn't also be handed the
+      // link to sign as them) does not, matching PD-9's default.
+      let isAdmin = false;
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+        isAdmin = true;
+      } catch (e) {
+        if (!(e instanceof PermissionError)) throw e;
+      }
+      return { ...result, token: isAdmin ? result.token : null };
     }),
 
   // Admins see the review queue + resolve it. Flag off → [] so the UI collapses

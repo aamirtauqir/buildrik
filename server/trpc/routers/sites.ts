@@ -344,6 +344,18 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
+      // acknowledgeStale deliberately ships past a stale-approval block (the
+      // reviewer signed off on an earlier version of the site) — that override
+      // is ADMIN+, not the plain EDITOR who may publish under a fresh approval
+      // (S-7 / PD-9).
+      if (input.acknowledgeStale) {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(

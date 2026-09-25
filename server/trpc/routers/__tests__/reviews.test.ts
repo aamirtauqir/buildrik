@@ -100,6 +100,28 @@ describe("reviews router", () => {
     expect(submitMock).not.toHaveBeenCalled();
   });
 
+  it("submit response has no token for an EDITOR who is not an ADMIN (S-7)", async () => {
+    checkSiteRoleMock
+      .mockResolvedValueOnce(undefined) // EDITOR gate
+      .mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN")); // token gate
+    submitMock.mockResolvedValueOnce({ id: "r1", status: "PENDING", token: "secret-token", inviteEmailSent: true, adminsNotified: 1 });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(
+      caller.submit({ siteId: "s1", clientEmail: "client@example.com" }),
+    ).resolves.toMatchObject({ id: "r1", token: null });
+  });
+
+  it("submit response includes the token for an ADMIN", async () => {
+    checkSiteRoleMock
+      .mockResolvedValueOnce(undefined) // EDITOR gate
+      .mockResolvedValueOnce(undefined); // token gate — ADMIN
+    submitMock.mockResolvedValueOnce({ id: "r1", status: "PENDING", token: "secret-token", inviteEmailSent: true, adminsNotified: 1 });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(
+      caller.submit({ siteId: "s1", clientEmail: "client@example.com" }),
+    ).resolves.toMatchObject({ id: "r1", token: "secret-token" });
+  });
+
   it("list is Admin-gated and never queries if denied", async () => {
     checkWorkspaceRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN"));
     const caller = reviewsRouter.createCaller(makeCtx() as never);

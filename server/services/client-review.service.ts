@@ -42,7 +42,8 @@ export class ClientReviewError extends Error {
     | "ALREADY_RESOLVED"
     | "NOT_IDENTIFIED"
     | "NOT_INVITED"
-    | "EMAIL_MISMATCH",
+    | "EMAIL_MISMATCH"
+    | "SELF_APPROVAL_BLOCKED",
     message: string,
     /** What a dead-link screen may still name: the agency and the round.
      *  Only set for REVOKED / EXPIRED — a token that resolved to a real row. */
@@ -110,6 +111,7 @@ async function requireLiveReview(token: string) {
       revokedAt: true,
       reviewerId: true,
       invitedEmail: true,
+      requestedById: true,
       snapshotPages: true,
       createdAt: true,
       resolvedAt: true,
@@ -296,6 +298,22 @@ export async function resolveReviewByToken(
   const { review, reviewerId } = await requireIdentifiedReview(token);
   if (review.status !== "PENDING") {
     throw new ClientReviewError("ALREADY_RESOLVED", "This review has already been answered.");
+  }
+  // S-7 defense in depth: submitReview already refuses to mint a token for
+  // the submitter's own address (or a workspace member's), but a row can
+  // predate that check or its invitedEmail can be edited some other way —
+  // never let the signer be the person who submitted the round.
+  if (status === "APPROVED") {
+    const requester = await prisma.user.findUnique({
+      where: { id: review.requestedById },
+      select: { email: true },
+    });
+    if (requester?.email && review.invitedEmail && requester.email.toLowerCase() === review.invitedEmail) {
+      throw new ClientReviewError(
+        "SELF_APPROVAL_BLOCKED",
+        "This review can't be approved by the person who submitted it.",
+      );
+    }
   }
   const resolved = await prisma.reviewRequest.update({
     where: { id: review.id },
