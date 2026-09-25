@@ -98,4 +98,20 @@ describe("S-9 site-scoped workspace lists", () => {
     const result = await listSites(workspace.id, owner.id, { page: 1, perPage: 20, sort: "lastEdited" });
     expect(result.data.map((s) => s.id).sort()).toEqual([s1.id, s2.id].sort());
   });
+
+  // IMPORTANT 10 (controller, fix round 1): the ADMIN case above proves the
+  // "manages the whole workspace" exemption; this proves the OTHER unscoped
+  // case — a non-admin member with zero SitePermission rows is on the "all
+  // sites" default and must also see everything, not just admins.
+  it("an unscoped non-admin (EDITOR, 0 SitePermission rows) also sees both sites in listSites", async () => {
+    const owner = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: owner.id });
+    const unscopedUser = await createTestUser();
+    await createTestWorkspaceMember({ userId: unscopedUser.id, workspaceId: workspace.id, role: "EDITOR" });
+    const s1 = await createTestSite({ workspaceId: workspace.id, createdBy: owner.id });
+    const s2 = await createTestSite({ workspaceId: workspace.id, createdBy: owner.id });
+
+    const result = await listSites(workspace.id, unscopedUser.id, { page: 1, perPage: 20, sort: "lastEdited" });
+    expect(result.data.map((s) => s.id).sort()).toEqual([s1.id, s2.id].sort());
+  });
 });

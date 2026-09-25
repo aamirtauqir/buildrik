@@ -159,7 +159,13 @@ export async function listSites(
   const pageIds = ids.slice(skip, skip + perPage);
   const pageSites = await prisma.site.findMany({ where: { id: { in: pageIds } }, select: SITE_SELECT });
   const byId = new Map(pageSites.map((s) => [s.id, s]));
-  const pageRows = pageIds.map((id) => enrich(byId.get(id)!));
+  // A page id can go missing between the id query and this fetch (deleted
+  // concurrently) — skip it instead of a non-null assertion that would throw
+  // on a legitimate race rather than just returning one fewer row.
+  const pageRows = pageIds.flatMap((id) => {
+    const site = byId.get(id);
+    return site ? [enrich(site)] : [];
+  });
 
   return {
     data: pageRows,

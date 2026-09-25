@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, Prisma } from "@prisma/client";
 import type { UserRoleType } from "@/lib/constants/enums";
 
 const ROLE_RANK: Record<UserRoleType, number> = {
@@ -32,6 +32,14 @@ interface ScopedMember {
   _count: { sitePermissions: number };
 }
 
+// ADMIN/OWNER manage the whole workspace and are never site-scoped — shared
+// by resolveSiteScope (single-site check) and siteScopeWhere (workspace-wide
+// list/aggregate filter) so the "who is exempt from scoping" rule has one
+// home instead of two copies that could drift.
+function managesWorkspace(role: string): boolean {
+  return role === "ADMIN" || role === "OWNER";
+}
+
 /**
  * Enforce per-site scoping. A member invited to "specific sites" has one
  * SitePermission row per allowed site; such a member may reach ONLY those
@@ -52,8 +60,7 @@ async function resolveSiteScope(
     where: { memberId_siteId: { memberId: member.id, siteId } },
     select: { roleOverride: true },
   });
-  const managesWorkspace = member.role === "ADMIN" || member.role === "OWNER";
-  if (!managesWorkspace && member._count.sitePermissions > 0 && !row) {
+  if (!managesWorkspace(member.role) && member._count.sitePermissions > 0 && !row) {
     throw new PermissionError("FORBIDDEN", "You don't have access to this site.");
   }
   return row;
@@ -72,7 +79,7 @@ export async function siteScopeWhere(
   db: PrismaClient,
   userId: string,
   workspaceId: string,
-): Promise<Record<string, unknown>> {
+): Promise<Prisma.SiteWhereInput> {
   const member = await db.workspaceMember.findFirst({
     where: { userId, workspaceId, status: "ACTIVE" },
     select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
@@ -81,8 +88,7 @@ export async function siteScopeWhere(
   // before reaching here, so this is defensive — deny rather than leak.
   if (!member) return { id: "__no_workspace_access__" };
 
-  const managesWorkspace = member.role === "ADMIN" || member.role === "OWNER";
-  if (managesWorkspace || member._count.sitePermissions === 0) return {};
+  if (managesWorkspace(member.role) || member._count.sitePermissions === 0) return {};
 
   const rows = await db.sitePermission.findMany({
     where: { memberId: member.id },
@@ -116,7 +122,8 @@ export async function assertSiteAccess(
  * The one answer to "what role does this user have ON THIS SITE".
  *
  * Site scope is enforced on the way through, and this site's `roleOverride`
- * wins over the workspace role — which is the whole reason this exists as its
+ * (when present) caps the workspace role by ROLE_RANK — PD-6, S-6 — never
+ * upgrades it. That resolution is the whole reason this exists as its
  * own export. `sites.myRole` used to answer the chrome's version of this
  * question with a bare `workspaceMember.findFirst` and return `member.role`, so
  * a member with a per-site override was told one thing by the UI and a

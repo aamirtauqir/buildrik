@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   createTestUser,
   createTestWorkspace,
@@ -65,5 +65,26 @@ describe("getEffectiveSiteRole — roleOverride cap (S-6 / PD-6)", () => {
     await expect(checkSiteRole(prisma, scopedUser.id, site.id, "EDITOR")).rejects.toBeInstanceOf(
       PermissionError,
     );
+  });
+
+  it("EDITOR member + VIEWER override — getEffectiveSiteRole resolves to the literal 'VIEWER' cap (IMPORTANT 10)", async () => {
+    const owner = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: owner.id });
+    const site = await createTestSite({ workspaceId: workspace.id, createdBy: owner.id });
+
+    const scopedUser = await createTestUser();
+    const member = await createTestWorkspaceMember({
+      userId: scopedUser.id,
+      workspaceId: workspace.id,
+      role: "EDITOR",
+    });
+    await createTestSitePermission({
+      memberId: member.id,
+      siteId: site.id,
+      grantedBy: owner.id,
+      roleOverride: "VIEWER",
+    });
+
+    await expect(getEffectiveSiteRole(prisma, scopedUser.id, site.id)).resolves.toBe("VIEWER");
   });
 });
