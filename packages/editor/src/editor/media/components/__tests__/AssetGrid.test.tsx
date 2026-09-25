@@ -207,6 +207,30 @@ describe("AssetGrid — grid/list view toggle", () => {
   });
 });
 
+// B-9: the list view's checkbox spans (role="checkbox") had no tabIndex and
+// no key handler, so a keyboard user could never reach or toggle them.
+describe("AssetGrid — list-view checkboxes are keyboard-reachable", () => {
+  it("Select all files toggles selMode/selectAll on Space, same as a click", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "a" })] });
+    const { container } = mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    const box = container.querySelector('[aria-label="Select all files"]')!;
+    expect(box).toHaveAttribute("tabIndex", "0");
+    fireEvent.keyDown(box, { key: " " });
+    expect(state.selectAll).toHaveBeenCalled();
+  });
+
+  it("a row's own checkbox toggles the row on Space", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "a" })] });
+    const { container } = mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    const box = container.querySelector('[data-testid="mgr-list-check-a"]')!;
+    expect(box).toHaveAttribute("tabIndex", "0");
+    fireEvent.keyDown(box, { key: "Enter" });
+    expect(state.toggleSelect).toHaveBeenCalledWith("a");
+  });
+});
+
 describe("AssetGrid — selection semantics", () => {
   it("plain click selects the asset for the details rail", () => {
     const state = makeState({ libraryItems: [makeItem({ key: "a" })] });

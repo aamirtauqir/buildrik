@@ -261,6 +261,14 @@ export const PageRow = React.memo<Props>(
           <div
             className="bd-pg-row-checkbox"
             data-testid={`page-row-checkbox-${page.id}`}
+            /* B-9: this div is a visual affordance inside an already-focusable,
+               already Space-handling row (see the row's onKeyDown above) — a
+               second independent tab stop on the same control would be a
+               nested-interactive anti-pattern. It gets a real checkbox role +
+               state instead of only aria-hidden, so assistive tech reading
+               the row hears what the icon shows. */
+            role={onToggleSelect ? "checkbox" : undefined}
+            aria-checked={onToggleSelect ? isSelected : undefined}
             aria-hidden={!onToggleSelect}
             onClick={(e) => {
               if (!onToggleSelect) return;

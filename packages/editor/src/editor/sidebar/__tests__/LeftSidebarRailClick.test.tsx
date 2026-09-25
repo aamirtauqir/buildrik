@@ -143,3 +143,21 @@ describe("LeftSidebar rail click semantics", () => {
     expect(document.querySelector(".ls-panel-close")).toBeNull();
   });
 });
+
+// B-9: every rail tab was an equal Tab stop, so Tab walked all six before
+// leaving the rail. Only the active tab is now in the Tab order.
+describe("LeftSidebar rail — roving tabindex + tabpanel naming", () => {
+  it("the active tab is tabIndex 0; the rest are -1", () => {
+    renderSidebar({ activeTab: "layers", drawerOpen: true });
+    expect(document.querySelector('[data-tab="layers"]')).toHaveAttribute("tabIndex", "0");
+    expect(document.querySelector('[data-tab="add"]')).toHaveAttribute("tabIndex", "-1");
+    expect(document.querySelector('[data-tab="pages"]')).toHaveAttribute("tabIndex", "-1");
+  });
+
+  it("the tabpanel is labelled by the active tab's button id", () => {
+    renderSidebar({ activeTab: "pages", drawerOpen: true });
+    const panel = screen.getByTestId("sidebar-panel");
+    expect(panel).toHaveAttribute("aria-labelledby", "rail-tab-pages");
+    expect(document.getElementById("rail-tab-pages")).not.toBeNull();
+  });
+});
