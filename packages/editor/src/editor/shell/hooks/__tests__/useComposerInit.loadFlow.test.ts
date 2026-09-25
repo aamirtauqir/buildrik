@@ -97,6 +97,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
   /* The real class, so `instanceof` in the autosave catch behaves as it does
      in the app. */
+  isSaveConflictPending: vi.fn(() => false),
   SaveConflictError: class SaveConflictError extends Error {
     constructor(public serverToken?: string) {
       super("SAVE_CONFLICT");
@@ -112,6 +113,7 @@ vi.mock("@/services/AssetUploadService", () => ({
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import {
   getSiteIdFromUrl,
+  isSaveConflictPending,
   loadProject,
   loadServerMedia,
   saveProject as syncSaveProject,
@@ -539,6 +541,41 @@ describe("useComposerInit — autosave conflict handling", () => {
     );
     expect(states.some((st) => st && st.status === "conflict")).toBe(true);
     expect(states.some((st) => st && st.status === "error")).toBe(false);
+  });
+
+  /* A-2 / PD-11: once a save was refused, every later autosave carries the
+     same stale token and would be refused again — re-raising the dialog the
+     user just dismissed. Autosave holds until the conflict is resolved. */
+  it("sends no autosave while a conflict is waiting on the user's choice", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(isSaveConflictPending).mockReturnValue(true);
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+
+    expect(syncSaveProject).not.toHaveBeenCalled();
+    expect(params.setIsDirty).toHaveBeenLastCalledWith(true);
+    const states = vi.mocked(params.setSaveState).mock.calls.map(([arg]) =>
+      typeof arg === "function" ? arg({ status: "conflict" }) : arg,
+    );
+    expect(states.some((st) => st && st.status === "saving")).toBe(false);
+
+    // Resolved (Overwrite / reload clears the hold) → autosave resumes.
+    vi.mocked(isSaveConflictPending).mockReturnValue(false);
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+    expect(syncSaveProject).toHaveBeenCalledTimes(1);
   });
 
   it("a real failure still says so", async () => {

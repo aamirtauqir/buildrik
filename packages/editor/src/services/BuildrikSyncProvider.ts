@@ -47,6 +47,19 @@ function getClient() {
 // successful save; the caller may force it (to the server's value) to overwrite.
 let _baselineLastEditedAt: string | null = null;
 
+/* A-2 / PD-11: set when the server refused a behind-copy, cleared only when the
+   user resolves it (Overwrite adopts the server token; Reload re-loads). While
+   it stands, autosave holds back: every further autosave would carry the same
+   stale token, be refused again, and re-raise the dialog the user just
+   dismissed — the "Conflict — reload" pill is the standing notice instead. */
+let _conflictPending = false;
+
+/** Whether a save conflict is waiting on the user's choice. Autosave reads it
+ *  before sending; a manual save still goes out (and re-surfaces the dialog). */
+export function isSaveConflictPending(): boolean {
+  return _conflictPending;
+}
+
 /** Assets per `loadServerMedia` page. The drawer's "Load more" walks the rest.
  *  Not exported: nothing outside this module decides the page size, and an
  *  export with no importer is what `gate:ds-ssot` calls a dead export. */
@@ -99,6 +112,7 @@ export class SaveConflictError extends Error {
  *  save matches the server and wins. */
 export function setBaselineLastEditedAt(iso: string | null): void {
   _baselineLastEditedAt = iso;
+  _conflictPending = false;
 }
 
 // Conflict signal — emitted on a window CustomEvent so BOTH manual save and
@@ -410,6 +424,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
+    _conflictPending = false;
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -497,6 +512,7 @@ async function saveProjectNow(
     const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
     if (match) {
       const serverToken = match[1].trim();
+      _conflictPending = true;
       emitSaveConflict(serverToken);
       throw new SaveConflictError(serverToken);
     }

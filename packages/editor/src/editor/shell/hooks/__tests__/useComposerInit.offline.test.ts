@@ -54,6 +54,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.reject(new Error("Failed to fetch"))),
+  isSaveConflictPending: vi.fn(() => false),
   SaveConflictError: class extends Error {},
 }));
 

@@ -60,7 +60,6 @@ const ALLOWED = {
   "dashboard.recentSites": "Home shows recent ACTIVITY, not recent sites; the sites list is its own screen.",
   "auth.logout": "Sign-out goes through NextAuth signOut + /api/auth/logout.",
   "sites.getProjectData": "The editor loads through sites.get; saves through sites.saveProject.",
-  "sites.saveProjectData": "Superseded by sites.saveProject (editorSaveProjectSchema) — see packages/shared/schemas/sites.ts.",
   "upload.limits": "Upload limits are read from PLAN_LIMITS on the client.",
   "siteComponents.usage": "The editor's component library shows usage from its own local registry.",
   "help.categories": "The Help index renders its categories from help.articles.",

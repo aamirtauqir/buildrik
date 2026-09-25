@@ -1,18 +1,14 @@
 /**
- * D-14a / A20-2 — `saveProjectData`'s optimistic-concurrency check
- * (`server/services/sites.service.ts:603-609`) reads `site.lastEditedAt`
- * BEFORE the write transaction, not inside it. Two concurrent saves that
- * both loaded the same `expectedLastEditedAt` both pass that read and both
- * commit — the second one silently clobbers the first instead of getting
- * `SAVE_CONFLICT`.
- *
- * `it.fails`: this documents the bug against the real service + a real
- * Postgres transaction (not a mock), so it fails today (both saves
- * succeed). A-2 fixes it with a CAS `updateMany` inside the transaction;
- * that flips this to a real pass, at which point `it.fails` itself starts
- * failing (unexpected pass) — the intended signal to drop `.fails` there.
+ * D-14a / A20-2 / A-2 — `saveProjectData`'s optimistic-concurrency check
+ * used to read `site.lastEditedAt` BEFORE the write transaction, so two
+ * concurrent saves that both loaded the same `expectedLastEditedAt` both
+ * passed that read and both committed — the second silently clobbered the
+ * first. A-2 made it a CAS `updateMany` (lastEditedAt in the WHERE) first in
+ * the transaction; this runs it against a real Postgres transaction, not a
+ * mock, so the row-lock re-evaluation is what is actually under test.
  */
 import { describe, it, expect, beforeEach } from "vitest";
+import { prisma } from "@/lib/prisma";
 import { saveProjectData } from "@/server/services/sites.service";
 import {
   createTestUser,
@@ -27,8 +23,8 @@ beforeEach(async () => {
 });
 
 describe("saveProjectData — concurrent-save race (D-14a / A20-2)", () => {
-  it.fails(
-    "exactly one of two concurrent saves sharing the same expectedLastEditedAt should win",
+  it(
+    "exactly one of two concurrent saves sharing the same expectedLastEditedAt wins",
     async () => {
       const user = await createTestUser();
       const workspace = await createTestWorkspace({ ownerId: user.id });
@@ -58,11 +54,16 @@ describe("saveProjectData — concurrent-save race (D-14a / A20-2)", () => {
         (r): r is PromiseRejectedResult => r.status === "rejected",
       );
 
-      // Today: both fulfill (the bug). After A-2's CAS fix: exactly one
-      // fulfills and the other rejects with SAVE_CONFLICT.
       expect(fulfilled.length).toBe(1);
       expect(rejected.length).toBe(1);
       expect(String(rejected[0]?.reason)).toContain("SAVE_CONFLICT");
+
+      // The loser's page write rolled back with its transaction: the row
+      // holds exactly the winner's content.
+      const winner = results[0]?.status === "fulfilled" ? "A" : "B";
+      const stored = await prisma.page.findUniqueOrThrow({ where: { id: page.id } });
+      expect(stored.name).toBe(`Home ${winner}`);
+      expect(stored.blocks).toEqual([winner]);
     },
   );
 });

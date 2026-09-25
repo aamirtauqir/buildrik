@@ -14,7 +14,6 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
-  saveProjectData,
   saveProjectFromEditor,
   getProjectData,
 } from "@/server/services/sites.service";
@@ -42,7 +41,6 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
-  saveProjectDataSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
@@ -602,31 +600,6 @@ export const sitesRouter = router({
         description: `Rolled back from version ${input.jobId}`,
       });
       return result;
-    }),
-
-  saveProjectData: protectedProcedure
-    .input(saveProjectDataSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
-      } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-        throw e;
-      }
-      try {
-        return await saveProjectData(input);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
-          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
-        // Same refusal as the editor save above — this door writes through the
-        // same boundary, so it must report the same thing.
-        if (e instanceof Error && e.message === "EMPTY_SNAPSHOT")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "This save carried no pages, so it was not applied. Reload the site before editing.",
-          });
-        throw e;
-      }
     }),
 
   getProjectData: protectedProcedure

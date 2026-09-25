@@ -24,7 +24,8 @@ vi.mock("@/lib/prisma", () => ({
           update: vi.fn().mockResolvedValue({}),
         },
         site: {
-          update: vi.fn().mockResolvedValue({}),
+          updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+          findUnique: vi.fn(),
         },
         formBlock: {
           deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -52,7 +53,8 @@ function makeTx() {
     update: vi.fn().mockResolvedValue({}),
   };
   const txSite = {
-    update: vi.fn().mockResolvedValue({}),
+    updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    findUnique: vi.fn(),
   };
   const txFormBlock = {
     deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -114,9 +116,9 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
         }),
       })
     );
-    expect(txSite.update).toHaveBeenCalledWith(
+    expect(txSite.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "site-1" },
+        where: expect.objectContaining({ id: "site-1", deletedAt: null }),
         data: expect.objectContaining({
           pages: 2,
           lastEditedAt: expect.any(Date),
@@ -158,7 +160,7 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
     expect(result.success).toBe(true);
     expect(txPage.upsert).not.toHaveBeenCalled();
     expect(txPage.update).not.toHaveBeenCalled();
-    expect(txSite.update).toHaveBeenCalledWith(
+    expect(txSite.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ pages: 0 }),
       })
@@ -206,7 +208,7 @@ describe("saveProjectFromEditor — editor save path (positional args)", () => {
       where: { id: { in: ["page-2", "page-3"] } },
     });
     expect(txPage.upsert).toHaveBeenCalledTimes(1);
-    expect(txSite.update).toHaveBeenCalledWith(
+    expect(txSite.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ pages: 1 }),
       })
@@ -388,42 +390,57 @@ describe("saveProjectData — canonical input-object signature", () => {
   });
 });
 
-describe("saveProjectData — 61-conflict optimistic concurrency", () => {
+describe("saveProjectData — 61-conflict optimistic concurrency (A-2 CAS)", () => {
+  let tx: ReturnType<typeof makeTx>;
   beforeEach(() => {
     vi.clearAllMocks();
-    const { txPage, txSite, txFormBlock } = makeTx();
+    tx = makeTx();
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
-      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+      fn({ page: tx.txPage, site: tx.txSite, formBlock: tx.txFormBlock })
     );
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ deletedAt: null } as any);
   });
 
   const loaded = new Date("2026-06-19T10:00:00.000Z");
 
-  it("rejects a behind-copy when expectedLastEditedAt no longer matches", async () => {
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({
-      id: "site-1",
-      lastEditedAt: new Date("2026-06-19T10:05:00.000Z"), // someone else saved later
-    } as any);
+  it("rejects a behind-copy when the CAS update matches no row", async () => {
+    const newer = new Date("2026-06-19T10:05:00.000Z"); // someone else saved later
+    tx.txSite.updateMany.mockResolvedValue({ count: 0 });
+    tx.txSite.findUnique.mockResolvedValue({ lastEditedAt: newer, deletedAt: null });
     await expect(
-      saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString())
-    ).rejects.toThrow(/^SAVE_CONFLICT:/);
+      saveProjectData(
+        { siteId: "site-1", pages: [{ id: "p1", blocks: [], name: "Home", slug: "home", position: 0 }] },
+        loaded.toISOString(),
+      )
+    ).rejects.toThrow(`SAVE_CONFLICT:${newer.toISOString()}`);
+    // The CAS runs FIRST, so a losing save writes no page at all.
+    expect(tx.txPage.upsert).not.toHaveBeenCalled();
+    expect(tx.txPage.deleteMany).not.toHaveBeenCalled();
   });
 
-  it("saves when expectedLastEditedAt matches the row", async () => {
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({
-      id: "site-1",
-      lastEditedAt: loaded,
-    } as any);
+  it("puts expectedLastEditedAt in the UPDATE's WHERE, not in a read before it", async () => {
     const result = await saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString());
     expect(result.success).toBe(true);
+    expect(tx.txSite.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "site-1", deletedAt: null, lastEditedAt: loaded },
+      })
+    );
   });
 
   it("skips the check entirely when expectedLastEditedAt is omitted (non-regressive)", async () => {
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({
-      id: "site-1",
-      lastEditedAt: new Date("2026-06-19T10:05:00.000Z"),
-    } as any);
     const result = await saveProjectData({ siteId: "site-1", pages: [] });
     expect(result.success).toBe(true);
+    expect(tx.txSite.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "site-1", deletedAt: null } })
+    );
+  });
+
+  it("reports SITE_NOT_FOUND when the site is deleted between the read and the CAS", async () => {
+    tx.txSite.updateMany.mockResolvedValue({ count: 0 });
+    tx.txSite.findUnique.mockResolvedValue({ lastEditedAt: loaded, deletedAt: new Date() });
+    await expect(
+      saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString())
+    ).rejects.toThrow("SITE_NOT_FOUND");
   });
 });

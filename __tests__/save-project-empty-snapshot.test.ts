@@ -31,13 +31,12 @@ vi.mock("@/lib/prisma", () => {
       create: vi.fn(),
     },
     formBlock: { deleteMany: (...a: unknown[]) => formBlockDeleteMany(...a) },
-    site: { update: (...a: unknown[]) => siteUpdate(...a) },
+    site: { updateMany: (...a: unknown[]) => siteUpdate(...a) },
   };
   return {
     prisma: {
       site: {
         findUnique: (...a: unknown[]) => siteFindUnique(...a),
-        update: (...a: unknown[]) => siteUpdate(...a),
       },
       $transaction: async (fn: (t: unknown) => unknown) => fn(tx),
     },
@@ -51,7 +50,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   siteFindUnique.mockResolvedValue({ id: "s_1", deletedAt: null, lastEditedAt: null });
   pageFindMany.mockResolvedValue([{ id: "p_1" }, { id: "p_2" }]);
-  siteUpdate.mockResolvedValue({});
+  siteUpdate.mockResolvedValue({ count: 1 });
 });
 
 describe("saveProjectData with an empty page list", () => {

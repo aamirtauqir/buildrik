@@ -18,6 +18,7 @@ import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/ty
 import { importMigratedProject } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
+  isSaveConflictPending,
   loadCurrentUserId,
   loadProject,
   loadServerMedia,
@@ -503,6 +504,14 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       changeSeq += 1;
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        /* A-2 / PD-11: a refused save is waiting on the user's choice. Sending
+           again would carry the same stale token and be refused again, so the
+           edit stays dirty under the "Conflict" pill until the dialog resolves
+           it (Overwrite clears the hold and saves; Reload re-loads). */
+        if (siteId && isSaveConflictPending()) {
+          setIsDirty(true);
+          return;
+        }
         const seqAtSend = changeSeq;
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
 

@@ -50,6 +50,7 @@ import {
   SaveConflictError,
   ProjectNotLoadedError,
   SAVE_CONFLICT_EVENT,
+  isSaveConflictPending,
 } from "../BuildrikSyncProvider";
 
 /* saveProject refuses a site whose project never loaded — the guard that stops
@@ -477,6 +478,64 @@ describe("save-conflict parsing (61-conflict)", () => {
     await second;
     expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(2);
     expect(mocks.saveProjectMutate.mock.calls[1][0]).toMatchObject({ expectedLastEditedAt: "2026-07-02T00:00:00.000Z" });
+  });
+
+  /* Review Focus 2 (A-2): the server CAS refuses any token that is not the
+     row's current lastEditedAt. Five edits fired while a slow save is still
+     travelling must each leave with the token the previous save returned —
+     zero self-conflicts with nobody else on the site. The mock server below
+     IS that CAS: it compares, advances, and answers slowly. */
+  it("5 rapid saves against a slow CAS server produce 0 self-conflicts", async () => {
+    vi.useFakeTimers();
+    try {
+      let serverLastEditedAt = "2026-06-30T12:00:00.000Z";
+      mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T", lastEditedAt: serverLastEditedAt });
+      mocks.pagesListQuery.mockResolvedValue([]);
+      await loadProject("s1");
+      let tick = 0;
+      mocks.saveProjectMutate.mockImplementation(
+        ({ expectedLastEditedAt }: { expectedLastEditedAt: string | null }) =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              if (expectedLastEditedAt !== serverLastEditedAt) {
+                reject(new Error(`SAVE_CONFLICT:${serverLastEditedAt}`));
+                return;
+              }
+              tick += 1;
+              const savedAt = new Date(Date.parse("2026-07-01T00:00:00.000Z") + tick * 1000);
+              serverLastEditedAt = savedAt.toISOString();
+              resolve({ success: true, savedAt });
+            }, 800);
+          }),
+      );
+
+      const saves = Array.from({ length: 5 }, () => saveProject("s1", PROJECT));
+      const settled = Promise.allSettled(saves);
+      await vi.advanceTimersByTimeAsync(5 * 800 + 10);
+      const results = await settled;
+
+      expect(results.filter((r) => r.status === "rejected")).toHaveLength(0);
+      expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(5);
+      expect(isSaveConflictPending()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a refused save holds autosave until the user resolves it", async () => {
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    expect(isSaveConflictPending()).toBe(true);
+
+    // "Overwrite" adopts the server token — the hold lifts with it.
+    setBaselineLastEditedAt("2026-07-01T10:00:00.000Z");
+    expect(isSaveConflictPending()).toBe(false);
+
+    // A fresh load ("Reload latest") lifts it too.
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-07-01T11:00:00.000Z"));
+    await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
+    await loadedSite("s1");
+    expect(isSaveConflictPending()).toBe(false);
   });
 
   it("setBaselineLastEditedAt forces the token (the 'Overwrite' escape hatch)", async () => {
