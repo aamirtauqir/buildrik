@@ -240,3 +240,38 @@ describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
     expect(sanitizeTemplateHtml('<a href="/x" target="_blank">x</a>')).toContain('rel="noopener noreferrer"');
   });
 });
+
+describe("component instance overrides (S-1 review round 2)", () => {
+  it("sanitizes content overrides and drops unsafe attribute overrides on write", () => {
+    const overrides = [
+      { op: "replace", path: "#/children[0]/content/content", value: '<img src=x onerror="alert(1)">Owned' },
+      { op: "replace", path: "#/children[1]/attribute/href", value: "java\tscript:alert(1)" },
+      { op: "replace", path: "#/children[1]/attribute/x onerror=y", value: "1" },
+      { op: "replace", path: "#/children[1]/attribute/srcdoc", value: "<script>x</script>" },
+      { op: "replace", path: "#/children[1]/attribute/title", value: "kept" },
+      { op: "replace", path: "#/style/color", value: "red" },
+    ];
+    const blocks = {
+      id: "r",
+      type: "container",
+      tagName: "div",
+      children: [{ id: "i", type: "container", tagName: "div", data: { componentInstance: { componentId: "c", overrides } } }],
+    };
+    const reasons: string[] = [];
+    sanitizeBlocks(blocks, (r) => reasons.push(r));
+    const kept = blocks.children[0].data.componentInstance.overrides;
+    expect(kept.map((o) => o.path)).toEqual([
+      "#/children[0]/content/content",
+      "#/children[1]/attribute/title",
+      "#/style/color",
+    ]);
+    expect(kept[0].value).toContain("Owned");
+    expect(kept[0].value).not.toMatch(/onerror/i);
+    expect(reasons.filter((r) => r === "override")).toHaveLength(4);
+  });
+
+  it("tolerates overrides of an unexpected shape", () => {
+    const blocks = { id: "r", type: "container", tagName: "div", data: { componentInstance: { overrides: "nope" } } };
+    expect(() => sanitizeBlocks(blocks)).not.toThrow();
+  });
+});

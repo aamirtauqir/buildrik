@@ -41,7 +41,8 @@ export type SanitizeReason =
   | "attr-name"
   | "attr-forbidden"
   | "attr-event-handler"
-  | "attr-url";
+  | "attr-url"
+  | "override";
 
 export type OnSanitizeChange = (reason: SanitizeReason, detail: string) => void;
 
@@ -84,6 +85,39 @@ function sanitizeAttributeMap(attrs: unknown, onChange?: OnSanitizeChange): void
   }
 }
 
+/**
+ * A component instance's stored overrides (`data.componentInstance.overrides`,
+ * `#/<elementPath>/<type>/<property>` ops) are written into the cloned master
+ * on every sync, so they get the same rules: content sanitized, an unsafe
+ * attribute override (or one with a non-string value) removed.
+ */
+function sanitizeInstanceOverrides(data: unknown, onChange?: OnSanitizeChange): void {
+  const overrides = asRecord(asRecord(data)?.componentInstance)?.overrides;
+  if (!Array.isArray(overrides)) return;
+  for (let i = overrides.length - 1; i >= 0; i--) {
+    const op = asRecord(overrides[i]);
+    if (!op || typeof op.path !== "string") continue;
+    const parts = op.path.split("/");
+    const property = parts[parts.length - 1] ?? "";
+    const type = parts[parts.length - 2];
+    if (type === "content") {
+      if (typeof op.value !== "string") {
+        onChange?.("override", op.path);
+        overrides.splice(i, 1);
+        continue;
+      }
+      const clean = purify(op.value);
+      if (clean !== op.value) onChange?.("override", op.path);
+      op.value = clean;
+    } else if (type === "attribute") {
+      if (typeof op.value !== "string" || unsafeAttributeReason(property, op.value)) {
+        onChange?.("override", op.path);
+        overrides.splice(i, 1);
+      }
+    }
+  }
+}
+
 function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange): void {
   if (node.tagName != null && node.tagName !== "" && !isAllowedElementTag(node.tagName)) {
     onChange?.("tag", String(node.tagName));
@@ -97,6 +131,7 @@ function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange
   }
 
   sanitizeAttributeMap(node.attributes, onChange);
+  sanitizeInstanceOverrides(node.data, onChange);
 
   const children = node.children;
   if (Array.isArray(children)) {

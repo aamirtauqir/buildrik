@@ -105,3 +105,50 @@ describe("a malformed master does not break the library (S-1 review round 2)", (
     warn.mockRestore();
   });
 });
+
+describe("instance overrides are sanitized where they are applied (S-1 review round 2)", () => {
+  const safeMaster = (id: string): ComponentDefinition => ({
+    id,
+    name: "Card",
+    masterTree: {
+      id: "m",
+      type: "container",
+      tagName: "div",
+      children: [
+        { id: "t", type: "text", tagName: "p", content: "Hi", children: [] },
+        { id: "l", type: "link", tagName: "a", attributes: { href: "/ok" }, children: [] },
+      ],
+    } as never,
+    createdAt: 1,
+    updatedAt: 1,
+    version: 1,
+  });
+
+  it("a stored hostile content / attribute override renders clean after a master sync", async () => {
+    stored.splice(0, stored.length);
+    const { manager, mgr, page } = makeStack();
+    await mgr.adoptLibraryComponent(safeMaster("ov-1"));
+    const elementId = await mgr.instantiateComponent("ov-1", page.root.id);
+    const element = manager.getElement(elementId!)!;
+    // What a loaded project carries on the instance element (rehydrateInstances reads it).
+    element.setData("componentInstance", {
+      elementId,
+      componentId: "ov-1",
+      syncedVersion: 0, // the master moved on: sync re-clones and re-applies
+      isDetached: false,
+      overrides: [
+        { op: "replace", path: "#/children[0]/content/content", value: '<img src=x onerror="alert(1)">Owned' },
+        { op: "replace", path: "#/children[1]/attribute/href", value: "java\tscript:alert(1)" },
+        { op: "replace", path: "#/children[1]/attribute/x onmouseover=alert(1) y", value: "1" },
+        { op: "replace", path: "#/children[1]/attribute/srcdoc", value: "<script>x</script>" },
+        { op: "replace", path: "#/children[1]/attribute/title", value: "kept" },
+      ],
+    });
+    mgr.rehydrateInstances();
+    expect(await mgr.syncInstance(elementId!)).toBe(true);
+    const html = manager.toHTML();
+    expect(html).toContain("Owned");
+    expect(html).toContain('title="kept"');
+    expect(html).not.toMatch(/onerror|onmouseover|srcdoc|script:/i);
+  });
+});

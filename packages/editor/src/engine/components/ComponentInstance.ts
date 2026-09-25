@@ -13,6 +13,7 @@ import type {
   Override,
   OverrideType,
 } from "../../shared/types/components";
+import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
 import type { Patch } from "../utils/JsonPatch";
 
@@ -67,27 +68,37 @@ function resolveNodeByElementPath(tree: ElementData, elementPath: string): Eleme
   return node;
 }
 
-/** Write one override value into the correct bucket of an ElementData node. */
+/**
+ * Write one override value into the correct bucket of an ElementData node.
+ * Returns false when the override is refused.
+ *
+ * Overrides come from the stored project (`componentInstance.overrides`) and
+ * land in a tree that is pasted and rendered as-is, so this is an ingest
+ * boundary like importProject: content goes through the content sanitizer, an
+ * attribute through the same name/value rule the serializer applies (A19-1).
+ */
 function applyOverrideToNode(
   node: ElementData,
   type: OverrideType,
   property: string,
   value: unknown
-): void {
+): boolean {
   switch (type) {
     case "style":
       node.styles = { ...(node.styles ?? {}), [property]: value as string };
-      break;
+      return true;
     case "content":
-      node.content = value as string;
-      break;
+      if (typeof value !== "string") return false;
+      node.content = sanitizeHTML(value);
+      return true;
     case "attribute":
-      node.attributes = { ...(node.attributes ?? {}), [property]: value as string };
-      break;
+      if (typeof value !== "string" || !isSafeAttrValue(property, value, node.tagName ?? "")) return false;
+      node.attributes = { ...(node.attributes ?? {}), [property]: value };
+      return true;
     case "trait": {
       const trait = node.traits?.find((t) => t.name === property);
       if (trait) trait.value = value as typeof trait.value;
-      break;
+      return true;
     }
   }
 }
@@ -121,7 +132,10 @@ export function applyOverridesToTree(
       dropped++;
       continue;
     }
-    applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value);
+    if (!applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value)) {
+      dropped++;
+      continue;
+    }
     applied++;
     kept.push(op);
   }
