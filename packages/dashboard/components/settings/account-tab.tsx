@@ -151,24 +151,18 @@ export function AccountTab({
       >
         <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-sm">
           {!isSocialOnly && (
-            <div>
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-                Current password
-              </label>
-              <InputField
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-              />
-            </div>
+            <InputField
+              label="Current password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+            />
           )}
 
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-              New password
-            </label>
             <InputField
+              label="New password"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -182,10 +176,8 @@ export function AccountTab({
           </div>
 
           <div>
-            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-              Confirm new password
-            </label>
             <InputField
+              label="Confirm new password"
               type="password"
               value={confirmPassword}
               onChange={(e) => {
@@ -268,17 +260,13 @@ export function AccountTab({
           </div>
 
           {hasPassword && (
-            <div>
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-                Current password
-              </label>
-              <InputField
-                type="password"
-                value={emailPassword}
-                onChange={(e) => { setEmailPassword(e.target.value); if (emailError) setEmailError(""); }}
-                required
-              />
-            </div>
+            <InputField
+              label="Current password"
+              type="password"
+              value={emailPassword}
+              onChange={(e) => { setEmailPassword(e.target.value); if (emailError) setEmailError(""); }}
+              required
+            />
           )}
 
           {emailError && (
