@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import type { UserRoleType } from "@/lib/constants/enums";
+import type { PlanName } from "@/lib/constants/plan-limits";
 
 const ROLE_RANK: Record<UserRoleType, number> = {
   VIEWER: 0,
@@ -78,6 +79,42 @@ export async function assertSiteAccess(
   });
   if (!member) throw new PermissionError("FORBIDDEN");
   await resolveSiteScope(db, member, siteId);
+}
+
+/**
+ * The one answer to "which workspace is this SITE in, and what does that
+ * workspace say" — `workspaceId`, `plan`, `editsRequireApproval`.
+ *
+ * Consolidates three call sites (controller review round 1, IMPORTANT 4) that
+ * each read `site.workspaceId` off a bare `ctx.prisma.site.findUnique` and
+ * then, in two of them, did a SECOND round-trip through `workspaceMember` just
+ * to reach `workspace.plan` — the plan belongs to the workspace, not to a
+ * membership row, so that join was unnecessary. Every caller here has already
+ * proven site access via `checkSiteRole`/`assertSiteAccess`; this is a plain
+ * read, not an authorization check.
+ */
+const PLAN_NAMES: readonly PlanName[] = ["FREE", "PRO", "BUSINESS"];
+
+export async function getSiteWorkspace(
+  db: PrismaClient,
+  siteId: string,
+): Promise<{ workspaceId: string; plan: PlanName; editsRequireApproval: boolean } | null> {
+  const site = await db.site.findUnique({
+    where: { id: siteId },
+    select: { workspaceId: true, workspace: { select: { plan: true, editsRequireApproval: true } } },
+  });
+  if (!site) return null;
+  // `Workspace.plan` is a plain String column, not a DB-level enum — defend
+  // against a corrupt/unrecognized value the same way every prior caller did.
+  const rawPlan = site.workspace?.plan;
+  const plan: PlanName = (PLAN_NAMES as readonly string[]).includes(rawPlan ?? "")
+    ? (rawPlan as PlanName)
+    : "FREE";
+  return {
+    workspaceId: site.workspaceId,
+    plan,
+    editsRequireApproval: site.workspace?.editsRequireApproval ?? false,
+  };
 }
 
 /**

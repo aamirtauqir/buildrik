@@ -7,6 +7,7 @@ import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import {
   checkSiteRole,
   checkWorkspaceRole,
+  getSiteWorkspace,
   PermissionError,
 } from "@/server/services/permission.service";
 import { checkRateLimit } from "@/server/services/rate-limiter";
@@ -59,30 +60,19 @@ async function requireAdmin(
   }
 }
 
-/**
- * The `agency_layer` flag (and `editsRequireApproval`, where a caller needs
- * it) must be read from the SITE's own workspace, not the caller's SESSION
- * workspace — a member of several workspaces has a session workspace that
- * can differ from the site's, and reading the flag off the wrong one either
- * hard-fails a mutation that should have worked or silently reports
- * `editsRequireApproval: false` while the site's real workspace requires it
- * (A-8). `checkSiteRole` already scopes correctly by siteId; only the
- * flag/setting lookups needed this.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function resolveSiteWorkspaceId(ctx: any, siteId: string): Promise<string> {
-  const site = await ctx.prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
-  if (!site) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
-  return site.workspaceId;
-}
-
 export const reviewsRouter = router({
   // A content editor (anyone with EDITOR access to the site) submits it for review.
   submit: protectedProcedure
     .input(submitReviewInput)
     .mutation(async ({ ctx, input }) => {
-      const workspaceId = await resolveSiteWorkspaceId(ctx, input.siteId);
-      await requireAgencyLayer(workspaceId);
+      // The `agency_layer` flag must be read from the SITE's own workspace,
+      // not the caller's SESSION workspace — a member of several workspaces
+      // has a session workspace that can differ from the site's (A-8).
+      // `checkSiteRole` below scopes correctly by siteId; only this lookup
+      // needed it.
+      const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+      if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      await requireAgencyLayer(siteWorkspace.workspaceId);
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
@@ -151,10 +141,7 @@ export const reviewsRouter = router({
   status: protectedProcedure
     .input(reviewStatusForSiteInput)
     .query(async ({ ctx, input }) => {
-      const site = await ctx.prisma.site.findUnique({
-        where: { id: input.siteId },
-        select: { workspaceId: true },
-      });
+      const site = await getSiteWorkspace(ctx.prisma, input.siteId);
       if (!site) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
       if (!(await isFeatureEnabled(site.workspaceId, "agency_layer")))
         /* `reviewsEnabled: false` is the point: without it the editor cannot
@@ -206,8 +193,9 @@ export const reviewsRouter = router({
   currentRound: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveSiteWorkspaceId(ctx, input.siteId);
-      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return null;
+      const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+      if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      if (!(await isFeatureEnabled(siteWorkspace.workspaceId, "agency_layer"))) return null;
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
@@ -229,8 +217,12 @@ export const reviewsRouter = router({
   rounds: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
-      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return [];
+      // A-8 round 2: read from the SITE's workspace, not the caller's
+      // session workspace — an EDITOR on another workspace's site couldn't
+      // otherwise see their own round's history.
+      const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+      if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      if (!(await isFeatureEnabled(siteWorkspace.workspaceId, "agency_layer"))) return [];
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
@@ -246,8 +238,10 @@ export const reviewsRouter = router({
   approvedSnapshot: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
-      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return null;
+      // A-8 round 2: site's workspace, not the caller's session workspace.
+      const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+      if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      if (!(await isFeatureEnabled(siteWorkspace.workspaceId, "agency_layer"))) return null;
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
@@ -264,15 +258,19 @@ export const reviewsRouter = router({
   revoke: protectedProcedure
     .input(revokeReviewInput)
     .mutation(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
-      await requireAgencyLayer(workspaceId);
+      // A-8 round 2: site's workspace, not the caller's session workspace —
+      // an EDITOR on another workspace's site couldn't otherwise revoke their
+      // own round.
+      const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+      if (!siteWorkspace) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      await requireAgencyLayer(siteWorkspace.workspaceId);
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      const result = await revokeReviewRound(workspaceId, input.reviewId, input.expectedRevision);
+      const result = await revokeReviewRound(siteWorkspace.workspaceId, input.reviewId, input.expectedRevision);
       if (result.revoked) {
         await recordForSite({
           siteId: input.siteId,

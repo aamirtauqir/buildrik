@@ -8,11 +8,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const checkSiteRoleMock = vi.fn();
 const checkWorkspaceRoleMock = vi.fn();
+const getSiteWorkspaceMock = vi.fn();
 const submitMock = vi.fn();
 const listMock = vi.fn();
 const resolveMock = vi.fn();
 const isFeatureEnabledMock = vi.fn();
 const getCurrentRoundMock = vi.fn();
+const listRoundsMock = vi.fn();
+const getApprovedSnapshotMock = vi.fn();
+const revokeReviewRoundMock = vi.fn();
+const recordForSiteMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -28,6 +33,7 @@ vi.mock("@/server/trpc/workspace-ctx", () => ({
 vi.mock("@/server/services/permission.service", () => ({
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
   checkWorkspaceRole: (...a: unknown[]) => checkWorkspaceRoleMock(...a),
+  getSiteWorkspace: (...a: unknown[]) => getSiteWorkspaceMock(...a),
   PermissionError: class PermissionError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -44,6 +50,9 @@ vi.mock("@/server/services/review.service", () => ({
   listReviews: (...a: unknown[]) => listMock(...a),
   resolveReview: (...a: unknown[]) => resolveMock(...a),
   getCurrentRound: (...a: unknown[]) => getCurrentRoundMock(...a),
+  listRounds: (...a: unknown[]) => listRoundsMock(...a),
+  getApprovedSnapshot: (...a: unknown[]) => getApprovedSnapshotMock(...a),
+  revokeReviewRound: (...a: unknown[]) => revokeReviewRoundMock(...a),
   ReviewError: class ReviewError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -51,6 +60,9 @@ vi.mock("@/server/services/review.service", () => ({
       this.code = code;
     }
   },
+}));
+vi.mock("@/server/services/activity-log.service", () => ({
+  recordForSite: (...a: unknown[]) => recordForSiteMock(...a),
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 const checkRateLimitMock = vi.fn();
@@ -61,24 +73,24 @@ vi.mock("@/server/services/rate-limiter", () => ({
 import { reviewsRouter } from "@/server/trpc/routers/reviews";
 import { PermissionError } from "@/server/services/permission.service";
 
-// A-8: submit/status/currentRound now resolve the workspace from the SITE
-// (ctx.prisma.site.findUnique), not the session — every caller needs this.
-const siteFindUniqueMock = vi.fn();
+// A-8: submit/status/currentRound/rounds/approvedSnapshot/revoke now
+// resolve the workspace from the SITE via getSiteWorkspace, not the
+// session — every caller needs this.
 function makeCtx() {
   return {
     session: { user: { id: "u_1" } },
-    prisma: { site: { findUnique: (...a: unknown[]) => siteFindUniqueMock(...a) } } as never,
+    prisma: {} as never,
   };
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock, checkRateLimitMock, siteFindUniqueMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock, getCurrentRoundMock, checkRateLimitMock, getSiteWorkspaceMock, listRoundsMock, getApprovedSnapshotMock, revokeReviewRoundMock, recordForSiteMock].forEach((m) =>
     m.mockReset(),
   );
   // Default: agency layer ON, so the existing role-gate assertions still hold.
   isFeatureEnabledMock.mockResolvedValue(true);
   checkRateLimitMock.mockResolvedValue({ allowed: true, remaining: 9, resetAt: Date.now() + 1000 });
-  siteFindUniqueMock.mockResolvedValue({ workspaceId: "ws_1", workspace: { editsRequireApproval: false } });
+  getSiteWorkspaceMock.mockResolvedValue({ workspaceId: "ws_1", plan: "FREE", editsRequireApproval: false });
 });
 
 describe("reviews router", () => {
@@ -172,7 +184,7 @@ describe("reviews router", () => {
     // Session's own resolveWorkspaceId resolves "ws_1"; the site being
     // submitted for belongs to a DIFFERENT workspace whose flag is what
     // actually governs this call.
-    siteFindUniqueMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", workspace: { editsRequireApproval: false } });
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
     checkSiteRoleMock.mockResolvedValueOnce(undefined) // EDITOR gate
       .mockRejectedValueOnce(new PermissionError("FORBIDDEN")); // token gate (not admin)
     submitMock.mockResolvedValueOnce({ id: "r1", status: "PENDING", token: null, inviteEmailSent: null, adminsNotified: 0 });
@@ -183,7 +195,7 @@ describe("reviews router", () => {
   });
 
   it("currentRound reads agency_layer off the SITE's workspace, not the session's (A-8)", async () => {
-    siteFindUniqueMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", workspace: { editsRequireApproval: false } });
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
     isFeatureEnabledMock.mockResolvedValueOnce(false); // off for the SITE's workspace
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.currentRound({ siteId: "s2" })).resolves.toBeNull();
@@ -191,8 +203,43 @@ describe("reviews router", () => {
     expect(checkSiteRoleMock).not.toHaveBeenCalled();
   });
 
+  // A-8 round 2 (controller review): rounds/approvedSnapshot/revoke also read
+  // the caller's SESSION workspace instead of the SITE's — an EDITOR on
+  // another workspace's site couldn't see their own round history or revoke
+  // their own round.
+  it("rounds reads agency_layer off the SITE's workspace, not the session's", async () => {
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
+    isFeatureEnabledMock.mockResolvedValueOnce(true);
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    listRoundsMock.mockResolvedValueOnce([{ id: "r1" }]);
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.rounds({ siteId: "s2" })).resolves.toEqual([{ id: "r1" }]);
+    expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws_site_2", "agency_layer");
+  });
+
+  it("approvedSnapshot reads agency_layer off the SITE's workspace, not the session's", async () => {
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
+    isFeatureEnabledMock.mockResolvedValueOnce(true);
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    getApprovedSnapshotMock.mockResolvedValueOnce({ pages: [] });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.approvedSnapshot({ siteId: "s2" })).resolves.toEqual({ pages: [] });
+    expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws_site_2", "agency_layer");
+  });
+
+  it("revoke reads the SITE's workspace, not the session's, and passes it to revokeReviewRound", async () => {
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    revokeReviewRoundMock.mockResolvedValueOnce({ revoked: true });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(
+      caller.revoke({ siteId: "s2", reviewId: "r1", expectedRevision: "rev-1" }),
+    ).resolves.toEqual({ revoked: true });
+    expect(revokeReviewRoundMock).toHaveBeenCalledWith("ws_site_2", "r1", "rev-1");
+  });
+
   it("status returns the EFFECTIVE editsRequireApproval (layerOn && raw) — false when the layer is off, even if the raw setting is true (PD-7/8)", async () => {
-    siteFindUniqueMock.mockResolvedValueOnce({ workspaceId: "ws_site_2" });
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
     isFeatureEnabledMock.mockResolvedValueOnce(false);
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.status({ siteId: "s2" })).resolves.toMatchObject({

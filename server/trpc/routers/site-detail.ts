@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, assertSiteAccess, getSiteWorkspace, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
@@ -175,19 +175,11 @@ export const siteDetailRouter = router({
         // Read the plan from the SITE's own workspace, not an arbitrary
         // membership row for the caller — a caller who belongs to several
         // workspaces could otherwise have their redirect limit computed
-        // against the wrong workspace's plan (S-10).
-        const site = await ctx.prisma.site.findUnique({
-          where: { id: input.siteId },
-          select: { workspaceId: true },
-        });
-        const member = site
-          ? await ctx.prisma.workspaceMember.findFirst({
-              where: { userId: ctx.session.user!.id!, workspaceId: site.workspaceId, status: "ACTIVE" },
-              include: { workspace: { select: { plan: true } } },
-            })
-          : null;
-        const planResult = z.enum(["FREE", "PRO", "BUSINESS"] as const).safeParse(member?.workspace?.plan ?? "FREE");
-        const safePlan: PlanName = planResult.success ? planResult.data : "FREE";
+        // against the wrong workspace's plan (S-10). The plan belongs to the
+        // workspace, not to a membership row, so no member lookup is needed
+        // at all (IMPORTANT 4, controller review round 1).
+        const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+        const safePlan: PlanName = siteWorkspace?.plan ?? "FREE";
         const { siteId, ...data } = input;
         try {
           return await createRedirect(siteId, data, safePlan);
@@ -250,18 +242,8 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        const site = await ctx.prisma.site.findUnique({
-          where: { id: input.siteId },
-          select: { workspaceId: true },
-        });
-        const member = site
-          ? await ctx.prisma.workspaceMember.findFirst({
-              where: { userId: ctx.session.user!.id!, workspaceId: site.workspaceId, status: "ACTIVE" },
-              include: { workspace: { select: { plan: true } } },
-            })
-          : null;
-        const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(member?.workspace?.plan ?? "FREE");
-        const plan: PlanName = planResult.success ? planResult.data : "FREE";
+        const siteWorkspace = await getSiteWorkspace(ctx.prisma, input.siteId);
+        const plan: PlanName = siteWorkspace?.plan ?? "FREE";
         try {
           return await importRedirects(input.siteId, input.csv, plan);
         } catch (e: unknown) {
