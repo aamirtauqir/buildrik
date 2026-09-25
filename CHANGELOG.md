@@ -21,7 +21,7 @@ The editor now follows the Figma v3 IA boards (`4418:45431`) across rail, drawer
 - Publish panel remounted the editor; 50× `siteVersions.get` load storm; migration rerun on every open; `darkValue` lost on save; nested headings; published sites missing their base font; Share creating duplicate links; CMS key rename / duplicate key.
 
 ### Deploy
-- Run `prisma migrate deploy` BEFORE deploying: `20260924120000_page_folders`, `20260924140000_site_component_page_scope`.
+- Run `prisma migrate deploy` BEFORE deploying: `20260924120000_page_folders`, `20260924140000_site_component_page_scope`, `20261001100000_notification_site_id`.
 
 ## Buildrik DS V1 — 2026-04-19
 
