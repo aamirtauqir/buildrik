@@ -250,3 +250,18 @@ describe("target links get rel=noopener noreferrer (S-1 review fix 3)", () => {
     expect(out).toContain('rel="nofollow noopener noreferrer"');
   });
 });
+
+describe("style declarations on load (S-1 review round 3)", () => {
+  it("drops breakout declarations from styles and breakpoint maps, keeps the rest", () => {
+    const tree = {
+      id: "r",
+      type: "container",
+      tagName: "div",
+      styles: { color: "red}</style><script>x</script>", padding: "4px" },
+      breakpointStyles: { tablet: { margin: "8px", color: "blue</style>" } },
+    } as ElementData;
+    sanitizeElementTreeContent(tree);
+    expect(tree.styles).toEqual({ padding: "4px" });
+    expect(tree.breakpointStyles?.tablet).toEqual({ margin: "8px" });
+  });
+});

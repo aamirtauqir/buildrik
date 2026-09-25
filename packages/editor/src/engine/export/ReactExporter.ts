@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import JSZip from "jszip";
 import type { ElementData, PageData } from "../../shared/types";
 import type { Composer } from "../Composer";
@@ -281,6 +282,7 @@ export class ReactExporter {
   private stylesToCSS(styles: Record<string, string>, indentLevel: number): string {
     const indent = "  ".repeat(indentLevel);
     return Object.entries(styles)
+      .filter(([key, value]) => isSafeCssDeclaration(key, value))
       .map(([key, value]) => `${indent}${camelToKebab(key)}: ${value};`)
       .join("\n");
   }

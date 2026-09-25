@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { EVENTS } from "../../shared/constants/events";
 import {
   BREAKPOINT_ORDER,
@@ -497,7 +498,10 @@ export class StyleEngine {
   private generateStyleRule(style: StyleData, scope?: string, important = false): string {
     const selector = scope ? `${scope} ${style.selector}` : style.selector;
     const bang = important ? " !important" : "";
+    // Exported into a published <style>: a declaration that could leave the
+    // rule or the element is not written (A19-1 class).
     const props = Object.entries(style.properties ?? {})
+      .filter(([key, value]) => isSafeCssDeclaration(key, value))
       .map(([key, value]) => `  ${camelToKebab(key)}: ${value}${bang};`)
       .join("\n");
 

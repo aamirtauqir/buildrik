@@ -275,3 +275,38 @@ describe("component instance overrides (S-1 review round 2)", () => {
     expect(() => sanitizeBlocks(blocks)).not.toThrow();
   });
 });
+
+describe("style declarations (S-1 review round 3)", () => {
+  it("drops breakout / dangerous declarations from styles and every breakpoint map on write", () => {
+    const blocks = {
+      id: "r",
+      type: "container",
+      tagName: "div",
+      styles: {
+        color: "red}</style><script>alert(1)</script>",
+        width: "expression(alert(1))",
+        "x y": "1",
+        padding: "4px",
+        backgroundImage: "url(https://cdn.example.com/a.png)",
+        background: "linear-gradient(90deg, #fff 0%, rgba(0,0,0,.5) 100%)",
+        borderColor: "var(--buildrick-design-primary)",
+      },
+      breakpointStyles: {
+        tablet: { color: "blue</style>", margin: "8px" },
+        mobile: { background: "url(javascript:alert(1))" },
+        desktop: "nope",
+      },
+    };
+    const reasons: string[] = [];
+    sanitizeBlocks(blocks, (r) => reasons.push(r));
+    expect(blocks.styles).toEqual({
+      padding: "4px",
+      backgroundImage: "url(https://cdn.example.com/a.png)",
+      background: "linear-gradient(90deg, #fff 0%, rgba(0,0,0,.5) 100%)",
+      borderColor: "var(--buildrick-design-primary)",
+    });
+    expect(blocks.breakpointStyles.tablet).toEqual({ margin: "8px" });
+    expect(blocks.breakpointStyles.mobile).toEqual({});
+    expect(reasons.filter((r) => r === "style")).toHaveLength(5);
+  });
+});

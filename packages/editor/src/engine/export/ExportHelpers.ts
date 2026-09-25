@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
 import { THEME } from "../../shared/constants/defaultStyles";
 import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 
@@ -342,13 +343,15 @@ export function stylesToString(styles: Record<string, string>): string {
 }
 
 /**
- * Convert styles object to CSS block
+ * Convert styles object to CSS block. A declaration that could leave its rule
+ * or the page's `<style>` (`red}</style><script>…`) is not written.
  */
 export function stylesToCSS(styles: Record<string, string>, minify: boolean): string {
   const indent = minify ? "" : "  ";
   const nl = minify ? "" : "\n";
 
   return Object.entries(styles)
+    .filter(([key, value]) => isSafeCssDeclaration(key, value))
     .map(([key, value]) => `${indent}${camelToKebab(key)}: ${value};${nl}`)
     .join("");
 }

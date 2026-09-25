@@ -9,6 +9,8 @@
  *   - `tagName` not on the shared allowlist (or malformed, e.g.
  *     "img src=x onerror=… x") → "div", content kept
  *   - element rich-text `content` → sanitized with DOMPurify (isomorphic)
+ *   - `styles` / `breakpointStyles` → declarations that could leave the
+ *     published <style> (`isSafeCssDeclaration`)
  *   - `attributes` → malformed names, `srcdoc`, on* event handlers, and
  *     javascript:/vbscript:/non-image data: URL values are dropped
  *     (`isDangerousUrl`, shared with the editor)
@@ -29,6 +31,7 @@ import {
   URL_ATTRIBUTES,
   isAllowedElementTag,
   isDangerousUrl,
+  isSafeCssDeclaration,
   isValidAttributeName,
   withSafeTargets,
   srcsetUrls,
@@ -42,7 +45,8 @@ export type SanitizeReason =
   | "attr-forbidden"
   | "attr-event-handler"
   | "attr-url"
-  | "override";
+  | "override"
+  | "style";
 
 export type OnSanitizeChange = (reason: SanitizeReason, detail: string) => void;
 
@@ -118,6 +122,20 @@ function sanitizeInstanceOverrides(data: unknown, onChange?: OnSanitizeChange): 
   }
 }
 
+/** Drop declarations that could leave a published page's <style> (in place). */
+function sanitizeStyleMap(styles: unknown, onChange?: OnSanitizeChange): void {
+  const map = asRecord(styles);
+  if (!map) return;
+  for (const key of Object.keys(map)) {
+    if (!isSafeCssDeclaration(key, map[key])) {
+      onChange?.("style", `${key}: ${String(map[key]).slice(0, 60)}`);
+      delete map[key];
+    }
+  }
+}
+
+const BREAKPOINTS = ["desktop", "tablet", "mobile"] as const;
+
 function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange): void {
   if (node.tagName != null && node.tagName !== "" && !isAllowedElementTag(node.tagName)) {
     onChange?.("tag", String(node.tagName));
@@ -132,6 +150,9 @@ function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange
 
   sanitizeAttributeMap(node.attributes, onChange);
   sanitizeInstanceOverrides(node.data, onChange);
+  sanitizeStyleMap(node.styles, onChange);
+  const breakpoints = asRecord(node.breakpointStyles);
+  if (breakpoints) for (const bp of BREAKPOINTS) sanitizeStyleMap(breakpoints[bp], onChange);
 
   const children = node.children;
   if (Array.isArray(children)) {

@@ -71,6 +71,36 @@ export function isDangerousUrl(value: string): boolean {
   return compact.startsWith("data:") && !compact.startsWith("data:image/");
 }
 
+/** A style key as stored: kebab or camelCase, vendor-prefixed, or a custom property. */
+const CSS_PROPERTY_SHAPE = /^(?:--[a-zA-Z0-9_-]+|-?[a-zA-Z][a-zA-Z0-9-]*)$/;
+/**
+ * `<` could close the surrounding `</style>`; `{` and `}` open or end a rule.
+ * The same characters `siteTokensCSS` strips from a token value.
+ */
+const CSS_BREAKOUT = /[<{}]/;
+/** A template token placeholder (`{{token.color.primary}}`), resolved before
+ *  publish; balanced and name-only, so it cannot leave the rule. */
+const CSS_TOKEN_PLACEHOLDER = /\{\{[a-zA-Z0-9._-]+\}\}/g;
+const CSS_DANGEROUS = [/expression\s*\(/i, /-moz-binding/i, /behavior\s*:/i, /javascript:/i, /vbscript:/i];
+const CSS_URL = /url\(\s*(['"]?)([\s\S]*?)\1\s*\)/gi;
+
+/**
+ * One style declaration that is safe to write into a stylesheet — a published
+ * page's `<style>`, where a value reading `red}</style><script>…` would leave
+ * the rule, then the element. The one check the export writers, the server
+ * write boundary and the editor's load sanitizer share.
+ */
+export function isSafeCssDeclaration(property: string, value: unknown): boolean {
+  if (typeof value !== "string" || !CSS_PROPERTY_SHAPE.test(property)) return false;
+  if (["behavior", "-moz-binding"].includes(property.toLowerCase())) return false;
+  if (CSS_BREAKOUT.test(value.replace(CSS_TOKEN_PLACEHOLDER, ""))) return false;
+  if (CSS_DANGEROUS.some((pattern) => pattern.test(value))) return false;
+  for (const match of value.matchAll(CSS_URL)) {
+    if (isDangerousUrl(match[2] ?? "")) return false;
+  }
+  return true;
+}
+
 const TARGET_REL = ["noopener", "noreferrer"];
 
 const TARGET_ATTR = /\starget\s*=/i;

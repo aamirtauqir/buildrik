@@ -22,6 +22,7 @@ import {
   FORBIDDEN_ATTRIBUTES,
   URL_ATTRIBUTES,
   isDangerousUrl,
+  isSafeCssDeclaration,
   isValidAttributeName,
   withSafeTargets,
   srcsetUrls,
@@ -196,9 +197,21 @@ export function sanitizeElementTreeContent(data: ElementData): void {
       }
     }
   }
+  // Written into a published <style> by the export: nothing that could leave it.
+  dropUnsafeDeclarations(data.styles);
+  if (isPlainRecord(data.breakpointStyles)) {
+    for (const map of Object.values(data.breakpointStyles ?? {})) dropUnsafeDeclarations(map);
+  }
   if (!Array.isArray(data.children)) return;
   for (const child of data.children) {
     if (isPlainRecord(child)) sanitizeElementTreeContent(child);
+  }
+}
+
+function dropUnsafeDeclarations(styles: Record<string, string> | undefined): void {
+  if (!isPlainRecord(styles) || !styles) return;
+  for (const [key, value] of Object.entries(styles)) {
+    if (!isSafeCssDeclaration(key, value)) delete styles[key];
   }
 }
 
