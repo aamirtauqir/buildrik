@@ -19,6 +19,7 @@ import { Button, Menu, MenuItem, PanelFrame, Popover, TextField } from "@/editor
 import type {
   DiscColor,
   DiscOrientation,
+  StockFailureReason,
   StockPhoto,
   StockVideo,
 } from "../data/mediaTypes";
@@ -29,6 +30,14 @@ interface StockBrowserOverlayProps {
   videos: StockVideo[];
   loading: Record<"img" | "vid", boolean> | Record<string, boolean>;
   searchQuery: string;
+  /** WHY the last search failed, or null/absent when it did not. Flow-check
+   *  2026-09-25: this overlay used to silently swallow every failure — the
+   *  toast fired once and the results pane sat on the pristine "Search to
+   *  browse free …" idle copy forever, indistinguishable from never having
+   *  searched. StockSourceModal (the fullpage surface) already carries the
+   *  same reason as a persistent, retry-capable message; this is the same
+   *  action, so it gets the same behaviour. */
+  searchFailed?: StockFailureReason | null;
   orientation: DiscOrientation;
   color: DiscColor;
   onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
@@ -37,6 +46,29 @@ interface StockBrowserOverlayProps {
   onLoadMore(type: "img" | "vid"): void;
   onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
 }
+
+/**
+ * Each failure gets its own sentence because each has a different next step,
+ * and none of them is "try a different search term" — which is the only thing
+ * the old shared "No photos found for …" copy could ever suggest.
+ *
+ * `retryable` gates the Try again button: re-running the query cannot conjure
+ * an API key, so offering it on a configuration fault just wastes the click.
+ */
+export const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
+  "not-configured": {
+    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
+    retryable: false,
+  },
+  unauthorized: {
+    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
+    retryable: false,
+  },
+  "request-failed": {
+    message: "Couldn't reach the stock library.",
+    retryable: true,
+  },
+};
 
 export const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
   { id: "all", label: "Any" },
@@ -140,6 +172,7 @@ export function StockBrowserOverlay({
   videos,
   loading,
   searchQuery,
+  searchFailed,
   orientation,
   color,
   onSearch,
@@ -325,9 +358,34 @@ export function StockBrowserOverlay({
           </div>
         ) : null}
 
-        {items.length === 0 && !isLoading ? (
+        {/* A failed request is not an empty result — see the `searchFailed`
+            doc above. Checked before the empty-results branch so a failure
+            with zero items never falls through to the generic idle copy. */}
+        {items.length === 0 && !isLoading && searchFailed ? (
+          <p className="tw:px-4 tw:pt-6 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="alert" data-testid="stock-failed">
+            {FAILURE_COPY[searchFailed].message}
+            {FAILURE_COPY[searchFailed].retryable ? (
+              <>
+                {" "}
+                <Button
+                  color="light"
+                  size="xs"
+                  variant="link"
+                  className="tw:h-auto tw:min-h-0 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
+                  onClick={submitSearch}
+                >
+                  Try again
+                </Button>
+              </>
+            ) : null}
+          </p>
+        ) : null}
+
+        {items.length === 0 && !isLoading && !searchFailed ? (
           <p className="tw:px-4 tw:pt-6 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-            Search to browse free {type === "img" ? "photos" : "videos"}.
+            {searchQuery.length > 0
+              ? `No ${type === "img" ? "photos" : "videos"} found for "${searchQuery}"`
+              : `Search to browse free ${type === "img" ? "photos" : "videos"}.`}
           </p>
         ) : null}
       </div>

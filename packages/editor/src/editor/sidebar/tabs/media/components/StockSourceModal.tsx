@@ -43,7 +43,7 @@ import {
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
-import { COLORS, FilterDropdown, ORIENTATIONS, TYPES } from "./StockBrowserOverlay";
+import { COLORS, FAILURE_COPY, FilterDropdown, ORIENTATIONS, TYPES } from "./StockBrowserOverlay";
 
 export type StockKind = "img" | "vid";
 export type StockItem = StockPhoto | StockVideo;
@@ -69,29 +69,6 @@ interface StockSourceModalProps {
 
 
 const PROVIDER_LABEL: Record<string, string> = { unsplash: "Unsplash", pexels: "Pexels", pixabay: "Pixabay" };
-
-/**
- * Each failure gets its own sentence because each has a different next step,
- * and none of them is "try a different search term" — which is the only thing
- * the old shared "No photos found for …" copy could ever suggest.
- *
- * `retryable` gates the Try again button: re-running the query cannot conjure
- * an API key, so offering it on a configuration fault just wastes the click.
- */
-const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
-  "not-configured": {
-    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
-    retryable: false,
-  },
-  unauthorized: {
-    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
-    retryable: false,
-  },
-  "request-failed": {
-    message: "Couldn't reach the stock library.",
-    retryable: true,
-  },
-};
 
 /* v3 4418:154195 / 6883:75565: one result per row — a 24-inset card, 180
    image on r8, name and credit 14 ink; the chosen one wears a 2px accent
