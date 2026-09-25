@@ -52,9 +52,6 @@ const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const ActivityTab = React.lazy(() => import("./tabs/activity/ActivityTab").then((m) => ({ default: m.ActivityTab })));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
-const AITab = React.lazy(() =>
-  import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
-);
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;

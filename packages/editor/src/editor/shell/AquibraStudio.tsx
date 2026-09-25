@@ -630,6 +630,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
+        /* FA-1: the canvas context menu's "Improve with AI" (right-click →
+           el already selected, see Canvas.tsx handleContextMenu) opens the
+           SAME right-column AI thread as every other AI door — same event,
+           same panel, no second engine. Without this prop the menu item
+           hides itself (useCanvasContextMenu only shows it when set). */
+        onAIRequest={() => composer.emit("ui:switch-tab", { tab: "ai" })}
         onResendReview={resendReview}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
@@ -640,6 +646,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            facts confirm — two gates for one board (B3-10). */
         nextMove={nextMove}
         onRequestPublish={requestPublish}
+        // FB-4: closes Review's ⌘K row, "R" shortcut and panel render when
+        // the server's agency review layer is off — the topbar pill stays
+        // visible either way (owner decision).
+        reviewsEnabled={reviewStatus.reviewsEnabled}
       />
 
       {/* P3: Issues panel. Board 4418:147641 puts it in the inspector column —
