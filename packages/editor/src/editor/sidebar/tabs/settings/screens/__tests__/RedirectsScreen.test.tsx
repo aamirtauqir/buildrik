@@ -173,7 +173,7 @@ describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester"
     expect(cell("r1")).toEqual(["/menu-old", "/menu", "301", "Edit"]);
     expect(cell("r2")).toEqual(["/book", "/reservations", "301", "Edit"]);
     expect(cell("r3")).toEqual(["/promo-eid", "https://bellacucina.com/offers", "302", "Edit"]);
-    expect(screen.getByTestId("set-rd-edit-r1")).toHaveClass("tw:h-8");
+    expect(screen.getByTestId("set-rd-edit-r1")).toHaveClass("tw:h-7");
     expect(screen.queryByTestId("set-rd-empty")).toBeNull();
 
     expect(screen.getByTestId("set-card-title-404-suggester")).toHaveTextContent("404 suggester");
