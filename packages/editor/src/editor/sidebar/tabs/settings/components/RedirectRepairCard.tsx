@@ -55,8 +55,14 @@ export function RedirectRepairCard({ pageName, siteName, from, to, saved, onSave
   const [error, setError] = React.useState<string | null>(null);
 
   /* A new slug change replaces the draft — the fields follow the door, not
-     the last edit. */
+     the last edit. Only on a CHANGE of door: useState already seeded the
+     fields on mount, and re-running the reset then raced a keystroke made
+     before the passive effect flushed — the typed path was overwritten with
+     the prop (seen as a CI flake in RedirectsScreen's rerender test). */
+  const doorRef = React.useRef({ from, to });
   React.useEffect(() => {
+    if (doorRef.current.from === from && doorRef.current.to === to) return;
+    doorRef.current = { from, to };
     setFromPath(from);
     setToPath(to);
     setBusy(false);
