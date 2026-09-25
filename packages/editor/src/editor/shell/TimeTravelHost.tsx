@@ -159,10 +159,21 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
 
   const restore = React.useCallback(async () => {
     if (!composer || !entry) return;
-    /* The board's promise: "Your current work is saved as a version first." */
-    await composer.versions?.autoCheckpoint?.("Before restoring").catch(() => null);
-    composer.history?.restoreEntry?.(entry.id);
+    const targetId = entry.id;
+    /* Exit Time-Travel the moment a restore is confirmed, before the
+       checkpoint/restore work below even runs. The band's own copy
+       ("nothing is written until you restore") stops being true the instant
+       the user confirms — leaving the host mounted until the async work
+       resolved left the stale "Previewing …" band and an enabled Restore…
+       sitting over a write that had already landed (reproduced whenever the
+       session had 2+ prior entries; the extra render pass between the
+       confirm click and the checkpoint/restore promises settling was enough
+       for `entries`/`index` to be read again against a stack that had
+       already changed shape under it). Exiting first means there is no
+       window where a completed write is still described as pending. */
     exit();
+    await composer.versions?.autoCheckpoint?.("Before restoring").catch(() => null);
+    composer.history?.restoreEntry?.(targetId);
   }, [composer, entry, exit]);
 
   React.useEffect(() => {

@@ -64,6 +64,29 @@ describe("SendForReview — the outcome the user never saw (boards 129:223 / 129
   });
 });
 
+describe("SendForReview — dialog escapes the Review panel (flow-check DEF-review-send-dialog-clipped)", () => {
+  /* The Review panel is a 300px `<aside overflow:hidden>` in the shipped
+     product — the only place this trigger ever mounts. The old `Popover`
+     rendered its panel as a DOM sibling of the trigger, inside that aside,
+     so it got clipped to ~130px with no scrim. `Modal` must portal out via
+     OverlayMount instead. */
+  it("renders the dialog outside a clipping <aside>, not as its descendant", () => {
+    const { container } = render(
+      <aside style={{ width: 300, overflow: "hidden" }} data-testid="review-aside">
+        <SendForReview composer={null} />
+      </aside>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
+
+    const dialog = screen.getByRole("dialog");
+    const aside = container.querySelector('[data-testid="review-aside"]');
+    expect(aside).not.toBeNull();
+    expect(aside?.contains(dialog)).toBe(false);
+    // OverlayMount's own scrim, proving it went through the shared portal.
+    expect(screen.getByTestId("overlay-scrim")).toBeTruthy();
+  });
+});
+
 describe("SendForReview (F4)", () => {
   it("double-click on Send submits once (sending guard)", async () => {
     render(<SendForReview composer={null} />);
