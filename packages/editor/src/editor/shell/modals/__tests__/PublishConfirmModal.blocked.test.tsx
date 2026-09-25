@@ -120,4 +120,23 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     await waitFor(() => expect(screen.getByText("your connected Vercel project")).toBeInTheDocument());
     expect(screen.getByText("Publish now")).not.toBeDisabled();
   });
+
+  /* v3 FC-8: this door used to read only the FIRST failing check
+     (`.find(status === "fail")`), so a site failing two checks showed one and
+     hid the other — while the Publish panel's PrePublishChecks list, reading
+     the same server call, has always shown every row. */
+  it("shows every failing check, not just the first", async () => {
+    const NO_PAGES = "Every page is empty. Add content before publishing.";
+    fetchPrePublishChecks.mockResolvedValue({
+      ready: false,
+      checks: [
+        { label: "Vercel connected", status: "fail" as const, detail: NOT_CONNECTED },
+        { label: "Empty pages", status: "fail" as const, detail: NO_PAGES },
+      ],
+    });
+    mount();
+    await waitFor(() => expect(screen.getByText(NOT_CONNECTED)).toBeInTheDocument());
+    expect(screen.getByText(NO_PAGES)).toBeInTheDocument();
+    expect(screen.getByText("Publish now")).toBeDisabled();
+  });
 });
