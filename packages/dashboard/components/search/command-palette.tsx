@@ -56,7 +56,7 @@ const SETTINGS_ITEMS: ResultItem[] = [
 const ACTION_ITEMS: ResultItem[] = [
   { id: "a-create-site", label: "Create Site", description: "Start a new site", href: "/dashboard/sites/new", scope: "actions" },
   { id: "a-invite", label: "Invite Member", description: "Add a team member", href: "/dashboard/settings/team?invite=true", scope: "actions" },
-  { id: "a-ai", label: "Generate with AI", description: "AI-powered generation", href: "/dashboard/sites/new?ai=true", scope: "actions" },
+  { id: "a-ai", label: "Generate with AI", description: "AI-powered generation", href: "/dashboard/sites/new?method=ai", scope: "actions" },
   { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/settings/domains", scope: "actions" },
 ];
 

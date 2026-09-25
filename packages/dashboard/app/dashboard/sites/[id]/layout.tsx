@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { SiteHeader } from "@/components/site-detail/site-header";
@@ -50,6 +51,13 @@ export default function SiteDetailLayout({
         <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
           This site may have been deleted or you don&apos;t have access.
         </p>
+        <Link
+          href="/dashboard/projects"
+          className="mt-4 text-body-sm font-medium"
+          style={{ color: "var(--color-primary)" }}
+        >
+          Back to sites
+        </Link>
       </div>
     );
   }
