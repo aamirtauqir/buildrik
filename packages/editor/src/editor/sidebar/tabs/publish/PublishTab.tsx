@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "../../../../engine";
@@ -33,7 +33,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchPrePublishChecks, unpublishSite } from "../../../../services/PublishService";
 import { EVENTS } from "@/shared/constants";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
-import { PrePublishChecks } from "./PrePublishChecks";
+import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
@@ -93,6 +93,7 @@ const FIX_TARGETS: Record<string, FixTarget> = {
   "SEO configured": { screen: "seo" },
   "Domain connected": { screen: "domains" },
   "Empty pages": { tab: "pages" },
+  Favicon: { screen: "general" },
 };
 
 /** The board's row rhythm: label left, value right, one line. */
@@ -126,8 +127,8 @@ const EnvRow: React.FC<{ label: string; value: string | null; empty: string; onO
     size="xs"
     onClick={onOpen}
     disabled={!onOpen}
-    className={`${ROW} tw:h-auto tw:w-full tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:font-normal tw:hover:bg-transparent`}
-    data-testid={`publish-env-${label === "Preview deployment" ? "preview" : "production"}`}
+    className={`${ROW} tw:h-8 tw:w-full tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-0 tw:font-normal tw:hover:bg-transparent`}
+    data-testid={`publish-env-${label.startsWith("Preview") ? "preview" : "production"}`}
   >
     <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{label}</span>
     <span className={`${META} tw:flex tw:min-w-0 tw:items-center tw:gap-1`} title={value ?? empty}>
@@ -273,8 +274,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* The build log behind board 784:4403's "View log". A pre-job failure never
      reaches the worker, so there are no steps and the link stays away rather
      than opening an empty list. */
+  /* 4418:97570 / 97787 / 97355: while a run is in flight or has just ended,
+     the panel shows the run and ENVIRONMENT only — no checks, no changes. */
+  const failedAt = (() => {
+    const steps = hasFailed ? publishJob?.steps ?? [] : [];
+    const i = steps.findIndex((st) => st.status === "failed");
+    return i >= 0 ? { index: i + 1, total: steps.length } : null;
+  })();
+  const connectionRefused = hasFailed && /token|connection|unauthori[sz]ed|reconnect/i.test(error ?? "");
+  const resultState = isPublishing || justPublished || hasFailed;
   const failedSteps = hasFailed && publishJob?.steps?.length ? publishJob.steps : null;
   const [logOpen, setLogOpen] = React.useState(false);
+  const [reconnectOpen, setReconnectOpen] = React.useState(false);
 
   /* Board 784:4250's "step 2 of 4". The worker marks exactly one step
      `running`; before it does, or once the list is exhausted, there is no
@@ -343,9 +354,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     setCheckState("loading");
     try {
       const result = await fetchPrePublishChecks(siteId);
-      /* Spec B4 draws no Favicon row. It is advisory server-side (never a
-         `fail`), so dropping it changes no gate. */
-      setChecks({ ...result, checks: result.checks.filter((c) => c.label !== "Favicon") });
+      /* 7051:78232 / 7051:78633 draw the server's Favicon row too (with
+         Fix ›), so every server row renders — the list is the server's. */
+      setChecks(result);
       setCheckState("ready");
     } catch {
       // DF5: never fall back to a fake-passing checklist — show Retry.
@@ -454,7 +465,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
           target="_blank"
           rel="noopener noreferrer"
-          className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+          className={`${CHECK_DOOR} tw:no-underline`}
         >
           Connect
         </a>
@@ -471,7 +482,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             ? composer?.emit(EVENTS.UI_SETTINGS_OPEN, { screen: target.screen })
             : composer?.emit("ui:switch-tab", { tab: target.tab })
         }
-        className={`tw:flex-none ${TEXT_LINK}`}
+        className={CHECK_DOOR}
       >
         Fix ›
       </Button>
@@ -513,36 +524,65 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      publish failed by revoking the connection. One implementation, so the two
      cannot say different things about the same failure. */
   const failureSection = (
-    <section className={SECTION} aria-label="Publish failure">
-      <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
-        Publish failed.
-      </h2>
-      <p className={META}>
+    <section className={`${SECTION} ${RESULT_BLOCK}`} aria-label="Publish failure">
+      {/* 4418:97355: a 13px red line, the reason in 12 muted, then a primary
+          door — "Repair connection" when the connection was refused, else
+          "Try again" — with "View log" beside it. */}
+      <h2 className={RESULT_TITLE_ERROR}>Publish failed.</h2>
+      <p className={`${META} tw:mt-2 tw:leading-[18px]`}>
         {error}
-        {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
+        {error && !/nothing was deployed|unchanged/i.test(error)
+          ? snapshot.lastDeploy?.isLive
+            ? " The previous live version is unchanged."
+            : " Nothing was deployed."
+          : ""}
       </p>
-      <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
-        <Button
-          color="light"
-          size="xs"
-          disabled={!onRequestPublish}
-          onClick={() => {
-            publishJob?.reset?.();
-            onRequestPublish?.();
-          }}
-          className={TEXT_LINK}
-        >
-          Try again
-        </Button>
+      <div className="tw:mt-3 tw:flex tw:items-center tw:gap-4">
+        {connectionRefused ? (
+          <Button size="xs" onClick={() => setReconnectOpen(true)} className="tw:h-7 tw:px-3" data-testid="publish-repair">
+            Repair connection
+          </Button>
+        ) : (
+          <Button
+            size="xs"
+            disabled={!onRequestPublish}
+            onClick={() => {
+              publishJob?.reset?.();
+              onRequestPublish?.();
+            }}
+            className="tw:h-7 tw:px-3"
+          >
+            Try again
+          </Button>
+        )}
         {/* Board 784:4403 draws "View log" beside "Try again". `getPublishStatus`
             has always returned the `steps` column — the link names the step
             that failed and the ones that never ran. */}
         {failedSteps && (
-          <Button color="light" size="xs" onClick={() => setLogOpen((v) => !v)} aria-expanded={logOpen} className={TEXT_LINK}>
-            {logOpen ? "Hide log" : "View log"}
+          <Button color="light" size="xs" onClick={() => setLogOpen(true)} aria-haspopup="dialog" className={TEXT_LINK}>
+            View log
           </Button>
         )}
       </div>
+      {/* 4418:98003 — the log is a dialog: where it stopped, why, and what
+          is still live; the step list follows. */}
+      <Modal
+        open={Boolean(failedSteps) && logOpen}
+        onClose={() => setLogOpen(false)}
+        testId="publish-log"
+        title={`Publish log · ${siteName} / Production`}
+        footer={
+          <Button size="xs" onClick={() => setLogOpen(false)}>
+            Back to publish
+          </Button>
+        }
+      >
+        {failedAt ? <p className={LOG_LINE}>Attempt failed at step {failedAt.index} of {failedAt.total}.</p> : null}
+        {error ? <p className={LOG_LINE}>{error}</p> : null}
+        <p className={LOG_LINE}>
+          No new deployment was created.
+          {snapshot.lastDeploy?.isLive ? ` Current live version: v${snapshot.lastDeploy.version}.` : ""}
+        </p>
       {failedSteps && logOpen && (
         <ul className="tw:m-0 tw:mt-2 tw:list-none tw:p-0" aria-label="Build log">
           {failedSteps.map((s) => (
@@ -568,6 +608,40 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ))}
         </ul>
       )}
+      </Modal>
+      {/* 4418:98009 — reconnecting happens in the dashboard; the dialog says
+          so, names the site, and offers the way back once it is done. */}
+      <Modal
+        open={reconnectOpen}
+        onClose={() => setReconnectOpen(false)}
+        testId="publish-reconnect"
+        title="Reconnect Vercel · Workspace"
+        footer={
+          <>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:border-transparent tw:bg-transparent"
+              onClick={() => {
+                setReconnectOpen(false);
+                publishJob?.reset?.();
+                void loadChecks();
+              }}
+            >
+              Connection restored · review publish
+            </Button>
+            <Button size="xs" onClick={openIntegrations}>
+              Open dashboard
+            </Button>
+          </>
+        }
+      >
+        <p className={LOG_LINE}>Open workspace connections in the dashboard to reconnect Vercel.</p>
+        <p className={LOG_LINE}>
+          {[siteName, "Production", snapshot.production.value].filter(Boolean).join(" · ")}
+        </p>
+        <p className={LOG_LINE}>Return after the connection is restored, then review the publish details again.</p>
+      </Modal>
     </section>
   );
 
@@ -657,7 +731,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             {/* Board 4418:97570 — Cancel beside the run. A job the worker has
                 already handed to Vercel answers NOT_CANCELLABLE; the server's
                 sentence prints under the bar and the run keeps going. */}
-            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
+            {/* 4418:97570 sets Cancel at the bar's right end. */}
+            <div className="tw:mt-1 tw:flex tw:items-center tw:justify-end tw:gap-4">
               <Button
                 color="light"
                 size="xs"
@@ -715,7 +790,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board 784:4326 — the moment after a publish: what went out, where
             to see it, and what changed against the version it replaced. */}
         {justPublished && (
-          <section className={SECTION} aria-label="Publish result">
+          <section className={`${SECTION} ${RESULT_BLOCK}`} aria-label="Publish result">
             {/* Board 4418:99089 (C5 G1-048): a dev simulation says so. The
                 worker gives it a `.dev-simulated.invalid` URL, which is how
                 the panel knows — and why it offers no "View live site". */}
@@ -733,12 +808,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               </>
             ) : (
               <>
-                <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-success-text)]">
-                  Published to production.
-                </h2>
-                <p className={META}>
-                  {snapshot.lastDeploy ? `v${snapshot.lastDeploy.version} · live · ` : ""}
-                  {snapshot.lastDeploy ? relativeShort(snapshot.lastDeploy.rawAt) : "just now"}
+                <h2 className={RESULT_TITLE_SUCCESS}>Published to production.</h2>
+                {/* 4418:97787: "● LIVE · v6". */}
+                <p className={`${META} tw:mt-2 tw:flex tw:items-center tw:gap-1.5`}>
+                  <span className="tw:size-2 tw:rounded-full tw:bg-[var(--bk-ink-muted)]" aria-hidden="true" />
+                  {snapshot.lastDeploy ? `LIVE · v${snapshot.lastDeploy.version}` : "LIVE"}
+                  <span className="tw:sr-only">{snapshot.lastDeploy ? relativeShort(snapshot.lastDeploy.rawAt) : "just now"}</span>
                 </p>
               </>
             )}
@@ -768,7 +843,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             list is the server's; the Client approval row is the lifecycle's,
             and the two read as one list. Absent during a run, which the board
             leads with. */}
-        {!isPublishing && (
+        {!resultState && (
         <section className={SECTION} aria-label="Pre-publish checks">
           <h3 className={SECTION_TITLE}>Pre-publish checks</h3>
           <PrePublishChecks state={checkState} checks={checks} onRetry={() => void loadChecks()} renderFix={renderFix}>
@@ -782,7 +857,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             hides it says the site has none (its row has no backing yet —
             annotation card beside 4418:97118). */}
         <section className={SECTION} aria-label="Release to">
-          <h3 className={SECTION_TITLE}>Release to</h3>
+          {/* The run boards (4418:97570 / 97787 / 97355) title it ENVIRONMENT. */}
+          <h3 className={SECTION_TITLE}>{resultState ? "Environment" : "Release to"}</h3>
           {snapshot.loading ? (
             <SkeletonRows widths={["tw:w-32", "tw:w-24"]} />
           ) : (
@@ -793,7 +869,13 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 empty="Not published yet"
                 onOpen={openDomains}
               />
-              <EnvRow label="Preview deployment" value={snapshot.preview.value} empty="None" onOpen={openDomains} />
+              <EnvRow
+                /* 97570 / 97787 write "Preview"; 97355 keeps "Preview deployment". */
+                label={isPublishing || justPublished ? "Preview" : "Preview deployment"}
+                value={snapshot.preview.value}
+                empty="None"
+                onOpen={openDomains}
+              />
             </>
           )}
         </section>
@@ -802,7 +884,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             published now. The count pair is the header; the rows are the
             changes themselves. Absent during a run and right after one. */}
         {!isPublishing && !justPublished && !hasFailed && (
-        <section className={SECTION} aria-label="Changes in this session">
+        <section className={`${SECTION} ${COLLAPSED_SECTION}`} aria-label="Changes in this session">
           <CollapsibleTitle title="Changes in this session" open={changesOpen} onToggle={() => setChangesOpen((v) => !v)} />
           {!changesOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-36", "tw:w-28", "tw:w-20", "tw:w-32"]} />
@@ -845,18 +927,32 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board B3-10's LAST DEPLOY — what is live right now, and therefore
             what a rollback would return to. */}
         {!isPublishing && !justPublished && !hasFailed && (
-        <section className={SECTION} aria-label="Last deploy">
+        <section className={`${SECTION} ${COLLAPSED_SECTION}`} aria-label="Last deploy">
           <CollapsibleTitle title="Last deploy" open={lastDeployOpen} onToggle={() => setLastDeployOpen((v) => !v)} />
           {!lastDeployOpen ? null : snapshot.loading ? (
             <SkeletonRows widths={["tw:w-24"]} />
           ) : snapshot.lastDeploy ? (
             <>
+              {/* 7051:78633: "● LIVE · v6" with its date, then "All versions ›". */}
               <div className={ROW}>
-                <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                  v{snapshot.lastDeploy.version} · {snapshot.lastDeploy.isLive ? "live" : "not live"}
+                <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:text-[var(--bk-ink)]">
+                  {snapshot.lastDeploy.isLive ? (
+                    <span className="tw:size-2 tw:rounded-full tw:bg-[var(--bk-ink)]" aria-hidden="true" />
+                  ) : null}
+                  {snapshot.lastDeploy.isLive ? "LIVE · " : "Not live · "}v{snapshot.lastDeploy.version}
                 </span>
                 <span className={META}>{snapshot.lastDeploy.when}</span>
               </div>
+              <Button
+                color="light"
+                size="xs"
+                disabled={!composer}
+                onClick={() => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "published" })}
+                className={`${CHECK_DOOR} tw:mt-1 tw:self-start`}
+                data-testid="publish-last-deploy-all"
+              >
+                All versions ›
+              </Button>
             </>
           ) : (
             <p className={META}>This site has never been published.</p>
@@ -872,6 +968,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           naming what the publish replaces, the CTA sized to its label, and
           the gate's reason with its door beside it. A bordered white band on
           16px gutters with 10 above and below. */}
+      {/* 4418:97118 prints what the publish replaces ABOVE the footer's rule. */}
+      {!noPublishPath && !resultState && !snapshot.loading && !snapshot.error ? (
+        <p className={`${META} tw:px-4 tw:pb-2`} data-testid="publish-footer-meta">
+          {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
+        </p>
+      ) : justPublished && !simulated ? (
+        /* 4418:97787: why the primary is off right after a publish. */
+        <p className={`${META} tw:px-4 tw:pb-2`} data-testid="publish-footer-meta">
+          No page changes{snapshot.lastDeploy ? ` since v${snapshot.lastDeploy.version}` : ""}. Edit a page to publish an
+          update.
+        </p>
+      ) : null}
       <div
         className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
         data-testid="publish-footer"
@@ -884,27 +992,37 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </Button>
         ) : (
           <>
-            {!snapshot.loading && !snapshot.error ? (
-              <p className={META} data-testid="publish-footer-meta">
-                {snapshot.lastDeploy?.isLive ? `Replaces LIVE · v${snapshot.lastDeploy.version}` : "First publish"}
-              </p>
-            ) : null}
             <div className="tw:flex tw:items-center tw:gap-3">
               {/* Boards 781:4526 / 784:4287 draw "Button · disabled" as a grey
                   chip sized to its label, 28 tall. The remaining 50% dim is
                   `themes/ux-fixes.css`'s global `button:disabled { opacity:
                   .5 }`, left global deliberately. */}
-              {(() => {
+              {hasFailed ? (
+                /* 4418:97355's foot: one way back to the panel. */
+                <Button
+                  onClick={() => publishJob?.reset?.()}
+                  className="tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:whitespace-nowrap tw:px-3 tw:py-1.5 tw:text-[13px]"
+                  data-testid="publish-back"
+                >
+                  Back to Publish
+                </Button>
+              ) : (() => {
                 const cta = (
                   <Button
                     onClick={onRequestPublish}
                     disabled={ctaDisabled}
-                    className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                    /* 4418:97118 draws the blocked CTA as the accent at 40%, one
+                       line, 13px — not a grey chip. */
+                    className={`tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:whitespace-nowrap tw:px-3 tw:py-1.5 tw:text-[13px] tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-white ${
+                      /* 4418:97570 draws "Publishing…" and 97787 "No new
+                         changes" at full strength. */
+                      isPublishing || justPublished ? "tw:disabled:opacity-100" : "tw:disabled:opacity-40"
+                    }`}
                     data-testid="publish-cta"
                   >
                     {/* One label, in every state. The board names the destination
                         and never draws an "Update" variant. */}
-                    {isPublishing ? "Publishing…" : "Publish to production"}
+                    {isPublishing ? "Publishing…" : justPublished ? "No new changes" : "Publish to production"}
                   </Button>
                 );
                 /* Board 7045:77984: hovering the live primary says what it
@@ -930,8 +1048,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   Connect Vercel
                 </Button>
               ) : null}
+              {/* 4418:97118: the gate's reason and door stack BESIDE the CTA. */}
+              {!isPublishing ? <PublishGateBanner nextMove={nextMove} composer={composer} /> : null}
             </div>
-            {ctaReason ? (
+            {ctaReason && !isPublishing && !hasFailed ? (
               <p className="tw:m-0 tw:text-[11px] tw:leading-[1.4] tw:text-[var(--bk-ink-muted)]" data-testid="publish-cta-reason">
                 {ctaReason}
               </p>
@@ -941,7 +1061,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 {blocking.map((c) => c.detail).join(" ")}
               </p>
             )}
-            {!isPublishing ? <PublishGateBanner nextMove={nextMove} composer={composer} /> : null}
           </>
         )}
       </div>
@@ -974,13 +1093,25 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 // Classes
 // ============================================
 
-const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-4";
+const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3";
+/* 4418:97118 stacks the two collapsible headers at a 28 pitch right under
+   RELEASE TO — they sit 4 apart, not a full section gap. */
+const COLLAPSED_SECTION = "tw:-mt-3";
 /* Board B3-10 sets these sections on the panel surface itself — no cards. */
 const SECTION = "tw:flex tw:flex-col tw:gap-0";
 /* The board's section label: 11px, uppercase, tracked, ink-muted. */
 const SECTION_TITLE =
   "tw:m-0 tw:mb-1 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
 const META = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)]";
+/* 4418:97787 / 97355: the outcome line is 13/400, green or red — not a 16
+   semibold heading. */
+/* The outcome block sits on the run block's 24 gutter and 32 top
+   (4418:97787 / 97355), with the board's air before ENVIRONMENT. */
+/* 4418:98003 / 98009 — the dialog lines, 13 ink with 12 between. */
+const LOG_LINE = "tw:m-0 tw:mb-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const RESULT_BLOCK = "tw:px-2 tw:pt-5 tw:pb-8";
+const RESULT_TITLE_SUCCESS = "tw:m-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-success-text)]";
+const RESULT_TITLE_ERROR = "tw:m-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-error-text)]";
 
 /** The worker's own step statuses, said in words. `pending` is the one that
     matters and the one a raw dump would bury: it means the step never ran,

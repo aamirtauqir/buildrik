@@ -16,6 +16,8 @@ import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 /**
  * Board 814:7027 leads with the reason these toasts exist: "shows what was
@@ -215,7 +217,7 @@ export function useHistoryFeedback(
        command fires once per user action. It also cannot double up with the
        toolbar, which calls `elements.removeElement` directly and never enters
        the command centre. */
-    let pending: { ids: string[]; name: string; children: number } | null = null;
+    let pending: { ids: string[]; name: string } | null = null;
 
     /* Read the selection BEFORE the command runs — afterwards the elements are
        gone and there is nothing left to name. */
@@ -226,12 +228,8 @@ export function useHistoryFeedback(
       }
       const ids = composer.selection?.getSelectedIds?.() ?? [];
       const first = ids[0] ? composer.elements.getElement(ids[0]) : null;
-      const type = first?.getType?.() ?? "element";
-      pending = {
-        ids,
-        name: type.charAt(0).toUpperCase() + type.slice(1),
-        children: first?.getChildren?.()?.length ?? 0,
-      };
+      // Board 5905:139383: "Hero deleted" — the layer's name, else its type label.
+      pending = { ids, name: getLayerName(first) ?? elementTypeLabel(first?.getType?.() ?? "element") };
     };
 
     /* COMMAND_RUN fires whether or not the command changed anything —
@@ -243,18 +241,13 @@ export function useHistoryFeedback(
        the same rule this walk applies to everything else. */
     const handleCommandRun = (data: { id?: string }) => {
       if (data?.id !== "delete" || !pending) return;
-      const { ids, name, children } = pending;
+      const { ids, name } = pending;
       pending = null;
 
       const gone = ids.filter((id) => !composer.elements.getElement(id));
       if (gone.length === 0) return;
 
-      const description =
-        gone.length > 1
-          ? `${gone.length} elements deleted`
-          : children > 0
-            ? `${name} (${children} ${children === 1 ? "child" : "children"}) deleted`
-            : `${name} deleted`;
+      const description = gone.length > 1 ? `${gone.length} elements deleted` : `${name} deleted`;
 
       addToast({
         description,

@@ -28,6 +28,8 @@
    with nothing but the input inside it). */
 .bd-ai-composer-field {
   position: relative;
+  width: 248px;
+  max-width: 100%;
 }
 
 .bd-ai-composer-input {
@@ -120,43 +122,14 @@
 .bd-ai-model-item:hover { background: var(--bk-bg-subtle); }
 .bd-ai-model-item[aria-current="true"] { color: var(--bk-accent); }
 
-/* The labelled primary (board 4418:104454): its own width, 8 across. Two
-   classes deep on purpose — flowbite's `px-3` is a `tw:` utility, and a
-   single-class rule ties it on specificity and loses on source order. */
-.bd-ai-composer-field .bd-ai-composer-send {
-  width: auto;
-  padding: 0 var(--bk-space-8);
-}
-
-/* The field's bottom-right corner: the quota counter (G2-129) then the send
-   button, side by side. */
-.bd-ai-composer-foot {
-  position: absolute;
-  right: var(--bk-space-4);
-  bottom: var(--bk-space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-}
-
+/* The daily counter sits in the field's bottom-right corner (G2-129). */
 .bd-ai-composer-quota {
+  position: absolute;
+  right: var(--bk-space-8);
+  bottom: var(--bk-space-8);
   font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-
-.bd-ai-composer-send {
-  width: 26px;
-  height: 22px;
-  border-radius: var(--bk-radius-sm);
-  border: none;
-  cursor: pointer;
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-accent-on);
-}
-
-.bd-ai-composer-send { background: var(--bk-accent); }
-.bd-ai-composer-send:hover { background: var(--bk-accent-hover); }
-.bd-ai-composer-send:disabled { background: var(--bk-border-medium); cursor: not-allowed; }
 
 /* P4 agent build loop */
 .bd-ai-mode {

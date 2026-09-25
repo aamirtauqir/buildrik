@@ -30,10 +30,11 @@ const page = (id: string, name: string) => ({
   status: "draft" as const,
 });
 
-function renderList(pages: ReturnType<typeof page>[]) {
+function renderList(pages: ReturnType<typeof page>[], search = "") {
   return render(
     <PageList
       pages={pages as never}
+      search={search}
       composer={null as never}
       folders={[]}
       pageToFolder={new Map()}
@@ -47,6 +48,7 @@ function renderList(pages: ReturnType<typeof page>[]) {
       onRenameStart={vi.fn()}
       onRenameCommit={vi.fn()}
       onRenameCancel={vi.fn()}
+      onRetry={vi.fn()}
       onAddPage={vi.fn()}
       onFolderToggle={vi.fn()}
       onFolderRename={vi.fn()}
@@ -83,8 +85,7 @@ describe("the Pages tree owns treeitems only", () => {
   });
 
   it("has no tree at all when a search matches nothing", () => {
-    renderList([page("p1", "Home"), page("p2", "About")]);
-    fireEvent.change(screen.getByPlaceholderText(/search/i), { target: { value: "zzzz" } });
+    renderList([page("p1", "Home"), page("p2", "About")], "zzzz");
     expect(screen.getByTestId("pages-no-results")).toBeInTheDocument();
     expect(screen.queryByRole("tree")).toBeNull();
   });

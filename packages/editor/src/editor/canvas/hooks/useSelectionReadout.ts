@@ -11,11 +11,9 @@ import { EVENTS } from "../../../shared/constants/events";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { useProjectLoading } from "@/editor/shell/hooks/useProjectLoading";
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { useInsertDrag } from "../insertDrag";
 
-/** `section` -> `Section`, matching the board's `Section · Hero` casing;
- *  the SSOT label first (`collection-list` -> `Collection list`, 4428:151488). */
-const cap = (s: string) => ELEMENT_TYPE_LABELS[s] ?? (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /**
  * The selected element's rendered size, read from the canvas DOM. Re-read per
@@ -40,6 +38,13 @@ const SELECTION_EVENTS = [
   EVENTS.SELECTION_REMOVED,
   EVENTS.ELEMENT_SELECTED,
   EVENTS.SELECTION_CLEARED,
+] as const;
+
+const INSTANCE_EVENTS = [
+  EVENTS.COMPONENT_INSTANTIATED,
+  EVENTS.INSTANCE_DETACHED,
+  EVENTS.COMPONENT_UPDATED,
+  EVENTS.COMPONENT_DELETED,
 ] as const;
 
 export function useSelectionReadout(
@@ -78,12 +83,35 @@ export function useSelectionReadout(
     };
   }, [composer]);
 
+  // Board 4418:166980: an instance reads "Component instance · {master}".
+  // Re-read when an element becomes / stops being an instance or a master is renamed.
+  const [, setInstanceTick] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const bump = () => setInstanceTick((n) => n + 1);
+    for (const evt of INSTANCE_EVENTS) composer.on(evt, bump);
+    return () => {
+      for (const evt of INSTANCE_EVENTS) composer.off(evt, bump);
+    };
+  }, [composer]);
+  const instance = selectedElement ? composer?.components?.getInstanceByElementId?.(selectedElement.id) : undefined;
+  const master = instance ? composer?.components?.getComponent?.(instance.componentId) : undefined;
+
+  // Board 4418:100890: during an Add drag the bar says where the drop lands.
+  const insert = useInsertDrag(composer);
+  if (insert.label && insert.target) {
+    const { path, after } = insert.target;
+    return { label: `Inserting ${insert.label} → ${path}${after ? ` · after ${after}` : ""}`, dims: null };
+  }
+
   const label = projectLoading
     ? "Loading…"
     : selectionCount > 1
       ? `${selectionCount} elements selected`
-      : selectedElement
-        ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
+      : master
+        ? `Component instance · ${master.name}`
+        : selectedElement
+          ? `${elementTypeLabel(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
         : "Nothing selected";
   return { label, dims: elementDims(selectedElement?.id) };
 }

@@ -21,6 +21,7 @@ function fakeComposer() {
     composer: {
       on: (e: string, cb: (p?: unknown) => void) => { (handlers[e] ??= []).push(cb); },
       off: (e: string, cb: (p?: unknown) => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
+      history: { undo: vi.fn() },
     } as unknown as Composer,
     fire: (e: string, payload?: unknown) => (handlers[e] ?? []).forEach((h) => h(payload)),
     count: (e: string) => (handlers[e] ?? []).length,
@@ -42,9 +43,31 @@ describe("useClipboardToasts", () => {
     /* Paste is coalesced across a macrotask — see below for why. */
     await flush();
 
-    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual([
+    expect(addToast.mock.calls.map((c) => c[0].description).sort()).toEqual([
       "Element copied", "Element cut", "Element duplicated", "Element pasted",
     ]);
+  });
+
+  /* Board 5940:147595: "Section duplicated · Undo" — the copy's type, and an
+     Undo. One duplicate command clones every selected element in one burst,
+     so the burst speaks once, like paste. */
+  it("names a single duplicate by its type and offers Undo; counts a burst", async () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+    const clone = (type: string) => ({ clone: { getType: () => type } });
+
+    fire(EVENTS.ELEMENT_DUPLICATED, clone("section"));
+    await flush();
+    fire(EVENTS.ELEMENT_DUPLICATED, clone("heading"));
+    fire(EVENTS.ELEMENT_DUPLICATED, clone("text"));
+    await flush();
+
+    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual(["Section duplicated", "2 elements duplicated"]);
+    const first = addToast.mock.calls[0][0];
+    expect(first.action.label).toBe("Undo");
+    first.action.onClick();
+    expect((composer as unknown as { history: { undo: ReturnType<typeof vi.fn> } }).history.undo).toHaveBeenCalled();
   });
 
   /* `pasteElement` emits CLIPBOARD_PASTE once PER element, and one paste can

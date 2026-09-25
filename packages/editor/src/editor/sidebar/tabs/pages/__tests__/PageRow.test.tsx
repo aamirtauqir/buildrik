@@ -177,3 +177,13 @@ describe("PageRow — a space belongs to the page name, not to selection", () =>
   });
 });
 
+
+/* v3 4418:93108: an open rename field says its keys under itself. */
+describe("PageRow — rename hint", () => {
+  it("shows “Enter to save · Esc to cancel” only while renaming", () => {
+    const { rerender } = render(<PageRow page={home} {...baseProps} />);
+    expect(screen.queryByText("Enter to save · Esc to cancel")).toBeNull();
+    rerender(<PageRow page={home} {...baseProps} isRenaming />);
+    expect(screen.getByText("Enter to save · Esc to cancel")).toBeInTheDocument();
+  });
+});

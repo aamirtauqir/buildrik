@@ -49,15 +49,18 @@ interface PublishGateModalProps {
 /** Board copy, with the round's real client in place of "Sara". */
 function gateCopy(reason: PublishGateReason, round: CurrentRound | null) {
   const who = round?.reviewerName ?? round?.invitedEmail ?? null;
-  const named = who && round?.invitedEmail && round.reviewerName ? `${who} (${round.invitedEmail})` : who;
+  const first = round?.reviewerName?.split(" ")[0] ?? null;
   switch (reason) {
+    /* Boards 4418:120066 / 5931:44782: the title names who holds the door,
+       the body names the round, the lock, and what Open Review does. */
     case "review-pending":
       return {
-        title: "Waiting on approval",
-        body: named
-          ? `This site was sent to ${named} for review. Publishing unlocks once they approve.`
-          : "This site is with its reviewer. Publishing unlocks once it is approved.",
-        action: "View review",
+        title: first ? `Waiting on ${first}` : "Waiting on approval",
+        body:
+          `Round ${round?.roundNumber ?? 1} is with ${who ?? "your reviewer"} for approval. ` +
+          "Publishing to production stays locked until they approve it, or until a workspace admin turns the approval lock off. " +
+          "Open Review to check its status.",
+        action: "Open Review",
       };
     case "changes-requested":
       return {
@@ -67,9 +70,12 @@ function gateCopy(reason: PublishGateReason, round: CurrentRound | null) {
       };
     case "no-review":
       return {
-        title: "No review sent yet",
-        body: "This site needs client approval before it can go live. Send it for review first.",
-        action: "Send for review",
+        title: "Not sent for review yet",
+        body:
+          `Round ${round ? round.roundNumber + 1 : 1} has not been sent to ${who ?? "your client"} yet. ` +
+          "Approval lock is on, so publishing to production waits for their approval. " +
+          "Open Review to send this draft as a review round.",
+        action: "Open Review",
       };
   }
 }
@@ -81,7 +87,7 @@ const CARD = "tw:flex tw:flex-col tw:items-start tw:gap-[14px] tw:px-8 tw:pt-[30
 /* 337:2240 / 337:2242 — `--size/row` (32) with a 16/10 inset on an 8 radius,
    NOT the 28 the modal footer caps its buttons at. These are not in a footer:
    the boards draw them inside the card, left-aligned, with no rule above. */
-const GATE_BUTTON = "tw:h-8 tw:min-h-0 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5";
+const GATE_BUTTON = "tw:h-8 tw:min-h-0 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5";
 /* The radius goes through `style`, not a utility, and the reason is measured:
    the SAME `tw:rounded-lg` on these two buttons computes 8px on the `light`
    one and 4px on the primary — same class string, same stylesheet, one
@@ -115,7 +121,7 @@ export const PublishGateModal: React.FC<PublishGateModalProps> = ({ reason, comp
 
   return (
     <ModalRoot open onOpenChange={(o) => !o && onClose()}>
-      <ModalContent size="md" srTitle={copy.title} data-testid="publish-gate">
+      <ModalContent size="prompt" srTitle={copy.title} data-testid="publish-gate">
         <div className={CARD}>
           <span
             className="tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]"
@@ -128,7 +134,7 @@ export const PublishGateModal: React.FC<PublishGateModalProps> = ({ reason, comp
           {/* 307:2196 is 456 wide, which IS 520 less the 32 gutters — the width
               is the padding, not a literal. */}
           <span
-            className="tw:w-full tw:text-[14px] tw:text-[var(--bk-ink-muted)]"
+            className="tw:w-full tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
             data-testid="publish-gate-body"
           >
             {copy.body}

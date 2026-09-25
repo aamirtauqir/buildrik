@@ -114,20 +114,35 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(screen.getByTestId("mgr-count")).toHaveTextContent(/files · Unused$/);
   });
 
-  it("labels the view controls 'Grid · 3 columns' and 'List' as text, not icons", async () => {
+  it("4418:58292 — the toolbar reads Filter ▾ · Grid|List · Grid ▾ · ⋯, and Grid ▾ names its column count", async () => {
     await mountLibrary();
-    expect(screen.getByText("Grid · 3 columns")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter");
+    expect(screen.getByRole("button", { name: "Grid" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "List" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Grid · 3 columns" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Library options" })).toBeInTheDocument();
   });
 
-  it("names the sort 'Date added' by default and 'Name A–Z' when sorted by name ascending", async () => {
+  it("7093:78182 — Filter ▾ offers FORMAT and the library's own file types, and the button names the choice", async () => {
+    const setFmtFilter = vi.fn();
+    await mountLibrary({ setFmtFilter });
+    fireEvent.click(screen.getByTestId("mgr-filter"));
+    expect(screen.getByTestId("mgr-filter-all")).toHaveAttribute("role", "menuitemradio");
+    expect(screen.getByRole("menuitemradio", { name: /Images/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("mgr-fmt-jpg"));
+    expect(setFmtFilter).toHaveBeenCalledWith("jpg");
+  });
+
+  it("7093:78219 / 6930:80054 — ⋯ › Sort by names the sort: 'Date added' by default", async () => {
     await mountLibrary();
+    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Date added");
   });
 
-  it("names the sort 'Name A–Z' when sorted by name ascending", async () => {
+  it("names the sort 'Name A→Z' when sorted by name ascending", async () => {
     await mountLibrary({ sort: "name", sortDir: "asc" });
-    expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Name A–Z");
+    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
+    expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Name A→Z");
   });
 
   it("draws a video without a poster as a neutral tile, never a broken <img>", async () => {
@@ -146,7 +161,8 @@ describe("Clone 3695:44543 / 44747 / 20154 · view switch preserves selection (a
     fireEvent.click(screen.getByRole("button", { name: "List" }));
     expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
     expect(screen.queryByTestId("mgr-bulk-bar")).toBeNull();
-    fireEvent.click(within(screen.getByTestId("mgr-gridn")).getByRole("button", { name: "3" }));
+    fireEvent.click(screen.getByTestId("mgr-gridn"));
+    fireEvent.click(screen.getByTestId("mgr-gridn-3"));
     expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
   });
 });
@@ -170,10 +186,11 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
 });
 
 describe("Clone 3695:19968 / 20154 · bulk mode", () => {
-  it("the toolbar's ☑ enters select mode as the List with nothing checked, and the rail says so", async () => {
+  it("⋯ › Select assets… enters select mode as the List with nothing checked, and the rail says so", async () => {
     const toggleSelMode = vi.fn();
     await mountLibrary({ toggleSelMode });
-    fireEvent.click(screen.getByRole("button", { name: "Select files" }));
+    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
+    fireEvent.click(screen.getByTestId("mgr-select-mode"));
     expect(toggleSelMode).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("mgr-list-head")).toBeInTheDocument();
     expect(screen.getByTestId("mgr-assets").dataset.view).toBe("list");
@@ -200,6 +217,9 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     expect(rail.queryByRole("heading", { name: "1 asset selected" })).toBeNull();
     expect(rail.getByText("chef-intro.mp4")).toBeInTheDocument();
     expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · MP4");
+    expect(screen.getByTestId("mgr-det-summary")).toHaveTextContent("1 version · used in 1 place");
+    expect(screen.queryByTestId("mgr-det-used")).toBeNull(); // collapsed until "Details ▸" is opened
+    fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
     expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("Used in 1 place");
     const actions = within(screen.getByTestId("mgr-det-actions"));
     expect(actions.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim())).toEqual([
@@ -209,8 +229,8 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     ]);
     expect(actions.getByRole("button", { name: "Insert to canvas" })).toHaveClass("mgr-btn-ink");
     fireEvent.click(screen.getByTestId("mgr-det-more"));
-    expect(actions.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Replace across site…", "Delete"]);
-    fireEvent.click(actions.getByRole("menuitem", { name: "Delete" }));
+    expect(actions.getAllByRole("menuitem").map((b) => b.textContent?.trim())).toEqual(["Replace across site…", "Delete…"]);
+    fireEvent.click(actions.getByRole("menuitem", { name: "Delete…" }));
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });
 
@@ -285,7 +305,7 @@ describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () =
     // The nested folder used to be invisible here: the tree was handed the
     // root-only list, so a folder created inside a scope had no row at all.
     const nested = rail.getByTestId("mgr-row-folder-f2");
-    expect(nested).toHaveClass("depth-2");
+    expect(nested).toHaveClass("depth-1");
     expect(nested.querySelector(".mgr-node-count")).toHaveTextContent("0");
   });
 
@@ -1185,7 +1205,11 @@ async function mountVersions(opts: { family?: typeof HERO[]; on?: string; upload
   return { composer, onOpenImageEditor, door, placements };
 }
 
-const selectHero = () => fireEvent.click(screen.getByTestId("mgr-asset-hero"));
+/* 4418:58292 — VERSIONS / USED IN sit behind the rail's "Details ▸" row. */
+const selectHero = () => {
+  fireEvent.click(screen.getByTestId("mgr-asset-hero"));
+  fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
+};
 const openVersions = () => fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
 
 describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Done — the save path", () => {

@@ -23,6 +23,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  MenuSeparator,
   PanelFrame,
   Popover,
 } from "@/editor/chrome-ui";
@@ -45,6 +46,9 @@ import "./PagesTab.css";
 
 export interface PagesTabProps {
   composer: Composer | null;
+  /** False while the drawer is closed but the panel stays mounted — the
+   *  topbar field goes back to being the ⌘K door. */
+  isOpen?: boolean;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
@@ -58,6 +62,7 @@ export interface PagesTabProps {
 
 export const PagesTab: React.FC<PagesTabProps> = ({
   composer,
+  isOpen = true,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -102,6 +107,22 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   /* Every Add-page door asks for the New-page modal (decision #19). */
   const requestNewPage = React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]);
   usePageCommands(composer, p.pages, p.selectPage, requestNewPage);
+
+  /* v3 4418:92256: the filter is the topbar field, which reads "Search
+     pages…" while this drawer is mounted — the drawer's own search band is
+     gone, as it went from Layers (4418:81300). */
+  const [search, setSearch] = React.useState("");
+  React.useEffect(() => {
+    if (!composer || !isOpen) return;
+    const onQuery = ({ query }: { query: string }) => setSearch(query);
+    composer.on(EVENTS.UI_SEARCH_QUERY, onQuery);
+    composer.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: "Search pages…" });
+    return () => {
+      composer.off(EVENTS.UI_SEARCH_QUERY, onQuery);
+      composer.emit(EVENTS.UI_SEARCH_CONTEXT, null);
+      setSearch("");
+    };
+  }, [composer, isOpen]);
 
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
@@ -298,6 +319,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
 
+  const menuFolderId = p.contextMenu ? f.pageToFolder.get(p.contextMenu.pageId) : undefined;
+  const menuFolderName = f.folders.find((fd) => fd.id === menuFolderId)?.name;
+
   return (
     // `bd-pg-panel` is the DS V2 root class — new PagesTab.css uses it as the
     // scope for all `.bd-pg-*` rules including the active-row 2px cobalt bar
@@ -306,29 +330,26 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
     // controls sizing. TabFrame fills the host via width:100%.
     <PanelFrame className={`bd-pg-panel${bulkMode ? " bulk-mode" : ""}`}>
-      {/* Board 4418:90494 header: the ⌘K keycap and the ⋯ panel menu ride in
-          the header's `actions` slot — as children they were dropped on the
-          floor and the keycap never rendered. */}
+      {/* v3 4418:90494 header: the ⋯ panel menu rides in the header's
+          `actions` slot. No ⌘K keycap — the topbar field is the ⌘K door. */}
       <PanelFrame.Header
         title="Pages"
-        isExpanded={isExpanded}
-        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={
           <>
-            {/* The keycap opens THE palette — the shell's ⌘K, which bands
-                this panel's rows under PAGES (B7). */}
-            <Button
-              color="light"
-              size="xs"
-              className="bd-pg-kbd-btn tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-              data-testid="pages-open-palette"
-              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {})}
-              aria-label="Open command palette"
-            >
-              <span className="bd-pg-kbd">⌘K</span>
-            </Button>
+            {bulkMode ? (
+              /* v3 7069:78984: select mode swaps the ⋯ for "Done". */
+              <Button
+                color="light"
+                size="xs"
+                className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-xs tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                data-testid="pages-select-done"
+                onClick={leaveSelectMode}
+              >
+                Done
+              </Button>
+            ) : (
             <Popover
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
@@ -346,21 +367,32 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 </IconButton>
               }
             >
-              <Menu label="Pages options">
+              {/* v3 7069:79383: Select pages… · Listings · Show structure, a
+                  rule, Reload. The board's ⌘R hint is not drawn — ⌘R is the
+                  browser's reload and nothing here binds it. "Widen panel"
+                  is the header's old expand button, as in Layers. */}
+              <Menu label="Pages options" className="tw:w-56">
                 <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
                   Select pages…
-                </MenuItem>
-                <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
-                  Show structure
-                </MenuItem>
-                <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
-                  Reload
                 </MenuItem>
                 <MenuItem data-testid="pages-open-listings" onClick={runMenu(() => setView("listings"))}>
                   Listings
                 </MenuItem>
+                <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
+                  Show structure
+                </MenuItem>
+                <MenuSeparator />
+                <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
+                  Reload
+                </MenuItem>
+                {onExpandToggle && (
+                  <MenuItem data-testid="pages-wide-view" onClick={runMenu(onExpandToggle)}>
+                    {isExpanded ? "Narrow panel" : "Widen panel"}
+                  </MenuItem>
+                )}
               </Menu>
             </Popover>
+            )}
           </>
         }
       />
@@ -405,6 +437,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             folders={f.folders}
             pageToFolder={f.pageToFolder}
             selectedIds={bulk.selectedIds}
+            search={search}
+            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onAddPage={requestNewPage}
             onAddFolder={() => f.createFolder("New Folder")}
             onSelectPage={p.selectPage}
@@ -443,6 +477,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onReplaceLayout={handleReplaceLayout}
           onCopyLink={p.copyPageLink}
           onSettings={p.openSettings}
+          folderName={menuFolderName}
+          onRemoveFromFolder={f.removePageFromFolder}
         />
       )}
       {/* Delete confirmation dialog */}

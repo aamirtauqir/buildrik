@@ -91,7 +91,7 @@ describe("useAIScope", () => {
   it("seeds from the current selection on mount", () => {
     composer = makeComposer([el("h", "section", "Hero")]);
     const { result } = renderHook(() => useAIScope(composer as never));
-    expect(result.current.scope).toEqual({ kind: "element", id: "h", label: "Hero section" });
+    expect(result.current.scope).toEqual({ kind: "element", id: "h", label: "Hero section", name: "Hero" });
   });
 
   it("selecting another element with the panel open scopes to it (not 'Whole page')", async () => {
@@ -100,14 +100,14 @@ describe("useAIScope", () => {
     await settle();
     act(() => composer.select(el("i", "image", "Menu preview")));
     await settle();
-    expect(result.current.scope).toEqual({ kind: "element", id: "i", label: "Menu preview image" });
+    expect(result.current.scope).toEqual({ kind: "element", id: "i", label: "Menu preview image", name: "Menu preview" });
   });
 
   it("a multi-select stays '3 selected'", async () => {
     const { result } = renderHook(() => useAIScope(composer as never));
     act(() => composer.selectMultiple([el("a", "text"), el("b", "text"), el("c", "text")]));
     await settle();
-    expect(result.current.scope).toEqual({ kind: "multi", count: 3 });
+    expect(result.current.scope).toEqual({ kind: "multi", ids: ["a", "b", "c"] });
   });
 
   it("clearing the selection returns to the whole page", async () => {
@@ -129,6 +129,6 @@ describe("useAIScope", () => {
     act(() => result.current.unlock());
     act(() => composer.select(el("g", "grid")));
     await settle();
-    expect(result.current.scope).toEqual({ kind: "element", id: "g", label: "Grid container" });
+    expect(result.current.scope).toEqual({ kind: "element", id: "g", label: "Grid container", name: "the selected grid" });
   });
 });

@@ -211,34 +211,10 @@
       "nodeId": "1174:4866"
     },
     {
-      "name": "fmt-strip",
-      "testId": "mgr-fmt-strip",
-      "spec": "media-fullpage-library",
-      "nodeId": "1174:4867"
-    },
-    {
-      "name": "fmt-jpg",
-      "testId": "mgr-fmt-jpg",
-      "spec": "media-fullpage-library",
-      "nodeId": "1174:4868"
-    },
-    {
       "name": "gridn",
       "testId": "mgr-gridn",
       "spec": "media-fullpage-library",
       "nodeId": "1174:4876"
-    },
-    {
-      "name": "gridn-2",
-      "testId": "mgr-gridn-2",
-      "spec": "media-fullpage-library",
-      "nodeId": "1174:4877"
-    },
-    {
-      "name": "gridn-3",
-      "testId": "mgr-gridn-3",
-      "spec": "media-fullpage-library",
-      "nodeId": "1174:4879"
     },
     {
       "name": "sort",

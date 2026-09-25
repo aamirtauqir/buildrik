@@ -151,7 +151,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       return { num: "", unit: val };
     }
     /* A token-bound value shows what it resolves to ("40", px) — the raw
-       `var(--buildrick-design-…)` leaked into the field (6894:74644). The
+       site-token `var(…)` string leaked into the field (6894:74644). The
        value itself stays bound until the field is edited. */
     if (isTokenVar(val)) {
       const resolved = resolveTokenVar(val);
