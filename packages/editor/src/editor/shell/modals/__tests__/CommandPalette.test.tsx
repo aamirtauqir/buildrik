@@ -32,7 +32,13 @@ function makeComposer(
   return {
     emit: vi.fn(),
     setZoom: vi.fn(),
-    history: { undo: vi.fn(), redo: vi.fn(), canUndo: vi.fn(() => opts.canUndo ?? true), canRedo: vi.fn(() => true) },
+    history: {
+      undo: vi.fn(),
+      redo: vi.fn(),
+      clear: vi.fn(),
+      canUndo: vi.fn(() => opts.canUndo ?? true),
+      canRedo: vi.fn(() => true),
+    },
     selection: {
       getSelectedIds: vi.fn(() => selected),
       getSelected: vi.fn(() => (selected.length ? { getType: () => opts.type ?? "heading" } : null)),
@@ -248,6 +254,31 @@ describe("CommandPalette — search", () => {
     renderPalette();
     type("fit");
     expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
+  });
+
+  /* PD-38 / C-6 (A14-3): "Clear history" used to emit HISTORY_CLEARED as pure
+     notification — nothing actually cleared the undo stack. Kept, but now a
+     real op behind a confirm. */
+  it("Clear history asks first and does nothing on Cancel", () => {
+    const { composer, onClose } = renderPalette();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    type("clear history");
+    fireEvent.click(screen.getByTestId("cmdk-row-history-clear"));
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(composer!.history.clear).not.toHaveBeenCalled();
+    expect(composer!.emit).not.toHaveBeenCalledWith(EVENTS.HISTORY_CLEARED, undefined);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    confirmSpy.mockRestore();
+  });
+
+  it("Clear history clears the undo stack once confirmed", () => {
+    const { composer } = renderPalette();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    type("clear history");
+    fireEvent.click(screen.getByTestId("cmdk-row-history-clear"));
+    expect(composer!.history.clear).toHaveBeenCalled();
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.HISTORY_CLEARED, undefined);
+    confirmSpy.mockRestore();
   });
 
   it("a query that matches nothing offers stock photos for it, and AI", () => {
