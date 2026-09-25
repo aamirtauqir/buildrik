@@ -649,7 +649,12 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Open export settings",
       group: "Navigation",
       keywords: ["export", "code", "download"],
-      run: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }),
+      /* A-7: "export" is a door (SETTINGS_SCREENS constants.ts kind: "door"),
+         not a SettingsTab screen — SettingsTab only navigates targets with
+         kind: "screen", so the old UI_PANEL_OPEN landed on the Settings
+         overview instead. UI_OPEN_EXPORTER is the same event the Export row
+         itself emits, opening the modal directly. */
+      run: () => composer.emit(EVENTS.UI_OPEN_EXPORTER, undefined),
     },
     {
       id: "open-integrations",

@@ -330,6 +330,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
+
+  /* A-7: the drawer tab to fall back to when a full page (Settings,
+     Templates, the Asset library) closes — the tab the user was actually on
+     before they navigated away, not always "add". Mirrors useStudioState's
+     own prevDrawerTabRef (persistence), kept separately here because the
+     hook does not expose it. */
+  const prevDrawerTabRef = React.useRef<string>("add");
+  React.useEffect(() => {
+    if (getTabMode(activeTabId) !== "fullpage") prevDrawerTabRef.current = activeTabId;
+  }, [activeTabId]);
   /* A CMS field's image pick opens in the Assets drawer but keeps the CMS
      workspace (and the record being edited) open beside it. */
   const railTab = useRailTab(activeTabId);
@@ -588,8 +598,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       // Media dual-mode: return to panel (slim launcher), don't switch tabs
       setMediaFullPage(false);
     } else {
-      // Return to last panel tab (default: Add)
-      onLeftPanelTabChange?.("add");
+      // Return to the drawer tab the user was actually on (default: Add).
+      onLeftPanelTabChange?.(prevDrawerTabRef.current);
     }
   }, [activeTabId, mediaFullPage, onLeftPanelTabChange]);
 

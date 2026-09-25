@@ -540,13 +540,22 @@ describe("one registry — ids are unique, the merged canvas rows are here", () 
       ["cms-records", EVENTS.CMS_MANAGE_RECORDS, {}],
       ["save-template", EVENTS.TEMPLATE_SAVE_REQUESTED, {}],
       ["open-analytics", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }],
-      ["open-export-settings", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }],
       ["open-integrations", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }],
     ] as const) {
       composer.emit.mockClear();
       run(id);
       expect(composer.emit, id).toHaveBeenCalledWith(event, payload);
     }
+  });
+
+  /* A-7: "export" is a door (kind: "door" in SETTINGS_SCREENS), not a
+     SettingsTab screen, so UI_PANEL_OPEN {panel:"settings",screen:"export"}
+     landed on the Settings overview. This is now the same event the Export
+     row itself emits, opening the modal directly. */
+  it("open-export-settings opens the exporter directly, not the Settings screen router", () => {
+    run("open-export-settings");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_OPEN_EXPORTER, undefined);
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, expect.anything());
   });
 
   it("replace-media asks the media drawer for the selected element, and does nothing without one", () => {
