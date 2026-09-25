@@ -4,7 +4,16 @@
  * it, so "java\tscript:" and "\x01javascript:" run as javascript:.
  */
 import { describe, it, expect } from "vitest";
-import { isDangerousUrl, isSafeCssDeclaration, srcsetUrls } from "../element-markup";
+import {
+  escapeStyleText,
+  isDangerousUrl,
+  isSafeCssDeclaration,
+  isSafeCssSelector,
+  isSafeElementId,
+  isSafeMediaQuery,
+  isSafeStyleRuleTarget,
+  srcsetUrls,
+} from "../element-markup";
 
 describe("isDangerousUrl", () => {
   it.each([
@@ -70,4 +79,102 @@ describe("isSafeCssDeclaration (S-1 review round 3)", () => {
     ["background", "{{token.color.primary}}"],
     ["box-shadow", "0 4px 12px {{token.color-shadow}}"],
   ])("allows %j: %j", (property, value) => expect(isSafeCssDeclaration(property, value)).toBe(true));
+});
+
+const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";
+
+describe("isSafeCssSelector (S-1 review round 4)", () => {
+  it.each([
+    HOSTILE_SELECTOR,
+    "a{color:red}",
+    "a}",
+    "a;b",
+    "@import url(x)",
+    "a\\3c",
+    "<b",
+    '[data-buildrick-id="x"]</style>',
+    '[data-buildrick-id="x\"]{}"]',
+    "[title='x']",
+    '[data-buildrick-id="a b"]',
+    "a:evil",
+    "a::-webkit-scrollbar-thumb:expression",
+    ":nth-child(1){}",
+    "a,",
+    ",a",
+    "",
+    "   ",
+    "a".repeat(2000),
+  ])("refuses %j", (selector) => expect(isSafeCssSelector(selector)).toBe(false));
+
+  it("refuses a non-string", () => expect(isSafeCssSelector(5)).toBe(false));
+
+  it.each([
+    '[data-buildrick-id="el-mt1euvra-1dxo08g1p58"]',
+    '[data-buildrick-id="el-mt7d1x3m-1qg2iv9zjda"]:hover',
+    '[data-buildrick-id="el_1"]:focus-visible',
+    ".btn-primary",
+    ".card:hover .card__title",
+    "#hero > .title",
+    "ul li + li",
+    "h1 ~ p",
+    "a:disabled, button:active",
+    "*",
+    "p::before",
+    "li:nth-child(2n+1)",
+    "tr:nth-of-type(odd)",
+    "input::placeholder",
+    "[disabled]",
+    "div.a.b#c[data-x=y]:first-child",
+  ])("allows %j", (selector) => expect(isSafeCssSelector(selector)).toBe(true));
+});
+
+describe("isSafeMediaQuery (S-1 review round 4)", () => {
+  it.each([
+    "(max-width: 1023px)",
+    "(max-width: 767px)",
+    "(min-width:768px) and (max-width:1023px)",
+    "(min-height: 600px)",
+  ])("allows %j", (query) => expect(isSafeMediaQuery(query)).toBe(true));
+
+  it.each([
+    "(max-width: 767px){}</style><script>alert(1)</script><style>",
+    "screen{a{}}",
+    "(max-width: 767px) { a { color: red } } @media (x)",
+    "(max-width: expression(1))",
+    "",
+    5,
+  ])("refuses %j", (query) => expect(isSafeMediaQuery(query)).toBe(false));
+});
+
+describe("isSafeStyleRuleTarget (S-1 review round 4)", () => {
+  it("takes a safe selector with no media query", () => {
+    expect(isSafeStyleRuleTarget(".a", undefined)).toBe(true);
+    expect(isSafeStyleRuleTarget(".a", null)).toBe(true);
+    expect(isSafeStyleRuleTarget(".a", "")).toBe(true);
+  });
+  it("needs both halves safe", () => {
+    expect(isSafeStyleRuleTarget(".a", "(max-width: 767px)")).toBe(true);
+    expect(isSafeStyleRuleTarget(".a", "x{}")).toBe(false);
+    expect(isSafeStyleRuleTarget(HOSTILE_SELECTOR, "(max-width: 767px)")).toBe(false);
+  });
+});
+
+describe("isSafeElementId (S-1 review round 4)", () => {
+  it.each(["el-mt1euvra-1dxo08g1p58", "root", "hero_1", "A-9"])("allows %j", (id) =>
+    expect(isSafeElementId(id)).toBe(true));
+  it.each(['x"]{}</style><script>alert(1)</script>', "a b", "a.b", "", 7, null])("refuses %j", (id) =>
+    expect(isSafeElementId(id)).toBe(false));
+});
+
+describe("escapeStyleText (S-1 review round 4)", () => {
+  it("cannot close the surrounding <style>, in any case", () => {
+    const out = escapeStyleText("a{}</style><script>x</script></STYLE ><StYlE>");
+    expect(out).not.toMatch(/<\/style/i);
+    expect(out).toContain("<\\/style>");
+    expect(out).toContain("<\\/STYLE >");
+  });
+  it("leaves ordinary CSS alone", () => {
+    const css = ".a > .b { content: \"<>\"; color: red }";
+    expect(escapeStyleText(css)).toBe(css);
+  });
 });

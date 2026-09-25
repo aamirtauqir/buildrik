@@ -8,6 +8,7 @@ import { describe, it, expect } from "vitest";
 import {
   sanitizeBlocks,
   sanitizeComponentPayload,
+  sanitizeProjectStyles,
   sanitizeTemplateHtml,
   sanitizeVersionPayload,
 } from "../sanitize-blocks";
@@ -319,5 +320,61 @@ describe("malformed override entries (S-1 review round 3)", () => {
     sanitizeBlocks([a, b]);
     expect(a.data.componentInstance.overrides).toEqual([good]);
     expect(b.data.componentInstance.overrides).toEqual([]);
+  });
+});
+
+const HOSTILE_SELECTOR = "a{}</style><script>alert(1)</script><style>";
+
+describe("project style rules and element ids (S-1 review round 4)", () => {
+  function rules() {
+    return [
+      { id: "s1", selector: '[data-buildrick-id="el-a1"]', properties: { color: "red" }, mediaQuery: "(max-width: 767px)" },
+      { id: "s2", selector: HOSTILE_SELECTOR, properties: { color: "red" } },
+      { id: "s3", selector: ".ok", properties: { color: "blue" }, mediaQuery: "(max-width: 767px){}</style><script>alert(1)</script><style>" },
+      { id: "s4", selector: '[data-buildrick-id="el-a1"]:hover', properties: { color: "red}</style>", padding: "4px" } },
+      { id: "t1", kind: "color", cssVar: "--primary", value: "#1A56DB" },
+      { id: "s5", selector: 7, properties: {} },
+    ];
+  }
+
+  it("drops a rule whose selector or media query could leave the stylesheet, keeps the rest", () => {
+    const reasons: string[] = [];
+    const styles = rules();
+    sanitizeProjectStyles(styles, (reason) => reasons.push(reason));
+    expect(styles.map((r) => r.id)).toEqual(["s1", "s4", "t1"]);
+    expect(styles[1]).toMatchObject({ properties: { padding: "4px" } });
+    expect(JSON.stringify(styles)).not.toMatch(/<\/style|<script/i);
+    expect(reasons.filter((r) => r === "style-rule")).toHaveLength(3);
+    expect(reasons).toContain("style");
+  });
+
+  it("tolerates a non-list styles value", () => {
+    expect(sanitizeProjectStyles({ a: 1 })).toEqual({ a: 1 });
+    expect(sanitizeProjectStyles(undefined)).toBeUndefined();
+  });
+
+  it("sanitizes the style rules in a version snapshot", () => {
+    const payload = { id: "v", snapshot: { pages: [], styles: rules() } };
+    sanitizeVersionPayload(payload);
+    expect(payload.snapshot.styles.map((r) => r.id)).toEqual(["s1", "s4", "t1"]);
+  });
+
+  it("gives an element with an id that could leave a selector a fresh one, keeping the node", () => {
+    const reasons: string[] = [];
+    const tree = {
+      id: "root",
+      type: "container",
+      children: [
+        { id: 'x"]{}</style><script>alert(1)</script>', type: "text", content: "Hi" },
+        { id: "el-ok_1", type: "text" },
+      ],
+    };
+    sanitizeBlocks(tree, (reason) => reasons.push(reason));
+    const [bad, good] = tree.children;
+    expect(bad.id).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(bad.content).toBe("Hi");
+    expect(good.id).toBe("el-ok_1");
+    expect(tree.id).toBe("root");
+    expect(reasons).toEqual(["id"]);
   });
 });

@@ -101,6 +101,84 @@ export function isSafeCssDeclaration(property: string, value: unknown): boolean 
   return true;
 }
 
+/**
+ * An element id as the editor mints it (`el-<time>-<random>`), or any other
+ * plain word. It is written into selectors (`.buildrick-<id>`,
+ * `[data-buildrick-id="<id>"]`) and class attributes, so nothing else is kept.
+ */
+const ELEMENT_ID_SHAPE = /^[A-Za-z0-9_-]+$/;
+export function isSafeElementId(id: unknown): id is string {
+  return typeof id === "string" && ELEMENT_ID_SHAPE.test(id);
+}
+
+const CSS_IDENT = "-?[A-Za-z_][A-Za-z0-9_-]*";
+const CSS_PSEUDO_CLASSES = [
+  "hover", "focus", "focus-visible", "focus-within", "active", "visited", "link",
+  "disabled", "enabled", "checked", "required", "optional", "valid", "invalid",
+  "placeholder-shown", "empty", "target", "root", "first-child", "last-child",
+  "only-child", "first-of-type", "last-of-type", "only-of-type",
+];
+const CSS_PSEUDO_ELEMENTS = [
+  "before", "after", "placeholder", "selection", "marker", "first-line", "first-letter",
+];
+const CSS_NTH = "nth-child|nth-last-child|nth-of-type|nth-last-of-type";
+const CSS_SIMPLE =
+  `(?:\\.${CSS_IDENT}|#${CSS_IDENT}` +
+  // [attr] or [attr=word] / [attr="word"] — the quoted form is how
+  // `[data-buildrick-id="<id>"]` is written, and a word cannot close it.
+  `|\\[${CSS_IDENT}(?:[~|^$*]?=(?:${CSS_IDENT}|"[A-Za-z0-9_-]*"))?\\]` +
+  `|:(?:${CSS_PSEUDO_CLASSES.join("|")})` +
+  `|:(?:${CSS_NTH})\\(\\s*(?:odd|even|[+-]?\\d*n?(?:\\s*[+-]\\s*\\d+)?)\\s*\\)` +
+  `|::?(?:${CSS_PSEUDO_ELEMENTS.join("|")}))`;
+const CSS_COMPOUND = `(?:(?:\\*|${CSS_IDENT})${CSS_SIMPLE}*|${CSS_SIMPLE}+)`;
+const CSS_COMPLEX = `${CSS_COMPOUND}(?:(?:\\s*[>+~]\\s*|\\s+)${CSS_COMPOUND})*`;
+const CSS_SELECTOR_SHAPE = new RegExp(`^\\s*${CSS_COMPLEX}(?:\\s*,\\s*${CSS_COMPLEX})*\\s*$`);
+const MAX_SELECTOR_LENGTH = 1000;
+
+/**
+ * A selector in one of the shapes the product writes — type, `.class`, `#id`,
+ * `[data-buildrick-id="<id>"]`, allowlisted pseudo-classes/elements, joined by
+ * descendant/child/sibling combinators or commas. Project-level rules are
+ * written raw ahead of `{` in a published stylesheet (and a single-file
+ * export's `<style>`), so a stored selector `a{}</style><script>…` ran script;
+ * anything outside this grammar — braces, `;`, `@`, `\`, `<`, a quote outside
+ * that attribute form — is refused.
+ */
+export function isSafeCssSelector(selector: unknown): selector is string {
+  return (
+    typeof selector === "string" &&
+    selector.length <= MAX_SELECTOR_LENGTH &&
+    CSS_SELECTOR_SHAPE.test(selector)
+  );
+}
+
+const MEDIA_FEATURE = "\\(\\s*(?:min|max)-(?:width|height)\\s*:\\s*\\d+px\\s*\\)";
+const MEDIA_QUERY_SHAPE = new RegExp(`^${MEDIA_FEATURE}(?:\\s+and\\s+${MEDIA_FEATURE})*$`);
+
+/** A media query of the breakpoint shape: `(max-width: 767px)`, ANDed. */
+export function isSafeMediaQuery(query: unknown): query is string {
+  return typeof query === "string" && MEDIA_QUERY_SHAPE.test(query);
+}
+
+/**
+ * A stored style rule's selector and media query, both writable. No media
+ * query (absent, null or "" — StyleEngine reads all three as base) is fine.
+ */
+export function isSafeStyleRuleTarget(selector: unknown, mediaQuery: unknown): boolean {
+  if (!isSafeCssSelector(selector)) return false;
+  return mediaQuery == null || mediaQuery === "" || isSafeMediaQuery(mediaQuery);
+}
+
+/**
+ * CSS about to be placed inside a `<style>` element: the only thing that ends
+ * it is `</style`, so that is written `<\/style` — the same CSS (`\/` is an
+ * escaped `/`), but no longer markup. The last check on every CSS-in-HTML
+ * writer, including the site's own Global CSS, which stays CSS.
+ */
+export function escapeStyleText(css: string): string {
+  return css.replace(/<\/(style)/gi, "<\\/$1");
+}
+
 const TARGET_REL = ["noopener", "noreferrer"];
 
 const TARGET_ATTR = /\starget\s*=/i;

@@ -12,8 +12,11 @@
  * `packages/shared/schemas/element-markup.ts` needs extending first.
  *
  * Covers pages.blocks, templates.pages[].blocks, site_components.payload,
- * site_versions.payload (server rules, `lib/sanitize-blocks.ts`) and
- * user_templates.html (DOMPurify). The editor's `isSafeAttrValue` is
+ * site_versions.payload (page roots AND snapshot.styles), sites.projectStyles
+ * (server rules, `lib/sanitize-blocks.ts`) and user_templates.html
+ * (DOMPurify). `id` counts element ids that would be regenerated;
+ * `style-rule` counts project style rules dropped for their selector or media
+ * query. The totals line also says how many of each were scanned. The editor's `isSafeAttrValue` is
  * stricter on URL schemes and now checks srcset/formaction/xlink:href/poster
  * too; it cannot be imported here (ESM editor → CJS shared under tsx), so
  * every stored value of those four is listed as `review-url-attr` for a
@@ -37,6 +40,7 @@ const require = createRequire(import.meta.url);
 const {
   sanitizeBlocks,
   sanitizeComponentPayload,
+  sanitizeProjectStyles,
   sanitizeTemplateHtml,
   sanitizeVersionPayload,
 } = require("../../lib/sanitize-blocks.ts");
@@ -104,6 +108,20 @@ function clientPass(source, rowId, roots) {
   }
 }
 
+/** How many selectors, media queries and element ids were looked at. */
+const scanned = { styleRuleSelectors: 0, styleRuleMediaQueries: 0, elementIds: 0 };
+function countRules(styles) {
+  if (!Array.isArray(styles)) return;
+  for (const r of styles) {
+    if (!r || typeof r !== "object") continue;
+    if (r.selector !== undefined) scanned.styleRuleSelectors++;
+    if (r.mediaQuery) scanned.styleRuleMediaQueries++;
+  }
+}
+function countIds(roots) {
+  for (const node of nodes(roots)) if (node.id !== undefined) scanned.elementIds++;
+}
+
 const prisma = new PrismaClient({ datasources: { db: { url } } });
 const counts = {};
 try {
@@ -112,6 +130,7 @@ try {
   for (const p of pages) {
     sanitizeBlocks(structuredClone(p.blocks), (reason, detail) => record("pages", p.id, reason, detail));
     clientPass("pages", p.id, p.blocks);
+    countIds(p.blocks);
   }
 
   const templates = await prisma.template.findMany({ select: { id: true, pages: true } });
@@ -141,7 +160,20 @@ try {
       record("site_versions", v.id, reason, detail)
     );
     const vPages = v.payload?.snapshot?.pages;
-    if (Array.isArray(vPages)) clientPass("site_versions", v.id, vPages.map((pg) => pg?.root));
+    if (Array.isArray(vPages)) {
+      clientPass("site_versions", v.id, vPages.map((pg) => pg?.root));
+      countIds(vPages.map((pg) => pg?.root));
+    }
+    countRules(v.payload?.snapshot?.styles);
+  }
+
+  const sites = await prisma.site.findMany({ select: { id: true, projectStyles: true } });
+  counts.sites = sites.length;
+  for (const site of sites) {
+    sanitizeProjectStyles(structuredClone(site.projectStyles), (reason, detail) =>
+      record("sites.projectStyles", site.id, reason, detail)
+    );
+    countRules(site.projectStyles);
   }
 
   const userTemplates = await prisma.userTemplate.findMany({ select: { id: true, html: true } });
@@ -156,6 +188,7 @@ try {
 }
 
 console.log(`Local DB ${host} — rows scanned:`, counts);
+console.log("Values scanned (pages + versions + projectStyles):", scanned);
 if (tally.size === 0) {
   console.log("No node or attribute would change.");
 } else {

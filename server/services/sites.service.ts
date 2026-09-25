@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import type {
@@ -721,7 +721,9 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       }
     }
 
-    // Site-level project artifacts.
+    // Site-level project artifacts. The style rules' selectors and media
+    // queries are written raw into the published stylesheet — same boundary.
+    sanitizeProjectStyles(input.styles);
     await tx.site.update({
       where: { id: input.siteId },
       data: {

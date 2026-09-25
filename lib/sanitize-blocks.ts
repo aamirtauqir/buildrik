@@ -14,6 +14,10 @@
  *   - `attributes` → malformed names, `srcdoc`, on* event handlers, and
  *     javascript:/vbscript:/non-image data: URL values are dropped
  *     (`isDangerousUrl`, shared with the editor)
+ *   - `id` → a fresh one when it is not a plain word (`isSafeElementId`): it
+ *     is written into selectors and class attributes
+ * and, for project-level style rules (`sanitizeProjectStyles`), a rule whose
+ * selector or media query could leave the stylesheet is dropped.
  *
  * The tag/attribute rules are `@buildrik/shared/schemas/element-markup`, the
  * same list the editor applies, so the two sides cannot drift.
@@ -25,6 +29,7 @@
  * Import this file directly from server code only — it pulls in jsdom via
  * isomorphic-dompurify and must never reach the client bundle.
  */
+import { randomUUID } from "node:crypto";
 import DOMPurify from "isomorphic-dompurify";
 import {
   FORBIDDEN_ATTRIBUTES,
@@ -32,6 +37,8 @@ import {
   isAllowedElementTag,
   isDangerousUrl,
   isSafeCssDeclaration,
+  isSafeElementId,
+  isSafeStyleRuleTarget,
   isValidAttributeName,
   withSafeTargets,
   srcsetUrls,
@@ -46,7 +53,9 @@ export type SanitizeReason =
   | "attr-event-handler"
   | "attr-url"
   | "override"
-  | "style";
+  | "style"
+  | "style-rule"
+  | "id";
 
 export type OnSanitizeChange = (reason: SanitizeReason, detail: string) => void;
 
@@ -149,6 +158,13 @@ function sanitizeStyleMap(styles: unknown, onChange?: OnSanitizeChange): void {
 const BREAKPOINTS = ["desktop", "tablet", "mobile"] as const;
 
 function sanitizeNode(node: Record<string, unknown>, onChange?: OnSanitizeChange): void {
+  // Regenerated, not dropped: the node and its content stay. A rule or binding
+  // naming the old id could not have been a safe selector anyway.
+  if (node.id !== undefined && !isSafeElementId(node.id)) {
+    onChange?.("id", String(node.id).slice(0, 60));
+    node.id = `el-${randomUUID()}`;
+  }
+
   if (node.tagName != null && node.tagName !== "" && !isAllowedElementTag(node.tagName)) {
     onChange?.("tag", String(node.tagName));
     node.tagName = "div";
@@ -207,12 +223,39 @@ export function sanitizeComponentPayload<T>(payload: T, onChange?: OnSanitizeCha
   return payload;
 }
 
-/** A version (engine NamedVersion): every page root in its project snapshot. */
+/**
+ * Project-level style rules (Site.projectStyles, a snapshot's `styles`):
+ * StyleEngine rules `{ id, selector, properties, mediaQuery? }`, written as
+ * `${selector} {` inside `@media ${mediaQuery}` into the published stylesheet.
+ * A rule whose selector or media query is outside the shared grammar is
+ * removed; a kept rule's declarations get the element-style rule. Entries with
+ * no selector at all (legacy design-token rows) are not style rules and are
+ * left as they are — the editor skips them on load. In place.
+ */
+export function sanitizeProjectStyles<T>(styles: T, onChange?: OnSanitizeChange): T {
+  if (!Array.isArray(styles)) return styles;
+  const rules: unknown[] = styles;
+  for (let i = rules.length - 1; i >= 0; i--) {
+    const rule = asRecord(rules[i]);
+    if (!rule || (rule.selector === undefined && rule.mediaQuery === undefined)) continue;
+    if (!isSafeStyleRuleTarget(rule.selector, rule.mediaQuery)) {
+      onChange?.("style-rule", `${String(rule.selector).slice(0, 60)} @ ${String(rule.mediaQuery ?? "")}`);
+      rules.splice(i, 1);
+      continue;
+    }
+    sanitizeStyleMap(rule.properties, onChange);
+  }
+  return styles;
+}
+
+/** A version (engine NamedVersion): every page root and style rule in its project snapshot. */
 export function sanitizeVersionPayload<T>(payload: T, onChange?: OnSanitizeChange): T {
-  const pages = asRecord(asRecord(payload)?.snapshot)?.pages;
+  const snapshot = asRecord(asRecord(payload)?.snapshot);
+  const pages = snapshot?.pages;
   if (Array.isArray(pages)) {
     for (const page of pages) sanitizeBlocks(asRecord(page)?.root, onChange);
   }
+  if (snapshot) sanitizeProjectStyles(snapshot.styles, onChange);
   return payload;
 }
 
