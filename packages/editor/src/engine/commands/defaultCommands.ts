@@ -13,7 +13,7 @@ import type { CommandData, ElementType } from "../../shared/types";
 import type { Element } from "../elements/Element";
 import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -31,19 +31,6 @@ import { nudgeSelected, reorderElement } from "./commandOperations";
  * snapshot and once standalone, so pasting produced a duplicate nobody asked
  * for. Found by codex reviewing the multi-selection fix.
  */
-/**
- * A-5: drop locked elements and elements inside a component instance from a
- * destructive multi-selection op (delete/cut). Locking and instance
- * membership are read straight from the element (the single source of
- * truth — see ElementSerialization.isLocked/isComponentInstance), not from a
- * panel's own tracking set. Returns the survivors and whether anything was
- * skipped, so the caller can tell the user their selection shrank.
- */
-function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
-  const kept = elements.filter((el) => !el.isLocked() && !el.isComponentInstance());
-  return { kept, skipped: kept.length !== elements.length };
-}
-
 function topMost(elements: Element[]): Element[] {
   const set = new Set(elements);
   return elements.filter((el) => {
