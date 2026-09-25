@@ -110,8 +110,6 @@ export interface StudioPanelsProps {
   ) => void;
   canvasRef?: React.RefObject<CanvasRef | null>;
   composerContainerRef?: React.RefObject<HTMLDivElement | null>;
-  /** Whether the active tab is in fullpage mode (derived from useStudioState) */
-  isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
   /** Canonical publish state machine (shared with the Topbar), forwarded to
@@ -210,7 +208,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onOpenImageEditor,
   canvasRef,
   composerContainerRef,
-  isFullPageMode = false,
   drawerWidth,
   publishJob,
   nextMove = null,
@@ -407,9 +404,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     if (activeTabId !== "publish") setUnpublishIntent(false);
   }, [activeTabId]);
   const effectiveFullPageMode =
-    isFullPageMode ||
-    getTabMode(activeTabId) === "fullpage" ||
-    (activeTabId === "assets" && mediaFullPage);
+    getTabMode(activeTabId) === "fullpage" || (activeTabId === "assets" && mediaFullPage);
 
   /* v3 IA (4428:140486): rail CMS keeps its drawer and REPLACES the canvas +
      inspector with the CMS workspace. The canvas stays mounted underneath

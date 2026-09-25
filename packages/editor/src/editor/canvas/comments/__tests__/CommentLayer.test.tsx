@@ -13,10 +13,15 @@ const createPinnedComment = vi.fn().mockResolvedValue(undefined);
 const reattachReviewComment = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/services/ReviewService", () => ({
-  currentSiteId: () => "site-1",
   fetchReviewComments: vi.fn(() => Promise.resolve([...comments])),
   createPinnedComment: (...a: unknown[]) => createPinnedComment(...a),
   reattachReviewComment: (...a: unknown[]) => reattachReviewComment(...a),
+}));
+// A-22: CommentLayer now reads the site id through
+// BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was a duplicate,
+// deleted from ReviewService).
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site-1",
 }));
 
 import { ToastProvider } from "@/editor/chrome-ui";

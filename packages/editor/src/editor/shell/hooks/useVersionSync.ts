@@ -22,7 +22,7 @@ import {
   getVersionSyncPendingCount,
   retryVersionSync,
 } from "../../../services/versionSync";
-import { currentSiteId } from "../../../services/ReviewService";
+import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 
 export function useVersionSync(
   composer: Composer | null,
@@ -37,7 +37,7 @@ export function useVersionSync(
     // the list-updated event (setProjectId) so they show WITHOUT a 2nd reload.
     void hydrateVersionsFromServer().then((added) => {
       if (added > 0) {
-        const sid = currentSiteId();
+        const sid = getSiteIdFromUrl();
         if (sid) void composer.versions.setProjectId(sid);
       }
     });

@@ -68,7 +68,7 @@ import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
-import { currentSiteId } from "@/services/ReviewService";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import "./settings.css";
 
 // ─── Module-scope data ───────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ export const SettingsTab: React.FC<
   // The standalone shell (:5050/?siteId=) never threads projectId through
   // AquibraStudio → StudioPanels; the URL param is the same source
   // BuildrikSyncProvider loads from.
-  const projectId = projectIdProp ?? currentSiteId();
+  const projectId = projectIdProp ?? getSiteIdFromUrl();
   // Effective plan: explicit prop wins; otherwise the real workspace tier
   // captured at project load.
   const effectivePlan: PlanTier = userPlan ?? getEditorPlanTier();

@@ -12,7 +12,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { STORAGE_KEYS } from "../shared/constants/storageKeys";
 import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
 
@@ -64,7 +64,7 @@ function readLocal(): MyTemplateRow[] {
 /** Mirror a just-saved template to the server (called from handleSaveTemplate). */
 /** Resolves false when the mirror failed and is queued — see the save handler. */
 export async function mirrorUserTemplate(t: MyTemplateRow): Promise<boolean> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   // Standalone demo: no server to mirror to, so nothing failed.
   if (!siteId) return true;
   return queue.run(
@@ -91,7 +91,7 @@ export async function mirrorUserTemplate(t: MyTemplateRow): Promise<boolean> {
  * They surface on the next My-Templates read. Best-effort; never throws.
  */
 export async function hydrateUserTemplatesFromServer(): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   // No siteId means the standalone demo, where there is no server to be down.
   if (!siteId) return;
   try {

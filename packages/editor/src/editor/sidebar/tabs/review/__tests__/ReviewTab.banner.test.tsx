@@ -25,7 +25,12 @@ vi.mock("../../../../../services/ReviewService", () => ({
   resolveReviewComment: vi.fn(),
   revokeReview: vi.fn(),
   fetchApprovedSnapshot: vi.fn(),
-  currentSiteId: () => "site_test",
+}));
+// A-22: RoleService (which ReviewTab asks for the role) now resolves the
+// site id through BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was
+// a duplicate, deleted).
+vi.mock("../../../../../services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site_test",
 }));
 
 import { ReviewTab } from "../ReviewTab";

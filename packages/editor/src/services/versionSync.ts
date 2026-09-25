@@ -16,7 +16,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
 import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
@@ -47,7 +47,7 @@ export function retryVersionSync(): Promise<void> {
 
 /** Mirror a newly-created (named or auto) version to the server. */
 export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `versionCreate:${version.id}`,
@@ -66,7 +66,7 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
 
 /** Mirror a version deletion to the server. */
 export async function mirrorVersionDelete(versionId: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending create for the same version is moot — deletion wins, so drop it
   // to avoid resurrecting a deleted version on a reconnect retry.
@@ -97,7 +97,7 @@ const HYDRATE_CHUNK = 10;
  * chunks so tRPC batches each chunk into one request.
  */
 export async function hydrateVersionsFromServer(): Promise<number> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
   try {

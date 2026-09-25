@@ -21,7 +21,6 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 }));
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
-  currentSiteId: vi.fn(() => null),
 }));
 vi.mock("@/services/syncRetryQueue", () => ({ totalPendingMirrors: () => 0 }));
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => null }));

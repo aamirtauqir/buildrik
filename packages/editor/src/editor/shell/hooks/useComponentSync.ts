@@ -23,7 +23,7 @@ import {
   getComponentSyncPendingCount,
   retryComponentSync,
 } from "../../../services/componentSync";
-import { currentSiteId } from "../../../services/ReviewService";
+import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import { captureComponentThumbnail } from "@/editor/sidebar/tabs/component-library/captureComponentThumbnail";
 
 export function useComponentSync(
@@ -39,7 +39,7 @@ export function useComponentSync(
     // event (setProjectId) so the panel shows them WITHOUT a second reload.
     void hydrateComponentsFromServer().then((added) => {
       if (added > 0) {
-        const sid = currentSiteId();
+        const sid = getSiteIdFromUrl();
         if (sid) void composer.components.setProjectId(sid);
       }
     });

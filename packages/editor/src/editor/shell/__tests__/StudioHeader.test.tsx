@@ -42,10 +42,13 @@ vi.mock("../../../services/ReviewService", () => ({
     reviewsEnabled: null,
     editsRequireApproval: null,
   },
-  // RoleService (P6) resolves the site id through ReviewService — null keeps
-  // the role "unknown" so no chrome gating kicks in during these tests.
-  currentSiteId: vi.fn(() => null),
 }));
+
+// A-22: RoleService and StudioHeader itself now resolve the site id through
+// BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was a duplicate,
+// deleted) — real jsdom URL has no /edit/<id>, so this resolves to null the
+// same way the old mock forced it to, keeping the role "unknown" so no
+// chrome gating kicks in during these tests.
 
 // P6 role gating — controllable per test; null = unknown (no gating).
 const roleState = vi.hoisted(() => ({ role: null as string | null }));

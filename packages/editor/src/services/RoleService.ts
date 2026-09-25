@@ -8,7 +8,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 
 export type WorkspaceRole = "VIEWER" | "EDITOR" | "DESIGNER" | "ADMIN" | "OWNER";
 
@@ -27,7 +27,7 @@ let cached: Promise<WorkspaceRole | null> | null = null;
  *  server enforces; unknown keeps the chrome as-is. */
 export function fetchMyRole(): Promise<WorkspaceRole | null> {
   if (cached) return cached;
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return Promise.resolve(null);
   cached = getBuildrikClient(DASHBOARD_URL)
     .sites.myRole.query({ siteId })

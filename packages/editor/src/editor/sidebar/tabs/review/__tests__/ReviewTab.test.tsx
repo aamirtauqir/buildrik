@@ -33,10 +33,13 @@ vi.mock("../../../../../services/ReviewService", () => ({
   reattachReviewComment: (...a: unknown[]) => reattachReviewComment(...a),
   reviewLinkUrl: (token: string) => `https://app.test/review/${token}`,
   fetchApprovedSnapshot: vi.fn(),
-  /* RoleService reads currentSiteId, and the panel now asks for the role
-     so a VIEWER gets the send control disabled with its reason — the
-     gating that did not travel with the control when it moved here. */
-  currentSiteId: () => "site_test",
+}));
+/* RoleService reads the site id (via BuildrikSyncProvider.getSiteIdFromUrl —
+   A-22: currentSiteId was a duplicate, deleted), and the panel now asks for
+   the role so a VIEWER gets the send control disabled with its reason — the
+   gating that did not travel with the control when it moved here. */
+vi.mock("../../../../../services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site_test",
 }));
 
 import { fetchRounds } from "../../../../../services/ReviewService";
