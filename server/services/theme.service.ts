@@ -50,6 +50,27 @@ function withTokens(projectSettings: unknown, theme: TokenTheme): Prisma.InputJs
   } as Prisma.InputJsonValue;
 }
 
+/** A site's token set exactly as it stands — designPresets absence included,
+ *  so a rollback can put the site back to "no presets". */
+function snapshotTokens(projectSettings: unknown): TokenTheme {
+  const current =
+    projectSettings && typeof projectSettings === "object" && !Array.isArray(projectSettings)
+      ? (projectSettings as { designTokens?: unknown; designPresets?: unknown })
+      : {};
+  const designTokens = Array.isArray(current.designTokens) ? current.designTokens : [];
+  return Array.isArray(current.designPresets)
+    ? { designTokens, designPresets: current.designPresets }
+    : { designTokens };
+}
+
+/** `projectSettings` put back to a snapshot's token set — presets removed when
+ *  the snapshot had none (withTokens leaves them, which is right for a push). */
+function restoreTokens(projectSettings: unknown, snapshot: TokenTheme): Prisma.InputJsonValue {
+  const restored = { ...(withTokens(projectSettings, snapshot) as Record<string, unknown>) };
+  if (!snapshot.designPresets) delete restored.designPresets;
+  return restored as Prisma.InputJsonValue;
+}
+
 const LEGACY_THEME_MESSAGE =
   "This theme was captured in an older format that would overwrite page styles. Capture it again from a source site.";
 
@@ -202,7 +223,7 @@ export async function pushSharedTheme(
       deletedAt: null,
       ...(siteIds ? { id: { in: siteIds } } : {}),
     },
-    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true },
+    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectSettings: true, lastEditedAt: true },
   });
 
   const results: PushResult[] = [];
@@ -217,26 +238,29 @@ export async function pushSharedTheme(
       // D2: snapshot the site's CURRENT tokens before the push overwrites them,
       // atomically with the overwrite, so a bad push can be rolled back. Push was
       // previously a wholesale overwrite with no prior-value capture.
-      await prisma.$transaction([
-        prisma.siteThemeSnapshot.create({
-          data: {
-            siteId: site.id,
-            workspaceId,
-            prevStyles: (readTokenTheme(site.projectSettings) ?? {
-              designTokens: [],
-            }) as unknown as Prisma.InputJsonValue,
-            prevDsSchemaVersion: site.dsSchemaVersion,
-          },
-        }),
-        prisma.site.update({
-          where: { id: site.id },
+      /* CAS on the lastEditedAt read above: projectSettings is merged from
+         that read, so an editor save landing in between would be silently
+         reverted by this write. It fails that site instead ("changed while
+         pushing" — push again). */
+      await prisma.$transaction(async (tx) => {
+        const claimed = await tx.site.updateMany({
+          where: { id: site.id, lastEditedAt: site.lastEditedAt },
           data: {
             projectSettings: withTokens(site.projectSettings, theme),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
           },
-        }),
-      ]);
+        });
+        if (claimed.count === 0) throw new Error("This site changed while pushing — push again.");
+        await tx.siteThemeSnapshot.create({
+          data: {
+            siteId: site.id,
+            workspaceId,
+            prevStyles: snapshotTokens(site.projectSettings) as unknown as Prisma.InputJsonValue,
+            prevDsSchemaVersion: site.dsSchemaVersion,
+          },
+        });
+      });
       await pruneSnapshots(site.id);
       results.push({ siteId: site.id, name: site.name, status: "pushed" });
     } catch (e) {
@@ -320,7 +344,7 @@ export async function rollbackSiteTheme(
       where: { id: siteId },
       data: {
         ...(prevTokens
-          ? { projectSettings: withTokens(site.projectSettings, prevTokens) }
+          ? { projectSettings: restoreTokens(site.projectSettings, prevTokens) }
           : {
               projectStyles:
                 snap.prevStyles == null ? Prisma.DbNull : (snap.prevStyles as Prisma.InputJsonValue),

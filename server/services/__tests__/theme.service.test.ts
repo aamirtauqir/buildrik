@@ -15,6 +15,7 @@ const wsUpdate = vi.fn();
 const siteFindFirst = vi.fn();
 const siteFindMany = vi.fn();
 const siteUpdate = vi.fn();
+const siteUpdateMany = vi.fn();
 const snapCreate = vi.fn();
 const snapFindMany = vi.fn();
 const snapFindFirst = vi.fn();
@@ -27,8 +28,15 @@ const presetDeleteMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    // $transaction runs the op array; mocked ops are already-resolved values.
-    $transaction: (ops: unknown[]) => Promise.all(ops as Promise<unknown>[]),
+    // $transaction: an op array (mocked ops are already-resolved values) or an
+    // interactive callback handed the same mocked client.
+    $transaction: (arg: unknown): Promise<unknown> =>
+      typeof arg === "function"
+        ? (arg as (tx: unknown) => Promise<unknown>)({
+            site: { updateMany: (...a: unknown[]) => siteUpdateMany(...a) },
+            siteThemeSnapshot: { create: (...a: unknown[]) => snapCreate(...a) },
+          })
+        : Promise.all(arg as Promise<unknown>[]),
     workspace: {
       findUnique: (...a: unknown[]) => wsFindUnique(...a),
       update: (...a: unknown[]) => wsUpdate(...a),
@@ -69,10 +77,11 @@ import {
 } from "@server/services/theme.service";
 
 beforeEach(() => {
-  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate, snapCreate, snapFindMany, snapFindFirst, snapDelete, snapDeleteMany, presetUpsert, presetFindMany, presetFindFirst, presetDeleteMany].forEach(
+  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate, siteUpdateMany, snapCreate, snapFindMany, snapFindFirst, snapDelete, snapDeleteMany, presetUpsert, presetFindMany, presetFindFirst, presetDeleteMany].forEach(
     (m) => m.mockReset(),
   );
   snapCreate.mockResolvedValue({ id: "snap" });
+  siteUpdateMany.mockResolvedValue({ count: 1 });
   snapFindMany.mockResolvedValue([]); // pruneSnapshots: under cap → no-op
 });
 
@@ -136,8 +145,8 @@ describe("pushSharedTheme", () => {
       { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2 },
       { id: "boom", name: "Boom", themeLocked: false, dsSchemaVersion: 0 },
     ]);
-    siteUpdate.mockImplementation((args: { where: { id: string } }) =>
-      args.where.id === "boom" ? Promise.reject(new Error("db down")) : Promise.resolve({}),
+    siteUpdateMany.mockImplementation((args: { where: { id: string } }) =>
+      args.where.id === "boom" ? Promise.reject(new Error("db down")) : Promise.resolve({ count: 1 }),
     );
 
     const results = await pushSharedTheme("w1");
@@ -148,9 +157,9 @@ describe("pushSharedTheme", () => {
       { siteId: "boom", name: "Boom", status: "failed", error: "db down" },
     ]);
     // locked site never written; the pushed site bumped its version 2 → 3.
-    const updatedIds = siteUpdate.mock.calls.map((c) => c[0].where.id);
+    const updatedIds = siteUpdateMany.mock.calls.map((c) => c[0].where.id);
     expect(updatedIds).toEqual(["ok", "boom"]);
-    expect(siteUpdate.mock.calls[0][0].data.dsSchemaVersion).toBe(3);
+    expect(siteUpdateMany.mock.calls[0][0].data.dsSchemaVersion).toBe(3);
   });
 
   it("writes the tokens into projectSettings, keeps every other setting, never touches projectStyles", async () => {
@@ -158,9 +167,8 @@ describe("pushSharedTheme", () => {
     siteFindMany.mockResolvedValueOnce([
       { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 1, projectSettings: { designTokens: [{ id: "t", v: "old" }], seo: { metaTitle: "Keep" } } },
     ]);
-    siteUpdate.mockResolvedValue({});
     await pushSharedTheme("w1");
-    const data = siteUpdate.mock.calls[0][0].data;
+    const data = siteUpdateMany.mock.calls[0][0].data;
     expect(data.projectSettings).toEqual({ designTokens: [{ id: "t", v: "new" }], seo: { metaTitle: "Keep" } });
     expect("projectStyles" in data).toBe(false);
     expect(data.lastEditedAt).toBeInstanceOf(Date); // an open editor gets SAVE_CONFLICT, not a silent overwrite
@@ -170,7 +178,22 @@ describe("pushSharedTheme", () => {
     wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "rule", selector: "[data-buildrik-id=a]" }], sharedThemeUpdatedAt: new Date() });
     await expect(pushSharedTheme("w1")).rejects.toMatchObject({ code: "NO_THEME" });
     expect(siteFindMany).not.toHaveBeenCalled();
-    expect(siteUpdate).not.toHaveBeenCalled();
+    expect(siteUpdateMany).not.toHaveBeenCalled();
+  });
+
+  /* Review M3: projectSettings is merged from the row read before the loop;
+     an editor save landing in between would be reverted by a blind update. */
+  it("writes with a CAS on the lastEditedAt it read; a site saved meanwhile fails with no snapshot", async () => {
+    const read = new Date("2026-09-26T10:00:00.000Z");
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "raced", name: "Raced", themeLocked: false, dsSchemaVersion: 1, projectSettings: {}, lastEditedAt: read },
+    ]);
+    siteUpdateMany.mockResolvedValueOnce({ count: 0 });
+    const res = await pushSharedTheme("w1");
+    expect(siteUpdateMany.mock.calls[0][0].where).toEqual({ id: "raced", lastEditedAt: read });
+    expect(res[0]).toMatchObject({ siteId: "raced", status: "failed" });
+    expect(snapCreate).not.toHaveBeenCalled();
   });
 
   it("scopes targets to the passed siteIds", async () => {
@@ -199,7 +222,6 @@ describe("pushSharedTheme — D2 snapshot", () => {
       { id: "locked", name: "L", themeLocked: true, dsSchemaVersion: 5, projectSettings: { designTokens: [{ old: 1 }] } },
       { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectSettings: { designTokens: [{ old: 2 }] } },
     ]);
-    siteUpdate.mockResolvedValue({});
     await pushSharedTheme("w1");
     // locked site is NOT snapshotted (never overwritten); unlocked is.
     expect(snapCreate).toHaveBeenCalledOnce();
@@ -271,6 +293,32 @@ describe("rollbackSiteTheme — a snapshot from the old projectStyles push", () 
     await rollbackSiteTheme("w1", "s1");
     expect(siteUpdate.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ selector: "[data-buildrik-id=a]" }] });
     expect("projectSettings" in siteUpdate.mock.calls[0][0].data).toBe(false);
+  });
+});
+
+describe("rollbackSiteTheme — presets (review M3)", () => {
+  it("a site that had no designPresets before the push has none after rollback", async () => {
+    siteFindFirst.mockResolvedValueOnce({
+      id: "s1", dsSchemaVersion: 4,
+      projectSettings: { designTokens: [{ pushed: 1 }], designPresets: [{ pushed: "preset" }], seo: { metaTitle: "Keep" } },
+    });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap", prevStyles: { designTokens: [{ was: 1 }] }, createdAt: new Date() });
+    siteUpdate.mockResolvedValue({});
+    snapDelete.mockResolvedValue({});
+    await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdate.mock.calls[0][0].data.projectSettings).toEqual({
+      designTokens: [{ was: 1 }],
+      seo: { metaTitle: "Keep" },
+    });
+  });
+
+  it("the push snapshot records presets even when the site had no tokens yet", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: { designTokens: [{ id: "t" }] }, sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "p", name: "P", themeLocked: false, dsSchemaVersion: 0, projectSettings: { designPresets: [{ id: "mine" }] }, lastEditedAt: new Date() },
+    ]);
+    await pushSharedTheme("w1");
+    expect(snapCreate.mock.calls[0][0].data.prevStyles).toEqual({ designTokens: [], designPresets: [{ id: "mine" }] });
   });
 });
 
