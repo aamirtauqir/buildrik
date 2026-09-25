@@ -43,9 +43,18 @@ vi.mock("@/server/services/email.service", () => ({
 }));
 
 const issueReviewToken = vi.fn();
-vi.mock("@/server/services/client-review.service", () => ({
-  issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
-}));
+vi.mock("@/server/services/client-review.service", async () => {
+  // Real normalizeReviewEmail (not stubbed) — submitReview's self-invite
+  // guard depends on its actual behavior (S-7), and duplicating its logic
+  // here would drift from the source of truth.
+  const actual = await vi.importActual<typeof import("@/server/services/client-review.service")>(
+    "@/server/services/client-review.service",
+  );
+  return {
+    issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
+    normalizeReviewEmail: actual.normalizeReviewEmail,
+  };
+});
 
 import {
   submitReview,
@@ -164,6 +173,24 @@ describe("submitReview", () => {
       ).rejects.toThrow(ReviewError);
       expect(create).not.toHaveBeenCalled();
       expect(issueReviewToken).not.toHaveBeenCalled();
+    });
+
+    // S-7 controller review round 1: a naive trim+lowercase let a +tagged or
+    // gmail-dotted variant of the submitter's own address slip past.
+    it("rejects a +tagged variant of the submitter's own email", async () => {
+      // beforeEach default: userFindUnique → { email: "edie@x.com" }
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "edie+client@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
+    });
+
+    it("rejects a +tagged variant of an ACTIVE member's email", async () => {
+      memberFindMany.mockResolvedValueOnce([{ user: { email: "member@x.com" } }]);
+      await expect(
+        submitReview("s1", "u1", "ready", undefined, "member+invite@x.com"),
+      ).rejects.toThrow(ReviewError);
+      expect(create).not.toHaveBeenCalled();
     });
 
     it("still accepts a genuinely external address", async () => {

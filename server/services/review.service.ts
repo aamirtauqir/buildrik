@@ -7,7 +7,7 @@ import {
   sendReviewResolvedEmail,
   sendReviewInviteEmail,
 } from "@/server/services/email.service";
-import { issueReviewToken } from "@/server/services/client-review.service";
+import { issueReviewToken, normalizeReviewEmail } from "@/server/services/client-review.service";
 import { isApprovalStale } from "@/server/services/publish-approval";
 import { logAuditEvent } from "@/server/services/audit.service";
 
@@ -52,10 +52,14 @@ export async function submitReview(
   // already enforces for the internal admin path had no equivalent here. Reject
   // before a token is ever minted.
   if (clientEmail) {
-    const normalisedClientEmail = clientEmail.trim().toLowerCase();
+    // S-7: normalized (drops +tag, and dots for gmail/googlemail) so
+    // `edie+client@x.com` can't dodge the "is this you" check — see
+    // normalizeReviewEmail's own doc comment for why this must be shared
+    // with client-review.service.ts's checks, not reimplemented here.
+    const normalisedClientEmail = normalizeReviewEmail(clientEmail);
     const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
     const requester = await prisma.user.findUnique({ where: { id: requestedById }, select: { email: true } });
-    if (requester?.email?.toLowerCase() === normalisedClientEmail) {
+    if (requester?.email && normalizeReviewEmail(requester.email) === normalisedClientEmail) {
       throw new ReviewError("BAD_REQUEST", "You can't invite yourself to review your own submission.");
     }
     if (site) {
@@ -63,7 +67,7 @@ export async function submitReview(
         where: { workspaceId: site.workspaceId, status: "ACTIVE" },
         select: { user: { select: { email: true } } },
       });
-      if (members.some((m) => m.user.email?.toLowerCase() === normalisedClientEmail)) {
+      if (members.some((m) => m.user.email && normalizeReviewEmail(m.user.email) === normalisedClientEmail)) {
         throw new ReviewError(
           "BAD_REQUEST",
           "That address belongs to a workspace member — invite an external reviewer instead.",

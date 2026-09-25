@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const reviewRequestFindUnique = vi.fn();
 const reviewRequestUpdate = vi.fn();
 const userFindUnique = vi.fn();
+const workspaceMemberFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -19,6 +20,7 @@ vi.mock("@/lib/prisma", () => ({
       update: (...a: unknown[]) => reviewRequestUpdate(...a),
     },
     user: { findUnique: (...a: unknown[]) => userFindUnique(...a) },
+    workspaceMember: { findMany: (...a: unknown[]) => workspaceMemberFindMany(...a) },
   },
 }));
 vi.mock("@/server/services/notification.trigger", () => ({
@@ -45,8 +47,10 @@ const liveReview = {
 };
 
 beforeEach(() => {
-  [reviewRequestFindUnique, reviewRequestUpdate, userFindUnique].forEach((m) => m.mockReset());
+  [reviewRequestFindUnique, reviewRequestUpdate, userFindUnique, workspaceMemberFindMany].forEach((m) => m.mockReset());
   reviewRequestFindUnique.mockResolvedValue(liveReview);
+  userFindUnique.mockResolvedValue({ email: "designer@agency.com" });
+  workspaceMemberFindMany.mockResolvedValue([]);
 });
 
 describe("resolveReviewByToken — self-approval block (S-7)", () => {
@@ -70,6 +74,36 @@ describe("resolveReviewByToken — self-approval block (S-7)", () => {
       status: "CHANGES_REQUESTED",
     });
     expect(userFindUnique).not.toHaveBeenCalled();
+  });
+
+  // Controller review round 1: the original check only covered the requester —
+  // any OTHER active workspace member's email must be blocked too.
+  it("refuses APPROVED when the invited email belongs to an ACTIVE workspace member who isn't the requester", async () => {
+    userFindUnique.mockResolvedValueOnce({ email: "designer@agency.com" });
+    workspaceMemberFindMany.mockResolvedValueOnce([{ user: { email: "Shared@Example.com" } }]);
+    await expect(resolveReviewByToken("tok", "APPROVED")).rejects.toMatchObject({
+      code: "SELF_APPROVAL_BLOCKED",
+    });
+    expect(reviewRequestUpdate).not.toHaveBeenCalled();
+    expect(workspaceMemberFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { workspaceId: "ws1", status: "ACTIVE" } }),
+    );
+  });
+
+  it("allows APPROVED when the invited email doesn't match the requester or any active member", async () => {
+    userFindUnique.mockResolvedValueOnce({ email: "designer@agency.com" });
+    workspaceMemberFindMany.mockResolvedValueOnce([{ user: { email: "other-member@agency.com" } }]);
+    reviewRequestUpdate.mockResolvedValueOnce({ id: "r1", status: "APPROVED", resolvedAt: new Date(), siteId: "s1" });
+    await expect(resolveReviewByToken("tok", "APPROVED")).resolves.toMatchObject({ status: "APPROVED" });
+  });
+
+  // S-7 controller review round 1: plus-tag/gmail-dot normalization must
+  // apply here too, not just at submit time.
+  it("refuses a +tagged variant of the requester's email", async () => {
+    userFindUnique.mockResolvedValueOnce({ email: "shared+internal@example.com" });
+    await expect(resolveReviewByToken("tok", "APPROVED")).rejects.toMatchObject({
+      code: "SELF_APPROVAL_BLOCKED",
+    });
   });
 });
 
