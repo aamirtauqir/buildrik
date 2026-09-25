@@ -191,7 +191,14 @@ export function VersionHistoryPanel({
     const target = versions.find((v) => v.id === versionId);
     safetyIdRef.current = null;
     try {
-      await restoreVersion(versionId);
+      const ok = await restoreVersion(versionId);
+      if (!ok) {
+        pushToast(
+          "Couldn't restore — nothing changed. Your current work was not saved as a version.",
+          "error"
+        );
+        return;
+      }
       /* G1-071: the restore saved the work on screen first; "Undo restore"
          restores that save (itself a confirmed-safe restore). */
       const safetyId = safetyIdRef.current;
