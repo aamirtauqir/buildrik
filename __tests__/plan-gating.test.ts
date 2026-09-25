@@ -124,4 +124,90 @@ describe("Share link allowEditors gate", () => {
       createShareLink("s1", { name: "Test" }, "user1")
     ).rejects.toThrow("NOT_WORKSPACE_MEMBER");
   });
+
+  // A-9: DESIGNER carries the same site-edit rank as EDITOR (permission.service
+  // ROLE_RANK), so the gate must catch it too, not just the literal "EDITOR" role.
+  it("allowEditors=false, member role=DESIGNER → throws EDITORS_CANNOT_CREATE_LINKS", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "DESIGNER",
+      workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
+    });
+    mockShareLinkCount.mockResolvedValue(0);
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test" }, "user1")
+    ).rejects.toThrow("EDITORS_CANNOT_CREATE_LINKS");
+  });
+});
+
+describe("Share link requirePw + defaultExpiration policy (A-9)", () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it("requirePw=true, no password on the request → throws PASSWORD_REQUIRED", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "PRO", sharingSettings: { requirePw: true, allowEditors: true } },
+    });
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test" }, "user1")
+    ).rejects.toThrow("PASSWORD_REQUIRED");
+    expect(mockShareLinkCreate).not.toHaveBeenCalled();
+  });
+
+  it("requirePw=true, password provided → does NOT throw", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "PRO", sharingSettings: { requirePw: true, allowEditors: true } },
+    });
+    mockShareLinkCount.mockResolvedValue(0);
+    mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test", password: "hunter2" }, "user1")
+    ).resolves.toBeDefined();
+  });
+
+  it("no expiresInDays given, workspace default '7d' → the link is created with a ~7 day expiry", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "PRO", sharingSettings: { defaultExpiration: "7d", allowEditors: true } },
+    });
+    mockShareLinkCount.mockResolvedValue(0);
+    mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await createShareLink("s1", { name: "Test" }, "user1");
+    const createArg = mockShareLinkCreate.mock.calls[0][0];
+    const expiresAt: Date = createArg.data.expiresAt;
+    expect(expiresAt).toBeInstanceOf(Date);
+    const days = (expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    expect(days).toBeGreaterThan(6.9);
+    expect(days).toBeLessThan(7.1);
+  });
+
+  it("an explicit expiresInDays on the request overrides the workspace default", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "PRO", sharingSettings: { defaultExpiration: "30d", allowEditors: true } },
+    });
+    mockShareLinkCount.mockResolvedValue(0);
+    mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await createShareLink("s1", { name: "Test", expiresInDays: 1 }, "user1");
+    const createArg = mockShareLinkCreate.mock.calls[0][0];
+    const expiresAt: Date = createArg.data.expiresAt;
+    const days = (expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    expect(days).toBeGreaterThan(0.9);
+    expect(days).toBeLessThan(1.1);
+  });
 });

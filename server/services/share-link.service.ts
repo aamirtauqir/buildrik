@@ -19,6 +19,17 @@ export async function listShareLinks(siteId: string, revealToken = false) {
   }));
 }
 
+// Workspace sharing-settings' `defaultExpiration` is a free-form string from
+// the settings form's fixed option list ("24h" | "7d" | "30d" | "" for no
+// expiration). Converts to fractional days for `expiresInDays`.
+function parseDefaultExpirationDays(value: string | null | undefined): number | undefined {
+  if (!value) return undefined;
+  const m = /^(\d+)(h|d)$/.exec(value.trim());
+  if (!m) return undefined;
+  const n = Number(m[1]);
+  return m[2] === "h" ? n / 24 : n;
+}
+
 export async function createShareLink(
   siteId: string,
   data: { name: string; password?: string; expiresInDays?: number },
@@ -27,24 +38,43 @@ export async function createShareLink(
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
   let plan: PlanName;
+  let settings: { requirePw: boolean; allowEditors: boolean; defaultExpiration: string | null } | null | undefined;
   if (userId) {
     const member = await prisma.workspaceMember.findFirst({
       where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
       include: { workspace: { select: { plan: true, sharingSettings: true } } },
     });
     if (!member) throw new Error("NOT_WORKSPACE_MEMBER");
-    const settings = member.workspace?.sharingSettings;
-    if (member.role === "EDITOR" && settings?.allowEditors === false) {
+    settings = member.workspace?.sharingSettings;
+    // A-9: DESIGNER has the same site-edit rank as EDITOR (permission.service
+    // ROLE_RANK) — the gate only checked "EDITOR" literally, so a DESIGNER
+    // bypassed it entirely.
+    if ((member.role === "EDITOR" || member.role === "DESIGNER") && settings?.allowEditors === false) {
       throw new Error("EDITORS_CANNOT_CREATE_LINKS");
     }
     plan = (member.workspace?.plan ?? "FREE") as PlanName;
   } else {
-    const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
+    const ws = await prisma.workspace.findUnique({
+      where: { id: site.workspaceId },
+      select: { plan: true, sharingSettings: true },
+    });
     plan = (ws?.plan ?? "FREE") as PlanName;
+    settings = ws?.sharingSettings;
   }
   const limits = PLAN_LIMITS[plan];
   const maxDays = limits.shareLinkExpiryMaxDays as number;
   const allowPasswords = limits.shareLinkPasswords as boolean;
+
+  // A-9: the UI already promises "require password" and "default expiration"
+  // from workspace sharing settings; the service silently ignored both,
+  // creating unprotected/non-expiring links regardless of the settings.
+  if (settings?.requirePw && !data.password) {
+    throw new Error("PASSWORD_REQUIRED");
+  }
+  if (!data.expiresInDays) {
+    const fromDefault = parseDefaultExpirationDays(settings?.defaultExpiration);
+    if (fromDefault !== undefined) data.expiresInDays = Math.min(fromDefault, maxDays);
+  }
 
   if (data.expiresInDays && data.expiresInDays > maxDays) {
     throw new Error("EXPIRY_EXCEEDS_PLAN");

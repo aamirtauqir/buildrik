@@ -485,6 +485,10 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
           if (e instanceof Error && e.message === "EDITORS_CANNOT_CREATE_LINKS")
             throw new TRPCError({ code: "FORBIDDEN", message: "Editors cannot create share links for this workspace" });
+          // A-9: the workspace requires a password on every link; the request
+          // is malformed as submitted (not a permission or plan problem).
+          if (e instanceof Error && e.message === "PASSWORD_REQUIRED")
+            throw new TRPCError({ code: "BAD_REQUEST", message: "This workspace requires a password on every share link." });
           // Plan limits reached the client as a bare 500 (a password link on
           // FREE, walk 2026-09-24). FORBIDDEN + the plan's reason, like the
           // page limit in pages.create.
