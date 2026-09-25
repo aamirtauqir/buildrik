@@ -34,6 +34,7 @@ const ROOT = path.resolve(DASHBOARD, "../..");
 
 /** Router file basename -> the key it is mounted under in server/trpc/router.ts. */
 const ROUTER_KEYS = {
+  activity: "activity",
   auth: "auth", dashboard: "dashboard", sites: "sites", "site-detail": "siteDetail",
   templates: "templates", team: "team", billing: "billing", account: "account",
   help: "help", learn: "learn", notifications: "notifications", onboarding: "onboarding",
