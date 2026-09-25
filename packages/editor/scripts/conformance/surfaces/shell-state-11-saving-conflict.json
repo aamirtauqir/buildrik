@@ -38,7 +38,7 @@
     },
     {
       "name": "scrim",
-      "testId": "conflict-scrim"
+      "testId": "overlay-scrim"
     }
   ],
   "_note": [
