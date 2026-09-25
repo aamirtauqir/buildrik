@@ -53,12 +53,12 @@ let _baselineLastEditedAt: string | null = null;
    it stands, autosave holds back: every further autosave would carry the same
    stale token, be refused again, and re-raise the dialog the user just
    dismissed — the "Conflict — reload" pill is the standing notice instead. */
-let _conflictPending = false;
+let _conflictToken: string | null = null;
 
 /** Whether a save conflict is waiting on the user's choice. Autosave reads it
  *  before sending; a manual save still goes out (and re-surfaces the dialog). */
 export function isSaveConflictPending(): boolean {
-  return _conflictPending;
+  return _conflictToken !== null;
 }
 
 /* A-1 / PD-1: the Site-column values this editor last knew the server held —
@@ -119,7 +119,7 @@ export class SaveConflictError extends Error {
  *  save matches the server and wins. */
 export function setBaselineLastEditedAt(iso: string | null): void {
   _baselineLastEditedAt = iso;
-  _conflictPending = false;
+  _conflictToken = null;
 }
 
 // Conflict signal — emitted on a window CustomEvent so BOTH manual save and
@@ -135,8 +135,11 @@ export function raiseSaveConflict(err: unknown): SaveConflictError | null {
   const msg = err instanceof Error ? err.message : String(err);
   const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
   if (!match) return null;
-  const serverToken = match[1].trim();
-  _conflictPending = true;
+  _conflictToken = match[1].trim();
+  return announceConflict(_conflictToken);
+}
+
+function announceConflict(serverToken: string): SaveConflictError {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
   }
@@ -450,7 +453,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
-    _conflictPending = false;
+    _conflictToken = null;
     _baselineSiteColumns = extractSiteColumnPatch(data);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
@@ -513,6 +516,10 @@ async function saveProjectNow(
   if (!_loadedSites.has(siteId)) {
     throw new ProjectNotLoadedError(siteId, _missingSites.has(siteId));
   }
+  /* A save queued behind the one that was refused carries the same stale
+     token — sending it would only be refused again. It is refused here, with
+     the same conflict, until the user resolves it (Overwrite / reload). */
+  if (_conflictToken !== null) throw announceConflict(_conflictToken);
   const client = getClient();
   /* Never persist a session Object URL: it is a broken image on every later
      open. The live element keeps its preview; once its upload reaches the

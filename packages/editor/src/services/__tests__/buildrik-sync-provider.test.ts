@@ -544,6 +544,25 @@ describe("save-conflict parsing (61-conflict)", () => {
     expect(isSaveConflictPending()).toBe(false);
   });
 
+  /* Review M1: a save queued behind a refused one carried the same stale
+     token and was sent anyway — refused again, one more round trip. */
+  it("a save queued behind a refused one is not sent; after Overwrite it goes out", async () => {
+    let refuse!: (e: Error) => void;
+    mocks.saveProjectMutate.mockImplementationOnce(() => new Promise((_, rej) => (refuse = rej)));
+    const first = saveProject("s1", PROJECT);
+    const queued = saveProject("s1", PROJECT);
+    await Promise.resolve();
+    refuse(new Error("SAVE_CONFLICT:2026-07-01T10:00:00.000Z"));
+    await expect(first).rejects.toThrow(SaveConflictError);
+    await expect(queued).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
+
+    setBaselineLastEditedAt("2026-07-01T10:00:00.000Z");
+    mocks.saveProjectMutate.mockResolvedValueOnce({ success: true, savedAt: new Date() });
+    await saveProject("s1", PROJECT);
+    expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(2);
+  });
+
   it("setBaselineLastEditedAt forces the token (the 'Overwrite' escape hatch)", async () => {
     setBaselineLastEditedAt("2026-07-05T09:00:00.000Z");
     mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
