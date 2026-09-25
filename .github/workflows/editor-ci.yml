@@ -188,8 +188,15 @@ jobs:
       # (fixed in a81ed8b1) would not be caught by CI — it's invisible to
       # packages/editor's vitest because the editor's own config is correct.
       # Includes server/, __tests__/, lib/, packages/shared/ test trees too.
+      # `packages/editor/src/**` is excluded here — the "Run editor tests"
+      # step above already ran that full suite against the editor's own
+      # (correct) config, and running it again against the root config
+      # doubled CI time for zero new coverage (D-15a). The root config's
+      # setupFiles + alias regression guard stays meaningful because it is
+      # still exercised by every other included tree (server/, __tests__/,
+      # lib/, packages/shared/, packages/dashboard/).
       - name: Run repo-root tests
-        run: npx vitest run --reporter=default
+        run: npx vitest run --reporter=default --exclude 'packages/editor/src/**'
 
   # D-14a: Postgres-backed test tier (`*.db.test.ts`, `pnpm test:db`).
   # Own job — not a step in build-and-test — because it needs a real

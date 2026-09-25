@@ -147,8 +147,17 @@ describe("Team Service", () => {
       vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
         id: "m1", status: "SUSPENDED",
       } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({ id: "u2" } as any);
+      vi.mocked(prisma.session.deleteMany).mockResolvedValue({ count: 1 } as any);
       const result = await revokeMember("m1", "ws1", "actor1");
       expect(result.status).toBe("SUSPENDED");
+      expect(prisma.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "u2" },
+          data: { sessionVersion: { increment: 1 } },
+        }),
+      );
+      expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { userId: "u2" } });
     });
 
     it("prevents self-revoke (would strand the actor)", async () => {
@@ -184,11 +193,20 @@ describe("Team Service", () => {
     it("removes member from workspace", async () => {
       const { deleteMember } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR", workspaceId: "ws1",
+        id: "m1", role: "EDITOR", workspaceId: "ws1", userId: "u2",
       } as any);
       vi.mocked(prisma.workspaceMember.delete).mockResolvedValue({ id: "m1" } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({ id: "u2" } as any);
+      vi.mocked(prisma.session.deleteMany).mockResolvedValue({ count: 1 } as any);
       await deleteMember("m1", "ws1");
       expect(prisma.workspaceMember.delete).toHaveBeenCalledWith({ where: { id: "m1" } });
+      expect(prisma.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "u2" },
+          data: { sessionVersion: { increment: 1 } },
+        }),
+      );
+      expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { userId: "u2" } });
     });
 
     it("prevents deleting owner", async () => {

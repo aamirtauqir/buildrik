@@ -1,3 +1,13 @@
+// @vitest-environment node
+//
+// This file only spawns `node scripts/check-ds-ssot.mjs` subprocesses and
+// reads/writes fixture files — it never touches the DOM. The suite's
+// default environment is jsdom (vitest.config.ts), whose per-file setup
+// cost (~10s) stacked with two subprocess spawns pushed a single test over
+// the 15s testTimeout under CI load (D-15a): the gate itself threw
+// correctly on the dead-runtime-export case, the test just never reached
+// the second assertion. `node` environment removes the jsdom tax this file
+// never needed.
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, mkdirSync, copyFileSync, readFileSync } from 'node:fs';
@@ -115,6 +125,11 @@ describe('check-ds-ssot gate', () => {
     expect(baseline.every((c) => 'category' in c && 'violations' in c)).toBe(true);
   });
 
+  // 30s: this is the only case in the file that runs the gate->scanner
+  // subprocess chain twice (withValue + withType), each spawn nesting a
+  // second `node` process. Under a loaded CI runner that doubled cost alone
+  // crossed the file's 15s default (D-15a) even after moving this file off
+  // the jsdom environment it never needed.
   it('fails on a dead runtime export but not on a dead type export', () => {
     const withValue = makeRepo({
       baseline: EMPTY_BASELINE,
@@ -130,7 +145,7 @@ describe('check-ds-ssot gate', () => {
       files: { 'src/probe.ts': 'export interface NobodyImportsThisProps { a: string }' },
     });
     expect(() => execFileSync('node', ['scripts/check-ds-ssot.mjs'], { cwd: withType })).not.toThrow();
-  });
+  }, 30000);
 
   it('ERROR mode: locks cleared category at zero, fails any new violation', () => {
     const dir = makeRepo({
