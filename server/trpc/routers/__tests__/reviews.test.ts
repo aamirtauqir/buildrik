@@ -102,14 +102,28 @@ describe("reviews router", () => {
     expect(resolveMock).toHaveBeenCalledWith("ws_1", "r1", "APPROVED", "u_1");
   });
 
-  /* currentRound carries the live client-link token (post-Oct-1 R4) — the
-     same people who get it back from submit: EDITORs of the site. */
-  it("currentRound returns the round, token included, to an EDITOR", async () => {
-    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+  /* currentRound carries the live client-link token (post-Oct-1 R4), but the
+     token is a live client-review credential — re-opens A19-6/S-7 if handed
+     to a non-admin. Only an ADMIN gets it back; any EDITOR still gets the
+     round itself, with token forced null. */
+  it("currentRound returns token to an ADMIN", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // ADMIN probe passes
     getCurrentRoundMock.mockResolvedValueOnce({ id: "r1", token: "tok_1" });
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.currentRound({ siteId: "s1" })).resolves.toMatchObject({ token: "tok_1" });
-    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u_1", "s1", "EDITOR");
+    expect(checkSiteRoleMock).toHaveBeenNthCalledWith(1, expect.anything(), "u_1", "s1", "EDITOR");
+    expect(checkSiteRoleMock).toHaveBeenNthCalledWith(2, expect.anything(), "u_1", "s1", "ADMIN");
+    expect(getCurrentRoundMock).toHaveBeenCalledWith("s1", true);
+  });
+
+  it("currentRound returns the round with token null to an EDITOR who is not an ADMIN", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined); // EDITOR gate
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN")); // ADMIN probe fails
+    getCurrentRoundMock.mockResolvedValueOnce({ id: "r1", token: null });
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.currentRound({ siteId: "s1" })).resolves.toMatchObject({ token: null });
+    expect(getCurrentRoundMock).toHaveBeenCalledWith("s1", false);
   });
 
   it("currentRound is FORBIDDEN below EDITOR and never reads the round", async () => {
