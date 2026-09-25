@@ -28,13 +28,13 @@
     },
     {
       "name": "card-body",
-      "testId": "set-card-body-scripts-end",
+      "testId": "set-card-body-scripts",
       "spec": "s7-settings-custom-code",
       "nodeId": "639:4462"
     },
     {
       "name": "card-body-title",
-      "testId": "set-card-title-body-scripts-end",
+      "testId": "set-card-title-body-scripts",
       "spec": "s7-settings-custom-code",
       "nodeId": "639:4463"
     },
@@ -104,6 +104,9 @@
     "code, and the product ships one that accepts only external <script src>.",
     "Same shape as the Headers board's missing 'Not yet enforced' banner and the",
     "Analytics board's missing consent caveat: three boards in this family draw",
-    "features whose product versions carry a disclaimer the board never got."
+    "features whose product versions carry a disclaimer the board never got.",
+    "",
+    "2026-09-25 (conformance-recipes): card-body re-pointed set-card-body-scripts-end -> set-card-body-scripts: the card's",
+    "anchor is 'body-scripts' since the three side-labelled code cards (8cecfd2e9)."
   ]
 }

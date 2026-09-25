@@ -109,18 +109,6 @@
       "testId": "set-field-label-clarity-project-id",
       "spec": "s7-settings-analytics",
       "nodeId": "639:3792"
-    },
-    {
-      "name": "card-consent",
-      "testId": "set-card-consent",
-      "spec": "s7-settings-analytics",
-      "nodeId": "1711:8414"
-    },
-    {
-      "name": "card-consent-title",
-      "testId": "set-card-title-consent",
-      "spec": "s7-settings-analytics",
-      "nodeId": "1711:8415"
     }
   ],
   "_note": [
@@ -170,6 +158,9 @@
     "caveat, so the board describes a consent control and the product ships a",
     "stored boolean. Same shape as the Headers board's missing 'Not yet enforced'",
     "banner. Behaviour, so the CODE contract governs and the caveat stays; but the",
-    "board is drawing a feature that does not exist."
+    "board is drawing a feature that does not exist.",
+    "",
+    "2026-09-25 (conformance-recipes): card-consent + card-consent-title dropped — the Cookie Consent switch is hidden on",
+    "purpose, stored value kept (eeec1af46, ledger G3-108, board 4418:127827)."
   ]
 }

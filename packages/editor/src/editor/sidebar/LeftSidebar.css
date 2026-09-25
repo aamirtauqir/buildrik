@@ -69,6 +69,11 @@
   font-weight: 400;
   color: var(--bk-ink-muted);
 }
+/* ink-muted on accent-tint is 4.49:1 at 11px (WCAG AA fail) — the active
+   item's label takes the active ink, as its glyph does. */
+.ls-rail--figma .ls-btn--active .ls-btn__label {
+  color: var(--bk-accent-text);
+}
 
 /* ─────────────────────────────────────────────
    DIVIDER — 24px hairline between zones

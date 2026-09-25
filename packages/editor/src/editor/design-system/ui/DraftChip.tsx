@@ -29,7 +29,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
     <span
       style={{
         fontSize: 11,
-        color: "var(--bk-warning)",
+        color: "var(--bk-warning-text)",
         fontWeight: 600,
         padding: "2px 8px",
         borderRadius: 20,

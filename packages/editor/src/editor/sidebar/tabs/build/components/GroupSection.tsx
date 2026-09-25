@@ -215,7 +215,7 @@ export const Row: React.FC<{
           data-testid={fav.testId}
           /* Hover-only either way: the boards draw element rows without it. */
           className={`tw:w-[20px] tw:shrink-0 tw:text-center tw:text-[12px] tw:cursor-pointer tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100 ${
-            fav.on ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-gray-400)]"
+            fav.on ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink-muted)]"
           }`}
           onClick={(e) => {
             e.stopPropagation();
@@ -232,7 +232,7 @@ export const Row: React.FC<{
         <span
           aria-hidden="true"
           data-testid={`insert-row-grip-${testId}`}
-          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:cursor-grab"
         >
           ⠿
         </span>

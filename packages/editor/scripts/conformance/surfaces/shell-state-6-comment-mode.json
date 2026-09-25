@@ -37,7 +37,7 @@
     },
     {
       "action": "hover",
-      "testId": "footer-selection-label"
+      "testId": "topbar"
     }
   ],
   "contrastScope": "[data-testid=\"inspector-panel\"]",
@@ -77,12 +77,6 @@
       "testId": "inspector-state-pill",
       "spec": "shell-state-6-comment-mode",
       "nodeId": "200:109"
-    },
-    {
-      "name": "footer-selection",
-      "testId": "footer-selection-label",
-      "spec": "shell-state-6-comment-mode",
-      "nodeId": "200:197"
     },
     {
       "name": "comment-layer",
@@ -162,6 +156,9 @@
     "  width. Asserting it a sixth time through a 1440 shell would add nothing",
     "  and would fight the 143:* / 1082:* board conflicts already recorded",
     "  there.",
-    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger).",
+    "",
+    "2026-09-25 (conformance-recipes): target footer-selection dropped — the status footer",
+    "was removed on purpose in 83854c5e3 (\"remove the status footer — the columns run to 900\"). The pointer-parking hover moved from the footer to the topbar."
   ]
 }

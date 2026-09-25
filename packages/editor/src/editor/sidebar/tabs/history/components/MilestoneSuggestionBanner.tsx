@@ -93,7 +93,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           rather than of the stack, and the middle one changed size when the
           name became an input. */}
       <div data-testid="milestone-content" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
-        <div data-testid="milestone-trigger" style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
+        <div data-testid="milestone-trigger" style={{ fontSize: 11, color: "var(--bk-ink-soft)" }}>
           {triggerLabel}
         </div>
         {isEditing ? (
@@ -138,7 +138,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             data-testid="milestone-reasoning"
             style={{
               fontSize: 11,
-              color: "var(--bk-ink-muted)",
+              color: "var(--bk-ink-soft)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",

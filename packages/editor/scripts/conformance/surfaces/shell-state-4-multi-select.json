@@ -37,7 +37,7 @@
     },
     {
       "action": "hover",
-      "testId": "footer-selection-label"
+      "testId": "topbar"
     }
   ],
   "contrastScope": "[data-testid=\"multiselect-panel\"]",
@@ -51,12 +51,6 @@
     {
       "name": "align-label",
       "testId": "multiselect-align-label"
-    },
-    {
-      "name": "footer-selection",
-      "testId": "footer-selection-label",
-      "spec": "shell-state-4-multi-select",
-      "nodeId": "66:199"
     },
     {
       "name": "ai-chip",
@@ -174,6 +168,9 @@
     "  11 -> 11/16 (66:204's line box, which is not the property in dispute).",
     "  Both declarations carried the size without a line-height, so they sat on",
     "  Inter's own normal.",
-    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger)."
+    "2026-09-24 (gates): footer targets dropped — the status footer was removed in 83854c5e3 (\"remove the status footer\"); zoom lives in the canvas bar (canvas-zoom-trigger).",
+    "",
+    "2026-09-25 (conformance-recipes): target footer-selection dropped — the status footer",
+    "was removed on purpose in 83854c5e3 (\"remove the status footer — the columns run to 900\"). The pointer-parking hover moved from the footer to the topbar."
   ]
 }

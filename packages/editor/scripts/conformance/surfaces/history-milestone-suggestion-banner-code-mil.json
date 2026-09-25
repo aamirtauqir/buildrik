@@ -28,7 +28,10 @@
       "name": "trigger",
       "testId": "milestone-trigger",
       "spec": "history-milestone-suggestion-banner-code-mil",
-      "nodeId": "433:2353"
+      "nodeId": "433:2353",
+      "skipProps": {
+        "color": "The board draws --color/ink-muted here, on the accent tint: that pair measures 4.49:1, under WCAG AA 4.5 for 11px text. The code uses --bk-ink-soft instead (conformance-recipes, 2026-09-25)."
+      }
     },
     {
       "name": "name",
@@ -40,7 +43,10 @@
       "name": "reasoning",
       "testId": "milestone-reasoning",
       "spec": "history-milestone-suggestion-banner-code-mil",
-      "nodeId": "433:2355"
+      "nodeId": "433:2355",
+      "skipProps": {
+        "color": "The board draws --color/ink-muted here, on the accent tint: that pair measures 4.49:1, under WCAG AA 4.5 for 11px text. The code uses --bk-ink-soft instead (conformance-recipes, 2026-09-25)."
+      }
     },
     {
       "name": "actions",

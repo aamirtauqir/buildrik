@@ -329,7 +329,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
               </span>
               {/* Board 165:2 puts the age at the right of its own row, not on
                   a second line under the text with the type repeated. */}
-              <span className={ROW_META_CLASS} data-testid={`notifications-row-meta-${index}`}>{relTime(n.createdAt)}</span>
+              <span className={`bk-notif-row__meta ${ROW_META_CLASS}`} data-testid={`notifications-row-meta-${index}`}>{relTime(n.createdAt)}</span>
             </Row>
             {/* Board 165:81 — a tinted marker of its own, indented to the row's
                 text column (dot 16 + 8 wide + 8 gap), not a quiet third line

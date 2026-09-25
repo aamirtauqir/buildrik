@@ -30,7 +30,10 @@
       "name": "restoring-sub",
       "testId": "history-restoring-sub",
       "spec": "history-saves-restoring",
-      "nodeId": "163:268"
+      "nodeId": "163:268",
+      "skipProps": {
+        "color": "The board draws --color/ink-muted here, on the accent tint: that pair measures 4.49:1, under WCAG AA 4.5 for 11px text. The code uses --bk-ink-soft instead (conformance-recipes, 2026-09-25)."
+      }
     },
     {
       "name": "prune-note-text",

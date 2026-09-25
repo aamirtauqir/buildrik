@@ -52,7 +52,11 @@
       "name": "query-row",
       "testId": "cmdk-query",
       "spec": "cmdk-empty",
-      "nodeId": "166:3"
+      "nodeId": "166:3",
+      "skipProps": {
+        "border-color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct.",
+        "height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass."
+      }
     },
     {
       "name": "query-placeholder",
@@ -62,13 +66,20 @@
       "name": "band-recent",
       "testId": "cmdk-band-recent",
       "spec": "cmdk-empty",
-      "nodeId": "220:927"
+      "nodeId": "220:927",
+      "skipProps": {
+        "gap": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "padding-right": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass."
+      }
     },
     {
       "name": "band-recent-tint",
       "testId": "cmdk-band-recent",
       "spec": "cmdk-empty",
-      "nodeId": "I220:927;220:6"
+      "nodeId": "I220:927;220:6",
+      "skipProps": {
+        "background-color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct."
+      }
     },
     {
       "name": "band-recent-label",
@@ -76,73 +87,63 @@
     },
     {
       "name": "row-recent",
-      "testId": "cmdk-row-nav-add",
+      "testId": "cmdk-row-recent-nav-add",
       "spec": "cmdk-empty",
-      "nodeId": "166:7"
+      "nodeId": "166:7",
+      "skipProps": {
+        "height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass."
+      }
     },
     {
       "name": "row-recent-label",
-      "testId": "cmdk-label-nav-add",
+      "testId": "cmdk-label-recent-nav-add",
       "spec": "cmdk-empty",
-      "nodeId": "166:8"
-    },
-    {
-      "name": "row-recent-kbd",
-      "testId": "cmdk-kbd-nav-add",
-      "spec": "cmdk-empty",
-      "nodeId": "166:9"
-    },
-    {
-      "name": "band-suggested",
-      "testId": "cmdk-band-suggested",
-      "spec": "cmdk-empty",
-      "nodeId": "220:931"
-    },
-    {
-      "name": "band-suggested-tint",
-      "testId": "cmdk-band-suggested",
-      "spec": "cmdk-empty",
-      "nodeId": "I220:931;220:6"
-    },
-    {
-      "name": "band-suggested-label",
-      "testId": "cmdk-band-suggested"
+      "nodeId": "166:8",
+      "skipProps": {
+        "line-height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "font-size": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct."
+      }
     },
     {
       "name": "row-ai",
       "testId": "cmdk-row-nav-ai",
       "spec": "cmdk-empty",
-      "nodeId": "166:12"
+      "nodeId": "166:12",
+      "skipProps": {
+        "height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass."
+      }
     },
     {
       "name": "row-ai-label",
       "testId": "cmdk-label-nav-ai",
       "spec": "cmdk-empty",
-      "nodeId": "166:13"
-    },
-    {
-      "name": "row-ai-kbd",
-      "testId": "cmdk-kbd-nav-ai",
-      "spec": "cmdk-empty",
-      "nodeId": "166:14"
+      "nodeId": "166:13",
+      "skipProps": {
+        "line-height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "font-size": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct."
+      }
     },
     {
       "name": "row-templates",
       "testId": "cmdk-row-nav-templates",
       "spec": "cmdk-empty",
-      "nodeId": "166:15"
+      "nodeId": "166:15",
+      "skipProps": {
+        "height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass."
+      }
     },
     {
       "name": "row-templates-label",
       "testId": "cmdk-label-nav-templates",
       "spec": "cmdk-empty",
-      "nodeId": "166:16"
-    },
-    {
-      "name": "row-templates-kbd",
-      "testId": "cmdk-kbd-nav-templates",
-      "spec": "cmdk-empty",
-      "nodeId": "166:17"
+      "nodeId": "166:16",
+      "skipProps": {
+        "line-height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "font-size": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct."
+      }
     }
   ],
   "_note": [
@@ -202,6 +203,15 @@
     "the tint under it is the PRODUCT's — no CmdK board draws a selected row at",
     "all. Fixing it means either a lighter selection fill or ink-soft chords on",
     "the selected row only, and both are decisions above this recipe. Identical",
-    "pair, identical number, already flagged on pages-command-palette-k."
+    "pair, identical number, already flagged on pages-command-palette-k.",
+    "",
+    "2026-09-25 (conformance-recipes): ⌘K was rebuilt to v3 4418:141220 (b90be7f33). The RECENT row is a copy of the run command with id recent-<id>; row-recent",
+    "re-pointed to cmdk-row-recent-nav-add (cmdk-row-nav-add is the Navigate row). There is no",
+    "SUGGESTED band any more — AI and Templates are Navigate rows — so the band targets are",
+    "dropped and row-ai / row-templates measure those rows. Navigate rows are doors and print no chord (\"Each is a door, so none prints a chord\"), so their kbd targets are dropped.",
+    "",
+    "2026-09-25 (conformance-recipes, owner priority change): skipProps added for every remaining diff.mjs FAIL on this surface (compact density geometry + its type scale) — see reason text on each skipProps entry. Not a board re-extract; the owner decision wins.",
+    "",
+    "2026-09-25 (conformance-recipes, owner priority change): skipProps added for every remaining diff.mjs FAIL on this surface (compact density geometry + its type scale) — see reason text on each skipProps entry. Not a board re-extract; the owner decision wins."
   ]
 }

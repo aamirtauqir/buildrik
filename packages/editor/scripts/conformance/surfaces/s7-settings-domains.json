@@ -17,34 +17,16 @@
     },
     {
       "action": "waitFor",
-      "testId": "set-field-domain"
+      "testId": "set-dom-name"
     }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
     {
-      "name": "card",
-      "testId": "set-card-custom-domain",
-      "spec": "s7-settings-domains",
-      "nodeId": "639:3404"
-    },
-    {
-      "name": "card-title",
-      "testId": "set-card-title-custom-domain",
-      "spec": "s7-settings-domains",
-      "nodeId": "639:3405"
-    },
-    {
       "name": "field-domain",
-      "testId": "set-field-domain",
+      "testId": "set-dom-name",
       "spec": "s7-settings-domains",
       "nodeId": "639:3406"
-    },
-    {
-      "name": "field-domain-label",
-      "testId": "set-field-label-domain",
-      "spec": "s7-settings-domains",
-      "nodeId": "639:3407"
     }
   ],
   "_note": [
@@ -94,6 +76,10 @@
     "free buildrick.app address until you connect one', and the board draws no",
     "empty state at all — it opens straight on a connected domain. So the state a",
     "new site actually sees is undrawn on this board, and the state the board",
-    "draws needs a domain to exist first. Worth a frame."
+    "draws needs a domain to exist first. Worth a frame.",
+    "",
+    "2026-09-25 (conformance-recipes): Add opens the Add-domain dialog; the domain field is set-dom-name there. The",
+    "'Custom domain' card now renders once per CONNECTED domain (a6e28e028) and this probe has",
+    "none, so card + card-title are dropped; the dialog's label carries no anchor (dropped)."
   ]
 }
