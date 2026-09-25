@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { FormField, Popover, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { FormField, Modal, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { ReviewSentModal, type ReviewSendState } from "./modals/ReviewSentModal";
 import type { Composer } from "../../engine";
 import { EVENTS } from "@/shared/constants/events";
@@ -146,38 +146,65 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       onClose={() => setOutcomeModal(null)}
       onResend={() => { setOutcomeModal(null); void send(); }}
     />
-    <Popover
+    {disabledReason ? (
+      /*
+       * A viewer's trigger stays focusable so the reason is reachable by
+       * keyboard: aria-disabled + tooltip, no onClick (native disabled
+       * would hide the why). sending/sent below keep native disabled —
+       * those are busy states, and busy must stay un-clickable.
+       */
+      <Tooltip
+        content={disabledReason}
+        placement="bottom-end"
+        arrow={false}
+        className="tw:max-w-[280px] tw:whitespace-normal"
+      >
+        <Button size="xs" aria-disabled="true" onClick={() => {}}>
+          {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
+        </Button>
+      </Tooltip>
+    ) : (
+      <Button
+        size="xs"
+        onClick={() => state !== "sent" && setOpen((v) => !v)}
+        disabled={state === "sending" || state === "sent"}
+      >
+        {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
+      </Button>
+    )}
+    {/*
+     * Gate 22 (portal discipline): this used to be a `Popover`, which is
+     * deliberately NOT portaled (see Popover.tsx's own header comment) —
+     * fine for a menu anchored in normal flow, wrong here because this
+     * trigger's ONLY mount point in the shipped product is inside the
+     * 300px-wide Review panel `<aside overflow:hidden>`. The popover's
+     * absolutely-positioned panel grew past that aside's bounds and got
+     * clipped by its `overflow:hidden`, with no scrim — about 85% of the
+     * dialog was invisible (flow-check DEF-review-send-dialog-clipped).
+     * `Modal` mounts through `OverlayMount`'s portal into the shared
+     * overlay root, exactly like this panel's own sibling confirms (Round
+     * history, Withdraw request, Re-send review link), so it escapes the
+     * aside entirely and gets the same centered scrim they already have.
+     */}
+    <Modal
       open={open}
       onClose={() => setOpen(false)}
-      placement="bottom-end"
-      label="Send for review"
-      trigger={
-        disabledReason ? (
-          /*
-           * A viewer's trigger stays focusable so the reason is reachable by
-           * keyboard: aria-disabled + tooltip, no onClick (native disabled
-           * would hide the why). sending/sent below keep native disabled —
-           * those are busy states, and busy must stay un-clickable.
-           */
-          <Tooltip
-            content={disabledReason}
-            placement="bottom-end"
-            arrow={false}
-            className="tw:max-w-[280px] tw:whitespace-normal"
-          >
-            <Button size="xs" aria-disabled="true" onClick={() => {}}>
-              {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
-            </Button>
-          </Tooltip>
-        ) : (
+      title="Send for review"
+      testId="send-for-review"
+      footer={
+        <>
           <Button
+            color="light"
             size="xs"
-            onClick={() => state !== "sent" && setOpen((v) => !v)}
-            disabled={state === "sending" || state === "sent"}
+            onClick={() => setOpen(false)}
+            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
-            {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
+            Cancel
           </Button>
-        )
+          <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>
+            Send
+          </Button>
+        </>
       }
     >
       <div className="bk-send-review">
@@ -244,16 +271,8 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
             ) : null}
           </div>
         ) : null}
-        <div className="bk-send-review__actions">
-          <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-            Cancel
-          </Button>
-          <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>
-            Send
-          </Button>
-        </div>
       </div>
-    </Popover>
+    </Modal>
     </>
   );
 };
