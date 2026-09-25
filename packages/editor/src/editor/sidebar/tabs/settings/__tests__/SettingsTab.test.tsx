@@ -787,29 +787,45 @@ describe("SettingsTab — a screen mounted with the shell keeps its handlers", (
   });
 });
 
-/* M7 (PD-1): Site columns belong to the dashboard and the editor mirrors them
-   only for an ADMIN. Below ADMIN, an edit on these screens would save into the
-   project and never reach the site — silently reverting. The screen is
-   read-only instead, and says why. */
-describe("SettingsTab — site-column screens below ADMIN", () => {
+/* M7 (PD-1), narrowed in review round 2: only the fields the sync provider
+   mirrors to Site columns (SITE_COLUMN_FIELDS) are the dashboard's. Below
+   ADMIN those are read-only and say why; everything else on the screen —
+   Author, Twitter handle, Global CSS — is project data the EDITOR could always
+   change, and still can, with the Save footer to save it. */
+describe("SettingsTab — Site-column fields below ADMIN", () => {
   afterEach(() => {
     role.value = null;
   });
 
-  it("an EDITOR sees SEO read-only with the reason, and no Save", () => {
+  it("an EDITOR on General: Site name is read-only with the reason; Author edits and saves", async () => {
     role.value = "EDITOR";
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.click(screen.getByTestId("set-nav-seo"));
-    expect(screen.getByTestId("set-admin-only").textContent).toBe("Only admins can change site settings");
-    expect((screen.getByLabelText("Meta title") as HTMLInputElement).matches(":disabled")).toBe(true);
-    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(true);
+    expect(screen.getAllByTestId("set-admin-only")[0].textContent).toBe("Only admins can change this");
+    const author = screen.getByLabelText("Author") as HTMLInputElement;
+    expect(author.matches(":disabled")).toBe(false);
+    fireEvent.change(author, { target: { value: "Sam" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+    expect(screen.getByTestId("set-foot-save")).toBeTruthy();
   });
 
-  it("an ADMIN (or an unknown role) edits as before", () => {
+  it("an ADMIN edits every field", async () => {
     role.value = "ADMIN";
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
     expect(screen.queryByTestId("set-admin-only")).toBeNull();
-    expect((screen.getByLabelText("Meta title") as HTMLInputElement).matches(":disabled")).toBe(false);
+  });
+
+  it("an unknown role (demo, lookup failed) stays editable — the server decides", async () => {
+    role.value = null;
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
+    expect(siteName.matches(":disabled")).toBe(false);
+    expect(screen.queryByTestId("set-admin-only")).toBeNull();
   });
 });

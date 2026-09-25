@@ -233,7 +233,33 @@ function emptyToNull(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null;
 }
 
-function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
+/**
+ * The projectSettings fields extractSiteColumnPatch reads — each one is a Site
+ * column the dashboard owns, mirrored from the editor only for an ADMIN (A-1).
+ * The Settings screens lock exactly these below ADMIN (M7 / PD-1);
+ * `siteColumnFields.test.ts` pins this list to the function's reads, so a new
+ * mirrored field cannot land without being locked, and project data (Author,
+ * Twitter handle, Global CSS) is never locked by mistake.
+ */
+export const SITE_COLUMN_FIELDS = [
+  "seo.siteName",
+  "seo.favicon",
+  "seo.language",
+  "seo.metaTitle",
+  "seo.metaDescription",
+  "seo.metaTitleTemplate",
+  "seo.defaultOgImage",
+  "seo.allowIndexing",
+  "seo.robotsTxt",
+  "seo.touchIcon",
+  "seo.socialLinks",
+  "customCode.headScripts",
+  "customCode.bodyScripts",
+  "publishing.publishedPassword",
+] as const;
+export type SiteColumnField = (typeof SITE_COLUMN_FIELDS)[number];
+
+export function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
   if (!settings) return {};
   const seo = settings.seo;
