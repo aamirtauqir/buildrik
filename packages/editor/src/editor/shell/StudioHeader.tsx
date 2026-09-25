@@ -465,14 +465,34 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     }
   }, []);
 
+  /* Brand stages its token edits in a provider this header sits outside, so it
+     announces them. Without this the chip read "Saved · just now" with a green
+     dot while the Brand footer two panels away said "Unsaved brand changes" —
+     same concept, two surfacings, and the global one is the one a user watches.
+     It is deliberately not the project's dirty flag: see the emit site.
+     Declared before guardNavigation/onBefore, which now both read it — a
+     staged-but-unsaved brand edit is exactly the kind of work those guards
+     exist to not lose (B-1). */
+  const [brandDirty, setBrandDirty] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
+    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    /* Block body, not a shorthand: `off` is chainable and returns the composer,
+       so an arrow shorthand hands React an instance where a destructor belongs. */
+    return () => {
+      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    };
+  }, [composer]);
+
   const guardNavigation = React.useCallback(
     (nav: () => void) => {
       if (bypassRef.current) return nav();
       // 5A: while offline the save pipeline reports queued saves as clean
       // (useSaveCallback settles to idle) but the queue dies on navigation —
       // never offer a fake "Save & leave" here.
-      if (offline && isDirty) return setExitDialog({ kind: "risky", nav });
-      if (isDirty || saveStatus === "saving" || saveStatus === "error") {
+      if (offline && (isDirty || brandDirty)) return setExitDialog({ kind: "risky", nav });
+      if (isDirty || brandDirty || saveStatus === "saving" || saveStatus === "error") {
         return setExitDialog({
           kind: "dirty",
           error: saveStatus === "error" ? "The last save failed." : undefined,
@@ -490,7 +510,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       if (stranded > 0) return setExitDialog({ kind: "stranded", pending: stranded, nav });
       nav();
     },
-    [offline, isDirty, saveStatus],
+    [offline, isDirty, brandDirty, saveStatus],
   );
 
   const saveAndLeave = React.useCallback(async () => {
@@ -560,15 +580,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
          from the pill afterwards. */
       if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkExitReason?: unknown[] };
-        (w.__bkExitReason ??= []).push({ isDirty, saveStatus, stranded, at: Date.now() });
+        (w.__bkExitReason ??= []).push({ isDirty, brandDirty, saveStatus, stranded, at: Date.now() });
       }
-      if (!isDirty && saveStatus !== "saving" && stranded === 0) return;
+      if (!isDirty && !brandDirty && saveStatus !== "saving" && stranded === 0) return;
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", onBefore);
     return () => window.removeEventListener("beforeunload", onBefore);
-  }, [isDirty, saveStatus]);
+  }, [isDirty, brandDirty, saveStatus]);
 
   const exitToDashboard = React.useCallback(() => {
     guardNavigation(() => window.location.assign(`${DASHBOARD_URL}/dashboard/projects`));
@@ -631,23 +651,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         addToast?.({ title: "Couldn't start collaboration", description: "Try again in a moment.", tone: "error" }),
       );
   }, [composer, currentUser, addToast]);
-
-  /* Brand stages its token edits in a provider this header sits outside, so it
-     announces them. Without this the chip read "Saved · just now" with a green
-     dot while the Brand footer two panels away said "Unsaved brand changes" —
-     same concept, two surfacings, and the global one is the one a user watches.
-     It is deliberately not the project's dirty flag: see the emit site. */
-  const [brandDirty, setBrandDirty] = React.useState(false);
-  React.useEffect(() => {
-    if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
-    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    /* Block body, not a shorthand: `off` is chainable and returns the composer,
-       so an arrow shorthand hands React an instance where a destructor belongs. */
-    return () => {
-      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    };
-  }, [composer]);
 
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
