@@ -40,6 +40,19 @@ beforeEach(() =>
 );
 
 describe("site-component.service", () => {
+  it("stores the master tree sanitized, on create and update (S-1a)", async () => {
+    upsert.mockResolvedValueOnce({ componentId: "c1" });
+    await upsertSiteComponent({
+      siteId: "s1", componentId: "c1", name: "Card",
+      payload: { id: "c1", masterTree: { id: "m", type: "container", tagName: "script", attributes: { srcdoc: "<script>x</script>", title: "t" } } },
+    });
+    const { create, update } = upsert.mock.calls[0][0];
+    for (const payload of [create.payload, update.payload]) {
+      expect(payload.masterTree.tagName).toBe("div");
+      expect(payload.masterTree.attributes).toEqual({ title: "t" });
+    }
+  });
+
   it("upsertSiteComponent upserts on (siteId, componentId) carrying the payload", async () => {
     upsert.mockResolvedValueOnce({ componentId: "c1" });
     const res = await upsertSiteComponent({

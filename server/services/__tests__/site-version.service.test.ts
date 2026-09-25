@@ -28,6 +28,20 @@ import {
 beforeEach(() => [upsert, findMany, findUnique, deleteMany, userFindMany].forEach((m) => m.mockReset()));
 
 describe("site-version.service", () => {
+  it("stores the snapshot's page roots sanitized, on create and update (S-1a)", async () => {
+    upsert.mockResolvedValueOnce({ versionId: "v1" });
+    findMany.mockResolvedValueOnce([]);
+    await createSiteVersion({
+      siteId: "s1", versionId: "v1", name: "V", isAuto: true,
+      payload: { id: "v1", snapshot: { pages: [{ id: "p", root: { id: "r", type: "container", tagName: "img src=x onerror=alert(1) x", attributes: { srcdoc: "<script>x</script>" } } }] } },
+    });
+    const { create, update } = upsert.mock.calls[0][0];
+    for (const payload of [create.payload, update.payload]) {
+      expect(payload.snapshot.pages[0].root.tagName).toBe("div");
+      expect(payload.snapshot.pages[0].root.attributes).toEqual({});
+    }
+  });
+
   it("createSiteVersion upserts on (siteId, versionId) carrying the payload", async () => {
     upsert.mockResolvedValueOnce({ versionId: "v1" });
     findMany.mockResolvedValueOnce([{ id: "a" }]); // prune: under cap

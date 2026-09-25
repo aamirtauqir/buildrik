@@ -18,6 +18,13 @@
  */
 
 import DOMPurify from "dompurify";
+import {
+  FORBIDDEN_ATTRIBUTES,
+  URL_ATTRIBUTES,
+  isValidAttributeName,
+  srcsetUrls,
+  toAllowedElementTag,
+} from "@buildrik/shared/schemas/element-markup";
 import type { ElementData } from "../../types";
 import {
   ALLOWED_URL_SCHEMES,
@@ -28,7 +35,6 @@ import {
 
 // Re-export config for convenience
 export {
-  DEFAULT_ALLOWED_TAGS,
   DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
   ALLOWED_SRC_SCHEMES,
@@ -67,33 +73,34 @@ export function isSafeUrl(url: string, allowedSchemes: Set<string> = ALLOWED_URL
 }
 
 /**
- * Check if an attribute value is safe
+ * Check if an attribute (name and value) is safe to emit.
+ *
+ * The name is emitted raw, so one that is not a plain attribute name
+ * ("x onerror=alert(1) y") is refused. `srcdoc` is refused outright: it is a
+ * whole document that runs in this origin. Every URL attribute in the shared
+ * list is scheme-checked, not only href/src/action (A19-1).
  */
 export function isSafeAttrValue(attr: string, value: string, _tag: string): boolean {
-  const lower = value.toLowerCase().trim();
+  if (!isValidAttributeName(attr)) return false;
+  const name = attr.toLowerCase();
+  if (FORBIDDEN_ATTRIBUTES.has(name)) return false;
 
-  // Check dangerous patterns
+  // Event handlers are always dangerous
+  if (name.startsWith("on")) return false;
+
+  const lower = value.toLowerCase().trim();
   for (const pattern of DANGEROUS_PATTERNS) {
     if (pattern.test(lower)) {
       return false;
     }
   }
 
-  // URL attributes need special validation. `src` additionally allows blob:,
-  // which is how a just-uploaded image is previewed before it reaches a server.
-  if (attr === "src") {
-    return isSafeUrl(value, ALLOWED_SRC_SCHEMES);
-  }
-  if (attr === "href" || attr === "action") {
-    return isSafeUrl(value);
-  }
-
-  // Event handlers are always dangerous
-  if (attr.startsWith("on")) {
-    return false;
-  }
-
-  return true;
+  if (!URL_ATTRIBUTES.has(name)) return true;
+  // Media sources additionally allow blob:, which is how a just-uploaded image
+  // is previewed before it reaches a server. Never on a navigable URL.
+  if (name === "srcset") return srcsetUrls(value).every((url) => isSafeUrl(url, ALLOWED_SRC_SCHEMES));
+  if (name === "src" || name === "poster") return isSafeUrl(value, ALLOWED_SRC_SCHEMES);
+  return isSafeUrl(value);
 }
 
 // =============================================================================
@@ -159,8 +166,13 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
  *
  * Only unsafe attributes go — the same `isSafeAttrValue` test the serializers
  * use, so nothing legitimate is lost.
+ *
+ * A `tagName` off the shared allowlist (or malformed, e.g.
+ * "img src=x onerror=… x") becomes "div": the tag is emitted raw into canvas
+ * markup, so it is as much an injection point as any attribute.
  */
 export function sanitizeElementTreeContent(data: ElementData): void {
+  if (data.tagName) data.tagName = toAllowedElementTag(data.tagName);
   if (typeof data.content === "string" && data.content.length > 0) {
     data.content = sanitizeHTML(data.content);
   }

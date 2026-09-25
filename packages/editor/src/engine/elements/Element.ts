@@ -13,6 +13,7 @@ import type { AnimationConfig } from "../../shared/types/animations";
 import type { BreakpointStyles } from "../../shared/types/breakpoints";
 import type { DataBinding } from "../../shared/types/data";
 import type { ElementCategory } from "../../shared/utils/nesting/types";
+import { isAllowedElementTag } from "@buildrik/shared/schemas/element-markup";
 import { getDefaultTagName } from "../../shared/utils/html";
 import type { Composer } from "../Composer";
 import { ElementChildren } from "./ElementChildren";
@@ -112,10 +113,14 @@ export class Element {
    * already stored, and it cannot change anything whose type legitimately maps
    * to "div" (container, card, spacer …) because the mapping returns "div"
    * for those too.
+   *
+   * A stored tag off the shared allowlist falls back the same way: the tag is
+   * emitted raw by `toHTML`, so "img src=x onerror=… x" would inject a handler
+   * into the canvas (A19-1).
    */
   getTagName(): string {
     const stored = this.data.tagName;
-    if (!stored || stored === "div") return getDefaultTagName(this.data.type);
+    if (!stored || stored === "div" || !isAllowedElementTag(stored)) return getDefaultTagName(this.data.type);
     return stored;
   }
   getData(): ElementData {
