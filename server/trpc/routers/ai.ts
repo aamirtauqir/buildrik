@@ -44,8 +44,8 @@ const contentInputSchema = z.object({
   type: z.enum(["content", "layout", "section"]),
   options: z
     .object({
-      tone: z.string().optional(),
-      length: z.string().optional(),
+      tone: z.string().max(100).optional(),
+      length: z.string().max(100).optional(),
     })
     .optional(),
 });
@@ -61,7 +61,7 @@ const pageInputSchema = z.object({
 
 const layoutInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
-  sectionType: z.string().optional(),
+  sectionType: z.string().max(100).optional(),
 });
 
 const summarizeInputSchema = z.object({
@@ -92,7 +92,7 @@ const milestoneSuggestInputSchema = z.object({
   recentChanges: z
     .array(
       z.object({
-        id: z.string(),
+        id: z.string().max(100),
         label: z.string().max(200),
         timestamp: z.number(),
         type: z.enum(["checkpoint", "patch"]),
@@ -108,7 +108,7 @@ const milestoneSuggestInputSchema = z.object({
 });
 
 const pageElementRefSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).max(100),
   type: z.string().min(1).max(40),
   text: z.string().max(200).optional(),
 });
@@ -129,7 +129,7 @@ const mediaAssetRefSchema = z.object({
 });
 
 const scopeSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("element"), id: z.string().min(1) }),
+  z.object({ kind: z.literal("element"), id: z.string().min(1).max(100) }),
   // Page scope may carry the page's element list for multi-element edits (P3),
   // the design-token registry for set-token recall (W4), and the media library
   // for set-image recall (W5).
@@ -164,6 +164,8 @@ export const aiRouter = router({
       try {
         return await generateContent(input);
       } catch (e: unknown) {
+        await releaseQuota(ctx.session.user.id);
+        console.error("[ai.content] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -176,8 +178,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Content generation failed",
+          message: "Content generation failed",
         });
       }
     }),
@@ -189,6 +190,8 @@ export const aiRouter = router({
       try {
         return await generatePage(input);
       } catch (e: unknown) {
+        await releaseQuota(ctx.session.user.id);
+        console.error("[ai.page] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -201,8 +204,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Page generation failed",
+          message: "Page generation failed",
         });
       }
     }),
@@ -214,6 +216,8 @@ export const aiRouter = router({
       try {
         return await generateLayout(input);
       } catch (e: unknown) {
+        await releaseQuota(ctx.session.user.id);
+        console.error("[ai.layout] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -226,8 +230,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Layout generation failed",
+          message: "Layout generation failed",
         });
       }
     }),
@@ -302,9 +305,10 @@ export const aiRouter = router({
       try {
         assertProviderConfigured(model);
       } catch (e) {
+        console.error("[ai.streamPrompt] provider not configured", e);
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: e instanceof Error ? e.message : "AI provider not configured",
+          message: "AI provider not configured",
         });
       }
       // Reserve one unit atomically before the provider call (closes the
@@ -328,7 +332,8 @@ export const aiRouter = router({
           });
         } catch (e) {
           await releaseQuota(userId);
-          throw e;
+          console.error("[ai.streamPrompt] plan generation error", e);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Plan generation failed" });
         }
         yield { type: "plan" as const, plan: { steps } };
         yield { type: "done" as const };
@@ -357,7 +362,8 @@ export const aiRouter = router({
                 });
         } catch (e) {
           await releaseQuota(userId);
-          throw e;
+          console.error("[ai.streamPrompt] edit-command generation error", e);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Edit generation failed" });
         }
         yield {
           type: "edit" as const,
@@ -383,7 +389,8 @@ export const aiRouter = router({
         }
       } catch (e) {
         if (!delivered) await releaseQuota(userId);
-        throw e;
+        console.error("[ai.streamPrompt] stream error", e);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "AI response failed" });
       }
     }),
 

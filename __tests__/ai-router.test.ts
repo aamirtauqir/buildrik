@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { checkQuota, reserveQuota, releaseQuota, resolveModelForUser, streamContent, summarizeChanges, suggestMilestone } = vi.hoisted(() => ({
+const {
+  checkQuota, reserveQuota, releaseQuota, resolveModelForUser, streamContent,
+  summarizeChanges, suggestMilestone, generateContent, generatePage, generateLayout,
+  generatePlan, generateEditCommands, assertProviderConfigured,
+} = vi.hoisted(() => ({
   checkQuota: vi.fn(),
   reserveQuota: vi.fn(),
   releaseQuota: vi.fn(),
@@ -8,6 +12,12 @@ const { checkQuota, reserveQuota, releaseQuota, resolveModelForUser, streamConte
   streamContent: vi.fn(),
   summarizeChanges: vi.fn(),
   suggestMilestone: vi.fn(),
+  generateContent: vi.fn(),
+  generatePage: vi.fn(),
+  generateLayout: vi.fn(),
+  generatePlan: vi.fn(),
+  generateEditCommands: vi.fn(),
+  assertProviderConfigured: vi.fn(),
 }));
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -23,13 +33,18 @@ vi.mock("@/server/services/quota.service", () => ({
 }));
 vi.mock("@/server/services/ai.service", () => ({
   streamContent,
-  generateContent: vi.fn(),
-  generatePage: vi.fn(),
-  generateLayout: vi.fn(),
+  generateContent,
+  generatePage,
+  generateLayout,
+  generatePlan,
+  generateEditCommands,
+  generatePageEditCommands: vi.fn(),
+  generateComponentSchema: vi.fn(),
   summarizeChanges,
   suggestMilestone,
-  // W3 provider-key guard — no-op in tests (no real API keys configured).
-  assertProviderConfigured: vi.fn(),
+  editCommandToRow: (c: unknown) => c,
+  // W3 provider-key guard — defaults to a no-op; individual tests override.
+  assertProviderConfigured,
 }));
 
 import { aiRouter } from "@server/trpc/routers/ai";
@@ -46,6 +61,12 @@ describe("ai router", () => {
     streamContent.mockReset();
     summarizeChanges.mockReset();
     suggestMilestone.mockReset();
+    generateContent.mockReset();
+    generatePage.mockReset();
+    generateLayout.mockReset();
+    generatePlan.mockReset();
+    generateEditCommands.mockReset();
+    assertProviderConfigured.mockReset();
     // Server resolves the model from the user's tier; the client model is a
     // hint. Default to echoing the requested model for these tests.
     resolveModelForUser.mockResolvedValue("gpt-4o-mini");
@@ -141,6 +162,144 @@ describe("ai router", () => {
       caller.content({ prompt: "write copy", type: "content" }),
     ).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
     expect(reserveQuota).toHaveBeenCalled();
+  });
+
+  // S-8 round 2 (controller review): content/page/layout still echoed
+  // e.message, and never released quota on failure — only summarize/
+  // milestoneSuggest/componentSchema did.
+  it.each([
+    ["content", () => generateContent, () => ({ prompt: "write copy", type: "content" as const })],
+    ["page", () => generatePage, () => ({ pageType: "landing" as const, description: "d", style: "modern" as const })],
+    ["layout", () => generateLayout, () => ({ prompt: "hero section" })],
+  ] as const)("%s never echoes the provider's raw error message and releases quota on failure", async (name, getMock, input) => {
+    getMock().mockRejectedValueOnce(new Error("sk-super-secret-provider-detail"));
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      await (caller[name] as (i: unknown) => Promise<unknown>)(input());
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
+    expect(caught?.message).not.toContain("secret");
+    expect(releaseQuota).toHaveBeenCalledWith("user-1");
+  });
+
+  it("streamPrompt masks assertProviderConfigured's message behind a fixed string", async () => {
+    assertProviderConfigured.mockImplementationOnce(() => {
+      throw new Error("AI is not configured: no OpenAI API key on the server.");
+    });
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      const sub = await caller.streamPrompt({
+        prompt: "hi",
+        scope: { kind: "element", id: "el-1" },
+        model: "gpt-4o-mini",
+      });
+      await sub[Symbol.asyncIterator]().next();
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("PRECONDITION_FAILED");
+    expect(caught?.message).toBe("AI provider not configured");
+  });
+
+  it("streamPrompt (plan intent) never echoes a raw provider error and releases quota", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
+    generatePlan.mockRejectedValueOnce(new Error("sk-super-secret-provider-detail"));
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      const sub = await caller.streamPrompt({
+        prompt: "build a page",
+        scope: { kind: "page", elements: [{ id: "el-1", type: "text" }] },
+        model: "gpt-4o-mini",
+        intent: "plan",
+      });
+      await sub[Symbol.asyncIterator]().next();
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
+    expect(caught?.message).not.toContain("secret");
+    expect(releaseQuota).toHaveBeenCalledWith("user-1");
+  });
+
+  it("streamPrompt (style-command intent) never echoes a raw provider error and releases quota", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
+    generateEditCommands.mockRejectedValueOnce(new Error("sk-super-secret-provider-detail"));
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      const sub = await caller.streamPrompt({
+        prompt: "make it bold",
+        scope: { kind: "element", id: "el-1" },
+        model: "gpt-4o-mini",
+        intent: "style-command",
+      });
+      await sub[Symbol.asyncIterator]().next();
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
+    expect(caught?.message).not.toContain("secret");
+    expect(releaseQuota).toHaveBeenCalledWith("user-1");
+  });
+
+  it("streamPrompt (text stream) never echoes a raw provider error", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
+    streamContent.mockImplementationOnce(async function* () {
+      throw new Error("sk-super-secret-provider-detail");
+    });
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      const sub = await caller.streamPrompt({
+        prompt: "hi",
+        scope: { kind: "element", id: "el-1" },
+        model: "gpt-4o-mini",
+      });
+      await sub[Symbol.asyncIterator]().next();
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
+    expect(caught?.message).not.toContain("secret");
+  });
+
+  it("rejects an oversized options.tone/length on content (S-8 .max())", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.content({ prompt: "x", type: "content", options: { tone: "y".repeat(101) } }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("rejects an oversized sectionType on layout (S-8 .max())", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.layout({ prompt: "x", sectionType: "y".repeat(101) }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("rejects an oversized milestone recentChanges[].id (S-8 .max())", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.milestoneSuggest({
+        recentChanges: [{ id: "x".repeat(101), label: "y", timestamp: 0, type: "patch" }],
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("rejects an oversized element-scope id on streamPrompt (S-8 .max())", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.streamPrompt({
+        prompt: "hi",
+        scope: { kind: "element", id: "x".repeat(101) },
+        model: "gpt-4o-mini",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
   it("streamPrompt throws TOO_MANY_REQUESTS when quota exhausted", async () => {
