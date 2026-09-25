@@ -291,7 +291,7 @@ export const siteDetailRouter = router({
     // Cross-site monitor: every domain in the caller's workspace.
     listForWorkspace: protectedProcedure.query(async ({ ctx }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
-      return listWorkspaceDomains(workspaceId);
+      return listWorkspaceDomains(workspaceId, ctx.session.user!.id!);
     }),
 
     // The Add-a-domain dialog's `Available` / `Already connected` tag. Not

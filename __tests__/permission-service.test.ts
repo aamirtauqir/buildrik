@@ -63,9 +63,20 @@ describe("checkSiteRole", () => {
     });
   });
 
-  it("roleOverride upgrades access: workspace VIEWER + EDITOR override resolves for EDITOR", async () => {
+  it("roleOverride is a CAP, not an upgrade: workspace VIEWER + EDITOR override stays VIEWER (S-6/PD-6)", async () => {
     const db = makeDb({ workspaceId: "ws1" }, { role: "VIEWER", siteCount: 1 }, { roleOverride: "EDITOR" });
-    await expect(checkSiteRole(db, "u1", "s1", "EDITOR")).resolves.toBeUndefined();
+    await expect(checkSiteRole(db, "u1", "s1", "EDITOR")).rejects.toMatchObject({
+      name: "PermissionError",
+      code: "FORBIDDEN",
+    });
+  });
+
+  it("roleOverride caps access: workspace EDITOR + VIEWER override resolves to VIEWER (S-6/PD-6)", async () => {
+    const db = makeDb({ workspaceId: "ws1" }, { role: "EDITOR", siteCount: 1 }, { roleOverride: "VIEWER" });
+    await expect(checkSiteRole(db, "u1", "s1", "EDITOR")).rejects.toMatchObject({
+      name: "PermissionError",
+      code: "FORBIDDEN",
+    });
   });
 
   // ─── Per-site scoping (was never enforced — CR1) ─────────────────────────

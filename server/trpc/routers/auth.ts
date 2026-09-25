@@ -281,6 +281,15 @@ export const authRouter = router({
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
       }
       const userId = user.id;
+
+      // S-5/PD-5: read verification status from the DB, not the session — a
+      // session predates a later account compromise/reset and can't be trusted
+      // for this check.
+      const dbUser = await ctx.prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
+      if (!dbUser?.emailVerified) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Verify your email before accepting an invite." });
+      }
+
       const existing = await ctx.prisma.workspaceMember.findUnique({
         where: { userId_workspaceId: { userId, workspaceId: invite.workspaceId } },
       });

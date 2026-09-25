@@ -257,6 +257,7 @@ export const accountRouter = router({
             if (e instanceof Error && e.message === "TRANSFER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Transfer not found or already completed." });
             if (e instanceof Error && e.message === "TRANSFER_EXPIRED") throw new TRPCError({ code: "BAD_REQUEST", message: "Transfer invitation has expired." });
             if (e instanceof Error && e.message === "EMAIL_MISMATCH") throw new TRPCError({ code: "FORBIDDEN", message: "This transfer was not sent to your email address." });
+            if (e instanceof Error && e.message === "EMAIL_NOT_VERIFIED") throw new TRPCError({ code: "FORBIDDEN", message: "Verify your email before accepting a workspace transfer." });
             throw e;
           }
         }),

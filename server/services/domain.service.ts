@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
+import { siteScopeWhere } from "@/server/services/permission.service";
 import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
 
 // Vercel's canonical targets — what a domain should point at when we have no
@@ -122,9 +123,12 @@ export interface WorkspaceDomainRow {
 
 // Cross-site domains monitor (prototype 15-domains): every custom domain in the
 // workspace with its site, status, and SSL — the agency "all domains at once" view.
-export async function listWorkspaceDomains(workspaceId: string): Promise<WorkspaceDomainRow[]> {
+export async function listWorkspaceDomains(workspaceId: string, userId: string): Promise<WorkspaceDomainRow[]> {
+  // S-9: a member scoped to specific sites must never see another site's
+  // domain in this cross-site monitor.
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.domain.findMany({
-    where: { site: { workspaceId, deletedAt: null } },
+    where: { site: { workspaceId, deletedAt: null, ...scope } },
     orderBy: [{ status: "asc" }, { domain: "asc" }],
     select: {
       id: true,

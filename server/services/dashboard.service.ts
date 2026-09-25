@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
+import { siteScopeWhere } from "@/server/services/permission.service";
 import type {
   DashboardStats,
   RecentSite,
@@ -10,10 +11,15 @@ import type {
 
 export async function getDashboardStats(
   workspaceId: string,
+  userId: string,
   memberRole: string,
 ): Promise<DashboardStats> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
   const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000);
+
+  // S-9: a member scoped to specific sites must never see other sites'
+  // counts/analytics in their own dashboard stats.
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
 
   const [
     totalSites,
@@ -28,27 +34,27 @@ export async function getDashboardStats(
     memberRows,
     lastPublished,
   ] = await Promise.all([
-    prisma.site.count({ where: { workspaceId, deletedAt: null } }),
-    prisma.site.count({ where: { workspaceId, status: "PUBLISHED", deletedAt: null } }),
-    prisma.site.count({ where: { workspaceId, status: "DRAFT", deletedAt: null } }),
-    prisma.site.count({ where: { workspaceId, status: "ARCHIVED", deletedAt: null } }),
+    prisma.site.count({ where: { workspaceId, deletedAt: null, ...scope } }),
+    prisma.site.count({ where: { workspaceId, status: "PUBLISHED", deletedAt: null, ...scope } }),
+    prisma.site.count({ where: { workspaceId, status: "DRAFT", deletedAt: null, ...scope } }),
+    prisma.site.count({ where: { workspaceId, status: "ARCHIVED", deletedAt: null, ...scope } }),
     // "Collaborators" excludes the owner — matches the Team page, which
     // treats an owner-only workspace as "No team members yet".
     prisma.workspaceMember.count({ where: { workspaceId, role: { not: "OWNER" } } }),
     prisma.invite.count({ where: { workspaceId, status: "PENDING" } }),
     prisma.siteAnalytics.aggregate({
-      where: { site: { workspaceId }, date: { gte: thirtyDaysAgo } },
+      where: { site: { workspaceId, ...scope }, date: { gte: thirtyDaysAgo } },
       _sum: { visitors: true },
     }),
     prisma.siteAnalytics.aggregate({
       where: {
-        site: { workspaceId },
+        site: { workspaceId, ...scope },
         date: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
       },
       _sum: { visitors: true },
     }),
     prisma.siteAnalytics.findMany({
-      where: { site: { workspaceId }, date: { gte: thirtyDaysAgo } },
+      where: { site: { workspaceId, ...scope }, date: { gte: thirtyDaysAgo } },
       select: { date: true, visitors: true },
       orderBy: { date: "asc" },
     }),
@@ -58,7 +64,7 @@ export async function getDashboardStats(
       include: { user: { select: { fullName: true, avatar: true } } },
     }),
     prisma.site.findMany({
-      where: { workspaceId, lastPublishedAt: { not: null }, deletedAt: null },
+      where: { workspaceId, lastPublishedAt: { not: null }, deletedAt: null, ...scope },
       orderBy: { lastPublishedAt: "desc" },
       take: 1,
       select: { name: true, lastPublishedAt: true },
@@ -106,10 +112,12 @@ export async function getDashboardStats(
 
 export async function getRecentSites(
   workspaceId: string,
+  userId: string,
   limit = 4
 ): Promise<RecentSite[]> {
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const sites = await prisma.site.findMany({
-    where: { workspaceId, deletedAt: null },
+    where: { workspaceId, deletedAt: null, ...scope },
     orderBy: { lastEditedAt: "desc" },
     take: limit,
     select: {

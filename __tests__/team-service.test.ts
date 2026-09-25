@@ -24,6 +24,7 @@ vi.mock("@/server/services/email.service", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
+import { sendTeamInviteEmail } from "@/server/services/email.service";
 
 describe("Team Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
@@ -95,6 +96,36 @@ describe("Team Service", () => {
       }, "PRO");
       expect(result.sent).toBe(1);
       expect(result.skipped).toBe(1);
+    });
+
+    // B-5: an SMTP failure must be visible in the result, not silently
+    // swallowed behind "N invitations sent".
+    it("reports emailFailed and excludes failed sends from `sent` (B-5)", async () => {
+      const { inviteMembers } = await import("@/server/services/team.service");
+      vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
+      vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.invite.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", name: "Test WS" } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", fullName: "Inviter" } as any);
+      vi.mocked(prisma.invite.create)
+        .mockResolvedValueOnce({ id: "inv1", email: "bob@test.com", status: "PENDING", token: "t1" } as any)
+        .mockResolvedValueOnce({ id: "inv2", email: "carol@test.com", status: "PENDING", token: "t2" } as any);
+      vi.mocked(sendTeamInviteEmail)
+        .mockResolvedValueOnce(undefined as any)
+        .mockRejectedValueOnce(new Error("SMTP down"));
+
+      const result = await inviteMembers("ws1", "u1", {
+        emails: ["bob@test.com", "carol@test.com"],
+        role: "EDITOR",
+      }, "PRO");
+
+      // Both invite rows were still created (the pending row is real and
+      // Resend-able) — only the reported `sent` count and `emailFailed` reflect
+      // the send outcome.
+      expect(prisma.invite.create).toHaveBeenCalledTimes(2);
+      expect(result.sent).toBe(1);
+      expect(result.skipped).toBe(0);
+      expect(result.emailFailed).toEqual(["carol@test.com"]);
     });
   });
 
@@ -235,6 +266,43 @@ describe("Team Service", () => {
       vi.mocked(prisma.invite.deleteMany).mockResolvedValue({ count: 1 } as any);
       await revokeInvite("inv1", "ws1");
       expect(prisma.invite.deleteMany).toHaveBeenCalledWith({ where: { id: "inv1", workspaceId: "ws1" } });
+    });
+  });
+
+  describe("resendInvite", () => {
+    it("sends first, then bumps resendCount/expiresAt only on success", async () => {
+      const { resendInvite } = await import("@/server/services/team.service");
+      vi.mocked(prisma.invite.findUnique).mockResolvedValue({
+        id: "inv1", workspaceId: "ws1", email: "bob@test.com", token: "t1", resendCount: 0, invitedBy: "u1",
+      } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", name: "Test WS" } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", fullName: "Inviter" } as any);
+      vi.mocked(sendTeamInviteEmail).mockResolvedValueOnce(undefined as any);
+      vi.mocked(prisma.invite.update).mockResolvedValue({ id: "inv1", resendCount: 1 } as any);
+
+      const result = await resendInvite("inv1", "ws1");
+      expect(sendTeamInviteEmail).toHaveBeenCalled();
+      expect(prisma.invite.update).toHaveBeenCalledWith({
+        where: { id: "inv1" },
+        data: { expiresAt: expect.any(Date), resendCount: { increment: 1 } },
+      });
+      expect(result.resendCount).toBe(1);
+    });
+
+    // B-5: a failed resend must not silently count against the 2-resend
+    // limit or claim success — the old order bumped resendCount BEFORE
+    // sending and swallowed the send error.
+    it("throws INVITE_EMAIL_FAILED and never touches resendCount on a send failure (B-5)", async () => {
+      const { resendInvite } = await import("@/server/services/team.service");
+      vi.mocked(prisma.invite.findUnique).mockResolvedValue({
+        id: "inv1", workspaceId: "ws1", email: "bob@test.com", token: "t1", resendCount: 0, invitedBy: "u1",
+      } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", name: "Test WS" } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", fullName: "Inviter" } as any);
+      vi.mocked(sendTeamInviteEmail).mockRejectedValueOnce(new Error("SMTP down"));
+
+      await expect(resendInvite("inv1", "ws1")).rejects.toThrow("INVITE_EMAIL_FAILED");
+      expect(prisma.invite.update).not.toHaveBeenCalled();
     });
   });
 

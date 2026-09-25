@@ -98,6 +98,39 @@ export async function createTestSitePermission(
   });
 }
 
+export async function createTestInvite(
+  params: { workspaceId: string; invitedBy: string } & Partial<Prisma.InviteUncheckedCreateInput>,
+) {
+  const { workspaceId, invitedBy, ...overrides } = params;
+  return prisma.invite.create({
+    data: {
+      workspaceId,
+      invitedBy,
+      email: `invitee-${randomUUID()}@test.buildrik.local`,
+      role: "EDITOR",
+      token: randomUUID(),
+      status: "PENDING",
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      ...overrides,
+    },
+  });
+}
+
+export async function createTestAccount(
+  params: { userId: string; provider: string; providerAccountId: string } & Partial<Prisma.AccountUncheckedCreateInput>,
+) {
+  const { userId, provider, providerAccountId, ...overrides } = params;
+  return prisma.account.create({
+    data: {
+      userId,
+      provider,
+      providerAccountId,
+      type: "oauth",
+      ...overrides,
+    },
+  });
+}
+
 const MODEL_TO_TABLE = {
   user: "users",
   workspace: "workspaces",
@@ -108,6 +141,8 @@ const MODEL_TO_TABLE = {
   pendingUpload: "pending_uploads",
   mediaAsset: "media_assets",
   mediaAssetVersion: "media_asset_versions",
+  invite: "invites",
+  account: "accounts",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

@@ -106,7 +106,7 @@ export const siteComponentsRouter = router({
   // its "used on N sites" count. Workspace from the session (IDOR-safe).
   workspaceList: protectedProcedure.query(async ({ ctx }) => {
     const workspaceId = await resolveWorkspaceId(ctx);
-    return listWorkspaceComponents(workspaceId);
+    return listWorkspaceComponents(workspaceId, ctx.session.user.id);
   }),
 
   // C1 jump-to + C3 blast-radius: which sites carry a given master.
