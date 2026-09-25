@@ -77,11 +77,11 @@ const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]"
 /* Escape deselects, then closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
    open menu or dialog, or focus on the canvas (where Escape deselects).
-   Inspector "Pick on canvas" is also not ours: its own Escape handler
-   (Canvas.tsx) cancels the pick and leaves the current selection alone —
-   without this check, this capture-phase handler ran first and cleared the
-   selection out from under it, so cancelling a pick landed on "Nothing
-   selected" instead of back on the element you started from. */
+   Inspector "Pick on canvas" is also not ours: cancelling it should leave the
+   selection you started from alone. Live walk (2026-09-25) confirmed this is
+   a window-CAPTURE listener that races Canvas.tsx's own document-bubble pick
+   handler and always wins, so without this check a single Escape both
+   cancelled the pick AND cleared the selection out from under it. */
 function escapeIsOurs(e: KeyboardEvent): boolean {
   if (document.querySelector('[role="menu"], [role="dialog"], [role="alertdialog"]')) return false;
   if (document.querySelector('[data-bk-pick="true"]')) return false;
