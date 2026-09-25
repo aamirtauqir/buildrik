@@ -38,7 +38,6 @@ import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
-import { usePageCommands } from "./usePageCommands";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
@@ -101,12 +100,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Name conflict error state (Screen GoEJk)
   const [nameError, setNameError] = React.useState<string | null>(null);
 
-  /* The panel's rows in the one ⌘K palette (New page · Go to <page>), live
-     while this panel is mounted. The panel-local palette and its own ⌘K
-     listener are gone — decision #38, TODOS.md:393. */
+  /* v3 FC-2 (2026-09-25): the panel's ⌘K rows (New page · Go to <page>) now
+     register from the SHELL (usePageJumpList + usePageCommands, called once
+     in StudioPanels) so they're in the palette whether or not this panel is
+     mounted — like Layers/Assets/Records/Templates. The panel-local palette
+     and its own ⌘K listener are still gone — decision #38, TODOS.md:393. */
   /* Every Add-page door asks for the New-page modal (decision #19). */
   const requestNewPage = React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]);
-  usePageCommands(composer, p.pages, p.selectPage, requestNewPage);
 
   /* v3 4418:92256: the filter is the topbar field, which reads "Search
      pages…" while this drawer is mounted — the drawer's own search band is
