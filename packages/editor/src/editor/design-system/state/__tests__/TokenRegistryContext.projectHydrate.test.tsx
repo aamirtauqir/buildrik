@@ -13,6 +13,7 @@ import { render, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { TokenRegistryProvider, useColorRegistry } from "../TokenRegistryContext";
+import { DEFAULT_TOKENS } from "../../constants";
 
 type Listener = (payload: unknown) => void;
 
@@ -31,6 +32,9 @@ function makeComposer(primary: string) {
     getProjectSettings: () => settings,
     setPrimary(value: string) {
       settings = { ...settings, designTokens: [{ ...(settings.designTokens[0] as object), value }] };
+    },
+    clearTokens() {
+      settings = { ...settings, designTokens: [] };
     },
   };
 }
@@ -67,6 +71,22 @@ describe("TokenRegistryProvider · project token hydration (D-4)", () => {
     composer.setPrimary("#abcdef");
     act(() => composer.emit("project:loaded"));
     expect(seen.toLowerCase()).toBe("#abcdef");
+  });
+
+  /* Review M4: undoing a site's first token edit imports a project with NO
+     designTokens; an early return on the empty list left the undone value. */
+  it("an empty project token list puts the registries back to the seed", () => {
+    const composer = makeComposer("#123456");
+    render(
+      <TokenRegistryProvider projectId="p1" composer={composer}>
+        <PrimaryProbe />
+      </TokenRegistryProvider>,
+    );
+    expect(seen.toLowerCase()).toBe("#123456");
+    composer.clearTokens();
+    act(() => composer.emit("project:loaded"));
+    expect(seen.toLowerCase()).not.toBe("#123456");
+    expect(seen).toBe(DEFAULT_TOKENS.find((t) => t.id === "color-primary")?.value);
   });
 
   it("does not listen to settings changes (Brand stages edits in these registries)", () => {

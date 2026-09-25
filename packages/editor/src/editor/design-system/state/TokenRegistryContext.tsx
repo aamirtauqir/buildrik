@@ -311,9 +311,12 @@ const ProjectTokensHydrator: React.FC<{ composer: TokenRegistryProviderProps["co
     const hydrate = () => {
       if (staged.current) return;
       const settings = composer.getProjectSettings?.();
-      const incoming = settings?.designTokens;
-      if (!incoming?.length) return;
-      resetAllKinds(mergeProjectTokens(incoming as DesignToken[], settings?.designTokensSchemaVersion));
+      /* An empty list is a state too: undoing a site's first token edit
+         imports a project with no designTokens, and returning early here left
+         the undone value standing in the registries. No saved tokens = the
+         seed, which is what mergeProjectTokens([]) yields. */
+      const incoming = (settings?.designTokens ?? []) as DesignToken[];
+      resetAllKinds(mergeProjectTokens(incoming, settings?.designTokensSchemaVersion));
     };
     hydrate();
     composer.on(EVENTS.PROJECT_LOADED, hydrate);
