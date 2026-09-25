@@ -198,10 +198,13 @@ describe("AssetDetailsPanel — view only", () => {
     const img = TEN.find((i) => i.type === "img") as LibraryItem;
     render(
       <AssetDetailsPanel
-        selectedItem={img} versions={[]} usageCount={0} usedIn={[]} libraryItems={TEN}
+        selectedItem={img} versions={[]} usageCount={0} libraryItems={TEN}
         onOpenVersions={vi.fn()} onInsert={vi.fn()} onEditImage={vi.fn()}
         onOpenRename={onOpenRename} onRequestDelete={onRequestDelete}
-        composer={{ mediaOps: { replaceAcross: vi.fn() } } as unknown as AssetDetailsPanelProps["composer"]}
+        composer={{
+          mediaOps: { replaceAcross: vi.fn(), getUsagesByPage: vi.fn(() => new Map()) },
+          elements: { getAllPages: vi.fn(() => []) },
+        } as unknown as AssetDetailsPanelProps["composer"]}
         addToast={vi.fn()}
       />,
     );

@@ -1307,13 +1307,25 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
     await mountVersions();
     selectHero();
     expect(screen.queryByTestId("mgr-det-versions")).toBeNull();
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("3 places — Home, Menu");
+    /* FC-6: a navigable row list, not a joined string — grouped by page,
+       each hit with its own "Jump ›" (same shape as the drawer's overlay). */
+    const used = within(screen.getByTestId("mgr-det-used"));
+    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("Home");
+    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("2");
+    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("Menu");
+    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("1");
   });
 
   it("USED IN follows the placements to the applied version", async () => {
     await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
     selectHero();
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("3 places — Home, Menu");
+    /* FC-6: still traces correctly when the ORIGINAL is selected but a saved
+       version is what's actually applied — `AssetDetailsPanel` traces every
+       family member with placements (`replaceSources`), not just the
+       selected item's own src. */
+    const used = within(screen.getByTestId("mgr-det-used"));
+    expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("Home");
+    expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("Menu");
     expect(screen.getByTestId("mgr-use-hero")).toHaveTextContent("used ×3");
   });
 

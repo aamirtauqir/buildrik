@@ -29,13 +29,17 @@ function makeImage(overrides: Partial<LibraryItem> = {}): LibraryItem {
 
 function renderPanel(overrides: Partial<React.ComponentProps<typeof AssetDetailsPanel>> = {}) {
   const composer = {
-    mediaOps: { replaceAcross: vi.fn(), getUsages: vi.fn(() => ({ count: 0, places: [] })) },
+    mediaOps: {
+      replaceAcross: vi.fn(),
+      getUsages: vi.fn(() => ({ count: 0, places: [] })),
+      getUsagesByPage: vi.fn(() => new Map()),
+    },
+    elements: { getAllPages: vi.fn(() => []) },
   } as any;
   const props = {
     selectedItem: makeImage(),
     versions: [],
     usageCount: 0,
-    usedIn: [],
     libraryItems: [],
     onOpenVersions: vi.fn(),
     onInsert: vi.fn(),

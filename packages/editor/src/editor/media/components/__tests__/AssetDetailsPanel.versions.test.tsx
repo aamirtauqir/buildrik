@@ -32,7 +32,9 @@ function makeComposer() {
   return {
     mediaOps: {
       replaceAcross: vi.fn(() => ({ replaced: ["el-1", "el-2"], failed: [] })),
+      getUsagesByPage: vi.fn(() => new Map()),
     },
+    elements: { getAllPages: vi.fn(() => []) },
   } as unknown as AssetDetailsPanelProps["composer"];
 }
 
@@ -41,7 +43,6 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
     selectedItem: makeItem(),
     versions: [],
     usageCount: 0,
-    usedIn: [],
     libraryItems: [],
     onOpenVersions: vi.fn(),
     onInsert: vi.fn(),
@@ -182,7 +183,11 @@ describe("AssetDetailsPanel — replace-all picker", () => {
 
   it("failed replacements surface an error toast", () => {
     const composer = {
-      mediaOps: { replaceAcross: vi.fn(() => ({ replaced: [], failed: ["el-9"] })) },
+      mediaOps: {
+        replaceAcross: vi.fn(() => ({ replaced: [], failed: ["el-9"] })),
+        getUsagesByPage: vi.fn(() => new Map()),
+      },
+      elements: { getAllPages: vi.fn(() => []) },
     } as unknown as AssetDetailsPanelProps["composer"];
     const { props } = mount({
       selectedItem: selected,
