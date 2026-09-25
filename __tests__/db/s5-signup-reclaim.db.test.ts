@@ -13,7 +13,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 
 import { prisma } from "@/lib/prisma";
-import { signup } from "@/server/services/auth.service";
+import { signup, verifyEmail, verifyMagicLink } from "@/server/services/auth.service";
+import { generateToken } from "@/server/services/token.service";
 import { authRouter } from "@/server/trpc/routers/auth";
 import {
   createTestUser,
@@ -119,5 +120,96 @@ describe("acceptInvite requires a DB-verified email (S-5)", () => {
         where: { userId_workspaceId: { userId: invitee.id, workspaceId: workspace.id } },
       }),
     ).not.toBeNull();
+  });
+});
+
+describe("first-verification credential clearing (PD-5, controller ruling fix round 1)", () => {
+  it("verifyMagicLink on a never-verified row clears passwordHash/2FA and bumps sessionVersion", async () => {
+    const user = await createTestUser({
+      email: "magiclink-victim@test.buildrik.local",
+      emailVerified: null,
+      passwordHash: "$2b$10$attacker-set-hash",
+      twoFactorEnabled: true,
+      twoFactorSecret: "v1:fake",
+      backupCodes: ["code1", "code2"],
+      sessionVersion: 0,
+    });
+    const token = await generateToken("magic_link", user.id, 15);
+
+    await verifyMagicLink(token);
+
+    const after = await prisma.user.findUnique({ where: { id: user.id } });
+    expect(after!.emailVerified).not.toBeNull();
+    expect(after!.passwordHash).toBeNull();
+    expect(after!.twoFactorEnabled).toBe(false);
+    expect(after!.twoFactorSecret).toBeNull();
+    expect(after!.backupCodes).toEqual([]);
+    expect(after!.sessionVersion).toBe(1);
+  });
+
+  it("verifyEmail on a never-verified row KEEPS passwordHash/2FA — only marks emailVerified", async () => {
+    const user = await createTestUser({
+      email: "signup-owner@test.buildrik.local",
+      emailVerified: null,
+      passwordHash: "$2b$10$owner-set-hash",
+      twoFactorEnabled: true,
+      twoFactorSecret: "v1:fake",
+      backupCodes: ["code1", "code2"],
+      sessionVersion: 0,
+    });
+    const token = await generateToken("email_verify", user.id, 60 * 24);
+
+    await verifyEmail(token);
+
+    const after = await prisma.user.findUnique({ where: { id: user.id } });
+    expect(after!.emailVerified).not.toBeNull();
+    // Clicking your own signup's verification link confirms that signup —
+    // it must not sign you out of the password you just set.
+    expect(after!.passwordHash).toBe("$2b$10$owner-set-hash");
+    expect(after!.twoFactorEnabled).toBe(true);
+    expect(after!.twoFactorSecret).toBe("v1:fake");
+    expect(after!.backupCodes).toEqual(["code1", "code2"]);
+    expect(after!.sessionVersion).toBe(0);
+  });
+});
+
+describe("signup() concurrent-signup race (CRITICAL 3, controller ruling fix round 1)", () => {
+  it("two concurrent signups for the same brand-new email: exactly one succeeds, the other gets EMAIL_EXISTS, no 500", async () => {
+    const email = `race-${Date.now()}@test.buildrik.local`;
+
+    const results = await Promise.allSettled([
+      signup("Racer A", email, "passwordA"),
+      signup("Racer B", email, "passwordB"),
+    ]);
+
+    const fulfilled = results.filter((r) => r.status === "fulfilled");
+    const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0].reason).toMatchObject({ code: "EMAIL_EXISTS" });
+
+    const rows = await prisma.user.findMany({ where: { email } });
+    expect(rows).toHaveLength(1);
+  });
+
+  it("two concurrent signups reclaiming the same abandoned unverified row: exactly one succeeds, no 500", async () => {
+    const email = `race-reclaim-${Date.now()}@test.buildrik.local`;
+    const stale = await createTestUser({ email, emailVerified: null, lastLoginAt: null });
+
+    const results = await Promise.allSettled([
+      signup("Racer A", email, "passwordA"),
+      signup("Racer B", email, "passwordB"),
+    ]);
+
+    const fulfilled = results.filter((r) => r.status === "fulfilled");
+    const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0].reason).toMatchObject({ code: "EMAIL_EXISTS" });
+
+    const rows = await prisma.user.findMany({ where: { email } });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].id).not.toBe(stale.id);
+    expect(await prisma.user.findUnique({ where: { id: stale.id } })).toBeNull();
   });
 });

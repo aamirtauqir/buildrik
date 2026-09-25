@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
@@ -185,27 +186,64 @@ export async function signup(fullName: string, email: string, password: string) 
     if (!reclaimable) {
       throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
     }
-    await prisma.$transaction(async (tx) => {
-      // Workspace.ownerId is a plain column, not a cascading FK — delete the
-      // workspaces first or they outlive the user with a dead owner.
-      await tx.workspace.deleteMany({ where: { ownerId: existing.id } });
-      await tx.verificationToken.deleteMany({ where: { identifier: existing.id } });
-      await tx.user.delete({ where: { id: existing.id } });
-    });
-    await logAuditEvent("SIGNUP_RECLAIMED_UNVERIFIED", "success", { email });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const { user, workspaceId } = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: { fullName, email, passwordHash },
-      select: SAFE_USER_SELECT,
-    });
-    const { workspaceId } = await createWorkspaceForUser(tx, user.id, fullName);
-    return { user, workspaceId };
-  });
+  // CRITICAL 3 (controller ruling, fix round 1): the reclaimable check above
+  // reads outside any transaction, so two concurrent signups for the same
+  // still-unverified email could both pass it on stale reads, then race on
+  // delete-then-create — one hitting a P2002 (unique email) or P2025
+  // (already-deleted row) that used to bubble up as an unhandled 500. The
+  // reclaim delete and the create now share ONE transaction: the guarded
+  // `deleteMany` re-checks reclaimability (lastLoginAt/emailVerified still
+  // null) as part of the DELETE itself, which Postgres serializes on the row
+  // — a concurrent transaction's DELETE blocks until this one commits or
+  // rolls back, then finds 0 matching rows and fails the guard instead of
+  // silently deleting nothing and creating a duplicate-email row.
+  let user: Prisma.UserGetPayload<{ select: typeof SAFE_USER_SELECT }>;
+  try {
+    user = await prisma.$transaction(async (tx) => {
+      if (existing) {
+        const deleted = await tx.user.deleteMany({
+          where: { id: existing.id, lastLoginAt: null, emailVerified: null },
+        });
+        if (deleted.count !== 1) {
+          // Another transaction reclaimed/verified/logged into this row
+          // while we were waiting — the address is no longer reclaimable.
+          throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
+        }
+        // Workspace.ownerId is a plain column, not a cascading FK — delete
+        // the workspace(s) too or they outlive the user with a dead owner.
+        await tx.workspace.deleteMany({ where: { ownerId: existing.id } });
+        await tx.verificationToken.deleteMany({ where: { identifier: existing.id } });
+      }
 
+      const createdUser = await tx.user.create({
+        data: { fullName, email, passwordHash },
+        select: SAFE_USER_SELECT,
+      });
+      await createWorkspaceForUser(tx, createdUser.id, fullName);
+      return createdUser;
+    });
+  } catch (err) {
+    if (err instanceof AuthError) throw err;
+    // P2002 (unique `email` constraint — a concurrent signup for a
+    // brand-new email won the create race) / P2025 (a record the query
+    // expected was gone, e.g. workspace/verificationToken deleteMany racing
+    // with another reclaim) both mean a concurrent signup got here first.
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      (err.code === "P2002" || err.code === "P2025")
+    ) {
+      throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
+    }
+    throw err;
+  }
+
+  if (existing) {
+    await logAuditEvent("SIGNUP_RECLAIMED_UNVERIFIED", "success", { email });
+  }
   await logAuditEvent("SIGNUP", "success", { userId: user.id, email });
 
   const token = await generateToken("email_verify", user.id, 60 * 24); // 24h
@@ -255,29 +293,18 @@ export async function verifyEmail(token: string) {
   }
 
   await invalidateToken(token);
-  const user = await prisma.$transaction(async (tx) => {
-    const before = await tx.user.findUnique({ where: { id: userId }, select: { emailVerified: true } });
-    return tx.user.update({
-      where: { id: userId },
-      data: {
-        emailVerified: new Date(),
-        // PD-5 anti-pre-account-hijack: a first-ever verification clears any
-        // password/2FA set before the real owner controlled the inbox — the
-        // only way to tell "self-verifying your own signup" from "verifying
-        // an account someone else pre-seeded with a password" apart is that
-        // neither can be trusted, so both pay this cost. See S-5.
-        ...(before?.emailVerified
-          ? {}
-          : {
-              passwordHash: null,
-              twoFactorEnabled: false,
-              twoFactorSecret: null,
-              backupCodes: [],
-              sessionVersion: { increment: 1 },
-            }),
-      },
-      select: SAFE_USER_SELECT,
-    });
+  // Controller ruling (fix round 1): verifyEmail does NOT clear credentials.
+  // Clicking your OWN signup's verification link confirms that signup — it
+  // is the legitimate owner using the password they just set. PD-5's
+  // anti-pre-account-hijack clearing applies only where the first
+  // verification could belong to someone who never proved control of the
+  // password: magic link (verifyMagicLink, below) and OAuth first-link
+  // (auth.config.ts). Clearing here would sign every normal signup out of
+  // its own just-created password.
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { emailVerified: new Date() },
+    select: SAFE_USER_SELECT,
   });
 
   await logAuditEvent("EMAIL_VERIFIED", "success", { userId });
