@@ -5,7 +5,6 @@
  */
 
 import { runTransaction } from "../../../../shared/utils/helpers";
-import { getElementNameFromType } from "../../utils/elementInfo";
 import type { ContextAction } from "../contextMenuRegistry";
 
 export const editSubmenu: ContextAction[] = [
@@ -48,17 +47,20 @@ export const editSubmenu: ContextAction[] = [
     group: "Edit",
     shortcut: "Cmd+X",
     isVisible: ({ isRoot }) => !isRoot,
+    /* Follow-up to A-5 (controller review, round 1): this used to call
+       composer.elements.removeElement directly, bypassing the lock/instance
+       filter the engine `cut` command applies — a right-click Cut on a
+       locked element removed it anyway. Routed through commands.run("cut")
+       like the Delete row below: it applies the same filter, sets
+       composer.clipboard from the WHOLE selection (not just the
+       right-clicked element), and emits CLIPBOARD_CUT — which
+       useClipboardToasts already turns into the "N cut" + Undo toast, so
+       the manual toast/removeElement/local clipboard write here would only
+       double it (same reasoning as Paste's comment above). The OS-clipboard
+       write (for pasting outside the app) stays, off the still-useful
+       `element` context. */
     handler: ({ composer, element, addToast }) => {
-      // Get element info for toast before cutting
-      const elementType = element.getType?.() || "element";
-      const elementName = getElementNameFromType(elementType);
-      const childCount = element.getChildren?.()?.length || 0;
-
       const data = element.getData?.();
-      // Same fix as Copy above: populate the in-app clipboard, not only the
-      // OS one, so a right-click Cut → right-click Paste round trip actually
-      // pastes something back instead of hitting the "Nothing to paste" toast.
-      if (composer) composer.clipboard = data ? [data] : null;
       const text = JSON.stringify(data, null, 2);
       navigator?.clipboard?.writeText(text).catch(() => {
         addToast?.({
@@ -67,27 +69,7 @@ export const editSubmenu: ContextAction[] = [
           duration: 3000,
         });
       });
-      runTransaction(composer, "context-cut", () => {
-        composer.elements.removeElement(element.getId());
-        composer.selection.select(null as never);
-      });
-
-      // Show undo toast
-      if (addToast) {
-        const message =
-          childCount > 0
-            ? `${elementName} (${childCount} ${childCount === 1 ? "child" : "children"}) cut`
-            : `${elementName} cut`;
-        addToast({
-          description: message,
-          tone: "info",
-          duration: 5000,
-          action: {
-            label: "Undo",
-            onClick: () => composer.history.undo(),
-          },
-        });
-      }
+      composer.commands.run("cut");
     },
   },
   {

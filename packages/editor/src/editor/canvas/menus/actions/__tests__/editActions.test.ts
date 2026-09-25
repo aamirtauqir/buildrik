@@ -127,11 +127,15 @@ describe("editActions — delete runs the engine command", () => {
   });
 });
 
-/* A-5: Cut wrote only the OS clipboard (navigator.clipboard) while Copy also
-   set composer.clipboard — so right-click Cut → right-click Paste hit the
-   "Nothing to paste" toast instead of pasting the cut element back. */
-describe("editActions — cut populates the in-app clipboard", () => {
-  it("cut sets composer.clipboard from element.getData(), like copy", () => {
+/* Controller review round 1 (follow-up to A-5): this row used to call
+   composer.elements.removeElement directly, bypassing the engine `cut`
+   command's lock/instance filter entirely — a right-click Cut on a locked
+   element removed it anyway. It's now routed through commands.run("cut"),
+   the same command Delete's row already used, which applies the filter,
+   sets composer.clipboard from the whole selection, and emits CLIPBOARD_CUT
+   (useClipboardToasts turns that into the "N cut" + Undo toast). */
+describe("editActions — cut routes through the engine cut command", () => {
+  it("runs composer.commands.run('cut') and does not call removeElement directly", () => {
     const composer = buildMockComposer();
     const cut = editSubmenu.find((a) => a.id === "cut");
     expect(cut).toBeDefined();
@@ -143,7 +147,24 @@ describe("editActions — cut populates the in-app clipboard", () => {
       addToast: vi.fn(),
     } as Ctx);
 
-    expect(composer.clipboard).toEqual([sampleData]);
+    expect(composer.commands.run).toHaveBeenCalledWith("cut");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+  });
+
+  it("still writes the element's data to the OS clipboard", () => {
+    const composer = buildMockComposer();
+    const cut = editSubmenu.find((a) => a.id === "cut");
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    cut!.handler!({
+      composer,
+      element: buildMockElement(),
+      isRoot: false,
+      addToast: vi.fn(),
+    } as Ctx);
+
+    expect(writeText).toHaveBeenCalledWith(JSON.stringify(sampleData, null, 2));
   });
 });
 
