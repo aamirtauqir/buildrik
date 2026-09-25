@@ -38,9 +38,11 @@ function makeComposer() {
   const detachInstance = vi.fn(async (_id: string) => true);
   const updateComponent = vi.fn(async () => true);
   const setActivePage = vi.fn();
+  const select = vi.fn();
   const pageOf: Record<string, string> = { e1: "r-home", e2: "r-home", e3: "r-menu" };
+  const getElement = (id: string) => ({ getId: () => id, getParent: () => root(pageOf[id]) });
   const composer = {
-    selection: { getSelectedIds: () => [] },
+    selection: { getSelectedIds: () => [], select },
     getProjectMetadata: () => ({ name: "Bella Cucina" }),
     elements: {
       getAllPages: () => [
@@ -48,8 +50,12 @@ function makeComposer() {
         { id: "menu", name: "Menu", root: { id: "r-menu" } },
         { id: "about", name: "About", root: { id: "r-about" } },
       ],
-      getElement: (id: string) => ({ getId: () => id, getParent: () => root(pageOf[id]) }),
+      getElement,
       setActivePage,
+      /* `locateOnCanvas` (the used-on row's jump-to-usage) reads the active
+         page before switching — "home" starts as active, matching the
+         fixture's own default page. */
+      getActivePage: () => ({ id: "home" }),
     },
     components: {
       getInstancesOfComponent: () => [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }],
@@ -57,7 +63,7 @@ function makeComposer() {
       updateComponent,
     },
   } as unknown as Composer;
-  return { composer, detachInstance, updateComponent, setActivePage };
+  return { composer, detachInstance, updateComponent, setActivePage, select };
 }
 
 const renderMaster = (composer: Composer) =>
@@ -108,8 +114,13 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("STRUCTURE lists the master's parts; USED ON the pages with instances, which open on click", () => {
-    const { composer, setActivePage } = makeComposer();
+  /* Flow-check (2026-09-25): a used-on row click used to ONLY switch page —
+     on the page that was already active (this fixture's "home"), that read
+     as nothing happening at all: no selection, no scroll. It now also
+     selects one of the page's actual instances (`locateOnCanvas`, the same
+     page-switch/select/scroll seam Review's "Locate ›" row uses). */
+  it("STRUCTURE lists the master's parts; USED ON the pages with instances, which jump to an instance on click", () => {
+    const { composer, setActivePage, select } = makeComposer();
     renderMaster(composer);
     expect(screen.getByTestId("component-structure-header").textContent).toContain("3");
     const rows = screen.getAllByTestId("component-structure-row").map((r) => r.textContent);
@@ -117,8 +128,20 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     expect(screen.getByTestId("component-usedon-home").textContent).toBe("Home2 instances");
     expect(screen.getByTestId("component-usedon-menu").textContent).toBe("Menu1 instance");
     expect(screen.queryByTestId("component-usedon-about")).toBeNull();
+
+    // Menu isn't the active page ("home" is) — switches, then selects e3.
     fireEvent.click(screen.getByTestId("component-usedon-menu"));
     expect(setActivePage).toHaveBeenCalledWith("menu");
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
+    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e3");
+
+    // Home IS already active — no page switch, but still selects an instance
+    // (e1, the first of its two) instead of doing nothing.
+    setActivePage.mockClear();
+    select.mockClear();
+    fireEvent.click(screen.getByTestId("component-usedon-home"));
+    expect(setActivePage).not.toHaveBeenCalled();
+    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e1");
   });
 
   it("the name renames inline (G2-124)", async () => {
@@ -129,5 +152,48 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     fireEvent.change(input, { target: { value: "  Dish card " } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(updateComponent).toHaveBeenCalledWith("cmp-1", { name: "Dish card" });
+  });
+
+  /* Flow-check (2026-09-25): Esc did nothing on this screen — every sibling
+     drill-in (Add's Generate/create sub-views) backs out a level on Esc, this
+     one never wired it. */
+  describe("Escape", () => {
+    it("backs out of the screen", () => {
+      const { composer } = makeComposer();
+      const onBack = vi.fn();
+      render(
+        <ToastProvider>
+          <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
+        </ToastProvider>,
+      );
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(onBack).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not back out while renaming — the field's own Escape owns that", () => {
+      const { composer } = makeComposer();
+      const onBack = vi.fn();
+      render(
+        <ToastProvider>
+          <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
+        </ToastProvider>,
+      );
+      fireEvent.click(screen.getByTestId("component-name"));
+      fireEvent.keyDown(screen.getByTestId("component-rename-input"), { key: "Escape" });
+      expect(onBack).not.toHaveBeenCalled();
+    });
+
+    it("does not back out while Detach all's confirm is open", () => {
+      const { composer } = makeComposer();
+      const onBack = vi.fn();
+      render(
+        <ToastProvider>
+          <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
+        </ToastProvider>,
+      );
+      fireEvent.click(screen.getByTestId("component-detach-all"));
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(onBack).not.toHaveBeenCalled();
+    });
   });
 });
