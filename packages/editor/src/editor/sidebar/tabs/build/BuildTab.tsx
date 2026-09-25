@@ -145,8 +145,15 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       }
       const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
       await insertMine(adopted);
-    } catch {
-      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
+    } catch (err) {
+      // A damaged library copy fails the same way every time — retrying won't help.
+      const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
+      addToast({
+        description: damaged
+          ? "This library component is damaged and can't be added."
+          : "Couldn't add component. Try again.",
+        tone: "error",
+      });
     }
   }, [composer, addToast, insertMine]);
 
