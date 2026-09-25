@@ -179,20 +179,45 @@ curl -I https://app.buildrick.io/api/trpc/auth.checkEmail
 # → 405 Method Not Allowed (GET on POST-only route) is OK
 ```
 
-## Step C — Cron jobs (15 routes)
+## Step C — Cron jobs (18 routes)
 
-cPanel → Cron Jobs. Add each one (schedules in `vercel.json`):
+cPanel → Cron Jobs. `vercel.json` at the repo root is the source of truth
+for the schedule column — this list is generated from it (C-2). Add each
+line below as its own cPanel cron entry, using the SAME `$CRON_SECRET`
+value from the env vars:
 
 ```bash
-# 5-min interval
-*/5 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/dns-verify
-
-# Daily
-0 2 * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ssl-check
-# ... (15 total — full list in /Users/shahg/Desktop/pencil/buildrik/vercel.json)
+*/5  * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/scheduled-publish
+0    2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ssl-check
+0    8 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/billing-dunning
+0    9 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/billing-downgrade
+0    3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/session-cleanup
+0    4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/invite-expiry
+0    5 * * 0   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/token-cleanup
+0    6 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/soft-delete-purge
+0    1 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/analytics-purge
+0    8 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/analytics-aggregate
+*/5  * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/dns-verify
+0    2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/form-submission-purge
+30   2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ip-anonymization
+0    4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/workspace-transfer-expiry
+0    11 * * *  curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/account-deletion
+30   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/publish-job-cleanup
+15   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ai-job-cleanup
+0    3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ephemeral-purge
 ```
 
-Use the SAME `$CRON_SECRET` value from the env vars.
+**Before enabling these on a live account**, read them backlog-first, not
+trigger-first — `account-deletion`, `billing-downgrade`,
+`soft-delete-purge` and `form-submission-purge` will process whatever has
+built up since launch the first time they run. Inspect the backlog
+read-only before wiring the crontab: e.g. `SELECT count(*) FROM
+account_deletion_reqs WHERE "scheduledAt" <= now()` (and the equivalent
+selection query each route's own where-clause uses) over the SSH tunnel,
+for each of those four. `scheduled-publish` is safe to schedule but
+currently pointless — `schedulePublish` refuses every call with
+`NO_RENDERER` until a server-side renderer exists (A-16), so the cron will
+find nothing due.
 
 ## Step D — Smoke test
 
