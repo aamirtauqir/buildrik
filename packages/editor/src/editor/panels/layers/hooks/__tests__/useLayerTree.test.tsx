@@ -9,10 +9,32 @@
  */
 
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import type { Composer } from "../../../../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import { useLayerTree } from "../useLayerTree";
+
+/** D-9: the layer rebuild handler is now rAF-coalesced. Stub rAF so tests
+ *  can flush it deterministically, matching useCanvasSync's test pattern. */
+function stubRaf() {
+  let queue: Array<() => void> = [];
+  let id = 0;
+  vi.stubGlobal("requestAnimationFrame", (cb: () => void) => {
+    id += 1;
+    queue.push(cb);
+    return id;
+  });
+  vi.stubGlobal("cancelAnimationFrame", () => {
+    queue = [];
+  });
+  return {
+    flush: () => {
+      const q = queue;
+      queue = [];
+      q.forEach((cb) => cb());
+    },
+  };
+}
 
 interface EngineEl {
   getId: () => string;
@@ -180,16 +202,77 @@ describe("useLayerTree — expansion controls", () => {
    event happened to fire. */
 describe("useLayerTree — page switch", () => {
   it("rebuilds the tree when the active page changes", () => {
-    const composer = makeComposer();
-    const { result } = renderHook(() => useLayerTree(composer));
-    expect(result.current.layers.map((l) => l.id)).toEqual(["a", "b"]);
+    const raf = stubRaf();
+    try {
+      const composer = makeComposer();
+      const { result } = renderHook(() => useLayerTree(composer));
+      expect(result.current.layers.map((l) => l.id)).toEqual(["a", "b"]);
+
+      act(() => {
+        composer._setPage("page-2");
+        composer._emit(EVENTS.PROJECT_CHANGED);
+        raf.flush(); // D-9: rebuild is rAF-coalesced
+      });
+
+      // page-2's root is excluded too — its children are what the panel lists.
+      expect(result.current.layers.some((l) => l.id === "root-2")).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe("useLayerTree — D-9 hover updater bail-out", () => {
+  /* root > a > a1; a1's hover should expand ancestor "a". */
+  function makeParentedComposer(): Composer & { _emit(ev: string): void } {
+    const handlers = new Map<string, Set<() => void>>();
+    const page = { id: "page-1", root: { id: "root" } };
+    const rootEl = el("root", []);
+    const aEl = el("a", []);
+    const a1El = el("a1", []);
+    const a2El = el("a2", []);
+    aEl.getChildren = () => [a1El, a2El];
+    aEl.getParent = () => rootEl as never;
+    a1El.getParent = () => aEl as never;
+    a2El.getParent = () => aEl as never;
+    rootEl.getChildren = () => [aEl];
+    const map = new Map<string, EngineEl>([
+      ["root", rootEl],
+      ["a", aEl],
+      ["a1", a1El],
+      ["a2", a2El],
+    ]);
+    return {
+      elements: {
+        getActivePage: () => page,
+        getElement: (id: string) => map.get(id) ?? null,
+      },
+      on: (ev: string, fn: () => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      },
+      off: (ev: string, fn: () => void) => handlers.get(ev)?.delete(fn),
+      _emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
+    } as unknown as Composer & { _emit(ev: string): void };
+  }
+
+  it("returns the SAME expandedIds Set when the hovered element's ancestors are already expanded", () => {
+    const composer = makeParentedComposer();
+    const { result, rerender } = renderHook(
+      ({ hoveredId }: { hoveredId: string | null }) => useLayerTree(composer, hoveredId),
+      { initialProps: { hoveredId: null as string | null } }
+    );
 
     act(() => {
-      composer._setPage("page-2");
-      composer._emit(EVENTS.PROJECT_CHANGED);
+      rerender({ hoveredId: "a1" }); // expands ancestor "a"
     });
+    const afterFirstHover = result.current.expandedIds;
+    expect(afterFirstHover.has("a")).toBe(true);
 
-    // page-2's root is excluded too — its children are what the panel lists.
-    expect(result.current.layers.some((l) => l.id === "root-2")).toBe(false);
+    act(() => {
+      // hover a different element whose ancestors ("a") are already expanded
+      rerender({ hoveredId: "a2" });
+    });
+    expect(result.current.expandedIds).toBe(afterFirstHover); // identical reference: no new Set
   });
 });
