@@ -59,12 +59,29 @@ async function requireAdmin(
   }
 }
 
+/**
+ * The `agency_layer` flag (and `editsRequireApproval`, where a caller needs
+ * it) must be read from the SITE's own workspace, not the caller's SESSION
+ * workspace — a member of several workspaces has a session workspace that
+ * can differ from the site's, and reading the flag off the wrong one either
+ * hard-fails a mutation that should have worked or silently reports
+ * `editsRequireApproval: false` while the site's real workspace requires it
+ * (A-8). `checkSiteRole` already scopes correctly by siteId; only the
+ * flag/setting lookups needed this.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function resolveSiteWorkspaceId(ctx: any, siteId: string): Promise<string> {
+  const site = await ctx.prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  if (!site) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+  return site.workspaceId;
+}
+
 export const reviewsRouter = router({
   // A content editor (anyone with EDITOR access to the site) submits it for review.
   submit: protectedProcedure
     .input(submitReviewInput)
     .mutation(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
+      const workspaceId = await resolveSiteWorkspaceId(ctx, input.siteId);
       await requireAgencyLayer(workspaceId);
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
@@ -134,18 +151,25 @@ export const reviewsRouter = router({
   status: protectedProcedure
     .input(reviewStatusForSiteInput)
     .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
-      if (!(await isFeatureEnabled(workspaceId, "agency_layer")))
+      const site = await ctx.prisma.site.findUnique({
+        where: { id: input.siteId },
+        select: { workspaceId: true, workspace: { select: { editsRequireApproval: true } } },
+      });
+      if (!site) throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+      if (!(await isFeatureEnabled(site.workspaceId, "agency_layer")))
         /* `reviewsEnabled: false` is the point: without it the editor cannot
            tell "reviews are off here" from "this site was never sent", and
            would offer Send for review as a door into a mutation that
-           hard-fails requireAgencyLayer. */
+           hard-fails requireAgencyLayer. `editsRequireApproval` still reads
+           the SITE's real workspace setting (A-8) — the publish chip must
+           tell the truth about whether approval is required even while the
+           reviews UI itself stays hidden. */
         return {
           state: "none" as const,
           reviewerName: null,
           at: null,
           reviewsEnabled: false,
-          editsRequireApproval: false,
+          editsRequireApproval: site.workspace?.editsRequireApproval ?? false,
         };
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
@@ -177,7 +201,7 @@ export const reviewsRouter = router({
   currentRound: protectedProcedure
     .input(currentRoundInput)
     .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
+      const workspaceId = await resolveSiteWorkspaceId(ctx, input.siteId);
       if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return null;
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
