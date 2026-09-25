@@ -25,6 +25,20 @@ import { modelSchema, DEFAULT_MODEL, aiQuotaSchema } from "@buildrik/shared/sche
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 
+// Every provider-error catch below releases the quota unit it reserved, then
+// throws a fixed client-facing message with the real error logged
+// server-side. If releaseQuota itself throws (DB hiccup releasing the
+// reservation), that raw error must not replace the fixed message the catch
+// was about to throw — it's swallowed here and logged, so the caller always
+// gets the masked message, never a leaked DB error.
+async function safeReleaseQuota(userId: string): Promise<void> {
+  try {
+    await releaseQuota(userId);
+  } catch (e) {
+    console.error("[ai] releaseQuota failed", e);
+  }
+}
+
 // Reserve one AI unit for the user's tier-resolved model before a provider
 // call. content/page/layout previously called the provider with NO quota
 // reservation — unlimited free AI / cost-abuse exposure. Throws on exhaustion.
@@ -164,7 +178,7 @@ export const aiRouter = router({
       try {
         return await generateContent(input);
       } catch (e: unknown) {
-        await releaseQuota(ctx.session.user.id);
+        await safeReleaseQuota(ctx.session.user.id);
         console.error("[ai.content] provider error", e);
         if (
           e instanceof Error &&
@@ -190,7 +204,7 @@ export const aiRouter = router({
       try {
         return await generatePage(input);
       } catch (e: unknown) {
-        await releaseQuota(ctx.session.user.id);
+        await safeReleaseQuota(ctx.session.user.id);
         console.error("[ai.page] provider error", e);
         if (
           e instanceof Error &&
@@ -216,7 +230,7 @@ export const aiRouter = router({
       try {
         return await generateLayout(input);
       } catch (e: unknown) {
-        await releaseQuota(ctx.session.user.id);
+        await safeReleaseQuota(ctx.session.user.id);
         console.error("[ai.layout] provider error", e);
         if (
           e instanceof Error &&
@@ -242,7 +256,7 @@ export const aiRouter = router({
       try {
         return await summarizeChanges(input.versionName, input.changes);
       } catch (e: unknown) {
-        await releaseQuota(ctx.session.user.id);
+        await safeReleaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
         // Never echo the provider's raw error text to the client (S-8) — log
         // it server-side and return a fixed message.
@@ -267,7 +281,7 @@ export const aiRouter = router({
       try {
         return await suggestMilestone(input.recentChanges, input.pageStructure);
       } catch (e: unknown) {
-        await releaseQuota(ctx.session.user.id);
+        await safeReleaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
         console.error("[ai.milestoneSuggest] provider error", err);
         if (err.status === 429) {
@@ -331,7 +345,7 @@ export const aiRouter = router({
             model,
           });
         } catch (e) {
-          await releaseQuota(userId);
+          await safeReleaseQuota(userId);
           console.error("[ai.streamPrompt] plan generation error", e);
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Plan generation failed" });
         }
@@ -361,7 +375,7 @@ export const aiRouter = router({
                   model,
                 });
         } catch (e) {
-          await releaseQuota(userId);
+          await safeReleaseQuota(userId);
           console.error("[ai.streamPrompt] edit-command generation error", e);
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Edit generation failed" });
         }
@@ -388,7 +402,7 @@ export const aiRouter = router({
           yield chunk;
         }
       } catch (e) {
-        if (!delivered) await releaseQuota(userId);
+        if (!delivered) await safeReleaseQuota(userId);
         console.error("[ai.streamPrompt] stream error", e);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "AI response failed" });
       }
@@ -415,7 +429,7 @@ export const aiRouter = router({
         });
         return { raw };
       } catch (e: unknown) {
-        await releaseQuota(userId);
+        await safeReleaseQuota(userId);
         const err = e as { status?: number; message?: string };
         console.error("[ai.componentSchema] provider error", err);
         if (err.status === 429) {

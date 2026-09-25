@@ -185,6 +185,40 @@ describe("ai router", () => {
     expect(releaseQuota).toHaveBeenCalledWith("user-1");
   });
 
+  // A releaseQuota failure (DB hiccup releasing the reserved unit) must not
+  // replace the fixed client-facing message with its own raw error — the
+  // provider-error catch already decided what the client sees.
+  it.each([
+    ["content", () => generateContent, () => ({ prompt: "write copy", type: "content" as const })],
+    ["page", () => generatePage, () => ({ pageType: "landing" as const, description: "d", style: "modern" as const })],
+    ["layout", () => generateLayout, () => ({ prompt: "hero section" })],
+  ] as const)("%s: a releaseQuota failure inside the catch doesn't leak a raw DB error", async (name, getMock) => {
+    getMock().mockRejectedValueOnce(new Error("provider blew up"));
+    releaseQuota.mockRejectedValueOnce(new Error("db connection reset"));
+    const caller = aiRouter.createCaller(callerCtx);
+    let caught: TRPCError | null = null;
+    try {
+      await (caller[name] as (i: unknown) => Promise<unknown>)(
+        name === "content"
+          ? { prompt: "write copy", type: "content" as const }
+          : name === "page"
+            ? { pageType: "landing" as const, description: "d", style: "modern" as const }
+            : { prompt: "hero section" },
+      );
+    } catch (err) {
+      caught = err as TRPCError;
+    }
+    expect(caught?.code).toBe("INTERNAL_SERVER_ERROR");
+    expect(caught?.message).not.toContain("db connection reset");
+  });
+
+  it("releaseQuota is never called on a successful mutation", async () => {
+    generateContent.mockResolvedValueOnce({ text: "ok" });
+    const caller = aiRouter.createCaller(callerCtx);
+    await caller.content({ prompt: "write copy", type: "content" });
+    expect(releaseQuota).not.toHaveBeenCalled();
+  });
+
   it("streamPrompt masks assertProviderConfigured's message behind a fixed string", async () => {
     assertProviderConfigured.mockImplementationOnce(() => {
       throw new Error("AI is not configured: no OpenAI API key on the server.");
