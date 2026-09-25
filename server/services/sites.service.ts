@@ -98,11 +98,18 @@ export async function listSites(
     },
   } as const;
 
-  const enrich = (site: {
-    analytics: { visitors: number }[];
-    domains: { domain: string; isPrimary: boolean }[];
-    [key: string]: unknown;
-  }) => {
+  // Regression fix (dashboard tsc, fix round 1): the previous inline object
+  // type for `site` mixed named properties with an index signature
+  // (`[key: string]: unknown`) as an escape hatch for the rest-spread below.
+  // TS's rest-destructuring inference collapses that combination — `...rest`
+  // typed as `{}` rather than the named fields — so `enrich`'s return type
+  // silently narrowed to just `{ domain, visitors30d }` and every dashboard
+  // consumer of `sites.list` (projects page, client detail view, command
+  // palette, invite modal, use-template modal) broke on `.id`/`.name`/etc.
+  // A precise Prisma-derived payload type has no index signature, so the
+  // rest spread keeps its named fields.
+  type SiteRow = Prisma.SiteGetPayload<{ select: typeof SITE_SELECT }>;
+  const enrich = (site: SiteRow) => {
     const { analytics, domains, ...rest } = site;
     return {
       ...rest,
