@@ -56,7 +56,8 @@ let _baselineLastEditedAt: string | null = null;
 let _conflictToken: string | null = null;
 
 /** Whether a save conflict is waiting on the user's choice. Autosave reads it
- *  before sending; a manual save still goes out (and re-surfaces the dialog). */
+ *  and holds the edit; a manual save is not sent either — saveProjectNow
+ *  refuses with the held SaveConflictError, which re-surfaces the dialog. */
 export function isSaveConflictPending(): boolean {
   return _conflictToken !== null;
 }
