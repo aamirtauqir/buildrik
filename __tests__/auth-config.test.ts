@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Transaction-client mock (used inside $transaction callback)
 const txUserCreate = vi.fn();
@@ -18,6 +18,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     account: {
       findFirst: vi.fn(),
+      findUnique: vi.fn(),
       upsert: vi.fn(),
     },
     $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
@@ -234,5 +235,228 @@ describe("OAuth signIn callback", () => {
 
     expect(result).toBe("/auth/error/social-error?reason=unverified-email");
     expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+  });
+});
+
+// CRITICAL N1 (controller ruling, fix round 2) — GitHub's own `userinfo`
+// override must resolve email from `/user/emails`' `verified: true` flag,
+// never from `/user`'s free-text "public email" field or an
+// unverified-but-primary fallback.
+describe("GitHub provider userinfo() — real profile/userinfo function (CRITICAL N1)", () => {
+  // NextAuth's `GitHub(config)` factory stores whatever config we pass under
+  // `.options` on the returned provider object — the DEFAULT `.userinfo` on
+  // that object is untouched; Auth.js only deep-merges `.options` onto the
+  // defaults inside its own internal `parseProviders()` at real request
+  // time (node_modules/@auth/core/lib/utils/providers.js — not part of the
+  // package's public exports, so not worth importing here). Reading
+  // `.options.userinfo.request` grabs exactly the function this repo wrote
+  // in server/auth.config.ts, which is what these tests need to verify.
+  function githubUserinfoRequest() {
+    const provider = authConfig.providers.find(
+      (p) => (typeof p === "function" ? p({}) : p).id === "github",
+    );
+    const resolved = (typeof provider === "function" ? provider({}) : provider) as {
+      options: { userinfo: { request: (args: { tokens: { access_token: string } }) => Promise<{ email: string | null }> } };
+    };
+    return resolved.options.userinfo.request;
+  }
+
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset();
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("an unverified primary email → no email returned (never trusted)", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url === "https://api.github.com/user") {
+        return Promise.resolve({ json: () => Promise.resolve({ id: 1, login: "attacker", email: null }) });
+      }
+      if (url === "https://api.github.com/user/emails") {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { email: "victim@example.com", primary: true, verified: false },
+              { email: "attacker-real@example.com", primary: false, verified: true },
+            ]),
+        });
+      }
+      throw new Error(`unexpected fetch ${url}`);
+    });
+
+    const profile = await githubUserinfoRequest()({ tokens: { access_token: "tok" } });
+    // The unverified PRIMARY is never used — falls back to the verified
+    // secondary instead of the attacker's chosen unverified address.
+    expect(profile.email).toBe("attacker-real@example.com");
+  });
+
+  it("no verified email at all → email is null (signIn refuses)", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url === "https://api.github.com/user") {
+        return Promise.resolve({ json: () => Promise.resolve({ id: 1, login: "attacker", email: null }) });
+      }
+      if (url === "https://api.github.com/user/emails") {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([{ email: "victim@example.com", primary: true, verified: false }]),
+        });
+      }
+      throw new Error(`unexpected fetch ${url}`);
+    });
+
+    const profile = await githubUserinfoRequest()({ tokens: { access_token: "tok" } });
+    expect(profile.email).toBeNull();
+  });
+
+  it("a verified secondary email is used when primary is unverified and no other verified email exists", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url === "https://api.github.com/user") {
+        return Promise.resolve({ json: () => Promise.resolve({ id: 2, login: "real-user", email: null }) });
+      }
+      if (url === "https://api.github.com/user/emails") {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { email: "unverified@example.com", primary: true, verified: false },
+              { email: "verified-secondary@example.com", primary: false, verified: true },
+            ]),
+        });
+      }
+      throw new Error(`unexpected fetch ${url}`);
+    });
+
+    const profile = await githubUserinfoRequest()({ tokens: { access_token: "tok" } });
+    expect(profile.email).toBe("verified-secondary@example.com");
+  });
+
+  it("ignores /user's own `email` field entirely — only /user/emails' verified flag counts", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url === "https://api.github.com/user") {
+        // /user's own email field claims an address — must be ignored.
+        return Promise.resolve({
+          json: () => Promise.resolve({ id: 3, login: "someone", email: "claimed@example.com" }),
+        });
+      }
+      if (url === "https://api.github.com/user/emails") {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([{ email: "actually-verified@example.com", primary: true, verified: true }]),
+        });
+      }
+      throw new Error(`unexpected fetch ${url}`);
+    });
+
+    const profile = await githubUserinfoRequest()({ tokens: { access_token: "tok" } });
+    expect(profile.email).toBe("actually-verified@example.com");
+  });
+});
+
+describe("signIn callback — GitHub unverified email refused on both paths (CRITICAL N1)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("first-verification path: refuses when GitHub's userinfo resolved no verified email", async () => {
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const result = await signInCallback({
+      user: { id: "temp", email: undefined } as any,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-1" } as any,
+      // The userinfo override returns `email: null` for an unverified-only
+      // account — NextAuth's profile() mapping carries that straight to
+      // `user.email`.
+      profile: { email: null } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe("/auth/error/social-error?reason=unverified-email");
+    expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("link path: refuses linking into an existing row when GitHub gave no verified email", async () => {
+    // Even though a row for this address already exists (and is verified),
+    // the sign-in attempt itself carries no verified GitHub email — must
+    // never reach the existing-row lookup at all, let alone link.
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const result = await signInCallback({
+      user: { id: "temp", email: undefined } as any,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-2" } as any,
+      profile: { email: null } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe("/auth/error/social-error?reason=unverified-email");
+    expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("a GitHub-verified email DOES proceed (positive control)", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    txUserCreate.mockResolvedValue({ id: "new-gh-user", email: "real@example.com", fullName: "Real User" });
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const userObj = { id: "temp", email: "real@example.com", name: "Real User" } as any;
+    const result = await signInCallback({
+      user: userObj,
+      account: { provider: "github", type: "oauth", providerAccountId: "gh-3" } as any,
+      profile: { email: "real@example.com" } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(userObj.id).toBe("new-gh-user");
+  });
+});
+
+describe("signIn callback — Account provider-link ownership cannot be reassigned (CRITICAL N1)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("refuses when the provider_providerAccountId is already linked to a DIFFERENT user", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-b",
+      email: "shared@example.com",
+      passwordHash: null,
+      emailVerified: new Date("2026-01-01"),
+      accounts: [],
+    } as any);
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-a" } as any);
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const result = await signInCallback({
+      user: { id: "temp", email: "shared@example.com" } as any,
+      account: { provider: "google", type: "oauth", providerAccountId: "g-shared" } as any,
+      profile: { email: "shared@example.com", email_verified: true } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe("/auth/error/social-error?reason=provider-linked-elsewhere");
+    expect(mockPrisma.account.upsert).not.toHaveBeenCalled();
+  });
+
+  it("proceeds normally when the provider link already belongs to the SAME user (re-login)", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user-a",
+      email: "owner@example.com",
+      passwordHash: null,
+      emailVerified: new Date("2026-01-01"),
+      accounts: [{ provider: "google" }],
+    } as any);
+    mockPrisma.account.findUnique.mockResolvedValue({ userId: "user-a" } as any);
+
+    const signInCallback = authConfig.callbacks!.signIn!;
+    const result = await signInCallback({
+      user: { id: "temp", email: "owner@example.com" } as any,
+      account: { provider: "google", type: "oauth", providerAccountId: "g-owned" } as any,
+      profile: { email: "owner@example.com", email_verified: true } as any,
+      credentials: undefined as any,
+    } as any);
+
+    expect(result).toBe(true);
+    expect(mockPrisma.account.upsert).toHaveBeenCalled();
   });
 });
