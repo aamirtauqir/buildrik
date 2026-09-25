@@ -88,7 +88,13 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return getSiteSettings(input.siteId);
+        try {
+          return await getSiteSettings(input.siteId);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+          throw e;
+        }
       }),
 
     update: protectedProcedure

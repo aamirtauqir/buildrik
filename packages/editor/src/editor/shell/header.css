@@ -74,6 +74,8 @@
    `--unread` is one class, so ::before is written two deep to clear Row's own
    `tw:relative` utilities on source order. */
 .bk-notifications .bk-notif-row--unread { background: var(--bk-accent-tint); }
+/* ink-muted on the tint is 4.49:1 (WCAG AA fail); the unread age steps up. */
+.bk-notifications .bk-notif-row--unread .bk-notif-row__meta { color: var(--bk-ink-soft); }
 .bk-notifications .bk-notif-row--unread::before {
   content: "";
   position: absolute;

@@ -49,14 +49,6 @@
       "testId": "set-field-label-default-og-image-url",
       "spec": "s7-settings-seo",
       "nodeId": "638:3397"
-    },
-    {
-      "name": "field-title-template",
-      "testId": "set-field-title-template"
-    },
-    {
-      "name": "field-title-template-label",
-      "testId": "set-field-label-title-template"
     }
   ],
   "_note": [
@@ -102,6 +94,9 @@
     "it is doing more work than the board credits. It is also the one place the",
     "two screens are linked, and it is prose, not a link: it names the Pages tab",
     "but does not go there. The board's note asks for exactly that ('this screen",
-    "does not say how many pages override the default'), and neither side has it."
+    "does not say how many pages override the default'), and neither side has it.",
+    "",
+    "2026-09-25 (conformance-recipes): field-title-template + label dropped — the Title template field was removed on purpose",
+    "when SEO defaults were rebuilt to Clone 3397:32076, whose frame draws none (487a971fa)."
   ]
 }

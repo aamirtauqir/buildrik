@@ -134,10 +134,14 @@ for (const name of CASES) {
           /* Second CI run (33614492368): with 1px, 18 cases still failed on
              text-wrapped nodes alone — 42 drifts, all width, max 2.84px / 6%
              (a 57px label at 55). Linux Chromium shapes Inter a few percent
-             narrower. So: 3px for anything, or 6% for nodes under 160px (a
-             label, a chip, a button — never a panel, a drawer or a row). */
+             narrower. So: 3px for anything, or 7% for nodes under 160px (a
+             label, a chip, a button — never a panel, a drawer or a row).
+             6% → 7% 2026-09-25: media-drawer-no-results>23 sat at 6.02% on
+             mac-captured baselines vs a linux CI run, twice — mac's own
+             refresh keeps landing just past a 6% line drawn from a linux
+             sample. 7% still excludes anything panel/drawer/row-sized. */
           const b = parseFloat(bv), d = Math.abs(parseFloat(av) - b);
-          if (Number.isFinite(d) && (d <= 3 || (b < 160 && d / b <= 0.06))) continue;
+          if (Number.isFinite(d) && (d <= 3 || (b < 160 && d / b <= 0.07))) continue;
         }
         /* An `auto` margin resolves to whatever is left over, so it inherits the
            same text-shaping difference: CI run 33620647495 had exactly two

@@ -70,6 +70,15 @@ beforeEach(() => {
 });
 
 describe("remaining UI toggles", () => {
+  /* Board 7063:78846 prints "Paste HTML…  ⌘⇧V" in the Add panel's ⋯ menu. */
+  it("paste-html is ⌘⇧V and asks for the Paste HTML dialog", () => {
+    const cmd = buildDefaultCommands(composer as unknown as Composer).find((c) => c.id === "paste-html");
+    expect(cmd?.label).toBe("Paste HTML…");
+    expect(cmd?.shortcut).toBe("ctrl+shift+v");
+    run("paste-html");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PASTE_HTML_REQUESTED);
+  });
+
   it("ui-open-exporter emits its event", () => {
     run("ui-open-exporter");
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_EXPORTER);

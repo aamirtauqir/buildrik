@@ -10,10 +10,14 @@ export interface ComposerProps {
   /** "7 left today" (board 4418:104313, G2-129) — only when the quota read
    *  answered; absent otherwise. */
   quotaLabel?: string;
+  /** Draw "Plan changes" under the field. The run boards (4418:104837 …
+   *  105548) show the field alone while a run is on screen; Enter still
+   *  sends whenever nothing is streaming. Default: not while streaming. */
+  showPlan?: boolean;
 }
 
 export const Composer: React.FC<ComposerProps> = ({
-  onSubmit, streaming, quotaLabel,
+  onSubmit, streaming, quotaLabel, showPlan = !streaming,
 }) => {
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
@@ -26,12 +30,10 @@ export const Composer: React.FC<ComposerProps> = ({
     onSubmit(trimmed);
   };
 
-  /* Boards 170:7 / 170:36 / 170:48 / 171:74 draw the prompt block as 72 tall:
-     8 above a 52-tall input, 12 below. It measured 100, because the send
-     control sat in a row of its own UNDER the input — and no AI board draws
-     that row at all. The control is not deleted (Enter alone is not a visible
-     way to send); it moves inside the field, where the boards leave the space
-     empty. */
+  /* Boards 4418:104313 / 104454 / 6881:63246: the field (248 wide, the
+     counter in its corner), then "Plan changes" as a 28-tall primary of its
+     own under it, on the left. It used to sit inside the field as a 22-tall
+     chip. */
   return (
     <div className="bd-ai-composer" data-testid="ai-prompt">
       <div className="bd-ai-composer-field">
@@ -50,28 +52,24 @@ export const Composer: React.FC<ComposerProps> = ({
           }}
           rows={2}
         />
-        {quotaLabel || !streaming ? (
-          <div className="bd-ai-composer-foot">
-            {quotaLabel ? (
-              <span className="bd-ai-composer-quota" data-testid="ai-quota">
-                {quotaLabel}
-              </span>
-            ) : null}
-            {streaming ? null : (
-              <Button
-                type="button"
-                className="bd-ai-composer-send"
-                disabled={!trimmed}
-                onClick={submit}
-              >
-                {/* Board 4418:104454's primary is a labelled "Plan changes" — the
-                    panel only plans and runs (decision #23). It was a bare ↑. */}
-                Plan changes
-              </Button>
-            )}
-          </div>
+        {quotaLabel ? (
+          <span className="bd-ai-composer-quota" data-testid="ai-quota">
+            {quotaLabel}
+          </span>
         ) : null}
       </div>
+      {showPlan ? (
+        <Button
+          type="button"
+          size="xs"
+          className="tw:mt-3 tw:h-7 tw:rounded-md tw:px-2 tw:text-[13px] tw:font-medium tw:focus:ring-0 tw:disabled:bg-[var(--bk-accent)] tw:disabled:text-[var(--bk-accent-on)] tw:disabled:opacity-40"
+          disabled={!trimmed || streaming}
+          onClick={submit}
+          data-testid="ai-plan-changes"
+        >
+          Plan changes
+        </Button>
+      ) : null}
     </div>
   );
 };

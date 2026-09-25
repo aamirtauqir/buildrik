@@ -30,9 +30,15 @@ export interface AssetPickRequest {
   onSelect?: (asset: MediaAsset) => void;
   /** A starting search for the grid (⌘K passes the element's name). */
   query?: string;
+  /** The rail tab whose workspace asked. It stays the active rail item and
+   *  keeps its workspace open beside the picker — CMS pick boards 6765:59890
+   *  draw the record sheet still open, rail on CMS, while the drawer picks. */
+  host?: "content";
 }
 
 let pending: AssetPickRequest | null = null;
+/** Who asked — so a hosted pick can hand the rail back when it ends. */
+let pendingComposer: Composer | null = null;
 const listeners = new Set<() => void>();
 
 function publish(next: AssetPickRequest | null) {
@@ -42,13 +48,19 @@ function publish(next: AssetPickRequest | null) {
 
 /** Open the Assets drawer in pick mode for `request`. */
 export function requestAssetPick(composer: Composer, request: AssetPickRequest): void {
+  pendingComposer = composer;
   publish(request);
   composer.emit("ui:switch-tab", { tab: "assets" });
 }
 
-/** Leave pick mode (Cancel, ✕, or after a pick lands). */
+/** Leave pick mode (Cancel, ✕, or after a pick lands). A hosted pick
+ *  returns the drawer to its host tab. */
 export function endAssetPick(): void {
+  const host = pending?.host;
+  const composer = pendingComposer;
+  pendingComposer = null;
   publish(null);
+  if (host && composer) composer.emit("ui:switch-tab", { tab: host });
 }
 
 function subscribe(listener: () => void) {
@@ -60,6 +72,13 @@ function subscribe(listener: () => void) {
 
 export function useAssetPick(): AssetPickRequest | null {
   return React.useSyncExternalStore(subscribe, () => pending, () => null);
+}
+
+/** The rail tab that reads as active: the pick's host while its picker is
+ *  open in the Assets drawer, else the drawer's own tab. */
+export function useRailTab<T extends string>(activeTab: T): T | "content" {
+  const pick = useAssetPick();
+  return activeTab === "assets" && pick?.host ? pick.host : activeTab;
 }
 
 /**

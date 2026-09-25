@@ -24,7 +24,7 @@ import {
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, Modal, useToast } from "@/editor/chrome-ui";
 import { SaveVersionFooter } from "./version-history/SaveVersionFooter";
 import { ALL_SAVES, SavesFilter, applySavesFilter, type SavesFilterValue } from "./version-history/SavesFilter";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
@@ -83,26 +83,30 @@ const SKELETON_BAR_W = ["tw:w-[132px]", "tw:w-[96px]", "tw:w-[150px]", "tw:w-[11
    round at all, so it hangs off the two variants rather than the base. */
 const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-16)] tw:py-2.5";
-/* Board 163:167's confirm band — accent tint, its own actions row. */
-const RESTORE_CONFIRM =
-  "tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
-const RESTORE_CONFIRM_TITLE = "tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)]";
-const RESTORE_CONFIRM_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
-const RESTORE_CONFIRM_ACTIONS = "tw:mt-1 tw:flex tw:items-center tw:justify-between tw:gap-2";
+/* Board 4418:74511 — 13/20 ink-soft body, then a 12/16 muted footnote. */
+/* 4418:173587 / 6881:70883 — the details overlay's 13/20 ink lines. */
+const DETAILS_LINE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const RESTORE_CONFIRM_BODY = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+const RESTORE_CONFIRM_SUB = "tw:mt-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 const NOTICE_PRUNED =
   `${NOTICE_BASE} tw:rounded-lg tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
 const NOTICE_RESTORING =
   `${NOTICE_BASE} tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
 const NOTICE_STRONG = "tw:font-normal tw:text-[12px] tw:leading-[18px]";
-const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* ink-soft, as RESTORE_CONFIRM_SUB: ink-muted on the accent tint is 4.49:1. */
+const NOTICE_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 export function VersionHistoryPanel({
   composer,
   searchQuery = "",
+  onMatchCount,
 }: {
   composer: Composer | null;
   searchQuery?: string;
+  /** Board 4418:165744's "1 of 4 match" band is drawn by the tab, above the
+   *  approval band; the counts live here. */
+  onMatchCount?: (shown: number, total: number) => void;
 }) {
   const {
     versions,
@@ -260,6 +264,9 @@ export function VersionHistoryPanel({
     const query = searchQuery.toLowerCase();
     return kept.filter((v) => v.name.toLowerCase().includes(query));
   }, [versions, searchQuery, savesFilter]);
+  React.useEffect(() => {
+    onMatchCount?.(filteredVersions.length, versions.length);
+  }, [onMatchCount, filteredVersions.length, versions.length]);
 
   /* Board 162:2 puts a change count on every row. It is derived, not stored:
      the undo stack is the same source the board's sibling view (Saves ·
@@ -279,6 +286,8 @@ export function VersionHistoryPanel({
     : null;
 
   // Version currently awaiting restore confirmation (rendered outside the list).
+  const [detailsId, setDetailsId] = React.useState<string | null>(null);
+  const detailsVersion = detailsId ? versions.find((v) => v.id === detailsId) ?? null : null;
   const restoreConfirmVersion = restoreConfirmId
     ? filteredVersions.find((v) => v.id === restoreConfirmId) ?? null
     : null;
@@ -340,38 +349,31 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
-      {/* Board 163:167 — the restore confirm, at the TOP of the panel.
-          It used to render below the list, "as a pinned section", which on a
-          list of fifty auto-saves put the confirmation for a click at the top
-          somewhere the user had to go looking for.
-
-          The board also carries the sentence this was missing entirely:
-          restoring does not discard the current work, it saves it first. That
-          is the whole reason the action is safe to take, and the confirm said
-          only "Restore to X?". The board writes "saved as v4 first" — the
-          engine does save first (VERSION_RESTORING reports `savedAs`), but
-          not until the restore is under way, so the name is absent and the
-          fact stated. */}
-      {restoreConfirmVersion && (
-        <div className={RESTORE_CONFIRM} role="alertdialog" aria-label="Confirm restore">
-          <strong className={RESTORE_CONFIRM_TITLE}>
-            Restore “{versionDisplayName(restoreConfirmVersion)}”?
-          </strong>
-          <span className={RESTORE_CONFIRM_SUB}>
-            Your current work is saved first — nothing is lost.
-          </span>
-          <div className={RESTORE_CONFIRM_ACTIONS}>
-            {/* Cancel first, per the board: the safe door is the one nearer
-                the reading order's start. */}
-            <Button color="light" size="xs" className="tw:h-7" onClick={handleRestoreCancel}>
-              Cancel
-            </Button>
-            <Button size="xs" className="tw:h-7" onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}>
-              Restore
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Board 4418:74511 — the restore confirm is a centred modal naming what
+          a restore touches and what it leaves alone. Its second sentence
+          keeps the engine's own guarantee: the current work is saved first
+          (VERSION_RESTORING reports `savedAs`), so nothing is lost. */}
+      <ConfirmDialog
+        open={restoreConfirmVersion !== null}
+        testId="history-restore-confirm"
+        onClose={handleRestoreCancel}
+        onConfirm={() => restoreConfirmVersion && handleRestoreConfirm(restoreConfirmVersion.id)}
+        title={
+          restoreConfirmVersion
+            ? `Restore “${versionDisplayName(restoreConfirmVersion)}” to the draft?`
+            : "Restore to the draft?"
+        }
+        message={
+          <>
+            <p className={RESTORE_CONFIRM_BODY}>
+              Restores draft pages, styles and saved site settings. Your live site, Content records,
+              Media, saved components and server settings stay unchanged.
+            </p>
+            <p className={RESTORE_CONFIRM_SUB}>Your current work is saved first — nothing is lost.</p>
+          </>
+        }
+        confirmLabel="Restore draft"
+      />
 
       {/* Board 163:220 — the restore banner, above the list. */}
       {restoring && (
@@ -415,7 +417,50 @@ export function VersionHistoryPanel({
         onDeleteConfirm={handleDeleteConfirm}
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
+        onDetails={setDetailsId}
       />
+
+      {/* Board 4418:173587 — a save's details, with the two things one does
+          next: compare it with the current draft, or restore it. */}
+      <Modal
+        open={detailsVersion !== null}
+        onClose={() => setDetailsId(null)}
+        testId="history-save-details"
+        title="Saved version"
+        footer={
+          <>
+            <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" onClick={() => setDetailsId(null)}>
+              Close
+            </Button>
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => {
+                if (detailsVersion) void handleCompare(detailsVersion.id);
+                setDetailsId(null);
+              }}
+            >
+              Compare with current
+            </Button>
+            <Button
+              size="xs"
+              onClick={() => {
+                if (detailsVersion) handleRestoreClick(detailsVersion.id);
+                setDetailsId(null);
+              }}
+            >
+              Restore this save…
+            </Button>
+          </>
+        }
+      >
+        <p className={DETAILS_LINE}>{composer?.getProjectMetadata?.()?.name || "Untitled site"}</p>
+        <p className={DETAILS_LINE}>Inspect this save before restoring it. Your live site stays unchanged.</p>
+        <p className={`${DETAILS_LINE} tw:mt-4`}>Selected save</p>
+        <p className={`${DETAILS_LINE} tw:mt-2`} data-testid="history-save-details-line">
+          {detailsVersion ? `${versionDisplayName(detailsVersion)} · ${formatTime(detailsVersion.createdAt)}` : ""}
+        </p>
+      </Modal>
 
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}

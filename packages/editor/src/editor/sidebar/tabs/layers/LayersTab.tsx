@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, Popover, TOPBAR_CONTEXT_SEARCH_ID, Tooltip } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -56,7 +56,6 @@ export interface LayersTabProps {
   composer: Composer | null;
   onElementSelect?: (elementId: string) => void;
   canvasHoveredId?: string | null;
-  onAddBlockClick?: () => void;
   /** Header help action (board 208:191 — the 16:6 Panel header's first slot). */
   onHelpClick?: () => void;
   /** Header close action (16:6 second slot — "closing is the last thing you do"). */
@@ -77,9 +76,15 @@ const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]"
 
 /* Escape deselects, then closes the drawer (owner ruling 2026-09-24) — but a key meant for
    something else is not ours: a rename field or any other text field, an
-   open menu or dialog, or focus on the canvas (where Escape deselects). */
+   open menu or dialog, or focus on the canvas (where Escape deselects).
+   Inspector "Pick on canvas" is also not ours: cancelling it should leave the
+   selection you started from alone. Live walk (2026-09-25) confirmed this is
+   a window-CAPTURE listener that races Canvas.tsx's own document-bubble pick
+   handler and always wins, so without this check a single Escape both
+   cancelled the pick AND cleared the selection out from under it. */
 function escapeIsOurs(e: KeyboardEvent): boolean {
   if (document.querySelector('[role="menu"], [role="dialog"], [role="alertdialog"]')) return false;
+  if (document.querySelector('[data-bk-pick="true"]')) return false;
   const t = e.target instanceof HTMLElement ? e.target : null;
   if (!t || t === document.body) return true;
   /* The topbar Layers filter: the first Escape empties it, the next closes. */
@@ -92,7 +97,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   composer,
   onElementSelect,
   canvasHoveredId,
-  onAddBlockClick,
   onHelpClick,
   onClose,
   isExpanded,
@@ -125,15 +129,19 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
-  const [stats, setStats] = React.useState<{ total: number; selected: number }>({ total: 0, selected: 0 });
+  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null }>({
+    total: 0,
+    selected: 0,
+    matches: null,
+  });
 
   // Subscribe to stats event from LayersPanel
   React.useEffect(() => {
     if (!composer) return;
     const onStats = (data: unknown) => {
-      const d = data as { total: number; selected: number };
+      const d = data as { total: number; selected: number; matches?: number | null };
       if (typeof d?.total === "number" && typeof d?.selected === "number") {
-        setStats({ total: d.total, selected: d.selected });
+        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null });
       }
     };
     composer.on("layers:stats-change", onStats);
@@ -155,13 +163,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       setSearch("");
     };
   }, [composer, isOpen]);
-  /* The no-results "clear": re-announcing the context is what empties the
-     topbar field (StudioHeader resets its query on every context). */
-  const clearSearch = React.useCallback(() => {
-    setSearch("");
-    composer?.emit(EVENTS.UI_SEARCH_CONTEXT, { placeholder: LAYERS_SEARCH_PLACEHOLDER });
-  }, [composer]);
-
   React.useEffect(() => {
     if (!onClose || menuOpen || !isOpen) return;
     /* Two steps, as the prototype is wired: with something selected Escape
@@ -227,6 +228,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               <MenuItem data-testid="layers-collapse-all" onClick={runMenu(() => composer?.emit("layers:collapse-all", {}))}>
                 Collapse all
               </MenuItem>
+              <MenuSeparator />
               <MenuItem
                 data-testid="layers-display-settings-toggle"
                 onClick={runMenu(() => setDisplaySettingsOpen((v) => !v))}
@@ -259,11 +261,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               selectedElement={selectedElement}
               onLayerHover={handleLayerHover}
               canvasHoveredId={canvasHoveredId}
-              onAddBlockClick={onAddBlockClick}
               search={search}
               displaySettingsOpen={displaySettingsOpen}
               onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}
-              onSearchChange={clearSearch}
             />
           </LayersTreeBoundary>
         ) : (
@@ -279,9 +279,11 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           {/* The span is the board's own second node (142:59 inside 142:58):
               the band carries the height, the run carries the type. */}
           <span data-testid="layers-count-text">
-            {stats.selected >= 2
-              ? `${stats.selected} selected of ${stats.total}`
-              : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+            {stats.matches !== null && search
+              ? `${stats.matches} of ${stats.total} layers match “${search}”`
+              : stats.selected >= 2
+                ? `${stats.selected} selected of ${stats.total}`
+                : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
           </span>
           {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
               dims the element for you; the published site still shows it. */}

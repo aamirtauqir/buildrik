@@ -24,9 +24,22 @@ const baseProps = {
   onReplaceLayout: vi.fn(),
   onCopyLink: vi.fn(),
   onSettings: vi.fn(),
+  onRemoveFromFolder: vi.fn(),
 };
 
 describe("PageContextMenu", () => {
+  /* The row's hover × left the row when v3 7069:79370 gave that spot to the
+     ⠿ handle; taking a page out of its folder lives here now. */
+  it("offers Remove from <folder> only for a page in a folder", () => {
+    const onRemoveFromFolder = vi.fn();
+    const { unmount } = render(<PageContextMenu pageId="p2" {...baseProps} />);
+    expect(screen.queryByTestId("pages-menu-remove-folder")).toBeNull();
+    unmount();
+    render(<PageContextMenu pageId="p2" {...baseProps} folderName="Marketing" onRemoveFromFolder={onRemoveFromFolder} />);
+    fireEvent.click(screen.getByText("Remove from Marketing"));
+    expect(onRemoveFromFolder).toHaveBeenCalledWith("p2");
+  });
+
   it("renders a labelled menu of menuitems", () => {
     render(<PageContextMenu pageId="p2" {...baseProps} />);
     const menu = screen.getByRole("menu");

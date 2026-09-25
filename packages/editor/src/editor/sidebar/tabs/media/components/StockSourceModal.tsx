@@ -33,16 +33,17 @@
  */
 
 import * as React from "react";
-import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
-import { SearchBar } from "../../../shared/SearchBar";
-import type { StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
+import { Search, X } from "lucide-react";
+import { Button, IconButton, ModalBody, ModalContent, ModalRoot, TextInput } from "@/editor/chrome-ui";
+import type { DiscColor, DiscOrientation, StockFailureReason, StockPhoto, StockVideo } from "../data/mediaTypes";
 import {
   LIBRARY_MODAL_BODY,
+  LIBRARY_MODAL_BTN_OUTLINE,
   LIBRARY_MODAL_BTN_PRIMARY,
-  LIBRARY_MODAL_BTN_SECONDARY,
   LIBRARY_MODAL_FOOT,
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
+import { COLORS, FAILURE_COPY, FilterDropdown, ORIENTATIONS, TYPES } from "./StockBrowserOverlay";
 
 export type StockKind = "img" | "vid";
 export type StockItem = StockPhoto | StockVideo;
@@ -57,50 +58,34 @@ interface StockSourceModalProps {
   /** WHY the last search failed, or null/absent when it did not (blocker A-STOCK). */
   searchFailed?: StockFailureReason | null;
   onSearch(query: string): void;
+  orientation: DiscOrientation;
+  color: DiscColor;
+  onSetOrientation(o: DiscOrientation): void;
+  onSetColor(c: DiscColor): void;
   onLoadMore(type: "img" | "vid"): void;
   /** Save the ONE selected result. Resolves when it has settled; closing is the orchestrator's. */
   onSave(type: StockKind, item: StockItem): Promise<unknown> | void;
 }
 
-const SOURCES: ReadonlyArray<{ id: StockKind; label: string; noun: string }> = [
-  { id: "img", label: "Photos", noun: "photos" },
-  { id: "vid", label: "Videos", noun: "videos" },
-];
 
 const PROVIDER_LABEL: Record<string, string> = { unsplash: "Unsplash", pexels: "Pexels", pixabay: "Pixabay" };
 
-/**
- * Each failure gets its own sentence because each has a different next step,
- * and none of them is "try a different search term" — which is the only thing
- * the old shared "No photos found for …" copy could ever suggest.
- *
- * `retryable` gates the Try again button: re-running the query cannot conjure
- * an API key, so offering it on a configuration fault just wastes the click.
- */
-const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
-  "not-configured": {
-    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
-    retryable: false,
-  },
-  unauthorized: {
-    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
-    retryable: false,
-  },
-  "request-failed": {
-    message: "Couldn't reach the stock library.",
-    retryable: true,
-  },
-};
-
+/* v3 4418:154195 / 6883:75565: one result per row — a 24-inset card, 180
+   image on r8, name and credit 14 ink; the chosen one wears a 2px accent
+   edge on r8. States (6840:62903 rest, 6823:599xx) sit in the same 24 inset. */
 const CARD =
-  "tw:flex tw:flex-col tw:gap-1 tw:rounded-lg tw:border-2 tw:p-2 tw:text-left tw:cursor-pointer " +
+  "tw:flex tw:flex-col tw:gap-5 tw:rounded-xl tw:border-2 tw:p-[22px] tw:text-left tw:cursor-pointer " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-const CARD_OFF = "tw:border-transparent tw:hover:bg-[var(--bk-bg-subtle)]";
-const CARD_ON = "tw:border-[var(--bk-accent)]";
-const THUMB = "tw:block tw:w-full tw:aspect-[3/2] tw:rounded-md tw:object-cover tw:bg-[var(--bk-bg-subtle)]";
-const TITLE = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
-const CREDIT = "tw:truncate tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const STATE = "tw:m-0 tw:py-8 tw:text-center tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const CARD_OFF = "tw:border-transparent tw:hover:bg-[var(--bk-gray-50)]";
+const CARD_ON = "tw:rounded-lg tw:border-[var(--bk-accent)]";
+const THUMB = "tw:block tw:h-45 tw:w-full tw:rounded-lg tw:object-cover tw:bg-[var(--bk-bg-subtle)]";
+const TITLE = "tw:truncate tw:text-[14px] tw:font-normal tw:leading-5 tw:text-[var(--bk-ink)]";
+const CREDIT = "tw:truncate tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const STATE = "tw:m-0 tw:p-6 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const SEARCH_FIELD =
+  "tw:flex tw:h-9 tw:items-center tw:gap-2 tw:rounded-md tw:border tw:border-[var(--bk-border-input)] tw:bg-white tw:pl-3 tw:pr-1 tw:text-[var(--bk-ink-muted)] " +
+  "tw:[&>div]:min-w-0 tw:[&>div]:flex-1 tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:p-0 tw:[&_input]:text-[14px] " +
+  "tw:[&_input]:leading-5 tw:[&_input]:text-[var(--bk-ink)] tw:[&_input]:shadow-none tw:[&_input]:ring-0 tw:[&_input]:outline-none";
 
 interface CardProps {
   id: string;
@@ -166,12 +151,17 @@ export function StockSourceModal({
   searchQuery,
   searchFailed,
   onSearch,
+  orientation,
+  color,
+  onSetOrientation,
+  onSetColor,
   onLoadMore,
   onSave,
 }: StockSourceModalProps) {
   const [source, setSource] = React.useState<StockKind>("img");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [draft, setDraft] = React.useState(searchQuery);
 
   // A reopened dialog starts on photos with nothing selected.
   React.useEffect(() => {
@@ -182,17 +172,22 @@ export function StockSourceModal({
     }
   }, [open]);
 
+  React.useEffect(() => setDraft(searchQuery), [searchQuery]);
+
+  /* Typing searches after a pause; Enter searches now (the rest state tells
+     the user to "press Enter"). */
+  React.useEffect(() => {
+    if (draft === searchQuery) return;
+    const t = setTimeout(() => onSearch(draft), 400);
+    return () => clearTimeout(t);
+  }, [draft, searchQuery, onSearch]);
+
   if (!open) return null;
 
   const results: StockItem[] = source === "img" ? photos : videos;
   const selected = selectedId === null ? null : (results.find((r) => r.id === selectedId) ?? null);
   const isLoading = loading[source];
-  const noun = SOURCES.find((s) => s.id === source)?.noun ?? "photos";
-
-  const switchSource = (next: StockKind) => {
-    setSource(next);
-    setSelectedId(null);
-  };
+  const noun = source === "img" ? "photos" : "videos";
 
   const save = async () => {
     if (!selected || saving) return;
@@ -210,44 +205,54 @@ export function StockSourceModal({
         <h2 className={LIBRARY_MODAL_TITLE} data-testid="stock-title">
           Stock assets
         </h2>
-        <ModalBody className="tw:flex tw:min-h-0 tw:flex-col tw:gap-3">
+        <ModalBody className="tw:flex tw:min-h-0 tw:flex-col tw:gap-4">
           <p className={LIBRARY_MODAL_BODY} data-testid="stock-body">
             Browse stock photos and save an image to this site. Your canvas selection stays unchanged.
           </p>
-          <div className="tw:flex tw:items-center tw:gap-2">
-            <div className="tw:min-w-0 tw:flex-1">
-              <SearchBar
-                value={searchQuery}
-                onChange={onSearch}
-                placeholder={`Search stock ${noun}…`}
-                ariaLabel="Search stock"
-                debounceMs={400}
-                testId="stock-search"
-              />
-            </div>
-            <div role="group" aria-label="Stock source" className="tw:flex tw:shrink-0 tw:gap-1" data-testid="stock-source-switch">
-              {SOURCES.map((s) => {
-                const active = source === s.id;
-                return (
-                  <Button
-                    key={s.id}
-                    type="button"
-                    size="xs"
-                    variant={active ? undefined : "secondary"}
-                    aria-pressed={active}
-                    className={active ? LIBRARY_MODAL_BTN_PRIMARY : LIBRARY_MODAL_BTN_SECONDARY}
-                    data-testid={`stock-source-${s.id}`}
-                    onClick={() => switchSource(s.id)}
-                  >
-                    {s.label}
-                  </Button>
-                );
-              })}
-            </div>
+          <div className={SEARCH_FIELD} data-testid="stock-search">
+            <Search size={16} aria-hidden="true" className="tw:shrink-0" />
+            <TextInput
+              type="text"
+              value={draft}
+              placeholder="Search Pexels and Unsplash…"
+              aria-label="Search stock"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter") onSearch(draft);
+              }}
+            />
+            {draft ? (
+              <IconButton
+                size="sm"
+                label="Clear search"
+                data-testid="stock-search-clear"
+                onClick={() => {
+                  setDraft("");
+                  onSearch("");
+                }}
+              >
+                <X size={14} aria-hidden="true" />
+              </IconButton>
+            ) : null}
+          </div>
+          {/* Board 4418:154195 — Orientation ▾ · Colour ▾ · Type ▾, 88 wide,
+              16 in. Type replaces the old Photos | Videos switch. */}
+          <div className="tw:flex tw:gap-2 tw:px-4" data-testid="stock-filter-row">
+            <FilterDropdown label="Orientation" value={orientation} options={ORIENTATIONS} onPick={onSetOrientation} testId="stock-filter-orientation" />
+            <FilterDropdown label="Colour" value={color} options={COLORS} onPick={onSetColor} testId="stock-filter-colour" />
+            <FilterDropdown
+              label="Type"
+              value={source}
+              options={TYPES}
+              onPick={(t) => {
+                setSource(t);
+                setSelectedId(null);
+              }}
+              testId="stock-filter-type"
+            />
           </div>
 
           <div className="tw:min-h-0 tw:flex-1 tw:overflow-auto" data-testid="stock-results">
-
             {isLoading ? (
               <p className={`${STATE} tw:text-[var(--bk-accent-text)]`} data-testid="stock-loading">
                 Searching...
@@ -255,11 +260,14 @@ export function StockSourceModal({
             ) : null}
 
             {!isLoading && searchQuery.length === 0 ? (
-              <p className={STATE} data-testid="stock-idle">
-                Search to see stock {noun}.
-              </p>
+              <div className={`${STATE} tw:flex tw:flex-col tw:gap-5`} data-testid="stock-idle">
+                <span>Search millions of free {noun}</span>
+                <span>
+                  Type a subject — “restaurant interior”, “pizza oven”, “dining room” — and press Enter. Results come
+                  from Pexels and Unsplash.
+                </span>
+              </div>
             ) : null}
-
             {/* A failed request is not an empty result, and the three failures
                 are not each other. Until the service carried a reason, all four
                 rendered "No photos found for …" (blocker A-STOCK). */}
@@ -290,7 +298,7 @@ export function StockSourceModal({
             ) : null}
 
             {results.length > 0 ? (
-              <div className="tw:grid tw:grid-cols-2 tw:gap-2">
+              <div className="tw:flex tw:flex-col tw:gap-2">
                 {source === "img"
                   ? photos.map((p) => (
                       <Card key={p.id} id={p.id} selected={selectedId === p.id} onSelect={() => setSelectedId(p.id)}>
@@ -320,8 +328,8 @@ export function StockSourceModal({
               <Button
                 type="button"
                 size="xs"
-                variant="secondary"
-                className={`${LIBRARY_MODAL_BTN_SECONDARY} tw:mt-3 tw:w-full`}
+                color="light"
+                className={`${LIBRARY_MODAL_BTN_OUTLINE} tw:mt-3 tw:w-full`}
                 data-testid="stock-load-more"
                 onClick={() => onLoadMore(source)}
                 disabled={isLoading}
@@ -335,23 +343,27 @@ export function StockSourceModal({
           <Button
             type="button"
             size="xs"
-            variant="secondary"
-            className={LIBRARY_MODAL_BTN_SECONDARY}
+            color="light"
+            className={`${LIBRARY_MODAL_BTN_OUTLINE} tw:text-[var(--bk-gray-700)]`}
             onClick={onClose}
             data-testid="stock-cancel"
           >
             Cancel
           </Button>
-          <Button
-            type="button"
-            size="xs"
-            className={LIBRARY_MODAL_BTN_PRIMARY}
-            onClick={() => void save()}
-            disabled={!selected || saving}
-            data-testid="stock-save"
-          >
-            {saving ? "Saving…" : "Save to library"}
-          </Button>
+          {/* 6840:62903 — with nothing found yet there is nothing to save, and
+              the rest state shows Cancel alone. */}
+          {results.length > 0 ? (
+            <Button
+              type="button"
+              size="xs"
+              className={LIBRARY_MODAL_BTN_PRIMARY}
+              onClick={() => void save()}
+              disabled={!selected || saving}
+              data-testid="stock-save"
+            >
+              {saving ? "Saving…" : "Save to library"}
+            </Button>
+          ) : null}
         </div>
       </ModalContent>
     </ModalRoot>

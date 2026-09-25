@@ -28,15 +28,9 @@
     },
     {
       "name": "field-default-locale",
-      "testId": "set-field-default-locale",
+      "testId": "set-loc-default",
       "spec": "s7-settings-localization",
       "nodeId": "639:4109"
-    },
-    {
-      "name": "field-default-locale-label",
-      "testId": "set-field-label-default-locale",
-      "spec": "s7-settings-localization",
-      "nodeId": "639:4110"
     },
     {
       "name": "card-locales-title",
@@ -100,6 +94,11 @@
     "ships, each enabled non-default locale will serve under its own path",
     "prefix'), while the board draws a PATH column with '/'-prefixed values as if",
     "it had. Fourth board in this family drawing a feature whose product version",
-    "ships with a disclaimer."
+    "ships with a disclaimer.",
+    "",
+    "2026-09-25 (conformance-recipes): field-default-locale re-pointed to set-loc-default (the Select in the label-left",
+    "Default row, 867305c5c / 6249f342e); its label is a plain <label> with no anchor, so",
+    "field-default-locale-label is dropped. Probe fixture now also answers siteDetail.locales,",
+    "which the screen loads alongside settings.get — without it only the load-error card rendered."
   ]
 }

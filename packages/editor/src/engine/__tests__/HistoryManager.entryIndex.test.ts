@@ -72,8 +72,11 @@ describe("history entry lookup", () => {
     vi.useFakeTimers();
     const { composer, id } = threeStepProject();
     const rows = composer.history.getHistoryStack();
-    /* The formatter title-cases only the first word. */
-    expect(rows.map((r) => r.label)).toEqual(["Inline edit", "Added block"]);
+    /* 2e5406c4d: a raw label that already reads as a sentence (starts
+       capitalized, has a space) passes through unchanged rather than being
+       re-cased — the same rule that keeps a real "Added Heading" insert label
+       literal. "Inline Edit" matches that shape, so it stays as given. */
+    expect(rows.map((r) => r.label)).toEqual(["Inline Edit", "Added block"]);
 
     const newest = composer.history.getEntrySnapshot(rows[0].id);
     expect(newest, "the newest row must resolve").toBeTruthy();

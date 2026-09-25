@@ -27,7 +27,7 @@ import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
-import { LAYER_NAME_KEY } from "@/editor/panels/layers/hooks/layersPersistence";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
@@ -103,6 +103,17 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
   for (const [id, label, fn, keywords] of nav) {
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
+  /* The Permissions dialog's door for every role but a viewer (whose door is
+     the inspector notice) — and, for the owner, the way to delete the site
+     (5905:44701). "More", so it shows only once typed: 4418:141220's opening
+     list does not draw it. */
+  commands.push({
+    id: "nav-permissions",
+    label: "Permissions",
+    group: "More",
+    keywords: ["role", "access", "delete site"],
+    handler: run(() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)),
+  });
 
   if (!composer) return commands;
 
@@ -310,13 +321,14 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
 // PARTS
 // =============================================================================
 
-/** 4418:141220 kbd chip — gray-100 on a gray-200 edge, 20 tall, 11/16 medium. */
+/** 4418:141220 kbd chip — gray-100 on a gray-200 edge, 20 tall, 11/16 medium.
+ *  Ink is ink-soft, not gray-500: gray-500 on gray-100 is 4.39:1 (WCAG AA fail). */
 const Kbd: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   return (
     <span
       data-testid={testId}
-      className="tw:flex tw:h-5 tw:flex-none tw:items-center tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:whitespace-nowrap tw:text-[var(--bk-gray-500)]"
+      className="tw:flex tw:h-5 tw:flex-none tw:items-center tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:whitespace-nowrap tw:text-[var(--bk-ink-soft)]"
     >
       {/* The board prints "⌘Z", not "⌘+Z": symbols join their key directly. */}
       {formatChord(shortcut, isMac).replace(/([⌘⇧⌥⌃])\+/g, "$1")}

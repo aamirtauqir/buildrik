@@ -111,9 +111,10 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
       ] as MediaStateResult["libraryItems"],
     });
     mount(state);
+    fireEvent.click(screen.getByTestId("mgr-filter"));
     expect(screen.getByText("JPG")).toBeInTheDocument();
     expect(screen.getByText("MP4")).toBeInTheDocument();
-    // A chip with nothing behind it could only ever empty the grid.
+    // A row with nothing behind it could only ever empty the grid.
     expect(screen.queryByText("SVG")).toBeNull();
   });
 
@@ -124,33 +125,43 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
       ] as MediaStateResult["libraryItems"],
     });
     mount(state);
+    fireEvent.click(screen.getByTestId("mgr-filter"));
     fireEvent.click(screen.getByText("PNG"));
     expect(state.setFmtFilter).toHaveBeenCalledWith("png");
   });
 
-  // A type filter set in the drawer persists into the manager; without a
-  // visible chip the grid would look filtered for no reason on screen.
-  it("a drawer type filter shows as a clearable chip", () => {
+  it("6879:61904 — an active file type is named on the Filter button", () => {
+    const state = makeState({ fmtFilter: "jpg" });
+    mount(state);
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter · JPG");
+  });
+
+  // A type filter set in the drawer persists into the manager; the Filter
+  // button names it, and its All row clears it.
+  it("a drawer type filter is named on the Filter button and All clears it", () => {
     const state = makeState({ activeTypes: new Set(["vid"]) as MediaStateResult["activeTypes"] });
     mount(state);
-    const chip = screen.getByLabelText(/Clear the type filter/i);
-    fireEvent.click(chip);
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter · Video");
+    fireEvent.click(screen.getByTestId("mgr-filter"));
+    fireEvent.click(screen.getByTestId("mgr-filter-all"));
     expect(state.setType).toHaveBeenCalledWith("all");
   });
 
   it("the 2 / 3 / 4 toggle sets the column count", () => {
     const state = makeState({ gridN: 3 });
     mount(state);
-    fireEvent.click(screen.getByRole("button", { name: "4" }));
+    fireEvent.click(screen.getByRole("button", { name: "Grid · 3 columns" }));
+    fireEvent.click(screen.getByText("4 columns"));
     expect(state.setGridN).toHaveBeenCalledWith(4);
   });
 
-  // Clone 3695:19968 — the toolbar's ☑ enters select mode as the List with
-  // nothing checked. Select-all moved to the list header's checkbox.
-  it("the toolbar's ☑ enters select mode as the list, and selects nothing", () => {
+  // 7093:78219 — ⋯ › Select assets… enters select mode as the List with
+  // nothing checked. Select-all lives in the list header's checkbox.
+  it("⋯ › Select assets… enters select mode as the list, and selects nothing", () => {
     const state = makeState({ selMode: false, libraryItems: [makeItem({ key: "a" })] });
     const { container } = mount(state);
-    fireEvent.click(screen.getByLabelText("Select files"));
+    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
+    fireEvent.click(screen.getByText("Select assets…"));
     expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
     expect(state.selectAll).not.toHaveBeenCalled();
     expect(container.querySelector(".mgr-list")).toBeInTheDocument();
@@ -158,19 +169,24 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
 });
 
 describe("AssetGrid — sort menu", () => {
-  it("opens the sort menu and selecting an option calls setSort keeping direction", () => {
+  const openSort = () => {
+    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
+    fireEvent.click(screen.getByTestId("mgr-sort"));
+  };
+
+  it("6930:80054 — each option carries its own direction (Name Z→A)", () => {
     const state = makeState({ sort: "date", sortDir: "desc" });
     mount(state);
-    fireEvent.click(screen.getByText("Date added"));
-    fireEvent.click(screen.getByText("Name"));
+    openSort();
+    fireEvent.click(screen.getByText("Name Z→A"));
     expect(state.setSort).toHaveBeenCalledWith("name", "desc");
   });
 
-  it("direction row flips asc/desc without changing the sort key", () => {
+  it("Reverse order flips asc/desc without changing the sort key", () => {
     const state = makeState({ sort: "size", sortDir: "asc" });
     mount(state);
-    fireEvent.click(screen.getByText("Size"));
-    fireEvent.click(screen.getByText("Ascending ↑"));
+    openSort();
+    fireEvent.click(screen.getByText("Reverse order"));
     expect(state.setSort).toHaveBeenCalledWith("size", "desc");
   });
 });
@@ -348,7 +364,7 @@ describe("AssetGrid — badges + footer", () => {
     expect(state.shiftSelect).toHaveBeenCalledWith("b", "a");
   });
 
-  it("only the file KIND badges (▶ / ◆ / Aa) remain — provenance left the card", () => {
+  it("only the file KIND badges (▶ / SVG / Aa) remain — provenance left the card", () => {
     const state = makeState({
       libraryItems: [
         makeItem({ key: "a", assetSource: "stock" }),
@@ -373,7 +389,7 @@ describe("AssetGrid — badges + footer", () => {
     });
     mount(state);
     expect(screen.getByText("▶")).toBeInTheDocument();
-    expect(screen.getByText("◆")).toBeInTheDocument();
+    expect(screen.getByText("SVG")).toBeInTheDocument();
     // The font THUMB also renders "Aa" as its specimen — scope to the badge.
     expect(document.querySelectorAll(".mgr-kind")).toHaveLength(3);
   });
@@ -497,13 +513,21 @@ describe("AssetGrid — the card ··· menu (Clone 3721:43552)", () => {
     expect(props.onSelectAsset).not.toHaveBeenCalled();
   });
 
-  it("the list rows keep the right-click door and draw no ··· button", () => {
+  it("4418:58608 — every list row ends in a ⋯ that opens the same menu; right-click still does", () => {
     const state = makeState({ libraryItems: [makeItem({ key: "team", name: "team-photo.jpg" })] });
     mount(state);
     fireEvent.click(screen.getByRole("button", { name: "List" }));
-    expect(screen.queryByRole("button", { name: "More actions for team-photo.jpg" })).toBeNull();
-    fireEvent.contextMenu(screen.getByTestId("mgr-list-row-team"));
+    fireEvent.click(screen.getByTestId("mgr-list-menu-team"));
     expect(state.openCtxMenu).toHaveBeenCalledTimes(1);
+    fireEvent.contextMenu(screen.getByTestId("mgr-list-row-team"));
+    expect(state.openCtxMenu).toHaveBeenCalledTimes(2);
+  });
+
+  it("4418:58608 — in select mode the toolbar carries '☑ Select', which leaves select mode", () => {
+    const state = makeState({ selMode: true, libraryItems: [makeItem({ key: "team" })] });
+    mount(state);
+    fireEvent.click(screen.getByTestId("mgr-select-chip"));
+    expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
   });
 });
 

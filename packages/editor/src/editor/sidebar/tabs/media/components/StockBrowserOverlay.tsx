@@ -19,6 +19,7 @@ import { Button, Menu, MenuItem, PanelFrame, Popover, TextField } from "@/editor
 import type {
   DiscColor,
   DiscOrientation,
+  StockFailureReason,
   StockPhoto,
   StockVideo,
 } from "../data/mediaTypes";
@@ -29,6 +30,14 @@ interface StockBrowserOverlayProps {
   videos: StockVideo[];
   loading: Record<"img" | "vid", boolean> | Record<string, boolean>;
   searchQuery: string;
+  /** WHY the last search failed, or null/absent when it did not. Flow-check
+   *  2026-09-25: this overlay used to silently swallow every failure — the
+   *  toast fired once and the results pane sat on the pristine "Search to
+   *  browse free …" idle copy forever, indistinguishable from never having
+   *  searched. StockSourceModal (the fullpage surface) already carries the
+   *  same reason as a persistent, retry-capable message; this is the same
+   *  action, so it gets the same behaviour. */
+  searchFailed?: StockFailureReason | null;
   orientation: DiscOrientation;
   color: DiscColor;
   onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
@@ -38,14 +47,37 @@ interface StockBrowserOverlayProps {
   onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
 }
 
-const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
-  { id: "all", label: "All" },
+/**
+ * Each failure gets its own sentence because each has a different next step,
+ * and none of them is "try a different search term" — which is the only thing
+ * the old shared "No photos found for …" copy could ever suggest.
+ *
+ * `retryable` gates the Try again button: re-running the query cannot conjure
+ * an API key, so offering it on a configuration fault just wastes the click.
+ */
+export const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
+  "not-configured": {
+    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
+    retryable: false,
+  },
+  unauthorized: {
+    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
+    retryable: false,
+  },
+  "request-failed": {
+    message: "Couldn't reach the stock library.",
+    retryable: true,
+  },
+};
+
+export const ORIENTATIONS: Array<{ id: DiscOrientation; label: string }> = [
+  { id: "all", label: "Any" },
   { id: "landscape", label: "Landscape" },
   { id: "portrait", label: "Portrait" },
   { id: "squarish", label: "Square" },
 ];
 
-const COLORS: Array<{ id: DiscColor; label: string }> = [
+export const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "all", label: "All" },
   { id: "black_and_white", label: "B&W" },
   { id: "black", label: "Black" },
@@ -58,9 +90,9 @@ const COLORS: Array<{ id: DiscColor; label: string }> = [
   { id: "blue", label: "Blue" },
 ];
 
-const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
-  { id: "img", label: "Photos" },
-  { id: "vid", label: "Videos" },
+export const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
+  { id: "img", label: "Photo" },
+  { id: "vid", label: "Video" },
 ];
 
 /** Caption: infinite scroll hands over to an explicit Load more after 3. */
@@ -70,7 +102,7 @@ const DROPDOWN =
   "tw:h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:bg-white tw:px-1.5 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 
-function FilterDropdown<T extends string>({
+export function FilterDropdown<T extends string>({
   label,
   value,
   options,
@@ -110,17 +142,23 @@ function FilterDropdown<T extends string>({
         </Button>
       }
     >
-      <Menu label={label}>
+      {/* Board 6998:77880: 224 wide, rows 30, the current row 13/500 with a
+          trailing ✓ (not the leading radio tick). */}
+      <Menu label={label} className="tw:w-[206px] tw:[&_[role^=menuitem]]:h-[30px] tw:[&_[role=menuitemradio]>span:first-child]:hidden">
         {options.map((o) => (
           <MenuItem
             key={o.id}
+            radio
             selected={o.id === value}
             onClick={() => {
               setOpen(false);
               onPick(o.id);
             }}
           >
-            {o.label}
+            <span className="tw:flex tw:w-full tw:items-center">
+              <span className={o.id === value ? "tw:font-medium" : undefined}>{o.label}</span>
+              {o.id === value ? <span aria-hidden="true" className="tw:ml-auto tw:text-[11px]">✓</span> : null}
+            </span>
           </MenuItem>
         ))}
       </Menu>
@@ -134,6 +172,7 @@ export function StockBrowserOverlay({
   videos,
   loading,
   searchQuery,
+  searchFailed,
   orientation,
   color,
   onSearch,
@@ -319,9 +358,34 @@ export function StockBrowserOverlay({
           </div>
         ) : null}
 
-        {items.length === 0 && !isLoading ? (
+        {/* A failed request is not an empty result — see the `searchFailed`
+            doc above. Checked before the empty-results branch so a failure
+            with zero items never falls through to the generic idle copy. */}
+        {items.length === 0 && !isLoading && searchFailed ? (
+          <p className="tw:px-4 tw:pt-6 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="alert" data-testid="stock-failed">
+            {FAILURE_COPY[searchFailed].message}
+            {FAILURE_COPY[searchFailed].retryable ? (
+              <>
+                {" "}
+                <Button
+                  color="light"
+                  size="xs"
+                  variant="link"
+                  className="tw:h-auto tw:min-h-0 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
+                  onClick={submitSearch}
+                >
+                  Try again
+                </Button>
+              </>
+            ) : null}
+          </p>
+        ) : null}
+
+        {items.length === 0 && !isLoading && !searchFailed ? (
           <p className="tw:px-4 tw:pt-6 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-            Search to browse free {type === "img" ? "photos" : "videos"}.
+            {searchQuery.length > 0
+              ? `No ${type === "img" ? "photos" : "videos"} found for "${searchQuery}"`
+              : `Search to browse free ${type === "img" ? "photos" : "videos"}.`}
           </p>
         ) : null}
       </div>

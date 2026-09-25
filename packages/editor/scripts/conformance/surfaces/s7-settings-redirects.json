@@ -23,22 +23,6 @@
     {
       "name": "card-redirects",
       "testId": "set-card-redirects"
-    },
-    {
-      "name": "card-add",
-      "testId": "set-card-add-redirect"
-    },
-    {
-      "name": "field-from",
-      "testId": "set-field-from-path",
-      "spec": "s7-settings-redirects",
-      "nodeId": "640:2779"
-    },
-    {
-      "name": "field-from-label",
-      "testId": "set-field-label-from-path",
-      "spec": "s7-settings-redirects",
-      "nodeId": "640:2780"
     }
   ],
   "_note": [
@@ -90,6 +74,11 @@
     "opens with 'Saved, not yet live… visitors hitting the old URL won't be",
     "forwarded until deployment wiring ships', and the board's own annotation",
     "(2876:12441) adds that redirects are not covered by version history. Neither",
-    "caveat is drawn on the board's cards."
+    "caveat is drawn on the board's cards.",
+    "",
+    "2026-09-25 (conformance-recipes): card-add, field-from, field-from-label dropped — the inline Add-redirect card is gone;",
+    "Add redirect is a header action opening RedirectDialog 4254:75736 (11f8febd9, 89b9c2020).",
+    "Probe fixture rows moved to the shared schema's shape (toUrl + type) and it now answers",
+    "siteDetail.redirects.suggestions, which the screen loads with the list."
   ]
 }

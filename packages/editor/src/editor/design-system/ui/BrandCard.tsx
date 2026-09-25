@@ -38,13 +38,16 @@ export interface BrandRowProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   disabled?: boolean;
 }
 
-const ROW = "tw:flex tw:h-12 tw:w-full tw:items-center tw:gap-3 tw:pl-4 tw:pr-3 tw:text-left tw:outline-none";
+const ROW = "tw:group tw:flex tw:h-12 tw:w-full tw:items-center tw:gap-3 tw:pl-4 tw:pr-3 tw:text-left tw:outline-none";
 const BRAND_ROW_NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const BRAND_ROW_SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* ink-muted on the selected row's accent-tint is 4.49:1 (WCAG AA fail) — a
+   selected row's secondary ink (sub-line, ›) steps up to ink-soft. */
+const BRAND_ROW_SUB =
+  "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:group-data-[selected]:text-[var(--bk-ink-soft)]";
 
 /** The muted › a drill-in row ends in. */
 export const BrandChevron: React.FC = () => (
-  <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+  <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)] tw:group-data-[selected]:text-[var(--bk-ink-soft)]">
     ›
   </span>
 );
@@ -64,6 +67,7 @@ export const BrandRow: React.FC<BrandRowProps> = ({ name, sub, trailing, onSelec
         role={onSelect ? "button" : undefined}
         tabIndex={interactive ? 0 : undefined}
         aria-pressed={onSelect ? selected : undefined}
+        data-selected={selected || undefined}
         aria-disabled={onSelect && disabled ? true : undefined}
         onClick={interactive ? onSelect : undefined}
         onKeyDown={

@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, IconButton, PanelBackRow, TextInput, type ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
@@ -34,6 +34,8 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
+  /** Detach all finished — the list reports the count (board 4418:143126). */
+  onDetachedAll?: (count: number) => void;
   /** The element currently selected on canvas — what "Update component" promotes. */
   selectedElementId?: string | null;
 }
@@ -63,6 +65,25 @@ export function componentDeleteCopy(name: string, instances: number): { title: s
   };
 }
 
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/**
+ * Delete a master — board 4418:142651: "Menu card deleted · 18 instances
+ * detached · Undo". Snapshots first, so Undo can re-register the master and
+ * relink the instances it detached. Both delete doors (this screen and the
+ * list's row menu) use it. Throws when the engine does.
+ */
+export async function deleteComponentWithUndo(composer: Composer, id: string): Promise<ToastInput> {
+  const snapshot = composer.components.snapshotComponent(id);
+  const detached = composer.components.getInstancesOfComponent(id).length;
+  await composer.components.deleteComponent(id);
+  const name = snapshot?.component.name ?? "Component";
+  return {
+    description: detached > 0 ? `${name} deleted · ${count(detached, "instance", "instances")} detached` : `${name} deleted`,
+    ...(snapshot && { action: { label: "Undo", onClick: () => void composer.components.restoreDeletedComponent(snapshot) } }),
+  };
+}
+
 export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   component,
   composer,
@@ -71,6 +92,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
+  onDetachedAll,
   selectedElementId = null,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
@@ -149,6 +171,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     setShowUpdateConfirm(false);
     if (!composer || !selectedElementId) return;
 
+    const before = composer.components.snapshotComponent(component.id);
     const { updated, instancesSynced, overridesDropped } =
       await composer.components.updateComponentMaster(component.id, selectedElementId);
 
@@ -163,30 +186,32 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
     void captureComponentThumbnail(composer, component.id, selectedElementId);
 
-    const followed =
+    // Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo".
+    const headline =
       instancesSynced > 0
-        ? `${instancesSynced} instance${instancesSynced === 1 ? "" : "s"} followed`
-        : "no instances placed yet";
+        ? `${component.name} updated · ${count(instancesSynced, "linked instance", "linked instances")} updated`
+        : `${component.name} updated`;
+    const action = before && {
+      label: "Undo",
+      onClick: () => void composer.components.revertComponentMaster(component.id, before.component.masterTree),
+    };
 
     // Overrides whose target the new master no longer has cannot be re-applied.
     // They are gone; the engine used to report that only to devError, which is
     // a no-op in production, so the user watched their edits revert in silence.
     if (overridesDropped > 0) {
       addToast({
-        description: `"${component.name}" updated — ${followed}. ${overridesDropped} override${
+        description: `${headline}. ${overridesDropped} override${
           overridesDropped === 1 ? "" : "s"
         } couldn't be re-applied and ${overridesDropped === 1 ? "was" : "were"} lost.`,
         tone: "warning",
         duration: 8000,
+        ...(action && { action }),
       });
       return;
     }
 
-    addToast({
-      description: `"${component.name}" updated — ${followed}.`,
-      tone: "success",
-      duration: 4000,
-    });
+    addToast({ description: headline, ...(action && { action }) });
   };
 
   // Handle delete action — opens ConfirmDialog
@@ -197,10 +222,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Actual delete after confirmation
   const confirmDeleteAction = async () => {
     if (!composer) return;
-    await composer.components.deleteComponent(component.id);
     setShowDeleteConfirm(false);
-    // TODO: Add soft-delete + undo when backend supports it
-    addToast({ description: `"${component.name}" deleted`, tone: "warning", duration: 4000 });
+    try {
+      addToast(await deleteComponentWithUndo(composer, component.id));
+    } catch {
+      addToast({ description: "Couldn't delete component.", tone: "error" });
+      return;
+    }
     onDelete?.();
     onBack();
   };
@@ -224,11 +252,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const structure = component.masterTree?.children ?? [];
   const siteName = composer?.getProjectMetadata?.()?.name || "this site";
 
-  const confirmDetachAll = () => {
+  const confirmDetachAll = async () => {
     setShowDetachAll(false);
     if (!composer) return;
-    for (const inst of instances) void composer.components.detachInstance(inst.elementId);
-    addToast({ description: `Detached ${instances.length} instance${instances.length === 1 ? "" : "s"} of "${component.name}".`, tone: "success", duration: 4000 });
+    await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    onDetachedAll?.(instances.length);
+    onBack();
   };
 
   const commitRename = async () => {
@@ -244,14 +273,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="component-master">
-      <Button
-        color="light"
-        onClick={onBack}
-        data-testid="component-back-row"
-        className="tw:h-9 tw:w-full tw:justify-start tw:rounded-none tw:border-0 tw:border-b tw:border-[var(--bk-gray-100)] tw:bg-transparent tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
-      >
-        ‹&nbsp;&nbsp;Saved components
-      </Button>
+      <PanelBackRow label="Saved components" onClick={onBack} data-testid="component-back-row" />
       <div className="tw:flex tw:items-center tw:gap-2 tw:h-11 tw:px-4 tw:shrink-0">
         <span className="tw:flex-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Components</span>
         {onClose && (
@@ -413,14 +435,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onConfirm={confirmUpdateAction}
         title="Update component"
         message={
-          /* The undo caveat is measured, not assumed: with history primed, one
-             Cmd+Z after an update reverted the instance on the canvas and left
-             the component at the new version — element history holds the pages,
-             not the component definition. */
+          /* ⌘Z alone reverts the pages, not the component definition (measured),
+             so the way back is the toast's Undo, which restores the master. */
           (instanceCount > 0
             ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
             : `Replace "${component.name}" with the element selected on the canvas? `) +
-          "Undo won't take the component back — it reverts the pages, not the component itself."
+          "To go back, use Undo on the confirmation that follows."
         }
         confirmLabel="Update component"
         tone="destructive"
@@ -429,7 +449,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         open={showDetachAll}
         testId="component-detach-all-confirm"
         onClose={() => setShowDetachAll(false)}
-        onConfirm={confirmDetachAll}
+        onConfirm={() => void confirmDetachAll()}
         title={`Detach all ${instanceCount} instance${instanceCount === 1 ? "" : "s"} of ${component.name}?`}
         message={`They become independent elements and keep their content and appearance; they will no longer follow updates to the ${component.name} master.`}
         confirmLabel="Detach all"

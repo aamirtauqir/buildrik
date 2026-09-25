@@ -144,6 +144,12 @@ const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: s
 ];
 
 /** Board 5930:44781 — the Breakpoint list (+ Custom width…, G2-014). */
+/* Boards 5930:44801 / 5930:44781 / 7048:78046: the footer's menus are 224
+   wide with 30px rows (a descendant rule, so it outranks the item's h-8). */
+const FOOTER_MENU = "tw:min-w-[224px] tw:[&_[role^=menuitem]]:h-[30px]";
+/* The View menu's Breakpoint / Zoom rows open lists: tinted, medium. */
+const SUBMENU_ROW = "tw:!bg-[var(--bk-gray-100)] tw:font-medium";
+
 const BREAKPOINT_ROWS: { id: Breakpoint; label: string; width?: string }[] = [
   { id: "desktop", label: "Desktop" },
   { id: "tablet", label: "Tablet", width: "768px" },
@@ -270,6 +276,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {onFitToScreen && (
         <MenuItem
           radio
+          tick="box"
           selected={false}
           data-testid="canvas-zoom-fit"
           onClick={() => {
@@ -284,6 +291,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <MenuItem
           key={z}
           radio
+          tick="box"
           selected={Math.round(zoom) === z}
           data-testid={`canvas-zoom-${z}`}
           onClick={() => {
@@ -358,8 +366,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             </Button>
           }
         >
-          {/* Board 5930:44801 draws the View menu 220 wide. */}
-          <Menu label="View" data-testid="canvas-view-menu" className="tw:min-w-[220px]">
+          {/* Board 5930:44801 draws the View menu 224 wide, rows 30. */}
+          <Menu label="View" data-testid="canvas-view-menu" className={FOOTER_MENU}>
             {viewPane === "main" && (
               <>
                 {VIEW_ROWS.map((row) => {
@@ -371,7 +379,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                     <MenuItem
                       key={row.key}
                       selected={overlays[row.key]}
-                      kbd={opensGrid ? `${row.kbd} ▸` : row.kbd}
+                      kbd={opensGrid ? `${gridSize ?? 8} px ▸` : row.kbd}
                       data-testid={`canvas-view-${row.key}`}
                       onClick={() => {
                         if (opensGrid) {
@@ -390,6 +398,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 <MenuGroup>
                   {device && onDeviceChange && (
                     <MenuItem
+                      className={SUBMENU_ROW}
                       data-testid="canvas-view-breakpoint"
                       kbd={`${customWidth ? `${customWidth}px` : (DEVICE_LABEL[device] ?? device)} ▸`}
                       onClick={() => setViewPane("breakpoint")}
@@ -397,7 +406,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                       Breakpoint
                     </MenuItem>
                   )}
-                  <MenuItem data-testid="canvas-view-zoom" kbd={`${Math.round(zoom)}% ▸`} onClick={() => setViewPane("zoom")}>
+                  <MenuItem className={SUBMENU_ROW} data-testid="canvas-view-zoom" kbd={`${Math.round(zoom)}% ▸`} onClick={() => setViewPane("zoom")}>
                     Zoom
                   </MenuItem>
                 </MenuGroup>
@@ -409,6 +418,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                   <MenuItem
                     key={row.id}
                     radio
+                    tick="trailing"
                     selected={device === row.id && !customWidth}
                     kbd={row.width}
                     data-testid={`canvas-breakpoint-${row.id}`}
@@ -511,7 +521,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             </Button>
           }
         >
-          <Menu label="Zoom" data-testid="canvas-zoom-menu">
+          <Menu label="Zoom" data-testid="canvas-zoom-menu" className={FOOTER_MENU}>
             {zoomRows(() => setZoomOpen(false))}
           </Menu>
         </Popover>

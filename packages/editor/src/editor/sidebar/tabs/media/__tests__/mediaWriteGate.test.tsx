@@ -225,7 +225,7 @@ describe("AssetDetailsPanel — view only", () => {
     role = "EDITOR";
     const { onOpenRename } = mount();
     fireEvent.click(screen.getByTestId("mgr-det-more"));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Rename" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Rename…" }));
     expect(onOpenRename).toHaveBeenCalledTimes(1);
   });
 });

@@ -68,7 +68,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
-import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
+import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
    loads the panel's stylesheet the way production does. */
 import "@/editor/sidebar/tabs/ai/AITab.css";
@@ -777,9 +777,12 @@ const MINE_COMPONENTS: ComponentDefinition[] = [
 const INSERT_COMPOSER = {
   components: { getAllComponents: () => MINE_COMPONENTS },
   selection: { getSelectedIds: () => [] as string[] },
-  elements: { getElement: () => null },
+  /* getActivePage: BuildTab scopes Mine to the open page (G2-118, 92e5cba73);
+     no page means site-wide components only, which is what the boards draw. */
+  elements: { getElement: () => null, getActivePage: () => null },
   on: () => {},
   off: () => {},
+  emit: () => {},
 } as unknown as Composer;
 
 /**
@@ -1136,6 +1139,7 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
+          onRetry={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -2173,7 +2177,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
-      <LayersNoResults search="hero" onClear={() => {}} />
+      <LayersNoResults search="hero" onSearchEverywhere={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
@@ -2283,7 +2287,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "pages-loading": () => (
     <div data-probe="pages-loading" style={{ width: 280, background: "#fff" }}>
-      <PagesLoadingSkeleton />
+      <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
     </div>
   ),
   "insert-disabled-row": () => (
@@ -2384,21 +2388,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     <div data-probe="history-saves-changes">
       {historyHost(
         withStoredView("changes", <HistoryTab composer={historyStub({ stack: HISTORY_ENTRIES })} />),
-      )}
-    </div>
-  ),
-  // The scrubber is opened by a button and reports the previewed entry back up
-  // to the panel, so the band the board draws only exists after that click —
-  // "partial-scrubber-opens-by-button" in boards.json. AutoOpen performs it.
-  "history-saves-time-travel": () => (
-    <div data-probe="history-saves-time-travel">
-      {historyHost(
-        withStoredView(
-          "saves",
-          <AutoOpen testid="history-time-travel">
-            <HistoryTab composer={historyStub({ stack: HISTORY_ENTRIES })} />
-          </AutoOpen>,
-        ),
       )}
     </div>
   ),
@@ -3068,6 +3057,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
+        onRemoveFromFolder={() => {}}
       />
     </div>
   ),
@@ -3280,6 +3270,15 @@ const CASES: Record<string, () => React.ReactElement> = {
         enabledLocales: ["en-US", "ur-PK"],
         autoRedirectLocale: false,
       },
+      /* The screen also loads the per-locale summary (867305c5c); without it
+         the load rejects and only the load-error card renders. */
+      "siteDetail.locales": {
+        locales: [
+          { code: "en-US", path: "/", translated: 4, total: 4, status: "LIVE", pending: [] },
+          { code: "ur-PK", path: "/ur-PK", translated: 1, total: 4, status: "PENDING", pending: ["Menu", "About", "Contact"] },
+        ],
+        total: 4,
+      },
     });
     return (
       <SettingsPane case_="settings-localization">
@@ -3290,10 +3289,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* Board 640:2440 — the board's own pair of redirects. */
   "settings-redirects": () => {
     stubTrpc({
+      /* The row shape is the shared schema's (6249f342e): toUrl + type. The
+         screen also loads the 404 suggester alongside the list. */
       "siteDetail.redirects.list": [
-        { id: "r1", fromPath: "/pizza-menu", toPath: "/menu", statusCode: 301 },
-        { id: "r2", fromPath: "/contact-us", toPath: "/contact", statusCode: 301 },
+        { id: "r1", fromPath: "/pizza-menu", toUrl: "/menu", type: "301" },
+        { id: "r2", fromPath: "/contact-us", toUrl: "/contact", type: "301" },
       ],
+      "siteDetail.redirects.suggestions": [],
     });
     return (
       <SettingsPane case_="settings-redirects">

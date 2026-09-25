@@ -62,6 +62,8 @@ interface AssetDetailOverlayProps {
   onCopyUrl?(item: LibraryItem): void;
   onDownload?(item: LibraryItem): void;
   onDelete?(item: LibraryItem): void;
+  /** Board 4418:61698's header expand — this asset, selected, in the full library. */
+  onExpand?(item: LibraryItem): void;
   /** A viewer's reasons — Rename / Delete stay visible, disabled, titled. */
   viewOnly?: { rename?: string; delete?: string };
 }
@@ -69,9 +71,14 @@ interface AssetDetailOverlayProps {
 const ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 tw:font-normal " +
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
-const ROW_CHEVRON = "tw:text-[13px] tw:text-[var(--bk-ink-muted)]";
-const ROW_COUNT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
+const VERSION_ROW = "tw:flex tw:h-14 tw:w-full tw:items-start tw:gap-3 tw:pt-2.5 tw:pl-5 tw:pr-4";
+const VERSION_DOT = "tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full";
+const VERSION_TIME = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const VERSION_META = "tw:mt-0.5 tw:w-[72px] tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-500)]";
+/* Board 4418:61698: the nav rows end in a 12px ink › in a 24 box, and
+   Versions' count is 11/400 ink beside it. */
+const ROW_CHEVRON = "tw:flex tw:w-6 tw:shrink-0 tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]";
+const ROW_COUNT = "tw:text-[11px] tw:font-normal tw:tabular-nums tw:text-[var(--bk-ink)]";
 /**
  * True when another modal dialog is VISIBLE above `el` — i.e. one this surface
  * opened. Escape belongs to the topmost layer, not to us.
@@ -95,8 +102,11 @@ function isCoveredByModal(el: HTMLElement): boolean {
 
 /* Button's `link` variant supplies the recipe; the row's own geometry
    (full-width 36h nav row) stays here. */
-const BACK_ROW =
-  "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left";
+const BACK_ROW = "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left tw:font-normal";
+/* v3: the hub's back row is 14 ink (4418:61698); a sub-view's — "‹ name ·
+   versions / used in" — is the 13 accent link (4418:62883 / 63087). */
+const BACK_ROW_HUB = "tw:text-[14px] tw:text-[var(--bk-ink)]";
+const BACK_ROW_SUB = "tw:text-[13px] tw:text-[var(--bk-accent-text)]";
 
 export function AssetDetailOverlay({
   item,
@@ -111,6 +121,7 @@ export function AssetDetailOverlay({
   onCopyUrl,
   onDownload,
   onDelete,
+  onExpand,
   viewOnly,
 }: AssetDetailOverlayProps) {
   const [view, setView] = useState<View>("hub");
@@ -341,11 +352,11 @@ export function AssetDetailOverlay({
       {/* The drill-in draws the shared panel header itself — the overlay
           covers the drawer, and the board keeps Media's 44h header on every
           drill-in screen. */}
-      <PanelFrame.Header title="Assets" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={onExpand ? () => onExpand(item) : undefined} />
 
       {/* Back row — ‹ pops one level, exactly like ESC. */}
       <Button
-        variant="link" className={BACK_ROW}
+        variant="link" className={`${BACK_ROW} ${view === "hub" ? BACK_ROW_HUB : BACK_ROW_SUB}`}
         data-testid="media-detail-back"
         onClick={() => (view === "hub" ? onClose() : setView("hub"))}
         aria-label={view === "hub" ? "Back to media grid" : `Back to ${display}`}
@@ -525,7 +536,7 @@ export function AssetDetailOverlay({
                     title={a.blocked}
                     onClick={() => a.fn?.(item)}
                   >
-                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
+                    <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[14px]">
                       <span aria-hidden="true" className="tw:flex tw:text-[var(--bk-ink-soft)]">{a.icon}</span>
                       <span className="tw:truncate">{a.label}</span>
                     </span>
@@ -537,24 +548,21 @@ export function AssetDetailOverlay({
         )
       ) : view === "versions" ? (
         <div className="tw:w-full" role="list" aria-label="Version history">
-          {/* Current — pinned, accent-tint with the 3px bar (board 241:1436). */}
-          {/* Board 75:65 — the current version is a 44-high accent-tint chip
-              on a 6 radius at a 10 inset, the same box the older rows use in
-              bg-subtle. It shipped 56 tall, full-bleed and square. */}
-          <div
-            className="tw:relative tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-2.5"
-            data-testid="media-version-current"
-            role="listitem"
-          >
-            <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-            <span className="tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-            <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-              now
-            </span>
-            <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]">
-              current
-            </span>
-          </div>
+          {/* v3 4418:62883: 56-high full-bleed rows — dot 20 in, the time
+              13 ink over the author line, the size delta 11/500 muted in a
+              column at 156, ⋯ in a 24 box 16 from the edge. The current
+              version is tinted with the 3px accent bar. (Pre-v3 board 75:65
+              drew 44 chips at a 12 inset.) An empty history shows only the
+              note, as 4418:63971 draws it. */}
+          {dbVersions.length > 0 ? (
+            <div className={`${VERSION_ROW} tw:relative tw:bg-[var(--bk-accent-tint)]`} data-testid="media-version-current" role="listitem">
+              <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
+              <span className={`${VERSION_DOT} tw:bg-[var(--bk-accent)]`} aria-hidden="true" />
+              <span className={VERSION_TIME}>now</span>
+              <span className={VERSION_META}>current</span>
+              <span className="tw:w-6 tw:shrink-0" aria-hidden="true" />
+            </div>
+          ) : null}
           {dbVersions.map((v, i) => {
             const ts = new Date(v.createdAt).getTime();
             const prev = dbVersions[i + 1];
@@ -567,28 +575,15 @@ export function AssetDetailOverlay({
                   : `${delta > 0 ? "+" : "−"}${fmtSize(Math.abs(delta))}`;
             return (
               <React.Fragment key={v.id}>
-                {/* Boards 75:71 / 75:77 / 75:83 — an older version wears the
-                    SAME box as the current one, in bg-subtle: 44 tall, 6
-                    radius, 10 inset, 10 gap, inset from the panel edge. They
-                    shipped 56 tall, full-bleed and square, directly under a
-                    44 chip on a 6 radius, which read as two different lists. */}
-                <div
-                  className="tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5"
-                  data-testid={`media-version-${v.id}`}
-                  role="listitem"
-                >
-                  <span className="tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-gray-300)]" aria-hidden="true" />
-                  <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-                    {formatRelativeTime(ts, { fallback: "daysShort" })}
-                  </span>
-                  <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]">
-                    {meta}
-                  </span>
+                <div className={VERSION_ROW} data-testid={`media-version-${v.id}`} role="listitem">
+                  <span className={`${VERSION_DOT} tw:bg-[var(--bk-gray-300)]`} aria-hidden="true" />
+                  <span className={VERSION_TIME}>{formatRelativeTime(ts, { fallback: "daysShort" })}</span>
+                  <span className={VERSION_META}>{meta}</span>
                   <Button
                     type="button"
                     color="light"
                     size="xs"
-                    className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
+                    className="tw:-mt-0.5 tw:size-6 tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-gray-500)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
                     data-testid={`media-version-menu-${v.id}`}
                     aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
                     disabled={restoringId !== null}
@@ -639,7 +634,7 @@ export function AssetDetailOverlay({
             );
           })}
           {dbVersions.length === 0 ? (
-            <div className="tw:px-4 tw:pt-6 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+            <div className="tw:px-4 tw:pt-8 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="media-versions-empty">
               No saved versions yet. Edits create restore points automatically.
             </div>
           ) : null}
@@ -651,56 +646,57 @@ export function AssetDetailOverlay({
                not a dash: this answer is what makes deleting safe. */
             <div className="tw:px-4 tw:pt-8 tw:text-[13px] tw:leading-5" data-testid="media-used-empty">
               <p className="tw:text-[var(--bk-ink)]">Not used on any page</p>
-              <p className="tw:mt-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+              <p className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-gray-500)]">
                 Deleting this file won{"’"}t change anything on your site.
               </p>
             </div>
           ) : (
-            /* Board 75:90 lists one CHIP PER HIT — page name over the
-               element's own name, with a "Go ›" link — and no page-group
-               header at all: 75:96 "Home / Hero background", 75:101 "Menu /
-               Header image", 75:106 "About / Gallery · item 2". It shipped as
-               a 28-high bg-subtle header per page with bare full-bleed rows
-               under it, which put the page name in two places and left the
-               row itself with no shape. Flattened here to the board's list;
-               the hit count the header carried is already in the drill-in row
-               that opens this view. */
-            usage.flatMap((pg) =>
-              pg.hits.map((hit) => (
+            /* v3 4418:63087 groups the hits by PAGE again: a 28 gray-100 band
+               with the page name and its count, then 44 rows — the element's
+               name 13 ink over "Page › name" 11 muted, and "Jump ›" 12 accent.
+               (The pre-v3 board 75:90 drew one chip per hit instead.) */
+            usage.map((pg) => (
+              <React.Fragment key={pg.pageId}>
                 <div
-                  key={hit.elementId}
-                  className="tw:mx-3 tw:mt-2 tw:flex tw:h-11 tw:items-center tw:gap-2.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5"
-                  data-testid={`media-used-row-${hit.elementId}`}
-                  role="listitem"
+                  className="tw:flex tw:h-7 tw:items-center tw:justify-between tw:bg-[var(--bk-gray-100)] tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  data-testid={`media-used-page-${pg.pageId}`}
                 >
-                  <span className="tw:min-w-0 tw:flex-1">
-                    {/* 75:98 — the page, 12 on an 18 line box in ink. */}
-                    <span className="tw:block tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-                      {pg.pageName}
-                    </span>
-                    {/* 75:99 — what it is on that page, 11/16 in ink-muted. */}
-                    <span
-                      className="tw:block tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                      data-testid={`media-used-sub-${hit.elementId}`}
-                    >
-                      {hit.label}
-                    </span>
-                  </span>
-                  {/* 75:100 — "Go ›", 11/16 in accent-text. It said "Jump ›". */}
-                  <Button
-                    type="button"
-                    color="light"
-                    size="xs"
-                    variant="link"
-                    className="tw:min-h-6 tw:shrink-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]"
-                    data-testid={`media-jump-${hit.elementId}`}
-                    onClick={() => handleJump(pg.pageId, hit.elementId)}
-                  >
-                    Go {"›"}
-                  </Button>
+                  <span className="tw:truncate">{pg.pageName}</span>
+                  <span className="tw:font-medium tw:tabular-nums">{pg.hits.length}</span>
                 </div>
-              )),
-            )
+                {pg.hits.map((hit) => (
+                  <div
+                    key={hit.elementId}
+                    className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4"
+                    data-testid={`media-used-row-${hit.elementId}`}
+                    role="listitem"
+                  >
+                    <span className="tw:min-w-0 tw:flex-1">
+                      <span className="tw:block tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                        {hit.label}
+                      </span>
+                      <span
+                        className="tw:block tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                        data-testid={`media-used-sub-${hit.elementId}`}
+                      >
+                        {hit.crumb}
+                      </span>
+                    </span>
+                    <Button
+                      type="button"
+                      color="light"
+                      size="xs"
+                      variant="link"
+                      className="tw:min-h-6 tw:shrink-0 tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                      data-testid={`media-jump-${hit.elementId}`}
+                      onClick={() => handleJump(pg.pageId, hit.elementId)}
+                    >
+                      Jump {"›"}
+                    </Button>
+                  </div>
+                ))}
+              </React.Fragment>
+            ))
           )}
           {/* Board 75:111 — the delete guard. The empty state already tells
               you deleting is safe; the state where it is NOT safe said

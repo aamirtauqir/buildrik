@@ -144,6 +144,6 @@ describe("CommentRow", () => {
 
   it("says 'resolved' in the meta line as well as colouring the dot", () => {
     render(<CommentRow author="Ali" body="footer link dead" resolved meta="Home · 3d" />);
-    expect(screen.getByText(/· resolved$/)).toBeTruthy();
+    expect(screen.getByText(/· Resolved$/)).toBeTruthy();
   });
 });

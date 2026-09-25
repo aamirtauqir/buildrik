@@ -36,7 +36,6 @@ const baseProps = {
   onRenameCommit: vi.fn(),
   onRenameCancel: vi.fn(),
   onDrop: vi.fn(),
-  onPageRemove: vi.fn(),
 };
 
 describe("PageFolder (flat model)", () => {

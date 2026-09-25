@@ -26,6 +26,7 @@ import type { SnapLine } from "../hooks/useCanvasSnapping";
 import type { CursorState } from "../hooks/useCursorIntelligence";
 import type { SectionBoundary, SectionDragState } from "../hooks/useSectionReorder";
 import { CanvasSpotSpacing } from "../spots";
+import { announceInsertTarget, describeInsertTarget, useInsertDrag } from "../insertDrag";
 import {
   SelectionBoxOverlay,
   ElementHoverOverlay,
@@ -169,6 +170,19 @@ export function CanvasOverlayGroup({
   onInlineCommand,
   onOpenImageEditor,
 }: CanvasOverlayGroupProps) {
+  /* Board 4418:100890: while an Add row is held, say where it would land —
+     the drawer note and the footer readout read the same announcement. */
+  const insert = useInsertDrag(composer);
+  React.useEffect(() => {
+    if (!composer || !insert.label) return;
+    announceInsertTarget(
+      composer,
+      isDragOver && isValidDrop && dropTargetId && dropPosition
+        ? describeInsertTarget(composer, dropTargetId, dropPosition)
+        : null,
+    );
+  }, [composer, insert.label, isDragOver, isValidDrop, dropTargetId, dropPosition]);
+
   // Defensive early return if critical objects are missing
   if (!composer || !canvasRef) return null;
 
@@ -322,6 +336,7 @@ export function CanvasOverlayGroup({
           canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
           dropSlotRect={dropSlotRect}
           dropTargetPath={dropTargetPath}
+          insert={insert.label ? { label: insert.label, target: insert.target } : null}
         />
       )}
 

@@ -18,7 +18,6 @@ import { Button } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { LoadCard, SET_CARD, SET_EYEBROW, Screen } from "../shared";
-import { NAV_ICONS } from "../icons";
 import {
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
@@ -134,12 +133,16 @@ export function summaryLine(id: SettingsNavId, o: SettingsOverview): string {
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
-/** The frame's card order — not the sidebar's (VISITORS sits second here). */
-const OVERVIEW_GROUPS: SettingsNavGroupId[] = ["site-setup", "visitors", "seo-publishing", "advanced", "workspace"];
+/** 4418:128917's two columns — the frame's card order, not the sidebar's. */
+const OVERVIEW_COLUMNS: SettingsNavGroupId[][] = [
+  ["site-setup", "seo-publishing"],
+  ["visitors", "advanced", "workspace"],
+];
 
+/* 4418:128917: a 52 row, 16 in — two 14/20 lines and the › at the far right. */
 const ROW_CLASS =
-  "tw:flex tw:h-auto tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
-  "tw:bg-transparent tw:px-2 tw:py-2 tw:text-left tw:font-normal tw:no-underline tw:text-[var(--bk-ink)] " +
+  "tw:flex tw:h-13 tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:border-0 " +
+  "tw:bg-transparent tw:px-4 tw:py-1.5 tw:text-left tw:font-normal tw:no-underline tw:text-[var(--bk-ink)] " +
   "tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean; external?: boolean }> = ({
@@ -148,22 +151,15 @@ const RowBody: React.FC<{ nav: SettingsNavDef; line: string; attention: boolean;
   attention,
   external,
 }) => {
-  const Icon = NAV_ICONS[nav.id];
   return (
     <>
-      <span
-        className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]"
-        aria-hidden
-      >
-        <Icon size={16} strokeWidth={1.5} />
-      </span>
-      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-0.5">
-        <span className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink)]">
+      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+        <span className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">
           {nav.title}
           {external ? <ArrowUpRight size={12} className="tw:ml-1 tw:inline tw:align-[-1px]" aria-hidden /> : null}
         </span>
         <span
-          className="tw:truncate tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
           data-testid={`set-ov-row-line-${nav.id}`}
         >
           {line}
@@ -288,11 +284,13 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
         </section>
       ) : null}
 
-      <div className="tw:grid tw:grid-cols-3 tw:items-start tw:gap-4">
-        {OVERVIEW_GROUPS.map((group) => (
+      <div className="tw:flex tw:items-start tw:gap-8">
+        {OVERVIEW_COLUMNS.map((column) => (
+        <div key={column[0]} className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-6">
+        {column.map((group) => (
           <section
             key={group}
-            className={`${SET_CARD} tw:flex tw:flex-col tw:gap-2 tw:p-4`}
+            className={`${SET_CARD} tw:flex tw:flex-col tw:gap-2 tw:px-6 tw:py-5`}
             aria-label={SETTINGS_NAV_GROUPS[group]}
             data-testid={`set-ov-group-${group}`}
           >
@@ -325,6 +323,8 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, onOpe
               ))}
             </ul>
           </section>
+        ))}
+        </div>
         ))}
       </div>
     </Screen>

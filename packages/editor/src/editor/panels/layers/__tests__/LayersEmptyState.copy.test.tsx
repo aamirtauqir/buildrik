@@ -1,22 +1,20 @@
 /**
- * C5 G2-063 — the Layers empty state reads as board 4418:83911 draws it:
- * "No layers yet. Add an element to start building…" with the door named for
- * the rail item it opens ("Open Add"), not the retired "Insert".
+ * v3 board 4418:83911 (S·Layers · empty): the state glyph, "Nothing here
+ * yet" and "No layers yet. Add an element to start building this page." —
+ * no button; Add is the rail item beside the drawer.
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { LayersEmptyState } from "../components/LayersEmptyState";
 
 describe("LayersEmptyState", () => {
-  it("says No layers yet and offers Open Add", () => {
-    const open = vi.fn();
-    render(<LayersEmptyState onAddBlockClick={open} />);
-    expect(screen.getByTestId("layers-empty")).toHaveTextContent("No layers yet. Add an element to start building.");
-    expect(screen.queryByText(/Insert/)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Open Add" }));
-    expect(open).toHaveBeenCalledTimes(1);
+  it("reads as the board draws it, with no button", () => {
+    render(<LayersEmptyState />);
+    expect(screen.getByTestId("layers-empty")).toHaveTextContent("Nothing here yet");
+    expect(screen.getByTestId("layers-empty-text")).toHaveTextContent("No layers yet. Add an element to start building this page.");
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });

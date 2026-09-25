@@ -134,15 +134,14 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
               </Button>
             ) : null}
           </header>
-          {panel.collections.length === 0 ? (
-            /* 6881:79324 — no collections: the invitation sits in the pane. */
-            <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-24 tw:text-center" data-testid="cms-ws-empty">
-              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">Create your first collection</p>
-              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">It opens here once created.</p>
-            </div>
-          ) : null}
         </section>
-        <HintColumn title="Select a collection" hint="Open a collection to see its details here." testId="cms-ws-hint" />
+        {/* 6881:79324 — with no collections the invitation takes the hint
+            column; the pane stays empty. */}
+        {panel.collections.length === 0 ? (
+          <HintColumn title="Create your first collection" hint="It opens here once created." testId="cms-ws-empty" />
+        ) : (
+          <HintColumn title="Select a collection" hint="Open a collection to see its details here." testId="cms-ws-hint" />
+        )}
       </div>
     );
   }
@@ -181,12 +180,12 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
   if (ws.tab === "records") {
     body = isEmpty ? (
       /* 4428:148905 — an empty collection offers both ways in. */
-      <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:pt-24 tw:text-center" data-testid="cms-ws-no-records">
+      <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
         <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
-        <p className="tw:m-0 tw:mt-2 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
-        <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
+        <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
         <div className="tw:mt-3 tw:flex tw:gap-2">
-          <Button size="xs" className={PRIMARY} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
+          <Button size="xs" className={`${PRIMARY} tw:h-8`} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
             Add record
           </Button>
           <ImportRecordsButton importer={importer} />
@@ -218,7 +217,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       : ws.tab === "dynamic-pages"
         ? { title: "Select a page", hint: "Generated pages open here and under Pages." }
         : ws.tab === "fields"
-          ? { title: "Select a field", hint: "Click a row to open its settings — type, key and validation." }
+          ? { title: "Select a field", hint: "Click a row to open its settings — type, key, required and validation." }
         : ws.tab === "settings"
           ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
           : null;

@@ -131,9 +131,17 @@ export function useLayerContextActions(
           });
           break;
         }
-        case "group":
-          actionsHook.groupLayers([...selectionHook.selectedIds], treeHook.layers);
+        case "group": {
+          const ids = multi ? [...selectionHook.selectedIds] : [nodeId];
+          const node = findById(treeHook.layers, nodeId);
+          const name = actionsHook.customNames.get(nodeId) ?? node?.type ?? "Element";
+          actionsHook.groupLayers(ids, treeHook.layers);
+          addToast({
+            description: `Wrapped ${multi ? `${ids.length} elements` : name.charAt(0).toUpperCase() + name.slice(1)} in a group`,
+            action: { label: "Undo", onClick: () => composer?.history.undo() },
+          });
           break;
+        }
         case "selectChildren": {
           const node = findById(treeHook.layers, nodeId);
           if (node && node.children.length > 0) {

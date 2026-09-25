@@ -63,7 +63,13 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
   onOpenMenu,
 }) => {
   const [anchor, setAnchor] = React.useState<{ right: number; top: number; scale: number } | null>(null);
+  /* Pulls the pill back onto the scrollable canvas viewport when `anchor`
+     alone would place it past the viewport's right edge (see the effect
+     below). Reset to 0 every time `anchor` gets a fresh raw value — it is
+     re-derived from THIS anchor, never carried over from the last one. */
+  const [shiftX, setShiftX] = React.useState(0);
   const moreRef = React.useRef<HTMLButtonElement>(null);
+  const toolbarRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,6 +88,9 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         top: (r.top - c.top) / scale + (canvas.scrollTop || 0) + INSET / scale,
         scale,
       });
+      /* A fresh raw anchor means the last frame's viewport correction no
+         longer applies — the effect below re-measures from scratch. */
+      setShiftX(0);
     };
     update();
     const observer = new ResizeObserver(update);
@@ -100,19 +109,52 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
     };
   }, [elementId, canvasRef]);
 
+  /* A wide (page-width) element's toolbar can anchor past the RIGHT edge of
+     `.bd-canvas-scroll`'s currently-scrolled-into-view window — still a valid
+     DOM position (nothing clips `.buildrick-canvas` itself, it's simply wider
+     than its scrollable ancestor), but invisible/unclickable there: the pill
+     sits scrolled out of view, and whatever paints at that screen point next
+     (Inspector at 4418:… boards, once the canvas column ends) receives the
+     click instead. `getContextMenuActions`/the click handler never saw
+     anything wrong because nothing threw — the button was simply never
+     reachable. Measured live: a full-width root selection anchored the pill
+     at screen x 1272-1360 while `.bd-canvas-scroll`'s visible window ended at
+     1116, handing every click in that gap to the Inspector's row underneath.
+     Shift, don't reposition from scratch: this runs AFTER the raw anchor's
+     own render (same layout effect timing tooltips/popovers use), so the
+     correction lands before paint — no visible flash. */
+  React.useLayoutEffect(() => {
+    if (!anchor) return;
+    const canvas = canvasRef.current;
+    const toolbar = toolbarRef.current;
+    if (!canvas || !toolbar) return;
+    const viewport = canvas.closest<HTMLElement>(".bd-canvas-scroll") ?? canvas;
+    const viewportRect = viewport.getBoundingClientRect();
+    const toolbarRect = toolbar.getBoundingClientRect();
+    const overflow = toolbarRect.right - viewportRect.right;
+    if (overflow > 0.5) {
+      setShiftX(-(overflow / anchor.scale));
+    }
+    // Deliberately only `anchor` — `shiftX` is this effect's own output, not
+    // an input; including it would re-measure an already-corrected position
+    // relative to itself and either no-op or (with rounding) oscillate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anchor, canvasRef]);
+
   if (!anchor || !composer.elements.getElement(elementId)) return null;
 
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
     <div
+      ref={toolbarRef}
       data-testid="selection-toolbar"
       className={`bd-canvas-toolbar ${PILL}`}
       onMouseDown={stop}
       onClick={stop}
       style={{
         position: "absolute",
-        left: anchor.right,
+        left: anchor.right + shiftX,
         top: anchor.top,
         /* Chrome, not page: it stays 1:1 however far the page is zoomed. */
         transform: `translateX(-100%) scale(${1 / anchor.scale})`,

@@ -7,6 +7,7 @@ import type { BlockData, ElementType } from "../../shared/types";
 export const contactBlockConfig: BlockData & { elementType: ElementType } = {
   id: "contact",
   label: "Contact",
+  description: "Contact details and a short message form, side by side.",
   category: "Sections",
   elementType: "section",
   content:

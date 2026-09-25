@@ -17,15 +17,15 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
   Button,
-  ConfirmDialog,
   IconButton,
   Menu,
   MenuItem,
+  Modal,
   Popover,
   Select,
   Textarea,
@@ -37,6 +37,8 @@ import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
+import { RecordPreview } from "./RecordPreview";
+import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 
 export type OpenMediaLibrary = (
@@ -122,7 +124,17 @@ export function RecordSheet({
   const [saving, setSaving] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [leaveTo, setLeaveTo] = React.useState<null | (() => void)>(null);
+  /* The safe answer takes focus: the Modal focuses its first control, which in
+     the board's order is Discard — Enter would throw the edits away. */
+  const keepRef = React.useRef<HTMLButtonElement | null>(null);
+  const leaving = leaveTo !== null;
+  React.useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => keepRef.current?.focus(), 0);
+    return () => window.clearTimeout(id);
+  }, [leaving]);
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [previewOpen, setPreviewOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
 
   React.useEffect(() => {
@@ -135,7 +147,8 @@ export function RecordSheet({
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
   const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
-  const title = record ? recordTitle(collection, record) : `New ${collection.name.replace(/s$/, "")}`;
+  const singular = collection.name.replace(/s$/, "");
+  const title = record ? recordTitle(collection, record) : `New ${singular}`;
   const crumb = record ? title : "New record";
 
   const guard = (go: () => void) => (dirty ? setLeaveTo(() => go) : go());
@@ -145,7 +158,13 @@ export function RecordSheet({
     setSaveError(null);
     try {
       await onSave(form, published);
-      addToast({ tone: "success", title: "Record saved", description: `${collection.name} · Changes to this record are live in the CMS.` });
+      /* 6561:54690 — the collection rides in the title; the body says what
+         the save reached and what it did not yet. */
+      addToast({
+        tone: "success",
+        title: `Record saved · ${collection.name}`,
+        description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+      });
       onClose();
     } catch (e) {
       /* A published record is validated against the collection's rules
@@ -171,15 +190,30 @@ export function RecordSheet({
     }
     await onDelete(record);
     onClose();
+    /* 6881:70387 — "<name> deleted · <collection>", what went, what Undo does. */
     addToast({
       tone: "success",
-      title: `${title} deleted`,
-      description: collection.name,
+      title: `${title} deleted · ${collection.name}`,
+      description: "The record is gone. Undo restores it.",
       action: { label: "Undo", onClick: () => void onRestore(record) },
     });
   };
 
-  const set = (slug: string, v: unknown) => setForm((p) => ({ ...p, [slug]: v }));
+  /* 6749:59940 — a new record's slug follows its name ("auto from name")
+     until someone types into the slug field itself. */
+  const nameSlug = collection.displayField ?? "name";
+  const autoSlug = !record && collection.fields.some((f) => f.slug === "slug") && collection.fields.some((f) => f.slug === nameSlug);
+  const [slugTouched, setSlugTouched] = React.useState(false);
+  const nameField = collection.fields.find((f) => f.slug === nameSlug);
+  const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
+  const set = (slug: string, v: unknown) => {
+    if (slug === "slug") setSlugTouched(true);
+    setForm((p) => ({
+      ...p,
+      [slug]: v,
+      ...(autoSlug && !slugTouched && slug === nameSlug ? { slug: slugify(String(v ?? "")) } : {}),
+    }));
+  };
 
   const control = (f: CMSField) => {
     const id = `cms-field-${f.slug}`;
@@ -267,7 +301,7 @@ export function RecordSheet({
           type={type}
           sizing="sm"
           className={CONTROL}
-          placeholder={f.placeholder}
+          placeholder={autoSlug && f.slug === "slug" ? "auto from name" : f.placeholder}
           value={v === undefined || v === null ? "" : String(v)}
           onChange={(e) => set(f.slug, f.type === "number" && e.target.value !== "" ? Number(e.target.value) : e.target.value)}
         />
@@ -284,7 +318,7 @@ export function RecordSheet({
 
   return (
     <div
-      className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:flex tw:flex-col tw:gap-2 tw:overflow-hidden tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel)] tw:px-8 tw:pb-3"
+      className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:flex tw:overflow-hidden tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel)]"
       role="dialog"
       aria-label={`Record · ${crumb}`}
       data-testid="cms-sheet"
@@ -295,6 +329,7 @@ export function RecordSheet({
         }
       }}
     >
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2 tw:px-8 tw:pb-3">
       <header className="tw:flex tw:h-11 tw:w-[280px] tw:flex-none tw:items-center tw:gap-2 tw:px-4">
         <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
           {title}
@@ -362,20 +397,34 @@ export function RecordSheet({
             {row.map(control)}
           </div>
         ))}
+        {/* 7116:76427 — "Preview ▸" opens the read-only card beside the form. */}
+        <Button
+          size="xs"
+          variant="link"
+          aria-expanded={previewOpen}
+          className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium"
+          data-testid="cms-sheet-preview"
+          onClick={() => setPreviewOpen((o) => !o)}
+        >
+          Preview ▸
+        </Button>
       </div>
 
       <footer className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:pt-2">
         <div className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4" data-testid="cms-sheet-eligibility">
           <span
-            className={`tw:size-1.5 tw:rounded-full ${missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
+            className={`tw:size-1.5 tw:rounded-full ${!record && !dirty ? "tw:bg-[var(--bk-ink-muted)]" : missing.length ? "tw:bg-[var(--bk-warning)]" : "tw:bg-[var(--bk-success)]"}`}
             aria-hidden="true"
           />
+          {!record && !dirty ? <TriangleAlert size={12} className="tw:flex-none tw:text-[var(--bk-warning-text)]" aria-hidden="true" /> : null}
           <span
             className={`tw:flex-1 tw:text-[13px] tw:leading-5 tw:font-medium ${missing.length ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-success-text)]"}`}
           >
-            {missing.length
-              ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
-              : "Eligible for publishing"}
+            {!record && !dirty
+              ? "Not eligible — not saved yet"
+              : missing.length
+                ? `Not eligible for publishing — ${missing.map((f) => f.name).join(", ")} ${missing.length === 1 ? "is" : "are"} required`
+                : "Eligible for publishing"}
           </span>
           <ToggleSwitch
             checked={published}
@@ -386,37 +435,65 @@ export function RecordSheet({
           />
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">
-          <span
-            className={`tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-            role={saveError ? "alert" : undefined}
-            data-testid="cms-sheet-state"
-          >
-            {saveError ?? (dirty ? "Unsaved changes on this record" : "No unsaved changes on this record")}
+          <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+            <span
+              className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
+              role={saveError ? "alert" : undefined}
+              data-testid="cms-sheet-state"
+            >
+              {saveError ??
+                (dirty ? "Unsaved changes on this record" : record ? "No unsaved changes on this record" : "New record · nothing saved yet")}
+            </span>
+            {/* 6749:59940 — a new record says what Save needs and what it does. */}
+            {!record && !saveError ? (
+              <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-sheet-new-hint">
+                {nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this {singular} with every
+                field above. Publishing the site makes it live.
+              </span>
+            ) : null}
           </span>
           <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
             Cancel
           </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={(!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+          <Button size="xs" className={SMALL_BTN} disabled={(!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
             {saveError ? "Retry save" : "Save record"}
           </Button>
         </div>
       </footer>
+      </div>
+      {previewOpen ? (
+        <RecordPreview collection={collection} record={record} form={form} title={title} onDelete={record ? () => void remove() : undefined} />
+      ) : null}
 
-      <ConfirmDialog
+      {/* 6879:67190 — the danger action first, the safe one last; "Keep
+          editing" takes focus, and Escape / the scrim give the same answer. */}
+      <Modal
         open={leaveTo !== null}
         onClose={() => setLeaveTo(null)}
-        onConfirm={() => {
-          const go = leaveTo;
-          setLeaveTo(null);
-          go?.();
-        }}
         title="Discard record changes?"
-        message={`${crumb} has unsaved changes. Keep editing to save them, or leave and lose them.`}
-        confirmLabel="Discard and leave"
-        cancelLabel="Keep editing"
-        tone="destructive"
+        kind="form"
         testId="cms-discard"
-      />
+        footer={
+          <>
+            <Button
+              variant="danger"
+              onClick={() => {
+                const go = leaveTo;
+                setLeaveTo(null);
+                go?.();
+              }}
+              data-testid="cms-discard-confirm"
+            >
+              Discard and leave
+            </Button>
+            <Button ref={keepRef} variant="secondary" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
+              Keep editing
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0">{`${crumb} has unsaved changes. Keep editing to finish them, or discard the edits and leave the record.`}</p>
+      </Modal>
       {record ? (
         <TypedDeleteDialog
           open={typedDelete}
@@ -425,10 +502,10 @@ export function RecordSheet({
             await onDelete(record);
             setTypedDelete(false);
             onClose();
-            addToast({ tone: "success", title: `${title} deleted`, description: `${collection.name} · The record and its generated page are gone.` });
+            addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });
           }}
           name={title}
-          consequence="Deleting removes this record and its generated page."
+          consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
         />

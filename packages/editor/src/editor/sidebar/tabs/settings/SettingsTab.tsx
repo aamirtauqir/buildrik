@@ -45,6 +45,7 @@ import {
   SAVE_ERROR_MESSAGES,
   NAV_ICONS,
   SET_BTN,
+  SET_HEAD_BTN,
   SET_EYEBROW,
   SiteSettingsScreen,
   LockedScreen,
@@ -86,7 +87,6 @@ const GROUP_ORDER: SettingsNavGroupId[] = ["site-setup", "seo-publishing", "visi
    save here` · Done). */
 const IMMEDIATE_SCREENS = new Set<SettingsNavId>(["domains", "forms", "integrations"]);
 
-const OVERVIEW_SUBTITLE = " · everything on this page is scoped to this project.";
 
 function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
   const required = SCREEN_PLAN_REQUIREMENTS[screenId];
@@ -100,29 +100,30 @@ function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
    `size="xs"` gives the Button its 32; everything else is replaced per
    property through twMerge (padding, alignment, type). The <a> rows for
    Members / Billing wear the same string — nothing in it needs a button. */
-/* 4418:127313: 36-tall rows (--bk-size-row-nav), 14px. */
+/* 4418:127313 / 4418:127966: 36-tall rows (--bk-size-row-nav), 14px, a 20
+   icon slot 12 from the label (label at x60). The current row is semibold. */
 const NAV_ROW =
-  "tw:flex tw:h-[var(--bk-size-row-nav)] tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
+  "tw:flex tw:h-[var(--bk-size-row-nav)] tw:w-full tw:items-center tw:justify-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
   "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
-  "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
+  "tw:bg-[var(--bk-accent-tint)] tw:font-semibold tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
 
 const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
   /* 4418:127313 marks Overview with a dot, not a glyph. */
   if (id === "overview") {
     return (
-      <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+      <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
         <span className="tw:size-1.5 tw:rounded-full tw:bg-current" />
       </span>
     );
   }
   const Icon = NAV_ICONS[id];
   return (
-    <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-      <Icon size={16} strokeWidth={1.5} />
+    <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+      <Icon size={18} strokeWidth={1.5} />
     </span>
   );
 };
@@ -378,10 +379,10 @@ export const SettingsTab: React.FC<
     setGuardOpen(false);
   }, []);
 
-  const handleDiscard = React.useCallback(() => {
-    const pending = pendingRef.current;
-    pendingRef.current = null;
-    setGuardOpen(false);
+  /* Roll the screen back to its snapshot and remount it (a server screen
+     re-reads its row). The footer's Discard (4418:127966 save bar) stops
+     here; the guard's Discard then goes where the user was going. */
+  const rollBack = React.useCallback(() => {
     // Roll composer back to the snapshot taken when the screen mounted (or
     // last saved). structuredClone on the way out so later composer
     // mutations don't poison the snapshot we still hold.
@@ -394,12 +395,19 @@ export const SettingsTab: React.FC<
     // Prime the ref synchronously — the effect that mirrors it has not run
     // yet, and the intent below reads it.
     screenIsDirtyRef.current = false;
+  }, [composer]);
+
+  const handleDiscard = React.useCallback(() => {
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    setGuardOpen(false);
+    rollBack();
     if (!pending || pending.kind === "leave") {
       leave();
       return;
     }
     performNav(pending.id);
-  }, [composer, leave, performNav]);
+  }, [rollBack, leave, performNav]);
 
   // ─── Save ─────────────────────────────────────────────────────────────
 
@@ -540,21 +548,18 @@ export const SettingsTab: React.FC<
 
   const headTitle =
     isOverview || !current
-      ? "Settings"
+      ? "Settings overview"
       : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
-  const headSub = isOverview || !current ? `${siteName}${OVERVIEW_SUBTITLE}` : (screenHeader?.subtitle ?? current.subtitle);
+  const headSub = current ? (screenHeader?.subtitle ?? current.subtitle) : "";
 
   const immediate = IMMEDIATE_SCREENS.has(currentScreen as SettingsNavId);
-  const footStatus: { text: string; tone: "muted" | "danger" | "warning" } = isOverview
-    ? { text: "Pick a section to edit its settings", tone: "muted" }
-    : immediate && loadState === "ready"
-      ? { text: "Actions apply immediately · nothing to save here", tone: "muted" }
-    : loadState === "loading"
+  const footStatus: { text: string; tone: "muted" | "danger" | "warning" } =
+    loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
         ? { text: "Settings could not load", tone: "danger" }
         : saveError
-          ? { text: "Changes not saved", tone: "danger" }
+          ? { text: "Not saved", tone: "danger" }
           : screenIsDirty
             ? { text: "Unsaved changes", tone: "warning" }
             : { text: "All changes saved", tone: "muted" };
@@ -741,48 +746,52 @@ export const SettingsTab: React.FC<
 
       {/* ── Pane ────────────────────────────────────────────────────────── */}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        <header
-          className={`tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-6 tw:px-12 tw:pt-7 ${
-            isOverview ? "tw:pb-2" : "tw:border-b tw:border-[var(--bk-border)] tw:pb-6"
-          }`}
-        >
-          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
+        {/* 4418:128917: the Overview has no header band — a bare "Settings
+            overview" title on the pane's grey. Every other screen: a 112 white
+            band, title + subtitle left, the screen's action right (4418:127966),
+            with "Saves immediately" beside it where actions apply at once
+            (4418:127680). Search lives in the sidebar. */}
+        {isOverview ? (
+          <header className="tw:flex tw:shrink-0 tw:items-center tw:bg-[var(--bk-gray-50)] tw:px-10 tw:pt-6">
             <h2
-              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-9 tw:text-[var(--bk-ink)]"
               data-testid="set-head-title"
             >
               {headTitle}
             </h2>
-            <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-head-sub">
+          </header>
+        ) : (
+        <header className="tw:flex tw:h-28 tw:shrink-0 tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
+          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
+            <h2
+              className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-9 tw:text-[var(--bk-ink)]"
+              data-testid="set-head-title"
+            >
+              {headTitle}
+            </h2>
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-head-sub">
               {headSub}
             </p>
           </div>
-          {isOverview ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="xs"
-              className={`${SET_BTN} tw:w-70 tw:shrink-0 tw:justify-start tw:gap-2 tw:font-normal tw:text-[var(--bk-ink-muted)]`}
-              onClick={() => setQuery((q) => q ?? "")}
-              data-testid="set-search-open"
-            >
-              <SearchIcon size={14} aria-hidden />
-              Search settings
-            </Button>
+          {immediate && !locked ? (
+            <span className="tw:ml-auto tw:shrink-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="set-head-immediate">
+              Saves immediately
+            </span>
           ) : null}
           {locked ? (
-            <Button type="button" size="xs" className={`${SET_BTN} tw:shrink-0`} onClick={openBilling} data-testid="set-head-upgrade">
+            <Button type="button" size="xs" className={SET_HEAD_BTN} onClick={openBilling} data-testid="set-head-upgrade">
               Upgrade
             </Button>
           ) : (
             headerAction
           )}
         </header>
+        )}
 
         <div
           key={resetKey}
-          className={`tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-6 tw:overflow-y-auto tw:px-12 tw:pb-8 ${
-            isOverview ? "tw:bg-[var(--bk-bg-panel)] tw:pt-2" : "tw:bg-[var(--bk-bg-subtle)] tw:pt-8"
+          className={`tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-6 tw:overflow-y-auto tw:bg-[var(--bk-gray-50)] ${
+            isOverview ? "tw:px-10 tw:pb-6 tw:pt-6" : "tw:px-12 tw:py-8"
           }`}
           data-testid="set-body"
         >
@@ -794,36 +803,39 @@ export const SettingsTab: React.FC<
         {/* 4418:127313 draws no footer on a clean screen: the bar appears
             while there is something to save, a save failed, or loading did —
             and on the Overview, whose Done is its way out. */}
-        {locked || (!isOverview && !immediate && footStatus.text === "All changes saved") ? null : (
-        <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:gap-4 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
+        {/* The Overview (4418:128917) and the immediate screens (4418:127680)
+            draw no footer either — nothing there waits to be saved, and Back to
+            canvas is the way out. */}
+        {locked || isOverview || immediate || footStatus.text === "All changes saved" ? null : (
+        <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            className={`${SET_BTN} tw:h-7 tw:px-3 tw:text-[var(--bk-ink-muted)]`}
+            disabled={!screenIsDirty && !saveError}
+            onClick={rollBack}
+            data-testid="set-foot-discard"
+          >
+            Discard
+          </Button>
+          <Button
+            type="button"
+            size="xs"
+            className={`${SET_BTN} tw:h-7 tw:px-3`}
+            disabled={loadState !== "ready" || saving}
+            onClick={() => handleSave()}
+            data-testid="set-foot-save"
+          >
+            {saveError ? "Retry save" : "Save"}
+          </Button>
           <span
-            className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
+            className={`tw:ml-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
             role="status"
             data-testid="set-foot-status"
           >
             {footStatus.text}
           </span>
-          {isOverview || immediate ? (
-            <Button type="button" size="xs" className={SET_BTN} onClick={requestLeave} data-testid={isOverview ? "set-ov-done" : "set-foot-done"}>
-              Done
-            </Button>
-          ) : (
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <Button type="button" variant="ghost" size="xs" className={SET_BTN} onClick={requestLeave} data-testid="set-foot-cancel">
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                size="xs"
-                className={SET_BTN}
-                disabled={loadState !== "ready" || saving}
-                onClick={() => handleSave()}
-                data-testid="set-foot-save"
-              >
-                {saveError ? "Retry save" : "Save changes"}
-              </Button>
-            </div>
-          )}
         </footer>
         )}
       </div>

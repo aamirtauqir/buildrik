@@ -75,6 +75,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   onAdvancedToggle,
   mixedKeys,
 }) => {
+  const [showOverflow, setShowOverflow] = React.useState(false);
   // Collapsed preview: show the display type so users can see "flex" vs "grid"
   // vs "block" at a glance without expanding. Position is also load-bearing —
   // if it's anything other than static, tag it too.
@@ -124,16 +125,23 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           {/* Position — five tiles for a property most elements never leave
               `static`, so it sits with the rest of the advanced block rather
               than above Spacing. Board 32:2 draws no Position row. */}
-          <div className={SECTION_SUBTITLE}>Position</div>
           <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
 
-          {/* Overflow (advanced) */}
-          <div className={SECTION_SUBTITLE}>Overflow</div>
-          <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
-
-          {/* Visibility & Float (advanced) */}
-          <div className={SECTION_SUBTITLE}>Visibility & Float</div>
-          <VisibilityFloatControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
+          {/* Board 7058:78647 opens this block as the one Position row; overflow
+              and visibility & float wait one more click. */}
+          <MoreSettingsToggle
+            isOpen={showOverflow}
+            onToggle={() => setShowOverflow((v) => !v)}
+            collapsedLabel="Overflow & visibility"
+          />
+          {showOverflow && (
+            <>
+              <div className={SECTION_SUBTITLE}>Overflow</div>
+              <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
+              <div className={SECTION_SUBTITLE}>Visibility & Float</div>
+              <VisibilityFloatControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
+            </>
+          )}
         </>
       )}
 

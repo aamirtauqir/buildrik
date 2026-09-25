@@ -26,6 +26,7 @@ function makeComposer(createComponent = vi.fn().mockResolvedValue({ id: "c1", na
   const el = { getType: () => "section", getCustomData: (k: string) => (k === "layerName" || k === "name" ? "Hero" : undefined) };
   return {
     composer: {
+      emit: vi.fn(),
       components: { createComponent, adoptInstances },
       elements: { getElement: () => el, getActivePage: () => ({ id: "page-home", name: "Home" }) },
     } as never,
@@ -51,6 +52,9 @@ describe("CreateComponentModal — board 4418:142143", () => {
     const { composer } = makeComposer();
     renderModal(composer);
     expect(screen.getByTestId("create-component-title")).toHaveTextContent("Create component");
+    // The board's dialog title is 20/600 (the Modal default), not 16.
+    expect(screen.getByTestId("create-component-title").className).toContain("--bk-text-20");
+    expect(screen.getByTestId("create-component-title").className).not.toContain("--bk-text-16");
     expect(screen.getByTestId("create-component-lead")).toHaveTextContent(
       /^Selected: Home › .+ \(section\)\. Creating a master converts this .+ into its first instance\. Nothing else changes unless you opt in below\.$/,
     );
@@ -60,6 +64,8 @@ describe("CreateComponentModal — board 4418:142143", () => {
       expect(screen.queryByText(new RegExp(gone, "i"))).toBeNull();
     }
     expect(screen.getByRole("button", { name: "Create component" })).toBeInTheDocument();
+    // Board footer 7431:145583: top rule, 16px vertical padding.
+    expect(screen.getByTestId("create-component-cancel").parentElement?.className).toContain("tw:border-t");
   });
 
   it("offers the convert box only when identical groups exist, with their count", () => {
@@ -78,6 +84,17 @@ describe("CreateComponentModal — board 4418:142143", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true, pageId: null });
     expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1"]);
+  });
+
+  /* Board 4418:166980: "Hero created as a component" (no tone dot), and the
+     drawer turns to Components, where the new master carries a New badge. */
+  it("says '{name} created as a component' and opens the Components drawer", async () => {
+    const { composer } = makeComposer();
+    const { onClose } = renderModal(composer);
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(addToastMock).toHaveBeenCalledWith({ description: "Hero created as a component" });
+    expect((composer as unknown as { emit: ReturnType<typeof vi.fn> }).emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
   });
 
   it("with the box ticked, the matches are converted too", async () => {

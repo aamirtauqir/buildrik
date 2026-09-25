@@ -6,6 +6,7 @@ import {
   createClientComment,
   listClientComments,
   resolveReviewByToken,
+  requestNewReviewLink,
   ClientReviewError,
 } from "@/server/services/client-review.service";
 import {
@@ -112,6 +113,16 @@ export const clientReviewRouter = router({
     const { token, ...rest } = input;
     try {
       return await createClientComment(token, rest);
+    } catch (e) {
+      translate(e);
+    }
+  }),
+
+  /** Dead-link page's "Request a new link" — notifies the owner, grants
+   *  nothing. Strict budget: each call is a notification in someone's bell. */
+  requestNewLink: strictClientLimit.input(reviewTokenInput).mutation(async ({ input }) => {
+    try {
+      return await requestNewReviewLink(input.token);
     } catch (e) {
       translate(e);
     }
