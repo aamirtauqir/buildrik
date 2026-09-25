@@ -239,7 +239,11 @@ describe("reviews router", () => {
   });
 
   it("status returns the EFFECTIVE editsRequireApproval (layerOn && raw) — false when the layer is off, even if the raw setting is true (PD-7/8)", async () => {
-    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: false });
+    // Raw setting is TRUE and the layer is OFF — this must still come back
+    // false. Round 1 left this mocked with editsRequireApproval: false,
+    // which could not tell "effective" logic apart from a straight pass-
+    // through of the raw value; a leaked raw=true would have passed too.
+    getSiteWorkspaceMock.mockResolvedValueOnce({ workspaceId: "ws_site_2", plan: "FREE", editsRequireApproval: true });
     isFeatureEnabledMock.mockResolvedValueOnce(false);
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.status({ siteId: "s2" })).resolves.toMatchObject({
