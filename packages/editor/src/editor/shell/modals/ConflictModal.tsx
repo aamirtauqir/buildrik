@@ -20,7 +20,8 @@
  * `bk-unsaved-v1-<site>` (`discardUnsaved`). Left in place, the reload would
  * offer "Restore my edits" right after the user chose to drop them, and
  * Restore would autosave the stale project over the teammate's work with the
- * fresh token. Overwrite keeps it — that copy is the one being saved.
+ * fresh token. Overwrite keeps it — that copy is the one being saved — and
+ * lifts a discard left by a Reload whose unload prompt was cancelled.
  *
  * @license BSD-3-Clause
  */
@@ -34,7 +35,7 @@ import {
   ModalTitle,
   OverlayMount,
 } from "@/editor/chrome-ui";
-import { discardUnsaved } from "@/services/unsavedRecovery";
+import { discardUnsaved, resumeKeepingUnsaved } from "@/services/unsavedRecovery";
 
 export interface ConflictModalProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
           <Button onClick={discardThen(onReload)}>Reload latest</Button>
           <Button color="light" onClick={discardThen(onSaveBackup)}>Save a backup</Button>
           {confirmOverwrite ? (
-            <Button color="red" onClick={onOverwrite}>Yes, overwrite</Button>
+            <Button color="red" onClick={() => { resumeKeepingUnsaved(); onOverwrite(); }}>Yes, overwrite</Button>
           ) : (
             <Button color="light" onClick={() => setConfirmOverwrite(true)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Overwrite…</Button>
           )}

@@ -218,5 +218,31 @@ describe("ConflictModal", () => {
       keepUnsaved("s2", EMPTY_PROJECT);
       expect(readUnsaved("s2")).not.toBeNull();
     });
+  
+    /* Round 3: the reload can be cancelled (the unsaved-changes prompt), and
+       the page lives on. A discard latch that outlived that would make every
+       later keepUnsaved a no-op — a failed Overwrite, or a new conflict,
+       would leave a tab-only edit unrecoverable. */
+    it("choosing Overwrite after a cancelled reload keeps work again", async () => {
+      const { keepUnsaved, readUnsaved } = await import("@/services/unsavedRecovery");
+      render(<ConflictModal {...makeProps()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
+      // …the reload was cancelled; the user picks Overwrite instead.
+      fireEvent.click(screen.getByRole("button", { name: "Overwrite…" }));
+      fireEvent.click(screen.getByRole("button", { name: "Yes, overwrite" }));
+      keepUnsaved("s1", EMPTY_PROJECT);
+      expect(readUnsaved("s1")).not.toBeNull();
+    });
+
+    it("a new conflict raised after a cancelled reload keeps work again", async () => {
+      const { keepUnsaved, readUnsaved } = await import("@/services/unsavedRecovery");
+      const { raiseSaveConflict, setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
+      render(<ConflictModal {...makeProps()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
+      raiseSaveConflict(new Error("SAVE_CONFLICT:2026-09-26T01:00:00.000Z"));
+      keepUnsaved("s1", EMPTY_PROJECT);
+      expect(readUnsaved("s1")).not.toBeNull();
+      setBaselineLastEditedAt(null); // leave no hold behind for other tests
+    });
   });
 });

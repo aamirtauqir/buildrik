@@ -10,6 +10,7 @@
 
 import { createBuildrikApiClient } from "./api-client";
 import { fetchMyRole, roleAtLeast } from "./RoleService";
+import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
@@ -141,6 +142,9 @@ export function raiseSaveConflict(err: unknown): SaveConflictError | null {
 }
 
 function announceConflict(serverToken: string): SaveConflictError {
+  /* A conflict raised after a Reload whose unload prompt was cancelled: the
+     page lives on, and its refused work must be kept again. */
+  resumeKeepingUnsaved();
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
   }

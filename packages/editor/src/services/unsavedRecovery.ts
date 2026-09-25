@@ -36,8 +36,11 @@ export interface UnsavedWork {
    latest / Save a backup). The reload is not instant: a debounced autosave
    still inside its conflict hold can fire between the choice and the unload
    and would keep the behind copy again — which the reload then offers back,
-   and Restore would save over the teammate's work with the fresh token. The
-   page is going away, so this never needs clearing. */
+   and Restore would save over the teammate's work with the fresh token.
+   The reload CAN be cancelled (the unsaved-changes prompt) and the page lives
+   on, so the latch is lifted again by `resumeKeepingUnsaved` — on Overwrite
+   and on any new conflict — or a failed Overwrite would have nowhere to keep
+   the tab-only edit. */
 const discarded = new Set<string>();
 
 /** Keep a snapshot the server refused. Best-effort: a full state is large and
@@ -80,4 +83,11 @@ export function clearUnsaved(siteId: string): void {
 export function discardUnsaved(siteId: string): void {
   discarded.add(siteId);
   clearUnsaved(siteId);
+}
+
+/** The discard did not happen after all (the reload was cancelled and the user
+ *  chose Overwrite, or a new conflict was raised): keep refused work again.
+ *  One site is open per page, so every latch is lifted. */
+export function resumeKeepingUnsaved(): void {
+  discarded.clear();
 }
