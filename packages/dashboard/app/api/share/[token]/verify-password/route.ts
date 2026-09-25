@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import { checkRateLimit } from "@server/services/rate-limiter";
 import { shareUnlockProof } from "@server/services/share-link.service";
+import { clientIp } from "@lib/request-ip";
 
 const VERIFY_MAX_ATTEMPTS = 5;
 const VERIFY_WINDOW_MS = 60_000;
@@ -14,7 +15,7 @@ export async function POST(
 
   // The token circulates by design, so without a throttle the password gate
   // is open to unlimited offline-speed guessing.
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const ip = clientIp(req.headers);
   const limit = await checkRateLimit(
     `share-verify:${token}:${ip}`,
     VERIFY_MAX_ATTEMPTS,

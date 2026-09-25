@@ -105,6 +105,7 @@ const MODEL_TO_TABLE = {
   site: "sites",
   page: "pages",
   sitePermission: "site_permissions",
+  rateLimitBucket: "rate_limit_buckets",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

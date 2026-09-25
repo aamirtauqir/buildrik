@@ -16,6 +16,7 @@ import { captchaEnabled, verifyTurnstile } from "@/server/services/turnstile.ser
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
 import { record as recordActivity } from "@/server/services/activity-log.service";
+import { clientIp } from "@/lib/request-ip";
 
 // Strict: 5 attempts per 15 min (2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -28,8 +29,6 @@ const LOGIN_MAX_FAILURES = 10;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 // Require a captcha solve once an IP has this many recent failed logins.
 const LOGIN_CAPTCHA_AFTER = 3;
-const clientIp = (headers: Headers | undefined) =>
-  headers?.get("x-forwarded-for")?.split(",")[0]?.trim() || headers?.get("x-real-ip") || "unknown";
 
 function handleAuthError(err: unknown): never {
   if (err instanceof AuthError) {

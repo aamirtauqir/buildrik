@@ -207,6 +207,49 @@ pnpm smoke:prod \
 
 8 checks. Each fails surfaces what to fix.
 
+## Reverse-proxy IP header (S-11 — confirm before relying on rate limits)
+
+Every place the app reads the caller's IP (rate-limit keys, session records,
+new-device alerts) goes through one helper now: `clientIp()` in
+`lib/request-ip.ts`. Its body reads the **leftmost** entry of
+`x-forwarded-for`, falling back to `x-real-ip`.
+
+That is deliberately provisional. Behind cPanel/LiteSpeed the app sits behind
+a proxy, and "leftmost" is only correct if the proxy hop is trusted to have
+either (a) set `x-forwarded-for` itself with the real client IP as the only
+or first entry, or (b) appended to an existing header rather than trusting
+whatever the client sent. If a client can reach the proxy directly and set
+its own `x-forwarded-for: 1.2.3.4` before the proxy appends its own hop, the
+**leftmost** entry is attacker-controlled and every per-IP limit in this app
+keys on a spoofed value — trivially bypassable.
+
+**Before depending on IP-based limiting in production**, a founder/ops step
+outside this repo:
+
+1. Confirm what LiteSpeed actually forwards. From the cPanel host:
+   ```bash
+   curl -s -H "X-Forwarded-For: 9.9.9.9" https://app.buildrick.io/api/public/track/<test-site-id> -o /dev/null -D -
+   ```
+   then check the app's own logs (or a temporary debug log in
+   `clientIp()`) for what header value the Node process actually saw —
+   does LiteSpeed pass the spoofed value through unchanged, append its own
+   hop, or overwrite it? Also check whether LiteSpeed sets its own trusted
+   header (commonly `X-Real-IP` from the actual upstream connection).
+2. If the proxy **appends** (trusted last hop = the real client), switch
+   `clientIp()`'s body to read the **rightmost** entry instead of leftmost.
+   If LiteSpeed sets its own `X-Real-IP` from the raw TCP connection
+   (untouched by client headers), prefer that header over `x-forwarded-for`
+   entirely.
+3. Change only `lib/request-ip.ts` — every caller (rate limiter keys,
+   session `ip` column, device-alert emails) picks up the fix at once,
+   which is the point of having one helper instead of seven copies.
+
+A wrong hop count is not a safe default to guess at: a rightmost-hop helper
+keys every user on the proxy's own IP if the hop count is off by one, and
+would rate-limit-block everyone behind that IP together. That is why the
+helper ships leftmost (safe-but-spoofable) rather than a guessed rightmost
+(unsafe-if-wrong) until this is confirmed against the real LiteSpeed config.
+
 ## Common failures
 
 | Symptom | Cause |
