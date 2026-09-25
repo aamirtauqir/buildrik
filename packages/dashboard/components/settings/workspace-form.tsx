@@ -378,7 +378,9 @@ export function WorkspaceForm({
                 Require password on shared links
               </p>
               <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                New shared links will require a password by default.
+                New shared links will require a password by default. Has no
+                effect on the Free plan, which doesn&apos;t support
+                password-protected links.
               </p>
             </div>
             <button

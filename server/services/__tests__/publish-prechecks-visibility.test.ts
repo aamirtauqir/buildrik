@@ -101,10 +101,13 @@ describe("pre-publish checks count what ships", () => {
   // A-17: a page-generating CMS collection whose bound template page is gone
   // used to ship silently with no generated pages — surface it as a warning
   // before publish.
-  it("passes CMS templates when there is no page-generating collection", async () => {
+  // Minor fix (controller review round 1): a "pass" row for a check that
+  // never applies is noise on the near-all-sites-have-no-CMS-collection
+  // case — the row is absent entirely, not a pass.
+  it("omits the CMS templates row entirely when there is no page-generating collection", async () => {
     pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true }]);
     const { checks } = await runPrePublishChecks("s1");
-    expect(status(checks, "CMS templates")).toBe("pass");
+    expect(status(checks, "CMS templates")).toBeUndefined();
   });
 
   it("warns when a collection's bound template page no longer exists", async () => {

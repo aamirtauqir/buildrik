@@ -174,6 +174,24 @@ describe("Share link requirePw + defaultExpiration policy (A-9)", () => {
     ).resolves.toBeDefined();
   });
 
+  // Minor fix (controller review round 1): FREE has no password links at
+  // all (PLAN_LIMITS.FREE.shareLinkPasswords is false) — enforcing requirePw
+  // there would make link creation impossible, not safer.
+  it("requirePw=true on FREE (no password links on this plan) → does NOT throw", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue({
+      role: "ADMIN",
+      workspace: { plan: "FREE", sharingSettings: { requirePw: true, allowEditors: true } },
+    });
+    mockShareLinkCount.mockResolvedValue(0);
+    mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test" }, "user1")
+    ).resolves.toBeDefined();
+  });
+
   it("no expiresInDays given, workspace default '7d' → the link is created with a ~7 day expiry", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
     mockWorkspaceMemberFindFirst.mockResolvedValue({

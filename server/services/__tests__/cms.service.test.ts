@@ -224,9 +224,12 @@ describe("generateDynamicPages — A-17 title dedupe + script/style-safe substit
 });
 
 describe("findStaleTemplateBindings (A-17)", () => {
-  it("returns [] when the site has no page-generating collection", async () => {
+  it("reports hasPageGeneratingCollections: false when the site has no page-generating collection", async () => {
     colFindMany.mockResolvedValueOnce([]);
-    await expect(findStaleTemplateBindings("s1", [{ slug: "home", isHomePage: true }])).resolves.toEqual([]);
+    await expect(findStaleTemplateBindings("s1", [{ slug: "home", isHomePage: true }])).resolves.toEqual({
+      hasPageGeneratingCollections: false,
+      stale: [],
+    });
   });
 
   it("flags a collection whose template page filename matches no current page", async () => {
@@ -235,7 +238,10 @@ describe("findStaleTemplateBindings (A-17)", () => {
       { slug: "home", isHomePage: true },
       { slug: "about", isHomePage: false },
     ]);
-    expect(out).toEqual([{ collectionId: "c1", collectionName: "Blog", templatePath: "deleted-page.html" }]);
+    expect(out).toEqual({
+      hasPageGeneratingCollections: true,
+      stale: [{ collectionId: "c1", collectionName: "Blog", templatePath: "deleted-page.html" }],
+    });
   });
 
   it("does not flag a collection whose template page still exists (slug.html, or index.html for home)", async () => {
@@ -247,6 +253,6 @@ describe("findStaleTemplateBindings (A-17)", () => {
       { slug: "home", isHomePage: true },
       { slug: "about", isHomePage: false },
     ]);
-    expect(out).toEqual([]);
+    expect(out).toEqual({ hasPageGeneratingCollections: true, stale: [] });
   });
 });

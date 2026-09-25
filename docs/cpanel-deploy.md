@@ -182,11 +182,16 @@ curl -I https://app.buildrick.io/api/trpc/auth.checkEmail
 ## Step C — Cron jobs (18 routes)
 
 cPanel → Cron Jobs. `vercel.json` at the repo root is the source of truth
-for the schedule column — this list is generated from it (C-2). Add each
-line below as its own cPanel cron entry, using the SAME `$CRON_SECRET`
-value from the env vars:
+for the schedule column — this list is generated from it (C-2). `$CRON_SECRET`
+is a shell variable, not something cron sources from the app's env — cPanel's
+crontab does not run through a login shell, so it must be **defined at the top
+of the crontab itself** (standard `VAR=value` crontab syntax applies to every
+line below it) with the SAME value as the app's `CRON_SECRET` env var. Add the
+line below FIRST, then each cron line as its own cPanel cron entry:
 
 ```bash
+CRON_SECRET=<the same value as the app's CRON_SECRET env var>
+
 */5  * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/scheduled-publish
 0    2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ssl-check
 0    8 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/billing-dunning

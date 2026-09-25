@@ -79,6 +79,14 @@ describe("GET /api/sse/publish/[jobId] (S-10)", () => {
     expect(assertSiteAccessMock).toHaveBeenCalledWith(expect.anything(), "u_1", "site_1");
   });
 
+  // The route trusts getPublishStatus's explicit select to keep `log` out —
+  // it does no filtering of its own. This file mocks getPublishStatus, so
+  // the route-level assertion above can only prove the route forwards
+  // whatever the mock returns; it can't prove the real function is safe.
+  // That proof is __tests__/publish-service.test.ts's getPublishStatus
+  // describe block (controller review round 1, minor fix — strengthened
+  // there to use a row that HAS a log field, not one that already omits it).
+
   it("sends a Forbidden event, not the job, when assertSiteAccess denies (site-scoped + ACTIVE only, S-10)", async () => {
     getPublishStatusMock.mockResolvedValueOnce({
       id: "job_1",

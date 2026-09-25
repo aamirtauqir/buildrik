@@ -151,19 +151,29 @@ export interface DynamicPage {
  * site (`@@unique([siteId, slug])`), so this reproduces the exporter's
  * naming without duplicating its de-duplication logic.
  */
+export interface StaleTemplateBindingsResult {
+  /** True when the site has at least one page-generating collection — lets a
+   *  caller distinguish "nothing to check" from "checked, none stale"
+   *  (controller review round 1: a pre-publish check that always shows a
+   *  "pass" row is noise for the near-all-sites-have-no-CMS-collection case). */
+  hasPageGeneratingCollections: boolean;
+  stale: { collectionId: string; collectionName: string; templatePath: string }[];
+}
+
 export async function findStaleTemplateBindings(
   siteId: string,
   pages: { slug: string; isHomePage: boolean }[],
-): Promise<{ collectionId: string; collectionName: string; templatePath: string }[]> {
+): Promise<StaleTemplateBindingsResult> {
   const cols = await prisma.cmsCollection.findMany({
     where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
     select: { id: true, name: true, pageTemplatePath: true },
   });
-  if (cols.length === 0) return [];
+  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [] };
   const fileNames = new Set(pages.map((p) => (p.isHomePage ? "index.html" : `${p.slug}.html`)));
-  return cols
+  const stale = cols
     .filter((c) => !fileNames.has(c.pageTemplatePath as string))
     .map((c) => ({ collectionId: c.id, collectionName: c.name, templatePath: c.pageTemplatePath as string }));
+  return { hasPageGeneratingCollections: true, stale };
 }
 
 export interface GeneratedPage {

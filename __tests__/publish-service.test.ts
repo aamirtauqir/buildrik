@@ -333,6 +333,31 @@ describe("Publish Service", () => {
       expect(job?.status).toBe("BUILDING");
       expect(job?.progress).toBe(40);
     });
+
+    // S-10 / SSE route (controller review round 1, minor fix): a test that
+    // just checks the RETURNED object lacks `log` is tautological against a
+    // mocked Prisma client — the mock returns exactly what a test hands it
+    // and doesn't enforce `select` the way real Postgres does, so a mock
+    // simply omitting `log` proves nothing. The real guarantee is the QUERY
+    // itself: assert the `select` argument is an explicit field allowlist
+    // that never names `log`.
+    it("queries with an explicit select that never names `log`", async () => {
+      vi.mocked(prisma.publishBuildJob.findUnique).mockResolvedValue({
+        id: "job1",
+        status: "COMPLETED",
+        progress: 100,
+        steps: [],
+        error: null,
+      } as any);
+
+      await getPublishStatus("job1");
+      const selectArg = vi.mocked(prisma.publishBuildJob.findUnique).mock.calls[0][0]?.select as
+        | Record<string, unknown>
+        | undefined;
+      expect(selectArg).toBeDefined();
+      expect(Object.keys(selectArg ?? {}).length).toBeGreaterThan(0);
+      expect(Object.keys(selectArg ?? {})).not.toContain("log");
+    });
   });
 
   describe("cancelPublish", () => {

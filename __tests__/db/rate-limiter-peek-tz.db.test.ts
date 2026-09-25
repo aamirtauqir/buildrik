@@ -1,18 +1,23 @@
 /**
  * S-11 — `peekRateLimit` compared `row.resetAt < now` in JAVASCRIPT.
- * `resetAt` is `timestamp WITHOUT time zone`; Prisma reads it back
- * interpreting the stored wall-clock digits under the Postgres SESSION's
- * `TimeZone` GUC, not as a literal UTC instant. Under a session whose TZ is
- * ahead of UTC (e.g. `America/New_York` is behind, but the read/write
- * asymmetry shows up either direction — verified empirically against this
- * connection: `SET TIME ZONE 'America/New_York'` shifts the JS-side read of
- * a just-written, still-future `resetAt` back into the apparent past), the
- * JS comparison sees `resetAt < now` as true for a bucket that has NOT
- * actually expired — so peek always reported `allowed: true`, even for a
- * bucket already at its max count. The fix computes the comparison IN SQL
+ * `resetAt` is `timestamp WITHOUT time zone`, and the write/read round trip
+ * through the Postgres SESSION's `TimeZone` GUC is asymmetric: on INSERT,
+ * Prisma converts the JS Date (a UTC instant) into the session-timezone
+ * wall-clock digits before storing them; on READ, those same digits come
+ * back taken at face value as UTC, with no reverse conversion. For a session
+ * whose TimeZone is BEHIND UTC (e.g. `America/New_York`, UTC-4/-5), that
+ * asymmetry shifts every stored `resetAt` EARLIER than intended — a
+ * still-future expiry reads back as already in the past. Verified
+ * empirically against this connection: `SET TIME ZONE 'America/New_York'`
+ * on a just-written, still-15-minutes-in-the-future `resetAt` reads it back
+ * ~4-5 hours earlier — already before `now`. The JS comparison
+ * `resetAt < now` therefore read true for a bucket that had NOT actually
+ * expired, so peek always reported `allowed: true`, even for a bucket
+ * already at its max count. The fix computes the comparison IN SQL
  * (`("resetAt" < $now) AS "expired"`), the same discipline `checkRateLimit`
- * already uses for its write, which is unaffected by how the driver
- * deserializes the column into a JS Date.
+ * already uses for its write — both sides of the comparison live in
+ * Postgres's own time space, so the session TimeZone's write/read asymmetry
+ * never has anywhere to introduce an error.
  */
 import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { prisma } from "@/lib/prisma";

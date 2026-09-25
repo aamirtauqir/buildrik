@@ -109,17 +109,21 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   // CMS dynamic-page templates (A-17): a page-generating collection whose
   // bound template page was deleted/renamed since binding would otherwise
   // silently ship without its generated pages — surfaced here, before publish,
-  // instead of only as a server log at publish time.
-  const staleTemplates = await findStaleTemplateBindings(siteId, allPages);
-  if (staleTemplates.length > 0) {
-    const names = staleTemplates.map((s) => s.collectionName).join(", ");
-    checks.push({
-      label: "CMS templates",
-      status: "warning",
-      detail: `${staleTemplates.length === 1 ? "Collection" : "Collections"} ${names}: the bound template page no longer exists — its generated pages won't be published.`,
-    });
-  } else {
-    checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
+  // instead of only as a server log at publish time. Skipped entirely (no
+  // row at all) when the site has no page-generating collection — a "pass"
+  // row for a check that never applies is noise (controller review round 1).
+  const templateBindings = await findStaleTemplateBindings(siteId, allPages);
+  if (templateBindings.hasPageGeneratingCollections) {
+    if (templateBindings.stale.length > 0) {
+      const names = templateBindings.stale.map((s) => s.collectionName).join(", ");
+      checks.push({
+        label: "CMS templates",
+        status: "warning",
+        detail: `${templateBindings.stale.length === 1 ? "Collection" : "Collections"} ${names}: the bound template page no longer exists — its generated pages won't be published.`,
+      });
+    } else {
+      checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
+    }
   }
 
   const hasFail = checks.some((c) => c.status === "fail");
