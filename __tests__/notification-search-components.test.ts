@@ -1,11 +1,16 @@
 import { describe, it, expect } from "vitest";
 
 describe("Notification Components", () => {
-  it("NOTIFICATION_TABS exports 3 tabs (All, Unread, Mentions)", async () => {
+  it("NOTIFICATION_TABS exports 3 tabs (All, Unread, Account & billing)", async () => {
+    // A-20: the "mentions" filter never showed @mentions — it groups
+    // security + billing notification types. Relabeled to say what it
+    // actually shows; the filter key stays "mentions" to avoid schema churn.
     const mod = await import("@/components/notifications/notification-page");
     expect(mod.NOTIFICATION_TABS).toHaveLength(3);
     const labels = mod.NOTIFICATION_TABS.map((t: { label: string }) => t.label);
-    expect(labels).toEqual(["All", "Unread", "Mentions"]);
+    expect(labels).toEqual(["All", "Unread", "Account & billing"]);
+    const keys = mod.NOTIFICATION_TABS.map((t: { key: string }) => t.key);
+    expect(keys).toEqual(["all", "unread", "mentions"]);
   });
 
   it("NotificationDropdown component exists", async () => {

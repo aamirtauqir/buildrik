@@ -10,7 +10,12 @@ import type { NotificationData } from "@buildrik/shared/schemas/notifications";
 export const NOTIFICATION_TABS = [
   { key: "all" as const, label: "All" },
   { key: "unread" as const, label: "Unread" },
-  { key: "mentions" as const, label: "Mentions" },
+  // Filter key stays "mentions" (shared/schemas/notifications.ts's
+  // MENTION_NOTIFICATION_TYPES) to avoid schema churn — the tab has never
+  // shown @mentions; it groups security + billing notifications
+  // (SECURITY_PASSWORD_CHANGED, SECURITY_2FA_CHANGED,
+  // SECURITY_LOGIN_NEW_DEVICE, PAYMENT_FAILED). Label it what it shows.
+  { key: "mentions" as const, label: "Account & billing" },
 ];
 
 type TabFilter = "all" | "unread" | "mentions";
