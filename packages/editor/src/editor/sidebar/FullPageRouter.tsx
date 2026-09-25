@@ -1,6 +1,46 @@
 /**
- * FullPageRouter — Routes fullpage-mode tabs (Templates, Assets)
+ * FullPageRouter — Routes fullpage-mode tabs: Templates, Settings, Design
+ * (`mode: "fullpage"` in tabsConfig) and Assets (`mode: "panel"`, but
+ * portaled full-page via the `mediaFullPage` override — StudioPanels.tsx).
+ * History is a right-column mode (Publish/Review/History/Activity swap in
+ * for the Inspector), never fullpage, and has no case here.
  * Renders inside LayoutShell.FullPage slot when a fullpage tab is active.
+ *
+ * FC-7 — THE THREE TAKEOVER SHAPES
+ * ---------------------------------
+ * The studio has exactly three ways a surface can take over from the normal
+ * rail+drawer+canvas+inspector layout. They read as one family (all replace
+ * the editing chrome, all close on their own Escape) but they are NOT
+ * interchangeable — each is load-bearing for a different reason:
+ *
+ * 1. Full-screen portal (Templates · Assets · Settings · Design — the cases
+ *    below). Rendered via chrome-ui's `Portal` into the overlay root,
+ *    `position: fixed; inset: 0`, OUTSIDE LayoutShell's grid entirely — the
+ *    rail disappears too. Each screen builds its own 256px nav with its own
+ *    `‹ Back to canvas`, owns its own Escape and its own confirm dialogs
+ *    (an unsaved-draft guard, for Settings). Used when the surface is a
+ *    whole workspace in its own right, not a canvas-editing mode.
+ *
+ * 2. CMS canvas region (`cmsWorkspaceOpen`, StudioPanels.tsx). Rendered
+ *    in-place inside `LayoutShell.Canvas` (`tw:absolute tw:inset-0` over the
+ *    canvas content, NOT a Portal) — the rail and drawer stay mounted and
+ *    interactive beside it; only the canvas + inspector are replaced. Used
+ *    because CMS editing is still "in the site" (the drawer's other tabs —
+ *    Pages, Layers — stay reachable while you edit a record).
+ *
+ * 3. Compare overlay (`CompareHost.tsx`). Rendered once by the shell through
+ *    chrome-ui's `OverlayMount` (Gate 22's overlay-root primitive, not a
+ *    bare `Portal` and not an in-canvas region) — full-canvas, opened by
+ *    `UI_COMPARE_OPEN` from any of its three doors (Review, History,
+ *    Publish history). Used because Compare is transient and door-agnostic:
+ *    nothing owns "the Compare tab", so it has no tab id and no rail slot to
+ *    replace — an overlay is the only shape that fits a surface with no home
+ *    tab.
+ *
+ * Rule of thumb for new takeovers: if it's a workspace someone opens as a
+ * destination (has its own rail-adjacent identity) → shape 1. If it's an
+ * editing mode that should still show the rest of the drawer → shape 2. If
+ * it's transient and reachable from more than one unrelated door → shape 3.
  *
  * @license BSD-3-Clause
  */

@@ -264,9 +264,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      the site carries (the aggregate `usageMap` reads). */
   const usageCount = React.useMemo(() => versions.reduce((n, v) => n + v.placements, 0), [versions]);
 
-  /* Clone 3695:20340 — USED IN names the pages ("1 place — Menu preview"). */
-  const usedIn = React.useMemo(() => [...new Set(versions.flatMap((v) => v.pages))], [versions]);
-
   const handleUploadClick = React.useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -936,7 +933,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           dimmed={assetDrag !== null}
           versions={versions}
           usageCount={usageCount}
-          usedIn={usedIn}
           libraryItems={state.libraryItems}
           onOpenVersions={() => {
             if (selectedItem) setVersionsFor(selectedItem.versionOf ?? selectedItem.key);
@@ -962,6 +958,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           }}
           composer={composer}
           addToast={addToast}
+          /* FC-6: the "Used in" row list's Jump ›, same contract as the
+             drawer's overlay (AssetDetailOverlay.tsx's handleJump) — select
+             the element on its page, then close this full-screen takeover
+             (FC-7 shape 1) so the selection is actually visible underneath. */
+          onJumpToElement={(pageId, elementId) => {
+            composer.elements.setActivePage(pageId);
+            const el = composer.elements.getElement(elementId);
+            if (el) composer.selection.select(el);
+            onClose();
+          }}
           onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */

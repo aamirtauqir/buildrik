@@ -49,7 +49,6 @@ function mount(selectedItem: LibraryItem, over: Partial<AssetDetailsPanelProps> 
     selectedItem,
     versions: [],
     usageCount: 0,
-    usedIn: [],
     libraryItems: TEN,
     onOpenVersions: vi.fn(),
     onInsert: vi.fn(),
@@ -57,7 +56,14 @@ function mount(selectedItem: LibraryItem, over: Partial<AssetDetailsPanelProps> 
     onOpenRename: vi.fn(),
     onRequestDelete: vi.fn(),
     composer: {
-      mediaOps: { replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })) },
+      mediaOps: {
+        replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
+        // FC-6: the "Used in" row list reads usage through the same
+        // collectUsageByPage util the drawer's overlay uses — empty by
+        // default, individual tests override with `usagePages`/`over`.
+        getUsagesByPage: vi.fn(() => new Map()),
+      },
+      elements: { getAllPages: vi.fn(() => []) },
     } as unknown as AssetDetailsPanelProps["composer"],
     addToast: vi.fn(),
     ...over,
@@ -105,9 +111,34 @@ describe("Clone 3695:20340 · Selected · menu-cover.png", () => {
     expect(screen.queryByRole("button", { name: /^Used in ·/ })).toBeNull();
   });
 
-  it("USED IN names the places, or says the asset is not used", () => {
-    mount(byName("menu-cover.png"), { usageCount: 1, usedIn: ["Menu preview"] });
-    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("1 place — Menu preview");
+  it("USED IN lists the page and element as a navigable row, or says the asset is not used", () => {
+    const item = byName("menu-cover.png");
+    mount(item, {
+      usageCount: 1,
+      composer: {
+        mediaOps: {
+          replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
+          getUsagesByPage: vi.fn(
+            () =>
+              new Map([
+                [
+                  "page-1",
+                  [
+                    {
+                      getId: () => "el-1",
+                      getType: () => "img",
+                      getAttribute: () => undefined,
+                    },
+                  ],
+                ],
+              ]),
+          ),
+        },
+        elements: { getAllPages: vi.fn(() => [{ id: "page-1", name: "Menu preview" }]) },
+      } as unknown as AssetDetailsPanelProps["composer"],
+    });
+    expect(screen.getByTestId("mgr-det-used-page-page-1")).toHaveTextContent("Menu preview");
+    expect(screen.getByTestId("mgr-det-used-row-el-1")).toHaveTextContent("img");
   });
 
   it("USED IN reads 'Not used on this site' at zero usage", () => {

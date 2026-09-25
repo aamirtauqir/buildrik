@@ -3,7 +3,8 @@
  * Manages left sidebar, canvas area, right inspector, and fullpage views.
  *
  * Panel mode: Rail + Drawer (variable width) + Canvas + Inspector
- * Fullpage mode: Rail + FullPage (Templates, Settings, History, Design)
+ * Fullpage mode: Rail + FullPage (Templates, Assets, Settings, Design — the
+ * FullPageRouter cases; History is a right-column mode, not fullpage)
  *
  * @license BSD-3-Clause
  */
@@ -122,6 +123,15 @@ export interface StudioPanelsProps {
   /** The ONE publish door — AquibraStudio's `requestPublish`, which routes on
    *  `nextMove.gate`. Absent = no publish path is wired (flag off). */
   onRequestPublish?: () => void;
+  /** FB-8: Issues is a right-column mode, same mechanism as the AI drill-in
+   *  (`aiInInspector` below) — it swaps in for ProInspector rather than
+   *  floating an absolute overlay on top of it. AquibraStudio owns the open
+   *  state and builds the panel (it needs `composer.designSystem` +
+   *  `requestBrandToken`, already in scope there); this just says where it
+   *  renders. */
+  issuesOpen?: boolean;
+  issuesPanel?: React.ReactNode;
+  onCloseIssues?: () => void;
 }
 
 // ============================================================================
@@ -202,6 +212,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   publishJob,
   nextMove = null,
   onRequestPublish,
+  issuesOpen = false,
+  issuesPanel,
+  onCloseIssues,
 }) => {
   /* The site whose brand/tokens/publish state these panels edit.
      This was a prop, and `AquibraStudio` never passed it — so every consumer
@@ -318,6 +331,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      render moved. ✕ closes the panel and the inspector returns. */
   const rightColumnTab = !readOnlyView && isLeftPanelOpen && RIGHT_COLUMN_TABS.has(activeTabId);
   useColumnPanelEscape(rightColumnTab, () => onLeftPanelToggle?.());
+  /* FB-8: Issues is a right-column mode too — Escape returns to the
+     Inspector the same way it does for Publish/Review/History. */
+  useColumnPanelEscape(!readOnlyView && issuesOpen, () => onCloseIssues?.());
 
   /* A click on the empty canvas closes the Layers drawer (prototype B10 /
      C4#18) — the canvas clears the selection itself. */
@@ -644,6 +660,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canRedo={canRedo}
             />
           </div>
+          {/* FC-7 takeover shape 2 of 3 (see FullPageRouter.tsx's "THE THREE
+              TAKEOVER SHAPES" contract): an in-place region over the canvas,
+              NOT a Portal — the rail and drawer stay mounted and reachable
+              beside it. */}
           {cmsWorkspaceOpen ? (
             <div className="tw:absolute tw:inset-0 tw:z-[var(--bk-z-chrome)] tw:bg-[var(--bk-bg-panel)]" data-testid="cms-workspace-host">
               <React.Suspense fallback={null}>
@@ -665,7 +685,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {rightColumnTab ? (
+          {issuesOpen && issuesPanel ? (
+            issuesPanel
+          ) : rightColumnTab ? (
             <RightColumnPanel>
               <TabRouter
                 activeTab={activeTabId}
@@ -704,7 +726,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area).
+        {/* FullPage View — Templates, Assets, Settings, Design (replaces canvas area).
             Mounted ONLY in fullpage mode. It used to render on every tab and
             rely on the slot's display:none, so the Media DRAWER kept a whole
             second LibraryManager (and its media state) mounted invisibly —

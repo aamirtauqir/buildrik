@@ -24,7 +24,6 @@ describe("useStudioModals", () => {
     expect(m.showCollectionSetup).toBe(false);
     expect(m.showCreateComponent).toBe(false);
     expect(m.showSaveAsComponent).toBe(false);
-    expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();
@@ -36,10 +35,11 @@ describe("useStudioModals", () => {
   });
 
   // Simple boolean modals -------------------------------------------------------
+  // FC-11: `projectSettings` dropped — it was never a modal, just a flag
+  // StudioModals converted straight back into `openLeftPanelToTab("settings")`.
   it.each([
     ["saveTemplate", "openSaveTemplate", "closeSaveTemplate", "showSaveTemplate"],
     ["exporter", "openExporter", "closeExporter", "showExporter"],
-    ["projectSettings", "openProjectSettings", "closeProjectSettings", "showProjectSettings"],
     ["cmsCollectionSetup", "openCMSCollectionSetup", "closeCMSCollectionSetup", "showCMSCollectionSetup"],
   ] as const)("%s: open sets flag, close clears it", (_name, open, close, flag) => {
     const { result } = renderHook(() => useStudioModals());
@@ -171,7 +171,6 @@ describe("useStudioModals", () => {
         selectionIds: ["a"],
         extractedBindings: new Map(),
       });
-      result.current.openProjectSettings();
       result.current.openCMSCollectionSetup();
     });
     act(() => result.current.closeAll());
@@ -184,7 +183,6 @@ describe("useStudioModals", () => {
     expect(m.showCollectionSetup).toBe(false);
     expect(m.showCreateComponent).toBe(false);
     expect(m.showSaveAsComponent).toBe(false);
-    expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();

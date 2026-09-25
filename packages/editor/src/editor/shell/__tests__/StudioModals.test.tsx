@@ -87,8 +87,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     showSaveAsComponent: false,
     onCloseSaveAsComponent: vi.fn(),
     saveAsComponentContext: null,
-    showProjectSettings: false,
-    onCloseProjectSettings: vi.fn(),
     showCMSCollectionSetup: false,
     onCloseCMSCollectionSetup: vi.fn(),
     ...over,
@@ -118,17 +116,12 @@ const ALL_MARKERS = [
 describe("StudioModals — mounting contract", () => {
   afterEach(() => cleanup());
 
-  /* Board 1172:4867's modal is superseded by the Clone's full-screen Settings:
-     the flag AquibraStudio raises for `Site settings` / ⌃, opens the tab and
-     clears itself — nothing mounts. */
-  it("showProjectSettings: true opens the Settings tab and closes the flag; no modal mounts", () => {
-    const onCloseProjectSettings = vi.fn();
-    const composer = makeComposer();
-    renderModals({ showProjectSettings: true, onCloseProjectSettings, composer } as Partial<StudioModalsProps>);
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "settings" });
-    expect(onCloseProjectSettings).toHaveBeenCalledTimes(1);
-    for (const id of ALL_MARKERS) expect(screen.queryByTestId(id)).toBeNull();
-  });
+  /* FC-11: Board 1172:4867's modal is superseded by the Clone's full-screen
+     Settings. `Site settings` / ⌃, no longer round-trip through a
+     StudioModals flag at all — AquibraStudio calls
+     `state.openLeftPanelToTab("settings")` directly (see
+     AquibraStudio.wiring.test.ts), so StudioModals has nothing left to own
+     for this door. */
 
   it("renders NO modal when every flag is false", () => {
     renderModals();
