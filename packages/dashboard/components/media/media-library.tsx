@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, AlertTriangle, Plus } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
+import { safeBlobName } from "@buildrik/shared/schemas/upload";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
@@ -81,6 +82,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     onError: (err) => addToast("error", "Couldn't delete asset", err.message),
   });
   const createAsset = trpc.media.createAsset.useMutation();
+  const utils = trpc.useUtils();
 
   const moveAsset = trpc.media.moveAsset.useMutation({
     onSuccess: () => { assets.refetch(); setMoveTarget(null); addToast("success", "Asset moved"); },
@@ -139,9 +141,12 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     if (files.length === 0) return;
     setUploading(true);
     try {
+      // The signing route only issues tokens under the caller's own prefix
+      // (`u/<userId>/`, audit S-4); the file keeps its name on the row.
+      const { prefix } = await utils.media.uploadPrefix.fetch();
       for (const file of files) {
         const type = mediaTypeFromMime(file.type);
-        const blob = await upload(file.name, file, {
+        const blob = await upload(`${prefix}${safeBlobName(file.name)}`, file, {
           access: "public",
           handleUploadUrl: "/api/asset-upload",
           clientPayload: JSON.stringify({ bytes: file.size, type, mimeType: file.type, filename: file.name }),

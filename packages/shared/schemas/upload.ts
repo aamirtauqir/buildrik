@@ -21,5 +21,16 @@ export const UPLOAD_LIMITS: Record<string, { formats: string[]; maxSizeMB: numbe
   ticket: { formats: ["image/png", "image/jpeg", "application/pdf"], maxSizeMB: 10 },
 };
 
+/**
+ * A client-chosen file name made safe to sit inside a blob key: the basename
+ * only (no `../`, no directories), anything outside `[A-Za-z0-9._-]` replaced,
+ * no leading dots, at most 100 chars keeping the extension end. Never empty.
+ */
+export function safeBlobName(name: string): string {
+  const base = name.split(/[\\/]/).pop() ?? "";
+  const cleaned = base.replace(/[^A-Za-z0-9._-]/g, "_").replace(/^\.+/, "").slice(-100);
+  return cleaned || "file";
+}
+
 export type PresignInput = z.infer<typeof presignSchema>;
 export type ConfirmInput = z.infer<typeof confirmSchema>;

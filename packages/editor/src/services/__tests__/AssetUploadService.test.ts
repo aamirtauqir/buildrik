@@ -9,6 +9,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // same pattern as buildrik-sync-provider.test.ts).
 const uploadMock = vi.fn();
 const media = {
+  uploadPrefix: vi.fn(),
   createAsset: vi.fn(),
   deleteAsset: vi.fn(),
   createFolder: vi.fn(),
@@ -25,6 +26,7 @@ vi.mock("@vercel/blob/client", () => ({
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
     media: {
+      uploadPrefix: { query: () => media.uploadPrefix() },
       createAsset: { mutate: (i: unknown) => media.createAsset(i) },
       deleteAsset: { mutate: (i: unknown) => media.deleteAsset(i) },
       createFolder: { mutate: (i: unknown) => media.createFolder(i) },
@@ -50,6 +52,7 @@ const pngBlob = () => new Blob(["abc"], { type: "image/png" });
 beforeEach(() => {
   uploadMock.mockReset();
   for (const fn of Object.values(media)) fn.mockReset();
+  media.uploadPrefix.mockResolvedValue({ prefix: "u/U1/" });
 });
 
 afterEach(() => {
@@ -73,7 +76,8 @@ describe("uploadBlob", () => {
       Blob,
       { access: string; handleUploadUrl: string; clientPayload: string; contentType?: string },
     ];
-    expect(filename).toBe("x.png");
+    // S-4: under the server-issued owned prefix; the row keeps the real name.
+    expect(filename).toBe("u/U1/x.png");
     expect(passedBlob).toBe(blob);
     expect(opts.access).toBe("public");
     expect(opts.handleUploadUrl).toBe("http://dash.test/api/asset-upload");
@@ -92,6 +96,12 @@ describe("uploadBlob", () => {
       bytes: 3,
       contentType: "image/png",
     });
+  });
+
+  it("cannot climb out of the owned prefix with the file name (S-4)", async () => {
+    uploadMock.mockResolvedValue({ url: "https://blob.example/a.png" });
+    await uploadBlob(pngBlob(), "../../sites/s1/my logo.png", "image/png", { type: "image" });
+    expect(uploadMock.mock.calls[0][0]).toBe("u/U1/my_logo.png");
   });
 
   it("defaults folderId/siteId to null and empty contentType to undefined", async () => {
