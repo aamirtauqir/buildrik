@@ -940,7 +940,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         </div>
       ) : null}
 
-      {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} initialQuery={cmdQuery} /> : null}
+      {cmdOpen ? (
+        <CommandPalette
+          onClose={() => setCmdOpen(false)}
+          composer={composer ?? null}
+          initialQuery={cmdQuery}
+          /* FB-4: Review has no client gate today — hide its ⌘K row when the
+             agency review layer is off (same flag the topbar pill already
+             reads for its own "Not sent" vs plain "Review" wording). */
+          reviewsEnabled={reviewStatus.reviewsEnabled}
+        />
+      ) : null}
 
       {(saveStatus === "error" && !saveBannerDismissed) || leaveAfterSave ? (
         <SaveFailedBanner

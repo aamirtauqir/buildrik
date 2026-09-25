@@ -64,10 +64,19 @@ const BOARD_REGISTRY: Reg[] = [
 function renderPalette(
   composer: ReturnType<typeof makeComposer> | null = makeComposer({ registry: BOARD_REGISTRY }),
   initialQuery?: string,
+  /* v3 FC-2/FB-4 gate — defaults true so the existing "board's rows in
+     order" test still lists Open Review. A dedicated test below covers
+     the off case. */
+  reviewsEnabled = true,
 ) {
   const onClose = vi.fn();
   render(
-    <CommandPalette onClose={onClose} composer={composer as unknown as Composer | null} initialQuery={initialQuery} />,
+    <CommandPalette
+      onClose={onClose}
+      composer={composer as unknown as Composer | null}
+      initialQuery={initialQuery}
+      reviewsEnabled={reviewsEnabled}
+    />,
   );
   return { onClose, composer };
 }
@@ -101,6 +110,23 @@ describe("CommandPalette — board 4418:141220 structure", () => {
       "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
+  });
+
+  it("FB-4: hides Open Review when the agency review layer is off", () => {
+    renderPalette(undefined, undefined, false);
+    expect(labels()).not.toContain("Open Review");
+  });
+
+  it("FB-4: hides Open Review when the flag hasn't answered yet (null)", () => {
+    const onClose = vi.fn();
+    render(
+      <CommandPalette
+        onClose={onClose}
+        composer={makeComposer({ registry: BOARD_REGISTRY }) as unknown as Composer | null}
+        reviewsEnabled={null}
+      />,
+    );
+    expect(labels()).not.toContain("Open Review");
   });
 
   it("disabled rows are aria-disabled; actions print a chord, doors do not", () => {
