@@ -134,10 +134,16 @@ export async function hydrateComponentsFromServer(): Promise<number> {
     const local = new Map((await loadComponents(siteId)).map((c) => [c.id, c]));
     const fetchPayload = async (key: string) =>
       (await client().siteComponents.get.query({ siteId, componentId: key })) as ComponentDefinition | null;
+    /* A master passed over for a queued mirror was not reconciled, so the
+       scope's one-time pass is not done — it re-runs on the next hydrate. */
+    let skippedQueued = false;
     for (const r of remote) {
       const key = r.componentId;
       const stampKey = `component:${key}`;
-      if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) continue;
+      if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) {
+        skippedQueued = true;
+        continue;
+      }
       const mine = local.get(key);
       if (!serverCopyWins(stampKey, r.updatedAt, mine?.updatedAt, !!mine, firstPass)) {
         /* Unstamped and equal to the server's copy → adopt it (one get), so
@@ -153,7 +159,7 @@ export async function hydrateComponentsFromServer(): Promise<number> {
       recordServerStamp(stampKey, r.updatedAt, payload.updatedAt);
       written++;
     }
-    markStampMigrationDone(migrationScope);
+    if (!skippedQueued) markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (e) {
     // eslint-disable-next-line no-console

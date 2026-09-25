@@ -147,8 +147,19 @@ export async function hydrateCmsFromServer(): Promise<void> {
       return;
     }
     const localCollections = new Map((await Storage.loadCollections()).map((c) => [c.id, c]));
+    /* A row passed over for a queued mirror was not reconciled, so the scope's
+       one-time pass is not done — it re-runs on the next hydrate. */
+    let skippedQueued = false;
     for (const rc of remote) {
-      if (hasQueuedMirror("collection", rc.id)) continue;
+      /* A queued DELETE: the collection is going away here — nothing of it is
+         written. A queued UPSERT only protects the collection row itself; its
+         entries are separate rows and still reconcile below. */
+      if (queue.isPending(`collectionDelete:${rc.id}`)) {
+        skippedQueued = true;
+        continue;
+      }
+      const collectionQueued = queue.isPending(`collectionUpsert:${rc.id}`);
+      if (collectionQueued) skippedQueued = true;
       const localCollection = localCollections.get(rc.id);
       const collection: CMSCollection = {
         id: rc.id,
@@ -167,21 +178,27 @@ export async function hydrateCmsFromServer(): Promise<void> {
         pageTemplatePath: rc.pageTemplatePath ?? undefined,
         createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
       };
-      if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
-        await Storage.saveCollection(collection);
-        recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
-      } else if (
-        localCollection && !hasServerStamp(`collection:${rc.id}`) &&
-        sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
-      ) {
-        recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
+      // A queued upsert: the local change is newer and still on its way.
+      if (!collectionQueued) {
+        if (serverCopyWins(`collection:${rc.id}`, rc.updatedAt, localCollection?.updatedAt, !!localCollection, firstPass)) {
+          await Storage.saveCollection(collection);
+          recordServerStamp(`collection:${rc.id}`, rc.updatedAt, collection.updatedAt);
+        } else if (
+          localCollection && !hasServerStamp(`collection:${rc.id}`) &&
+          sameContent(omit(localCollection, ["createdAt", "updatedAt"]), omit(collection, ["createdAt", "updatedAt"]))
+        ) {
+          recordServerStamp(`collection:${rc.id}`, rc.updatedAt, localCollection.updatedAt);
+        }
       }
       const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
         id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
       }>;
       const localEntries = new Map((await Storage.loadContentItems(rc.id)).map((i) => [i.id, i]));
       for (const e of entries) {
-        if (hasQueuedMirror("entry", e.id)) continue;
+        if (hasQueuedMirror("entry", e.id)) {
+          skippedQueued = true;
+          continue;
+        }
         const localEntry = localEntries.get(e.id);
         const status = e.status === "PUBLISHED" ? "published" : "draft";
         if (!serverCopyWins(`entry:${e.id}`, e.updatedAt, localEntry?.updatedAt, !!localEntry, firstPass)) {
@@ -200,7 +217,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
         recordServerStamp(`entry:${e.id}`, e.updatedAt, iso(e.updatedAt));
       }
     }
-    markStampMigrationDone(migrationScope);
+    if (!skippedQueued) markStampMigrationDone(migrationScope);
     setHydrationStatus("ready");
   } catch (err) {
     // eslint-disable-next-line no-console

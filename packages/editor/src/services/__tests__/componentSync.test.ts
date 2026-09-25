@@ -106,6 +106,22 @@ describe("componentSync — unstamped masters (C-4 round 2)", () => {
     await expect(hydrateComponentsFromServer()).resolves.toBe(1);
   });
 
+  it("a master skipped for a queued mirror leaves the scope due, so the pass re-runs", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("offline"));
+    await mirrorComponentUpsert({ id: "q", name: "Mine", updatedAt: 1 } as never);
+    list.mockResolvedValueOnce([{ componentId: "q", updatedAt: new Date(9000) }]);
+    loadComponents.mockResolvedValueOnce([{ id: "q", name: "Mine", updatedAt: 1 }]);
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    const marks = () => JSON.parse(localStorage.getItem("bk-sync-stamp-migrations-v1") ?? "[]");
+    expect(marks()).not.toContain("component:site-123");
+    await retryComponentSync();
+    list.mockResolvedValueOnce([]);
+    await hydrateComponentsFromServer();
+    expect(marks()).toContain("component:site-123");
+    warn.mockRestore();
+  });
+
   it("after the pass, an unstamped master that differs stays local and unstamped", async () => {
     migrated();
     list.mockResolvedValueOnce([{ componentId: "d", updatedAt: new Date(3000) }]);

@@ -391,6 +391,31 @@ describe("hydrateCmsFromServer", () => {
       expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e", data: { a: 1, b: 3 } });
     });
 
+    /* Round 3: a collection with a queued mirror used to `continue` past its
+       ENTRY loop too, while the scope was still marked done — its unstamped
+       entries never got the pass and a teammate's edit stayed hidden. */
+    it("a queued collection mirror skips only the collection write — its entries still get the pass, and the scope stays due", async () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      colUpsert.mockRejectedValueOnce(new Error("offline"));
+      await syncCollectionUpsert({ id: "c", name: "Mine", slug: "c", fields: [], createdAt: "", updatedAt: T(0) } as never);
+      colListQuery.mockResolvedValueOnce([{ ...col("c", 9000), name: "Theirs" }]);
+      loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+      loadContentItems.mockResolvedValueOnce([{ id: "e", data: { t: "stale" }, status: "draft", updatedAt: T(1000) }]);
+      entListQuery.mockResolvedValueOnce([entry("e", { t: "teammate" }, 5000)]);
+      await hydrateCmsFromServer();
+      expect(saveCollection).not.toHaveBeenCalled(); // the queued local change wins
+      expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e", data: { t: "teammate" } });
+      expect(migrations()).not.toContain("cms:site-123"); // skipped a row → pass re-runs
+      // Once the mirror drains, the next hydrate completes the pass.
+      await retryCmsSync();
+      colListQuery.mockResolvedValueOnce([col("c", 0)]);
+      loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: T(0) }]);
+      entListQuery.mockResolvedValueOnce([]);
+      await hydrateCmsFromServer();
+      expect(migrations()).toContain("cms:site-123");
+      warn.mockRestore();
+    });
+
     it("an unstamped collection equal to the server's is adopted too", async () => {
       migrated();
       const server = { ...col("c", 3000), name: "Posts" };
