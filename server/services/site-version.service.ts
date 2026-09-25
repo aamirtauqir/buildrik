@@ -58,6 +58,17 @@ export async function getSiteVersion(siteId: string, versionId: string): Promise
   return row?.payload ?? null;
 }
 
+/**
+ * Rename a saved version ("Name this version…", boards Saves 6930:82577). The
+ * router already gates this at EDITOR role (guardSiteRole), so a viewer never
+ * reaches here. `updateMany` (not `update`) so a version deleted out from
+ * under a stale client is a no-op, matching `deleteSiteVersion`'s idempotency.
+ */
+export async function renameSiteVersion(siteId: string, versionId: string, name: string): Promise<{ ok: true }> {
+  await prisma.siteVersion.updateMany({ where: { siteId, versionId }, data: { name } });
+  return { ok: true };
+}
+
 export async function deleteSiteVersion(siteId: string, versionId: string): Promise<{ ok: true }> {
   // deleteMany (not delete) so a missing row is a no-op, not a P2025 throw —
   // the editor mirror fires delete best-effort and may race a prune.

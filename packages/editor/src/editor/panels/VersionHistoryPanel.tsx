@@ -116,6 +116,7 @@ export function VersionHistoryPanel({
     retryLoad,
     restoreVersion,
     deleteVersion,
+    renameVersion,
     compareVersions,
     updateAiSummary,
   } = useVersionHistory(composer);
@@ -234,6 +235,17 @@ export function VersionHistoryPanel({
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
+
+  const handleRename = React.useCallback(
+    async (versionId: string, name: string) => {
+      try {
+        await renameVersion(versionId, name);
+      } catch {
+        pushToast("Rename failed", "error");
+      }
+    },
+    [renameVersion, pushToast],
+  );
 
   // Handle Compare click
   const handleCompare = React.useCallback(
@@ -418,6 +430,7 @@ export function VersionHistoryPanel({
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
         onDetails={setDetailsId}
+        onRename={handleRename}
       />
 
       {/* Board 4418:173587 — a save's details, with the two things one does

@@ -64,6 +64,18 @@ export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean
   );
 }
 
+/** Mirror a version rename ("Name this version…", board 6930:82577) to the server. */
+export async function mirrorVersionRename(versionId: string, name: string): Promise<void> {
+  const siteId = currentSiteId();
+  if (!siteId) return;
+  await queue.run(
+    `versionRename:${versionId}`,
+    () => client().siteVersions.rename.mutate({ siteId, versionId, name }),
+    // eslint-disable-next-line no-console
+    (e) => console.warn("[version-sync] rename mirror failed", e)
+  );
+}
+
 /** Mirror a version deletion to the server. */
 export async function mirrorVersionDelete(versionId: string): Promise<void> {
   const siteId = getSiteIdFromUrl();

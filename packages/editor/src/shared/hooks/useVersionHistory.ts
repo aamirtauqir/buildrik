@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import type { NamedVersion, CompareResult } from "../types/versions";
 import { EVENTS } from "../constants/events";
+import { mirrorVersionRename } from "../../services/versionSync";
 
 export interface UseVersionHistoryReturn {
   /** List of saved versions */
@@ -26,6 +27,8 @@ export interface UseVersionHistoryReturn {
   restoreVersion: (id: string) => Promise<void>;
   /** Delete a version by id */
   deleteVersion: (id: string) => Promise<void>;
+  /** Rename a version ("Name this version…", board 6930:82577) */
+  renameVersion: (id: string, name: string) => Promise<void>;
   /** Get a specific version by id */
   getVersion: (id: string) => NamedVersion | undefined;
   /** Compare two versions and return diff */
@@ -113,6 +116,17 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     [composer]
   );
 
+  const renameVersion = React.useCallback(
+    async (id: string, name: string) => {
+      if (!composer?.versions) return;
+      await composer.versions.updateVersion(id, { name });
+      // Best-effort mirror, same failure contract as create/delete — the
+      // local rename already landed, a failed mirror never rolls it back.
+      void mirrorVersionRename(id, name);
+    },
+    [composer]
+  );
+
   const getVersion = React.useCallback(
     (id: string): NamedVersion | undefined => {
       return versions.find((v) => v.id === id);
@@ -152,6 +166,7 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     createVersion,
     restoreVersion,
     deleteVersion,
+    renameVersion,
     getVersion,
     compareVersions,
     updateAiSummary,

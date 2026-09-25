@@ -4,6 +4,7 @@ const upsert = vi.fn();
 const findMany = vi.fn();
 const findUnique = vi.fn();
 const deleteMany = vi.fn();
+const updateMany = vi.fn();
 const userFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -13,6 +14,7 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       findUnique: (...a: unknown[]) => findUnique(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
     },
     user: { findMany: (...a: unknown[]) => userFindMany(...a) },
   },
@@ -22,10 +24,11 @@ import {
   createSiteVersion,
   listSiteVersions,
   getSiteVersion,
+  renameSiteVersion,
   deleteSiteVersion,
 } from "@server/services/site-version.service";
 
-beforeEach(() => [upsert, findMany, findUnique, deleteMany, userFindMany].forEach((m) => m.mockReset()));
+beforeEach(() => [upsert, findMany, findUnique, deleteMany, updateMany, userFindMany].forEach((m) => m.mockReset()));
 
 describe("site-version.service", () => {
   it("createSiteVersion upserts on (siteId, versionId) carrying the payload", async () => {
@@ -113,5 +116,22 @@ describe("site-version.service", () => {
     deleteMany.mockResolvedValueOnce({ count: 0 });
     expect(await deleteSiteVersion("s1", "gone")).toEqual({ ok: true });
     expect(deleteMany).toHaveBeenCalledWith({ where: { siteId: "s1", versionId: "gone" } });
+  });
+
+  /* Board Saves 6930:82577 — "Name this version…". updateMany (not update) so a
+     version deleted out from under a stale client is a no-op, matching
+     deleteSiteVersion's idempotency contract. */
+  it("renameSiteVersion updates the name by (siteId, versionId)", async () => {
+    updateMany.mockResolvedValueOnce({ count: 1 });
+    expect(await renameSiteVersion("s1", "v1", "Launch draft")).toEqual({ ok: true });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { siteId: "s1", versionId: "v1" },
+      data: { name: "Launch draft" },
+    });
+  });
+
+  it("renameSiteVersion is a no-op (not a throw) when the version is gone", async () => {
+    updateMany.mockResolvedValueOnce({ count: 0 });
+    expect(await renameSiteVersion("s1", "gone", "New name")).toEqual({ ok: true });
   });
 });
