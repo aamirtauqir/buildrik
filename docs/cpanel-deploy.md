@@ -181,13 +181,32 @@ curl -I https://app.buildrick.io/api/trpc/auth.checkEmail
 
 ## Step C — Cron jobs (18 routes)
 
-cPanel → Cron Jobs. `vercel.json` at the repo root is the source of truth
-for the schedule column — this list is generated from it (C-2). `$CRON_SECRET`
-is a shell variable, not something cron sources from the app's env — cPanel's
-crontab does not run through a login shell, so it must be **defined at the top
-of the crontab itself** (standard `VAR=value` crontab syntax applies to every
-line below it) with the SAME value as the app's `CRON_SECRET` env var. Add the
-line below FIRST, then each cron line as its own cPanel cron entry:
+`vercel.json` at the repo root is the source of truth for the schedule
+column — this list is generated from it (C-2). `$CRON_SECRET` is a shell
+variable, not something cron sources from the app's env — cPanel's crontab
+does not run through a login shell, so it must be **defined at the top of
+the crontab itself** (standard `VAR=value` crontab syntax applies to every
+line below it) with the SAME value as the app's `CRON_SECRET` env var.
+
+**cPanel's Cron Jobs UI cannot do this.** That form has one field per entry
+(minute/hour/day/month/weekday/command) — there is no way to add a bare
+`CRON_SECRET=<value>` line ahead of the entries, and pasting one into the
+Command field just runs it as its own (failing) command. Two ways to get
+the line in:
+
+1. **Edit the raw crontab over SSH/terminal** — `crontab -e` opens the same
+   file the UI edits, but as a plain text file, where a bare `VAR=value`
+   line on its own row is valid. Add the `CRON_SECRET=` line first, then
+   the 18 entries below it (still fine to review/re-add the individual
+   lines through the cPanel UI afterwards — it renders whatever's in the
+   file, it just can't add that first line itself).
+2. **No SSH access** — inline the secret in each cron entry's Command field
+   instead of relying on the shared variable, e.g. `curl -fsS -H
+   "Authorization: Bearer <the actual value>" https://...`. Every one of
+   the 18 entries needs the value substituted individually this way; there
+   is no shared-variable shortcut through the UI alone.
+
+The commands below use `$CRON_SECRET` assuming route 1 (`crontab -e`):
 
 ```bash
 CRON_SECRET=<the same value as the app's CRON_SECRET env var>
