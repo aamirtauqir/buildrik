@@ -20,6 +20,7 @@
  */
 
 import { upload } from "@vercel/blob/client";
+import { safeBlobName } from "@buildrik/shared/schemas/upload";
 import { createBuildrikApiClient } from "./api-client";
 import type { RemoteAssetSync } from "@/shared/types/media";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
@@ -48,6 +49,7 @@ export interface UploadBlobResult {
  * separately so we don't depend on File-only metadata.
  *
  * Flow:
+ *   0. Ask the server for the caller's key prefix (`media.uploadPrefix`).
  *   1. `@vercel/blob/client` `upload()` POSTs metadata to `/api/asset-upload`
  *      with `clientPayload = JSON.stringify({bytes})` for pre-validation.
  *   2. Dashboard route validates session + quota + size; returns scoped token.
@@ -107,7 +109,10 @@ export async function uploadBlob(
     siteId?: string | null;
   },
 ): Promise<UploadBlobResult> {
-  const result = await upload(filename, blob, {
+  // The signing route issues a token only under the caller's own prefix
+  // (`u/<userId>/`, audit S-4); the server says what it is.
+  const { prefix } = await getClient().media.uploadPrefix.query();
+  const result = await upload(`${prefix}${safeBlobName(filename)}`, blob, {
     access: "public",
     handleUploadUrl: `${DASHBOARD_URL}/api/asset-upload`,
     clientPayload: JSON.stringify({

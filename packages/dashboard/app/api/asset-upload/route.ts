@@ -21,7 +21,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { auth } from "@server/auth";
 import { prisma } from "@/lib/prisma";
-import { assertMediaWrite, checkStorageQuota, createAsset } from "@server/services/media.service";
+import { assertMediaWrite, checkStorageQuota, createAsset, ownedBlobPrefix } from "@server/services/media.service";
 import { PermissionError } from "@server/services/permission.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { MediaType } from "@buildrik/shared/schemas/media";
@@ -66,6 +66,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           throw new Error("Unauthenticated upload attempt");
         }
         const userId = session.user.id;
+
+        // Every media upload lands under the caller's own prefix (audit S-4).
+        // It is what lets media.service tell a blob this user uploaded from a
+        // favicon, avatar or another tenant's file before it ever calls del().
+        const prefix = ownedBlobPrefix(userId);
+        if (!pathname.startsWith(prefix) || pathname.split("/").includes("..")) {
+          throw new PermissionError("FORBIDDEN", `Upload path must start with ${prefix}`);
+        }
 
         // 2. Plan-tier quota check via existing media service.
         // BUSINESS tier returns totalBytes = -1 (unlimited).

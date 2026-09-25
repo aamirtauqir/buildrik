@@ -15,6 +15,7 @@ import {
   listAssetVersions,
   listAssets,
   moveAsset,
+  ownedBlobPrefix,
   restoreAssetVersion,
   updateAsset,
 } from "@/server/services/media.service";
@@ -43,10 +44,14 @@ import {
 /**
  * Every media write is role-gated in the service (`assertMediaWrite`): a
  * VIEWER on the row's site gets PermissionError, which reaches the client as
- * FORBIDDEN instead of a generic 500.
+ * FORBIDDEN instead of a generic 500. A URL outside the caller's own upload
+ * prefix (`URL_NOT_OWNED`, audit S-4) is the same kind of refusal.
  */
 function rethrowPermission(e: unknown): never {
   if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+  if (e instanceof Error && e.message === "URL_NOT_OWNED") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "That file was not uploaded to your media library." });
+  }
   throw e;
 }
 
@@ -329,6 +334,12 @@ export const mediaRouter = router({
     .query(async ({ ctx }) => {
       return checkStorageQuota(ctx.session.user.id);
     }),
+
+  /** The key prefix `/api/asset-upload` will issue a token for — clients put
+   *  every media upload under it (audit S-4). */
+  uploadPrefix: protectedProcedure.query(({ ctx }) => ({
+    prefix: ownedBlobPrefix(ctx.session.user.id),
+  })),
 
   // ─── Stock media search (#24) ───────────────────────────────────────────
   // Server-proxied so provider keys (UNSPLASH_ACCESS_KEY / PEXELS_API_KEY)
