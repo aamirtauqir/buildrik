@@ -28,6 +28,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 });
 
 import { ToastProvider } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 import { PublishConfirmModal } from "../PublishConfirmModal";
 
 const composer = {} as never;
@@ -138,6 +139,31 @@ describe("PublishConfirmModal — approval line reflects the real round", () => 
     await waitFor(() => expect(screen.getByText("Not sent for review.")).toBeTruthy());
     const btn = (await screen.findByText("Publish now")).closest("button") as HTMLButtonElement;
     expect(btn.disabled).toBe(false);
+  });
+});
+
+/* DEF-shell-publish-confirm-no-panel / board 7574:193972: the confirm used to
+   float over whatever the canvas was already showing. The board opens the
+   Publish panel (with its pre-publish checks) in the right column BEHIND the
+   confirm. `UI_PANEL_OPEN` is the existing event `useEditorEventListeners`
+   already answers for every ⌘K "Open X panel" command. */
+describe("PublishConfirmModal — opens the Publish panel behind it", () => {
+  it("emits UI_PANEL_OPEN for 'publish' once, on open", async () => {
+    const emit = vi.fn();
+    renderModal({ composer: { emit } as never, isOpen: true });
+    await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "publish" });
+    expect(emit).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not emit while closed", async () => {
+    const emit = vi.fn();
+    renderModal({ composer: { emit } as never, isOpen: false });
+    expect(emit).not.toHaveBeenCalled();
+  });
+
+  it("tolerates a composer with no emit method (test doubles elsewhere in this file)", async () => {
+    expect(() => renderModal({ composer: {} as never })).not.toThrow();
   });
 });
 

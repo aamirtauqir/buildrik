@@ -20,12 +20,21 @@
  * `PreviewShareModal` — the same dialog the site menu's "Share preview link"
  * row opens, so both doors land on one flow.
  *
+ * DEF-shell-share-dialog-hidden-under-preview: this region used to stack at
+ * `Z_LAYERS.floatingPanel` (3000) — the CANVAS z-scale (engine layers,
+ * badges, drop feedback). `OverlayMount`'s scrim/frame ride the separate
+ * chrome `--bk-z-*` scale (`--bk-z-overlay` 50 / `--bk-z-modal` 60), same as
+ * `FullPageRouter`'s full-screen views. 3000 buried the modal under this
+ * overlay's own iframe. This is chrome, not canvas — it now uses
+ * `--bk-z-overlay`, the same tier `FullPageRouter` uses for its full-screen
+ * views, so a `Modal` opened on top (z-modal, 60) still wins.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
+import { isModalOpen } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
 
@@ -44,7 +53,7 @@ interface PreviewOverlayProps {
    bar — ‹ Back to canvas · the device widths · Share preview — replacing
    the old Done pill over the page. */
 const REGION_CLASS =
-  "tw:fixed tw:inset-0 " +
+  "tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] " +
   "tw:flex tw:flex-col tw:bg-[var(--bk-bg-app)]";
 
 /** Board 4418:165611 — the preview's own 56-tall bar: back on the left, the
@@ -85,10 +94,15 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
   React.useEffect(() => {
     if (html == null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        onDone();
-      }
+      if (e.key !== "Escape") return;
+      /* The Share modal's own trap answers Escape (focus.ts `isModalOpen`
+         F9 rule) — this handler is on `window` capture, which fires before
+         the trap's `document` capture listener, so without this check
+         Escape closed the modal AND the preview underneath it in one
+         keystroke (DEF-shell-share-dialog-hidden-under-preview). */
+      if (isModalOpen()) return;
+      e.stopPropagation();
+      onDone();
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
@@ -106,7 +120,6 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone, si
       aria-label="Site preview"
       data-testid="preview-overlay"
       className={REGION_CLASS}
-      style={{ zIndex: Z_LAYERS.floatingPanel }}
     >
       <div className={DEVICE_BAR_CLASS}>
         <Button color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">

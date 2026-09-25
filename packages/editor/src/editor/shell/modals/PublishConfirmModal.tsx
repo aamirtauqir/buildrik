@@ -21,6 +21,7 @@
 import * as React from "react";
 import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { PublishConfirmFacts, warningsLine } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
 
 export interface PublishConfirmModalProps {
@@ -57,6 +58,20 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
      nothing in it must not be offered. */
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [warnCount, setWarnCount] = React.useState(0);
+
+  /* Board 7574:193972: the confirm opens with the Publish panel already up
+     in the right column behind it — the checks the panel has always shown
+     up front, not a modal floating over a bare canvas
+     (DEF-shell-publish-confirm-no-panel). `UI_PANEL_OPEN` is the existing
+     event `useEditorEventListeners` already answers for every ⌘K "Open X
+     panel" command — this reuses that door instead of drilling a new prop
+     through the shell (which owns this modal at
+     `AquibraStudio.tsx`, out of scope for this fix). Fires once per open,
+     not on every re-render while the facts stream in. */
+  React.useEffect(() => {
+    if (!isOpen) return;
+    composer?.emit?.(EVENTS.UI_PANEL_OPEN, { panel: "publish" });
+  }, [isOpen, composer]);
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
