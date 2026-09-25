@@ -1,10 +1,12 @@
-# Editor IA Ownership Audit — against `main` 6875289 (v0.4.0.0), 2026-09-25
+# Editor IA Ownership Audit — against `main` 6875289 (v0.4.0.0), re-checked on 92ff53f84, 2026-09-25
 
 **Scope:** information architecture only. The questions are: where each feature lives (left drawer, right column, global chrome, full screen, modal, popover), which feature owns which job, and whether the module boundaries make sense. Visual styling, typography, accessibility, search quality, click targets and prototype bugs are out of scope. The audit is read-only; no product code was changed.
 
 ## How this audit got here
 
 Earlier passes (v1 and v2) audited an older local snapshot of this repo. Every file they cited is different on `main`. Release **0.4.0.0, "Code-gap Oct 1 — Editor v3 to Figma"**, landed on 2026-09-24 and fixed most of v1/v2's P0s. So this version re-checked every earlier finding against `main` and rebuilt the placement matrix from `main`'s code. Findings that no longer hold are listed as fixed in §5, not repeated.
+
+**Re-checked on `92ff53f84`** ("Code-gap round 2", #26, which landed after the audit and touched eight of the files behind open findings). All eight — FA-1, FB-1, FB-2, FB-3, FB-5, FB-7, FB-8, FC-6 — still hold there; the line numbers below are from `92ff53f84`.
 
 **Evidence used:**
 
@@ -31,7 +33,7 @@ Paths are relative to `packages/editor/src/editor/`. `SP` = `shell/StudioPanels.
 | Brand | Full-screen (`FullPageRouter.tsx:399-414`) | site | rail, B, ⌘K, Settings "Brand ↗", Issues "Open Brand" | `7315:80955` | ✓ |
 | Inspector | RIGHT column; tabs Style · **Settings** · Effects | element | selection | `4428:141170` / `141642` / `142686` | ✓ placement; name clash (FB-1) |
 | Selected-element AI | RIGHT column, as its own state (`SP:260, 432-435`) | element / page | I, ⌘J, ⌘K, inspector ✦, empty canvas "Describe your site" | `4418:104454` | ✓ placement; stacking ✗ (FA-1) |
-| Review | RIGHT column (`SP:56`) | site | topbar chip/CTA, R, ⌘K, Activity rows | `4418:115784` | ✓; no gate (FB-3) |
+| Review | RIGHT column (`SP:57`) | site | topbar chip/CTA, R, ⌘K, Activity rows | `4418:115784` | ✓; no gate (FB-3) |
 | Issues | `position:absolute` block over the right column (`AS:647-660`) | page or site | site menu, ⌘K, Publish gate banner, errors-confirm modal | `4418:147641` | Geometry ✓; not part of the column system (FA-1) |
 | History | RIGHT column; tabs Session · Saves · Published | session + site | save pill, H, ⌃H, ⌘K, Publish "All versions ›", Activity rows | `4418:73545` | ✓ |
 | Activity | RIGHT column (`rail/tabsConfig.ts:199-212`) | site | site menu "Activity log", ⌘K, notifications "View all activity ›" | `4418:140587` | ✗ backend missing (FB-2) |
@@ -77,8 +79,8 @@ Paths are relative to `packages/editor/src/editor/`. `SP` = `shell/StudioPanels.
 
 **FA-1 · The right column has no single rule for which panel wins** [v2 FB-8, widened]
 - **Current structure:** four mechanisms share the right side of the screen.
-  1. **Column panels.** Publish, Review, History and Activity occupy the left drawer's single tab slot but render in the right column: `RIGHT_COLUMN_TABS` (`SP:56`), `rightColumnTab` (`SP:309`).
-  2. **AI.** A separate flag, `setAiInInspector(true)` (`SP:433`).
+  1. **Column panels.** Publish, Review, History and Activity occupy the left drawer's single tab slot but render in the right column: `RIGHT_COLUMN_TABS` (`SP:57`), `rightColumnTab` (`SP:319`).
+  2. **AI.** A separate flag, `setAiInInspector(true)` (`SP:443`).
   3. **Issues.** A separate `issuesOpen` overlay, drawn `position:absolute` above both (`AS:647-660`).
   4. **CMS workspace.** It hides the inspector (`SP:349-351`).
 - **Consequences** (*code-read*):
@@ -122,7 +124,7 @@ Paths are relative to `packages/editor/src/editor/`. `SP` = `shell/StudioPanels.
 - **Priority:** P1 · **Decision:** CHANGE (guard) + PRODUCT DECISION REQUIRED (which letters)
 
 **FB-5 · "Bind to CMS field…" opens the wrong surface**
-- **Current structure:** the canvas context-menu row emits `UI_SWITCH_TAB {tab:"content"}` (`canvas/menus/actions/standaloneActions.ts:58`). That opens CMS, whose workspace now covers the canvas and inspector. Binding lives in Inspector › Settings › Content (`inspector/sections/ContentSection.tsx:105-109`).
+- **Current structure:** the canvas context-menu row emits `UI_SWITCH_TAB {tab:"content"}` (`canvas/menus/actions/standaloneActions.ts:71`). That opens CMS, whose workspace now covers the canvas and inspector. Binding lives in Inspector › Settings › Content (`inspector/sections/ContentSection.tsx:105-109`).
 - **Figma proof:** `4428:149540` (Inspector · Settings · From CMS). Q6 of the v3 plan. G2-055 said to repoint this row once G2-144 landed; G2-144 is done.
 - **Recommended IA:** emit `UI_INSPECTOR_FOCUS_SECTION {section:"content"}`, as "Add interaction" already does.
 - **Priority:** P1 · **Decision:** CHANGE
@@ -134,7 +136,7 @@ Paths are relative to `packages/editor/src/editor/`. `SP` = `shell/StudioPanels.
 - **Priority:** P1 · **Decision:** PRODUCT DECISION REQUIRED
 
 **FB-7 · Share says "page" but shares the whole site**
-- **Current structure:** the modal title is `Share preview of ${page}` (`shell/PreviewShareModal.tsx:139`). The URL is `${DASHBOARD_URL}/share/${token}` with no page parameter (`:106`). The dashboard route supports `?page=` and otherwise opens the first page.
+- **Current structure:** the modal title is `Share preview of ${page}` (`shell/PreviewShareModal.tsx:141`). The URL is `${DASHBOARD_URL}/share/${token}` with no page parameter (`:106`). The dashboard route supports `?page=` and otherwise opens the first page.
 - **Figma proof:** `4418:165739`.
 - **Recommended IA:** append `?page=<slug>`, or title the modal for the site. Also name the three share concepts in one place: draft link, review link, and the dashboard's password/expiry links.
 - **Priority:** P1 · **Decision:** CHANGE
@@ -154,7 +156,7 @@ Paths are relative to `packages/editor/src/editor/`. `SP` = `shell/StudioPanels.
 | FC-3 | "Improve with AI" can never show, because `AquibraStudio` passes no `onAIRequest`. Its v3 home in the Inspector ⋯ menu isn't built. G2-055 is marked done anyway. "Describe your site" opens the editing AI, not Add's generator. | `AS:593-641`; `canvas/menus/actions/standaloneActions.ts:45`; `canvas/Canvas.tsx:789` | `7048:77991`; G2-055 | Wire the row or delete it; fix the ledger row; route "Describe your site" to the creator | CHANGE |
 | FC-4 | Page folders are personal (per user) inside a shared panel, and nothing says so. The CHANGELOG says "personal + shared", but only personal folders exist. Tooltip `7069:78978` says "This browser only", which is wrong because folders sync. | `prisma/schema.prisma:1580-1596`; `server/trpc/routers/pages.ts:115-116` | `4418:92679` | Label them "My folders" or build shared folders; fix the CHANGELOG and the tooltip | PRODUCT DECISION |
 | FC-5 | Components' home and scope contradict each other. There is a drawer plus Add groups plus Brand › Component styles. Components can now be page-scoped, which cuts against "reusable". A comment says they fold into Brand, but Q4 says Add. ⇧A has two listeners. | `BuildTab.tsx:65`; `rail/tabsConfig.ts:251-252`; `useEditorShortcuts.ts:148` | `4418:142419` | Fix the comment; name the "This page" scope; drop one ⇧A listener | CHANGE |
-| FC-6 | Media detail views are still forked. Used-in is a joined string in the library but has "Go ›" rows in the drawer. There are still two stock browsers. | `media/components/AssetDetailsPanel.tsx:379`; `StockBrowserOverlay.tsx:10-11` | G3-023 vs G3-048; G3-029 vs G3-036 | Share the Used-in rows; choose one stock surface | CHANGE / PRODUCT DECISION |
+| FC-6 | Media detail views are still forked. Used-in is a joined string in the library but has "Go ›" rows in the drawer. There are still two stock browsers. | `media/components/AssetDetailsPanel.tsx:389`; `StockBrowserOverlay.tsx:10-11` | G3-023 vs G3-048; G3-029 vs G3-036 | Share the Used-in rows; choose one stock surface | CHANGE / PRODUCT DECISION |
 | FC-7 | The editor now has three takeover shapes (full-screen portal, CMS canvas region, Compare overlay), and no written contract. Comments disagree: `FullPageView.tsx:4` says "Templates, Settings, History"; `FullPageRouter.tsx:2` says "Templates, Assets". | as cited | G3-068, G1-002 | One short contract doc; correct both comments | CHANGE |
 | FC-8 | Publish readiness has two sources, the lifecycle gate and the server checklist, and only the panel shows both before the click. | `shell/lifecycle.ts:37`; `sidebar/tabs/publish/PublishTab.tsx:498` | G1-043/044/045 | Show checklist blockers in the confirm modal too | CHANGE |
 | FC-9 | Viewers cannot open read-only History, Review or Activity. Their rail is Layers and Assets only, and column panels are blocked in view mode. | `SP:54, 309, 509-513` | G1-062 done | Decide read-only access for viewers | PRODUCT DECISION |
