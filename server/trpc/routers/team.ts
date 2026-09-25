@@ -171,7 +171,14 @@ export const teamRouter = router({
   }),
   resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ ctx, input }) => {
     const { workspaceId } = await requireAdmin(ctx);
-    return resendInvite(input.inviteId, workspaceId);
+    try {
+      return await resendInvite(input.inviteId, workspaceId);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "INVITE_EMAIL_FAILED") {
+        throw new TRPCError({ code: "BAD_GATEWAY", message: "Couldn't send the invite email. Try again." });
+      }
+      throw e;
+    }
   }),
   activity: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId } = await requireAdmin(ctx);
