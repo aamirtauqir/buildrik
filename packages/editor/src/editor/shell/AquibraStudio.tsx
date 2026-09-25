@@ -429,6 +429,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     lastPublishedAt: publishJob.lastPublishedAt,
     serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
     serverBlock: publishJob.blockedReason,
+    saveConflict: state.saveState.status === "conflict",
   });
 
   /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────

@@ -24,6 +24,15 @@ vi.mock("../api-client", () => ({
   }),
 }));
 
+const settledBaseline = vi.fn(() => Promise.resolve<string | null>("2026-09-20T10:00:00.000Z"));
+const raiseSaveConflict = vi.fn((err: unknown) =>
+  /SAVE_CONFLICT:/.test(String(err)) ? new Error("SAVE_CONFLICT") : null,
+);
+vi.mock("../BuildrikSyncProvider", () => ({
+  settledBaselineLastEditedAt: () => settledBaseline(),
+  raiseSaveConflict: (e: unknown) => raiseSaveConflict(e),
+}));
+
 import {
   publishSite,
   fetchPublishStatus,
@@ -45,8 +54,36 @@ describe("publishSite", () => {
     ];
     const result = await publishSite("site-1", pages);
 
-    expect(publishMutate).toHaveBeenCalledWith({ siteId: "site-1", pages });
+    expect(publishMutate).toHaveBeenCalledWith({
+      siteId: "site-1",
+      pages,
+      expectedLastEditedAt: "2026-09-20T10:00:00.000Z",
+    });
     expect(result).toEqual({ jobId: "job-1" });
+  });
+
+  /* C-3: the token is read only after in-flight saves settle — otherwise the
+     tab's own save, landed on the server but not yet answered, would read as
+     someone else's newer copy. */
+  it("waits for the in-flight save before reading the freshness token", async () => {
+    let release!: (v: string) => void;
+    settledBaseline.mockImplementationOnce(() => new Promise((r) => (release = r)));
+    publishMutate.mockResolvedValueOnce({ id: "job-2" });
+
+    const pending = publishSite("site-1", []);
+    await Promise.resolve();
+    expect(publishMutate).not.toHaveBeenCalled();
+    release("2026-09-20T10:05:00.000Z");
+    await pending;
+    expect(publishMutate).toHaveBeenCalledWith(
+      expect.objectContaining({ expectedLastEditedAt: "2026-09-20T10:05:00.000Z" }),
+    );
+  });
+
+  it("a stale-tab refusal raises the save conflict instead of a bare publish error", async () => {
+    publishMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-09-20T10:05:00.000Z"));
+    await expect(publishSite("site-1", [])).rejects.toThrow(/changed somewhere else/);
+    expect(raiseSaveConflict).toHaveBeenCalled();
   });
 
   it("propagates a tRPC failure (pre-publish checks / no Vercel connection)", async () => {

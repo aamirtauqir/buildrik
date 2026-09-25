@@ -339,8 +339,13 @@ export const sitesRouter = router({
           ctx.session.user.id,
           input.pages,
           input.acknowledgeStale,
+          { expectedLastEditedAt: input.expectedLastEditedAt },
         );
       } catch (e: unknown) {
+        // C-3: the tab's copy is behind the server's — same CONFLICT (and the
+        // same `SAVE_CONFLICT:<iso>` message) the save path returns.
+        if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))
+          throw new TRPCError({ code: "CONFLICT", message: e.message });
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
           throw new TRPCError({
             code: "CONFLICT",

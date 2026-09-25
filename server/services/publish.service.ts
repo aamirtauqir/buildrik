@@ -193,7 +193,7 @@ export async function startPublish(
   /** P1 rollback: `bypassApproval` skips the approval gate — an ADMIN restoring
    *  a previously-shipped version is not a new change needing sign-off.
    *  `rolledBackFrom` tags the new job with the version it re-deployed. */
-  opts?: { bypassApproval?: boolean; rolledBackFrom?: string },
+  opts?: { bypassApproval?: boolean; rolledBackFrom?: string; expectedLastEditedAt?: string | null },
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
@@ -237,6 +237,17 @@ export async function startPublish(
     select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true, lastEditedAt: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
+     saved by someone else after this tab last loaded or saved it, those pages
+     are a behind-copy and would silently replace the newer work on the live
+     site. Same token and same refusal the save path uses. */
+  if (
+    opts?.expectedLastEditedAt &&
+    site.lastEditedAt.getTime() > new Date(opts.expectedLastEditedAt).getTime()
+  ) {
+    throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  }
 
   // m-approval gate: in a workspace that requires approval, a publish is blocked
   // unless the site's latest review is APPROVED. Only the OWNER is exempt; ADMINs

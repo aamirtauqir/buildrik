@@ -127,10 +127,29 @@ export function setBaselineLastEditedAt(iso: string | null): void {
 // (the editor's "emit events, UI subscribes" convention). The shell listens for
 // `buildrik:save-conflict`.
 export const SAVE_CONFLICT_EVENT = "buildrik:save-conflict";
-function emitSaveConflict(serverLastEditedAt: string): void {
+
+/** Read a server `SAVE_CONFLICT:<iso>` refusal — from a save OR a publish
+ *  (C-3) — into the one conflict state: hold autosave, raise the dialog, and
+ *  hand back the typed error. Returns null for any other failure. */
+export function raiseSaveConflict(err: unknown): SaveConflictError | null {
+  const msg = err instanceof Error ? err.message : String(err);
+  const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
+  if (!match) return null;
+  const serverToken = match[1].trim();
+  _conflictPending = true;
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt } }));
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken } }));
   }
+  return new SaveConflictError(serverToken);
+}
+
+/** C-3: the freshness token a publish carries. Read only once every save
+ *  already in flight has landed — a save advances the server's lastEditedAt
+ *  before its response advances this baseline, and reading in that gap would
+ *  refuse the tab's publish over its own save. */
+export async function settledBaselineLastEditedAt(): Promise<string | null> {
+  await _saveChain;
+  return _baselineLastEditedAt;
 }
 
 /**
@@ -520,15 +539,7 @@ async function saveProjectNow(
   } catch (err) {
     // Translate the server's CONFLICT into a typed error the shell can catch to
     // show the conflict dialog (rather than a generic save-failed toast).
-    const msg = err instanceof Error ? err.message : String(err);
-    const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
-    if (match) {
-      const serverToken = match[1].trim();
-      _conflictPending = true;
-      emitSaveConflict(serverToken);
-      throw new SaveConflictError(serverToken);
-    }
-    throw err;
+    throw raiseSaveConflict(err) ?? err;
   }
 
   const result = primaryResult as { success: boolean; savedAt: Date };

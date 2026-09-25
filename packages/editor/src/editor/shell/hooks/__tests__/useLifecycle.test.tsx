@@ -65,6 +65,7 @@ const input = (over: Partial<UseLifecycleInput> = {}): UseLifecycleInput => ({
   lastPublishedAt: null,
   serverHasUnpublishedChanges: null,
   serverBlock: null,
+  saveConflict: false,
   ...over,
 });
 
