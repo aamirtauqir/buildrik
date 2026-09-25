@@ -66,6 +66,20 @@ export interface CMSCollectionBinding {
 /** An element whose whole content is one `{{item.<field>}}` placeholder. */
 const ITEM_PLACEHOLDER = /^\s*\{\{\s*item\.([\w-]+)\s*\}\}\s*$/;
 
+/** Every `{{item.<field>}}` reference anywhere in a string — a repeater's
+ *  template can mix a placeholder into a sentence, not just stand alone as
+ *  `ITEM_PLACEHOLDER` requires. Exported so `fieldUsage.ts` can walk a
+ *  Collection-bound repeater's template and find a field used only there —
+ *  the field-level `bindings` map below never sees it, so USED BY and the
+ *  delete-lock (4418:165439) missed it without this. */
+export function findItemFieldRefs(content: string): string[] {
+  const out: string[] = [];
+  const re = /\{\{\s*item\.([\w-]+)\s*\}\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content))) out.push(m[1]);
+  return out;
+}
+
 /** Field types whose value reads as text in a placeholder. */
 const TEXT_LIKE_FIELDS = new Set<CMSFieldType>(["text", "textarea", "richtext", "number", "select", "date", "datetime", "url", "email"]);
 
