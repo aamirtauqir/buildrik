@@ -21,6 +21,7 @@ import DOMPurify from "dompurify";
 import {
   FORBIDDEN_ATTRIBUTES,
   URL_ATTRIBUTES,
+  isDangerousUrl,
   isValidAttributeName,
   srcsetUrls,
   toAllowedElementTag,
@@ -49,6 +50,9 @@ export {
  * Check if a URL is safe
  */
 export function isSafeUrl(url: string, allowedSchemes: Set<string> = ALLOWED_URL_SCHEMES): boolean {
+  // The scheme as a browser reads it (controls/whitespace inside it ignored),
+  // shared with the server sanitizer.
+  if (isDangerousUrl(url)) return false;
   const trimmed = url.trim().toLowerCase();
 
   // Check for dangerous patterns

@@ -58,10 +58,27 @@ export const URL_ATTRIBUTES: ReadonlySet<string> = new Set([
   "href", "src", "srcset", "action", "formaction", "poster", "xlink:href",
 ]);
 
-/** The URLs a `srcset` value names ("a.jpg 1x, b.jpg 2x" → ["a.jpg", "b.jpg"]). */
+/**
+ * A URL a browser would run or render as a document: javascript:, vbscript:,
+ * or a data: URL that is not an image. The scheme is read as a browser reads
+ * it — every C0 control and space removed ("java\tscript:" and
+ * "\x01javascript:" both run) — so a regex anchored on the raw string cannot
+ * be slipped past. The one check the server sanitizer and the editor share.
+ */
+export function isDangerousUrl(value: string): boolean {
+  const compact = value.replace(/[\x00-\x20]/g, "").toLowerCase();
+  if (compact.startsWith("javascript:") || compact.startsWith("vbscript:")) return true;
+  return compact.startsWith("data:") && !compact.startsWith("data:image/");
+}
+
+/**
+ * The URLs a `srcset` value names ("a.jpg 1x, b.jpg 200w" → ["a.jpg", "b.jpg"]).
+ * Only a trailing width/density descriptor is cut, not everything after the
+ * first space: whitespace inside "java\tscript:" must not split the URL off.
+ */
 export function srcsetUrls(value: string): string[] {
   return value
     .split(",")
-    .map((candidate) => candidate.trim().split(/\s+/)[0] ?? "")
+    .map((candidate) => candidate.trim().replace(/\s+\d+(?:\.\d+)?[wxh]$/i, ""))
     .filter((url) => url.length > 0);
 }

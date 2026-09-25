@@ -230,3 +230,15 @@ describe("tag and attribute allowlist (S-1a, A19-1)", () => {
     }
   });
 });
+
+describe("URL schemes a browser would still run (S-1 review fix 2)", () => {
+  it.each(["java\tscript:alert(1)", "java\nscript:alert(1)", "\x01javascript:alert(1)", "data:application/xhtml+xml,x"])(
+    "refuses %j on every URL attribute",
+    (url) => {
+      for (const attr of ["href", "src", "formaction", "xlink:href", "poster", "action"]) {
+        expect(isSafeAttrValue(attr, url, "a"), attr).toBe(false);
+      }
+      expect(isSafeAttrValue("srcset", `a.jpg 1x, ${url} 2x`, "img")).toBe(false);
+    }
+  );
+});

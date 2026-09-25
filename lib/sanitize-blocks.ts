@@ -11,6 +11,7 @@
  *   - element rich-text `content` → sanitized with DOMPurify (isomorphic)
  *   - `attributes` → malformed names, `srcdoc`, on* event handlers, and
  *     javascript:/vbscript:/non-image data: URL values are dropped
+ *     (`isDangerousUrl`, shared with the editor)
  *
  * The tag/attribute rules are `@buildrik/shared/schemas/element-markup`, the
  * same list the editor applies, so the two sides cannot drift.
@@ -27,6 +28,7 @@ import {
   FORBIDDEN_ATTRIBUTES,
   URL_ATTRIBUTES,
   isAllowedElementTag,
+  isDangerousUrl,
   isValidAttributeName,
   srcsetUrls,
 } from "@buildrik/shared/schemas/element-markup";
@@ -47,15 +49,6 @@ export type OnSanitizeChange = (reason: SanitizeReason, detail: string) => void;
 const PURIFY_CONFIG = { ADD_ATTR: ["target"] };
 
 const EVENT_HANDLER_ATTR = /^on/i;
-const DANGEROUS_SCHEME = /^\s*(?:javascript|vbscript):/i;
-const DATA_SCHEME = /^\s*data:/i;
-const SAFE_DATA_SCHEME = /^\s*data:image\//i;
-
-function isUnsafeUrl(value: string): boolean {
-  if (DANGEROUS_SCHEME.test(value)) return true;
-  return DATA_SCHEME.test(value) && !SAFE_DATA_SCHEME.test(value);
-}
-
 function unsafeAttributeReason(name: string, value: string): SanitizeReason | null {
   if (!isValidAttributeName(name)) return "attr-name";
   const lower = name.toLowerCase();
@@ -63,7 +56,7 @@ function unsafeAttributeReason(name: string, value: string): SanitizeReason | nu
   if (EVENT_HANDLER_ATTR.test(name)) return "attr-event-handler";
   if (URL_ATTRIBUTES.has(lower)) {
     const urls = lower === "srcset" ? srcsetUrls(value) : [value];
-    if (urls.some(isUnsafeUrl)) return "attr-url";
+    if (urls.some(isDangerousUrl)) return "attr-url";
   }
   return null;
 }

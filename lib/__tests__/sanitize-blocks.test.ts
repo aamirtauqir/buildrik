@@ -195,3 +195,29 @@ describe("sanitizeComponentPayload / sanitizeVersionPayload / sanitizeTemplateHt
     expect(out).toContain('target="_blank"');
   });
 });
+
+describe("URL schemes a browser would still run (S-1 review fix 2)", () => {
+  it.each([
+    "java\tscript:alert(1)",
+    "java\nscript:alert(1)",
+    "java\rscript:alert(1)",
+    "\x01javascript:alert(1)",
+    " \x00vbscript:msgbox(1)",
+    "JaVaScRiPt:alert(1)",
+    "data:text/html,<script>alert(1)</script>",
+    "\tdata:text/html,x",
+  ])("drops href=%j", (href) => {
+    const blocks = { id: "r", type: "link", tagName: "a", attributes: { href } };
+    sanitizeBlocks(blocks);
+    expect(blocks.attributes).not.toHaveProperty("href");
+  });
+
+  it.each(["https://x.com/a", "/p", "#top", "mailto:a@b.c", "data:image/png;base64,AAAA", "page.html"])(
+    "keeps href=%j",
+    (href) => {
+      const blocks = { id: "r", type: "link", tagName: "a", attributes: { href } };
+      sanitizeBlocks(blocks);
+      expect(blocks.attributes.href).toBe(href);
+    }
+  );
+});
