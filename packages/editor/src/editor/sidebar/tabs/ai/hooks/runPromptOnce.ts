@@ -5,9 +5,10 @@ import type { AIModel } from "../types";
  * Promise wrapper around the streamPrompt subscription for DISCRETE
  * request/response calls. The agent runner (P4) makes a sequence of these (one
  * plan call, then one per step), where async/await sequencing is far clearer
- * than threading the streaming `useStreamPrompt` hook's state through effects.
- * Since decision #23 (plan/run only) every AI-panel prompt goes through here;
- * `useStreamPrompt` serves the in-canvas popover.
+ * than threading a streaming hook's state through effects.
+ * Since decision #23 (plan/run only) every AI-panel prompt goes through here.
+ * (`useStreamPrompt` was a second, unused streaming path — nothing imported
+ * it outside its own tests — deleted v3 FC-10, 2026-09-25.)
  */
 
 /**
@@ -18,7 +19,9 @@ import type { AIModel } from "../types";
  */
 export type AiErrorKind = "not-configured" | "quota" | "other";
 
-export function aiErrorKind(code: string | undefined): AiErrorKind {
+/* Not exported — useStreamPrompt.ts was its only outside consumer, deleted
+   v3 FC-10 (2026-09-25, dead code — nothing else imported that hook). */
+function aiErrorKind(code: string | undefined): AiErrorKind {
   if (code === "PRECONDITION_FAILED") return "not-configured";
   if (code === "TOO_MANY_REQUESTS") return "quota";
   return "other";
@@ -30,7 +33,7 @@ export function aiErrorKind(code: string | undefined): AiErrorKind {
  * an outage used to hold the panel on "Thinking…" indefinitely. Two attempts,
  * then the failure is surfaced.
  */
-export const AI_RECONNECT_BUDGET = 2;
+const AI_RECONNECT_BUDGET = 2;
 
 /** A failed prompt, with the kind the panel renders its state from. */
 export class AiRunError extends Error {
