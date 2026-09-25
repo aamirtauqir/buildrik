@@ -51,6 +51,17 @@ export interface IssuesPanelProps {
   onOpenBrand?: (tokenId?: string) => void;
   /** Suppress this token's issues for the session. */
   onIgnore?: (tokenId: string) => void;
+  /**
+   * Content-scan state (x3: `useContentIssueScanner` — the client-side alt-
+   * text / broken-link detectors). DS-lint and the publish-check bridge are
+   * synchronous/fetch-and-forget, so this is the one source that runs long
+   * enough, and can fail loudly enough, to need its own banner. Absent when
+   * the caller has no scanner wired up — the panel then renders as it always
+   * did.
+   */
+  scanState?: "idle" | "scanning" | "error";
+  /** Re-run the scan — the scan-failed banner's "Try again". */
+  onRescan?: () => void;
 }
 
 type Filter = "all" | "error" | "warning";
@@ -128,6 +139,8 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   onFix,
   onOpenBrand,
   onIgnore,
+  scanState = "idle",
+  onRescan,
 }) => {
   const [filter, setFilter] = React.useState<Filter>("all");
   // T10 page scope. Defaults to "page" — "what's wrong with what I'm looking
@@ -191,6 +204,22 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         </div>
       ) : (
         <PanelHeader title="Issues" onClose={onClose} size="panel" />
+      )}
+
+      {scanState === "scanning" && (
+        <div className={`${BAND} tw:bg-[var(--bk-accent-tint)]`} role="status" aria-live="polite" data-testid="issues-scan-banner">
+          <span className="tw:text-xs tw:text-[var(--bk-accent-text)]">Scanning for issues…</span>
+        </div>
+      )}
+      {scanState === "error" && (
+        <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-scan-banner">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+            <span className="tw:text-xs tw:text-[var(--bk-error-text)]">Scan failed.</span>
+            <Button color="light" size="xs" className={GHOST} onClick={() => onRescan?.()}>
+              Try again
+            </Button>
+          </div>
+        </div>
       )}
 
       {issues.length === 0 ? (
