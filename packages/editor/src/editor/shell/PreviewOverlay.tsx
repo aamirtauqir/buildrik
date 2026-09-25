@@ -34,7 +34,7 @@
 import * as React from "react";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
-import { isModalOpen } from "@/editor/chrome-ui/focus";
+import { isModalOpen } from "@/editor/chrome-ui";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
 
