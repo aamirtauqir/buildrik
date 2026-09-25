@@ -105,6 +105,9 @@ const MODEL_TO_TABLE = {
   site: "sites",
   page: "pages",
   sitePermission: "site_permissions",
+  pendingUpload: "pending_uploads",
+  mediaAsset: "media_assets",
+  mediaAssetVersion: "media_asset_versions",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

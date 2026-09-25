@@ -2,7 +2,7 @@
  * PUT /api/upload/[fileId]
  *
  * Receives the file body for an upload previously registered via
- * trpc.upload.presign. Pairs with the in-memory pendingUploads table in
+ * trpc.upload.presign. Pairs with the DB-backed PendingUpload rows in
  * server/services/upload.service.ts.
  *
  * Used by site-detail/settings-tab + seo-tab for favicon, og-image, etc.
@@ -20,10 +20,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@server/auth";
 import {
+  assertUploadRole,
   getPendingUpload,
   setPendingUploadStoredUrl,
   validateUpload,
 } from "@server/services/upload.service";
+import { PermissionError } from "@server/services/permission.service";
+import { safeBlobName } from "@buildrik/shared/schemas/upload";
 
 export async function PUT(
   req: NextRequest,
@@ -43,6 +46,15 @@ export async function PUT(
   if (pending.userId !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  // The presign checked the role, but the pending row lives 10 minutes: a
+  // role revoked in between must not still write (audit S-3).
+  try {
+    await assertUploadRole(pending.context, pending.siteId, pending.userId, pending.wsId);
+  } catch (e) {
+    if (e instanceof PermissionError) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const msg = e instanceof Error ? e.message : "Invalid upload";
+    return NextResponse.json({ error: msg }, { status: 400 });
+  }
 
   const contentType = req.headers.get("content-type") || "";
   if (contentType !== pending.fileType) {
@@ -61,17 +73,16 @@ export async function PUT(
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
-  // Store under a stable key derived from context + ids so re-uploads of the
-  // same logical asset (favicon, og-image) replace the prior blob. Vercel
-  // Blob will dedup or rotate per its own rules.
+  // The key keeps its context prefix but gets a random suffix and is never
+  // overwritten: a fixed `sites/<id>/favicon.png` was guessable and
+  // replaceable (audit S-3). Every client stores the URL confirm returns.
   const pathname = buildBlobPath(pending);
 
   try {
     const blob = await put(pathname, body, {
       access: "public",
       contentType: pending.fileType,
-      addRandomSuffix: false,
-      allowOverwrite: true,
+      addRandomSuffix: true,
     });
     await setPendingUploadStoredUrl(fileId, blob.url);
     return NextResponse.json({ ok: true, url: blob.url });
@@ -82,7 +93,7 @@ export async function PUT(
 }
 
 function buildBlobPath(pending: NonNullable<Awaited<ReturnType<typeof getPendingUpload>>>): string {
-  const ext = guessExt(pending.fileType, pending.fileName);
+  const ext = guessExt(pending.fileType, safeBlobName(pending.fileName));
   const ctx = pending.context;
   const wsId = pending.wsId;
   const siteId = pending.siteId ?? "global";
@@ -91,9 +102,10 @@ function buildBlobPath(pending: NonNullable<Awaited<ReturnType<typeof getPending
   if (ctx === "favicon") return `sites/${siteId}/favicon${ext}`;
   if (ctx === "touch_icon") return `sites/${siteId}/touch-icon${ext}`;
   if (ctx === "og_image") return `sites/${siteId}/og-image${ext}`;
-  if (ctx === "site_media") return `media/${wsId}/${pending.fileName}`;
-  if (ctx === "ticket") return `tickets/${pending.userId}/${pending.fileName}`;
-  return `uploads/${wsId}/${pending.fileName}`;
+  const name = safeBlobName(pending.fileName);
+  if (ctx === "site_media") return `media/${wsId}/${name}`;
+  if (ctx === "ticket") return `tickets/${pending.userId}/${name}`;
+  return `uploads/${wsId}/${name}`;
 }
 
 function guessExt(mime: string, fallback: string): string {

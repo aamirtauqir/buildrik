@@ -20,24 +20,26 @@ export function validateUpload(context: string, fileType: string, sizeMB?: numbe
   if (sizeMB !== undefined && sizeMB > limits.maxSizeMB) throw new Error("FILE_TOO_LARGE");
 }
 
-/** Contexts whose blob lands at a FIXED per-site path the live site serves. */
+/** Contexts that belong to a site and need its siteId. */
 const SITE_ASSET_CONTEXTS = new Set(["favicon", "touch_icon", "og_image"]);
+/** The only contexts that may carry a siteId at all. */
+const SITE_SCOPED_CONTEXTS = new Set([...SITE_ASSET_CONTEXTS, "site_media"]);
 
 /**
- * The PUT that follows a presign writes with `allowOverwrite: true` to a
- * stable path (`sites/<id>/favicon.png`, `workspaces/<id>/icon.png`,
- * `media/<ws>/<name>`), so the presign IS the write authorisation. It used to
- * check nothing: any signed-in account could overwrite any site's favicon or
- * OG image by naming its siteId (audit 2026-09-24). Site assets need ADMIN —
- * the same tier as `siteDetail.settings.update`, which stores them — and a
- * siteId, since without one they landed on a shared `sites/global/` path.
- * Workspace icon needs workspace ADMIN; workspace media needs EDITOR. Avatar
- * and ticket paths are keyed by the caller's own userId. Throws
- * PermissionError, or Error("SITE_REQUIRED").
+ * The write authorisation for an upload, run at presign AND again at the PUT
+ * that follows (`/api/upload/[fileId]`): a role revoked inside the 10-minute
+ * TTL must not still write (audit 2026-09-25 S-3). It used to check nothing:
+ * any signed-in account could overwrite any site's favicon or OG image by
+ * naming its siteId (audit 2026-09-24). Site assets need ADMIN — the same
+ * tier as `siteDetail.settings.update`, which stores them — and a siteId,
+ * since without one they landed on a shared `sites/global/` path. Workspace
+ * icon needs workspace ADMIN; workspace media needs EDITOR. Avatar and ticket
+ * paths are keyed by the caller's own userId. Throws PermissionError, or
+ * Error("SITE_REQUIRED").
  */
-async function assertUploadRole(
+export async function assertUploadRole(
   context: string,
-  siteId: string | undefined,
+  siteId: string | null | undefined,
   userId: string,
   wsId: string,
 ): Promise<void> {
@@ -58,6 +60,9 @@ export async function createPresignedUrl(
   wsId: string,
 ): Promise<{ fileId: string; uploadUrl: string }> {
   validateUpload(input.context, input.fileType);
+  // A siteId on an avatar/ticket/workspace icon was stored as a bare label
+  // that no check ever read — refuse it rather than keep an unchecked claim.
+  if (input.siteId && !SITE_SCOPED_CONTEXTS.has(input.context)) throw new Error("SITE_NOT_ALLOWED");
   await assertUploadRole(input.context, input.siteId, userId, wsId);
 
   const fileId = crypto.randomUUID();
