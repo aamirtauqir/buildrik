@@ -57,21 +57,10 @@ export interface ContentRequest {
   tone: ToneType;
 }
 
-export interface LayoutRequest {
-  prompt: string;
-  style?: LayoutStyle;
-}
-
 export interface ImageRequest {
   prompt: string;
   size?: ImageSize;
   style?: ImageStyle;
-}
-
-export interface CodeRequest {
-  prompt: string;
-  language: ProgrammingLanguage;
-  style?: CodeStyle;
 }
 
 export interface StreamCallbacks {
@@ -108,17 +97,6 @@ export async function generateContent(
     options
   );
   return response.data.content;
-}
-
-export interface BatchRequest {
-  type: "content" | "layout" | "code" | "improve";
-  params: Record<string, unknown>;
-}
-
-export interface BatchResult<T = string> {
-  success: boolean;
-  data?: T;
-  error?: AIError;
 }
 
 export const PROMPT_TEMPLATES = {
