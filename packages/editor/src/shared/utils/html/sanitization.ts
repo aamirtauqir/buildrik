@@ -185,14 +185,25 @@ export function sanitizeElementTreeContent(data: ElementData): void {
   if (typeof data.content === "string" && data.content.length > 0) {
     data.content = sanitizeHTML(data.content);
   }
+  // Stored JSON of any shape reaches here (a component master is only
+  // z.record-checked on the server), so a wrong-typed field is dropped or
+  // skipped, never dereferenced.
+  if (data.attributes !== undefined && !isPlainRecord(data.attributes)) delete data.attributes;
   if (data.attributes) {
     for (const [name, value] of Object.entries(data.attributes)) {
-      if (!isSafeAttrValue(name, value, data.tagName ?? "")) {
+      if (typeof value !== "string" || !isSafeAttrValue(name, value, data.tagName ?? "")) {
         delete data.attributes[name];
       }
     }
   }
-  data.children?.forEach((child) => sanitizeElementTreeContent(child));
+  if (!Array.isArray(data.children)) return;
+  for (const child of data.children) {
+    if (isPlainRecord(child)) sanitizeElementTreeContent(child);
+  }
+}
+
+function isPlainRecord(value: unknown): boolean {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**

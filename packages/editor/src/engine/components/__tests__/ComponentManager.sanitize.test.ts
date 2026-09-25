@@ -9,7 +9,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import type { ComponentDefinition } from "../../../shared/types/components";
-import { makeEngine, type FakeComposer } from "../../elements/__tests__/harness";
+import { makeEngine, emitsOf, type FakeComposer } from "../../elements/__tests__/harness";
+import { EVENTS } from "../../../shared/constants/events";
 import type { Composer } from "../../Composer";
 
 const stored: ComponentDefinition[] = [];
@@ -44,7 +45,7 @@ function makeStack() {
   const mgr = new ComponentManager(composer as unknown as Composer);
   composer.components = mgr as unknown as FakeComposer["components"];
   const page = manager.createPage("Home");
-  return { manager, mgr, page };
+  return { composer, manager, mgr, page };
 }
 
 async function placedHtml(mgr: ComponentManager, manager: ReturnType<typeof makeEngine>["manager"], rootId: string, id: string) {
@@ -68,5 +69,39 @@ describe("component masters are sanitized on the way in", () => {
     const html = await placedHtml(mgr, manager, page.root.id, "local-1");
     expect(html).toContain("Hi");
     expect(html).not.toMatch(/onerror|srcdoc|<iframe/i);
+  });
+});
+
+describe("a malformed master does not break the library (S-1 review round 2)", () => {
+  const malformed = (id: string, masterTree: unknown): ComponentDefinition =>
+    ({ ...hostile(id), masterTree }) as unknown as ComponentDefinition;
+
+  it("skips rows without a usable master tree and still loads and announces the good ones", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const nestedBad = hostile("nested-bad");
+    (nestedBad.masterTree.children as unknown[]).push({ id: "x", type: "container", children: "oops", attributes: "nope" });
+    stored.splice(
+      0,
+      stored.length,
+      malformed("null-tree", null),
+      malformed("array-tree", []),
+      malformed("string-children", { id: "m", type: "container", children: "oops" }),
+      nestedBad,
+      hostile("good")
+    );
+    const { composer, mgr } = makeStack();
+    await vi.waitFor(() => expect(emitsOf(composer, EVENTS.COMPONENT_LIST_UPDATED)).toHaveLength(1));
+    expect(mgr.getAllComponents().map((c) => c.id).sort()).toEqual(["good", "nested-bad"]);
+    expect(warn).toHaveBeenCalledTimes(3);
+    warn.mockRestore();
+  });
+
+  it("refuses to adopt a library master without a usable tree", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stored.splice(0, stored.length);
+    const { mgr } = makeStack();
+    await expect(mgr.adoptLibraryComponent(malformed("lib-bad", null))).rejects.toThrow();
+    expect(mgr.getComponent("lib-bad")).toBeUndefined();
+    warn.mockRestore();
   });
 });
