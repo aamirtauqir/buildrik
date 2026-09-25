@@ -282,6 +282,9 @@ export const MEDIA_EVENTS = {
   SERVER_PAGE_CHANGED: "media:server-page",
   /** Emitted when a media asset is added */
   MEDIA_ADDED: "media:added",
+  /** Emitted once per `importServerAssets` call with every newly-hydrated
+   *  asset (D-10), instead of one MEDIA_ADDED per asset. Payload: MediaAsset[] */
+  MEDIA_ADDED_BATCH: "media:added:batch",
   /* A new session rebuilt the object URLs for locally-stored assets. blob: URLs
      die with the window that made them, so the library re-creates them on
      load — and anything already placed on a page still points at the dead one.

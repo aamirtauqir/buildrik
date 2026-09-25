@@ -611,6 +611,11 @@ export class MediaManager extends MediaEventEmitter {
     // uploaded earlier this session). Map server enum back to engine
     // MediaAssetType. SVG-as-image: discriminate via mimeType.
     const existingAssetIds = new Set(this.state.assets.map((a) => a.id));
+    // D-10: hydration used to persist + push + emit MEDIA_ADDED per asset,
+    // separated by an IndexedDB await — one render per asset (200+ on a
+    // large library). Collect the new assets here and persist/push/emit
+    // once after the loop.
+    const newAssets: MediaAsset[] = [];
     for (const sa of serverAssets) {
       if (existingAssetIds.has(sa.id)) continue;
       const engineType: MediaAssetType =
@@ -639,13 +644,17 @@ export class MediaManager extends MediaEventEmitter {
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
       };
-      // Metadata-only IndexedDB write. Blob arg omitted — first render
-      // request fetches the public URL into a Blob via the existing
-      // getAssetSrc lazy path.
-      await this.persist(asset);
-      this.state.assets.push(asset);
-      this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
+      newAssets.push(asset);
     }
+
+    if (newAssets.length === 0) return;
+
+    // Metadata-only IndexedDB writes, in parallel. Blob arg omitted — first
+    // render request fetches the public URL into a Blob via the existing
+    // getAssetSrc lazy path.
+    await Promise.all(newAssets.map((asset) => this.persist(asset)));
+    this.state.assets.push(...newAssets);
+    this.emit(MEDIA_EVENTS.MEDIA_ADDED_BATCH, newAssets);
   }
 
   /**

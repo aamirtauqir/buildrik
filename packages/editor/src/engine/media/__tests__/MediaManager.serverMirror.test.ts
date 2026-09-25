@@ -247,6 +247,36 @@ describe("MediaManager server mirror — tags ↔ userMetadata.tags (C3)", () =>
     expect(manager.getAsset("unsized")?.width).toBeUndefined();
     expect(manager.getAsset("unsized")?.height).toBeUndefined();
   });
+
+  it("D-10: emits exactly one MEDIA_ADDED_BATCH for the whole hydration, not one MEDIA_ADDED per asset", async () => {
+    const manager = makeManager(makeRemoteSync());
+    const { MEDIA_EVENTS } = await import("@/shared/constants/media");
+    const addedSpy = vi.fn();
+    const batchSpy = vi.fn();
+    manager.on(MEDIA_EVENTS.MEDIA_ADDED, addedSpy);
+    manager.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, batchSpy);
+
+    await manager.importServerAssets([row("one"), row("two"), row("three")], []);
+
+    expect(addedSpy).not.toHaveBeenCalled();
+    expect(batchSpy).toHaveBeenCalledTimes(1);
+    const batch = batchSpy.mock.calls[0][0] as Array<{ id: string }>;
+    expect(batch.map((a) => a.id).sort()).toEqual(["one", "three", "two"]);
+    expect(manager.getAsset("one")).toBeTruthy();
+    expect(manager.getAsset("two")).toBeTruthy();
+    expect(manager.getAsset("three")).toBeTruthy();
+  });
+
+  it("D-10: importServerAssets with no new assets emits nothing", async () => {
+    const manager = makeManager(makeRemoteSync());
+    const { MEDIA_EVENTS } = await import("@/shared/constants/media");
+    const batchSpy = vi.fn();
+    manager.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, batchSpy);
+
+    await manager.importServerAssets([], []);
+
+    expect(batchSpy).not.toHaveBeenCalled();
+  });
 });
 
 /* Clone 3686:42317 (Assets · Site fonts, Phase 5): `Add font` turns an

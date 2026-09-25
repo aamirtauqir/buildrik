@@ -96,6 +96,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     composer.media.on(MEDIA_EVENTS.INITIALIZED, onInitialized);
     composer.media.on(MEDIA_EVENTS.INIT_FAILED, onInitFailed);
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, reload);
+    composer.media.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_UPDATED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, reload);
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, reload);
@@ -107,6 +108,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
       composer.media.off(MEDIA_EVENTS.INITIALIZED, onInitialized);
       composer.media.off(MEDIA_EVENTS.INIT_FAILED, onInitFailed);
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, reload);
+      composer.media.off(MEDIA_EVENTS.MEDIA_ADDED_BATCH, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_UPDATED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, reload);
       composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, reload);

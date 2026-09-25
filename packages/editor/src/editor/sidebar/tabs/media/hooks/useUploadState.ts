@@ -122,6 +122,7 @@ export function useUploadState(
     };
 
     const onAdded = () => recalcStorage();
+    const onAddedBatch = () => recalcStorage();
     const onDeleted = () => recalcStorage();
 
     const onComplete = (payload: unknown) => {
@@ -152,6 +153,7 @@ export function useUploadState(
     composer.media.on(MEDIA_EVENTS.UPLOAD_PROGRESS, onProgress);
     composer.media.on(MEDIA_EVENTS.UPLOAD_ERROR, onError);
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, onAdded);
+    composer.media.on(MEDIA_EVENTS.MEDIA_ADDED_BATCH, onAddedBatch);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, onDeleted);
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
 
@@ -161,6 +163,7 @@ export function useUploadState(
       composer.media.off(MEDIA_EVENTS.UPLOAD_PROGRESS, onProgress);
       composer.media.off(MEDIA_EVENTS.UPLOAD_ERROR, onError);
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, onAdded);
+      composer.media.off(MEDIA_EVENTS.MEDIA_ADDED_BATCH, onAddedBatch);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, onDeleted);
       composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
     };
