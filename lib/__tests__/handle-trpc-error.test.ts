@@ -6,8 +6,6 @@
  * (FORBIDDEN, NOT_FOUND, BAD_REQUEST, CONFLICT, ...) silently did nothing,
  * so a blocked action (e.g. Settings > Integrations > Disconnect as an
  * EDITOR) looked like it succeeded.
- *
- * @license BSD-3-Clause
  */
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import { TRPCClientError } from "@trpc/client";
