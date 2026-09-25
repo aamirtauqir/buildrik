@@ -3425,15 +3425,15 @@
     },
     {
       "nodeId": "807:8723",
-      "name": "S5.5 · reviewer-view · external-reviewer",
+      "name": "[superseded 2026-09-25] S5.5 · reviewer-view · external-reviewer",
       "family": "S5 flows",
-      "state": "reviewer-view · external-reviewer",
+      "state": "superseded",
       "width": 1440,
       "height": 900,
-      "status": "active",
-      "authority": "board",
+      "status": "out-of-scope",
+      "authority": "superseded:doc:packages/editor/CLAUDE.md#client-sign-off",
       "recipe": null,
-      "verifiedNote": "2026-09-08: s5-flows-reviewer-view-external-reviewer — /review/<token> is a DASHBOARD route needing a live server and a real token. Out of reach of this harness, which drives the two editor Vite roots. Same class as the activity log and the client sign-off boards.",
+      "verifiedNote": "2026-09-08: s5-flows-reviewer-view-external-reviewer — /review/<token> is a DASHBOARD route needing a live server and a real token. Out of reach of this harness, which drives the two editor Vite roots. Same class as the activity log and the client sign-off boards. Superseded 2026-09-25 (FC-12): formalized as out-of-editor-scope rather than left as a per-board 'unreachable' note — client sign-off IS the dashboard /review/<token> page, documented in packages/editor/CLAUDE.md, not an editor surface this harness will ever measure.",
       "verified": "unreachable"
     },
     {
@@ -5625,16 +5625,16 @@
     },
     {
       "nodeId": "1344:7162",
-      "name": "S7.0 · navigation-model · drill-in — NEW 2026-08-28",
+      "name": "[superseded 2026-09-25] S7.0 · navigation-model · drill-in — NEW 2026-08-28",
       "family": "S7",
-      "state": "navigation-model · drill-in",
+      "state": "superseded",
       "width": 1440,
       "height": 400,
-      "status": "active",
-      "authority": "founder:drill-in — standing preference reconfirmed 2026-08-28",
+      "status": "out-of-scope",
+      "authority": "superseded:code:SettingsTab drill-in (fullpage Settings)",
       "recipe": null,
       "verified": "unreachable",
-      "verifiedNote": "2026-09-08: the board's own frame name reads 'RETIRED 2026-09-02, not a screen' — a 1440x400 frame with two text nodes. Verified against the code rather than assumed: SettingsTab.tsx:75-92 implements all 13 drill-in rows in its order."
+      "verifiedNote": "2026-09-08: the board's own frame name reads 'RETIRED 2026-09-02, not a screen' — a 1440x400 frame with two text nodes. Verified against the code rather than assumed: SettingsTab.tsx:75-92 implements all 13 drill-in rows in its order. Superseded 2026-09-25 (FC-12/FC-13): formalized as retired rather than left 'active'/'unreachable' — Settings shipped as the fullpage Clone (3397:32915) with SettingsTab's own drill-in, which is what the board's own frame name already said."
     },
     {
       "nodeId": "1344:7165",
