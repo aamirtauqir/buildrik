@@ -323,7 +323,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 1,
-    "compared": 39
+    "compared": 19
   },
   "insert-blocks-expanded": {
     "contrastFailures": 0,
@@ -331,7 +331,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 1,
-    "compared": 25
+    "compared": 13
   },
   "insert-components-expanded": {
     "contrastFailures": 0,
@@ -339,7 +339,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 1,
-    "compared": 32
+    "compared": 17
   },
   "insert-mine-expanded": {
     "contrastFailures": 0,
@@ -347,7 +347,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 1,
-    "compared": 41
+    "compared": 21
   },
   "review-panel-detached-present": {
     "contrastFailures": 6,
@@ -1125,7 +1125,7 @@
   },
   "insert-dragging": {
     "skipped": 2,
-    "compared": 20
+    "compared": 17
   },
   "notifications-unread": {
     "contrastFailures": 4,
@@ -1257,7 +1257,7 @@
     },
     "nonTextPairs": {},
     "skipped": 2,
-    "compared": 23
+    "compared": 6
   },
   "cmdk-typing": {
     "contrastFailures": 1,
@@ -1267,7 +1267,7 @@
     },
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 19
+    "compared": 6
   },
   "cmdk-results": {
     "contrastFailures": 1,
@@ -1277,7 +1277,7 @@
     },
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 31
+    "compared": 12
   },
   "cmdk-no-results": {
     "skipped": 2,
@@ -1291,7 +1291,7 @@
     },
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 29
+    "compared": 11
   },
   "s7-settings-headers": {
     "skipped": 0,

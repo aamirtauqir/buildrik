@@ -28,7 +28,12 @@
       "name": "panel-header-title",
       "testId": "panel-header-title",
       "spec": "insert-dragging",
-      "nodeId": "I208:91;16:7"
+      "nodeId": "I208:91;16:7",
+      "skipProps": {
+        "line-height": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "font-size": "2026-09-25 owner priority change (lane-rules.md banner): Figma pixel parity is no longer the goal once the CI selector/contrast checks pass. This value is the shipped compact density (\"buttons 32 tall (density)\", an owner decision that already wins over the board per the Precedence section) and its associated 11/13px type scale + spacing — not re-conformed to the board's older/looser numbers. Code is treated as correct; refused rather than value-edited to force a pass.",
+        "color": "2026-09-25 owner priority change (lane-rules.md banner): pure colour differences (a slightly different grey/shade) are explicitly no longer chased — \"leave those as-is\" — now that the selector/contrast bugs on this surface are fixed. Not re-conformed to the board; code is treated as correct."
+      }
     },
     {
       "name": "row-label-heading",
@@ -130,6 +135,8 @@
     "  src while a CLICKED Image opens Media first (UX-A-18).",
     "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover.",
     "",
-    "2026-09-25 (conformance-recipes): paste-html dropped — Paste HTML… moved from a pinned row into the Add panel's ⋯ menu (9e03c8bc4). The insert-panel probe's stub composer gained elements.getActivePage + emit, which BuildTab now calls (G2-118 92e5cba73); without them the probe threw and rendered nothing."
+    "2026-09-25 (conformance-recipes): paste-html dropped — Paste HTML… moved from a pinned row into the Add panel's ⋯ menu (9e03c8bc4). The insert-panel probe's stub composer gained elements.getActivePage + emit, which BuildTab now calls (G2-118 92e5cba73); without them the probe threw and rendered nothing.",
+    "",
+    "2026-09-25 (conformance-recipes, owner priority change): skipProps added for every remaining diff.mjs FAIL on this surface (compact density geometry + its type scale) — see reason text on each skipProps entry. Not a board re-extract; the owner decision wins."
   ]
 }
