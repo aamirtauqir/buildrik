@@ -34,9 +34,19 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       className="min-h-screen [font-variant-numeric:tabular-nums]"
       style={{ backgroundColor: "var(--color-bg-surface)", fontFamily: "'Inter', 'Inter Tight', sans-serif" }}
     >
+      {/* Visually hidden until focused — a keyboard user landing on the page
+          otherwise has to tab through the full top nav + sidebar before
+          reaching the content on every single page. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[10000] focus:rounded-md focus:px-3 focus:py-2 focus:text-body-sm focus:font-medium focus:text-white"
+        style={{ backgroundColor: "var(--color-primary)" }}
+      >
+        Skip to content
+      </a>
       <TopNav onSearch={() => setPaletteOpen(true)} />
       {showSidebar && <Sidebar />}
-      <main className={cn("pt-[var(--topnav-h)]", showSidebar && "lg:ml-[var(--sidebar-w)]")}>
+      <main id="main-content" className={cn("pt-[var(--topnav-h)]", showSidebar && "lg:ml-[var(--sidebar-w)]")}>
         <div className="px-10 pb-[60px] pt-8">{children}</div>
       </main>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

@@ -94,7 +94,7 @@ export function BulkActionBar({ selectedCount, archivedView = false, onAction, o
           </div>
         );
       })}
-      <button onClick={onClear} className="ml-1 rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+      <button onClick={onClear} aria-label="Clear selection" className="ml-1 rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
     </div>
   );
 }

@@ -28,6 +28,7 @@ interface MemberActionsProps {
 export function MemberActions({ memberId, isOwner, isCurrentUser, isSuspended, onAction }: MemberActionsProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -37,11 +38,24 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, isSuspended, o
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   if (isOwner) return null;
 
   return (
     <div className="relative" ref={ref}>
       <button
+        ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)] transition-colors"
         aria-label="Member actions"
@@ -49,7 +63,7 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, isSuspended, o
         <MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
+        <div role="menu" className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
           {(isSuspended ? SUSPENDED_ACTIONS : ACTIVE_ACTIONS).map((item) => {
             const isDestructive = item.action === "delete" || item.action === "revoke";
             // Never let a member act destructively on their own row — no
