@@ -14,7 +14,7 @@ vi.mock("../../nesting", () => ({
 }));
 
 import { findValidDropTarget } from "../dropTarget";
-import type { Element } from "../../../../engine/elements/Element";
+import type { Element } from "@/engine/elements/Element";
 
 function makeElement(
   id: string,

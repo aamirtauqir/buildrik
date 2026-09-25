@@ -10,7 +10,7 @@ import * as React from "react";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import type { DeviceType } from "../../../shared/types";
 import { migrateLegacyPanelState } from "./panelStateMigration";
-import { getTabMode, type GroupedTabId } from "../../rail/tabsConfig";
+import { getTabMode, type GroupedTabId } from "@/editor/rail/tabsConfig";
 
 // ============================================
 // Constants

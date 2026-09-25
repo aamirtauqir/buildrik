@@ -23,7 +23,7 @@ import {
   getComponentSyncPendingCount,
   retryComponentSync,
 } from "../../../services/componentSync";
-import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { captureComponentThumbnail } from "@/editor/sidebar/tabs/component-library/captureComponentThumbnail";
 
 export function useComponentSync(

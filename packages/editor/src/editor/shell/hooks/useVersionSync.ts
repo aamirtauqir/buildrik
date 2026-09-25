@@ -22,7 +22,7 @@ import {
   getVersionSyncPendingCount,
   retryVersionSync,
 } from "../../../services/versionSync";
-import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
 export function useVersionSync(
   composer: Composer | null,
