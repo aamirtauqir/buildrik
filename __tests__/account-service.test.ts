@@ -20,10 +20,65 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+const createNotificationMock = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/server/services/notification.trigger", () => ({
+  createNotification: (...a: unknown[]) => createNotificationMock(...a),
+}));
+
 import { prisma } from "@/lib/prisma";
 
 describe("Account Service", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); createNotificationMock.mockClear(); });
+
+  // A-20: every account-security notification needs a destination so the
+  // bell row is clickable — these had none.
+  describe("account security notifications carry actionUrl (A-20)", () => {
+    it("changePassword", async () => {
+      const { changePassword } = await import("@/server/services/account.service");
+      const bcrypt = await import("bcryptjs");
+      const realHash = await bcrypt.hash("current-password-1", 4);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", passwordHash: realHash } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
+      await changePassword("u1", "current-password-1", "new-password-1");
+      expect(createNotificationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "SECURITY_PASSWORD_CHANGED", actionUrl: "/dashboard/settings/security" }),
+      );
+    });
+
+    it("setPassword", async () => {
+      const { setPassword } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", passwordHash: null } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
+      await setPassword("u1", "new-password-1");
+      expect(createNotificationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "SECURITY_PASSWORD_CHANGED", actionUrl: "/dashboard/settings/security" }),
+      );
+    });
+
+    it("confirm2FA", async () => {
+      const { confirm2FA } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ twoFactorSecret: "SECRETSECRETSECRETS" } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
+      const otplib = await import("otplib");
+      vi.spyOn(otplib.authenticator, "verify").mockReturnValue(true);
+      await confirm2FA("u1", "123456");
+      expect(createNotificationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "SECURITY_2FA_CHANGED", actionUrl: "/dashboard/settings/security" }),
+      );
+    });
+
+    it("disable2FA", async () => {
+      const { disable2FA } = await import("@/server/services/account.service");
+      const bcrypt = await import("bcryptjs");
+      const realHash = await bcrypt.hash("my-password-1", 4);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", passwordHash: realHash } as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
+      await disable2FA("u1", "my-password-1");
+      expect(createNotificationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "SECURITY_2FA_CHANGED", actionUrl: "/dashboard/settings/security" }),
+      );
+    });
+  });
 
   describe("getProfile", () => {
     it("returns user profile", async () => {
@@ -242,13 +297,23 @@ describe("Integrations Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   describe("listIntegrations", () => {
-    it("returns workspace integrations", async () => {
+    it("returns the full config for an ADMIN (revealFullConfig=true)", async () => {
       const { listIntegrations } = await import("@/server/services/integrations.service");
       vi.mocked(prisma.workspaceIntegration.findMany).mockResolvedValue([
-        { id: "int1", provider: "GOOGLE_ANALYTICS", config: { trackingId: "G-XXX" }, isActive: true },
+        { id: "int1", provider: "SLACK", config: { webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" }, isActive: true },
       ] as any);
-      const result = await listIntegrations("ws1");
-      expect(result).toHaveLength(1);
+      const result = await listIntegrations("ws1", true);
+      expect(result[0].config).toEqual({ webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" });
+    });
+
+    it("redacts secrets and full webhook path for a non-admin (S-10)", async () => {
+      const { listIntegrations } = await import("@/server/services/integrations.service");
+      vi.mocked(prisma.workspaceIntegration.findMany).mockResolvedValue([
+        { id: "int1", provider: "SLACK", config: { webhookUrl: "https://hooks.slack.com/services/T1/B1/xyz", apiKey: "sk-live-secret" }, isActive: true },
+      ] as any);
+      const result = await listIntegrations("ws1", false);
+      expect(result[0].config).not.toHaveProperty("apiKey");
+      expect(result[0].config.webhookUrl).toBe("https://hooks.slack.com/…");
     });
   });
 

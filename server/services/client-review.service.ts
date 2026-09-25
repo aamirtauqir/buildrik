@@ -33,6 +33,36 @@ import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 /** 90 days — long enough for a slow client, short enough that a leaked link dies. */
 const TOKEN_TTL_DAYS = 90;
 
+/**
+ * S-7 (controller review round 1): the self-invite/self-approve guards
+ * (submitReview's clientEmail check, identifyReviewer's invitedEmail match,
+ * resolveReviewByToken's self-approval block) all compare email ADDRESSES —
+ * and a plain `trim().toLowerCase()` treats `edie+client@x.com` as a
+ * different address from `edie@x.com`, even though most providers deliver
+ * both to the same mailbox. An EDITOR could invite themselves via a
+ * plus-tagged variant of their own address and every "is this you"
+ * comparison would say no. Gmail/Googlemail additionally ignore dots in the
+ * local part (`e.die@gmail.com` === `edie@gmail.com`).
+ *
+ * SSOT: every comparison in review.service.ts and this file goes through
+ * this one function, on BOTH sides of the comparison — normalizing only the
+ * caller-supplied side and leaving a stored value raw would silently
+ * reintroduce the gap for any address already stored before this shipped.
+ */
+export function normalizeReviewEmail(email: string): string {
+  const trimmed = email.trim().toLowerCase();
+  const at = trimmed.lastIndexOf("@");
+  if (at === -1) return trimmed;
+  let local = trimmed.slice(0, at);
+  const domain = trimmed.slice(at + 1);
+  const plus = local.indexOf("+");
+  if (plus !== -1) local = local.slice(0, plus);
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    local = local.replace(/\./g, "");
+  }
+  return `${local}@${domain}`;
+}
+
 export class ClientReviewError extends Error {
   constructor(
     public code:
@@ -42,7 +72,8 @@ export class ClientReviewError extends Error {
     | "ALREADY_RESOLVED"
     | "NOT_IDENTIFIED"
     | "NOT_INVITED"
-    | "EMAIL_MISMATCH",
+    | "EMAIL_MISMATCH"
+    | "SELF_APPROVAL_BLOCKED",
     message: string,
     /** What a dead-link screen may still name: the agency and the round.
      *  Only set for REVOKED / EXPIRED — a token that resolved to a real row. */
@@ -110,6 +141,7 @@ async function requireLiveReview(token: string) {
       revokedAt: true,
       reviewerId: true,
       invitedEmail: true,
+      requestedById: true,
       snapshotPages: true,
       createdAt: true,
       resolvedAt: true,
@@ -202,7 +234,7 @@ export async function getReviewByToken(token: string) {
  */
 export async function identifyReviewer(token: string, name: string, email: string) {
   const review = await requireLiveReview(token);
-  const normalised = email.trim().toLowerCase();
+  const normalised = normalizeReviewEmail(email);
 
   // The signature must belong to the person the link was sent to. Without this
   // the token holder can sign as anyone — including as an existing reviewer on
@@ -212,7 +244,10 @@ export async function identifyReviewer(token: string, name: string, email: strin
   if (!review.invitedEmail) {
     throw new ClientReviewError("NOT_INVITED", "This link was not sent to anyone.");
   }
-  if (normalised !== review.invitedEmail) {
+  // S-7: normalize BOTH sides — invitedEmail is stored as a plain
+  // trim+lowercase (issueReviewToken keeps the literal typed address for
+  // display), so a plus-tag/dot variant of the same mailbox must still match.
+  if (normalised !== normalizeReviewEmail(review.invitedEmail)) {
     throw new ClientReviewError(
       "EMAIL_MISMATCH",
       "That is not the address this link was sent to.",
@@ -296,6 +331,34 @@ export async function resolveReviewByToken(
   const { review, reviewerId } = await requireIdentifiedReview(token);
   if (review.status !== "PENDING") {
     throw new ClientReviewError("ALREADY_RESOLVED", "This review has already been answered.");
+  }
+  // S-7 defense in depth: submitReview already refuses to mint a token for
+  // the submitter's own address (or a workspace member's), but a row can
+  // predate that check, its invitedEmail can be edited some other way, or a
+  // member can be added to the workspace AFTER the invite was sent — never
+  // let the signer be the person who submitted the round, or anyone
+  // currently an ACTIVE member of the site's workspace (controller review
+  // round 1: the original check only covered the submitter, not other
+  // members).
+  if (status === "APPROVED" && review.invitedEmail) {
+    const invited = normalizeReviewEmail(review.invitedEmail);
+    const [requester, members] = await Promise.all([
+      prisma.user.findUnique({ where: { id: review.requestedById }, select: { email: true } }),
+      prisma.workspaceMember.findMany({
+        where: { workspaceId: review.site.workspaceId, status: "ACTIVE" },
+        select: { user: { select: { email: true } } },
+      }),
+    ]);
+    const isRequester = !!requester?.email && normalizeReviewEmail(requester.email) === invited;
+    const isActiveMember = members.some(
+      (m) => m.user.email && normalizeReviewEmail(m.user.email) === invited,
+    );
+    if (isRequester || isActiveMember) {
+      throw new ClientReviewError(
+        "SELF_APPROVAL_BLOCKED",
+        "This review can't be approved by a member of the workspace that submitted it.",
+      );
+    }
   }
   const resolved = await prisma.reviewRequest.update({
     where: { id: review.id },

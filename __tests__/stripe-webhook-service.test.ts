@@ -61,7 +61,11 @@ describe("Stripe Webhook Service", () => {
       expect(prisma.subscription.update).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ status: "PAST_DUE" }),
       }));
-      expect(prisma.notification.create).toHaveBeenCalled();
+      // A-20: the notification needs a destination — the bell row was
+      // unclickable without one.
+      expect(prisma.notification.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ type: "PAYMENT_FAILED", actionUrl: "/dashboard/settings/billing" }),
+      });
     });
 
     // Regression: dunning used to hang off charge.failed reading

@@ -19,6 +19,7 @@ const siteUpdate = vi.fn();
 const workspaceFindUnique = vi.fn();
 const memberFindUnique = vi.fn();
 const reviewFindFirst = vi.fn();
+const isFeatureEnabledMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -43,6 +44,9 @@ vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: vi.fn(() => Promise.resolve(null)),
   markInactive: vi.fn(),
 }));
+vi.mock("@server/services/feature-flag.service", () => ({
+  isFeatureEnabled: (...a: unknown[]) => isFeatureEnabledMock(...a),
+}));
 
 import { startPublish } from "@server/services/publish.service";
 
@@ -57,6 +61,10 @@ describe("startPublish · approval gate enforcement", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubEnv("NODE_ENV", "development"); // skip the Vercel-connection check
+    // Every existing test in this file predates PD-7/8 and asserts against a
+    // workspace where the layer IS on (that was implicit before; the gate now
+    // also checks it) — default true so those keep exercising "layer on".
+    isFeatureEnabledMock.mockResolvedValue(true);
   });
 
   it("Editor + gate ON + never sent for review → throws APPROVAL_NONE (no job queued)", async () => {
@@ -232,5 +240,57 @@ describe("startPublish · approval gate enforcement", () => {
       if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
+  });
+
+  /* PD-7/8 (controller review round 1): editsRequireApproval=true with
+     agency_layer=false is not a config anyone can ever satisfy — reviews.submit
+     hard-refuses (requireAgencyLayer) when the layer is off, so no review can
+     ever reach APPROVED, and the gate deadlocked every non-owner publish
+     forever. */
+  it("approval ON + agency_layer OFF → EDITOR can publish (gate skips enforcement, no deadlock)", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    isFeatureEnabledMock.mockResolvedValue(false);
+    jobCreate.mockResolvedValue({ id: "job-1" });
+    siteUpdate.mockResolvedValue({});
+
+    let approvalError = false;
+    try {
+      await startPublish("site-1", "ws-1", "user-editor");
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
+    }
+    expect(approvalError).toBe(false);
+    // Never even asked for the latest review — the gate short-circuited before it.
+    expect(reviewFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("approval ON + agency_layer ON → unchanged: EDITOR with no review still throws APPROVAL_NONE", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    isFeatureEnabledMock.mockResolvedValue(true);
+
+    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("asks isFeatureEnabled about the SITE's workspace, not the caller's session workspace", async () => {
+    baseHappyMocks();
+    siteFindUnique.mockResolvedValue({
+      name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", lastEditedAt: null,
+    });
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+    isFeatureEnabledMock.mockResolvedValue(false);
+    jobCreate.mockResolvedValue({ id: "job-1" });
+    siteUpdate.mockResolvedValue({});
+
+    // Not asserting the outcome here (a later, unrelated Vercel-connection
+    // check may still throw) — only that the approval gate asked about the
+    // right workspace before getting there.
+    await startPublish("site-1", "ws-2", "user-editor").catch(() => {});
+    expect(isFeatureEnabledMock).toHaveBeenCalledWith("ws-1", "agency_layer");
   });
 });

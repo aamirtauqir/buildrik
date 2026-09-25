@@ -143,6 +143,7 @@ const MODEL_TO_TABLE = {
   mediaAssetVersion: "media_asset_versions",
   invite: "invites",
   account: "accounts",
+  rateLimitBucket: "rate_limit_buckets",
 } as const;
 
 export type TruncatableModel = keyof typeof MODEL_TO_TABLE;

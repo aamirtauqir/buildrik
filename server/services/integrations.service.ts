@@ -13,10 +13,38 @@ async function assertSafeWebhookConfig(config: Record<string, unknown>): Promise
   }
 }
 
-export async function listIntegrations(workspaceId: string) {
-  return prisma.workspaceIntegration.findMany({
+// Keys in a config blob that never leave the server to a non-admin caller —
+// tokens/secrets/keys are write-only, and a webhook URL is reduced to its
+// origin (S-10: listIntegrations returned the full row, incl. bearer tokens
+// and full webhook paths, to any ACTIVE member).
+const SENSITIVE_CONFIG_KEY = /token|secret|key|password|credential/i;
+
+function redactConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const redacted: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(config)) {
+    if (SENSITIVE_CONFIG_KEY.test(k)) continue;
+    if (k === "webhookUrl" && typeof v === "string") {
+      try {
+        redacted[k] = `${new URL(v).origin}/…`;
+      } catch {
+        redacted[k] = "…";
+      }
+      continue;
+    }
+    redacted[k] = v;
+  }
+  return redacted;
+}
+
+export async function listIntegrations(workspaceId: string, revealFullConfig: boolean) {
+  const rows = await prisma.workspaceIntegration.findMany({
     where: { workspaceId },
   });
+  if (revealFullConfig) return rows;
+  return rows.map((row) => ({
+    ...row,
+    config: redactConfig(row.config as Record<string, unknown>),
+  }));
 }
 
 export async function addIntegration(workspaceId: string, input: AddIntegrationInput, plan: PlanName) {

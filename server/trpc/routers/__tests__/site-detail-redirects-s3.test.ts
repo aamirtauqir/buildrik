@@ -19,7 +19,7 @@ const updateRedirectMock = vi.fn();
 const listRedirectsMock = vi.fn();
 const getRedirectSuggestionsMock = vi.fn();
 const redirectFindUnique = vi.fn();
-const memberFindFirst = vi.fn();
+const getSiteWorkspaceMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -33,6 +33,7 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/server/services/permission.service", () => ({
   assertSiteAccess: (...a: unknown[]) => assertSiteAccessMock(...a),
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
+  getSiteWorkspace: (...a: unknown[]) => getSiteWorkspaceMock(...a),
   PermissionError: class PermissionError extends Error {
     constructor(public code: "NOT_FOUND" | "FORBIDDEN", message?: string) {
       super(message ?? code);
@@ -60,7 +61,6 @@ import { PermissionError } from "@/server/services/permission.service";
 
 const prisma = {
   redirect: { findUnique: redirectFindUnique },
-  workspaceMember: { findFirst: memberFindFirst },
 };
 function caller() {
   return siteDetailRouter.createCaller({ session: { user: { id: "u_1" } }, prisma } as never);
@@ -69,9 +69,9 @@ function caller() {
 beforeEach(() => {
   [
     assertSiteAccessMock, checkSiteRoleMock, createRedirectMock, updateRedirectMock,
-    listRedirectsMock, getRedirectSuggestionsMock, redirectFindUnique, memberFindFirst,
+    listRedirectsMock, getRedirectSuggestionsMock, redirectFindUnique, getSiteWorkspaceMock,
   ].forEach((m) => m.mockReset());
-  memberFindFirst.mockResolvedValue({ workspace: { plan: "PRO" } });
+  getSiteWorkspaceMock.mockResolvedValue({ workspaceId: "ws1", plan: "PRO", editsRequireApproval: false });
 });
 
 describe("siteDetail.redirects.create", () => {

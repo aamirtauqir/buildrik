@@ -7,7 +7,7 @@ import {
   sendReviewResolvedEmail,
   sendReviewInviteEmail,
 } from "@/server/services/email.service";
-import { issueReviewToken } from "@/server/services/client-review.service";
+import { issueReviewToken, normalizeReviewEmail } from "@/server/services/client-review.service";
 import { isApprovalStale } from "@/server/services/publish-approval";
 import { logAuditEvent } from "@/server/services/audit.service";
 
@@ -46,6 +46,36 @@ export async function submitReview(
    *  live draft (contracts §1.6). Every submit re-renders and overwrites it. */
   snapshotPages?: { path: string; html: string }[],
 ) {
+  // S-7: an EDITOR could invite an address they control themselves (their own
+  // email, or another workspace member's) and then approve their own
+  // submission through the client link — the "second pair of eyes" resolveReview
+  // already enforces for the internal admin path had no equivalent here. Reject
+  // before a token is ever minted.
+  if (clientEmail) {
+    // S-7: normalized (drops +tag, and dots for gmail/googlemail) so
+    // `edie+client@x.com` can't dodge the "is this you" check — see
+    // normalizeReviewEmail's own doc comment for why this must be shared
+    // with client-review.service.ts's checks, not reimplemented here.
+    const normalisedClientEmail = normalizeReviewEmail(clientEmail);
+    const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+    const requester = await prisma.user.findUnique({ where: { id: requestedById }, select: { email: true } });
+    if (requester?.email && normalizeReviewEmail(requester.email) === normalisedClientEmail) {
+      throw new ReviewError("BAD_REQUEST", "You can't invite yourself to review your own submission.");
+    }
+    if (site) {
+      const members = await prisma.workspaceMember.findMany({
+        where: { workspaceId: site.workspaceId, status: "ACTIVE" },
+        select: { user: { select: { email: true } } },
+      });
+      if (members.some((m) => m.user.email && normalizeReviewEmail(m.user.email) === normalisedClientEmail)) {
+        throw new ReviewError(
+          "BAD_REQUEST",
+          "That address belongs to a workspace member — invite an external reviewer instead.",
+        );
+      }
+    }
+  }
+
   // Only overwrite the snapshot when the caller rendered one — an internal
   // submit with no editor render leaves any existing snapshot untouched.
   const snapshot = snapshotPages ? { snapshotPages: snapshotPages as Prisma.InputJsonValue } : {};

@@ -137,6 +137,45 @@ export interface DynamicPage {
   seoDescription: string;
 }
 
+/**
+ * Page-generating collections whose bound template page is missing from the
+ * site's CURRENT pages — a stale binding (the template page was deleted or
+ * renamed since the collection was configured). Used by
+ * `runPrePublishChecks` to surface the miss as a visible warning BEFORE
+ * publish, instead of the deploy silently shipping without those pages
+ * (see `appendDynamicPagesToPublish`, which is the authoritative,
+ * publish-time check against the actual rendered export paths).
+ *
+ * Matches by the same filename shape the exporter's `pageFileNames` assigns
+ * (`${slug}.html`, `index.html` for the home page) — slug is unique per
+ * site (`@@unique([siteId, slug])`), so this reproduces the exporter's
+ * naming without duplicating its de-duplication logic.
+ */
+export interface StaleTemplateBindingsResult {
+  /** True when the site has at least one page-generating collection — lets a
+   *  caller distinguish "nothing to check" from "checked, none stale"
+   *  (controller review round 1: a pre-publish check that always shows a
+   *  "pass" row is noise for the near-all-sites-have-no-CMS-collection case). */
+  hasPageGeneratingCollections: boolean;
+  stale: { collectionId: string; collectionName: string; templatePath: string }[];
+}
+
+export async function findStaleTemplateBindings(
+  siteId: string,
+  pages: { slug: string; isHomePage: boolean }[],
+): Promise<StaleTemplateBindingsResult> {
+  const cols = await prisma.cmsCollection.findMany({
+    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    select: { id: true, name: true, pageTemplatePath: true },
+  });
+  if (cols.length === 0) return { hasPageGeneratingCollections: false, stale: [] };
+  const fileNames = new Set(pages.map((p) => (p.isHomePage ? "index.html" : `${p.slug}.html`)));
+  const stale = cols
+    .filter((c) => !fileNames.has(c.pageTemplatePath as string))
+    .map((c) => ({ collectionId: c.id, collectionName: c.name, templatePath: c.pageTemplatePath as string }));
+  return { hasPageGeneratingCollections: true, stale };
+}
+
 export interface GeneratedPage {
   path: string;
   content: string;
@@ -184,6 +223,45 @@ export async function resolveDynamicPages(
  * yield []. (The editor supplies templateHtml from the page bound to this
  * collection; the deploy of these files is verified at publish time.)
  */
+// A17: substitution must not reach inside <script>/<style> — a field value
+// containing e.g. `{` could otherwise land inside inline JS/CSS unescaped
+// and unexpected (the surrounding markup is HTML-escaped by design;
+// script/style content is not HTML). Splits the template into
+// script/style spans and the rest, substitutes only the rest, and
+// reassembles in order.
+function substituteOutsideScriptStyle(
+  html: string,
+  data: Record<string, unknown>,
+): string {
+  const spanRe = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
+  let result = "";
+  let last = 0;
+  let m: RegExpExecArray | null;
+  const sub = (segment: string) =>
+    segment.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+      const v = data[key];
+      return v == null ? "" : escapeHtml(String(v));
+    });
+  while ((m = spanRe.exec(html))) {
+    result += sub(html.slice(last, m.index));
+    result += m[0]; // script/style span verbatim — never substituted
+    last = spanRe.lastIndex;
+  }
+  result += sub(html.slice(last));
+  return result;
+}
+
+// A17: the template page already has its OWN <title>/<meta name="description">
+// (it's a real, exportable page) — injecting the generated page's SEO without
+// removing them produced two <title> elements, and browsers/crawlers use the
+// first, so the pattern-derived title the collection is configured for never
+// actually won.
+function stripExistingSeoTags(html: string): string {
+  return html
+    .replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, "")
+    .replace(/<meta\b[^>]*\bname\s*=\s*["']description["'][^>]*>/gi, "");
+}
+
 export async function generateDynamicPages(
   siteId: string,
   collectionId: string,
@@ -200,15 +278,13 @@ export async function generateDynamicPages(
     orderBy: { updatedAt: "desc" },
     select: { id: true, data: true },
   });
+  const cleanedTemplate = stripExistingSeoTags(templateHtml);
   return entries.map((e) => {
     const data = (e.data as Record<string, unknown>) ?? {};
     const slug = applyPattern(col.pageSlugPattern as string, data, true);
     const seoTitle = col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "";
     const seoDescription = col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "";
-    let html = templateHtml.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
-      const v = data[key];
-      return v == null ? "" : escapeHtml(String(v));
-    });
+    let html = substituteOutsideScriptStyle(cleanedTemplate, data);
     const seoTags =
       `<title>${escapeHtml(seoTitle)}</title>` +
       (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
@@ -238,7 +314,18 @@ export async function appendDynamicPagesToPublish(
   const result = [...pages];
   for (const col of cols) {
     const template = pages.find((p) => p.path === col.pageTemplatePath);
-    if (!template) continue;
+    if (!template) {
+      // A-17: was a silent `continue` — a collection whose template page was
+      // deleted/renamed since binding produced NO generated pages with no
+      // signal anywhere. runPrePublishChecks (publish.service.ts) surfaces
+      // this as a visible warning before the user ever gets here; this stays
+      // a warn-only skip (not a throw) so a stale binding degrades a publish
+      // rather than failing one outright — see A-17's risk_notes.
+      console.warn(
+        `[cms] collection ${col.id} on site ${siteId}: template page "${col.pageTemplatePath}" is not in this publish — skipping its generated pages.`,
+      );
+      continue;
+    }
     const generated = await generateDynamicPages(siteId, col.id, template.html);
     for (const g of generated) result.push({ path: g.path, html: g.content });
   }

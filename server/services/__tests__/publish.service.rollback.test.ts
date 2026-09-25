@@ -65,6 +65,18 @@ describe("completePublish — payload retention", () => {
     expect("log" in updateArg.data).toBe(false);
   });
 
+  it("carries an optional progress/steps through to the COMPLETED write (D-1 — the worker's inline update used to set these, completePublish did not)", async () => {
+    jobFindUnique.mockResolvedValue({ id: "j1", siteId: "s1" });
+    jobUpdate.mockResolvedValue({ id: "j1" });
+    siteUpdate.mockResolvedValue({});
+    jobFindMany.mockResolvedValue([]);
+    const steps = [{ name: "Generating pages", status: "done" }];
+    await completePublish("j1", "https://x.vercel.app", { progress: 100, steps });
+    const updateArg = jobUpdate.mock.calls[0][0];
+    expect(updateArg.data.progress).toBe(100);
+    expect(updateArg.data.steps).toBe(steps);
+  });
+
   it("prunes the payload on COMPLETED jobs beyond the 20 most recent", async () => {
     jobFindUnique.mockResolvedValue({ id: "j21", siteId: "s1" });
     jobUpdate.mockResolvedValue({ id: "j21" });

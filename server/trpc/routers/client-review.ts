@@ -56,8 +56,10 @@ function translate(e: unknown): never {
               // inline under the email field, and it must not read as "your
               // link is dead" when the link is fine and the address is wrong.
               "BAD_REQUEST"
-            : // EXPIRED and REVOKED are both "this link is dead" — FORBIDDEN, so
-              // the page can render the expired screen rather than a 404.
+            : // EXPIRED, REVOKED and SELF_APPROVAL_BLOCKED (S-7 — the submitter
+              // can't sign their own round) are all "this action is refused" —
+              // FORBIDDEN, so the page can render its blocked/dead-link screen
+              // rather than a 404.
               "FORBIDDEN";
     /* An OBJECT, not the bare code string: the global errorFormatter lifts a
        cause's enumerable fields with Object.entries, so a string arrived at the

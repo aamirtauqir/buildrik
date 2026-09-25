@@ -6,6 +6,7 @@ import { validateToken, invalidateToken } from "@server/services/token.service";
 import { encode } from "next-auth/jwt";
 import { logAuditEvent } from "@server/services/audit.service";
 import { recordDeviceAndAlert } from "@server/services/device-alert.service";
+import { clientIp } from "@lib/request-ip";
 
 const createSessionSchema = z.object({
   sessionToken: z.string().uuid(),
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
       sessionToken: randomUUID(),
       expires,
       device: req.headers.get("user-agent") ?? undefined,
-      ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined,
+      ip: clientIp(req.headers, null),
       current: true,
     },
   });
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
   await recordDeviceAndAlert(
     user.id,
     user.email,
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "",
+    clientIp(req.headers, ""),
     req.headers.get("user-agent") || ""
   );
 

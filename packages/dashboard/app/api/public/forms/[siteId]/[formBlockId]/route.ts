@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { submitForm } from "@server/services/form-submission.service";
 import { checkRateLimit } from "@server/services/rate-limiter";
 import { formSubmissionSchema } from "@buildrik/shared/schemas/forms";
+import { clientIp } from "@lib/request-ip";
 
 const FORM_SUBMIT_MAX = 10;
 const FORM_SUBMIT_WINDOW_MS = 60_000;
@@ -14,7 +15,7 @@ export async function POST(
   { params }: { params: Promise<{ siteId: string; formBlockId: string }> }
 ) {
   const { siteId, formBlockId } = await params;
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const ip = clientIp(req.headers);
 
   const limit = await checkRateLimit(
     `form-submit:${siteId}:${formBlockId}:${ip}`,

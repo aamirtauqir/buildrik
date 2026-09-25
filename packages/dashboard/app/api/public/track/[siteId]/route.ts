@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { recordPageView } from "@server/services/analytics.service";
 import { checkRateLimit } from "@server/services/rate-limiter";
+import { clientIp } from "@lib/request-ip";
 
 // First-party analytics beacon. Published sites POST a page-view here on load.
 // Public + cross-origin (the deployed site lives on its own host), so it must
@@ -24,7 +25,7 @@ export async function POST(
   { params }: { params: Promise<{ siteId: string }> }
 ) {
   const { siteId } = await params;
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const ip = clientIp(req.headers);
 
   const limit = await checkRateLimit(`track:${siteId}:${ip}`, TRACK_MAX, TRACK_WINDOW_MS);
   if (!limit.allowed) {
@@ -41,6 +42,9 @@ export async function POST(
   const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
   const str = (v: unknown) => (typeof v === "string" ? v : undefined);
 
+  // recordPageView caps every string column server-side (analytics.service.ts
+  // `cap()`) before it reaches the DB — the unbounded write S-10 flagged here
+  // was already closed there; this route need not duplicate the cap.
   await recordPageView(siteId, {
     path: str(body.path) ?? "/",
     referrer: str(body.referrer) ?? req.headers.get("referer"),

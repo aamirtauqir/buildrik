@@ -17,10 +17,6 @@
 
 import { prisma } from "@lib/prisma";
 
-/** A schedule must be in the future, and not so far out it is certainly a typo. */
-const MIN_LEAD_MS = 60_000;                       // one minute
-const MAX_LEAD_MS = 365 * 24 * 60 * 60 * 1000;    // one year
-
 export class ScheduledPublishError extends Error {
   constructor(public code: string, message: string) {
     super(message);
@@ -28,49 +24,29 @@ export class ScheduledPublishError extends Error {
   }
 }
 
-export async function schedulePublish(input: {
+/**
+ * A-16 / PD-18: when a schedule comes due, `dueSchedules` → `startPublish` →
+ * the worker, which refuses any job with no page-HTML payload — only the
+ * EDITOR renders one, and nothing captures a page snapshot at schedule time.
+ * A schedule created today is GUARANTEED to fail later, silently (there is
+ * no UI caller to warn anyone at creation time or at failure time). Refuse
+ * it here instead of letting a promise get made that cannot be kept. Safe:
+ * `schedulePublish` has no production caller today (confirmed absent from
+ * `packages/`). The full validation + create implementation this replaced
+ * (lead-time bounds, the partial-unique-index ALREADY_SCHEDULED race) is in
+ * git history — restore it in the same commit that ships a server-side
+ * renderer.
+ */
+export async function schedulePublish(_input: {
   siteId: string;
   workspaceId: string;
   userId: string;
   scheduledFor: Date;
-}) {
-  const lead = input.scheduledFor.getTime() - Date.now();
-  if (Number.isNaN(lead)) {
-    throw new ScheduledPublishError("INVALID_DATE", "That is not a valid date and time.");
-  }
-  if (lead < MIN_LEAD_MS) {
-    throw new ScheduledPublishError(
-      "TOO_SOON",
-      "Pick a time at least a minute from now — anything sooner should just be published.",
-    );
-  }
-  if (lead > MAX_LEAD_MS) {
-    throw new ScheduledPublishError("TOO_FAR", "Pick a time within the next year.");
-  }
-
-  /* The partial unique index (`scheduled_publishes_site_pending_unique`) is the
-     real guard: two concurrent requests can both pass a findFirst check and
-     only the database can refuse the second. This read exists to turn that
-     refusal into a sentence a person can act on. */
-  try {
-    return await prisma.scheduledPublish.create({
-      data: {
-        siteId: input.siteId,
-        workspaceId: input.workspaceId,
-        createdBy: input.userId,
-        scheduledFor: input.scheduledFor,
-        status: "PENDING",
-      },
-    });
-  } catch (e) {
-    if (typeof e === "object" && e !== null && (e as { code?: string }).code === "P2002") {
-      throw new ScheduledPublishError(
-        "ALREADY_SCHEDULED",
-        "This site already has a publish scheduled. Cancel it first to pick a new time.",
-      );
-    }
-    throw e;
-  }
+}): Promise<never> {
+  throw new ScheduledPublishError(
+    "NO_RENDERER",
+    "Scheduled publish isn't available yet — publish from the editor instead.",
+  );
 }
 
 /** Cancelling RECORDS the cancellation; it never deletes the row. */

@@ -25,6 +25,20 @@ import { modelSchema, DEFAULT_MODEL, aiQuotaSchema } from "@buildrik/shared/sche
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 
+// Every provider-error catch below releases the quota unit it reserved, then
+// throws a fixed client-facing message with the real error logged
+// server-side. If releaseQuota itself throws (DB hiccup releasing the
+// reservation), that raw error must not replace the fixed message the catch
+// was about to throw — it's swallowed here and logged, so the caller always
+// gets the masked message, never a leaked DB error.
+async function safeReleaseQuota(userId: string): Promise<void> {
+  try {
+    await releaseQuota(userId);
+  } catch (e) {
+    console.error("[ai] releaseQuota failed", e);
+  }
+}
+
 // Reserve one AI unit for the user's tier-resolved model before a provider
 // call. content/page/layout previously called the provider with NO quota
 // reservation — unlimited free AI / cost-abuse exposure. Throws on exhaustion.
@@ -44,8 +58,8 @@ const contentInputSchema = z.object({
   type: z.enum(["content", "layout", "section"]),
   options: z
     .object({
-      tone: z.string().optional(),
-      length: z.string().optional(),
+      tone: z.string().max(100).optional(),
+      length: z.string().max(100).optional(),
     })
     .optional(),
 });
@@ -61,13 +75,13 @@ const pageInputSchema = z.object({
 
 const layoutInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
-  sectionType: z.string().optional(),
+  sectionType: z.string().max(100).optional(),
 });
 
 const summarizeInputSchema = z.object({
   versionName: z.string().min(1).max(200),
   changes: z.object({
-    elementName: z.string(),
+    elementName: z.string().max(200),
     summary: z.object({
       style: z.number().int().nonnegative(),
       text: z.number().int().nonnegative(),
@@ -75,14 +89,16 @@ const summarizeInputSchema = z.object({
       content: z.number().int().nonnegative(),
       other: z.number().int().nonnegative(),
     }),
-    changes: z.array(
-      z.object({
-        type: z.enum(["style", "text", "layout", "content", "other"]),
-        property: z.string(),
-        before: z.string(),
-        after: z.string(),
-      })
-    ),
+    changes: z
+      .array(
+        z.object({
+          type: z.enum(["style", "text", "layout", "content", "other"]),
+          property: z.string().max(100),
+          before: z.string().max(2000),
+          after: z.string().max(2000),
+        })
+      )
+      .max(200),
   }),
 });
 
@@ -90,8 +106,8 @@ const milestoneSuggestInputSchema = z.object({
   recentChanges: z
     .array(
       z.object({
-        id: z.string(),
-        label: z.string(),
+        id: z.string().max(100),
+        label: z.string().max(200),
         timestamp: z.number(),
         type: z.enum(["checkpoint", "patch"]),
       })
@@ -106,7 +122,7 @@ const milestoneSuggestInputSchema = z.object({
 });
 
 const pageElementRefSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).max(100),
   type: z.string().min(1).max(40),
   text: z.string().max(200).optional(),
 });
@@ -127,7 +143,7 @@ const mediaAssetRefSchema = z.object({
 });
 
 const scopeSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("element"), id: z.string().min(1) }),
+  z.object({ kind: z.literal("element"), id: z.string().min(1).max(100) }),
   // Page scope may carry the page's element list for multi-element edits (P3),
   // the design-token registry for set-token recall (W4), and the media library
   // for set-image recall (W5).
@@ -162,6 +178,8 @@ export const aiRouter = router({
       try {
         return await generateContent(input);
       } catch (e: unknown) {
+        await safeReleaseQuota(ctx.session.user.id);
+        console.error("[ai.content] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -174,8 +192,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Content generation failed",
+          message: "Content generation failed",
         });
       }
     }),
@@ -187,6 +204,8 @@ export const aiRouter = router({
       try {
         return await generatePage(input);
       } catch (e: unknown) {
+        await safeReleaseQuota(ctx.session.user.id);
+        console.error("[ai.page] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -199,8 +218,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Page generation failed",
+          message: "Page generation failed",
         });
       }
     }),
@@ -212,6 +230,8 @@ export const aiRouter = router({
       try {
         return await generateLayout(input);
       } catch (e: unknown) {
+        await safeReleaseQuota(ctx.session.user.id);
+        console.error("[ai.layout] provider error", e);
         if (
           e instanceof Error &&
           "status" in e &&
@@ -224,19 +244,23 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            e instanceof Error ? e.message : "Layout generation failed",
+          message: "Layout generation failed",
         });
       }
     }),
 
   summarize: protectedProcedure
     .input(summarizeInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await summarizeChanges(input.versionName, input.changes);
       } catch (e: unknown) {
+        await safeReleaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
+        // Never echo the provider's raw error text to the client (S-8) — log
+        // it server-side and return a fixed message.
+        console.error("[ai.summarize] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -245,18 +269,21 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Summary generation failed",
+          message: "Summary generation failed",
         });
       }
     }),
 
   milestoneSuggest: protectedProcedure
     .input(milestoneSuggestInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await suggestMilestone(input.recentChanges, input.pageStructure);
       } catch (e: unknown) {
+        await safeReleaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
+        console.error("[ai.milestoneSuggest] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -265,7 +292,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Milestone suggestion failed",
+          message: "Milestone suggestion failed",
         });
       }
     }),
@@ -292,9 +319,10 @@ export const aiRouter = router({
       try {
         assertProviderConfigured(model);
       } catch (e) {
+        console.error("[ai.streamPrompt] provider not configured", e);
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: e instanceof Error ? e.message : "AI provider not configured",
+          message: "AI provider not configured",
         });
       }
       // Reserve one unit atomically before the provider call (closes the
@@ -317,8 +345,9 @@ export const aiRouter = router({
             model,
           });
         } catch (e) {
-          await releaseQuota(userId);
-          throw e;
+          await safeReleaseQuota(userId);
+          console.error("[ai.streamPrompt] plan generation error", e);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Plan generation failed" });
         }
         yield { type: "plan" as const, plan: { steps } };
         yield { type: "done" as const };
@@ -346,8 +375,9 @@ export const aiRouter = router({
                   model,
                 });
         } catch (e) {
-          await releaseQuota(userId);
-          throw e;
+          await safeReleaseQuota(userId);
+          console.error("[ai.streamPrompt] edit-command generation error", e);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Edit generation failed" });
         }
         yield {
           type: "edit" as const,
@@ -372,8 +402,9 @@ export const aiRouter = router({
           yield chunk;
         }
       } catch (e) {
-        if (!delivered) await releaseQuota(userId);
-        throw e;
+        if (!delivered) await safeReleaseQuota(userId);
+        console.error("[ai.streamPrompt] stream error", e);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "AI response failed" });
       }
     }),
 
@@ -398,8 +429,9 @@ export const aiRouter = router({
         });
         return { raw };
       } catch (e: unknown) {
-        await releaseQuota(userId);
+        await safeReleaseQuota(userId);
         const err = e as { status?: number; message?: string };
+        console.error("[ai.componentSchema] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -408,7 +440,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Component schema generation failed",
+          message: "Component schema generation failed",
         });
       }
     }),

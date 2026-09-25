@@ -2,9 +2,10 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock } from "@server/services/publish-approval";
+import { isFeatureEnabled } from "@server/services/feature-flag.service";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -26,7 +27,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
        null-safe path filter is more fragile than reading a handful of rows. */
     prisma.page.findMany({
       where: { siteId },
-      select: { id: true, name: true, blocks: true, settings: true },
+      select: { id: true, name: true, blocks: true, settings: true, slug: true, isHomePage: true },
     }),
     prisma.site.findUnique({
       where: { id: siteId },
@@ -103,6 +104,26 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." });
   } else {
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });
+  }
+
+  // CMS dynamic-page templates (A-17): a page-generating collection whose
+  // bound template page was deleted/renamed since binding would otherwise
+  // silently ship without its generated pages — surfaced here, before publish,
+  // instead of only as a server log at publish time. Skipped entirely (no
+  // row at all) when the site has no page-generating collection — a "pass"
+  // row for a check that never applies is noise (controller review round 1).
+  const templateBindings = await findStaleTemplateBindings(siteId, allPages);
+  if (templateBindings.hasPageGeneratingCollections) {
+    if (templateBindings.stale.length > 0) {
+      const names = templateBindings.stale.map((s) => s.collectionName).join(", ");
+      checks.push({
+        label: "CMS templates",
+        status: "warning",
+        detail: `${templateBindings.stale.length === 1 ? "Collection" : "Collections"} ${names}: the bound template page no longer exists — its generated pages won't be published.`,
+      });
+    } else {
+      checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
+    }
   }
 
   const hasFail = checks.some((c) => c.status === "fail");
@@ -258,7 +279,13 @@ export async function startPublish(
        approval and no error. The deploy 50 lines below already uses
        `site.workspaceId`; only the gate was reading the session value. */
     const gateWorkspaceId = site.workspaceId;
-    const [workspace, member] = await Promise.all([
+    // PD-7/8 (controller review round 1): reviews live behind `agency_layer` —
+    // reviews.submit hard-refuses (requireAgencyLayer) when the flag is off, so
+    // a workspace with editsRequireApproval=true but agency_layer=false has NO
+    // way to ever produce an APPROVED review. Enforcing the gate there deadlocks
+    // every non-owner publish forever. Only enforce approval when the layer is
+    // actually on for this site's workspace.
+    const [workspace, member, agencyLayerOn] = await Promise.all([
       prisma.workspace.findUnique({
         where: { id: gateWorkspaceId },
         select: { editsRequireApproval: true },
@@ -267,8 +294,9 @@ export async function startPublish(
         where: { userId_workspaceId: { userId, workspaceId: gateWorkspaceId } },
         select: { role: true },
       }),
+      isFeatureEnabled(gateWorkspaceId, "agency_layer"),
     ]);
-    if (workspace?.editsRequireApproval) {
+    if (workspace?.editsRequireApproval && agencyLayerOn) {
       /* `revokedAt: null` is load-bearing. Revoking a round is the only way out
          of a review nobody can resolve — the submitter is refused a self-resolve
          by design, so on a one-seat workspace a PENDING round is otherwise
@@ -435,7 +463,11 @@ export async function cancelPublish(jobId: string) {
  *  the HTML-at-rest; the most-recent (the live version) is always retained. */
 const PUBLISH_HISTORY_RETAINED = 20;
 
-export async function completePublish(jobId: string, publicUrl: string) {
+export async function completePublish(
+  jobId: string,
+  publicUrl: string,
+  extra?: { progress?: number; steps?: Prisma.InputJsonValue },
+) {
   const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
   if (!job) throw new Error("JOB_NOT_FOUND");
 
@@ -444,7 +476,15 @@ export async function completePublish(jobId: string, publicUrl: string) {
       where: { id: jobId },
       // P1: KEEP the log payload (was `log: Prisma.DbNull`) so this version can
       // be rolled back later. Storage is bounded by the prune below.
-      data: { status: "COMPLETED", completedAt: new Date() },
+      data: {
+        status: "COMPLETED",
+        completedAt: new Date(),
+        // D-1: the worker's inline write also carried progress:100 and the
+        // final steps array so the SSE/poll progress UI reaches 100% — carry
+        // them through here now that the worker calls this instead.
+        ...(extra?.progress !== undefined ? { progress: extra.progress } : {}),
+        ...(extra?.steps !== undefined ? { steps: extra.steps } : {}),
+      },
     }),
     prisma.site.update({
       where: { id: job.siteId },

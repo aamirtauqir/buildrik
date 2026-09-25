@@ -179,20 +179,69 @@ curl -I https://app.buildrick.io/api/trpc/auth.checkEmail
 # → 405 Method Not Allowed (GET on POST-only route) is OK
 ```
 
-## Step C — Cron jobs (15 routes)
+## Step C — Cron jobs (18 routes)
 
-cPanel → Cron Jobs. Add each one (schedules in `vercel.json`):
+`vercel.json` at the repo root is the source of truth for the schedule
+column — this list is generated from it (C-2). `$CRON_SECRET` is a shell
+variable, not something cron sources from the app's env — cPanel's crontab
+does not run through a login shell, so it must be **defined at the top of
+the crontab itself** (standard `VAR=value` crontab syntax applies to every
+line below it) with the SAME value as the app's `CRON_SECRET` env var.
+
+**cPanel's Cron Jobs UI cannot do this.** That form has one field per entry
+(minute/hour/day/month/weekday/command) — there is no way to add a bare
+`CRON_SECRET=<value>` line ahead of the entries, and pasting one into the
+Command field just runs it as its own (failing) command. Two ways to get
+the line in:
+
+1. **Edit the raw crontab over SSH/terminal** — `crontab -e` opens the same
+   file the UI edits, but as a plain text file, where a bare `VAR=value`
+   line on its own row is valid. Add the `CRON_SECRET=` line first, then
+   the 18 entries below it (still fine to review/re-add the individual
+   lines through the cPanel UI afterwards — it renders whatever's in the
+   file, it just can't add that first line itself).
+2. **No SSH access** — inline the secret in each cron entry's Command field
+   instead of relying on the shared variable, e.g. `curl -fsS -H
+   "Authorization: Bearer <the actual value>" https://...`. Every one of
+   the 18 entries needs the value substituted individually this way; there
+   is no shared-variable shortcut through the UI alone.
+
+The commands below use `$CRON_SECRET` assuming route 1 (`crontab -e`):
 
 ```bash
-# 5-min interval
-*/5 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/dns-verify
+CRON_SECRET=<the same value as the app's CRON_SECRET env var>
 
-# Daily
-0 2 * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ssl-check
-# ... (15 total — full list in /Users/shahg/Desktop/pencil/buildrik/vercel.json)
+*/5  * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/scheduled-publish
+0    2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ssl-check
+0    8 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/billing-dunning
+0    9 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/billing-downgrade
+0    3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/session-cleanup
+0    4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/invite-expiry
+0    5 * * 0   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/token-cleanup
+0    6 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/soft-delete-purge
+0    1 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/analytics-purge
+0    8 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/analytics-aggregate
+*/5  * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/dns-verify
+0    2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/form-submission-purge
+30   2 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ip-anonymization
+0    4 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/workspace-transfer-expiry
+0    11 * * *  curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/account-deletion
+30   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/publish-job-cleanup
+15   * * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ai-job-cleanup
+0    3 * * *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://app.buildrick.io/api/cron/ephemeral-purge
 ```
 
-Use the SAME `$CRON_SECRET` value from the env vars.
+**Before enabling these on a live account**, read them backlog-first, not
+trigger-first — `account-deletion`, `billing-downgrade`,
+`soft-delete-purge` and `form-submission-purge` will process whatever has
+built up since launch the first time they run. Inspect the backlog
+read-only before wiring the crontab: e.g. `SELECT count(*) FROM
+account_deletion_reqs WHERE "scheduledAt" <= now()` (and the equivalent
+selection query each route's own where-clause uses) over the SSH tunnel,
+for each of those four. `scheduled-publish` is safe to schedule but
+currently pointless — `schedulePublish` refuses every call with
+`NO_RENDERER` until a server-side renderer exists (A-16), so the cron will
+find nothing due.
 
 ## Step D — Smoke test
 
@@ -206,6 +255,49 @@ pnpm smoke:prod \
 (dashboard + editor on same URL since unified mode)
 
 8 checks. Each fails surfaces what to fix.
+
+## Reverse-proxy IP header (S-11 — confirm before relying on rate limits)
+
+Every place the app reads the caller's IP (rate-limit keys, session records,
+new-device alerts) goes through one helper now: `clientIp()` in
+`lib/request-ip.ts`. Its body reads the **leftmost** entry of
+`x-forwarded-for`, falling back to `x-real-ip`.
+
+That is deliberately provisional. Behind cPanel/LiteSpeed the app sits behind
+a proxy, and "leftmost" is only correct if the proxy hop is trusted to have
+either (a) set `x-forwarded-for` itself with the real client IP as the only
+or first entry, or (b) appended to an existing header rather than trusting
+whatever the client sent. If a client can reach the proxy directly and set
+its own `x-forwarded-for: 1.2.3.4` before the proxy appends its own hop, the
+**leftmost** entry is attacker-controlled and every per-IP limit in this app
+keys on a spoofed value — trivially bypassable.
+
+**Before depending on IP-based limiting in production**, a founder/ops step
+outside this repo:
+
+1. Confirm what LiteSpeed actually forwards. From the cPanel host:
+   ```bash
+   curl -s -H "X-Forwarded-For: 9.9.9.9" https://app.buildrick.io/api/public/track/<test-site-id> -o /dev/null -D -
+   ```
+   then check the app's own logs (or a temporary debug log in
+   `clientIp()`) for what header value the Node process actually saw —
+   does LiteSpeed pass the spoofed value through unchanged, append its own
+   hop, or overwrite it? Also check whether LiteSpeed sets its own trusted
+   header (commonly `X-Real-IP` from the actual upstream connection).
+2. If the proxy **appends** (trusted last hop = the real client), switch
+   `clientIp()`'s body to read the **rightmost** entry instead of leftmost.
+   If LiteSpeed sets its own `X-Real-IP` from the raw TCP connection
+   (untouched by client headers), prefer that header over `x-forwarded-for`
+   entirely.
+3. Change only `lib/request-ip.ts` — every caller (rate limiter keys,
+   session `ip` column, device-alert emails) picks up the fix at once,
+   which is the point of having one helper instead of seven copies.
+
+A wrong hop count is not a safe default to guess at: a rightmost-hop helper
+keys every user on the proxy's own IP if the hop count is off by one, and
+would rate-limit-block everyone behind that IP together. That is why the
+helper ships leftmost (safe-but-spoofable) rather than a guessed rightmost
+(unsafe-if-wrong) until this is confirmed against the real LiteSpeed config.
 
 ## Common failures
 
