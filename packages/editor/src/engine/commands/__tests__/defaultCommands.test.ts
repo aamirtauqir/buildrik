@@ -19,14 +19,22 @@ interface MockElement {
   getType: () => string;
   getParent: () => MockElement | null;
   getChildren: () => MockElement[];
+  isLocked: () => boolean;
+  isComponentInstance: () => boolean;
 }
 
-function makeElement(id: string, type = "container"): MockElement {
+function makeElement(
+  id: string,
+  type = "container",
+  opts: { locked?: boolean; instance?: boolean; parent?: MockElement | null } = {},
+): MockElement {
   return {
     getId: () => id,
     getType: () => type,
-    getParent: () => null,
+    getParent: () => opts.parent ?? null,
     getChildren: () => [],
+    isLocked: () => opts.locked === true,
+    isComponentInstance: () => opts.instance === true,
   };
 }
 
@@ -170,6 +178,14 @@ describe("clipboard", () => {
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_CUT, { elementIds: ["el-2"] });
   });
 
+  it("cut leaves a locked element standing and emits the skip event", () => {
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-locked", "container", { locked: true })]);
+    run("cut");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.clipboard).toBeNull();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
   /* Paste used to target whatever was selected, with no nesting check, and to
      emit CLIPBOARD_PASTE a second time on top of the one `pasteElement`
      already sends. Live: copying a heading and pasting with that heading still
@@ -279,6 +295,51 @@ describe("delete / duplicate / group", () => {
     expect(composer.elements.removeElement).toHaveBeenCalledTimes(3);
     expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
     expect(composer.endTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  // A-5: locked and instance-owned elements have no business dying to a bare
+  // Delete/⌘A. A single locked element is a no-op — no confirm dialog either,
+  // since there is nothing left to delete.
+  it("delete leaves a locked element standing", () => {
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-locked", "container", { locked: true })]);
+    run("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
+  it("delete leaves an element inside a component instance standing", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-instance", "container", { instance: true }),
+    ]);
+    run("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
+  it("delete removes the unlocked elements and skips the locked one, confirmed", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"),
+      makeElement("el-2", "container", { locked: true }),
+      makeElement("el-3"),
+    ]);
+    run("delete", { confirmed: true });
+    expect(composer.elements.removeElement).toHaveBeenCalledTimes(2);
+    expect(composer.elements.removeElement).toHaveBeenCalledWith("el-1");
+    expect(composer.elements.removeElement).toHaveBeenCalledWith("el-3");
+    expect(composer.elements.removeElement).not.toHaveBeenCalledWith("el-2");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+  });
+
+  // A locked container in a multi-selection with its own (unlocked) child
+  // also selected: topMost prunes the child as the locked parent's
+  // descendant before the lock filter ever runs, so the whole subtree
+  // survives rather than the child being deleted on its own.
+  it("a locked parent protects its selected child from delete", () => {
+    const parent = makeElement("parent", "container", { locked: true });
+    const child = makeElement("child", "container", { parent });
+    composer.selection.getAllSelected.mockReturnValue([parent, child]);
+    run("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
   });
 
   /* getAllSelected, not getSelectedIds: duplicate prunes to top-most elements

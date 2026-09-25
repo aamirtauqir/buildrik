@@ -31,6 +31,19 @@ import { nudgeSelected, reorderElement } from "./commandOperations";
  * snapshot and once standalone, so pasting produced a duplicate nobody asked
  * for. Found by codex reviewing the multi-selection fix.
  */
+/**
+ * A-5: drop locked elements and elements inside a component instance from a
+ * destructive multi-selection op (delete/cut). Locking and instance
+ * membership are read straight from the element (the single source of
+ * truth — see ElementSerialization.isLocked/isComponentInstance), not from a
+ * panel's own tracking set. Returns the survivors and whether anything was
+ * skipped, so the caller can tell the user their selection shrank.
+ */
+function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
+  const kept = elements.filter((el) => !el.isLocked() && !el.isComponentInstance());
+  return { kept, skipped: kept.length !== elements.length };
+}
+
 function topMost(elements: Element[]): Element[] {
   const set = new Set(elements);
   return elements.filter((el) => {
@@ -96,7 +109,12 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         /* Pruned like cut: removing a parent already removes its children and
            the descendant's own removeElement then no-ops, but the history
            label would still count it. */
-        const selected = topMost(c.selection.getAllSelected());
+        /* A-5: topMost runs first so a locked/instance ancestor already
+           absorbs its selected descendants — filtering afterward on the
+           pruned set is what keeps a locked container's children from being
+           deleted individually once the container itself is dropped. */
+        const { kept: selected, skipped } = dropLockedAndInstances(topMost(c.selection.getAllSelected()));
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         /* Decision #17: one element deletes at once (Undo follows); more than
            one asks first. Every door — Delete/Backspace, ⌘K — lands here, so
@@ -197,7 +215,8 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+x",
       requiresSelection: true,
       run: (c) => {
-        const selected = topMost(c.selection.getAllSelected());
+        const { kept: selected, skipped } = dropLockedAndInstances(topMost(c.selection.getAllSelected()));
+        if (skipped) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
         if (selected.length === 0) return;
         const ids = selected.map((el) => el.getId());
         c.clipboard = ids

@@ -160,17 +160,41 @@ export function useLayerActions(
     if (el) el.setAttribute("data-hidden", String(pending.hidden));
   }, [hiddenIds]);
 
-  const toggleLock = React.useCallback((id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLockedIds((prev) => {
-      const next = new Set(prev);
-      const isNowLocked = !prev.has(id);
-      if (isNowLocked) next.add(id);
-      else next.delete(id);
-      pendingLockRef.current = { id, locked: isNowLocked };
-      return next;
-    });
-  }, []);
+  const toggleLock = React.useCallback(
+    (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      // A-5: read the lock straight off the element, not this panel's own
+      // set — a canvas-menu lock (or anything else calling el.setLocked
+      // directly) drifted from the panel's tracking after hydration, so a
+      // second Layers click could re-lock an already-locked element instead
+      // of unlocking it.
+      const isNowLocked = !composer?.elements.getElement(id)?.isLocked();
+      setLockedIds((prev) => {
+        const next = new Set(prev);
+        if (isNowLocked) next.add(id);
+        else next.delete(id);
+        pendingLockRef.current = { id, locked: isNowLocked };
+        return next;
+      });
+    },
+    [composer]
+  );
+
+  // Re-derive lockedIds from the elements whenever one changes — keeps the
+  // panel in sync with a lock/unlock that happened outside toggleLock (the
+  // canvas context menu's Lock action, for one).
+  React.useEffect(() => {
+    if (!composer) return;
+    const resync = () => {
+      const locked = new Set<string>();
+      for (const el of composer.elements.getAllElements() ?? []) {
+        if (el.getData().locked === true) locked.add(el.getId());
+      }
+      setLockedIds(locked);
+    };
+    composer.on(EVENTS.ELEMENT_UPDATED, resync);
+    return () => composer.off(EVENTS.ELEMENT_UPDATED, resync);
+  }, [composer]);
 
   // Apply DOM lock attribute + engine lock state after state commit
   React.useEffect(() => {

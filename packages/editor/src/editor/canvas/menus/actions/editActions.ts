@@ -55,6 +55,10 @@ export const editSubmenu: ContextAction[] = [
       const childCount = element.getChildren?.()?.length || 0;
 
       const data = element.getData?.();
+      // Same fix as Copy above: populate the in-app clipboard, not only the
+      // OS one, so a right-click Cut → right-click Paste round trip actually
+      // pastes something back instead of hitting the "Nothing to paste" toast.
+      if (composer) composer.clipboard = data ? [data] : null;
       const text = JSON.stringify(data, null, 2);
       navigator?.clipboard?.writeText(text).catch(() => {
         addToast?.({

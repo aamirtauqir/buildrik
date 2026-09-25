@@ -127,3 +127,23 @@ describe("editActions — delete runs the engine command", () => {
   });
 });
 
+/* A-5: Cut wrote only the OS clipboard (navigator.clipboard) while Copy also
+   set composer.clipboard — so right-click Cut → right-click Paste hit the
+   "Nothing to paste" toast instead of pasting the cut element back. */
+describe("editActions — cut populates the in-app clipboard", () => {
+  it("cut sets composer.clipboard from element.getData(), like copy", () => {
+    const composer = buildMockComposer();
+    const cut = editSubmenu.find((a) => a.id === "cut");
+    expect(cut).toBeDefined();
+
+    cut!.handler!({
+      composer,
+      element: buildMockElement(),
+      isRoot: false,
+      addToast: vi.fn(),
+    } as Ctx);
+
+    expect(composer.clipboard).toEqual([sampleData]);
+  });
+});
+
