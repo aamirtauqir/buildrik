@@ -193,7 +193,12 @@ export function useLayerActions(
       setLockedIds(locked);
     };
     composer.on(EVENTS.ELEMENT_UPDATED, resync);
-    return () => composer.off(EVENTS.ELEMENT_UPDATED, resync);
+    /* Block body, not a shorthand: `off` is chainable and returns the
+       composer, so an arrow shorthand hands React an instance where a
+       destructor belongs. */
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, resync);
+    };
   }, [composer]);
 
   // Apply DOM lock attribute + engine lock state after state commit
