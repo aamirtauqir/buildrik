@@ -83,6 +83,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Without this the tsc gate below type-checks against whatever
+      # @prisma/client happens to be cached — stale by however many
+      # migrations landed since. Added 2026-09-25 after exactly that: 181
+      # editor / 252 dashboard tsc errors on a branch that was 0/0 locally,
+      # all model fields (wizardData, KnownDevice, PageFolder…) added by
+      # migrations this CI run never regenerated the client for.
+      - name: Generate Prisma client
+        run: npx prisma generate --schema prisma/schema.prisma
+
       # Bundle-drop guard: designer reference snapshots (HTML mocks, comp
       # previews, ui-kits) must live under docs/reference/, NOT inside the
       # editor source tree. A reference/ or project/ folder under
