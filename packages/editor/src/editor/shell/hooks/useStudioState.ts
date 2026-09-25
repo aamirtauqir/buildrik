@@ -99,6 +99,14 @@ export interface Issue {
    * land — the Issues panel's page scope and the topbar chip count read it.
    */
   pageId?: string;
+  /**
+   * Which content detector produced this (`useContentIssueScanner` /
+   * `engine/content/contentIssues`). Absent on DS-lint token issues. Tells
+   * the Issues panel which fix affordance to render: an inline alt-text
+   * field for `missing-alt`, or "Fix" → select + open the Link section for
+   * `broken-link`.
+   */
+  contentKind?: "missing-alt" | "broken-link";
 }
 
 /**
