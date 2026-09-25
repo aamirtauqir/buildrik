@@ -75,6 +75,13 @@ describe("Sites Service", () => {
 
   describe("listSites", () => {
     it("returns paginated sites", async () => {
+      // S-9: listSites now resolves siteScopeWhere(userId, workspaceId) first.
+      // An ADMIN is never site-scoped, so this keeps the unrestricted list.
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1",
+        role: "ADMIN",
+        _count: { sitePermissions: 0 },
+      } as any);
       vi.mocked(prisma.site.count).mockResolvedValue(2);
       vi.mocked(prisma.site.findMany).mockResolvedValue([
         {
@@ -111,7 +118,7 @@ describe("Sites Service", () => {
         },
       ] as any);
 
-      const result = await listSites("ws_123", {
+      const result = await listSites("ws_123", "u_1", {
         page: 1,
         perPage: 12,
         sort: "lastEdited",

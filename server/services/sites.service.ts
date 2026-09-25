@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { checkSiteRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -46,14 +46,20 @@ const SORT_MAP: Record<string, Record<string, string>> = {
 
 export async function listSites(
   workspaceId: string,
+  userId: string,
   filters: ListSitesInput
 ) {
   const { page, perPage, status, sort, search, folderId, clientId, createdBy, dateRange, templateUsed, hasCustomDomain, hasTraffic } = filters;
   const skip = (page - 1) * perPage;
 
+  // S-9: a member scoped to specific sites must never see sites outside
+  // their grant in the workspace-wide list.
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
+
   const where: Record<string, unknown> = {
     workspaceId,
     deletedAt: null,
+    ...scope,
   };
 
   if (status) where.status = status;
@@ -70,94 +76,96 @@ export async function listSites(
   if (hasCustomDomain === false) where.domains = { none: {} };
 
   const orderBy = SORT_MAP[sort] ?? SORT_MAP.lastEdited;
+  const SITE_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    status: true,
+    thumbnail: true,
+    pages: true,
+    lastEditedAt: true,
+    publishedUrl: true,
+    createdAt: true,
+    createdBy: true,
+    template: true,
+    folderId: true,
+    clientId: true,
+    themeLocked: true,
+    domains: { take: 1, select: { domain: true, isPrimary: true } },
+    analytics: {
+      where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
+      select: { visitors: true },
+    },
+  } as const;
+
+  const enrich = (site: {
+    analytics: { visitors: number }[];
+    domains: { domain: string; isPrimary: boolean }[];
+    [key: string]: unknown;
+  }) => {
+    const { analytics, domains, ...rest } = site;
+    return {
+      ...rest,
+      domain: domains[0]?.domain ?? null,
+      visitors30d: analytics.reduce((sum, a) => sum + a.visitors, 0),
+    };
+  };
 
   // visitors30d is a 30-day aggregate, not a column, so it can't be filtered or
-  // sorted in SQL here. When the request needs it (traffic filter or traffic
-  // sort) we scan all matching sites and paginate in memory; otherwise we keep
-  // efficient DB pagination. Was: filter applied AFTER skip/take, which dropped
-  // matching sites on other pages and reported the wrong total.
-  const needsFullScan = !!hasTraffic || sort === "traffic";
-
-  const [total, data] = await Promise.all([
-    prisma.site.count({ where }),
-    prisma.site.findMany({
-      where,
-      orderBy,
-      ...(needsFullScan ? {} : { skip, take: perPage }),
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        status: true,
-        thumbnail: true,
-        pages: true,
-        lastEditedAt: true,
-        publishedUrl: true,
-        createdAt: true,
-        createdBy: true,
-        template: true,
-        folderId: true,
-        clientId: true,
-        themeLocked: true,
-        domains: { take: 1, select: { domain: true, isPrimary: true } },
-        analytics: {
-          where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
-          select: { visitors: true },
-        },
-      },
-    }),
-  ]);
-
-  const enriched = data.map((site) => {
-    const visitors30d = site.analytics.reduce((sum, a) => sum + a.visitors, 0);
-    const domain = site.domains[0]?.domain ?? null;
-    return {
-      id: site.id,
-      name: site.name,
-      slug: site.slug,
-      status: site.status,
-      thumbnail: site.thumbnail,
-      pages: site.pages,
-      lastEditedAt: site.lastEditedAt,
-      publishedUrl: site.publishedUrl,
-      createdAt: site.createdAt,
-      createdBy: site.createdBy,
-      template: site.template,
-      folderId: site.folderId,
-      clientId: site.clientId,
-      themeLocked: site.themeLocked,
-      domain,
-      visitors30d,
-    };
-  });
-
-  // Fast path: no traffic filter/sort → enriched is already the correct page.
-  if (!needsFullScan) {
-    return { data: enriched, total, page, totalPages: Math.ceil(total / perPage) };
+  // sorted directly in the Site query. When the request needs it (traffic
+  // filter or traffic sort), fetch just the matching ids in DB order, sum
+  // visitors per id with one groupBy on siteAnalytics, filter/sort/paginate
+  // that id list in memory, then fetch the full payload for only the
+  // resulting page (D-11: was one query pulling every matching site's full
+  // payload — domains + every analytics row — to reduce() in JS regardless
+  // of page).
+  if (!hasTraffic && sort !== "traffic") {
+    const [total, data] = await Promise.all([
+      prisma.site.count({ where }),
+      prisma.site.findMany({ where, orderBy, skip, take: perPage, select: SITE_SELECT }),
+    ]);
+    return { data: data.map(enrich), total, page, totalPages: Math.ceil(total / perPage) };
   }
 
-  let rows = enriched;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
+  const matching = await prisma.site.findMany({ where, orderBy, select: { id: true } });
+  const orderedIds = matching.map((s) => s.id);
+
+  const sums = await prisma.siteAnalytics.groupBy({
+    by: ["siteId"],
+    where: { siteId: { in: orderedIds }, date: { gte: thirtyDaysAgo } },
+    _sum: { visitors: true },
+  });
+  const visitorsById = new Map<string, number>(orderedIds.map((id) => [id, 0]));
+  for (const row of sums) visitorsById.set(row.siteId, row._sum.visitors ?? 0);
+
+  let ids = orderedIds;
   if (sort === "traffic") {
-    rows = [...rows].sort((a, b) => b.visitors30d - a.visitors30d);
+    ids = [...ids].sort((a, b) => (visitorsById.get(b) ?? 0) - (visitorsById.get(a) ?? 0));
   }
   if (hasTraffic) {
-    rows = rows.filter((s) => {
+    ids = ids.filter((id) => {
+      const v = visitorsById.get(id) ?? 0;
       switch (hasTraffic) {
-        case "none": return s.visitors30d === 0;
-        case "1-100": return s.visitors30d >= 1 && s.visitors30d <= 100;
-        case "100-1000": return s.visitors30d > 100 && s.visitors30d <= 1000;
-        case "1000+": return s.visitors30d > 1000;
+        case "none": return v === 0;
+        case "1-100": return v >= 1 && v <= 100;
+        case "100-1000": return v > 100 && v <= 1000;
+        case "1000+": return v > 1000;
         default: return true;
       }
     });
   }
 
-  const pageRows = rows.slice(skip, skip + perPage);
+  const pageIds = ids.slice(skip, skip + perPage);
+  const pageSites = await prisma.site.findMany({ where: { id: { in: pageIds } }, select: SITE_SELECT });
+  const byId = new Map(pageSites.map((s) => [s.id, s]));
+  const pageRows = pageIds.map((id) => enrich(byId.get(id)!));
+
   return {
     data: pageRows,
-    total: rows.length,
+    total: ids.length,
     page,
-    totalPages: Math.ceil(rows.length / perPage),
+    totalPages: Math.ceil(ids.length / perPage),
   };
 }
 

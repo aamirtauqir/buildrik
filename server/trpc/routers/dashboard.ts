@@ -42,12 +42,12 @@ async function getWorkspaceMember(ctx: WorkspaceCtx) {
 export const dashboardRouter = router({
   stats: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
-    return getDashboardStats(member.workspaceId, member.role);
+    return getDashboardStats(member.workspaceId, ctx.session!.user!.id, member.role);
   }),
 
   recentSites: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
-    return getRecentSites(member.workspaceId);
+    return getRecentSites(member.workspaceId, ctx.session!.user!.id);
   }),
 
   attentionQueue: protectedProcedure.query(async ({ ctx }) => {

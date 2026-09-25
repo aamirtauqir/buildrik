@@ -62,7 +62,7 @@ export const sitesRouter = router({
     .input(listSitesSchema)
     .query(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
-      return listSites(workspaceId, input);
+      return listSites(workspaceId, ctx.session.user!.id!, input);
     }),
 
   get: protectedProcedure

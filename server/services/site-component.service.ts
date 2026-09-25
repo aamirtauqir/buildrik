@@ -9,6 +9,7 @@
  */
 import { prisma } from "@/lib/prisma";
 import type { UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-component";
+import { siteScopeWhere } from "@/server/services/permission.service";
 
 export async function upsertSiteComponent(
   input: UpsertSiteComponentInput
@@ -72,10 +73,14 @@ export async function deleteSiteComponent(
  * caller's workspace is supplied from the session, never client input).
  */
 export async function listWorkspaceComponents(
-  workspaceId: string
+  workspaceId: string,
+  userId: string
 ): Promise<Array<{ componentId: string; name: string; siteCount: number; updatedAt: Date }>> {
+  // S-9: a member scoped to specific sites must never see components from a
+  // site outside their grant, or have its usage counted in "used on N sites".
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.siteComponent.findMany({
-    where: { site: { workspaceId, deletedAt: null } },
+    where: { site: { workspaceId, deletedAt: null, ...scope } },
     select: { componentId: true, name: true, updatedAt: true },
   });
   const byId = new Map<

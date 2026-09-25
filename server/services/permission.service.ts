@@ -59,6 +59,38 @@ async function resolveSiteScope(
   return row;
 }
 
+/**
+ * S-9: the same "specific sites" scoping rule as resolveSiteScope, for
+ * workspace-wide LIST/aggregate queries that never had a single siteId to
+ * check against. Returns a Prisma `Site.where` fragment: `{}` (no
+ * restriction) for ADMIN/OWNER or an unscoped member, or `{ id: { in: [...] } }`
+ * for a member scoped to specific sites. Spread the result into any query's
+ * `where` (directly for a `Site` query, or under a `site: {...}` relation
+ * filter for a query on a related model).
+ */
+export async function siteScopeWhere(
+  db: PrismaClient,
+  userId: string,
+  workspaceId: string,
+): Promise<Record<string, unknown>> {
+  const member = await db.workspaceMember.findFirst({
+    where: { userId, workspaceId, status: "ACTIVE" },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
+  });
+  // No ACTIVE member: callers resolve workspaceId through a membership check
+  // before reaching here, so this is defensive — deny rather than leak.
+  if (!member) return { id: "__no_workspace_access__" };
+
+  const managesWorkspace = member.role === "ADMIN" || member.role === "OWNER";
+  if (managesWorkspace || member._count.sitePermissions === 0) return {};
+
+  const rows = await db.sitePermission.findMany({
+    where: { memberId: member.id },
+    select: { siteId: true },
+  });
+  return { id: { in: rows.map((r) => r.siteId) } };
+}
+
 export async function assertSiteAccess(
   db: PrismaClient,
   userId: string,
