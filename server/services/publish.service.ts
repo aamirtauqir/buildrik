@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
-import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
+import { appendDynamicPagesToPublish, findStaleTemplateBindings } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import { publishApprovalBlock } from "@server/services/publish-approval";
 import {
@@ -26,7 +26,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
        null-safe path filter is more fragile than reading a handful of rows. */
     prisma.page.findMany({
       where: { siteId },
-      select: { id: true, name: true, blocks: true, settings: true },
+      select: { id: true, name: true, blocks: true, settings: true, slug: true, isHomePage: true },
     }),
     prisma.site.findUnique({
       where: { id: siteId },
@@ -103,6 +103,22 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." });
   } else {
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });
+  }
+
+  // CMS dynamic-page templates (A-17): a page-generating collection whose
+  // bound template page was deleted/renamed since binding would otherwise
+  // silently ship without its generated pages — surfaced here, before publish,
+  // instead of only as a server log at publish time.
+  const staleTemplates = await findStaleTemplateBindings(siteId, allPages);
+  if (staleTemplates.length > 0) {
+    const names = staleTemplates.map((s) => s.collectionName).join(", ");
+    checks.push({
+      label: "CMS templates",
+      status: "warning",
+      detail: `${staleTemplates.length === 1 ? "Collection" : "Collections"} ${names}: the bound template page no longer exists — its generated pages won't be published.`,
+    });
+  } else {
+    checks.push({ label: "CMS templates", status: "pass", detail: "Every dynamic-page collection's template page exists." });
   }
 
   const hasFail = checks.some((c) => c.status === "fail");

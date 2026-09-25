@@ -45,6 +45,7 @@ import {
   resolveDynamicPages,
   generateDynamicPages,
   appendDynamicPagesToPublish,
+  findStaleTemplateBindings,
   CmsError,
 } from "@server/services/cms.service";
 
@@ -181,5 +182,71 @@ describe("appendDynamicPagesToPublish", () => {
     expect(out).toHaveLength(3); // 2 original + 1 generated
     expect(out[2]).toMatchObject({ path: "blog/hello-world/index.html" });
     expect(out[2].html).toContain("<body>Hello World</body>");
+  });
+
+  it("A-17: skips (never throws) and logs when the bound template page is not in this publish", async () => {
+    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "missing.html" }]);
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const pages = [{ path: "index.html", html: "<html></html>" }];
+    await expect(appendDynamicPagesToPublish("s1", pages)).resolves.toEqual(pages);
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockRestore();
+  });
+});
+
+describe("generateDynamicPages — A-17 title dedupe + script/style-safe substitution", () => {
+  it("removes the template's own <title> and meta description before injecting the generated ones", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    const template =
+      '<html><head><title>Old Title</title><meta name="description" content="old desc"></head><body>{title}</body></html>';
+    const out = await generateDynamicPages("s1", "c1", template);
+    const titleCount = (out[0].content.match(/<title>/g) ?? []).length;
+    expect(titleCount).toBe(1);
+    expect(out[0].content).toContain("<title>Hello</title>");
+    expect(out[0].content).not.toContain("Old Title");
+    expect(out[0].content).not.toContain("old desc");
+  });
+
+  it("does not substitute {placeholder}-shaped text inside <script> or <style>", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello" } }]);
+    const template =
+      "<html><head></head><body><h1>{title}</h1>" +
+      "<style>.x { content: '{title}'; }</style>" +
+      "<script>const t = '{title}';</script>" +
+      "</body></html>";
+    const out = await generateDynamicPages("s1", "c1", template);
+    expect(out[0].content).toContain("<h1>Hello</h1>"); // substituted outside script/style
+    expect(out[0].content).toContain("content: '{title}'"); // untouched inside <style>
+    expect(out[0].content).toContain("const t = '{title}'"); // untouched inside <script>
+  });
+});
+
+describe("findStaleTemplateBindings (A-17)", () => {
+  it("returns [] when the site has no page-generating collection", async () => {
+    colFindMany.mockResolvedValueOnce([]);
+    await expect(findStaleTemplateBindings("s1", [{ slug: "home", isHomePage: true }])).resolves.toEqual([]);
+  });
+
+  it("flags a collection whose template page filename matches no current page", async () => {
+    colFindMany.mockResolvedValueOnce([{ id: "c1", name: "Blog", pageTemplatePath: "deleted-page.html" }]);
+    const out = await findStaleTemplateBindings("s1", [
+      { slug: "home", isHomePage: true },
+      { slug: "about", isHomePage: false },
+    ]);
+    expect(out).toEqual([{ collectionId: "c1", collectionName: "Blog", templatePath: "deleted-page.html" }]);
+  });
+
+  it("does not flag a collection whose template page still exists (slug.html, or index.html for home)", async () => {
+    colFindMany.mockResolvedValueOnce([
+      { id: "c1", name: "Blog", pageTemplatePath: "about.html" },
+      { id: "c2", name: "Landing", pageTemplatePath: "index.html" },
+    ]);
+    const out = await findStaleTemplateBindings("s1", [
+      { slug: "home", isHomePage: true },
+      { slug: "about", isHomePage: false },
+    ]);
+    expect(out).toEqual([]);
   });
 });

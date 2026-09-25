@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const pageFindManyMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
 const domainFindFirstMock = vi.fn();
+const cmsCollectionFindManyMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -26,6 +27,10 @@ vi.mock("@/lib/prisma", () => ({
     reviewRequest: { findFirst: vi.fn() },
     // `getActiveVercelConnection` lives in integrations.service, not lib/vercel
     // — it reads this table directly.
+
+    // A-17: runPrePublishChecks' CMS-templates check reads this via
+    // cms.service's findStaleTemplateBindings.
+    cmsCollection: { findMany: (...a: unknown[]) => cmsCollectionFindManyMock(...a) },
 
     $transaction: vi.fn(),
   },
@@ -55,6 +60,7 @@ beforeEach(() => {
     metaTitleTemplate: "{page} — Site", touchIcon: "x", deletedAt: null, workspaceId: "ws1",
   });
   domainFindFirstMock.mockReset().mockResolvedValue(null);
+  cmsCollectionFindManyMock.mockReset().mockResolvedValue([]);
 });
 
 describe("pre-publish checks count what ships", () => {
@@ -90,5 +96,32 @@ describe("pre-publish checks count what ships", () => {
     ]);
     const { checks } = await runPrePublishChecks("s1");
     expect(status(checks, "Pages ready")).toBe("fail");
+  });
+
+  // A-17: a page-generating CMS collection whose bound template page is gone
+  // used to ship silently with no generated pages — surface it as a warning
+  // before publish.
+  it("passes CMS templates when there is no page-generating collection", async () => {
+    pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true }]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "CMS templates")).toBe("pass");
+  });
+
+  it("warns when a collection's bound template page no longer exists", async () => {
+    pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true }]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Blog", pageTemplatePath: "gone.html" }]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "CMS templates")).toBe("warning");
+    expect(detail(checks, "CMS templates")).toContain("Blog");
+  });
+
+  it("passes when the bound template page still exists", async () => {
+    pageFindManyMock.mockResolvedValue([
+      { id: "1", name: "Home", blocks: [{}], settings: null, slug: "home", isHomePage: true },
+      { id: "2", name: "Blog template", blocks: [{}], settings: null, slug: "blog-template", isHomePage: false },
+    ]);
+    cmsCollectionFindManyMock.mockResolvedValue([{ id: "c1", name: "Blog", pageTemplatePath: "blog-template.html" }]);
+    const { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "CMS templates")).toBe("pass");
   });
 });

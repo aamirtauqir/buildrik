@@ -28,6 +28,11 @@ vi.mock("@/lib/prisma", () => ({
     reviewRequest: {
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    // A-17: runPrePublishChecks' CMS-templates check reads this via
+    // cms.service's findStaleTemplateBindings.
+    cmsCollection: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     publishBuildJob: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
