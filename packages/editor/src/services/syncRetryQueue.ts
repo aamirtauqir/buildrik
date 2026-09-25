@@ -75,6 +75,13 @@ export class SyncRetryQueue {
     return this.queue.size;
   }
 
+  /** Whether a mirror for `key` is waiting to reach the server. Hydration
+   *  reads it so a newer server copy never overwrites a local change that
+   *  simply has not landed yet (C-4). */
+  isPending(key: string): boolean {
+    return this.queue.has(key);
+  }
+
   /**
    * Forget a queued op without replaying it — used when a later op supersedes
    * it (a delete drops a pending upsert for the same target, so a reconnect

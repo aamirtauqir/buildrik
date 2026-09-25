@@ -26,12 +26,14 @@ vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localho
 const loadCollections = vi.fn();
 const saveCollection = vi.fn();
 const saveContentItem = vi.fn();
+const loadContentItems = vi.fn(async (_collectionId: string): Promise<unknown[]> => []);
 const storageAvailable = vi.fn(() => true);
 vi.mock("../../engine/cms/CollectionStorage", () => ({
   isStorageAvailable: () => storageAvailable(),
   loadCollections: (...a: unknown[]) => loadCollections(...a),
   saveCollection: (...a: unknown[]) => saveCollection(...a),
   saveContentItem: (...a: unknown[]) => saveContentItem(...a),
+  loadContentItems: (id: string) => loadContentItems(id),
 }));
 
 import {
@@ -51,6 +53,7 @@ beforeEach(() => {
     m.mockReset(),
   );
   storageAvailable.mockReset().mockReturnValue(true);
+  loadContentItems.mockReset().mockResolvedValue([]);
 });
 
 describe("cmsSync", () => {
@@ -290,21 +293,63 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
 });
 
 describe("hydrateCmsFromServer", () => {
-  it("writes server collections + entries to local storage, skipping ids already local", async () => {
+  /* C-4 / PD-36: server-first by updatedAt. The additive pass this replaced
+     skipped every collection already local — so a teammate's edit to an
+     entry in a collection this browser had seen never arrived. */
+  it("writes a missing collection, re-reads the entries of one already local, and skips an up-to-date one", async () => {
     colListQuery.mockResolvedValueOnce([
       { id: "srv-new", name: "Posts", slug: "posts", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
       { id: "local-1", name: "Pages", slug: "pages", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
     ]);
-    loadCollections.mockResolvedValueOnce([{ id: "local-1" }]); // already local → skip
-    entListQuery.mockResolvedValueOnce([
-      { id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) },
-    ]);
+    loadCollections.mockResolvedValueOnce([{ id: "local-1", updatedAt: new Date(0).toISOString() }]); // same age → not rewritten
+    entListQuery
+      .mockResolvedValueOnce([{ id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) }])
+      .mockResolvedValueOnce([{ id: "e2", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(5000) }]);
+    loadContentItems.mockImplementation(async (id: string) =>
+      id === "local-1" ? [{ id: "e2", data: { t: "stale" }, updatedAt: new Date(1000).toISOString() }] : [],
+    );
     await hydrateCmsFromServer();
     // only the non-local collection is written
     expect(saveCollection).toHaveBeenCalledTimes(1);
     expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "srv-new", slug: "posts" });
-    // its entry, with status mapped back to engine casing
+    // its entry, with status mapped back to engine casing …
     expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e1", collectionId: "srv-new", status: "published" });
+    // … AND the newer server copy of an entry in the already-local collection
+    expect(saveContentItem.mock.calls[1][0]).toMatchObject({ id: "e2", collectionId: "local-1", data: { t: "server" } });
+    expect(entListQuery).toHaveBeenCalledTimes(2);
+  });
+
+  it("a newer server collection overwrites the local one; an older one does not", async () => {
+    colListQuery.mockResolvedValueOnce([
+      { id: "newer", name: "Renamed on server", slug: "n", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(9000) },
+      { id: "older", name: "Old on server", slug: "o", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(1000) },
+    ]);
+    loadCollections.mockResolvedValueOnce([
+      { id: "newer", updatedAt: new Date(2000).toISOString() },
+      { id: "older", updatedAt: new Date(5000).toISOString() },
+    ]);
+    entListQuery.mockResolvedValue([]);
+    await hydrateCmsFromServer();
+    expect(saveCollection).toHaveBeenCalledTimes(1);
+    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "newer", name: "Renamed on server" });
+  });
+
+  it("never overwrites an entry whose local change is still queued for the server", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    entUpsert.mockRejectedValueOnce(new Error("offline"));
+    await syncEntryUpsert({ id: "queued", collectionId: "c", data: { t: "mine" }, status: "draft", createdAt: "", updatedAt: "" } as never);
+    colListQuery.mockResolvedValueOnce([
+      { id: "c", name: "C", slug: "c", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
+    ]);
+    loadCollections.mockResolvedValueOnce([{ id: "c", updatedAt: new Date(0).toISOString() }]);
+    entListQuery.mockResolvedValueOnce([
+      { id: "queued", data: { t: "server" }, status: "DRAFT", createdAt: new Date(0), updatedAt: new Date(99999) },
+    ]);
+    await hydrateCmsFromServer();
+    expect(saveContentItem).not.toHaveBeenCalled();
+    entUpsert.mockResolvedValue({});
+    await retryCmsSync();
+    warn.mockRestore();
   });
 
   it("no-ops when the server has no collections", async () => {

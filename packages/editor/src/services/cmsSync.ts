@@ -57,11 +57,16 @@ export function retryCmsSync(): Promise<void> {
 }
 
 /**
- * Cross-device load (E7): pull server collections + entries into the engine's
- * IndexedDB on editor open. ADDITIVE — only collections whose id isn't already
- * local are written, so a local unsynced edit is never clobbered. Best-effort.
- * Populates local storage; the engine reads it (immediately on a fresh device
- * whose store was empty, otherwise on the next load).
+ * Cross-device load (E7 / C-4, PD-36): pull server collections + entries into
+ * the engine's IndexedDB on editor open. SERVER-FIRST BY `updatedAt`: a row is
+ * written when it is missing locally or the server's copy is newer, and every
+ * collection's entries are re-read — the old additive pass skipped any
+ * collection already local, so another member's entry edits never arrived. A
+ * row with a mirror still queued here (upsert or delete) is left alone: that
+ * local change is newer than anything the server holds. Nothing local is
+ * deleted in this step. Best-effort. Populates local storage; the engine reads
+ * it (immediately on a fresh device whose store was empty, otherwise on the
+ * next load).
  */
 /**
  * Hydration status, so the Content drawer can tell "no collections" from
@@ -102,6 +107,16 @@ export async function retryCmsHydration(): Promise<void> {
   await hydrateCmsFromServer();
 }
 
+/** The server copy wins when the local one is missing, undated, or older. */
+function serverIsNewer(remote: Date | string, local: string | undefined): boolean {
+  if (!local) return true;
+  return new Date(remote).getTime() > new Date(local).getTime();
+}
+
+function hasQueuedMirror(kind: "collection" | "entry", id: string): boolean {
+  return queue.isPending(`${kind}Upsert:${id}`) || queue.isPending(`${kind}Delete:${id}`);
+}
+
 export async function hydrateCmsFromServer(): Promise<void> {
   const siteId = currentSiteId();
   // No site or no storage is not a failure — there is nothing to hydrate FROM,
@@ -121,31 +136,38 @@ export async function hydrateCmsFromServer(): Promise<void> {
       setHydrationStatus("ready");
       return;
     }
-    const localIds = new Set((await Storage.loadCollections()).map((c) => c.id));
+    const localCollections = new Map((await Storage.loadCollections()).map((c) => [c.id, c]));
     for (const rc of remote) {
-      if (localIds.has(rc.id)) continue;
-      const collection: CMSCollection = {
-        id: rc.id,
-        /* Stamped with the site it came FROM. Hydration writes straight into
-           IndexedDB, past `CollectionManager`, so without this the rows would
-           land unscoped and keep showing on every other site in this browser —
-           the store is browser-global. (2026-08-24.) */
-        siteId,
-        name: rc.name, slug: rc.slug,
-        description: rc.description ?? undefined, icon: rc.icon ?? undefined,
-        displayField: rc.displayField ?? undefined,
-        fields: (rc.fields as CMSField[]) ?? [],
-        pageSlugPattern: rc.pageSlugPattern ?? undefined,
-        pageSeoTitle: rc.pageSeoTitle ?? undefined,
-        pageSeoDescription: rc.pageSeoDescription ?? undefined,
-        pageTemplatePath: rc.pageTemplatePath ?? undefined,
-        createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
-      };
-      await Storage.saveCollection(collection);
+      if (hasQueuedMirror("collection", rc.id)) continue;
+      const localCollection = localCollections.get(rc.id);
+      if (!localCollection || serverIsNewer(rc.updatedAt, localCollection.updatedAt)) {
+        const collection: CMSCollection = {
+          id: rc.id,
+          /* Stamped with the site it came FROM. Hydration writes straight into
+             IndexedDB, past `CollectionManager`, so without this the rows would
+             land unscoped and keep showing on every other site in this browser —
+             the store is browser-global. (2026-08-24.) */
+          siteId,
+          name: rc.name, slug: rc.slug,
+          description: rc.description ?? undefined, icon: rc.icon ?? undefined,
+          displayField: rc.displayField ?? undefined,
+          fields: (rc.fields as CMSField[]) ?? [],
+          pageSlugPattern: rc.pageSlugPattern ?? undefined,
+          pageSeoTitle: rc.pageSeoTitle ?? undefined,
+          pageSeoDescription: rc.pageSeoDescription ?? undefined,
+          pageTemplatePath: rc.pageTemplatePath ?? undefined,
+          createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
+        };
+        await Storage.saveCollection(collection);
+      }
       const entries = (await client().cms.entries.list.query({ siteId, collectionId: rc.id })) as Array<{
         id: string; data: Record<string, unknown>; status: string; createdAt: Date | string; updatedAt: Date | string;
       }>;
+      const localEntries = new Map((await Storage.loadContentItems(rc.id)).map((i) => [i.id, i]));
       for (const e of entries) {
+        if (hasQueuedMirror("entry", e.id)) continue;
+        const localEntry = localEntries.get(e.id);
+        if (localEntry && !serverIsNewer(e.updatedAt, localEntry.updatedAt)) continue;
         await Storage.saveContentItem({
           id: e.id, collectionId: rc.id, data: e.data,
           status: e.status === "PUBLISHED" ? "published" : "draft",

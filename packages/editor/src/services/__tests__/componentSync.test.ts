@@ -37,6 +37,7 @@ import {
   mirrorComponentUpsert,
   mirrorComponentDelete,
   hydrateComponentsFromServer,
+  getComponentHydrationStatus,
   onComponentSyncError,
   retryComponentSync,
   getComponentSyncPendingCount,
@@ -83,15 +84,34 @@ describe("componentSync", () => {
     off();
   });
 
-  it("hydrate writes server components not already local, skipping existing ids", async () => {
-    list.mockResolvedValueOnce([{ componentId: "srv1" }, { componentId: "local1" }]);
-    loadComponents.mockResolvedValueOnce([{ id: "local1" }]); // already local → skip
-    get.mockResolvedValueOnce({ id: "srv1", name: "Server one" });
-    await hydrateComponentsFromServer();
-    expect(get).toHaveBeenCalledTimes(1);
-    expect(saveComponent).toHaveBeenCalledTimes(1);
-    expect(saveComponent.mock.calls[0][0]).toMatchObject({ id: "srv1" });
+  /* C-4 / PD-36: server-first by updatedAt — the additive pass skipped every
+     id already local, so a teammate's edit to a shared master never arrived. */
+  it("hydrate writes missing and newer-on-server masters, skips up-to-date ones", async () => {
+    list.mockResolvedValueOnce([
+      { componentId: "srv1", updatedAt: new Date(1000) },
+      { componentId: "local1", updatedAt: new Date(1000) },
+      { componentId: "stale1", updatedAt: new Date(9000) },
+    ]);
+    loadComponents.mockResolvedValueOnce([
+      { id: "local1", updatedAt: 5000 }, // local is newer → skip
+      { id: "stale1", updatedAt: 2000 }, // server is newer → rewrite
+    ]);
+    get
+      .mockResolvedValueOnce({ id: "srv1", name: "Server one" })
+      .mockResolvedValueOnce({ id: "stale1", name: "Edited on server" });
+    await expect(hydrateComponentsFromServer()).resolves.toBe(2);
+    expect(get).toHaveBeenCalledTimes(2);
+    expect(saveComponent.mock.calls.map((c) => c[0].id)).toEqual(["srv1", "stale1"]);
     expect(saveComponent.mock.calls[0][1]).toBe("site-123"); // projectId
+    expect(getComponentHydrationStatus()).toBe("ready");
+  });
+
+  it("a failed hydrate says so through the status", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    list.mockRejectedValueOnce(new Error("offline"));
+    await expect(hydrateComponentsFromServer()).resolves.toBe(0);
+    expect(getComponentHydrationStatus()).toBe("error");
+    warn.mockRestore();
   });
 
   it("no-ops when not on an /edit/<siteId> URL", async () => {

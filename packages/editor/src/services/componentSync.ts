@@ -79,30 +79,60 @@ export async function mirrorComponentDelete(componentId: string): Promise<void> 
 }
 
 /**
- * Cross-device load: pull server components into the local IndexedDB cache on
- * editor open. ADDITIVE — only componentIds not already local are written, so a
- * local unsynced master is never clobbered. Best-effort; never throws.
+ * Hydration status (C-4), the CMS pattern: "could not ask" is told apart from
+ * "nothing there" so the editor can say so and offer Retry — the hydrate used
+ * to `console.warn` and leave the library looking empty. "ready" means nothing
+ * is pending, so a surface that never hydrates is not stuck in "loading".
+ */
+export type ComponentHydrationStatus = "loading" | "ready" | "error";
+let hydrationStatus: ComponentHydrationStatus = "ready";
+
+export function getComponentHydrationStatus(): ComponentHydrationStatus {
+  return hydrationStatus;
+}
+
+function setHydrationStatus(next: ComponentHydrationStatus): void {
+  hydrationStatus = next;
+}
+
+/**
+ * Cross-device load (C-4, PD-36): pull server components into the local
+ * IndexedDB cache on editor open. SERVER-FIRST BY `updatedAt`: a master is
+ * written when it is missing locally or the server's row is newer than the
+ * local copy — the old additive pass skipped every id already local, so a
+ * teammate's edit to a shared master never arrived. A master with a mirror
+ * still queued here is left alone (the local change is the newer one).
+ * Nothing local is deleted. Returns how many masters were written.
  */
 export async function hydrateComponentsFromServer(): Promise<number> {
   const siteId = currentSiteId();
   if (!siteId) return 0;
-  let added = 0;
+  let written = 0;
+  setHydrationStatus("loading");
   try {
     const remote = await client().siteComponents.list.query({ siteId });
-    if (!remote.length) return 0;
-    const localIds = new Set((await loadComponents(siteId)).map((c) => c.id));
+    if (!remote.length) {
+      setHydrationStatus("ready");
+      return 0;
+    }
+    const local = new Map((await loadComponents(siteId)).map((c) => [c.id, c]));
     for (const r of remote) {
-      if (localIds.has(r.componentId)) continue;
-      const payload = await client().siteComponents.get.query({ siteId, componentId: r.componentId });
+      const key = r.componentId;
+      if (queue.isPending(`componentUpsert:${key}`) || queue.isPending(`componentDelete:${key}`)) continue;
+      const mine = local.get(key);
+      if (mine && new Date(r.updatedAt).getTime() <= mine.updatedAt) continue;
+      const payload = await client().siteComponents.get.query({ siteId, componentId: key });
       if (!payload) continue;
       await saveComponent(payload as ComponentDefinition, siteId);
-      added++;
+      written++;
     }
+    setHydrationStatus("ready");
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[component-sync] hydrate from server failed", e);
+    setHydrationStatus("error");
   }
-  return added;
+  return written;
 }
 
 /** One entry of the workspace component library (FROM LIBRARY, board 4418:99857). */
