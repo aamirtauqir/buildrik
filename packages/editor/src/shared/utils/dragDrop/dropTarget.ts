@@ -69,6 +69,17 @@ export function findValidDropTarget(
 
     const cursorType = cursor.getType() as ElementType;
 
+    // A-5: a component instance's subtree is a structural read-only zone —
+    // syncInstance discards structural edits inside it — so dropping a new
+    // element into or beside an instance is refused here the same way
+    // wrapping/deleting already are (isComponentInstance walks the ancestor
+    // chain, so this also covers an element nested inside an instance).
+    if (cursor.isComponentInstance()) {
+      cursor = cursor.getParent();
+      depth++;
+      continue;
+    }
+
     // Check if cursor can accept the child directly
     if (canHaveChildren(cursorType) && canNestElement(childType, cursorType)) {
       const position =

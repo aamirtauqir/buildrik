@@ -17,7 +17,6 @@ import { TRPCClientError } from "@trpc/client";
 // same pattern as buildrik-sync-provider.test.ts).
 const mutateMock = {
   content: vi.fn(),
-  layout: vi.fn(),
 };
 
 vi.mock("@trpc/client", async (importOriginal) => {
@@ -27,7 +26,6 @@ vi.mock("@trpc/client", async (importOriginal) => {
     createTRPCClient: () => ({
       ai: {
         content: { mutate: (input: unknown) => mutateMock.content(input) },
-        layout: { mutate: (input: unknown) => mutateMock.layout(input) },
       },
     }),
   };
@@ -48,7 +46,6 @@ let client: typeof import("../AiTrpcClient").aiTrpcClient;
 
 beforeEach(async () => {
   mutateMock.content.mockReset();
-  mutateMock.layout.mockReset();
   vi.resetModules();
   client = (await import("../AiTrpcClient")).aiTrpcClient;
 });
@@ -68,19 +65,6 @@ describe("AiTrpcClient success paths", () => {
     expect(res.cached).toBe(false);
     expect(res.tokensUsed).toBe(42);
     expect(typeof res.duration).toBe("number");
-  });
-
-  // v3 FC-10: generatePage was dropped from AiTrpcClient — nothing in the
-  // editor ever called it (the dashboard's own AI onboarding path is a
-  // separate client), so this test shrinks to the mutation still in use.
-  it("generateLayout routes to its own mutation", async () => {
-    mutateMock.layout.mockResolvedValue({ html: "<section/>" });
-
-    const layoutInput = { prompt: "grid" };
-    const layout = await client.generateLayout(layoutInput);
-
-    expect(mutateMock.layout).toHaveBeenCalledExactlyOnceWith(layoutInput);
-    expect(layout.data.html).toBe("<section/>");
   });
 
   it("serves the second identical request from cache without re-calling the mutation", async () => {

@@ -56,6 +56,13 @@ const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo
  * that to the server. Gating N React leaves cannot close a window listener; the
  * gate belongs at the gateway.
  */
+/**
+ * Commands allowed to reach the engine while a full-page surface (Templates,
+ * the Asset library, Settings) is mounted. Everything else on that surface
+ * belongs to the surface itself — see the data-bk-surface carve-out below.
+ */
+const UNIVERSAL_COMMANDS = new Set(["save"]);
+
 const MUTATING_COMMANDS = new Set([
   "delete", "duplicate", "cut", "paste", "undo", "redo", "save",
   "group", "ungroup",
@@ -203,6 +210,18 @@ export class CommandCenter {
 
     // A read-only composer runs no command that changes the document.
     if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
+
+    // A full-page surface (Templates, Asset library, Settings) owns the
+    // keyboard while mounted — the canvas stays mounted behind it but is not
+    // what the user is looking at. DOM query, not an import — engine/ must
+    // not depend on editor/, same contract as the modal carve-out below.
+    if (
+      !UNIVERSAL_COMMANDS.has(commandId) &&
+      typeof document !== "undefined" &&
+      document.querySelector('[data-bk-surface="fullpage"]')
+    ) {
+      return false;
+    }
 
     // Carve-out 0: the inspector's "Pick on canvas" owns a bare Escape while
     // it's armed. Canvas.tsx's own listener cancels the pick; this shortcut

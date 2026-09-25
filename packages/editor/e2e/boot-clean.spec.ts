@@ -67,9 +67,12 @@
  * simulation is what failed here. One assertion at boot catches the whole family,
  * which is cheap next to an unrequested autosave write or a wiped token list.
  *
- * WHAT IT CANNOT SEE, stated rather than implied: `useSaveState`'s own flag
- * (`useSaveState.ts:40`, the settings screens) is not reachable from the page
- * and is NOT asserted here. Two of three flags are covered.
+ * WHAT IT CANNOT SEE, stated rather than implied: a third, settings-screen
+ * flag this note used to cite from `useSaveState.ts:40` is not reachable
+ * from the page and is NOT asserted here. That hook was deleted 2026-09-26
+ * (A-22, zero importers anywhere in `src/`) — the flag it names never
+ * shipped a caller, so the gap this note is about was never closable from
+ * here regardless. Two of three flags are covered.
  *
  * A FOURTH INSTANCE, same day, and this one destroyed data. The same bootstrap
  * seeding put the app's own startup on the UNDO stack: each `createPage` emits

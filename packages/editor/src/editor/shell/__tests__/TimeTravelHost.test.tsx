@@ -78,6 +78,37 @@ describe("TimeTravelHost", () => {
     frameEl.remove();
   });
 
+  // A-18: the preview absorbed no pointer input and left the composer
+  // mutable, so a click/Delete during time-travel reached the live canvas
+  // hidden underneath the band — the element count changed with no visible
+  // change on screen.
+  it("goes read-only while active and restores the prior value on exit", async () => {
+    renderProjectPages.mockResolvedValue([{ path: "index.html", html: "<h1>then</h1>", name: "Home", slug: "" }]);
+    const frameEl = document.createElement("div");
+    frameEl.className = "buildrick-canvas";
+    document.body.appendChild(frameEl);
+    const c = { ...makeComposer(), readOnly: false };
+    render(<TimeTravelHost composer={c as never} />);
+    expect(c.readOnly).toBe(false);
+    c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
+    expect(c.readOnly).toBe(true);
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    await waitFor(() => expect(screen.getByTestId("tt-preview")).toHaveAttribute("data-status", "ready"));
+    expect(screen.getByTestId("tt-preview").className).not.toMatch(/pointer-events-none/);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(c.readOnly).toBe(false);
+    frameEl.remove();
+  });
+
+  it("does not clobber a readOnly composer (view mode) that was already true before it opened", () => {
+    const c = { ...makeComposer(), readOnly: true };
+    render(<TimeTravelHost composer={c as never} />);
+    c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
+    expect(c.readOnly).toBe(true);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(c.readOnly).toBe(true);
+  });
+
   it("Restore… asks (76095), saves a version first, then restores that point", async () => {
     renderProjectPages.mockResolvedValue([]);
     const c = makeComposer();

@@ -42,10 +42,13 @@ vi.mock("../../../services/ReviewService", () => ({
     reviewsEnabled: null,
     editsRequireApproval: null,
   },
-  // RoleService (P6) resolves the site id through ReviewService — null keeps
-  // the role "unknown" so no chrome gating kicks in during these tests.
-  currentSiteId: vi.fn(() => null),
 }));
+
+// A-22: RoleService and StudioHeader itself now resolve the site id through
+// BuildrikSyncProvider.getSiteIdFromUrl (currentSiteId was a duplicate,
+// deleted) — real jsdom URL has no /edit/<id>, so this resolves to null the
+// same way the old mock forced it to, keeping the role "unknown" so no
+// chrome gating kicks in during these tests.
 
 // P6 role gating — controllable per test; null = unknown (no gating).
 const roleState = vi.hoisted(() => ({ role: null as string | null }));
@@ -861,6 +864,35 @@ describe("F1 dirty-exit guard", () => {
     await waitFor(() => expect(assign).toHaveBeenCalled());
   });
 
+  // B-1: the exit guard used to check only the project's `isDirty`, so a
+  // staged-but-unsaved Brand token edit (project clean) walked straight out
+  // with no dialog — the same gap the beforeunload tests below close.
+  function brandComposerForExit() {
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    return {
+      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string, payload?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(payload));
+      },
+    };
+  }
+
+  it("a staged Brand edit with a clean project still opens the exit dialog", () => {
+    const assign = stubLocation();
+    const composer = brandComposerForExit();
+    render(<StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />);
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    fireEvent.click(exitBtn());
+    expect(assign).not.toHaveBeenCalled();
+    expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
+  });
+
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
     render(<StudioHeader {...makeProps({ isDirty: true, isOffline: true })} />);
     fireEvent.click(exitBtn());
@@ -922,6 +954,39 @@ describe("F1 dirty-exit guard", () => {
     lastProps = makeProps();
     expect(fireBeforeUnload().prevented).toBe(true);
     strandedMirrors = 0;
+  });
+
+  // B-1: a staged Brand edit with a clean project used to leave the native
+  // beforeunload prompt silent too — reload with unsaved token changes lost
+  // them with no warning at all.
+  it("beforeunload prompts on a CLEAN project when Brand has a staged edit", () => {
+    strandedMirrors = 0;
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    const composer = {
+      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string, payload?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(payload));
+      },
+    };
+    const spy = vi.spyOn(window, "addEventListener");
+    const { unmount } = render(
+      <StudioHeader {...makeProps({ isDirty: false, composer: composer as never })} />,
+    );
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    const handler = spy.mock.calls.filter(([t]) => t === "beforeunload").pop()?.[1] as (
+      e: Partial<BeforeUnloadEvent>,
+    ) => void;
+    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
+    handler(e as unknown as BeforeUnloadEvent);
+    spy.mockRestore();
+    unmount();
+    expect((e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(0);
   });
 });
 

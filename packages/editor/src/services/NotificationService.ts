@@ -16,12 +16,12 @@
 
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 
 /** The bell lists this site only (decision 9). No site in the URL (the
  *  standalone demo) = every notification, as the dashboard bell shows. */
 function siteScope(): { siteId: string } | undefined {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   return siteId ? { siteId } : undefined;
 }
 

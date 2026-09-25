@@ -145,8 +145,15 @@ function RailZone({
             <Button
               color="light"
               className={`ls-btn ls-btn--labeled${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+              id={`rail-tab-${tab.id}`}
               onClick={() => onBtnClick(tab.id)}
               role="tab"
+              /* B-9: roving tabindex — every rail tab sat at the button's own
+                 default (focusable), so Tab walked all six before leaving
+                 the rail. Only the active tab is a Tab stop; handleKeyDown
+                 above already moves both selection and focus with the
+                 arrows. */
+              tabIndex={isSelectedTab ? 0 : -1}
               aria-selected={isVisibleActive}
               aria-label={tab.ariaLabel}
               data-tab={tab.id}
@@ -453,6 +460,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         }
         data-testid="sidebar-panel"
         role="tabpanel"
+        /* B-9: the panel had no accessible name tying it to the rail tab
+           that opened it — a screen reader landing here after Tab/arrow nav
+           heard "tabpanel", not which one. */
+        aria-labelledby={`rail-tab-${activeTab}`}
         aria-hidden={!drawerOpen}
         /* `inert` as well as aria-hidden: the closed drawer is width 0 and
            opacity 0 but its whole tree stays mounted, so every control inside

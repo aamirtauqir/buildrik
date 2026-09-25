@@ -80,6 +80,31 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
     setFrame({ status: "live" });
   }, []);
 
+  /* A-18: the preview band drew over the live canvas but left it
+     pointer-events and keyboard-live underneath — a click landed on an
+     element you could not see, and Delete/⌘Z ran through CommandCenter
+     against the live document while "nothing is written until you restore"
+     sat on screen above it. The overlay below drops pointer-events-none so
+     clicks land on the (sandboxed) preview iframe instead of falling
+     through, and the composer goes read-only for the duration — the
+     registry's own MUTATING_COMMANDS gate (CommandCenter.ts) then refuses
+     Delete/duplicate/undo/redo/etc. the same way ?view=readonly does.
+     Restores whatever readOnly was before (not a hard-coded false — a
+     readOnly VIEW route sets it independently), and only once: exit() is
+     called first inside restore(), so this always restores before the
+     actual history write runs. */
+  const prevReadOnlyRef = React.useRef<boolean | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    if (active) {
+      if (prevReadOnlyRef.current === null) prevReadOnlyRef.current = composer.readOnly;
+      composer.readOnly = true;
+    } else if (prevReadOnlyRef.current !== null) {
+      composer.readOnly = prevReadOnlyRef.current;
+      prevReadOnlyRef.current = null;
+    }
+  }, [active, composer]);
+
   /* ⌃⇧T is global — it used to live in HistoryTab, so it only worked with the
      panel already open. */
   React.useEffect(() => {
@@ -285,7 +310,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
       ) : null}
       {fr && frame.status !== "live" ? (
         <div
-          className="tw:pointer-events-none tw:fixed tw:z-[55] tw:overflow-hidden tw:bg-[var(--bk-bg-card)]"
+          className="tw:fixed tw:z-[55] tw:overflow-hidden tw:bg-[var(--bk-bg-card)]"
           style={{ left: fr.left, top: fr.top, width: fr.width, height: fr.height }}
           data-testid="tt-preview"
           data-status={frame.status}

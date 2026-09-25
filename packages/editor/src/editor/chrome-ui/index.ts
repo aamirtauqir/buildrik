@@ -143,7 +143,6 @@ export {
   type ToastActionPayload,
   type UseToastReturn,
 } from "./Toast";
-export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";
 export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator, POPOVER_BASE_CLASS } from "./Popover";
 export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";
 

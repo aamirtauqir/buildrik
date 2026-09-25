@@ -10,7 +10,7 @@ vi.mock("../api-client", () => ({
   getBuildrikClient: () => ({ reviews: { submit: { mutate } } }),
 }));
 
-import { submitForReview, currentSiteId } from "../ReviewService";
+import { submitForReview } from "../ReviewService";
 
 beforeEach(() => {
   mutate.mockReset().mockResolvedValue(undefined);
@@ -67,40 +67,9 @@ describe("submitForReview", () => {
   });
 });
 
-describe("currentSiteId (URL parsing SSOT for the sync services)", () => {
-  it("reads the unified-editor /edit/<id> path", () => {
-    window.history.pushState({}, "", "/edit/site-abc");
-    expect(currentSiteId()).toBe("site-abc");
-  });
-
-  it("decodes a percent-encoded path id", () => {
-    window.history.pushState({}, "", "/edit/site%20one");
-    expect(currentSiteId()).toBe("site one");
-  });
-
-  it("stops the path id at / ? and # boundaries", () => {
-    window.history.pushState({}, "", "/edit/site-abc/settings?tab=seo#top");
-    expect(currentSiteId()).toBe("site-abc");
-  });
-
-  it("falls back to the legacy ?siteId= query param", () => {
-    window.history.pushState({}, "", "/?siteId=qs-1");
-    expect(currentSiteId()).toBe("qs-1");
-  });
-
-  it("prefers the /edit/ path over a conflicting ?siteId=", () => {
-    window.history.pushState({}, "", "/edit/path-wins?siteId=query-loses");
-    expect(currentSiteId()).toBe("path-wins");
-  });
-
-  it("returns null outside the editor (no path id, no query param)", () => {
-    window.history.pushState({}, "", "/dashboard");
-    expect(currentSiteId()).toBeNull();
-  });
-
-  it("matches /edit/ anywhere in the path (nested prefixes still resolve)", () => {
-    // Current behavior: the regex is unanchored, so a prefixed route still matches.
-    window.history.pushState({}, "", "/app/edit/nested-1");
-    expect(currentSiteId()).toBe("nested-1");
-  });
-});
+/* A-22: currentSiteId was a byte-for-byte duplicate of
+   BuildrikSyncProvider.getSiteIdFromUrl (minus its decode try/catch) — same
+   intent, same rules, so per SSOT it's deleted and every importer (including
+   this file's own submitForReview) repoints to the one helper. Its URL-
+   parsing coverage already lives in
+   buildrik-sync-provider.test.ts ("getSiteIdFromUrl" describes). */

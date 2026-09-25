@@ -14,7 +14,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
 import { SyncRetryQueue, type SyncRetryInfo, registerPendingSource } from "./syncRetryQueue";
@@ -103,7 +103,7 @@ export async function retryCmsHydration(): Promise<void> {
 }
 
 export async function hydrateCmsFromServer(): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   // No site or no storage is not a failure — there is nothing to hydrate FROM,
   // and the local collections (if any) are the whole truth.
   if (!siteId || !Storage.isStorageAvailable()) {
@@ -162,7 +162,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
 }
 
 export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `collectionUpsert:${c.id}`,
@@ -187,7 +187,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending upsert for the same collection is now moot — deletion wins, so
   // drop it to avoid resurrecting a deleted collection on retry.
@@ -201,7 +201,7 @@ export async function syncCollectionDelete(id: string): Promise<void> {
 }
 
 export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `entryUpsert:${item.id}`,
@@ -219,7 +219,7 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
 }
 
 export async function syncEntryDelete(id: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   queue.drop(`entryUpsert:${id}`);
   await queue.run(

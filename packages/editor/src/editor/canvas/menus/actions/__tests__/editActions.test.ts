@@ -127,3 +127,44 @@ describe("editActions — delete runs the engine command", () => {
   });
 });
 
+/* Controller review round 1 (follow-up to A-5): this row used to call
+   composer.elements.removeElement directly, bypassing the engine `cut`
+   command's lock/instance filter entirely — a right-click Cut on a locked
+   element removed it anyway. It's now routed through commands.run("cut"),
+   the same command Delete's row already used, which applies the filter,
+   sets composer.clipboard from the whole selection, and emits CLIPBOARD_CUT
+   (useClipboardToasts turns that into the "N cut" + Undo toast). */
+describe("editActions — cut routes through the engine cut command", () => {
+  it("runs composer.commands.run('cut') and does not call removeElement directly", () => {
+    const composer = buildMockComposer();
+    const cut = editSubmenu.find((a) => a.id === "cut");
+    expect(cut).toBeDefined();
+
+    cut!.handler!({
+      composer,
+      element: buildMockElement(),
+      isRoot: false,
+      addToast: vi.fn(),
+    } as Ctx);
+
+    expect(composer.commands.run).toHaveBeenCalledWith("cut");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+  });
+
+  it("still writes the element's data to the OS clipboard", () => {
+    const composer = buildMockComposer();
+    const cut = editSubmenu.find((a) => a.id === "cut");
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    cut!.handler!({
+      composer,
+      element: buildMockElement(),
+      isRoot: false,
+      addToast: vi.fn(),
+    } as Ctx);
+
+    expect(writeText).toHaveBeenCalledWith(JSON.stringify(sampleData, null, 2));
+  });
+});
+

@@ -9,18 +9,45 @@
 import { snapToGrid } from "../../shared/utils/dragDrop";
 import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
+import type { Element } from "../elements/Element";
 
 /** Direction for z-index reordering */
 export type ReorderDirection = "forward" | "backward" | "front" | "back";
 
 /**
+ * A-5: drop locked elements and elements inside a component instance from a
+ * destructive multi-selection op (delete/cut/nudge). Locking and instance
+ * membership are read straight from the element (the single source of
+ * truth — see ElementSerialization.isLocked/isComponentInstance), not from a
+ * panel's own tracking set. Returns the survivors and whether anything was
+ * skipped, so the caller can tell the user their selection shrank. Lives
+ * here (not defaultCommands.ts, which imports FROM this module) so both
+ * defaultCommands' delete/cut and nudgeSelected below can share it without
+ * a circular import.
+ */
+export function dropLockedAndInstances(elements: Element[]): { kept: Element[]; skipped: boolean } {
+  const kept = elements.filter((el) => !el.isLocked() && !el.isComponentInstance());
+  return { kept, skipped: kept.length !== elements.length };
+}
+
+/**
  * Nudge the currently selected element by (deltaX, deltaY) pixels.
  * Applies position changes via inline styles.
  * Respects snap-to-grid setting when enabled.
+ *
+ * Controller review round 1, IMPORTANT 2: a locked element nudged anyway —
+ * the delete/cut/toggleLock/drop-target guards from A-5 never reached the
+ * keyboard-arrow path. Skips a locked (or instance-owned) selection and
+ * emits the same LOCKED_ELEMENTS_SKIPPED event delete/cut emit, so the
+ * shell's toast (round 1 MINOR 4) fires the same way.
  */
 export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number): void {
   const selected = composer.selection.getSelected();
   if (!selected) return;
+  if (selected.isLocked?.() || selected.isComponentInstance?.()) {
+    composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+    return;
+  }
 
   const elementId = selected.getId();
   const domElement = document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;

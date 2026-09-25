@@ -231,7 +231,23 @@ function buildCommands(
     { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
     /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
     { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
-    { id: "history-clear", label: "Clear history", group: "More", handler: run(() => composer.emit(EVENTS.HISTORY_CLEARED, undefined)) },
+    {
+      id: "history-clear",
+      label: "Clear history",
+      group: "More",
+      /* PD-38: kept, but not as a confirm-less destructive action — it used
+         to emit HISTORY_CLEARED as pure notification, with nothing actually
+         clearing the undo stack (C-6/A14-3). composer.history.clear() is the
+         real op; a plain window.confirm is the smallest "with a confirm"
+         that doesn't need new dialog plumbing inside the palette. */
+      handler: run(() => {
+        if (typeof window !== "undefined" && !window.confirm("Clear this session's undo history? This can't be undone.")) {
+          return;
+        }
+        composer.history?.clear();
+        composer.emit(EVENTS.HISTORY_CLEARED, undefined);
+      }),
+    },
   );
   used.add("redo");
 

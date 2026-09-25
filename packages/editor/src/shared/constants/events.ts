@@ -183,6 +183,10 @@ export const EVENTS = {
   CLIPBOARD_COPY: "clipboard:copy",
   CLIPBOARD_CUT: "clipboard:cut",
   CLIPBOARD_PASTE: "clipboard:paste",
+  /* A-5: delete/cut skip locked elements and elements inside a component
+     instance — this tells the shell so it can toast why the selection count
+     shrank instead of doing nothing silently. */
+  LOCKED_ELEMENTS_SKIPPED: "clipboard:locked-elements-skipped",
 
   // ============================================
   // Data Binding Events

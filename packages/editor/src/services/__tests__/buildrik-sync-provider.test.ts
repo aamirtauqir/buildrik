@@ -329,7 +329,7 @@ describe("getSiteIdFromUrl — /edit/<id> path variants", () => {
     expect(getSiteIdFromUrl()).toBe("path-wins");
   });
 
-  it("is ANCHORED: a nested /app/edit/<id> path does NOT match (unlike ReviewService.currentSiteId)", () => {
+  it("is ANCHORED: a nested /app/edit/<id> path does NOT match (unlike the deleted ReviewService.currentSiteId, A-22)", () => {
     window.history.replaceState({}, "", "/app/edit/nested-1");
     expect(getSiteIdFromUrl()).toBeNull();
   });

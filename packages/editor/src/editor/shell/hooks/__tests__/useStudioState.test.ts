@@ -71,18 +71,37 @@ describe("useStudioState", () => {
 
   // Persistence ----------------------------------------------------------------
   describe("panel-state persistence", () => {
-    it("persists leftPanelTab / subTabs / rightPanelTab to buildrick-panel-state", () => {
+    it("persists leftPanelTab / rightPanelTab to buildrick-panel-state", () => {
       const { result } = renderHook(() => useStudioState());
       act(() => {
         result.current.setLeftPanelTab("pages");
-        result.current.setLeftPanelSubTabs({ pages: "list" });
         result.current.setRightPanelTab("styles");
       });
       expect(readPersisted()).toMatchObject({
         leftPanelTab: "pages",
-        leftPanelSubTabs: { pages: "list" },
         rightPanelTab: "styles",
       });
+    });
+
+    /* A-7: a sub-tab is a one-shot deep-link destination, not a sticky
+       preference — persisting it left a stale sub-tab that a later plain
+       openLeftPanelToTab(primaryTab) call would silently reuse. */
+    it("does NOT persist leftPanelSubTabs", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => {
+        result.current.setLeftPanelSubTabs({ pages: "list" });
+      });
+      expect(readPersisted()?.leftPanelSubTabs).toBeUndefined();
+    });
+
+    /* A-7: a full-page tab (Settings, Templates, the Asset library) is a
+       destination, not a steady state — persisting it verbatim dropped a
+       reload right back into Settings instead of the canvas. */
+    it("persists the last DRAWER tab, not a full-page tab, while a full page is open", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.setLeftPanelTab("pages"));
+      act(() => result.current.setLeftPanelTab("settings"));
+      expect(readPersisted()).toMatchObject({ leftPanelTab: "pages" });
     });
 
     /* Board 817:4649: "Toggles persist per-user per-project." They did not —
@@ -171,11 +190,23 @@ describe("useStudioState", () => {
       expect(result.current.leftPanelSubTabs).toEqual({ design: "colors" });
     });
 
-    it("openLeftPanelToTab without a sub-tab leaves subTabs untouched", () => {
+    it("openLeftPanelToTab without a sub-tab leaves ANOTHER tab's subTab untouched", () => {
       const { result } = renderHook(() => useStudioState());
       act(() => result.current.setLeftPanelSubTabs({ add: "blocks" }));
       act(() => result.current.openLeftPanelToTab("pages"));
       expect(result.current.leftPanelSubTabs).toEqual({ add: "blocks" });
+    });
+
+    /* A-7 consume-once: a deep link's sub-tab is a one-shot destination. A
+       plain re-open of the SAME primary tab with no subTab must not silently
+       reuse whatever a prior deep link had left there — Settings opened
+       plain, after once landing on Settings > SEO, must show the overview. */
+    it("openLeftPanelToTab without a sub-tab clears a PRIOR sub-tab for the SAME primary tab", () => {
+      const { result } = renderHook(() => useStudioState());
+      act(() => result.current.openLeftPanelToTab("settings", "seo"));
+      expect(result.current.leftPanelSubTabs).toEqual({ settings: "seo" });
+      act(() => result.current.openLeftPanelToTab("settings"));
+      expect(result.current.leftPanelSubTabs).toEqual({});
     });
 
     it("openBlocks / openPages / openLayers target add / pages / layers", () => {

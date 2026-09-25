@@ -14,7 +14,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
-import { currentSiteId } from "./ReviewService";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
 import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
@@ -45,7 +45,7 @@ export function retryComponentSync(): Promise<void> {
 
 /** Mirror a created/updated component master to the server (upsert). */
 export async function mirrorComponentUpsert(component: ComponentDefinition): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   await queue.run(
     `componentUpsert:${component.id}`,
@@ -65,7 +65,7 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
 
 /** Mirror a component deletion to the server. */
 export async function mirrorComponentDelete(componentId: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return;
   // A pending upsert for the same component is moot — deletion wins, so drop it
   // to avoid resurrecting a deleted master on a reconnect retry.
@@ -84,7 +84,7 @@ export async function mirrorComponentDelete(componentId: string): Promise<void> 
  * local unsynced master is never clobbered. Best-effort; never throws.
  */
 export async function hydrateComponentsFromServer(): Promise<number> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
   try {
@@ -118,7 +118,7 @@ export interface LibraryComponentEntry {
 /** The workspace's shared masters as seen from this site; [] when there is no
  *  site (demo) or the read fails — the group then simply has no rows. */
 export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return [];
   try {
     const rows = await client().siteComponents.library.query({ siteId });
@@ -132,7 +132,7 @@ export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> 
 
 /** A library master's full definition, to bring onto this site. */
 export async function fetchLibraryComponent(componentId: string): Promise<ComponentDefinition | null> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return null;
   const payload = await client().siteComponents.libraryGet.query({ siteId, componentId });
   return (payload as ComponentDefinition | null) ?? null;

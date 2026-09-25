@@ -6,18 +6,10 @@
  * @license BSD-3-Clause
  */
 import { getBuildrikClient } from "./api-client";
+import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PublishPage } from "../editor/shell/exportPublishPages";
 import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
-
-/** The site being edited, read from the unified-editor URL (/edit/<siteId>) or
- *  the legacy ?siteId param. */
-export function currentSiteId(): string | null {
-  if (typeof window === "undefined") return null;
-  const path = window.location.pathname.match(/\/edit\/([^/?#]+)/);
-  if (path) return decodeURIComponent(path[1]);
-  return new URLSearchParams(window.location.search).get("siteId");
-}
 
 export interface ReviewStatus {
   state: ReviewPillState;
@@ -64,7 +56,7 @@ export const UNKNOWN_REVIEW_STATUS: ReviewStatus = {
  * from "no answer yet" from "the read failed".
  */
 export async function fetchReviewStatus(): Promise<ReviewStatus> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return UNKNOWN_REVIEW_STATUS;
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
@@ -81,7 +73,7 @@ export async function fetchReviewStatus(): Promise<ReviewStatus> {
  * so a flaky request can never erase an "Approved by X" pill mid-session.
  */
 export async function fetchReviewStatusOrNull(): Promise<ReviewStatus | null> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return UNKNOWN_REVIEW_STATUS;
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
@@ -129,7 +121,7 @@ export async function submitForReview(
   clientEmail?: string,
   snapshotPages?: PublishPage[],
 ): Promise<SubmitOutcome> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) throw new Error("No site to send for review");
   const r = (await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({
     siteId,
@@ -195,7 +187,7 @@ export interface CurrentRound {
  * (design review DF5). Returns [] only when there is genuinely no site.
  */
 export async function fetchReviewComments(status?: "OPEN" | "RESOLVED"): Promise<ReviewComment[]> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return [];
   const rows = await getBuildrikClient(DASHBOARD_URL).comments.list.query({ siteId, status });
   return rows.map((r) => ({
@@ -221,7 +213,7 @@ export async function fetchReviewComments(status?: "OPEN" | "RESOLVED"): Promise
  * there is genuinely no site.
  */
 export async function fetchCurrentRound(): Promise<CurrentRound | null> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return null;
   return getBuildrikClient(DASHBOARD_URL).reviews.currentRound.query({ siteId });
 }
@@ -243,7 +235,7 @@ export interface RoundListRow {
  * history"; [] only when there is genuinely no site.
  */
 export async function fetchRounds(): Promise<RoundListRow[]> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return [];
   return getBuildrikClient(DASHBOARD_URL).reviews.rounds.query({ siteId });
 }
@@ -255,7 +247,7 @@ export async function fetchRounds(): Promise<RoundListRow[]> {
  * no stored snapshot — a state the Compare view renders explicitly.
  */
 export async function fetchApprovedSnapshot(): Promise<PublishPage[] | null> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return null;
   return getBuildrikClient(DASHBOARD_URL).reviews.approvedSnapshot.query({ siteId });
 }
@@ -269,7 +261,7 @@ export async function revokeReview(
   reviewId: string,
   expectedRevision: string,
 ): Promise<{ revoked: boolean; reason?: string }> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) return { revoked: false, reason: "error" };
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.revoke.mutate({
@@ -289,7 +281,7 @@ export async function revokeReview(
  * (contracts §6.4), so the designer can always answer feedback before re-sending.
  */
 export async function postReply(body: string, pageId?: string): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) throw new Error("No site to reply on");
   await getBuildrikClient(DASHBOARD_URL).comments.create.mutate({ siteId, body, pageId });
 }
@@ -304,7 +296,7 @@ export async function createPinnedComment(input: {
   y: number | null;
   targetSelector: string | null;
 }): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) throw new Error("No site to comment on");
   await getBuildrikClient(DASHBOARD_URL).comments.create.mutate({ siteId, ...input });
 }
@@ -314,14 +306,14 @@ export async function reattachReviewComment(
   id: string,
   input: { targetSelector: string; pageId?: string | null; x?: number | null; y?: number | null },
 ): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) throw new Error("No site to reattach on");
   await getBuildrikClient(DASHBOARD_URL).comments.reattach.mutate({ id, siteId, ...input });
 }
 
 /** Resolve / reopen a comment. Throws on failure for a retry. */
 export async function resolveReviewComment(id: string, status: "OPEN" | "RESOLVED"): Promise<void> {
-  const siteId = currentSiteId();
+  const siteId = getSiteIdFromUrl();
   if (!siteId) throw new Error("No site to resolve on");
   await getBuildrikClient(DASHBOARD_URL).comments.resolve.mutate({ id, siteId, status });
 }

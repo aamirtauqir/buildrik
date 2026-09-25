@@ -57,21 +57,10 @@ export interface ContentRequest {
   tone: ToneType;
 }
 
-export interface LayoutRequest {
-  prompt: string;
-  style?: LayoutStyle;
-}
-
 export interface ImageRequest {
   prompt: string;
   size?: ImageSize;
   style?: ImageStyle;
-}
-
-export interface CodeRequest {
-  prompt: string;
-  language: ProgrammingLanguage;
-  style?: CodeStyle;
 }
 
 export interface StreamCallbacks {
@@ -108,69 +97,6 @@ export async function generateContent(
     options
   );
   return response.data.content;
-}
-
-/**
- * Generate layout HTML using AI
- */
-async function generateLayout(
-  prompt: string,
-  style?: LayoutStyle,
-  options?: AIRequestOptions
-): Promise<string> {
-  const response = await aiTrpcClient.generateLayout(
-    { prompt, sectionType: style },
-    options
-  );
-  return response.data.html;
-}
-
-/**
- * Generate code snippet using AI
- */
-async function generateCode(
-  prompt: string,
-  language: ProgrammingLanguage | string,
-  _style?: CodeStyle,
-  options?: AIRequestOptions
-): Promise<string> {
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: `Generate ${language} code: ${prompt}`,
-      type: "content",
-    },
-    options
-  );
-  return response.data.content;
-}
-
-/**
- * Improve/refine existing content
- */
-async function improveContent(
-  content: string,
-  instruction: string,
-  options?: AIRequestOptions
-): Promise<string> {
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: `Improve the following content. Instruction: ${instruction}\n\nContent:\n${content}`,
-      type: "content",
-    },
-    options
-  );
-  return response.data.content;
-}
-
-export interface BatchRequest {
-  type: "content" | "layout" | "code" | "improve";
-  params: Record<string, unknown>;
-}
-
-export interface BatchResult<T = string> {
-  success: boolean;
-  data?: T;
-  error?: AIError;
 }
 
 export const PROMPT_TEMPLATES = {

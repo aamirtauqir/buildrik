@@ -44,6 +44,12 @@ export function useClipboardToasts(
     const cut = (e: unknown) =>
       addToast({ description: `${plural(count(e), "Element", "elements")} cut`, tone: "info", duration: 2000 });
 
+    /* Round-1 controller review, MINOR 4: LOCKED_ELEMENTS_SKIPPED (delete,
+       cut, nudge — A-5) had no listener anywhere, so a locked element quietly
+       staying put looked identical to nothing having been selected at all. */
+    const lockedSkipped = () =>
+      addToast({ description: "Locked elements were skipped", tone: "info", duration: 2500 });
+
     /* CLIPBOARD_PASTE is emitted by pasteElement, once PER element — so a
        three-element paste fired three toasts stacked on top of each other. The
        header above records that even TWO was a bug worth fixing. Collect the
@@ -89,6 +95,7 @@ export function useClipboardToasts(
     composer.on(EVENTS.CLIPBOARD_CUT, cut);
     composer.on(EVENTS.CLIPBOARD_PASTE, pasted);
     composer.on(EVENTS.ELEMENT_DUPLICATED, duplicated);
+    composer.on(EVENTS.LOCKED_ELEMENTS_SKIPPED, lockedSkipped);
     return () => {
       if (burst) clearTimeout(burst);
       if (dupeBurst) clearTimeout(dupeBurst);
@@ -96,6 +103,7 @@ export function useClipboardToasts(
       composer.off(EVENTS.CLIPBOARD_CUT, cut);
       composer.off(EVENTS.CLIPBOARD_PASTE, pasted);
       composer.off(EVENTS.ELEMENT_DUPLICATED, duplicated);
+      composer.off(EVENTS.LOCKED_ELEMENTS_SKIPPED, lockedSkipped);
     };
   }, [composer, addToast]);
 }

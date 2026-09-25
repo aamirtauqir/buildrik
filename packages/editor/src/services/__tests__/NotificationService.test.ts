@@ -21,7 +21,7 @@ vi.mock("../api-client", () => ({
     },
   }),
 }));
-vi.mock("../ReviewService", () => ({ currentSiteId: () => siteId() }));
+vi.mock("../BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => siteId() }));
 
 import { fetchRecentNotifications, fetchUnreadCount, markAllNotificationsRead } from "../NotificationService";
 

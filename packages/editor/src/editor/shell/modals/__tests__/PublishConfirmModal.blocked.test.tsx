@@ -21,7 +21,6 @@ vi.mock("@/services/PublishService", () => ({
 }));
 vi.mock("@/services/ReviewService", () => ({
   fetchCurrentRound: async () => null,
-  currentSiteId: () => "site-1",
 }));
 vi.mock("@/editor/shell/exportPublishPages", () => ({
   exportPublishPages: async () => [{ path: "index.html", html: "<html></html>" }],
