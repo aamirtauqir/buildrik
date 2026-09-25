@@ -17,9 +17,13 @@
  *   C                     → toggle canvas comment mode (board 58:215 legend)
  *   Ctrl/Cmd+,            → openSiteSettings() — the site menu's own row
  *   Ctrl/Cmd+H            → left panel · version history
- *   Shift+A               → left panel · components
  *
- * The last three are printed on site-menu rows (Figma 642:3664), so the hints
+ * (Shift+A → Components was bound here too until FB-1 (2026-09-25) — a
+ * second listener racing GROUPED_TABS_CONFIG's own "⇧A" binding in
+ * useSidebarKeyboard.ts for the same destination. That table is the one
+ * source now; this hook no longer touches it.)
+ *
+ * The other two are printed on site-menu rows (Figma 642:3664), so the hints
  * and these handlers are one contract. On macOS the browser eats ⌘, and ⌘H
  * before the page sees them, which is why `SiteMenu` advertises the control
  * chords there — the handler accepts either modifier so both platforms work.
@@ -145,11 +149,11 @@ export function useEditorShortcuts({
         openLeftPanelToTab?.("history");
         return;
       }
-      if (e.shiftKey && (e.key === "A" || e.key === "a") && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        e.preventDefault();
-        openLeftPanelToTab?.("components");
-        return;
-      }
+      // FB-1: ⇧A was bound here AND in useSidebarKeyboard.ts (driven by
+      // GROUPED_TABS_CONFIG's "⇧A" shortcut on the "components" tab) — two
+      // listeners racing to the same destination. useSidebarKeyboard.ts is
+      // the one table (it also feeds the keyboard-shortcuts sheet), so this
+      // one stands down.
 
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();

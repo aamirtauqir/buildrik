@@ -1,7 +1,10 @@
 /**
- * usePageCommands — the Pages panel's rows in the one ⌘K palette exist
- * exactly while the panel is mounted (decision #38's `when: pagesActive`,
- * realised as registration lifetime), and follow the page list.
+ * usePageCommands — the "New page"/"Go to <page>" rows in the one ⌘K
+ * palette, registered for exactly as long as the CALLER stays mounted.
+ *
+ * v3 FC-2 (2026-09-25): the caller is the shell now (StudioPanels), not the
+ * Pages panel, so the rows are always in ⌘K — but the hook's own
+ * mount/unmount registration lifetime, tested here, is unchanged.
  *
  * @license BSD-3-Clause
  */

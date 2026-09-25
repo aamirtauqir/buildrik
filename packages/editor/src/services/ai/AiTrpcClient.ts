@@ -197,23 +197,6 @@ class AiTrpcClient {
     );
   }
 
-  async generatePage(
-    input: {
-      pageType: "landing" | "portfolio" | "product" | "pricing" | "blog";
-      description: string;
-      style: "modern" | "minimal" | "bold";
-    },
-    options: AIRequestOptions = {}
-  ): Promise<
-    AIResponse<{
-      sections: Array<{ type: string; html: string; css?: string }>;
-    }>
-  > {
-    return this.execute("ai.page", input, options, () =>
-      trpc().ai.page.mutate(input)
-    );
-  }
-
   async generateLayout(
     input: { prompt: string; sectionType?: string },
     options: AIRequestOptions = {}

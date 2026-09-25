@@ -18,7 +18,7 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Package, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Copy, ClipboardPaste, CopyPlus, CornerLeftUp, Crosshair, MoreHorizontal, PanelRightClose, Package, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
@@ -41,6 +41,10 @@ export interface InspectorElementMenuProps {
   /** G2-146: open / close every section of this tab. */
   onExpandAll?: () => void;
   onCollapseAll?: () => void;
+  /** v3 FC-3 (board 7048:77991): "Improve with AI" — opens the SAME
+   *  right-column AI thread as the header's ✦ chip and the canvas context
+   *  menu's row (all three call the identical `ui:switch-tab` seam). */
+  onAIRequest?: () => void;
 }
 
 interface MenuItem {
@@ -136,6 +140,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   onHideInspector,
   onExpandAll,
   onCollapseAll,
+  onAIRequest,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { addToast } = useToast();
@@ -229,6 +234,9 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   };
   const hasParent = Boolean(composer?.elements.getElement(selectedElementId)?.getParent?.());
   const navItems: MenuItem[] = [
+    ...(onAIRequest
+      ? [{ id: "ai", label: "Improve with AI", icon: <Sparkles size={14} aria-hidden="true" />, onClick: run(onAIRequest) }]
+      : []),
     ...(onPick
       ? [{ id: "pick", label: "Pick on canvas", icon: <Crosshair size={14} aria-hidden="true" />, onClick: run(onPick) }]
       : []),

@@ -407,6 +407,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onHideInspector={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
               onExpandAll={expandAll}
               onCollapseAll={collapseAll}
+              /* v3 FC-3 (board 7048:77991): same seam as the header's ✦ chip
+                 — one AI thread, three doors (chip, ⋯ row, canvas context menu). */
+              onAIRequest={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
             />
           )}
         </div>

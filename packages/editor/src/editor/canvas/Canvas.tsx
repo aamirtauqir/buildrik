@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
-import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 
 /** Grey left each side of the page card when the canvas fits on load. */
@@ -805,7 +805,14 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                 composer.emit("ui:switch-tab", { tab: "add" });
                 requestInsertGroup(composer, "blocks");
               }}
-              onDescribe={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
+              /* v3 FC-3: "Describe your site" CREATES the first section — that
+                 is Add's generator (same door as ⌘K "Generate a block with
+                 AI…"), not the right-column AI, which only ever EDITS an
+                 existing selection and has none to work with on an empty
+                 canvas. */
+              onDescribe={() => {
+                if (composer) requestGenerateBlock(composer);
+              }}
               onStartBlank={() => {
                 setStartedBlank(true);
                 composer?.emit("ui:switch-tab", { tab: "add" });

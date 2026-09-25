@@ -17,7 +17,6 @@ import { TRPCClientError } from "@trpc/client";
 // same pattern as buildrik-sync-provider.test.ts).
 const mutateMock = {
   content: vi.fn(),
-  page: vi.fn(),
   layout: vi.fn(),
 };
 
@@ -28,7 +27,6 @@ vi.mock("@trpc/client", async (importOriginal) => {
     createTRPCClient: () => ({
       ai: {
         content: { mutate: (input: unknown) => mutateMock.content(input) },
-        page: { mutate: (input: unknown) => mutateMock.page(input) },
         layout: { mutate: (input: unknown) => mutateMock.layout(input) },
       },
     }),
@@ -50,7 +48,6 @@ let client: typeof import("../AiTrpcClient").aiTrpcClient;
 
 beforeEach(async () => {
   mutateMock.content.mockReset();
-  mutateMock.page.mockReset();
   mutateMock.layout.mockReset();
   vi.resetModules();
   client = (await import("../AiTrpcClient")).aiTrpcClient;
@@ -73,23 +70,16 @@ describe("AiTrpcClient success paths", () => {
     expect(typeof res.duration).toBe("number");
   });
 
-  it("generatePage and generateLayout route to their own mutations", async () => {
-    mutateMock.page.mockResolvedValue({ sections: [{ type: "hero", html: "<div/>" }] });
+  // v3 FC-10: generatePage was dropped from AiTrpcClient — nothing in the
+  // editor ever called it (the dashboard's own AI onboarding path is a
+  // separate client), so this test shrinks to the mutation still in use.
+  it("generateLayout routes to its own mutation", async () => {
     mutateMock.layout.mockResolvedValue({ html: "<section/>" });
 
-    const pageInput = {
-      pageType: "landing" as const,
-      description: "d",
-      style: "modern" as const,
-    };
     const layoutInput = { prompt: "grid" };
-
-    const page = await client.generatePage(pageInput);
     const layout = await client.generateLayout(layoutInput);
 
-    expect(mutateMock.page).toHaveBeenCalledExactlyOnceWith(pageInput);
     expect(mutateMock.layout).toHaveBeenCalledExactlyOnceWith(layoutInput);
-    expect(page.data.sections).toHaveLength(1);
     expect(layout.data.html).toBe("<section/>");
   });
 

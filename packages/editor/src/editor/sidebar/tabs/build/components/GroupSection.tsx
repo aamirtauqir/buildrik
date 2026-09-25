@@ -131,7 +131,11 @@ export const Row: React.FC<{
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick }) => {
+  /** v3 FC-5: a saved component scoped to the open page only (board
+   *  6971:77663's "This page" scope) drew identically to a site-wide one —
+   *  nothing told the two apart in the Mine list. */
+  meta?: string;
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, onHoverChange, testId, grip, fav, draggable, onDragStart, onClick, meta }) => {
   const row = (
     <div
       role="button"
@@ -204,6 +208,14 @@ export const Row: React.FC<{
         {label}
         {disabled && (
           <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
+        )}
+        {meta && (
+          <span
+            data-testid={`insert-row-meta-${testId}`}
+            className="tw:ml-[var(--bk-space-8)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]"
+          >
+            {meta}
+          </span>
         )}
       </span>
       {fav ? (
@@ -476,6 +488,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
               e.dataTransfer.effectAllowed = "copy";
             }}
             onClick={() => onMineInsert?.(c)}
+            meta={c.pageId ? "This page" : undefined}
           />
         ))}
         {mine.length === 0 && !library?.length && (

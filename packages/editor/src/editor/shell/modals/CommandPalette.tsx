@@ -55,6 +55,10 @@ export interface CommandPaletteProps {
   composer: Composer | null;
   /** A panel's "Search everywhere for …" hand-off (G2-059) opens on its query. */
   initialQuery?: string;
+  /** FB-4: server flag for the agency review layer — `null`/`false` hides the
+   *  "Open Review" row. Absent prop behaves like `false` (no row) rather
+   *  than assuming the layer is on. */
+  reviewsEnabled?: boolean | null;
 }
 
 /** Board 4418:141220's bands, in its order. PAGES (context, Pages panel open)
@@ -67,7 +71,11 @@ const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tool
 // COMMANDS
 // =============================================================================
 
-function buildCommands(composer: Composer | null, onClose: () => void): PaletteCommand[] {
+function buildCommands(
+  composer: Composer | null,
+  onClose: () => void,
+  reviewsEnabled: boolean | null | undefined,
+): PaletteCommand[] {
   const commands: PaletteCommand[] = [];
   const run = (fn: () => void) => () => {
     fn();
@@ -93,7 +101,11 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     ["new-page", "New page", () => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), ["page", "create", "add page"]],
     /* 4428:149355: the catalogue opens in replace mode for the active page. */
     ["replace-layout", "Replace layout with template…", () => composer?.emit(EVENTS.UI_BROWSE_TEMPLATES, { replace: true })],
-    ["review", "Open Review", () => openPanel("review")],
+    /* FB-4: the agency review layer is off for most sites — no row, no
+       letter, no panel, until the workspace turns it on (server flag, not
+       a client feature flag). The topbar Review pill stays visible either
+       way (owner decision) — this only hides the ⌘K shortcut into it. */
+    ...(reviewsEnabled ? ([["review", "Open Review", () => openPanel("review")]] as Array<[string, string, () => void, string[]?]>) : []),
     ["activity", "Open Activity", () => openPanel("activity")],
     ["issues", "Open Issues", () => composer?.emit(EVENTS.UI_OPEN_ISSUES, undefined), ["problems", "errors", "warnings", "checks"]],
     ["settings", "Open Site settings", () => openPanel("settings")],
@@ -346,7 +358,12 @@ const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
 // COMPONENT
 // =============================================================================
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer, initialQuery = "" }) => {
+export const CommandPalette: React.FC<CommandPaletteProps> = ({
+  onClose,
+  composer,
+  initialQuery = "",
+  reviewsEnabled,
+}) => {
   const [query, setQuery] = React.useState(initialQuery);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -356,9 +373,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
      this list — and every "cannot run" reason in it — is rebuilt on each open
      against the selection of that moment. */
   const commands = React.useMemo(
-    () => buildCommands(composer, onClose),
+    () => buildCommands(composer, onClose, reviewsEnabled),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [composer],
+    [composer, reviewsEnabled],
   );
 
   /* RECORDS — CMS records answer by their display field and open in the
