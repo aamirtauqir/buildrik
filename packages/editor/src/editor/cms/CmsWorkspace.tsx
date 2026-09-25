@@ -304,6 +304,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary 
       {ws.recordId && (ws.recordId === "new" || sheetRecord) ? (
         <RecordSheet
           key={ws.recordId}
+          composer={composer}
           collection={collection}
           record={sheetRecord}
           onClose={() => cmsWorkspace.openRecord(null)}

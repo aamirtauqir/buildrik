@@ -18,6 +18,7 @@
  */
 import * as React from "react";
 import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
+import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import {
@@ -38,6 +39,7 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
+import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { resolveUrl, slugify } from "./DynamicPagesPane";
 import type { CmsTab } from "./cmsWorkspaceStore";
 
@@ -48,6 +50,7 @@ export type OpenMediaLibrary = (
 ) => void;
 
 export interface RecordSheetProps {
+  composer: Composer | null;
   collection: CMSCollection;
   /** null → a new record. */
   record: CMSContentItem | null;
@@ -104,6 +107,7 @@ function rowsOf(fields: CMSField[]): CMSField[][] {
 }
 
 export function RecordSheet({
+  composer,
   collection,
   record,
   onClose,
@@ -136,6 +140,7 @@ export function RecordSheet({
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [typedDelete, setTypedDelete] = React.useState(false);
+  const [templatePreviewOpen, setTemplatePreviewOpen] = React.useState(false);
 
   React.useEffect(() => {
     setForm(initial);
@@ -346,6 +351,15 @@ export function RecordSheet({
             }
           >
             <Menu label="Record menu">
+              <MenuItem
+                data-testid="cms-sheet-preview-template"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setTemplatePreviewOpen(true);
+                }}
+              >
+                Preview saved record
+              </MenuItem>
               <MenuItem danger data-testid="cms-sheet-delete" onClick={() => void remove()}>
                 Delete record…
               </MenuItem>
@@ -508,6 +522,18 @@ export function RecordSheet({
           consequence={`Deleting removes this record and its generated page ${resolveUrl(collection.pageSlugPattern ?? "", record.data)}.`}
           confirmLabel="Delete record"
           testId="cms-delete-record"
+        />
+      ) : null}
+      {templatePreviewOpen && record ? (
+        <RecordTemplatePreviewDialog
+          composer={composer}
+          collection={collection}
+          record={record}
+          onClose={() => setTemplatePreviewOpen(false)}
+          onChooseTemplate={() => {
+            setTemplatePreviewOpen(false);
+            onOpenTab("dynamic-pages");
+          }}
         />
       ) : null}
     </div>
