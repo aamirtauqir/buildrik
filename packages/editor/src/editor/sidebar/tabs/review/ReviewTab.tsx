@@ -420,7 +420,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             Round history ›
           </MenuItem>
           {liveToken ? (
-            <MenuItem onClick={() => openReviewLink(liveToken)}>Open current review link</MenuItem>
+            <MenuItem onClick={() => openReviewLink(liveToken)} data-testid="review-menu-open-link">
+              Open current review link
+            </MenuItem>
           ) : null}
           {/* The re-send is a menu row, not a footer button: no 4418 Review
               board draws a primary under the composer. It always asks first —

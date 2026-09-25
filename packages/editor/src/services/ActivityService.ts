@@ -19,21 +19,17 @@
  * @license BSD-3-Clause
  */
 
+import type { SiteActivityFilter, SiteActivityKind, SiteActivityEntry } from "@buildrik/shared/schemas/activity";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 
-export type ActivityFilter = "all" | "edits" | "comments" | "publish";
+export type ActivityFilter = SiteActivityFilter;
 
-export type ActivityKind = "edit" | "comment" | "publish";
+export type ActivityKind = SiteActivityKind;
 
-export interface ActivityEntry {
-  id: string;
-  kind: ActivityKind;
-  actorName: string | null;
-  summary: string;
-  actionUrl: string | null;
+export type ActivityEntry = Omit<SiteActivityEntry, "createdAt"> & {
   createdAt: string | Date;
-}
+};
 
 export type ActivityReadFailure = "unauthorized" | "failed";
 

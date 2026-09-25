@@ -558,8 +558,11 @@ export async function getPublishDiff(siteId: string, fromJobId: string, toJobId:
  * The exception to "HTML never leaves the service" (getPublishDiff /
  * getPublishStatus / getPublishHistory keep it in): those are list/status
  * payloads where HTML would be dead weight, while this is the one lazy read
- * whose whole job is the content — and that content is already public at the
- * site's live URL. Same shape and laziness as `getApprovedSnapshot`.
+ * whose whole job is the content — and `jobId` can point at ANY COMPLETED
+ * publish job for the site, not only the current live one, so this can
+ * expose a superseded or since-unpublished version's HTML. It is not public
+ * by that fact alone; the router gates the call at EDITOR. Same shape and
+ * laziness as `getApprovedSnapshot`.
  *
  * Throws NOT_FOUND when the job is not a COMPLETED publish of this site; null
  * when its payload was pruned past the retained window (a state, not an error).

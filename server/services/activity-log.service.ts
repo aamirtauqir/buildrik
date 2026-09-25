@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import type { SiteActivityEntry, SiteActivityFilter, SiteActivityKind } from "@buildrik/shared/schemas/activity";
 
 export type ActivityAction =
@@ -179,7 +180,7 @@ export async function listSiteActivity(
   filter: SiteActivityFilter,
   limit = 30,
 ): Promise<SiteActivityEntry[]> {
-  const logActions: Record<SiteActivityFilter, Record<string, unknown>> = {
+  const logActions: Record<SiteActivityFilter, Prisma.ActivityLogWhereInput> = {
     all: {},
     edits: { action: { notIn: [...PUBLISH_ACTIONS, ...REVIEW_ACTIONS] } },
     comments: { action: { in: [...REVIEW_ACTIONS] } },
