@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { Badge, Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
@@ -31,10 +31,16 @@ import {
   SaveErrorBanner,
   SCREEN_EMPTY,
   SET_BTN,
+  SET_HEAD_BTN,
   SET_RESTORE_STRIP,
   SET_ROW,
   SET_ROW_LABEL,
+  SET_TABLE,
+  SET_TD,
+  SET_TH,
   Screen,
+  pillClass,
+  type PillTone,
   Section,
   Select,
 } from "../shared";
@@ -54,27 +60,20 @@ export type LocalizationScreenProps = ScreenProps & {
   registerHeaderAction?: (node: React.ReactNode | null) => void;
 };
 
-/* The Locales table: an eyebrow header row on a hairline, 32-high body rows. */
-const TH =
-  "tw:h-8 tw:pr-4 tw:text-left tw:align-middle tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase " +
-  "tw:leading-4 tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
-const TD = "tw:h-8 tw:pr-4 tw:align-middle tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+/* The Locales table (4418:127966): shared header/row shape, columns 180 · 140 · 180 · 110. */
 const TR = "tw:cursor-pointer tw:hover:bg-[var(--bk-bg-subtle)]";
 /* The locale name is the row's keyboard door — a ghost button in the first
    cell, so a Tab lands on it and Enter opens the checklist. */
 const ROW_BTN =
-  "tw:h-6 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-13)] " +
+  "tw:h-5 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-13)] " +
   "tw:font-normal tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent " +
   "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 /* LIVE green / PENDING amber / NOT STARTED grey — the frame's three pills. */
-const PILL =
-  "tw:inline-flex tw:h-5 tw:items-center tw:rounded-[var(--bk-radius-sm)] tw:border tw:px-2 tw:py-0 " +
-  "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:leading-4 tw:tracking-[0.04em]";
-const PILL_TONE: Record<LocaleStatus, { label: string; className: string }> = {
-  LIVE: { label: "Live", className: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]" },
-  PENDING: { label: "Pending", className: "tw:border-[var(--bk-yellow-300)] tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]" },
-  NOT_STARTED: { label: "Not started", className: "tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]" },
+const PILL_TONE: Record<LocaleStatus, { label: string; tone: PillTone }> = {
+  LIVE: { label: "Live", tone: "success" },
+  PENDING: { label: "Pending", tone: "warning" },
+  NOT_STARTED: { label: "Not started", tone: "neutral" },
 };
 
 interface LocalesRead {
@@ -180,7 +179,7 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
     if (!registerHeaderAction) return;
     registerHeaderAction(
       ready ? (
-        <Button size="xs" className={SET_BTN} onClick={() => setAddOpen(true)} data-testid="set-loc-add">
+        <Button size="xs" className={SET_HEAD_BTN} onClick={() => setAddOpen(true)} data-testid="set-loc-add">
           Add locale
         </Button>
       ) : null
@@ -284,21 +283,21 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
               setDirty(true);
             }}
             aria-labelledby="locale-auto-redirect-label"
-            sizing="sm"
+            sizing="md"
             data-testid="set-loc-redirect"
           />
         </div>
       </Section>
 
       <Section title="Locales">
-        <table id="locales" className="tw:w-full tw:border-collapse" data-testid="set-loc-table">
+        <table id="locales" className={SET_TABLE} data-testid="set-loc-table">
           <thead>
-            <tr className="tw:border-b tw:border-[var(--bk-border)]">
-              <th scope="col" className={`${TH} tw:w-[30%]`}>Locale</th>
-              <th scope="col" className={`${TH} tw:w-[22%]`}>Path</th>
-              <th scope="col" className={`${TH} tw:w-[28%]`}>Pages translated</th>
-              <th scope="col" className={TH}>Status</th>
-              <th scope="col" className={TH}>
+            <tr>
+              <th scope="col" className={`${SET_TH} tw:w-48`}>Locale</th>
+              <th scope="col" className={`${SET_TH} tw:w-38`}>Path</th>
+              <th scope="col" className={`${SET_TH} tw:w-48`}>Pages translated</th>
+              <th scope="col" className={`${SET_TH} tw:w-[122px]`}>Status</th>
+              <th scope="col" className={SET_TH}>
                 <span className="tw:sr-only">Actions</span>
               </th>
             </tr>
@@ -314,7 +313,7 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
                   onClick={() => setChecklist(row)}
                   data-testid={`set-loc-row-${row.code}`}
                 >
-                  <td className={TD}>
+                  <td className={SET_TD}>
                     <Button
                       size="xs"
                       variant="ghost"
@@ -328,21 +327,21 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
                       {localeLabel(row.code)}
                     </Button>
                   </td>
-                  <td className={`${TD} tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)]`}>{row.path}</td>
-                  <td className={TD} data-testid={`set-loc-row-pages-${row.code}`}>
+                  <td className={`${SET_TD} tw:text-[var(--bk-ink-soft)]`}>{row.path}</td>
+                  <td className={`${SET_TD} tw:text-[var(--bk-ink-soft)]`} data-testid={`set-loc-row-pages-${row.code}`}>
                     {row.translated} of {row.total}
                   </td>
-                  <td className={TD}>
-                    <Badge className={`${PILL} ${tone.className}`} data-testid={`set-loc-row-status-${row.code}`}>
+                  <td className={SET_TD}>
+                    <span className={pillClass(tone.tone)} data-testid={`set-loc-row-status-${row.code}`}>
                       {tone.label}
-                    </Badge>
+                    </span>
                   </td>
-                  <td className={`${TD} tw:pr-0 tw:text-right`}>
+                  <td className={`${SET_TD} tw:pr-0 tw:text-right`}>
                     {isDefault ? null : (
                       <Button
                         size="xs"
                         variant="ghost"
-                        className={`${SET_BTN} tw:h-6 tw:px-2`}
+                        className={`${SET_BTN} tw:h-5 tw:px-2`}
                         disabled={enabledLocales.length <= 1}
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
