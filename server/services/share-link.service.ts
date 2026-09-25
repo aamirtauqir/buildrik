@@ -4,18 +4,21 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 // The link token IS the bearer credential for the draft it unlocks — a
 // VIEWER should not be able to read it off the list, only an EDITOR+ who
-// could also create one. passwordHash never leaves the server at all; a
-// boolean-ish placeholder preserves the UI's `passwordHash &&` truthiness
-// check without exposing the bcrypt hash (S-10).
+// could also create one. passwordHash never leaves the server at all — a
+// `hasPassword` boolean replaces it (controller review round 1: an earlier
+// "set"/null STRING placeholder was still typed `passwordHash: string` on
+// the consuming UI, so nothing forced callers to stop treating it as the
+// real hash's presence-or-shape; a boolean field with its own name is
+// harder to misuse that way, and matches what the UI actually needs).
 export async function listShareLinks(siteId: string, revealToken = false) {
   const rows = await prisma.shareLink.findMany({
     where: { siteId, isActive: true },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map((row) => ({
+  return rows.map(({ passwordHash, ...row }) => ({
     ...row,
     token: revealToken ? row.token : null,
-    passwordHash: row.passwordHash ? "set" : null,
+    hasPassword: passwordHash != null,
   }));
 }
 
@@ -68,7 +71,9 @@ export async function createShareLink(
   // A-9: the UI already promises "require password" and "default expiration"
   // from workspace sharing settings; the service silently ignored both,
   // creating unprotected/non-expiring links regardless of the settings.
-  if (settings?.requirePw && !data.password) {
+  // requirePw is meaningless on a plan with no password links at all (FREE) —
+  // enforcing it there would make link creation impossible, not safer.
+  if (settings?.requirePw && !data.password && allowPasswords) {
     throw new Error("PASSWORD_REQUIRED");
   }
   if (!data.expiresInDays) {

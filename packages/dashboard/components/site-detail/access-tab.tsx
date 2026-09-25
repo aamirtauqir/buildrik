@@ -4,7 +4,10 @@ import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
 import { shareUrl } from "@lib/utils";
 import { Button, SectionCard, MetricValue, InputField } from "@/components/dashboard/primitives";
 
-interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
+// `token` is null for a caller the server didn't reveal it to (VIEWER — S-10);
+// `hasPassword` replaces the raw hash entirely (controller review round 1,
+// IMPORTANT 6) — the service never sends passwordHash, not even redacted.
+interface ShareLinkEntry { id: string; name: string; token: string | null; viewCount: number; isActive: boolean; expiresAt: Date | null; hasPassword: boolean; createdAt: Date; }
 
 interface AccessTabProps {
   shareLinks: ShareLinkEntry[];
@@ -160,7 +163,10 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
         ) : (
           <div className="space-y-2">
             {shareLinks.map((link) => {
-              const url = shareUrl(link.token);
+              // `token` is null when the server didn't reveal it to this
+              // caller (VIEWER — S-10). Copy/open/QR need the real link;
+              // Revoke only needs the row id, so it stays available either way.
+              const url = link.token ? shareUrl(link.token) : null;
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">
@@ -168,18 +174,22 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{link.name}</p>
                       <div className="mt-1 flex items-center gap-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <span className="flex items-center gap-1"><Eye className="h-3 w-3" /><MetricValue>{link.viewCount}</MetricValue> views</span>
-                        {link.passwordHash && <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Password</span>}
+                        {link.hasPassword && <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Password</span>}
                         {link.expiresAt && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />Expires <MetricValue>{new Date(link.expiresAt).toLocaleDateString()}</MetricValue></span>}
                         <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>Created <MetricValue>{new Date(link.createdAt).toLocaleDateString()}</MetricValue></span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code" aria-label="Show QR code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
-                      <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      {url && (
+                        <>
+                          <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code" aria-label="Show QR code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                          <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                        </>
+                      )}
                       <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke" aria-label="Revoke share link"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                     </div>
                   </div>
-                  {showQr === link.id && (
+                  {url && showQr === link.id && (
                     <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
                       <QrCodeCanvas url={url} />
                       <p className="text-body-sm font-mono" style={{ color: "var(--color-text-secondary)" }}>{url}</p>

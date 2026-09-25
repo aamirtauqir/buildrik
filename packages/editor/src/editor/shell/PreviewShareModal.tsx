@@ -35,8 +35,8 @@ export interface PreviewShareModalProps {
 }
 
 interface ShareLinkRow {
-  token: string;
-  passwordHash: string | null;
+  token: string | null;
+  hasPassword: boolean;
   expiresAt: Date | string | null;
 }
 
@@ -49,7 +49,11 @@ type LinkState =
 const DEFAULT_LINK_NAME = "Draft preview";
 
 function isOpenToAnyone(row: ShareLinkRow, now: number): boolean {
-  if (row.passwordHash) return false;
+  // controller review round 1 (IMPORTANT 6): the service no longer sends
+  // passwordHash at all (not even a redacted placeholder) — hasPassword is
+  // the boolean the server computed server-side. A row with no token (never
+  // revealed to this caller) can't be reused either.
+  if (row.hasPassword || row.token == null) return false;
   return row.expiresAt == null || new Date(row.expiresAt).getTime() > now;
 }
 
@@ -72,7 +76,8 @@ async function findOrCreateShareToken(siteId: string): Promise<string> {
   const sharing = getBuildrikClient(DASHBOARD_URL).siteDetail.sharing;
   const rows: ShareLinkRow[] = await sharing.list.query({ siteId });
   const reusable = rows.find((row) => isOpenToAnyone(row, Date.now()));
-  if (reusable) return reusable.token;
+  // isOpenToAnyone already refused any row with a null token.
+  if (reusable?.token) return reusable.token;
   const created = await sharing.create.mutate({ siteId, name: DEFAULT_LINK_NAME });
   return created.token;
 }

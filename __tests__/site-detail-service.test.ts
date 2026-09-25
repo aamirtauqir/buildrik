@@ -172,8 +172,11 @@ describe("Site Detail Service", () => {
       const result = await listShareLinks("s1");
       expect(result).toHaveLength(1);
       expect(result[0].token).toBeNull();
-      // Truthy placeholder, never the real bcrypt hash.
-      expect(result[0].passwordHash).toBe("set");
+      // hasPassword boolean — never the real bcrypt hash, and the raw hash
+      // field is dropped entirely from the returned shape (controller review
+      // round 1, IMPORTANT 6).
+      expect(result[0].hasPassword).toBe(true);
+      expect(result[0]).not.toHaveProperty("passwordHash");
     });
 
     it("listShareLinks reveals the token when revealToken=true", async () => {
@@ -183,7 +186,8 @@ describe("Site Detail Service", () => {
       ] as any);
       const result = await listShareLinks("s1", true);
       expect(result[0].token).toBe("abc123");
-      expect(result[0].passwordHash).toBeNull();
+      expect(result[0].hasPassword).toBe(false);
+      expect(result[0]).not.toHaveProperty("passwordHash");
     });
 
     it("createShareLink generates token", async () => {
