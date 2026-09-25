@@ -291,9 +291,10 @@ existed in this table until 2026-08-16.
 | `NEXT_PUBLIC_FEATURE_PUBLISH` | Publish dropdown + publish flow in the shipping editor. Must be set alongside `VITE_FEATURE_PUBLISH`, which only serves the standalone demo. | Yes once publishing is live |
 | ~~`NEXT_PUBLIC_FEATURE_COMPONENTS_V2`~~ | **Deleted 2026-08-16.** It selected between two Components panels, and because only the `NEXT_PUBLIC_` half ships, it only ever meant "the port-5050 demo shows `ComponentsPanelV2`, every real user sees `ComponentsTab`". `ComponentsTab` is the one built to board 641:2546, so `ComponentsPanelV2` and the flag are gone. | — |
 | `NEXT_PUBLIC_FEATURE_DS_AI` | AI entry points in the Brand / design-system panel. | No |
-| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration (presence avatars, connection pill, remote cursors). Merge model today is last-write-wins. | No — enable when the collab arc ships |
+| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration (presence avatars, connection pill, remote cursors). Merge model today is last-write-wins. **Also the server kill switch** (S-12, 2026-09-26): `/api/collab/:siteId/ops` and `/api/sse/collab/:siteId` return 404 unless it is exactly `"true"` (`isCollabEnabled`, `collab.service.ts`). Next inlines it at build time on the server too, so the routes and the button always agree. `gate:baked-flags` fails a bundle with it baked `"true"`. | No — enable when the collab arc ships (and drop it from `check-baked-flags.mjs`'s `FORBIDDEN` then) |
 
-`scripts/check-prod-env.mjs` checks none of these. A flag that is silently false in
+`scripts/check-prod-env.mjs` checks none of these (`check-baked-flags.mjs` checks the
+built bundle: Publish must be `"true"`, Collab must not be). A flag that is silently false in
 production looks exactly like a feature that was never built — the same shape as the
 `GOOGLE_CLIENT_ID` incident above.
 

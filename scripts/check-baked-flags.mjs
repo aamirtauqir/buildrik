@@ -36,10 +36,22 @@ import { join } from "node:path";
  *
  * `FEATURE_DS_AI` and `FEATURE_COLLAB` are not here either, and must not be:
  * both are meant to be OFF in production (collab is demo-only with six known
- * non-convergence bugs). This file asserts what must be ON.
+ * non-convergence bugs).
  */
 const REQUIRED = {
   NEXT_PUBLIC_FEATURE_PUBLISH: "true",
+};
+
+/**
+ * flag → a value the CLIENT bundle must NOT carry.
+ *
+ * Collab's op channel replays every op to every collaborator unmerged
+ * (last-write-wins, six known OT bugs — audit C-5), and its server routes are
+ * gated on this same variable (S-12). Baking it "true" turns both on at once,
+ * so a build that does is refused rather than shipped.
+ */
+const FORBIDDEN = {
+  NEXT_PUBLIC_FEATURE_COLLAB: "true",
 };
 
 const buildDir = process.argv[2] ?? "packages/dashboard/.next";
@@ -83,10 +95,19 @@ for (const [flag, want] of Object.entries(REQUIRED)) {
   }
 }
 
+for (const [flag, banned] of Object.entries(FORBIDDEN)) {
+  if (new RegExp(`${flag}\\s*:\\s*"${banned}"`).test(haystack)) {
+    console.error(`  ✗ ${flag} is baked "${banned}" — it must be off in a production build`);
+    failed++;
+  } else {
+    console.log(`  ✓ ${flag} not baked "${banned}"`);
+  }
+}
+
 console.log(`[baked-flags] ${files.length} bundle file(s) scanned`);
 if (failed) {
-  console.error(`\n[baked-flags] BLOCK: ${failed} flag(s) not baked. Set them in .env.production.local and rebuild —`);
-  console.error(`a NEXT_PUBLIC_* set only in the server environment does nothing; they are inlined at build time.`);
+  console.error(`\n[baked-flags] BLOCK: ${failed} flag(s) wrong. Fix them in .env.production.local (and .env.local, which a`);
+  console.error(`production build also loads) and rebuild — NEXT_PUBLIC_* are inlined at build time, not read at runtime.`);
   process.exit(1);
 }
 console.log("[baked-flags] PASS");
