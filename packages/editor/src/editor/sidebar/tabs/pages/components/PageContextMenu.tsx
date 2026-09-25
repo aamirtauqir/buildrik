@@ -3,7 +3,7 @@
  *
  * Rules:
  * - Renders through <Portal> into the shared chrome overlay root
- * - "Delete Page" is DISABLED (not hidden) when: page is homepage OR only page
+ * - "Delete page" is DISABLED (not hidden) when: page is homepage OR only page
  * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
  *   the hand-rolled version this replaced, SKIPS the disabled Delete item
  *

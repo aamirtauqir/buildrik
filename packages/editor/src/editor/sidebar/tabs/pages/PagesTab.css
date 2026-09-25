@@ -443,7 +443,6 @@
   white-space: nowrap;
 }
 .bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 500; }
-.bd-pg-bulk-spacer { flex: 1; }
 .bd-pg-bulk-toolbar button {
   /* Board 141:120-123: plain 12px card-white text actions on the ink band. */
   padding: var(--bk-space-4) var(--bk-space-8);
@@ -459,56 +458,6 @@
 .bd-pg-bulk-toolbar button:hover { background: var(--bk-gray-700); color: var(--bk-bg-card); }
 .bd-pg-bulk-toolbar button.danger { color: var(--bk-red-500); }
 .bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-gray-700); color: var(--bk-red-500); }
-.bd-pg-bulk-close {
-  width: 22px; height: 22px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border-radius: var(--bk-radius-full);
-}
-.bd-pg-bulk-close svg { width: 12px; height: 12px; }
-.bd-pg-bulk-folder { position: relative; }
-.bd-pg-bulk-menu {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 0;
-  min-width: 180px;
-  padding: var(--bk-space-4);
-  border-radius: 4px;
-  background: var(--bk-bg-card);
-  color: var(--bk-ink);
-  border: 1px solid var(--bk-border);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-  z-index: 10;
-}
-.bd-pg-bulk-menu-empty {
-  padding: var(--bk-space-8) 10px;
-  font: 400 var(--bk-text-12) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  font-style: italic;
-}
-.bd-pg-bulk-menu-item {
-  display: block;
-  width: 100%;
-  padding: 6px 10px;
-  text-align: left;
-  background: transparent;
-  border: 0;
-  border-radius: 3px;
-  color: var(--bk-ink);
-  font: 400 12px var(--bk-font-ui);
-  cursor: pointer;
-}
-.bd-pg-bulk-menu-item:hover {
-  background: var(--bk-accent-tint);
-  color: var(--bk-ink);
-}
-.bd-pg-bulk-menu-sep {
-  height: 1px;
-  margin: var(--bk-space-4) 6px;
-  background: var(--bk-border);
-}
-
 .bd-pg-drawer-scrim {
   position: fixed;
   inset: 0;

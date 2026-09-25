@@ -42,7 +42,8 @@
   "The footer reads '0 layers' during load against the board's '12 layers'.",
   "Sample data; the SHAPE is the contract, and the shape is a footer that is",
   "present while the tree is coming.",
-  "2026-09-24 (gates): layers-toolbar / layers-search targets dropped — 3c20244e6 removed the drawer search band; the filter is the topbar field."
+  "2026-09-24 (gates): layers-toolbar / layers-search targets dropped — 3c20244e6 removed the drawer search band; the filter is the topbar field.",
+  "2026-09-25 (gates): skeleton-row / skeleton-icon targets dropped — ae9975a4e's shared PanelLoadingSkeleton renders bars only (no per-row icon+bar wrapper); layers-sk-row and layers-sk-icon never rendered again after that commit and check-anchors.mjs caught it as a hard MISSING (layers-sk-icon happened to weak-match an unrelated template and slipped past on eyeball review, layers-sk-row did not)."
  ],
  "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-loading",
  "viewport": {
@@ -74,18 +75,6 @@
    "testId": "layers-count",
    "spec": "layers-loading",
    "nodeId": "776:4093"
-  },
-  {
-   "name": "skeleton-row",
-   "testId": "layers-sk-row",
-   "spec": "layers-loading",
-   "nodeId": "775:4220"
-  },
-  {
-   "name": "skeleton-icon",
-   "testId": "layers-sk-icon",
-   "spec": "layers-loading",
-   "nodeId": "775:4221"
   },
   {
    "name": "skeleton-bar",

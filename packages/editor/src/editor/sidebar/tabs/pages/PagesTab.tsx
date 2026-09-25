@@ -29,6 +29,7 @@ import {
 } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "@/shared/constants/events";
+import { listNames } from "@shared/utils/helpers/string";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -489,13 +490,14 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           if (deleteTargetId) p.deletePage(deleteTargetId);
           setDeleteTargetId(null);
         }}
-        title={`Delete "${deleteTarget?.name}"?`}
+        /* v3 4418:93099: curly quotes, "Delete page". */
+        title={`Delete “${deleteTarget?.name}”?`}
         /* "permanently removed … you can undo" contradicted itself in one
            sentence, and this door raises no toast (only the page-tab bar
            does), so "immediately after" pointed at a control that is not
            there. Undo is the keyboard one — walked live. */
         message="This page and everything on it is removed. Undo (⌘Z) brings it back."
-        confirmLabel="Delete Page"
+        confirmLabel="Delete page"
         tone="destructive"
       />
       {/* Board 183:2 — the bulk confirm names what goes. */}
@@ -510,10 +512,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
            brought both back. Telling a user an action is irreversible when it
            is not is the expensive direction to be wrong in — they stop
            looking for the way back. */
-        message={`${(bulkDeleteIds ?? [])
-          .map((id) => `“${p.pages.find((pg) => pg.id === id)?.name ?? id}”`)
-          .join(", ")} are removed from this site. One undo (⌘Z) brings them all back.`}
-        confirmLabel="Delete pages"
+        /* v3 6887:77911 — the names as a sentence, what goes with them, and
+           the way back. The board's "Undo is available for 30 seconds" is
+           not how undo works here: ⌘Z has no clock. */
+        message={`${listNames(
+          (bulkDeleteIds ?? []).map((id) => p.pages.find((pg) => pg.id === id)?.name ?? id),
+        )} — and everything on them — are removed. Inbound links to these pages will break. One undo (⌘Z) brings them all back.`}
+        confirmLabel={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}`}
         tone="destructive"
         testId="pages-bulk-delete"
         success={{

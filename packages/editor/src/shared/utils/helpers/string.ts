@@ -203,3 +203,9 @@ export function randomString(
   }
   return result;
 }
+
+/** "Home, Menu and Contact" — a sentence list; "" for none. */
+export function listNames(names: readonly string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}

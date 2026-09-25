@@ -3,6 +3,7 @@
  * @license BSD-3-Clause
  */
 
+import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
 import "./styles/layers-v2.css";
 import type { Element } from "../../../engine/elements/Element";
@@ -24,11 +25,6 @@ import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
-/** "Heading, Subtitle and Menu previews" — board 6887:78291's sentence. */
-function listNames(names: string[]): string {
-  if (names.length <= 1) return names[0] ?? "the selection";
-  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-}
 
 export const LayersPanel: React.FC<LayersPanelProps> = ({
   composer,
@@ -464,7 +460,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         onClose={() => setDeleteSelectionOpen(false)}
         onConfirm={confirmDeleteSelection}
         title={`Delete ${elementsLabel(selectedCount)}?`}
-        message={`This removes ${listNames(selectedNames)} (and anything nested inside them) from ${activePage?.name ?? "this page"}. You can undo from the toast.`}
+        message={`This removes ${listNames(selectedNames) || "the selection"} (and anything nested inside them) from ${activePage?.name ?? "this page"}. You can undo from the toast.`}
         confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
         tone="destructive"
         testId="layers-delete-selection"

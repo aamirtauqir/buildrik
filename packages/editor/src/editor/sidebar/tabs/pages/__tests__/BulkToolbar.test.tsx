@@ -13,12 +13,12 @@ const folders: FolderItem[] = [
 
 const baseProps = {
   selectedCount: 3,
+  selectedNames: ["Menu", "Contact", "About"],
   folders,
   onDuplicate: vi.fn(),
   onMoveToFolder: vi.fn(),
   onRemoveFromFolders: vi.fn(),
   onDelete: vi.fn(),
-  onClear: vi.fn(),
 };
 
 describe("BulkToolbar", () => {
@@ -35,17 +35,20 @@ describe("BulkToolbar", () => {
     expect(screen.queryByText(/^Unpublish$/)).toBeNull();
   });
 
-  it("Move-to-folder click opens dropdown listing folders", () => {
+  /* v3 6887:77925: Move to… opens a dialog, not a pop-up list. */
+  it("Move to… opens the Move dialog naming the pages, with the folders and Top level", () => {
     render(<BulkToolbar {...baseProps} />);
     fireEvent.click(screen.getByText(/Move to/));
-    expect(screen.getByText("Marketing")).toBeInTheDocument();
+    expect(screen.getByText("Move 3 pages to…")).toBeInTheDocument();
+    expect(screen.getByText(/Menu, Contact and About · Choose a folder/)).toBeInTheDocument();
+    expect(screen.getByText("Top level (no folder)")).toBeInTheDocument();
   });
 
-  it("clicking a folder in the dropdown invokes onMoveToFolder with folderId", () => {
+  it("confirming with a folder picked calls onMoveToFolder with its id", () => {
     const fn = vi.fn();
     render(<BulkToolbar {...baseProps} onMoveToFolder={fn} />);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText("Marketing"));
+    fireEvent.click(screen.getByText(/Move to…/));
+    fireEvent.click(screen.getByRole("button", { name: "Move to Marketing" }));
     expect(fn).toHaveBeenCalledWith("f1");
   });
 
@@ -56,11 +59,12 @@ describe("BulkToolbar", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it("Remove from folder click invokes onRemoveFromFolders", () => {
+  it("Top level (no folder) calls onRemoveFromFolders", () => {
     const fn = vi.fn();
     render(<BulkToolbar {...baseProps} onRemoveFromFolders={fn} />);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText(/Remove from folder/));
+    fireEvent.click(screen.getByText(/Move to…/));
+    fireEvent.click(screen.getByText("Top level (no folder)"));
+    fireEvent.click(screen.getByRole("button", { name: "Move to top level" }));
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
@@ -68,14 +72,6 @@ describe("BulkToolbar", () => {
     const { container } = render(<BulkToolbar {...baseProps} />);
     const danger = container.querySelector("button.danger");
     expect(danger?.textContent).toMatch(/Delete/);
-  });
-
-  it("Close click invokes onClear", () => {
-    const fn = vi.fn();
-    const { container } = render(<BulkToolbar {...baseProps} onClear={fn} />);
-    const close = container.querySelector(".bd-pg-bulk-close") as HTMLElement;
-    fireEvent.click(close);
-    expect(fn).toHaveBeenCalledTimes(1);
   });
 
   it("toolbar root has class .bd-pg-bulk-toolbar with role toolbar", () => {

@@ -2534,8 +2534,8 @@ const CASES: Record<string, () => React.ReactElement> = {
           onClose={() => {}}
           onConfirm={() => {}}
           title="Delete 3 pages?"
-          message="“Home”, “Menu”, “About” are removed from this site. One undo (⌘Z) brings them all back."
-          confirmLabel="Delete pages"
+          message="Home, Menu and About — and everything on them — are removed. Inbound links to these pages will break. One undo (⌘Z) brings them all back."
+          confirmLabel="Delete 3 pages"
           tone="destructive"
           testId="modal-success"
           success={{ title: "Deleted", message: "3 pages deleted." }}

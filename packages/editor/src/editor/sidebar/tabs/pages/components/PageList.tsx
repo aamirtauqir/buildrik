@@ -321,12 +321,12 @@ export const PageList: React.FC<Props> = ({
       {selectedIds.size >= 1 && (
         <BulkToolbar
           selectedCount={selectedIds.size}
+          selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
           folders={folders}
           onDuplicate={onBulkDuplicate}
           onMoveToFolder={onBulkMoveToFolder}
           onRemoveFromFolders={onBulkRemoveFromFolders}
           onDelete={onBulkDelete}
-          onClear={onClearSelection}
         />
       )}
       {/* Board 140:38 footer vs board 141:78: when a bulk selection is

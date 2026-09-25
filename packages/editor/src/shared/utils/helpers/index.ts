@@ -102,6 +102,7 @@ export {
   template,
   escapeRegExp,
   randomString,
+  listNames,
 } from "./string";
 
 // =============================================================================
