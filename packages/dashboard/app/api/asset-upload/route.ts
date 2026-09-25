@@ -70,8 +70,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Every media upload lands under the caller's own prefix (audit S-4).
         // It is what lets media.service tell a blob this user uploaded from a
         // favicon, avatar or another tenant's file before it ever calls del().
+        // `%` and `\` are refused too: our keys never hold them, and encoded
+        // separators (`..%2F`) would slip past the `..` segment check.
         const prefix = ownedBlobPrefix(userId);
-        if (!pathname.startsWith(prefix) || pathname.split("/").includes("..")) {
+        if (!pathname.startsWith(prefix) || pathname.split("/").includes("..") || /[%\\]/.test(pathname)) {
           throw new PermissionError("FORBIDDEN", `Upload path must start with ${prefix}`);
         }
 

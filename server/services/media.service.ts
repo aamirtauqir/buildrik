@@ -54,7 +54,8 @@ export function ownedBlobPrefix(userId: string): string {
 /**
  * Whether `url` is a Vercel Blob this user uploaded through the media library:
  * https, a `*.public.blob.vercel-storage.com` host, and a path under
- * `ownedBlobPrefix(userId)` (dot segments resolved first by the URL parser).
+ * `ownedBlobPrefix(userId)` (dot segments resolved first by the URL parser;
+ * any `%` or `\` refused outright).
  *
  * The one ownership test for media (audit 2026-09-25 S-4). Ownership used to
  * be inferred from which MediaAsset/Version rows existed — but favicon, OG,
@@ -70,6 +71,10 @@ export function isOwnedBlobUrl(url: string, userId: string): boolean {
   } catch {
     return false;
   }
+  // Our own keys are `u/<cuid>/` + safeBlobName ([A-Za-z0-9._-]), so they
+  // never hold `%` or `\`. Refusing both closes the encoded-separator bypass
+  // (`u/<me>/..%2F..%2Fsites%2F…`), which the URL parser leaves undecoded.
+  if (url.includes("\\") || parsed.pathname.includes("%")) return false;
   return (
     parsed.protocol === "https:" &&
     parsed.hostname.endsWith(".public.blob.vercel-storage.com") &&

@@ -66,6 +66,11 @@ describe("isOwnedBlobUrl", () => {
     expect(isOwnedBlobUrl(`${STORE}/a-x1.png`, "U1")).toBe(false);
     expect(isOwnedBlobUrl(`${STORE}/u/U1/../U2/a.png`, "U1")).toBe(false);
     expect(isOwnedBlobUrl(`${STORE}/u/U1/%2e%2e/U2/a.png`, "U1")).toBe(false);
+    expect(isOwnedBlobUrl(`${STORE}/u/U1/..%2F..%2Fsites%2Fvictim%2Ffavicon.png`, "U1")).toBe(false);
+    expect(isOwnedBlobUrl(`${STORE}/u/U1/..%2f..%2fu%2fU2%2fa.png`, "U1")).toBe(false);
+    expect(isOwnedBlobUrl(`${STORE}/u/U1/..%5C..%5Csites%5Cv.png`, "U1")).toBe(false);
+    expect(isOwnedBlobUrl(`${STORE}/u/U1/%2e%2e%2F%2e%2e%2Fsites/v.png`, "U1")).toBe(false);
+    expect(isOwnedBlobUrl(`${STORE}/u/U1/a\\..\\b.png`, "U1")).toBe(false);
     expect(isOwnedBlobUrl("https://evil.example/u/U1/a.png", "U1")).toBe(false);
     expect(isOwnedBlobUrl("http://abc.public.blob.vercel-storage.com/u/U1/a.png", "U1")).toBe(false);
     expect(isOwnedBlobUrl("not a url", "U1")).toBe(false);
@@ -101,6 +106,15 @@ describe("deleteAsset — S-4", () => {
     await expect(deleteAsset(user.id, { assetId: legacy.id })).resolves.toEqual({ success: true });
 
     expect(await prisma.mediaAsset.count()).toBe(0);
+    expect(delMock).not.toHaveBeenCalled();
+  });
+
+  it("never deletes a blob reached through an encoded separator", async () => {
+    const user = await createTestUser();
+    const url = `${STORE}/u/${user.id}/..%2F..%2Fsites%2Fvictim%2Ffavicon.png`;
+    await expect(createAsset(user.id, asset(url))).rejects.toThrow("URL_NOT_OWNED");
+    const legacy = await prisma.mediaAsset.create({ data: { userId: user.id, ...asset(url) } });
+    await deleteAsset(user.id, { assetId: legacy.id });
     expect(delMock).not.toHaveBeenCalled();
   });
 
@@ -148,7 +162,15 @@ describe("POST /api/asset-upload token issue — S-4", () => {
   it("refuses a pathname outside the caller's prefix", async () => {
     const user = await createTestUser();
     sessionUserId = user.id;
-    for (const pathname of ["p.png", "sites/victim/favicon.png", `u/other/p.png`, `u/${user.id}/../other/p.png`]) {
+    for (const pathname of [
+      "p.png",
+      "sites/victim/favicon.png",
+      `u/other/p.png`,
+      `u/${user.id}/../other/p.png`,
+      `u/${user.id}/..%2F..%2Fsites%2Fvictim%2Ffavicon.png`,
+      `u/${user.id}/..%5C..%5Cp.png`,
+      `u/${user.id}/..\\..\\p.png`,
+    ]) {
       const res = await POST(tokenRequest(pathname));
       expect(res.status, pathname).toBe(403);
     }
