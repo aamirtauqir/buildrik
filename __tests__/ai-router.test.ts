@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { checkQuota, reserveQuota, resolveModelForUser, streamContent } = vi.hoisted(() => ({
+const { checkQuota, reserveQuota, releaseQuota, resolveModelForUser, streamContent, summarizeChanges, suggestMilestone } = vi.hoisted(() => ({
   checkQuota: vi.fn(),
   reserveQuota: vi.fn(),
+  releaseQuota: vi.fn(),
   resolveModelForUser: vi.fn(),
   streamContent: vi.fn(),
+  summarizeChanges: vi.fn(),
+  suggestMilestone: vi.fn(),
 }));
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -15,6 +18,7 @@ vi.mock("@/server/services/rate-limiter", () => ({
 vi.mock("@/server/services/quota.service", () => ({
   checkQuota,
   reserveQuota,
+  releaseQuota,
   resolveModelForUser,
 }));
 vi.mock("@/server/services/ai.service", () => ({
@@ -22,8 +26,8 @@ vi.mock("@/server/services/ai.service", () => ({
   generateContent: vi.fn(),
   generatePage: vi.fn(),
   generateLayout: vi.fn(),
-  summarizeChanges: vi.fn(),
-  suggestMilestone: vi.fn(),
+  summarizeChanges,
+  suggestMilestone,
   // W3 provider-key guard — no-op in tests (no real API keys configured).
   assertProviderConfigured: vi.fn(),
 }));
@@ -37,11 +41,76 @@ describe("ai router", () => {
   beforeEach(() => {
     checkQuota.mockReset();
     reserveQuota.mockReset();
+    releaseQuota.mockReset();
     resolveModelForUser.mockReset();
     streamContent.mockReset();
+    summarizeChanges.mockReset();
+    suggestMilestone.mockReset();
     // Server resolves the model from the user's tier; the client model is a
     // hint. Default to echoing the requested model for these tests.
     resolveModelForUser.mockResolvedValue("gpt-4o-mini");
+    reserveQuota.mockResolvedValue({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
+  });
+
+  const validChanges = {
+    elementName: "hero",
+    summary: { style: 1, text: 0, layout: 0, content: 0, other: 0 },
+    changes: [{ type: "style" as const, property: "color", before: "#000", after: "#fff" }],
+  };
+
+  it("summarize reserves quota and refuses when exhausted (S-8)", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.summarize({ versionName: "v1", changes: validChanges }),
+    ).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+    expect(reserveQuota).toHaveBeenCalled();
+    expect(summarizeChanges).not.toHaveBeenCalled();
+  });
+
+  it("summarize rejects an oversized property/before/after string (S-8)", async () => {
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.summarize({
+        versionName: "v1",
+        changes: {
+          ...validChanges,
+          changes: [{ type: "style", property: "x".repeat(101), before: "a", after: "b" }],
+        },
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("summarize never echoes the provider's raw error message (S-8)", async () => {
+    summarizeChanges.mockRejectedValueOnce(new Error("sk-super-secret-provider-detail"));
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.summarize({ versionName: "v1", changes: validChanges }),
+    ).rejects.toMatchObject({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Summary generation failed",
+    });
+    expect(releaseQuota).toHaveBeenCalledWith("user-1");
+  });
+
+  it("milestoneSuggest reserves quota and refuses when exhausted (S-8)", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.milestoneSuggest({ recentChanges: [] }),
+    ).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+    expect(suggestMilestone).not.toHaveBeenCalled();
+  });
+
+  it("milestoneSuggest never echoes the provider's raw error message (S-8)", async () => {
+    suggestMilestone.mockRejectedValueOnce(new Error("sk-super-secret-provider-detail"));
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.milestoneSuggest({ recentChanges: [] }),
+    ).rejects.toMatchObject({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Milestone suggestion failed",
+    });
   });
 
   /* G2-129: the panel counter reads the SAME check the daily limit enforces. */

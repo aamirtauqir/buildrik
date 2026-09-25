@@ -67,7 +67,7 @@ const layoutInputSchema = z.object({
 const summarizeInputSchema = z.object({
   versionName: z.string().min(1).max(200),
   changes: z.object({
-    elementName: z.string(),
+    elementName: z.string().max(200),
     summary: z.object({
       style: z.number().int().nonnegative(),
       text: z.number().int().nonnegative(),
@@ -75,14 +75,16 @@ const summarizeInputSchema = z.object({
       content: z.number().int().nonnegative(),
       other: z.number().int().nonnegative(),
     }),
-    changes: z.array(
-      z.object({
-        type: z.enum(["style", "text", "layout", "content", "other"]),
-        property: z.string(),
-        before: z.string(),
-        after: z.string(),
-      })
-    ),
+    changes: z
+      .array(
+        z.object({
+          type: z.enum(["style", "text", "layout", "content", "other"]),
+          property: z.string().max(100),
+          before: z.string().max(2000),
+          after: z.string().max(2000),
+        })
+      )
+      .max(200),
   }),
 });
 
@@ -91,7 +93,7 @@ const milestoneSuggestInputSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        label: z.string(),
+        label: z.string().max(200),
         timestamp: z.number(),
         type: z.enum(["checkpoint", "patch"]),
       })
@@ -232,11 +234,16 @@ export const aiRouter = router({
 
   summarize: protectedProcedure
     .input(summarizeInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await summarizeChanges(input.versionName, input.changes);
       } catch (e: unknown) {
+        await releaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
+        // Never echo the provider's raw error text to the client (S-8) — log
+        // it server-side and return a fixed message.
+        console.error("[ai.summarize] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -245,18 +252,21 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Summary generation failed",
+          message: "Summary generation failed",
         });
       }
     }),
 
   milestoneSuggest: protectedProcedure
     .input(milestoneSuggestInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await suggestMilestone(input.recentChanges, input.pageStructure);
       } catch (e: unknown) {
+        await releaseQuota(ctx.session.user.id);
         const err = e as { status?: number; message?: string };
+        console.error("[ai.milestoneSuggest] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -265,7 +275,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Milestone suggestion failed",
+          message: "Milestone suggestion failed",
         });
       }
     }),
@@ -400,6 +410,7 @@ export const aiRouter = router({
       } catch (e: unknown) {
         await releaseQuota(userId);
         const err = e as { status?: number; message?: string };
+        console.error("[ai.componentSchema] provider error", err);
         if (err.status === 429) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -408,7 +419,7 @@ export const aiRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: err.message ?? "Component schema generation failed",
+          message: "Component schema generation failed",
         });
       }
     }),
