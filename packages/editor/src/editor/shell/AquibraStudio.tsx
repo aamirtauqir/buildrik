@@ -527,6 +527,50 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return <StudioSkeleton />;
   }
 
+  /* FB-8: Issues used to float as an absolute 360px overlay on top of the
+     inspector (z-45). It is now a real right-column mode — StudioPanels
+     swaps it in for ProInspector the same way it swaps in the AI drill-in.
+     Built here (not in StudioPanels) because it needs `requestBrandToken`
+     and `composer.designSystem`, both already in scope on this component. */
+  const issuesPanel = issuesOpen ? (
+    <IssuesPanel
+      issues={state.issues}
+      activePageId={activePageId}
+      onClose={() => setIssuesOpen(false)}
+      onBack={() => setIssuesOpen(false)}
+      /* B9 / SH-63 — a row click lands on the canvas: the element the
+         issue names, else the first element that uses its token (the
+         engine's usage tracker knows), else the Brand panel where the
+         token lives. Never a dead click. */
+      onSelectElement={(issue) => {
+        const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
+        const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
+        const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
+        setIssuesOpen(false);
+        if (target) composer.selection.select(target);
+        /* Brand ON the issue's token — it landed on the first colour
+           row (walk B9: color-primary opened color-action). */
+        else if (issue.tokenId) requestBrandToken(composer, issue.tokenId);
+        else composer.emit("ui:switch-tab", { tab: "design" });
+      }}
+      // applyAutoFix already wraps the rewrite in one transaction, which
+      // is what lets the panel promise a single undo step. It returns
+      // null when it will not touch the token — the panel shows that as
+      // fix-failed instead of silently doing nothing.
+      onFix={async (issue) =>
+        issue.tokenId && issue.autoFixHint
+          ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
+          : null
+      }
+      onOpenBrand={(tokenId) => {
+        setIssuesOpen(false);
+        if (tokenId) requestBrandToken(composer, tokenId);
+        else composer.emit("ui:switch-tab", { tab: "design" });
+      }}
+      onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
+    />
+  ) : null;
+
   return (
     <div
       className={`tw:flex tw:flex-col tw:gap-0 bd-studio ${className}`}
@@ -640,61 +684,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            facts confirm — two gates for one board (B3-10). */
         nextMove={nextMove}
         onRequestPublish={requestPublish}
+        issuesOpen={issuesOpen}
+        issuesPanel={issuesPanel}
+        onCloseIssues={() => setIssuesOpen(false)}
       />
 
-      {/* P3: Issues panel. Board 4418:147641 puts it in the inspector column —
-          300 wide, ending where the column ends, not over the status footer. */}
-      {issuesOpen && (
-        <div
-          data-testid="issues-column"
-          style={{
-            position: "absolute",
-            top: "var(--bk-size-topbar)",
-            right: 0,
-            bottom: "var(--bk-size-footer)",
-            width: "var(--bk-size-inspector)",
-            zIndex: 45,
-            background: "var(--bk-bg-panel)",
-            borderLeft: "1px solid var(--bk-border)",
-          }}
-        >
-          <IssuesPanel
-            issues={state.issues}
-            activePageId={activePageId}
-            onClose={() => setIssuesOpen(false)}
-            /* B9 / SH-63 — a row click lands on the canvas: the element the
-               issue names, else the first element that uses its token (the
-               engine's usage tracker knows), else the Brand panel where the
-               token lives. Never a dead click. */
-            onSelectElement={(issue) => {
-              const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
-              const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
-              const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
-              setIssuesOpen(false);
-              if (target) composer.selection.select(target);
-              /* Brand ON the issue's token — it landed on the first colour
-                 row (walk B9: color-primary opened color-action). */
-              else if (issue.tokenId) requestBrandToken(composer, issue.tokenId);
-              else composer.emit("ui:switch-tab", { tab: "design" });
-            }}
-            // applyAutoFix already wraps the rewrite in one transaction, which
-            // is what lets the panel promise a single undo step. It returns
-            // null when it will not touch the token — the panel shows that as
-            // fix-failed instead of silently doing nothing.
-            onFix={async (issue) =>
-              issue.tokenId && issue.autoFixHint
-                ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
-                : null
-            }
-            onOpenBrand={(tokenId) => {
-              setIssuesOpen(false);
-              if (tokenId) requestBrandToken(composer, tokenId);
-              else composer.emit("ui:switch-tab", { tab: "design" });
-            }}
-            onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
-          />
-        </div>
-      )}
       {/* Tour overlay removed — onboarding handled by orchestrator */}
 
       <StudioModals
