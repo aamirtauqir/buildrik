@@ -23,12 +23,14 @@ import {
   URL_ATTRIBUTES,
   isDangerousUrl,
   isSafeCssDeclaration,
+  isSafeElementId,
   isValidAttributeName,
   withSafeTargets,
   srcsetUrls,
   toAllowedElementTag,
 } from "@buildrik/shared/schemas/element-markup";
 import type { ElementData } from "../../types";
+import { generateId } from "../helpers/id";
 import {
   ALLOWED_URL_SCHEMES,
   ALLOWED_SRC_SCHEMES,
@@ -180,8 +182,13 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
  * A `tagName` off the shared allowlist (or malformed, e.g.
  * "img src=x onerror=… x") becomes "div": the tag is emitted raw into canvas
  * markup, so it is as much an injection point as any attribute.
+ *
+ * An `id` that is not a plain word gets a fresh one (the node stays): ids are
+ * written into selectors (`.buildrick-<id>`, `[data-buildrick-id="<id>"]`).
+ * A style rule naming the old id could not pass the selector rule either.
  */
 export function sanitizeElementTreeContent(data: ElementData): void {
+  if (data.id !== undefined && !isSafeElementId(data.id)) data.id = generateId("el");
   if (data.tagName) data.tagName = toAllowedElementTag(data.tagName);
   if (typeof data.content === "string" && data.content.length > 0) {
     data.content = sanitizeHTML(data.content);

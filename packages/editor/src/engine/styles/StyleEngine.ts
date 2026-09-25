@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { isSafeCssDeclaration } from "@buildrik/shared/schemas/element-markup";
+import { isSafeCssDeclaration, isSafeStyleRuleTarget } from "@buildrik/shared/schemas/element-markup";
 import { EVENTS } from "../../shared/constants/events";
 import {
   BREAKPOINT_ORDER,
@@ -408,6 +408,11 @@ export class StyleEngine {
    * carrying selector=undefined; without this filter they reach
    * downstream consumers (useTokenUsageMap, generateCSS) and crash
    * the panel via the error boundary above DesignSystemTab.
+   *
+   * A rule whose selector or media query is outside the shared grammar is
+   * dropped too: both are written raw into the preview document, the
+   * single-file export's <style> and the published stylesheet, so a stored
+   * selector `a{}</style><script>…` ran script (S-1).
    */
   importStyles(styles: StyleData[]): void {
     let dropped = 0;
@@ -415,7 +420,7 @@ export class StyleEngine {
       const valid =
         style != null &&
         typeof style.id === "string" && style.id.length > 0 &&
-        typeof style.selector === "string" && style.selector.length > 0 &&
+        isSafeStyleRuleTarget(style.selector, style.mediaQuery) &&
         style.properties != null && typeof style.properties === "object";
       if (!valid) {
         dropped += 1;
