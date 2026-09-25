@@ -65,7 +65,7 @@ export function BulkActionBar({ selectedCount, archivedView = false, onAction, o
                 }
               }}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-              style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-secondary)" }}
+              style={{ color: isDestructive ? "var(--color-error)" : "var(--color-text-secondary)" }}
             >
               <Icon className="h-3.5 w-3.5" />{item.label}
               {isMove && <ChevronDown className="h-3 w-3" />}

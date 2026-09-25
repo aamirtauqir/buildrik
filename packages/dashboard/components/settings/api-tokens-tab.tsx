@@ -54,6 +54,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
   const [expiryDays, setExpiryDays] = useState<number | null>(null);
   const [plaintext, setPlaintext] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const create = trpc.apiTokens.create.useMutation({
     onSuccess: (res) => {
@@ -64,9 +65,10 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
     onError: (err) => addToast("error", "Couldn't create token", err.message),
   });
   const revoke = trpc.apiTokens.revoke.useMutation({
-    onSuccess: () => { list.refetch(); addToast("success", "Token revoked"); },
+    onSuccess: () => { list.refetch(); addToast("success", "Token revoked"); setRevokingId(null); },
     onError: (err) => addToast("error", "Couldn't revoke token", err.message),
   });
+  const revokingToken = list.data?.find((t) => t.id === revokingId) ?? null;
   const del = trpc.apiTokens.delete.useMutation({
     onSuccess: () => { list.refetch(); addToast("success", "Token deleted"); },
     onError: (err) => addToast("error", "Couldn't delete token", err.message),
@@ -162,7 +164,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => revoke.mutate({ id: t.id })}
+                          onClick={() => setRevokingId(t.id)}
                           className="text-body-sm font-medium text-[var(--color-error)] hover:text-[var(--color-error-text)]"
                         >
                           Revoke
@@ -267,6 +269,32 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
             {copied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
           </button>
         </div>
+      </Modal>
+
+      {/* Revoke confirm */}
+      <Modal
+        open={!!revokingId}
+        onClose={() => setRevokingId(null)}
+        title="Revoke API token"
+        width={420}
+        footer={
+          <>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setRevokingId(null)}>Cancel</Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              onClick={() => { if (revokingId) revoke.mutate({ id: revokingId }); }}
+              disabled={revoke.isPending}
+            >
+              {revoke.isPending ? "Revoking…" : "Revoke"}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          {revokingToken ? <>Requests using <strong>{revokingToken.name}</strong> will stop working immediately.</> : "This token will stop working immediately."} This can&apos;t be undone.
+        </p>
       </Modal>
     </div>
   );
