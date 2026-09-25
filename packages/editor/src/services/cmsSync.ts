@@ -228,7 +228,11 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
-      }).then((row) => recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt)),
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`collection:${c.id}`, row.updatedAt, c.updatedAt);
+      }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e)
   );
@@ -260,7 +264,11 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
         collectionId: item.collectionId,
         data: item.data,
         status: item.status === "published" ? "PUBLISHED" : "DRAFT",
-      }).then((row) => recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt)),
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+      }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e)
   );

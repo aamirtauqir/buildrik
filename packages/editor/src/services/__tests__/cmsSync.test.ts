@@ -297,6 +297,25 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
   });
 });
 
+/* Round 2: a mirror that resolved but returned no row (an older server, a
+   mock) reached the server. Reading `row.updatedAt` off undefined threw inside
+   the queued op, so it counted as a FAILED mirror and sat in the retry queue
+   forever — replayed, "failing" again, on every reconnect. */
+describe("cmsSync — a mirror answered without a row", () => {
+  it("is a success, not a queued failure, and records no stamp", async () => {
+    const onErr = vi.fn();
+    const off = onCmsSyncError(onErr);
+    colUpsert.mockResolvedValueOnce(undefined);
+    entUpsert.mockResolvedValueOnce(undefined);
+    await syncCollectionUpsert({ id: "nr", name: "N", slug: "n", fields: [], createdAt: "", updatedAt: "x" } as never);
+    await syncEntryUpsert({ id: "nr-e", collectionId: "nr", data: {}, status: "draft", createdAt: "", updatedAt: "x" } as never);
+    expect(onErr).not.toHaveBeenCalled();
+    expect(getCmsSyncPendingCount()).toBe(0);
+    expect(localStorage.getItem("bk-sync-stamps-v1")).toBeNull();
+    off();
+  });
+});
+
 describe("hydrateCmsFromServer", () => {
   /* C-4 / PD-36: server-first, decided on the SERVER's clock. The additive
      pass this replaced skipped every collection already local — so a

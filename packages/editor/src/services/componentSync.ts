@@ -66,7 +66,11 @@ export async function mirrorComponentUpsert(component: ComponentDefinition): Pro
         payload: component as unknown as Record<string, unknown>,
         // Scope (board 6971:77663): null = the whole site.
         pageId: component.pageId ?? null,
-      }).then((row) => recordServerStamp(`component:${component.id}`, row.updatedAt, component.updatedAt)),
+      }).then((row) => {
+        /* No row back is still a mirror that landed; reading updatedAt off
+           undefined made it a "failure", queued and replayed forever. */
+        if (row?.updatedAt) recordServerStamp(`component:${component.id}`, row.updatedAt, component.updatedAt);
+      }),
     // eslint-disable-next-line no-console
     (e) => console.warn("[component-sync] upsert mirror failed (kept locally)", e)
   );

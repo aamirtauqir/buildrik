@@ -67,6 +67,19 @@ const stamps = (): Record<string, { server: string; local: string }> =>
   JSON.parse(localStorage.getItem("bk-sync-stamps-v1") ?? "{}");
 
 /* Round 2 #3: masters hydrated or mirrored before stamps existed have none. */
+describe("componentSync — a mirror answered without a row", () => {
+  it("is a success, not a queued failure, and records no stamp", async () => {
+    const onErr = vi.fn();
+    const off = onComponentSyncError(onErr);
+    upsert.mockResolvedValueOnce(undefined);
+    await mirrorComponentUpsert(comp("nr"));
+    expect(onErr).not.toHaveBeenCalled();
+    expect(getComponentSyncPendingCount()).toBe(0);
+    expect(localStorage.getItem("bk-sync-stamps-v1")).toBeNull();
+    off();
+  });
+});
+
 describe("componentSync — unstamped masters (C-4 round 2)", () => {
   it("first hydrate for this site: an older unstamped master takes the server's copy once (one get) and is stamped", async () => {
     list.mockResolvedValueOnce([{ componentId: "old", updatedAt: new Date(9000) }]);
