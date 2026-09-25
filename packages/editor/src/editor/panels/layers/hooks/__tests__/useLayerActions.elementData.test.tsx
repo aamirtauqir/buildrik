@@ -123,6 +123,37 @@ describe("useLayerActions — names and locks live in element data", () => {
     expect(result.current.lockedIds.has("a")).toBe(true);
   });
 
+  // Controller review round 1, IMPORTANT 3: ELEMENT_UPDATED fires on every
+  // element mutation, not just lock changes — a style edit on an unrelated,
+  // still-unlocked element used to rebuild lockedIds from scratch (a new Set
+  // every time), so every consumer re-rendered on every edit anywhere in the
+  // document. The resync now bails (returns the SAME Set) when the updated
+  // element's lock state didn't actually change.
+  it("does not change the lockedIds Set identity when an unlocked element merely updates", () => {
+    const a = fakeElement("a");
+    const composer = makeComposer([a]);
+    const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
+    act(() => result.current.hydrateFromStorage(PAGE));
+    const before = result.current.lockedIds;
+
+    act(() => composer.emit(EVENTS.ELEMENT_UPDATED, a));
+
+    expect(result.current.lockedIds).toBe(before);
+  });
+
+  it("does not change the lockedIds Set identity when an already-locked element updates again", () => {
+    const a = fakeElement("a", { locked: true });
+    const composer = makeComposer([a]);
+    const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
+    act(() => result.current.hydrateFromStorage(PAGE));
+    const before = result.current.lockedIds;
+    expect(before.has("a")).toBe(true);
+
+    act(() => composer.emit(EVENTS.ELEMENT_UPDATED, a));
+
+    expect(result.current.lockedIds).toBe(before);
+  });
+
   it("migrates names and locks left in the old per-browser keys", () => {
     localStorage.setItem(getStorageKey(PAGE, "names"), JSON.stringify({ a: "Old name" }));
     localStorage.setItem(getStorageKey(PAGE, "locked"), JSON.stringify(["a"]));

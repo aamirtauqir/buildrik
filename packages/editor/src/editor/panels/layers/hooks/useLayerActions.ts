@@ -14,6 +14,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
@@ -183,14 +184,28 @@ export function useLayerActions(
   // Re-derive lockedIds from the elements whenever one changes — keeps the
   // panel in sync with a lock/unlock that happened outside toggleLock (the
   // canvas context menu's Lock action, for one).
+  //
+  // Controller review round 1, IMPORTANT 3: ELEMENT_UPDATED fires on EVERY
+  // element mutation (style edits included — see ElementStyles.ts), and this
+  // used to rescan every element and build a brand-new Set on each one, so a
+  // style tweak on an unrelated, unlocked element replaced lockedIds's
+  // identity for no reason — every consumer re-rendered on every edit
+  // anywhere in the document. Now reads only the updated element's own lock
+  // state and returns the SAME Set (React bails on identical state) unless
+  // that element's membership actually needs to change.
   React.useEffect(() => {
     if (!composer) return;
-    const resync = () => {
-      const locked = new Set<string>();
-      for (const el of composer.elements.getAllElements() ?? []) {
-        if (el.getData().locked === true) locked.add(el.getId());
-      }
-      setLockedIds(locked);
+    const resync = (el: Element) => {
+      const id = el.getId();
+      const isLocked = el.isLocked();
+      setLockedIds((prev) => {
+        const wasLocked = prev.has(id);
+        if (wasLocked === isLocked) return prev;
+        const next = new Set(prev);
+        if (isLocked) next.add(id);
+        else next.delete(id);
+        return next;
+      });
     };
     composer.on(EVENTS.ELEMENT_UPDATED, resync);
     /* Block body, not a shorthand: `off` is chainable and returns the
