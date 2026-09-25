@@ -37,6 +37,7 @@ function makeComposer(
     cms: {
       bindings: {
         getBindings: vi.fn((id: string) => bindingsByElement[id] ?? []),
+        hasAny: vi.fn(() => Object.keys(bindingsByElement).length > 0),
         resolveBinding,
         getAllCollectionBindings: vi.fn(() => collectionBindings),
       },

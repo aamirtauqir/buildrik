@@ -31,7 +31,14 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
   const [revision, setRevision] = React.useState(0);
 
   React.useEffect(() => {
-    if (!content || !composer?.cms.bindings) {
+    const hasElementBindings = composer?.cms.bindings?.hasAny() ?? false;
+    const hasCollectionBindings =
+      (composer?.cms.bindings?.getAllCollectionBindings().length ?? 0) > 0;
+
+    if (!content || !composer?.cms.bindings || (!hasElementBindings && !hasCollectionBindings)) {
+      // D-7: no bindings and no collection-list repeaters — nothing to
+      // resolve, so skip the DOMParser pass entirely instead of parsing and
+      // re-serializing content that will come out byte-identical.
       setResolvedContent(content);
       setIsResolving(false);
       return;
