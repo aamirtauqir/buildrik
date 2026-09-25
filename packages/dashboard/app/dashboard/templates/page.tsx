@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
+import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
@@ -48,6 +49,21 @@ function TemplatesBrowserInner() {
     router.replace(pathname + templateFiltersToQuery(next), { scroll: false });
   }
 
+  // Every keystroke drove a router.replace (URL change) and a fresh
+  // templates.list query — typing "hero" fired 4 requests instead of 1. The
+  // input keeps its own fast-updating local state; only the URL/query update
+  // is debounced.
+  const [searchInput, setSearchInput] = useState(filters.search);
+  useEffect(() => {
+    setSearchInput(filters.search);
+  }, [filters.search]);
+  const debouncedSearchInput = useDebouncedValue(searchInput, 250);
+  useEffect(() => {
+    if (debouncedSearchInput === filters.search) return;
+    applyFilters({ search: debouncedSearchInput, page: 1 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchInput]);
+
   const list = trpc.templates.list.useQuery(
     {
       category: filters.category as "ALL" | "PORTFOLIO" | "BUSINESS" | "BLOG" | "AGENCY" | "ECOMMERCE" | "RESTAURANT",
@@ -75,8 +91,8 @@ function TemplatesBrowserInner() {
         <InputField
           wrapperClassName="ml-auto w-[280px]"
           leading={<Search className="h-4 w-4" />}
-          value={filters.search}
-          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search templates…"
           aria-label="Search templates"
         />

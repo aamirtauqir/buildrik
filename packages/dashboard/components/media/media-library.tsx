@@ -7,6 +7,7 @@ import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
+import { useDebouncedValue } from "@lib/hooks/use-debounced-value";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -67,8 +68,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
+  const debouncedSearch = useDebouncedValue(search, 250);
   const assets = trpc.media.listAssets.useQuery({
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     folderId,
     type: typeFilter === "all" ? undefined : typeFilter,
     limit,

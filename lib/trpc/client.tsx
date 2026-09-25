@@ -109,6 +109,12 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
+            // D-13: the default staleTime is 0, so every remount/refocus
+            // refetched — navigating Projects → Media → Projects inside 30s
+            // re-issued sites.list every time. A query that needs fresher
+            // data invalidates explicitly on mutation (grep onSuccess) or
+            // overrides staleTime per-call; this is a floor, not a cap.
+            staleTime: 30_000,
             retry: (failureCount, error) => {
               /* A definitive answer is not worth asking again. Only
                  UNAUTHORIZED was listed here, so opening a site you have no
