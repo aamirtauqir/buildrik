@@ -321,13 +321,14 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
 // PARTS
 // =============================================================================
 
-/** 4418:141220 kbd chip — gray-100 on a gray-200 edge, 20 tall, 11/16 medium. */
+/** 4418:141220 kbd chip — gray-100 on a gray-200 edge, 20 tall, 11/16 medium.
+ *  Ink is ink-soft, not gray-500: gray-500 on gray-100 is 4.39:1 (WCAG AA fail). */
 const Kbd: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   return (
     <span
       data-testid={testId}
-      className="tw:flex tw:h-5 tw:flex-none tw:items-center tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:whitespace-nowrap tw:text-[var(--bk-gray-500)]"
+      className="tw:flex tw:h-5 tw:flex-none tw:items-center tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:leading-4 tw:whitespace-nowrap tw:text-[var(--bk-ink-soft)]"
     >
       {/* The board prints "⌘Z", not "⌘+Z": symbols join their key directly. */}
       {formatChord(shortcut, isMac).replace(/([⌘⇧⌥⌃])\+/g, "$1")}

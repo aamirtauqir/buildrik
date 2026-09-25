@@ -49,12 +49,6 @@
       "nodeId": "I233:1172;232:8"
     },
     {
-      "name": "paste-html",
-      "testId": "insert-paste-html",
-      "spec": "insert-dragging",
-      "nodeId": "233:1177"
-    },
-    {
       "name": "row-heading",
       "testId": "insert-el-Heading"
     },
@@ -134,6 +128,8 @@
     "  container rather than for the thing being dragged (UX-A-19).",
     "  the drop path has no needs-asset branch, so a DRAGGED Image lands with no",
     "  src while a CLICKED Image opens Media first (UX-A-18).",
-    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover."
+    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover.",
+    "",
+    "2026-09-25 (conformance-recipes): paste-html dropped — Paste HTML… moved from a pinned row into the Add panel's ⋯ menu (9e03c8bc4). The insert-panel probe's stub composer gained elements.getActivePage + emit, which BuildTab now calls (G2-118 92e5cba73); without them the probe threw and rendered nothing."
   ]
 }

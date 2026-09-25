@@ -85,12 +85,6 @@
       "nodeId": "166:22"
     },
     {
-      "name": "row-nav-kbd",
-      "testId": "cmdk-kbd-nav-review",
-      "spec": "cmdk-typing",
-      "nodeId": "166:23"
-    },
-    {
       "name": "row-action",
       "testId": "cmdk-row-view-preview",
       "spec": "cmdk-typing",
@@ -145,6 +139,8 @@
     "selected row's --bk-accent-tint #EBF5FF at 11px. Here it is '⌘+P', because",
     "Actions now leads and Preview is row 0. The chord colour is the board's",
     "(166:26, --color/ink-muted, and diff compares it); the tint under it belongs",
-    "to no board at all. Recorded as a named pair, not silenced."
+    "to no board at all. Recorded as a named pair, not silenced.",
+    "",
+    "2026-09-25 (conformance-recipes): ⌘K was rebuilt to v3 4418:141220 (b90be7f33). Navigate rows are doors and print no chord (\"Each is a door, so none prints a chord\"), so their kbd targets are dropped."
   ]
 }

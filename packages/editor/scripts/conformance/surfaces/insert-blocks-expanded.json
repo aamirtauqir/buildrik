@@ -52,21 +52,15 @@
     },
     {
       "name": "card-thumb",
-      "testId": "insert-block-thumb-container",
+      "testId": "insert-block-thumb-hero",
       "spec": "insert-blocks-expanded",
       "nodeId": "1069:4726"
     },
     {
       "name": "card-label",
-      "testId": "insert-block-label-container",
+      "testId": "insert-block-label-hero",
       "spec": "insert-blocks-expanded",
       "nodeId": "1069:4727"
-    },
-    {
-      "name": "paste-html-label",
-      "testId": "insert-row-label-insert-paste-html",
-      "spec": "insert-blocks-expanded",
-      "nodeId": "1069:4786"
     },
     {
       "name": "blocks-grid",
@@ -147,6 +141,11 @@
     "That hover is also where a real contrast failure lives: 11px",
     "--bk-ink-muted on gray-100 is 4.39:1. Fixed in this pass (BuildTab.css,",
     "`.bld-group-header:hover span`), not baselined.",
-    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover. The neutral hover that parked the pointer off the rows now targets panel-header-title, as insert-dragging does."
+    "2026-09-24 (gates): insert-search-wrap / insert-tips targets dropped — 6f18799aa moved search to the topbar field and 06d4667da replaced the tips strip with the first-use tip popover. The neutral hover that parked the pointer off the rows now targets panel-header-title, as insert-dragging does.",
+    "",
+    "2026-09-25 (conformance-recipes): paste-html-label dropped — Paste HTML… moved from a pinned row into the Add panel's ⋯ menu (9e03c8bc4). The insert-panel probe's stub composer gained elements.getActivePage + emit, which BuildTab now calls (G2-118 92e5cba73); without them the probe threw and rendered nothing.",
+    "",
+    "card-thumb / card-label re-pointed from the 'container' block to 'hero': Blocks was cut to",
+    "v3 4428:140817's eight blocks, Hero first (f45d8e2ee); there is no container block any more."
   ]
 }

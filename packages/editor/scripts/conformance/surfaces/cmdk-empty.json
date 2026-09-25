@@ -76,37 +76,15 @@
     },
     {
       "name": "row-recent",
-      "testId": "cmdk-row-nav-add",
+      "testId": "cmdk-row-recent-nav-add",
       "spec": "cmdk-empty",
       "nodeId": "166:7"
     },
     {
       "name": "row-recent-label",
-      "testId": "cmdk-label-nav-add",
+      "testId": "cmdk-label-recent-nav-add",
       "spec": "cmdk-empty",
       "nodeId": "166:8"
-    },
-    {
-      "name": "row-recent-kbd",
-      "testId": "cmdk-kbd-nav-add",
-      "spec": "cmdk-empty",
-      "nodeId": "166:9"
-    },
-    {
-      "name": "band-suggested",
-      "testId": "cmdk-band-suggested",
-      "spec": "cmdk-empty",
-      "nodeId": "220:931"
-    },
-    {
-      "name": "band-suggested-tint",
-      "testId": "cmdk-band-suggested",
-      "spec": "cmdk-empty",
-      "nodeId": "I220:931;220:6"
-    },
-    {
-      "name": "band-suggested-label",
-      "testId": "cmdk-band-suggested"
     },
     {
       "name": "row-ai",
@@ -121,12 +99,6 @@
       "nodeId": "166:13"
     },
     {
-      "name": "row-ai-kbd",
-      "testId": "cmdk-kbd-nav-ai",
-      "spec": "cmdk-empty",
-      "nodeId": "166:14"
-    },
-    {
       "name": "row-templates",
       "testId": "cmdk-row-nav-templates",
       "spec": "cmdk-empty",
@@ -137,12 +109,6 @@
       "testId": "cmdk-label-nav-templates",
       "spec": "cmdk-empty",
       "nodeId": "166:16"
-    },
-    {
-      "name": "row-templates-kbd",
-      "testId": "cmdk-kbd-nav-templates",
-      "spec": "cmdk-empty",
-      "nodeId": "166:17"
     }
   ],
   "_note": [
@@ -202,6 +168,11 @@
     "the tint under it is the PRODUCT's — no CmdK board draws a selected row at",
     "all. Fixing it means either a lighter selection fill or ink-soft chords on",
     "the selected row only, and both are decisions above this recipe. Identical",
-    "pair, identical number, already flagged on pages-command-palette-k."
+    "pair, identical number, already flagged on pages-command-palette-k.",
+    "",
+    "2026-09-25 (conformance-recipes): ⌘K was rebuilt to v3 4418:141220 (b90be7f33). The RECENT row is a copy of the run command with id recent-<id>; row-recent",
+    "re-pointed to cmdk-row-recent-nav-add (cmdk-row-nav-add is the Navigate row). There is no",
+    "SUGGESTED band any more — AI and Templates are Navigate rows — so the band targets are",
+    "dropped and row-ai / row-templates measure those rows. Navigate rows are doors and print no chord (\"Each is a door, so none prints a chord\"), so their kbd targets are dropped."
   ]
 }

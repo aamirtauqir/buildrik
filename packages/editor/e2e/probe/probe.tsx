@@ -777,9 +777,12 @@ const MINE_COMPONENTS: ComponentDefinition[] = [
 const INSERT_COMPOSER = {
   components: { getAllComponents: () => MINE_COMPONENTS },
   selection: { getSelectedIds: () => [] as string[] },
-  elements: { getElement: () => null },
+  /* getActivePage: BuildTab scopes Mine to the open page (G2-118, 92e5cba73);
+     no page means site-wide components only, which is what the boards draw. */
+  elements: { getElement: () => null, getActivePage: () => null },
   on: () => {},
   off: () => {},
+  emit: () => {},
 } as unknown as Composer;
 
 /**

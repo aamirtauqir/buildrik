@@ -230,7 +230,7 @@ export const Row: React.FC<{
         <span
           aria-hidden="true"
           data-testid={`insert-row-grip-${testId}`}
-          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-gray-400)] tw:cursor-grab"
+          className="tw:w-[28px] tw:shrink-0 tw:text-center tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:cursor-grab"
         >
           ⠿
         </span>

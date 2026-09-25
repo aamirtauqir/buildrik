@@ -57,7 +57,7 @@
     },
     {
       "action": "waitFor",
-      "testId": "cmdk-band-go-to"
+      "testId": "cmdk-band-navigate"
     }
   ],
   "contrastScope": "[data-testid=\"cmdk-palette\"]",
@@ -82,13 +82,13 @@
     },
     {
       "name": "band-actions",
-      "testId": "cmdk-band-actions",
+      "testId": "cmdk-band-view",
       "spec": "cmdk-recent",
       "nodeId": "303:1981"
     },
     {
       "name": "band-actions-tint",
-      "testId": "cmdk-band-actions",
+      "testId": "cmdk-band-view",
       "spec": "cmdk-recent",
       "nodeId": "I303:1981;220:6"
     },
@@ -112,13 +112,13 @@
     },
     {
       "name": "band-go-to",
-      "testId": "cmdk-band-go-to",
+      "testId": "cmdk-band-navigate",
       "spec": "cmdk-recent",
       "nodeId": "303:1987"
     },
     {
       "name": "band-go-to-tint",
-      "testId": "cmdk-band-go-to",
+      "testId": "cmdk-band-navigate",
       "spec": "cmdk-recent",
       "nodeId": "I303:1987;220:6"
     },
@@ -133,12 +133,6 @@
       "testId": "cmdk-label-nav-review",
       "spec": "cmdk-recent",
       "nodeId": "303:1989"
-    },
-    {
-      "name": "row-nav-kbd",
-      "testId": "cmdk-kbd-nav-review",
-      "spec": "cmdk-recent",
-      "nodeId": "303:1990"
     }
   ],
   "_note": [
@@ -203,6 +197,9 @@
     "cmdk-typing, cmdk-results and pages-command-palette-k. The chord colour is",
     "303:1984's own and diff compares it; the tint under it belongs to no board —",
     "no CmdK frame draws a selected row at all. Recorded as a named pair so a NEW",
-    "failing pair still fails the run."
+    "failing pair still fails the run.",
+    "",
+    "2026-09-25 (conformance-recipes): ⌘K was rebuilt to v3 4418:141220 (b90be7f33). The board's ACTIONS / GO TO bands are now VIEW (Preview) and NAVIGATE (Open",
+    "Review): band targets re-pointed to cmdk-band-view / cmdk-band-navigate. Navigate rows are doors and print no chord (\"Each is a door, so none prints a chord\"), so their kbd targets are dropped."
   ]
 }
