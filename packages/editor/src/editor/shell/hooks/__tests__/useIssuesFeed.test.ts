@@ -90,7 +90,19 @@ describe("useIssuesFeed", () => {
       ],
     });
     const issues = setIssuesHook();
-    renderHook(() => useIssuesFeed(makeComposer(), "site-1", issues.setIssues));
+    // `composer` MUST be hoisted outside the render callback — renderHook
+    // re-invokes that callback on every render, so a `makeComposer()` call
+    // inline there hands the hook a NEW object each time. `composer` feeds
+    // useContentIssueScanner's effect deps (and this hook's own DS-lint
+    // effect), so its identity changing every render re-fires "on mount"
+    // effects every render → setState → re-render → new composer → repeat,
+    // an infinite loop this test hit for real (root-caused via `it.only`
+    // bisection: this exact shape of test OOM'd in isolation at ~1.5GB/210s
+    // while the sibling test with a hoisted composer passed in ~10s). The
+    // real editor never hits this: `useComposerInit` holds `composer` in
+    // `React.useState`, stable across renders by React's own contract.
+    const composer = makeComposer();
+    renderHook(() => useIssuesFeed(composer, "site-1", issues.setIssues));
 
     await waitFor(() => expect(issues.get()).toHaveLength(2));
     expect(issues.get().find((i) => i.id === "publish-check:Domain connected")?.type).toBe("error");
@@ -99,7 +111,8 @@ describe("useIssuesFeed", () => {
 
   it("without a siteId, contributes no publish-check rows", async () => {
     const issues = setIssuesHook();
-    renderHook(() => useIssuesFeed(makeComposer(), null, issues.setIssues));
+    const composer = makeComposer(); // hoisted — see note above
+    renderHook(() => useIssuesFeed(composer, null, issues.setIssues));
     expect(fetchPrePublishChecks).not.toHaveBeenCalled();
     expect(issues.get()).toHaveLength(0);
   });
@@ -107,14 +120,16 @@ describe("useIssuesFeed", () => {
   it("a failed check fetch leaves Issues silent on that source, not stuck loading", async () => {
     fetchPrePublishChecks.mockRejectedValue(new Error("network"));
     const issues = setIssuesHook();
-    renderHook(() => useIssuesFeed(makeComposer(), "site-1", issues.setIssues));
+    const composer = makeComposer(); // hoisted — see note above
+    renderHook(() => useIssuesFeed(composer, "site-1", issues.setIssues));
     await waitFor(() => expect(fetchPrePublishChecks).toHaveBeenCalled());
     expect(issues.get()).toHaveLength(0);
   });
 
   it("rescan() re-fetches the checks (the panel's one Try again covers both sources)", async () => {
     const issues = setIssuesHook();
-    const { result } = renderHook(() => useIssuesFeed(makeComposer(), "site-1", issues.setIssues));
+    const composer = makeComposer(); // hoisted — see note above
+    const { result } = renderHook(() => useIssuesFeed(composer, "site-1", issues.setIssues));
     await waitFor(() => expect(fetchPrePublishChecks).toHaveBeenCalledTimes(1));
     act(() => result.current.rescan());
     await waitFor(() => expect(fetchPrePublishChecks).toHaveBeenCalledTimes(2));
