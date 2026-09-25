@@ -110,7 +110,7 @@ export async function createShareLink(
     expiresAt.setDate(expiresAt.getDate() + data.expiresInDays);
   }
 
-  return prisma.shareLink.create({
+  const row = await prisma.shareLink.create({
     data: {
       siteId,
       name: data.name,
@@ -119,6 +119,12 @@ export async function createShareLink(
       expiresAt,
     },
   });
+  // S-10: the caller of sharing.create is the person who just minted this
+  // link, so the token is fine to return — but the bcrypt hash is not. Same
+  // redacted shape listShareLinks already returns, so nothing downstream
+  // treats "the row from create" differently from "a row from list".
+  const { passwordHash: _passwordHash, ...redacted } = row;
+  return { ...redacted, hasPassword: row.passwordHash != null };
 }
 
 export async function revokeShareLink(id: string) {
