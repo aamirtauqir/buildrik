@@ -116,6 +116,12 @@ describe("LocalizationScreen — the frame's strip and two cards", () => {
     expect(screen.getByTestId("set-loc-restore")).toHaveTextContent(
       "Restoring a site version leaves this configuration unchanged.",
     );
+    // C-7 (PD-39 overridden): the UI stays, but says plainly that publish
+    // ships the default locale only — the table tracks translation
+    // progress, not live per-language routes.
+    expect(screen.getByTestId("set-loc-publish-note")).toHaveTextContent(
+      "Per-language pages publish in a later release.",
+    );
     expect(screen.getByTestId("set-card-default")).toHaveTextContent("Default");
     expect(screen.getByTestId("set-card-locales")).toHaveTextContent("Locales");
     expect(screen.getByLabelText("Default locale")).toBe(defaultSelect());
