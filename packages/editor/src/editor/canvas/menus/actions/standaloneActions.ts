@@ -15,7 +15,7 @@ const SECTION_TYPES = new Set([
   "cta", "card", "pricing", "columns", "grid", "flex",
 ]);
 /** Element types the CMS can feed a field into. */
-const BINDABLE_TYPES = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
+export const BINDABLE_TYPES: ReadonlySet<string> = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
 
 /** Save the selection (or `element` alone) as a component — the canvas ⋯ and
  *  the inspector ⋯ open the same dialog. Bindings are extracted up-front so

@@ -55,17 +55,6 @@ describe("StudioPanels — ui:cms-open (⌘K → a collection or a record)", () 
   });
 });
 
-/* A-14: ui:switch-tab {tab:"ai"} set aiInInspector while the inspector column
-   was gated on the inspector's hide preference, so ⌘J with a hidden inspector
-   mounted AITab into a zero-width column. Gap walk 93 #2 had the same shape
-   for Publish/Review/History/Activity/Issues: the column now opens for any
-   panel it hosts (isInspectorColumnOpen, unit-tested in tabsConfig.test.ts). */
-describe("StudioPanels — the column opens for every panel it hosts", () => {
-  it("feeds AI, Issues and the column tabs into isInspectorColumnOpen", () => {
-    expect(src).toContain("columnModeOpen: rightColumnTab || issuesOpen || aiInInspector");
-  });
-});
-
 /* Security carry-over (same class as the VIEWER rail gate): "ui:switch-tab"
  * is a SECOND door onto the tabs the rail gates — the ⌘K palette, canvas
  * context menus, PublishTab, CmsWorkspace and others all route through it.

@@ -235,3 +235,28 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
   });
 });
+
+/* A-14 / GW-2: every panel the column hosts opens the column, even with the
+   inspector hidden (was a source-text check). */
+describe("StudioPanels — the column opens for every panel it hosts", () => {
+  it("AI, a column tab and Issues each open a hidden inspector's column", () => {
+    const composer = makeComposer();
+    const { rerender } = render(<Harness composer={composer} />);
+    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
+    expect(screen.getByTestId("ai-tab")).toBeTruthy();
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+
+    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "history" }));
+    expect(screen.getByTestId("column-tab-history")).toBeTruthy();
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+
+    rerender(<Harness composer={composer} issuesOpen renderIssuesPanel={() => <div data-testid="issues" />} />);
+    expect(screen.getByTestId("issues")).toBeTruthy();
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+});

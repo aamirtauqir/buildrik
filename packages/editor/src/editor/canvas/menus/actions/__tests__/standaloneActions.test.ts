@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { standaloneActions } from "../standaloneActions";
+import { BINDABLE_TYPES, standaloneActions } from "../standaloneActions";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ActionContext } from "../../contextMenuRegistry";
 import {
@@ -57,7 +57,7 @@ describe("standaloneActions", () => {
     });
 
     it("is offered only on types whose inspector profile carries the Content section", () => {
-      for (const type of ["text", "heading", "paragraph", "image", "button", "link"]) {
+      for (const type of BINDABLE_TYPES) {
         const el = makeElementStub({ id: `x-${type}`, type, parent });
         expect(action("bind-to-cms").isVisible!({ ...ctx, element: el as unknown as Element })).toBe(true);
         expect(getProfileFor(type).order).toContain("content");
