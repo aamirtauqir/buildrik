@@ -70,9 +70,13 @@ function treeChildRoles(): string[] {
   return Array.from(tree.children).flatMap((child) => {
     const role = child.getAttribute("role");
     // `presentation` is ignored by AT, so the row it wraps is what the tree
-    // actually owns — that wrapper is deliberate (see PageRow).
+    // actually owns — that wrapper is deliberate (see PageRow). Only the
+    // presentation wrapper's OWN direct child (the row) is what the tree
+    // owns; a deep querySelectorAll would also pick up roles nested further
+    // inside the row itself (e.g. PageRow's bulk-select checkbox), which is
+    // a legitimate descendant of the treeitem, not a sibling the tree owns.
     if (role && role !== "presentation" && role !== "none") return [role];
-    return Array.from(child.querySelectorAll("[role]")).map((n) => n.getAttribute("role") ?? "");
+    return Array.from(child.querySelectorAll(":scope > [role]")).map((n) => n.getAttribute("role") ?? "");
   });
 }
 
