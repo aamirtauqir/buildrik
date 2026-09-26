@@ -1096,14 +1096,6 @@
     },
     "nonTextPairs": {}
   },
-  "media-drill-in-stock-browser": {
-    "skipped": 0,
-    "compared": 28,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
   "media-drill-in-versions": {
     "skipped": 0,
     "compared": 31,
