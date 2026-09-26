@@ -30,6 +30,7 @@ import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGr
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
+import { instantiateComponentAtSelection } from "../component-library/instantiate";
 import { fetchLibraryComponent } from "@/services/componentSync";
 import "./BuildTab.css";
 
@@ -117,16 +118,12 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // uses: selected element is the parent, else the active page root.
   const insertMine = React.useCallback(async (c: ComponentDefinition) => {
     if (!composer) return;
-    let parentId = composer.selection.getSelectedIds()[0];
-    if (!parentId) parentId = composer.elements.getActivePage()?.root?.id ?? "";
-    if (!parentId) {
+    const result = await instantiateComponentAtSelection(composer, c.id);
+    if (result === "no-parent") {
       addToast({ description: "Open a page first to add this component.", tone: "warning" });
-      return;
-    }
-    try {
-      await composer.components.instantiateComponent(c.id, parentId);
+    } else if (result === "ok") {
       addToast({ description: "Component added to canvas", tone: "success" });
-    } catch {
+    } else {
       addToast({ description: "Couldn't add component. Try again.", tone: "error" });
     }
   }, [composer, addToast]);
