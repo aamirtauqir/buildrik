@@ -16,6 +16,12 @@ import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { captureComponentThumbnail } from "./captureComponentThumbnail";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
+/* Same "switch page, then select + scroll to the element" seam Review's
+   Locate row uses (`locateComment`'s own header: "the REGRESSION-guarded
+   seam"). Reused rather than re-implemented for the used-on row below —
+   the name is Review's, the behaviour (page switch → select → scrollIntoView)
+   is exactly what "click a used-on row" needs too. */
+import { locateComment as locateOnCanvas } from "@/editor/sidebar/tabs/review/locate";
 // ============================================
 // Types
 // ============================================
@@ -110,6 +116,24 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const [showDetachAll, setShowDetachAll] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [draftName, setDraftName] = React.useState(component.name);
+
+  /* Flow-check (2026-09-25): Esc did nothing here — every sibling drill-in
+     (Add's Generate/create sub-views) backs out one level on Esc; this screen
+     never wired it. Skips while renaming (the field's own Escape already
+     handles that, see the rename input below) or while one of this screen's
+     own confirms is open — those own Escape through OverlayMount/ConfirmDialog
+     and must close themselves first, not the whole panel underneath them. */
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (renaming || showDeleteConfirm || showUpdateConfirm || showDetachAll) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      onBack();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onBack, renaming, showDeleteConfirm, showUpdateConfirm, showDetachAll]);
 
   // Handle insert action — the shared insert (A-15), same words as Add.
   const handleInsert = async () => {
@@ -206,18 +230,23 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Instance count for delete message
   const instanceCount = composer?.components?.getInstancesOfComponent?.(component.id)?.length ?? 0;
 
-  // Instances by page — USED ON (click opens the page).
+  /* Instances by page — USED ON. Flow-check (2026-09-25): clicking a row only
+     switched page — on the page that was already active (the common case,
+     since you opened the master from something on it), that reads as
+     "nothing happened": no selection, no scroll, row just highlights.
+     `firstInstanceId` lets the click select + scroll to an actual instance,
+     not just land on its page. */
   const instances = composer?.components?.getInstancesOfComponent?.(component.id) ?? [];
   const pages = composer?.elements.getAllPages?.() ?? [];
   const usedOn = pages
-    .map((page) => ({
-      page,
-      count: instances.filter((inst) => {
+    .map((page) => {
+      const pageInstances = instances.filter((inst) => {
         let el = composer?.elements.getElement(inst.elementId) ?? null;
         while (el?.getParent()) el = el.getParent();
         return el?.getId() === page.root?.id;
-      }).length,
-    }))
+      });
+      return { page, count: pageInstances.length, firstInstanceId: pageInstances[0]?.elementId ?? null };
+    })
     .filter((row) => row.count > 0);
   const structure = component.masterTree?.children ?? [];
   const siteName = composer?.getProjectMetadata?.()?.name || "this site";
@@ -362,20 +391,30 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           <span className="tw:flex-1">USED ON</span>
           <span className="tw:font-[family-name:var(--bk-font-mono)]">{usedOn.length}</span>
         </div>
-        {usedOn.map(({ page, count }) => (
-          <div
-            key={page.id}
-            role="button"
-            tabIndex={0}
-            className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
-            data-testid={`component-usedon-${page.id}`}
-            onClick={() => composer?.elements.setActivePage(page.id)}
-            onKeyDown={(e) => { if (e.key === "Enter") composer?.elements.setActivePage(page.id); }}
-          >
-            <span className="tw:truncate">{page.name}</span>
-            <span className={ROW_META}>{count} instance{count === 1 ? "" : "s"}</span>
-          </div>
-        ))}
+        {usedOn.map(({ page, count, firstInstanceId }) => {
+          const jumpToUsage = () => {
+            if (!composer) return;
+            if (firstInstanceId) {
+              locateOnCanvas(composer, { pageId: page.id, targetSelector: firstInstanceId });
+            } else {
+              composer.elements.setActivePage(page.id);
+            }
+          };
+          return (
+            <div
+              key={page.id}
+              role="button"
+              tabIndex={0}
+              className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
+              data-testid={`component-usedon-${page.id}`}
+              onClick={jumpToUsage}
+              onKeyDown={(e) => { if (e.key === "Enter") jumpToUsage(); }}
+            >
+              <span className="tw:truncate">{page.name}</span>
+              <span className={ROW_META}>{count} instance{count === 1 ? "" : "s"}</span>
+            </div>
+          );
+        })}
       </div>
 
       <div className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2">
