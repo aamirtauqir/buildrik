@@ -20,6 +20,7 @@ import {
   resolveShareLink,
   shareUnlockProof,
 } from "@/server/services/share-link.service";
+import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 
 const link = (over: Record<string, unknown> = {}) => ({
   id: "l1",
@@ -130,32 +131,64 @@ describe("getShareDraftRows", () => {
   /* Lv3 #10 (dashboard verify pass 3): the bindings reached the draft render
      but no CMS data did, so the scratch composer could resolve nothing and the
      page showed the element's last-saved text — stale, then an empty <p>. The
-     rows now carry the collections the bindings reference and their PUBLISHED
-     entries only — an anonymous link holder never sees a draft record. */
-  it("carries the referenced collections and only their published entries, scoped to the site", async () => {
-    const bindings = {
-      field: { t2: [{ binding: { sourceId: "cms:notes", path: "title", type: "variable" }, collectionId: "notes", fieldSlug: "title", property: "content" }] },
-      collection: { list1: { elementId: "list1", collectionId: "posts", itemVar: "item" } },
-    };
-    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [] } as never);
+     rows now carry what the bindings on the DELIVERED pages read: their
+     collections, their PUBLISHED entries only, and only the fields bound
+     (review I-2 — the whole entry reached an anonymous visitor, "internal
+     notes" and all, including collections bound only on hidden pages). */
+  const fieldBinding = (collectionId: string, fieldSlug: string) => [
+    { binding: { sourceId: `cms:${collectionId}`, path: fieldSlug, type: "variable" }, collectionId, fieldSlug, property: "content" },
+  ];
+  const bindings = {
+    field: { t2: fieldBinding("notes", "title"), hid: fieldBinding("secret", "title") },
+    collection: { list1: { elementId: "list1", collectionId: "posts", itemVar: "post" } },
+  };
+  const visible = {
+    id: "p1", name: "Home", slug: "home", position: 0, isHomePage: true, meta: null, settings: null,
+    blocks: {
+      id: "root", type: "container", children: [
+        { id: "t2", type: "text", content: "x" },
+        { id: "list1", type: "container", children: [{ id: "c1", type: "text", content: "{{ post.headline }} by {{post.author}}" }] },
+      ],
+    },
+  };
+  const hidden = {
+    id: "p2", name: "Drafts", slug: "drafts", position: 1, isHomePage: false, meta: null,
+    settings: { visibility: "hidden" }, blocks: { id: "r2", type: "container", children: [{ id: "hid", type: "text" }] },
+  };
+
+  it("carries the delivered pages' collections, published entries only, projected to the bound fields", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ name: "Bella", projectCmsBindings: bindings, sitePages: [visible, hidden] } as never);
     vi.mocked(prisma.cmsCollection.findMany).mockResolvedValue([
-      { id: "notes", name: "Notes", slug: "notes", displayField: "title", fields: [{ id: "title", slug: "title", name: "Title", type: "text" }] },
+      { id: "notes", name: "Notes", slug: "notes", displayField: "name", fields: [
+        { id: "title", slug: "title", name: "Title", type: "text" },
+        { id: "name", slug: "name", name: "Name", type: "text" },
+        { id: "notes", slug: "internal-notes", name: "Internal notes", type: "text" },
+      ] },
+      { id: "posts", name: "Posts", slug: "posts", displayField: null, fields: [] },
     ] as never);
-    vi.mocked(prisma.cmsEntry.findMany).mockResolvedValue([
-      { id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3" }, updatedAt: new Date("2026-09-26T00:00:00Z") },
-    ] as never);
+    vi.mocked(prisma.cmsEntry.findMany).mockImplementation((async (args: { where: { collectionId: string } }) =>
+      args.where.collectionId === "notes"
+        ? [{ id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3", name: "N", "internal-notes": "fire Bob", email: "a@b.c" }, updatedAt: new Date(0) }]
+        : [{ id: "e2", collectionId: "posts", data: { headline: "H", author: "A", draftNotes: "x" }, updatedAt: new Date(0) }]) as never);
 
     const rows = await getShareDraftRows("s1");
 
     const colWhere = vi.mocked(prisma.cmsCollection.findMany).mock.calls.at(-1)![0]!.where;
-    expect(colWhere).toEqual({ siteId: "s1", id: { in: ["notes", "posts"] } });
-    const entryArgs = vi.mocked(prisma.cmsEntry.findMany).mock.calls.at(-1)![0]!;
-    expect(entryArgs.where).toEqual({ collectionId: { in: ["notes"] }, status: "PUBLISHED" });
-    expect(entryArgs.orderBy).toEqual({ updatedAt: "desc" });
-    expect(rows.cms.collections.map((c) => c.id)).toEqual(["notes"]);
-    expect(rows.cms.entries).toEqual([
-      { id: "e1", collectionId: "notes", data: { title: "Tom & Jerry <3" }, updatedAt: new Date("2026-09-26T00:00:00Z") },
+    expect(colWhere).toEqual({ siteId: "s1", id: { in: ["notes", "posts"] } }); // "secret" (hidden page) absent
+    const entryCalls = vi.mocked(prisma.cmsEntry.findMany).mock.calls.map(([a]) => a!);
+    expect(entryCalls.map((a) => a.where)).toEqual([
+      { collectionId: "notes", status: "PUBLISHED" },
+      { collectionId: "posts", status: "PUBLISHED" },
     ]);
+    expect(entryCalls.every((a) => a.take === CMS_COLLECTION_LIMIT_MAX)).toBe(true);
+    expect(entryCalls.every((a) => JSON.stringify(a.orderBy) === JSON.stringify({ updatedAt: "desc" }))).toBe(true);
+
+    const byId = Object.fromEntries(rows.cms.entries.map((e) => [e.id, e.data]));
+    expect(byId.e1).toEqual({ title: "Tom & Jerry <3", name: "N" });
+    expect(byId.e2).toEqual({ headline: "H", author: "A" });
+    const notes = rows.cms.collections.find((c) => c.id === "notes")!;
+    expect((notes.fields as Array<{ slug: string }>).map((f) => f.slug)).toEqual(["title", "name"]);
+    expect(JSON.stringify(rows.cms)).not.toContain("fire Bob");
   });
 
   it("queries no CMS at all for a site without bindings", async () => {

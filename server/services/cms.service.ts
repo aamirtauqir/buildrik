@@ -10,6 +10,7 @@ import type {
 import { CSV_IMPORT_MAX_ROWS, CSV_IMPORT_MAX_COLUMNS, CSV_IMPORT_MAX_CELL_LENGTH } from "@buildrik/shared/schemas/cms";
 import { insertBeforeHeadClose } from "@/lib/publish-html";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
+import { CMS_COLLECTION_LIMIT_MAX } from "@buildrik/shared/schemas/sites";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -504,28 +505,49 @@ export async function generateDynamicPages(
 }
 
 /**
- * The CMS data a draft render needs to resolve a site's bindings: the named
- * collections of THIS site, and their PUBLISHED entries only — the read is for
- * the /share/<token> draft, whose holder may be anonymous, so a draft record
- * never leaves the server. Entries come newest-first, the editor store's own
- * order (CollectionStorage.loadContentItems), so "the first published
- * record" a binding without an itemId previews is the same record the canvas
- * shows. Only the columns the resolver reads are selected.
+ * The CMS data a draft render needs to resolve a site's bindings, and nothing
+ * more — the read is for the /share/<token> draft, whose holder may be
+ * anonymous. Takes, per collection, the field slugs the delivered pages'
+ * bindings read (`fieldsByCollection`, from share-link.service); returns the
+ * collections of THIS site among them, their PUBLISHED entries only (a draft
+ * record never leaves the server) capped at CMS_COLLECTION_LIMIT_MAX each,
+ * and every entry's `data` — and each collection's field list — projected to
+ * those slugs plus the display field. An unbound field ("internal notes") is
+ * not sent (review I-2). Entries come newest-first, the editor store's order
+ * (CollectionStorage.loadContentItems), so "the first published record" a
+ * binding without an itemId previews is the record the canvas shows.
  */
-export async function getPublishedCmsForBindings(siteId: string, collectionIds: string[]) {
-  if (collectionIds.length === 0) return { collections: [], entries: [] };
-  const collections = await prisma.cmsCollection.findMany({
-    where: { siteId, id: { in: collectionIds } },
+export async function getPublishedCmsForBindings(siteId: string, fieldsByCollection: ReadonlyMap<string, ReadonlySet<string>>) {
+  if (fieldsByCollection.size === 0) return { collections: [], entries: [] };
+  const rows = await prisma.cmsCollection.findMany({
+    where: { siteId, id: { in: [...fieldsByCollection.keys()] } },
     select: { id: true, name: true, slug: true, displayField: true, fields: true, createdAt: true, updatedAt: true },
   });
-  const entries = collections.length
-    ? await prisma.cmsEntry.findMany({
-        where: { collectionId: { in: collections.map((c) => c.id) }, status: "PUBLISHED" },
+  const keep = (c: { id: string; displayField: string | null }) =>
+    new Set([...(fieldsByCollection.get(c.id) ?? []), ...(c.displayField ? [c.displayField] : [])]);
+  const collections = rows.map((c) => {
+    const slugs = keep(c);
+    const fields = Array.isArray(c.fields)
+      ? (c.fields as Array<{ id?: string; slug?: string }>).filter((f) => slugs.has(f.slug ?? f.id ?? ""))
+      : [];
+    return { ...c, fields };
+  });
+  const perCollection = await Promise.all(
+    rows.map(async (c) => {
+      const slugs = keep(c);
+      const found = await prisma.cmsEntry.findMany({
+        where: { collectionId: c.id, status: "PUBLISHED" },
         orderBy: { updatedAt: "desc" },
+        take: CMS_COLLECTION_LIMIT_MAX,
         select: { id: true, collectionId: true, data: true, status: true, createdAt: true, updatedAt: true },
-      })
-    : [];
-  return { collections, entries };
+      });
+      return found.map((e) => {
+        const data = (e.data ?? {}) as Record<string, unknown>;
+        return { ...e, data: Object.fromEntries(Object.entries(data).filter(([k]) => slugs.has(k))) };
+      });
+    }),
+  );
+  return { collections, entries: perCollection.flat() };
 }
 
 /**
