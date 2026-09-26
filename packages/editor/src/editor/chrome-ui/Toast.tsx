@@ -276,11 +276,44 @@ function ToastItem({
 }) {
   const { id, tone = "info", title, description, action, duration } = toast;
 
+  // A13-14: hover/focus pauses the auto-dismiss timer — a user mid-read (or
+  // mid-Undo-click) should not have the toast vanish under their cursor.
+  // Tracks remaining time across pause/resume with Date.now() rather than a
+  // fixed re-arm, so repeated hover/leave cycles don't reset the clock.
+  const remainingRef = React.useRef(duration);
+  const startedAtRef = React.useRef(0);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clear = React.useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const arm = React.useCallback((ms: number) => {
+    clear();
+    if (!Number.isFinite(ms)) return;
+    startedAtRef.current = Date.now();
+    timerRef.current = setTimeout(() => onDismiss(id), ms);
+  }, [clear, id, onDismiss]);
+
   React.useEffect(() => {
-    if (!Number.isFinite(duration)) return;
-    const timer = setTimeout(() => onDismiss(id), duration);
-    return () => clearTimeout(timer);
-  }, [id, duration, onDismiss]);
+    remainingRef.current = duration;
+    arm(duration);
+    return clear;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, duration]);
+
+  const pause = () => {
+    if (!Number.isFinite(duration) || !timerRef.current) return;
+    clear();
+    remainingRef.current = Math.max(0, remainingRef.current - (Date.now() - startedAtRef.current));
+  };
+  const resume = () => {
+    if (!Number.isFinite(duration) || timerRef.current) return;
+    arm(remainingRef.current);
+  };
 
   const persistent = isPersistent(toast);
   const dotClass = TONE_DOT_CLASS[tone];
@@ -312,6 +345,10 @@ function ToastItem({
     <div
       data-testid={`toast-item-${index}`}
       data-persistent={persistent ? "true" : undefined}
+      onMouseEnter={pause}
+      onMouseLeave={resume}
+      onFocus={pause}
+      onBlur={resume}
       className={[
         /* Lines=1: a 36px bar that hugs its text, pad 10/16, gap 16.
            Lines=2 (a title): the 420px card, pad 16, gap 8. */
