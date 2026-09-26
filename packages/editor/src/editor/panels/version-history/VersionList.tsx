@@ -202,6 +202,7 @@ export function VersionRow({
               <TextInput
                 ref={renameInputRef}
                 value={renameValue}
+                maxLength={200}
                 onChange={(e) => setRenameValue(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 onBlur={commitRename}
