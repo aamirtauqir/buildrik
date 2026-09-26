@@ -90,4 +90,47 @@ describe("initSliderRuntime", () => {
     initSliderRuntime(document);
     expect(document.querySelector(".buildrick-slider-arrow")).toBeNull();
   });
+
+  it("opts.autoplay overrides data-autoplay (the canvas forces it off)", () => {
+    vi.useFakeTimers();
+    const slider = buildSlider({ "data-autoplay": "true", "data-interval": "1" });
+    initSliderRuntime(document, { autoplay: false });
+    vi.advanceTimersByTime(5000);
+    const slides = slider.querySelectorAll(".buildrick-slide");
+    expect((slides[0] as HTMLElement).style.display).toBe("");
+  });
+
+  it("opens on getInitialIndex's slide, keyed by data-buildrick-id", () => {
+    const slider = buildSlider({ "data-buildrick-id": "s1" });
+    initSliderRuntime(document, { getInitialIndex: (key) => (key === "s1" ? 1 : undefined) });
+    const slides = slider.querySelectorAll(".buildrick-slide");
+    expect((slides[0] as HTMLElement).style.display).toBe("none");
+    expect((slides[1] as HTMLElement).style.display).toBe("");
+  });
+
+  it("calls onIndexChange as the shown slide changes", () => {
+    const slider = buildSlider({ "data-buildrick-id": "s1" });
+    const seen: Array<[string, number]> = [];
+    initSliderRuntime(document, { onIndexChange: (key, i) => seen.push([key, i]) });
+    slider.querySelector<HTMLButtonElement>(".buildrick-slider-next")!.click();
+    expect(seen).toEqual([["s1", 0], ["s1", 1]]);
+  });
+
+  it("an arrow/dot click stops propagation, so it doesn't also select the slider in the canvas", () => {
+    const slider = buildSlider();
+    initSliderRuntime(document);
+    const parentHandler = vi.fn();
+    slider.parentElement!.addEventListener("click", parentHandler);
+    slider.querySelector<HTMLButtonElement>(".buildrick-slider-next")!.click();
+    expect(parentHandler).not.toHaveBeenCalled();
+  });
+
+  it("cleanup removes the injected arrows/dots and the init marker", () => {
+    const slider = buildSlider();
+    const cleanup = initSliderRuntime(document);
+    expect(slider.querySelectorAll(".buildrick-slider-arrow, .buildrick-slider-dots")).toHaveLength(3);
+    cleanup();
+    expect(slider.querySelectorAll(".buildrick-slider-arrow, .buildrick-slider-dots")).toHaveLength(0);
+    expect(slider.getAttribute("data-bk-slider-init")).toBeNull();
+  });
 });

@@ -55,12 +55,30 @@ describe("Slider › PLAYBACK + CONTROLS", () => {
     expect(composer.elements.getElement("s")?.getAttribute("data-dots")).toBe("false");
   });
 
-  it("clamps the interval to 1-60 seconds", () => {
+  it("does not clamp/commit per keystroke — only on blur", () => {
+    const composer = project();
+    composer.elements.getElement("s")?.setAttribute("data-autoplay", "true");
+    render(<SliderPlaybackSection elementId="s" composer={composer} isOpen />);
+    const interval = screen.getByLabelText("Autoplay interval, seconds") as HTMLInputElement;
+    fireEvent.change(interval, { target: { value: "999" } });
+    expect(interval.value).toBe("999"); // draft is untouched — no fighting the user mid-type
+    expect(composer.elements.getElement("s")?.getAttribute("data-interval")).toBeUndefined();
+  });
+
+  it("clamps the interval to 1-60 seconds on blur", () => {
     const composer = project();
     composer.elements.getElement("s")?.setAttribute("data-autoplay", "true");
     render(<SliderPlaybackSection elementId="s" composer={composer} isOpen />);
     const interval = screen.getByLabelText("Autoplay interval, seconds");
     fireEvent.change(interval, { target: { value: "999" } });
+    fireEvent.blur(interval);
     expect(composer.elements.getElement("s")?.getAttribute("data-interval")).toBe("60");
+  });
+
+  it("gives each toggle an accessible name via aria-labelledby", () => {
+    render(<SliderPlaybackSection elementId="s" composer={project()} isOpen />);
+    expect(screen.getByRole("switch", { name: "Autoplay" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Arrows" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Dots" })).toBeInTheDocument();
   });
 });

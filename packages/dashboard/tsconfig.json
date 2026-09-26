@@ -43,6 +43,9 @@
       "@buildrik/shared/*": [
         "../shared/*"
       ],
+      "@buildrik/editor/*": [
+        "../editor/*"
+      ],
       "@shared/*": [
         "../editor/src/shared/*"
       ],

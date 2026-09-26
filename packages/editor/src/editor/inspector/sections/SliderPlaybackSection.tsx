@@ -41,6 +41,8 @@ const boolAttr = (el: { getAttribute: (n: string) => string | undefined }, name:
   return v === undefined ? fallback : v === "true";
 };
 
+const clampInterval = (v: string) => Math.min(60, Math.max(1, Number(v) || 5));
+
 export const SliderPlaybackSection: React.FC<SliderPlaybackSectionProps> = ({
   elementId,
   composer,
@@ -58,12 +60,18 @@ export const SliderPlaybackSection: React.FC<SliderPlaybackSectionProps> = ({
   }, [composer]);
 
   const slider = composer?.elements.getElement(elementId);
-  if (!composer || !slider) return null;
+  const autoplay = slider ? boolAttr(slider, "data-autoplay", false) : false;
+  const savedInterval = slider ? Number(slider.getAttribute("data-interval")) || 5 : 5;
+  const arrows = slider ? boolAttr(slider, "data-arrows", true) : true;
+  const dots = slider ? boolAttr(slider, "data-dots", true) : true;
 
-  const autoplay = boolAttr(slider, "data-autoplay", false);
-  const interval = Number(slider.getAttribute("data-interval")) || 5;
-  const arrows = boolAttr(slider, "data-arrows", true);
-  const dots = boolAttr(slider, "data-dots", true);
+  // Local draft while typing — clamping on every keystroke fights the user
+  // (clearing the field to retype gets clamped straight back to 1 mid-edit).
+  // Committed (clamped + written to the attribute) on blur only.
+  const [intervalDraft, setIntervalDraft] = React.useState<string | null>(null);
+  React.useEffect(() => setIntervalDraft(null), [elementId]);
+
+  if (!composer || !slider) return null;
 
   const set = (name: string, value: string) =>
     runTxn(composer, "slider-settings", () => slider.setAttribute(name, value));
@@ -71,8 +79,8 @@ export const SliderPlaybackSection: React.FC<SliderPlaybackSectionProps> = ({
   return (
     <Section title="Playback" icon="Play" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-slider-playback">
       <div className={ROW}>
-        <span className={LABEL}>Autoplay</span>
-        <ToggleSwitch checked={autoplay} label="" onChange={(v) => set("data-autoplay", String(v))} />
+        <span className={LABEL} id="slider-autoplay-label">Autoplay</span>
+        <ToggleSwitch checked={autoplay} aria-labelledby="slider-autoplay-label" onChange={(v) => set("data-autoplay", String(v))} />
       </div>
       {autoplay && (
         <div className={ROW}>
@@ -84,22 +92,23 @@ export const SliderPlaybackSection: React.FC<SliderPlaybackSectionProps> = ({
             max={60}
             className="tw:w-20"
             aria-label="Autoplay interval, seconds"
-            value={String(interval)}
-            onChange={(e) => {
-              const n = Math.min(60, Math.max(1, Number(e.target.value) || 5));
-              set("data-interval", String(n));
+            value={intervalDraft ?? String(savedInterval)}
+            onChange={(e) => setIntervalDraft(e.target.value)}
+            onBlur={(e) => {
+              set("data-interval", String(clampInterval(e.target.value)));
+              setIntervalDraft(null);
             }}
           />
           <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">sec</span>
         </div>
       )}
       <div className={ROW}>
-        <span className={LABEL}>Arrows</span>
-        <ToggleSwitch checked={arrows} label="" onChange={(v) => set("data-arrows", String(v))} />
+        <span className={LABEL} id="slider-arrows-label">Arrows</span>
+        <ToggleSwitch checked={arrows} aria-labelledby="slider-arrows-label" onChange={(v) => set("data-arrows", String(v))} />
       </div>
       <div className={ROW}>
-        <span className={LABEL}>Dots</span>
-        <ToggleSwitch checked={dots} label="" onChange={(v) => set("data-dots", String(v))} />
+        <span className={LABEL} id="slider-dots-label">Dots</span>
+        <ToggleSwitch checked={dots} aria-labelledby="slider-dots-label" onChange={(v) => set("data-dots", String(v))} />
       </div>
     </Section>
   );
