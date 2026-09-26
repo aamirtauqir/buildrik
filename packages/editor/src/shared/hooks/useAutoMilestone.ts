@@ -20,6 +20,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../constants/events";
 import { aiTrpcClient } from "@/services/ai/AiTrpcClient";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
 export interface MilestoneSuggestion {
   suggestedName: string;
@@ -59,6 +60,37 @@ const SUGGESTION_COOLDOWN_MS = 10 * 60_000; // 10 minutes
    (attempted or shown), so a quiet 10 minutes with one small edit doesn't
    still spend a call the moment the cooldown lifts. */
 const MIN_CHANGES_SINCE_LAST_SUGGESTION = 5;
+
+/* carry-over 15 round 2: `lastSuggestionTime` lived only in React state, so a
+   remount (StrictMode double-mount aside, a real one happens on any panel
+   that unmounts/remounts this hook) reset it to 0 — `hasAttempted` read
+   false again, which bypassed BOTH the 10-minute cooldown and the
+   significance threshold below for the "first" attempt after the remount.
+   Persisted per site so the cooldown survives a remount; sessionStorage
+   because the cooldown is a same-session concept, not something that should
+   outlive the tab. Wrapped in try/catch — storage can be disabled or full,
+   and a suggestion gate is never worth breaking the editor over. */
+const LAST_SUGGESTION_KEY_PREFIX = "bk-auto-milestone-last-suggestion-";
+
+function readPersistedLastSuggestionTime(siteId: string | null): number {
+  if (!siteId) return 0;
+  try {
+    const raw = sessionStorage.getItem(LAST_SUGGESTION_KEY_PREFIX + siteId);
+    const parsed = raw ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writePersistedLastSuggestionTime(siteId: string | null, time: number): void {
+  if (!siteId) return;
+  try {
+    sessionStorage.setItem(LAST_SUGGESTION_KEY_PREFIX + siteId, String(time));
+  } catch {
+    // Storage disabled or full — in-memory state still gates this session.
+  }
+}
 
 /**
  * Approximate property count per element type, used to normalize "mass change"
@@ -164,7 +196,9 @@ export function useAutoMilestone(
 ): UseAutoMilestoneReturn {
   const [suggestion, setSuggestion] = React.useState<MilestoneSuggestion | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [lastSuggestionTime, setLastSuggestionTime] = React.useState(0);
+  const [lastSuggestionTime, setLastSuggestionTime] = React.useState(() =>
+    readPersistedLastSuggestionTime(getSiteIdFromUrl()),
+  );
 
   const autoCheckpointCountRef = React.useRef(0);
   // Significance threshold: history entries recorded since the gate last
@@ -184,18 +218,22 @@ export function useAutoMilestone(
 
       // Rate limit: don't attempt more than once per cooldown window. Armed
       // on every ATTEMPT below, not only a success, so a run of failures
-      // can't disable the gate. lastSuggestionTime === 0 means no attempt
-      // has happened yet this session — nothing to cool down from.
-      const hasAttempted = lastSuggestionTime !== 0;
-      if (hasAttempted && Date.now() - lastSuggestionTime < SUGGESTION_COOLDOWN_MS) return;
+      // can't disable the gate. lastSuggestionTime persists per site
+      // (sessionStorage), so this holds across a remount too — a state-only
+      // value read 0 again after remounting and let the very next qualifying
+      // event straight through.
+      if (Date.now() - lastSuggestionTime < SUGGESTION_COOLDOWN_MS) return;
 
-      // Significance threshold: once the gate has armed at least once, a
-      // cooldown lifting is not itself a reason to spend another call —
-      // require real activity since it last armed. The very first attempt
-      // of a session has no "last" to measure since.
-      if (hasAttempted && changesSinceLastSuggestionRef.current < MIN_CHANGES_SINCE_LAST_SUGGESTION) return;
+      // Significance threshold: require real recorded activity since the
+      // gate last armed — including the very first attempt. No exemption:
+      // an exempted first attempt is indistinguishable, after a remount,
+      // from "the gate never armed," which is exactly the bypass this
+      // threshold exists to close.
+      if (changesSinceLastSuggestionRef.current < MIN_CHANGES_SINCE_LAST_SUGGESTION) return;
 
-      setLastSuggestionTime(Date.now());
+      const now = Date.now();
+      setLastSuggestionTime(now);
+      writePersistedLastSuggestionTime(getSiteIdFromUrl(), now);
       changesSinceLastSuggestionRef.current = 0;
       setIsLoading(true);
 
