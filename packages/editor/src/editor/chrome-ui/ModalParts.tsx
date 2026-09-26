@@ -48,6 +48,22 @@ const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
 /** Lets ModalClose inherit the root's close without per-consumer wiring. */
 const ModalCloseContext = React.createContext<(() => void) | null>(null);
 
+/**
+ * B-7 round 2: ~50 existing ModalRoot consumers render a visible
+ * `<ModalTitle>` (or set ModalContent's `srTitle`) but never separately wire
+ * `labelledBy`/`ariaLabel` on ModalRoot itself — that was the ONLY way the
+ * dialog node got a name after the round-1 fix, so those ~50 dialogs stayed
+ * unnamed. ModalTitle/ModalContent register their name into this context;
+ * ModalRoot reads it and forwards it to OverlayMount, so every existing
+ * consumer gets a name with no file of theirs touched. An explicit
+ * labelledBy/ariaLabel passed directly to ModalRoot always wins (opt-out for
+ * a caller that wants something else named).
+ */
+const ModalAutoNameContext = React.createContext<{
+  setLabelledBy: (id: string | null) => void;
+  setAriaLabel: (label: string | null) => void;
+}>({ setLabelledBy: () => {}, setAriaLabel: () => {} });
+
 export interface ModalRootProps {
   open: boolean;
   /** Radix-style callback the existing surfaces already pass. */
@@ -57,17 +73,50 @@ export interface ModalRootProps {
   dismissOnScrimClick?: boolean;
   /** Board 183:16 — a form with unsaved input pulses instead of closing. */
   dirty?: boolean;
+  /** Id of the element that names this dialog (usually a ModalTitle) — set
+   *  on the role=dialog node's aria-labelledby. B-7/A13-4: ModalRoot used to
+   *  drop this on the floor, so every compound-form dialog's dialog node was
+   *  unnamed to assistive tech even though ModalContent's own srTitle prop
+   *  only ever reached a redundant aria-label on the CONTENT div, one level
+   *  in from the actual role=dialog element OverlayMount renders. */
+  labelledBy?: string;
+  /** Direct accessible name for a dialog with no visible heading to point
+   *  labelledBy at. Ignored when labelledBy is set. */
+  ariaLabel?: string;
 }
 
 /** Compound root: owns the portal, scrim and focus trap. */
-export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick, dirty }: ModalRootProps) {
+export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick, dirty, labelledBy, ariaLabel }: ModalRootProps) {
   const close = React.useCallback(() => {
     onClose?.();
     onOpenChange?.(false);
   }, [onClose, onOpenChange]);
+  // Auto-detected from a descendant ModalTitle (preferred — a visible
+  // heading) or ModalContent's srTitle (fallback — screen-reader only).
+  // Explicit props below always take precedence.
+  const [autoLabelledBy, setAutoLabelledBy] = React.useState<string | null>(null);
+  const [autoAriaLabel, setAutoAriaLabel] = React.useState<string | null>(null);
+  const autoNameCtx = React.useMemo(
+    () => ({ setLabelledBy: setAutoLabelledBy, setAriaLabel: setAutoAriaLabel }),
+    [],
+  );
+  // A caller that passes EITHER explicit prop opts out of auto-detection
+  // entirely — an explicit ariaLabel must win even over an auto-detected
+  // ModalTitle, not just over an auto-detected srTitle.
+  const hasExplicitName = labelledBy != null || ariaLabel != null;
+  const resolvedLabelledBy = hasExplicitName ? labelledBy : autoLabelledBy ?? undefined;
+  // aria-labelledby beats aria-label per the ARIA spec — leaving a stale
+  // aria-label set alongside a labelledBy would silently lose it.
+  const resolvedAriaLabel = resolvedLabelledBy
+    ? undefined
+    : hasExplicitName
+      ? ariaLabel
+      : autoAriaLabel ?? undefined;
   return (
-    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
-      <ModalCloseContext.Provider value={close}>{children}</ModalCloseContext.Provider>
+    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} labelledBy={resolvedLabelledBy} ariaLabel={resolvedAriaLabel}>
+      <ModalCloseContext.Provider value={close}>
+        <ModalAutoNameContext.Provider value={autoNameCtx}>{children}</ModalAutoNameContext.Provider>
+      </ModalCloseContext.Provider>
     </OverlayMount>
   );
 }
@@ -82,6 +131,14 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   { size = "question", srTitle, className, children, ...rest },
   ref,
 ) {
+  // B-7 round 2: registers as the dialog's fallback name (below a visible
+  // ModalTitle) so the ~50 existing callers that only ever set `srTitle`
+  // here get it applied to the actual role=dialog node, not just this div.
+  const { setAriaLabel } = React.useContext(ModalAutoNameContext);
+  React.useEffect(() => {
+    setAriaLabel(srTitle ?? null);
+    return () => setAriaLabel(null);
+  }, [srTitle, setAriaLabel]);
   return (
     <div
       ref={ref}
@@ -123,11 +180,23 @@ export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement
 }
 
 export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
-  function ModalTitle({ inset = true, className, children, ...rest }, ref) {
+  function ModalTitle({ inset = true, className, id, children, ...rest }, ref) {
+    // B-7 round 2: a visible ModalTitle is the preferred name for the
+    // dialog — registers its id (the caller's own `id` prop if given, else
+    // one generated here) as the auto-detected labelledBy so ModalRoot can
+    // wire it up without the ~50 existing callers passing `labelledBy`
+    // themselves.
+    const generatedId = React.useId();
+    const resolvedId = id ?? generatedId;
+    const { setLabelledBy } = React.useContext(ModalAutoNameContext);
+    React.useEffect(() => {
+      setLabelledBy(resolvedId);
+      return () => setLabelledBy(null);
+    }, [resolvedId, setLabelledBy]);
     return (
       /* twMerge: on a plain element a caller's `tw:text-*` and the default
          both compile and stylesheet order decides; merged, the caller wins. */
-      <h2 ref={ref} className={twMerge(inset ? MODAL_TITLE_HEAD_CLASS : "", MODAL_TITLE_CLASS, className)} {...rest}>
+      <h2 ref={ref} id={resolvedId} className={twMerge(inset ? MODAL_TITLE_HEAD_CLASS : "", MODAL_TITLE_CLASS, className)} {...rest}>
         {children}
       </h2>
     );

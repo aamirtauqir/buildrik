@@ -249,6 +249,16 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
         Restoring a site version leaves this configuration unchanged.
       </div>
 
+      {/* C-7 (PD-39 overridden): the publish pipeline emits one language —
+          the default locale's pages, at the site root. Nothing under
+          Locales generates a /<code>/ page tree today, so a row's
+          translation progress and status pill describe work being tracked,
+          not routes that exist on the live site. Said plainly instead of
+          implying every enabled locale already publishes. */}
+      <div className={SET_RESTORE_STRIP} data-testid="set-loc-publish-note">
+        Per-language pages publish in a later release. Today, publishing ships the default locale only — the rows below track translation progress, not live routes.
+      </div>
+
       <Section title="Default">
         <div className={SET_ROW}>
           <label htmlFor="default-locale" className={SET_ROW_LABEL}>

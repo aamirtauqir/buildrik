@@ -23,6 +23,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 
 const POLL_INTERVAL_MS = 2000;
+const MAX_CONSECUTIVE_POLL_FAILURES = 3;
 const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 
 export type PublishUiState =
@@ -124,6 +125,12 @@ export interface UsePublishJobResult {
    *  last job's URL and the hydrated live state so the topbar and panel stop
    *  saying live — the shell's `publishedUrl` is derived from both. */
   unpublished: () => void;
+  /** True when `uiState === "failed"` because polling was lost (network,
+   *  not the job itself) rather than the job reaching a real FAILED status.
+   *  The job may still be running server-side — the recovery is "Check
+   *  status" (`track(jobId)`, resumes polling the SAME job), not a fresh
+   *  publish. */
+  pollLost: boolean;
 }
 
 export function usePublishJob(): UsePublishJobResult {
@@ -138,6 +145,25 @@ export function usePublishJob(): UsePublishJobResult {
   const hydratedUrl = hydrated?.isPublished ? hydrated.publishedUrl : null;
   const pollTimer = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = React.useRef(false);
+  // B-2: the re-entrancy guard used to key ONLY on jobId, which is set
+  // AFTER `await publishSite(...)` resolves — a double-click inside that
+  // await window fired two jobs. Set true before the call, cleared in
+  // finally, and checked first in publish().
+  const inFlightRef = React.useRef(false);
+  // B-2: a poll failure used to stop polling on the FIRST failed tick — a
+  // single dropped network request permanently orphaned an in-flight job
+  // (uiState stuck "publishing" forever, since jobId/status never reach a
+  // terminal state). Back off across a few consecutive failures instead,
+  // and once the poll is truly lost, unblock republish even though the
+  // last-known status was never terminal.
+  const pollFailCountRef = React.useRef(0);
+  const pollLostRef = React.useRef(false);
+  // Mirrors pollLostRef into state so `uiState` (a plain derivation, not an
+  // effect) actually re-renders on poll-loss — a ref alone is invisible to
+  // callers until something else happens to re-render. Without this, jobId
+  // stays set and status never reaches a terminal value, so uiState computed
+  // "publishing" forever: no failed state, no retry, an infinite spinner.
+  const [pollLost, setPollLost] = React.useState(false);
   // Mirror status into a ref so publish()'s re-entrancy guard can read latest
   // status without rotating useCallback identity per poll tick.
   const statusRef = React.useRef<PublishStatus | null>(null);
@@ -157,21 +183,32 @@ export function usePublishJob(): UsePublishJobResult {
     try {
       const next = await fetchPublishStatus(id);
       if (abortRef.current) return;
+      pollFailCountRef.current = 0;
       setStatus(next);
       if (TERMINAL.has(next.status)) {
         stopPolling();
         if (next.status === "FAILED" && next.error) setError(next.error);
       }
     } catch (e) {
+      if (abortRef.current) return;
+      pollFailCountRef.current += 1;
+      // Back off across a few consecutive failures — one dropped request
+      // (a flaky network tick) should not orphan an otherwise-healthy job.
+      if (pollFailCountRef.current < MAX_CONSECUTIVE_POLL_FAILURES) return;
       const msg = e instanceof Error ? e.message : "Failed to poll publish status";
       setError(msg);
       stopPolling();
+      pollLostRef.current = true;
+      setPollLost(true);
     }
   }, [stopPolling]);
 
   const startPolling = React.useCallback((id: string) => {
     stopPolling();
     abortRef.current = false;
+    pollFailCountRef.current = 0;
+    pollLostRef.current = false;
+    setPollLost(false);
     // Immediate first poll, then interval.
     void tick(id);
     pollTimer.current = setInterval(() => void tick(id), POLL_INTERVAL_MS);
@@ -183,9 +220,20 @@ export function usePublishJob(): UsePublishJobResult {
       pages: PublishPagePayload[],
       opts?: { acknowledgeStale?: boolean },
     ) => {
-      // Block only when a job is still in-flight. After a terminal state
-      // (COMPLETED/FAILED/CANCELLED), allow republish.
-      if (jobId && statusRef.current && !TERMINAL.has(statusRef.current.status)) return;
+      // Block a double-click BEFORE the request even lands (inFlightRef),
+      // and block a still-in-flight job AFTER it lands (jobId + non-terminal
+      // status) — unless polling on that job was lost, in which case it can
+      // never reach a terminal status on its own and must not block forever.
+      if (inFlightRef.current) return;
+      if (
+        jobId &&
+        statusRef.current &&
+        !TERMINAL.has(statusRef.current.status) &&
+        !pollLostRef.current
+      ) {
+        return;
+      }
+      inFlightRef.current = true;
       setError(null);
       setBlockedReason(null);
       try {
@@ -210,6 +258,8 @@ export function usePublishJob(): UsePublishJobResult {
         const reason = classifyPublishBlock(msg);
         if (reason) setBlockedReason(reason);
         else setError(msg);
+      } finally {
+        inFlightRef.current = false;
       }
     },
     [jobId, startPolling],
@@ -242,6 +292,7 @@ export function usePublishJob(): UsePublishJobResult {
     setStatus(null);
     setError(null);
     setBlockedReason(null);
+    setPollLost(false);
   }, [stopPolling]);
 
   // Cleanup on unmount.
@@ -296,8 +347,15 @@ export function usePublishJob(): UsePublishJobResult {
     `error` is only otherwise set from a poll or a cancel, and both of those
     have a `jobId`, so this branch is reached only by a pre-job failure.
   */
+  // B-2: a job whose polling was lost (MAX_CONSECUTIVE_POLL_FAILURES) never
+  // reaches a terminal status on its own — jobId stays set with a
+  // "publishing"-shaped status forever. Fold that into "failed" so the
+  // panel's existing failed-state UI (retry included) picks it up instead of
+  // spinning indefinitely with no way out.
   const uiState: PublishUiState = jobId
-    ? status?.status === "COMPLETED"
+    ? pollLost
+      ? "failed"
+      : status?.status === "COMPLETED"
       ? "published"
       : status?.status === "FAILED"
         ? "failed"
@@ -334,5 +392,6 @@ export function usePublishJob(): UsePublishJobResult {
     track,
     reset,
     dismissBlock,
+    pollLost,
   };
 }

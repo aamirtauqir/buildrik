@@ -79,11 +79,17 @@ describe("AdvancedTab visibility", () => {
     expect(s.setVisibility).toHaveBeenCalledWith("hidden");
   });
 
-  it("shows the visibility helper text matching the current mode", () => {
+  it("shows only the not-published helper text for hidden — no contradicting reachable-via-direct-URL line", () => {
     render(<AdvancedTab s={makeSettings({ visibility: "hidden" })} />);
     expect(
-      screen.getByText("Page is not linked in menus but reachable via direct URL.")
+      screen.getByText("Not published. Hidden pages are left out of the deploy.")
     ).toBeTruthy();
+    expect(screen.queryByText(/reachable via direct URL/)).toBeNull();
+  });
+
+  it("shows the publicly-accessible helper text for live only", () => {
+    render(<AdvancedTab s={makeSettings({ visibility: "live" })} />);
+    expect(screen.getByText("Page is publicly accessible.")).toBeTruthy();
   });
 });
 

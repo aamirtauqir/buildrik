@@ -52,10 +52,9 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         {s.visibility === "hidden" && (
           <HelperText className={BK_HELPER_CLASS}>Not published. Hidden pages are left out of the deploy.</HelperText>
         )}
-        <HelperText className={BK_HELPER_CLASS}>
-          {s.visibility === "live" && "Page is publicly accessible."}
-          {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
-        </HelperText>
+        {s.visibility === "live" && (
+          <HelperText className={BK_HELPER_CLASS}>Page is publicly accessible.</HelperText>
+        )}
       </div>
       {/* Indexing */}
       <div className="tw:flex tw:flex-col tw:gap-2">

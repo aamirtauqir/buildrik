@@ -73,6 +73,10 @@ export interface UseEditorShortcutsOptions {
    * the row have to land in the same place.
    */
   openSiteSettings?: () => void;
+  /** A-8/PD-7/PD-8: the C shortcut opens comment mode — a review-flow tool.
+   *  Off (default) matches "not reachable" rather than silently degrading;
+   *  callers that know the site's workspace has no agency layer pass false. */
+  reviewsEnabled?: boolean;
 }
 
 export function useEditorShortcuts({
@@ -81,6 +85,7 @@ export function useEditorShortcuts({
   saveProject,
   openLeftPanelToTab,
   openSiteSettings,
+  reviewsEnabled = true,
 }: UseEditorShortcutsOptions): void {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -109,7 +114,11 @@ export function useEditorShortcuts({
 
       // C — comment mode toggle (keyboard legend 58:215). Plain key, no
       // modifiers, guarded above against editable surfaces.
-      if ((e.key === "c" || e.key === "C") && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+      if (
+        reviewsEnabled &&
+        (e.key === "c" || e.key === "C") &&
+        !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey
+      ) {
         e.preventDefault();
         composer?.emit("ui:comment-mode", {});
         return;
@@ -200,5 +209,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals, openLeftPanelToTab, openSiteSettings]);
+  }, [saveProject, composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
 }

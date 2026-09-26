@@ -39,6 +39,24 @@ export interface DropContext {
   onDropSuccess?: (success: DropSuccess) => void;
 }
 
+/**
+ * Pre-snapshotted DataTransfer payloads. The dispatcher (useDropExecution)
+ * reads every channel synchronously before any `await` — real browsers zero
+ * out DataTransfer at the first microtask boundary, so a handler that reads
+ * `e.dataTransfer.getData(...)` itself after an earlier `await` in the
+ * dispatch chain (handleComponentDrop) gets back "". Handlers below prefer
+ * `payloads` and fall back to a direct read only for callers (tests) that
+ * haven't passed one.
+ */
+export interface DropPayloads {
+  multiData: string;
+  elementData: string;
+  componentId: string;
+  templateData: string;
+  blockData: string;
+  catalogComponentId?: string;
+}
+
 // =============================================================================
 // MULTI-ELEMENT DROP
 // =============================================================================
@@ -47,8 +65,8 @@ export interface DropContext {
  * Handle multi-element drop operation
  * Returns true if handled, false if not a multi-element drop
  */
-export function handleMultiElementDrop(e: React.DragEvent, ctx: DropContext): boolean {
-  const multiData = e.dataTransfer.getData("application/x-aquibra-multi");
+export function handleMultiElementDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): boolean {
+  const multiData = payloads?.multiData ?? e.dataTransfer.getData("application/x-aquibra-multi");
   if (!multiData) return false;
 
   const { composer, freshTargetId, freshDropPosition, onDropError } = ctx;
@@ -144,9 +162,10 @@ export function handleMultiElementDrop(e: React.DragEvent, ctx: DropContext): bo
 export function handleElementDrop(
   e: React.DragEvent,
   ctx: DropContext,
-  dropTargetId: string | null
+  dropTargetId: string | null,
+  payloads?: DropPayloads
 ): boolean {
-  const elementData = e.dataTransfer.getData("element");
+  const elementData = payloads?.elementData ?? e.dataTransfer.getData("element");
   if (!elementData) return false;
 
   const { composer, freshTargetId, onDropError } = ctx;
@@ -235,8 +254,8 @@ export function handleElementDrop(
  * Handle component drop (instantiate component)
  * Returns true if handled, false if not a component drop
  */
-export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext): Promise<boolean> {
-  const componentId = e.dataTransfer.getData("application/x-aquibra-component");
+export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): Promise<boolean> {
+  const componentId = payloads?.componentId ?? e.dataTransfer.getData("application/x-aquibra-component");
   if (!componentId) return false;
 
   const { composer, freshTargetId, onDropError } = ctx;
@@ -289,8 +308,8 @@ export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext):
  * Handle template drop
  * Returns true if handled, false if not a template drop
  */
-export function handleTemplateDrop(e: React.DragEvent, ctx: DropContext): boolean {
-  const templateData = e.dataTransfer.getData("application/aquibra-template");
+export function handleTemplateDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): boolean {
+  const templateData = payloads?.templateData ?? e.dataTransfer.getData("application/aquibra-template");
   if (!templateData) return false;
 
   const { composer, canvasRef, freshTargetId, freshDropPosition, onDropError } = ctx;
@@ -372,8 +391,8 @@ export function handleTemplateDrop(e: React.DragEvent, ctx: DropContext): boolea
  * Handle block drop (insert new element)
  * Returns true if handled, false if not a block drop
  */
-export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
-  const blockData = e.dataTransfer.getData("block");
+export function handleBlockDrop(e: React.DragEvent, ctx: DropContext, payloads?: DropPayloads): boolean {
+  const blockData = payloads?.blockData ?? e.dataTransfer.getData("block");
   if (!blockData) return false;
 
   const { composer, canvasRef, freshTargetId, freshDropPosition, onDropError, onDropSuccess } = ctx;
@@ -542,7 +561,7 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
 export function handleCatalogDrop(
   e: React.DragEvent,
   ctx: DropContext,
-  payloads?: { catalogComponentId?: string },
+  payloads?: DropPayloads,
 ): boolean {
   // Prefer pre-snapshotted payload (dispatcher reads dataTransfer
   // synchronously to dodge the post-await zero-out). Fall back to direct

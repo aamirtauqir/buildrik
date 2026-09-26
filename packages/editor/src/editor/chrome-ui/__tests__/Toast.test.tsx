@@ -49,6 +49,82 @@ describe("Toast", () => {
     expect(screen.queryByText("Published")).toBeNull();
   });
 
+  it("pauses the auto-dismiss timer on hover, and resumes with the remaining time on leave (A13-14)", () => {
+    vi.useFakeTimers();
+    let api!: ReturnType<typeof useToast>;
+    render(
+      <ToastProvider>
+        <Harness onReady={(a) => {
+          api = a;
+        }} />
+      </ToastProvider>,
+    );
+    act(() => {
+      api.addToast({ description: "Published", duration: 1000 });
+    });
+    const toast = screen.getByTestId("toast-item-0");
+
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    act(() => {
+      // React's onMouseEnter/onMouseLeave are implemented on top of the
+      // bubbling mouseover/mouseout events — a non-bubbling "mouseenter"
+      // dispatched directly on the node never reaches React's root listener.
+      toast.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    });
+    // Paused — the remaining ~400ms must not elapse while hovered.
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(screen.getByText("Published")).toBeTruthy();
+
+    act(() => {
+      toast.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
+    });
+    // Resumed with the ~400ms remaining, not the full 1000ms.
+    act(() => {
+      vi.advanceTimersByTime(399);
+    });
+    expect(screen.getByText("Published")).toBeTruthy();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.queryByText("Published")).toBeNull();
+  });
+
+  it("pauses the auto-dismiss timer on focus, and resumes on blur", () => {
+    vi.useFakeTimers();
+    let api!: ReturnType<typeof useToast>;
+    render(
+      <ToastProvider>
+        <Harness onReady={(a) => {
+          api = a;
+        }} />
+      </ToastProvider>,
+    );
+    act(() => {
+      api.addToast({ description: "Published", duration: 1000 });
+    });
+    const closeBtn = screen.getByRole("button", { name: "Dismiss notification" });
+
+    act(() => {
+      closeBtn.focus();
+    });
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(screen.getByText("Published")).toBeTruthy();
+
+    act(() => {
+      closeBtn.blur();
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(screen.queryByText("Published")).toBeNull();
+  });
+
   it("duration Infinity persists until dismissed", () => {
     vi.useFakeTimers();
     let api!: ReturnType<typeof useToast>;

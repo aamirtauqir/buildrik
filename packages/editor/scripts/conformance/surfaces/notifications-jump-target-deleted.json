@@ -9,7 +9,7 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "notifications-jump-gone"
+      "testId": "notifications-row-0"
     }
   ],
   "contrastScope": "[data-probe]",
@@ -33,27 +33,24 @@
       "nodeId": "165:77"
     },
     {
-      "name": "jump-gone",
-      "testId": "notifications-jump-gone",
-      "spec": "notifications-jump-target-deleted",
-      "nodeId": "165:81"
-    },
-    {
-      "name": "jump-gone-title",
-      "testId": "notifications-jump-gone-title",
-      "spec": "notifications-jump-target-deleted",
-      "nodeId": "165:82"
-    },
-    {
-      "name": "jump-gone-body",
-      "testId": "notifications-jump-gone-body"
-    },
-    {
       "name": "header",
       "testId": "panel-header"
     }
   ],
   "_note": [
+    "A-20 (2026-09-26, audit-fix lane L4b): the 165:81/165:82/165:83 band",
+    "('What this points to was deleted' + 'The notification is kept, but",
+    "there's nothing to jump to.') is REMOVED from NotificationPanel.tsx —",
+    "nothing about a null actionUrl says the target was deleted; most",
+    "linkless notifications (account security, billing) never had a target",
+    "at all. This is CLAUDE.md's behaviour-precedence case: the board draws",
+    "the band, but the claim it makes is factually unsupportable by the data",
+    "the server sends, and the ledger's decision-free fix for A-20 is",
+    "binding over the visual. The `jump-gone`/`jump-gone-title`/",
+    "`jump-gone-body` targets below are gone with it — this recipe now only",
+    "proves the row itself renders as non-interactive. If 165:71 is revisited",
+    "in Figma to match, re-add targets against the new board reading.",
+    "",
     "REACHED VIA PROBE: the list is a dashboard tRPC read (NotificationService",
     "-> api-client, superjson), so the probe answers that one request and lets",
     "the real panel, the real service and the real ordering run. Nothing about",

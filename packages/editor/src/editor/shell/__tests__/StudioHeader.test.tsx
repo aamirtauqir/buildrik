@@ -553,6 +553,21 @@ describe("StudioHeader", () => {
       fireEvent.click(door);
       expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
+
+    /* A-8 round 2: with reviewsEnabled false, TabRouter renders `null` for
+       the "review" tab (TabRouter.tsx:239 `if (!reviewsEnabled) return
+       null;`) — the permanent "Review ›" door from the case above led
+       straight into a blank panel. There is nowhere for this door to open
+       to, so it must not render, same as the Comments toggle right above. */
+    it("A-8 round 2: reviewsEnabled false — no Review door at all (it would open a blank panel)", () => {
+      const onOpenReview = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false, reviewsEnabled: false }) })}
+        />,
+      );
+      expect(screen.queryByTestId("topbar-review-pill")).toBeNull();
+    });
   });
 
   /* Rewritten 2026-08-23. These asserted that view mode REPLACED Publish with
@@ -699,6 +714,25 @@ describe("StudioHeader", () => {
 
     it("no composer, no Comments toggle — nothing to toggle", () => {
       render(<StudioHeader {...makeProps()} />);
+      expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
+    });
+
+    it("A-8/PD-7/PD-8: reviewsEnabled false disables the Comments toggle — a review-flow tool with nowhere to review from", () => {
+      const composer = {
+        on: vi.fn(),
+        off: vi.fn(),
+        emit: vi.fn(),
+        getProjectMetadata: vi.fn(() => ({ name: "x" })),
+        exportHTML: vi.fn(() => ({ combined: "" })),
+      } as unknown as StudioHeaderProps["composer"];
+      render(
+        <StudioHeader
+          {...makeProps({ composer, reviewStatus: reviewStatus({ reviewsEnabled: false }) })}
+        />,
+      );
+      // No handler means the bar renders no Comments toggle at all —
+      // stronger than a disabled button, since there's genuinely nowhere
+      // for a comment to go review.
       expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
     });
 

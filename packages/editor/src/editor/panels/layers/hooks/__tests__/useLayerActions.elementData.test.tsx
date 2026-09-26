@@ -123,6 +123,59 @@ describe("useLayerActions — names and locks live in element data", () => {
     expect(result.current.lockedIds.has("a")).toBe(true);
   });
 
+  // Carry-over 14: undo/redo/import replay a whole snapshot without a
+  // per-element ELEMENT_UPDATED for each one, so lockedIds went stale —
+  // still showing a row as locked after an undo unlocked it, or unlocked
+  // after a redo relocked it.
+  it("rescans all elements' lock state on HISTORY_UNDO", () => {
+    const a = fakeElement("a", { locked: true });
+    const b = fakeElement("b");
+    const composer = makeComposer([a, b]);
+    const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
+    act(() => result.current.hydrateFromStorage(PAGE));
+    expect([...result.current.lockedIds]).toEqual(["a"]);
+
+    // The undo flips both without emitting ELEMENT_UPDATED for either —
+    // the panel only learns about it from HISTORY_UNDO itself.
+    act(() => {
+      a.setLocked(false);
+      b.setLocked(true);
+      composer.emit(EVENTS.HISTORY_UNDO);
+    });
+
+    expect([...result.current.lockedIds]).toEqual(["b"]);
+  });
+
+  it("rescans all elements' lock state on HISTORY_REDO", () => {
+    const a = fakeElement("a");
+    const composer = makeComposer([a]);
+    const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
+    act(() => result.current.hydrateFromStorage(PAGE));
+    expect(result.current.lockedIds.has("a")).toBe(false);
+
+    act(() => {
+      a.setLocked(true);
+      composer.emit(EVENTS.HISTORY_REDO);
+    });
+
+    expect(result.current.lockedIds.has("a")).toBe(true);
+  });
+
+  it("rescans all elements' lock state on PROJECT_LOADED — a fresh import replaces the document", () => {
+    const a = fakeElement("a", { locked: true });
+    const composer = makeComposer([a]);
+    const { result } = renderHook(() => useLayerActions(composer as never, PAGE));
+    act(() => result.current.hydrateFromStorage(PAGE));
+    expect(result.current.lockedIds.has("a")).toBe(true);
+
+    // The import swaps in an element with the same id but unlocked.
+    const replacement = fakeElement("a", { locked: false });
+    composer.elements.getAllElements = () => [replacement];
+    act(() => composer.emit(EVENTS.PROJECT_LOADED));
+
+    expect(result.current.lockedIds.has("a")).toBe(false);
+  });
+
   // Controller review round 1, IMPORTANT 3: ELEMENT_UPDATED fires on every
   // element mutation, not just lock changes — a style edit on an unrelated,
   // still-unlocked element used to rebuild lockedIds from scratch (a new Set

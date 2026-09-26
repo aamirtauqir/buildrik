@@ -1876,7 +1876,7 @@
       "authority": "board:165-71",
       "recipe": "notifications-jump-target-deleted",
       "verified": "drift-fixed",
-      "verifiedNote": "conformed + measured 2026-09-08 (recipe notifications-jump-target-deleted): 12 properties, board won on three. CONTRAST: 4.39 on the notifications day band, board-mandated ink-muted on bg-subtle."
+      "verifiedNote": "conformed + measured 2026-09-08 (recipe notifications-jump-target-deleted): 12 properties, board won on three. CONTRAST: 4.39 on the notifications day band, board-mandated ink-muted on bg-subtle. UPDATED 2026-09-26 (A-20, audit-fix L4b): the jump-gone band this board draws made a claim ('was deleted') the data can't support and was removed from NotificationPanel.tsx per the ledger's binding decision-free fix — recipe narrowed to the row only; re-measure against a revised board if 165:71 is redrawn."
     },
     {
       "nodeId": "453:4051",

@@ -199,7 +199,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         draggable={canDrag}
         aria-selected={isSelected}
         aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
+        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", dimmed in editor" : ""}${isLocked ? ", locked" : ""}`}
         aria-level={layer.depth + 1}
         title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
         style={rowStyle}

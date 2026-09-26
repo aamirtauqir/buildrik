@@ -216,6 +216,34 @@ export function useLayerActions(
     };
   }, [composer]);
 
+  /* Carry-over 14: an undo/redo that crosses a lock/unlock, or a fresh
+     import/load, changes lock state on elements this hook never got a
+     per-element ELEMENT_UPDATED for (undo/redo replay the whole snapshot;
+     PROJECT_LOADED swaps the document out from under it) — lockedIds went
+     stale, showing rows as unlocked (or locked) that the engine disagreed
+     with. Unlike the single-element resync above, a bulk change can move
+     membership in both directions at once, so this rebuilds the whole set
+     from a full rescan — cheap next to an undo/redo/import, which already
+     re-renders the entire tree. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const rescanAll = () => {
+      const next = new Set<string>();
+      for (const el of composer.elements.getAllElements() ?? []) {
+        if (el.isLocked()) next.add(el.getId());
+      }
+      setLockedIds(next);
+    };
+    composer.on(EVENTS.HISTORY_UNDO, rescanAll);
+    composer.on(EVENTS.HISTORY_REDO, rescanAll);
+    composer.on(EVENTS.PROJECT_LOADED, rescanAll);
+    return () => {
+      composer.off(EVENTS.HISTORY_UNDO, rescanAll);
+      composer.off(EVENTS.HISTORY_REDO, rescanAll);
+      composer.off(EVENTS.PROJECT_LOADED, rescanAll);
+    };
+  }, [composer]);
+
   // Apply DOM lock attribute + engine lock state after state commit
   React.useEffect(() => {
     const pending = pendingLockRef.current;

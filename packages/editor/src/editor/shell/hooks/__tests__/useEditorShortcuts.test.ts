@@ -308,4 +308,25 @@ describe("useEditorShortcuts", () => {
       input.remove();
     });
   });
+
+  describe("C — comment mode (A-8/PD-7/PD-8: gated on reviewsEnabled)", () => {
+    it("toggles comment mode when reviewsEnabled is unset (default true)", () => {
+      mount();
+      dispatchKey({ key: "c" });
+      expect(composer.emit).toHaveBeenCalledWith("ui:comment-mode", {});
+    });
+
+    it("toggles comment mode when reviewsEnabled is explicitly true", () => {
+      mount({ reviewsEnabled: true });
+      dispatchKey({ key: "c" });
+      expect(composer.emit).toHaveBeenCalledWith("ui:comment-mode", {});
+    });
+
+    it("does nothing when reviewsEnabled is false — comment mode is a review-flow tool with nowhere to review from", () => {
+      mount({ reviewsEnabled: false });
+      const ev = dispatchKey({ key: "c" });
+      expect(composer.emit).not.toHaveBeenCalledWith("ui:comment-mode", {});
+      expect(ev.defaultPrevented).toBe(false);
+    });
+  });
 });

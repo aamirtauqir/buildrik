@@ -40,7 +40,7 @@
 
 import * as React from "react";
 import { ACHIEVEMENT_AUTO_DISMISS_MS, type AchievementPromptState } from "./useOnboardingOrchestrator";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useFocusTrap } from "@/editor/chrome-ui";
 
 export interface AchievementPromptProps extends AchievementPromptState {
   onDismiss: () => void;
@@ -129,6 +129,12 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
 
   const fill = isLastStep ? FILL_DONE : FILL_STEP;
 
+  // B-7/A13-10: this overlay had 0 ModalRoot/OverlayMount/useFocusTrap hits —
+  // `autoFocus` on the CTA moved focus in but Tab was never trapped inside
+  // the card and Escape did nothing. useFocusTrap covers both (and moving
+  // focus in), so the CTA's `autoFocus` prop below is redundant now.
+  const cardRef = useFocusTrap(true, onDismiss);
+
   return (
     <>
       {/* Accessible live region — invisible, read by screen readers on mount */}
@@ -143,6 +149,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
       <div onClick={onDismiss} aria-hidden="true" className={SCRIM} />
       {/* Achievement card */}
       <div
+        ref={cardRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="achievement-title"
@@ -210,7 +217,6 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           <Button
             type="button"
             onClick={onDismiss}
-            autoFocus
             className={`${CTA} ${fill}`}
             data-testid="achievement-cta"
           >

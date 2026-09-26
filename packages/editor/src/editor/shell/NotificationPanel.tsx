@@ -341,26 +341,12 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                 centred — 12/18 then 11/16, which stack to exactly 6+18=24.
                 The right inset is 16, which is what makes the body line 312
                 wide inside the 360 panel. It shipped 44 and centred. */}
-            {jumpable ? null : (
-              <div
-                className="tw:flex tw:h-16 tw:flex-col tw:bg-[var(--bk-warning-tint)] tw:pt-1.5 tw:pl-8 tw:pr-4"
-                data-jump-gone-note
-                data-testid="notifications-jump-gone"
-              >
-                <span
-                  className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]"
-                  data-testid="notifications-jump-gone-title"
-                >
-                  What this points to was deleted
-                </span>
-                <span
-                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                  data-testid="notifications-jump-gone-body"
-                >
-                  The notification is kept, but there&rsquo;s nothing to jump to.
-                </span>
-              </div>
-            )}
+            {/* A-20: `actionUrl == null` used to render as "What this points
+                to was deleted" — but the server has no field that says the
+                target WAS deleted; most linkless notifications (account
+                security, billing) never had a target to begin with. Render
+                them as plain, non-interactive info instead of a claim the
+                server can't back up. */}
             </React.Fragment>
           );
         })}

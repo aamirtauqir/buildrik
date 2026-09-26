@@ -293,19 +293,126 @@ describe("usePublishJob", () => {
       expect(result.current.error).toBe("Publish failed");
     });
 
-    it("sets error and stops polling when a status poll rejects", async () => {
-      mockFetchStatus.mockRejectedValueOnce(new Error("network down"));
+    it("backs off across consecutive poll failures instead of orphaning the job on the first one", async () => {
+      mockFetchStatus.mockRejectedValue(new Error("network down"));
 
       const { result } = renderHook(() => usePublishJob());
       await act(async () => {
         await result.current.publish("site-1", PAGES);
       });
       await flushMicrotasks();
+      // Failure 1 of 3 — no error surfaced yet, polling keeps going.
+      expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("publishing");
+      expect(mockFetchStatus).toHaveBeenCalledTimes(1);
 
+      await advance(2000);
+      // Failure 2 of 3 — still no error.
+      expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("publishing");
+      expect(mockFetchStatus).toHaveBeenCalledTimes(2);
+
+      await advance(2000);
+      // Failure 3 of 3 — now surfaces and stops. B-2: jobId stays set (the
+      // job never reached a terminal status on its own) so uiState MUST fold
+      // the lost poll in as "failed" — otherwise the panel spins forever with
+      // no retry, which is the bug this test pins.
       expect(result.current.error).toBe("network down");
+      expect(result.current.uiState).toBe("failed");
+      expect(mockFetchStatus).toHaveBeenCalledTimes(3);
 
       await advance(10000);
-      expect(mockFetchStatus).toHaveBeenCalledTimes(1);
+      expect(mockFetchStatus).toHaveBeenCalledTimes(3);
+    });
+
+    it("track() resumes polling and clears the poll-lost failed state on success", async () => {
+      mockFetchStatus.mockRejectedValue(new Error("network down"));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      await advance(2000);
+      await advance(2000);
+      expect(result.current.uiState).toBe("failed");
+      const lostJobId = result.current.jobId;
+      expect(lostJobId).not.toBeNull();
+
+      // The panel's "Check status" retry resumes tracking the SAME job.
+      mockFetchStatus.mockReset();
+      mockFetchStatus.mockResolvedValue(statusOf("COMPLETED", { jobId: lostJobId! }));
+
+      act(() => result.current.track(lostJobId!));
+      await flushMicrotasks();
+
+      expect(result.current.uiState).toBe("published");
+      expect(result.current.error).toBeNull();
+    });
+
+    it("a single dropped poll does not stop polling", async () => {
+      mockFetchStatus
+        .mockRejectedValueOnce(new Error("blip"))
+        .mockResolvedValue(statusOf("BUILDING", { progress: 40 }));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      expect(result.current.error).toBeNull();
+
+      await advance(2000);
+      expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("publishing");
+      expect(result.current.progress).toBe(40);
+    });
+
+    it("republish is allowed once the poll is lost, even though the last status was never terminal", async () => {
+      mockFetchStatus.mockRejectedValue(new Error("network down"));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+      await advance(2000);
+      await advance(2000);
+      expect(result.current.error).toBe("network down");
+
+      mockPublishSite.mockResolvedValueOnce({ jobId: "job-2" });
+      mockFetchStatus.mockResolvedValue(statusOf("QUEUED", { jobId: "job-2" }));
+
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      await flushMicrotasks();
+
+      expect(mockPublishSite).toHaveBeenCalledTimes(2);
+      expect(result.current.jobId).toBe("job-2");
+    });
+  });
+
+  describe("in-flight guard (B-2) — a double click before the request lands", () => {
+    it("a second publish() fired before the first await resolves creates only one job", async () => {
+      let resolvePublish: (v: { jobId: string }) => void = () => {};
+      mockPublishSite.mockImplementationOnce(
+        () => new Promise((resolve) => { resolvePublish = resolve; }),
+      );
+
+      const { result } = renderHook(() => usePublishJob());
+
+      let firstDone: Promise<void>;
+      let secondDone: Promise<void>;
+      await act(async () => {
+        firstDone = result.current.publish("site-1", PAGES);
+        secondDone = result.current.publish("site-1", PAGES);
+        resolvePublish({ jobId: "job-1" });
+        await Promise.all([firstDone, secondDone]);
+      });
+
+      expect(mockPublishSite).toHaveBeenCalledTimes(1);
+      expect(result.current.jobId).toBe("job-1");
     });
   });
 

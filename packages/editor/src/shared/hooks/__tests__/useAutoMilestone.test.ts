@@ -10,6 +10,9 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 const suggestMilestone = vi.hoisted(() => vi.fn());
 vi.mock("@/services/ai/AiTrpcClient", () => ({ aiTrpcClient: { suggestMilestone } }));
 
+const mockGetSiteId = vi.hoisted(() => vi.fn((): string | null => null));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: mockGetSiteId }));
+
 import { useAutoMilestone } from "../useAutoMilestone";
 import { EVENTS } from "../../constants/events";
 import type { Composer } from "../../../engine";
@@ -67,11 +70,27 @@ function stubSuggest(suggestedName = "Milestone A", reasoning = "big change") {
 
 beforeEach(() => {
   suggestMilestone.mockReset();
+  mockGetSiteId.mockReset();
+  mockGetSiteId.mockReturnValue(null);
+  sessionStorage.clear();
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
+
+/* Carries the significance threshold (MIN_CHANGES_SINCE_LAST_SUGGESTION = 5
+   in the hook) — no exemption applies to a first attempt any more, so every
+   test that expects a suggestion to fire on the very first qualifying event
+   has to earn that with real recorded activity first, same as production
+   would require. Emits a bare HISTORY_RECORDED with no label so it neither
+   resets nor advances the checkpoint counter — only the significance ref. */
+async function armSignificance(composer: ReturnType<typeof createMockComposer>, n = 5) {
+  for (let i = 0; i < n; i++) {
+    await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, {}));
+  }
+}
 
 describe("useAutoMilestone — availability", () => {
   it("null composer → unavailable, no suggestion", () => {
@@ -94,6 +113,7 @@ describe("useAutoMilestone — triggers", () => {
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
+    await armSignificance(composer);
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "el-1" }));
 
     await waitFor(() => expect(result.current.suggestion).not.toBeNull());
@@ -115,6 +135,7 @@ describe("useAutoMilestone — triggers", () => {
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
+    await armSignificance(composer);
     await act(async () => composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }));
 
     await waitFor(() => expect(result.current.suggestion?.trigger).toBe("page_added"));
@@ -132,17 +153,114 @@ describe("useAutoMilestone — triggers", () => {
   });
 
 
-  it("enforces the 30s cooldown between suggestions", async () => {
+  it("enforces the 10-minute cooldown between suggestions (carry-over 15: raised from 30s)", async () => {
     const suggestMock = stubSuggest();
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
+    await armSignificance(composer);
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
     await waitFor(() => expect(result.current.suggestion).not.toBeNull());
     expect(suggestMock).toHaveBeenCalledTimes(1);
 
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
     expect(suggestMock).toHaveBeenCalledTimes(1); // suppressed by cooldown
+  });
+
+  it("carry-over 15: a run of failed attempts still arms the cooldown — a flaky/quota-exhausted endpoint can't disable the gate", async () => {
+    suggestMilestone.mockRejectedValue(new Error("quota exceeded"));
+    const composer = createMockComposer();
+    const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await armSignificance(composer);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    await waitFor(() => expect(suggestMilestone).toHaveBeenCalledTimes(1));
+    expect(result.current.suggestion).toBeNull();
+
+    // A second qualifying event immediately after the failed attempt must
+    // NOT retry — the old code only armed the cooldown on success, so a
+    // failure left it retrying on every subsequent qualifying event.
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
+    expect(suggestMilestone).toHaveBeenCalledTimes(1);
+  });
+
+  it("carry-over 15: never requests a suggestion while the tab is hidden", async () => {
+    const suggestMock = stubSuggest();
+    const composer = createMockComposer();
+    const visibilitySpy = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    expect(suggestMock).not.toHaveBeenCalled();
+
+    visibilitySpy.mockRestore();
+  });
+
+  it("carry-over 15 round 2: requires the significance threshold on the FIRST attempt too — no exemption", async () => {
+    // Fake ONLY Date — real setTimeout/setInterval stay so `waitFor`'s
+    // internal polling keeps working (faking the whole clock leaves
+    // `waitFor` polling a clock that never advances, which hangs the test
+    // for its full real-time timeout and corrupts every test after it,
+    // since the timeout races past this function's `finally`).
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const suggestMock = stubSuggest();
+    const composer = createMockComposer();
+    const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    // A remount reset lastSuggestionTime to 0 before, and an exempted first
+    // attempt made that indistinguishable from "the gate never armed" — the
+    // exact bypass carry-over 15 round 2 closes. With no exemption, a
+    // qualifying event with NO recorded activity yet must be withheld.
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    expect(suggestMock).not.toHaveBeenCalled();
+
+    // Once real activity accumulates, the (still-first) attempt goes through.
+    await armSignificance(composer);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
+    await waitFor(() => expect(result.current.suggestion).not.toBeNull());
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+
+    // Cooldown elapses, but nothing was recorded in between — the next
+    // attempt must still be withheld on significance, not just cooldown.
+    vi.setSystemTime(Date.now() + 11 * 60_000);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "c" }));
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it("carry-over 15 round 2: lastSuggestionTime survives a remount (persisted per site) — cooldown still holds", async () => {
+    mockGetSiteId.mockReturnValue("site-remount-1");
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const suggestMock = stubSuggest();
+    const composer = createMockComposer();
+    const first = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await armSignificance(composer);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
+    await waitFor(() => expect(first.result.current.suggestion).not.toBeNull());
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+
+    // Remount the hook (new component instance — state and refs reset, as a
+    // real panel remount does) shortly after, well inside the cooldown.
+    first.unmount();
+    const second = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    // Even with fresh in-memory state, the persisted timestamp still blocks
+    // — this is the bug: before the fix, a remount read lastSuggestionTime
+    // back as 0 and let this straight through.
+    await armSignificance(composer);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "b" }));
+    expect(suggestMock).toHaveBeenCalledTimes(1);
+
+    // Once the real cooldown elapses, the persisted timestamp still allows
+    // a legitimate later attempt through.
+    vi.setSystemTime(Date.now() + 11 * 60_000);
+    await armSignificance(composer);
+    await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "c" }));
+    await waitFor(() => expect(second.result.current.suggestion).not.toBeNull());
+    expect(suggestMock).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 
   it("fires checkpoint_threshold after 10 consecutive 'Auto:' records", async () => {
@@ -199,7 +317,13 @@ describe("useAutoMilestone — triggers", () => {
 
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
-    await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, { label: "Restyle card" }));
+    // The mock's history stack is a fixed >=50% patch, so every emit
+    // qualifies as mass_change — but the significance threshold still gates
+    // each attempt; the 5th of these (each also +1 toward significance) is
+    // the one that finally clears it and fires.
+    for (let i = 0; i < 5; i++) {
+      await act(async () => composer.emit(EVENTS.HISTORY_RECORDED, { label: "Restyle card" }));
+    }
     await waitFor(() => expect(result.current.suggestion?.trigger).toBe("mass_change"));
     expect(suggestMock).toHaveBeenCalledTimes(1);
   });
@@ -228,6 +352,7 @@ describe("useAutoMilestone — triggers", () => {
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
+    await armSignificance(composer);
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "a" }));
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.suggestion).toBeNull();
@@ -243,6 +368,7 @@ describe("useAutoMilestone — suggestion actions", () => {
     stubSuggest("Suggested name");
     const composer = createMockComposer();
     const rendered = renderHook(() => useAutoMilestone(asComposer(composer)));
+    await armSignificance(composer);
     await act(async () => composer.emit(EVENTS.ELEMENT_DELETED, { id: "x" }));
     await waitFor(() => expect(rendered.result.current.suggestion).not.toBeNull());
     return { composer, ...rendered };
