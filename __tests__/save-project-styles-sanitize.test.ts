@@ -13,7 +13,8 @@ vi.mock("@/lib/prisma", () => {
   const tx = {
     page: { findMany: vi.fn(async () => []), deleteMany: vi.fn(), upsert: vi.fn(), update: vi.fn() },
     formBlock: { deleteMany: vi.fn() },
-    site: { update: (...a: unknown[]) => siteUpdate(...a) },
+    // A-2: the site-level write is the compare-and-swap updateMany.
+    site: { updateMany: (...a: unknown[]) => siteUpdate(...a) },
   };
   return {
     prisma: {
@@ -28,7 +29,7 @@ import { saveProjectData } from "@/server/services/sites.service";
 beforeEach(() => {
   vi.clearAllMocks();
   siteFindUnique.mockResolvedValue({ id: "s_1", deletedAt: null, lastEditedAt: null });
-  siteUpdate.mockResolvedValue({});
+  siteUpdate.mockResolvedValue({ count: 1 });
 });
 
 describe("saveProjectData — project style rules", () => {

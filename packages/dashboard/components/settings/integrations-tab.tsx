@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type InputHTMLAttributes, useId, useState } from "react";
 import { Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
@@ -101,6 +101,21 @@ function Toggle({
   );
 }
 
+/** A provider-config text field: the label keeps this panel's own
+ *  body-sm/primary style (InputField's built-in `label` is body/secondary),
+ *  associated to the input through a generated id. */
+function ConfigField({ label, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; wrapperClassName?: string }) {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={id} className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        {label}
+      </label>
+      <InputField id={id} {...props} />
+    </>
+  );
+}
+
 function GoogleAnalyticsConfig({
   values,
   onChange,
@@ -111,10 +126,8 @@ function GoogleAnalyticsConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Tracking ID
-        </label>
-        <InputField
+        <ConfigField
+          label="Tracking ID"
           type="text"
           value={values["trackingId"] ?? ""}
           onChange={(e) => onChange("trackingId", e.target.value)}
@@ -156,10 +169,8 @@ function MailchimpConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          API Key
-        </label>
-        <InputField
+        <ConfigField
+          label="API Key"
           type="text"
           value={values["apiKey"] ?? ""}
           onChange={(e) => onChange("apiKey", e.target.value)}
@@ -168,10 +179,8 @@ function MailchimpConfig({
         />
       </div>
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Audience ID
-        </label>
-        <InputField
+        <ConfigField
+          label="Audience ID"
           type="text"
           value={values["audienceId"] ?? ""}
           onChange={(e) => onChange("audienceId", e.target.value)}
@@ -215,10 +224,8 @@ function ZapierConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Webhook URL
-        </label>
-        <InputField
+        <ConfigField
+          label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
@@ -265,10 +272,8 @@ function SlackConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Webhook URL
-        </label>
-        <InputField
+        <ConfigField
+          label="Webhook URL"
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
@@ -277,10 +282,8 @@ function SlackConfig({
         />
       </div>
       <div>
-        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Channel name
-        </label>
-        <InputField
+        <ConfigField
+          label="Channel name"
           type="text"
           value={values["channelName"] ?? ""}
           onChange={(e) => onChange("channelName", e.target.value)}

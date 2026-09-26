@@ -94,6 +94,7 @@ vi.mock("../modals/CommandPalette", () => ({
 
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
+import { shellDirty } from "../shellDirtyRegistry";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
 import { submitForReview } from "../../../services/ReviewService";
@@ -1027,6 +1028,46 @@ describe("F1 dirty-exit guard", () => {
     spy.mockRestore();
     unmount();
     expect((e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(0);
+  });
+
+  /* B-1 fix round 1: the exit guard, beforeunload and the chip read the ONE
+     shell dirty registry — a dirty Settings screen or an open CMS record with
+     unsaved fields (project clean) walked out of the editor unprompted while
+     only `isDirty || brandDirty` was consulted. */
+  describe("reads the shell dirty registry", () => {
+    afterEach(() => {
+      act(() => {
+        shellDirty.set("settings", false);
+        shellDirty.set("cms-record", false);
+      });
+    });
+
+    it.each(["settings", "cms-record"] as const)(
+      "%s dirty with a clean project: Exit prompts and beforeunload prevents",
+      (domain) => {
+        strandedMirrors = 0;
+        const assign = stubLocation();
+        act(() => shellDirty.set(domain, true));
+        render(<StudioHeader {...makeProps({ isDirty: false })} />);
+        fireEvent.click(exitBtn());
+        expect(assign).not.toHaveBeenCalled();
+        expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
+        cleanup();
+        lastProps = makeProps({ isDirty: false });
+        expect(fireBeforeUnload().prevented).toBe(true);
+      },
+    );
+
+    it("clean registry and clean project: Exit navigates, beforeunload stays silent", () => {
+      strandedMirrors = 0;
+      const assign = stubLocation();
+      render(<StudioHeader {...makeProps({ isDirty: false })} />);
+      fireEvent.click(exitBtn());
+      expect(assign).toHaveBeenCalled();
+      cleanup();
+      lastProps = makeProps({ isDirty: false });
+      expect(fireBeforeUnload().prevented).toBe(false);
+    });
   });
 });
 

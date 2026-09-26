@@ -49,6 +49,7 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { SaveFailedBanner } from "./SaveFailedBanner";
+import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
 import "./header.css";
 
 /** Selected element minimal info */
@@ -476,20 +477,21 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      dot while the Brand footer two panels away said "Unsaved brand changes" —
      same concept, two surfacings, and the global one is the one a user watches.
      It is deliberately not the project's dirty flag: see the emit site.
-     Declared before guardNavigation/onBefore, which now both read it — a
-     staged-but-unsaved brand edit is exactly the kind of work those guards
-     exist to not lose (B-1). */
-  const [brandDirty, setBrandDirty] = React.useState(false);
+     The announcement goes into the shell dirty registry (B-1), the ONE source
+     the exit guard, beforeunload and this chip read — alongside Settings'
+     and an open CMS record's entries, which their own surfaces register. */
   React.useEffect(() => {
     if (!composer) return;
-    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
+    const onBrandDirty = (p?: { dirty?: boolean }) => shellDirty.set("brand", Boolean(p?.dirty));
     composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
     /* Block body, not a shorthand: `off` is chainable and returns the composer,
        so an arrow shorthand hands React an instance where a destructor belongs. */
     return () => {
       composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+      shellDirty.set("brand", false);
     };
   }, [composer]);
+  const shellIsDirty = useShellDirty();
 
   const guardNavigation = React.useCallback(
     (nav: () => void) => {
@@ -497,8 +499,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       // 5A: while offline the save pipeline reports queued saves as clean
       // (useSaveCallback settles to idle) but the queue dies on navigation —
       // never offer a fake "Save & leave" here.
-      if (offline && (isDirty || brandDirty)) return setExitDialog({ kind: "risky", nav });
-      if (isDirty || brandDirty || saveStatus === "saving" || saveStatus === "error") {
+      // The registry is read at call time, not from render: a surface's
+      // entry can change in the same gesture that triggers the exit.
+      const unsaved = isDirty || shellDirty.get();
+      if (offline && unsaved) return setExitDialog({ kind: "risky", nav });
+      if (unsaved || saveStatus === "saving" || saveStatus === "error") {
         return setExitDialog({
           kind: "dirty",
           error: saveStatus === "error" ? "The last save failed." : undefined,
@@ -516,7 +521,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       if (stranded > 0) return setExitDialog({ kind: "stranded", pending: stranded, nav });
       nav();
     },
-    [offline, isDirty, brandDirty, saveStatus],
+    [offline, isDirty, saveStatus],
   );
 
   const saveAndLeave = React.useCallback(async () => {
@@ -578,6 +583,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     const onBefore = (e: BeforeUnloadEvent) => {
       if (bypassRef.current) return;
       const stranded = totalPendingMirrors();
+      const shellUnsaved = shellDirty.get();
       /* Dev-only, and LOAD-BEARING: `e2e/boot-clean.spec.ts` reads
          `__bkExitReason` and fails as UNMEASURED if this is removed.
          This guard has three independent reasons to prompt, and a
@@ -586,15 +592,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
          from the pill afterwards. */
       if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkExitReason?: unknown[] };
-        (w.__bkExitReason ??= []).push({ isDirty, brandDirty, saveStatus, stranded, at: Date.now() });
+        (w.__bkExitReason ??= []).push({ isDirty, shellUnsaved, saveStatus, stranded, at: Date.now() });
       }
-      if (!isDirty && !brandDirty && saveStatus !== "saving" && stranded === 0) return;
+      if (!isDirty && !shellUnsaved && saveStatus !== "saving" && stranded === 0) return;
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", onBefore);
     return () => window.removeEventListener("beforeunload", onBefore);
-  }, [isDirty, brandDirty, saveStatus]);
+  }, [isDirty, saveStatus]);
 
   const exitToDashboard = React.useCallback(() => {
     guardNavigation(() => window.location.assign(`${DASHBOARD_URL}/dashboard/projects`));
@@ -669,7 +675,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         ? "conflict"
         : saveStatus === "error"
           ? "error"
-          : isDirty || brandDirty
+          : isDirty || shellIsDirty
             ? "unsaved"
             : "saved";
 

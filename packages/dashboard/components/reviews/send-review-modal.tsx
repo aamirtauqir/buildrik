@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Modal } from "@/components/dashboard/primitives";
@@ -14,6 +14,7 @@ interface SendReviewModalProps {
 export function SendReviewModal({ open, onClose, siteId, siteName }: SendReviewModalProps) {
   const { addToast } = useToast();
   const [note, setNote] = useState("");
+  const noteId = useId();
 
   const utils = trpc.useUtils();
 
@@ -63,11 +64,12 @@ export function SendReviewModal({ open, onClose, siteId, siteName }: SendReviewM
       </p>
 
       <div className="mt-4">
-        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label htmlFor={noteId} className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Note{" "}
           <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
         </label>
         <textarea
+          id={noteId}
           rows={3}
           value={note}
           onChange={(e) => setNote(e.target.value)}

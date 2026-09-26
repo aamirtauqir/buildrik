@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -111,6 +111,8 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
   const [canonicalUrl, setCanonicalUrl] = useState<string | null>(null);
   const [allowIndexing, setAllowIndexing] = useState<boolean | null>(null);
   const [robotsTxt, setRobotsTxt] = useState<string | null>(null);
+  const canonicalId = useId();
+  const robotsId = useId();
 
   const update = trpc.siteDetail.settings.update.useMutation({
     onSuccess: () => {
@@ -159,9 +161,10 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
       ) : (
         <div className="space-y-5">
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
+            <label htmlFor={canonicalId} className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
             <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>The preferred URL search engines should index (e.g. https://www.example.com).</p>
             <input
+              id={canonicalId}
               value={canonical}
               onChange={(e) => setCanonicalUrl(e.target.value)}
               placeholder="https://www.example.com"
@@ -192,9 +195,10 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
           </div>
 
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
+            <label htmlFor={robotsId} className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
             <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Leave blank for the sensible default. Custom rules override it.</p>
             <textarea
+              id={robotsId}
               value={robots}
               onChange={(e) => setRobotsTxt(e.target.value)}
               rows={4}

@@ -60,10 +60,10 @@ import {
   HeadersScreen,
   LocalizationScreen,
   DomainsScreen,
-  WebhooksScreen,
   OverviewScreen,
 } from "./index";
 import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
+import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { searchSettings } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
@@ -144,7 +144,7 @@ export const SettingsTab: React.FC<
      *  the Pages panel's URL-repair draft when there is one (3519:19920). */
     openRequest?: SettingsOpenRequest | null;
   }
-> = ({ composer, initialScreen, openRequest, onClose, userPlan, projectId: projectIdProp, onDirtyChange, onOpenDesignTab }) => {
+> = ({ composer, initialScreen, openRequest, onClose, userPlan, projectId: projectIdProp, onOpenDesignTab }) => {
   // The standalone shell (:5050/?siteId=) never threads projectId through
   // AquibraStudio → StudioPanels; the URL param is the same source
   // BuildrikSyncProvider loads from.
@@ -188,9 +188,16 @@ export const SettingsTab: React.FC<
   // ref, not the post-render state: screens push dirty via an effect, and a
   // click in the same gesture as an edit would otherwise read stale false.
   const screenIsDirtyRef = React.useRef(false);
-  React.useEffect(() => {
-    screenIsDirtyRef.current = screenIsDirty;
-  }, [screenIsDirty]);
+  /* The ONE writer of the dirty flag: state (renders the footer), the ref
+     (same-gesture click handlers) and this tab's shell-registry entry, all
+     synchronously. The registry must not lag an effect behind: Discard /
+     Save and continue clear it and leave in the same handler, and the
+     shell's tab-switch guard reads it as the leave lands (B-1). */
+  const markScreenDirty = React.useCallback((dirty: boolean) => {
+    setScreenIsDirty(dirty);
+    screenIsDirtyRef.current = dirty;
+    shellDirty.set("settings", dirty);
+  }, []);
 
   /* What the Unsaved settings dialog was raised for. Its Discard finishes
      that intent — the door out, or the screen that was clicked — after the
@@ -239,22 +246,20 @@ export const SettingsTab: React.FC<
      before every passive effect of the commit, so the reset always precedes
      the register, on mount and on a screen change alike. */
   React.useLayoutEffect(() => {
-    setScreenIsDirty(false);
+    markScreenDirty(false);
     setGuardOpen(false);
     setSaveError(null);
     setLoadState("ready");
     screenSaveHandlerRef.current = null;
     screenFlushHandlerRef.current = null;
     screenSnapshotRef.current = composer ? structuredClone(composer.getProjectSettings()) : null;
-  }, [currentScreen, composer]);
+  }, [currentScreen, composer, markScreenDirty]);
 
-  React.useEffect(() => {
-    onDirtyChange?.(screenIsDirty);
-  }, [screenIsDirty, onDirtyChange]);
-
-  const handleScreenDirty = React.useCallback((dirty: boolean) => {
-    setScreenIsDirty(dirty);
-  }, []);
+  /* This tab owns its entry in the shell dirty registry (B-1): the shell's
+     tab-switch guard, the exit guard and beforeunload all read it (written
+     by markScreenDirty). Cleared on unmount so a closed Settings never
+     leaves a stale block behind. */
+  React.useEffect(() => () => shellDirty.set("settings", false), []);
 
   /* A field reached through Search: once its screen has rendered (and, for a
      server-backed screen, loaded), scroll it into view and focus it. The id
@@ -295,8 +300,11 @@ export const SettingsTab: React.FC<
           return;
         case "members":
         case "billing":
+        case "webhooks":
           /* The sidebar's rows are links; a Search result or an Overview
-             `Open ›` naming these takes the same door. */
+             `Open ›` naming these takes the same door. Webhooks moved to the
+             dashboard's Settings > Integrations (A-12/A01-6) — workspace-
+             scoped, so it belongs beside Vercel/Slack/Zapier there. */
           window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
           return;
         default:
@@ -394,12 +402,17 @@ export const SettingsTab: React.FC<
       composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
     }
     setResetKey((k) => k + 1);
-    setScreenIsDirty(false);
+    markScreenDirty(false);
     setSaveError(null);
-    // Prime the ref synchronously — the effect that mirrors it has not run
-    // yet, and the intent below reads it.
-    screenIsDirtyRef.current = false;
-  }, [composer]);
+  }, [composer, markScreenDirty]);
+
+  /* The shell's "Leave anyway" runs this: the screens write to the composer
+     live, so leaving without the rollback would keep the "lost" values in
+     project settings for the next save to persist. */
+  React.useEffect(() => {
+    shellDirty.setDiscard("settings", rollBack);
+    return () => shellDirty.setDiscard("settings", null);
+  }, [rollBack]);
 
   const handleDiscard = React.useCallback(() => {
     const pending = pendingRef.current;
@@ -430,8 +443,7 @@ export const SettingsTab: React.FC<
     const succeeded = () => {
       if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
-      setScreenIsDirty(false);
-      screenIsDirtyRef.current = false;
+      markScreenDirty(false);
       if (then) then();
       /* 4418:165469 draws "Settings saved" as a toast (bottom-left, dark),
          not a centred dialog: title, the site's line, "Return to settings". */
@@ -483,7 +495,7 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, projectId, addToast, siteName]);
+  }, [composer, current, currentScreen, saving, projectId, addToast, siteName, markScreenDirty]);
 
   /* The guard's Save and continue (4418:165478): save, then finish whatever
      raised the guard. A failed save leaves the dialog down and the screen's
@@ -526,7 +538,7 @@ export const SettingsTab: React.FC<
     const common = {
       composer,
       projectId,
-      onDirtyChange: handleScreenDirty,
+      onDirtyChange: markScreenDirty,
       registerSaveHandler,
       registerFlushHandler,
       onLoadStateChange: setLoadState,
@@ -555,8 +567,6 @@ export const SettingsTab: React.FC<
         return <FormsScreen {...common} />;
       case "domains":
         return <DomainsScreen {...common} />;
-      case "webhooks":
-        return <WebhooksScreen {...common} />;
       default:
         return null;
     }

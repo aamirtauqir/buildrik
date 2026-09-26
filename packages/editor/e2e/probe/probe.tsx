@@ -130,7 +130,6 @@ import {
   HeadersScreen,
   RedirectsScreen,
   FormsScreen,
-  WebhooksScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
 import type { PageData } from "@/shared/types";
@@ -3347,26 +3346,10 @@ const CASES: Record<string, () => React.ReactElement> = {
       </SettingsPane>
     );
   },
-  /* Board 640:3849 — a connected endpoint, which is what the board draws
-     (a URL, an event list and a masked secret), not the empty state. */
-  "settings-webhooks": () => {
-    stubTrpc({
-      "webhooks.status": {
-        url: "https://api.bellacucina.com/hooks/buildrick",
-        events: ["site.publish"],
-        secret: "whsec_9f2c41a8b7e3",
-        lastDeliveryAt: "2026-09-01T10:00:00.000Z",
-        lastStatus: "200",
-        failures24h: 0,
-        recentFailures: [],
-      },
-    });
-    return (
-      <SettingsPane case_="settings-webhooks">
-        <WebhooksScreen />
-      </SettingsPane>
-    );
-  },
+  // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
+  // from this pane's WebhooksScreen to the dashboard's Settings >
+  // Integrations, which this probe harness does not render. Board 640:3849
+  // is retired in boards.json and its s7-settings-webhooks recipe deleted.
   /* Board 639:3092 — the connected-domain state, in the S7 pane rather than
      the DNS drill-in `settings-domains-dns` measures. */
   "settings-domains": () => {

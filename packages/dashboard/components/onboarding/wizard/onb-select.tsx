@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@lib/utils";
 
@@ -16,12 +16,16 @@ interface OnbSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 /** Labeled onboarding select — mirrors OnbField metrics (46px, radius 8, onb
  *  tokens). Native <select> for keyboard + a11y; chevron is decorative. */
 export const OnbSelect = forwardRef<HTMLSelectElement, OnbSelectProps>(
-  ({ label, hint, error, placeholder, options, className, value, ...props }, ref) => (
+  ({ label, hint, error, placeholder, options, className, value, id, ...props }, ref) => {
+    const generatedId = useId();
+    const selectId = id ?? generatedId;
+    return (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-onb-text mb-2">{label}</label>
+      <label htmlFor={selectId} className="block text-sm font-semibold text-onb-text mb-2">{label}</label>
       <div className="relative">
         <select
           ref={ref}
+          id={selectId}
           value={value}
           className={cn(
             "w-full h-onb-input pl-4 pr-10 rounded-onb text-[13.5px] appearance-none",
@@ -53,6 +57,7 @@ export const OnbSelect = forwardRef<HTMLSelectElement, OnbSelectProps>(
         <p className="mt-2 text-xs leading-[1.4] text-onb-muted">{hint}</p>
       ) : null}
     </div>
-  )
+    );
+  }
 );
 OnbSelect.displayName = "OnbSelect";

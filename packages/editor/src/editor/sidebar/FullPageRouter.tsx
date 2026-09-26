@@ -87,7 +87,6 @@ export interface FullPageRouterProps {
   onSwitchToAdd?: () => void;
   onSwitchToDesign?: () => void;
   projectId?: string | null;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
@@ -104,7 +103,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSwitchToAdd,
   onSwitchToDesign,
   projectId,
-  onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
   templatesOpen,
@@ -171,7 +169,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               initialScreen={activeSubTab}
               composer={composer}
               projectId={projectId}
-              onDirtyChange={onSettingsDirtyChange}
               openRequest={settingsOpen}
               onOpenDesignTab={onSwitchToDesign}
               onClose={commonTabProps.onClose}

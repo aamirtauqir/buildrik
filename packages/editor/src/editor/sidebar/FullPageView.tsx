@@ -34,7 +34,6 @@ export interface FullPageViewProps {
   onSwitchToAdd?: () => void;
   onSwitchToDesign?: () => void;
   projectId?: string | null;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
@@ -59,7 +58,6 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   onSwitchToAdd,
   onSwitchToDesign,
   projectId,
-  onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
   templatesOpen,
@@ -91,7 +89,6 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             onSwitchToAdd={onSwitchToAdd}
             onSwitchToDesign={onSwitchToDesign}
             projectId={projectId}
-            onSettingsDirtyChange={onSettingsDirtyChange}
             settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
             templatesOpen={templatesOpen}

@@ -136,6 +136,17 @@ export const authConfig: NextAuthConfig = {
             select: { userId: true },
           });
           if (linkedAccount) {
+            // Connect-provider guard: a public login has no active session
+            // (currentSessionUserId() → null) and keeps the account-first
+            // behaviour above unchanged. But when SOMEONE IS ALREADY SIGNED
+            // IN (Settings → Connect provider) and the provider account they
+            // just authorized turns out to be linked to a DIFFERENT user,
+            // silently switching `user.id` here would silently switch their
+            // session onto that other user's account. Refuse instead.
+            const sessionUserId = await currentSessionUserId();
+            if (sessionUserId && sessionUserId !== linkedAccount.userId) {
+              return "/auth/error/social-error?reason=provider-linked-elsewhere";
+            }
             user.id = linkedAccount.userId;
             return true;
           }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 
@@ -50,6 +50,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
 
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
+  const nameId = useId();
   const [scopes, setScopes] = useState<string[]>(["sites:read"]);
   const [expiryDays, setExpiryDays] = useState<number | null>(null);
   const [plaintext, setPlaintext] = useState<string | null>(null);
@@ -201,8 +202,9 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
+            <label htmlFor={nameId} className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
             <InputField
+              id={nameId}
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}

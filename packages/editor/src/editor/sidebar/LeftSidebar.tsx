@@ -16,7 +16,7 @@ import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -75,9 +75,6 @@ export interface LeftSidebarProps {
   onElementSelect?: (elementId: string) => void;
   onBlockClick?: (block: BlockData) => void;
   canvasHoveredId?: string | null;
-  /** Settings' unsaved-edit flag, owned by the shell — see the guard below. */
-  settingsDirty?: boolean;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
   pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
@@ -235,8 +232,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onElementSelect,
   onBlockClick,
   canvasHoveredId,
-  settingsDirty = false,
-  onSettingsDirtyChange,
   pagesOpen,
   projectId,
   onOpenLibrary,
@@ -257,49 +252,17 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const isExpanded = controlledExpanded ?? internalExpanded;
   const onExpandToggle = controlledExpandToggle ?? (() => setInternalExpanded((p) => !p));
 
-  /* `settingsDirty` is OWNED BY THE SHELL, not by this component. Settings is
-     a full-page tab, so the copy the user types into is the one FullPageView
-     mounts, and only the shell sees both that and this rail. While the flag
-     lived here it was fed by a second, invisible SettingsTab that no edit
-     ever reached — so the guard below never fired and leaving Settings
-     dropped unsaved changes without a word. */
-  const [tabGuard, setTabGuard] = React.useState<{
-    open: boolean;
-    pendingTab: GroupedTabId | null;
-  }>({ open: false, pendingTab: null });
-
-  const safeTabChange = React.useCallback(
-    (tab: GroupedTabId) => {
-      if (activeTab === "settings" && settingsDirty) {
-        setTabGuard({ open: true, pendingTab: tab });
-      } else {
-        onTabChange(tab);
-      }
-    },
-    [activeTab, onTabChange, settingsDirty]
-  );
-
-  const confirmTabSwitch = React.useCallback(() => {
-    const dest = tabGuard.pendingTab;
-    setTabGuard({ open: false, pendingTab: null });
-    onSettingsDirtyChange?.(false);
-    if (dest) onTabChange(dest);
-  }, [tabGuard.pendingTab, onTabChange, onSettingsDirtyChange]);
-
-  const cancelTabSwitch = React.useCallback(() => {
-    setTabGuard({ open: false, pendingTab: null });
-    if (activeTab !== "settings") {
-      onTabChange("settings");
-    }
-  }, [activeTab, onTabChange]);
-
+  /* No Settings guard here: every rail door calls `onTabChange`, which the
+     shell routes through its one tab-switch guard (useTabSwitchGuard, fed by
+     the shell dirty registry — B-1). A second, rail-only confirm duplicated
+     that guard and could prompt twice for one click. */
   // Rail button click: open drawer if closed, switch tab if different.
   // Clicking the already-active tab TOGGLES the drawer (closes when open,
   // reopens when closed) — replaces the removed `.ls-panel-close` × icon.
   const handleBtnClick = React.useCallback(
     (tabId: GroupedTabId) => {
       if (tabId !== activeTab) {
-        safeTabChange(tabId);
+        onTabChange(tabId);
         if (!drawerOpen) onDrawerToggle();
       } else {
         // Clicking the already-active rail icon toggles the drawer
@@ -308,7 +271,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onDrawerToggle();
       }
     },
-    [activeTab, drawerOpen, onDrawerToggle, safeTabChange]
+    [activeTab, drawerOpen, onDrawerToggle, onTabChange]
   );
 
   // Keyboard nav within rail
@@ -339,11 +302,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       if (nextIdx !== idx) {
         const nextButton = arr[nextIdx];
         const tabId = nextButton.dataset.tab as GroupedTabId | undefined;
-        if (tabId) safeTabChange(tabId);
+        if (tabId) onTabChange(tabId);
         nextButton.focus();
       }
     },
-    [safeTabChange]
+    [onTabChange]
   );
 
   // Global keyboard shortcuts (A, T, Z, etc.)
@@ -354,7 +317,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     () => (reviewsEnabled ? new Set() : new Set<GroupedTabId>(["review"])),
     [reviewsEnabled],
   );
-  useSidebarKeyboard(safeTabChange, openAssistant, disabledTabs);
+  useSidebarKeyboard(onTabChange, openAssistant, disabledTabs);
 
   const { addToast } = useToast();
 
@@ -494,7 +457,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onBlockClick={onBlockClick}
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
-                  onSwitchToTemplates={() => safeTabChange("templates")}
+                  onSwitchToTemplates={() => onTabChange("templates")}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   onOpenLibrary={onOpenLibrary}
@@ -509,16 +472,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </InspectorErrorBoundary>
         </div>
       </div>
-      {/* Settings dirty guard */}
-      <ConfirmDialog
-        open={tabGuard.open}
-        onClose={cancelTabSwitch}
-        onConfirm={confirmTabSwitch}
-        title="Unsaved Changes"
-        message="You have unsaved changes in Settings. Switching tabs will discard them."
-        confirmLabel="Discard & Switch"
-        tone="destructive"
-      />
     </div>
   );
 };
