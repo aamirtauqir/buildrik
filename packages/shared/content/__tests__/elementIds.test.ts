@@ -4,6 +4,7 @@ import {
   claimUniqueIds,
   copyIdKeyedRecord,
   copyIdKeyedStyles,
+  reidSite,
   stableElementId,
   withUniqueIds,
 } from "../elementIds";
@@ -95,3 +96,25 @@ describe("copy helpers", () => {
     expect(copyIdKeyedRecord({ hero: 1, "el-new": 2 }, renames)["el-new"]).toBe(2);
   });
 });
+
+describe("reidSite", () => {
+  it("keys by page id (the editor's scheme), copies id-keyed rules, maps renames per page, and is idempotent", () => {
+    const pages = [
+      { id: "p1", blocks: tree("home") },
+      { id: "p2", blocks: tree("about") },
+    ];
+    const styles = [{ id: "s", selector: '[data-buildrick-id="ai-hero-0"]', properties: {} }];
+    const first = reidSite(pages, styles);
+    const newHero = first.renamedIn.get("p2")!.get("ai-hero-0")!;
+    expect(newHero).toBe(stableElementId("p2", "ai-hero-0", 0));
+    expect(first.renamedIn.get("p1")!.size).toBe(0);
+    expect((first.styles as Array<{ selector: string }>).map((r) => r.selector)).toEqual([
+      '[data-buildrick-id="ai-hero-0"]',
+      `[data-buildrick-id="${newHero}"]`,
+    ]);
+    const second = reidSite(first.pages, first.styles);
+    expect(second.renames).toEqual([]);
+    expect(second.styles).toEqual(first.styles);
+  });
+});
+

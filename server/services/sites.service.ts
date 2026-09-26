@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
-import { blankPageRoot, copyIdKeyedStyles, withUniqueIds } from "@buildrik/shared/content/elementIds";
+import { blankPageRoot, reidSite } from "@buildrik/shared/content/elementIds";
 import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -399,28 +399,7 @@ export async function duplicateSite(
      deterministic re-id — keyed by the ORIGINAL page id, so the duplicate
      gets exactly the ids the editor gives the original on load — and what is
      keyed by a renamed id (style rules, a form block) is carried along. */
-  const uniquePages = withUniqueIds(originalPages.map((p) => ({ key: p.id, blocks: p.blocks })));
-  const renames = uniquePages.flatMap((p) => p.renames);
-  const renamedIn = new Map(
-    originalPages.map((p, i) => {
-      const firstRename = new Map<string, string>();
-      for (const r of uniquePages[i].renames) if (!firstRename.has(r.from)) firstRename.set(r.from, r.to);
-      return [p.id, firstRename] as const;
-    }),
-  );
-  const safeStyles = sanitizeProjectStyles(original.projectStyles);
-  const copiedStyles = Array.isArray(safeStyles)
-    ? [
-        ...safeStyles,
-        ...copyIdKeyedStyles(
-          safeStyles.filter((r): r is { id: string; selector: string } => {
-            const rule = r as { id?: unknown; selector?: unknown } | null;
-            return typeof rule?.id === "string" && typeof rule.selector === "string";
-          }),
-          renames,
-        ),
-      ]
-    : safeStyles;
+  const reid = reidSite(originalPages, sanitizeProjectStyles(original.projectStyles));
 
   // Site + pages + form blocks must be copied atomically — a crash mid-copy
   // previously left an orphan half-built site. The page copy also dropped
@@ -439,7 +418,7 @@ export async function duplicateSite(
         // sanitization (or have been written by a path that skipped it) — the
         // copy re-runs the same allowlist sanitizer the direct-save path uses
         // (:639) rather than trusting the source row.
-        projectStyles: (copiedStyles as Prisma.InputJsonValue) ?? undefined,
+        projectStyles: (reid.styles as Prisma.InputJsonValue) ?? undefined,
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         lastEditedAt: new Date(),
@@ -453,7 +432,7 @@ export async function duplicateSite(
           name: p.name,
           slug: p.slug,
           position: p.position,
-          blocks: (uniquePages[i].blocks ?? []) as Prisma.InputJsonValue,
+          blocks: (reid.pages[i].blocks ?? []) as Prisma.InputJsonValue,
           isHomePage: p.isHomePage,
           seoTitle: p.seoTitle,
           seoDescription: p.seoDescription,
@@ -482,7 +461,7 @@ export async function duplicateSite(
           return {
             siteId: newSite.id,
             pageId: newPageId,
-            blockId: (f.pageId ? renamedIn.get(f.pageId)?.get(f.blockId) : undefined) ?? f.blockId,
+            blockId: (f.pageId ? reid.renamedIn.get(f.pageId)?.get(f.blockId) : undefined) ?? f.blockId,
             name: f.name,
             fields: f.fields as Prisma.InputJsonValue,
             submitButtonText: f.submitButtonText,

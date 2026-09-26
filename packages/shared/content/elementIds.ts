@@ -162,3 +162,40 @@ export function copyIdKeyedRecord<V>(record: Record<string, V>, renames: IdRenam
   }
   return out;
 }
+
+/**
+ * One site, stored pages in position order: the pages with ids made unique
+ * (keyed by page id — exactly what the editor assigns on load), the site's
+ * style rules with copies for every renamed id, and per page the FIRST new
+ * id each renamed old id got (what a reference keyed by old id + page, like
+ * a form block, should follow). Shared by `duplicateSite` and the backfill.
+ */
+export function reidSite<P extends { id: string; blocks: unknown }>(pages: P[], projectStyles: unknown) {
+  const unique = withUniqueIds(pages.map((p) => ({ key: p.id, blocks: p.blocks })));
+  const renames = unique.flatMap((u) => u.renames);
+  const renamedIn = new Map<string, Map<string, string>>();
+  pages.forEach((p, i) => {
+    const first = new Map<string, string>();
+    for (const r of unique[i].renames) if (!first.has(r.from)) first.set(r.from, r.to);
+    renamedIn.set(p.id, first);
+  });
+  const styles = Array.isArray(projectStyles)
+    ? [
+        ...projectStyles,
+        ...copyIdKeyedStyles(
+          projectStyles.filter((r): r is { id: string; selector: string } => {
+            const rule = r as { id?: unknown; selector?: unknown } | null;
+            return typeof rule?.id === "string" && typeof rule.selector === "string";
+          }),
+          renames,
+        ),
+      ]
+    : projectStyles;
+  return {
+    pages: pages.map((p, i) => ({ ...p, blocks: unique[i].blocks, renames: unique[i].renames })),
+    renames,
+    renamedIn,
+    styles,
+  };
+}
+
